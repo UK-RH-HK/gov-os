@@ -1,0 +1,101 @@
+
+=== S1 impacted-test selection: a trivial (whitespace-only) mutation of one decision record
+D021 before: exit=0 green record "AUD-0002" current
+D021 after trivial mutation: exit=0 green record "AUD-0002" is obsolete (inputs changed)
+# is there any product surface that selects checks from the changed path? (status / continue / doctor output after the mutation)
+exit=0 {"next_action": "no runnable tasks: run readiness planning or discovery"}
+# the remedy the product names is 'gov audit' — the whole suite:
+{"args": "audit --no-persist", "wall_ms": 208, "max_threads": 1, "max_child_processes": 1, "samples": 97, "exit": 0, "families_in_result": 20, "verdict": "HEALTHY"}
+# every family, one at a time (each invocation also runs the family twice for the reproducibility check):
+  schema_invariants 15ms
+  graph_integrity 15ms
+  index_freshness 46ms
+  memory_retrieval_regression 63ms
+  authority_role_limits 15ms
+  mutation_scope 17ms
+  path_map_compliance 49ms
+  context_reproducibility 15ms
+  concurrency_claims 15ms
+  adapter_portability 15ms
+  skill_regression 20ms
+  command_contract_consistency 15ms
+  secrets_sensitivity_indexing 36ms
+  recovery_rebuild 15ms
+  fresh_agent_reconstruction 52ms
+  product_traceability 15ms
+  audit_reproducibility 12ms
+  policy_enforcement_coverage 18ms
+  policy_precedence 16ms
+  plugin_governance 18ms
+sum of per-family invocations: 482ms (includes 20 process start-ups)
+
+=== S2 parallel execution of independent checks: thread/child sampling during a full and a deep audit
+{"args": "audit --no-persist", "wall_ms": 199, "max_threads": 1, "max_child_processes": 1, "samples": 90, "exit": 0, "families_in_result": 20, "verdict": "HEALTHY"}
+{"args": "audit --no-persist --deep", "wall_ms": 409, "max_threads": 1, "max_child_processes": 1, "samples": 185, "exit": 0, "families_in_result": 20, "verdict": "HEALTHY"}
+{"args": "doctor", "wall_ms": 74, "max_threads": 1, "max_child_processes": 0, "samples": 33, "exit": 0, "families_in_result": 0, "verdict": "HEALTHY"}
+
+=== S3 isolation: where does the suite run and what does it touch? (deep audit rebuilds the LIVE index in place)
+state.db before: {'inode': 3710256, 'mtime': 1789776474401, 'sha': '42ade8067dfdc17b'}
+exit=0 {"audit": "AUD-0002", "recovery_rebuild": {"deep": true, "duration_ms": 198, "rebuild_1": "3eac26f5ce0103585894fc1f2d66af99c7e1d4ddc00d0ce68bcaccb4d53f0773", "rebuild_2": "3eac26f5ce0103585894fc1f2d66af99c7e1d4ddc00d0ce68bcaccb4d53f0773", "tracked_before": "3eac26f5ce0103585894fc1f2d66af99c7e1d4ddc00d0ce68bcaccb4d53f0773"}, "verdict": "HEALTHY"}
+state.db after : {'inode': 3710943, 'mtime': 1789776479008, 'sha': '39de97b1ec96c8ea'}
+AUD-0001.yaml
+AUD-0002.yaml
+# no worktree, copy or child process is used: see max_threads/max_child_processes in S2
+
+=== S4 cache keyed by content/policy/framework hashes: two identical runs, then one changed input
+{"args": "audit --no-persist", "wall_ms": 219, "max_threads": 1, "max_child_processes": 1, "samples": 98, "exit": 0, "families_in_result": 20, "verdict": "HEALTHY"}
+{"args": "audit --no-persist", "wall_ms": 221, "max_threads": 1, "max_child_processes": 1, "samples": 99, "exit": 0, "families_in_result": 20, "verdict": "HEALTHY"}
+.
+..
+claims.db
+state.db
+telemetry
+# change one policy override (an inputs_hash input) and re-run: every family is recomputed, none is reused
+{"args": "audit --no-persist", "wall_ms": 239, "max_threads": 1, "max_child_processes": 1, "samples": 107, "exit": 0, "families_in_result": 20, "verdict": "DEGRADED"}
+# inputs_hash is used only to judge an existing green record current/obsolete (D021, task close), never to skip work:
+runtime/src/verification/mod.rs:54:pub fn inputs_hash(p: &Project) -> String {
+runtime/src/verification/mod.rs:927:    let ih = inputs_hash(p);
+runtime/src/verification/mod.rs:936:            json!({"scope": "governance-suite", "auditor_role": p.role, "session": p.session_id, "families": families, "findings": findings, "verdict": verdict, "inputs_hash": ih, "result_hash": h1, "green": green, "state_class": "EVIDENCE", "run_at": now_iso(), "deep": opts.deep}),
+runtime/src/verification/mod.rs:951:        json!({"audit": id, "verdict": verdict, "green": green, "families": families, "findings": findings, "inputs_hash": ih, "result_hash": h1, "reproducible": reproducible, "counts": {"critical": findings.iter().filter(|x| x["severity"] == "critical").count(), "high": findings.iter().filter(|x| x["severity"] == "high").count(), "medium": findings.iter().filter(|x| x["severity"] == "medium").count(), "low": findings.iter().filter(|x| x["severity"] == "low").count()}}),
+runtime/src/doctor.rs:569:    let ih = crate::verification::inputs_hash(p);
+runtime/src/doctor.rs:572:        .map(|g| g["inputs_hash"].as_str() == Some(&ih))
+runtime/src/orchestration/tasks.rs:501:            Some(g) if g["inputs_hash"].as_str() == Some(&crate::verification::inputs_hash(p)) => {}
+
+=== S5 RED/YELLOW/GREEN machine state (HEALTHY / DEGRADED / UNHEALTHY) and aggregation by worst severity
+GREEN  doctor: exit=0 {"failed": [], "ok": true, "verdict": "HEALTHY"}
+GREEN  audit : exit=0 {"findings": [], "ok": true, "verdict": "HEALTHY"}
+YELLOW doctor: exit=0 {"failed": [["D010", "medium", "stale: 1 changed, 0 added, 0 removed"]], "ok": true, "verdict": "DEGRADED"}
+YELLOW audit (family index_freshness): exit=0 {"findings": [["index_freshness", "medium", "index stale: 1 changed, 0 added, 0 removed"]], "ok": true, "verdict": "DEGRADED"}
+RED    doctor: exit=3 {"failed": [["D010", "medium", "stale: 0 changed, 1 added, 0 removed"], ["D011", "critical", "1 file(s) contain secret patterns but are not secret-class: src/creds.rs"]], "ok": false, "verdict": "UNHEALTHY"}
+RED    audit : exit=3 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["path_map_compliance", "critical", "secret content in a non-secret-class path (blocked from index; must be moved or classified secret)"]], "ok": false, "verdict": "UNHEALTHY"}
+# doctor and audit are separate verdicts; no command aggregates tiers or both surfaces into one repository state (adopt a11 only, for adoption)
+
+=== S6 hard-block vs warning: does a RED (UNHEALTHY) repository block governed work?
+doctor: exit=3 {"failed": [["D010", "medium", "stale: 0 changed, 1 added, 0 removed"], ["D011", "critical", "1 file(s) contain secret patterns but are not secret-class: src/creds.rs"]], "ok": false, "verdict": "UNHEALTHY"}
+task create: TASK-0001
+continue --claim: exit=0 {"err": null, "ok": true, "status": "NEXT_WORK", "task": "TASK-0001"}
+task close: exit=0 [true, "DONE"]
+cit propose: exit=0 [true, "CIT-0001"]
+# a failed product suite is reported with exit 0 (warning-shaped), see O1-product-families.out G; a stale green is DEGRADED (exit 0)
+# per-check severity is explicit in output; which states block which commands is not declared anywhere (no block/warn field):
+exit=0 ["id", "message", "name", "ok", "remediation", "severity"]
+
+=== S7 health-result provenance
+audit record keys: ['auditor_role', 'created', 'deep', 'green', 'id', 'inputs_hash', 'result_hash', 'run_at', 'scope', 'session', 'state_class', 'status', 'title', 'type', 'verdict']
+{'session': 'S-probe', 'auditor_role': 'orchestrator', 'inputs_hash': '27bf6f160dffe605a3f469a4f9557aafb427b584d29a52edb3014cc92a11b3e8', 'result_hash': 'f2eda58a0fca800d45d200430465b65ca900bb9cc6c4086484d22c5ce4838942', 'run_at': '2026-09-19T00:08:02Z'}
+# doctor: is anything persisted?
+governed tree hash before/after doctor: 28c4d9719e94e015 / 28c4d9719e94e015
+only trace of the doctor run: cli.doctor {'ok': True, 'duration_ms': 65, 'error': None}
+
+=== S8 remediation / task generation from a RED health result
+exit=3 {"remediation": ["gov rebuild-memory (full when pins changed; --incremental otherwise)", "move to a secret-class path or add a secret rule in REPOSITORY_CONTRACT.yaml; indexing is blocked meanwhile", "gov adapters generate"], "verdict": "UNHEALTHY"}
+exit=0 {"status": "NO_RUNNABLE_WORK", "suggestion": "run `gov readiness plan <feature>` or create discovery tasks"}
+exit=0 {"blocked": 0, "changed": [], "cycles": [], "runnable": [], "waiting_human": 0}
+task records before/after doctor+audit+continue+replan: 0 / 0
+
+=== S9 stale evidence: an obsolete green is surfaced as a warning only (D021 medium → DEGRADED)
+exit=0 {"failed": [["D021", "medium", "green record \"AUD-0001\" is obsolete (inputs changed)"]], "ok": true, "verdict": "DEGRADED"}
+
+=== U<->O5 (AC-16): is any SLO/health breach observed without a human/agent invoking doctor or audit?
+audit records before/after task create+claim+checkpoint+status: 1 / 1
+telemetry event names in this project: ['cli.checkpoint', 'cli.doctor', 'cli.init', 'cli.status', 'cli.task']

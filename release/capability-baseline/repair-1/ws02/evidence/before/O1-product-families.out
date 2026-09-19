@@ -1,0 +1,34 @@
+
+=== A. one test-obligation per TEST_POLICY.product_families value; family accepted, independence enforced where policy demands
+exit=0 ["unit", "contract", "integration", "system", "acceptance", "scenario", "security", "performance", "recovery", "smoke"]
+exit=0 [["medium", "TO-0004 (system) is not independent of the implementer (TEST_POLICY.independent_test_author_required_for)"], ["medium", "TO-0005 (acceptance) is not independent of the implementer (TEST_POLICY.independent_test_author_required_for)"], ["medium", "TO-0006 (scenario) is not independent of the implementer (TEST_POLICY.independent_test_author_required_for)"]]
+
+=== B. the contract says 'live/smoke'; an obligation of family 'live' is rejected as outside the policy vocabulary
+exit=0 [["medium", "TO-0011 declares test family 'live' outside TEST_POLICY.product_families"]]
+
+=== C. with acceptance/scenario/system obligations marked independent, product_traceability is clean
+exit=0 []
+
+=== D. family vocabulary is freely redefinable by the project (TEST_POLICY.product_families: overridable)
+exit=0 {"applied": [{"key": "product_families", "mode": "overridable", "policy": "TEST_POLICY", "source": "PROJECT_POLICY.policy_overrides", "value": ["unit"]}], "refused": []}
+exit=0 [["medium", "TO-0002 declares test family 'contract' outside TEST_POLICY.product_families"], ["medium", "TO-0003 declares test family 'integration' outside TEST_POLICY.product_families"], ["medium", "TO-0004 declares test family 'system' outside TEST_POLICY.product_families"], ["medium", "TO-0005 declares test family 'acceptance' outside TEST_POLICY.product_families"], ["medium", "TO-0006 declares test family 'scenario' outside TEST_POLICY.product_families"], ["medium", "TO-0007 declares test family 'security' outside TEST_POLICY.product_families"], ["medium", "TO-0008 declares test family 'performance' outside TEST_POLICY.product_families"], ["medium", "TO-0009 declares test family 'recovery' outside TEST_POLICY.product_families"], ["medium", "TO-0010 declares test family 'smoke' outside TEST_POLICY.product_families"]]
+
+=== E. no family is required: a feature whose only obligation is 'unit' (no security/performance/recovery/smoke) raises nothing
+exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 3 added, 0 removed"]], "verdict": "DEGRADED"}
+
+=== F. product suite execution: gov verify product (ecosystem-detected cargo test)
+exit=0 {"command": ["cargo", "test"], "exit": 0, "ran": true, "source": "ecosystem:rust-cargo", "status": "passed"}
+# result carries one exit code for the whole command; no per-family result exists
+telemetry event: product.suite {'status': 'passed', 'exit': 0, 'source': 'ecosystem:rust-cargo', 'command': ['cargo', 'test']}
+
+=== G. a failing product test: product suite FAILS, but no health surface changes
+exit=0 {"exit": 101, "ran": true, "status": "failed"}
+doctor: exit=0 {"failed": [], "ok": true, "verdict": "HEALTHY"}
+audit : exit=0 {"findings": [], "ok": true, "verdict": "HEALTHY"}
+exit=0 {"memory": {"added": 0, "index_fresh": true, "index_manifest_present": true, "removed": 0, "runtime_present": true, "stale": 0}, "next_action": "no runnable tasks: run readiness planning or discovery"}
+
+=== H. task close accepts a self-attested tests.status=passed while the product suite is failing
+task: TASK-0001
+exit=0 true
+exit=0 {"error": null, "ok": true, "result": {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+exit=0 {"exit": 101, "ran": true, "status": "failed"}

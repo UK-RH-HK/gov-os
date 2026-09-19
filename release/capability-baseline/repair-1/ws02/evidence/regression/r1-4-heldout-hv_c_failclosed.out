@@ -1,0 +1,15 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.24s
+     Running tests/hv_c_failclosed.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho33/debug/deps/hv_c_failclosed-7cebcf5545522af3)
+
+running 6 tests
+test c1_both_enforcement_points_fail_closed_on_an_undetermined_subject ... ok
+test c2_the_section_5_allow_list_is_consulted_before_the_state_read ... ok
+test c3_break_glass_can_still_be_exited_and_the_exit_policy_is_unchanged ... ok
+test c4_an_unreadable_marking_is_treated_as_marked_and_can_still_be_cleared ... ok
+test c5_the_state_carrying_guard_resolves_nothing_and_holds_under_the_same_input ... ok
+test c6_the_fail_open_is_gone_and_resolution_is_byte_identical ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

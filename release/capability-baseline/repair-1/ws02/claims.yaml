@@ -1,0 +1,118 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0015
+workstream: WS-2 (part)
+base_commit: c6b60bc760a0bb42907f74210fd9e644a420851a
+work_commits: [0683a20, 81f2dec, f8a7396, 463ff71]
+binary_under_test_sha256: 9c82578416b27a155dbd8abce86bb6a92ba9cd5fc2a43be53ffa45a0aa5fe7b4
+claim_semantics: >-
+  Builder claims only (Contract v3 O3: builder evidence is regression evidence). REPAIRED_CLAIMED means the WS-2 side of
+  the class is implemented generally and its named probe lines were re-run; acceptance is decided by fresh independent
+  verification. Where a probe line needs a host call site owned by another workstream, the line and the integration
+  point are listed under pending_integration.
+classes:
+  - class: BC-P2-03
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/verification/currency.rs
+      - runtime/src/verification/mod.rs
+      - runtime/src/doctor.rs
+      - framework/schemas/audit.schema.json
+      - framework/policies/TEST_POLICY.yaml
+      - runtime/src/verification/families_ext.rs
+    product_checks:
+      - {check: "verification::currency::Snapshot / inputs_hash (suite key over 30 input classes incl. runtime_identity, machine_trust)", tier: "every suite result (G1-G6)"}
+      - {check: "doctor D021 (names the changed classes)", tier: "G1 / gov doctor"}
+      - {check: "verification::close_gate -> currency::enforce_close (governance-affecting by class and by governed inputs touched)", tier: "G2 (host call site IP-WS02-01)"}
+      - {check: "families human_gate_integrity, change_control_integrity, continuity_checkpoint_handoff, model_routing_integrity (re-check exercises L/K/N/M records)", tier: "G3/G4/G5/G6"}
+    probes_rerun:
+      - {probe: "alpha-r FRESH-invalidation.py", before: "[F] 4 of 13 input classes left D021 current (spec/requirements, product source, index manifest, adoption evidence); [F-A2] provisioning and root rotation left D021 current", after: "13/13 [F] invalidate (class named); [F-A2] both invalidate (machine_trust)"}
+      - {probe: "beta-r FRESH-evidence-invalidation.py", before: "PASS 2 / FAIL 3 (FRESH-source, FRESH-spec, FRESH-manifest)", after: "PASS 5 / FAIL 0"}
+      - {probe: "delta-r FRESH-invalidation.py", before: "13 checks, 6 pass, 7 fail (RES, EXP, CKPT, HND, TASK, F.impl.1, F.families.1)", after: "13 pass, 0 fail"}
+      - {probe: "epsilon-r O4-suite-currency.sh §A", before: "8/14 classes invalidate (tool registry, architecture, requirements, interfaces, source, index manifest stay current)", after: "14/14 invalidate"}
+      - {probe: "epsilon-r O4-suite-currency.sh §B", before: "DAG cycle UNHEALTHY while D021 'current'", after: "D021 obsolete (index_manifest, spec_tasks); doctor UNHEALTHY"}
+      - {probe: "epsilon-r O4-suite-currency.sh §C/§E", before: "PASS / degraded force", after: "unchanged (PASS / degraded force)"}
+      - {probe: "epsilon-r O4-suite-currency.sh §D", before: "class=governance task closes on stale green", after: "unchanged via the tasks.rs path gate; refusal available through verification::close_gate (supplementary S-F.2/S-F.3) - pending IP-WS02-01"}
+      - {probe: "epsilon-r O4-suite-currency.sh §F (currency part)", before: "D021 current after upstream REQ change", after: "D021 obsolete (index_manifest, spec_requirements); DONE-task re-staling is BC-P2-04 (WS-4)"}
+      - {probe: "zeta-r FR-freshness-invalidation.py", before: "7/13 PASS (requirement, interface, architecture, task manifest, source, index manifest FAIL)", after: "13/13 PASS"}
+      - {probe: "synthesis AC16-X1 X1-O4-green-stale-after-direct-spec-change", before: FAIL, after: PASS}
+    pending_integration: [IP-WS02-01, IP-WS02-19, IP-WS02-22]
+    integration_points: [IP-WS02-01, IP-WS02-11, IP-WS02-14, IP-WS02-19, IP-WS02-22]
+    owner_decision_required: null
+  - class: BC-P2-06
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/scheduler/mod.rs
+      - runtime/src/scheduler/catalogue.rs
+      - runtime/src/scheduler/sandbox.rs
+      - runtime/src/scheduler/store.rs
+      - runtime/src/verification/mod.rs
+      - runtime/src/doctor.rs
+      - cli/src/main.rs (additive `gov health` block)
+      - framework/schemas/audit.schema.json
+    product_checks:
+      - {check: "scheduler::tier_run (tier contract G1-G6) and scheduler::guard (G0 hard-block refusal)", tier: "G0-G6"}
+      - {check: "scheduler::catalogue (declared inputs, isolation, reproducibility, cache, hard-block vs warning per check)", tier: "all"}
+      - {check: "per-check cache keyed by the declared class digests + extras", tier: "G1-G5 (Use), G5/G6 hosts (Refresh)"}
+      - {check: "health ledger (.governance-runtime/health/results) + audit record provenance", tier: "every run incl. doctor"}
+      - {check: "doctor D031 (active suite hard-blocks), gov health status (RED/YELLOW/GREEN)", tier: "G1 / doctor"}
+    probes_rerun:
+      - {probe: "epsilon-r O5-scheduler-requirements.sh S1", before: "trivial decision edit -> only remedy the whole suite, serially, twice", after: "D021 names changed classes (index_manifest, spec_decisions); remedy `gov health run` re-executes only impacted checks (supplementary S-A.5, S-A.6)"}
+      - {probe: "O5 S2", before: "max_threads 1 (audit, deep, doctor)", after: "max_threads 9 audit / 4 deep / 5 doctor; child processes for scenario sandboxes"}
+      - {probe: "O5 S3", before: "deep audit replaces live state.db (new inode + hash)", after: "full rebuilds run in a sandbox (isolated_in_sandbox: true), same inode; with --no-persist the live state.db is byte-identical (S-B.1); persisted run changes only the new evidence record's index rows (S-B.2)"}
+      - {probe: "O5 S4", before: "second identical run recomputes all (199 ms vs 208 ms)", after: "second identical run served from cache (62 ms vs 309 ms cold)"}
+      - {probe: "O5 S5", before: "per-surface verdicts only", after: "per-surface verdicts plus `gov health status` RED/YELLOW/GREEN over doctor + suite (S-C.2)"}
+      - {probe: "O5 S6", before: "UNHEALTHY state refuses nothing; no block/warn field", after: "every check carries `enforcement` (hard-block/warning + operations); `gov health guard` refuses task.create/claim/close, cit.propose (S-C.3); the probe's direct task/CIT commands still succeed - pending IP-WS02-02/03/05/08"}
+      - {probe: "O5 S7", before: "audit record lacks runtime identity/commit; doctor unpersisted", after: "audit record carries tier, trigger, checks, inputs, runtime (binary sha256), repository, actor, times; every doctor run persisted as a health result (S-D.1)"}
+      - {probe: "O5 S9", before: "stale green only a warning", after: "D021 still a warning (correct for the repository state); stale evidence now refuses governance-affecting close through close_gate (pending IP-WS02-01)"}
+      - {probe: "O5 S8, U<->O5", before: "no generation / no automatic health", after: "unchanged: remediation-task generation is BC-P2-24 (WS-5); automatic host triggers are BC-P2-07 call sites (IP-WS02-01..18)"}
+    pending_integration: [IP-WS02-01, IP-WS02-02, IP-WS02-03, IP-WS02-05, IP-WS02-06, IP-WS02-07, IP-WS02-08, IP-WS02-12, IP-WS02-13, IP-WS02-18]
+    integration_points: [IP-WS02-01, IP-WS02-02, IP-WS02-03, IP-WS02-04, IP-WS02-05, IP-WS02-06, IP-WS02-07, IP-WS02-08, IP-WS02-09, IP-WS02-10, IP-WS02-12, IP-WS02-13, IP-WS02-14, IP-WS02-15, IP-WS02-18, IP-WS02-19]
+    owner_decision_required: null
+  - class: BC-P2-42
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/skills.rs
+      - framework/health/SKILL_SCENARIO_CHECKS.yaml
+      - runtime/src/verification/mod.rs
+      - runtime/src/verification/currency.rs (project_skills class incl. skill-bindings.json)
+    product_checks:
+      - {check: "skill_regression family: schema, version<->content (tracked bindings + machine observations), executed validation scenarios in sandboxes", tier: "G5/G6"}
+      - {check: "gov health skills [--record] [--include-deferred]", tier: "on demand"}
+    probes_rerun:
+      - {probe: "epsilon-r O2-governance-families.sh §11", before: "family_ok false (schema, no scenarios)", after: "family_ok false (same findings)"}
+      - {probe: "epsilon-r O2-governance-families.sh §11b", before: "family_ok true: false scenario undetected", after: "family_ok false: scenario cannot be executed -> reported (medium)"}
+      - {probe: "gamma-r F1-skills.sh F1.b3", before: "method changed without version change: ok true, 0 findings", after: "high finding 'SKL-BARE@1.0.0: content changed without a version change since this machine first observed it'"}
+      - {probe: "supplementary S-G.1..S-G.5", before: "n/a (new surface)", after: "false executable scenario FAILED, true PASSED; binding recorded; content change under bound version reported; re-binding refused"}
+    kernel_scenarios: {executable_passing: 5, declared_agent: 4, declared_qualification: 3, deferred_observed_false: 2}
+    pending_integration: [IP-WS02-16, IP-WS02-20, IP-WS02-21]
+    integration_points: [IP-WS02-09, IP-WS02-16, IP-WS02-19, IP-WS02-20, IP-WS02-21]
+    owner_decision_required: null
+  - class: BC-P2-43
+    status: REPAIRED_CLAIMED
+    files:
+      - runtime/src/verification/product.rs
+      - runtime/src/verification/mod.rs
+      - runtime/src/doctor.rs
+      - runtime/src/scheduler/catalogue.rs
+    product_checks:
+      - {check: "gov verify product: per-family execution, governed evidence record (scope product-tests) with freshness key, PRODUCT_TESTS_FAILED on failure", tier: "on demand; evidence consumed at G2/G4/G5"}
+      - {check: "product_test_health family + doctor D030 (failing family HIGH; covered-paths hard-block on task.close, global on release.build/update.apply)", tier: "G1/G2/G4/G5"}
+      - {check: "verification::close_gate -> product::enforce_close (outcome verified from recorded evidence)", tier: "G2 (host call site IP-WS02-01)"}
+    probes_rerun:
+      - {probe: "epsilon-r O1-product-families.sh §F", before: "one family-blind command, one exit code", after: "unit and integration families run and recorded separately (record families map; supplementary S-E.1/S-E.2); the probe's projection prints the first family's command"}
+      - {probe: "O1 §G", before: "verify product exit 0 on failure; doctor HEALTHY; audit HEALTHY", after: "verify product exit 1 PRODUCT_TESTS_FAILED; doctor exit 3 UNHEALTHY (D030); audit exit 3 UNHEALTHY (product_test_health)"}
+      - {probe: "O1 §H", before: "close accepts self-attested passed", after: "tasks.rs close still accepts (pending IP-WS02-01); `gov health close-check` refuses PRODUCT_TESTS_FAILED (S-E.6), stale evidence PRODUCT_TEST_EVIDENCE_STALE (S-E.8)"}
+      - {probe: "epsilon-r U-slos-and-healthy.sh SLO-2", before: "doctor HEALTHY, audit HEALTHY with a failing suite", after: "doctor exit 3 UNHEALTHY (D030), audit exit 3 UNHEALTHY"}
+    pending_integration: [IP-WS02-01, IP-WS02-19]
+    integration_points: [IP-WS02-01, IP-WS02-09, IP-WS02-12, IP-WS02-13, IP-WS02-19, IP-WS02-22]
+    owner_decision_required: null
+regression:
+  cargo_test_lib: {passed: 56, failed: 0, baseline_passed: 42, new_tests: 14}
+  cargo_test_certification: {passed: 79, failed: 0, baseline_passed: 79}
+  r1_heldout:
+    AR-0027: {result: "12/0, 6/2, 4/1, 4/0", baseline_at_R1-4: "12/0, 6/2, 4/1, 4/0", same_failures: true}
+    AR-0029: {result: "6/0, 4/2, 5/0, 5/0, 6/0, ho_f compile error", baseline_at_R1-4: identical, same_failures: true}
+    AR-0031: {result: "5/3, 5/1, 6/2, 11/1", baseline_at_R1-4: identical, same_failures: true}
+    AR-0033: {result: "9/1, 7/0, 6/0, 8/0", baseline_at_R1-4: "10/0, 7/0, 6/0, 8/0", difference: "hv_a::a1 pins the product source census at 84 .rs files; WS-2 adds 7 new files (91). No behavioural test changed outcome."}
+owner_decision_required: []

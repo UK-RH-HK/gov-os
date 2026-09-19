@@ -1,0 +1,108 @@
+# gov: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/prefix-target/release/gov sha256 7ab2169af82ec468
+# scratch: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probe-scratch/tmp.NUxfiG3hZX
+
+=== S-A scheduler: impacted selection, cache reuse, concurrency, currency re-established
+CHECK S-A.1 PASS a full scheduler run completes the suite
+      detail: {"complete": true, "parallelism": {"process_id": 391763, "threads_used": ["gov-health-0", "gov-health-1", "gov-health-2", "gov-health-3"], "workers": 4}, "summary": {"complete": true, "executed": 9, "executed_checks": ["graph_integrity", "memory_retrieval_regression", "context_reproducibility", "concurrency_claims", "skill_regression", "secrets_sensitivity_indexing", "recovery_rebuild", "fresh_agent_reconstruction", "audit_reproducibility"], "not_evaluated": 0, "not_evaluated_checks": [], "reused": 16, "reused_checks": ["schema_invariants", "index_freshness", "authority_role_limits", "mutation_scope", "path_map_compliance", "adapter_portability", "command_contract_consistency", "product_traceability", "policy_enforcement_coverage", "policy_precedence", "plugin_governance", "product_test_health", "human_gate_integrity", "change_control_integrity", "continuity_checkpoint_handoff", "model_routing_integrity"]}, "verdict": "HEALTHY"}
+CHECK S-A.2 PASS independent checks ran on more than one worker thread
+      detail: {"process_id": 391763, "threads_used": ["gov-health-0", "gov-health-1", "gov-health-2", "gov-health-3"], "workers": 4}
+CHECK S-A.3 PASS an identical second run is served from the cache (only the never-cached, time/session-dependent checks execute)
+      detail: {"executed": ["concurrency_claims", "fresh_agent_reconstruction", "audit_reproducibility"], "ms_first": 693, "ms_second": 61, "reused": 22}
+CHECK S-A.4 PASS a one-line decision change makes the green record stale and names the changed input classes
+      detail: [{"class": "index_manifest", "contract_class": "relevant index manifest"}, {"class": "spec_decisions", "contract_class": "authoritative spec/decision"}]
+CHECK S-A.5 PASS after the trivial mutation only the checks whose declared inputs changed re-execute; the rest are reused
+      detail: {"executed": ["schema_invariants", "graph_integrity", "index_freshness", "memory_retrieval_regression", "path_map_compliance", "context_reproducibility", "concurrency_claims", "secrets_sensitivity_indexing", "recovery_rebuild", "fresh_agent_reconstruction", "product_traceability", "audit_reproducibility", "plugin_governance", "human_gate_integrity", "change_control_integrity"], "ms": 183, "reused": ["authority_role_limits", "mutation_scope", "adapter_portability", "skill_regression", "command_contract_consistency", "policy_enforcement_coverage", "policy_precedence", "product_test_health", "continuity_checkpoint_handoff", "model_routing_integrity"]}
+CHECK S-A.6 PASS the impacted re-check re-established currency (D021 current) without a full serial suite
+      detail: "green record \"AUD-0003\" current"
+
+=== S-B isolation: a deep check never touches the live state.db
+CHECK S-B.1 PASS two full rebuilds ran in a disposable sandbox; the live state.db is byte-identical (same inode, same hash)
+      detail: {"after": [5554728, "38e9891a2a43fa23"], "before": [5554728, "38e9891a2a43fa23"], "recovery_rebuild": {"deep": true, "duration_ms": 213, "isolated_in_sandbox": true, "rebuild_1": "db577adfabaeac3ceb43005d0b12d2bb3c9b9b6a29b594af31ab76e12e34a293", "rebuild_2": "db577adfabaeac3ceb43005d0b12d2bb3c9b9b6a29b594af31ab76e12e34a293", "tracked_before": "db577adfabaeac3ceb43005d0b12d2bb3c9b9b6a29b594af31ab76e12e34a293"}}
+CHECK S-B.2 PASS with persistence the only live index change is the new governed evidence record itself
+      detail: {"changed_artifacts": ["spec/audits/AUD-0002.yaml"]}
+CHECK S-B.3 PASS sandboxes are removed after the run
+      detail: []
+
+=== S-C hard-block vs warning
+CHECK S-C.1 PASS every check declares hard-block or warning
+      detail: {"D011": "hard-block", "D012": "hard-block", "D021": "warning", "graph_integrity": "hard-block", "index_freshness": "warning", "path_map_compliance": "hard-block", "product_test_health": "hard-block"}
+CHECK S-C.2 PASS a critical secret finding makes the health state RED with an active hard-block
+      detail: {"blocks": [["D011", "critical", ["task.create", "task.claim", "task.close", "cit.propose", "cit.approve", "cit.execute", "handoff.create", "release.build", "update.apply", "adopt.migrate"]]], "state": "RED"}
+CHECK S-C.3[task.create] PASS the G0 guard refuses task.create while the hard-block is active
+      detail: "task.create is refused: 1 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: src/creds.rs. Repair the condition, then re-run `gov health run`"
+CHECK S-C.3[task.claim] PASS the G0 guard refuses task.claim while the hard-block is active
+      detail: "task.claim is refused: 1 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: src/creds.rs. Repair the condition, then re-run `gov health run` "
+CHECK S-C.3[task.close] PASS the G0 guard refuses task.close while the hard-block is active
+      detail: "task.close is refused: 1 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: src/creds.rs. Repair the condition, then re-run `gov health run` "
+CHECK S-C.3[cit.propose] PASS the G0 guard refuses cit.propose while the hard-block is active
+      detail: "cit.propose is refused: 1 active hard-block(s), e.g. check D011 (critical): 1 file(s) contain secret patterns but are not secret-class: src/creds.rs. Repair the condition, then re-run `gov health run`"
+CHECK S-C.4 PASS a remedy/continuity operation outside the hard-block vocabulary stays available
+      detail: {"allowed": true, "blocks": [], "operation": "checkpoint.create"}
+CHECK S-C.5 PASS after the repair the guard re-evaluates the stale blocking check and allows the operation
+      detail: {"allowed": true, "blocks": [], "operation": "task.create", "reevaluated": ["doctor"]}
+CHECK S-C.6 PASS a DAG cycle (graph_integrity high) refuses task.claim, which it governs, but not task.create, which it does not
+      detail: {"claim": "task.claim is refused: 1 active hard-block(s), e.g. check graph_integrity (high): task DAG has cycles: [[\"TASK-0801\", \"TASK-0802\"]]. Repair the condition, then "}
+CHECK S-C.7 PASS doctor reports the suite-origin hard-block (D031)
+      detail: "graph_integrity (high) refuses [\"task.claim\",\"task.close\",\"release.build\"]: task DAG has cycles: [[\"TASK-0801\", \"TASK-0802\"]]"
+
+=== S-D health-result provenance
+CHECK S-D.1 PASS a doctor run is persisted as a health result with tier, checks, inputs, runtime identity, repository state, actor and time
+      detail: {"actor": {"pid": 392576, "role": "orchestrator", "session": "S-ws02"}, "checks": "<31 entries>", "finished_at": "2026-09-19T00:50:19Z", "inputs": "<30 entries>", "inputs_hash": "5bfef9556d4388c40e6bc5990168a6726204abd77569214e0328af3b0ec645ff", "repository": {"content_key": "5bfef9556d4388c40e6bc5990168a6726204abd77569214e0328af3b0ec645ff", "git_commit": "f92dbd072a4630b611e5c5228499e4d4bf387503", "git_dirty_files": 0, "root_name": "sd"}, "runtime": {"binary_name": "gov", "binary_sha256": "7ab2169af82ec468becfa808c8236adf2dce880b74b560deee24e120dfcc70f0", "cli_version": "4.1.5", "index_version": "4.1.5-idx3", "runtime_version": "4.1.5"}, "started_at": "2026-09-19T00:50:19Z", "tier": "G1", "trigger": {"event": "gov doctor", "paths": [], "subject": null}}
+CHECK S-D.2 PASS the governed audit record carries the same provenance
+      detail: ["actor", "auditor_role", "cache_mode", "checks", "complete", "created", "deep", "finished_at", "green", "health_result", "id", "inputs", "inputs_hash", "machine_trust", "parallelism", "repository", "reproducible", "result_hash", "run_at", "run_summary", "runtime", "scope", "session", "started_at", "state_class", "status", "suite_verdict", "tier", "title", "trigger", "type", "verdict"]
+CHECK S-D.3 PASS `gov health history` lists the recorded results
+      detail: [["HR-20260919T005019651Z-6af2144e", "audit", "G5", "HEALTHY"], ["HR-20260919T005019636Z-528f6767", "doctor", "G1", "HEALTHY"], ["HR-20260919T005019533Z-58b45c82", "doctor", "G1", "HEALTHY"], ["HR-20260919T005018653Z-2535327d", "audit", "G5", "HEALTHY"]]
+
+=== S-E product tests: per-family governed evidence
+CHECK S-E.1 PASS product tests run and are recorded per family
+      detail: {"integration": {"command": ["cargo", "test", "--test", "*"], "exit": 0, "status": "passed"}, "unit": {"command": ["cargo", "test", "--lib"], "exit": 0, "status": "passed"}}
+CHECK S-E.2 PASS the run is a governed evidence record with a freshness key per family
+      detail: {"record": "AUD-0002", "verdict": "PASSED"}
+CHECK S-E.3 PASS a failing family is reported per family and the command fails (non-zero exit)
+      detail: {"exit": 1, "families": {"integration": "failed", "unit": "passed"}}
+CHECK S-E.4 PASS the failing family changes the health state (doctor D030, audit product_test_health)
+      detail: {"D030": "product test family 'integration' FAILED in AUD-0003 (exit 101): work under its covered paths cannot close and releases are refused until a passing run is recor", "audit": "UNHEALTHY", "doctor": "UNHEALTHY"}
+CHECK S-E.5 PASS the failure refuses the close of work under the family's covered paths only
+      detail: {"docs": {"allowed": true, "blocks": [], "operation": "task.close"}, "src": "HEALTH_HARD_BLOCK"}
+CHECK S-E.6 PASS a self-attested tests.status=passed is refused against the recorded failing evidence
+      detail: "TASK-0001: the report claims tests passed, but the latest recorded run of family 'integration' (AUD-0003) failed"
+CHECK S-E.7 PASS after a passing run is recorded the same claim is verified from evidence
+      detail: {"close_check": "allowed"}
+CHECK S-E.8 PASS evidence recorded before a covered source change is stale: a passed claim is refused until re-run
+      detail: "TASK-0002: the report claims tests passed, but the recorded run of family 'unit' (AUD-0004) predates changes to its covered inputs; run `gov verify product`"
+
+=== S-F task-close currency gate (governance-affecting by class and by governed inputs)
+CHECK S-F.1 PASS the green record is stale (an architecture record changed)
+      detail: "green record \"AUD-0002\" is obsolete (inputs changed: index_manifest, spec_architecture, spec_tasks)"
+CHECK S-F.2 PASS the stale evidence is re-checked before reliance (impacted checks only) and a new green record is written; the close may proceed
+      detail: {"g2": {"health_result": "HR-20260919T005026095Z-4047e9ca", "record": "AUD-0003", "summary": {"complete": true, "executed": 18, "executed_checks": ["schema_invariants", "graph_integrity", "index_freshness", "memory_retrieval_regression", "authority_role_limits", "path_map_compliance", "context_reproducibility", "concurrency_claims", "secrets_sensitivity_indexing", "recovery_rebuild", "fresh_agent_reconstruction", "product_traceability", "audit_reproducibility", "plugin_governance", "human_gate_integrity", "change_control_integrity", "continuity_checkpoint_handoff", "model_routing_integrity"], "not_evaluated": 0, "not_evaluated_checks": [], "reused": 7, "reused_checks": ["mutation_scope", "adapter_portability", "skill_regression", "command_contract_consistency", "policy_enforcement_coverage", "policy_precedence", "product_test_health"]}, "verdict": "HEALTHY"}, "governance_affecting": true, "reasons": ["task class 'governance' is governance-affecting", "touches governed inputs: spec/architecture/ARCH-0001.yaml (spec_architecture)"]}
+CHECK S-F.3 PASS when the re-check does not come back green the governance-affecting close is refused
+      detail: "governance-affecting work cannot close on stale green evidence: green record \"AUD-0003\" is obsolete (inputs changed: index_manifest, spec_tasks); run `gov health run` (re-checks only the checks the changed inputs impact)"
+
+=== S-G skill regression
+CHECK S-G.1 PASS validation scenarios are executed in sandboxes: a false expectation is reported FAILED, a true one PASSES
+      detail: {"SKL-PROBE-FALSE": "failed", "SKL-PROBE-TRUE": "passed"}
+CHECK S-G.2 PASS the skill_regression family fails on the false scenario
+      detail: ["SKL-PROBE-FALSE V1: validation scenario FAILED \u2014 given 'a fresh project', expected 'creating a task is refused': \"expected ok=false, got ok=true ()\""]
+CHECK S-G.3 PASS a passing version is bound to its content in the tracked skill-bindings.json
+      detail: ["SKL-PROBE-TRUE@1.0.0"]
+CHECK S-G.4 PASS a method change without a version change is reported against the tracked binding
+      detail: ["SKL-PROBE-TRUE@1.0.0: content changed without a version change (bound content 2b760b22226b recorded 2026-09-19T00:50:29Z, now f89aebf09004); bump the version and re-validate", "SKL-PROBE-TRUE@1.0.0: content changed without a version change since this machine first observed it (2b760b22226b at 2026-09-19T00:50:28Z, now f89aebf09004); bump the version"]
+CHECK S-G.5 PASS re-binding changed content under the same version is refused
+      detail: "a skill version is already bound to different content: a changed method needs a new version"
+
+=== S-H tier contract
+CHECK S-H.1 PASS the tier contract declares G0..G6 and the checks of each tier
+      detail: {"G0": 0, "G1": 36, "G2": 6, "G3": 5, "G4": 22, "G5": 56, "G6": 25}
+CHECK S-H.2 PASS a G3 run executes only G3 (and never-cached) checks
+      detail: {"executed": ["audit_reproducibility", "change_control_integrity", "concurrency_claims", "fresh_agent_reconstruction"], "tier": "G3"}
+
+=== S-I runtime identity
+CHECK S-I.1 PASS a modified gov binary makes the green record stale (changed class: runtime_identity only)
+      detail: {"changed_classes": [{"class": "runtime_identity", "contract_class": "runtime/kernel implementation"}], "current": false, "green": "AUD-0001", "key": "8ef3568c94131aa4c7da22786bf4a05a574cc031f3462e5923138a4524ca621f", "message": "green record \"AUD-0001\" is obsolete (inputs changed: runtime_identity)", "recorded_key": "2e1c58642ca591c5db50d10988d5da0965187e6d75e9b8df5af9de43a4913f26"}
+
+=== S-J concurrency safety: checks run concurrently on an untrusted kernel without corrupting shared state
+CHECK S-J.1 FAIL the embedded baseline first materialised during concurrent checks is complete (identical file set to a single-threaded materialisation) and a later embedded init succeeds
+      detail: {"files": 1, "reference_files": 127, "second_init": "KERNEL_SOURCE_NOT_FOUND"}
+
+SUMMARY checks=42 pass=41 fail=1 failed=['S-J.1']
