@@ -212,6 +212,22 @@ fn every_event_source_generates_linked_governed_work_once() {
     assert_eq!(ftask["generation"]["source"], "retrieval-failure");
     assert_eq!(ftask["generation"]["failure"], json!(fid));
     assert_eq!(ftask["class"], "memory");
+    // no loops: a miss on a query made for the follow-up itself (its context compile queries its title and
+    // objective) is recorded, and generates no follow-up of the follow-up
+    let n_rf = of_source(&generated(&root), "retrieval-failure").len();
+    let own = format!(
+        "{} {}",
+        ftask["title"].as_str().unwrap(),
+        ftask["objective"].as_str().unwrap()
+    );
+    let m2 = g
+        .with_role("backend-engineer")
+        .ok(&["memory", "miss", "--query", &own]);
+    assert!(m2["id"].is_string(), "{m2}");
+    assert_eq!(
+        of_source(&generated(&root), "retrieval-failure").len(),
+        n_rf
+    );
     // --- a performance regression reported by the product: a durable regression record, then linked work
     g.ok(&[
         "telemetry",

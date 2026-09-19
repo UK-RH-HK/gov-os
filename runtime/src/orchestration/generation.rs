@@ -54,7 +54,8 @@
 //!   scheduler's guard re-evaluates a stale block ([`reevaluate_stale_failures`]); work is generated from the
 //!   condition as it is now. A dry run, or a run whose writes are refused, does not re-evaluate and leaves stale
 //!   failures for the next generation.
-//! * **No loops.** Findings about generated work itself never generate work.
+//! * **No loops.** Findings about generated work itself never generate work: health findings naming a generated
+//!   task, and retrieval misses on queries made for generated work (a follow-up's own context compile).
 use crate::orchestration::control;
 use crate::records::{Record, RecordStore};
 use crate::util::{now_iso, sha256_hex};
@@ -459,15 +460,25 @@ pub struct GenCtx<'a> {
     pub cfg: Config,
     /// Ids and paths of generated/adopted tasks (findings about them never generate work).
     generated_tasks: BTreeSet<String>,
+    /// Titles of generated tasks: a retrieval query made for generated work (its context compile queries its title
+    /// and objective) is about generated work.
+    generated_titles: Vec<String>,
 }
 
 impl<'a> GenCtx<'a> {
     pub fn new(p: &'a Project, store: &'a RecordStore) -> Self {
         let mut generated_tasks = BTreeSet::new();
+        let mut generated_titles = vec![];
         for t in store.of_type("task") {
             if source_of(t).is_some() {
                 generated_tasks.insert(t.id());
                 generated_tasks.insert(t.path.clone());
+                if t.data.get("generation").is_some_and(|g| g.is_object()) {
+                    let title = t.get("title");
+                    if title.trim().len() >= 12 {
+                        generated_titles.push(title.trim().to_string());
+                    }
+                }
             }
         }
         GenCtx {
@@ -475,7 +486,19 @@ impl<'a> GenCtx<'a> {
             store,
             cfg: Config::load(p),
             generated_tasks,
+            generated_titles,
         }
+    }
+    /// A retrieval miss on a query made for generated work (the query names a generated task or carries its title):
+    /// following it up would generate work about the follow-up itself, without end.
+    fn query_about_generated_work(&self, query: &str) -> bool {
+        self.generated_titles
+            .iter()
+            .any(|t| query.contains(t.as_str()))
+            || self
+                .generated_tasks
+                .iter()
+                .any(|t| t.starts_with("TASK-") && query.contains(t.as_str()))
     }
     fn about_generated_work(&self, f: &Value) -> bool {
         let path = f["path"].as_str().unwrap_or("");
@@ -1184,6 +1207,11 @@ pub fn failures(g: &GenCtx) -> Vec<Candidate> {
             continue;
         }
         let kind = v["failure_kind"].as_str().unwrap_or("bug").to_string();
+        if kind == "retrieval-miss"
+            && g.query_about_generated_work(v["subject"]["query"].as_str().unwrap_or(""))
+        {
+            continue; // no loops: a miss made while working on generated work is not new work
+        }
         let source = match kind.as_str() {
             "retrieval-miss" => "retrieval-failure",
             "tool-failure" => "tool-failure",
