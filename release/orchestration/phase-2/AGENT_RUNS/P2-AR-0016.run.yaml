@@ -19,5 +19,13 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/ws03/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0016.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 76ffaaadaaf543b79d1239c85c2e3fddeaaaf313
+  branch_tip_commit: 6853526e74449defae5eaf0115da016cd95674d5
+  branch_product_code_digest: 8e5577f9864f9036275b6d0813ca865f4471d4f0e7a4835c6652a87565bfad33
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-08': 'REPAIRED_CLAIMED', 'BC-P2-09': 'REPAIRED_CLAIMED', 'BC-P2-10': 'REPAIRED_CLAIMED', 'BC-P2-12': 'REPAIRED_CLAIMED', 'BC-P2-18': 'REPAIRED_CLAIMED', 'BC-P2-45': 'REPAIRED_CLAIMED', 'BC-P2-49': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: scope conforms (WS-3-owned runtime/policy/schema files, main.rs semantic owner, lib.rs pub mod only; new t2.rs, human_channel.rs, tests/certification/ws03.rs; srr/** and Contract v3 byte-identical); existing builder tests updated for intended behaviour changes (undeclared role -> L0, complete gate packages, owner-signed answers), declared in report §10 — srr.rs change supplies a complete package to a positive-case gate create and does not weaken R1, to be re-checked under AC-14; lib 53/0, certification 91/0 per builder; R1 held-out base 110/12 -> 109/13, the one extra failure hv_a::a1 size pin (census 0 violations). Owner question (standalone human-gate anchor on machines with no release root) adjudicated by the orchestrator as DETERMINED by OWNER-DECISION-P2-0002 Option A + ARCH-0003 §2/§3 -> default false; routed to round 2 (P2-ADJ-0001)
 started_at: '2026-09-19'
