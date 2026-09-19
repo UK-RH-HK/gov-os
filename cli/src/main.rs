@@ -301,7 +301,235 @@ enum Cmd {
         #[command(subcommand)]
         op: OracleCmd,
     },
+    // ---- WS-10 (P2-AR-0031) additive block: research, experiment and test-data lifecycles (Gate J, Gate H4)
+    /// Research outputs as governed evidence (Contract v3 J1): record, update, conclude, withdraw, show, check, sync
+    Research {
+        #[command(subcommand)]
+        op: ResearchCmd,
+    },
+    /// Experiment lifecycle (Contract v3 J2): design, run, reproduce, conclude, promote, abandon, show, check
+    Experiment {
+        #[command(subcommand)]
+        op: ExperimentCmd,
+    },
+    /// Data requirements and test datasets with provenance and recorded authorship (Contract v3 H4)
+    Data {
+        #[command(subcommand)]
+        op: DataCmd,
+    },
+    /// The FEATURE → SCENARIOS → DATA → TEST DATA → SUCCESS/FAILURE → INDEPENDENT TESTS chain (Contract v3 H4)
+    Scenario {
+        #[command(subcommand)]
+        op: ScenarioCmd,
+    },
 }
+// ---- WS-10 (P2-AR-0031) additive block: lifecycle subcommands (runtime/src/lifecycle)
+#[derive(Subcommand)]
+enum ResearchCmd {
+    /// Record a research output: complete → CONCLUDED (EVIDENCE); with --draft → FRAMED/IN_PROGRESS, held reference-only
+    Record {
+        /// The research fields (JSON/YAML, or @file): question, reason, method, sources|data, measurements, uncertainty, conclusion, confidence
+        #[arg(long)]
+        fields: String,
+        #[arg(long)]
+        draft: bool,
+        /// The task the research was done for (recorded as influenced)
+        #[arg(long)]
+        task: Option<String>,
+    },
+    /// Update unfinished (FRAMED/IN_PROGRESS) research; it stays reference-only
+    Update {
+        id: String,
+        #[arg(long)]
+        fields: String,
+    },
+    /// FRAMED/IN_PROGRESS → CONCLUDED: every J1 field recorded; the research becomes EVIDENCE
+    Conclude {
+        id: String,
+        #[arg(long)]
+        fields: Option<String>,
+    },
+    /// FRAMED/IN_PROGRESS → WITHDRAWN
+    Withdraw {
+        id: String,
+        #[arg(long)]
+        reason: String,
+    },
+    /// A research record, its evidence standing, recorded and derived influences, T2 binding and identity
+    Show { id: String },
+    /// Standing of every research record and the research findings
+    Check,
+    /// Record every missing influence backlink on research and experiment records
+    Sync,
+}
+#[derive(Subcommand)]
+enum ExperimentCmd {
+    /// Record an experiment in DESIGNED (hypothesis|question, method, data|data_provenance|inputs; outputs outside production)
+    Design {
+        #[arg(long)]
+        fields: String,
+    },
+    /// Amend an experiment (its design only while DESIGNED)
+    Update {
+        id: String,
+        #[arg(long)]
+        fields: String,
+    },
+    /// DESIGNED → RUNNING: record the primary run's results; every input is bound by SHA-256
+    Run {
+        id: String,
+        #[arg(long)]
+        results: String,
+        #[arg(long)]
+        environment: Option<String>,
+        #[arg(long)]
+        task: Option<String>,
+    },
+    /// Record a reproduction run; the OS judges agreement and recomputes reproducibility
+    Reproduce {
+        id: String,
+        #[arg(long)]
+        results: String,
+        #[arg(long)]
+        environment: Option<String>,
+    },
+    /// RUNNING → CONCLUDED: interpretation, decision_influence, confidence, reproducibility procedure/environment
+    Conclude {
+        id: String,
+        #[arg(long)]
+        fields: String,
+    },
+    /// CONCLUDED → PROMOTED: without --gate raise the promotion gate; with --gate apply the owner-signed approval
+    Promote {
+        id: String,
+        /// Comma-separated production paths the promotion approves
+        #[arg(long)]
+        paths: String,
+        #[arg(long)]
+        gate: Option<String>,
+        #[arg(long)]
+        cit: Option<String>,
+    },
+    /// Any non-final state → ABANDONED
+    Abandon {
+        id: String,
+        #[arg(long)]
+        reason: String,
+    },
+    /// An experiment, its standing, runs, reproducibility, input drift, influences and T2 binding
+    Show { id: String },
+    /// Standing of every experiment and the experiment findings (incl. production-merge detection)
+    Check,
+}
+#[derive(Subcommand)]
+enum DataCmd {
+    /// Register a data requirement or a test dataset (provenance, content binding, OS-recorded authorship)
+    Register {
+        #[arg(long)]
+        fields: String,
+    },
+    /// A data record: kind, provenance, authorship, what it realises, which tests use it, its gaps
+    Show { id: String },
+}
+#[derive(Subcommand)]
+enum ScenarioCmd {
+    /// Trace a feature's or scenario's chain with every gap
+    Trace { id: String },
+    /// Every chain gap in the project
+    Check,
+}
+fn lifecycle_arg(s: &Option<String>) -> Result<Value> {
+    match s {
+        None => Ok(Value::Null),
+        Some(_) => parse_json_arg(s),
+    }
+}
+fn lifecycle_cmd(cli: &Cli) -> Result<Value> {
+    use gov_runtime::lifecycle::{experiment as ex, research as rs, scenario as sc};
+    let p = open_project(cli, true)?;
+    match &cli.cmd {
+        Cmd::Research { op } => match op {
+            ResearchCmd::Record {
+                fields,
+                draft,
+                task,
+            } => rs::record(
+                &p,
+                parse_json_arg(&Some(fields.clone()))?,
+                *draft,
+                task.as_deref(),
+            ),
+            ResearchCmd::Update { id, fields } => {
+                rs::update(&p, id, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ResearchCmd::Conclude { id, fields } => rs::conclude(&p, id, lifecycle_arg(fields)?),
+            ResearchCmd::Withdraw { id, reason } => rs::withdraw(&p, id, reason),
+            ResearchCmd::Show { id } => rs::show(&p, id),
+            ResearchCmd::Check => rs::check(&p),
+            ResearchCmd::Sync => gov_runtime::lifecycle::sync_influences(&p),
+        },
+        Cmd::Experiment { op } => match op {
+            ExperimentCmd::Design { fields } => {
+                ex::design(&p, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ExperimentCmd::Update { id, fields } => {
+                ex::update(&p, id, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ExperimentCmd::Run {
+                id,
+                results,
+                environment,
+                task,
+            } => ex::run(
+                &p,
+                id,
+                parse_json_arg(&Some(results.clone()))?,
+                lifecycle_arg(environment)?,
+                task.as_deref(),
+            ),
+            ExperimentCmd::Reproduce {
+                id,
+                results,
+                environment,
+            } => ex::reproduce(
+                &p,
+                id,
+                parse_json_arg(&Some(results.clone()))?,
+                lifecycle_arg(environment)?,
+            ),
+            ExperimentCmd::Conclude { id, fields } => {
+                ex::conclude(&p, id, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ExperimentCmd::Promote {
+                id,
+                paths,
+                gate,
+                cit,
+            } => ex::promote(
+                &p,
+                id,
+                &csv(&Some(paths.clone())),
+                gate.as_deref(),
+                cit.as_deref(),
+            ),
+            ExperimentCmd::Abandon { id, reason } => ex::abandon(&p, id, reason),
+            ExperimentCmd::Show { id } => ex::show(&p, id),
+            ExperimentCmd::Check => ex::check(&p),
+        },
+        Cmd::Data { op } => match op {
+            DataCmd::Register { fields } => {
+                sc::register(&p, parse_json_arg(&Some(fields.clone()))?)
+            }
+            DataCmd::Show { id } => sc::show(&p, id),
+        },
+        Cmd::Scenario { op } => match op {
+            ScenarioCmd::Trace { id } => sc::trace_cmd(&p, id),
+            ScenarioCmd::Check => sc::check(&p),
+        },
+        _ => Err(GovError::new("USAGE", "not a lifecycle command")),
+    }
+}
+// ---- end WS-10 additive block
 /// `gov oracle` (P2-AR-0014, BC-P2-51). Read-only: it validates documents and changes no governed state.
 #[derive(Subcommand)]
 enum OracleCmd {
@@ -1356,6 +1584,35 @@ fn g0_label(cmd: &Cmd) -> String {
             OracleCmd::Format => "oracle format",
             OracleCmd::Validate { .. } => "oracle validate",
         }),
+        // WS-10 (P2-AR-0031) additive arms
+        Cmd::Research { op } => s(match op {
+            ResearchCmd::Record { .. } => "research record",
+            ResearchCmd::Update { .. } => "research update",
+            ResearchCmd::Conclude { .. } => "research conclude",
+            ResearchCmd::Withdraw { .. } => "research withdraw",
+            ResearchCmd::Show { .. } => "research show",
+            ResearchCmd::Check => "research check",
+            ResearchCmd::Sync => "research sync",
+        }),
+        Cmd::Experiment { op } => s(match op {
+            ExperimentCmd::Design { .. } => "experiment design",
+            ExperimentCmd::Update { .. } => "experiment update",
+            ExperimentCmd::Run { .. } => "experiment run",
+            ExperimentCmd::Reproduce { .. } => "experiment reproduce",
+            ExperimentCmd::Conclude { .. } => "experiment conclude",
+            ExperimentCmd::Promote { .. } => "experiment promote",
+            ExperimentCmd::Abandon { .. } => "experiment abandon",
+            ExperimentCmd::Show { .. } => "experiment show",
+            ExperimentCmd::Check => "experiment check",
+        }),
+        Cmd::Data { op } => s(match op {
+            DataCmd::Register { .. } => "data register",
+            DataCmd::Show { .. } => "data show",
+        }),
+        Cmd::Scenario { op } => s(match op {
+            ScenarioCmd::Trace { .. } => "scenario trace",
+            ScenarioCmd::Check => "scenario check",
+        }),
     }
 }
 
@@ -1676,6 +1933,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 },
             ),
         },
+        Cmd::Research { .. } | Cmd::Experiment { .. } | Cmd::Data { .. } | Cmd::Scenario { .. } => lifecycle_cmd(cli), // WS-10 additive arm
         Cmd::Mcp { .. } => Err(GovError::new("MCP_NOT_IMPLEMENTED", "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)")),
     }.inspect(|_v| { let _ = name; })
 }
@@ -1751,6 +2009,11 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Artefact { .. } => "artefact",
         Cmd::Health { .. } => "health", // WS-2 additive arm
         Cmd::Oracle { .. } => "oracle",
+        // WS-10 (P2-AR-0031) additive arms
+        Cmd::Research { .. } => "research",
+        Cmd::Experiment { .. } => "experiment",
+        Cmd::Data { .. } => "data",
+        Cmd::Scenario { .. } => "scenario",
     }
 }
 

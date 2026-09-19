@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/research.schema.json",
   "title": "research",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -170,37 +170,92 @@
       "type": "string"
     },
     "question": {
-      "type": "string"
+      "type": "string",
+      "description": "J1 question"
     },
     "reason": {
-      "type": "string"
+      "type": "string",
+      "description": "J1 reason: why the question needs answering"
     },
     "method": {
-      "type": "string"
+      "type": "string",
+      "description": "J1 method"
     },
     "sources": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "J1 sources: documents, URLs, repository paths or governed record ids; an id-shaped entry must name a governed record"
     },
     "measurements": {
-      "type": "object"
+      "type": [
+        "object",
+        "array"
+      ],
+      "description": "J1 measurements (non-empty)"
     },
     "uncertainty": {
-      "type": "string"
+      "type": [
+        "string",
+        "object"
+      ],
+      "description": "J1 uncertainty"
     },
     "conclusion": {
-      "type": "string"
+      "type": "string",
+      "description": "J1 conclusion"
     },
     "confidence": {
-      "type": "number"
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "J1 confidence in [0, 1]"
     },
     "influences": {
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "description": "J1 influenced decisions/tasks: ids of the decisions, gates, tasks and other governed records that derive from this research (OS-maintained backlinks; `gov research sync`) (record ids; an id that names no governed record is reported by the lifecycle checks)"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "J1 data: governed data/research/experiment record ids the research measured (an alternative to `sources`) (record ids; an id that names no governed record is reported by the lifecycle checks)"
+    },
+    "research_state": {
+      "enum": [
+        "FRAMED",
+        "IN_PROGRESS",
+        "CONCLUDED",
+        "WITHDRAWN"
+      ],
+      "description": "lifecycle state (OS-written): FRAMED -> IN_PROGRESS -> CONCLUDED; any non-final state -> WITHDRAWN"
+    },
+    "recorded_by": {
+      "type": "object",
+      "description": "OS stamp: role, session, time and operation that recorded the research (T2-sealed)"
+    },
+    "concluded_by": {
+      "type": "object",
+      "description": "OS stamp of the conclusion transition (T2-sealed)"
+    },
+    "withdrawn_reason": {
+      "type": "string"
+    },
+    "lifecycle": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "OS-written lifecycle history"
+    },
+    "os_binding": {
+      "type": "object",
+      "description": "T2 seal (runtime/src/t2.rs)"
     }
   },
   "required": [
@@ -208,5 +263,145 @@
     "type",
     "status",
     "question"
+  ],
+  "description": "A governed research output (Contract v3 Gate J1, lines 596-605; framework §45). A research record is governed EVIDENCE only when it records question, reason, method, sources/data, measurements, uncertainty, conclusion and confidence; the decisions/tasks it influenced are recorded in `influences` (maintained by the OS when a decision or task derives from it: runtime/src/lifecycle). Unstructured or unfinished research is held reference-only: `research_state` FRAMED/IN_PROGRESS/WITHDRAWN requires `state_class` NARRATIVE or HISTORICAL. A current record that claims evidence (no state_class = the policy default EVIDENCE) without every J1 field is invalid. Written through `gov research record|update|conclude|withdraw`.",
+  "$defs": {
+    "j1_complete": {
+      "$comment": "Contract v3 J1 lines 598-605: question/reason, method, sources/data, measurements, uncertainty, conclusion, confidence (influenced decisions/tasks are OS-maintained backlinks)",
+      "required": [
+        "question",
+        "reason",
+        "method",
+        "measurements",
+        "uncertainty",
+        "conclusion",
+        "confidence"
+      ],
+      "properties": {
+        "question": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "method": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "measurements": {
+          "minProperties": 1,
+          "minItems": 1
+        },
+        "uncertainty": {
+          "pattern": "\\S",
+          "minProperties": 1
+        },
+        "conclusion": {
+          "type": "string",
+          "pattern": "\\S"
+        },
+        "confidence": {
+          "type": "number"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "sources"
+          ],
+          "properties": {
+            "sources": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "data"
+          ],
+          "properties": {
+            "data": {
+              "minItems": 1
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "$comment": "J1: a current research record that claims evidence (state_class absent = policy default EVIDENCE) records every J1 field",
+      "if": {
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "ACTIVE",
+              "PROVISIONAL"
+            ]
+          },
+          "state_class": {
+            "enum": [
+              "EVIDENCE",
+              "AUTHORITATIVE",
+              "DERIVED"
+            ]
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/$defs/j1_complete"
+      }
+    },
+    {
+      "$comment": "a CONCLUDED research record records every J1 field whatever its state_class",
+      "if": {
+        "required": [
+          "research_state"
+        ],
+        "properties": {
+          "research_state": {
+            "const": "CONCLUDED"
+          }
+        }
+      },
+      "then": {
+        "$ref": "#/$defs/j1_complete"
+      }
+    },
+    {
+      "$comment": "framework §45: research that is not concluded is reference only",
+      "if": {
+        "required": [
+          "research_state"
+        ],
+        "properties": {
+          "research_state": {
+            "enum": [
+              "FRAMED",
+              "IN_PROGRESS",
+              "WITHDRAWN"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "state_class"
+        ],
+        "properties": {
+          "state_class": {
+            "enum": [
+              "NARRATIVE",
+              "HISTORICAL"
+            ]
+          }
+        }
+      }
+    }
   ]
 }
