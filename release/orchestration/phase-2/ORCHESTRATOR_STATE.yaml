@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-19T06:14:50Z'
-state_hash: c317e92c4ddb7e634cff272b2af64c3bdd1ca3f7c21f2a898cbf037737cac4f7
+updated_at: '2026-09-19T06:18:45Z'
+state_hash: 4e5185f111e936ae160a85504efd98de3c3834386cab5f165d9a784e74575a3f
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_REPAIR_1_ROUND_2_RUNNING
 
@@ -230,7 +230,7 @@ agent_runs:
   - {run_id: P2-AR-0023, role: capability-repair, workstream: WS-2, iteration: 1, round: 2, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r2-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0023.run.yaml}
   - {run_id: P2-AR-0024, role: capability-repair, workstream: WS-3 (+docs), iteration: 1, round: 2, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r2-ws03, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0024.run.yaml}
   - {run_id: P2-AR-0025, role: capability-repair, workstream: WS-4, iteration: 1, round: 2, status: RUNNING, branch: phase2/repair-1-r2-ws04, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0025.run.yaml}
-  - {run_id: P2-AR-0026, role: capability-repair, workstream: WS-5, iteration: 1, round: 2, status: RUNNING, branch: phase2/repair-1-r2-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0026.run.yaml}
+  - {run_id: P2-AR-0026, role: capability-repair, workstream: WS-5, iteration: 1, round: 2, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r2-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0026.run.yaml}
   - {run_id: P2-AR-0027, role: capability-repair, workstream: WS-6, iteration: 1, round: 2, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r2-ws06, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0027.run.yaml}
   - {run_id: P2-AR-0028, role: capability-repair, workstream: WS-7, iteration: 1, round: 2, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r2-ws07, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0028.run.yaml}
   - {run_id: P2-AR-0029, role: capability-repair, workstream: WS-8, iteration: 1, round: 2, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r2-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.run.yaml}
@@ -241,7 +241,7 @@ running_work:
   - {run_id: P2-AR-0023, role: capability-repair, status: COMPLETED_AWAITING_INTEGRATION, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0023.run.yaml}
   - {run_id: P2-AR-0024, role: capability-repair, status: COMPLETED_AWAITING_INTEGRATION, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0024.run.yaml}
   - {run_id: P2-AR-0025, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0025.run.yaml}
-  - {run_id: P2-AR-0026, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0026.run.yaml}
+  - {run_id: P2-AR-0026, role: capability-repair, status: COMPLETED_AWAITING_INTEGRATION, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0026.run.yaml}
   - {run_id: P2-AR-0027, role: capability-repair, status: COMPLETED_AWAITING_INTEGRATION, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0027.run.yaml}
   - {run_id: P2-AR-0028, role: capability-repair, status: COMPLETED_AWAITING_INTEGRATION, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0028.run.yaml}
   - {run_id: P2-AR-0029, role: capability-repair, status: COMPLETED_AWAITING_INTEGRATION, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.run.yaml}
