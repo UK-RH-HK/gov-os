@@ -1,0 +1,1 @@
+binary: 3271ce0e4e095561911e0d03d8641aa92fbeda39ef3c8a2ecb2a9f21cacbe81d (base c6b60bc; identical to cap2-candidate-0 per delta-r F.impl.bins original_sha256 3271ce0e4e095561)

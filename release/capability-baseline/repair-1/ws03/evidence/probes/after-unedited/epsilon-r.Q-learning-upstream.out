@@ -1,0 +1,101 @@
+
+=== Q1.1-2 execution/report → lesson candidate: a worker return carrying a lesson
+lesson created: L-0001
+{'status': 'PROVISIONAL', 'state_class': 'EVIDENCE', 'scope': 'PROJECT', 'lifecycle': 'candidate', 'sources': ['HND-0001', 'TASK-0001'], 'provenance': {'from_handoff': 'HND-0001', 'task': 'TASK-0001', 'at': '2026-09-19T00:39:48Z'}}
+# does a task-close report's 'lessons' field also create candidates?
+exit=0 [true, "DONE"]
+L-0001.yaml
+
+=== Q1.3-4 corroboration and scope classification: the worker lesson is re-scoped by a raw edit and exported
+# no command classifies or corroborates a lesson; its own provenance (handoff + task ids) counts as 2 'sources'
+prepare re-scoped candidate (lifecycle still "candidate"): exit=0 {"err": null, "msg": "", "ok": true, "packet": "PKT-0001"}
+# a FRAMEWORK lesson with zero sources is blocked by LEARNING_POLICY.corroboration_min_sources=1:
+exit=1 {"err": "UPSTREAM_BLOCKED", "msg": "export gate failed closed for L-0101: lesson L-0101 cites 0 source(s); LEARNING_POLICY.corroboration_min_sources = 1", "ok": false}
+# lifecycle transitions are raw edits; any value in the enum is accepted and nothing checks who set it:
+exit=0 {"err": null, "ok": true}
+exit=0 []
+
+=== Q1.5 rule/skill/retrieval/tool proposal: canonical-side clustering into Framework Change Proposals (D-0004)
+clusters: [('memory-freshness|advisory,close,freshness,index', ['PKT-0001-proj1', 'PKT-0002-proj2', 'PKT-0003-proj3'], 'cross_project_repeat', 'strong_change_candidate', 'FCP-0001'), ('pricing|table,tariff,typo', ['PKT-0009-projX'], 'critical_defect', 'immediate_patch_candidate', 'FCP-0002')]
+written: ['FCP-0001', 'FCP-0002']
+FCP-0001 {'status': 'PROVISIONAL', 'state_class': 'AUTHORITATIVE', 'trigger': 'cross_project_repeat', 'release_action': 'strong_change_candidate', 'packets': ['PKT-0001-proj1', 'PKT-0002-proj2', 'PKT-0003-proj3'], 'next': 'implement in the canonical repository, add a synthetic regression fixture, independent review, release'}
+FCP-0002 {'status': 'PROVISIONAL', 'state_class': 'AUTHORITATIVE', 'trigger': 'critical_defect', 'release_action': 'immediate_patch_candidate', 'packets': ['PKT-0009-projX'], 'next': 'implement in the canonical repository, add a synthetic regression fixture, independent review, release'}
+# a PROJECT-scoped packet placed in the inbox is clustered into an FCP like any other (intake does not re-check scope)
+
+=== Q1.6-8 independent validation, human approval, governed version
+# FCP records carry no validation/approval fields and no command transitions them; release build takes no FCP input:
+FCP schema properties: ['cluster_key', 'confidence', 'created', 'created_at', 'evidence_strength', 'generic_failure_mode', 'id', 'next', 'packets', 'problem_statement', 'release_action', 'source_projects', 'state_class', 'status', 'suggested_framework_change', 'title', 'trigger', 'type']
+  upstream        Upstream learning: prepare/submit sanitised framework lesson packets
+  lessons         Framework lesson intake (canonical repository): cluster inbox packets into Framework Change Proposals
+Commands:
+  cluster  
+  help     Print this message or the help of the given subcommand(s)
+
+Options:
+# upstream submit 'human approval' is a free-text --approved-by string supplied by the (L3+) caller, not an answered gate:
+prepare L-0001-style clean lesson: PKT-0004
+submit without approval: exit=4 HUMAN_GATE_REQUIRED
+orchestrator agent submits with --approved-by "i-approve-myself": exit=0 {"approved_by": "i-approve-myself", "err": null, "ok": true}
+lesson after submit: {'lifecycle': 'promoted', 'upstream': {'packet_id': 'PKT-0004', 'payload_hash': 'b54257855ca60bb3f2809328aada06c3168ac1b260aa1f2e2bf17ef8ef4beb25', 'at': '2026-09-19T00:39:49Z'}}
+exit=0 []
+
+=== Q2.1 lessons are evidence, not authority: a lesson contradicting an ACTIVE decision, compiled into a context packet
+exit=0 {"det_active_decisions": ["D-0001"], "det_mentions_lesson": false, "ranked_state_classes": [["file:governance/kernel/skills/SKL-BACKEND-IMPL.yaml", "AUTHORITATIVE"], ["L-0001", "EVIDENCE"], ["L-0002", "AUTHORITATIVE"], ["L-0001", "EVIDENCE"], ["file:governance/kernel/skills/SKL-TEST-DESIGN.yaml", "AUTHORITATIVE"], ["file:governance/kernel/skills/SKL-DB-MIGRATION.yaml", "AUTHORITATIVE"]], "retrieved_lessons": ["L-0001", "L-0002", "L-0001"]}
+# a lesson self-labelled AUTHORITATIVE (L-0002) is accepted by the schema and raises no finding:
+exit=0 {"findings": [["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]], "verdict": "HEALTHY"}
+
+=== Q2.2 decisions record chosen action (gate answer → decision record)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+KeyError: 'result'
+exit=1 null
+D-0001 {'question': 'money repr?', 'chosen_option': 'A', 'rationale': 'exactness', 'approved_by': None, 'human_approved': None, 'status': 'ACTIVE'}
+
+=== Q3 only FRAMEWORK candidates are eligible for upstream export
+PROJECT  : exit=1 {"err": "UPSTREAM_SCOPE", "ok": false}
+PRODUCT  : exit=1 {"err": "UPSTREAM_SCOPE", "ok": false}
+FRAMEWORK: exit=0 {"err": null, "ok": true}
+# attempt to widen eligibility through the project overlay (LEARNING_POLICY.* is immutable):
+exit=0 {"refused": [["upstream_eligible_scopes", "LEARNING_POLICY.upstream_eligible_scopes: constitutional/sec"]]}
+PROJECT after widening attempt: exit=1 {"err": "UPSTREAM_SCOPE", "ok": false}
+
+=== Q4.1 sanitisation — project/customer identifiers stripped (fixture lesson L-0004)
+packet PKT-0006
+{'problem_statement': 'In the [REDACTED] [REDACTED] project an agent recorded gate answers that the owner never saw.', 'scans': {'identifiers_redacted': 2, 'paths_removed': [], 'secret_hits': [], 'code_lines': 0, 'blocked_reasons': []}}
+identifier occurrences in packet: 0
+
+=== Q4.2 secret / sensitivity scan (L-0003: AWS key, customer name, raw code, product path)
+exit=1 {"err": "UPSTREAM_BLOCKED", "ok": false, "reasons": ["lesson L-0003 cites 0 source(s); LEARNING_POLICY.corroboration_min_sources = 1", "secret pattern aws-access-key in field problem_statement", "4 raw code line(s) in lesson text exceed policy max 0; provide a synthetic reproducer instead"]}
+# sensitivity: a fixture file matching a DATA_SENSITIVITY never-export classification
+['secret', 'restricted', 'confidential']
+exit=1 {"err": "UPSTREAM_BLOCKED", "ok": false, "reasons": ["fixture file customers/list.csv matches DATA_SENSITIVITY classification customers/** (restricted) in SECURITY_POLICY.never_export_classes"]}
+
+=== Q4.3 outbound allowlist / default deny
+remote destination: exit=1 REMOTE_TRANSPORT_NOT_CONFIGURED
+non-inbox local destination: exit=1 UPSTREAM_DESTINATION
+fixture file under a forbidden path (product/**): exit=1 {"err": "UPSTREAM_BLOCKED", "ok": false, "reasons": ["fixture file product/api/x.py matches a forbidden outbound path"]}
+# widening the allowlist through the overlay (allowed_payload is shrink_only):
+exit=0 {"refused": [["upstream.allowed_payload", "LEARNING_POLICY.upstream.allowed_payload: entries [\"raw_code\"] are not"]]}
+submit PKT-0006 (approved) → what lands in the inbox: exit=0 ["packet.yaml"]
+PKT-0006-fx-base/packet.yaml
+
+=== Q4.4 synthetic reproducer preference
+raw code in lesson text, no reproducer: exit=1 {"err": "UPSTREAM_BLOCKED", "ok": false, "reasons": ["1 raw code line(s) in lesson text exceed policy max 0; provide a synthetic reproducer instead"]}
+same lesson with a synthetic reproducer: exit=0 {"err": null, "ok": true}
+
+=== Q4.5 no raw project / customer / vector-store export — attempts that rely only on the self-declared 'synthetic' flag
+# (a) the project's real product source file, verbatim, declared as a synthetic fixture file named src/lib.rs
+prepare: PKT-0012
+exit=0 ["packet.yaml", "fixture/src/lib.rs"]
+inbox received a byte-identical copy of the project's src/lib.rs
+# (b) vector rows from the project's derived index dumped into a fixture file named embeddings.json
+vector columns: ['chunk_id', 'artifact_id', 'embedder', 'dim', 'vec'] rows dumped: 3
+exit=0 {"err": null, "ok": true, "packet": "PKT-0013"}
+# (c) filename-based controls do work: a fixture named index.sqlite or state.db
+exit=1 {"err": "UPSTREAM_BLOCKED", "ok": false, "reasons": ["fixture file index.sqlite matches a forbidden outbound path", "fixture file state.db matches a forbidden outbound path"]}
+
+=== Q4 ledger / payload hash
+{'packet_id': 'PKT-0004', 'payload_hash': 'b54257855ca60bb3f2809328aada06c3168ac1b260aa1f2e2bf17ef8ef4beb25', 'approved_by': 'i-approve-myself', 'files': ['packet.yaml']}
+{'packet_id': 'PKT-0006', 'payload_hash': 'b1d4b08f63c582a7079b8bbeea5df9b1d9de82172d60518060c84823c6d697fc', 'approved_by': 'owner', 'files': ['packet.yaml']}
+{'packet_id': 'PKT-0012', 'payload_hash': '3c1130fc68b5b737e2cb37969df29245d4897781022e5293f1cc21e4c29b6686', 'approved_by': 'owner', 'files': ['packet.yaml', 'fixture/src/lib.rs']}
+exit=0

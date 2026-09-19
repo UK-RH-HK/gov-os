@@ -1,0 +1,19 @@
+## integrated binary (HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a)
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+init from shipped 4.1.4: True
+refused overlay keys on the 4.1.4 kernel: ['PROJECT_POLICY.project.name', 'PROJECT_POLICY.project.alias', 'PROJECT_POLICY.project.created', 'PROJECT_POLICY.project.onboarding_mode', 'MODEL_ROUTING_OVERRIDES.schema_version', 'MODEL_ROUTING_OVERRIDES.providers', 'MODEL_ROUTING_OVERRIDES.preferences.prefer_lowest_cost_meeting_tier']
+  e.g.: PROJECT_POLICY.project.name: key is not declared overridable by the kernel precedence rules (deny by default) (POLICY_PRECEDENCE mode 'immutable', rule <default>)
+doctor verdict: UNHEALTHY | D027: [('D027', False, 'critical')]
+gate HDG-0001 answered through the owner-signed channel: True
+update 4.1.4 -> shipped 4.1.5: VERIFICATION_FAILED | doctor reports critical findings after update: D027 — update rolled back
+
+## WS-3 branch alone: 'git archive' export of phase2/repair-1-ws03 at 6853526e74449defae5eaf0115da016cd95674d5, built in scratch (cargo build --release)
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws03-export-target/release/gov
+init from shipped 4.1.4: True
+refused overlay keys on the 4.1.4 kernel: ['PROJECT_POLICY.project.name', 'PROJECT_POLICY.project.alias', 'PROJECT_POLICY.project.created', 'PROJECT_POLICY.project.onboarding_mode', 'MODEL_ROUTING_OVERRIDES.schema_version', 'MODEL_ROUTING_OVERRIDES.providers', 'MODEL_ROUTING_OVERRIDES.preferences.prefer_lowest_cost_meeting_tier']
+  e.g.: PROJECT_POLICY.project.name: key is not declared overridable by the kernel precedence rules (deny by default) (POLICY_PRECEDENCE mode 'immutable', rule <default>)
+doctor verdict: UNHEALTHY | D027: [('D027', False, 'critical')]
+gate HDG-0001 answered through the owner-signed channel: True
+update 4.1.4 -> shipped 4.1.5: VERIFICATION_FAILED | doctor reports critical findings after update: D027 — update rolled back
+
+## WS-8 branch alone for contrast: 'git archive' export of phase2/repair-1-ws08 not rebuilt here; WS-8's recorded alpha-r S5-update [U2] shows the update applied (release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/S5-update.out)

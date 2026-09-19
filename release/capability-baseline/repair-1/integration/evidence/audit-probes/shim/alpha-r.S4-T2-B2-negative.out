@@ -1,0 +1,79 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): alpha-r/S4-T2-B2-negative mode=shim
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 7aa0f4a409f976a523b6ccc3071be29e41df0871a329300a82ae441334cde3fe; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/mirror-shim/target/release/gov
+# date 2026-09-19T02:45:23Z
+## [N1] single agent, single role, no --session flags anywhere
+[N1] adopt baseline                                      -> ok
+[N1] adopt inventory                                     -> ok
+[N1] adopt classify                                      -> ok
+[N1] adopt map                                           -> ok
+[N1] adopt plan                                          -> ok
+[N1] adopt test-design                                   -> ok
+[N1] adopt review --verdict MIGRATION_PLAN_APPROVED      -> ok
+[N1] adopt migrate                                       -> ok
+[N1] adopt verify-migration                              -> ok
+[N1] adopt extract-legacy                                -> ok
+[N1] adopt build-memory                                  -> ok
+[N1] adopt verify-memory                                 -> ok
+[N1] adopt audit --accept-exceptions                     -> ok
+[N1] recorded sessions: planner S-e6ff5f98b734 | reviewer S-822fdd3b850c | executor S-a4597227ed20 | migration verifier S-af2d56dd74bd | memory builder S-c395bf25a470 | memory verifier S-f1289ff8eed8
+[N1] stage status: {'A0': 'done', 'A1': 'done', 'A2': 'done', 'A3': 'done', 'A4': 'done', 'A5': 'done', 'A6': 'done', 'A7': 'done', 'A8': 'done', 'A9': 'done', 'A10': 'done', 'A11': 'done'} | final verdict: ADOPTED_WITH_ACCEPTED_EXCEPTIONS
+
+## [N2] post-approval edits to the reviewed tests and catalogue
+[N2] reviewer approves a plan with 12 tests
+[N2-review] ok {"stage": "A5", "verdict": {"verdict": "MIGRATION_PLAN_APPROVED", "session": "S-review", "role": "orchestrator", "at": "2026-09-19T02:45:26Z", "tests": 12, "notes": null}}
+[N2] executor (after approval) emptied 06-migration-tests.yaml and changed src/pkg/util.py to DELETE_FROM_ACTIVE_TREE, batch 2, no gate
+[N2-A6] ok {"complete": true}
+[N2] src/pkg/util.py still exists: True | core.py imports it: True
+[N2-A7] ok {"verdict": "MIGRATION_REJECTED_NEEDS_REPAIR", "catalogue_problems": ["\"ART-9056eb8faa28\" expected DELETE_FROM_ACTIVE_TREE but state is PRESENT (src/pkg/util.py)"], "broken_links": [], "tests": {"pass": 0, "fail": 0}}
+
+## [N3] reality diverges from the map; the verifier claims ACCEPTED
+[N3-A6] ok {"complete": true}
+[N3] moves in the map: [('.cursorrules', 'archive/governance/legacy-rules/.cursorrules'), ('docs/spec-login.md', 'spec/requirements/spec-login.md')]
+[N3] reality tampered: archive/governance/legacy-rules/.cursorrules moved back to .cursorrules
+[N3-claim] REFUSED VERDICT_CONFLICT: verifier claims acceptance but evidence computes MIGRATION_REJECTED_NEEDS_REPAIR; repair first
+[N3-computed] ok {"verdict": "MIGRATION_REJECTED_NEEDS_REPAIR", "catalogue_problems": ["\"ART-03130413f4c7\" expected MOVE but state is PRESENT (.cursorrules)"], "tests": {"pass": 7, "fail": 3}}
+[N3-next-stage] REFUSED STAGE_ORDER: stage A7 must be complete first (protocol order A0→A11)
+[N3] audit family path_map_compliance: HEALTHY {"ok": true, "findings": 0, "detail": {"unmatched": 0, "secret_content_outside_secret_class": []}, "status": "executed", "cached_from": null}
+
+## [N4] unknown material artefacts block destructive batches; SPLIT / MERGE
+[N4-classify] ok {"unknown": 1, "by_class": {"DATA_RUNTIME": 1, "DEAD_OR_UNUSED": 1, "GENERATED": 1, "GOVERNANCE_LEGACY": 1, "PRODUCT_SOURCE": 3, "PRODUCT_TEST": 1, "REPORT_EVIDENCE": 1, "SPEC_AUTHORITATIVE": 1, "SPEC_DERIVED": 1, "UNKNOWN": 1}, "actions": null, "unknown_blocking_destructive": null}
+[N4-map] ok {"unknown": null, "by_class": null, "actions": {"DELETE_FROM_ACTIVE_TREE": 2, "KEEP_IN_PLACE": 8, "MOVE": 2}, "unknown_blocking_destructive": 1}
+[N4] UNKNOWN entries: [('misc/opaque.zzz', 'UNKNOWN', 'KEEP_IN_PLACE')]
+[N4] destructive entries: [('legacy-index/vectors.json', 'DELETE_FROM_ACTIVE_TREE', 6), ('src/pkg/dead.py', 'DELETE_FROM_ACTIVE_TREE', 7)]
+[N4] migrate batch 0 -> ok
+[N4] migrate batch 1 -> ok
+[N4] migrate batch 2 -> ok
+[N4] migrate batch 3 -> ok
+[N4] migrate batch 4 -> ok
+[N4] migrate batch 5 -> ok
+[N4] migrate batch 6 -> REFUSED UNKNOWN_BLOCKS_DESTRUCTIVE: 1 UNKNOWN artefact(s) block destructive batch 6 (protocol §8)
+[N4] migrate batch 7 -> REFUSED UNKNOWN_BLOCKS_DESTRUCTIVE: 1 UNKNOWN artefact(s) block destructive batch 7 (protocol §8)
+[N4] catalogue entry README.md -> SPLIT: migrate batch 5 -> REFUSED MIGRATION_BATCH_FAILED: batch 5 failed at ART-3d1db03b377d ([PLAN_UNSUPPORTED] ART-3d1db03b377d: SPLIT requires a manual CIT); batch rolled back
+[N4] catalogue entry README.md -> MERGE: migrate batch 5 -> REFUSED MIGRATION_BATCH_FAILED: batch 5 failed at ART-3d1db03b377d ([PLAN_UNSUPPORTED] ART-3d1db03b377d: MERGE requires a manual CIT); batch rolled back
+
+## [N5] references / imports are represented and rewritten on MOVE; batch rollback
+[N5] map README.md              action=KEEP_IN_PLACE  target=None references=['docs/spec-login.md'] imports=[] consumers=[]
+[N5] map docs/spec-login.md     action=MOVE           target=spec/requirements/spec-login.md references=['README.md'] imports=[] consumers=['README.md']
+[N5] map src/pkg/core.py        action=KEEP_IN_PLACE  target=None references=['src/pkg/util.py', 'tests/test_core.py'] imports=['src/pkg/util.py'] consumers=['tests/test_core.py']
+[N5] map src/pkg/util.py        action=KEEP_IN_PLACE  target=None references=['src/pkg/core.py'] imports=[] consumers=['src/pkg/core.py']
+[N5-batch1] ok {"complete": false}
+[N5-batch2] ok {"stage": "A6", "batches": [{"batch": 2, "at": "2026-09-19T02:45:31Z", "applied": 1, "moves": [["docs/spec-login.md", "spec/requirements/spec-login.md"]], "created": [], "references_updated": ["README.md"], "skipped": [], "blocked": [], "retired_with_active_references": [], "tests": {"tests": 10, "pass": 10, "fail": 0, "deferred": 2, "deferred_reasons": [], "ok": true, "results": [{"id": "MT-001", "kind": "path_present", "ok": true, "path": "governance/framework.lock", "description": "kernel pinned"}, {"id": "MT-002", "kind": "path_present", "ok": true, "path": "governance/kernel/KERNEL_MANIFE
+[N5] ledger entries for batch 2: [('ART-1448c41471be', 'applied', None), (None, 'batch_complete', 1)]
+[N5] README link before: See the [login spec](docs/spec-login.md). | after: See the [login spec](spec/requirements/spec-login.md).
+[N5-rollback] ok {"batch": 2, "restored": ["docs/spec-login.md"], "removed": [], "references_reverted": ["README.md"]}
+[N5] after rollback: docs/spec-login.md exists = True | README restored = True
+
+## [N6] A0 detects interrupted prior governance work
+[N6-A0] ok {"interrupted": true, "freeze_advice": "interrupted work detected: review items before A1; broad edits are frozen by protocol"}
+[N6] interrupted_work = {"detected": true, "items": [{"kind": "partial_governance_dir", "classification": "PARTIAL_SHOULD_ROLL_BACK", "note": "governance/ exists without framework.lock"}]}
+[N6-A0-rerun] ok {"interrupted": true, "freeze_advice": "interrupted work detected: review items before A1; broad edits are frozen by protocol"}
+[N6] does A0 refuse / freeze on interrupted work, or only advise? only advises
+
+## [N7] verifier role strings
+[N7-A7-role-migration-executor] ok {"verdict": "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"}
+[N7-A7-acting-role-L1] ok {"verdict": "MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD"}
+[N7] recorded verdicts: {'A5': ('MIGRATION_PLAN_APPROVED', 'migration-executor', 'S-r'), 'A7': ('MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD', 'backend-engineer', 'S-v2')}
+
+DONE
+[exit=0]

@@ -1,0 +1,30 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify/runtime)
+   Compiling srr-heldout-ar0027 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho27)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.22s
+     Running tests/heldout_srr3.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho27/debug/deps/heldout_srr3-3b88a1753b6cf9da)
+
+running 5 tests
+test d1_break_glass_authority_cannot_be_manufactured ... ok
+test d2_valid_break_glass_enters_marks_and_is_single_use ... ok
+test d3_below_floor_refusal_surface_against_owner_decision_0006_section_6 ... FAILED
+test d4_exit_policy_is_one_point_at_the_stricter_reading ... ok
+test d5_break_glass_is_purely_local ... ok
+
+failures:
+
+---- d3_below_floor_refusal_surface_against_owner_decision_0006_section_6 stdout ----
+AR-0027 D3 — while marked `DEGRADED — RECOVERY ONLY`:
+  REFUSED   (32): ["upstream submit", "upstream export", "memory select", "gate create", "gate answer", "gate revoke", "gate present", "decide", "tools install", "replan", "plugins register", "plugins unregister", "handoff create", "handoff return", "readiness plan", "cit propose", "cit simulate", "cit approve", "cit reject", "cit execute", "adopt migrate", "adopt extract-legacy", "adopt build-memory", "task create", "task status", "task claim", "task close", "release build", "release certify", "trust provision", "trust root-update", "skills install"]
+  PERMITTED (3): ["checkpoint", "update --apply", "kernel reinstall"]
+
+thread 'd3_below_floor_refusal_surface_against_owner_decision_0006_section_6' (536182) panicked at tests/heldout_srr3.rs:264:9:
+OBSERVED: 'cit approve' is permitted while the machine is marked DEGRADED — RECOVERY ONLY
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    d3_below_floor_refusal_surface_against_owner_decision_0006_section_6
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+
+error: test failed, to rerun pass `--test heldout_srr3`

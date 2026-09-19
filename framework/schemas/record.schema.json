@@ -161,13 +161,35 @@
       }
     },
     "provenance": {
-      "type": "object"
+      "type": "object",
+      "description": "Declared producer/provenance (who or what produced the record, from what). Version-control provenance (introducing and last-changing commit) is derived by `gov artefact show`."
     },
     "staleness": {
       "type": "object"
     },
     "legacy_source": {
       "type": "string"
+    },
+    "consumers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Expected downstream consumers: each id yields the canonical edge '<id> CONSUMES <this record>'."
+    },
+    "producers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Producers of this record: each id yields the canonical edge '<id> PRODUCES <this record>'."
+    },
+    "influences": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Decisions/tasks this output influences: each id yields '<this record> AFFECTS <id>'."
     }
   },
   "required": [

@@ -1,0 +1,131 @@
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ws05-scratch/fam-final/gamma-r/f2f3
+
+==== F2.0 the generated registry (governance/generated/tool-registry.json) — one entry per field group ====
+  generated_from: {'kernel': '3a93cc29327dd36612388e44b0d49e7c61be45d10bc979c674f7b705149c3c82', 'overlay': '6945f776f219e4ed3054320f6a5dd490e113258fa111beb5c0280cdd712ba166', 'generated_at': '2026-09-19T00:33:43Z'}
+  tools: 16  mcp_servers: 1  roles with exposure: 15
+  [b1 identity/version] entries carrying each key (of 16): {'tool_id': 16, 'name': 16, 'version': 16}
+  [b2 executable/transport] entries carrying each key (of 16): {'type': 16, 'health_check': 16, 'package': 2, 'source': 2}
+  [b3 permissions] entries carrying each key (of 16): {'permissions': 16, 'required_permission_classes': 14}
+  [b4 allowed roles/task classes] entries carrying each key (of 16): {'approved_roles': 16, 'task_classes': 0, 'allowed_task_classes': 0}
+  [b5 sensitivity/network/fs scope] entries carrying each key (of 16): {'permissions': 16, 'credential_scope': 16, 'sensitivity': 0, 'filesystem_scope': 0, 'network_scope': 0}
+  [b6 health status] entries carrying each key (of 16): {'health_check': 16, 'health': 0, 'health_status': 0}
+  [b7 provenance/hash pin] entries carrying each key (of 16): {'provenance': 0, 'pin': 0, 'version_pin': 2, 'sha256': 0, 'hash': 0}
+  [b8 installation/approval status] entries carrying each key (of 16): {'status': 16, 'installed_by': 0, 'installed_at': 0, 'approval': 0, 'security_review': 2, 'license_review': 2}
+  sample TOOL-GIT-001: {"tool_id": "TOOL-GIT-001", "name": "git", "type": "CLI", "capabilities": ["git_status", "git_diff", "git_log", "git_mv", "git_commit"], "permissions": {"repo_write": true, "network": false}, "credential_scope": "none", "status": "active", "version": "system", "approved_roles": ["all"], "health_check": {"kind": "command", "command": ["git", "--version"], "expect_exit": 0}, "required_permission_classes": ["READ_REPO", "WRITE_REPO_SCOPED"], "reversible": true, "license": "GPL-2.0"}
+  sample MCP: {"id": "MCP-REPO-001", "name": "repository-intelligence", "transport": "stdio", "command": ["gov", "mcp", "serve"], "capabilities": ["status", "retrieval", "context_compile", "task_dag", "cit_simulate"], "required_permission_classes": ["READ_REPO"], "approved_roles": ["all"], "credential_scope": "none", "status": "planned", "health": {"kind": "none"}}
+  role_exposure[research-agent]: {'permissions': ['READ_REPO', 'NETWORK_READ'], 'tools': ['TOOL-FS-001', 'TOOL-AST-001', 'TOOL-SQLITE-001', 'TOOL-SECRETS-001'], 'mcp_servers': []}
+  role_exposure[independent-auditor]: {'permissions': ['READ_REPO', 'RUN_TESTS'], 'tools': ['TOOL-FS-001', 'TOOL-TEST-001', 'TOOL-AST-001', 'TOOL-CARGO-001', 'TOOL-CARGO-002', 'TOOL-NPM-001', 'TOOL-GO-001', 'TOOL-CMAKE-001', 'TOOL-MAKE-001', 'TOOL-MAVEN-001', 'TOOL-SQLITE-001', 'TOOL-SECRETS-001'], 'mcp_servers': []}
+
+==== F2.b3/b4 exposure is computed from permissions + approved_roles (executable): resolve per role ====
+  research-agent         run_tests -> [] | role lacks approval or permission classes for the available tool
+  research-agent         git_commit -> [] | role lacks approval or permission classes for the available tool
+  orchestrator           run_tests -> ['TOOL-CARGO-001'] | 
+  orchestrator           git_commit -> ['TOOL-GIT-001'] | 
+  independent-auditor    run_tests -> ['TOOL-CARGO-001'] | 
+  independent-auditor    git_commit -> [] | role lacks approval or permission classes for the available tool
+  test-execution-agent   run_tests -> ['TOOL-CARGO-001'] | 
+  test-execution-agent   git_commit -> [] | role lacks approval or permission classes for the available tool
+$ task-class scoping: is any tool restricted by task class? a task that requires a tool its class should not use
+  context packet required_tools: ['TOOL-CARGO-002', 'TOOL-DOES-NOT-EXIST']
+exit=0 ok=true
+  (no match above = tool exposure never consults a task class)
+
+==== F2.b6 health status: executed per tool ====
+   {'tool_id': 'TOOL-FS-001', 'ok': True, 'kind': 'builtin'}
+   {'tool_id': 'TOOL-GIT-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-TEST-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-AST-001', 'ok': True, 'kind': 'builtin'}
+   {'tool_id': 'TOOL-CARGO-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-CARGO-002', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-CARGO-003', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-NPM-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-GO-001', 'ok': False, 'kind': 'command', 'exit': -1, 'stderr': 'No such file or directory (os error 2)'}
+   {'tool_id': 'TOOL-CMAKE-001', 'ok': False, 'kind': 'command', 'exit': -1, 'stderr': 'No such file or directory (os error 2)'}
+   {'tool_id': 'TOOL-MAKE-001', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''}
+   {'tool_id': 'TOOL-MAVEN-001', 'ok': False, 'kind': 'command', 'exit': -1, 'stderr': 'No such file or directory (os error 2)'}
+   {'tool_id': 'TOOL-SQLITE-001', 'ok': True, 'kind': 'builtin'}
+   {'tool_id': 'TOOL-SECRETS-001', 'ok': True, 'kind': 'builtin'}
+$ is health status recorded in the registry?
+  any registry tool carrying a health result: False
+
+==== F2.b7 provenance/hash pin: installed tools vs plugins ====
+  TOOL-FS-001        version=builtin  version_pin=None           pin=None
+  TOOL-GIT-001       version=system   version_pin=None           pin=None
+  TOOL-TEST-001      version=system   version_pin=None           pin=None
+  TOOL-AST-001       version=stdlib   version_pin=python>=3.11   pin=None
+  TOOL-CARGO-001     version=system   version_pin=None           pin=None
+  TOOL-CARGO-002     version=system   version_pin=None           pin=None
+  TOOL-CARGO-003     version=system   version_pin=None           pin=None
+  TOOL-LSP-RUST-001  version=system   version_pin=None           pin=None
+  TOOL-NPM-001       version=system   version_pin=None           pin=None
+  TOOL-GO-001        version=system   version_pin=None           pin=None
+  TOOL-CMAKE-001     version=system   version_pin=None           pin=None
+  TOOL-MAKE-001      version=system   version_pin=None           pin=None
+  TOOL-MAVEN-001     version=system   version_pin=None           pin=None
+  TOOL-SQLITE-001    version=stdlib   version_pin=sqlite>=3.35   pin=None
+  TOOL-SECRETS-001   version=builtin  version_pin=None           pin=None
+  TOOL-WEB-001       version=0        version_pin=None           pin=None
+
+==== F3.b1 capability gap -> candidate discovery ====
+  resolve web_search       gap= True reason= a tool exists but is not active (proposed/deprecated) | candidates returned: [] [] | next: gov tools install --descriptor <file> (checks TOOL_POLICY au
+  resolve code_intel       gap= True reason= a tool exists but is not active (proposed/deprecated) | candidates returned: [] [] | next: gov tools install --descriptor <file> (checks TOOL_POLICY au
+  resolve quantum_compile  gap= True reason= no registered tool provides this capability | candidates returned: [] [] | next: gov tools install --descriptor <file> (checks TOOL_POLICY au
+$ does a gap create any governed record (task, gate, capability-memory entry)?
+  governed record count before=4 after=4
+
+==== F3.b2..b8 acquisition: auto-install conditions, approval, install, pin, register, health ====
+$ (a) all conditions except the security evidence record: descriptor claims security_review: passed with no governed record
+  installed= False gate= HDG-0001
+     role_has_install_authority True role tooling-engineer; install roles ["tooling-engineer", "orchestrator"]
+     installation_reversible True descriptor.reversible
+     cost_within_budget True cost 0 <= 0
+     no_privilege_escalation True required ["READ_REPO"] within role permissions ["READ_REPO", "WRITE_REPO_SCOPED", "RUN_TES
+     licence_and_security_satisfied False license MIT; security_review "passed" evidenced by no governed record (descriptor.security
+     version_pinned_and_recorded True descriptor.version_pin
+     tool_registered True will be registered under governance/project/tools/
+     environment_reproducible True install and uninstall commands declared
+$ (b) the human approves the install gate (HDG-0001): present, decide A; then re-run the same install
+exit=0 ok=true
+exit=0 ok=true
+  after approval: installed= False new gate= HDG-0002
+  citing the answered gate in the descriptor: installed= False new gate= HDG-0003
+  tools.rs: 455:        return Ok(json!({"installed": false, "human_gate": gate["id"], "checks": checks}));
+  (tools::install never reads an answered gate; an approved install can only proceed if the descriptor itself meets every automatic condition)
+$ (c) security evidence resolved through a governed record + all conditions -> autonomous install
+  installed= True executed= True exec= {'exit': 0, 'stdout': '', 'stderr': ''} health= {'tool_id': 'TOOL-QC-C', 'ok': True, 'kind': 'command', 'exit': 0, 'stderr': ''} registered_at= governance/project/tools/TOOL-QC-C.yaml None
+  resolve after install: tools= ['TOOL-QC-C'] gap= False
+  record: version_pin: 1.0.0
+  record: status: active
+  record: installed_by: S-te
+  record: installed_at: '2026-09-19T00:33:44Z'
+  record: approved_roles:
+$ (d) cost over budget / licence not approved / irreversible / privilege escalation / no version pin -> each fails its condition and raises a gate
+  cost_usd=500                             installed= False gate= HDG-0004 failed= ['cost_within_budget']
+  license="GPL-3.0"                        installed= False gate= HDG-0005 failed= ['licence_and_security_satisfied']
+  reversible=false                         installed= False gate= HDG-0006 failed= ['installation_reversible']
+  required_permission_classes=["SECRET_READ"] installed= False gate= HDG-0007 failed= ['no_privilege_escalation']
+  version_pin=""                           installed= False gate= HDG-0008 failed= ['version_pinned_and_recorded']
+  uninstall_command=[]                     installed= False gate= HDG-0009 failed= ['environment_reproducible']
+$ is 'maintenance' reviewed anywhere? (conditions evaluated)
+   ['role_has_install_authority', 'installation_reversible', 'cost_within_budget', 'no_privilege_escalation', 'licence_and_security_satisfied', 'version_pinned_and_recorded', 'tool_registered', 'environment_reproducible']
+$ (e) health test after install: a tool whose health check FAILS
+  installed= True health= {'tool_id': 'TOOL-QC-E', 'ok': False, 'kind': 'command', 'exit': 1, 'stderr': ''}
+  resolve still offers: ['TOOL-QC-C', 'TOOL-QC-E']
+  TOOL-QC-E record status: active
+$ (f) install command fails -> nothing registered
+exit=1 ok=false code=INSTALL_FAILED msg=install command failed (1)
+  tools dir: TOOL-QC-C.yaml
+  tools dir: TOOL-QC-E.yaml
+$ (g) install without --execute: registered as active although install_command never ran
+  installed= True executed= False
+$ (h) continue task: the missing-tool gap is not linked to any task (required_tools is never checked)
+  TASK-NEEDS-TOOL runnable: False
+  continue -> None skills gap: None
+
+==== F2.b8.x approval standing shown by the generated registry for a HAND-DECLARED plugin that claims provenance in its own descriptor ====
+  OS plugin registry has claimsreg: False
+  generated tool-registry entry: status=active approved_roles=['all'] provenance={'registered_at': '2026-01-01T00:00:00Z', 'registered_by_role': 'human', 'method': 'gov plugins register'} denied_for_acting_role=None
+  role_exposure lists claimsreg for: ['backend-engineer', 'change-controller', 'data-engineer', 'devops-engineer', 'frontend-engineer', 'independent-auditor', 'independent-test-designer', 'memory-engineer', 'migration-executor', 'orchestrator', 'release-agent', 'research-agent', 'security-engineer', 'test-execution-agent', 'tooling-engineer']
+  tools resolve --capability embed as backend-engineer (L1): ['claimsreg']
+  capabilities invoke claimsreg as backend-engineer (L1): exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'execute_plugin' (requires L2); AUTHORITY_POLICY.auth
+END

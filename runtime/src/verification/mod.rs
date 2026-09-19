@@ -1,11 +1,20 @@
-//! Governance verification suite (framework §63-64) producing a governed audit record whose green status is tied
-//! to an inputs hash (a green record becomes stale when suite inputs change).
+//! Governance verification suite (framework §63-64; Contract v3 Gate O2/O4/O5).
+//!
+//! The families are executed by the Governance Health Scheduler (`crate::scheduler`): dependency-aware selection,
+//! concurrent execution, sandbox isolation for checks that write state, a cache keyed by the digests of each check's
+//! declared inputs, and a ledger of every health result with provenance. A green governance-suite record is current
+//! only while its `inputs_hash` equals the key over **every** Contract v3:97-109 input class ([`currency`]).
 use crate::memory::db::RuntimeDb;
 use crate::memory::manifest::freshness;
 use crate::records::{new_record, save_record, RecordStore};
-use crate::util::{hash_tree, hash_value, now_iso, read_yaml};
+use crate::scheduler::{self, CacheMode, RecordPolicy, RunOptions, Selection, Tier, Trigger};
+use crate::util::{now_iso, read_yaml};
 use crate::{graph, Project, Result};
 use serde_json::{json, Value};
+
+pub mod currency;
+pub mod families_ext;
+pub mod product;
 
 pub const KNOWN_CLI: &[&str] = &[
     "status",
@@ -48,39 +57,17 @@ pub const KNOWN_CLI: &[&str] = &[
     "lessons",
     "plugins",
     "policy",
+    "health",
 ];
 
-/// Hash of inputs relevant to the governance suite: kernel, overlay, governance tests, decisions.
+/// The suite-level currency key over every evidence input class (see [`currency`]).
 pub fn inputs_hash(p: &Project) -> String {
-    let mut parts = vec![];
-    for sub in [
-        "governance/kernel",
-        "governance/project",
-        "governance/tests",
-        "spec/decisions",
-        "governance/framework.lock",
-    ] {
-        let path = p.root.join(sub);
-        if path.is_dir() {
-            parts.push(json!({sub: hash_tree(&path, &[]).map(|(h, _)| h).unwrap_or_default()}));
-        } else if path.is_file() {
-            parts.push(json!({sub: crate::util::sha256_file(&path).unwrap_or_default()}));
-        }
-    }
-    hash_value(&json!(parts))
+    currency::inputs_hash(p)
 }
 
+/// The latest green governance-suite record.
 pub fn latest_green(p: &Project) -> Option<Value> {
-    let store = RecordStore::load(&p.root);
-    let mut audits: Vec<&crate::records::Record> = store
-        .of_type("audit")
-        .into_iter()
-        .filter(|a| {
-            a.data["green"].as_bool().unwrap_or(false) && a.get("scope") == "governance-suite"
-        })
-        .collect();
-    audits.sort_by_key(|a| a.id());
-    audits.last().map(|a| a.data.clone())
+    currency::latest_green(p)
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
@@ -100,21 +87,28 @@ pub struct SuiteOptions {
     pub families: Vec<String>,
 }
 
-pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
+/// What a family executes against: a project (live, or a sandbox copy), its derived index and its records.
+pub struct FamilyCtx<'a> {
+    pub p: &'a Project,
+    pub db: Option<&'a RuntimeDb>,
+    pub store: &'a RecordStore,
+    pub deep: bool,
+    /// The run's input snapshot (shared by every family of one scheduler run).
+    pub snapshot: Option<&'a currency::Snapshot>,
+}
+
+/// Execute one governance family. Called by the scheduler on a worker thread (or inside a sandbox).
+pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
+    let p = ctx.p;
+    let store = ctx.store;
+    let db = ctx.db;
     let pol = p.policies();
-    let want = pol.get_list("TEST_POLICY", "governance_families");
-    let db_exists = p.db_path().exists();
-    let db = if db_exists {
-        Some(RuntimeDb::open(&p.db_path())?)
-    } else {
-        None
+    let fam = fam.to_string();
+    let opts = SuiteOptions {
+        deep: ctx.deep,
+        families: vec![],
     };
-    let store = RecordStore::load(&p.root);
-    let mut out = vec![];
-    for fam in want {
-        if !opts.families.is_empty() && !opts.families.contains(&fam) {
-            continue;
-        }
+    {
         let mut f = Family {
             id: fam.clone(),
             ok: true,
@@ -428,8 +422,8 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
             "context_reproducibility" => {
                 if let Some(db) = &db {
                     if let Some(t) = store.of_type("task").first() {
-                        let a = crate::context::compile(p, db, &t.id())?;
-                        let b = crate::context::compile(p, db, &t.id())?;
+                        let a = crate::context::compile(p, *db, &t.id())?;
+                        let b = crate::context::compile(p, *db, &t.id())?;
                         if a["deterministic_hash"] != b["deterministic_hash"] {
                             f.findings.push(finding(
                                 "high",
@@ -506,9 +500,18 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 f.detail = v;
             }
             "skill_regression" => {
-                for pr in crate::skills::validate_all(p) {
-                    f.findings.push(finding("medium", &fam, pr, None));
-                }
+                // version ↔ content binding and executed validation scenarios (each in its own sandbox)
+                let (findings, detail) = crate::skills::regression(
+                    p,
+                    &crate::skills::RegressionOptions {
+                        execute: true,
+                        only: None,
+                        observe: true,
+                        include_deferred: false,
+                    },
+                );
+                f.findings.extend(findings);
+                f.detail = detail;
             }
             "command_contract_consistency" => {
                 let c = read_yaml(
@@ -850,6 +853,17 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
             "audit_reproducibility" => {
                 f.detail = json!({"note": "result hash compared across two consecutive in-process runs by `gov audit` (see audit record result_hash)"});
             }
+            "product_test_health" => {
+                let (findings, detail) = product::health_findings(p, ctx.snapshot);
+                f.findings.extend(findings);
+                f.detail = detail;
+            }
+            "human_gate_integrity" => families_ext::human_gate_integrity(store, &mut f),
+            "change_control_integrity" => families_ext::change_control_integrity(p, store, &mut f),
+            "continuity_checkpoint_handoff" => {
+                families_ext::continuity_checkpoint_handoff(p, store, &mut f)
+            }
+            "model_routing_integrity" => families_ext::model_routing_integrity(p, store, &mut f),
             other => {
                 f.findings.push(finding(
                     "low",
@@ -859,83 +873,150 @@ pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
                 ));
             }
         }
+        let _ = &opts;
         f.ok = !f.findings.iter().any(|x| {
             matches!(
                 x["severity"].as_str(),
                 Some("critical") | Some("high") | Some("medium")
             )
         });
-        out.push(f);
+        Ok(f)
     }
-    Ok(out)
+}
+
+/// Compatibility entry point: execute the (selected) suite families through the scheduler without reading or writing
+/// the cache or the ledger. Families run concurrently; state-writing families run in sandboxes.
+pub fn run(p: &Project, opts: &SuiteOptions) -> Result<Vec<Family>> {
+    let mut o = RunOptions::new(Tier::G5, Trigger::new("verification::run"));
+    o.selection = if opts.families.is_empty() {
+        Selection::All
+    } else {
+        Selection::Explicit(opts.families.clone())
+    };
+    o.cache = CacheMode::Off;
+    o.deep = opts.deep;
+    o.surface = "suite".into();
+    o.record = RecordPolicy::Never;
+    o.ledger = false;
+    let out = scheduler::run_suite(p, &o)?;
+    Ok(out.wanted_families())
 }
 
 fn result_hash(fams: &[Family]) -> String {
-    hash_value(&json!(fams
+    crate::util::hash_value(&json!(fams
         .iter()
         .map(|f| json!({"id": f.id, "ok": f.ok, "findings": f.findings}))
         .collect::<Vec<_>>()))
 }
 
-/// Run the suite (twice for reproducibility), write an audit record, return verdict.
+/// `gov audit`: the full suite (G5) through the scheduler. Checks whose declared inputs are unchanged since their
+/// cached result are served from the cache (`--no-cache` re-executes them); everything executed is shown
+/// reproducible (double run or identical-key comparison). Persists a governance-suite record with provenance.
 pub fn audit(p: &Project, opts: &SuiteOptions, persist: bool) -> Result<Value> {
-    let fams = run(p, opts)?;
-    let h1 = result_hash(&fams);
-    let fams2 = run(
-        p,
-        &SuiteOptions {
-            deep: false,
-            families: opts.families.clone(),
-        },
-    )?;
-    let h2 = result_hash(&fams2);
+    let mut o = RunOptions::new(Tier::G5, Trigger::new("gov audit"));
+    o.selection = if opts.families.is_empty() {
+        Selection::All
+    } else {
+        Selection::Explicit(opts.families.clone())
+    };
+    o.cache = CacheMode::Use;
+    o.deep = opts.deep;
+    o.surface = "audit".into();
+    o.record = if persist {
+        RecordPolicy::Always
+    } else {
+        RecordPolicy::Never
+    };
+    audit_with(p, &o)
+}
+
+/// Run the suite under `o` and shape the result as an audit (the envelope every caller of [`audit`] relies on),
+/// persisting a governance-suite record according to `o.record`.
+pub fn audit_with(p: &Project, o: &RunOptions) -> Result<Value> {
+    let mut out = scheduler::run_suite(p, o)?;
+    let wanted = out.wanted_families();
     let mut findings: Vec<Value> = vec![];
     let mut n = 0;
-    for f in &fams {
+    for f in &wanted {
         for x in &f.findings {
             n += 1;
             let mut y = x.clone();
             y["id"] = json!(format!("GF-{n:04}"));
-            if y["path"].is_null() {
-                y.as_object_mut().unwrap().remove("path");
+            if let Some(obj) = y.as_object_mut() {
+                if obj.get("path").map(|v| v.is_null()).unwrap_or(false) {
+                    obj.remove("path");
+                }
+                if obj.get("covers").map(|v| v.is_null()).unwrap_or(false) {
+                    obj.remove("covers");
+                }
             }
             findings.push(y);
         }
     }
-    let reproducible = h1 == h2 || opts.deep;
-    if !reproducible {
-        findings.push(json!({"id": format!("GF-{:04}", n + 1), "severity": "high", "family": "audit_reproducibility", "message": "governance suite results differ between two consecutive runs"}));
-    }
-    let has = |sev: &str| findings.iter().any(|x| x["severity"].as_str() == Some(sev));
-    let verdict = if has("critical") || has("high") {
-        "UNHEALTHY"
-    } else if has("medium") {
-        "DEGRADED"
-    } else {
-        "HEALTHY"
-    };
-    let green = verdict == "HEALTHY";
-    let families: serde_json::Map<String, Value> = fams
+    let reproducible = !out.runs.iter().any(|r| r.reproducible == Some(false));
+    let verdict = out.result["verdict"]
+        .as_str()
+        .unwrap_or("UNHEALTHY")
+        .to_string();
+    let complete = out.complete();
+    let suite_verdict = out.result["suite_verdict"]
+        .as_str()
+        .unwrap_or("INCOMPLETE")
+        .to_string();
+    let green = complete && suite_verdict == "HEALTHY" && verdict == "HEALTHY";
+    let families: serde_json::Map<String, Value> = out
+        .runs
         .iter()
-        .map(|f| {
-            (
+        .filter(|r| r.wanted)
+        .filter_map(|r| {
+            let f = r.family.as_ref()?;
+            Some((
                 f.id.clone(),
-                json!({"ok": f.ok, "findings": f.findings.len(), "detail": f.detail}),
-            )
+                json!({"ok": f.ok, "findings": f.findings.len(), "detail": f.detail, "status": match r.status { scheduler::Status::Executed => "executed", scheduler::Status::Reused => "reused", scheduler::Status::NotEvaluated => "not-evaluated" }, "cached_from": r.cached_from}),
+            ))
         })
         .collect();
-    let ih = inputs_hash(p);
+    let ih = out.snapshot.key();
+    let h1 = result_hash(&wanted);
+    let write = match o.record {
+        RecordPolicy::Always => true,
+        RecordPolicy::Never => false,
+        RecordPolicy::WhenCompleteAndStale => {
+            green
+                && latest_green(p)
+                    .map(|g| g["inputs_hash"].as_str() != Some(ih.as_str()))
+                    .unwrap_or(true)
+        }
+    };
+    let counts = json!({"critical": findings.iter().filter(|x| x["severity"] == "critical").count(), "high": findings.iter().filter(|x| x["severity"] == "high").count(), "medium": findings.iter().filter(|x| x["severity"] == "medium").count(), "low": findings.iter().filter(|x| x["severity"] == "low").count()});
+    let provenance = json!({
+        "tier": o.tier.as_str(), "trigger": o.trigger.to_value(), "health_result": out.result["id"],
+        "checks": out.result["checks"], "run_summary": out.result["summary"], "parallelism": out.result["parallelism"],
+        "cache_mode": o.cache.as_str(), "runtime": out.result["runtime"], "machine_trust": out.result["machine_trust"],
+        "repository": out.result["repository"], "actor": out.result["actor"], "started_at": out.result["started_at"],
+        "finished_at": out.result["finished_at"],
+    });
     let mut id = String::new();
-    if persist {
+    if write {
         let store = RecordStore::load(&p.root);
         id = store.next_id("audit");
+        let mut fields = json!({"scope": "governance-suite", "auditor_role": p.role, "session": p.session_id, "families": families, "findings": findings, "verdict": verdict, "suite_verdict": suite_verdict, "complete": complete, "inputs_hash": ih, "inputs": out.snapshot.classes_value(), "result_hash": h1, "reproducible": reproducible, "green": green, "state_class": "EVIDENCE", "run_at": now_iso(), "deep": o.deep});
+        if let (Some(m), Some(pv)) = (fields.as_object_mut(), provenance.as_object()) {
+            for (k, v) in pv {
+                m.insert(k.clone(), v.clone());
+            }
+        }
         let rec = new_record(
             "audit",
             &id,
             &format!("Governance suite audit {id} ({verdict})"),
-            json!({"scope": "governance-suite", "auditor_role": p.role, "session": p.session_id, "families": families, "findings": findings, "verdict": verdict, "inputs_hash": ih, "result_hash": h1, "green": green, "state_class": "EVIDENCE", "run_at": now_iso(), "deep": opts.deep}),
+            fields,
         );
         save_record(&p.root, &rec)?;
+        out.result["record"] = json!(id);
+        if o.ledger {
+            let _ = scheduler::store::save_result(p, &out.result);
+        }
         // the audit record is evidence; keep the derived index fresh (verifier L4 / HV-28)
         if p.db_path().exists() {
             let _ = crate::memory::indexer::rebuild(
@@ -947,60 +1028,54 @@ pub fn audit(p: &Project, opts: &SuiteOptions, persist: bool) -> Result<Value> {
             );
         }
     }
+    Ok(json!({
+        "audit": id, "verdict": verdict, "green": green, "families": families, "findings": findings,
+        "inputs_hash": ih, "inputs": out.snapshot.classes_value(), "result_hash": h1, "reproducible": reproducible, "counts": counts,
+        "complete": complete, "suite_verdict": suite_verdict,
+        "health_result": out.result["id"], "tier": o.tier.as_str(), "summary": out.result["summary"],
+        "parallelism": out.result["parallelism"], "cache_mode": o.cache.as_str(), "state": out.result["state"], "blocks": out.result["blocks"],
+        "runtime": out.result["runtime"], "repository": out.result["repository"],
+    }))
+}
+
+/// **The task-close health gate (integration point for `orchestration::tasks::close`, WS-5).** One call covering
+/// the health duties of a close, in order:
+///
+/// 1. **G0** — `scheduler::guard("task.close", touched)`: an active hard-block governing the touched paths refuses;
+/// 2. **G2 re-check** — stale evidence is re-checked before the close may rely on it (Contract v3:111). For a
+///    governance-affecting task every stale suite check is re-executed (the rest are served from the cache) and a
+///    governance-suite record is written when that re-establishes currency; otherwise the G2 checks run;
+/// 3. **O4** — `currency::enforce_close`: governance-affecting work (by class or by governed inputs touched) cannot
+///    close on stale or absent green evidence (`force` records the degradation instead);
+/// 4. **O1/U** — `product::enforce_close`: the test outcome comes from recorded per-family evidence, not the report.
+///
+/// `touched` must be the union of the report's `files_changed` and the mutations observed since the claim.
+/// Returns the notes to record as `degraded` on the report, and the G2 health result id.
+pub fn close_gate(
+    p: &Project,
+    task: &Value,
+    report: &Value,
+    touched: &[String],
+    force: bool,
+) -> Result<Value> {
+    scheduler::guard(p, scheduler::catalogue::ops::TASK_CLOSE, touched)?;
+    let (affecting, reasons) = currency::governance_affecting(task, touched);
+    let id = task["id"].as_str().unwrap_or("?");
+    let mut o = RunOptions::new(Tier::G2, scheduler::Trigger::task_close(id, touched));
+    o.surface = "task.close".into();
+    if affecting {
+        o.selection = Selection::All;
+    }
+    let g2 = audit_with(p, &o)?;
+    let mut degraded = currency::enforce_close(p, task, touched, force)?;
+    degraded.extend(product::enforce_close(p, task, report, touched)?);
     Ok(
-        json!({"audit": id, "verdict": verdict, "green": green, "families": families, "findings": findings, "inputs_hash": ih, "result_hash": h1, "reproducible": reproducible, "counts": {"critical": findings.iter().filter(|x| x["severity"] == "critical").count(), "high": findings.iter().filter(|x| x["severity"] == "high").count(), "medium": findings.iter().filter(|x| x["severity"] == "medium").count(), "low": findings.iter().filter(|x| x["severity"] == "low").count()}}),
+        json!({"allowed": true, "governance_affecting": affecting, "reasons": reasons, "g2": {"health_result": g2["health_result"], "verdict": g2["verdict"], "record": g2["audit"], "summary": g2["summary"]}, "degraded": degraded}),
     )
 }
 
-/// Run the product test command declared in PROJECT_POLICY (or detected ecosystem) and record evidence.
+/// `gov verify product`: run every product test family this project can run and record the results as governed,
+/// freshness-bound evidence (see [`product`]). A failing family is returned as `PRODUCT_TESTS_FAILED`.
 pub fn product_suite(p: &Project) -> Result<Value> {
-    let pp = p.project_policy();
-    let mut cmd: Vec<String> = pp["tests"]["product_test_command"]
-        .as_array()
-        .map(|a| {
-            a.iter()
-                .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                .collect()
-        })
-        .unwrap_or_default();
-    let mut source = "PROJECT_POLICY.tests.product_test_command".to_string();
-    if cmd.is_empty() {
-        let eco = crate::capabilities::ecosystems::detect(&p.root, &[p.contract().root("product")]);
-        if let Some(e) = eco["ecosystems"].as_array().and_then(|a| {
-            a.iter()
-                .find(|e| e["test"].is_object() && e["available"].as_bool().unwrap_or(false))
-        }) {
-            cmd = e["test"]["command"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                .collect();
-            source = format!("ecosystem:{}", e["id"].as_str().unwrap_or(""));
-            if let Some(d) = e["dir"].as_str() {
-                if !d.is_empty() {
-                    return run_product_cmd(p, &cmd, &p.root.join(d), &source);
-                }
-            }
-        }
-    }
-    if cmd.is_empty() {
-        return Ok(
-            json!({"ran": false, "reason": "no product test command configured or detectable (capability gap)", "status": "not_applicable_with_reason"}),
-        );
-    }
-    run_product_cmd(p, &cmd, &p.root, &source)
-}
-
-fn run_product_cmd(
-    p: &Project,
-    cmd: &[String],
-    cwd: &std::path::Path,
-    source: &str,
-) -> Result<Value> {
-    let (code, out, err) = crate::util::run_cmd(cmd, cwd)?;
-    let status = if code == 0 { "passed" } else { "failed" };
-    let ev = json!({"ran": true, "command": cmd, "cwd": cwd.to_string_lossy(), "source": source, "exit": code, "status": status, "stdout_tail": out.lines().rev().take(20).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n"), "stderr_tail": err.lines().rev().take(20).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n"), "at": now_iso()});
-    crate::observability::emit(p, "product.suite", ev.clone())?;
-    Ok(ev)
+    product::run(p, &[])
 }

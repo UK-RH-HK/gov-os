@@ -1,0 +1,93 @@
+
+=== baseline: every family ok, verdict HEALTHY
+exit=0 {"families_ok": ["adapter_portability", "audit_reproducibility", "authority_role_limits", "command_contract_consistency", "concurrency_claims", "context_reproducibility", "fresh_agent_reconstruction", "graph_integrity", "index_freshness", "memory_retrieval_regression", "mutation_scope", "path_map_compliance", "plugin_governance", "policy_enforcement_coverage", "policy_precedence", "product_traceability", "recovery_rebuild", "schema_invariants", "secrets_sensitivity_indexing", "skill_regression"], "n": 20, "verdict": "HEALTHY"}
+
+=== 1 schema/invariants — decision record with a lifecycle status outside AUTHORITY_POLICY
+exit=3 {"detail": {"records_checked": 2}, "family_ok": false, "findings": [["high", "D-0901 (decision): /status: \"BOGUS_STATUS\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTORICAL\",\"REJECTED\",\"DEPRECATED\",\"RETIRED\"]"], ["high", "D-0901 has status 'BOGUS_STATUS' outside AUTHORITY_POLICY.lifecycle_statuses"]]}
+   full-suite: exit=3 {"findings": [["schema_invariants", "high", "D-0901 (decision): /status: \"BOGUS_STATUS\" is not one of [\"ACTIVE\",\"PROVISIONAL\",\"SUPERSEDED\",\"LEGACY\",\"HISTOR"], ["schema_invariants", "high", "D-0901 has status 'BOGUS_STATUS' outside AUTHORITY_POLICY.lifecycle_statuses"], ["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"]], "verdict": "UNHEALTHY"}
+
+=== 2 graph integrity — task depends on a task that does not exist
+exit=3 {"detail": {"dangling": 0, "edge_types": {"CALLS": 1}, "orphans": 1}, "family_ok": false, "findings": [["high", "task \"TASK-0901\" depends on missing \"TASK-9999\""]]}
+   full-suite: exit=3 {"findings": [["graph_integrity", "high", "task \"TASK-0901\" depends on missing \"TASK-9999\""], ["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]], "verdict": "UNHEALTHY"}
+
+=== 3 index freshness — an indexed file (spec/now/NOW.md, src/lib.rs) edited after the index build
+exit=0 {"detail": {"added": [], "checked": 159, "removed": [], "stale": ["spec/now/NOW.md", "src/lib.rs"]}, "family_ok": false, "findings": [["medium", "index stale: 2 changed, 0 added, 0 removed"]]}
+   full-suite: exit=3 {"findings": [["index_freshness", "medium", "index stale: 2 changed, 0 added, 0 removed"], ["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 1.00 mrr 1.00 stale 0.11 superseded 0.00 forbidden 0"]], "verdict": "UNHEALTHY"}
+
+=== 4 retrieval regression — held-out queries now expect an artefact the index will not return
+exit=3 {"detail": {"failed": ["HQ-001", "HQ-002", "HQ-003", "HQ-004", "HQ-005", "HQ-006", "HQ-007", "HQ-008"], "mrr": 0.5294117647058824, "pending": 2, "precision_at_k": 0.5, "queries": 17, "recall_at_k": 0.5294117647058824, "status": "FAIL"}, "family_ok": false, "findings": [["high", "held-out retrieval regression failed: recall@k 0.53 mrr 0.53 stale 0.00 superseded 0.00 forbidden 0"]]}
+   full-suite: exit=3 {"findings": [["memory_retrieval_regression", "high", "held-out retrieval regression failed: recall@k 0.53 mrr 0.53 stale 0.00 superseded 0.00 forbidden 0"]], "verdict": "UNHEALTHY"}
+
+=== 5 authority/role limits — a task contract whose allowed_paths include the immutable kernel (INV-007)
+exit=3 {"detail": null, "family_ok": false, "findings": [["critical", "TASK-0902 allowed_paths include governance/kernel (INV-007)"]]}
+   full-suite: exit=3 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["authority_role_limits", "critical", "TASK-0902 allowed_paths include governance/kernel (INV-007)"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]], "verdict": "UNHEALTHY"}
+
+=== 6 mutation scope — kernel payload modified in place
+exit=3 {"detail": null, "family_ok": false, "findings": [["critical", "kernel payload modified in place (INV-007): modified [\"policies/TEST_POLICY.yaml\"] missing [] added []"]]}
+   full-suite: exit=3 {"findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload does not match KERNEL_MANIFEST.json: modified [\"policies/"], ["index_freshness", "medium", "index stale: 1 changed, 0 added, 0 removed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"policies/TEST_POLICY.yaml\"] missing [] added []"], ["policy_precedence", "critical", "constitutional policy is not being read from a verified kernel: installed kernel FAILED verification (kernel p"]], "verdict": "UNHEALTHY"}
+
+=== 7 repository/path-map compliance — secret content planted in a non-secret product path
+exit=3 {"detail": {"secret_content_outside_secret_class": ["src/creds.rs"], "unmatched": 0}, "family_ok": false, "findings": [["critical", "secret content in a non-secret-class path (blocked from index; must be moved or classified secret)"]]}
+   full-suite: exit=3 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["path_map_compliance", "critical", "secret content in a non-secret-class path (blocked from index; must be moved or classified secret)"]], "verdict": "UNHEALTHY"}
+
+=== 8 context reproducibility — overlay adds a deterministic field the compiled packet does not carry (additive, allowed)
+exit=0 {"detail": {"chars": 18456, "deterministic_hash": "499b33b224356e12e79017425d38b1f3fa62152a4e1a60b8e541cef0af1f2222", "task": "TASK-0903"}, "family_ok": false, "findings": [["medium", "context packet lacks deterministic field 'probe_required_field' (CONTEXT_POLICY.deterministic_authority_fields)"], ["low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]]}
+   full-suite: exit=0 {"findings": [["index_freshness", "medium", "index stale: 1 changed, 1 added, 0 removed"], ["context_reproducibility", "medium", "context packet lacks deterministic field 'probe_required_field' (CONTEXT_POLICY.deterministic_authority_fields"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"], ["adapter_portability", "medium", "adapter manifest overlay_hash differs from current overlay (stale adapters)"]], "verdict": "DEGRADED"}
+# 8b same family on the untouched baseline with NO task records (vacuity check):
+exit=0 {"detail": null, "ok": true}
+
+=== 9 concurrency/session claims — a claim held on a task id that does not exist
+exit=0 {"detail": {"claims": 1, "expired": 0}, "family_ok": false, "findings": [["medium", "claim references unknown task \"TASK-9998\""]]}
+   full-suite: exit=0 {"findings": [["concurrency_claims", "medium", "claim references unknown task \"TASK-9998\""]], "verdict": "DEGRADED"}
+# 9b expired claim on an existing task (severity low):
+exit=0 {"detail": {"claims": 1, "expired": 1}, "family_ok": true, "findings": [["low", "1 expired claim(s) not swept"]]}
+   full-suite: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"], ["concurrency_claims", "low", "1 expired claim(s) not swept"]], "verdict": "DEGRADED"}
+
+=== 10 adapter/model portability — generated provider adapter edited by hand
+tampered: governance/generated/adapters/api/system-instruction.txt
+exit=0 {"detail": {"adapters_checked": 5, "invariants": 15, "ok": false, "problems": ["api: output governance/generated/adapters/api/system-instruction.txt modified since generation"]}, "family_ok": false, "findings": [["medium", "api: output governance/generated/adapters/api/system-instruction.txt modified since generation"]]}
+   full-suite: exit=0 {"findings": [["adapter_portability", "medium", "api: output governance/generated/adapters/api/system-instruction.txt modified since generation"]], "verdict": "DEGRADED"}
+
+=== 11 skill regression — project skill declared with no validation scenarios
+exit=0 {"detail": null, "family_ok": false, "findings": [["medium", "SKL-PROBE: <root>: \"method\" is a required property"], ["medium", "SKL-PROBE: no validation scenarios"]]}
+   full-suite: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["skill_regression", "medium", "SKL-PROBE: <root>: \"method\" is a required property"], ["skill_regression", "medium", "SKL-PROBE: no validation scenarios"]], "verdict": "DEGRADED"}
+# 11b a skill whose declared validation scenario is FALSE is not detected (scenarios are never executed):
+exit=0 {"detail": null, "family_ok": true, "findings": []}
+   full-suite: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"]], "verdict": "DEGRADED"}
+
+=== 12 command-contract consistency — COMMAND_CONTRACT maps an operation to a CLI verb that does not exist
+exit=0 {"detail": null, "family_ok": false, "findings": [["medium", "operation \"probe_op\" maps to unknown CLI command 'frobnicate'"]]}
+   full-suite: exit=3 {"findings": [["schema_invariants", "high", "installed kernel failed verification: kernel payload does not match KERNEL_MANIFEST.json: modified [\"commands/"], ["index_freshness", "medium", "index stale: 1 changed, 0 added, 0 removed"], ["mutation_scope", "critical", "kernel payload modified in place (INV-007): modified [\"commands/COMMAND_CONTRACT.yaml\"] missing [] added []"], ["command_contract_consistency", "medium", "operation \"probe_op\" maps to unknown CLI command 'frobnicate'"], ["policy_precedence", "critical", "constitutional policy is not being read from a verified kernel: installed kernel FAILED verification (kernel p"]], "verdict": "UNHEALTHY"}
+
+=== 13 secrets/sensitivity indexing — a secret-bearing chunk injected into the derived index
+# injected chunk file:archive/code-reference/.gitkeep#0-probe
+exit=3 {"detail": {"excluded": 0, "leaked_chunks": 1, "secret_artifacts": 0}, "family_ok": false, "findings": [["critical", "secret pattern found in indexed chunk \"file:archive/code-reference/.gitkeep#0-probe\" (INV-009)"]]}
+   full-suite: exit=3 {"findings": [["secrets_sensitivity_indexing", "critical", "secret pattern found in indexed chunk \"file:archive/code-reference/.gitkeep#0-probe\" (INV-009)"]], "verdict": "UNHEALTHY"}
+
+=== 14 recovery/rebuild — tracked index-manifest hash no longer matches the live runtime
+exit=0 {"detail": {"deep": false, "live": "9bde8ceb23aa4a7f32fdba48c0456e26478ba91f9e699e134bea936151ced367", "tracked": "0000000000000000000000000000000000000000000000000000000000000000"}, "family_ok": false, "findings": [["medium", "tracked index-manifest hash differs from live runtime (rebuild or commit manifests)"]]}
+   full-suite: exit=0 {"findings": [["recovery_rebuild", "medium", "tracked index-manifest hash differs from live runtime (rebuild or commit manifests)"]], "verdict": "DEGRADED"}
+# 14b deep mode (two full rebuilds compared) on the untouched baseline:
+exit=0 {"detail": {"deep": true, "duration_ms": 181, "rebuild_1": "9bde8ceb23aa4a7f32fdba48c0456e26478ba91f9e699e134bea936151ced367", "rebuild_2": "9bde8ceb23aa4a7f32fdba48c0456e26478ba91f9e699e134bea936151ced367", "tracked_before": "9bde8ceb23aa4a7f32fdba48c0456e26478ba91f9e699e134bea936151ced367"}, "ok": true}
+
+=== 15 fresh-agent reconstruction — read budget lowered below what reconstruction needs
+exit=0 {"detail": {"budget": 2, "next_action": "no runnable tasks: run readiness planning or discovery", "reads": 4, "status_chars": 1693}, "family_ok": false, "findings": [["medium", "fresh-agent reconstruction needs 4 file reads > budget 2"]]}
+   full-suite: exit=0 {"findings": [["index_freshness", "medium", "index stale: 1 changed, 0 added, 0 removed"], ["adapter_portability", "medium", "adapter manifest overlay_hash differs from current overlay (stale adapters)"], ["fresh_agent_reconstruction", "medium", "fresh-agent reconstruction needs 4 file reads > budget 2"]], "verdict": "DEGRADED"}
+
+=== 16 product traceability — task marked DONE without any closing report
+exit=0 {"detail": {"done": 1, "features": 0, "task_traceability": 0.0, "tasks": 1}, "family_ok": false, "findings": [["medium", "TASK-0905 is DONE without a closing report"]]}
+   full-suite: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"], ["product_traceability", "medium", "TASK-0905 is DONE without a closing report"]], "verdict": "DEGRADED"}
+
+=== 17 audit reproducibility — what the family itself checks
+exit=0 {"family_detail": {"note": "result hash compared across two consecutive in-process runs by `gov audit` (see audit record result_hash)"}, "reproducible": true, "result_hash": "f2eda58a0fca800d45d200430465b65ca900bb9cc6c4086484d22c5ce4838942"}
+# the family body is a constant note; the comparison is done by audit() over two in-process runs (runtime/src/verification/mod.rs:880-907).
+# 17b attempt to make two consecutive runs differ: a claim whose lease expires while the audit is running.
+attempt 0: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_field"]], "reproducible": true}
+attempt 1: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_field"], ["concurrency_claims", "low", "1 expired claim(s) not swept"]], "reproducible": true}
+attempt 2: exit=0 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_field"]], "reproducible": true}
+attempt 3: exit=3 {"findings": [["index_freshness", "medium", "index stale: 0 changed, 1 added, 0 removed"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_field"], ["audit_reproducibility", "high", "governance suite results differ between two consecutive runs"]], "reproducible": false}
+# non-reproducible run observed and flagged at attempt 3
+# 17c --deep: run 1 (deep) rebuilds the live index mid-suite, run 2 (non-deep) sees a different state; is that flagged?
+exit=0 {"findings": [["index_freshness", "medium", "index stale: 1 changed, 0 added, 0 removed"]], "reproducible": true}
+# the same project immediately afterwards (non-deep): the stale finding reported above no longer reproduces
+exit=0 {"findings": [], "reproducible": true}

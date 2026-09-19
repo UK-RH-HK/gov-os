@@ -1,8 +1,31 @@
 policy: HUMAN_GATE_POLICY
 version: 1.0.0
 raise_for: [product_direction, expensive_or_irreversible_architecture, privacy_security_legal, major_data_migration, destructive_data_action, vendor_choice, ux_direction, commercial_assumption, high_cost_infrastructure, material_acceptance_criterion, low_confidence_critical_path, governance_change]
-agent_resolvable_when: {max_radius: R1, min_confidence: 0.8, reversible: true}
+# BC-P2-18: an agent resolves only on an ASSESSED radius, reversibility and confidence (an unassessed value counts
+# against it), with a recorded rationale, and only when the assessment was not made solely by the resolving session
+# (another session raised it, or the OS computed it).
+agent_resolvable_when: {max_radius: R1, min_confidence: 0.8, reversible: true, require_assessed: true, independent_assessment: true}
+# BC-P2-18 / framework §51: gates raised for these triggers are human decisions and never agent-resolvable (refused at
+# answer time and again when a consumer reads the answer). A project may add triggers, never remove them.
+human_only_triggers: [framework_update, destructive_migration, privilege_elevation, kernel_integrity_override, tool_install, budget_threshold]
+# BC-P2-49: every field must carry substantive content; permitted_next_actions are derived by the OS for each gate.
 decision_package_fields: [question, why_now, current_state, options, impact, reversibility, cost_rework, recommendation, confidence, permitted_next_actions]
+package_non_substantive_values: ["", "not assessed", "unassessed", "tbd", "todo", "?", "-", "...", "unknown"]
+# Framework-authored package content for system-raised gates, per trigger, used only for fields the raising code did
+# not supply (a gate whose package is still incomplete is refused).
+system_gate_package:
+  framework_update: {cost_rework: "gov update --rollback restores the previous kernel, overlay and lock; work done against the new release may need re-verification after a rollback"}
+  destructive_migration: {cost_rework: "a declined entry stays in place and is re-planned; an approved removal is recoverable from the batch snapshot and git history, at the cost of re-running the batch"}
+  tool_install: {cost_rework: "uninstalling removes the capability; tasks built on it must be re-planned onto an alternative"}
+  privilege_elevation: {cost_rework: "unregistering the plugin removes its elevated standing; anything produced through it must be re-validated"}
+  kernel_integrity_override: {cost_rework: "continuing on a modified kernel may produce governance evidence that must be re-established after gov kernel reinstall"}
+  budget_threshold: {cost_rework: "stopping forfeits only the spend already made; continuing adds spend beyond the delegated budget"}
+  contradiction: {cost_rework: "work built on the rejected input must be re-planned; work already delivered on it is re-verified", why_now: "authoritative inputs contradict each other and deterministic precedence cannot choose between them"}
+# BC-P2-10: human answers and presentation receipts are owner-signed documents verified against the
+# administrator-provisioned `human-gate` anchor (the Signed Release Root's delegation when one is provisioned). On a
+# machine with no release root, a standalone administrator-provisioned anchor is honoured only while this is true;
+# a project may tighten it to false, never loosen it.
+human_channel: {standalone_anchor_when_unprovisioned: true}
 prioritisation: [critical_path_effect, tasks_blocked, impact_radius, time_sensitivity, irreversibility]
 must_be_presented_in_chat: true
 continue_independent_work: true

@@ -1,0 +1,35 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.87s
+     Running tests/hv_a_derivation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho33/debug/deps/hv_a_derivation-6fc9e02d5e496237)
+
+running 10 tests
+test a10_the_single_exemption_writes_only_into_the_snapshot_directory ... ok
+test a1_the_derived_census_reproduces_independently_at_the_claimed_scale ... FAILED
+test a2_the_same_signatures_flag_the_pre_repair_source ... ok
+test a3_plausible_future_primitives_against_the_signatures ... ok
+test a4_the_bullet_6_primitive_the_census_cannot_see_is_refused_by_the_sink ... ok
+test a5_an_acceptance_marker_accepts_an_unenforced_implementation ... ok
+test a6_the_positive_controls_are_classified_by_what_they_actually_prove ... ok
+test a7_no_sink_entry_claims_an_absence_and_bullet_7_has_real_call_sites ... ok
+test a8_the_rustfmt_assumption_behind_the_splitter_is_untrue_but_costs_nothing_here ... ok
+test a9_the_cfg_test_cut_hides_no_section_6_primitive ... ok
+
+failures:
+
+---- a1_the_derived_census_reproduces_independently_at_the_claimed_scale stdout ----
+independent walk: 86 files, 811 functions
+
+thread 'a1_the_derived_census_reproduces_independently_at_the_claimed_scale' (541340) panicked at tests/hv_a_derivation.rs:22:5:
+assertion `left == right` failed: the product tree is not the size the census claims
+  left: 86
+ right: 84
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    a1_the_derived_census_reproduces_independently_at_the_claimed_scale
+
+test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+error: test failed, to rerun pass `--test hv_a_derivation`

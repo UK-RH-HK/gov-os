@@ -1,0 +1,161 @@
+# P2-AR-0022 cargo test --test certification at 38811b8 (all eight merges + compile reconciliation + G0 registration; BEFORE the semantic reconciliations and test updates) — the failures the integration then addressed
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/runtime)
+   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.43s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-15a10c09d13f7815)
+
+running 100 tests
+test arch::core_crates_have_no_python_or_node_bindings ... ok
+test arch::kernel_data_contains_no_language_or_toolchain_assumptions ... ok
+test arch::rust_sources_never_hardcode_external_language_runtimes ... ok
+test repair2::interface_contract_kernel_yaml_and_migration_substance_are_consistent ... ok
+test arch::builtin_embedder_matches_python_reference_plugin ... ok
+test arch::ecosystem_resolution_follows_the_governed_project_not_the_os ... ok
+test repair2::release_build_reproduces_released_versions_from_their_commit ... ok
+test repair3::current_release_payload_identity_and_hygiene ... ok
+test arch::schemas_policies_and_registries_validate_against_kernel_schemas ... ok
+test arch::plugin_protocol_is_language_neutral_bash_embedder ... ok
+test repair2::plugins_are_governed_capabilities_not_arbitrary_commands ... ok
+test repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts ... ok
+test repair2::incremental_rebuild_follows_record_relocation ... ok
+test repair2::task_close_uses_observed_mutations_not_self_attestation ... ok
+test repair3::policy_exceptions_require_a_real_governing_decision ... ok
+test repair2::framework_lock_is_release_identifying_and_portable ... ok
+test multi_machine::clone_rebuilds_identical_derived_state ... ok
+test repair2::project_policy_cannot_weaken_constitutional_floors ... ok
+test repair::authority_levels_are_enforced_on_executable_paths ... ok
+test migration::adoption_dependency_proof_citations_and_rerun_identity ... FAILED
+test repair2::cit_approval_derives_only_from_an_answered_gate ... ok
+test repair::budget_parallel_agents_threshold_raises_gate ... ok
+test arch::core_runs_without_any_governed_toolchain_on_path ... ok
+test repair::embedded_kernel_installs_without_canonical_root ... ok
+test repair::cit_auto_simulation_and_secret_redaction ... ok
+test repair::plugin_host_large_response_through_cli ... ok
+test repair::context_packet_layers_and_contradiction_flags ... ok
+test repair3::constitutional_floors_require_a_verified_kernel ... ok
+test repair::claims_survive_full_memory_rebuild ... ok
+test repair3::plugin_descriptors_can_never_authorise_themselves ... ok
+test section6::a_no_primitive_claim_is_refutable_by_this_suite ... ok
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger ... ok
+test section6::both_capability_acquisition_primitives_ask_section_6_without_consulting_the_descriptor ... ok
+test section6::section_6_coverage_is_derived_from_the_product ... ok
+test migration::path_migration_with_rollback_and_memory_rebuild ... FAILED
+test section6::the_dropped_held_out_sub_checks_run_here ... ok
+test section6::the_floors_sink_never_lowers_a_floor_however_the_value_was_set ... ok
+test repair::freeze_writes_is_honoured_by_adopt_and_upstream ... ok
+test repair::reranker_hook_invoked_and_never_silently_skipped ... ok
+test repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index ... ok
+test repair::policy_enforcement_coverage_is_complete_and_honest ... ok
+test section6::a_human_gate_record_cannot_be_written_below_floor_however_it_was_minted ... ok
+test repair::sensitivity_classes_and_namespaces_are_enforced ... ok
+test srr::an_unreadable_marking_is_read_the_same_way_by_every_consumer_and_still_exits ... ok
+test srr::an_unsigned_source_is_refused_once_a_trust_anchor_exists ... ok
+test section6::an_undetermined_subject_fails_closed_at_both_enforcement_points ... ok
+test repair::update_approval_requires_presented_answered_gate ... ok
+test brownfield::brownfield_adoption_end_to_end has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered has been running for over 60 seconds
+test greenfield::greenfield_end_to_end has been running for over 60 seconds
+test repair::unmeasured_memory_recall_is_not_green ... ok
+test srr::expired_metadata_fails_closed_against_the_declared_local_clock ... ok
+test repair::implementation_prerequisites_and_symbol_route ... ok
+test srr::modified_metadata_payload_and_migration_all_fail_closed ... ok
+test section6::the_marking_is_absent_from_every_surface_on_a_healthy_machine ... ok
+test srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance ... ok
+test srr::root_succession_requires_both_quorums_no_gaps_and_revokes_by_omission ... ok
+test srr::section_6_refusal_class_tables_are_partitioned_by_what_the_product_actually_enforces ... ok
+test greenfield::greenfield_end_to_end ... ok
+test srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target ... ok
+test section6::the_below_floor_marking_reaches_every_surface_including_ones_that_know_nothing_about_it ... ok
+test srr::the_no_bypass_and_no_signing_preservation_census_still_holds ... ok
+test srr::the_capability_contract_source_chain_is_hash_bound_and_fails_closed ... ok
+test srr::wrong_key_wrong_product_and_wrong_channel_all_fail_closed ... ok
+test repair::task_close_enforces_mutation_scope ... ok
+test srr::an_interrupted_install_leaves_one_complete_version_and_never_advances_a_floor ... ok
+test srr::an_allow_listed_operation_cannot_create_a_human_gate_below_floor ... ok
+test srr::installed_integrity_authenticity_and_admissibility_stay_three_separate_predicates ... ok
+test srr::environment_repository_and_caller_inputs_cannot_create_trust_or_approval ... ok
+test repair::smaller_findings_regressions ... ok
+test ws03::every_cli_command_label_is_classified_by_g0 ... ok
+test srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network ... ok
+test srr::below_floor_refusal_is_default_refuse_across_the_whole_operation_surface ... ok
+test srr::protected_floors_survive_uninstall_and_project_removal ... ok
+test srr::replaying_older_metadata_is_refused_by_the_protected_high_water ... ok
+test repair::benchmark_records_evidence_and_selection_pins_through_decision has been running for over 60 seconds
+test srr::section_6_effects_are_enforced_inside_their_sinks ... ok
+test repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
+test ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate ... ok
+test srr::the_floor_binds_every_ingress_and_only_owner_signed_break_glass_admits_a_below_floor_release ... ok
+test repair::destructive_migration_requires_answered_gate_record has been running for over 60 seconds
+test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
+test upstream::export_gate_fails_closed_on_content_whatever_the_name ... ok
+test ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere ... ok
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment ... ok
+test ws03::hand_written_gate_and_decision_records_are_not_honoured ... ok
+test ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified ... FAILED
+test ws08::a_machine_that_did_not_install_the_project_verifies_the_pinned_release_first ... ok
+test repair::destructive_migration_requires_answered_gate_record ... ok
+test ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record ... ok
+test ws03::presentation_is_recorded_only_from_an_owner_signed_receipt ... ok
+test ws08::certification_is_taken_only_from_the_trust_root ... ok
+test ws08::framework_lock_records_the_verified_identity_and_its_basis ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them ... ok
+test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
+test ws03::blocked_work_is_released_only_by_an_authorising_answer ... ok
+test ws03::cit_approval_consumes_only_honoured_gate_answers ... ok
+test ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it ... FAILED
+test failure_injection::injected_failures_are_detected_and_recovered ... ok
+test ws03::human_answers_come_only_from_the_owner_signed_channel ... ok
+test ws03::the_decision_package_is_enforced ... ok
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations ... ok
+test ws08::an_unauthenticated_installation_is_never_presented_as_current ... ok
+test brownfield::brownfield_adoption_end_to_end ... FAILED
+test repair::benchmark_records_evidence_and_selection_pins_through_decision ... ok
+
+failures:
+
+---- migration::adoption_dependency_proof_citations_and_rerun_identity stdout ----
+
+thread 'migration::adoption_dependency_proof_citations_and_rerun_identity' (590930) panicked at cli/../tests/certification/common.rs:194:9:
+gov decide HDG-0001 --option B --by owner failed (exit 1): {"code":"HUMAN_CHANNEL_UNAVAILABLE","message":"no authenticated human channel exists on this machine: no human-channel anchor is provisioned (/tmp/gov-cert-machine/7f641d0421be0bb9/governance-os/machine/human-channel/anchor.json is absent). A human answer can only come from an owner-signed document verified against an administrator-provisioned anchor (BC-P2-10; OWNER-DECISION-0006 req. 2). Remediation: the administrator installs the owner's public human-gate keys with `gov trust human-channel --provision <anchor.json>` (a self-signed `human-channel-anchor` document from the administrator domain), or provisions a Signed Release Root delegating `human-gate`","details":{"role":"human-gate","remediation":"the administrator installs the owner's public human-gate keys with `gov trust human-channel --provision <anchor.json>` (a self-signed `human-channel-anchor` document from the administrator domain), or provisions a Signed Release Root delegating `human-gate`","inbox":"/tmp/gov-cert-machine/7f641d0421be0bb9/governance-os/machine/human-channel/inbox"}}
+stderr: 
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- migration::path_migration_with_rollback_and_memory_rebuild stdout ----
+
+thread 'migration::path_migration_with_rollback_and_memory_rebuild' (590931) panicked at cli/../tests/certification/common.rs:194:9:
+gov gate present HDG-0001 failed (exit 1): {"code":"T2_UNBOUND","message":"HDG-0001 (spec/decisions/HDG-0001.yaml) cannot establish a gate that can be presented: it is T2 state that no gov operation on this machine produced as it stands (binding BROKEN). D-0007 rule 2: such a record is a request, recorded and ignored. Restore it from version control, or withdraw and re-raise it through gov.","details":{"record":"HDG-0001","path":"spec/decisions/HDG-0001.yaml","fact":"a gate that can be presented","t2":{"binding":"BROKEN","reason":"the record was modified after the OS operation 'gate create (system)' sealed it at 2026-09-19T01:29:50Z"}}}
+stderr: 
+
+---- ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified stdout ----
+
+thread 'ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified' (602306) panicked at cli/../tests/certification/common.rs:194:9:
+gov decide HDG-0001 --option A --by owner failed (exit 1): {"code":"HUMAN_CHANNEL_UNAVAILABLE","message":"no authenticated human channel exists on this machine: this machine's provisioned Signed Release Root (version 1) delegates no `human-gate` role. A human answer can only come from an owner-signed document verified against an administrator-provisioned anchor (BC-P2-10; OWNER-DECISION-0006 req. 2). Remediation: have the owner's root quorum sign a successor root that delegates the `human-gate` role to the owner's human-gate key(s), and apply it with `gov trust root-update`","details":{"role":"human-gate","remediation":"have the owner's root quorum sign a successor root that delegates the `human-gate` role to the owner's human-gate key(s), and apply it with `gov trust root-update`","inbox":"/tmp/gov-cert-machine/372879f326757fe3/governance-os/machine/human-channel/inbox"}}
+stderr: 
+
+---- ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it stdout ----
+
+thread 'ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it' (603173) panicked at cli/../tests/certification/common.rs:194:9:
+gov decide HDG-0001 --option A --by owner failed (exit 1): {"code":"HUMAN_CHANNEL_UNAVAILABLE","message":"no authenticated human channel exists on this machine: this machine's provisioned Signed Release Root (version 1) delegates no `human-gate` role. A human answer can only come from an owner-signed document verified against an administrator-provisioned anchor (BC-P2-10; OWNER-DECISION-0006 req. 2). Remediation: have the owner's root quorum sign a successor root that delegates the `human-gate` role to the owner's human-gate key(s), and apply it with `gov trust root-update`","details":{"role":"human-gate","remediation":"have the owner's root quorum sign a successor root that delegates the `human-gate` role to the owner's human-gate key(s), and apply it with `gov trust root-update`","inbox":"/tmp/gov-cert-machine/a3a90f956de94f16/governance-os/machine/human-channel/inbox"}}
+stderr: 
+
+---- brownfield::brownfield_adoption_end_to_end stdout ----
+
+thread 'brownfield::brownfield_adoption_end_to_end' (590927) panicked at cli/../tests/certification/brownfield.rs:352:5:
+{"stage":"A11","verdict":"NOT_ADOPTED_HEALTHY","audit":"AUD-0002","audit_verdict":"UNHEALTHY","doctor":"UNHEALTHY","checks":[{"criterion":"migration baseline pinned","ok":true},{"criterion":"every material artefact classified","ok":true},{"criterion":"target path map explicit","ok":true},{"criterion":"migration plan independently reviewed","ok":true},{"criterion":"independent migration tests exist","ok":true},{"criterion":"migrated paths/imports/links pass","ok":true},{"criterion":"behaviour baseline preserved or changed by decision","ok":true},{"criterion":"legacy governance has no accidental authority","ok":true},{"criterion":"unique knowledge extracted from retired stores","ok":true},{"criterion":"memory built on stable canonical paths","ok":true},{"criterion":"independent memory verifier passed","ok":true},{"criterion":"comprehensive v4 audit completed","ok":true},{"criterion":"installed release pinned in framework.lock","ok":true},{"criterion":"project overlay separate from kernel","ok":true},{"criterion":"clean machine can reconstruct derived runtime","ok":true}],"findings":{"critical":0,"high":3,"medium":0,"low":11},"adoption_findings":[{"severity":"medium","family":"adoption_dependency","path":"README.md","message":"docs README.md:3 still refers to retired AGENT_RULES_v2.md (citation exact); retirement authorised by gate HDG-0001; the reference was not re-pointed at the archive — fix or remove it","id":"GF-47c0132b7c"},{"severity":"low","family":"adoption_knowledge","path":"spec/reports/RPT-LK03d51f5253.yaml","message":"4 legacy knowledge unit(s) extracted from .cursorrules await review in RPT-LK03d51f5253","id":"GF-af5cbdd55d"},{"severity":"low","family":"adoption_knowledge","path":"spec/reports/RPT-LK3b6a11d828.yaml","message":"4 legacy knowledge unit(s) extracted from AGENT_RULES_v2.md await review in RPT-LK3b6a11d828","id":"GF-c10d9d4366"},{"severity":"low","family":"adoption_knowledge","path":"spec/reports/RPT-LK7ee75d5706.yaml","message":"1 legacy knowledge unit(s) extracted from .chat/sessions.jsonl await review in RPT-LK7ee75d5706","id":"GF-1095012602"},{"severity":"low","family":"adoption_knowledge","path":"spec/reports/RPT-LK8bd9446e09.yaml","message":"1 legacy knowledge unit(s) extracted from memory/chat_history.sqlite await review in RPT-LK8bd9446e09","id":"GF-9ffc1183e2"},{"severity":"low","family":"adoption_knowledge","path":"spec/reports/RPT-LKb85d693865.yaml","message":"1 legacy knowledge unit(s) extracted from .github/copilot-instructions.md await review in RPT-LKb85d693865","id":"GF-1e9af72d5f"}],"legacy_authority_retired":true,"finding_messages":[{"id":"GF-47c0132b7c","severity":"medium","family":"adoption_dependency","message":"docs README.md:3 still refers to retired AGENT_RULES_v2.md (citation exact); retirement authorised by gate HDG-0001; the reference was not re-pointed at the archive — fix or remove it"},{"id":"GF-af5cbdd55d","severity":"low","family":"adoption_knowledge","message":"4 legacy knowledge unit(s) extracted from .cursorrules await review in RPT-LK03d51f5253"},{"id":"GF-c10d9d4366","severity":"low","family":"adoption_knowledge","message":"4 legacy knowledge unit(s) extracted from AGENT_RULES_v2.md await review in RPT-LK3b6a11d828"},{"id":"GF-1095012602","severity":"low","family":"adoption_knowledge","message":"1 legacy knowledge unit(s) extracted from .chat/sessions.jsonl await review in RPT-LK7ee75d5706"},{"id":"GF-9ffc1183e2","severity":"low","family":"adoption_knowledge","message":"1 legacy knowledge unit(s) extracted from memory/chat_history.sqlite await review in RPT-LK8bd9446e09"},{"id":"GF-1e9af72d5f","severity":"low","family":"adoption_knowledge","message":"1 legacy knowledge unit(s) extracted from .github/copilot-instructions.md await review in RPT-LKb85d693865"},{"severity":"high","family":"schema_invariants","message":"MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/0: {\"stage\":\"A5\",\"role\":\"independent migration reviewer / test author\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml\"} is not of type \"string\""},{"severity":"high","family":"schema_invariants","message":"MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/1: {\"stage\":\"A6\",\"role\":\"migration executor\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md\"} is not of type \"string\""},{"severity":"high","family":"schema_invariants","message":"MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/2: {\"stage\":\"A6\",\"role\":\"migration executor\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl\"} is not of type \"string\""},{"severity":"low","family":"context_reproducibility","message":"context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"},{"severity":"low","family":"skill_regression","message":"SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family"},{"severity":"low","family":"skill_regression","message":"SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness"},{"severity":"low","family":"skill_regression","message":"SKL-IMPACT-ANALYSIS V1: not executed by the governance suite — declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands."},{"severity":"low","family":"skill_regression","message":"SKL-LIVE-MIGRATION V1: not executed by the governance suite — declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run"},{"severity":"low","family":"skill_regression","message":"SKL-REPO-ADOPTION V1: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run"},{"severity":"low","family":"skill_regression","message":"SKL-REPO-ADOPTION V2: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run"},{"severity":"low","family":"skill_regression","message":"SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite — declared deferred: the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands."},{"severity":"low","family":"skill_regression","message":"SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34"}],"doctor_failed":[{"id":"D021","message":"no green governance record"},{"id":"D031","message":"schema_invariants (high) refuses [\"task.close\",\"cit.execute\",\"release.build\",\"update.apply\"]: MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/0: {\"stage\":\"A5\",\"role\":\"independent migration reviewer / test author\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml\"} is not of type \"string\"; schema_invariants (high) refuses [\"task.close\",\"cit.execute\",\"release.build\",\"update.apply\"]: MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/1: {\"stage\":\"A6\",\"role\":\"migration executor\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md\"} is not of type \"string\"; schema_invariants (high) refuses [\"task.close\",\"cit.execute\",\"release.build\",\"update.apply\"]: MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/2: {\"stage\":\"A6\",\"role\":\"migration executor\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl\"} is not of type \"string\""}],"evidence":"spec/audits/GOVERNANCE-ADOPTION/12-ADOPTION-FINAL-REPORT.md"}
+findings: [{"id":"GF-47c0132b7c","severity":"medium","family":"adoption_dependency","message":"docs README.md:3 still refers to retired AGENT_RULES_v2.md (citation exact); retirement authorised by gate HDG-0001; the reference was not re-pointed at the archive — fix or remove it"},{"id":"GF-af5cbdd55d","severity":"low","family":"adoption_knowledge","message":"4 legacy knowledge unit(s) extracted from .cursorrules await review in RPT-LK03d51f5253"},{"id":"GF-c10d9d4366","severity":"low","family":"adoption_knowledge","message":"4 legacy knowledge unit(s) extracted from AGENT_RULES_v2.md await review in RPT-LK3b6a11d828"},{"id":"GF-1095012602","severity":"low","family":"adoption_knowledge","message":"1 legacy knowledge unit(s) extracted from .chat/sessions.jsonl await review in RPT-LK7ee75d5706"},{"id":"GF-9ffc1183e2","severity":"low","family":"adoption_knowledge","message":"1 legacy knowledge unit(s) extracted from memory/chat_history.sqlite await review in RPT-LK8bd9446e09"},{"id":"GF-1e9af72d5f","severity":"low","family":"adoption_knowledge","message":"1 legacy knowledge unit(s) extracted from .github/copilot-instructions.md await review in RPT-LKb85d693865"},{"severity":"high","family":"schema_invariants","message":"MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/0: {\"stage\":\"A5\",\"role\":\"independent migration reviewer / test author\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/06-migration-tests.yaml\"} is not of type \"string\""},{"severity":"high","family":"schema_invariants","message":"MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/1: {\"stage\":\"A6\",\"role\":\"migration executor\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/07-MIGRATION-EXECUTION-REPORT.md\"} is not of type \"string\""},{"severity":"high","family":"schema_invariants","message":"MPLAN-GOVERNANCE-ADOPTION (migration-plan): /consumers/2: {\"stage\":\"A6\",\"role\":\"migration executor\",\"artefact\":\"spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl\"} is not of type \"string\""},{"severity":"low","family":"context_reproducibility","message":"context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"},{"severity":"low","family":"skill_regression","message":"SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family"},{"severity":"low","family":"skill_regression","message":"SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness"},{"severity":"low","family":"skill_regression","message":"SKL-IMPACT-ANALYSIS V1: not executed by the governance suite — declared deferred: the executable form below (CIT-P on governance/project/PROJECT_POLICY.yaml must yield radius R5 with a human gate) was observed FALSE on 4.1.5 (radius R2); materiality from what a change touches is BC-P2-13 (WS-4). Enable it (mode: executable) when that repair lands."},{"severity":"low","family":"skill_regression","message":"SKL-LIVE-MIGRATION V1: not executed by the governance suite — declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run"},{"severity":"low","family":"skill_regression","message":"SKL-REPO-ADOPTION V1: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run"},{"severity":"low","family":"skill_regression","message":"SKL-REPO-ADOPTION V2: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run"},{"severity":"low","family":"skill_regression","message":"SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite — declared deferred: the executable form below (a research record without method fails schema validation) was observed FALSE on 4.1.5 (research.schema.json requires only id/type/status/question); research completeness is BC-P2-47 (WS-10). Enable it (mode: executable) when that repair lands."},{"severity":"low","family":"skill_regression","message":"SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34"}]
+
+
+failures:
+    brownfield::brownfield_adoption_end_to_end
+    migration::adoption_dependency_proof_citations_and_rerun_identity
+    migration::path_migration_with_rollback_and_memory_rebuild
+    ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified
+    ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it
+
+test result: FAILED. 95 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 191.68s
+
+error: test failed, to rerun pass `-p gov-cli --test certification`
+
+real	3m33.043s
+user	32m33.788s
+sys	1m42.556s

@@ -1,0 +1,150 @@
+# normalised diff: release/capability-baseline/repair-1/ws05/evidence/probe-reruns/gamma-r/E1-authority.repaired.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/gamma-r.E1-authority.out
+# changed lines: 115
+--- recorded (builder branch)
++++ integrated
+@@ -16 +16 @@
+-change-controller      L3  claim=ALLOW create=ALLOW gate=ALLOW cit=ALLOW pause=ALLOW decide=ALLOW resume=AUTHORITY_DENIED
++change-controller      L3  claim=ALLOW create=ALLOW gate=ALLOW cit=ALLOW pause=ALLOW decide=HUMAN_CHANNEL_UNAVAILABLE resume=AUTHORITY_DENIED
+@@ -18 +18 @@
+-human                  L5  claim=ALLOW create=ALLOW gate=ALLOW cit=ALLOW pause=ALLOW decide=ALLOW resume=ALLOW
++human                  L5  claim=AUTHORITY_DENIED create=AUTHORITY_DENIED gate=AUTHORITY_DENIED cit=AUTHORITY_DENIED pause=AUTHORITY_DENIED decide=ALLOW resume=AUTHORITY_DENIED
+@@ -21,2 +21,2 @@
+-exit=1 ok=false code=UNKNOWN_ROLE msg=role 'data-scientist' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-engineer, human)
+-exit=1 ok=false code=UNKNOWN_ROLE msg=role 'Human' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-engineer, human)
++exit=1 ok=false code=UNKNOWN_ROLE msg=role 'data-scientist' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-engineer, change-controller)
++exit=1 ok=false code=UNKNOWN_ROLE msg=role 'Human' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-engineer, change-controller)
+@@ -31 +31 @@
+-task replan                        (none declared)            exit=0 ok=true                                                         changed=[~ spec/tasks/TASK-C2.yaml ]
++task replan                        (none declared)            exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' ( changed=[]
+@@ -36 +36 @@
+-decide                             answer_gate:L3             exit=1 ok=false code=GATE_NOT_PRESENTED msg=HDG-0900 has not been pres changed=[]
++decide                             answer_gate:L3             exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' ( changed=[]
+@@ -55,2 +55,2 @@
+-memory heldout-starter --force     (none declared)            exit=0 ok=true                                                         changed=[~ governance/tests/memory/heldout.yaml ]
+-kernel override                    override_kernel_integrity:L4 exit=0 ok=true                                                         changed=[]
++memory heldout-starter --force     (none declared)            exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' ( changed=[]
++kernel override                    override_kernel_integrity:L4 exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' ( changed=[]
+@@ -61,2 +61,2 @@
+-adapters generate                  (none declared)            exit=0 ok=true                                                         changed=[~ governance/generated/adapter-manifest.json ]
+-tools registry                     (none declared)            exit=0 ok=true                                                         changed=[~ governance/generated/tool-registry.json ]
++adapters generate                  (none declared)            exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' ( changed=[]
++tools registry                     (none declared)            exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' ( changed=[]
+@@ -68,4 +68,2 @@
+-exit=0 ok=true
+-framework.lock
+-generated
+-kernel
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++ls: cannot access '<path>': No such file or directory
+@@ -73,4 +71,2 @@
+- ok= False AUTHORITY_DENIED role 'independent-auditor' (L0) may not perform 'install_kernel' (requires L4); AUTHORITY_POLICY.authority_levels_required
+-generated
+-kernel
+-project
++ ok= False AUTHORITY_DENIED role 'independent-auditor' (L0) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required).
++ls: cannot access '<path>': No such file or directory
+@@ -80 +76 @@
+-exit=0 ok=true
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -82 +78 @@
+- ok= False AUTHORITY_DENIED role 'backend-engineer' (L1) may not perform 'install_kernel' (requires L4); AUTHORITY_POLICY.authority_levels_required
++ ok= False AUTHORITY_DENIED role 'backend-engineer' (L1) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a rol
+@@ -84,13 +80,8 @@
+-  adopt baseline     exit=0 ok=true
+-  adopt inventory    exit=0 ok=true
+-  adopt classify     exit=0 ok=true
+-  adopt map          exit=0 ok=true
+-  adopt plan         exit=0 ok=true
+-  adopt test-design  exit=0 ok=true
+-  adopt review       exit=0 ok=true
+-  adopt migrate(A6)  exit=0 ok=true
+-    governance/framework.lock
+-    governance/generated
+-    governance/kernel
+-    governance/project
+-    governance/tests
++  adopt baseline     exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++  adopt inventory    exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++  adopt classify     exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++  adopt map          exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++  adopt plan         exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++  adopt test-design  exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
++  adopt review       exit=1 ok=false code=ADOPTION_NOT_STARTED msg=run `gov adopt baseline` (A0) first
++  adopt migrate(A6)  exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -98 +89 @@
+-  adopt migrate(2nd) exit=0 ok=true
++  adopt migrate(2nd) exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -100 +91 @@
+-  ok= False AUTHORITY_DENIED role 'independent-auditor' (L0) may not perform 'migrate_execute' (requires L3); AUTHORITY_POLICY.authority_levels_required
++  ok= False AUTHORITY_DENIED role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use 
+@@ -104 +95 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not record a human answer for HDG-0910 (requires L3: a change controller/orchestrator relaying the human, or --role human)
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'answer_gate'; 'answer_gate' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -106 +97 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'product-spec-agent' (L2) may not record a human answer for HDG-0910 (requires L3: a change controller/orchestrator relaying the human, or --role human)
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'product-spec-agent' (L2) may not perform 'answer_gate'; 'answer_gate' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -108 +99 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=agent 'change-controller' (acting role change-controller L3) may not answer HDG-0910: agent_resolvable_when requires radius <= R1 (gate R3), confidence >= 0.8 (gate 0.5), reversible (false) and an L3+ acting role
++exit=1 ok=false code=AUTHORITY_DENIED msg=agent 'change-controller' may not resolve HDG-0910: impact radius R3 exceeds R1; confidence Some(0.5) is below 0.8; the decision is not assessed reversible (Some(false)) (HUMAN_GATE_POLICY.agent_resolvable_when; framework §50). It needs a human answer.
+@@ -110 +101 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'approve_cit_human' (requires L3); AUTHORITY_POLICY.authority_levels_required
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'approve_cit_auto'; 'approve_cit_auto' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -114,11 +105,5 @@
+- ok= True answered_by_kind= human decision= D-0004
+-  approved_by: human
+-  human_approved: true
+-  approved_by_kind: human
+-  answer:
+-    option: A
+-    by: human
+-    by_kind: human
+-    acting_role: change-controller
+-    at: '<ts>'
+-    rationale: null
++ ok= False answered_by_kind= None decision= None
++Traceback (most recent call last):
++  File "<string>", line 1, in <module>
++KeyError: 'result'
++grep: <path> No such file or directory
+@@ -133 +118 @@
+-CIT CIT-0006 simulated: radius=R1 human_gate=HDG-0922
++CIT CIT-0005 simulated: radius=R1 human_gate=HDG-0922
+@@ -160 +145 @@
+- ok= True {"cit": "CIT-0006", "cit_status": "APPROVED", "decision": "D-0922", "human_gate": "HDG-0922", "method": "human", "human_approved": true}
++ ok= False {"code": "T2_UNBOUND", "message": "HDG-0922 (spec/decisions/HDG-0922.yaml) cannot establish a recorded Human Decision Gate answer: it is T2 state that no gov operation on this machine produced as it stands (binding BROKEN). D-0007 rule 2: such a record is a request, recorded and ignored. Restore it from version control, or withdraw and re-raise it through gov.", "details": {"record": "HDG-0922", "
+@@ -162,5 +147,2 @@
+- ok= True cit_status= COMMITTED None
+-  REQ-0002 now: acceptance_criteria:
+-  REQ-0002 now: - a
+-  REQ-0002 now: - b
+-  REQ-0002 now: updated: '2026-09-19'
++ ok= False cit_status= None T2_UNBOUND
++  REQ-0002 now: {"id":"REQ-0002","type":"requirement","title":"totals exact","status":"ACTIVE","feature":"F-0002","kind":"functional","acceptance_criteria":["a"]}
+@@ -186 +168 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'present_gate' (requires L1); AUTHORITY_POLICY.authority_levels_required
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'present_gate'; 'present_gate' requires L1 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -201 +183 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'present_gate' (requires L1); AUTHORITY_POLICY.authority_levels_required
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'independent-auditor' (L0) may not perform 'present_gate'; 'present_gate' requires L1 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -203 +185 @@
+-exit=1 ok=false code=GATE_NOT_PRESENTED msg=HDG-0950 has not been presented in chat (INV-008); run `gov gate present HDG-0950` and show it to the human first
++exit=1 ok=false code=GATE_NOT_PRESENTED msg=HDG-0950 has not been presented in its current form (INV-008); run `gov gate present HDG-0950` and show it to the human first
+@@ -207 +189 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not record a human answer for HDG-0950 (requires L3: a change controller/orchestrator relaying the human, or --role human)
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'answer_gate'; 'answer_gate' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -209 +191 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=agent 'product-spec-agent' (acting role product-spec-agent L2) may not answer HDG-0950: agent_resolvable_when requires radius <= R1 (gate R1), confidence >= 0.8 (gate 0.9), reversible (true) and an L3+ acting role
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'product-spec-agent' (L2) may not perform 'answer_gate'; 'answer_gate' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -211 +193 @@
+- ok= True kind= agent
++ ok= False kind= None
+@@ -213 +195 @@
+-exit=1 ok=false code=AUTHORITY_DENIED msg=role 'change-controller' (L3) may not perform 'revoke_gate' (requires L4); AUTHORITY_POLICY.authority_levels_required
++exit=1 ok=false code=AUTHORITY_DENIED msg=role 'change-controller' (L3) may not perform 'revoke_gate'; 'revoke_gate' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+@@ -215,4 +197 @@
+- ok= True {'cit': None, 'decisions': ['D-0931']}
+-  <path> REJECTED
+-  --
+-  <path> HDG-0950
++ ok= True {'cit': None, 'decisions': [], 'blocked_tasks': []}

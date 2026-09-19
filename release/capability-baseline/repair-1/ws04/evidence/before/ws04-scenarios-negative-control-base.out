@@ -1,0 +1,85 @@
+gov under test: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ho-base/target-gov/debug/gov; canonical root: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/base-clone
+# project ws04s1: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zs-neg/ws04s1-776088449
+$ gov init --name ws04s1 --alias z-ws04s1    [session=S-zeta role=orchestrator exit=0 3.9s]
+  init ok: version=4.1.5 conformance=HEALTHY
+  [probe wrote record] spec/features/F-0001.yaml: {"id": "F-0001", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend", "requirements": ["REQ-0002"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"], "readiness": {"intent_outcome": "PRESENT", "user_actor": "PRESENT", "journey_workflow": "PRESENT", "scenarios": "PRESENT", "inputs": "PRESENT", "data_model_schema": "PRESENT", "representative_test_data": "PRESENT", "processing_algorithm": "PRESENT", "expected_outputs": "PRESENT", "functional_requirements": "PRESENT", "non_functional_requirements": "PRESENT", "ux_interactions": "PRESENT", "ba
+  [probe wrote record] spec/scenarios/SCN-0001.yaml: {"id": "SCN-0001", "type": "scenario", "title": "Append two orders and total", "status": "ACTIVE", "feature": "F-0001", "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["total_cents is 399"], "success_criteria": ["exact total"], "failure_criteria": ["duplicate ids accepted"]}
+  [probe wrote record] spec/tasks/TST-0001.yaml: {"id": "TST-0001", "type": "test-obligation", "title": "Totals acceptance test", "status": "ACTIVE", "feature": "F-0001", "family": "unit", "scenario": "SCN-0001"}
+  [probe wrote record] spec/requirements/REQ-0001.yaml: {"id": "REQ-0001", "type": "requirement", "title": "Totals round half up (legacy)", "status": "SUPERSEDED", "feature": "F-0001", "kind": "functional", "superseded_by": "REQ-0002"}
+  [probe wrote record] spec/requirements/REQ-0002.yaml: {"id": "REQ-0002", "type": "requirement", "title": "Totals use banker's rounding", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "supersedes": ["REQ-0001"], "statement": "The ledger SHALL use banker's rounding."}
+  [probe wrote record] spec/requirements/REQ-0003.yaml: {"id": "REQ-0003", "type": "requirement", "title": "Musing about totals", "status": "ACTIVE", "feature": "F-0001", "kind": "functional", "state_class": "NARRATIVE"}
+  [probe wrote record] spec/decisions/D-0001.yaml: {"id": "D-0001", "type": "decision", "title": "Use i64 cents", "status": "ACTIVE", "chosen_option": "A", "affects": ["F-0001"]}
+  [probe wrote record] spec/interfaces/API-0001.yaml: {"id": "API-0001", "type": "interface", "title": "Ledger API", "status": "ACTIVE", "version": "2.3.1", "contract": {"sig": "total()"}, "consumers": ["TASK-0001"], "producers": ["TASK-0009"]}
+  [probe wrote record] spec/data/DATA-0001.yaml: {"id": "DATA-0001", "type": "data", "title": "Orders dataset", "status": "ACTIVE"}
+  [probe wrote record] spec/research/RES-0001.yaml: {"id": "RES-0001", "type": "research", "title": "Rounding research", "status": "ACTIVE", "question": "which?", "conclusion": "bankers", "influences": ["D-0001"]}
+$ gov task create --id TASK-0001 --class implementation --objective "Work TASK-0001" --feature F-0001 --status DRAFT --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0002\"], \"scenarios\": [\"SCN-0001\"], \"acceptance_tests\": [\"TST-0001\"], \"interfaces\": [\"API-0001\"], \"required_data\": [\"DATA-0001\"], \"derived_from\": [\"RES-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task create --id TASK-0002 --class implementation --objective "Work TASK-0002" --feature F-0001 --status DRAFT --allowed src/**,tests/** --fields "{\"requirements\": [\"REQ-0001\", \"REQ-0003\", \"REQ-9999\", \"RES-0001\"], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task create --id TASK-0003 --class implementation --objective "Work TASK-0003" --feature F-0001 --status DRAFT --allowed src/**,tests/** --fields "{\"required_inputs\": [{\"id\": \"API-0001\", \"version\": \">=3.0.0\", \"reason\": \"needs the v3 contract\"}, {\"id\": \"REQ-0002\", \"content_hash\": \"0000000000000000000000000000000000000000000000000000000000000000\", \"reason\": \"pinned rule\"}], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov task create --id TASK-0004 --class implementation --objective "Work TASK-0004" --feature F-0001 --status DRAFT --allowed src/**,tests/** --fields "{\"relations\": [{\"type\": \"GOVERNED_BY\", \"target\": \"REQ-0002\", \"note\": \"the rounding rule this task implements\"}], \"supplementary_context\": [\"RES-9999\", {\"id\": \"RES-0001\", \"reason\": \"background\"}], \"scenarios\": [\"SCN-0001\"]}"    [session=S-zeta role=orchestrator exit=0 0.1s]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.7s]
+$ gov context manifest TASK-0001    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S1-complete-manifest-satisfied: FAIL -- TASK-0001 manifest delivery_state=None counts=None
+$ gov context manifest TASK-0002    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S1-superseded-blocks: FAIL -- REQ-0001 (SUPERSEDED by REQ-0002): ['NOT_DECLARED']
+OBS S1-non-authoritative-blocks: FAIL -- REQ-0003 (NARRATIVE) as requirement: ['NOT_DECLARED']
+OBS S1-absent-blocks: FAIL -- REQ-9999: ['NOT_DECLARED']
+OBS S1-wrong-type-blocks: FAIL -- RES-0001 declared as requirement: ['NOT_DECLARED']
+OBS S1-blocked-state: FAIL -- delivery_state=None missing=[] violations=[]
+$ gov context manifest TASK-0003    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S1-version-constraint: FAIL -- API-0001 at 2.3.1 vs >=3.0.0: ['NOT_DECLARED']
+OBS S1-hash-pin: FAIL -- REQ-0002 pinned to 000..0: ['NOT_DECLARED']
+$ gov context manifest TASK-0004    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S1-relations-note-is-reason: FAIL -- relations[] declaration (merged with the feature-inherited declaration of the same id): []
+OBS S1-supplementary-separate-and-non-blocking: FAIL -- supplementary=None
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.2s]
+OBS s2-completed: FAIL -- section aborted: KeyError('content')
+$ gov context compile TASK-0001    [session=S-zeta role=orchestrator exit=0 0.1s]
+OBS s3-completed: FAIL -- section aborted: KeyError('receipt_contract')
+$ gov artefact show REQ-0002    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S4-nine-w1-attributes: FAIL -- artefact show REQ-0002 keys=[] provenance=None
+$ gov artefact show REQ-0001    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S4-superseded-by-derived: FAIL -- REQ-0001 superseded_by=None
+  [probe wrote record] spec/scenarios/REQ-0007.yaml: {"id": "REQ-0007", "type": "requirement", "title": "Misplaced", "status": "ACTIVE", "feature": "F-0001"}
+  [probe wrote record] spec/tasks/TASK-0008.yaml: {"id": "TASK-0008", "type": "task", "title": "Stale", "status": "ACTIVE", "class": "implementation", "task_status": "READY", "objective": "x", "requirements": ["REQ-0001"], "human_gate": "HDG-0001"}
+$ gov artefact check    [session=S-zeta role=orchestrator exit=2 0.0s]
+OBS S4-misplaced-record-reported: FAIL -- misplaced=None
+OBS S4-stale-link-reported: FAIL -- stale_links=[]
+$ gov rebuild-memory    [session=S-zeta role=orchestrator exit=0 0.7s]
+$ gov memory impact API-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov memory impact TASK-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS S4-consumers-direction: FAIL -- impact(API-0001)={'TASK-0001': 'USES → API-0001', 'TASK-0009': 'API-0001 PRODUCES →'}; impact(TASK-0001) contains API-0001: True
+$ gov memory impact TASK-0009 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov memory impact TASK-0009 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS S4-producers-direction: FAIL -- impact(TASK-0009, the declared producer)={}
+$ gov memory impact DATA-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov memory impact DATA-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS S4-required-data-reaches-task: FAIL -- impact(DATA-0001)={}
+$ gov memory impact RES-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+$ gov memory impact RES-0001 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS S4-influences-reaches-decision: FAIL -- impact(RES-0001)={'TASK-0001': 'DERIVED_FROM → RES-0001', 'TASK-0002': 'GOVERNED_BY → RES-0001'}
+$ gov memory graph TASK-0008 --depth 1    [session=S-zeta role=orchestrator exit=0 0.0s]
+OBS S4-human-gate-blocks-task: FAIL -- graph(TASK-0008)=[('HDG-0001', '→BLOCKS'), ('REQ-0001', '→GOVERNED_BY')]
+
+==== SUMMARY ====
+S1-complete-manifest-satisfied: FAIL
+S1-superseded-blocks: FAIL
+S1-non-authoritative-blocks: FAIL
+S1-absent-blocks: FAIL
+S1-wrong-type-blocks: FAIL
+S1-blocked-state: FAIL
+S1-version-constraint: FAIL
+S1-hash-pin: FAIL
+S1-relations-note-is-reason: FAIL
+S1-supplementary-separate-and-non-blocking: FAIL
+s2-completed: FAIL
+s3-completed: FAIL
+S4-nine-w1-attributes: FAIL
+S4-superseded-by-derived: FAIL
+S4-misplaced-record-reported: FAIL
+S4-stale-link-reported: FAIL
+S4-consumers-direction: FAIL
+S4-producers-direction: FAIL
+S4-required-data-reaches-task: FAIL
+S4-influences-reaches-decision: FAIL
+S4-human-gate-blocks-task: FAIL
+total=21 pass=0 fail=21

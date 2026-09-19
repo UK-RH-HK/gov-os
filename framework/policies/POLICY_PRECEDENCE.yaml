@@ -34,6 +34,11 @@ rules:
   - {key: HUMAN_GATE_POLICY.agent_resolvable_when.max_radius, mode: ceiling, kind: radius}
   - {key: HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence, mode: floor, kind: number}
   - {key: HUMAN_GATE_POLICY.agent_resolvable_when.reversible, mode: strengthen_only_bool, strict_value: true}
+  - {key: HUMAN_GATE_POLICY.agent_resolvable_when.require_assessed, mode: strengthen_only_bool, strict_value: true}
+  - {key: HUMAN_GATE_POLICY.agent_resolvable_when.independent_assessment, mode: strengthen_only_bool, strict_value: true}
+  - {key: HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned, mode: strengthen_only_bool, strict_value: false}
+  - {key: HUMAN_GATE_POLICY.package_non_substantive_values, mode: additive}
+  - {key: HUMAN_GATE_POLICY.human_only_triggers, mode: additive}
   - {key: HUMAN_GATE_POLICY.batch_low_priority, mode: overridable}
   - {key: HUMAN_GATE_POLICY.continue_independent_work, mode: overridable}
   - {key: HUMAN_GATE_POLICY.*, mode: immutable}
@@ -117,5 +122,25 @@ rules:
   - {key: ARCHIVE_POLICY.archive_mutation, mode: immutable}
   - {key: ARCHIVE_POLICY.do_not_archive, mode: additive}
   - {key: ARCHIVE_POLICY.*, mode: overridable}
+  # ---- project overlay files (BC-P2-45). Every key of every overlay is evaluated here, not only policy_overrides: a
+  # value equal to the kernel/template value changes nothing and is accepted; any other value must satisfy its rule
+  # (deny by default). Refusals are reported (doctor D027, suite family policy_precedence, gov policy overrides) and the
+  # product reads the kernel value instead (PolicySet.effective_overlays, Project::project_policy).
+  - {key: PROJECT_POLICY.readiness.enforce_pre_implementation_cells, mode: strengthen_only_bool, strict_value: true}
+  - {key: PROJECT_POLICY.readiness.*, mode: strengthen_only_bool, strict_value: true}
+  - {key: PROJECT_POLICY.staleness.on_stale_close, mode: floor, kind: ordered, order: [warn, fail]}
+  - {key: PROJECT_POLICY.project.*, mode: overridable}
+  - {key: PROJECT_POLICY.schema_version, mode: overridable}
+  - {key: PROJECT_POLICY.tests.*, mode: overridable}
+  - {key: PROJECT_POLICY.gates.*, mode: overridable}
+  - {key: PROJECT_POLICY.human_gates.*, mode: overridable}
+  - {key: PROJECT_POLICY.*, mode: immutable}
+  - {key: MODEL_ROUTING_OVERRIDES.task_class_overrides.*, mode: floor, kind: tier}
+  - {key: MODEL_ROUTING_OVERRIDES.role_overrides.*.minimum_tier, mode: floor, kind: tier}
+  - {key: MODEL_ROUTING_OVERRIDES.role_overrides.*.default_reasoning, mode: floor, kind: ordered, order: [low, medium, high, extra_high]}
+  - {key: MODEL_ROUTING_OVERRIDES.providers, mode: overridable}
+  - {key: MODEL_ROUTING_OVERRIDES.preferences.*, mode: overridable}
+  - {key: MODEL_ROUTING_OVERRIDES.schema_version, mode: overridable}
+  - {key: MODEL_ROUTING_OVERRIDES.*, mode: immutable}
   # ---- this file
   - {key: POLICY_PRECEDENCE.*, mode: immutable}

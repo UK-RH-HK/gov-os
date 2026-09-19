@@ -1,0 +1,71 @@
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate
+(a) role declared: orchestrator for adopt verify-migration
+(a) role declared: orchestrator for adopt extract-legacy
+(a) role declared: orchestrator for adopt build-memory
+(a) role declared: orchestrator for adopt verify-memory
+(a) role declared: orchestrator for adopt audit --accept-exceptions
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate
+(a) role declared: orchestrator for adopt verify-migration
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate
+(a) role declared: orchestrator for adopt verify-migration --verdict
+(a) role declared: orchestrator for adopt verify-migration
+(a) role declared: orchestrator for adopt extract-legacy
+(a) role declared: orchestrator for audit --no-persist --family
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt review --verdict
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt migrate --batch
+(a) role declared: orchestrator for adopt rollback --batch
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt baseline
+(a) role declared: orchestrator for adopt inventory
+(a) role declared: orchestrator for adopt classify
+(a) role declared: orchestrator for adopt map
+(a) role declared: orchestrator for adopt plan
+(a) role declared: orchestrator for adopt test-design
+(a) role declared: orchestrator for adopt migrate

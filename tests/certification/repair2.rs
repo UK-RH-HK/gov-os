@@ -67,7 +67,8 @@ fn cit_approval_derives_only_from_an_answered_gate() {
             .error_code(),
         "GATE_NOT_PRESENTED"
     );
-    g.ok(&["gate", "present", &gate]);
+    // (WS-3 / BC-P2-10: a gate counts as presented to the human only on the owner's signed receipt)
+    crate::ws03::human_receipt(&g, &gate);
     let e = g.err(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     assert_eq!(e.error_code(), "GATE_NOT_ANSWERED", "{}", e.envelope);
     assert_eq!(
@@ -103,16 +104,7 @@ fn cit_approval_derives_only_from_an_answered_gate() {
     c.as_object_mut().unwrap().remove("approval");
     write_yaml(&root, &format!("spec/decisions/{cid}.yaml"), &c);
     // (b) the human declines: the transaction is REJECTED, durably, and nothing can execute it
-    let d = g.ok(&[
-        "decide",
-        &gate,
-        "--option",
-        "B",
-        "--by",
-        "owner",
-        "--rationale",
-        "declined",
-    ]);
+    let d = crate::ws03::human_decide(&g, &gate, "B");
     assert_eq!(d["option"], "B");
     let rec = yaml(&root, &format!("spec/decisions/{cid}.yaml"));
     assert_eq!(rec["cit_status"], "REJECTED", "{rec}");
@@ -135,16 +127,7 @@ fn cit_approval_derives_only_from_an_answered_gate() {
     // (d) the correct path: presented + answered A -> approval carries the full trail; execute revalidates
     let (cid2, gate2) = security_cit(&g, &root, "hdr2");
     g.ok(&["gate", "present", &gate2]);
-    let d2 = g.ok(&[
-        "decide",
-        &gate2,
-        "--option",
-        "A",
-        "--by",
-        "owner",
-        "--rationale",
-        "approved",
-    ]);
+    let d2 = crate::ws03::human_decide(&g, &gate2, "A");
     let ap = g.ok(&["cit", "approve", &cid2, "--by", "owner", "--method", "auto"]);
     assert_eq!(
         ap["method"], "human",
@@ -209,23 +192,21 @@ fn cit_approval_derives_only_from_an_answered_gate() {
     // (f) stale approval: approved, then the gate is re-answered by editing the record -> execution refuses
     let (cid3, gate3) = security_cit(&g, &root, "hdr3");
     g.ok(&["gate", "present", &gate3]);
-    g.ok(&["decide", &gate3, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gate3, "A");
     g.ok(&[
         "cit", "approve", &cid3, "--by", "owner", "--method", "human",
     ]);
+    // WS-3 / BC-P2-09: a gate answer can no longer be changed by editing the record at all — the edited record is
+    // not what gov wrote (T2), so execution refuses it before reading any answer field (previously APPROVAL_STALE /
+    // GATE_DECLINED, derived from the edited fields themselves).
     let mut gr = yaml(&root, &format!("spec/decisions/{gate3}.yaml"));
     gr["answer"]["at"] = json!("2030-01-01T00:00:00Z");
     write_yaml(&root, &format!("spec/decisions/{gate3}.yaml"), &gr);
-    assert_eq!(
-        g.err(&["cit", "execute", &cid3]).error_code(),
-        "APPROVAL_STALE"
-    );
+    assert_eq!(g.err(&["cit", "execute", &cid3]).error_code(), "T2_UNBOUND");
     gr["answer"]["option"] = json!("B");
     write_yaml(&root, &format!("spec/decisions/{gate3}.yaml"), &gr);
-    assert_eq!(
-        g.err(&["cit", "execute", &cid3]).error_code(),
-        "GATE_DECLINED"
-    );
+    assert_eq!(g.err(&["cit", "execute", &cid3]).error_code(), "T2_UNBOUND");
+    assert!(!exists(&root, "src/hdr3.rs"));
     // (g) the automatic path never claims human approval
     let mf = root.join(".governance-runtime/ed.json");
     std::fs::write(
@@ -427,19 +408,28 @@ fn project_policy_cannot_weaken_constitutional_floors() {
         layer3["policy_overrides_refused"].as_array().unwrap().len() >= 10,
         "{layer3}"
     );
-    // exceptions follow the same rules and need a real governing decision (verifier V-M1)
-    write_yaml(
-        &root,
-        "spec/decisions/D-0001.yaml",
-        &json!({"id": "D-0001", "type": "decision", "title": "Budget headroom for the migration window",
-        "status": "ACTIVE", "question": "may parallel agents exceed the default?", "chosen_option": "A", "rationale": "measured",
-        "human_approved": true, "authorises_exceptions": ["EXC-0001", "EXC-0003"]}),
-    );
+    // exceptions follow the same rules and need a real governing decision (verifier V-M1). WS-3 / BC-P2-09: that
+    // decision must be one a gov operation wrote — the human's owner-signed answer to a gate that asked for exactly
+    // this scope — because a hand-written decision claiming human approval is a request, recorded and ignored.
+    let eg = g.ok(&[
+        "gate",
+        "create",
+        "--question",
+        "Budget headroom for the migration window: may parallel agents exceed the default?",
+        "--fields",
+        &crate::ws03::package(
+            json!({"decision_scope": {"authorises_exceptions": ["EXC-0001", "EXC-0003"]}}),
+        ),
+    ]);
+    let dec_id = crate::ws03::human_decide(&g, eg["id"].as_str().unwrap(), "A")["decision"]
+        .as_str()
+        .unwrap()
+        .to_string();
     let mut ex = yaml(&root, "governance/project/PROJECT_EXCEPTIONS.yaml");
     ex["exceptions"] = json!([
-        {"id": "EXC-0001", "policy": "AUTHORITY_POLICY", "key": "authority_levels_required.create_task", "value": "L0", "decision": "D-0001", "expires": "2999-01-01", "reason": "attempt"},
+        {"id": "EXC-0001", "policy": "AUTHORITY_POLICY", "key": "authority_levels_required.create_task", "value": "L0", "decision": dec_id, "expires": "2999-01-01", "reason": "attempt"},
         {"id": "EXC-0002", "policy": "BUDGET_POLICY", "key": "defaults.max_parallel_agents", "value": 9, "expires": "2999-01-01", "reason": "no decision"},
-        {"id": "EXC-0003", "policy": "BUDGET_POLICY", "key": "defaults.max_parallel_agents", "value": 9, "decision": "D-0001", "expires": "2999-01-01", "reason": "relaxable with a decision"}
+        {"id": "EXC-0003", "policy": "BUDGET_POLICY", "key": "defaults.max_parallel_agents", "value": 9, "decision": dec_id, "expires": "2999-01-01", "reason": "relaxable with a decision"}
     ]);
     write_yaml(&root, "governance/project/PROJECT_EXCEPTIONS.yaml", &ex);
     let ov2 = g.ok(&["policy", "overrides"]);
@@ -704,7 +694,7 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
     let gate = r["human_gate"].as_str().unwrap().to_string();
     assert!(!exists(&root, "governance/project/plugins/netembed.yaml"));
     g.ok(&["gate", "present", &gate]);
-    g.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gate, "A");
     let mut net2 = net.clone();
     net2["registration_gate"] = json!(gate);
     std::fs::write(&df, net2.to_string()).unwrap();
@@ -801,8 +791,17 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock = yaml(&root, "governance/framework.lock");
-    assert_eq!(lock["release_commit"], m["release_commit"], "{lock}");
-    assert_eq!(lock["source"], "release:agentic-engineering-os@4.1.3");
+    // BC-P2-37 (P2-AR-0020): the release's manifest.json is unsigned and this machine holds no trust anchor, so
+    // neither its release_commit nor a `release:` label is recorded as identity (Contract v3:149 "recorded, not
+    // invented"; D-0007 rule 2). The lock records what verification established and says why.
+    assert_ne!(lock["release_commit"], m["release_commit"], "{lock}");
+    assert_eq!(lock["release_commit"], "unverified", "{lock}");
+    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["authenticity"], "UNKNOWN", "{lock}");
+    assert!(lock["identity_basis"]["release_commit"]
+        .as_str()
+        .unwrap()
+        .contains("not recorded as identity"));
     assert_eq!(
         lock["installed_at_commit"].as_str().unwrap(),
         git(&root, &["rev-parse", "HEAD"]).1.trim()
@@ -820,15 +819,14 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock2 = yaml(&root2, "governance/framework.lock");
-    assert_eq!(
-        lock2["release_commit"].as_str().unwrap(),
-        git(&canonical_root(), &["rev-parse", "HEAD"]).1.trim()
-    );
+    // BC-P2-37 (P2-AR-0020): identity is decided by content, never by where the bytes came from. The checkout's
+    // payload is byte-identical to the payload embedded in this binary, so it records the embedded identity (equal to
+    // lock3 below), not the checkout's unauthenticated Git HEAD — and still never the consumer's commit.
     assert_ne!(lock2["release_commit"], lock2["installed_at_commit"]);
     assert!(lock2["source"]
         .as_str()
         .unwrap()
-        .starts_with("source:agentic-engineering-os@"));
+        .starts_with("embedded:agentic-engineering-os@"));
     // embedded payload: the commit baked into the binary; still never the consumer's HEAD
     let (root3, g3) = setup_fixture("greenfield", "rep2-lock-emb", "S-rep2");
     g3.with_env("GOV_CANONICAL_ROOT", "/nonexistent").ok(&[
@@ -840,6 +838,12 @@ fn framework_lock_is_release_identifying_and_portable() {
         "--skip-index",
     ]);
     let lock3 = yaml(&root3, "governance/framework.lock");
+    for k in ["release_commit", "release_hash", "source", "version"] {
+        assert_eq!(
+            lock2[k], lock3[k],
+            "same bytes, same recorded identity: {k}"
+        );
+    }
     assert!(lock3["source"]
         .as_str()
         .unwrap()
@@ -936,7 +940,7 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
             false
         );
         g.ok(&["gate", "present", &gate]);
-        g.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+        crate::ws03::human_decide(&g, &gate, "A");
         g.ok(&[
             "update",
             "--apply",
@@ -967,11 +971,14 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     );
     let lock = yaml(&root, "governance/framework.lock");
     assert_eq!(lock["version"], "4.1.3");
-    assert_eq!(
+    // BC-P2-37 (P2-AR-0020): the 4.1.3 manifest.json is unsigned and this machine holds no trust anchor; its
+    // release_commit is not recorded as identity and the release is not labelled a verified `release:`.
+    assert_ne!(
         lock["release_commit"],
         json(&rel413, "manifest.json")["release_commit"]
     );
-    assert_eq!(lock["source"], "release:agentic-engineering-os@4.1.3");
+    assert_eq!(lock["release_commit"], "unverified");
+    assert_eq!(lock["source"], "source:agentic-engineering-os@4.1.3");
     let rule = yaml(&root, "governance/project/REPOSITORY_CONTRACT.yaml")["paths"]
         .as_array()
         .unwrap()
@@ -1032,12 +1039,14 @@ fn genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger() 
     let lock2 = yaml(&root, "governance/framework.lock");
     assert_eq!(lock2["version"], gov_runtime::VERSION);
     assert_eq!(lock2["lock_schema_version"], "1.1.0");
+    // BC-P2-37 (P2-AR-0020): the canonical framework is byte-identical to this binary's embedded payload, so the
+    // recorded identity is the binary's own (decided by content), not the checkout's unauthenticated Git HEAD.
     assert_eq!(
         lock2["release_commit"].as_str().unwrap(),
-        git(&canonical_root(), &["rev-parse", "HEAD"]).1.trim()
+        gov_runtime::kernel::embedded::commit()
     );
     assert!(lock2["source"].as_str().unwrap().starts_with(&format!(
-        "source:agentic-engineering-os@{}",
+        "embedded:agentic-engineering-os@{}",
         gov_runtime::VERSION
     )));
     assert_eq!(

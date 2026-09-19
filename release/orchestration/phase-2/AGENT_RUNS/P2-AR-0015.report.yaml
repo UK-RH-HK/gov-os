@@ -1,0 +1,108 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0015
+role: capability-repair
+objective: Repair iteration 1, round 1, WS-2 (part) - implement the repair-delta requirements for BC-P2-03 (green-evidence currency), BC-P2-06 (health scheduler mechanics and G0-G6 tier contract), BC-P2-42 (skill regression executed, versions bound to content) and BC-P2-43 (product-test results governed); claims only.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]). This run is a builder: it authored the WS-2
+  product changes listed under `produced` and grades none of them; its evidence is regression evidence (Contract v3 O3).
+  It authored none of the audits, syntheses or verifications of Phase 1 or Phase 2, and no other repair workstream.
+  It read the common protocol P2-HO-0010, its handoff P2-HO-0012, repair-delta.md (all of it), blocker-classes.yaml,
+  the synthesis findings.yaml, the family findings of alpha-r/beta-r/gamma-r/delta-r/epsilon-r/zeta-r for its fifteen
+  findings, the epsilon-r audit report's AC-5 section, the named probes and their outputs, Contract v3, the AGENT_RUNS
+  README, the R1 held-out reproduction notes and the product source it changed or called. It did not read session or
+  agent transcripts, task-output stores (including its own) or user auto-memory; it spawned no sub-agent and did not
+  contact the product owner. Probes of record were re-run unedited from the merged evidence directories.
+input:
+  base_commit: c6b60bc760a0bb42907f74210fd9e644a420851a
+  candidate: cap2-candidate-0
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0012-repair-1-ws02.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0012-repair-1-ws02.md
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  - release/capability-baseline/audit-0/synthesis/findings.yaml
+  - release/capability-baseline/audit-0/{alpha-r,beta-r,gamma-r,delta-r,epsilon-r,zeta-r}/findings.yaml (A0-B3-01, A0-D1-04, A0-F1-01, A0-J1-03, A0-O1-01, A0-O2-01, A0-O4-01, A0-O4-02, A0-O5-01..04, A0-O5-11, A0-O5-12, A0-W6-05)
+  - release/capability-baseline/audit-0/epsilon-r/00-AUDIT-REPORT.md (section 4)
+  - release/capability-baseline/audit-0/*-r/evidence (named probes and outputs)
+  - release/capability-baseline/audit-0/synthesis/evidence/AC16-X1-upstream-change-chain.py
+  - release/verification/4.1.6-r1*/evidence (REPRODUCTION.md, heldout-tests, recorded reruns)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - runtime/src/** and cli/src/main.rs (read; changed only where listed under produced)
+produced:
+  - runtime/src/verification/currency.rs
+  - runtime/src/verification/product.rs
+  - runtime/src/verification/families_ext.rs
+  - runtime/src/verification/mod.rs
+  - runtime/src/scheduler/mod.rs
+  - runtime/src/scheduler/catalogue.rs
+  - runtime/src/scheduler/sandbox.rs
+  - runtime/src/scheduler/store.rs
+  - runtime/src/doctor.rs
+  - runtime/src/skills.rs
+  - runtime/src/lib.rs (pub mod scheduler; only)
+  - cli/src/main.rs (additive WS-2 block: gov health)
+  - framework/policies/TEST_POLICY.yaml
+  - framework/schemas/audit.schema.json
+  - framework/health/SKILL_SCENARIO_CHECKS.yaml
+  - release/capability-baseline/repair-1/ws02/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/ws02/claims.yaml
+  - release/capability-baseline/repair-1/ws02/evidence/
+tests_or_attacks:
+  - {id: RERUN-alpha-r-FRESH, description: "alpha-r FRESH-invalidation: 13 input classes + trust anchor provisioning/rotation invalidate the green record", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/alpha-r-FRESH-invalidation.out}
+  - {id: RERUN-beta-r-FRESH, description: "beta-r FRESH-evidence-invalidation 5/5 (was 2/5)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/beta-r-FRESH-evidence-invalidation.out}
+  - {id: RERUN-delta-r-FRESH, description: "delta-r FRESH-invalidation 13/13 (was 6/13) incl. F.impl.1 runtime identity and F.families.1", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/delta-r-FRESH-invalidation.out}
+  - {id: RERUN-zeta-r-FR, description: "zeta-r FR-freshness-invalidation 13/13 (was 7/13)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/zeta-r-FR-freshness-invalidation.out}
+  - {id: RERUN-epsilon-r-O4-A, description: "O4 §A 14/14 input classes invalidate (was 8/14); §B D021 obsolete under a DAG cycle", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O4-suite-currency.out}
+  - {id: RERUN-epsilon-r-O4-D, description: "O4 §D class=governance task still closes via the unchanged tasks.rs gate; refusal available via verification::close_gate, pending IP-WS02-01", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O4-suite-currency.out}
+  - {id: RERUN-AC16-X1-O4, description: "X1-O4-green-stale-after-direct-spec-change", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/AC16-X1-upstream-change-chain.out}
+  - {id: RERUN-epsilon-r-O5-S1-S4-S7, description: "O5 S1 (changed classes named, impacted remedy), S2 (>1 thread), S3 (deep rebuilds sandboxed, same inode), S4 (second run from cache), S7 (provenance in record and ledger)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O5-scheduler-requirements.out}
+  - {id: RERUN-epsilon-r-O5-S6, description: "O5 S6 direct task/CIT commands still succeed in RED state; refusal via scheduler::guard pending IP-WS02-02/03/05/08 (gov health guard refuses: supplementary S-C.3)", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O5-scheduler-requirements.out}
+  - {id: RERUN-epsilon-r-O1-FG, description: "O1 §F per-family results recorded; §G verify product fails (exit 1), doctor and audit UNHEALTHY", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O1-product-families.out}
+  - {id: RERUN-epsilon-r-O1-H, description: "O1 §H tasks.rs close still accepts a self-attested pass; close-from-evidence via close_gate pending IP-WS02-01 (gov health close-check refuses: S-E.6)", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O1-product-families.out}
+  - {id: RERUN-epsilon-r-U-SLO2, description: "U SLO-2 failing product suite makes doctor and audit UNHEALTHY", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/U-slos-and-healthy.out}
+  - {id: RERUN-epsilon-r-O2-11b, description: "O2 §11b skill with a false (non-executable) scenario reported, family fails", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/O2-governance-families.out}
+  - {id: RERUN-gamma-r-F1-b3, description: "F1.b3 method changed without version change reported (HIGH)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/after/gamma-r-F1-skills.out}
+  - {id: WS02-SUPPLEMENTARY, description: "builder checks S-A..S-J (scheduler, isolation, hard-block, provenance, product tests, close gate, skills, tier contract, runtime identity, concurrency safety)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/supplementary/WS02-supplementary.out}
+  - {id: WS02-S-J-NEGATIVE-CONTROL, description: "S-J.1 fails 2/2 on 0683a20 (pre-fix), passes on the final binary", result: CONFIRMED, evidence_path: release/capability-baseline/repair-1/ws02/evidence/supplementary/WS02-supplementary-negative-control-0683a20-run1.out}
+  - {id: REG-LIB, description: "cargo test --lib 56 passed (baseline 42 + 14 new)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/regression/cargo-test-lib.out}
+  - {id: REG-CERT, description: "cargo test --test certification 79 passed (baseline 79)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/regression/cargo-test-certification.out}
+  - {id: R1-HELDOUT, description: "AR-0027/0029/0031 held-out suites identical to their R1-4 recorded reruns; AR-0033 identical except hv_a::a1 source census 84 -> 91 files", result: PASS, evidence_path: release/capability-baseline/repair-1/ws02/evidence/regression/}
+findings:
+  - id: P2-AR-0015-D1
+    severity: MEDIUM
+    capability: [A2, O5]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "kernel::embedded_kernel_dir stages into .staging-<pid>; concurrent first materialisation by threads of one process leaves a corrupt cache marked complete (exposed by WS-2 concurrency, fixed on the WS-2 side in 81f2dec, root cause routed to WS-8 as IP-WS02-15)"
+    path: release/capability-baseline/repair-1/ws02/00-REPAIR-REPORT.md
+  - id: P2-AR-0015-D2
+    severity: LOW
+    capability: [F1, K3, J1]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "Two kernel skill validation scenarios are false on the product (SKL-IMPACT-ANALYSIS V1: radius R2 not R5; SKL-RESEARCH-BENCHMARK V1: research without method passes schema); declared deferred with executable checks, routed to BC-P2-13 / BC-P2-47 (IP-WS02-20/21)"
+    path: release/capability-baseline/repair-1/ws02/evidence/supplementary/gov-health-skills-include-deferred.json
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-ws02
+  commit: fd9e6e7c23fc03d6569319d62e176f1a65854353
+  evidence_path: release/capability-baseline/repair-1/ws02/evidence/
+unresolved:
+  - "Host call sites for the tier contract and the G0 guard are other workstreams' files (IP-WS02-01..08, 12, 13, 18): O4 §D, O5 S6 and O1 §H turn PASS only when they land"
+  - "IP-WS02-15 (WS-8): embedded kernel cache staging race and unverified reuse; ~/.cache/gov/kernels/4.1.5-2120db97b369 left partial by an intermediate WS-2 build (safe to delete)"
+  - "IP-WS02-16: framework/KERNEL.yaml payload_dirs does not include health (runtime-compiled scenario checks used meanwhile)"
+  - "IP-WS02-22 (BC-P2-09): green and product-test records are honoured without a T2 binding"
+  - "R1 AR-0033 hv_a::a1 pins the source census at 84 files; the R1-preservation verifier re-establishes it for the new candidate"
+recommended_next_action: Integrate WS-2 with the round-1 workstreams, then apply the recorded host call sites (IP-WS02-01..08, 12, 13, 18) in their owners' files in the next round, and re-run O4 §D, O5 S6 and O1 §H.
+completed_at: "2026-09-19T01:17:30Z"

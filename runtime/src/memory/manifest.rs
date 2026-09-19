@@ -30,7 +30,7 @@ pub fn build_index_manifest(
     lexical: &Value,
     reranker: &Value,
 ) -> Result<Value> {
-    let rows = db.query("SELECT path, artifact_id, content_hash, status, state_class, record_type, namespace, path_class, superseded_by FROM artifacts ORDER BY path", &[])?;
+    let rows = db.query("SELECT a.path, a.artifact_id, a.content_hash, a.status, a.state_class, a.record_type, a.namespace, a.path_class, a.superseded_by, d.key AS derivation FROM artifacts a LEFT JOIN derivation d ON d.path = a.path ORDER BY a.path", &[])?;
     let mut artifacts = Map::new();
     for r in rows {
         let path = r
@@ -48,6 +48,7 @@ pub fn build_index_manifest(
             "namespace",
             "path_class",
             "superseded_by",
+            "derivation",
         ] {
             if let Some(v) = r.get(k) {
                 if !v.is_null() {
@@ -110,11 +111,19 @@ pub struct Freshness {
     pub pin_mismatch: Vec<String>,
     pub age_hours: Option<f64>,
     pub age_exceeded: bool,
+    /// Entries whose content is unchanged but whose derivation key differs from the current path map, adapter set
+    /// or authority mapping (also listed in `stale`): the index still carries their old classification.
+    pub reclassified: Vec<String>,
 }
 
-/// Compare the tracked index manifest with the working tree (indexable, non-secret, text files only) and with the
-/// policy pins (embedder, chunking, lexical engine, index format). A pin mismatch is never "fresh".
-pub fn freshness(p: &Project) -> Freshness {
+/// Compare the tracked index manifest with the working tree (indexable, non-secret, text files only), with the
+/// policy pins (embedder, chunking, lexical engine, index format) and with each entry's derivation key (path-map
+/// decision, code-intelligence adapter, authority mapping — BC-P2-29). A pin mismatch or a reclassified entry is
+/// never "fresh". Evaluated against the policy set and path map on disk now (`indexer::current_view`), never a view
+/// cached before a mutation.
+pub fn freshness(p_in: &Project) -> Freshness {
+    let view = crate::memory::indexer::current_view(p_in);
+    let p = &view;
     let Some(m) = read_index_manifest(p) else {
         return Freshness {
             fresh: false,
@@ -126,6 +135,7 @@ pub fn freshness(p: &Project) -> Freshness {
             pin_mismatch: vec![],
             age_hours: None,
             age_exceeded: false,
+            reclassified: vec![],
         };
     };
     let expected = crate::memory::indexer::expected_pins(p);
@@ -162,11 +172,17 @@ pub fn freshness(p: &Project) -> Freshness {
         .unwrap_or_default();
     let contract = p.contract();
     let scanner = p.secret_scanner();
+    let governed = crate::capabilities::governance::plugin_set(p);
+    let derive = crate::memory::indexer::DerivationContext::new(p, &governed.usable);
     let mut stale = vec![];
+    let mut reclassified = vec![];
     let mut added = vec![];
     let mut seen = std::collections::HashSet::new();
     let mut checked = 0usize;
     for (abs, rel) in iter_repo_files(&p.root, false) {
+        if crate::memory::failures::is_memory_quality_path(&rel) {
+            continue; // never indexed (memory::failures::MEMORY_QUALITY_DIR)
+        }
         let d = contract.decide(&rel);
         if d.is_never_index() || scanner.path_is_secret(&rel) {
             continue;
@@ -188,14 +204,20 @@ pub fn freshness(p: &Project) -> Freshness {
             Some(e) => {
                 if e.get("content_hash").and_then(|v| v.as_str()) != Some(h.as_str()) {
                     stale.push(rel.clone());
+                } else if e.get("derivation").and_then(|v| v.as_str())
+                    != Some(derive.key(&d, &rel).as_str())
+                {
+                    stale.push(rel.clone());
+                    reclassified.push(rel.clone());
                 }
             }
             None => added.push(rel.clone()),
         }
     }
+    // an entry is removed when its file is gone or no longer indexable under the current path map
     let removed: Vec<String> = arts
         .keys()
-        .filter(|k| !seen.contains(*k) && !p.root.join(k).exists())
+        .filter(|k| !seen.contains(*k))
         .cloned()
         .collect();
     let fresh =
@@ -210,5 +232,6 @@ pub fn freshness(p: &Project) -> Freshness {
         pin_mismatch,
         age_hours,
         age_exceeded,
+        reclassified,
     }
 }

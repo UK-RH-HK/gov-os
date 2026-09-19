@@ -1,0 +1,16 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho33)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.26s
+     Running tests/hv_b_bullet7.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/target-ho33/debug/deps/hv_b_bullet7-f6e44d38d814d226)
+
+running 7 tests
+test b1_a_below_floor_machine_does_not_read_as_current ... ok
+test b2_an_unmarked_machine_is_not_marked_and_a_cleared_marking_lifts ... ok
+test b3_a_machine_with_no_home_is_not_spuriously_marked ... ok
+test b4_every_command_result_carries_the_marking_through_the_envelope ... ok
+test b5_a_stdout_path_bypasses_the_command_result_envelope ... ok
+test b6_the_non_json_surface_carries_the_marking ... ok
+test b7_in_process_reporting_surfaces_are_covered_only_where_they_carry_it_themselves ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+

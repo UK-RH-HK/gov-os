@@ -1,12 +1,24 @@
 schema: governance-os.contract-source-lock
-schema_version: 1
+schema_version: 2
 contract_version: v3
 owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md
 owner_source_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
 canonical_import: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
 canonical_import_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
 compiled: framework/contracts/governance-capability-acceptance.yaml
-compiled_sha256: 30cec97cb03ad481680c5a721a99d442d0acac942e857f3a8f331e1cca8f64f3
-binding: The compiled representation is valid only while canonical_import_sha256 equals owner_source_sha256 AND the compiled file matches a fresh compilation of that source. Any difference is a hard failure (Contract v3, 'Contract authority model').
+compiled_sha256: b7882fb71aff3ccd75e07405f98575cf8e7e18f0d317526f6f36519570de97af
+compiled_schema: framework/schemas/governance-capability-acceptance.schema.json
+compiled_schema_sha256: d1b49226b3adf56e10305191ca7c8651985e4a0ac95200bc2277a1a49ab9128b
+evidence_map: tests/governance/capability-evidence-map.yaml
+evidence_map_source_sha256: 5582032ed6b181da2e1e3a450cc8f84b082ba139f7990290eac3f64524f76857
+generated_view: docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+generated_view_sha256: ea93e9217002dcb7d76670f20e3d6d66338a67b2efcb2f8762a8b84a8e56e7b1
+universe:
+  capabilities: 101
+  gates: 23
+  checklist_items: 713
+  qualification_challenges: 8
+  carried_source_lines: 1026
+binding: 'The compiled representation, the source-derived fields of the evidence map and the generated view are valid only while canonical_import_sha256 equals owner_source_sha256 and each equals a fresh derivation from that source (compiled_sha256: canonical-JSON digest of the compiled value; evidence_map_source_sha256: canonical-JSON digest of the evidence map with its governed fields removed; generated_view_sha256: SHA-256 of the view''s bytes). `gov contract verify` fails on any semantic difference (Contract v3, ''Contract authority model'').'
 gate: GATE-OWNER-CAC-UPLOAD
 logged_precedence_conflict: The owner supplied the normative source at the repository root rather than at the destination path; an active owner directive outranks the frozen gate convention, so the root file is authoritative and the destination copy is a hash-bound canonical import.

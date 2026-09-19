@@ -1,0 +1,24 @@
+# family beta-r  clone HEAD ddf722a04461abacafb6011c40857eac6c0971e8  gov sha256 aebc7078f35f5b67c08b8c13b97930c9c693b4d3ff9748f8f97fcc6a315a070e  start 2026-09-19T00:34:56Z
+C1-deterministic-structured-memory: 18 pass / 0 fail
+C2-relationship-graph: 7 pass / 3 fail
+C3-semantic-memory: 11 pass / 3 fail
+C4-lexical-memory: 21 pass / 13 fail
+C5-code-structural-memory: 7 pass / 4 fail
+C6-temporal-memory: 5 pass / 1 fail
+C7-episodic-memory: 6 pass / 1 fail
+C8-failure-memory: 6 pass / 2 fail
+C9-context-packet: 8 pass / 2 fail
+C10-capability-memory: 6 pass / 4 fail
+D1-incremental-freshness: 8 pass / 3 fail
+D2-retrieval-router: 5 pass / 4 fail
+D3-hierarchical-retrieval: 4 pass / 1 fail
+D4-component-separation: 9 pass / 2 fail
+D5-model-selection: 7 pass / 4 fail
+D6-rebuild-guarantee: 6 pass / 2 fail
+R1-R2-legacy-and-chat-retirement: 8 pass / 5 fail
+R3-archive-policy: 3 pass / 1 fail
+X-K2-D1-W6-interactions: 3 pass / 2 fail
+FRESH-evidence-invalidation: 2 pass / 3 fail
+DERIVED-views-reconciliation: 0 pass / 2 fail
+SCALE-retrieval-latency: 0 pass / 0 fail
+# family beta-r end 2026-09-19T00:36:01Z

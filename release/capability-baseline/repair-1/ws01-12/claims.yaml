@@ -1,0 +1,155 @@
+schema: governance-os.phase-2.repair-claims
+schema_version: 1
+run_id: P2-AR-0014
+workstream: WS-1(part)+WS-12
+branch: phase2/repair-1-ws01-12
+base_commit: c6b60bc760a0bb42907f74210fd9e644a420851a
+product_work_commit: 473c3fba12a64cc36144c192c02b07f5db63fa04
+product_code_digest_base: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+product_code_digest_work_commit: d6005a510a81935736c370659c9a75395ccccaf64799e9d31b02957b7d51f03c
+note: Builder claims with regression evidence (Contract v3 O3). Acceptance is decided by fresh independent verifiers.
+claims:
+  - class: BC-P2-01
+    status: REPAIRED_CLAIMED
+    requirement: >-
+      Compiled form, evidence map and generated view carry every capability section of the owner source incl. Gate U,
+      every checklist item (713 + qualifiers at 385/515), the W10 hard invariant, each advanced-qualification challenge,
+      the Contract v3:53-73 fields and the requirement-class label verbatim; `gov contract verify` fails, typed, on any
+      semantic difference in any derived view (Contract v3:37-49; AC-13).
+    files:
+      - runtime/src/contracts.rs
+      - framework/contracts/governance-capability-acceptance.yaml
+      - framework/contracts/contract-source.lock
+      - framework/schemas/governance-capability-acceptance.schema.json
+      - tests/governance/capability-evidence-map.yaml
+      - docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md
+    unchanged_owner_bytes:
+      - Governance_OS_Capability_Acceptance_Contract_v3.md (4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3)
+      - framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md (4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3)
+    product_checks:
+      - check: gov contract verify (runtime/src/contracts.rs::verify)
+        tier: on demand; not yet scheduled at a G-tier (IP-1 G5/doctor, IP-2 release build)
+        typed_errors: [CONTRACT_SOURCE_DIVERGED, CONTRACT_LOCK_DIVERGED, CONTRACT_COMPILER_LOSSY, CONTRACT_SCHEMA_DIVERGED, CONTRACT_COMPILED_DIVERGED, CONTRACT_EVIDENCE_MAP_DIVERGED, CONTRACT_GENERATED_VIEW_DIVERGED, CONTRACT_SOURCE_UNRECOGNISED]
+      - check: cargo test --lib contracts::tests (14 tests, incl. the_committed_binding_chain_verifies and regeneration_is_idempotent_over_the_committed_views)
+        tier: builder regression (G0-independent)
+    probes_rerun:
+      - probe: release/capability-baseline/audit-0/synthesis/evidence/AC01-09-13-14-universe-identity-binding.py
+        before: "verify capability_count=100; missing from compiled ['U']; 53-73 fields none; bullets 0/344; O5 DIVERGES; U DIVERGES; schema admits U False; map rows 100; view rows 100, bullets 0/344"
+        after: "verify capability_count=101; missing []; 12 fields + checklist; bullets 344/344; O5 OK; U OK; V1-V4 DIVERGES only against the probe's sentinel (label carried verbatim); schema admits U True; map rows 101; view rows 101, bullets 344/344; AC-10 101/101 unchanged (BC-P2-02)"
+        evidence: evidence/probes-before/AC01-09-13-14-universe-identity-binding.out, evidence/probes-after/AC01-09-13-14-universe-identity-binding.out
+      - probe: release/capability-baseline/audit-0/alpha-r/evidence/C0-contract-derived-views.py
+        before: "compiled keys: identity only; 53-73 fields []"
+        after: "compiled keys incl. checklist/statements/all fields; 7 of the probe's 9 field names (it looks for evidence_classes / qualification_challenges); its 'bullets represented: 0' is a literal"
+      - probe: release/capability-baseline/audit-0/beta-r/evidence/DERIVED-views-reconciliation.py
+        before: "DERIVED-compiled FAIL (0 carried); DERIVED-evidence-map FAIL"
+        after: "DERIVED-compiled FAIL 121/123 — D3 L324/L325 contain U+2192, escaped by json.dumps (123/123 with ensure_ascii=False, evidence/bc-p2-01/probe-encoding-check.out); DERIVED-evidence-map FAIL (BC-P2-02)"
+      - probe: release/capability-baseline/audit-0/gamma-r/evidence/DV-derived-views.py
+        before: "no-bullets; NOT_YET_MAPPED/0chk"
+        after: "checklist + all fields carried; titles/classes same; NOT_YET_MAPPED/0chk (BC-P2-02)"
+      - probe: release/capability-baseline/audit-0/delta-r/evidence/DERIVED-VIEWS-JKLMN.py
+        before: "pass=20 fail=3 [DV.compiled.bullets, DV.compiled.fields, DV.map.1]"
+        after: "pass=22 fail=1 [DV.map.1] (BC-P2-02)"
+      - probe: release/capability-baseline/audit-0/epsilon-r/evidence/V-oracle-format-and-contract-views.sh (section D)
+        before: "gate U present False; O5, V1-V4 ORIGINAL; 100 capabilities"
+        after: "gate U present True in compiled form and evidence map; O5 EXECUTION_REFINEMENT; V1-V4 NEW TESTING REFINEMENT; 101 capabilities"
+      - probe: release/capability-baseline/audit-0/zeta-r/evidence/DV-derived-view-reconciliation.py
+        before: "pass=4 fail=5"
+        after: "pass=7 fail=2 [W bullets 83/86 — W8 L1148, W11 L1180/L1181 contain U+2192 (86/86 with ensure_ascii=False); evidence owner (BC-P2-02)]"
+    builder_evidence:
+      - evidence/bc-p2-01/mutation-controls.out (20/20: delete bullet, delete U, change label in each of compiled/map/view -> typed error; lock, schema, import controls)
+      - evidence/bc-p2-01/probe-encoding-check.out (722/722 checklist lines carried verbatim)
+    tests_changed:
+      - "replaced contracts::tests::the_compiler_invents_nothing_and_is_deterministic (it exercised the removed headings-only parse_capabilities); properties now asserted by a_single_changed_byte_in_the_source_changes_the_binding and the_line_accounting_is_independent_of_the_compiler / a_semantic_difference_in_the_compiled_form_is_a_typed_failure"
+      - "adapted contracts::tests::a_single_changed_byte_in_the_source_changes_the_binding to compile(&str) -> Result and the real source"
+    integration_points: [IP-1, IP-2, IP-3, IP-7]
+    owner_decision_required: false
+    limits:
+      - evidence owners remain unmapped (AC-10, BC-P2-02)
+      - per-capability values the owner source does not state are not invented (null in the compiled form, governed in the map)
+  - class: BC-P2-51
+    status: REPAIRED_CLAIMED
+    requirement: >-
+      A machine-checkable Qualification Oracle format covering every V1-V4 element exists, is kept separate from the
+      public qualification suite, validates a well-formed sample and rejects samples missing each V1-V4 field; it is
+      accepted by a fresh independent reviewer before any hidden fault is generated (Contract v3:1012-1062, :1206; AC-6).
+    acceptance_note: this claim covers the format and validator only; QUALIFICATION_ORACLE_FORMAT_ACCEPTED is the AC-6 reviewer's
+    files:
+      - framework/qualification-oracle/qualification-oracle.schema.json
+      - runtime/src/qualification_oracle.rs
+      - runtime/src/lib.rs (pub mod line)
+      - cli/src/main.rs (additive `gov oracle format|validate` block)
+    format:
+      id: governance-os.qualification-oracle
+      version: 1
+      format_sha256: f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd
+      kinds: [qualification-oracle, qualification-score-report]
+      crosswalk_entries: 44
+      crosswalk_fields: 50
+      status: PROPOSED
+    product_checks:
+      - check: gov oracle validate / qualification_oracle::{validate_file, validate_value, cross_check}
+        tier: on demand; natural G6 check (IP-4)
+        typed_errors: [ORACLE_RECORD_INVALID, ORACLE_SCORE_BINDING_MISMATCH, ORACLE_SEPARATION_VIOLATED, ORACLE_RECORD_UNREADABLE, ORACLE_FORMAT_INCOMPLETE]
+      - check: gov oracle format (crosswalk verified against the approved source bytes)
+        tier: on demand
+      - check: cargo test --lib qualification_oracle::tests (9 tests)
+        tier: builder regression
+    probes_rerun:
+      - probe: release/capability-baseline/audit-0/synthesis/evidence/AC06-oracle-format-search.sh
+        before: "no V1-V4 identifier anywhere; gov oracle unrecognised"
+        after: "all 12 identifier patterns in framework/qualification-oracle/qualification-oracle.schema.json and runtime/src/qualification_oracle.rs; gov oracle exists"
+        evidence: evidence/probes-before/AC06-oracle-format-search.out, evidence/probes-after/AC06-oracle-format-search.out
+      - probe: release/capability-baseline/audit-0/epsilon-r/evidence/V-oracle-format-and-contract-views.sh (sections A-C)
+        before: "A: no identifiers; B: gov oracle unrecognized, fault-manifest governed record -> HEALTHY"
+        after: "A: identifiers in the format and validator; B: gov oracle recognised; a fault-manifest *governed project record* under schema_invariants still HEALTHY (governance suite is WS-2's: IP-5); the same record given to gov oracle validate -> ORACLE_RECORD_INVALID"
+    builder_evidence:
+      - evidence/bc-p2-51/oracle-format-checks.out (78/78 — samples conform; every crosswalk field removed -> rejected and tagged; 16 semantic cases; binding; separation; the audit's FM-0001/FM-0002)
+      - evidence/bc-p2-51/gov-oracle-format.json
+      - evidence/bc-p2-51/samples/ (FORMAT_SAMPLE placeholders; not hidden faults, bound to no repository)
+    integration_points: [IP-4, IP-5, IP-6, IP-7]
+    owner_decision_required: false
+    limits:
+      - no hidden fault, oracle content or qualification repository generated
+      - GATE-P2-ORACLE-FORMAT remains NOT_SATISFIED until the fresh AC-6 review
+      - design choices listed in 00-REPAIR-REPORT.md section 2.6 are for the reviewer to judge
+integration_points:
+  - id: IP-1
+    workstream: WS-2
+    file: 'runtime/src/verification/mod.rs or runtime/src/doctor.rs'
+    call: 'gov_runtime::contracts::verify(&canonical_root) when the canonical OS tree is present; any CONTRACT_* error -> HIGH finding with details.differences'
+    why: 'BC-P2-01''s check must run at a G-tier (G5 full suite / doctor), repair-delta 0.2c'
+  - id: IP-2
+    workstream: WS-8
+    file: 'runtime/src/release.rs (release::build)'
+    call: 'refuse unless gov_runtime::contracts::verify(canonical_root) returns verdict CONTRACT_SOURCE_BOUND'
+    why: 'a release must not ship derived contract views that diverge from the owner source'
+  - id: IP-3
+    workstream: WS-1 (later round, BC-P2-02)
+    file: 'tests/governance/capability-evidence-map.yaml (governed fields), then `gov contract compile`'
+    call: 'populate evidence_class (Contract v3:83-91), automated_checks per capability and per checklist item, health_scheduler_tiers (G0-G6), freshness_triggers (:99-109), others; regeneration preserves them and verify enforces the vocabularies'
+    why: 'AC-10 evidence owners'
+  - id: IP-4
+    workstream: WS-2 (G6 entry point, BC-P2-07)
+    file: 'new scheduler / G6 module'
+    call: 'gov_runtime::qualification_oracle::validate_file(oracle, &ValidateOptions{public_suites, repositories, ..}) and validate_file(report, &ValidateOptions{oracle: Some(oracle), ..}) (or validate_value / cross_check in-process); refuse to record health for a non-conforming, unbound or non-separate run'
+    why: 'V1-V4 are the hidden oracle a G6 qualification run is scored against'
+  - id: IP-5
+    workstream: WS-2
+    file: 'runtime/src/verification/mod.rs (schema_invariants or a new family)'
+    call: 'qualification_oracle::is_hidden_oracle_material(&record.data) per record, or qualification_oracle::scan_for_hidden_oracle_material(&p.root); HIGH finding'
+    why: 'Contract v3:1014/1062 — a governed repository under qualification must hold no hidden-oracle material (epsilon-r V section B)'
+  - id: IP-6
+    workstream: orchestrator / oracle-format reviewer
+    file: 'release/orchestration/phase-2/GATES/GATE-REGISTER.yaml (GATE-P2-ORACLE-FORMAT)'
+    call: 'record the reviewed format_sha256 f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd'
+    why: 'documents are valid only against the exact format version they name'
+  - id: IP-7
+    workstream: WS-3
+    file: 'cli/src/main.rs'
+    call: 'additive Cmd::Oracle / OracleCmd block and command_name arm "oracle" (read-only; no role semantics); for a BC-P2-08 authority census, `oracle *` and `contract verify` are read-only, `contract compile` writes framework/contracts/**, tests/governance/**, docs/generated/**'
+    why: 'shared hot spot, additions only (+42/-0)'
+regression:
+  cargo_test_lib: {passed: 63, failed: 0, base_passed: 42, evidence: evidence/regression/cargo-test-lib.out}
+  cargo_test_certification: {passed: 79, failed: 0, base_passed: 79, evidence: evidence/regression/cargo-test-certification.out}
+  r1_heldout_suites: NOT_TRIGGERED (no change to srr/**, kernel_trust, kernel, lock, init, update, release, recovery, records, tools/capabilities or any section-6 sink)
+owner_decision_required: []

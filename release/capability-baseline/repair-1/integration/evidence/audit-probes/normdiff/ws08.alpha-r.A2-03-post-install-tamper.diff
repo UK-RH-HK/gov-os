@@ -1,0 +1,7 @@
+# normalised diff: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-03.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/alpha-r.A2-03-post-install-tamper.out
+# changed lines: 1
+--- recorded (builder branch)
++++ integrated
+@@ -28 +27,0 @@
+-[A2-03 exit=0]

@@ -1,0 +1,11 @@
+   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/r1/ho29)
+error: cannot construct `AuthenticatedRelease` with struct literal syntax due to private fields
+   --> tests/ho_f_preservation.rs:179:18
+    |
+179 |     let forged = gov_runtime::srr::AuthenticatedRelease {
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: ...and other private field `admitted` that was not provided
+
+error: could not compile `srr-heldout-ar0029` (test "ho_f_preservation") due to 1 previous error

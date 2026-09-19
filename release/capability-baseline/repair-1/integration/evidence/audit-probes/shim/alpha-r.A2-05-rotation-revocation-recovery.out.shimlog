@@ -1,0 +1,39 @@
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-rot-yh8uk6na/s0/kernel
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-rot-yh8uk6na/s2-old/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-rot-yh8uk6na/s2-new/kernel
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust root-update --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-rot-yh8uk6na/s5-min/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-rot-yh8uk6na/s5-old/kernel
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-rot-min-0e6j510y/m1/kernel
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-bg-yk7fxz0c/new/kernel
+(a) role declared: orchestrator for kernel reinstall --source
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for kernel reinstall --source
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for init --force --break-glass
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-05-rotation-revocation-recovery-U5vPT6/alpha-r-a2-bg-rb-gvyv6bue/r15/kernel
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for update --rollback --break-glass

@@ -1,0 +1,120 @@
+
+## ws01-bc01-mutation-controls
+recorded on the builder's branch: 20 PASS / 0 FAIL (20 lines)
+integrated: 20 PASS / 0 FAIL (20 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws01-bc51-oracle-format-checks
+recorded on the builder's branch: 71 PASS / 0 FAIL (71 lines)
+integrated: 71 PASS / 0 FAIL (71 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws02-supplementary
+recorded on the builder's branch: 42 PASS / 0 FAIL (42 lines)
+integrated: 42 PASS / 0 FAIL (42 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws03-named-checks
+recorded on the builder's branch: 37 PASS / 0 FAIL (37 lines)
+integrated: 37 PASS / 0 FAIL (37 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws04-scenarios
+recorded on the builder's branch: 37 PASS / 0 FAIL (37 lines)
+integrated: 37 PASS / 0 FAIL (37 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws05-supplementary
+recorded on the builder's branch: 22 PASS / 0 FAIL (22 lines)
+integrated: 22 PASS / 0 FAIL (22 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws06-supplementary
+recorded on the builder's branch: 19 PASS / 0 FAIL (19 lines)
+integrated: 19 PASS / 0 FAIL (19 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws08-P1..P4
+recorded on the builder's branch: 45 PASS / 0 FAIL (45 lines)
+integrated: 2 PASS / 7 FAIL (9 lines); PASS->FAIL 7; FAIL->PASS 0; recorded lines not reached 36
+    PASS->FAIL  P1a
+    PASS->FAIL  P1b
+    PASS->FAIL  P1c
+    PASS->FAIL  P1d
+    PASS->FAIL  P1e
+    PASS->FAIL  P1f
+    PASS->FAIL  C1a
+    NOT REACHED R1a
+    NOT REACHED R1b
+    NOT REACHED R1c
+    NOT REACHED R1d
+    NOT REACHED R1e
+    NOT REACHED R1f
+    NOT REACHED R1h
+    NOT REACHED R1g
+    NOT REACHED R2a
+    NOT REACHED R3a
+    NOT REACHED R3b
+    NOT REACHED R3c
+    NOT REACHED R4a
+    NOT REACHED R5a
+    NOT REACHED R5b
+    NOT REACHED C1b
+    NOT REACHED C2a
+    NOT REACHED C2b
+    NOT REACHED C3a
+    NOT REACHED C3b
+    NOT REACHED C4a
+    NOT REACHED C4b
+    NOT REACHED C5a
+    NOT REACHED C6a
+    NOT REACHED C7a
+    NOT REACHED K1a
+    NOT REACHED K1b
+    NOT REACHED K1c
+    NOT REACHED K1d
+    NOT REACHED K1e
+    NOT REACHED K2a
+    NOT REACHED K3a
+    NOT REACHED K4a
+    NOT REACHED K4b
+    NOT REACHED K5a
+    NOT REACHED K5b
+roleshim: 23 PASS / 7 FAIL (30 lines); PASS->FAIL 7; FAIL->PASS 0; recorded lines not reached 15
+    PASS->FAIL  K1a
+    PASS->FAIL  K1b
+    PASS->FAIL  K1c
+    PASS->FAIL  K1d
+    PASS->FAIL  K1e
+    PASS->FAIL  K4a
+    PASS->FAIL  K5a
+    NOT REACHED R1a
+    NOT REACHED R1b
+    NOT REACHED R1c
+    NOT REACHED R1d
+    NOT REACHED R1e
+    NOT REACHED R1f
+    NOT REACHED R1h
+    NOT REACHED R1g
+    NOT REACHED R2a
+    NOT REACHED R3a
+    NOT REACHED R3b
+    NOT REACHED R3c
+    NOT REACHED R4a
+    NOT REACHED R5a
+    NOT REACHED R5b
+roleshim + derived owner channel (P1, P4): 45 PASS / 0 FAIL (45 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+## ws09-11-regression-probes
+recorded on the builder's branch: 27 PASS / 0 FAIL (27 lines)
+integrated: 22 PASS / 5 FAIL (27 lines); PASS->FAIL 5; FAIL->PASS 0; recorded lines not reached 0
+    PASS->FAIL  S1-gate-A-retires-without-repointing
+    PASS->FAIL  S1-A7-reports-accepted-dangling
+    PASS->FAIL  S1-A7-detects-repoint-into-archive
+    PASS->FAIL  S2-new-dependant-blocks-retirement
+    PASS->FAIL  S4-secret-store-retired-and-kept-secret
+derived owner channel: 27 PASS / 0 FAIL (27 lines); PASS->FAIL 0; FAIL->PASS 0; recorded lines not reached 0
+=> lines that passed on the builder's branch and do not pass in the last run listed: 0 []
+
+TOTAL unresolved PASS->not-PASS lines over all probes (last run listed per probe): 0

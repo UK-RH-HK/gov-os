@@ -1,0 +1,80 @@
+
+######## delta-r
+== DERIVED-VIEWS-JKLMN.out: REGENERATED, BYTE-IDENTICAL
+== FRESH-invalidation.out: SAME(normalised) markers=13/13 changed=0
+== J1-J2-research-experiments.out: DIFF 10 lines markers=20/20 changed=1
+   MARKER 'J2.merge.enforced': committed='FAIL' rerun='PASS'
+   --> ok
+   -CHECK J2.merge.enforced FAIL closing an experimental task whose output landed in the production tree (product/**) is refused or marked non-mergeable
+   -detail: {"close": {"checkpoint": "CKPT-00003", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+   +-> ERROR [PRODUCTION_MERGE_NOT_ALLOWED] task TASK-0001 (experiment) may not merge into production (production_merge_allowed: false) but its mutations landed in the production tree: ["product/gateway_async.py"]; keep experimental output outside the production tree (spec/exp<RND>/** or a path the rep
+   +CHECK J2.merge.enforced PASS closing an experimental task whose output landed in the production tree (product/**) is refused or marked non-mergeable
+   +detail: {"close": {"code": "PRODUCTION_MERGE_NOT_ALLOWED", "details": {"class": "experiment", "evidence": {"attributed_elsewhere": [], "baseline": "claim baseline <TS> (commit <HEX>)", "carried": [], "cit_covered": [], "observed": ["product/gateway_async.py"]}, "observed": ["product/gateway_async.p
+   -OBSERVE J2.merge.after after the experimental code is committed into the production tree: {"doctor_failed_checks": ["D021"], "git_commit_rc": 0, "status_next_action": "gov continue \u2192 claim TASK-0002"}
+   +OBSERVE J2.merge.after after the experimental code is committed into the production tree: {"doctor_failed_checks": ["D021"], "git_commit_rc": 0, "status_next_action": "gov continue \u2192 claim TASK-0001"}
+   -SUMMARY checks=20 pass=12 fail=8 failed=['J1.a.influences', 'J1.a.influence_backlink', 'J1.b.accepted', 'J1.b.audit', 'J2.empty', 'J2.incomplete.audit', 'J2.merge.enforced', 'J2.merge.detected']
+   +SUMMARY checks=20 pass=13 fail=7 failed=['J1.a.influences', 'J1.a.influence_backlink', 'J1.b.accepted', 'J1.b.audit', 'J2.empty', 'J2.incomplete.audit', 'J2.merge.detected']
+== K1-cit-p.out: SAME(normalised) markers=12/12 changed=0
+== K2-cit-e.out: SAME(normalised) markers=27/27 changed=0
+== K3-auto-impact-simulation.out: DIFF 6 lines markers=19/19 changed=0
+   -detail: {"cits_after": 17, "cits_before": 17, "close": {"checkpoint": "CKPT-00008", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+   +detail: {"cits_after": 17, "cits_before": 17, "close": {"checkpoint": "CKPT-00008", "degraded": [], "overrides": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+   -detail: {"close": {"checkpoint": "CKPT-00009", "degraded": [], "report": "RPT-0002", "task": "TASK-0002", "task_status": "DONE"}}
+   +detail: {"close": {"checkpoint": "CKPT-00009", "degraded": [], "overrides": [], "report": "RPT-0002", "task": "TASK-0002", "task_status": "DONE"}}
+   -detail: {"cits": 0, "close": {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+   +detail: {"cits": 0, "close": {"checkpoint": "CKPT-00001", "degraded": [], "overrides": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
+== K4-impact-radius.out: SAME(normalised) markers=9/9 changed=0
+== L1-contradiction-resolution.out: SAME(normalised) markers=19/19 changed=0
+== L2-decision-package.out: SAME(normalised) markers=20/20 changed=0
+== L3-gate-presentation-attacks.out: DIFF 23 lines markers=46/43 changed=3
+   MARKER 'L3.b5.10': committed='FAIL' rerun=None
+   MARKER 'L3.b5.11': committed='FAIL' rerun=None
+   MARKER 'L3.b5.9': committed='FAIL' rerun=None
+   -detail: {"claim": {"baseline": {"commit": "<HEX>", "files": 224}, "claimed_at": "<TS>", "expires_at": "<TS>", "role": "orchestrator", "session_id": "probe-<HEX>", "task_id": "TASK-0003"}, "replan": [{"from": "WAITING_HUMAN", "task": "TASK-0003", "to": "READY"}]}
+   +detail: {"claim": {"baseline": {"at": "<TS>", "carried": [], "commit": "<HEX>", "files": 224, "reused": false}, "branch": "main", "claimed_at": "<TS>", "expires_at": "<TS>", "git_dir": "<PATH>", "head": "<HEX>", "renewed": false, "role": "orchestrator", "scope": ["product/**"], "session_id": "probe
+   --> ok
+   -$ gov --json --session probe-<HEX> cit propose --proposal 'probe change b5worker' --trigger governance_change --manifest <PATH>
+   --> ok
+   -# RECORD EDIT (direct file write, no gov command): spec/d<RND>/HDG-0025.yaml
+   -$ gov --json --session probe-<HEX> rebuild-memory --incremental
+   --> ok
+   -$ gov --json --session worker-1 --role backend-engineer task close TASK-0005 --report <PATH>
+   --> ok
+   -CHECK L3.b5.9 FAIL a worker (backend-engineer, L1) that hand-writes gate/decision records inside its task cannot close the task with those writes unobserved
+   -detail: {"close": {"checkpoint": "CKPT-00006", "degraded": [], "report": "RPT-0001", "task": "TASK-0005", "task_status": "DONE"}, "observed_files_changed": ["product/work.txt"]}
+   -$ gov --json --session probe-<HEX> audit --no-persist
+   --> ok
+   -OBSERVE L3.b5.10 gov audit verdict after forged approval records exist: {"families_failing": ["graph_integrity"], "verdict": "DEGRADED"}
+   -CHECK L3.b5.10 FAIL the governance suite reports forged/unanswered-yet-ANSWERED gate records
+   -$ gov --json --session probe-<HEX> --role human memory select builtin:128 --by anyone
+   --> ok
+   -CHECK L3.b5.11 FAIL `gov memory select` run with a self-declared --role human cannot record human_approved=true
+   -detail: {"approved_by_kind": "human", "approved_by_role": "human", "human_approved": true, "ok": true}
+   -SUMMARY checks=46 pass=28 fail=18 failed=['L3.b1.6', 'L3.b2.2', 'L3.b2.3', 'L3.b2.5', 'L3.b4.s2', 'L3.b4.s3', 'L3.b4.o2', 'L3.b4.t2', 'L3.b4.t3', 'L3.b4.t4', 'L3.b4.t5', 'L3.b5.1', 'L3.b5.2', 'L3.b5.3', 'L3.b5.8', 'L3.b5.9', 'L3.b5.10', 'L3.b5.11']
+   +-> ERROR [CLAIM_SCOPE_CONFLICT] TASK-0005: its mutation scope ["product/**"] overlaps live claim(s) of other sessions: TASK-0003 (session probe-<HEX>, scope ["product/**"]); parallel work is permitted only on disjoint mutation scopes — wait for them to close or release, or narrow the task's allowed
+   +unexpected failure: gov task claim TASK-0005: {'code': 'CLAIM_SCOPE_CONFLICT', 'message': 'TASK-0005: its mutation scope ["product/**"] overlaps live claim(s) of other sessions: TASK-0003 (session probe-<HEX>, scope ["product/**"]); parallel work is permitted only on disjoint mutation scopes — wait
+== L3-supplement.out: DIFF 2 lines markers=2/2 changed=0
+   -detail: {"close": {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}, "gate_status": "PENDING"}
+   +detail: {"close": {"checkpoint": "CKPT-00001", "degraded": [], "overrides": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}, "gate_status": "PENDING"}
+== L4-non-global-blocking.out: SAME(normalised) markers=10/10 changed=0
+== M1-M3-routing.out: SAME(normalised) markers=21/21 changed=0
+== M4-empirical-routing.out: SAME(normalised) markers=15/15 changed=0
+== N1-N2-checkpoints.out: DIFF 11 lines markers=24/24 changed=0
+   +"branch": "main",
+   +"git_dir": "<PATH>",
+   +"head": "<HEX>",
+   +"scope": [
+   +"product/**"
+   +],
+   -"task_id": "TASK-0001"
+   +"task_id": "TASK-0001",
+   +"worktree": "<PATH>"
+   -detail: {"claim": {"claimed_at": "<TS>", "expires_at": "<TS>", "role": "orchestrator", "session_id": "probe-<HEX>", "task_id": "TASK-0001"}, "mode": "RUNNING", "role": "orchestrator", "session": "probe-<HEX>", "task": "TASK-0001"}
+   +detail: {"claim": {"branch": "main", "claimed_at": "<TS>", "expires_at": "<TS>", "git_dir": "<PATH>", "head": "<HEX>", "role": "orchestrator", "scope": ["product/**"], "session_id": "probe-<HEX>", "task_id": "TASK-0001", "worktree": "<PATH>"}, "mode": "RUNNING", "role": "orchestrator", "session": "
+== N2-significant-mutation-adopt.out: SAME(normalised) markers=1/1 changed=0
+== N3-N4-W9-watchdog-handoff.out: SAME(normalised) markers=18/18 changed=0
+== PINNED-INPUTS.out: NOT REGENERATED by the re-run (not produced by the family's probe runner)
+== REG-cargo-test-certification.out: NOT REGENERATED by the re-run (not produced by the family's probe runner)
+== REG-cargo-test-lib.out: NOT REGENERATED by the re-run (not produced by the family's probe runner)
+
+# files compared: 17; files with normalised differences: 5

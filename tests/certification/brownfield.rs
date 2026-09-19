@@ -134,9 +134,15 @@ fn brownfield_adoption_end_to_end() {
         "fx-brown",
     ]);
     assert_eq!(mig["complete"], true, "{mig}");
+    // BC-P2-33: README.md cites AGENT_RULES_v2.md, so its retirement waits for an answered Human Decision Gate bound to
+    // that dependency proof (dependency proof before retirement; no active reference re-pointed at the archive)
+    let readme_before = read(&root, "README.md");
+    assert!(
+        exists(&root, "AGENT_RULES_v2.md"),
+        "a legacy rule file an active document still cites is not retired without an answered gate"
+    );
     for p in [
         ".cursorrules",
-        "AGENT_RULES_v2.md",
         ".github/copilot-instructions.md",
         ".index/vectors.json",
         ".index/manifest.json",
@@ -185,12 +191,35 @@ fn brownfield_adoption_end_to_end() {
     assert!(gates.len() >= 2, "{gates:?}");
     for gid in &gates {
         executor.ok(&["gate", "present", gid]);
-        executor.ok(&["decide", gid, "--option", "A", "--by", "owner"]);
+        crate::ws03::human_decide(&executor, gid, "A");
     }
+    let rules_entry = cat2
+        .iter()
+        .find(|e| e["current_path"] == "AGENT_RULES_v2.md")
+        .unwrap();
+    assert!(
+        rules_entry["gate_reasons"]
+            .to_string()
+            .contains("active_references")
+            && rules_entry["dependency_proof"]["active_references"]
+                .to_string()
+                .contains("README.md"),
+        "{rules_entry}"
+    );
     executor.ok(&["adopt", "migrate", "--batch", "7"]);
     assert!(
         !exists(&root, "src/app/old_export.py") && !exists(&root, "docs/legacy_module.py"),
         "answered gates => dead code removed from the active tree"
+    );
+    assert!(
+        !exists(&root, "AGENT_RULES_v2.md")
+            && exists(&root, "archive/governance/legacy-rules/AGENT_RULES_v2.md"),
+        "answered gate => the cited legacy rule file is retired"
+    );
+    assert_eq!(
+        read(&root, "README.md"),
+        readme_before,
+        "the active README is never re-pointed at archived legacy material"
     );
     assert!(exists(&root, "spec/decisions/decision-2-copy.yaml"));
     assert!(
@@ -290,7 +319,7 @@ fn brownfield_adoption_end_to_end() {
     assert_eq!(sim["impact"]["human_gate_required"], true);
     let gate = sim["human_gate"].as_str().unwrap().to_string();
     executor.ok(&["gate", "present", &gate]);
-    executor.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&executor, &gate, "A");
     executor.ok(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     let ex2 = executor.ok(&["cit", "execute", &cid]);
     assert_eq!(ex2["cit_status"], "COMMITTED", "{ex2}");

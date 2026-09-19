@@ -2,7 +2,7 @@
 use crate::checkpoints;
 use crate::memory::db::RuntimeDb;
 use crate::memory::manifest::freshness;
-use crate::orchestration::{control, dag, gates};
+use crate::orchestration::{claims, control, dag, gates};
 use crate::records::RecordStore;
 use crate::{Project, Result};
 use serde_json::{json, Value};
@@ -125,6 +125,10 @@ pub fn continue_work(p: &Project, db: &RuntimeDb, claim: bool) -> Result<Value> 
     // prefer tasks on the longest open dependency chain, then lowest id
     let mut candidates: Vec<String> = d.runnable.clone();
     candidates.sort_by_key(|t| (if d.longest_chain.contains(t) { 0 } else { 1 }, t.clone()));
+    // offer only work this session can take (BC-P2-14/15): not designated for another role, not held by another
+    // session, and not overlapping the mutation scope of another session's live claim
+    let store = RecordStore::load(&p.root);
+    let (candidates, deferred) = partition_for_session(p, &store, candidates)?;
     if ctl["mode"].as_str() == Some("PAUSED") {
         return Ok(
             json!({"status": "PAUSED", "gate": gate_text, "message": "execution paused; gov resume after the reason is resolved"}),
@@ -141,10 +145,9 @@ pub fn continue_work(p: &Project, db: &RuntimeDb, claim: bool) -> Result<Value> 
     }
     let Some(next) = candidates.first().cloned() else {
         return Ok(
-            json!({"status": "NO_RUNNABLE_WORK", "gate": gate_text, "waiting_human": d.waiting_human, "blocked": d.blocked, "suggestion": "run `gov readiness plan <feature>` or create discovery tasks"}),
+            json!({"status": "NO_RUNNABLE_WORK", "gate": gate_text, "waiting_human": d.waiting_human, "blocked": d.blocked, "deferred": deferred, "suggestion": if deferred.is_empty() { "run `gov readiness plan <feature>` or create discovery tasks" } else { "runnable work exists but this session cannot take it now (see `deferred`): act in the designated role, or wait for the overlapping claims to close" }}),
         );
     };
-    let store = RecordStore::load(&p.root);
     let task = store
         .get(&next)
         .map(|r| r.data.clone())
@@ -158,6 +161,52 @@ pub fn continue_work(p: &Project, db: &RuntimeDb, claim: bool) -> Result<Value> 
     }
     Ok(
         json!({"status": "NEXT_WORK", "task": next, "task_contract": task, "context_packet": {"path": format!(".governance-runtime/context/{next}.json"), "deterministic_hash": packet["deterministic_hash"], "packet_hash": packet["packet_hash"], "chars": packet["chars"]},
-        "skills": skills, "routing": {"minimum_tier": routing["minimum_tier"], "reasoning": routing["reasoning"], "chosen": routing["chosen"]}, "claimed": claimed, "parallel_runnable": candidates.iter().skip(1).take(5).cloned().collect::<Vec<_>>(), "gate": gate_text, "status_summary": st["next_action"]}),
+        "skills": skills, "routing": {"minimum_tier": routing["minimum_tier"], "reasoning": routing["reasoning"], "chosen": routing["chosen"]}, "claimed": claimed, "parallel_runnable": candidates.iter().skip(1).take(5).cloned().collect::<Vec<_>>(), "deferred": deferred, "gate": gate_text, "status_summary": st["next_action"]}),
     )
+}
+
+/// Split runnable tasks into those the acting session can claim now and those it cannot, with the reason: designated
+/// for another role, held by another session's live claim, or a mutation scope overlapping another session's live
+/// claim (the same rules [`crate::orchestration::tasks::claim`] enforces atomically).
+pub fn partition_for_session(
+    p: &Project,
+    store: &RecordStore,
+    runnable: Vec<String>,
+) -> Result<(Vec<String>, Vec<Value>)> {
+    let live = claims::live(p)?;
+    let others: Vec<&Value> = live
+        .iter()
+        .filter(|c| c["session_id"].as_str() != Some(p.session_id.as_str()))
+        .collect();
+    let mut ok = vec![];
+    let mut deferred = vec![];
+    for id in runnable {
+        let Some(t) = store.get(&id) else {
+            continue;
+        };
+        let role = t.get("role");
+        if !role.is_empty() && role != p.role {
+            deferred.push(json!({"task": id, "reason": format!("designated for role '{role}' (acting role '{}')", p.role), "designated_role": role}));
+            continue;
+        }
+        if let Some(h) = others
+            .iter()
+            .find(|c| c["task_id"].as_str() == Some(id.as_str()))
+        {
+            deferred.push(json!({"task": id, "reason": format!("claimed by session {}", h["session_id"].as_str().unwrap_or("?")), "holder": h["session_id"]}));
+            continue;
+        }
+        let scope = claims::scope_of_task(t);
+        let conflicts: Vec<Value> = others
+            .iter()
+            .filter(|c| claims::scopes_overlap(&scope, &claims::scope_of_claim(c)))
+            .map(|c| c["task_id"].clone())
+            .collect();
+        if !conflicts.is_empty() {
+            deferred.push(json!({"task": id, "reason": format!("mutation scope {} overlaps live claim(s) {conflicts:?} of other sessions", claims::describe_scope(&scope)), "conflicts": conflicts}));
+            continue;
+        }
+        ok.push(id);
+    }
+    Ok((ok, deferred))
 }

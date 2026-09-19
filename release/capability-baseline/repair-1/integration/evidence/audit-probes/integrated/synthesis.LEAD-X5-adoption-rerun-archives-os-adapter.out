@@ -1,0 +1,46 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): synthesis/LEAD-X5-adoption-rerun-archives-os-adapter mode=integrated
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 616741056dd255ac0be56a94bc59af7d0237cbb63fb8913dc16e7b43951f3624; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+# date 2026-09-19T02:28:26Z
+# project x5: fixture=brownfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-integrated-synthesis-LEAD-X5-adoption-rerun-archives-os-adapter-g0tWmz/x5-eeb6fd/proj
+$ gov adopt baseline   [role=orchestrator session=S-planner exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-planner exit=0]
+$ gov adopt classify   [role=orchestrator session=S-planner exit=0]
+$ gov adopt map   [role=orchestrator session=S-planner exit=0]
+$ gov adopt plan   [role=orchestrator session=S-planner exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-planner exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-reviewer exit=0]
+$ gov adopt migrate --name shipping-quotes --alias fx-1   [role=migration-executor session=S-executor exit=0]
+$ gov gate present HDG-0001   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0001 --option A --by owner   [role=human session=S-owner exit=1]
+$ gov gate present HDG-0002   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0002 --option A --by owner   [role=human session=S-owner exit=1]
+$ gov gate present HDG-0003   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0003 --option A --by owner   [role=human session=S-owner exit=1]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-executor exit=0]
+$ gov adopt verify-migration   [role=migration-verifier session=S-verifier exit=0]
+NOTE pass 1: migrate ok=True gates=['HDG-0001', 'HDG-0002', 'HDG-0003'] A7 verdict=MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+NOTE after pass 1: OS IDE adapter present at governance/generated/adapters/ide/RULES.md: True
+$ gov adopt baseline   [role=orchestrator session=S-planner exit=0]
+$ gov adopt inventory   [role=orchestrator session=S-planner exit=0]
+$ gov adopt classify   [role=orchestrator session=S-planner exit=0]
+$ gov adopt map   [role=orchestrator session=S-planner exit=0]
+$ gov adopt plan   [role=orchestrator session=S-planner exit=0]
+$ gov adopt test-design   [role=orchestrator session=S-planner exit=0]
+$ gov adopt review --verdict MIGRATION_PLAN_APPROVED   [role=migration-reviewer session=S-reviewer exit=0]
+$ gov adopt migrate --name shipping-quotes --alias fx-2   [role=migration-executor session=S-executor exit=0]
+$ gov gate present HDG-0004   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0004 --option A --by owner   [role=human session=S-owner exit=1]
+$ gov gate present HDG-0005   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0005 --option A --by owner   [role=human session=S-owner exit=1]
+$ gov gate present HDG-0006   [role=migration-executor session=S-executor exit=0]
+$ gov decide HDG-0006 --option A --by owner   [role=human session=S-owner exit=1]
+$ gov adopt migrate --batch 7   [role=migration-executor session=S-executor exit=0]
+$ gov adopt verify-migration   [role=migration-verifier session=S-verifier exit=0]
+NOTE pass 2: migrate ok=True gates=['HDG-0004', 'HDG-0005', 'HDG-0006'] A7 verdict=MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD
+X X5-W1-catalogue-ids-stable-across-passes PASS W1:1070 a path keeps its catalogue artefact id when adoption stages are re-run -- {"examples": {}, "paths_whose_id_changed": 0}
+X X5-S4xB2-os-generated-adapter-not-legacy PASS S4 A2/A3 on re-run: the Governance OS's own generated IDE adapter is not classified as legacy provider rules or moved to the legacy archive -- {"archived_copies": [], "classification": {"authority": "ACTIVE", "class": "GOVERNANCE_CURRENT", "id": null, "kinds": ["provider_rules", "doc"]}, "map": {"action": "KEEP_IN_PLACE", "artifact_id": "ART-9d65952f8dca", "target_path": null}, "still_at_original_path": true}
+NOTE ledger files: ["spec/audits/GOVERNANCE-ADOPTION/migration-ledger.jsonl"]
+X X5-T3-ledger-ids-match-catalogue PASS T3:972 / S5:945 the migration ledger identifies each moved artefact by the id the catalogue gives that path -- {"count": 0, "mismatches": []}
+SUMMARY total=3 pass=3 fail=0 failed=[]
+[exit=0]

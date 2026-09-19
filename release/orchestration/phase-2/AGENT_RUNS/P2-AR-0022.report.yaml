@@ -1,0 +1,126 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0022
+role: capability-repair
+objective: Repair iteration 1, round 1 integration builder — merge the eight round-1 repair branches in the handoff order, resolve textual and semantic conflicts minimally, register every new subcommand with WS-3's G0 guard, run every suite and every prior R1 held-out suite; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run is the
+  integration builder: it merged the round-1 branches and authored only the integration commits listed in
+  00-INTEGRATION-REPORT.md §2 and the integration evidence; it authored none of the round-1 repairs, no audit, synthesis or
+  verification run, and it grades no repair. It read P2-HO-0019, P2-HO-0010, AGENT_RUNS/README.md, the eight round-1
+  00-REPAIR-REPORT.md files and their evidence scripts and outputs, the orchestration ledger entries P2-L-0013/P2-L-0014 and
+  P2-ADJ-0001, framework §15.2, the product source and tests of the merged tree, the audit-of-record probes and libraries
+  (run unedited; adapters are separate, labelled evidence files) and the prior R1 held-out suites (run unedited). Other
+  branches were read with git show / git archive into scratch only. It did not read session or agent transcripts,
+  task-output stores or user auto-memory; it spawned no sub-agents and did not contact the product owner.
+input:
+  base_commit: 12c68d3094e5c211db137aad43f00174c43abffb
+  candidate: "none (integration branch of repair iteration 1, round 1; no candidate minted)"
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0019-integration-1.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0019-integration-1.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/orchestration/phase-2/PHASE_LEDGER.md (P2-L-0013, P2-L-0014)
+  - release/orchestration/phase-2/GATES/P2-ADJ-0001-STANDALONE-HUMAN-GATE-ANCHOR.md
+  - "release/capability-baseline/repair-1/{ws01-12,ws02,ws03,ws04,ws05,ws06,ws08,ws09-11}/00-REPAIR-REPORT.md and evidence/"
+  - "branches phase2/repair-1-{ws03,ws04,ws05,ws06,ws08,ws09-11,ws02,ws01-12} (tips 6853526, 14c7f68, 4a91c45, ffbe8c9, ea8efca, bc7c030, 37bfcd1, 0dc7798)"
+  - release/capability-baseline/audit-0/*/evidence (probes and libraries, run unedited)
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests and 4.1.6-r1-4/evidence/REPRODUCTION.md, derive.py (run unedited)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (§15.2)
+  - runtime/src, cli/src, framework/, tests/certification of the merged tree
+produced:
+  - "merge commits 02c1203 (ws03), 00cc5bf (ws04), 02c080f (ws05), 559aec6 (ws06), 4e647ee (ws08), f70b84d (ws09-11), 2b7aca7 (ws02), badd915 (ws01-12)"
+  - "runtime/src/verification/mod.rs (963e715: compile reconciliation)"
+  - "cli/src/main.rs, runtime/src/orchestration/control.rs, framework/policies/AUTHORITY_POLICY.yaml (38811b8: G0 registration)"
+  - "runtime/src/adopt.rs (6de7214: plan expected_consumers)"
+  - "runtime/src/context/mod.rs (b683f77: semantic_candidates)"
+  - "runtime/src/migrations/refs.rs (488a735: T2-sealed records never re-pointed)"
+  - "tests/certification/ws08.rs, tests/certification/migration.rs (875aac1: owner-signed answers)"
+  - "cli/src/main.rs (2cafbdc: rustfmt, whitespace only)"
+  - "runtime/src/verification/currency.rs (811317b: trust anchor read through srr::verifier::trusted_root, R1 AR-0031 a4)"
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+  - release/capability-baseline/repair-1/integration/evidence/
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib at 811317b: 146 passed, 0 failed (= base 42 + every builder's additions)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/regression/cargo-test-lib.out}
+  - {id: REG-CERT, description: "cargo test --test certification at 811317b: 100 passed, 0 failed (79 + WS-3 12 + WS-8 7 + WS-9/11 2; includes section6, srr, ws03, ws08)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/regression/cargo-test-certification.out}
+  - {id: REG-CERT-AFTER-MERGES, description: "certification straight after the merges + compile fix + G0 registration (38811b8): 95/5 — the failures the reconciliations addressed", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration/evidence/regression/cargo-test-certification.after-merges-38811b8.out}
+  - {id: REG-PY, description: "Python plugin tests (capabilities/tests): 4 passed", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/regression/python-plugin-tests.out}
+  - {id: REG-FMT, description: "rustfmt --check on every file touched beyond the merges: 0 hunks; cargo build: no warnings", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/regression/rustfmt-check.out}
+  - {id: R1-AR0027, description: "AR-0027 unedited: 26/3 (b1, b2, d3) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/r1-heldout/r1-heldout-integrated-final.out}
+  - {id: R1-AR0029, description: "AR-0029 unedited: 26/2 (b3, b6), ho_f_preservation does not compile (private fields) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/r1-heldout/r1-heldout-integrated-final.out}
+  - {id: R1-AR0031, description: "AR-0031 unedited: 27/7 (a1, a5, a8, b6, c2, c3, d2) = recorded baseline (26/8 with a4 before 811317b; a4 reproduced on WS-2's branch alone)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/r1-heldout/r1-heldout-integrated-final.out}
+  - {id: R1-AR0033, description: "AR-0033 unedited: 30/1 — only hv_a_derivation::a1, which pins 84 files / 740 functions (tree: 105 / 1457)", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration/evidence/r1-heldout/r1-heldout-integrated-final.out}
+  - {id: R1-AR0033-A1-UNPINNED, description: "labelled copy of hv_a::a1 with only the two size asserts printed: 0 violations in all seven §6 activities; AR-0033 derive.py: 0 violations in three splitter configurations", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/r1-heldout/r1-heldout-integrated-final.out}
+  - {id: R1-ATTRIB-WS02, description: "AR-0031 hx_a_census against a read-only export of WS-2's tip 37bfcd1 alone: a4 fails (hand-composed trust anchor path in verification/currency.rs)", result: CONFIRMED, evidence_path: release/capability-baseline/repair-1/integration/evidence/r1-heldout/attribution-ws02-branch-alone.hx_a_census.out}
+  - {id: G0-NEW-LABELS, description: "new labels observed through the binary: Write refused FROZEN/PAUSED with no governed change, Read run with no governed change, record_skill_binding L3, record_audit parity with audit, oracle outside; framework/health not needed in the installed kernel (9/9)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/g0/new_labels_g0_probe.out}
+  - {id: COLD-CACHE-CONCURRENCY, description: "WS-2 scheduler + doctor, 4 concurrent processes x 5 cold-cache trials x 4 scenarios (un/provisioned, trusted/untrusted kernel): caches byte-identical to the embedded payload, later embedded init ok (17/17)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/concurrency/cold_cache_scheduler.out}
+  - {id: BUILDER-PROBES, description: "every round-1 builder's own probe against the integrated binary: WS-1/12 20/20, 78/78, identical; WS-2 42/42; WS-3 37/37 and G0 matrix (only verify product changes: now FROZEN/PAUSED); WS-4 37/37; WS-5 22/22; WS-6 19/19; WS-8 45/45 and WS-9/11 27/27 once roles are declared and gates answered through the owner-signed channel (derived copies); no integration regression", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/builder-probes/COMPARE-builder-probes.out}
+  - {id: BUILDER-PROBES-UNEDITED-WS08-WS09, description: "unedited WS-8 P1..P4 (7 PASS->FAIL, 36 not reached) and WS-9/11 (22/27) fail only on paths WS-3 removed by design (undeclared role, partial gate package, --by human relay)", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration/evidence/builder-probes/COMPARE-builder-probes.out}
+  - {id: AUDIT-PROBES, description: "152 audit-of-record probe runs the builders cited (unedited and through a labelled evidence adapter): marked families 4 PASS->FAIL, each explained (two WS-3 intended refusals, one adapter artefact, one fixture budget below WS-4's mandatory blocks), 24 FAIL->PASS; unmarked families reviewed by normalised diff; no defect from combining two repairs", result: PASS, evidence_path: release/capability-baseline/repair-1/integration/evidence/audit-probes/COMPARE-audit-probes.out}
+findings:
+  - id: P2-AR-0022-I1
+    severity: INFO
+    capability: AC-14, O4
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-2's verification/currency.rs composed the trust anchor path by hand, failing AR-0031 hx_a::a4 on WS-2's branch alone; WS-2's recorded R1 run measured WS-6's tree (shared scratch symlinks). Repaired in the integration (811317b) without touching srr/**; AR-0031 back to 27/7."
+    path: release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0022-I2
+    severity: INFO
+    capability: L3, S4
+    blocking: false
+    blocker_class: BC-P2-09
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-9's migration reference re-pointing rewrote WS-3-sealed gate records (T2 binding broken); reconciled in the integration (488a735): T2-sealed records are never re-pointed"
+    path: release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0022-O1
+    severity: MEDIUM
+    capability: A1, M1, H3, S5
+    blocking: false
+    blocker_class: BC-P2-45
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-3 alone: on a project whose installed kernel predates WS-3's POLICY_PRECEDENCE rules (shipped 4.1.4/4.1.5), descriptive PROJECT_POLICY and MODEL_ROUTING_OVERRIDES keys are refused by default, D027 goes CRITICAL and an update to the shipped 4.1.5 rolls back; routed for round 2 (WS-3), not changed here"
+    path: release/capability-baseline/repair-1/integration/evidence/observations/old_kernel_overlay_precedence.out
+  - id: P2-AR-0022-O2
+    severity: LOW
+    capability: L3
+    blocking: false
+    blocker_class: BC-P2-10
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "Doctor D019 reports rendered-but-unacknowledged gates as 'exist only in files' after WS-3 separated rendering from presentation (WS-3 semantics x doctor wording); routed for round 2"
+    path: release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0022-O3
+    severity: INFO
+    capability: A5, O5
+    blocking: false
+    blocker_class: BC-P2-08
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "G0 refuses rebuild-memory under FREEZE_WRITES (not on the recovery allow-list); beta-r D6 assumed it runs — whether derived-state rebuild belongs on the allow-list is WS-3's to judge"
+    path: release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-integration
+  commit: 9126a07e72b1e03d3ed18ba0a72e7ba3664c69a9
+  evidence_path: release/capability-baseline/repair-1/integration/evidence
+unresolved:
+  - "O-1 (WS-3): new binary against a pre-WS-3 kernel refuses descriptive overlay keys (D027 CRITICAL; update to shipped 4.1.5 rolls back)"
+  - "O-2 (WS-3 x WS-2): doctor D019 wording for rendered-but-unacknowledged gates"
+  - "O-4 (WS-3): rebuild-memory refused under FREEZE_WRITES; allow-list question"
+  - "O-5 (process): builders' R1 re-runs shared scratch symlink paths; verifiers should use private paths"
+  - "O-6 (WS-2): stale comment in runtime/src/skills.rs (record_skill_binding is now declared L3)"
+  - "O-7: every builder's open integration points (round 2), including WS-4 IP-17 INDEX_VERSION and IP-WS02-16 framework/health registration"
+  - "O-8: P2-ADJ-0001 (standalone human-gate anchor default false) routed to round 2; integrated default still true"
+  - "AR-0033 hv_a::a1 size pin: the AC-14 verifier judges it on property (census 0 violations)"
+recommended_next_action: Hand the integrated tip (work commit 9126a07, product tip 811317b, product_code_digest b1ab1c8c...ffbb1) to round 2; route O-1..O-4 and O-6 to their owners (WS-3, WS-2) and apply P2-ADJ-0001 in round 2.
+completed_at: "2026-09-19T03:02:30Z"

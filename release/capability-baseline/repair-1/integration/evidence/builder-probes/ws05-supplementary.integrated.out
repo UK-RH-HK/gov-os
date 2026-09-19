@@ -1,0 +1,85 @@
+# P2-AR-0022 builder-probe re-run: probe=ws05-supplementary mode=integrated
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov sha256 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332; invoked as /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+# date 2026-09-19T02:06:37Z
+# $ env GOV_BIN=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov PROBE_SCRATCH=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597 python3 /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/repair-1/ws05/evidence/probes/ws05_supplementary.py
+
+## BC-P2-15 claim atomicity (real concurrent processes)
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/race-6393df/proj
+CHECK WS5-A1.race PASS 20 trials x 6 simultaneous processes claiming one task: exactly one grant per trial, every other process told TASK_CLAIMED, the store holds the winner
+      detail: {"bad_trials": []}
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/overlap-race-00a761/proj
+CHECK WS5-A2.overlap-race PASS 20 trials x 4 processes claiming four different tasks with the same scope src/** at once: exactly one grant, the rest CLAIM_SCOPE_CONFLICT
+      detail: {"bad_trials": []}
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/budget-race-3f2abd/proj
+CHECK WS5-A3.budget-race PASS max_parallel_agents=2, five processes claim five disjoint tasks at once: exactly two sessions are granted, three get BUDGET_EXCEEDED
+      detail: {"codes": ["OK", "BUDGET_EXCEEDED", "BUDGET_EXCEEDED", "OK", "BUDGET_EXCEEDED"], "sessions_holding": ["S-b0", "S-b3"]}
+
+## BC-P2-15 claim scope and unit of isolation
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/proj
+CHECK WS5-A4.isolation-recorded PASS the claim records its unit of isolation (worktree root, git dir, branch, HEAD) and its mutation scope
+      detail: {"branch": "main", "claimed_at": "2026-09-19T02:06:47Z", "expired": false, "expires_at": "2026-09-19T06:06:47Z", "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/proj/.git", "head": "019c8b91e57fa1329681e491a8fa7ffc3387eccd", "role": "backend-engineer", "scope": ["src/**"], "session_id": "S-i1", "task_id": "TASK-I1", "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/proj"}
+CHECK WS5-A5.cross-worktree PASS from a linked git worktree: the task held in the main worktree is TASK_CLAIMED, an overlapping scope is CLAIM_SCOPE_CONFLICT, a disjoint task is granted, and the holder cannot re-claim its task from another worktree
+      detail: {"disjoint": "OK", "holder_from_other_worktree": "CLAIM_WORKTREE_MISMATCH", "overlap": "CLAIM_SCOPE_CONFLICT", "same_task": "TASK_CLAIMED"}
+CHECK WS5-A5b.close-in-claim-worktree PASS closing from a worktree other than the one the claim was made in is refused (the baseline belongs to that tree)
+      detail: {"code": "CLAIM_WORKTREE_MISMATCH", "details": {"claim": {"branch": "main", "claimed_at": "2026-09-19T02:06:47Z", "expires_at": "2026-09-19T06:06:47Z", "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/proj/.git", "head": "019c8b91e57fa1329681e491a8fa7ffc3387eccd", "role": "backend-engineer", "scope": ["src/**"], "session_id": "S-i1", "task_id": "TASK-I1", "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/proj"}, "closing_worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/wt2"}, "message": "TASK-I1 was claimed from worktree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/proj; close it there \u2014 its mutation baseline belongs to that working tree (this is /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/iso-464b87/wt2)"}
+
+## BC-P2-15 parallel work on disjoint scopes in one worktree
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/disjoint-ffad76/proj
+CHECK WS5-A7.continue-disjoint PASS gov continue --claim gives each agent independent work: the second agent is offered the disjoint task, a third is told why the unrestricted task is deferred
+      detail: {"w1": "TASK-D1", "w2": "TASK-D2", "w3": "NO_RUNNABLE_WORK", "w3_deferred": [{"holder": "S-d1", "reason": "claimed by session S-d1", "task": "TASK-D1"}, {"holder": "S-d2", "reason": "claimed by session S-d2", "task": "TASK-D2"}, {"conflicts": ["TASK-D1", "TASK-D2"], "reason": "mutation scope unrestricted (the task declares no allowed_paths) overlaps live claim(s) [String(\"TASK-D1\"), String(\"TASK-D2\")] of other sessions", "task": "TASK-D3"}]}
+CHECK WS5-A6.disjoint-close PASS two sessions working disjoint scopes in one worktree both close, each declaring only its own change (the other's change is attributed to its claim / its close)
+      detail: {"D1": "OK", "D1_err": null, "D2": "OK", "D2_err": null}
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/claimreq-944796/proj
+CHECK WS5-A8.close-requires-claim PASS closing a task the session never claimed is refused (CLAIM_REQUIRED); an L3 --force close proceeds and records the override
+      detail: {"forced": "OK", "overrides": [{"claim": null, "override": "no_claim_held"}], "unclaimed": "CLAIM_REQUIRED"}
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/stale-release-a7b0f6/proj
+CHECK WS5-A9.stale-holder-release PASS after a lease expires and another session takes the task, the previous holder's release cannot delete the new claim
+      detail: {"holder": ["S-new"], "old_release": "TASK_CLAIMED", "takeover": "OK"}
+
+## BC-P2-14 blocks orders work
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/blocks-af992a/proj
+CHECK WS5-B1.blocks PASS A.blocks=[B]: B is not runnable while A is open (reason names A), replan stores B BLOCKED, and mutual blocks form a reported cycle
+      detail: {"B_reasons": [["blocked by TASK-A (its `blocks` lists TASK-B); TASK-A is READY"]], "B_status_after_replan": "BLOCKED", "cycles": [["TASK-C", "TASK-D"]]}
+CHECK WS5-B1b.blocks-released PASS once A is DONE, B becomes runnable and replan stores it READY
+      detail: {"runnable": ["TASK-B"]}
+
+## BC-P2-14 required data / tools / skills gate readiness
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/inputs-315e04/proj
+CHECK WS5-B3.inputs-gate PASS a task whose required data (record id, repository path, or a path escaping the repository), tool (unregistered or not active) or skill does not resolve is blocked with the reason; resolvable inputs do not block
+      detail: {"blocked": {"TASK-DATA": [["required data DATA-0042 is not available (no governed record or repository path)"]], "TASK-ESC": [["required data ../../../../etc/passwd is neither a governed record nor a path inside the repository"]], "TASK-PATH": [["required data fixtures/orders.csv is not available (no governed record or repository path)"]], "TASK-SKILL": [["required skill SKL-NOPE-9 is not registered (capability gap: `gov skills resolve <task>`)"]], "TASK-TOOL-MISSING": [["required tool TOOL-NOPE-9 is not registered (tool registry, MCP registry or capability plugins); raise a tooling task or register it (`gov tools install`)"]], "TASK-TOOL-PROPOSED": [["required tool TOOL-LSP-RUST-001 is registered but proposed, not active"]]}, "runnable": ["TASK-SKILL-OK", "TASK-TOOL-OK"]}
+CHECK WS5-B3b.inputs-appear PASS providing the data record / file makes the task runnable; superseding the record blocks it again
+      detail: {"after_provide": ["TASK-DATA", "TASK-PATH", "TASK-SKILL-OK", "TASK-TOOL-OK"], "after_supersede": [{"reasons": ["required data DATA-0042 is SUPERSEDED (not a current input)"], "task": "TASK-DATA"}]}
+
+## BC-P2-14 production-merge permission
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/merge-769823/proj
+CHECK WS5-B6.experiment-merge PASS an experiment task (even one created asking for production_merge_allowed: true) cannot close with output in the production tree; with its output kept under spec/experiments/** it closes
+      detail: {"detail": ["src/experimental.rs"], "with_spec_experiments": "OK", "with_src": "PRODUCTION_MERGE_NOT_ALLOWED"}
+CHECK WS5-B6b.no-merge-flag PASS any task whose contract says production_merge_allowed: false is held to it, not only experiments
+      detail: PRODUCTION_MERGE_NOT_ALLOWED
+CHECK WS5-B6c.contract-sandbox PASS a path the repository contract classifies as evidence (an experiment sandbox) is an allowed home for experimental output
+      detail: {"close": "OK", "err": null}
+
+## BC-P2-14 path scope: a CIT covers only changes inside the task's claim window
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/citwin-da4998/proj
+CHECK WS5-B8.old-cit-covers-nothing PASS a src/**-only task that rewrites a requirement touched by a CIT committed before its claim is refused (the earlier CIT governs nothing it did)
+      detail: task TASK-LATE reports mutations outside its contract: spec/requirements/REQ-0001.yaml: outside allowed_paths ["src/**"] and not governed by a CIT executed while this task was claimed; route them through a CIT or amend the task contract
+CHECK WS5-B8b.window-cit-covers PASS a change a CIT made while the task was claimed is governed by that CIT and does not block the task's close (control)
+      detail: {"close": "OK", "err": null}
+
+## BC-P2-14 path scope cannot be laundered by re-claiming
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/launder-7e8e4f/proj
+CHECK WS5-B9.no-baseline-laundering PASS an out-of-scope change stays observed after re-claiming, after release + re-claim, and after another session takes the task over
+      detail: {"release_reclaim": "MUTATION_SCOPE_VIOLATION", "renewal": "MUTATION_SCOPE_VIOLATION", "takeover": "MUTATION_SCOPE_VIOLATION"}
+
+## BC-P2-14 the close is held to the scope the claim reserved
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/widen-0d6b72/proj
+CHECK WS5-B11.reserved-scope PASS widening allowed_paths in the task record after the claim does not widen what the claim may close with
+      detail: task TASK-W reports mutations outside its contract: src/widened.rs: outside the scope ["docs/**"] the task's claim reserved (the task record was widened after the claim was granted; release and claim again to reserve the new scope); route them through a CIT or amend the task contract
+
+## BC-P2-14 designated role
+# project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws05-supplementary-integrated-1789783597/role-3911e2/proj
+CHECK WS5-B10.designated-role PASS the task's designated role binds claim and close (another role is refused even with the same session; continue does not offer it) and a task cannot designate an unknown role
+      detail: {"claim_designated": "OK", "claim_other_role": "ROLE_NOT_DESIGNATED", "close_designated": "OK", "close_other_role": "ROLE_NOT_DESIGNATED", "continue_offers": null, "create_unknown_role": "UNKNOWN_ROLE"}
+SUMMARY checks=22 pass=22 fail=0 failed=[]
+[exit=0]

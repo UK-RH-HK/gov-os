@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/audit.schema.json",
   "title": "audit",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "id": {
@@ -170,7 +170,8 @@
       "type": "string"
     },
     "scope": {
-      "type": "string"
+      "type": "string",
+      "description": "governance-suite (health-system output, excluded from the currency key), product-tests (per-family product-test evidence, excluded from the key), or any other audit scope (an input)"
     },
     "auditor_role": {
       "type": "string"
@@ -179,7 +180,8 @@
       "type": "string"
     },
     "families": {
-      "type": "object"
+      "type": "object",
+      "description": "governance-suite: family -> {ok, findings, detail, status, cached_from}; product-tests: family -> {status, exit, command, cwd, covers, key, source, attributed, duration_ms}"
     },
     "findings": {
       "type": "array",
@@ -223,13 +225,194 @@
       "type": "string"
     },
     "inputs_hash": {
-      "type": "string"
+      "type": "string",
+      "description": "suite currency key: digest over every evidence input class (Contract v3:97-109); a green record is current only while it equals the key of the current inputs"
     },
     "result_hash": {
       "type": "string"
     },
     "green": {
       "type": "boolean"
+    },
+    "inputs": {
+      "type": "object",
+      "description": "per input class digest (class id -> sha256) from which inputs_hash was computed; staleness names the classes that changed",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "suite_verdict": {
+      "type": "string",
+      "enum": [
+        "HEALTHY",
+        "DEGRADED",
+        "UNHEALTHY",
+        "INCOMPLETE"
+      ]
+    },
+    "complete": {
+      "type": "boolean",
+      "description": "every suite family has a result valid for inputs_hash (executed in this run or reused from the cache under an identical key)"
+    },
+    "reproducible": {
+      "type": "boolean"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6"
+      ]
+    },
+    "trigger": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string"
+        },
+        "subject": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "health_result": {
+      "type": "string",
+      "description": "id of the scheduler's ledger result (.governance-runtime/health/results/<id>.json)"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "executed",
+              "reused",
+              "not-evaluated"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "cached_from": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "threads": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isolation": {
+            "type": "string"
+          },
+          "reproducible": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "enforcement": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ]
+      }
+    },
+    "run_summary": {
+      "type": "object"
+    },
+    "parallelism": {
+      "type": "object"
+    },
+    "cache_mode": {
+      "type": "string",
+      "enum": [
+        "use",
+        "refresh",
+        "off"
+      ]
+    },
+    "runtime": {
+      "type": "object",
+      "description": "runtime implementation identity: crate versions and the SHA-256 of the executing binary",
+      "properties": {
+        "binary_sha256": {
+          "type": "string"
+        },
+        "cli_version": {
+          "type": "string"
+        },
+        "runtime_version": {
+          "type": "string"
+        }
+      }
+    },
+    "machine_trust": {
+      "type": "object"
+    },
+    "repository": {
+      "type": "object",
+      "description": "repository state: commit, dirty files, content key"
+    },
+    "actor": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string"
+        },
+        "session": {
+          "type": "string"
+        }
+      }
+    },
+    "run_at": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "finished_at": {
+      "type": "string"
+    },
+    "deep": {
+      "type": "boolean"
+    },
+    "failed_families": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

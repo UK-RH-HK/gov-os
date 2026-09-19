@@ -1,0 +1,8 @@
+# normalised diff: release/capability-baseline/repair-1/ws02/evidence/after/O1-product-families.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/epsilon-r.O1-product-families.out
+# changed lines: 2
+--- recorded (builder branch)
++++ integrated
+@@ -35 +35 @@
+-exit=0 {"error": null, "ok": true, "result": {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}
++exit=0 {"error": null, "ok": true, "result": {"checkpoint": "CKPT-00001", "degraded": [], "overrides": [], "report": "RPT-0001", "task": "TASK-0001", "task_status": "DONE"}}

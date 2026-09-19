@@ -1,0 +1,46 @@
+# P2-AR-0022 builder-probe re-run: probe=ws03-named-checks mode=integrated
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov sha256 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332; invoked as /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+# date 2026-09-19T02:04:50Z
+# $ env GOV=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov SCR=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws03-named-checks-integrated-1789783490 python3 /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/repair-1/ws03/evidence/ws03_named_checks.py
+# GOV=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+CHECK X2-E1-undeclared-role-is-not-orchestrator PASS an invocation with no role declared cannot perform an L4-only operation (gate revoke) -- "AUTHORITY_DENIED"
+CHECK S0-E1-01.init-undeclared PASS gov init with no declared role installs nothing -- "AUTHORITY_DENIED"
+CHECK X2-E1-init-honours-declared-role PASS init --force (install_kernel L4) evaluates the role declared by --role exactly as GOV_ROLE -- {"--role": "AUTHORITY_DENIED", "GOV_ROLE": "AUTHORITY_DENIED"}
+CHECK E1.b2.census.unclassed PASS task replan / memory heldout-starter --force carry an authority class and are refused for L0 with no mutation -- {"replan": "AUTHORITY_DENIED", "heldout": "AUTHORITY_DENIED"}
+CHECK S3-S4.R2.adopt-as-L0 PASS an adopt stage declared as independent-auditor (L0) is refused -- "AUTHORITY_DENIED"
+CHECK O5-G0.freeze-writes PASS no governed state changes under freeze-writes outside the explicit allow-list -- {"mutated": []}
+CHECK O5-G0.pause PASS no governed state changes under pause outside the explicit allow-list -- {"mutated": []}
+CHECK O5-G0.L0-init-force PASS L0 init --force is refused -- "AUTHORITY_DENIED"
+CHECK X2-L3-fabrication-default PASS human approval cannot be fabricated by CLI metadata (default) -- {"answer.by_kind": null}
+CHECK X2-L3-fabrication-role-human PASS human approval cannot be fabricated by CLI metadata (role-human) -- {"answer.by_kind": null}
+CHECK X2-L3-fabrication-env-GOV_ROLE PASS human approval cannot be fabricated by CLI metadata (env-GOV_ROLE) -- {"answer.by_kind": null}
+CHECK L3.b5.1 PASS an agent relaying `gov decide` with the default --by records no human approval -- {"ok": false, "code": "HUMAN_CHANNEL_UNAVAILABLE"}
+CHECK L3.b2.2 PASS a gate rendered only into a JSON envelope is not recorded as presented to a human -- {"presented_in_chat": false}
+CHECK L3.b2.3 PASS `gov --json continue` does not make a gate count as presented in the human interface -- {"presented_in_chat": false}
+CHECK L3.b2.5.adapted PASS a gate is recorded as presented only with a human-side receipt (the literal b2.5 checks for a receipt field after rendering alone) -- {"presented_in_chat": false, "presentation_receipt": null, "presented_by": {"session": "S-p", "role": "research-agent"}}
+CHECK L3.b5.11 PASS `gov memory select` with a self-declared --role human records no human approval -- {"ok": false, "code": "AUTHORITY_DENIED"}
+CHECK HC-1.positive PASS an owner-signed answer is recorded as the human's answer, with presentation evidence -- {"ok": true, "err": null}
+CHECK L3.b1.6 PASS a gate whose presentation flag was set by a direct file edit is still not presented -- "GATE_NOT_PRESENTED"
+CHECK L3.b5.8+X2-L3xE1+X2-L3xK2 PASS forged gate/decision files cannot carry a CIT to COMMITTED as human-approved -- {"approve": "T2_UNBOUND", "execute": "T2_UNBOUND"}
+CHECK L3.b4.o2 PASS re-binding an answered gate to another CIT by editing records does not execute the other CIT -- {"approve": "T2_UNBOUND", "execute": "T2_UNBOUND"}
+CHECK L3.b4.t2.answer-side PASS a declining answer does not release the blocked task (task_status) -- {"task_status": "BLOCKED"}
+CHECK L3.b4.t3.answer-side PASS revoking the authorising answer returns the task to blocked (task_status) -- {"task_status": "BLOCKED"}
+CHECK L3.b4.t4.answer-side PASS withdrawing an unanswered gate leaves the task blocked (task_status) -- {"task_status": "BLOCKED"}
+NOTE L3.b4.t2-t4.dag-side DAG runnable set (dag.rs is WS-5's; it must consult gates::task_gate_authorisation) -- {"runnable": ["TASK-0001", "TASK-0002", "TASK-0003"]}
+CHECK L1.b2.self PASS the same session cannot raise a gate declaring R0/0.95/reversible and resolve it as an agent -- {"code": "AUTHORITY_DENIED", "message": "agent 'orchestrator' may not resolve HDG-0001: the assessment rests solely on the resolving session's own declaration (it raised this gate); another session or the OS must have assessed it (HUMAN_GATE_POLICY.agent_resolvable_when; framework \u00a750). It needs a human answer.", "details": {"operation": "answer_gate_as_agent", "role": "orchestrator", "level": "L4", "reasons": ["the assessment rests solely on the resolving session's own declaration (it raised this gate); another session or the OS must have assessed it"], "assessment": {"impact_radius": "R
+CHECK L1.b2.neg.no-reversibility PASS agent resolution is refused when reversibility is not assessed -- "AUTHORITY_DENIED"
+CHECK L1.b4.1 PASS an agent resolution without a rationale is refused -- "USAGE"
+CHECK L1.b2.1.independent PASS an L4 agent may resolve an R0/0.95/reversible question assessed by another session
+CHECK M1.floor.1 PASS MODEL_ROUTING_OVERRIDES.task_class_overrides cannot lower the kernel minimum for security (T3) -- "T3"
+CHECK M2.b1.4 PASS a project role override cannot lower the reasoning below the task's declared minimum -- "extra_high"
+CHECK M3.b1.floor PASS a project role override cannot lower the orchestrator below T3/high -- {"tier": "T3", "reasoning": "high"}
+CHECK H3.b5.switch PASS the overlay cannot switch off readiness gating; the refused weakening is reported -- {"runnable": false, "refused": ["PROJECT_POLICY.readiness.enforce_pre_implementation_cells", "MODEL_ROUTING_OVERRIDES.role_overrides.orchestrator.minimum_tier", "MODEL_ROUTING_OVERRIDES.role_overrides.orchestrator.default_reasoning", "MODEL_ROUTING_OVERRIDES.role_overrides.backend-engineer.default_reasoning", "MODEL_ROUTING_OVERRIDES.task_class_overrides.security"]}
+CHECK L2.min.1 PASS a gate cannot be raised with package fields merely defaulted -- {"created": false, "defaulted": []}
+CHECK L2.b4.min PASS a gate always carries at least one option -- {"created": false}
+CHECK L2.b10.min PASS permitted next actions are exact (no placeholders) -- {"created": false}
+CHECK L2.b4.answer2 PASS an answer 'C' to a gate offering only A/B is refused -- {"agent": "GATE_OPTION_INVALID", "relay": "GATE_OPTION_INVALID"}
+CHECK L2.cit.b10 PASS the CIT-P gate's permitted next actions are exact -- ["gov gate present HDG-0002 \u2014 surface this package in the active human interface", "gov decide HDG-0002 --option A \u2014 record the owner-signed human answer choosing A (approve and execute (CIT-E)) from the human channel", "gov decide HDG-0002 --option B \u2014 record the owner-signed human answer choosing B (reject) from the human channel", "after an authorising answer: gov cit approve CIT-0001, then gov cit execute CIT-0001", "gov gate revoke HDG-0002 \u2014 withdraw the question (L4)", "continue independent runnable work that HDG-0002 does not block"]
+CHECK L2.budget.complete PASS the budget-threshold gate carries every package field with substantive content -- {"missing": []}
+SUMMARY checks=37 pass=37 fail=0 failed=[]
+[exit=0]

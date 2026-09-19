@@ -115,6 +115,19 @@ pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
     p.schemas()
         .validate("worker-return", &ret, "(worker return contract)")?;
     let mut store = RecordStore::load(&p.root);
+    // The worker's return is the consumption receipt (Contract v3 W5; `context::receipt`). It is validated against
+    // the task's manifest here and the verdict is recorded on the handoff, so the orchestrator sees missing or
+    // fabricated traceability when the work comes back; refusal is task close's (WS-5 integration point).
+    let receipt_validation = store
+        .get(id)
+        .map(|h| h.get("task"))
+        .filter(|t| !t.is_empty())
+        .and_then(|t| crate::context::receipt::validate(p, &store, &t, &ret).ok())
+        .map(|c| {
+            let mut s = c.summary();
+            s["errors_detail"] = json!(c.errors);
+            s
+        });
     let h = store
         .get_mut(id)
         .ok_or_else(|| GovError::new("HANDOFF_NOT_FOUND", format!("{id} not found")))?;
@@ -145,6 +158,9 @@ pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
     h.set("return", ret.clone());
     h.set("returned_at", json!(now_iso()));
     h.set("handoff_status", json!("RETURNED"));
+    if let Some(rv) = &receipt_validation {
+        h.set("receipt_validation", rv.clone());
+    }
     if !violations.is_empty() {
         h.set("authority_violations", json!(violations));
     }
@@ -188,6 +204,6 @@ pub fn return_result(p: &Project, id: &str, ret: Value) -> Result<Value> {
         created.push(lid);
     }
     Ok(
-        json!({"handoff": id, "status": "RETURNED", "files_changed": ret["files_changed"], "unresolved": ret["unresolved"], "lessons_created": created}),
+        json!({"handoff": id, "status": "RETURNED", "files_changed": ret["files_changed"], "unresolved": ret["unresolved"], "lessons_created": created, "receipt_validation": receipt_validation}),
     )
 }

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/migration-catalogue-entry.schema.json",
   "title": "migration-catalogue-entry",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "artifact_id": {
@@ -67,7 +67,11 @@
       "type": "object"
     },
     "sensitivity": {
-      "type": "string"
+      "type": "string",
+      "enum": [
+        "internal",
+        "secret"
+      ]
     },
     "rollback": {
       "type": "string"
@@ -99,14 +103,180 @@
         "MIGRATED",
         "RETIRED"
       ]
+    },
+    "type": {
+      "const": "migration-catalogue-entry"
+    },
+    "entry_hash": {
+      "type": "string",
+      "description": "content hash of the entry's material fields (W1 version/hash)"
+    },
+    "entry_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "catalogue_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "object",
+      "description": "W1 producer/provenance: stage, command, session, role, runtime",
+      "required": [
+        "stage",
+        "command"
+      ]
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entry_hash": {
+            "type": "string"
+          },
+          "entry_version": {
+            "type": "integer"
+          },
+          "catalogue_version": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "properties": {
+        "migrated_from": {
+          "type": "object",
+          "properties": {
+            "artifact_id": {
+              "type": "string"
+            },
+            "path": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "outgoing document citations (links and path mentions)"
+    },
+    "path_references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "outgoing path references from code/configuration"
+    },
+    "cited_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "incoming citations"
+    },
+    "reference_edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "direction": {
+            "enum": [
+              "in",
+              "out"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "path",
+          "direction",
+          "kind"
+        ]
+      }
+    },
+    "dependency_proof": {
+      "type": "object",
+      "description": "proof over code, configuration and docs that precedes a retirement (BC-P2-33)",
+      "properties": {
+        "subject": {
+          "type": "string"
+        },
+        "result": {
+          "enum": [
+            "NO_ACTIVE_REFERENCES",
+            "ACTIVE_REFERENCES"
+          ]
+        },
+        "active_references": {
+          "type": "array"
+        },
+        "dependants_digest": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "subject",
+        "result",
+        "active_references"
+      ]
+    },
+    "gate_reasons": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "destructive_cleanup",
+          "secret_material_move",
+          "active_references"
+        ]
+      }
+    },
+    "human_gate": {
+      "type": "string"
+    },
+    "extract_batch": {
+      "type": "integer"
+    },
+    "os_owned": {
+      "type": "string",
+      "enum": [
+        "installed",
+        "generated",
+        "adoption_evidence",
+        "unverified_layout"
+      ]
     }
   },
   "required": [
     "artifact_id",
+    "type",
     "current_path",
     "current_class",
     "authority",
     "action",
-    "reason"
+    "reason",
+    "entry_hash",
+    "entry_version",
+    "producer"
   ]
 }

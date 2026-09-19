@@ -267,6 +267,92 @@ pub fn evaluate(
     }
 }
 
+/// Outcome of evaluating one project **overlay document** (not a kernel policy) against the precedence rules.
+#[derive(Debug, Clone, Default)]
+pub struct OverlayVerdict {
+    /// The document as the product must read it: every refused leaf replaced by its kernel value (or removed when
+    /// the kernel defines none).
+    pub effective: Value,
+    /// Leaves that differ from the kernel value and were accepted under a non-free mode (floor raised, etc.).
+    pub applied: Vec<Value>,
+    /// Leaves refused by the rules: recorded, reported, never applied.
+    pub refused: Vec<Value>,
+}
+
+fn overlay_leaves(prefix: &str, v: &Value, out: &mut Vec<(String, Value)>) {
+    match v.as_object() {
+        // an empty mapping declares nothing, so there is nothing to evaluate
+        Some(m) if m.is_empty() => {}
+        Some(m) => {
+            for (k, x) in m {
+                let key = if prefix.is_empty() {
+                    k.clone()
+                } else {
+                    format!("{prefix}.{k}")
+                };
+                overlay_leaves(&key, x, out);
+            }
+        }
+        None => out.push((prefix.to_string(), v.clone())),
+    }
+}
+
+/// **BC-P2-45 — every project overlay key is subject to POLICY_PRECEDENCE.** Evaluate every leaf of the overlay
+/// document `doc` (file label `label`, e.g. `PROJECT_POLICY`, `MODEL_ROUTING_OVERRIDES`) against the rules keyed
+/// `<label>.<dotted>`; `kernel_value_of(dotted)` supplies the kernel (or kernel-default) value the leaf may not
+/// weaken. Subtrees named in `skip` are evaluated elsewhere (e.g. `policy_overrides`). A leaf equal to its kernel
+/// value changes nothing and is accepted as is; every other leaf must satisfy its rule (deny by default).
+pub fn evaluate_overlay(
+    prec: Option<&Precedence>,
+    label: &str,
+    source: &str,
+    doc: &Value,
+    kernel_value_of: &dyn Fn(&str) -> Option<Value>,
+    skip: &[&str],
+) -> OverlayVerdict {
+    let mut out = OverlayVerdict {
+        effective: doc.clone(),
+        ..Default::default()
+    };
+    let mut leaves = vec![];
+    overlay_leaves("", doc, &mut leaves);
+    for (dotted, value) in leaves {
+        if skip
+            .iter()
+            .any(|s| dotted == *s || dotted.starts_with(&format!("{s}.")))
+        {
+            continue;
+        }
+        let kernel = kernel_value_of(&dotted);
+        if kernel.as_ref() == Some(&value) {
+            continue;
+        }
+        let verdict = match prec {
+            Some(pr) => evaluate(pr, label, &dotted, kernel.as_ref(), &value, false),
+            None => Err(format!(
+                "{label}.{dotted}: precedence rules unavailable (fail closed)"
+            )),
+        };
+        match verdict {
+            Ok(mode) => {
+                if mode != "overridable" {
+                    out.applied.push(json!({"policy": label, "key": dotted, "value": value, "source": source, "mode": mode, "kernel_value": kernel}));
+                }
+            }
+            Err(reason) => {
+                match &kernel {
+                    Some(k) => crate::util::deep_set(&mut out.effective, &dotted, k.clone()),
+                    None => {
+                        crate::util::deep_delete(&mut out.effective, &dotted);
+                    }
+                }
+                out.refused.push(json!({"policy": label, "key": dotted, "value": value, "source": source, "kernel_value": kernel, "reason": reason}));
+            }
+        }
+    }
+    out
+}
+
 /// Deterministic summary for doctor/audit/context packets.
 pub fn describe(prec: &Precedence) -> Value {
     json!({"source": prec.source, "rules": prec.rules.len(), "default_mode": prec.default_mode, "layers": prec.layers})
@@ -372,5 +458,96 @@ mod tests {
             evaluate(&prec, "X", "y", None, &json!(1), false).is_err(),
             "deny by default"
         );
+    }
+
+    #[test]
+    fn overlay_documents_may_raise_floors_but_never_lower_them() {
+        let rule = |key: &str, mode: &str, kind: &str, order: &[&str]| Rule {
+            key: key.into(),
+            mode: mode.into(),
+            kind: kind.into(),
+            order: order.iter().map(|s| s.to_string()).collect(),
+            strict_value: if mode == "strengthen_only_bool" {
+                Some(json!(true))
+            } else {
+                None
+            },
+            exception_relaxable: false,
+        };
+        let prec = Precedence {
+            rules: vec![
+                rule("MRO.task_class_overrides.*", "floor", "tier", &[]),
+                rule(
+                    "MRO.role_overrides.*.default_reasoning",
+                    "floor",
+                    "ordered",
+                    &["low", "medium", "high", "extra_high"],
+                ),
+                rule("MRO.providers", "overridable", "", &[]),
+                rule("PP.readiness.enforce", "strengthen_only_bool", "", &[]),
+                rule("MRO.*", "immutable", "", &[]),
+                rule("PP.*", "immutable", "", &[]),
+            ],
+            default_mode: "immutable".into(),
+            layers: vec![],
+            source: "test".into(),
+        };
+        let kernel = |k: &str| -> Option<Value> {
+            match k {
+                "task_class_overrides.security" => Some(json!("T3")),
+                "task_class_overrides.docs" => Some(json!("T1")),
+                "role_overrides.orchestrator.default_reasoning" => Some(json!("high")),
+                "readiness.enforce" => Some(json!(true)),
+                _ => None,
+            }
+        };
+        let doc = json!({"providers": [{"name": "x"}], "task_class_overrides": {"security": "T1", "docs": "T2"},
+                         "role_overrides": {"orchestrator": {"default_reasoning": "low"}}, "unknown": 1, "empty": {}});
+        let v = evaluate_overlay(Some(&prec), "MRO", "MRO.yaml", &doc, &kernel, &[]);
+        let refused: Vec<&str> = v
+            .refused
+            .iter()
+            .map(|r| r["key"].as_str().unwrap())
+            .collect();
+        assert!(
+            refused.contains(&"task_class_overrides.security"),
+            "{refused:?}"
+        );
+        assert!(refused.contains(&"role_overrides.orchestrator.default_reasoning"));
+        assert!(
+            refused.contains(&"unknown"),
+            "deny by default for undeclared overlay keys"
+        );
+        assert_eq!(
+            v.effective["task_class_overrides"]["security"], "T3",
+            "the refused weakening is replaced by the floor"
+        );
+        assert_eq!(
+            v.effective["task_class_overrides"]["docs"], "T2",
+            "raising a floor is applied"
+        );
+        assert_eq!(
+            v.effective["role_overrides"]["orchestrator"]["default_reasoning"],
+            "high"
+        );
+        assert!(v.effective.get("unknown").is_none());
+        assert!(v
+            .applied
+            .iter()
+            .any(|a| a["key"] == "task_class_overrides.docs"));
+        let pp = json!({"readiness": {"enforce": false}, "policy_overrides": {"X.y": 1}});
+        let v = evaluate_overlay(
+            Some(&prec),
+            "PP",
+            "PP.yaml",
+            &pp,
+            &kernel,
+            &["policy_overrides"],
+        );
+        assert_eq!(v.refused.len(), 1, "{:?}", v.refused);
+        assert_eq!(v.effective["readiness"]["enforce"], true);
+        // no rules at all: fail closed
+        let v = evaluate_overlay(None, "PP", "PP.yaml", &pp, &kernel, &["policy_overrides"]);
+        assert_eq!(v.effective["readiness"]["enforce"], true);
     }
 }

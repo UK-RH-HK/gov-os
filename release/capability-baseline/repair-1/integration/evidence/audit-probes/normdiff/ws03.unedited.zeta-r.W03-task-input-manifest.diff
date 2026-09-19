@@ -1,0 +1,66 @@
+# normalised diff: release/capability-baseline/repair-1/ws03/evidence/probes/final-unedited/zeta-r.W03-task-input-manifest.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/integrated/zeta-r.W03-task-input-manifest.out
+# changed lines: 44
+--- recorded (builder branch)
++++ integrated
+@@ -87 +87 @@
+-OBS W3-m4-reason-delivered: FAIL -- dependency reason visible in the compiled packet: [{'id': 'REQ-0005', 'kind': 'functional', 'path': 'spec/requirements/REQ-0005.yaml', 'status': 'DEPRECATED', 'title': 'Totals are computed per currency (DEPRECATED)', 'type': 'requirement'}]
++OBS W3-m4-reason-delivered: PASS -- dependency reason visible in the compiled packet: [{'authority_flag': 'DEPRECATED', 'content': {'feature': 'F-0001', 'id': 'REQ-0005', 'kind': 'functional', 'status': 'DEPRECATED', 'title': 'Totals are computed per currency (DEPRECATED)', 'type': 'requirement'}, 'content_hash': '<hex>', 'declared_in': ['task.requirements', 'task.required_inputs'], 'id': 'REQ-0005', 'kind': 'functional', 'path': 'spec/requirements/REQ-0005.yaml', 'problems': [{'blocking': True, 'code': 'LIFECYCLE_STATE', 'message': 'REQ-0005 is DEPRECATED but the input requires ACTIVE; historical or non-current material cannot replace a current authoritative input'}, {'blocking': True, 'code': 'HASH_MISMATCH', 'message': 'REQ-0005 content hash is <hex>; the input is pinned to <hex> — the pinned version is no longer the governed content'}], 'reason': 'per-currency totals drive the API', 'required': True, 'state_class': 'AUTHORITATIVE', 'status': 'DEPRECATED', 'title': 'Totals are computed per currency (DEPRECATED)', 'type': 'requirement', 'version': None}]
+@@ -90,2 +90,2 @@
+-TASK-0103 (dependency declared only via relations[] with note) governing_requirements: [{"acceptance_criteria": ["2.5 -> 2"], "id": "REQ-0002", "kind": "functional", "path": "spec/requirements/REQ-0002.yaml", "status": "ACTIVE", "title": "Totals use banker's rounding", "type": "requirement"}]
+-OBS W3-m4-relations-note-dependency-delivered: FAIL -- a dependency declared through the schema's relations[{type,target,note}] reaches the packet with its reason
++TASK-0103 (dependency declared only via relations[] with note) governing_requirements: [{"acceptance_criteria": ["2.5 -> 2"], "content": {"acceptance_criteria": ["2.5 -> 2"], "feature": "F-0001", "id": "REQ-0002", "kind": "functional", "status": "ACTIVE", "supersedes": ["REQ-0001"], "title": "Totals use banker's rounding", "type": "requirement"}, "content_hash": "<hex>", "declared_in": ["feature F-0001.requirements", "task.relations[GOVERNED_BY]"], "id": "REQ-0002", "kind": "functional", "path": "spec/requirements/REQ-0002.yaml", "reason": "inherited from feature F-0001; rounding rule this task implements", "required": true, "state_class": "AUTHORITATIVE", "status": "ACTIVE", "title": "Totals use banker's rounding", "type": "requirement", "version": null}]
++OBS W3-m4-relations-note-dependency-delivered: PASS -- a dependency declared through the schema's relations[{type,target,note}] reaches the packet with its reason
+@@ -94 +94 @@
+-OBS W3-m5-supplementary-declared-separately: FAIL -- task-declared supplementary context reaches retrieved_intelligence: False; packet blocks: ['chars', 'compiled_at', 'deterministic_authority', 'deterministic_hash', 'index_version', 'packet_hash', 'packet_id', 'retrieved_intelligence', 'task']
++OBS W3-m5-supplementary-declared-separately: PASS -- task-declared supplementary context reaches retrieved_intelligence: True; packet blocks: ['budget', 'chars', 'compiled_at', 'delivery_state', 'deterministic_authority', 'deterministic_hash', 'index_version', 'input_hashes', 'input_manifest', 'manifest_hash', 'packet_hash', 'packet_id', 'provenance', 'receipt_contract', 'retrieved_intelligence', 'supplementary_state', 'task']
+@@ -164,0 +165,2 @@
++  "at": "<ts>",
++  "carried": [],
+@@ -166 +168,2 @@
+-  "files": 188
++  "files": 192,
++  "reused": false
+@@ -167,0 +171 @@
++ "branch": "main",
+@@ -169,0 +174,3 @@
++ "git_dir": "<path>",
++ "head": "<hex>",
++ "renewed": false,
+@@ -170,0 +178,3 @@
++ "scope": [
++  "src/**"
++ ],
+@@ -172 +182,3 @@
+- "task_id": "TASK-0201"
++ "store": "<path>",
++ "task_id": "TASK-0201",
++ "worktree": "<path>"
+@@ -185 +197 @@
+-OBS W3-r2-superseded-input-not-silent: FAIL -- TASK-0301 declares SUPERSEDED REQ-0001: replan->READY=True; delivered as [('REQ-0001', 'SUPERSEDED', None)]
++OBS W3-r2-superseded-input-not-silent: PASS -- TASK-0301 declares SUPERSEDED REQ-0001: replan->READY=True; delivered as [('REQ-0001', 'SUPERSEDED', 'SUPERSEDED')]
+@@ -191 +203 @@
+-TASK-0401 conflicting_decisions: [{"authority_flag": "UNKNOWN_OR_CONFLICTING", "chosen_option": "A", "id": "D-0001", "path": "spec/decisions/D-0001.yaml", "reason": "superseded by a later decision but still marked ACTIVE; resolve via CIT before relying on it", "status": "ACTIVE", "superseded_by": "D-0002", "title": "Half-up rounding", "type": "decision"}]
++TASK-0401 conflicting_decisions: [{"authority_flag": "UNKNOWN_OR_CONFLICTING", "chosen_option": "A", "content": {"chosen_option": "A", "id": "D-0001", "status": "ACTIVE", "title": "Half-up rounding", "type": "decision"}, "content_hash": "<hex>", "declared_in": ["task.decisions"], "id": "D-0001", "path": "spec/decisions/D-0001.yaml", "problems": [{"blocking": true, "code": "SUPERSEDED", "message": "D-0001 is superseded by D-0002; a superseded input cannot satisfy a current requirement \u2014 depend on D-0002 (or resolve the supersession via CIT)"}], "reason": null, "required": true, "state_class": "AUTHORITATIVE", "status": "ACTIVE", "superseded_by": "D-0002", "title": "Half-up rounding", "type": "decision", "version": null}]
+@@ -198 +210 @@
+-OBS W3-r3-duplicate-id-conflict-handled: FAIL -- two different REQ-0002 records (spec/requirements/ and spec/requirements/extra/): replan->READY=True; packet delivers [('REQ-0002', "Totals use banker's rounding", 'spec/requirements/REQ-0002.yaml'), ('REQ-0002', "Totals use banker's rounding", 'spec/requirements/REQ-0002.yaml')]; entries carrying a conflict/duplicate marker: []
++OBS W3-r3-duplicate-id-conflict-handled: PASS -- two different REQ-0002 records (spec/requirements/ and spec/requirements/extra/): replan->READY=True; packet delivers [('REQ-0002', "Totals use banker's rounding", 'spec/requirements/REQ-0002.yaml')]; entries carrying a conflict/duplicate marker: [{'acceptance_criteria': ['2.5 -> 2'], 'authority_flag': 'AMBIGUOUS_DUPLICATE_ID', 'content': {'acceptance_criteria': ['2.5 -> 2'], 'feature': 'F-0001', 'id': 'REQ-0002', 'kind': 'functional', 'status': 'ACTIVE', 'supersedes': ['REQ-0001'], 'title': "Totals use banker's rounding", 'type': 'requirement'}, 'content_hash': '<hex>', 'declared_in': ['task.requirements', 'feature F-0001.requirements'], 'duplicate_paths': ['spec/requirements/REQ-0002.yaml', 'spec/requirements/extra/REQ-0002.yaml'], 'id': 'REQ-0002', 'kind': 'functional', 'path': 'spec/requirements/REQ-0002.yaml', 'problems': [{'blocking': True, 'code': 'AMBIGUOUS_ID', 'message': 'REQ-0002 resolves to 2 records (spec/requirements/REQ-0002.yaml, spec/requirements/extra/REQ-0002.yaml); the input is ambiguous until the duplicate is removed or re-identified'}], 'reason': 'inherited from feature F-0001', 'required': True, 'state_class': 'AUTHORITATIVE', 'status': 'ACTIVE', 'title': "Totals use banker's rounding", 'type': 'requirement', 'version': None}]
+@@ -202 +214 @@
+-OBS W3-r3-conflicts-detected-by-doctor: PASS -- gov doctor D014: [{'id': 'D014', 'name': 'authority unambiguous (no supersession conflicts / duplicate ids)', 'ok': False, 'severity': 'high', 'message': '1 supersession conflict(s), 1 duplicate id(s)', 'remediation': 'resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids'}]
++OBS W3-r3-conflicts-detected-by-doctor: PASS -- gov doctor D014: [{'id': 'D014', 'name': 'authority unambiguous (no supersession conflicts / duplicate ids)', 'ok': False, 'severity': 'high', 'message': '1 supersession conflict(s), 1 duplicate id(s)', 'remediation': 'resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids', 'enforcement': {'mode': 'hard-block', 'refuses': [{'at_or_above': 'high', 'operations': ['task.close', 'cit.execute', 'release.build', 'update.apply'], 'scope': 'global'}], 'below_threshold': 'warning'}}]
+@@ -214,3 +226,3 @@
+-W3-m4-reason-delivered: FAIL
+-W3-m4-relations-note-dependency-delivered: FAIL
+-W3-m5-supplementary-declared-separately: FAIL
++W3-m4-reason-delivered: PASS
++W3-m4-relations-note-dependency-delivered: PASS
++W3-m5-supplementary-declared-separately: PASS
+@@ -223 +235 @@
+-W3-r2-superseded-input-not-silent: FAIL
++W3-r2-superseded-input-not-silent: PASS
+@@ -226 +238 @@
+-W3-r3-duplicate-id-conflict-handled: FAIL
++W3-r3-duplicate-id-conflict-handled: PASS
+@@ -230 +242 @@
+-total=20 pass=7 fail=13
++total=20 pass=12 fail=8

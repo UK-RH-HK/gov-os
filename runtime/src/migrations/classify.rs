@@ -12,24 +12,26 @@ pub struct LegacyItem {
 }
 
 /// Legacy governance/memory mechanisms in the active tree (used by A2 and `gov doctor`).
+///
+/// The Governance OS's own installed and generated state is never a legacy mechanism, wherever it lives (an adapter
+/// output named like a provider-rules file included): see [`super::ownership`].
 pub fn legacy_mechanisms(root: &Path) -> Vec<LegacyItem> {
+    let os = super::ownership::OsState::load(root);
     let mut out = vec![];
     for (abs, rel) in crate::paths::iter_repo_files(root, false) {
         if rel.starts_with("governance/") || rel.starts_with("archive/") || rel.starts_with("spec/")
         {
             continue;
         }
+        if os.owns(root, &rel) {
+            continue;
+        }
         let kinds = super::inventory::detect_kinds(&rel, &abs);
-        for k in [
-            "provider_rules",
-            "chat_store",
-            "index_store",
-            "old_governance",
-        ] {
-            if kinds.contains(&k) {
+        for k in LEGACY_KINDS {
+            if kinds.contains(k) {
                 out.push(LegacyItem {
                     path: rel.clone(),
-                    kind: k.into(),
+                    kind: (*k).into(),
                 });
                 break;
             }
@@ -37,6 +39,14 @@ pub fn legacy_mechanisms(root: &Path) -> Vec<LegacyItem> {
     }
     out
 }
+
+/// Inventory kinds that mark a pre-v4 governance or memory mechanism.
+pub const LEGACY_KINDS: &[&str] = &[
+    "provider_rules",
+    "chat_store",
+    "index_store",
+    "old_governance",
+];
 
 fn kinds(item: &Value) -> Vec<String> {
     item["kinds"]
@@ -51,9 +61,34 @@ fn kinds(item: &Value) -> Vec<String> {
 
 /// Build a reverse import graph over source files to detect dead/unused modules (heuristic, low confidence).
 /// Import graph over the inventory: (importer path, imported path) edges resolved loosely by module stem.
-fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)> {
+///
+/// Resolution is unchanged from the original linear scan (a file whose stem is the import's last segment, or a package
+/// `__init__`/`mod.rs`/`index.ts|js` named by it); the candidates are indexed by stem so the dependency proofs that
+/// now rescan the tree at every retirement stay linear in the number of imports.
+pub(crate) fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)> {
     let mut edges: Vec<(String, String)> = vec![];
+    let mut seen: HashSet<(String, String)> = HashSet::new();
     let plugins: Vec<crate::capabilities::protocol::PluginDescriptor> = vec![];
+    let mut by_stem: HashMap<String, Vec<String>> = HashMap::new();
+    let mut packages: Vec<String> = vec![];
+    for other in items {
+        let op = other["path"].as_str().unwrap_or("").to_string();
+        let stem = Path::new(&op)
+            .file_stem()
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_default();
+        if stem == "__init__"
+            || op.ends_with("/mod.rs")
+            || op.ends_with("/index.ts")
+            || op.ends_with("/index.js")
+            || op == "mod.rs"
+            || op == "index.ts"
+            || op == "index.js"
+        {
+            packages.push(op.clone());
+        }
+        by_stem.entry(stem).or_default().push(op);
+    }
     for it in items {
         let rel = it["path"].as_str().unwrap_or("");
         let k = kinds(it);
@@ -84,21 +119,29 @@ fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)> {
             if last.is_empty() {
                 continue;
             }
-            for other in items {
-                let op = other["path"].as_str().unwrap_or("");
-                let stem = Path::new(op)
-                    .file_stem()
-                    .map(|s| s.to_string_lossy().to_string())
-                    .unwrap_or_default();
-                if op != rel
-                    && (stem == last
-                        || (stem == "__init__" && op.contains(&format!("/{last}/"))
-                            || op.ends_with(&format!("{last}/mod.rs"))
-                            || op.ends_with(&format!("{last}/index.ts"))
-                            || op.ends_with(&format!("{last}/index.js"))))
+            let mut targets: Vec<&String> = by_stem
+                .get(&last)
+                .map(|v| v.iter().collect())
+                .unwrap_or_default();
+            for op in &packages {
+                let stem_init = op.ends_with("__init__.py")
+                    || op
+                        .rsplit('/')
+                        .next()
+                        .map(|n| n.starts_with("__init__."))
+                        .unwrap_or(false);
+                if (stem_init && op.contains(&format!("/{last}/")))
+                    || op.ends_with(&format!("{last}/mod.rs"))
+                    || op.ends_with(&format!("{last}/index.ts"))
+                    || op.ends_with(&format!("{last}/index.js"))
                 {
+                    targets.push(op);
+                }
+            }
+            for op in targets {
+                if op != rel {
                     let e = (rel.to_string(), op.to_string());
-                    if !edges.contains(&e) {
+                    if seen.insert(e.clone()) {
                         edges.push(e);
                     }
                 }
@@ -108,9 +151,47 @@ fn import_edges(root: &Path, items: &[Value]) -> Vec<(String, String)> {
     edges
 }
 
+/// The reference index over the inventory: imports, citations and path references between inventoried artefacts.
+pub fn reference_index(root: &Path, items: &[Value]) -> super::references::ReferenceIndex {
+    let files: Vec<super::references::ScanFile> = items
+        .iter()
+        .map(|it| super::references::ScanFile {
+            rel: it["path"].as_str().unwrap_or("").to_string(),
+            kinds: kinds(it),
+        })
+        .filter(|f| !f.rel.is_empty())
+        .collect();
+    super::references::build(root, &files, true)
+}
+
 pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
-    let edges = import_edges(root, items);
-    let imported: HashSet<String> = edges.iter().map(|(_, to)| to.clone()).collect();
+    let os = super::ownership::OsState::load(root);
+    let index = reference_index(root, items);
+    let path_maps = index.path_map_all();
+    let role_of_path: HashMap<String, String> = items
+        .iter()
+        .map(|it| {
+            let rel = it["path"].as_str().unwrap_or("").to_string();
+            let r = super::references::role_of(&rel, &kinds(it)).to_string();
+            (rel, r)
+        })
+        .collect();
+    // A module is in use when code imports it or code/configuration refers to its path (a documentation citation
+    // does not keep code alive).
+    let imported: HashSet<String> = index
+        .edges
+        .iter()
+        .filter(|e| {
+            e.kind == "import"
+                || (e.kind == "path_reference"
+                    && role_of_path
+                        .get(&e.from)
+                        .map(|r| r != "docs")
+                        .unwrap_or(true))
+        })
+        .filter(|e| !os.owns(root, &e.from))
+        .map(|e| e.to.clone())
+        .collect();
     let mut records: HashMap<String, Value> = HashMap::new();
     let mut supersedes: HashMap<String, String> = HashMap::new(); // superseded id -> superseder
     for it in items {
@@ -129,9 +210,7 @@ pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
         }
     }
     let mut out = vec![];
-    let mut n = 0usize;
     for it in items {
-        n += 1;
         let rel = it["path"].as_str().unwrap_or("").to_string();
         let k = kinds(it);
         let has = |x: &str| k.iter().any(|y| y == x);
@@ -146,19 +225,34 @@ pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
             String::new()
         };
         let low = text_head.to_lowercase();
-        if has("secret") {
+        let secret = has("secret");
+        let legacy_kind = LEGACY_KINDS.iter().any(|lk| has(lk));
+        let ownership = os.owner_of(root, &rel);
+        if let Some(o) = ownership {
+            // The Governance OS's own installed/generated state and adoption evidence: current governance, never
+            // legacy — whatever its file name looks like (BC-P2-33, Contract v3:874).
+            class = match o {
+                super::ownership::Ownership::Evidence => "REPORT_EVIDENCE",
+                super::ownership::Ownership::UnverifiedLayout => "GENERATED",
+                _ => "GOVERNANCE_CURRENT",
+            };
+            authority = match o {
+                super::ownership::Ownership::UnverifiedLayout
+                | super::ownership::Ownership::Generated { intact: false } => {
+                    "UNKNOWN_OR_CONFLICTING"
+                }
+                _ => "ACTIVE",
+            };
+            confidence = 0.99;
+            reasons.push(o.reason().to_string());
+            if secret {
+                reasons.push("secret pattern present in Governance OS state".into());
+            }
+        } else if secret && !legacy_kind {
             class = "SECRET";
             authority = "ACTIVE";
             confidence = 0.99;
             reasons.push("secret path pattern or secret content pattern".into());
-        } else if rel.starts_with("governance/kernel/")
-            || rel.starts_with("governance/project/")
-            || rel == "governance/framework.lock"
-        {
-            class = "GOVERNANCE_CURRENT";
-            authority = "ACTIVE";
-            confidence = 0.99;
-            reasons.push("installed Governance OS".into());
         } else if rel.starts_with("archive/") {
             class = "HISTORICAL";
             authority = "HISTORICAL";
@@ -351,17 +445,27 @@ pub fn classify_all(root: &Path, items: &[Value]) -> Vec<Value> {
             confidence = 0.5;
             reasons.push("binary file".into());
         }
-        let imports: Vec<&str> = edges
-            .iter()
-            .filter(|(from, _)| from == &rel)
-            .map(|(_, to)| to.as_str())
-            .collect();
-        let references: Vec<&str> = edges
-            .iter()
-            .filter(|(_, to)| to == &rel)
-            .map(|(from, _)| from.as_str())
-            .collect();
-        out.push(json!({"artifact_id": format!("ART-{n:05}"), "path": rel, "class": class, "authority": authority, "confidence": confidence, "reasons": reasons, "kinds": k, "git_tracked": it["git_tracked"], "size": it["size"], "hash": it["hash"], "imports": imports, "references": references}));
+        if secret && legacy_kind && ownership.is_none() {
+            reasons.push("legacy mechanism that also carries secret material: sensitivity secret (never indexed or exported; moved only under an answered Human Decision Gate with the destination classified secret)".into());
+        }
+        let pm = path_maps
+            .get(&rel)
+            .cloned()
+            .unwrap_or_else(|| index.path_map_fields(&rel));
+        let mut entry = json!({"artifact_id": super::identity::artefact_id(&rel), "path": rel, "class": class, "authority": authority, "confidence": confidence, "reasons": reasons, "kinds": k, "git_tracked": it["git_tracked"], "size": it["size"], "hash": it["hash"],
+            "sensitivity": if secret { "secret" } else { "internal" }, "os_owned": ownership.map(|o| o.label())});
+        for f in [
+            "imports",
+            "citations",
+            "path_references",
+            "consumers",
+            "cited_by",
+            "references",
+            "reference_edges",
+        ] {
+            entry[f] = pm[f].clone();
+        }
+        out.push(entry);
     }
     out
 }
