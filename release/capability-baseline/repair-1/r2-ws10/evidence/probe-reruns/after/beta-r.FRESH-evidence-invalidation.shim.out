@@ -1,0 +1,48 @@
+# P2-AR-0031 audit-of-record probe re-run (unedited): beta-r/FRESH-evidence-invalidation mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws10 (HEAD 25edc5a67bd725c5fe0420540879a3ef02d0f673); product files differing from HEAD: 0
+# probe sha256 d9e7e12e3c4afd7fc2cfa996eb02515068e85a576cc8d76c19772a0e10240c1e; gov eb9e9e6e599fcc085969b649039d2c116a1cae20e0c5b4c3fbe1a7243844a211 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/mirror-shim-after/target/release/gov
+# date 2026-09-19T05:03:28Z
+$ gov --role orchestrator init --name orders-ledger --alias fresh --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+$ gov --role orchestrator audit  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "governance suite UNHEALTHY: 0 critical, 5 high", "details": {"audit": "AUD-0002", "verdict": "UNHEALTHY", "green": false, "families": {"schema_invariants": {"ok": false, "findings": 5, "detail": {"records_checked": 13}, "status": "executed", "cached_from": null}, "graph_integrity": {"ok": true, "findings": 0, "detail": {"dangling": 0, "orphans": 5, "edge_types": {"AFFECTS": 2, "CALLS": 2, "FAILED_BECAUSE": 1, "GOVERNED_BY": 1, "IMPORTS": 3, "REALISES": 3, "SUPERSEDES": 1, "TESTS": 3, "USES": 1, "VALIDATED_BY": 1}}, "status": "executed", "cached_from": null}, "
+baseline audit: AUD-0002 UNHEALTHY green: False inputs_hash: 5ee8f141a62a6bc4
+baseline memory_retrieval_regression detail: {'status': 'PASS', 'recall_at_k': 1.0, 'mrr': 0.9761904761904762, 'precision_at_k': 0.9404761904761904, 'queries': 21, 'pending': 2, 'failed': [], 'isolated_in_sandbox': True}
+
+====================================================================================================
+inputs that DO invalidate
+====================================================================================================
+[model/retrieval profile] MEMORY_POLICY retrieval profile override (embedding dims): green record STALE=True | re-run verdict UNHEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+[project path map] path map: docs/** no longer semantically indexed: green record STALE=True | re-run verdict UNHEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+[governing contract/policy (test inputs)] held-out set edited: green record STALE=True | re-run verdict UNHEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+
+====================================================================================================
+inputs that do NOT invalidate (content the memory families measure)
+====================================================================================================
+held-out target chosen for deletion: src/app/models.py | queries expecting it: ['HQ-008', 'HQ-011']
+[relevant source files] relevant source file deleted (src/app/models.py, a held-out target): green record STALE=True | re-run verdict UNHEALTHY recall=0.9047619047619048 (baseline recall=1.0) failed=['HQ-008', 'HQ-011']
+[authoritative spec] authoritative spec (requirement) rewritten: green record STALE=True | re-run verdict UNHEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+[relevant index manifest] index manifest changed by a rebuild of new content: green record STALE=True | re-run verdict UNHEALTHY recall=1.0 (baseline recall=1.0) failed=[]
+
+====================================================================================================
+summary
+====================================================================================================
+  model/retrieval profile                    STALE=True  result-changed-on-rerun=False MEMORY_POLICY retrieval profile override (embedding dims)
+  project path map                           STALE=True  result-changed-on-rerun=False path map: docs/** no longer semantically indexed
+  governing contract/policy (test inputs)    STALE=True  result-changed-on-rerun=False held-out set edited
+  relevant source files                      STALE=True  result-changed-on-rerun=True  relevant source file deleted (src/app/models.py, a held-out target)
+  authoritative spec                         STALE=True  result-changed-on-rerun=False authoritative spec (requirement) rewritten
+  relevant index manifest                    STALE=True  result-changed-on-rerun=False index manifest changed by a rebuild of new content
+[PASS] FRESH-profile: a retrieval-profile change invalidates prior green governance evidence
+[PASS] FRESH-pathmap: a path-map change invalidates prior green governance evidence
+[PASS] FRESH-source: a relevant source change that alters memory regression results invalidates prior green evidence
+[PASS] FRESH-spec: an authoritative spec change invalidates prior green evidence for the memory families
+[PASS] FRESH-manifest: an index-manifest change invalidates prior green index/memory evidence
+
+=== SUMMARY ===
+PASS  FRESH-profile  a retrieval-profile change invalidates prior green governance evidence
+PASS  FRESH-pathmap  a path-map change invalidates prior green governance evidence
+PASS  FRESH-source  a relevant source change that alters memory regression results invalidates prior green evidence
+PASS  FRESH-spec  an authoritative spec change invalidates prior green evidence for the memory families
+PASS  FRESH-manifest  an index-manifest change invalidates prior green index/memory evidence
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-beta-r-FRESH-evidence-invalidation-1lIXen
+[exit=0]

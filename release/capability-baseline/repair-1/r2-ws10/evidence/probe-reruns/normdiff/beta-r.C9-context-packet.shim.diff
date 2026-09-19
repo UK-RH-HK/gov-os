@@ -1,0 +1,8 @@
+--- before
++++ after
+@@ -70 +70 @@
+-ranked_evidence artefact multiplicity: {'ARCH-0101': 1, 'D-0102': 1, 'TST-0001': 1, 'REQ-0001': 1, 'D-0103': 2, 'TASK-0001': 2, 'PRJ-0001': 2, 'file:src/app/api.py': 1, 'F-0001': 1}
++ranked_evidence artefact multiplicity: {'F-0001': 1, 'D-0103': 2, 'ARCH-0101': 1, 'D-0102': 1, 'TST-0001': 1, 'TASK-0001': 2, 'PRJ-0001': 2, 'REQ-0001': 1, 'file:src/app/api.py': 1}
+@@ -72 +72 @@
+-query hits: [('file:docs/runbook-copy.md', 'file:docs/runbook-copy.md#2', 'section'), ('D-0103', 'D-0103#2', 'section'), ('RES-0101', 'RES-0101#2', 'section'), ('file:docs/runbook-copy.md', 'file:docs/runbook-copy.md#3', 'section'), ('D-0103', 'D-0103#0', 'document'), ('TASK-0001', 'TASK-0001#0', 'document'), ('PRJ-0001', 'PRJ-0001#2', 'section'), ('TASK-0001', 'TASK-0001#2', 'section'), ('file:src/web/format.ts', 'file:src/web/format.ts#0', 'document'), ('PRJ-0001', 'PRJ-0001#3', 'section')]
++query hits: [('file:docs/runbook-copy.md', 'file:docs/runbook-copy.md#2', 'section'), ('D-0103', 'D-0103#2', 'section'), ('RES-0101', 'RES-0101#2', 'section'), ('file:docs/runbook-copy.md', 'file:docs/runbook-copy.md#3', 'section'), ('D-0103', 'D-0103#0', 'document'), ('TASK-0001', 'TASK-0001#0', 'document'), ('PRJ-0001', 'PRJ-0001#2', 'section'), ('TASK-0001', 'TASK-0001#2', 'section'), ('file:src/web/format.ts', 'file:src/web/format.ts#0', 'document'), ('file:src/web/api.ts', 'file:src/web/api.ts#0', 'document')]
