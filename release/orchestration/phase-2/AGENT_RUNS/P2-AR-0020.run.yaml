@@ -19,5 +19,13 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/ws08/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 436dd5aa0255cbb70ec1b12950946fa1733088c1
+  branch_tip_commit: ea8efca7c86903f43a2d40df3d38cad7a3f52d85
+  branch_product_code_digest: d34fbec033612eb497ee8b4052c6b9b41410433d0715b0f6c4ec02be7aa548e8
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-35': 'REPAIRED_CLAIMED', 'BC-P2-36': 'REPAIRED_CLAIMED', 'BC-P2-37': 'REPAIRED_CLAIMED', 'BC-P2-38': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: scope conforms (WS-8-owned srr/** except plugins.rs, kernel, kernel_trust, lock, release, update, lock schema); breakglass.rs, plugins.rs and D-0007 byte-identical; builder tests: new tests/certification/ws08.rs (7), repair2.rs lock assertions flipped where they asserted the defect (unsigned manifest commit recorded as identity; Contract v3:149), declared; lib 52/52, certification 86/86 (also under the XDG_CACHE_HOME variant); R1 held-out AR-0027/0029/0031 identical to baseline incl. failure messages, AR-0033 30/1 (hv_a::a1 size pin; AR-0033's own derive.py finds 0 §6 violations); admission on unprovisioned machines unchanged (OD-P2-02 was pending at dispatch; now answered A -> round 2); operator impact within ARCH-0003 §8: a clone/pulled kernel on a provisioned machine is refused until the pinned signed release is reinstalled
 started_at: '2026-09-19'

@@ -19,5 +19,13 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/ws05/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0018.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 78b1b5f3285f102782a02018d60c0f204feac91f
+  branch_tip_commit: 4a91c453726f8f634bce7ee4fd2823ae33d726d3
+  branch_product_code_digest: 4bd2b58121f31e2af37b6ad3ec8f71c4a2faca9850864fdc6da917cb6160651d
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-15': 'REPAIRED_CLAIMED', 'BC-P2-14': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: scope conforms (WS-5-owned files; tests/certification/greenfield.rs updated for an intended behaviour change — it now ASSERTS the ROLE_NOT_DESIGNATED refusal and continues as the designated role, a strengthening, declared in the report); no main.rs/lib.rs edits; lib 55/0, certification 79/0 per builder; claim race 12/15 double-granted -> 0/15 and 0/50; R1 held-out not required (no R1-list file touched); design note for the verifier: a task with no allowed_paths conflicts with every other claim (reading of Contract v3:392) and changes some audit-fixture outcomes, explained in report §4
 started_at: '2026-09-19'
