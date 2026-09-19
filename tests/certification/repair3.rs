@@ -161,7 +161,9 @@ fn plugin_descriptors_can_never_authorise_themselves() {
             .error_code(),
         "AUTHORITY_DENIED"
     );
-    let r = l4.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
+    // BC-P2-39 (repair iteration 1, WS-7): registering an executable plugin raises a gate for exactly it; the
+    // registration completes once the product owner answers A through the owner-signed channel
+    let r = crate::ws07::register_approved(&l4, &df);
     assert_eq!(r["registered"], true, "{r}");
     let reg = json(&root, "governance/generated/plugin-registry.json");
     let e = &reg["plugins"]["p-reg"];

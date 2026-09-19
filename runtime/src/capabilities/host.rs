@@ -190,6 +190,9 @@ pub fn invoke(
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    // the plugin runs its bound implementation only: no caller-controlled loader variable can substitute code
+    // (BC-P2-40; `binding::LOADER_ENV_VARS`), and an execution does not rewrite its own bound byte-code
+    super::binding::apply_plugin_env(&mut command);
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;

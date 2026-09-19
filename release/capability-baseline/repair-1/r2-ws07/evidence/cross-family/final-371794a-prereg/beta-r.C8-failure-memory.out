@@ -1,0 +1,104 @@
+# P2-AR-0028 cross-family re-run (unedited probe, adapter mode prereg): beta-r/C8-failure-memory label=final-371794a
+# gov ec2a76fe3020c31f40f52f3d858b5d827b4b6a05da9ef7902811d41b680031b4
+$ gov --role orchestrator init --name orders-ledger --alias c8 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+C8-b1 bugs
+====================================================================================================
+$ gov --role orchestrator task create --class repair --objective 'Fix reconciliation drift bug caused by float money' --fields '{"lessons": ["L-0101"], "decisions": ["D-0102"]}'  -> exit 0 ok=True
+$ gov --role orchestrator memory graph L-0101 --depth 1  -> exit 0 ok=True
+L-0101 (category=bug) graph: [('→FAILED_BECAUSE', 'D-0101'), ('←LEARNED_FROM', 'TASK-0001')]
+$ gov --role orchestrator memory query 'bug reconciliation drift float money' --k 5  -> exit 0 ok=True
+recall: [('TASK-0001', 'task'), ('TASK-0001', 'task'), ('L-0101', 'lesson'), ('L-0101', 'lesson'), ('D-0102', 'decision')]
+[PASS] C8-b1: a bug is a structured lesson record (category) with a FAILED_BECAUSE cause edge, linked to its repair task, and recallable
+
+====================================================================================================
+C8-b2 failed approaches (product-generated from a failed worker return)
+====================================================================================================
+$ gov --role orchestrator task create --class implementation --objective 'Batch settlement import' --status READY --allowed src/**  -> exit 0 ok=True
+$ gov --role orchestrator handoff create --to-role backend-engineer --task TASK-0002  -> exit 0 ok=True
+$ gov --role backend-engineer handoff return HND-0001 --file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8-ret.json  -> exit 0 ok=True
+lesson created: L-0102 {'status': 'PROVISIONAL', 'category': 'worker-return', 'lifecycle': 'candidate', 'provenance': {'from_handoff': 'HND-0001', 'task': 'TASK-0002', 'at': '2026-09-19T05:14:50Z'}, 'problem_statement': 'Streaming the whole settlement CSV in one pass fails on 2GB exports; chunk it'}
+[PASS] C8-b2: a failed approach reported through the worker-return contract becomes a durable PROVISIONAL lesson record with provenance
+
+====================================================================================================
+C8-b3 wrong assumptions (authored; any product-generated form?)
+====================================================================================================
+$ gov --role orchestrator audit --no-persist --family schema_invariants  -> exit 0 ok=True
+schema_invariants findings for L-0150: []
+$ gov --role orchestrator memory query 'which assumption about timestamps was wrong' --k 5  -> exit 0 ok=True
+recall: [('L-0150', 'lesson'), ('file:spec/interfaces/.gitkeep', 'file'), ('L-0150', 'lesson'), ('RES-0101', 'research'), ('file:governance/kernel/policies/BUDGET_POLICY.yaml', 'file')]
+failure kinds present (free-text lesson.category): ['bug', 'worker-return', 'wrong-assumption']
+[PASS] C8-b3: a wrong assumption is representable as a structured lesson (free-text category) with a cause edge and is recallable
+
+====================================================================================================
+C8-b4 retrieval misses
+====================================================================================================
+$ gov --role orchestrator memory query 'blue-green deployment rollback procedure for the settlement job' --k 5  -> exit 0 ok=True
+ad-hoc query with no relevant knowledge -> hits: ['L-0150', 'file:docs/runbook.md', 'file:config/settings.yaml', 'TASK-0002', 'file:governance/kernel/schemas/release-manifest.schema.json']
+retrieval_log rows (derived state.db): 3
+new tracked/untracked files after the miss: ['governance/generated/index-manifest.json', 'governance/generated/memory-manifest.json', 'spec/reports/memory-quality/FAIL-0001.yaml']
+$ gov --role orchestrator memory verify  -> exit 0 ok=True
+gov memory verify: True None status: PASS failed queries: ['HQ-MISS']
+$ gov --role orchestrator audit  -> exit 0 ok=True
+gov audit -> HEALTHY record: AUD-0002
+persisted audit record memory_retrieval_regression: {'ok': True, 'findings': 0, 'detail': {'status': 'PASS', 'recall_at_k': 0.9545454545454546, 'mrr': 0.9318181818181818, 'precision_at_k': 0.8977272727272727, 'queries': 22, 'pending': 2, 'failed': ['HQ-MISS'], 'isolated_in_sandbox': True}, 'status': 'executed', 'cached_from': None} findings: []
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+retrieval_log rows after full rebuild: 0
+[PASS] C8-b4-heldout: a held-out retrieval miss is persisted (failed query id) in a governed audit record
+new spec/ records created by the ad-hoc miss: ['spec/reports/memory-quality/FAIL-0001.yaml']
+[PASS] C8-b4-adhoc: an ad-hoc retrieval miss creates a durable memory-quality/failure record (framework §18)
+
+====================================================================================================
+C8-b5 regressions
+====================================================================================================
+$ gov --role orchestrator audit  -> exit 0 ok=True
+baseline audit findings: [('low', 'skill_regression', 'SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementin'), ('low', 'skill_regression', 'SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-aut'), ('low', 'skill_regression', 'SKL-IMPACT-ANALYSIS V1: not executed by the governance suite — declared deferred: the executable form below (CIT-P on go'), ('low', 'skill_regression', 'SKL-LIVE-MIGRATION V1: not executed by the governance suite — declared qualification: needs a brownfield repository with'), ('low', 'skill_regression', 'SKL-REPO-ADOPTION V1: not executed by the governance suite — declared qualification: adoption stages run on a brownfield'), ('low', 'skill_regression', 'SKL-REPO-ADOPTION V2: not executed by the governance suite — declared qualification: adoption stages run on a brownfield'), ('low', 'skill_regression', 'SKL-RESEARCH-BENCHMARK V1: not executed by the governance suite — declared deferred: the executable form below (a resear'), ('low', 'skill_regression', 'SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design ag'), ('low', 'skill_regression', 'SKL-THREAT-MODEL V1: not executed by the governance suite — declared agent: the expectation concerns the content of an a')]
+$ gov --role orchestrator audit  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "governance suite UNHEALTHY: 0 critical, 2 high", "details": {"audit": "AUD-0004", "verdict": "UNHEALTHY", "green": false, "families": {"schema_invariants": {"ok": false, "findings": 2, "detail": {"records_checked": 23}, "status": "executed", "cached_from": null}, "graph_integrity": {"ok": true, "findings": 0, "detail": {"dangling": 0, "orphans": 6, "edge_types": {"AFFECTS": 2, "CALLS": 2, "CONSUMES": 1, "DERIVED_FROM": 2, "FAILED_BECAUSE": 2, "GOVERNED_BY": 2, "IMPORTS": 3, "LEARNED_FROM": 1, "PRODUCES": 2, "REALISES": 3, "SUPERSEDES": 1, "TESTS": 3, "USES": 1
+audit before regression: AUD-0003 HEALTHY True | after: AUD-0004 UNHEALTHY False
+audit records: ['AUD-0001.yaml', 'AUD-0002.yaml', 'AUD-0003.yaml', 'AUD-0004.yaml']
+[PASS] C8-b5: a governance regression (verdict worsens) is recorded as successive structured, persisted audit records
+
+====================================================================================================
+C8-b6 migration failures (brownfield A7 on a sabotaged migration)
+====================================================================================================
+$ gov --role migration-verifier adopt verify-migration  -> exit 0 ok=True
+A7 verdict: MIGRATION_REJECTED_NEEDS_REPAIR legacy_in_active_tree: ['.cursorrules']
+baseline verdict A7: {'verdict': 'MIGRATION_REJECTED_NEEDS_REPAIR', 'session': 'S-verifier', 'role': 'migration-verifier', 'at': '2026-09-19T05:15:12Z'} ; evidence file present: True
+evidence excerpt: # 08 — Independent migration verification
+
+Verifier: migration-verifier (session S-verifier) at 2026-09-19T05:15:12Z. Executor confidence statements ignored; actual paths inspected; dependency references re-derived from a fresh scan.
+
+- Catalogue vs reality: 2 problem(s), 0 broken link(s), 1 legacy mechanism(s) still active
+- Legacy retirements awaiting a Human Decision Gate: 0 · kept by decision:
+$ gov --role migration-executor adopt extract-legacy  -> exit 1 ok=False error={"code": "STAGE_ORDER", "message": "stage A7 must be complete first (protocol order A0\u2192A11)", "details": null}
+A8 after rejected A7 -> STAGE_ORDER
+[PASS] C8-b6: a migration failure is recorded durably (baseline verdict + independent verification evidence) and blocks the next stage
+
+====================================================================================================
+C8-b7 tool failures
+====================================================================================================
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+rebuild degradations: ['src/app/__init__.py: plugin python-ast failed (PLUGIN_BAD_RESPONSE); used builtin', 'src/app/api.py: plugin python-ast failed (PLUGIN_BAD_RESPONSE); used builtin', 'src/app/models.py: plugin python-ast failed (PLUGIN_BAD_RESPONSE); used builtin'] | runtime meta capability.degradations: [('[]',)]
+index-manifest carries degradations?: False
+tracked/untracked files written by the failing run (excluding manifests): ['spec/decisions/D-0103.yaml', 'spec/decisions/HDG-0001.yaml', 'spec/reports/failures/FAIL-0002.yaml']
+after next rebuild, capability.degradations: [('[]',)]
+$ gov --role orchestrator rebuild-memory  -> exit 1 ok=False error={"code": "EMBEDDER_BAD_OUTPUT", "message": "plugin bad-dim returned a 3-d vector; pinned dimensionality is 64", "details": null}
+rebuild with failing embedder -> EMBEDDER_BAD_OUTPUT plugin bad-dim returned a 3-d vector; pinned dimensionality is 64
+$ gov --role orchestrator tools health  -> exit 0 ok=True
+tools health for TOOL-BROKEN-001: [{'tool_id': 'TOOL-BROKEN-001', 'ok': False, 'kind': 'command', 'exit': 1, 'stderr': '', 'failure_memory': {'status': 'recorded', 'id': 'FAIL-0010', 'path': 'spec/reports/failures/FAIL-0010.yaml', 'kind': 'tool-failure', 'signature': 'f3415f2021e5e799457f99b6', 'reason': None}}]
+spec/ records mentioning any of the three tool failures: [PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/decisions/D-0104.yaml'), PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/decisions/HDG-0001.yaml'), PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/decisions/D-0103.yaml'), PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/decisions/HDG-0002.yaml'), PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/reports/failures/FAIL-0002.yaml'), PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/reports/failures/FAIL-0003.yaml'), PosixPath('/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP/c8/spec/reports/failures/FAIL-0010.yaml')]
+[PASS] C8-b7: tool failures (adapter crash, embedder bad output, failing health check) leave a durable structured failure record
+
+=== SUMMARY ===
+PASS  C8-b1  a bug is a structured lesson record (category) with a FAILED_BECAUSE cause edge, linked to its repair task, and recallable
+PASS  C8-b2  a failed approach reported through the worker-return contract becomes a durable PROVISIONAL lesson record with provenance
+PASS  C8-b3  a wrong assumption is representable as a structured lesson (free-text category) with a cause edge and is recallable
+PASS  C8-b4-heldout  a held-out retrieval miss is persisted (failed query id) in a governed audit record
+PASS  C8-b4-adhoc  an ad-hoc retrieval miss creates a durable memory-quality/failure record (framework §18)
+PASS  C8-b5  a governance regression (verdict worsens) is recorded as successive structured, persisted audit records
+PASS  C8-b6  a migration failure is recorded durably (baseline verdict + independent verification evidence) and blocks the next stage
+PASS  C8-b7  tool failures (adapter crash, embedder bad output, failing health check) leave a durable structured failure record
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-C8-failure-memory-UzHbSP
+[exit=0]

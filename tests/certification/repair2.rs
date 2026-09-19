@@ -596,6 +596,25 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
         "AUTHORITY_DENIED"
     );
     assert_eq!(ran(), 0);
+    // BC-P2-39 (repair iteration 1, WS-7): not even an L4 role executes a hand-declared EXECUTABLE plugin. Its
+    // descriptor declares nothing elevated, but the OS cannot enforce what a spawned process does, so it runs only
+    // once registered against a gate raised for exactly it. (Before WS-7: "an L4 role may execute a valid
+    // hand-declared plugin" — the self-declared elevation A0-F4-03 found.)
+    assert_eq!(
+        g.err(&[
+            "capabilities",
+            "invoke",
+            "--plugin",
+            "rogue",
+            "--inputs",
+            "{}"
+        ])
+        .error_code(),
+        "PLUGIN_NOT_APPROVED"
+    );
+    assert_eq!(ran(), 0);
+    let rogue_desc = root.join("governance/project/plugins/rogue.yaml");
+    crate::ws07::register_approved(&g, &rogue_desc);
     g.ok(&[
         "capabilities",
         "invoke",
@@ -607,7 +626,7 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
     assert_eq!(
         ran(),
         1,
-        "an L4 role may execute a valid hand-declared plugin"
+        "an L4 role may execute a registered, approved plugin"
     );
     // pinned as the embedder: an L0 rebuild must not trigger execution
     set_overrides(
@@ -648,11 +667,28 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
     ]);
     assert_eq!(e.error_code(), "PLUGIN_PIN_MISMATCH", "{}", e.envelope);
     assert_eq!(ran(), 1);
+    // BC-P2-40 (WS-7): a version bump no longer re-pins the implementation by itself (that was the machine-local
+    // trust-on-first-use re-baseline A0-F4-04 found); the edited descriptor no longer matches its registration, and
+    // only a new registration, approved through its own gate, binds the new implementation
     write_yaml(
         &root,
         "governance/project/plugins/rogue.yaml",
         &json!({"plugin_id": "rogue", "capability": "embed", "version": "2", "command": [script]}),
     );
+    assert_eq!(
+        g.err(&[
+            "capabilities",
+            "invoke",
+            "--plugin",
+            "rogue",
+            "--inputs",
+            "{}"
+        ])
+        .error_code(),
+        "PLUGIN_REGISTRY_MISMATCH"
+    );
+    assert_eq!(ran(), 1);
+    crate::ws07::register_approved(&g, &rogue_desc);
     g.ok(&[
         "capabilities",
         "invoke",
@@ -661,8 +697,13 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
         "--inputs",
         "{\"texts\": []}",
     ]);
-    assert_eq!(ran(), 2, "a version bump re-pins the implementation");
-    // declared sha256 pin must match
+    assert_eq!(
+        ran(),
+        2,
+        "an approved re-registration binds the new implementation"
+    );
+    // a pin written into a registered descriptor is an edit: it no longer matches its registration (the declared-pin
+    // check itself is exercised on a hand-declared OS capability server in ws07)
     write_yaml(
         &root,
         "governance/project/plugins/rogue.yaml",
@@ -678,7 +719,7 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
             "{}"
         ])
         .error_code(),
-        "PLUGIN_PIN_MISMATCH"
+        "PLUGIN_REGISTRY_MISMATCH"
     );
     // approved_roles restricts even high-authority roles
     write_yaml(
@@ -686,6 +727,7 @@ fn plugins_are_governed_capabilities_not_arbitrary_commands() {
         "governance/project/plugins/rogue.yaml",
         &json!({"plugin_id": "rogue", "capability": "embed", "version": "2", "command": [script], "approved_roles": ["tooling-engineer"]}),
     );
+    crate::ws07::register_approved(&g, &rogue_desc);
     assert_eq!(
         g.err(&[
             "capabilities",

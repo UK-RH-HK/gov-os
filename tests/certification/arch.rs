@@ -174,6 +174,10 @@ fn plugin_protocol_is_language_neutral_bash_embedder() {
         "governance/project/plugins/echo.yaml",
         &json!({"plugin_id": "echo-embedder-sh", "capability": "embed", "version": "1", "command": [sh.to_string_lossy()], "languages": []}),
     );
+    // BC-P2-39 (repair iteration 1, WS-7): an executable plugin runs only when registered against a gate raised for it
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/echo.yaml"));
+    // the registration is written under the plugin id; drop the hand-written copy (a second declaration of the id)
+    std::fs::remove_file(root.join("governance/project/plugins/echo.yaml")).unwrap();
     let mut pp = yaml(&root, "governance/project/PROJECT_POLICY.yaml");
     pp["policy_overrides"] = json!({"MEMORY_POLICY.embedding.provider": "echo-embedder-sh", "MEMORY_POLICY.embedding.dimensions": 8});
     write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);

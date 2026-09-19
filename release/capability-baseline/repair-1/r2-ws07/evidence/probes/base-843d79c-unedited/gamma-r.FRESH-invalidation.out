@@ -1,0 +1,48 @@
+# P2-AR-0028 probe re-run: gamma-r/FRESH-invalidation mode=unedited label=base-843d79c
+# worktree HEAD 843d79c33e8a8db8b223611abc23d317edbc82a1; product files differing from HEAD: 0
+# probe sha256 48644e1b675035282250b65aaeeb8b8873a345a39922c8a7ebd86c9b95d43a7a; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/bin/gov-base-843d79c
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/probes/pr-base-843d79c-unedited-FRESH-invalidation-jyec5t/fresh
+
+==== FRESH.0 control: green record taken after the task's own change, no other input change -> close succeeds ====
+  audit: HEALTHY green= True record= AUD-0002 inputs_hash= f2ca631bbbcebd10 []
+  close TASK-GOV1 (declares governance/project/NOTES.md): exit=0 ok=true
+
+==== FRESH.1 project overlay input (E1/F2/F3/F4: TOOL_PERMISSIONS.yaml) changed after the green record ====
+  audit: HEALTHY green= True record= AUD-0003 inputs_hash= 23e6049c299f9013 []
+  input change applied after the green record: TOOL_PERMISSIONS.yaml edited
+  close TASK-GOV2 (declares governance/project/NOTES.md,governance/project/TOOL_PERMISSIONS.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=task touches governance paths but the last green governance record is obsolete; run `gov audit` first
+
+==== FRESH.2 project skill (F1 input) added after the green record ====
+  audit: HEALTHY green= True record= AUD-0004 inputs_hash= 6765455580a941d5 []
+  input change applied after the green record: project skill added
+  close TASK-GOV3 (declares governance/project/NOTES.md,governance/project/skills/SKL-P.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=task touches governance paths but the last green governance record is obsolete; run `gov audit` first
+
+==== FRESH.3 decision record (spec/decisions input) added after the green record ====
+  audit: DEGRADED green= False record= AUD-0005 inputs_hash= bdca688bab8a1843 ['SKL-P V1: validation scenario cannot be executed, so skill regression cannot pas']
+  input change applied after the green record: decision D-0500 added
+  close TASK-GOV4 (declares governance/project/NOTES.md): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=task touches governance paths but the last green governance record is obsolete; run `gov audit` first
+
+==== FRESH.4 plugin registry (F4 registration input, governance/generated) changed after the green record ====
+  audit: DEGRADED green= False record= AUD-0006 inputs_hash= eeb0d15a494b616d ['SKL-P V1: validation scenario cannot be executed, so skill regression cannot pas']
+  input change applied after the green record: plugin-registry.json edited
+  close TASK-GOV5 (declares governance/project/NOTES.md): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=task touches governance paths but the last green governance record is obsolete; run `gov audit` first
+
+==== FRESH.5 feature record (H2/H3/I input; not a suite input — readiness and the DAG are computed live) added after the green record ====
+  audit: DEGRADED green= False record= AUD-0007 inputs_hash= e03b3238fcc2a5e3 ['SKL-P V1: validation scenario cannot be executed, so skill regression cannot pas']
+  input change applied after the green record: feature F-9 added
+  close TASK-GOV6 (declares governance/project/NOTES.md,spec/features/F-9.yaml): exit=1 ok=false code=GOVERNANCE_SUITE_STALE msg=task touches governance paths but the last green governance record is obsolete; run `gov audit` first
+  live readiness of F-9 right after the change: ['security_privacy'] pre_implementation_ok= False
+
+==== FRESH.6 kernel policy/taxonomy/roles/command-contract edits (E1/G/H inputs) fail closed immediately ====
+  roles/ROLES.yaml                     edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  policies/AUTHORITY_POLICY.yaml       edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  taxonomy/READINESS_DIMENSIONS.yaml   edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  commands/COMMAND_CONTRACT.yaml       edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  policies/TOOL_POLICY.yaml            edited -> task create: exit=1 ok=false code=KERNEL_TAMPERED msg='task create' refused: the installed kernel does not match the release it claims to be (kernel payl
+  kernel trust verified= False | installed kernel FAILED verification (kernel payload does not match KERNEL_MANIFEST.json: modified ["roles/ROLES.yaml"] missing [] added []); constitutional policy is read from the embedded baseline 4
+
+==== FRESH.7 plugin implementation / skill method changes ====
+  plugin implementation change -> PLUGIN_PIN_MISMATCH: F4-plugins.out section F4.b3/b4
+  project skill method change without version bump -> nothing marked stale at skill level: F1-skills.out section F1.b3
+END
+[exit=0]

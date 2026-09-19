@@ -222,6 +222,11 @@ fn reranker_hook_invoked_and_never_silently_skipped() {
         "governance/project/plugins/rerank.yaml",
         &json!({"plugin_id": "marker-reranker", "capability": "rerank", "version": "1", "command": [root.join("rerank.sh").to_string_lossy()], "languages": []}),
     );
+    // BC-P2-39 (repair iteration 1, WS-7): an executable plugin runs only when registered against a gate raised for it
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/rerank.yaml"));
+    // the registration is written under the plugin id; the hand-written copy would be a second, unregistered
+    // declaration of the same id
+    std::fs::remove_file(root.join("governance/project/plugins/rerank.yaml")).unwrap();
     set_overrides(
         &root,
         json!({"MEMORY_POLICY.reranker.provider": "marker-reranker"}),
@@ -245,7 +250,7 @@ fn reranker_hook_invoked_and_never_silently_skipped() {
         .unwrap()
         .iter()
         .any(|h| h["rerank_score"].as_f64() == Some(9.0)));
-    std::fs::remove_file(root.join("governance/project/plugins/rerank.yaml")).unwrap();
+    std::fs::remove_file(root.join("governance/project/plugins/marker-reranker.yaml")).unwrap();
     assert_eq!(
         g.err(&["memory", "query", "integer cents", "--k", "3"])
             .error_code(),
@@ -1606,6 +1611,8 @@ fn plugin_host_large_response_through_cli() {
         "governance/project/plugins/big.yaml",
         &json!({"plugin_id": "big", "capability": "embed", "version": "1", "command": [root.join("big.sh").to_string_lossy()], "languages": []}),
     );
+    // BC-P2-39 (repair iteration 1, WS-7): an executable plugin runs only when registered against a gate raised for it
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/big.yaml"));
     let t0 = std::time::Instant::now();
     let r = g.ok(&[
         "capabilities",
