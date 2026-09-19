@@ -22,3 +22,7 @@ It intentionally contains every hazard listed in framework §75C and protocol §
 Exercised by `tests/certification/brownfield.rs`: full A0→A11 adoption with independence enforced (reviewer/verifier
 sessions must differ from planner/executor/builder), legacy authority retired (INV-004), secrets never indexed (INV-009),
 contradictions surfaced and resolved through CIT with a human gate, remediation iteration, final adoption verdict.
+
+**First-run path: provision, then install (OWNER-DECISION-P2-0002).** The harness provisions each scenario machine with the certification suite's throw-away test root (`tests/certification/common.rs::provision`, published-seed keys — never a production root) and installs a release signed under it (`gov init --source <signed release>`; `common::signed_source`). A machine with no trust anchor refuses kernel material from any external source; only the `gov` binary's own embedded payload may be installed there, as a marked bootstrap installation that is never presented as current, verified or certified.
+
+Adoption installs its kernel at A6 batch 0 through the same ingress, from the signed release (`gov adopt migrate --source <signed release>`).

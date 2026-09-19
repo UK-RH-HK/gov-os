@@ -1,0 +1,128 @@
+# P2-AR-0032 builder-probe re-run: probe=derived:WS02-r2-supplementary.fixtures.P2-AR-0032.py label=derived-runs
+# worktree HEAD 7491c5ca78ee2a7772571892cede623416e84324; product files differing from HEAD: 0
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/target/release/gov sha256 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82
+# scratch /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-derived_WS02-r2-supplementary.fixtures.P2-AR-0032.py-1789805215-2738493
+# date 2026-09-19T08:06:55Z
+# derived copy /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/WS02-r2-supplementary.fixtures.P2-AR-0032.py (sha256 81290cd2828172783d4316f1108bf38d4b4b9bac271bea6af22fc1bbe3a66565) of probe id ws02-r2-supplementary
+# $ env GOV=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/target/release/gov P2AR0023_SCRATCH=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-derived_WS02-r2-supplementary.fixtures.P2-AR-0032.py-1789805215-2738493 python3 /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/WS02-r2-supplementary.fixtures.P2-AR-0032.py
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/target/release/gov (5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82)  tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration  scratch /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-derived_WS02-r2-supplementary.fixtures.P2-AR-0032.py-1789805215-2738493
+
+## W7 orphan / unexplained-output detection and remediation
+CHECK W7.1a PASS an output whose declared consumer does not declare it is named -- [["spec-without-downstream-path", "REQ-0002"], ["unconsumed-output", "API-0001"], ["unconsumed-research", "RES-0001"], ["unjustified-acceptance-test", "TST-0009"], ["unjustified-code", "file:src/unexplained.rs"]]
+CHECK W7.1c PASS control: an output its consumer declares (interfaces) is not an orphan
+CHECK W7.2a PASS a requirement no work or test reaches is named (low: no work of its feature is DONE yet) -- "low"
+CHECK W7.2c PASS control: a requirement a task governs and a test validates is not an orphan
+CHECK W7.3a PASS research whose declared decision was decided without it is named (medium)
+CHECK W7.3c PASS control: research the decision cites (evidence_refs) is consumed
+CHECK W7.4a PASS an acceptance test with no requirement/scenario is named
+CHECK W7.4c PASS control: an acceptance test that tests a requirement is not an orphan
+CHECK W7.5a PASS code added after the governance baseline that nothing justifies is named
+CHECK W7.5c PASS control: baseline code is disclosed as baseline (low), not as unexplained output
+CHECK W7.6a PASS `--no-persist` generates no remediation (side-effect free) -- {"before": 1, "after": 1}
+CHECK W7.6b PASS a persisted audit generates exactly one linked investigation task per orphan -- {"generated": 5, "orphans": 5}
+CHECK W7.6c PASS the investigation is governed work: READY, designated change-controller, linked (AFFECTS) to its subject -- {"task_status": "READY", "role": "change-controller", "relations": [{"type": "AFFECTS", "target": "REQ-0002", "note": "orphan under investigation (spec-without-downstream-path)"}], "investigates": {"kind": "spec-without-downstream-path", "subject": "REQ-0002", "subject_type": "requirement", "key": "W7-3e29572a32e7bfb2", "path": "spec/requirements/REQ-0002.yaml", "detected_by": "gov audit (G5)", "detected_at": "2026-09-19T08:06:57Z"}}
+CHECK W7.6d PASS idempotent: a second audit creates no new task, and remediation does not hide the orphans (still reported)
+CHECK W7.6e PASS nothing is deleted
+CHECK W7.6f PASS remediation does not leave the index stale -- []
+CHECK W7.5b PASS code a closed task's report produced, traced to a requirement, is justified -- {"close": true, "orphans": [["unconsumed-output", "API-0001"], ["unconsumed-research", "RES-0001"], ["unjustified-acceptance-test", "TST-0009"], ["unjustified-code", "file:src/unexplained.rs"]]}
+CHECK W7.2b FAIL once implementation work of its feature is DONE, an untouched requirement of that feature is a delivery gap (medium)
+
+## T2: OS-written state and health evidence that no gov operation produced
+CHECK T2.1 PASS a hand-written (unsealed) answered gate is reported (medium), not honoured -- "HDG-0900 (human-gate) is an open or answered gate that no gov operation produced as it stands (UNSEALED: hand-written, forged, or written before the T2 primitive); the OS does not honour it (D-0007 rule 2, T2 binding)"
+CHECK T2.2 PASS a hand-written approval decision is disclosed (low): its approval is not honoured
+CHECK T2.3 PASS doctor D033 fails naming the forged gate -- "HDG-0900 is an open or answered gate that no gov operation produced as it stands (UNSEALED: hand-written, forged, or written before the T2 primitive); the OS does not honour them (D-0007 rule 2)"
+CHECK T2.4 PASS a sealed gate edited after the OS wrote it is tampered state in force (high, UNHEALTHY) -- "HDG-0001 (human-gate) was modified after the gov operation that wrote it sealed it (the record was modified after the OS operation 'gate create' sealed it at 2026-09-19T08:07:00Z) and is in force: tampered OS-written state \u2014 restore it from version control; the OS does not honour it (D-0007 rule 2, T2 binding)"
+CHECK T2.5 PASS a hand-written green governance-suite record is not honoured and is named -- {"green": "AUD-0001", "current": false, "changed_classes": [{"class": "adoption_evidence", "contract_class": "adoption/audit evidence"}, {"class": "index_manifest", "contract_class": "relevant index manifest"}, {"class": "spec_decisions", "contract_class": "authoritative spec/decision"}, {"class": "t2_bindings", "contract_class": "machine trust state (OS-operation binding of T2 records)"}], "key": "d7ec1bb6b15a67e3faeb91242d6e9e6a99ecdd2dccb9e9a6388662c6a3d51b81", "recorded_key": "ca29ef7b751686f8c284b3854bc378d1d71f1f7a8e33833fcf3bd75483117ff6", "unhonoured_green": ["AUD-0900"], "message": "green record \"AUD-0001\" is obsolete (inputs changed: adoption_evidence, index_manifest, spec_decisi
+CHECK T2.6 PASS a hand-written product-test record is not honoured as evidence -- {}
+CHECK T2.7 PASS the governance-suite record the OS writes is sealed as a health operation -- {"sealed": true}
+CHECK T2.8 PASS …under the operation name health:governance-suite -- {"alg": "hmac-sha256/t2-v1", "key_id": "181c8b663bd7433e", "operation": "health:governance-suite", "at": "2026-09-19T08:07:01Z", "mac": "bac4e57972f5065cb3cc2daa472b69012df234f0df1f58abea985f775e324275"}
+
+## CUR: the T2 binding state is a currency input
+CHECK CUR.1 PASS removing this machine's binding key (sealed records become unverifiable) changes exactly the t2_bindings class -- {"changed": ["t2_bindings"], "key": ["/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-derived_WS02-r2-supplementary.fixtures.P2-AR-0032.py-1789805215-2738493/machine-t2-805219635/governance-os/machine/t2-binding/key.json"]}
+
+## IDS: one stable finding-id scheme; EXIT: HEALTH_HARD_BLOCK is the blocked class
+CHECK IDS.1 PASS finding ids are content-derived: an earlier new finding renumbers nothing -- []
+CHECK IDS.2 PASS the suite uses the adoption audit's scheme (migrations::identity::finding_id) -- {"id": "GF-0e575ab330", "expected": "GF-0e575ab330"}
+CHECK SUITE.misplaced PASS graph_integrity names a record outside its canonical location (W1)
+CHECK EXIT.1 PASS a governed operation refused by an active hard-block exits 4 (blocked class, API-0002) -- {"exit": 4, "code": "HEALTH_HARD_BLOCK"}
+
+## G6: a qualification run is recorded only against a conforming, separate oracle and a bound report
+CHECK G6.1 PASS a conforming oracle and bound report are accepted; the G6 health result records the qualification (a FORMAT_SAMPLE is marked not counting) -- {"ok": true, "err": null, "tier": "G6"}
+CHECK G6.1b PASS what G6 records in the qualification repository carries no trace of the hidden oracle (no oracle id or digest; a one-way commitment only) -- []
+CHECK G6.2 PASS an oracle stored inside the governed repository is refused and no health is recorded -- "ORACLE_SEPARATION_VIOLATED"
+CHECK G6.3 PASS a report not bound to the oracle is refused -- "ORACLE_SCORE_BINDING_MISMATCH"
+CHECK G6.4 PASS an unknown qualification kind is a usage error
+
+## DOC: doctor checks
+CHECK DOC.D019a PASS a gate never rendered exists only in files and fails D019 (INV-008) -- "1 gate(s) never rendered to the human channel exist only in files and are not presented (INV-008): HDG-0001"
+CHECK DOC.D019b PASS a rendered gate awaiting the owner's signed receipt or answer is reported, not failed (presented = signed receipt/answer) -- "1 pending gate(s): 0 presented (owner-signed receipt or answer); 1 rendered to the human channel and awaiting the owner's signed receipt or answer (not yet evidenced as presented): HDG-0001"
+CHECK DOC.D032 PASS an installation whose authenticity is not established fails D032 (the doctor verdict is never HEALTHY without disclosing it) -- "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.5), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its rele"
+CHECK DOC.audit-disclosure PASS the audit discloses it too (low on an unprovisioned bootstrap machine) -- [{"severity": "low", "family": "installation_authenticity", "message": "installation authenticity not established (UNPROVISIONED machine): this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.5), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).", "path": "governance/framework.lock", "id": "GF-65ebad885a"}]
+CHECK DOC.D017 PASS D017 names the claims store in use -- "0 claim(s), 0 expired (claims store: .governance-runtime/claims.db, survives rebuilds)"
+CHECK DOC.D034 PASS an open tool failure in failure memory is reported and degrades (D034) -- "1 open failure record(s) awaiting follow-up (1 tool failure(s): capability degraded): FAIL-0001 (tool-failure)"
+CHECK DOC.status-failure-memory PASS `gov health status` reports open failure memory -- {"open": 1, "by_kind": {"tool-failure": 1}, "records": [{"id": "FAIL-0001", "failure_kind": "tool-failure", "title": "adapter crashed"}]}
+
+## SUITE: the reporting side of other workstreams' checks
+CHECK SUITE.families PASS every round-2 reporting family runs in the full suite -- ["adapter_portability", "audit_reproducibility", "authority_role_limits", "change_control_integrity", "command_contract_consistency", "concurrency_claims", "context_reproducibility", "continuity_checkpoint_handoff", "contract_binding", "fresh_agent_reconstruction", "graph_integrity", "human_gate_integrity", "index_content_coverage", "index_freshness", "installation_authenticity", "lineage_orphans", "memory_retrieval_regression", "model_routing_integrity", "mutation_scope", "os_binding_integrity", "path_map_compliance", "plugin_governance", "policy_enforcement_coverage", "policy_precedence", "product_test_health", "product_traceability", "recovery_rebuild", "schema_invariants", "secrets_sensi
+CHECK SUITE.stale PASS graph_integrity names a stale lineage link (W8)
+CHECK SUITE.stale-cit PASS an open CIT targeting a superseded record is stale; a committed CIT's targets are its change subjects, not stale links
+CHECK SUITE.delivery PASS context_reproducibility names a dispatchable task whose declared input is not delivered (W4) -- ["TASK-0002 is READY but its context packet is BLOCKED: declared mandatory input(s) not delivered: missing input REQ-9999 (W4 missing required input; `gov context manifest TASK-0002`)"]
+CHECK SUITE.hidden-oracle PASS hidden-oracle material inside the governed repository is HIGH: a governed record (schema_invariants) and any other file (path_map_compliance) (Contract v3:1014, :1062) -- [["schema_invariants", "spec/research/FM-0001.yaml"], ["path_map_compliance", "qa-oracle.json"]]
+CHECK SUITE.contract PASS contract_binding runs `gov contract verify` at G5 over the developer checkout -- {"applicable": true, "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3", "root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration", "verdict": "CONTRACT_SOURCE_BOUND", "served_from_cache": "HR-20260919T080708175Z-ee05bacd"}
+CHECK SUITE.coverage PASS index_content_coverage checks the whole live index -- {"checked_artifacts": 170, "uncovered_lines": 0, "complete": true}
+CHECK SUITE.contract-mutated PASS a derived view that diverges from the owner source is a HIGH contract_binding finding -- ["contract binding broken: [CONTRACT_GENERATED_VIEW_DIVERGED] docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md does not faithfully render the approved source: 2 difference(s) from the owner source Governance_OS_Capability_Acceptance_Contract_v3.md \u2014 A1 checklist item A1.1 missing or altered (expected \"- [ ] Constitution/hard invariants are identifiable and machine-readable. <sub>A1.1 \u00b7 L133</sub>\"); line 202 differs from a fresh rendering of the owner source and evidence map (expected \"- [ ] Constitution/hard invariants are identifiable and machine-readable. <sub>A1.1 \u00b7 L133</sub>\", found \"- [x] Constitution/hard invariants are identifiable and machine-readable. <sub>A1
+
+==== SUMMARY ====
+W7.1a: PASS
+W7.1c: PASS
+W7.2a: PASS
+W7.2c: PASS
+W7.3a: PASS
+W7.3c: PASS
+W7.4a: PASS
+W7.4c: PASS
+W7.5a: PASS
+W7.5c: PASS
+W7.6a: PASS
+W7.6b: PASS
+W7.6c: PASS
+W7.6d: PASS
+W7.6e: PASS
+W7.6f: PASS
+W7.5b: PASS
+W7.2b: FAIL
+T2.1: PASS
+T2.2: PASS
+T2.3: PASS
+T2.4: PASS
+T2.5: PASS
+T2.6: PASS
+T2.7: PASS
+T2.8: PASS
+CUR.1: PASS
+IDS.1: PASS
+IDS.2: PASS
+SUITE.misplaced: PASS
+EXIT.1: PASS
+G6.1: PASS
+G6.1b: PASS
+G6.2: PASS
+G6.3: PASS
+G6.4: PASS
+DOC.D019a: PASS
+DOC.D019b: PASS
+DOC.D032: PASS
+DOC.audit-disclosure: PASS
+DOC.D017: PASS
+DOC.D034: PASS
+DOC.status-failure-memory: PASS
+SUITE.families: PASS
+SUITE.stale: PASS
+SUITE.stale-cit: PASS
+SUITE.delivery: PASS
+SUITE.hidden-oracle: PASS
+SUITE.contract: PASS
+SUITE.coverage: PASS
+SUITE.contract-mutated: PASS
+total=51 pass=50 fail=1
+[exit=0]

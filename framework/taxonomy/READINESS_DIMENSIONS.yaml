@@ -1,6 +1,9 @@
 version: 1.0.0
 cell_states: [PRESENT, MISSING, PROVISIONAL, BLOCKED, N/A_WITH_REASON]
 # `gap_task_class` is the task class generated when the cell is MISSING;
+# `gap_task_role` (optional) is the designated role of that generated task: the designated role binds who may claim and
+# close it, so independent acceptance tests and representative test data are produced by roles independent of the
+# implementer (Contract v3 H4, O3; BC-P2-34 task-role side);
 # `pre_implementation` cells must be PRESENT (or N/A_WITH_REASON) before implementation tasks become READY.
 dimensions:
   - {id: intent_outcome, gap_task_class: specification, pre_implementation: true}
@@ -9,7 +12,7 @@ dimensions:
   - {id: scenarios, gap_task_class: specification, pre_implementation: true}
   - {id: inputs, gap_task_class: specification, pre_implementation: true}
   - {id: data_model_schema, gap_task_class: data, pre_implementation: true}
-  - {id: representative_test_data, gap_task_class: data, pre_implementation: true}
+  - {id: representative_test_data, gap_task_class: data, gap_task_role: data-author, pre_implementation: true}
   - {id: processing_algorithm, gap_task_class: research, pre_implementation: true}
   - {id: expected_outputs, gap_task_class: specification, pre_implementation: true}
   - {id: functional_requirements, gap_task_class: specification, pre_implementation: true}
@@ -27,5 +30,5 @@ dimensions:
   - {id: recovery_fallback, gap_task_class: architecture, pre_implementation: false}
   - {id: success_criteria, gap_task_class: specification, pre_implementation: true}
   - {id: failure_criteria, gap_task_class: specification, pre_implementation: true}
-  - {id: independent_acceptance_tests, gap_task_class: test-design, pre_implementation: true}
+  - {id: independent_acceptance_tests, gap_task_class: test-design, gap_task_role: independent-test-designer, pre_implementation: true}
   - {id: documentation_operations, gap_task_class: documentation, pre_implementation: false}

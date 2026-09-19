@@ -42,7 +42,16 @@ fn vector_groups(root: &Path) -> Vec<(String, i64)> {
 #[test]
 fn embedder_replaceable_end_to_end_and_no_silent_fallback() {
     let (root, g) = setup_fixture("greenfield", "rep-embed", "S-rep");
-    g.ok(&["init", "--name", "e", "--alias", "e-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "e",
+        "--alias",
+        "e-alias",
+        "--skip-index",
+    ]);
     serve_embed_plugin(&root, "reversed-builtin", true);
     set_overrides(
         &root,
@@ -122,7 +131,15 @@ fn embedder_replaceable_end_to_end_and_no_silent_fallback() {
 #[test]
 fn embedder_pin_change_escalates_to_full_rebuild_without_mixed_index() {
     let (root, g) = setup_fixture("greenfield", "rep-pin", "S-rep");
-    g.ok(&["init", "--name", "p", "--alias", "p-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "p",
+        "--alias",
+        "p-alias",
+    ]);
     assert_eq!(
         vector_groups(&root),
         vec![("hashed-ngram".to_string(), 512)]
@@ -181,7 +198,16 @@ fn embedder_pin_change_escalates_to_full_rebuild_without_mixed_index() {
 #[test]
 fn reranker_hook_invoked_and_never_silently_skipped() {
     let (root, g) = setup_fixture("greenfield", "rep-rerank", "S-rep");
-    g.ok(&["init", "--name", "r", "--alias", "r-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "r",
+        "--alias",
+        "r-alias",
+        "--skip-index",
+    ]);
     let marker = root.join(".governance-runtime/RERANK_INVOKED");
     std::fs::create_dir_all(marker.parent().unwrap()).unwrap();
     write(&root, "rerank.sh", &format!("#!/usr/bin/env bash\nREQ=$(cat)\ntouch '{}'\nfirst=$(printf '%s' \"$REQ\" | sed -n 's/.*\"id\":\"\\([^\"]*\\)\".*/\\1/p' | head -n1)\nprintf '{{\"protocol\":\"gov-capability/1\",\"ok\":true,\"provider\":{{\"id\":\"marker-reranker\",\"version\":\"1\"}},\"outputs\":{{\"scores\":[{{\"id\":\"%s\",\"score\":9.0}}]}}}}' \"$first\"\n", marker.display()));
@@ -196,6 +222,11 @@ fn reranker_hook_invoked_and_never_silently_skipped() {
         "governance/project/plugins/rerank.yaml",
         &json!({"plugin_id": "marker-reranker", "capability": "rerank", "version": "1", "command": [root.join("rerank.sh").to_string_lossy()], "languages": []}),
     );
+    // BC-P2-39 (repair iteration 1, WS-7): an executable plugin runs only when registered against a gate raised for it
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/rerank.yaml"));
+    // the registration is written under the plugin id; the hand-written copy would be a second, unregistered
+    // declaration of the same id
+    std::fs::remove_file(root.join("governance/project/plugins/rerank.yaml")).unwrap();
     set_overrides(
         &root,
         json!({"MEMORY_POLICY.reranker.provider": "marker-reranker"}),
@@ -219,7 +250,7 @@ fn reranker_hook_invoked_and_never_silently_skipped() {
         .unwrap()
         .iter()
         .any(|h| h["rerank_score"].as_f64() == Some(9.0)));
-    std::fs::remove_file(root.join("governance/project/plugins/rerank.yaml")).unwrap();
+    std::fs::remove_file(root.join("governance/project/plugins/marker-reranker.yaml")).unwrap();
     assert_eq!(
         g.err(&["memory", "query", "integer cents", "--k", "3"])
             .error_code(),
@@ -231,7 +262,15 @@ fn reranker_hook_invoked_and_never_silently_skipped() {
 #[test]
 fn benchmark_records_evidence_and_selection_pins_through_decision() {
     let (root, g) = setup_fixture("greenfield", "rep-bench", "S-rep");
-    let r = g.ok(&["init", "--name", "b", "--alias", "b-alias"]);
+    let r = g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "b",
+        "--alias",
+        "b-alias",
+    ]);
     assert!(
         r["heldout_generated"].as_u64().unwrap() >= 5,
         "starter held-out set must be generated at init: {r}"
@@ -268,7 +307,9 @@ fn benchmark_records_evidence_and_selection_pins_through_decision() {
     }
     let res_id = b["research_record"].as_str().unwrap().to_string();
     assert!(exists(&root, &format!("spec/research/{res_id}.yaml")));
-    let sel = g.ok(&[
+    // BC-P2-30 (A0-D5-02, WS-6 round 2): a profile change pins governance/project/** (radius R5), so the first call
+    // raises the change-control gate and applies nothing; it is applied only on the owner-signed answer to that gate.
+    let pending = g.ok(&[
         "memory",
         "select",
         "builtin:64",
@@ -277,6 +318,19 @@ fn benchmark_records_evidence_and_selection_pins_through_decision() {
         "--by",
         "owner",
     ]);
+    assert_eq!(pending["applied"], false, "{pending}");
+    let gid = pending["human_gate"].as_str().unwrap().to_string();
+    crate::ws03::human_decide(&g, &gid, "A");
+    let sel = g.ok(&[
+        "memory",
+        "select",
+        "builtin:64",
+        "--research",
+        &res_id,
+        "--gate",
+        &gid,
+    ]);
+    assert_eq!(sel["applied"], true, "{sel}");
     let did = sel["decision"].as_str().unwrap();
     assert!(exists(&root, &format!("spec/decisions/{did}.yaml")));
     assert_eq!(
@@ -294,7 +348,16 @@ fn benchmark_records_evidence_and_selection_pins_through_decision() {
 #[test]
 fn unmeasured_memory_recall_is_not_green() {
     let (root, g) = setup_fixture("greenfield", "rep-unmeasured", "S-rep");
-    g.ok(&["init", "--name", "u", "--alias", "u-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "u",
+        "--alias",
+        "u-alias",
+        "--skip-index",
+    ]);
     g.ok(&["rebuild-memory"]);
     assert_eq!(
         yaml(&root, "governance/tests/memory/heldout.yaml")["queries"]
@@ -324,7 +387,15 @@ fn unmeasured_memory_recall_is_not_green() {
 #[test]
 fn authority_levels_are_enforced_on_executable_paths() {
     let (root, g) = setup_fixture("greenfield", "rep-auth", "S-rep");
-    g.ok(&["init", "--name", "a", "--alias", "a-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "a",
+        "--alias",
+        "a-alias",
+    ]);
     let aud = g.with_role("independent-auditor"); // L0
     assert_eq!(
         aud.err(&[
@@ -482,8 +553,11 @@ fn authority_levels_are_enforced_on_executable_paths() {
     ]);
     let be = g.with_role("backend-engineer");
     be.ok(&["task", "claim", t["id"].as_str().unwrap()]);
-    let rep = write_report(
+    // BC-P2-20 (P2-AR-0026): the close report is the worker's consumption receipt
+    let rep = crate::ws05::receipt(
+        &be,
         &root,
+        t["id"].as_str().unwrap(),
         "w",
         "wrote docs",
         &["README.md"],
@@ -527,7 +601,21 @@ fn authority_levels_are_enforced_on_executable_paths() {
 #[test]
 fn task_close_enforces_mutation_scope() {
     let (root, g) = setup_fixture("greenfield", "rep-scope", "S-rep");
-    g.ok(&["init", "--name", "s", "--alias", "s-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "s",
+        "--alias",
+        "s-alias",
+    ]);
+    // P2-AR-0026 (BC-P2-16): a claim is granted only to a task the DAG finds runnable, and an implementation task
+    // needs its scenarios and acceptance tests declared (TEST_POLICY.implementation_task_requires); the receipt then
+    // traces the work to them (BC-P2-20)
+    let inputs = crate::ws05::traceable_inputs(&root, "0100");
+    git_commit_all(&root, "traceable inputs");
+    g.ok(&["rebuild-memory", "--incremental"]);
     let t = g.ok(&[
         "task",
         "create",
@@ -539,9 +627,39 @@ fn task_close_enforces_mutation_scope() {
         "READY",
         "--allowed",
         "src/**",
+        "--fields",
+        &inputs.to_string(),
     ]);
     let tid = t["id"].as_str().unwrap().to_string();
+    assert_eq!(t["task_status"], "READY", "{t}");
     g.ok(&["task", "claim", &tid]);
+    // a change governed by a committed CIT is legitimate even outside allowed_paths (within the claim window).
+    // Round-2 integration (P2-AR-0032): the CIT executes before the out-of-scope write below, not while it is on
+    // disk. With WS-4's G4 tier after CIT-E and WS-2's W7 remediation, a CIT executed while the stray SCN-0099 exists
+    // raises a governed investigation task for it; removing SCN-0099 (the remedy this test asserts) then leaves that
+    // task's AFFECTS edge dangling, the suite DEGRADED and WS-5's governance-affecting close refused (routed as an
+    // observation in the round-2 integration report). Every assertion below is unchanged.
+    let mf = root.join(".governance-runtime/m.json");
+    std::fs::write(
+        &mf,
+        json!([{"op": "write_file", "path": "spec/now/NOW.md", "content": "# NOW\ngoverned\n"}])
+            .to_string(),
+    )
+    .unwrap();
+    let c = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        "governed edit",
+        "--trigger",
+        "editorial",
+        "--manifest",
+        mf.to_str().unwrap(),
+    ]);
+    let cid = c["id"].as_str().unwrap().to_string();
+    g.ok(&["cit", "simulate", &cid]);
+    g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
+    g.ok(&["cit", "execute", &cid]);
     write(
         &root,
         "spec/scenarios/SCN-0099.yaml",
@@ -571,35 +689,15 @@ fn task_close_enforces_mutation_scope() {
             .error_code(),
         "MUTATION_SCOPE_VIOLATION"
     );
-    // a change governed by a committed CIT is legitimate even outside allowed_paths
-    let mf = root.join(".governance-runtime/m.json");
-    std::fs::write(
-        &mf,
-        json!([{"op": "write_file", "path": "spec/now/NOW.md", "content": "# NOW\ngoverned\n"}])
-            .to_string(),
-    )
-    .unwrap();
-    let c = g.ok(&[
-        "cit",
-        "propose",
-        "--proposal",
-        "governed edit",
-        "--trigger",
-        "editorial",
-        "--manifest",
-        mf.to_str().unwrap(),
-    ]);
-    let cid = c["id"].as_str().unwrap().to_string();
-    g.ok(&["cit", "simulate", &cid]);
-    g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
-    g.ok(&["cit", "execute", &cid]);
     // the out-of-scope file is still on disk: observed mutations (not the report) decide, so close is refused ...
-    let good = write_report(
+    let good = crate::ws05::receipt(
+        &g,
         &root,
+        &tid,
         "good",
         "in scope + governed",
         &["src/lib.rs", "spec/now/NOW.md"],
-        "passed",
+        "not_applicable_with_reason",
     );
     g.ok(&["rebuild-memory", "--incremental"]);
     assert_eq!(
@@ -617,7 +715,15 @@ fn task_close_enforces_mutation_scope() {
 #[test]
 fn claims_survive_full_memory_rebuild() {
     let (root, g) = setup_fixture("greenfield", "rep-claims", "S-alpha");
-    g.ok(&["init", "--name", "c", "--alias", "c-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "c",
+        "--alias",
+        "c-alias",
+    ]);
     let t = g.ok(&[
         "task",
         "create",
@@ -648,7 +754,15 @@ fn claims_survive_full_memory_rebuild() {
 #[test]
 fn budget_parallel_agents_threshold_raises_gate() {
     let (root, g) = setup_fixture("greenfield", "rep-budget", "S-one");
-    g.ok(&["init", "--name", "b", "--alias", "b-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "b",
+        "--alias",
+        "b-alias",
+    ]);
     set_overrides(
         &root,
         json!({"BUDGET_POLICY.defaults.max_parallel_agents": 1}),
@@ -756,7 +870,16 @@ fn destructive_migration_requires_answered_gate_record() {
 #[test]
 fn sensitivity_classes_and_namespaces_are_enforced() {
     let (root, g) = setup_fixture("greenfield", "rep-sens", "S-rep");
-    g.ok(&["init", "--name", "s", "--alias", "s-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "s",
+        "--alias",
+        "s-alias",
+        "--skip-index",
+    ]);
     let mut ds = yaml(&root, "governance/project/DATA_SENSITIVITY.yaml");
     ds["classifications"] = json!([{"pattern": "product/data/customers/**", "class": "restricted", "reason": "customer data"}, {"pattern": "docs/private/**", "class": "confidential", "reason": "legal"}]);
     write_yaml(&root, "governance/project/DATA_SENSITIVITY.yaml", &ds);
@@ -876,7 +999,15 @@ fn sensitivity_classes_and_namespaces_are_enforced() {
 #[test]
 fn cit_auto_simulation_and_secret_redaction() {
     let (root, g) = setup_fixture("greenfield", "rep-cit", "S-rep");
-    g.ok(&["init", "--name", "c", "--alias", "c-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "c",
+        "--alias",
+        "c-alias",
+    ]);
     let c = g.ok(&[
         "cit",
         "propose",
@@ -913,8 +1044,14 @@ fn cit_auto_simulation_and_secret_redaction() {
         doctor_check(&g, "D011").0,
         "no secret outside secret class after redaction"
     );
-    g.ok(&["cit", "simulate", &cid]);
-    g.ok(&["cit", "approve", &cid, "--by", "agent", "--method", "auto"]);
+    // WS-4 round 2 (BC-P2-13): writing product source is a behaviour change whatever the declared label, so this
+    // `editorial` CIT is human-gated; the approval goes through the owner channel, and execution is still refused
+    let sim = g.ok(&["cit", "simulate", &cid]);
+    assert_eq!(sim["impact"]["human_gate_required"], true, "{sim}");
+    let gate = sim["human_gate"].as_str().unwrap().to_string();
+    g.ok(&["gate", "present", &gate]);
+    crate::ws03::human_decide(&g, &gate, "A");
+    g.ok(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     assert_eq!(
         g.err(&["cit", "execute", &cid]).error_code(),
         "SECRET_IN_MANIFEST"
@@ -931,7 +1068,13 @@ fn update_approval_requires_presented_answered_gate() {
     write(&proj, "README.md", "# u\n");
     git_init_commit(&proj);
     let g = Gov::new(&proj, "S-rep");
-    let prev = canonical_root().join("fixtures/update/previous-release/4.1.1");
+    // provision, then install (OWNER-DECISION-P2-0002): both releases are signed under the suite's throw-away root
+    provision(&g);
+    let prev = signed_copy(
+        &canonical_root().join("fixtures/update/previous-release/4.1.1"),
+        "rep-update-4.1.1",
+        sequence_of("4.1.1"),
+    );
     g.ok(&[
         "init",
         "--source",
@@ -943,16 +1086,33 @@ fn update_approval_requires_presented_answered_gate() {
         "--skip-index",
     ]);
     assert_eq!(
-        g.err(&["update", "--apply"]).error_code(),
+        g.err(&["update", "--apply", "--source", signed_source()])
+            .error_code(),
         "HUMAN_GATE_REQUIRED"
     );
-    let ap = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);
+    let ap = g.ok(&[
+        "update",
+        "--apply",
+        "--source",
+        signed_source(),
+        "--approve",
+        "--by",
+        "owner",
+    ]);
     assert_eq!(ap["applied"], false);
     let gid = ap["human_gate"].as_str().unwrap().to_string();
     assert_eq!(yaml(&proj, "governance/framework.lock")["version"], "4.1.1");
     g.ok(&["gate", "present", &gid]);
     crate::ws03::human_decide(&g, &gid, "A");
-    let ap2 = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);
+    let ap2 = g.ok(&[
+        "update",
+        "--apply",
+        "--source",
+        signed_source(),
+        "--approve",
+        "--by",
+        "owner",
+    ]);
     assert_eq!(ap2["applied"], true);
     assert_eq!(
         yaml(&proj, "governance/framework.lock")["version"],
@@ -980,6 +1140,7 @@ fn freeze_writes_is_honoured_by_adopt_and_upstream() {
     ] {
         planner.ok(&["adopt", s]);
     }
+    crate::migration::reviewer_authors_tests(&root); // BC-P2-34: the reviewer approves with tests of its own
     planner
         .with_session("S-rev")
         .with_role("migration-reviewer")
@@ -988,7 +1149,16 @@ fn freeze_writes_is_honoured_by_adopt_and_upstream() {
         .with_session("S-exec")
         .with_role("migration-executor");
     ex.ok(&[
-        "adopt", "migrate", "--batch", "0", "--name", "libcore", "--alias", "fx-mig",
+        "adopt",
+        "migrate",
+        "--batch",
+        "0",
+        "--source",
+        signed_source(),
+        "--name",
+        "libcore",
+        "--alias",
+        "fx-mig",
     ]);
     ex.ok(&["freeze-writes", "--reason", "incident"]);
     assert_eq!(
@@ -1005,7 +1175,15 @@ fn freeze_writes_is_honoured_by_adopt_and_upstream() {
         .with_role("orchestrator")
         .ok(&["resume"]);
     let (root2, g2) = setup_fixture("greenfield", "rep-freeze-up", "S-rep");
-    g2.ok(&["init", "--name", "f", "--alias", "f-alias"]);
+    g2.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "f",
+        "--alias",
+        "f-alias",
+    ]);
     std::fs::copy(
         canonical_root().join("fixtures/upstream-learning/lessons/L-0001.yaml"),
         root2.join("spec/lessons/L-0001.yaml"),
@@ -1034,7 +1212,15 @@ fn freeze_writes_is_honoured_by_adopt_and_upstream() {
 #[test]
 fn context_packet_layers_and_contradiction_flags() {
     let (root, g) = setup_fixture("greenfield", "rep-ctx", "S-rep");
-    g.ok(&["init", "--name", "x", "--alias", "x-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "x",
+        "--alias",
+        "x-alias",
+    ]);
     write_yaml(
         &root,
         "spec/decisions/D-0001.yaml",
@@ -1107,7 +1293,15 @@ fn context_packet_layers_and_contradiction_flags() {
 #[test]
 fn implementation_prerequisites_and_symbol_route() {
     let (_root, g) = setup_fixture("greenfield", "rep-impl", "S-rep");
-    g.ok(&["init", "--name", "i", "--alias", "i-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "i",
+        "--alias",
+        "i-alias",
+    ]);
     let t = g.ok(&[
         "task",
         "create",
@@ -1133,7 +1327,15 @@ fn implementation_prerequisites_and_symbol_route() {
     let c = g.ok(&["continue"]);
     assert_ne!(c["task"], t["id"]);
     let (root2, g2) = setup_fixture("brownfield", "rep-sym", "S-rep");
-    g2.ok(&["init", "--name", "b", "--alias", "b-alias"]);
+    g2.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "b",
+        "--alias",
+        "b-alias",
+    ]);
     let a = g2.ok(&[
         "memory",
         "query",
@@ -1175,7 +1377,15 @@ fn implementation_prerequisites_and_symbol_route() {
 #[test]
 fn smaller_findings_regressions() {
     let (root, g) = setup_fixture("greenfield", "rep-small", "S-rep");
-    g.ok(&["init", "--name", "shipping-quotes", "--alias", "proj-z"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "shipping-quotes",
+        "--alias",
+        "proj-z",
+    ]);
     // L8: timestamps are quoted strings in YAML output
     assert!(
         read(&root, "governance/framework.lock").contains("installed_at: '"),
@@ -1288,11 +1498,18 @@ fn embedded_kernel_installs_without_canonical_root() {
     let root = tmp("rep-embedded");
     write(&root, "README.md", "x\n");
     git_init_commit(&root);
+    // UNPROVISIONED on purpose: this scenario is the binary's own embedded payload, which OWNER-DECISION-P2-0002
+    // admits on a machine with no trust anchor only as a marked bootstrap installation.
     let g = Gov::new(&root, "S-rep")
         .with_env("GOV_CANONICAL_ROOT", "/nonexistent/path")
         .with_env("GOV_KERNEL_CACHE", root.join("_cache").to_str().unwrap());
     let r = g.ok(&["init", "--name", "p", "--alias", "p-alias", "--skip-index"]);
     assert_eq!(r["version"], gov_runtime::VERSION);
+    assert_eq!(
+        r["release_authenticity"]["admission"], "BOOTSTRAP_EMBEDDED_PAYLOAD",
+        "{r}"
+    );
+    assert_eq!(r["release_authenticity"]["authenticity"], "UNKNOWN");
     let lock = yaml(&root, "governance/framework.lock");
     assert!(
         lock["source"]
@@ -1315,7 +1532,15 @@ fn embedded_kernel_installs_without_canonical_root() {
 #[test]
 fn policy_enforcement_coverage_is_complete_and_honest() {
     let (_root, g) = setup_fixture("greenfield", "rep-coverage", "S-rep");
-    g.ok(&["init", "--name", "p", "--alias", "p-alias"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "p",
+        "--alias",
+        "p-alias",
+    ]);
     let au = g.run(&["audit", "--no-persist"]);
     let f = if au.ok() { au.result() } else { au.details() };
     let fam = &f["families"]["policy_enforcement_coverage"];
@@ -1374,7 +1599,16 @@ fn policy_enforcement_coverage_is_complete_and_honest() {
 #[test]
 fn plugin_host_large_response_through_cli() {
     let (root, g) = setup_fixture("greenfield", "rep-big", "S-rep");
-    g.ok(&["init", "--name", "b", "--alias", "b-alias", "--skip-index"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "b",
+        "--alias",
+        "b-alias",
+        "--skip-index",
+    ]);
     write(&root, "big.sh", "#!/usr/bin/env bash\nREQ=$(cat)\nn=$(printf '%s' \"$REQ\" | sed -n 's/.*\"n\"[[:space:]]*:[[:space:]]*\\([0-9]*\\).*/\\1/p'); n=${n:-1}\nprintf '{\"protocol\":\"gov-capability/1\",\"ok\":true,\"provider\":{\"id\":\"big\",\"version\":\"1\"},\"outputs\":{\"vectors\":['\nrow=$(yes 0.123456 | head -n 512 | paste -sd, -)\nfor ((i=0;i<n;i++)); do if [ $i -gt 0 ]; then printf ','; fi; printf '[%s]' \"$row\"; done\nprintf '],\"dim\":512}}'\n");
     use std::os::unix::fs::PermissionsExt;
     std::fs::set_permissions(root.join("big.sh"), std::fs::Permissions::from_mode(0o755)).unwrap();
@@ -1383,6 +1617,8 @@ fn plugin_host_large_response_through_cli() {
         "governance/project/plugins/big.yaml",
         &json!({"plugin_id": "big", "capability": "embed", "version": "1", "command": [root.join("big.sh").to_string_lossy()], "languages": []}),
     );
+    // BC-P2-39 (repair iteration 1, WS-7): an executable plugin runs only when registered against a gate raised for it
+    crate::ws07::register_approved(&g, &root.join("governance/project/plugins/big.yaml"));
     let t0 = std::time::Instant::now();
     let r = g.ok(&[
         "capabilities",

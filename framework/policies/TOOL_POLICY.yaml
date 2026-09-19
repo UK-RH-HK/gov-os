@@ -2,7 +2,11 @@ policy: TOOL_POLICY
 version: 1.0.0
 permission_classes: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, EXEC_PLUGIN, NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_READ, DB_WRITE, CLOUD_READ, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
 tool_types: [MCP, CLI, API, library]
-# All conditions must hold for autonomous installation; otherwise a Human Decision Gate is raised.
+# All conditions must hold for autonomous installation; otherwise a Human Decision Gate is raised for exactly that
+# installation (subject: tool id, pinned version, installation descriptor). A presented, owner-answered A on that gate
+# lets the same install proceed; a decline ends the request (BC-P2-41). licence_and_security_satisfied needs an approved
+# licence AND a governed security review of that tool id and version: an OS-written report closing a `security` task,
+# not written by the installing session or role (Contract v3 F4:431) - a descriptor's own claim is never evidence.
 auto_install_conditions:
   - role_has_install_authority
   - installation_reversible
@@ -18,8 +22,13 @@ mcp:
   registry_path: governance/generated/tool-registry.json
   scope: role_and_task        # tool exposure is role/task scoped; never grant every agent every server
 # Capability plugins (gov-capability/1) are executable capabilities and are governed like tools (framework §28-32):
-# a descriptor executes only when schema-valid, registered in the generated registry, healthy, version/content pinned
-# and authorised for the acting role. Unknown, malformed, unregistered, unpinned or unauthorised plugins fail closed.
+# a descriptor executes only when schema-valid, healthy, bound (every byte the command executes equals the registered
+# implementation) and authorised for the acting role. The OS cannot confine a spawned process, so declared permissions
+# are not enforced and never decide whether approval is needed (BC-P2-39): every executable plugin runs only with an
+# OS-written, T2-sealed registration approved by a presented, owner-answered gate raised for exactly its identity,
+# version, implementation and permission set, re-verified at every execution. Only this gov binary's own capability
+# server (`gov capabilities serve-embed`) is non-elevated by construction and may run hand-declared.
+# Unknown, malformed, unregistered, unapproved, unbound or unauthorised plugins fail closed.
 plugins:
   descriptor_schema: plugin-descriptor
   require_valid_descriptor: true
@@ -27,7 +36,9 @@ plugins:
   # registered or not, and nothing inside a descriptor (approved_roles, provenance, status) can widen it.
   min_authority: L2                 # minimum authority level to trigger any capability plugin
   registry_path: governance/generated/plugin-registry.json   # OS-written; the only proof of registration
-  registration_binds: [plugin_id, version, descriptor_sha256, implementation_sha256]
+  registration_binds: [plugin_id, version, descriptor_sha256, implementation_sha256, registration_subject_sha256, registration_gate]
+  # declared elevation is shown to the approver (and raises the registration gate's stated impact); it is not what
+  # makes approval necessary - every executable plugin needs it
   elevated_permission_classes: [NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_WRITE, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
-  refuse_on_pin_drift: true         # implementation changed without a version change -> PLUGIN_PIN_MISMATCH
+  refuse_on_pin_drift: true         # any change to a bound byte -> PLUGIN_PIN_MISMATCH (Contract v3 F4:429: always refused)
   timeout_seconds: 60

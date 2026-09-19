@@ -25,14 +25,113 @@ fn scratch_file(g: &Gov, name: &str, text: &str) -> PathBuf {
     p
 }
 
-/// The administrator installs the owner's public `human-gate` key on this simulated machine (idempotent).
+/// A scratch directory beside the project, unique to this project root (never inside it).
+pub fn scratch_dir(g: &Gov, name: &str) -> PathBuf {
+    let d = scratch_file(g, ".scratch", "").parent().unwrap().join(name);
+    std::fs::create_dir_all(&d).unwrap();
+    d
+}
+
+/// **The authenticated human channel on this simulated machine** (idempotent).
+///
+/// P2-ADJ-0001 (following OWNER-DECISION-P2-0002 "provision, then work"): human answers derive only from a provisioned
+/// Signed Release Root's `human-gate` delegation; the standalone anchor is off. A machine that already has that
+/// channel (e.g. a harness-provisioned root delegating `human-gate` to [`owner`]) is used as it is. On a machine that
+/// is not provisioned yet, this does what the administrator of a dev/test machine does: provision a throw-away root
+/// ([`throwaway_root`]) that delegates `human-gate` to the test owner's key, then re-verify the kernel this machine
+/// installed while unprovisioned against a signed release of the same payload ([`reanchor_installed_kernel`]), so
+/// governed work continues on a kernel this machine has verified. A provisioned root that delegates no `human-gate`
+/// role is a test set-up error.
 pub fn human_channel(g: &Gov) {
     let st = g.run(&["trust", "human-channel"]);
     if st.ok() && st.result()["available"] == true {
         return;
     }
-    let f = scratch_file(g, "anchor.json", &anchor_doc(&owner(), &owner()));
-    g.ok(&["trust", "human-channel", "--provision", f.to_str().unwrap()]);
+    let posture = g.run(&["trust", "status"]).result()["posture"].clone();
+    assert_eq!(
+        posture, "UNPROVISIONED",
+        "this machine holds a trust root without a `human-gate` delegation to the test owner: provision a root that \
+         delegates it (the harness's `common::provision` / `setup_fixture`, or `ws03::throwaway_root`) — {}",
+        st.envelope
+    );
+    let f = throwaway_root(g);
+    g.ok(&["trust", "provision", "--anchor", f.to_str().unwrap()]);
+    if exists(&g.root, "governance/framework.lock") {
+        reanchor_installed_kernel(g);
+    }
+    let st = g.ok(&["trust", "human-channel"]);
+    assert_eq!(st["available"], true, "{st}");
+    assert_eq!(st["anchor"]["source"], "srr-root", "{st}");
+}
+
+/// A throw-away Signed Release Root for a dev/test machine (TEST MATERIAL ONLY: the `srr_material` Publisher's
+/// published-seed keys at 2-of-3, plus the test owner's `human-gate` key). Written outside the project, as
+/// administrator-domain material.
+///
+/// Round-2 integration (P2-AR-0032, WS-3 IP-R2-4): this is the certification harness's single suite root
+/// (`common::suite_root_file`, WS-8), which carries exactly this key material and `human-gate` delegation, so every
+/// scenario machine — harness-provisioned or provisioned here — trusts one root.
+pub fn throwaway_root(_g: &Gov) -> PathBuf {
+    crate::common::suite_root_file()
+}
+
+/// Provision this simulated machine with the throw-away root ([`throwaway_root`]) before anything is installed —
+/// the documented first-run path "provision, then install" (OWNER-DECISION-P2-0002 req. 3). Idempotent: a machine the
+/// harness already provisioned with the suite root stays as it is (`common::provision`).
+pub fn provision(g: &Gov) {
+    crate::common::provision(g);
+}
+
+/// A signed release of the kernel source `src` at `<dir>/kernel`, published with the throw-away root's release keys
+/// (TEST MATERIAL ONLY). On a provisioned machine every kernel ingress is a signed release; the metadata version
+/// follows `sequence`, so releases published for one machine in sequence order stay monotonic.
+pub fn signed_release(src: &Path, dir: &Path, sequence: u64) -> PathBuf {
+    std::fs::create_dir_all(dir).unwrap();
+    gov_runtime::kernel::stage_payload(src, &dir.join("kernel")).unwrap();
+    crate::common::sign_release(dir, sequence)
+}
+
+/// The owner's break-glass authorisation (the throw-away root's `recovery` key) to restore `release_kernel` below
+/// floor, placed in this machine's break-glass inbox (OWNER-DECISION-0006: below-floor restoration needs it).
+pub fn break_glass_for(g: &Gov, release_kernel: &Path, nonce: &str) {
+    crate::common::break_glass(g, release_kernel, nonce);
+}
+
+/// On a machine provisioned after the project was installed, the installed kernel has never been verified here
+/// (`KERNEL_UNANCHORED`): publish a signed release of exactly the payload framework.lock pins (the kernel compiled
+/// from this repository, a shipped release, the synthetic previous release, or the installed copy — whichever
+/// measures to the pin) with the throw-away root's release keys, and reinstall it through the product's verifier
+/// (the declared administrator role performs the reinstall).
+pub fn reanchor_installed_kernel(g: &Gov) {
+    let pin = yaml(&g.root, "governance/framework.lock")["release_hash"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let mut candidates = vec![
+        canonical_root().join("framework"),
+        canonical_root().join("fixtures/update/previous-release/4.1.1"),
+        g.root.join("governance/kernel"),
+    ];
+    for v in ["4.1.2", "4.1.3", "4.1.4", "4.1.5"] {
+        candidates.push(canonical_root().join(format!("release/releases/{v}/kernel")));
+    }
+    let src = candidates
+        .into_iter()
+        .find(|c| c.exists() && crate::srr_material::measure(c).1 == pin)
+        .unwrap_or_else(|| panic!("no known kernel source measures to the pinned payload {pin}"));
+    let rel = scratch_file(g, "reanchor.marker", "")
+        .parent()
+        .unwrap()
+        .join(format!("reanchor-{}", gov_runtime::util::short_uuid()));
+    gov_runtime::kernel::stage_payload(&src, &rel.join("kernel")).unwrap();
+    crate::common::sign_release(&rel, 1);
+    g.with_role("orchestrator").ok(&[
+        "kernel",
+        "reinstall",
+        "--source",
+        rel.join("kernel").to_str().unwrap(),
+    ]);
+    assert_eq!(g.ok(&["kernel", "trust"])["verified"], true);
 }
 
 /// A `human-channel-anchor` document installing `installed`'s public key, signed by `signer`.
@@ -139,6 +238,25 @@ pub fn package(extra: Value) -> String {
 
 fn fresh(tag: &str) -> (PathBuf, Gov) {
     let (root, g) = setup_fixture("greenfield", tag, "S-ws3");
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        tag,
+        "--alias",
+        &format!("a-{tag}"),
+    ]);
+    git_commit_all(&root, "after init");
+    (root, g)
+}
+
+/// [`fresh`] on a machine with NO Signed Release Root — for the scenario about the standalone human-channel anchor,
+/// which exists only on such a machine (a provisioned machine's channel is its root's `human-gate` delegation). The
+/// install is the binary's own embedded payload, the one kernel OWNER-DECISION-P2-0002 lets such a machine admit
+/// (as a marked bootstrap installation).
+fn fresh_unprovisioned(tag: &str) -> (PathBuf, Gov) {
+    let (root, g) = setup_fixture_unprovisioned("greenfield", tag, "S-ws3");
     g.ok(&["init", "--name", tag, "--alias", &format!("a-{tag}")]);
     git_commit_all(&root, "after init");
     (root, g)
@@ -171,17 +289,27 @@ fn an_undeclared_invocation_carries_no_privileged_authority_anywhere() {
     let (root, g) = setup_fixture("greenfield", "ws3-undeclared", "S-ws3");
     let none = g.with_role("");
     // first install: refused before anything is written
-    let e = none.err(&["init", "--name", "u"]);
+    let e = none.err(&["init", "--source", signed_source(), "--name", "u"]);
     assert_eq!(e.error_code(), "AUTHORITY_DENIED");
     assert_eq!(e.details()["cause"], "ROLE_UNDECLARED");
     assert!(!exists(&root, "governance/framework.lock") && !exists(&root, "governance/kernel"));
     // declared through the environment instead: the same resolution
     let env_l0 = g.with_role("").with_env("GOV_ROLE", "independent-auditor");
     assert_eq!(
-        env_l0.err(&["init", "--name", "u"]).details()["cause"],
+        env_l0
+            .err(&["init", "--source", signed_source(), "--name", "u"])
+            .details()["cause"],
         "LEVEL_TOO_LOW"
     );
-    g.ok(&["init", "--name", "u", "--alias", "a-u"]);
+    g.ok(&[
+        "init",
+        "--source",
+        signed_source(),
+        "--name",
+        "u",
+        "--alias",
+        "a-u",
+    ]);
     // installed: every privileged path refuses the undeclared caller; reads still work
     for args in [
         vec!["gate", "revoke", "HDG-0001"],
@@ -197,7 +325,7 @@ fn an_undeclared_invocation_carries_no_privileged_authority_anywhere() {
         vec!["resume"],
         vec!["memory", "heldout-starter", "--force"],
         vec!["task", "replan"],
-        vec!["init", "--force"],
+        vec!["init", "--source", signed_source(), "--force"],
     ] {
         let e = none.err(&args);
         assert_eq!(
@@ -210,12 +338,14 @@ fn an_undeclared_invocation_carries_no_privileged_authority_anywhere() {
     assert!(none.run(&["status"]).ok());
     assert!(none.run(&["gate", "list"]).ok());
     // --role on init / init --force is honoured exactly like GOV_ROLE (A0-E1-01, A0-S4-03)
-    let e = g.with_role("independent-auditor").err(&["init", "--force"]);
+    let e =
+        g.with_role("independent-auditor")
+            .err(&["init", "--source", signed_source(), "--force"]);
     assert_eq!(e.error_code(), "AUTHORITY_DENIED");
     let e = g
         .with_role("")
         .with_env("GOV_ROLE", "independent-auditor")
-        .err(&["init", "--force"]);
+        .err(&["init", "--source", signed_source(), "--force"]);
     assert_eq!(e.error_code(), "AUTHORITY_DENIED");
     // a declared `human` role is a claim, not an identity: it carries L0
     let e = g.with_role("human").err(&["gate", "revoke", "HDG-0001"]);
@@ -254,8 +384,8 @@ fn g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations
         vec!["gate", "present", &gid],
         vec!["audit"],
         vec!["verify", "governance"],
-        vec!["rebuild-memory"],
-        vec!["memory", "rebuild"],
+        vec!["verify", "product"],
+        vec!["health", "run"],
         vec!["memory", "heldout-starter", "--force"],
         vec!["adapters", "generate"],
         vec!["tools", "registry"],
@@ -263,7 +393,7 @@ fn g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations
         vec!["task", "replan"],
         vec!["task", "release", "TASK-G0"],
         vec!["continue"],
-        vec!["init", "--force"],
+        vec!["init", "--source", signed_source(), "--force"],
     ];
     let snapshot = |r: &Path| tree_hash(r, &[".governance-runtime/**"]);
     for (mode, code) in [("freeze-writes", "FROZEN"), ("pause", "PAUSED")] {
@@ -287,6 +417,26 @@ fn g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations
         if mode == "pause" {
             g.ok(&["gate", "present", &gid]);
         }
+        // round 2 (O-4): rebuilding derived index state is a recovery operation under both controls. It writes only
+        // the derived index and its generated manifests: no authoritative, governed or evidence file changes
+        let governed =
+            |r: &Path| tree_hash(r, &[".governance-runtime/**", "governance/generated/**"]);
+        let before = governed(&root);
+        g.ok(&["rebuild-memory"]);
+        g.ok(&["memory", "rebuild", "--incremental"]);
+        assert_eq!(
+            governed(&root),
+            before,
+            "{mode}: rebuild changed governed state"
+        );
+        // evidence-writing commands have non-persisting forms for diagnosis under the control (IP-WS02-09)
+        let before = snapshot(&root);
+        g.ok(&["health", "run", "--no-persist", "--tier", "G1"]);
+        assert_eq!(
+            snapshot(&root),
+            before,
+            "{mode}: a non-persisting health run wrote"
+        );
         g.ok(&[mode, "--reason", "still"]);
         g.ok(&["resume"]);
     }
@@ -357,39 +507,74 @@ fn every_cli_command_label_is_classified_by_g0() {
 /// against the administrator-provisioned anchor. Every local means an agent controls is refused.
 #[test]
 fn human_answers_come_only_from_the_owner_signed_channel() {
-    let (root, g) = fresh("ws3-hc");
+    let (root, g) = fresh_unprovisioned("ws3-hc");
     let gid = gate(&g, "Adopt vendor X?", json!({}));
     let (inst, sha) = render(&g, &gid);
-    // no channel on this machine yet: nothing can record a human answer
+    // P2-ADJ-0001: a machine with no Signed Release Root has no human channel — refused typed, with the remediation
     let e = g.err(&["decide", &gid, "--option", "A"]);
     assert_eq!(e.error_code(), "HUMAN_CHANNEL_UNAVAILABLE");
-    // the anchor is administrator-domain material: never repository content, never an unsigned key list
-    let in_repo = root.join("governance").join("hc-anchor.json");
-    std::fs::write(&in_repo, anchor_doc(&owner(), &owner())).unwrap();
-    assert_eq!(
-        g.err(&[
-            "trust",
-            "human-channel",
-            "--provision",
-            in_repo.to_str().unwrap()
-        ])
-        .error_code(),
-        "HUMAN_CHANNEL_ANCHOR_FROM_REPOSITORY_REFUSED"
+    assert_eq!(e.details()["cause"], "UNPROVISIONED", "{}", e.envelope);
+    assert!(
+        e.details()["provision_command"]
+            .as_str()
+            .unwrap()
+            .starts_with("gov trust provision"),
+        "{}",
+        e.envelope
     );
-    let not_self_signed = scratch_file(&g, "anchor-bad.json", &anchor_doc(&owner(), &key(0x66)));
+    // a standalone anchor is not a source of Human Gate authority: even the owner's own self-signed anchor, supplied
+    // from the administrator domain, is refused (and the status says the channel is unavailable, and why)
+    let owner_anchor = scratch_file(&g, "anchor-owner.json", &anchor_doc(&owner(), &owner()));
+    let e = g.err(&[
+        "trust",
+        "human-channel",
+        "--provision",
+        owner_anchor.to_str().unwrap(),
+    ]);
+    assert_eq!(e.error_code(), "HUMAN_CHANNEL_STANDALONE_DISABLED");
+    assert_eq!(e.details()["cause"], "STANDALONE_ANCHOR_DISABLED");
+    let st = g.ok(&["trust", "human-channel"]);
+    assert_eq!(st["available"], false);
+    assert_eq!(st["standalone_anchor_permitted_by_policy"], false);
     assert_eq!(
-        g.err(&[
-            "trust",
-            "human-channel",
-            "--provision",
-            not_self_signed.to_str().unwrap()
-        ])
-        .error_code(),
-        "HUMAN_CHANNEL_ANCHOR_INVALID"
+        st["unavailable_reason"]["code"],
+        "HUMAN_CHANNEL_UNAVAILABLE"
+    );
+    // the trust anchor is administrator-domain material: never repository content
+    let in_repo = root.join("governance").join("hc-root.json");
+    std::fs::copy(throwaway_root(&g), &in_repo).unwrap();
+    assert_eq!(
+        g.err(&["trust", "provision", "--anchor", in_repo.to_str().unwrap()])
+            .error_code(),
+        "SRR_ANCHOR_FROM_REPOSITORY_REFUSED"
     );
     std::fs::remove_file(&in_repo).unwrap();
     human_channel(&g);
-    // once anchored, the product never re-anchors (an agent cannot swap in its own key through the product)
+    // once anchored, the product never re-anchors: an agent cannot swap in its own key through the product
+    let agent = key(0x66);
+    let (akid, aentry) = key_entry(&agent);
+    let agent_root = scratch_file(
+        &g,
+        "root-agent.json",
+        &envelope(
+            &json!({"_type": "root", "spec_version": "srr/1", "product": gov_runtime::FRAMEWORK_NAME, "version": 1,
+                "expires": far_future(), "keys": {akid.clone(): aentry},
+                "roles": {"root": {"keyids": [akid.clone()], "threshold": 1}, "release": {"keyids": [akid.clone()], "threshold": 1},
+                          "snapshot": {"keyids": [akid.clone()], "threshold": 1}, "timestamp": {"keyids": [akid.clone()], "threshold": 1},
+                          "human-gate": {"keyids": [akid], "threshold": 1}}}),
+            &[&agent],
+        ),
+    );
+    assert_eq!(
+        g.err(&[
+            "trust",
+            "provision",
+            "--anchor",
+            agent_root.to_str().unwrap()
+        ])
+        .error_code(),
+        "SRR_ALREADY_PROVISIONED"
+    );
     let agent_anchor = scratch_file(&g, "anchor-agent.json", &anchor_doc(&key(0x66), &key(0x66)));
     assert_eq!(
         g.err(&[
@@ -399,7 +584,7 @@ fn human_answers_come_only_from_the_owner_signed_channel() {
             agent_anchor.to_str().unwrap()
         ])
         .error_code(),
-        "HUMAN_CHANNEL_ALREADY_PROVISIONED"
+        "HUMAN_CHANNEL_STANDALONE_DISABLED"
     );
     // CLI metadata, defaults, role claims and the environment
     assert_eq!(
@@ -1062,8 +1247,8 @@ fn project_overlays_may_raise_floors_but_never_lower_them() {
         r["reasoning"], "extra_high",
         "an overlay role default can never lower a task's declared minimum"
     );
-    let (ok27, _) = doctor_check(&g, "D027");
-    assert!(!ok27, "the refused weakening is reported");
+    // P2-AR-0026: the task is created (and its packet compiled) before doctor records the CRITICAL D027 result, because
+    // task creation is guarded by the G0 hard-block tier contract (IP-WS02-02) and D027 critical blocks it
     let t = g.ok(&[
         "task",
         "create",
@@ -1075,6 +1260,8 @@ fn project_overlays_may_raise_floors_but_never_lower_them() {
         "READY",
     ]);
     let ctx = g.ok(&["context", "compile", t["id"].as_str().unwrap()]);
+    let (ok27, _) = doctor_check(&g, "D027");
+    assert!(!ok27, "the refused weakening is reported");
     let layer3 = ctx["deterministic_authority"]["authority_layers"]
         .as_array()
         .unwrap()
@@ -1086,6 +1273,37 @@ fn project_overlays_may_raise_floors_but_never_lower_them() {
         layer3["readiness_enforced"], true,
         "readers of the project policy see the enforced value: {layer3}"
     );
+    // round 2 (IP-WS02-08): the CRITICAL finding is a hard-block, and G0 (`control::guard_write`) refuses governed
+    // work while it stands; removing the weakening repairs it and the guard re-evaluates and releases the block
+    let e = g.err(&[
+        "task",
+        "create",
+        "--class",
+        "documentation",
+        "--objective",
+        "blocked",
+    ]);
+    assert_eq!(e.error_code(), "HEALTH_HARD_BLOCK", "{}", e.envelope);
+    assert!(e.envelope.to_string().contains("D027"), "{}", e.envelope);
+    let mut pp = yaml(&root, "governance/project/PROJECT_POLICY.yaml");
+    pp["readiness"]["enforce_pre_implementation_cells"] = json!(true);
+    write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);
+    let mut mro = yaml(&root, "governance/project/MODEL_ROUTING_OVERRIDES.yaml");
+    mro["task_class_overrides"] = json!({"documentation": "T2"});
+    mro["role_overrides"] = json!({});
+    write_yaml(
+        &root,
+        "governance/project/MODEL_ROUTING_OVERRIDES.yaml",
+        &mro,
+    );
+    g.ok(&[
+        "task",
+        "create",
+        "--class",
+        "documentation",
+        "--objective",
+        "unblocked",
+    ]);
 }
 
 // ============================================================================================ decisions authorising exceptions
@@ -1191,4 +1409,336 @@ fn cit_approval_consumes_only_honoured_gate_answers() {
     let ap = cc.ok(&["cit", "approve", &cid2, "--method", "human"]);
     assert_eq!(ap["human_approved"], true);
     assert_eq!(cc.ok(&["cit", "execute", &cid2])["cit_status"], "COMMITTED");
+}
+
+// ============================================================================================ round 2 (P2-AR-0024)
+
+/// P2-ADJ-0001: the standalone human-gate anchor is off by default. On a machine with no Signed Release Root a human
+/// answer is refused typed and observable (remediation: provision); a project cannot switch the anchor on; an anchor
+/// file placed in machine state is not honoured; once the machine is provisioned with a root that delegates
+/// `human-gate`, the same owner's signed answer is honoured and re-verifies against that root.
+#[test]
+fn the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers() {
+    // a scenario about the unprovisioned posture itself: the harness's unprovisioned fixture (WS-8 convention)
+    let (root, g) = fresh_unprovisioned("ws3-adj1");
+    let eff = g.ok(&["policy", "effective", "HUMAN_GATE_POLICY"]);
+    assert_eq!(
+        eff["kernel"]["human_channel"]["standalone_anchor_when_unprovisioned"], false,
+        "kernel default: {eff}"
+    );
+    // a project may not switch it on (strengthen-only, strict value false)
+    let mut pp = yaml(&root, "governance/project/PROJECT_POLICY.yaml");
+    pp["policy_overrides"] =
+        json!({"HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned": true});
+    write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);
+    let ov = g.ok(&["policy", "overrides"]);
+    assert!(
+        ov["refused"]
+            .to_string()
+            .contains("human_channel.standalone_anchor_when_unprovisioned"),
+        "{ov}"
+    );
+    assert_eq!(
+        g.ok(&["policy", "effective", "HUMAN_GATE_POLICY"])["effective"]["human_channel"]
+            ["standalone_anchor_when_unprovisioned"],
+        false
+    );
+    pp["policy_overrides"] = json!({});
+    write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);
+    // observable before anything is attempted
+    let st = g.ok(&["trust", "human-channel"]);
+    assert_eq!(st["available"], false, "{st}");
+    assert_eq!(st["standalone_anchor_permitted_by_policy"], false);
+    assert!(
+        st["unavailable_reason"]["message"]
+            .as_str()
+            .unwrap()
+            .contains("gov trust provision"),
+        "{st}"
+    );
+    // an anchor file the administrator (or anyone able to write machine state) placed there is not honoured
+    let hc_dir = machine_state_dir(&root).join("human-channel");
+    std::fs::create_dir_all(&hc_dir).unwrap();
+    std::fs::write(hc_dir.join("anchor.json"), anchor_doc(&owner(), &owner())).unwrap();
+    let gid = gate(&g, "Adopt the reconciliation window?", json!({}));
+    let (inst, sha) = render(&g, &gid);
+    let doc = scratch_file(
+        &g,
+        "adj1-answer.json",
+        &signed_doc(
+            &gid,
+            &inst,
+            &sha,
+            Some("A"),
+            "n-adj1",
+            &owner(),
+            &far_future(),
+        ),
+    );
+    let e = g.err(&[
+        "decide",
+        &gid,
+        "--option",
+        "A",
+        "--answer-file",
+        doc.to_str().unwrap(),
+    ]);
+    assert_eq!(
+        e.error_code(),
+        "HUMAN_CHANNEL_UNAVAILABLE",
+        "{}",
+        e.envelope
+    );
+    assert_eq!(e.details()["cause"], "UNPROVISIONED");
+    assert_eq!(e.details()["standalone_anchor_present"], true);
+    assert!(e.details()["remediation"]
+        .as_str()
+        .unwrap()
+        .contains("provision"));
+    assert_ne!(
+        record(&root, &format!("spec/decisions/{gid}.yaml"))["gate_status"],
+        "ANSWERED",
+        "nothing was recorded"
+    );
+    std::fs::remove_file(hc_dir.join("anchor.json")).unwrap();
+    // provision, then work: the root's `human-gate` delegation is the channel, and the owner's answer is honoured
+    human_channel(&g);
+    let (inst, sha) = render(&g, &gid);
+    let doc = scratch_file(
+        &g,
+        "adj1-answer-2.json",
+        &signed_doc(
+            &gid,
+            &inst,
+            &sha,
+            Some("A"),
+            "n-adj1-2",
+            &owner(),
+            &far_future(),
+        ),
+    );
+    let d = g.ok(&[
+        "decide",
+        &gid,
+        "--option",
+        "A",
+        "--answer-file",
+        doc.to_str().unwrap(),
+    ]);
+    assert_eq!(d["answered_by_kind"], "human");
+    let show = g.ok(&["gate", "show", &gid]);
+    assert_eq!(show["answer"]["verified"], true, "{show}");
+    assert_eq!(show["authorisation"]["state"], "AUTHORISED", "{show}");
+}
+
+/// Round-1 integration observation O-1 (Contract v3 S5 "preserve the project overlay"; A1 "weakening refused"): a
+/// project on a shipped kernel whose precedence rules predate overlay-document evaluation (release 4.1.4, 4.1.5) keeps
+/// its descriptive overlay keys, every floor is still enforced against it, doctor D027 stays clean, and a framework
+/// update to shipped 4.1.5 is applied rather than rolled back. Provisioned machine, signed test releases of the shipped
+/// kernels (OWNER-DECISION-P2-0002).
+#[test]
+fn a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor() {
+    let (root, g) = setup_fixture("greenfield", "ws3-oldk", "S-ws3");
+    provision(&g);
+    let signed = |ver: &str, seq: u64| -> PathBuf {
+        signed_release(
+            &canonical_root().join(format!("release/releases/{ver}/kernel")),
+            &scratch_dir(&g, &format!("rel-{ver}")),
+            seq,
+        )
+    };
+    let r414 = signed("4.1.4", 14);
+    let r415 = signed("4.1.5", 15);
+    let r = g.ok(&[
+        "init",
+        "--source",
+        r414.to_str().unwrap(),
+        "--name",
+        "oldk",
+        "--alias",
+        "oldk-a",
+    ]);
+    assert_eq!(r["version"], "4.1.4");
+    git_commit_all(&root, "4.1.4 installed");
+    let ov = g.ok(&["policy", "overrides"]);
+    assert_eq!(
+        ov["refused"],
+        json!([]),
+        "descriptive keys are descriptive: {ov}"
+    );
+    assert!(
+        ov["precedence"]["governing_sets"].as_array().unwrap().len() == 2,
+        "{ov}"
+    );
+    let (ok27, msg) = doctor_check(&g, "D027");
+    assert!(ok27, "{msg}");
+    // the floors still hold against the older kernel
+    let mut pp = yaml(&root, "governance/project/PROJECT_POLICY.yaml");
+    pp["readiness"]["enforce_pre_implementation_cells"] = json!(false);
+    pp["project"]["name"] = json!("renamed");
+    pp["policy_overrides"] = json!({"MEMORY_POLICY.failure_memory.retrieval_miss.enabled": false, "MEMORY_POLICY.retrieval.default_k": 5});
+    write_yaml(&root, "governance/project/PROJECT_POLICY.yaml", &pp);
+    let mut mro = yaml(&root, "governance/project/MODEL_ROUTING_OVERRIDES.yaml");
+    mro["task_class_overrides"] = json!({"security": "T1"});
+    mro["providers"] = json!([{"name": "p", "models": []}]);
+    write_yaml(
+        &root,
+        "governance/project/MODEL_ROUTING_OVERRIDES.yaml",
+        &mro,
+    );
+    let ov = g.ok(&["policy", "overrides"]);
+    let refused: Vec<String> = ov["refused"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|r| {
+            format!(
+                "{}.{}",
+                r["policy"].as_str().unwrap(),
+                r["key"].as_str().unwrap()
+            )
+        })
+        .collect();
+    let mut want = vec![
+        "PROJECT_POLICY.readiness.enforce_pre_implementation_cells".to_string(),
+        "MODEL_ROUTING_OVERRIDES.task_class_overrides.security".to_string(),
+        "MEMORY_POLICY.failure_memory.retrieval_miss.enabled".to_string(),
+    ];
+    let mut got = refused.clone();
+    want.sort();
+    got.sort();
+    assert_eq!(got, want, "exactly the weakenings are refused: {ov}");
+    assert!(
+        ov["applied"].to_string().contains("MEMORY_POLICY"),
+        "a legitimate override still applies: {ov}"
+    );
+    assert!(!doctor_check(&g, "D027").0);
+    // back to the installed state, then update to the shipped 4.1.5 through its gate
+    git(&root, &["checkout", "--", "governance/project"]);
+    assert!(doctor_check(&g, "D027").0);
+    let first = g.run(&["update", "--apply", "--source", r415.to_str().unwrap()]);
+    assert!(!first.ok());
+    let gid = first.details()["gate"].as_str().unwrap().to_string();
+    human_decide(&g, &gid, "A");
+    let ap = g.ok(&[
+        "update",
+        "--apply",
+        "--source",
+        r415.to_str().unwrap(),
+        "--approve",
+    ]);
+    assert_eq!(ap["applied"], true, "{ap}");
+    assert_eq!(yaml(&root, "governance/framework.lock")["version"], "4.1.5");
+    assert_eq!(g.ok(&["policy", "overrides"])["refused"], json!([]));
+    assert!(doctor_check(&g, "D027").0);
+}
+
+/// Round 2 call sites (BC-P2-08 and the routed IPs), each through the product surface:
+/// * WS-9/11 IP-3 — the adoption catalogue and plan record the invocation's declared session and role as producer;
+/// * BC-P2-08 — `tools install --role` is the acting role, never a second role for one invocation (ROLE_CONFLICT);
+/// * WS-6 IP-6 — `gov memory miss` records an agent-reported retrieval miss (declared role; FREEZE_WRITES refuses it),
+///   `gov memory failures` lists open failures;
+/// * WS-4 IP-6 — `gov continue` with a damaged derived index is refused typed with the remediation, and
+///   `gov rebuild-memory` (a recovery operation even under FREEZE_WRITES, O-4) restores it.
+#[test]
+fn round_two_call_sites_use_the_declared_role_and_typed_refusals() {
+    // WS-9/11 IP-3
+    let (root, planner) = setup_fixture("migration", "ws3-r2-adopt", "S-planner-r2");
+    for s in ["baseline", "inventory", "classify", "map", "plan"] {
+        planner.ok(&["adopt", s]);
+    }
+    let cat = read(
+        &root,
+        "spec/audits/GOVERNANCE-ADOPTION/04-TARGET-PATH-MAP.jsonl",
+    );
+    let first: Value = serde_json::from_str(cat.lines().next().unwrap()).unwrap();
+    assert_eq!(first["producer"]["session"], "S-planner-r2", "{first}");
+    assert_eq!(first["producer"]["role"], "orchestrator", "{first}");
+    // round-2 integration (P2-AR-0032): WS-9/11 (P2-AR-0030) resolves every stage's actor against the process
+    // declaration (`identity::resolve_actor`) and records where the session and role were declared; here both are the
+    // invocation's flags, i.e. a declared session and role, never the A0 planner fallback
+    assert_eq!(
+        first["producer"]["session_source"], "session: flag; role: flag",
+        "{first}"
+    );
+    let plan = yaml(&root, "spec/audits/GOVERNANCE-ADOPTION/05-plan.yaml");
+    assert_eq!(plan["producer"]["session"], "S-planner-r2", "{plan}");
+    assert_eq!(plan["producer"]["role"], "orchestrator");
+
+    let (root, g) = fresh("ws3-r2-sites");
+    // BC-P2-08: one role per invocation — a `--role` given after `tools install` is the acting role itself (authority
+    // and the auto-install conditions are evaluated for it), never a second role an orchestrator lends its authority to
+    let d = scratch_file(
+        &g,
+        "tool.json",
+        &json!({"tool_id": "t-r2", "name": "t", "type": "cli", "version": "1", "license": "MIT", "reversible": true}).to_string(),
+    );
+    let e = g.err(&[
+        "tools",
+        "install",
+        "--descriptor",
+        d.to_str().unwrap(),
+        "--role",
+        "backend-engineer",
+    ]);
+    assert_eq!(e.error_code(), "AUTHORITY_DENIED", "{}", e.envelope);
+    assert_eq!(e.details()["role"], "backend-engineer", "{}", e.envelope);
+    // WS-6 IP-6
+    assert_eq!(
+        g.with_role("")
+            .err(&["memory", "miss", "--query", "where is the retry policy?"])
+            .error_code(),
+        "AUTHORITY_DENIED"
+    );
+    let m = g.with_role("backend-engineer").ok(&[
+        "memory",
+        "miss",
+        "--query",
+        "where is the retry policy?",
+        "--expected",
+        "D-0002",
+    ]);
+    assert_eq!(m["status"], "recorded", "{m}");
+    let path = m["path"].as_str().unwrap().to_string();
+    assert!(path.starts_with("spec/reports/memory-quality/"), "{path}");
+    let again = g.with_role("backend-engineer").ok(&[
+        "memory",
+        "miss",
+        "--query",
+        "Where is the  retry policy?",
+        "--expected",
+        "D-0002",
+    ]);
+    assert_eq!(
+        again["status"], "existing",
+        "deduplicated by signature: {again}"
+    );
+    let open = g.ok(&["memory", "failures"]);
+    assert!(
+        open["open"].to_string().contains(m["id"].as_str().unwrap()),
+        "{open}"
+    );
+    g.ok(&["freeze-writes", "--reason", "incident"]);
+    assert_eq!(
+        g.err(&["memory", "miss", "--query", "another question"])
+            .error_code(),
+        "FROZEN"
+    );
+    // WS-4 IP-6 with O-4: a damaged derived index, then its recovery under the freeze
+    std::fs::write(
+        root.join(".governance-runtime/state.db"),
+        b"this is not a database",
+    )
+    .unwrap();
+    let _ = std::fs::remove_file(root.join(".governance-runtime/state.db-wal"));
+    let _ = std::fs::remove_file(root.join(".governance-runtime/state.db-shm"));
+    g.ok(&["resume"]);
+    let e = g.err(&["continue"]);
+    assert_eq!(e.error_code(), "INDEX_UNAVAILABLE", "{}", e.envelope);
+    assert_eq!(e.details()["remediation"], "gov rebuild-memory");
+    g.ok(&["freeze-writes", "--reason", "repair the index"]);
+    std::fs::remove_file(root.join(".governance-runtime/state.db")).unwrap();
+    g.ok(&["rebuild-memory"]);
+    g.ok(&["resume"]);
+    g.ok(&["continue"]);
 }

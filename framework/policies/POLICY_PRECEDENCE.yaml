@@ -4,7 +4,9 @@ version: 1.0.0
 # higher one; it may never weaken hard invariants, security floors, authority floors, sensitivity floors or human-gate
 # requirements. Enforced mechanically at policy-load time (runtime policy_precedence::evaluate): a violating override
 # or exception is refused, recorded (doctor D027, suite family policy_precedence, context packet layer 3) and leaves the
-# effective policy unchanged.
+# effective policy unchanged. The rules of the installed kernel and the rules compiled into the running binary both
+# govern (policy_precedence::Governing): a key is overridable only if every rule set that declares its label allows it;
+# a rule set with no rule for a label (an older kernel that did not evaluate that overlay) does not govern that label.
 layers:
   - constitution_hard_invariants
   - security_and_authority_policy
@@ -101,6 +103,10 @@ rules:
   - {key: MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close, mode: ceiling, kind: number}
   - {key: MEMORY_POLICY.freshness.max_index_age_hours, mode: ceiling, kind: number}
   - {key: MEMORY_POLICY.rebuild.must_reproduce_manifest_hash, mode: strengthen_only_bool, strict_value: true}
+  - {key: MEMORY_POLICY.failure_memory.retrieval_miss.enabled, mode: strengthen_only_bool, strict_value: true}
+  - {key: MEMORY_POLICY.failure_memory.retrieval_miss.min_evidence_coverage, mode: floor, kind: number}
+  - {key: MEMORY_POLICY.failure_memory.tool_failures, mode: strengthen_only_bool, strict_value: true}
+  - {key: MEMORY_POLICY.failure_memory.*, mode: immutable}
   - {key: MEMORY_POLICY.namespaces.secret.*, mode: immutable}
   - {key: MEMORY_POLICY.namespaces.*.sensitivity, mode: floor, kind: ordered, order: [public, internal, confidential, restricted, secret]}
   - {key: MEMORY_POLICY.namespaces.*.roles, mode: shrink_only}

@@ -1,0 +1,10 @@
+0a1
+> # P2-AR-0031 DERIVED COPY (evidence only): RES-0101 and EXP-0001 are held reference-only (state_class NARRATIVE); nothing else differs.
+237c238
+<     y(root, "spec/experiments/EXP-0001.yaml", {"id": "EXP-0001", "type": "experiment",
+---
+>     y(root, "spec/experiments/EXP-0001.yaml", {"id": "EXP-0001", "type": "experiment", "state_class": "NARRATIVE",
+241c242
+<     y(root, "spec/research/RES-0101.yaml", {"id": "RES-0101", "type": "research",
+---
+>     y(root, "spec/research/RES-0101.yaml", {"id": "RES-0101", "type": "research", "state_class": "NARRATIVE",

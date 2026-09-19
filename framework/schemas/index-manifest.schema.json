@@ -2,17 +2,51 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/index-manifest.schema.json",
   "title": "index-manifest",
-  "x-schema-version": "1.0.0",
+  "x-schema-version": "1.1.0",
   "type": "object",
   "properties": {
     "index_version": {
       "type": "string"
     },
     "embedder": {
-      "type": "object"
+      "type": "object",
+      "description": "The pinned embedder (BC-P2-30): policy pin (id, version = the executed revision, dimensions, source) plus the executed component identity \u2014 identity (portable digest over adapter, model artefact and runtime identity), adapter (builtin, or plugin id / revision / descriptor and implementation hashes), model (id, revision, content sha256, artefact count), runtime (id, kind). Part of the hashed core: a change of any portable component makes the index incompatible.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "dimensions": {
+          "type": "integer"
+        },
+        "source": {
+          "type": "string"
+        },
+        "identity": {
+          "type": "string"
+        },
+        "adapter": {
+          "type": "object"
+        },
+        "model": {
+          "type": "object"
+        },
+        "runtime": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "dimensions",
+        "source"
+      ]
     },
     "reranker": {
-      "type": "object"
+      "type": "object",
+      "description": "The pinned reranker: provider, version (the executed revision), pinned_version (the policy pin; '0' names none) and the same component identity as the embedder. Not part of the hashed core (it changes no stored index state); bound at query time."
     },
     "chunking": {
       "type": "object"
@@ -40,6 +74,14 @@
       "items": {
         "type": "object"
       }
+    },
+    "components": {
+      "type": "object",
+      "description": "Outside the hashed core: per component (embedder, reranker) the full adapter, model artefact list (repository-relative path and sha256) and the inference runtime's content hash on the machine that built the index (machine-specific)."
+    },
+    "retrieval_profile": {
+      "type": "object",
+      "description": "Outside the hashed core: the profile digest and its governance state at build time (KERNEL_DEFAULT | GOVERNED | GOVERNED_UNVERIFIED | UNGOVERNED | UNGOVERNED_CHANGE) with the governing decision."
     }
   },
   "required": [

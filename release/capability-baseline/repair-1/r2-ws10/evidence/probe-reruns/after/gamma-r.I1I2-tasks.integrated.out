@@ -1,0 +1,98 @@
+# P2-AR-0031 audit-of-record probe re-run (unedited): gamma-r/I1I2-tasks mode=integrated
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws10 (HEAD 25edc5a67bd725c5fe0420540879a3ef02d0f673); product files differing from HEAD: 0
+# probe sha256 1042b4bafaee9ab0234fd391a8601d8d67df8d8ed12772b2454803af31e0c95b; gov eb9e9e6e599fcc085969b649039d2c116a1cae20e0c5b4c3fbe1a7243844a211 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/mirror-integrated-after/target/release/gov
+# date 2026-09-19T04:58:14Z
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-integrated-after-gamma-r-I1I2-tasks-XXpTn1/i1i2
+
+==== I1 one task per class in ONE DAG: created, schema-valid, class-specific minimum tier, runnable ====
+  I1.1  discovery            TASK-C01 ok=True tier=T2 merge_allowed=True 
+  I1.2  research             TASK-C02 ok=True tier=T2 merge_allowed=True 
+  I1.3  experiment           TASK-C03 ok=True tier=T2 merge_allowed=False 
+  I1.4  specification        TASK-C04 ok=True tier=T2 merge_allowed=True 
+  I1.5  decision-preparation TASK-C05 ok=True tier=T3 merge_allowed=True 
+  I1.6  data                 TASK-C06 ok=True tier=T1 merge_allowed=True 
+  I1.7  architecture         TASK-C07 ok=True tier=T3 merge_allowed=True 
+  I1.8  implementation       TASK-C08 ok=True tier=T2 merge_allowed=True 
+  I1.9  integration          TASK-C09 ok=True tier=T2 merge_allowed=True 
+  I1.10 test-design          TASK-C10 ok=True tier=T2 merge_allowed=True 
+  I1.11 test-execution       TASK-C11 ok=True tier=T1 merge_allowed=True 
+  I1.12 security             TASK-C12 ok=True tier=T3 merge_allowed=True 
+  I1.13 devops               TASK-C13 ok=True tier=T2 merge_allowed=True 
+  I1.14 performance          TASK-C14 ok=True tier=T2 merge_allowed=True 
+  I1.15 validation           TASK-C15 ok=True tier=T1 merge_allowed=True 
+  I1.16 refactor             TASK-C16 ok=True tier=T2 merge_allowed=True 
+  I1.17 repair               TASK-C17 ok=True tier=T2 merge_allowed=True 
+  I1.18 documentation        TASK-C18 ok=True tier=T1 merge_allowed=True 
+  I1.19 release              TASK-C19 ok=True tier=T2 merge_allowed=True 
+  I1.20 tooling              TASK-C20 ok=True tier=T2 merge_allowed=True 
+  I1.21 memory               TASK-C21 ok=True tier=T3 merge_allowed=True 
+  I1.22 governance           TASK-C22 ok=True tier=T3 merge_allowed=True 
+  in one DAG: runnable 21/22, blocked [{'task': 'TASK-C08', 'reasons': ['TEST_POLICY.implementation_task_requires: no scenarios declared on the task or its feature', 'TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature']}]
+$ classes outside the taxonomy are rejected; one cross-class dependency (implementation depends on research) blocks in the same DAG
+exit=3 ok=false code=SCHEMA_INVALID msg=schema validation failed for task (TASK-0001): /class: "coding" is not one of ["discovery","research","experiment","specification","decision-preparation","data","architecture","implementation","integration","test-design","test-execution","security","devops","performance","validation","refactor","rep
+  TASK-X1: [['dependency TASK-C02 is READY']]
+$ the 23rd enum value (migration) is extra to the owner list
+  task.class enum: ['discovery', 'research', 'experiment', 'specification', 'decision-preparation', 'data', 'architecture', 'implementation', 'integration', 'test-design', 'test-execution', 'security', 'devops', 'performance', 'validation', 'refactor', 'repair', 'documentation', 'release', 'tooling', 'memory', 'governance', 'migration']
+
+==== I2 task contract: every field declared on one task, then each field's consumer exercised ====
+  TASK-FULL fields: ['acceptance_tests', 'allowed_paths', 'blocks', 'class', 'decisions', 'dependencies', 'forbidden_paths', 'minimum_model_tier', 'minimum_reasoning', 'objective', 'production_merge_allowed', 'required_data', 'required_skills', 'required_tools', 'requirements', 'role', 'scenarios', 'task_status']
+  [I2.b1 objective           ] implement exact totals
+  [I2.b2 requirements        ] ['REQ-0001']
+  [I2.b2 decisions           ] ['D-0100']
+  [I2.b4 scenarios           ] ['SCN-0001']
+  [I2.b4 required_data       ] False
+  [I2.b5 acceptance tests    ] [{'criterion': '399', 'scenario': 'SCN-0001'}, {'test': 'TST-0001'}]
+  [I2.b6 required skills     ] [{'id': 'SKL-BACKEND-IMPL', 'resolved': True, 'version': '1.0.0'}, {'id': 'SKL-DOES-NOT-EXIST', 'resolved': False, 'version': None}]
+  [I2.b6 required tools      ] ['TOOL-CARGO-001', 'TOOL-DOES-NOT-EXIST']
+  [I2.b7 tier/reasoning      ] ('T3', 'high')
+  [I2.b8 allowed/prohibited  ] (['src/**'], ['governance/kernel/**', 'src/secret_core.rs'])
+  [I2.b9 production merge    ] False
+$ I2.b3 dependencies are enforced by the DAG; 'blocks' is not (TASK-FULL.blocks = [TASK-BLOCKED-BY-FULL], TASK-FULL still open)
+  TASK-BLOCKED-BY-FULL runnable: False
+  graph edge TASK-FULL->TASK-BLOCKED-BY-FULL: [('TASK-BLOCKED-BY-FULL', '→BLOCKS')]
+$ I2.b6 skills are resolved with a capability gap; missing tools are never checked
+  skills resolved= [{'id': 'SKL-BACKEND-IMPL', 'version': '1.0.0', 'source': 'kernel', 'content_sha256': '6560a87320d757f8927c7a9df5a7df9374a2090e50dfce7700c3509f02d95351'}] missing= ['SKL-DOES-NOT-EXIST'] gap= True
+  TASK-FULL runnable despite TOOL-DOES-NOT-EXIST and SKL-DOES-NOT-EXIST: False
+$ I2.b7 tier/reasoning are validated at creation and drive routing
+exit=2 ok=false code=USAGE msg=minimum_model_tier 'T9' is not a MODEL_ROUTING_POLICY tier
+exit=2 ok=false code=USAGE msg=minimum_reasoning 'ludicrous' is not one of MODEL_ROUTING_POLICY.reasoning_levels ["low", "medium", "high", "extra_high"]
+  route TASK-FULL: min_tier=T3 reasoning=high
+$ I2.b8 allowed/forbidden paths at close (observed mutations since the claim baseline)
+exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=task TASK-FULL reports mutations outside its contract: src/secret_core.rs: forbidden path; route them through a CIT or amend the task contract
+  (forbidden file removed)
+exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=task TASK-FULL reports mutations outside its contract: docs/outside.md: outside allowed_paths ["src/**"] and not governed by a CIT executed while this task was claimed; route them through a CIT or amend the task contract
+$ I2.b8.x any path once touched by ANY committed CIT is permanently accepted as in scope for every later task
+   COMMITTED
+exit=1 ok=false code=CLAIM_REQUIRED msg=TASK-LATER is not claimed by session S-be2; claim it first (`gov task claim TASK-LATER`) — the claim records the mutation baseline, scope and working tree the close is checked against
+  REQ-0001 acceptance_criteria now: ['rewritten by a src-only task']
+$ I2.b8.y close without a claim baseline falls back to 'git status --porcelain'; the first path loses its first character
+  porcelain: [ M README.md]
+  porcelain: [ M governance/generated/index-manifest.json]
+  porcelain: [ M governance/generated/memory-manifest.json]
+exit=1 ok=false code=CLAIM_REQUIRED msg=TASK-NOCLAIM is not claimed by session S-nc; claim it first (`gov task claim TASK-NOCLAIM`) — the claim records the mutation baseline, scope and working tree the close is checked against
+$ I2.b9 production-merge permission: an experiment task (production_merge_allowed false) changing production source
+  TASK-EXP production_merge_allowed = False
+exit=1 ok=false code=CLAIM_REQUIRED msg=TASK-EXP is not claimed by session S-exp; claim it first (`gov task claim TASK-EXP`) — the claim records the mutation baseline, scope and working tree the close is checked against
+  consumer? runtime/src/orchestration/readiness.rs:136:            json!({"class": class, "task_status": "READY", "feature": feature_id, "objective": format!("Fill readiness dimension '{dim}' for {feature_id} (currently {})", c["state"]), "readiness_cell": dim, "generated_by": "readiness-planner", "dependencies": [], "minimum_model_tier": crate::routing::tier_for_class(p, &class), "minimum_reasoning": "medium", "allowed_paths": ["spec/**"], "forbidden_paths": ["governance/kernel/**", "product/**"], "production_merge_allowed": false, "state_class": "AUTHORITATIVE"}),
+  consumer? runtime/src/orchestration/tasks.rs:76:    obj.entry("production_merge_allowed")
+  consumer? runtime/src/orchestration/tasks.rs:79:        obj.insert("production_merge_allowed".into(), json!(false));
+  consumer? runtime/src/orchestration/tasks.rs:813:/// specifies `production_merge_allowed: false`; an `experiment` task never merges, whatever its record says).
+  consumer? runtime/src/orchestration/tasks.rs:814:pub fn production_merge_allowed(t: &Record) -> bool {
+  consumer? runtime/src/orchestration/tasks.rs:816:        .get("production_merge_allowed")
+  consumer? runtime/src/orchestration/tasks.rs:971:    if !production_merge_allowed(t) {
+  consumer? runtime/src/orchestration/tasks.rs:978:            return Err(GovError::new("PRODUCTION_MERGE_NOT_ALLOWED", format!("task {id} ({}) may not merge into production (production_merge_allowed: false) but its mutations landed in the production tree: {landed:?}; keep experimental output outside the production tree (spec/experiments/** or a path the repository contract classifies as evidence) and promote it through a CIT", t.get("class"))).with_details(json!({"task": id, "class": t.get("class"), "production_paths": landed, "observed": observed, "evidence": evidence})));
+  consumer? runtime/src/orchestration/tasks.rs:1096:        "production_merge_allowed": production_merge_allowed(t), "mutation_scope": claims::scope_of_task(t)})
+  consumer? runtime/src/orchestration/tasks.rs:1108:        if production_merge_allowed(t) {
+  consumer? runtime/src/lifecycle/experiment.rs:11://! | — | DESIGNED | `design` | hypothesis or question; method; data (governed ids), data provenance or file inputs; outputs outside the production tree; `production_merge_allowed` never true |
+  consumer? runtime/src/lifecycle/experiment.rs:699:            .get("production_merge_allowed")
+  consumer? runtime/src/lifecycle/experiment.rs:704:                "{} declares production_merge_allowed: true; experimental output merges only through a promotion (Contract v3 J2)",
+  consumer? runtime/src/lifecycle/experiment.rs:918:/// completing its design. Adoption corrects `production_merge_allowed` to `false` and holds the record reference-only.
+  consumer? runtime/src/lifecycle/experiment.rs:933:    if let Some(v) = o.get("production_merge_allowed") {
+  consumer? runtime/src/lifecycle/experiment.rs:983:        for k in ["id", "type", "state_class", "production_merge_allowed"] {
+  consumer? runtime/src/lifecycle/experiment.rs:1017:            json!({"at": now_iso(), "production_merge_allowed_was": e.data.get("production_merge_allowed"), "state_class_was": e.data.get("state_class")}),
+  consumer? runtime/src/lifecycle/experiment.rs:1020:    rec.set("production_merge_allowed", json!(false));
+  consumer? runtime/src/lifecycle/experiment.rs:1067:        "production_merge_allowed",
+  consumer? runtime/src/lifecycle/experiment.rs:1263:            "production_merge_allowed",
+  consumer? runtime/src/lifecycle/experiment.rs:1507:            "hypothesis": "async halves p95", "method": "A/B on staging", "data": ["DATA-0001"], "production_merge_allowed": false,
+END
+[exit=0]

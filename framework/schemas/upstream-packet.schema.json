@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.agentic-engineering-os/4.1.5/upstream-packet.schema.json",
   "title": "upstream-packet",
-  "x-schema-version": "1.1.0",
+  "x-schema-version": "1.2.0",
   "type": "object",
   "properties": {
     "packet_id": {
@@ -81,27 +81,85 @@
     },
     "approval": {
       "type": "object",
-      "description": "approval evidence from upstream::resolve_export_approval, bound to the exact packet",
+      "description": "approval of this exact packet. At prepare: the export gate raised for it (gate, subject_sha256). At submit (upstream::resolve_export_approval): with LEARNING_POLICY.upstream.approval=human, the owner-signed human answer authorising the packet's export gate (trigger upstream_export), whose subject binds packet id, lesson and payload hash (channel human-gate, authenticated true); --approved-by is only recorded as approved_by_claim. With approval=policy no human approval is asserted (channel policy, human_approval false).",
       "properties": {
         "required": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "human",
+            "policy"
+          ]
         },
         "approved_by": {
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "description": "who approved as the verified human answer records it (answered_by of the owner-signed document); null unless a human approval was verified"
+        },
+        "approved_by_claim": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the caller's --approved-by string: a request, recorded and ignored (D-0007 rule 2)"
         },
         "channel": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "human-gate",
+            "policy"
+          ]
         },
         "authenticated": {
           "type": "boolean"
+        },
+        "human_approval": {
+          "type": "boolean"
+        },
+        "gate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "the export-approval Human Decision Gate"
+        },
+        "decision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "option": {
+          "type": "string"
+        },
+        "subject_sha256": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "subject": {
+          "type": "object",
+          "description": "upstream::export_subject: kind upstream-export, id (packet id), lesson_id, payload_hash, sha256"
+        },
+        "human_evidence": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "signing key ids, anchor and envelope digest of the owner-signed answer"
+        },
+        "approved_at": {
+          "type": "string"
         },
         "binds": {
           "type": "object",
           "properties": {
             "packet_id": {
+              "type": "string"
+            },
+            "lesson_id": {
               "type": "string"
             },
             "payload_hash": {

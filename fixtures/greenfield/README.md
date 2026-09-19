@@ -9,3 +9,5 @@ product ideation (PRJ) → scenarios → feature-readiness gaps → readiness pl
 tasks in the same DAG → implementation task stays BLOCKED until pre-implementation cells are PRESENT → independent
 test author records a test obligation → CIT-P/CIT-E with human gate (interface change) → checkpoints → model/tool
 routing → `gov verify product` runs `cargo test` → fresh-agent continuation from a new session.
+
+**First-run path: provision, then install (OWNER-DECISION-P2-0002).** The harness provisions each scenario machine with the certification suite's throw-away test root (`tests/certification/common.rs::provision`, published-seed keys — never a production root) and installs a release signed under it (`gov init --source <signed release>`; `common::signed_source`). A machine with no trust anchor refuses kernel material from any external source; only the `gov` binary's own embedded payload may be installed there, as a marked bootstrap installation that is never presented as current, verified or certified.

@@ -22,7 +22,9 @@ pub const LOCK_SCHEMA_VERSION: &str = "1.1.0";
 ///   of the running binary when the payload is byte-identical to its embedded payload, else `unverified`. An
 ///   unsigned `manifest.json` beside a source and a checkout's Git HEAD are never recorded as identity;
 /// * `source` — `release:` only for a release this machine verified, `embedded:` for this binary's own payload
-///   (decided by content, so it cannot vary with `XDG_CACHE_HOME` or any other path), otherwise `source:`.
+///   (decided by content, so it cannot vary with `XDG_CACHE_HOME` or any other path), otherwise `source:`;
+/// * `admission` — what admitted the bytes on this machine; `BOOTSTRAP_EMBEDDED_PAYLOAD` marks the bootstrap
+///   installation OWNER-DECISION-P2-0002 permits on a machine with no trust anchor.
 ///
 /// `source` and `release_commit` from the caller are hints and are not trusted: identity is decided here, from the
 /// installed digests, for every ingress that writes a lock (init, update, adopt).
@@ -50,6 +52,7 @@ pub fn write_lock(
         "sequence": id.sequence,
         "channel": id.channel,
         "release_metadata_sha256": id.release_metadata_sha256,
+        "admission": id.admission,
         "identity_basis": id.basis,
     });
     write_yaml(path, &lock)?;
@@ -65,6 +68,9 @@ pub struct ReleaseIdentity {
     pub sequence: Value,
     pub channel: Value,
     pub release_metadata_sha256: Value,
+    /// What admitted the installed bytes on this machine (OWNER-DECISION-P2-0002): `SIGNED_RELEASE_METADATA`,
+    /// `PROTECTED_RECORD_OF_AN_EARLIER_VERIFICATION`, `BOOTSTRAP_EMBEDDED_PAYLOAD`, or `NOT_ESTABLISHED`.
+    pub admission: String,
     pub basis: Value,
 }
 
@@ -117,8 +123,22 @@ pub fn release_identity(
         .map(|b| b.authenticity.clone())
         .filter(|a| !a.is_empty())
         .unwrap_or_else(|| "UNKNOWN".into());
+    let bootstrap = bound.as_ref().map(|b| b.is_bootstrap()).unwrap_or(false);
+    let admission = if verified {
+        bound
+            .as_ref()
+            .map(|b| b.admission.clone())
+            .filter(|a| !a.is_empty())
+            .unwrap_or_else(|| "PROTECTED_RECORD_OF_AN_EARLIER_VERIFICATION".into())
+    } else if bootstrap {
+        crate::srr::verifier::BOOTSTRAP_MODE.to_string()
+    } else {
+        "NOT_ESTABLISHED".to_string()
+    };
     let established_by = if verified {
         "this machine's protected installation record of the verifier's decision for these exact digests"
+    } else if bootstrap {
+        "not established: a BOOTSTRAP installation of the payload embedded in the installing gov binary, on a machine with no Signed Release Root trust anchor (OWNER-DECISION-P2-0002; authenticity UNKNOWN, never presented as current, verified or certified)"
     } else if bound.is_some() {
         "not established: installed on a machine with no Signed Release Root trust anchor (authenticity UNKNOWN)"
     } else {
@@ -143,6 +163,7 @@ pub fn release_identity(
             .filter(|b| verified && !b.release_metadata_sha256.is_empty())
             .map(|b| json!(b.release_metadata_sha256))
             .unwrap_or(Value::Null),
+        admission,
         basis: json!({
             "established_by": established_by,
             "version": if verified { "bound by the verified release identity" } else { "declared by the installed payload's KERNEL.yaml (not authenticated)" },

@@ -1,0 +1,7 @@
+synthesis  AC16-X2-authority-gate-chain             direct 3 pass-marks, 2 fail-marks, 1 tracebacks, [exit=1]
+delta-r    L3-gate-presentation-attacks             direct 0 pass-marks, 0 fail-marks, 1 tracebacks, [exit=1]
+synthesis  AC16-X2-authority-gate-chain             shim   4 pass-marks, 11 fail-marks, 0 tracebacks, [exit=0]
+delta-r    L3-gate-presentation-attacks             shim   27 pass-marks, 12 fail-marks, 0 tracebacks, [exit=1]
+zeta-r     W01-artefact-identity                    shim   144 pass-marks, 24 fail-marks, 0 tracebacks, [exit=0]
+zeta-r     W10-hard-invariant-attacks               shim   42 pass-marks, 4 fail-marks, 0 tracebacks, [exit=0]
+all-done

@@ -1,0 +1,40 @@
+2c2
+< # P2-AR-0022 (integration builder, repair iteration 1 round 1) — re-run EVERY prior R1 held-out suite UNEDITED
+---
+> # P2-AR-0023 (WS-2 repair builder, repair iteration 1 round 2) — re-run EVERY prior R1 held-out suite UNEDITED
+10c10
+< # Supplementary, clearly separated from the suites (P2-HO-0019 step 5):
+---
+> # Supplementary, clearly separated from the suites (P2-HO-0020 item 7: private, run-named scratch path measuring this worktree):
+12c12
+< #        the derived copy is committed beside this script as hv_a_derivation.a1-unpinned.P2-AR-0022.rs.txt and is
+---
+> #        the derived copy is committed beside this script as hv_a_derivation.a1-unpinned.P2-AR-0023.rs.txt and is
+16c16
+< # Usage: P2AR0022_SCRATCH=<scratch dir> run-r1-heldout.sh <label>   (writes r1-heldout-<label>.out beside this script)
+---
+> # Usage: P2AR0023_SCRATCH=<scratch dir> run-r1-heldout.sh <label>   (writes r1-heldout-<label>.out beside this script)
+21c21
+< SCR="${P2AR0022_SCRATCH:?set P2AR0022_SCRATCH to a scratch directory}"
+---
+> SCR="${P2AR0023_SCRATCH:?set P2AR0023_SCRATCH to a scratch directory}"
+24c24
+< export CARGO_BUILD_JOBS=4
+---
+> export CARGO_BUILD_JOBS=2
+54c54
+< cp "$HERE/hv_a_derivation.a1-unpinned.P2-AR-0022.rs.txt" "$SCR/ho33u/tests/hv_a_derivation_a1_unpinned.rs"
+---
+> cp "$HERE/hv_a_derivation.a1-unpinned.P2-AR-0023.rs.txt" "$SCR/ho33u/tests/hv_a_derivation_a1_unpinned.rs"
+59c59
+<   echo "# P2-AR-0022 R1 held-out re-run, label=$LABEL"
+---
+>   echo "# P2-AR-0023 R1 held-out re-run, label=$LABEL"
+126,128c126,128
+<   sed "s|^ROOT = .*|ROOT = \"$WT\"|" "$V/4.1.6-r1-4/evidence/derive.py" > "$SCR/derive_p2ar0022.py"
+<   echo "# diff of the copy against the evidence file:"; diff "$V/4.1.6-r1-4/evidence/derive.py" "$SCR/derive_p2ar0022.py"
+<   ( cd "$SCR" && python3 derive_p2ar0022.py )
+---
+>   sed "s|^ROOT = .*|ROOT = \"$WT\"|" "$V/4.1.6-r1-4/evidence/derive.py" > "$SCR/derive_p2ar0023.py"
+>   echo "# diff of the copy against the evidence file:"; diff "$V/4.1.6-r1-4/evidence/derive.py" "$SCR/derive_p2ar0023.py"
+>   ( cd "$SCR" && python3 derive_p2ar0023.py )

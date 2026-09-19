@@ -1,0 +1,234 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): delta-r/N1-N2-checkpoints mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 cd996ac1a7777d870d140e263bbdc63aee170830145c1e726344ddb163b943cd; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:40:05Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n1-1789800005-3bd384/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## N1 a checkpoint taken mid-task
+$ gov --json --session probe-cd899fbb task create --objective 'tune backoff' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-cd899fbb task claim TASK-0001
+  -> ok
+$ gov --json --session probe-cd899fbb gate create --question 'Which backoff curve?' --fields '{"options": [{"id": "A", "description": "exp"}]}'
+  -> ok
+$ gov --json --session probe-cd899fbb cit propose --proposal 'probe change open' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n1-1789800005-3bd384/m-open.json --trigger behaviour_change
+  -> ok
+$ gov --json --session probe-cd899fbb context compile TASK-0001
+  -> ok
+$ gov --json --session probe-cd899fbb checkpoint create --task TASK-0001 --next-action 'run load test' --step 'wrote backoff.txt' --tests-status 'failing: test_backoff'
+  -> ok
+---- checkpoint record ----
+{
+ "claim": {
+  "branch": "main",
+  "claimed_at": "2026-09-19T06:40:09Z",
+  "expires_at": "2026-09-19T10:40:09Z",
+  "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n1-1789800005-3bd384/proj/.git",
+  "head": "a56bc7a9babaf48d3c1273ba99480af14b704827",
+  "role": "orchestrator",
+  "scope": [
+   "product/**"
+  ],
+  "session_id": "probe-cd899fbb",
+  "task_id": "TASK-0001",
+  "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n1-1789800005-3bd384/proj"
+ },
+ "context_packet_hash": "fd21dc3dde6667b9713e64fe8a3a6c4b1df21debadecda83f21740dbb9e6f310",
+ "created": "2026-09-19",
+ "created_at": "2026-09-19T06:40:09Z",
+ "files_changed": [
+  "governance/generated/index-manifest.json",
+  "governance/generated/memory-manifest.json",
+  "product/backoff.txt",
+  "spec/decisions/CIT-0001.yaml",
+  "spec/decisions/HDG-0001.yaml",
+  "spec/decisions/HDG-0002.yaml",
+  "spec/reports/memory-quality/FAIL-0001.yaml",
+  "spec/tasks/TASK-0001.yaml"
+ ],
+ "health": {
+  "counts": {
+   "critical": 0,
+   "high": 0,
+   "low": 2,
+   "medium": 0
+  },
+  "health_result": "HR-20260919T064009328Z-d0ced49a",
+  "tier": "G3",
+  "verdict": "HEALTHY"
+ },
+ "id": "CKPT-00001",
+ "input_state": {
+  "contradictions": [],
+  "delivery_state": "COMPLETE",
+  "input_violations": [],
+  "missing_inputs": [],
+  "packet_compiled_at": "2026-09-19T06:40:09Z",
+  "packet_current": true,
+  "packet_hash": "fd21dc3dde6667b9713e64fe8a3a6c4b1df21debadecda83f21740dbb9e6f310",
+  "packet_invalidated": false,
+  "stale_inputs": [],
+  "task": "TASK-0001",
+  "task_status": "IN_PROGRESS"
+ },
+ "inputs": [],
+ "last_completed_step": "wrote backoff.txt",
+ "memory_snapshot": {
+  "fresh": true,
+  "index_manifest_hash": "b5793047b41003db2bad3500701f1af9382c1e93d02349f0a9eab2fdb61115ca",
+  "index_version": "4.1.5-idx4",
+  "stale_before_checkpoint": 5
+ },
+ "mode": "RUNNING",
+ "next_action": "run load test",
+ "observed_state": {
+  "at": "2026-09-19T06:40:09Z",
+  "material_decisions": [],
+  "routing_digest": "9be971ad34793e659044807ba3a420f91ecd316b48602b19b7d98f6492c90e17",
+  "task_states": {
+   "TASK-0001": "IN_PROGRESS"
+  },
+  "telemetry_events": 9
+ },
+ "open_questions": [
+  "HDG-0001: Which backoff curve?",
+  "HDG-0002: Approve change CIT-0001: probe change open"
+ ],
+ "open_transactions": [
+  "CIT-0001"
+ ],
+ "pending_decisions": [
+  "HDG-0001",
+  "HDG-0002"
+ ],
+ "role": "orchestrator",
+ "sequence": 1,
+ "session": "probe-cd899fbb",
+ "state_class": "EVIDENCE",
+ "state_reference": {
+  "governed_state_digest": "66e543c02b6d9ce04b2133a1676ac107c8c1fa5db9781a7024a21187d6e23ed7",
+  "index": {
+   "fresh": true,
+   "index_manifest_hash": "b5793047b41003db2bad3500701f1af9382c1e93d02349f0a9eab2fdb61115ca",
+   "index_version": "4.1.5-idx4",
+   "stale_before_checkpoint": 5
+  },
+  "repo_commit": "a56bc7a9babaf48d3c
+CHECK N1.b1 PASS session, role, task, mode and the live claim are recorded
+      detail: {"claim": {"branch": "main", "claimed_at": "2026-09-19T06:40:09Z", "expires_at": "2026-09-19T10:40:09Z", "git_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n1-1789800005-3bd384/proj/.git", "head": "a56bc7a9babaf48d3c1273ba99480af14b704827", "role": "orchestrator", "scope": ["product/**"], "session_id": "probe-cd899fbb", "task_id": "TASK-0001", "worktree": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n1-1789800005-3bd384/proj"}, "mode": "RUNNING", "role": "orchestrator", "session": "probe-cd899fbb", "task": "TASK-0001"}
+CHECK N1.b2 PASS last completed step
+      detail: wrote backoff.txt
+CHECK N1.b3 PASS next action
+      detail: run load test
+CHECK N1.b4a PASS pending decisions = the open Human Decision Gates
+      detail: ["HDG-0001", "HDG-0002"]
+CHECK N1.b4b PASS open questions can be recorded (the CLI accepts them)
+      detail: {"open_questions": ["HDG-0001: Which backoff curve?", "HDG-0002: Approve change CIT-0001: probe change open"]}
+CHECK N1.b5 PASS open transactions = CITs not yet committed/rejected
+      detail: ["CIT-0001"]
+CHECK N1.b6 PASS files changed (uncommitted working-tree changes)
+      detail: ["governance/generated/index-manifest.json", "governance/generated/memory-manifest.json", "product/backoff.txt", "spec/decisions/CIT-0001.yaml", "spec/decisions/HDG-0001.yaml", "spec/decisions/HDG-0002.yaml", "spec/reports/memory-quality/FAIL-0001.yaml", "spec/tasks/TASK-0001.yaml"]
+CHECK N1.b7 PASS test status
+      detail: failing: test_backoff
+CHECK N1.b8 PASS context packet hash of the task's compiled packet
+      detail: {"checkpoint": "fd21dc3dde6667b9713e64fe8a3a6c4b1df21debadecda83f21740dbb9e6f310", "packet": "fd21dc3dde6667b9713e64fe8a3a6c4b1df21debadecda83f21740dbb9e6f310"}
+$ gov --json --session probe-cd899fbb memory freshness
+  -> ok
+CHECK N1.b9 PASS memory snapshot reference (index manifest hash + index version)
+      detail: {"fresh": true, "index_manifest_hash": "b5793047b41003db2bad3500701f1af9382c1e93d02349f0a9eab2fdb61115ca", "index_version": "4.1.5-idx4", "stale_before_checkpoint": 5}
+$ gov --json --session probe-cd899fbb checkpoint create --next-action 
+  -> ERROR [USAGE] checkpoint requires next_action
+CHECK N1.guard.1 PASS a checkpoint without a next action is refused
+      detail: {"code": "USAGE", "details": null, "message": "checkpoint requires next_action"}
+$ gov --json --session probe-cd899fbb checkpoint create --next-action x --trigger whenever
+  -> ERROR [USAGE] unknown checkpoint trigger 'whenever' (policy triggers: ["task_transition", "material_decision", "accepted_cit", "significant_mutation", "before_handoff", "before_model_switch", "before_session_close", "before_compaction"])
+CHECK N1.guard.2 PASS an unknown trigger is refused
+      detail: {"code": "USAGE", "details": null, "message": "unknown checkpoint trigger 'whenever' (policy triggers: [\"task_transition\", \"material_decision\", \"accepted_cit\", \"significant_mutation\", \"before_handoff\", \"before_model_switch\", \"before_session_close\", \"before_compaction\"])"}
+$ gov --json --session probe-cd899fbb checkpoint latest
+  -> ok
+CHECK N1.latest PASS gov checkpoint latest returns it (LATEST pointer)
+      detail: CKPT-00001
+$ gov --json --session fresh-agent-2 status
+  -> ok
+CHECK N1.fresh PASS a fresh session reconstructs the checkpoint through gov status
+      detail: {"id": "CKPT-00001", "next_action": "run load test", "session": "probe-cd899fbb", "task": "TASK-0001"}
+
+## N2 which triggers actually produce a checkpoint
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n2-1789800009-5f2f7f/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+$ gov --json --session probe-55a59275 task create --objective 'transition probe' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-55a59275 task status TASK-0001 BLOCKED --note waiting
+  -> ok
+$ gov --json --session probe-55a59275 task status TASK-0001 READY
+  -> ok
+$ gov --json --session probe-55a59275 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-55a59275 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-55a59275 task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n2-1789800009-5f2f7f/rep1.json
+  -> ok
+$ gov --json --session probe-55a59275 checkpoint latest
+  -> ok
+$ gov --json --session probe-55a59275 checkpoint latest
+  -> ok
+CHECK N2.b1.close PASS task close writes a task_transition checkpoint
+      detail: {"after_close": 1, "before_close": 0, "trigger": "task_transition"}
+CHECK N2.b1.other FAIL other task transitions (status change, claim -> IN_PROGRESS) also checkpoint
+      detail: {"after_claim": 0, "after_status_changes": 0, "initial": 0}
+$ gov --json --session probe-55a59275 gate create --question 'Material decision?' --fields '{"options": [{"id": "A", "description": "yes"}], "impact_radius": "R3"}'
+  -> ok
+$ gov --json --session probe-55a59275 gate present HDG-0001
+  -> ok
+$ gov --json --session probe-55a59275 decide HDG-0001 --option A --rationale r
+  -> ok
+CHECK N2.b2 FAIL a material decision (answered R3 gate -> decision record) writes a checkpoint
+      detail: {"after": 1, "before": 1}
+$ gov --json --session probe-55a59275 cit propose --proposal 'probe change acc' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N1-N2-checkpoints-OUvofT/n2-1789800009-5f2f7f/m-acc.json --trigger behaviour_change
+  -> ok
+$ gov --json --session probe-55a59275 gate present HDG-0002
+  -> ok
+$ gov --json --session probe-55a59275 decide HDG-0002 --option A --rationale 'probe relay'
+  -> ok
+$ gov --json --session probe-55a59275 cit approve CIT-0001
+  -> ok
+$ gov --json --session probe-55a59275 cit execute CIT-0001
+  -> ok
+$ gov --json --session probe-55a59275 checkpoint latest
+  -> ok
+$ gov --json --session probe-55a59275 checkpoint latest
+  -> ok
+CHECK N2.b3 PASS an accepted (executed) CIT writes an accepted_cit checkpoint
+      detail: {"after": 2, "before": 1, "execute": "CKPT-00002", "trigger": "accepted_cit"}
+$ gov --json --session probe-55a59275 rebuild-memory --incremental
+  -> ok
+CHECK N2.b4 FAIL a significant mutation (30 new product files indexed) writes a checkpoint
+      detail: {"after": 2, "before": 2}
+$ gov --json --session probe-55a59275 task create --objective 'handoff probe' --class discovery --status READY --allowed product/**
+  -> ok
+$ gov --json --session probe-55a59275 handoff create --to-role backend-engineer --task TASK-0002
+  -> ok
+$ gov --json --session probe-55a59275 checkpoint latest
+  -> ok
+$ gov --json --session probe-55a59275 checkpoint latest
+  -> ok
+CHECK N2.b5 PASS creating a handoff first writes a before_handoff checkpoint
+      detail: {"after": 3, "before": 2, "trigger": "before_handoff"}
+$ gov --json --session probe-55a59275 route --class implementation
+  -> ok
+CHECK N2.b6 FAIL switching the model/provider mapping (new provider in the overlay, routing now selects it) is preceded by a checkpoint
+      detail: {"after": 3, "before": 3, "chosen_now": {"cost_per_1k_in": 0.0, "cost_per_1k_out": 0.0, "max_reasoning": "extra_high", "model": "new-model", "provider": "new-provider", "tier": "T3"}}
+$ gov --json --session probe-55a59275 session close
+  -> ok
+OBSERVE N2.b7.surface is there a session-close operation?: {"error": "", "ok": true}
+CHECK N2.b7 PASS a session-close operation exists and checkpoints before closing
+$ gov --json --session probe-55a59275 checkpoint create --next-action 'resume after compaction' --trigger before_compaction
+  -> ok
+CHECK N2.b8.manual PASS an agent/hook can record a before_compaction checkpoint explicitly
+OBSERVE N2.b8.adapters generated adapters: files, and whether any installs a pre-compaction hook or only instructs the agent: {"files": ["governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md", "governance/generated/adapters/cli/bootstrap-packet.json", "governance/generated/adapters/api/system-instruction.txt", "governance/generated/adapters/mcp/mcp-connections.json", "governance/generated/adapters/ide/RULES.md"], "hook_files": [], "mentions_before_compaction": true}
+CHECK N2.b8 FAIL a pre-compaction trigger is wired (a generated provider hook calls gov checkpoint), not only listed in agent instructions
+      detail: {"hook_files": []}
+OBSERVE N2.summary triggers of all checkpoints this project produced: ["accepted_cit", "before_compaction", "before_handoff", "before_model_switch", "before_session_close", "task_transition"]
+SUMMARY checks=24 pass=19 fail=5 failed=['N2.b1.other', 'N2.b2', 'N2.b4', 'N2.b6', 'N2.b8']
+[exit=0]

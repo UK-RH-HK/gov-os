@@ -1,0 +1,164 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0025
+role: capability-repair
+objective: "Repair iteration 1, round 2, WS-4: repair BC-P2-04, BC-P2-05, BC-P2-11 (CIT side), BC-P2-13 (CIT-P side) and BC-P2-18 (detection side) and implement the integration points routed to WS-4; claim per class and IP, never acceptance."
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Fresh builder session (this run continued across one context compaction of its own conversation). This run
+  authored the WS-4 round-2 product changes listed under produced; it authored none of the Phase-2 audits, the
+  synthesis, any verification or any other workstream's repair, and it never grades its own work: probe re-runs,
+  builder scenarios and tests are regression evidence only (Contract v3 O3). I read P2-HO-0023, P2-HO-0020, P2-HO-0010,
+  the repair-delta (§0, §2, §3 and my classes), the round-1 integration report, the round-1 reports that route IPs to
+  WS-4 (ws02, ws03, ws04, ws05, ws06, ws09-11), the audit-of-record probe sources I re-ran, the owner decisions and
+  adjudication named in P2-HO-0020, Contract v3 and framework sections for my classes, and the product source I
+  changed or depend on. I did NOT read any session or agent transcript, any task-output store (including my own), or
+  user auto-memory. I spawned no sub-agents and did not contact the owner. I edited only WS-4-owned files plus the
+  declared additive exceptions (cli/src/main.rs self-contained blocks; COMMAND_GUARDS entries; the certification test
+  registration line) and one builder test whose premise my class changes (declared in the repair report). No edit under
+  release/verification/, release/root-of-trust/, release/releases/, release/orchestration/phase-1/,
+  release/capability-baseline/audit-0/ or another workstream's repair-1 directory. Audit probes were run unedited;
+  their outputs were written only to this run's evidence directory. R1 held-out suites were run byte-identical from a
+  private, uniquely named scratch path measuring this worktree.
+input:
+  base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+  candidate: "none (repair iteration 1, round 2; cap2-candidate-1 not yet minted)"
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  governed_state_digest: 4981437f0dca482b0d7d2aba2d48378260a93eaace20f1ea15bb5761ec4c227d
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0023-repair-1-r2-ws04.md
+  common_handoffs:
+    - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+    - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+inspected:
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md (§0, §2, §3; BC-P2-04, -05, -11, -13, -18)
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md
+  - release/capability-baseline/repair-1/{ws02,ws03,ws04,ws05,ws06,ws09-11}/00-REPAIR-REPORT.md (integration points)
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001-AGENT-ROLE-IDENTITY.md, OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md, P2-ADJ-0001-STANDALONE-HUMAN-GATE-ANCHOR.md
+  - release/capability-baseline/audit-0/{delta-r,zeta-r,synthesis,epsilon-r,gamma-r,alpha-r,beta-r}/evidence probe sources re-run (48)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (K2-K4, L1, L3, N1-N4, O5, W3, W6, W9, AC-16)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (§47-50, §59-60)
+  - runtime/src/{cit,context,graph}/**, checkpoints.rs, orchestration/{handoffs,gates,tasks,control}.rs, scheduler/**, t2.rs, records.rs, memory/{indexer,manifest,failures}.rs, lib.rs
+  - cli/src/main.rs; framework/policies/{CHANGE,CHECKPOINT,CONTEXT}_POLICY.yaml; framework/schemas/{cit,checkpoint,context-packet,handoff,record,requirement,feature}.schema.json
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests and REPRODUCTION.md (run unedited)
+produced:
+  - runtime/src/cit/mod.rs
+  - runtime/src/cit/binding.rs (new)
+  - runtime/src/cit/materiality.rs (new)
+  - runtime/src/cit/propagation.rs (new)
+  - runtime/src/context/mod.rs
+  - runtime/src/context/manifest.rs
+  - runtime/src/context/receipt.rs
+  - runtime/src/context/contradictions.rs (new)
+  - runtime/src/checkpoints.rs
+  - runtime/src/orchestration/handoffs.rs
+  - runtime/src/graph/identity.rs
+  - runtime/src/records.rs (relation fields, TYPE_DIR/TYPE_PREFIX only)
+  - runtime/src/lib.rs (INDEX_VERSION only)
+  - runtime/src/orchestration/control.rs (additive COMMAND_GUARDS entries)
+  - cli/src/main.rs (additive: session close, cit classify, cit propagate, context staleness, checkpoint freshness)
+  - framework/policies/CHANGE_POLICY.yaml
+  - framework/policies/CHECKPOINT_POLICY.yaml
+  - framework/policies/CONTEXT_POLICY.yaml
+  - tests/certification/ws04r2.rs (new), tests/certification/main.rs (registration), tests/certification/repair.rs (one test updated)
+  - release/capability-baseline/repair-1/r2-ws04/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r2-ws04/claims.yaml
+  - release/capability-baseline/repair-1/r2-ws04/evidence/
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0025.report.yaml
+tests_or_attacks:
+  - id: AUDIT-PROBES-RERUN
+    description: 48 audit-of-record probes re-run unedited before (base 843d79c) and after (final binary, HEAD cd02bfc) through the P2-AR-0022 owner-channel adapter
+    result: PASS
+    detail: "88 FAIL->PASS, 4 PASS->FAIL (K4.a/b/f.human_approval/f.auto: probe premise of label-driven radius removed by BC-P2-13; derived-rows copy 6/9 on both binaries). Remaining FAIL lines of my classes are host call sites routed as R2-1..R2-12."
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/COMPARE-before-after.out
+  - id: UNMARKED-PROBES-DIFF
+    description: normalised before/after diff of the 14 observation-only probes (alpha-r, gamma-r, epsilon-r)
+    result: PASS
+    detail: "differences explained in 00-REPAIR-REPORT.md §5.2 (derived materiality, G0 at cit.propose under a critical block, gated criteria change in I3.b6, additive packet content); the three regressions this sweep found (G2.b5, beta-r R1-R2 CIT-E, watchdog timing) were repaired in this run"
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/UNMARKED-normalised-diff.out
+  - id: DERIVED-PROBES
+    description: labelled derived copies (one stated change each) K2 valid fixture, K4 derived rows, and the WS-4 builder scenario probe S1-S5 with a negative control on the base binary
+    result: PASS
+    detail: "K2 valid fixture 26/26 (base 20/27); K4 derived rows 6/9 on both; scenarios 40/40 (base 4/40)"
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/after/
+  - id: CARGO-LIB
+    description: cargo test --lib at cd02bfc
+    result: PASS
+    detail: 160 passed / 0 failed (146 base + 14 new)
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/regression/cargo-test-lib.out
+  - id: CARGO-CERTIFICATION
+    description: cargo test --test certification at cd02bfc (includes section6 §6 derivation)
+    result: PASS
+    detail: 105 passed / 0 failed (100 base + 5 ws04r2)
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/regression/cargo-test-certification.out
+  - id: RUSTFMT
+    description: rustfmt --check of every Rust file touched since the base
+    result: PASS
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/regression/rustfmt-check.out
+  - id: R1-HELDOUT
+    description: prior R1 held-out suites AR-0027/0029/0031/0033 run byte-identical from private scratch r1-P2-AR-0025-run3 against this worktree at cd02bfc
+    result: FAIL
+    detail: "AR-0027 26/3, AR-0029 26/2 (+ho_f non-compiling), AR-0031 27/7 identical to recorded baselines; AR-0033 30/1: hv_a::a1 fails only on its scale pin (84 files/740 functions vs this tree 109/1580)"
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/r1-heldout/r1-heldout-worktree-cd02bfc.out
+  - id: R1-CENSUS-UNPINNED
+    description: labelled copy of AR-0033 hv_a::a1 with only the two size assertions printed instead of asserted, plus AR-0033's own derive.py (ROOT line only)
+    result: PASS
+    detail: "0 violations in every §6 activity (human_gate_create 44/39/1, human_gate_approve 1/1, release_certification 1/1, trust_policy_mutation 8/1, privileged_plugin_acquisition 10/2, floor_lower_or_reset 3/1, present_below_floor_release_as_current 1/1); derive.py agrees under all three splitters"
+    evidence_path: release/capability-baseline/repair-1/r2-ws04/evidence/r1-heldout/r1-heldout-worktree-cd02bfc.out
+claims:
+  - {class: BC-P2-04, status: REPAIRED_CLAIMED, scope: "propagation engine, CIT-E path, direct-change detection/propagation, packet/receipt/checkpoint staleness, close-side API; host call sites WS-5/WS-6/WS-2", integration_points: [R2-1, R2-2, R2-3, R2-7, R2-14]}
+  - {class: BC-P2-05, status: REPAIRED_CLAIMED, scope: "checkpoint content/staleness/freshness, handoff and session-close continuity, watchdog, boundary observation; trigger sites WS-5/WS-3/WS-6/adapters, doctor WS-2", integration_points: [R2-6, R2-7, R2-11, R2-12, R2-13]}
+  - {class: BC-P2-11, status: REPAIRED_CLAIMED, scope: "CIT side; plugin side WS-7", integration_points: []}
+  - {class: BC-P2-13, status: REPAIRED_CLAIMED, scope: "CIT-P side and in-task detection API; close-side refusal WS-5", integration_points: [R2-4, R2-9, R2-13]}
+  - {class: BC-P2-18, status: REPAIRED_CLAIMED, scope: "detection, delivery blocking, routing, verified resolution; READY derivation WS-5, resolution rules WS-3", integration_points: [R2-5, R2-7]}
+routed_integration_points:
+  - {ip: IP-WS02-05, status: IMPLEMENTED, note: "execute in repair mode under an active hard-block (deviation stated in the report §3)"}
+  - {ip: IP-WS02-06, status: IMPLEMENTED}
+  - {ip: IP-WS02-07, status: IMPLEMENTED}
+  - {ip: ws03 IP-4, status: IMPLEMENTED}
+  - {ip: ws05 IP-1, status: IMPLEMENTED}
+  - {ip: ws05 IP-3, status: API_IMPLEMENTED, note: "consumed by WS-5 in round 3 (R2-4)"}
+  - {ip: ws06 IP-5, status: IMPLEMENTED}
+  - {ip: ws09-11 IP-5, status: IMPLEMENTED}
+  - {ip: ws04 IP-17, status: IMPLEMENTED}
+findings:
+  - id: P2-AR-0025-O1
+    severity: MEDIUM
+    capability: BC-P2-04, O5 (WS-6 memory)
+    blocking: false
+    blocker_class: null
+    new_vs_residual: BASELINE
+    owner_decision_required: false
+    title: "memory freshness counts files the indexer excludes as too_large (>2 MB) or duplicate-id as 'added' forever, so every CIT-E then fails index_freshness verification (pre-existing; routed to WS-6 as R2-10)"
+    path: release/capability-baseline/repair-1/r2-ws04/00-REPAIR-REPORT.md
+  - id: P2-AR-0025-O2
+    severity: LOW
+    capability: O5 S6 / governed repair (WS-2 scheduler catalogue)
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "G0 at cit.propose (IP-WS02-05 as specified) refuses proposing a repairing CIT under a critical block (alpha-r A3 §C5 aborts); scope of CRIT_ALL over cit.propose is WS-2's choice (R2-8)"
+    path: release/capability-baseline/repair-1/r2-ws04/00-REPAIR-REPORT.md
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-ws04
+  commit: 5b4a89378499818e7da25c1d31833957fd4743c3
+  product_commits:
+    - 172bf366026c296f7b95db76f8709398b9895ba9
+    - 6b68a174ef516821d027dda0c528d7d0977d7188
+    - e9e4e205dd6c3329ba61d93d47c63ad129f4c148
+    - 2fb66d505b68f5acc40804525eafb405c9d46bcf
+    - c4a16f610469050c75dd3d2512004badd4dba204
+    - cd02bfca3dd59f4e040b737d5569d97d17195aee
+  product_code_digest: 65d804d81b844a10b9c79c648cd28cc579cd7a40dbf91085c20e30ef7e50aee1
+  governed_state_digest: 4981437f0dca482b0d7d2aba2d48378260a93eaace20f1ea15bb5761ec4c227d
+  evidence_path: release/capability-baseline/repair-1/r2-ws04/
+owner_decision_required: []
+unresolved:
+  - "Host call sites for my classes are round-3 integration points R2-1..R2-15 (00-REPAIR-REPORT.md §4): WS-5 (close require_current_inputs, claim/dag/show task_staleness, classify_paths + verified_writes at close, READY via require_ready, observe_boundaries at transitions), WS-6 (propagation/boundaries at index rebuild; freshness vs too_large), WS-2 (doctor/audit checks, G4 records, CRIT_ALL over cit.propose, SKL-IMPACT-ANALYSIS V1 executable), WS-3 (gate answer/routing boundaries, label review), adapters (pre-compaction/session-close hooks), WS-1 (evidence map), WS-8 (IP-16)."
+  - "R1 held-out AR-0033 hv_a::a1 pins the candidate-4 scale (84 files/740 functions); this tree measures 109/1580 and the guarded census holds at 0 violations. For the AC-14 R1-preservation verifier and the orchestrator (not an owner question)."
+  - "Probe premises changed by BC-P2-13 (K4 label-driven radius rows, gamma-r I3.b6 editorial criteria change) — the verifier should read them with 00-REPAIR-REPORT.md §5.2."
+recommended_next_action: "Integrate round 2; in round 3 wire R2-1..R2-7 (WS-5/WS-6/WS-2/WS-3) so the direct-change, in-task materiality and immediate-trigger acceptance lines can pass; then mint cap2-candidate-1 for independent verification."
+completed_at: "2026-09-19T07:01:18Z"

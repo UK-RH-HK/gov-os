@@ -1,0 +1,24 @@
+# P2-AR-0030 audit-of-record probe re-run (unedited): alpha-r/S4-T2-B2-negative tree=before mode=direct  extra-env: 
+# tree HEAD 889382957160780f93f02cca6cb9b93c33f7585b (after) / base 843d79c (before); probe sha256 7aa0f4a409f976a523b6ccc3071be29e41df0871a329300a82ae441334cde3fe
+# gov e09eb5dc1b140d9644359d9ebd84f941fae66944394f060fcab7d58f10bc4880 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0030/base-tree-843d79c/target/release/gov
+# date 2026-09-19T04:04:52Z
+## [N1] single agent, single role, no --session flags anywhere
+[N1] adopt baseline                                      -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt inventory                                     -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt classify                                      -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt map                                           -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt plan                                          -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt test-design                                   -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt review --verdict MIGRATION_PLAN_APPROVED      -> REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+[N1] adopt migrate                                       -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt verify-migration                              -> REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+[N1] adopt extract-legacy                                -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt build-memory                                  -> REFUSED AUTHORITY_DENIED: no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an o
+[N1] adopt verify-memory                                 -> REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+[N1] adopt audit --accept-exceptions                     -> REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0030/base-tree-843d79c/release/capability-baseline/audit-0/alpha-r/evidence/S4-T2-B2-negative.py", line 48, in <module>
+    b = yaml.safe_load(open(EV(p, "00-BASELINE.yaml")))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0030/probes/p-before-direct-alpha-r-S4-T2-B2-negative-puevdp/alpha-r-s4n-vhlg97dc/n1/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml'
+# exit 1

@@ -447,3 +447,67 @@ pub fn check_substance(
     }
     problems
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn canonical() -> std::path::PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("..")
+    }
+
+    /// Repair-1 round 2 (ws06 IP-7): the 4.1.5 → 4.1.6 migration is a valid migration record and delivers the
+    /// `spec/reports/memory-quality/**` rule to an installed project's repository contract — after `spec/**`, so it
+    /// decides those paths (evidence, never indexed) — idempotently.
+    #[test]
+    fn the_next_migration_delivers_the_memory_quality_contract_rule() {
+        let root = canonical();
+        let migs = load_migrations(&root.join("migrations"));
+        let m = migs
+            .iter()
+            .find(|m| m["id"] == "M-4.1.5-4.1.6")
+            .expect("M-4.1.5-4.1.6");
+        let reg = crate::schemas::SchemaRegistry::new(&root.join("framework/schemas"));
+        assert!(reg.errors("migration", m).unwrap().is_empty());
+        // every migration chains from its predecessor
+        assert_eq!(path(&migs, "4.1.4", "4.1.6").len(), 2);
+        let dir = std::env::temp_dir().join(format!("gov-mig-{}", crate::util::short_uuid()));
+        let overlay = dir.join("governance/project");
+        std::fs::create_dir_all(&overlay).unwrap();
+        std::fs::copy(
+            root.join("framework/overlay-templates/REPOSITORY_CONTRACT.yaml"),
+            overlay.join("REPOSITORY_CONTRACT.yaml"),
+        )
+        .unwrap();
+        let p = Project::open(&dir);
+        let rel = "spec/reports/memory-quality/FAIL-0001.yaml";
+        let mut out = MigrationOutcome::default();
+        apply(&p, m, &root.join("framework"), false, &mut out).unwrap();
+        assert!(out.index_rebuild && out.regenerate_adapters && out.notes.len() == 1);
+        let c = crate::paths::RepositoryContract::load(&overlay.join("REPOSITORY_CONTRACT.yaml"))
+            .unwrap();
+        let d = c.decide(rel);
+        assert_eq!(d.class(), "evidence", "{:?}", d.attrs);
+        for f in [
+            "semantic_index",
+            "lexical_index",
+            "graph_index",
+            "code_index",
+        ] {
+            assert_eq!(d.attrs.get(f), Some(&json!(false)), "{f}: {:?}", d.attrs);
+        }
+        assert_eq!(
+            d.rule_pattern.as_deref(),
+            Some("spec/reports/memory-quality/**")
+        );
+        // idempotent: a second application changes nothing
+        let mut again = MigrationOutcome::default();
+        apply(&p, m, &root.join("framework"), false, &mut again).unwrap();
+        assert!(
+            again.overlay_keys_changed.is_empty(),
+            "{:?}",
+            again.overlay_keys_changed
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}

@@ -117,7 +117,15 @@ into `state.db.building` and swapped in atomically, so a failed build never leav
 
 ### 4.3 State that survives rebuilds
 Session claims live in `.governance-runtime/claims.db` (`ClaimsStore`), control state in `control.json`; neither is
-touched by `gov rebuild-memory` (doctor D026 checks the claims store). Everything in `state.db` is derived.
+touched by `gov rebuild-memory` (doctor D026 checks the claims store). Everything in `state.db` is derived. Because a
+rebuild changes only derived state, it stays available under FREEZE_WRITES and PAUSE (§4.6).
+
+Failure memory (BC-P2-32, framework §18) is durable: tool failures observed while indexing or retrieving are governed
+evidence records under `spec/reports/failures/`; retrieval misses — an agent's logged query whose best evidence covers
+less than `MEMORY_POLICY.failure_memory.retrieval_miss.min_evidence_coverage` of the question, or a miss an agent
+reports with `gov memory miss` — are memory-quality events under `spec/reports/memory-quality/` that are never indexed.
+One record per signature; `gov memory failures` lists those whose follow-up is not yet linked to work. The
+`failure_memory` keys are strengthen-only.
 
 ### 4.4 Sensitivity classes
 `SECURITY_POLICY.never_index_classes` / `never_export_classes` and `DATA_SENSITIVITY.classifications` become
@@ -149,12 +157,58 @@ touches the effective policy. A refused override is recorded (`gov policy overri
 (CRITICAL), by the suite family `policy_precedence` and in context-packet layer 3, and leaves the effective policy
 unchanged. Authority requirements can therefore only be raised, never lowered, by a repository.
 
-## 4.6 Authority and policy enforcement
-`authority::require(project, operation)` maps the session role (ROLES.yaml level L0–L5, `UNKNOWN_ROLE` otherwise)
-against `AUTHORITY_POLICY.authority_levels_required` (missing operation → L3) and returns `AUTHORITY_DENIED` with the
-required and actual level. It guards task create/status/claim/release/close, CIT propose/simulate/approve/execute/
-rollback, gate create/present/answer, emergency/resume controls, checkpoints, handoffs, kernel install/reinstall,
-update apply/rollback, tool install, adoption batches, upstream prepare/submit, benchmark/select, claims sweep.
+Every key of the project overlay documents `PROJECT_POLICY.yaml` and `MODEL_ROUTING_OVERRIDES.yaml` is evaluated the
+same way, not only `policy_overrides` (BC-P2-45): a value equal to the kernel/template value changes nothing; any other
+value must satisfy its rule (`PROJECT_POLICY.readiness.*` strengthen-only, `staleness.on_stale_close` ordered floor,
+descriptive keys such as `project.*` overridable, the rest immutable; `MODEL_ROUTING_OVERRIDES` tier and reasoning
+floors, `providers`/`preferences` free). A refused weakening is replaced by the kernel value in what the product reads
+(`Project::project_policy`, `routing::effective_overrides`) and reported as above.
+
+**Which rules govern.** Two rule sets can speak about a key: the installed, verified kernel's rules and the
+constitutional floor compiled into the running binary. `policy_precedence::Governing` evaluates a key against every
+set that declares a rule for its policy or overlay label and accepts it only when every such set accepts it, so a
+newer binary never lowers a floor an installed kernel declares and an older kernel never lowers a floor the binary
+enforces. A set with no rule at all for a label predates that label's evaluation and does not govern it: the kernels
+shipped as 4.1.4 and 4.1.5 carry no `PROJECT_POLICY`/`MODEL_ROUTING_OVERRIDES` rules, so on those kernels the binary's
+rules decide the overlay documents — descriptive keys stay descriptive and every floor is still enforced (round-1
+integration observation O-1). `gov policy overrides` lists the governing sets under `precedence.governing_sets`.
+
+## 4.6 Authority, acting role and the G0 guard
+**Acting role (BC-P2-08).** Every invocation resolves its role once: the global `--role <id>`, else `GOV_ROLE`, else
+*undeclared*. An undeclared invocation carries **L0** — no privileged authority (framework §23: no worker behaves as
+an orchestrator unless assigned); the old default `orchestrator` is gone. The resolved role is installed process-wide,
+so every project the command opens internally (`init`, every `adopt`/`migrate` stage, the first install batch) is
+evaluated against the same declared role. A stage flag (`adopt review --reviewer-role`, `verify-migration
+--verifier-role`, `verify-memory --verifier-role`) may declare the role when nothing else does and must agree with it
+otherwise (`ROLE_CONFLICT`). A declared L5 role (`human`) carries L0: human authority is exercised only through the
+authenticated human channel (§4.8). Agent roles L0–L4 remain declared by the harness or adapter that launches the
+agent (OWNER-DECISION-P2-0001); the OS enforces what the declared role may do and gives an undeclared one nothing.
+
+**Authority.** `authority::require(project, operation)` maps the acting role (ROLES.yaml level, `UNKNOWN_ROLE`
+otherwise) against `AUTHORITY_POLICY.authority_levels_required` (a class the installed kernel lacks is read from the
+kernel embedded in the binary, else L3) and refuses `AUTHORITY_DENIED` with `details.cause` = `ROLE_UNDECLARED`,
+`HUMAN_ROLE_CLAIM` or `LEVEL_TOO_LOW` and the remediation. Before the first install, lifecycle ingress is checked
+against the embedded kernel (`require_with_embedded_kernel`).
+
+**G0.** `orchestration::control::COMMAND_GUARDS` classifies every CLI command label by effect (`Read`/`Write`),
+authority class and scope; the CLI maps each invocation to one label (`g0_label`) and `control::g0` runs before
+dispatch: an unclassified label is refused (`G0_UNCLASSIFIED`); a `Write` is refused under FREEZE_WRITES (`FROZEN`)
+or PAUSE (`PAUSED`, exit 4) unless its label is on the explicit recovery allow-list, each entry with its reason —
+the emergency controls themselves, `cit rollback` (ROLLBACK_TRANSACTION), `telemetry emit`, `rebuild-memory` /
+`memory rebuild` (they rebuild only derived index state, deterministically, from Git and the authoritative records),
+and under PAUSE also `gate present`; then the authority class is evaluated for the declared role. Evidence-writing
+commands (`audit`, `verify governance|product`, `health run|product|close-check`) are writes of the `record_audit`
+class and are refused under the controls; their non-persisting forms (`audit --no-persist`, `health run
+--no-persist`) stay available for diagnosis. The runtime guard `control::guard_write` (kernel trust, OWNER-DECISION-0006
+§6, emergency state) still runs inside every mutating path.
+
+**Hard-blocks at G0.** `control::guard_write` also passes governed work that starts, hands off or completes work —
+`task create|claim|close`, `cit propose`, `handoff create` — through the health scheduler's hard-blocks
+(`scheduler::guard`): while a check whose block rule governs the operation stands failed, the operation is refused
+`HEALTH_HARD_BLOCK` naming the check; a block whose inputs changed is re-evaluated first, so a repaired condition never
+keeps refusing work. Operations that apply a sanctioned change which may itself be the remedy (`cit approve|execute`,
+`update --apply`, `adopt migrate`, `release build`) are guarded at their own hosts with their targets, never here.
+
 `framework/policies/ENFORCEMENT_MAP.yaml` maps every policy key to its enforcing function; `policy_coverage::report`
 verifies the map against the core and the `policy_enforcement_coverage` suite family fails on any unmapped key
 (decision D-0003).
@@ -177,15 +231,57 @@ pin — a declared `pin.sha256` must match, and an implementation that changes w
 (`PLUGIN_PIN_MISMATCH`). Plugins appear in the generated Tool/Capability Registry as `type: plugin`; doctor D028 and
 the suite family `plugin_governance` report invalid, denied or drifting plugins.
 
-## 4.8 Human Decision Gates and CIT approval
-Human approval is never caller-supplied. `cit approve` derives the approval from the gate record raised for that
-transaction: the gate must reference the CIT, be presented (`presented_by`/`presented_at`), be ANSWERED with option A,
-and its decision record (written by `gov decide`) must be ACTIVE; the approval object records gate, decision,
-answerer, answer kind and time, presenter and recorder. A presented-but-unanswered gate is `GATE_NOT_ANSWERED`, a
-decline is `GATE_DECLINED` and marks the CIT REJECTED, a withdrawn gate is `GATE_REVOKED`, a re-answered or replaced
-gate makes the approval `APPROVAL_STALE`. `cit execute` revalidates the same state before touching the repository.
-Without a gate only the automatic path within `CHANGE_POLICY.auto_approve_max_radius` exists and its decision record
-carries `human_approved: false`. `gov gate revoke` withdraws a gate and every approval derived from it.
+## 4.8 Human Decision Gates, the authenticated human channel and CIT approval
+**Decision package (BC-P2-49).** A gate is created only with substantive content for every
+`HUMAN_GATE_POLICY.decision_package_fields` entry and at least one option with a unique id (`GATE_PACKAGE_INCOMPLETE`
+lists what is missing or non-substantive); system-raised gates get framework-authored content per trigger for the
+fields the raising code did not supply; the OS derives the exact permitted next actions; an answer outside the offered
+options is `GATE_OPTION_INVALID`. Each option states whether it authorises the blocked work (default: `A` only).
+
+**Human answers (BC-P2-10, mechanism HC-1).** A human answer, a human-approval assertion and the evidence that a gate
+reached the human come only from **owner-signed documents** verified against the administrator-provisioned anchor:
+the provisioned Signed Release Root's delegation of the `human-gate` role (the same anchor that governs releases and
+break-glass). `gov gate present <HDG>` renders the package, records `presented_at`/`presented_by` and the package
+SHA-256, writes the exact bytes to the channel outbox and seals the record — rendering is **not** presentation. The
+owner signs a `human-gate-answer` binding the product, gate id, the OS-issued `gate_instance`, the package SHA-256, the
+option, `answered_by`, a single-use nonce and an expiry; it is placed in the channel inbox or passed with `gov decide
+<HDG> --answer-file`. Anything else is refused: `HUMAN_ANSWER_UNAUTHENTICATED` (missing, unsigned, wrong key, below
+threshold, expired, replayed, bound to another gate/instance/package/option), `HUMAN_ANSWER_MISMATCH` (`--option`
+disagrees with the signed option). `presented_in_chat` becomes true only on an owner-signed answer or an owner-signed
+`human-gate-receipt` (`gov gate present <HDG> --receipt-file f | --receipt-inbox`). The signed envelope is stored and
+re-verified against the current anchor at every use (`HUMAN_ANSWER_UNVERIFIED`). `gov` holds no signing key; CLI flags
+(`--by`, `--option`, `--role human`), environment variables, defaults, repository files, plugins and model output cannot
+produce an answer. `gov trust human-channel` reports the anchor, inbox/outbox, what a document binds and whether the
+anchor is writable by the invoking account (the ARCH-0003 §1 premise).
+
+**No release root, no human channel (P2-ADJ-0001).** `HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned`
+is `false`: on a machine with no Signed Release Root a human answer is refused `HUMAN_CHANNEL_UNAVAILABLE` with
+`details.cause: UNPROVISIONED` and the remediation — provision a root whose `human-gate` role delegates the product
+owner's key(s) (`gov trust provision --anchor <root.json>`); `gov trust human-channel --provision` of a standalone
+anchor is refused `HUMAN_CHANNEL_STANDALONE_DISABLED`; an anchor file placed in machine state is not honoured. The key
+is strengthen-only: a project may keep it false, never set it true; a kernel that predates the key reads as false. A
+dev/test machine provisions a throw-away root (OWNER-DECISION-P2-0002: provision, then work).
+
+**T2 binding (BC-P2-09).** Gate and decision records (and other OS-written state as their owners adopt it) carry an
+`os_binding` seal (HMAC-SHA256 under a machine binding key kept in protected machine state). A hand-written or edited
+record is `Unsealed`/`Broken`/`Foreign` and never honoured (`T2_UNBOUND`); `gov gate list` reports unverified records
+separately and `gov gate show <HDG>` reports the binding, the answer's verification and what the gate authorises.
+
+**Agent resolution (BC-P2-18).** An agent answer (`gov decide <HDG> --option X --by <acting role>`) is accepted only
+for an L3+ role resolving as itself, on a complete assessment (radius ≤ R1, confidence ≥ 0.8, reversible) made by
+another session or the OS, with a recorded rationale; it records `by_kind: agent` and is never a human approval. Gates
+raised for `HUMAN_GATE_POLICY.human_only_triggers` (`framework_update`, `destructive_migration`, `privilege_elevation`,
+`kernel_integrity_override`, `tool_install`, `budget_threshold` — a kernel floor a project may extend, never shrink)
+are never agent-resolvable, at answer time or at use.
+
+**Blocking and CIT approval.** An authorising answer moves the tasks the gate blocks from WAITING_HUMAN to READY, a
+declining answer to BLOCKED, and `gov gate revoke` withdraws the gate (derived decisions REJECTED, the linked CIT back
+to SIMULATED, blocked work BLOCKED). `cit approve` derives the approval from the gate raised for that transaction: the
+gate must reference the CIT, be presented, be ANSWERED with an authorising option through a verified answer, and its
+decision must be ACTIVE (`GATE_NOT_PRESENTED`, `GATE_NOT_ANSWERED`, `GATE_DECLINED`, `GATE_REVOKED`, `APPROVAL_STALE`,
+`APPROVAL_METHOD_MISMATCH` for `--method human` on an agent resolution); `cit approve|execute` and `update --apply`
+first require that the gates they rely on are records gov wrote whose answers verify. Without a gate only the
+automatic path within `CHANGE_POLICY.auto_approve_max_radius` exists and its decision carries `human_approved: false`.
 
 **Trust classes (D-0007).** Immutable release state (verified kernel, embedded baseline) > OS-written project state
 (governed records, plugin registry, ledgers) > verified derived state > project configuration (overlay, plugin
@@ -193,9 +289,35 @@ descriptors) > caller input (`--role`, `--by`, report fields) > plugin and model
 `registered`, `verified`, `human_approved`, `authority`, `provenance` or `override` is established only by the two
 highest classes; the same field arriving from a lower class is a request that is recorded and ignored.
 
-**Trust boundary.** The acting role is declared by the caller (`--role`, `GOV_ROLE`); the OS enforces what a role may
-do but does not authenticate who holds the session. Deployments that need authenticated human answers must bind
-`gov decide` to an authenticated channel (adapter responsibility); this is a documented boundary, not a hidden one.
+**Trust boundary.** Agent roles are declared by the harness or adapter (OWNER-DECISION-P2-0001); the OS enforces what
+a declared role may do and gives an undeclared or `human`-claiming invocation L0. Human answers are authenticated by the
+owner's signature against the provisioned root; the private key is never on the agents' machine.
+
+## 4.9 Health scheduler, context delivery, artefact identity, qualification oracle
+**Health scheduler (BC-P2-03/06/42/43).** `gov health` runs tiered checks G0–G6 (`scheduler::catalogue` declares each
+check's inputs, isolation, cache treatment, tiers and hard-block vs warning rule; `gov health checks` prints it).
+Checks whose declared inputs changed execute — concurrently when independent, state-writing ones in disposable
+sandboxes — and the rest are served from a cache keyed by those inputs; each result is recorded with its provenance
+(`gov health history|show`). Green governance evidence is keyed by every input class (`verification::currency`,
+`gov health currency`); a change makes it stale and doctor D021 says which class changed. `gov health status` reports
+RED/YELLOW/GREEN and the active hard-blocks; `gov health guard <op>` shows whether a governed operation would be
+refused (§4.6). Product-test results are recorded per family as governed evidence (`gov health product`,
+`gov verify product`); skill regression executes the kernel's skill scenarios (`gov health skills [--record]`).
+
+**Context delivery (BC-P2-17/19/20).** A task's mandatory inputs form a manifest resolved deterministically from the
+task record (`gov context manifest <TASK>`); the packet delivers each input's full content with its version and hash,
+marks an index outage explicitly (the supplementary block alone depends on the derived index) and is kept by hash
+(`gov context show <TASK> [--hash]`); `gov context verify <TASK>` re-resolves the manifest against a compiled packet;
+`gov context receipt <TASK> --file f` validates a worker's consumption receipt (a dry run).
+
+**Artefact identity (BC-P2-21).** `gov artefact show <id>` reports the W1 identity of a governed artefact (type,
+canonical location, authority, lifecycle, content hash, provenance, supersession, expected and actual consumers);
+`gov artefact check` lists misplaced records, duplicate ids, stale links and unconsumed outputs; `gov artefact lineage
+<id> --direction down|up` walks canonical edges.
+
+**Qualification oracle (BC-P2-51).** `gov oracle format` prints the Qualification Oracle format compiled into the binary
+and its crosswalk to Contract v3 Gate V; `gov oracle validate <file> [--oracle f] [--public-suite d] [--repository d]`
+validates an oracle or a score report held in verifier custody, fail-closed. Neither opens a governed project.
 
 ## 5. Change control
 
@@ -221,13 +343,21 @@ the removal and defers its scaffolded tests with the recorded reason); every bat
 rolled back when independent tests fail. `ARCHIVE_POLICY.unused_code_action` decides between removal and archival of
 dead code. Catalogue entries carry `imports`/`references`/`consumers` from the import graph.
 
-### 6.1 Observed mutation scope
-`task claim` snapshots the working tree (git `ls-files -co --exclude-standard` + sha256; walk fallback). `task close`
-diffs the tree against that baseline, discards OS-managed paths (generated views, evidence records, gate/CIT/task
-records) and contract-declared generated classes, and compares the observed set with the report's `files_changed`
-and the task contract: undeclared or out-of-scope changes are `MUTATION_SCOPE_VIOLATION` unless a committed CIT
-governs them (propagation writes count as governed). The report and checkpoint record `observed_files_changed` and
-the baseline used.
+### 6.1 Claims and observed mutation scope
+`task claim` is decided in one store transaction (`ClaimsStore::claim_exclusive`): another session's live claim is
+`TASK_CLAIMED`; the same session holding it from another worktree `CLAIM_WORKTREE_MISMATCH`; a new session beyond
+`BUDGET_POLICY.defaults.max_parallel_agents` `BUDGET_EXCEEDED` (with a budget gate); a live claim of another session
+whose mutation scope (`allowed_paths`, unrestricted when empty) may share a path `CLAIM_SCOPE_CONFLICT`; a store kept
+busy beyond its timeout `CLAIMS_BUSY`. Linked git worktrees of one repository claim against one store. A task's `role`
+binds claim and close (`ROLE_NOT_DESIGNATED`), and `task create` refuses a role the kernel does not define
+(`UNKNOWN_ROLE`). The claim snapshots the working tree; `task close` requires the closing session to hold the claim
+(`CLAIM_REQUIRED`) from the same worktree, diffs the tree against the baseline, attributes changes to other live claims
+or accepted closes in the window, and compares the rest with the report's `files_changed`, the scope the claim reserved
+and the task contract: undeclared or out-of-scope changes are `MUTATION_SCOPE_VIOLATION` unless a CIT **committed after
+this task's claim baseline** covers them (the permanent "any committed CIT" exemption is gone); a task whose contract
+forbids production merge, and every experiment task, cannot close with production-tree changes
+(`PRODUCTION_MERGE_NOT_ALLOWED`). An L3+ `--force` close records every override it used. The report and checkpoint
+record `observed_files_changed` and the baseline used.
 
 ## 7. Releases, updates, upstream learning
 

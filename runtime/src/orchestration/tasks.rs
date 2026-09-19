@@ -2,28 +2,40 @@
 //! Every mutating path is authority-checked (AUTHORITY_POLICY.authority_levels_required) and task close enforces the
 //! task's contract (Contract v3:560-569):
 //!
+//! * **runnable is derived** (BC-P2-16) — `task create --status READY`, `task status READY`, `replan`, `claim` and
+//!   `gov continue` all ask one question, [`crate::orchestration::dag::evaluate`]: dependencies and `blocks`, required
+//!   data/tools/skills, the mandatory task-input manifest, every governing Human Decision Gate, readiness policy,
+//!   TEST_POLICY (independence from recorded authorship included), pending re-tests and explicit holds. `DONE`,
+//!   `CLAIMED` and `IN_PROGRESS` are reached only through `close` and `claim`;
 //! * **claim** (BC-P2-15) — granted atomically to one session with the task's mutation scope and the session's
 //!   working tree recorded ([`crate::orchestration::claims`]); the task's designated `role` binds who may claim it;
+//!   the claim baseline (the tree snapshot, the CITs already committed, the reports already written and the task
+//!   contract as claimed) is sealed with the T2 binding primitive, so a worker cannot rewrite the evidence its close
+//!   is checked against;
 //! * **close** — only by the session holding the claim, from the working tree it was claimed in, in the designated
-//!   role (an L3+ `--force` records each override it uses);
+//!   role, never while a governing Human Decision Gate withholds authorisation; see [`close`] for the order of its
+//!   checks and why;
 //! * **path scope** (BC-P2-14) — the mutations observed since the task's claim baseline must be declared and inside
-//!   `allowed_paths` / outside `forbidden_paths`, unless a Change-Impact Transaction **executed while the task was
-//!   claimed** touched that path (a CIT committed before the claim covers nothing for this task). A claim baseline is
-//!   never reset by re-claiming: a renewal keeps it, and the mutations of an earlier, released claim window are
-//!   carried into the next baseline, so releasing and re-claiming cannot launder a change;
+//!   `allowed_paths` / outside `forbidden_paths` (as recorded now and as claimed), unless a Change-Impact Transaction
+//!   **executed while the task was claimed** touched that path. A claim baseline is never reset by re-claiming;
+//! * **OS-written state** (BC-P2-09, D-0007 T2) — a changed path under an OS-managed location is the OS's own write
+//!   only when it can be told apart from a worker's: a record carrying a T2 seal must verify, and a record of a kind
+//!   the OS always seals (gates, gate-derived decisions, close reports, and every type `t2::SEALED_RECORD_TYPES`
+//!   names) must carry one. Anything else there is observed as the worker's mutation of OS-written state and refused;
 //! * **production merge** (BC-P2-14) — a task whose contract forbids production merge (every `experiment` task)
-//!   cannot close with mutations in the production tree ([`is_production_path`]); promotion into production goes
-//!   through a CIT.
-//!
-//! `blocks`, `required_data`, `required_tools` and `required_skills` gate readiness in the DAG
-//! ([`crate::orchestration::dag`]).
+//!   cannot close with mutations in the production tree ([`is_production_path`]); promotion goes through a CIT;
+//! * **independence** (BC-P2-34, task-role side) — independence of tests and test data from the implementer is taken
+//!   from recorded authorship ([`AuthorshipIndex`]: the sealed close reports), never from what an artefact says about
+//!   itself; one session does not both implement a feature and author its independent tests or test data.
 use crate::authority;
 use crate::checkpoints;
 use crate::memory::claims::ClaimRequest;
 use crate::memory::db::RuntimeDb;
 use crate::memory::manifest::freshness;
+use crate::orchestration::dag::{self, DagCtx, TaskState, IMPLEMENTATION_CLASSES};
 use crate::orchestration::{claims, control, gates};
 use crate::records::{new_record, save_record, Record, RecordStore};
+use crate::scheduler::{self, catalogue::ops};
 use crate::util::{glob_match, now_iso, today};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
@@ -40,12 +52,44 @@ pub const STATUSES: &[&str] = &[
     "CANCELLED",
     "WAITING_HUMAN",
 ];
-/// Stored statuses from which a task may be claimed.
-const CLAIMABLE: &[&str] = &["READY", "CLAIMED", "IN_PROGRESS", "REVIEW"];
+
+/// Statuses a task reaches only through its lifecycle operation, never by `task create` / `task status`: a task is
+/// DONE only through an evidence-gated close, and CLAIMED / IN_PROGRESS only through an atomic claim.
+pub const OPERATION_ONLY_STATUSES: &[(&str, &str)] = &[
+    ("DONE", "gov task close <id> --report <receipt>"),
+    ("CLAIMED", "gov task claim <id>"),
+    ("IN_PROGRESS", "gov task claim <id>"),
+];
+
+fn operation_only(status: &str) -> Option<GovError> {
+    OPERATION_ONLY_STATUSES
+        .iter()
+        .find(|(s, _)| *s == status)
+        .map(|(s, route)| {
+            GovError::new(
+                "TASK_STATUS_REQUIRES_OPERATION",
+                format!("task status {s} is reached only through `{route}` (its evidence and claim checks cannot be skipped by setting the status)"),
+            )
+            .with_details(json!({"status": s, "route": route}))
+        })
+}
+
+/// The status the DAG derives for a task that is not DONE: READY when runnable, WAITING_HUMAN when a governing gate
+/// is pending, BLOCKED otherwise.
+fn derived_status(ev: &dag::TaskEval) -> &'static str {
+    match ev.state {
+        TaskState::Runnable => "READY",
+        TaskState::WaitingHuman => "WAITING_HUMAN",
+        TaskState::Blocked => "BLOCKED",
+        TaskState::Done => "DONE",
+    }
+}
 
 pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     control::guard_write(p, "task create")?;
     authority::require(p, "create_task")?;
+    // G0 (tier contract): an active hard-block governing task creation refuses it (BC-P2-06, IP-WS02-02)
+    scheduler::guard(p, ops::TASK_CREATE, &[])?;
     let store = RecordStore::load(&p.root);
     let id = fields
         .get("id")
@@ -66,6 +110,14 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
         .to_string();
     let obj = fields.as_object_mut().unwrap();
     obj.entry("task_status").or_insert(json!("DRAFT"));
+    let requested = obj
+        .get("task_status")
+        .and_then(|v| v.as_str())
+        .unwrap_or("DRAFT")
+        .to_string();
+    if let Some(e) = operation_only(&requested) {
+        return Err(e);
+    }
     obj.entry("objective").or_insert(json!(title));
     obj.entry("class").or_insert(json!("implementation"));
     let class = obj
@@ -109,15 +161,56 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
             return Err(GovError::new("UNKNOWN_ROLE", format!("task role '{r}' is not defined in the kernel ROLES.yaml; the designated role binds who may claim and close the task, so it must be a kernel role id (e.g. backend-engineer, independent-test-designer)")));
         }
     }
+    // provenance is a fact of the OS operation (D-0007 rule 2), never the caller's (W1 producer attribute)
+    if let Some(claimed) = obj.remove("provenance") {
+        obj.insert("provenance_requested".into(), claimed);
+    }
+    obj.insert(
+        "provenance".into(),
+        json!({"producer": "gov task create", "session": p.session_id, "role": p.role, "created_at": now_iso()}),
+    );
+    obj.remove("status_source");
     obj.remove("id");
     obj.remove("title");
-    let rec = new_record("task", &id, &title, Value::Object(obj.clone()));
+    let mut rec = new_record("task", &id, &title, Value::Object(obj.clone()));
     p.schemas()
         .validate("task", &rec.data, &format!("({id})"))?;
+    // READY is derived from the DAG, never asserted (BC-P2-16): a task that would not be runnable is stored in the
+    // status the DAG derives, with the reasons
+    let mut ready_check = Value::Null;
+    if requested == "READY" {
+        let ctx = DagCtx::new(p, &store);
+        let ev = dag::evaluate(&ctx, &rec, Some("READY"));
+        let stored = derived_status(&ev);
+        if stored != "READY" {
+            rec.set("task_status", json!(stored));
+            rec.set(
+                "status_note",
+                json!(format!(
+                    "READY was requested; the task DAG does not allow it: {}",
+                    ev.reasons.join("; ")
+                )),
+            );
+        }
+        ready_check =
+            json!({"requested_status": "READY", "stored_status": stored, "dag": ev.to_value()});
+    }
+    let stored = rec.get("task_status");
+    rec.set(
+        "status_source",
+        json!({"operation": "task create", "status": stored, "session": p.session_id, "role": p.role, "at": now_iso()}),
+    );
     save_record(&p.root, &rec)?;
-    Ok(rec.data)
+    let mut out = rec.data.clone();
+    if !ready_check.is_null() {
+        out["ready_check"] = ready_check;
+    }
+    Ok(out)
 }
 
+/// `gov task status <id> <status>`. DONE / CLAIMED / IN_PROGRESS are refused (their operations are `close` and
+/// `claim`); READY is granted only when the task DAG finds the task runnable (BC-P2-16); BLOCKED and WAITING_HUMAN set
+/// here are explicit holds the DAG and replan keep until an explicit READY releases them.
 pub fn set_status(p: &Project, id: &str, status: &str, note: Option<&str>) -> Result<Value> {
     control::guard_write(p, "task status")?;
     authority::require(p, "mutate_task_status")?;
@@ -127,18 +220,35 @@ pub fn set_status(p: &Project, id: &str, status: &str, note: Option<&str>) -> Re
             format!("invalid task status {status}"),
         ));
     }
-    let mut store = RecordStore::load(&p.root);
-    let rec = store
-        .get_mut(id)
-        .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
-    if rec.rtype() != "task" {
-        return Err(GovError::new("USAGE", format!("{id} is not a task")));
+    if let Some(e) = operation_only(status) {
+        return Err(e);
     }
+    let mut store = RecordStore::load(&p.root);
+    {
+        let rec = store
+            .get(id)
+            .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
+        if rec.rtype() != "task" {
+            return Err(GovError::new("USAGE", format!("{id} is not a task")));
+        }
+        if status == "READY" {
+            let ctx = DagCtx::new(p, &store);
+            let ev = dag::evaluate(&ctx, rec, Some("READY"));
+            if !ev.runnable() {
+                return Err(GovError::new("TASK_NOT_READY", format!("{id} cannot be set READY: the task DAG does not allow it ({}): {}. Resolve the reasons (`gov task dag`); READY is derived, not asserted", ev.state.as_str(), ev.reasons.join("; "))).with_details(ev.to_value()));
+            }
+        }
+    }
+    let rec = store.get_mut(id).unwrap();
     rec.set("task_status", json!(status));
     rec.set("updated", json!(today()));
     if let Some(n) = note {
         rec.set("status_note", json!(n));
     }
+    rec.set(
+        "status_source",
+        json!({"operation": "task status", "status": status, "session": p.session_id, "role": p.role, "at": now_iso(), "note": note}),
+    );
     let data = rec.data.clone();
     save_record(&p.root, rec)?;
     Ok(data)
@@ -150,34 +260,239 @@ pub fn list(p: &Project, status: Option<&str>) -> Vec<Value> {
         .map(|t| json!({"id": t.id(), "title": t.title(), "class": t.get("class"), "task_status": t.get("task_status"), "feature": t.get("feature"), "dependencies": t.list("dependencies"), "human_gate": t.get("human_gate"), "retest_required": t.data.get("retest_required").and_then(|v| v.as_bool()).unwrap_or(false), "path": t.path})).collect()
 }
 
-/// The task's designated role, if any, refuses every other acting role.
-fn designated_role_refusal(p: &Project, t: &Record, action: &str) -> Option<GovError> {
-    let designated = t.get("role");
-    if designated.is_empty() || designated == p.role {
-        return None;
+/// The task's designated role, if any, refuses every other acting role. `claimed` is the contract recorded in the
+/// sealed claim baseline: a role designated there binds too, so rewriting the task record during the claim does
+/// not change who may close it.
+fn designated_role_refusal(
+    p: &Project,
+    t: &Record,
+    action: &str,
+    claimed: Option<&Value>,
+) -> Option<GovError> {
+    let mut roles: Vec<String> = vec![t.get("role")];
+    if let Some(r) = claimed.and_then(|c| c.get("role")).and_then(|v| v.as_str()) {
+        roles.push(r.to_string());
     }
+    roles.retain(|r| !r.is_empty());
+    roles.dedup();
+    let designated = roles.iter().find(|r| **r != p.role)?.clone();
     Some(GovError::new("ROLE_NOT_DESIGNATED", format!("{} designates role '{designated}' (task contract `role`); the acting role '{}' may not {action} it — act as '{designated}' or have the task contract amended", t.id(), p.role)).with_details(json!({"task": t.id(), "designated_role": designated, "acting_role": p.role})))
 }
 
-/// Claim a runnable task for this session (BC-P2-15). The grant, the parallel-agent budget
-/// (BUDGET_POLICY.defaults.max_parallel_agents) and the mutation-scope overlap check are decided in one claims-store
-/// transaction; the task's designated role binds who may claim it.
+// ------------------------------------------------------------------------------------ recorded authorship (BC-P2-34)
+
+/// The author of an artefact's content as the OS recorded it: the session and acting role of the T2-sealed close
+/// report that accepted it.
+#[derive(Debug, Clone)]
+pub struct Author {
+    pub report: String,
+    pub task: String,
+    pub session: String,
+    pub role: String,
+    pub closed_at: String,
+    /// The current content is exactly what that close accepted (false: changed since only by a Change-Impact
+    /// Transaction the claim-window rules honour).
+    pub exact: bool,
+}
+
+impl Author {
+    pub fn to_value(&self) -> Value {
+        json!({"report": self.report, "task": self.task, "session": self.session, "role": self.role, "closed_at": self.closed_at, "exact": self.exact})
+    }
+}
+
+/// **Recorded authorship** (BC-P2-34; Contract v3:366, :526, :783-785): who produced a repository path, established
+/// from the OS's own record of completed work — the T2-sealed close reports and the content each accepted
+/// (`mutation_evidence.observed_hashes`) — never from a field an artefact states about itself (`author_role`,
+/// `independent_of_implementer`). A path's recorded author is the latest sealed close that accepted a change to it,
+/// provided the content is still what that close accepted or has since been changed only by an honoured,
+/// COMMITTED Change-Impact Transaction (e.g. staleness marking by CIT propagation); content changed any other way has
+/// no recorded author.
+pub struct AuthorshipIndex {
+    by_path: BTreeMap<String, Vec<(Option<String>, Author)>>,
+    by_task: BTreeMap<String, Vec<Author>>,
+    /// path -> epoch seconds at which an honoured COMMITTED CIT finished touching it.
+    cit_touches: BTreeMap<String, Vec<i64>>,
+}
+
+impl AuthorshipIndex {
+    pub fn build(p: &Project, store: &RecordStore) -> Self {
+        let _ = p;
+        let mut by_path: BTreeMap<String, Vec<(Option<String>, Author)>> = BTreeMap::new();
+        let mut by_task: BTreeMap<String, Vec<Author>> = BTreeMap::new();
+        for r in store.of_type("report") {
+            if !crate::t2::verify_record(r).is_verified() {
+                continue;
+            }
+            let me = &r.data["mutation_evidence"];
+            let a = Author {
+                report: r.id(),
+                task: r.get("task"),
+                session: r.get("session"),
+                role: r.get("role"),
+                closed_at: me["closed_at"].as_str().unwrap_or("").to_string(),
+                exact: true,
+            };
+            by_task.entry(a.task.clone()).or_default().push(a.clone());
+            if let Some(h) = me["observed_hashes"].as_object() {
+                for (path, hash) in h {
+                    by_path
+                        .entry(path.clone())
+                        .or_default()
+                        .push((hash.as_str().map(|s| s.to_string()), a.clone()));
+                }
+            }
+        }
+        let mut cit_touches: BTreeMap<String, Vec<i64>> = BTreeMap::new();
+        for c in store.of_type("cit") {
+            if c.get("cit_status") != "COMMITTED" || !cit_record_honoured(c) {
+                continue;
+            }
+            let ex = &c.data["execution"];
+            let Some(at) = ex["finished"]
+                .as_str()
+                .or(ex["started"].as_str())
+                .and_then(epoch_of)
+            else {
+                continue;
+            };
+            if let Some(t) = ex["propagation"]["touched"].as_array() {
+                for x in t.iter().filter_map(|x| x.as_str()) {
+                    cit_touches.entry(x.to_string()).or_default().push(at);
+                }
+            }
+        }
+        AuthorshipIndex {
+            by_path,
+            by_task,
+            cit_touches,
+        }
+    }
+
+    /// The recorded author of the current content of `path`, or `None`.
+    pub fn author_of(&self, p: &Project, path: &str) -> Option<Author> {
+        let cur = std::fs::read(p.root.join(path))
+            .ok()
+            .map(|b| crate::util::sha256_hex(&b))?;
+        let latest = self.by_path.get(path)?.iter().max_by(|(_, a), (_, b)| {
+            (epoch_of(&a.closed_at), &a.report).cmp(&(epoch_of(&b.closed_at), &b.report))
+        })?;
+        let (hash, a) = latest;
+        if hash.as_deref() == Some(cur.as_str()) {
+            return Some(a.clone());
+        }
+        let since = epoch_of(&a.closed_at)?;
+        let changed_by_cit = self
+            .cit_touches
+            .get(path)
+            .map(|v| v.iter().any(|t| *t >= since))
+            .unwrap_or(false);
+        changed_by_cit.then(|| Author {
+            exact: false,
+            ..a.clone()
+        })
+    }
+
+    /// The sealed closes of `task`.
+    pub fn closes_of(&self, task: &str) -> &[Author] {
+        self.by_task.get(task).map(|v| v.as_slice()).unwrap_or(&[])
+    }
+}
+
+/// Is `t` independent verification work for its feature (tests, test data)?
+fn independent_work(t: &Record) -> bool {
+    t.get("class") == "test-design"
+        || matches!(
+            t.get("role").as_str(),
+            "independent-test-designer" | "data-author"
+        )
+        || matches!(
+            t.get("readiness_cell").as_str(),
+            "independent_acceptance_tests" | "representative_test_data"
+        )
+}
+
+/// **Independence of the acting session** (BC-P2-34, task-role side): the reasons `session` may not claim or close
+/// `t`. An implementation task may not be taken by the session that authored (recorded authorship) the independent
+/// tests or test data it relies on, nor by a session holding or having closed independent test/data work of the
+/// same feature; and independent test/data work may not be taken by a session holding or having closed
+/// implementation work of that feature.
+pub fn independence_conflicts(
+    ctx: &DagCtx,
+    store: &RecordStore,
+    t: &Record,
+    session: &str,
+) -> Vec<String> {
+    let mut out = ctx.independence_reasons(t, Some(session));
+    let feature = t.get("feature");
+    let mine_impl = IMPLEMENTATION_CLASSES.contains(&t.get("class").as_str());
+    let mine_indep = independent_work(t);
+    if feature.is_empty() || !(mine_impl || mine_indep) {
+        return out;
+    }
+    for other in store.of_type("task") {
+        if other.id() == t.id() || other.get("feature") != feature {
+            continue;
+        }
+        let other_impl = IMPLEMENTATION_CLASSES.contains(&other.get("class").as_str());
+        let other_indep = independent_work(other);
+        let (mine, theirs) = if mine_impl && other_indep {
+            ("implementation", "independent test/data work")
+        } else if mine_indep && other_impl {
+            ("independent test/data work", "implementation")
+        } else {
+            continue;
+        };
+        if ctx.claim_session(&other.id()).as_deref() == Some(session) {
+            out.push(format!("session {session} holds the claim on {} ({theirs}) of feature {feature}; the same session may not also do its {mine} ({})", other.id(), t.id()));
+        }
+        if let Some(a) = ctx
+            .authorship()
+            .closes_of(&other.id())
+            .iter()
+            .find(|a| a.session == session)
+        {
+            out.push(format!("session {session} closed {} ({theirs}) of feature {feature} ({}); the same session may not also do its {mine} ({})", other.id(), a.report, t.id()));
+        }
+    }
+    out
+}
+
+fn independence_refusal(t: &Record, action: &str, reasons: &[String]) -> GovError {
+    GovError::new(
+        "INDEPENDENCE_VIOLATION",
+        format!("{} may not be {action} by this session: independence is established from recorded authorship (BC-P2-34): {}. Act from an independent session in the designated role", t.id(), reasons.join("; ")),
+    )
+    .with_details(json!({"task": t.id(), "reasons": reasons}))
+}
+
+/// Claim a runnable task for this session (BC-P2-15, BC-P2-16). The task DAG decides whether it may be claimed at all;
+/// the grant, the parallel-agent budget (BUDGET_POLICY.defaults.max_parallel_agents) and the mutation-scope overlap
+/// check are decided in one claims-store transaction; the designated role and recorded-authorship independence bind
+/// who may claim it.
 pub fn claim(p: &Project, id: &str) -> Result<Value> {
     control::guard_write(p, "task claim")?;
     authority::require(p, "claim_task")?;
+    // G0 (tier contract): an active hard-block governing claims refuses it (BC-P2-06, IP-WS02-03)
+    scheduler::guard(p, ops::TASK_CLAIM, &[])?;
     let store = RecordStore::load(&p.root);
     let t = store
         .get(id)
+        .filter(|t| t.rtype() == "task")
         .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
-    let st = t.get("task_status");
-    if !CLAIMABLE.contains(&st.as_str()) {
-        return Err(GovError::new(
-            "TASK_NOT_RUNNABLE",
-            format!("{id} is {st}; only READY tasks can be claimed (run `gov task dag` / replan)"),
-        ));
+    // the DAG decides (BC-P2-16): dependencies, blocks, required inputs, the mandatory manifest, gates, readiness,
+    // TEST_POLICY, re-test, explicit holds, DRAFT/DONE/CANCELLED
+    let ctx = DagCtx::new(p, &store);
+    let ev = dag::evaluate(&ctx, t, None);
+    if !ev.runnable() {
+        return Err(ev.refusal("claimed"));
     }
-    if let Some(e) = designated_role_refusal(p, t, "claim") {
+    if let Some(e) = designated_role_refusal(p, t, "claim", None) {
         return Err(e);
+    }
+    let conflicts = independence_conflicts(&ctx, &store, t, &p.session_id);
+    if !conflicts.is_empty() {
+        return Err(independence_refusal(t, "claimed", &conflicts));
     }
     let max_agents = p
         .policies()
@@ -226,13 +541,13 @@ pub fn claim(p: &Project, id: &str) -> Result<Value> {
     };
     let renewed = c["renewed"].as_bool().unwrap_or(false);
     // the grant is atomic; the task record is not part of that transaction, so re-read it: a concurrent close that
-    // finished between the status check above and the grant must not be followed by a claim of a closed task
+    // finished between the DAG check above and the grant must not be followed by a claim of a closed task
     let store = RecordStore::load(&p.root);
     let st_now = store
         .get(id)
         .map(|r| r.get("task_status"))
         .unwrap_or_default();
-    if !CLAIMABLE.contains(&st_now.as_str()) {
+    if matches!(st_now.as_str(), "DONE" | "CANCELLED" | "") {
         if !renewed {
             let _ = claims::release(p, id, &p.session_id, false);
         }
@@ -241,12 +556,19 @@ pub fn claim(p: &Project, id: &str) -> Result<Value> {
             format!("{id} became {st_now} while it was being claimed; the claim was withdrawn"),
         ));
     }
-    set_status_internal(p, id, "IN_PROGRESS", None)?;
+    set_status_internal(p, id, "IN_PROGRESS", None, "task claim")?;
+    let store = RecordStore::load(&p.root);
     c["baseline"] = establish_baseline(p, &store, id, renewed)?;
     Ok(c)
 }
 
-fn set_status_internal(p: &Project, id: &str, status: &str, note: Option<&str>) -> Result<Value> {
+fn set_status_internal(
+    p: &Project,
+    id: &str,
+    status: &str,
+    note: Option<&str>,
+    operation: &str,
+) -> Result<Value> {
     let mut store = RecordStore::load(&p.root);
     let rec = store
         .get_mut(id)
@@ -256,6 +578,10 @@ fn set_status_internal(p: &Project, id: &str, status: &str, note: Option<&str>) 
     if let Some(n) = note {
         rec.set("status_note", json!(n));
     }
+    rec.set(
+        "status_source",
+        json!({"operation": operation, "status": status, "session": p.session_id, "role": p.role, "at": now_iso()}),
+    );
     let data = rec.data.clone();
     save_record(&p.root, rec)?;
     Ok(data)
@@ -263,7 +589,18 @@ fn set_status_internal(p: &Project, id: &str, status: &str, note: Option<&str>) 
 
 /// Release a claim. The mutations the claim window produced stay attributed to the task: they are carried into the
 /// baseline of the next claim, so a release followed by a re-claim cannot reset the observed-mutation evidence.
+/// Releasing is a governed write like every other claim operation: it passes the write guard (kernel trust, the
+/// OWNER-DECISION-0006 §6 default-refuse allow-list, FREEZE_WRITES / PAUSE). The task's status afterwards is the one
+/// the DAG derives (READY only when it is runnable).
 pub fn release(p: &Project, id: &str, force: bool) -> Result<bool> {
+    control::guard_write(
+        p,
+        if force {
+            "task release --force"
+        } else {
+            "task release"
+        },
+    )?;
     authority::require(
         p,
         if force {
@@ -277,19 +614,33 @@ pub fn release(p: &Project, id: &str, force: bool) -> Result<bool> {
         let store = RecordStore::load(&p.root);
         if let Some(t) = store.get(id) {
             let _ = carry_forward(p, &store, t);
+            let st = t.get("task_status");
+            // an explicit hold set while the task was claimed stays as it was set
+            if !matches!(st.as_str(), "DONE" | "CANCELLED") && dag::explicit_hold(t).is_none() {
+                let ctx = DagCtx::new(p, &store);
+                let ev = dag::evaluate(&ctx, t, Some("READY"));
+                let _ = set_status_internal(
+                    p,
+                    id,
+                    derived_status(&ev),
+                    Some("released"),
+                    "task release",
+                );
+            }
         }
-        let _ = set_status_internal(p, id, "READY", Some("released"));
     }
     Ok(released.is_some())
 }
 
-/// Paths the Governance OS itself writes while a task is open (derived views, evidence records, gate/CIT records,
-/// task records). They are never attributed to the worker's mutation manifest.
+// ------------------------------------------------------------------------------------ OS-written state (BC-P2-09)
+
+/// Locations only the Governance OS writes while a task is open (derived views, evidence records, gate/decision/CIT
+/// records, task records, continuity records). A change under one of them is never simply "exempt": it is the OS's own
+/// write only when [`classify_os_path`] can tell it apart from a worker's.
 const OS_MANAGED_PREFIXES: &[&str] = &[
     "governance/generated/",
     "spec/reports/",
     "spec/audits/",
-    "spec/tasks/",
     "spec/planning/",
     "spec/decisions/HDG-",
     "spec/decisions/CIT-",
@@ -300,7 +651,19 @@ const OS_MANAGED_PREFIXES: &[&str] = &[
     "spec/now/NOW.md",
 ];
 
-fn os_managed(path: &str) -> bool {
+/// Is `path` a location only the OS writes? `spec/tasks/` holds both OS-written task records and authored test
+/// obligations (`TST-*`): only task records are OS-managed there, so an authored obligation is observed (and its
+/// authorship recorded by the close that accepts it).
+fn os_managed(p: &Project, path: &str) -> bool {
+    if let Some(rest) = path.strip_prefix("spec/tasks/") {
+        let abs = p.root.join(path);
+        return match std::fs::read_to_string(&abs) {
+            Ok(text) => crate::records::parse_record_text(&text, path)
+                .map(|r| r.rtype() == "task")
+                .unwrap_or(false),
+            Err(_) => rest.starts_with("TASK-"),
+        };
+    }
     OS_MANAGED_PREFIXES.iter().any(|pre| path.starts_with(pre))
 }
 
@@ -308,6 +671,69 @@ fn os_managed(path: &str) -> bool {
 fn contract_generated(p: &Project, path: &str) -> bool {
     let d = p.contract().decide(path);
     matches!(d.class().as_str(), "generated" | "derived")
+}
+
+/// How a changed OS-managed path stands at task close.
+#[derive(Debug, Clone)]
+pub enum OsWrite {
+    /// Provably written by a gov operation on this machine: its T2 seal verifies.
+    Bound,
+    /// No seal, and its kind is not (yet) sealed by every OS writer: accepted as the OS's own write and reported.
+    Unbound(String),
+    /// A lower-trust write to OS-written state: a seal that no longer verifies, a kind the OS always seals written
+    /// without one, or a governed record deleted.
+    Violation(String),
+}
+
+/// The record kind a changed file is, when every OS write of that kind is sealed: gates, decisions derived from a
+/// gate answer (or asserting human approval), close reports (sealed by [`close`], their only writer) and every type
+/// `t2::SEALED_RECORD_TYPES` names.
+fn sealed_kind(p: &Project, path: &str) -> Option<String> {
+    let text = std::fs::read_to_string(p.root.join(path)).ok()?;
+    let r = crate::records::parse_record_text(&text, path)?;
+    let t = r.rtype();
+    if crate::t2::SEALED_RECORD_TYPES.contains(&t.as_str()) {
+        return Some(format!("a {t} record"));
+    }
+    if t == "report" {
+        return Some("a task-close report".into());
+    }
+    if t == "decision"
+        && (r
+            .data
+            .get("human_approved")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false)
+            || r.list("derived_from").iter().any(|d| d.starts_with("HDG-")))
+    {
+        return Some("a decision derived from a Human Decision Gate answer".into());
+    }
+    None
+}
+
+/// Classify a changed OS-managed path (BC-P2-09 close side, `t2::classify_path`): the OS's own write is recognised by
+/// its seal, never by its location.
+pub fn classify_os_path(p: &Project, path: &str) -> OsWrite {
+    use crate::t2::Binding;
+    if !p.root.join(path).exists() {
+        return if path.starts_with("spec/") {
+            OsWrite::Violation(format!("{path} (an OS-written governed record) was deleted outside a gov operation; OS-written records are superseded, never deleted"))
+        } else {
+            OsWrite::Unbound(format!("{path}: derived output removed"))
+        };
+    }
+    match crate::t2::classify_path(&p.root, path) {
+        Binding::Verified { .. } => OsWrite::Bound,
+        Binding::Unsealed => match sealed_kind(p, path) {
+            Some(kind) => OsWrite::Violation(format!("{path} is {kind}: only a gov operation writes it and every such write is sealed (T2), but this one carries no seal")),
+            None => OsWrite::Unbound(format!("{path}: OS-managed location, record kind not yet sealed by every writer")),
+        },
+        other => OsWrite::Violation(format!(
+            "{path}: OS-written state (T2) changed outside a gov operation (binding {}: {})",
+            other.code(),
+            other.to_value()["reason"].as_str().unwrap_or("")
+        )),
+    }
 }
 
 /// Content listing of the governed repository (tracked + untracked, honouring .gitignore; walk fallback without git).
@@ -360,6 +786,47 @@ fn epoch_of(s: &str) -> Option<i64> {
         .map(|d| d.and_utc().timestamp())
 }
 
+/// The claim baseline of a task as read back.
+#[derive(Debug, Clone)]
+pub enum Baseline {
+    /// Sealed by the claim that wrote it and unmodified since.
+    Bound(Value),
+    /// Present but not provably written by a claim on this machine (edited, legacy, or another machine's).
+    Unbound { binding: Value },
+    /// No baseline.
+    Absent,
+}
+
+/// Read a task's claim baseline and verify its T2 seal (a baseline is machine-local runtime state the worker's
+/// account can write; the seal is what makes it the claim's evidence).
+pub fn read_baseline(p: &Project, id: &str) -> Baseline {
+    let Ok(doc) = crate::util::read_json(&claim_tree_path(p, id)) else {
+        return Baseline::Absent;
+    };
+    let b = crate::t2::verify_value(&doc, "");
+    if b.is_verified() {
+        Baseline::Bound(doc)
+    } else {
+        Baseline::Unbound {
+            binding: b.to_value(),
+        }
+    }
+}
+
+fn bound_baseline(p: &Project, id: &str) -> Option<Value> {
+    match read_baseline(p, id) {
+        Baseline::Bound(d) => Some(d),
+        _ => None,
+    }
+}
+
+/// The contract fields a claim reserves: the close is held to them as claimed as well as to the record as it is.
+fn contract_snapshot(t: &Record) -> Value {
+    json!({"allowed_paths": t.list("allowed_paths"), "forbidden_paths": t.list("forbidden_paths"),
+           "production_merge_allowed": production_merge_allowed(t), "class": t.get("class"), "role": t.get("role"),
+           "feature": t.get("feature"), "human_gate": t.get("human_gate")})
+}
+
 /// Snapshot the working tree now and make it the task's claim baseline (overwriting any previous one).
 pub fn snapshot_tree(p: &Project, id: &str) -> Result<Value> {
     let store = RecordStore::load(&p.root);
@@ -368,7 +835,8 @@ pub fn snapshot_tree(p: &Project, id: &str) -> Result<Value> {
 
 /// The claim window is bound exactly, not by clock: the baseline lists the CITs already COMMITTED and the close
 /// reports already written when it was taken, and only CITs committed / closes reported after it count as inside
-/// the window.
+/// the window. The baseline also records the task contract as claimed, and is sealed (T2) so the worker whose close
+/// it governs cannot rewrite it.
 fn write_baseline(
     p: &Project,
     store: &RecordStore,
@@ -397,28 +865,51 @@ fn write_baseline(
             }
         }
     }
-    let doc = json!({"task": id, "at": now_iso(), "commit": p.git_commit(), "session": p.session_id, "worktree": claims::worktree_id(p),
+    let contract = store.get(id).map(contract_snapshot).unwrap_or(Value::Null);
+    let mut doc = json!({"task": id, "at": now_iso(), "commit": p.git_commit(), "session": p.session_id, "role": p.role, "worktree": claims::worktree_id(p),
         "files": files, "carried": carried.keys().collect::<Vec<_>>(), "cits_committed": cits_committed, "reports_present": reports_present,
+        "contract": contract,
         "method": "git ls-files -co --exclude-standard + sha256 (walk fallback); mutations of earlier claim windows carried"});
+    crate::t2::seal_value(&mut doc, "", "task claim baseline")?;
     let path = claim_tree_path(p, id);
     std::fs::create_dir_all(path.parent().unwrap())?;
     crate::util::write_json(&path, &doc)?;
     let _ = std::fs::remove_file(carried_path(p, id));
     Ok(
-        json!({"files": doc["files"].as_object().map(|m| m.len()).unwrap_or(0), "commit": doc["commit"], "at": doc["at"], "reused": false, "carried": doc["carried"]}),
+        json!({"files": doc["files"].as_object().map(|m| m.len()).unwrap_or(0), "commit": doc["commit"], "at": doc["at"], "reused": false, "carried": doc["carried"], "sealed": true}),
     )
 }
 
+/// The carried mutations of earlier claim windows. A carried set that does not verify (edited outside gov) is not
+/// trusted to *drop* anything: every uncommitted path is carried as if created in the window, so it must still be
+/// declared and in scope at close.
 fn read_carried(p: &Project, id: &str) -> BTreeMap<String, Option<String>> {
-    crate::util::read_json(&carried_path(p, id))
-        .ok()
-        .and_then(|v| v.as_object().cloned())
+    let Ok(v) = crate::util::read_json(&carried_path(p, id)) else {
+        return BTreeMap::new();
+    };
+    if !crate::t2::verify_value(&v, "").is_verified() {
+        return uncommitted_paths(p)
+            .into_iter()
+            .filter(|f| !os_managed(p, f) && !contract_generated(p, f))
+            .map(|f| (f, None))
+            .collect();
+    }
+    v["carried"]
+        .as_object()
+        .cloned()
         .map(|m| {
             m.into_iter()
                 .map(|(k, v)| (k, v.as_str().map(|s| s.to_string())))
                 .collect()
         })
         .unwrap_or_default()
+}
+
+fn write_carried(p: &Project, id: &str, carried: &BTreeMap<String, Option<String>>) -> Result<()> {
+    let mut doc = json!({"task": id, "carried": carried, "at": now_iso()});
+    crate::t2::seal_value(&mut doc, "", "task release (carried mutations)")?;
+    std::fs::create_dir_all(task_runtime_dir(p, id))?;
+    crate::util::write_json(&carried_path(p, id), &doc)
 }
 
 /// The claim baseline: kept when the same session continues its claim; otherwise a fresh snapshot in which every
@@ -430,20 +921,32 @@ fn establish_baseline(
     id: &str,
     continuing: bool,
 ) -> Result<Value> {
-    let path = claim_tree_path(p, id);
     if continuing {
-        if let Ok(doc) = crate::util::read_json(&path) {
+        if let Some(doc) = bound_baseline(p, id) {
             return Ok(
-                json!({"files": doc["files"].as_object().map(|m| m.len()).unwrap_or(0), "commit": doc["commit"], "at": doc["at"], "reused": true, "carried": doc["carried"]}),
+                json!({"files": doc["files"].as_object().map(|m| m.len()).unwrap_or(0), "commit": doc["commit"], "at": doc["at"], "reused": true, "carried": doc["carried"], "sealed": true}),
             );
         }
     }
     let mut carried = read_carried(p, id);
-    if let (Ok(doc), Some(t)) = (crate::util::read_json(&path), store.get(id)) {
-        // an earlier claim window ended without a release or a close (lease expired, swept, session gone)
-        let obs = observe_against(p, store, t, Some(&doc));
-        for (k, orig) in obs.baseline_of {
-            carried.entry(k).or_insert(orig);
+    if let Some(t) = store.get(id) {
+        match read_baseline(p, id) {
+            // an earlier claim window ended without a release or a close (lease expired, swept, session gone)
+            Baseline::Bound(doc) => {
+                let obs = observe_against(p, store, t, Some(&doc));
+                for (k, orig) in obs.baseline_of {
+                    carried.entry(k).or_insert(orig);
+                }
+            }
+            // a baseline that does not verify is not trusted to hide anything: every uncommitted change is carried
+            Baseline::Unbound { .. } => {
+                for f in uncommitted_paths(p) {
+                    if !os_managed(p, &f) && !contract_generated(p, &f) {
+                        carried.entry(f).or_insert(None);
+                    }
+                }
+            }
+            Baseline::Absent => {}
         }
     }
     write_baseline(p, store, id, tree_listing(p), &carried)
@@ -453,16 +956,24 @@ fn establish_baseline(
 fn carry_forward(p: &Project, store: &RecordStore, t: &Record) -> Result<()> {
     let id = t.id();
     let path = claim_tree_path(p, &id);
-    let Ok(doc) = crate::util::read_json(&path) else {
-        return Ok(());
-    };
-    let obs = observe_against(p, store, t, Some(&doc));
     let mut carried = read_carried(p, &id);
-    for (k, orig) in obs.baseline_of {
-        carried.entry(k).or_insert(orig);
+    match read_baseline(p, &id) {
+        Baseline::Bound(doc) => {
+            let obs = observe_against(p, store, t, Some(&doc));
+            for (k, orig) in obs.baseline_of {
+                carried.entry(k).or_insert(orig);
+            }
+        }
+        Baseline::Unbound { .. } => {
+            for f in uncommitted_paths(p) {
+                if !os_managed(p, &f) && !contract_generated(p, &f) {
+                    carried.entry(f).or_insert(None);
+                }
+            }
+        }
+        Baseline::Absent => return Ok(()),
     }
-    std::fs::create_dir_all(task_runtime_dir(p, &id))?;
-    crate::util::write_json(&carried_path(p, &id), &json!(carried))?;
+    write_carried(p, &id, &carried)?;
     let _ = std::fs::remove_file(&path);
     Ok(())
 }
@@ -470,7 +981,8 @@ fn carry_forward(p: &Project, store: &RecordStore, t: &Record) -> Result<()> {
 /// What a task's claim window shows in the working tree.
 #[derive(Debug, Clone, Default)]
 pub struct Observation {
-    /// Paths changed since the baseline that are this task's (CIT-covered paths included, attributed ones not).
+    /// Paths changed since the baseline that are this task's (CIT-covered paths and T2 violations included,
+    /// attributed ones not).
     pub observed: Vec<String>,
     /// For each observed path not covered by a CIT: its baseline hash (None = the path did not exist).
     pub baseline_of: BTreeMap<String, Option<String>>,
@@ -483,9 +995,29 @@ pub struct Observation {
     pub cit_covered: BTreeSet<String>,
     /// Changed paths attributed to another claim or to a task closed inside the window.
     pub attributed: Vec<Value>,
+    /// Observed changes to OS-written state that no OS operation provably produced (BC-P2-09): `{path, reason}`.
+    /// They are refused whether or not they are declared or in scope.
+    pub t2_violations: Vec<Value>,
+    /// Changed OS-managed paths accepted as the OS's own writes: sealed and verifying.
+    pub os_bound: Vec<String>,
+    /// Changed OS-managed paths accepted as the OS's own writes without a seal (kinds not yet sealed by every
+    /// writer), reported so nothing is invisible.
+    pub os_unbound: Vec<String>,
     /// Start of the claim window (epoch seconds), when there is a baseline.
     pub window_start: Option<i64>,
     pub evidence: Value,
+}
+
+/// Is a CIT record honoured by the claim-window rules? A record carrying a T2 seal must verify; an unsealed record
+/// is honoured only while CIT state is not declared sealed (`t2::SEALED_RECORD_TYPES` does not contain `cit`) —
+/// once it is, an unsealed CIT record governs nothing.
+pub fn cit_record_honoured(c: &Record) -> bool {
+    use crate::t2::Binding;
+    match crate::t2::verify_record(c) {
+        Binding::Verified { .. } => true,
+        Binding::Unsealed => !crate::t2::SEALED_RECORD_TYPES.contains(&"cit"),
+        _ => false,
+    }
 }
 
 /// Paths touched by a COMMITTED Change-Impact Transaction that finished at or after `since` — the claim window of
@@ -496,7 +1028,7 @@ pub fn cit_covered_paths(store: &RecordStore, since: Option<i64>) -> BTreeSet<St
         return out;
     };
     for c in store.of_type("cit") {
-        if c.get("cit_status") != "COMMITTED" {
+        if c.get("cit_status") != "COMMITTED" || !cit_record_honoured(c) {
             continue;
         }
         let ex = &c.data["execution"];
@@ -514,7 +1046,8 @@ pub fn cit_covered_paths(store: &RecordStore, since: Option<i64>) -> BTreeSet<St
 }
 
 /// Paths touched by the CITs committed inside a claim window: those COMMITTED now and not already COMMITTED when
-/// the baseline was taken (baselines written before that list existed fall back to [`cit_covered_paths`]).
+/// the baseline was taken (baselines written before that list existed fall back to [`cit_covered_paths`]). Only CIT
+/// records the T2 rules honour count ([`cit_record_honoured`]).
 pub fn cit_window_paths(store: &RecordStore, baseline: Option<&Value>) -> BTreeSet<String> {
     let Some(doc) = baseline else {
         return BTreeSet::new();
@@ -525,7 +1058,10 @@ pub fn cit_window_paths(store: &RecordStore, baseline: Option<&Value>) -> BTreeS
     let before: BTreeSet<&str> = before.iter().filter_map(|x| x.as_str()).collect();
     let mut out = BTreeSet::new();
     for c in store.of_type("cit") {
-        if c.get("cit_status") == "COMMITTED" && !before.contains(c.id().as_str()) {
+        if c.get("cit_status") == "COMMITTED"
+            && !before.contains(c.id().as_str())
+            && cit_record_honoured(c)
+        {
             if let Some(t) = c.data["execution"]["propagation"]["touched"].as_array() {
                 out.extend(t.iter().filter_map(|x| x.as_str().map(|s| s.to_string())));
             }
@@ -535,6 +1071,7 @@ pub fn cit_window_paths(store: &RecordStore, baseline: Option<&Value>) -> BTreeS
 }
 
 /// Content accepted by closes that completed inside the window: report id, task, path -> hash (None = deleted).
+/// Only T2-sealed close reports count (a hand-written report accepts nothing).
 type ClosedState = (String, String, BTreeMap<String, Option<String>>);
 fn closed_states(store: &RecordStore, baseline: &Value, exclude_task: &str) -> Vec<ClosedState> {
     let present: Option<BTreeSet<String>> = baseline["reports_present"].as_array().map(|a| {
@@ -567,7 +1104,10 @@ fn closed_states(store: &RecordStore, baseline: &Value, exclude_task: &str) -> V
         if task == exclude_task {
             continue;
         }
-        // only the recorded close of a DONE task counts
+        // only the recorded, OS-written close of a DONE task counts
+        if !crate::t2::verify_record(r).is_verified() {
+            continue;
+        }
         let recorded = store
             .get(&task)
             .map(|t| t.get("task_status") == "DONE" && t.get("closed_by_report") == r.id())
@@ -585,14 +1125,36 @@ fn closed_states(store: &RecordStore, baseline: &Value, exclude_task: &str) -> V
 }
 
 /// Mutations observed for task `t` since its claim baseline, with attribution:
-/// 1. OS-managed and contract-generated paths are never the worker's;
+/// 1. contract-generated paths are never the worker's; an OS-managed path is the OS's own write only when
+///    [`classify_os_path`] can tell (a verifying seal, or an unsealed kind not yet sealed by every writer) — a
+///    T2 violation is the worker's mutation of OS-written state;
 /// 2. a path whose current content is exactly what a task closed inside this window accepted belongs to that close;
 /// 3. a path outside this task's scope, inside the scope of another live claim made from the same working tree and
 ///    changed since that claim's own baseline, belongs to that claim (scopes of concurrent claims are disjoint);
 /// 4. everything else is this task's. Paths a CIT executed inside the window touched are reported in `cit_covered`.
+///
+/// Only a sealed (bound) baseline is used; without one this observes git's uncommitted changes instead.
 pub fn observe(p: &Project, store: &RecordStore, t: &Record) -> Observation {
-    let doc = crate::util::read_json(&claim_tree_path(p, &t.id())).ok();
+    let doc = bound_baseline(p, &t.id());
     observe_against(p, store, t, doc.as_ref())
+}
+
+/// Sort a changed path under an OS-managed location into the observation (see [`observe`]).
+fn classify_into(p: &Project, f: &str, obs: &mut Observation) -> bool {
+    match classify_os_path(p, f) {
+        OsWrite::Bound => {
+            obs.os_bound.push(f.to_string());
+            false
+        }
+        OsWrite::Unbound(_) => {
+            obs.os_unbound.push(f.to_string());
+            false
+        }
+        OsWrite::Violation(reason) => {
+            obs.t2_violations.push(json!({"path": f, "reason": reason}));
+            true
+        }
+    }
 }
 
 fn observe_against(
@@ -604,20 +1166,19 @@ fn observe_against(
     let id = t.id();
     let now = tree_listing(p);
     let Some(doc) = doc else {
-        // no claim baseline (only reachable by an L3+ forced close): fall back to git's view of uncommitted changes
-        let observed: Vec<String> = uncommitted_paths(p)
-            .into_iter()
-            .filter(|f| !os_managed(f) && !contract_generated(p, f))
-            .collect();
-        return Observation {
-            current_of: observed
-                .iter()
-                .map(|f| (f.clone(), now.get(f).cloned()))
-                .collect(),
-            observed: observed.clone(),
-            evidence: json!({"baseline": "none (uncommitted changes: git diff HEAD + untracked files)", "observed": observed}),
-            ..Default::default()
-        };
+        // no bound claim baseline (only reachable by an L3+ forced close): fall back to git's view of uncommitted
+        // changes
+        let mut obs = Observation::default();
+        for f in uncommitted_paths(p) {
+            if contract_generated(p, &f) || (os_managed(p, &f) && !classify_into(p, &f, &mut obs)) {
+                continue;
+            }
+            obs.current_of.insert(f.clone(), now.get(&f).cloned());
+            obs.observed.push(f);
+        }
+        obs.evidence = json!({"baseline": "none (uncommitted changes: git diff HEAD + untracked files)", "observed": obs.observed,
+            "t2_violations": obs.t2_violations, "os_managed_bound": obs.os_bound, "os_managed_unbound": obs.os_unbound});
+        return obs;
     };
     let baseline: BTreeMap<String, String> = doc["files"]
         .as_object()
@@ -640,7 +1201,6 @@ fn observe_against(
             changed.insert(rel.clone());
         }
     }
-    changed.retain(|f| !os_managed(f) && !contract_generated(p, f));
     let closed = closed_states(store, doc, &id);
     let own_scope = reserved_scope(p, t).unwrap_or_else(|| claims::scope_of_task(t));
     let wt = claims::worktree_id(p);
@@ -653,16 +1213,14 @@ fn observe_against(
         })
         .map(|c| {
             let other = c["task_id"].as_str().unwrap_or("").to_string();
-            let theirs: BTreeMap<String, String> =
-                crate::util::read_json(&claim_tree_path(p, &other))
-                    .ok()
-                    .and_then(|d| d["files"].as_object().cloned())
-                    .map(|m| {
-                        m.into_iter()
-                            .filter_map(|(k, v)| v.as_str().map(|s| (k, s.to_string())))
-                            .collect()
-                    })
-                    .unwrap_or_default();
+            let theirs: BTreeMap<String, String> = bound_baseline(p, &other)
+                .and_then(|d| d["files"].as_object().cloned())
+                .map(|m| {
+                    m.into_iter()
+                        .filter_map(|(k, v)| v.as_str().map(|s| (k, s.to_string())))
+                        .collect()
+                })
+                .unwrap_or_default();
             let scope = claims::scope_of_claim(&c);
             (c, scope, theirs)
         })
@@ -673,13 +1231,32 @@ fn observe_against(
         ..Default::default()
     };
     for f in changed {
+        if contract_generated(p, &f) {
+            continue;
+        }
         let cur = now.get(&f).cloned();
-        if cit_covered.contains(&f) {
+        let mut t2_violation = false;
+        if os_managed(p, &f) {
+            // the OS's own writes are recognised by their seal; an in-window CIT may rewrite OS-written records
+            // (e.g. propagation marks), which is its governed change, not the worker's
+            if !classify_into(p, &f, &mut obs) {
+                continue;
+            }
+            if cit_covered.contains(&f) {
+                obs.t2_violations.pop();
+                obs.cit_covered.insert(f);
+                continue;
+            }
+            t2_violation = true;
+        } else if cit_covered.contains(&f) {
             obs.cit_covered.insert(f.clone());
             obs.observed.push(f);
             continue;
         }
         if let Some((rid, task, _)) = closed.iter().find(|(_, _, m)| m.get(&f) == Some(&cur)) {
+            if t2_violation {
+                obs.t2_violations.pop();
+            }
             obs.attributed
                 .push(json!({"path": f, "to": task, "via": "closed_report", "report": rid}));
             continue;
@@ -688,6 +1265,9 @@ fn observe_against(
             if let Some((c, _, _)) = others.iter().find(|(_, scope, theirs)| {
                 claims::path_in_scope(scope, &f) && theirs.get(&f) != cur.as_ref()
             }) {
+                if t2_violation {
+                    obs.t2_violations.pop();
+                }
                 obs.attributed.push(json!({"path": f, "to": c["task_id"], "via": "live_claim", "session": c["session_id"]}));
                 continue;
             }
@@ -697,7 +1277,8 @@ fn observe_against(
         obs.observed.push(f);
     }
     obs.evidence = json!({"baseline": format!("claim baseline {} (commit {})", doc["at"].as_str().unwrap_or("?"), doc["commit"].as_str().unwrap_or("?")),
-        "observed": obs.observed, "carried": doc["carried"], "attributed_elsewhere": obs.attributed, "cit_covered": obs.cit_covered});
+        "observed": obs.observed, "carried": doc["carried"], "attributed_elsewhere": obs.attributed, "cit_covered": obs.cit_covered,
+        "t2_violations": obs.t2_violations, "os_managed_bound": obs.os_bound, "os_managed_unbound": obs.os_unbound});
     obs
 }
 
@@ -723,8 +1304,8 @@ fn uncommitted_paths(p: &Project) -> Vec<String> {
     out.into_iter().collect()
 }
 
-/// Mutations observed since the claim baseline (added/modified/deleted), excluding OS-managed paths and changes
-/// attributed to other claims or closes (see [`observe`]).
+/// Mutations observed since the claim baseline (added/modified/deleted), excluding the OS's own provable writes and
+/// changes attributed to other claims or closes (see [`observe`]).
 pub fn observed_mutations(p: &Project, id: &str) -> (Vec<String>, Value) {
     let store = RecordStore::load(&p.root);
     match store.get(id) {
@@ -754,17 +1335,45 @@ pub fn reserved_scope(p: &Project, t: &Record) -> Option<Vec<String>> {
 }
 
 /// Mutation-scope check for a task: forbidden paths, kernel, contract-prohibited paths, and (when allowed_paths is
-/// declared) anything outside it — or outside the scope its claim reserved — that is not in `governed`: the paths a
-/// CIT executed inside this task's claim window touched ([`cit_window_paths`]).
+/// declared) anything outside it — or outside the scope its claim reserved, or outside the contract recorded in its
+/// sealed claim baseline — that is not in `governed`: the paths a CIT executed inside this task's claim window
+/// touched ([`cit_window_paths`]). `claimed` is the contract as claimed (`None` when there is no bound baseline).
 pub fn scope_violations(
     p: &Project,
     task: &crate::records::Record,
     files: &[String],
     governed: &BTreeSet<String>,
 ) -> Vec<String> {
+    let claimed = bound_baseline(p, &task.id()).map(|d| d["contract"].clone());
+    scope_violations_with(p, task, files, governed, claimed.as_ref())
+}
+
+fn str_list(v: Option<&Value>) -> Vec<String> {
+    v.and_then(|x| x.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+fn scope_violations_with(
+    p: &Project,
+    task: &crate::records::Record,
+    files: &[String],
+    governed: &BTreeSet<String>,
+    claimed: Option<&Value>,
+) -> Vec<String> {
     let reserved = reserved_scope(p, task);
     let allowed = task.list("allowed_paths");
+    let claimed_allowed = str_list(claimed.and_then(|c| c.get("allowed_paths")));
     let mut forbidden = task.list("forbidden_paths");
+    for f in str_list(claimed.and_then(|c| c.get("forbidden_paths"))) {
+        if !forbidden.contains(&f) {
+            forbidden.push(f);
+        }
+    }
     forbidden.push("governance/kernel/**".into());
     let prohibited: Vec<String> = p
         .contract()
@@ -789,17 +1398,23 @@ pub fn scope_violations(
             ));
             continue;
         }
-        if !allowed.is_empty()
-            && !allowed.iter().any(|pat| glob_match(pat, f))
-            && !governed.contains(f)
-        {
+        if governed.contains(f) {
+            continue;
+        }
+        if !allowed.is_empty() && !allowed.iter().any(|pat| glob_match(pat, f)) {
             out.push(format!(
                 "{f}: outside allowed_paths {allowed:?} and not governed by a CIT executed while this task was claimed"
             ));
             continue;
         }
+        if !claimed_allowed.is_empty() && !claimed_allowed.iter().any(|pat| glob_match(pat, f)) {
+            out.push(format!(
+                "{f}: outside the allowed_paths {claimed_allowed:?} the task had when it was claimed (the task record was changed during the claim)"
+            ));
+            continue;
+        }
         if let Some(r) = &reserved {
-            if !claims::path_in_scope(r, f) && !governed.contains(f) {
+            if !claims::path_in_scope(r, f) {
                 out.push(format!(
                     "{f}: outside the scope {r:?} the task's claim reserved (the task record was widened after the claim was granted; release and claim again to reserve the new scope)"
                 ));
@@ -838,14 +1453,38 @@ pub fn is_production_path(p: &Project, path: &str) -> bool {
     )
 }
 
-/// Close with evidence (worker return / report). Enforces authority, the claim (holder, worktree), the designated
-/// role, mutation scope, production-merge permission, tests status, index freshness (including embedder pins) and
-/// governance currency.
+/// **Close a task with evidence** (framework §13, §64; Contract v3:560-569, W5, O1/O4, L3).
+///
+/// The worker's structured return *is* the close report (the consumption receipt, BC-P2-20). The checks run in this
+/// order, and the order is deliberate — the first refusal is the one reported:
+///
+/// | # | check | refusal | `--force` (L3+) |
+/// |---|---|---|---|
+/// | 1 | normalise the worker return (`context::receipt::report_from_worker_return`, lossless) | — | — |
+/// | 2 | another session's live claim | `TASK_CLAIMED` | overridden, recorded |
+/// | 3 | evidence payload: `tests.status` allowed by TEST_POLICY, `work_completed` present | `EVIDENCE_REQUIRED` | no |
+/// | 4 | the claim: held by this session, from its working tree | `CLAIM_REQUIRED`, `CLAIM_WORKTREE_MISMATCH` | overridden, recorded |
+/// | 5 | the claim baseline is the sealed one the claim wrote (T2) | `CLAIM_BASELINE_UNBOUND` | overridden (git's uncommitted view), recorded |
+/// | 6 | designated role, as recorded now and as claimed | `ROLE_NOT_DESIGNATED` | overridden, recorded |
+/// | 7 | independence from recorded authorship (BC-P2-34) | `INDEPENDENCE_VIOLATION` | overridden, recorded |
+/// | 8 | every governing Human Decision Gate authorises the work (BC-P2-12) | `GATE_NOT_AUTHORISED` | **no**: a human gate is not an L3 decision |
+/// | 9 | observed mutations: declared, in scope (as recorded and as claimed), and no change to OS-written state that no OS operation produced (`t2::classify_path`, BC-P2-09) | `MUTATION_SCOPE_VIOLATION` | no |
+/// | 10 | production-merge permission | `PRODUCTION_MERGE_NOT_ALLOWED` | no |
+/// | 11 | index pins and freshness | `INDEX_PIN_MISMATCH`, `INDEX_STALE` | stale only (degraded) |
+/// | 12 | the consumption receipt against the manifest and packet (`context::receipt::require_valid`, W5) | `RECEIPT_INVALID` | no |
+/// | 13 | the health close gate (`verification::close_gate`): G0 hard-blocks, G2 re-check, governance-evidence currency (O4), product-test outcome from recorded evidence (O1) | `HEALTH_HARD_BLOCK`, `GOVERNANCE_SUITE_STALE`/`_MISSING`, `PRODUCT_TEST*` | currency only (degraded) |
+///
+/// Why this order: who may close (2, 4-7) and whether the work may complete at all (8) are decided before any
+/// evidence is weighed; the repository's own state (9-10), observed independently of the worker, is weighed before
+/// the worker's account of it (12), so an incomplete receipt never masks an out-of-scope or forged mutation; the
+/// evidence payload (3) keeps its long-standing place so a malformed report is refused as such; the health gate
+/// (13) runs last because it may execute checks and record a governance-suite result, which nothing before it
+/// should cause for a close that is refused anyway.
 pub fn close(
     p: &Project,
     db: &RuntimeDb,
     id: &str,
-    mut report: Value,
+    report_in: Value,
     force: bool,
 ) -> Result<Value> {
     control::guard_write(p, "task close")?;
@@ -861,12 +1500,20 @@ pub fn close(
     let store = RecordStore::load(&p.root);
     let t = store
         .get(id)
+        .filter(|t| t.rtype() == "task")
         .ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{id} not found")))?;
     if t.get("task_status") == "DONE" {
         return Err(GovError::new("USAGE", format!("{id} already DONE")));
     }
-    // another session's live claim is refused first (as before); the rest of the claim binding follows the
-    // evidence checks so a malformed report keeps its own refusal
+    // --- 1. the worker's return is the receipt (one contract; lossless mapping of status -> outcome)
+    if !report_in.is_object() {
+        return Err(GovError::new(
+            "EVIDENCE_REQUIRED",
+            "the close report must be a JSON object (the worker return / consumption receipt)",
+        ));
+    }
+    let mut report = crate::context::receipt::report_from_worker_return(&report_in);
+    // --- 2. another session's live claim is refused first (as before)
     let live_holder = claims::holder(p, id)?;
     if let Some(h) = &live_holder {
         if h["session_id"].as_str() != Some(p.session_id.as_str()) && !force {
@@ -876,6 +1523,7 @@ pub fn close(
             ));
         }
     }
+    // --- 3. the evidence payload keeps its precedence so a malformed report keeps its own refusal
     let tests_status = report
         .get("tests")
         .and_then(|x| x.get("status"))
@@ -900,12 +1548,14 @@ pub fn close(
             "report.work_completed is required",
         ));
     }
-    // --- the claim (BC-P2-15): work is closed by the session that holds it, from the working tree it was claimed in
+    // --- 4. the claim (BC-P2-15): work is closed by the session that holds it, from the working tree it was claimed in
     let wt = claims::worktree_id(p);
     let claim = claims::get(p, id)?;
     let mut overrides: Vec<Value> = vec![];
+    let mut own_claim = false;
     match &claim {
         Some(c) if c["session_id"].as_str() == Some(p.session_id.as_str()) => {
+            own_claim = true;
             let cw = c["worktree"].as_str().unwrap_or("");
             if !cw.is_empty() && cw != wt {
                 if !force {
@@ -930,31 +1580,97 @@ pub fn close(
             overrides.push(json!({"override": "no_claim_held", "claim": claim}));
         }
     }
-    // --- the designated role (BC-P2-14)
-    if let Some(e) = designated_role_refusal(p, t, "close") {
+    // --- 5. the claim baseline must be the sealed one the claim wrote: a rewritten baseline would hide mutations
+    let baseline = read_baseline(p, id);
+    let bound = match &baseline {
+        Baseline::Bound(d) => Some(d.clone()),
+        _ => None,
+    };
+    if own_claim && bound.is_none() {
+        let state = match &baseline {
+            Baseline::Unbound { binding } => json!({"state": "UNBOUND", "t2": binding}),
+            _ => json!({"state": "ABSENT"}),
+        };
+        if !force {
+            return Err(GovError::new("CLAIM_BASELINE_UNBOUND", format!("{id}: the claim baseline this close must be checked against is not the one the claim wrote (it is missing, or it was changed outside gov: T2 binding not verified); the observed mutations cannot be established. An L3+ `--force` close is checked against git's uncommitted changes instead and records the override")).with_details(json!({"task": id, "baseline": state})));
+        }
+        overrides.push(json!({"override": "claim_baseline_unbound", "baseline": state}));
+    }
+    let claimed_contract = bound.as_ref().map(|d| d["contract"].clone());
+    // --- 6. the designated role (BC-P2-14), as recorded now and as claimed
+    if let Some(e) = designated_role_refusal(p, t, "close", claimed_contract.as_ref()) {
         if !force {
             return Err(e);
         }
-        overrides.push(json!({"override": "designated_role", "designated_role": t.get("role"), "acting_role": p.role}));
+        overrides.push(json!({"override": "designated_role", "designated_role": e.details["designated_role"], "acting_role": p.role}));
     }
-    let files_changed: Vec<String> = report
-        .get("files_changed")
-        .and_then(|v| v.as_array())
-        .map(|a| {
-            a.iter()
-                .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                .collect()
-        })
-        .unwrap_or_default();
-    // --- mutation scope (framework §25/§42; verifier H4): the declared manifest ...
-    let obs = observe(p, &store, t);
+    let ctx = DagCtx::new(p, &store);
+    // --- 7. independence from recorded authorship (BC-P2-34)
+    let conflicts = independence_conflicts(&ctx, &store, t, &p.session_id);
+    if !conflicts.is_empty() {
+        if !force {
+            return Err(independence_refusal(t, "closed", &conflicts));
+        }
+        overrides.push(json!({"override": "independence", "reasons": conflicts}));
+    }
+    // --- 8. Human Decision Gates (BC-P2-12): work cannot complete while a governing gate withholds authorisation
+    let mut governing = ctx.governing_gates(t);
+    if let Some(g) = claimed_contract
+        .as_ref()
+        .and_then(|c| c["human_gate"].as_str())
+        .filter(|g| !g.is_empty())
+    {
+        if !governing.iter().any(|x| x == g) {
+            governing.push(g.to_string());
+        }
+    }
+    let mut gate_states = vec![];
+    let mut unauthorised = vec![];
+    for g in &governing {
+        let a = gates::task_gate_authorisation_in(p, &store, g);
+        let v = json!({"gate": g, "authorisation": a.to_value()});
+        if !a.authorises() {
+            unauthorised.push(
+                json!({"gate": g, "authorisation": a.to_value(), "reason": a.blocking_reason(g)}),
+            );
+        }
+        gate_states.push(v);
+    }
+    if !unauthorised.is_empty() {
+        let why: Vec<String> = unauthorised
+            .iter()
+            .filter_map(|u| u["reason"].as_str().map(|s| s.to_string()))
+            .collect();
+        return Err(GovError::new("GATE_NOT_AUTHORISED", format!("{id} cannot be completed: {}. Work blocked by a Human Decision Gate completes only after an answer that authorises it (present the gate; the human answers through the authenticated channel); `--force` does not override a human gate", why.join("; "))).with_details(json!({"task": id, "gates": unauthorised})));
+    }
+    // --- 9. mutation scope (framework §25/§42; verifier H4): the declared manifest ...
+    let mut files_changed: Vec<String> = vec![];
+    for k in ["files_changed", "outputs_produced"] {
+        for f in report
+            .get(k)
+            .and_then(|v| v.as_array())
+            .map(|a| {
+                a.iter()
+                    .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default()
+        {
+            if !files_changed.contains(&f) {
+                files_changed.push(f);
+            }
+        }
+    }
+    let obs = observe_against(p, &store, t, bound.as_ref());
     let governed = &obs.cit_window;
-    let violations = scope_violations(p, t, &files_changed, governed);
+    let violations =
+        scope_violations_with(p, t, &files_changed, governed, claimed_contract.as_ref());
     if !violations.is_empty() {
         return Err(GovError::new("MUTATION_SCOPE_VIOLATION", format!("task {id} reports mutations outside its contract: {}; route them through a CIT or amend the task contract", violations.join("; "))).with_details(json!({"violations": violations, "allowed_paths": t.list("allowed_paths")})));
     }
     // ... and the mutations actually observed in the repository since the claim baseline (verifier M-N4): undeclared
-    // or out-of-scope changes fail closed unless a CIT executed inside this claim window governs them;
+    // or out-of-scope changes fail closed unless a CIT executed inside this claim window governs them, and a change
+    // to OS-written state that no OS operation produced (T2) fails closed whatever the report says;
     // self-attestation is never sufficient
     let observed = obs.observed.clone();
     let evidence = obs.evidence.clone();
@@ -963,12 +1679,26 @@ pub fn close(
         .filter(|f| !files_changed.contains(f) && !governed.contains(*f))
         .cloned()
         .collect();
-    let observed_violations = scope_violations(p, t, &observed, governed);
-    if !undeclared.is_empty() || !observed_violations.is_empty() {
-        return Err(GovError::new("MUTATION_SCOPE_VIOLATION", format!("task {id}: the repository shows mutations the report does not declare or the contract does not allow (undeclared: {undeclared:?}; out of scope: {observed_violations:?}); declare every change in files_changed, route out-of-scope changes through a CIT, or amend the task contract")).with_details(json!({"undeclared": undeclared, "out_of_scope": observed_violations, "reported": files_changed, "observed": observed, "evidence": evidence})));
+    let observed_violations =
+        scope_violations_with(p, t, &observed, governed, claimed_contract.as_ref());
+    if !undeclared.is_empty() || !observed_violations.is_empty() || !obs.t2_violations.is_empty() {
+        let t2_paths: Vec<String> = obs
+            .t2_violations
+            .iter()
+            .filter_map(|v| v["path"].as_str().map(|s| s.to_string()))
+            .collect();
+        return Err(GovError::new("MUTATION_SCOPE_VIOLATION", format!("task {id}: the repository shows mutations the report does not declare or the contract does not allow (undeclared: {undeclared:?}; out of scope: {observed_violations:?}; OS-written state changed outside a gov operation: {t2_paths:?}); declare every change in files_changed, route out-of-scope changes through a CIT, amend the task contract, and restore OS-written records (gates, decisions, reports, CITs) from version control — they are written only by gov operations")).with_details(json!({"undeclared": undeclared, "out_of_scope": observed_violations, "t2_violations": obs.t2_violations, "reported": files_changed, "observed": observed, "evidence": evidence})));
     }
-    // --- production-merge permission (BC-P2-14; Contract v3:569, :614)
-    if !production_merge_allowed(t) {
+    // --- 10. production-merge permission (BC-P2-14; Contract v3:569, :614), as recorded now and as claimed
+    let merge_allowed = production_merge_allowed(t)
+        && claimed_contract
+            .as_ref()
+            .map(|c| {
+                c["production_merge_allowed"].as_bool().unwrap_or(true)
+                    && c["class"] != "experiment"
+            })
+            .unwrap_or(true);
+    if !merge_allowed {
         let landed: Vec<String> = observed
             .iter()
             .filter(|f| !governed.contains(*f) && is_production_path(p, f))
@@ -983,7 +1713,7 @@ pub fn close(
         .filter(|f| !observed.contains(f))
         .cloned()
         .collect();
-    // --- freshness (content and pins)
+    // --- 11. freshness (content and pins)
     let fr = freshness(p);
     let stale_count = fr.stale.len() + fr.added.len() + fr.removed.len();
     let max_stale = pol.get_i64(
@@ -992,7 +1722,7 @@ pub fn close(
         0,
     ) as usize;
     let on_stale = pol.get_str("MEMORY_POLICY", "freshness.on_stale_close", "fail");
-    let mut degraded = vec![];
+    let mut degraded: Vec<Value> = vec![];
     if !fr.pin_mismatch.is_empty() {
         return Err(GovError::new("INDEX_PIN_MISMATCH", format!("the index was built with different pins than policy declares ({}); run `gov rebuild-memory` before closing", fr.pin_mismatch.join("; "))));
     }
@@ -1000,29 +1730,26 @@ pub fn close(
         if on_stale == "fail" && !force {
             return Err(GovError::new("INDEX_STALE", format!("required index is stale ({stale_count} artefacts changed since last build); run `gov rebuild-memory --incremental` before closing")).with_details(json!({"stale": fr.stale, "added": fr.added, "removed": fr.removed})));
         }
-        degraded.push(format!("index stale ({stale_count})"));
+        degraded.push(json!(format!("index stale ({stale_count})")));
     }
-    // --- governance currency
-    let touches_gov = files_changed
-        .iter()
-        .any(|f| glob_match("governance/**", f) || glob_match("spec/decisions/**", f));
-    if touches_gov {
-        match crate::verification::latest_green(p) {
-            Some(g) if g["inputs_hash"].as_str() == Some(&crate::verification::inputs_hash(p)) => {}
-            Some(_) => {
-                if !force {
-                    return Err(GovError::new("GOVERNANCE_SUITE_STALE", "task touches governance paths but the last green governance record is obsolete; run `gov audit` first"));
-                }
-                degraded.push("governance suite stale".into());
-            }
-            None => {
-                if !force {
-                    return Err(GovError::new("GOVERNANCE_SUITE_MISSING", "task touches governance paths; no green governance record exists; run `gov audit` first"));
-                }
-                degraded.push("no governance record".into());
-            }
+    // --- 12. the consumption receipt (BC-P2-20, W5): validated against the manifest and the packet it names
+    report = require_receipt(p, &store, t, &report)?;
+    // --- 13. the health close gate (G0 hard-block, G2 re-check, O4 currency, O1 product tests from evidence)
+    // what this task touched: what it declares and what it was observed to change — not the paths an in-window CIT
+    // changed, which are that CIT's governed mutations (its own G4 tier covers them)
+    let mut touched: Vec<String> = files_changed.clone();
+    for f in &observed {
+        if !touched.contains(f) && !obs.cit_covered.contains(f) {
+            touched.push(f.clone());
         }
     }
+    let mut task_value = t.data.clone();
+    task_value["id"] = json!(id);
+    let gate = crate::verification::close_gate(p, &task_value, &report, &touched, force)?;
+    if let Some(d) = gate["degraded"].as_array() {
+        degraded.extend(d.iter().cloned());
+    }
+    // --- mint the report (sealed: an OS-written T2 record) and complete the task
     let closed_at = now_iso();
     let rpt_id = store.next_id("report");
     let robj = report.as_object_mut().unwrap();
@@ -1036,26 +1763,43 @@ pub fn close(
     }
     robj.insert("state_class".into(), json!("EVIDENCE"));
     robj.insert("observed_files_changed".into(), json!(observed));
+    robj.insert(
+        "close_gate".into(),
+        json!({"governance_affecting": gate["governance_affecting"], "reasons": gate["reasons"], "g2": gate["g2"], "human_gates": gate_states}),
+    );
     // the content this close accepts, so a later close in the same working tree can tell this task's accepted
-    // changes from its own (and so the evidence names exactly what was accepted)
+    // changes from its own, and so recorded authorship names exactly what was accepted
     robj.insert(
         "mutation_evidence".into(),
-        json!({"baseline": evidence["baseline"], "reported_but_unchanged": unobserved, "closed_at": closed_at,
+        json!({"baseline": evidence["baseline"], "baseline_sealed": bound.is_some(), "reported_but_unchanged": unobserved, "closed_at": closed_at,
             "observed_hashes": obs.current_of, "cit_covered": obs.cit_covered, "attributed_elsewhere": obs.attributed,
+            "os_managed_bound": obs.os_bound, "os_managed_unbound": obs.os_unbound,
             "carried": evidence["carried"], "claim": claim.as_ref().map(|c| json!({"session": c["session_id"], "role": c["role"], "worktree": c["worktree"], "branch": c["branch"], "head": c["head"], "scope": c["scope"], "claimed_at": c["claimed_at"]})),
-            "closing_worktree": wt, "overrides": overrides}),
+            "claimed_contract": claimed_contract, "closing_worktree": wt, "overrides": overrides}),
     );
     let title = format!("Report for {id}: {}", t.title());
-    let rec = new_record("report", &rpt_id, &title, Value::Object(robj.clone()));
+    let mut rec = new_record("report", &rpt_id, &title, Value::Object(robj.clone()));
     p.schemas()
         .validate("report", &rec.data, &format!("({rpt_id})"))?;
+    crate::t2::seal_record(&mut rec, "task close")?;
     save_record(&p.root, &rec)?;
+    let produced: Vec<String> = observed
+        .iter()
+        .filter(|f| !obs.cit_covered.contains(*f))
+        .cloned()
+        .collect();
     let mut store2 = RecordStore::load(&p.root);
     let tr = store2.get_mut(id).unwrap();
     tr.set("task_status", json!("DONE"));
     tr.set("closed_by_report", json!(rpt_id));
     tr.set("updated", json!(today()));
     tr.set("closed_at", json!(closed_at));
+    // the task -> output edges (W5 line 1126 / W8): what the task actually produced, as observed
+    tr.set("outputs_produced", json!(produced));
+    tr.set(
+        "status_source",
+        json!({"operation": "task close", "status": "DONE", "session": p.session_id, "role": p.role, "at": closed_at, "report": rpt_id}),
+    );
     if tr.data.get("retest_required").is_some() {
         tr.set("retest_required", json!(false));
     }
@@ -1076,13 +1820,94 @@ pub fn close(
         },
     );
     Ok(
-        json!({"task": id, "task_status": "DONE", "report": rpt_id, "checkpoint": ck["id"], "degraded": degraded, "overrides": overrides}),
+        json!({"task": id, "task_status": "DONE", "report": rpt_id, "checkpoint": ck["id"], "degraded": degraded, "overrides": overrides,
+               "receipt_validation": robj["receipt_validation"], "close_gate": {"governance_affecting": gate["governance_affecting"], "g2": gate["g2"]}}),
     )
+}
+
+/// **The consumption receipt at close** (BC-P2-20 close side): `context::receipt::validate` against the task's
+/// manifest and the packet the receipt names, refused as `RECEIPT_INVALID` with every error — exactly
+/// `receipt::require_valid`, with one rule the task DAG applies too ([`dag::produces_feature_specification`]): a task
+/// that produces its feature's specification does not complete *on* the inputs it only inherits from the feature,
+/// so an unsatisfied inherited-only input is advisory for it rather than `MANIFEST_UNSATISFIED` (what the task
+/// declares itself still binds). Returns the report fields to persist: the canonical receipt merged over the report,
+/// plus `receipt_validation`.
+fn require_receipt(p: &Project, store: &RecordStore, t: &Record, report: &Value) -> Result<Value> {
+    let id = t.id();
+    let mut chk = crate::context::receipt::validate(p, store, &id, report)?;
+    let mut advisory: Vec<Value> = vec![];
+    if dag::produces_feature_specification(t) {
+        let m = crate::context::manifest::resolve(p, store, t);
+        let inherited_only: BTreeSet<String> = m
+            .entries
+            .iter()
+            .filter(|e| e.required && !e.satisfied())
+            .filter(|e| e.sources.iter().all(|s| s.starts_with("feature ")))
+            .map(|e| e.id.clone())
+            .collect();
+        chk.errors.retain(|e| {
+            let ids: Vec<String> = e["ids"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                        .collect()
+                })
+                .unwrap_or_default();
+            let only_inherited = (e["code"] == "MANIFEST_UNSATISFIED"
+                && !ids.is_empty()
+                && ids.iter().all(|i| inherited_only.contains(i)))
+                || (e["code"] == "PACKET_BLOCKED"
+                    && ids.first().is_some_and(|h| {
+                        crate::context::load_packet(p, &id, Some(h))
+                            .map(|pk| dag::packet_blocked_only_by_inherited(t, &pk))
+                            .unwrap_or(false)
+                    }));
+            if only_inherited {
+                advisory.push(json!({"code": "INHERITED_INPUT_UNSATISFIED", "message": format!("{id} produces its feature's specification; the inputs it only inherits from the feature are not yet satisfied ({}: {})", e["code"].as_str().unwrap_or(""), ids.join(", ")), "ids": ids}));
+            }
+            !only_inherited
+        });
+    }
+    if !chk.ok() {
+        let codes: Vec<String> = chk
+            .errors
+            .iter()
+            .filter_map(|e| e["code"].as_str().map(|s| s.to_string()))
+            .collect();
+        return Err(GovError::new(
+            "RECEIPT_INVALID",
+            format!(
+                "{id}: the consumption receipt does not trace this completion to its inputs ({}). Remediation: return the fields in the packet's receipt_contract — {}",
+                codes.join(", "),
+                chk.errors.iter().filter_map(|e| e["message"].as_str()).collect::<Vec<_>>().join(" | ")
+            ),
+        )
+        .with_details(chk.to_value()));
+    }
+    chk.warnings.extend(advisory);
+    let mut out = crate::context::receipt::report_from_worker_return(report);
+    if let (Some(o), Some(c)) = (out.as_object_mut(), chk.receipt.as_object()) {
+        for (k, v) in c {
+            if !v.is_null() {
+                o.insert(k.clone(), v.clone());
+            }
+        }
+        let mut summary = chk.summary();
+        summary["warnings"] = json!(chk
+            .warnings
+            .iter()
+            .map(|w| w["code"].clone())
+            .collect::<Vec<_>>());
+        o.insert("receipt_validation".into(), summary);
+    }
+    Ok(out)
 }
 
 /// The enforcement state of a task's contract fields, for consumers that present the contract (the context packet,
 /// `gov task show`): resolution of `required_data`, `required_tools` and `required_skills`, the tasks that `blocks`
-/// it, the designated role and the production-merge permission. Read-only.
+/// it, the designated role, the production-merge permission, the governing gates and the task's DAG state.
+/// Read-only.
 pub fn contract_enforcement(p: &Project, store: &RecordStore, t: &Record) -> Value {
     let inputs = crate::orchestration::dag::required_inputs(p, store, t);
     let blocked_by: Vec<Value> = store
@@ -1091,9 +1916,12 @@ pub fn contract_enforcement(p: &Project, store: &RecordStore, t: &Record) -> Val
         .filter(|o| o.list("blocks").contains(&t.id()))
         .map(|o| json!({"task": o.id(), "task_status": o.get("task_status")}))
         .collect();
+    let ctx = DagCtx::new(p, store);
+    let ev = dag::evaluate(&ctx, t, None);
     json!({"required_data": inputs["required_data"], "required_tools": inputs["required_tools"], "required_skills": inputs["required_skills"],
         "blocked_by": blocked_by, "blocks": t.list("blocks"), "designated_role": t.get("role"),
-        "production_merge_allowed": production_merge_allowed(t), "mutation_scope": claims::scope_of_task(t)})
+        "production_merge_allowed": production_merge_allowed(t), "mutation_scope": claims::scope_of_task(t),
+        "governing_gates": ev.gates, "dag": {"state": ev.state.as_str(), "reasons": ev.reasons}})
 }
 
 /// Production-merge violations present in the working tree, for the governance suite (Contract v3:614 "production
@@ -1141,4 +1969,48 @@ pub fn production_merge_findings(p: &Project, store: &RecordStore) -> Vec<Value>
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// DONE, CLAIMED and IN_PROGRESS are reached only through close / claim: `task create` and `task status` refuse
+    /// them with the route to take; every other status is settable.
+    #[test]
+    fn operation_only_statuses_name_their_route() {
+        for s in ["DONE", "CLAIMED", "IN_PROGRESS"] {
+            let e = operation_only(s).expect(s);
+            assert_eq!(e.code, "TASK_STATUS_REQUIRES_OPERATION");
+            assert!(e.details["route"]
+                .as_str()
+                .unwrap()
+                .starts_with("gov task "));
+        }
+        for s in [
+            "DRAFT",
+            "READY",
+            "BLOCKED",
+            "REVIEW",
+            "CANCELLED",
+            "WAITING_HUMAN",
+        ] {
+            assert!(operation_only(s).is_none(), "{s}");
+        }
+    }
+
+    #[test]
+    fn independent_work_is_recognised_by_class_role_or_readiness_cell() {
+        let t = |f: Value| crate::records::new_record("task", "TASK-0001", "t", f);
+        assert!(independent_work(&t(json!({"class": "test-design"}))));
+        assert!(independent_work(&t(
+            json!({"class": "data", "role": "data-author"})
+        )));
+        assert!(independent_work(&t(
+            json!({"class": "specification", "readiness_cell": "independent_acceptance_tests"})
+        )));
+        assert!(!independent_work(&t(
+            json!({"class": "implementation", "role": "backend-engineer"})
+        )));
+    }
 }

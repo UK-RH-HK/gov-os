@@ -1,0 +1,23 @@
+# P2-AR-0027 audit-of-record probe re-run (unedited): beta-r/R3-archive-policy mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree HEAD (export of 843d79c)
+# probe sha256 9286c6d7361fa3627ef6b44ef7624dc6609946c79fb662a37a3d73a3db987b83; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/base-tree/target/release/gov
+# date 2026-09-19T04:46:57Z
+$ gov --role orchestrator init --name orders-ledger --alias r3 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+R3-b1 historical/superseded excluded from default current retrieval
+====================================================================================================
+archived artefacts in the index: [('file:archive/code-reference/pricing_v1.py', 'historical', 'HISTORICAL', 0, 0, 1), ('file:archive/spec/ledger-design-v1.md', 'historical', 'HISTORICAL', 0, 0, 1)]
+'mutable table recomputed nightly with float dollars': default -> ['file:docs/runbook.md', 'L-0101', 'ARCH-0101', 'file:governance/project/TOOL_PERMISSIONS.yaml', 'AUD-0001', 'L-0101'] (excluded_by_authority=4) | --include-historical -> ['D-0101', 'file:docs/runbook.md', 'D-0101', 'L-0101', 'file:governance/project/TOOL_PERMISSIONS.yaml', 'ARCH-0101']
+'"mutable table"': default -> [] (excluded_by_authority=1) | --include-historical -> []
+superseded D-0101: default -> ['D-0102', 'L-0101', 'L-0101', 'REQ-0001', 'D-0102', 'file:governance/kernel/skills/SKL-LIVE-MIGRATION.yaml'] | --include-historical -> [('D-0101', ['superseded_by:D-0102']), ('D-0101', ['superseded_by:D-0102'])]
+[PASS] R3-b1-default: archived and superseded material is excluded from default current-state retrieval
+[FAIL] R3-b1-explicit: archived and superseded material is retrievable when explicitly requested (CLI --include-historical)
+NOTE: retrieval has an `include_archive` option (retrieval/mod.rs RetrieveOptions) but `gov memory query` exposes only --include-historical
+
+====================================================================================================
+R3-b2 Git history preferred over dead-code archive (brownfield)
+====================================================================================================
+required command failed: gov decide HDG-0001 --option A --by owner: {'code': 'HUMAN_CHANNEL_UNAVAILABLE', 'message': "no authenticated human channel exists on this machine: no human-channel anchor is provisioned (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/run-direct-beta-r-R3-archive-policy-hbEayk/machines/14e72ff018cf386f/governance-os/machine/human-channel/anchor.json is absent). A human answer can only come from an owner-signed document verified against an administrator-provisioned anchor (BC-P2-10; OWNER-DECISION-0006 req. 2). Remediation: the administrator installs the owner's public human-gate keys with `gov trust human-channel --provision <anchor.json>` (a self-signed `human-channel-anchor` document from the administrator domain), or provisions a Signed Release Root delegating `human-gate`", 'details': {'role': 'human-gate', 'remediation': "the administrator installs the owner's public human-gate keys with `gov trust human-channel --provision <anchor.json>` (a self-signed `human-channel-anchor` document from the administrator domain), or provisions a Signed Release Root delegating `human-gate`", 'inbox': '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0027/runs/run-direct-beta-r-R3-archive-policy-hbEayk/machines/14e72ff018cf386f/governance-os/machine/human-channel/inbox'}}
+[exit=1]

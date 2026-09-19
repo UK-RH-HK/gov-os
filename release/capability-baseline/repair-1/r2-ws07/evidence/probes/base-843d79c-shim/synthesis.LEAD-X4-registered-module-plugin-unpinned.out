@@ -1,0 +1,24 @@
+# P2-AR-0028 probe re-run: synthesis/LEAD-X4-registered-module-plugin-unpinned mode=shim label=base-843d79c
+# gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/probes/bin-base-843d79c/gov-shim
+# project x4: fixture=greenfield root=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/probes/pr-base-843d79c-shim-X4-WG7c8j/x4-41229b/proj
+$ gov init --name x4   [role=orchestrator session=S-synth exit=0]
+   init ok version=4.1.5
+$ gov plugins register --descriptor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/probes/pr-base-843d79c-shim-X4-WG7c8j/x4-41229b/proj/governance/project/plugins/synthplug.yaml   [role=tooling-engineer session=S-te exit=0]
+   ok {"human_gate": "HDG-0001", "reason": "elevated permissions or privilege escalation require a presented, answered registration gate; re-run with the descriptor field registration_gate: <HDG> after the human answers A", "registered": false}
+NOTE registration raised gate HDG-0001; registered=False
+$ gov gate present HDG-0001   [role=orchestrator session=S-synth exit=0]
+$ gov decide HDG-0001 --option A --by owner   [role=human session=S-owner exit=0]
+$ gov plugins register --descriptor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/probes/pr-base-843d79c-shim-X4-WG7c8j/x4-41229b/proj/governance/project/plugins/synthplug.yaml   [role=tooling-engineer session=S-te exit=0]
+   ok {"acquisition": {"acquisition_class": "REMOTELY_ACQUIRED", "capability": "synthplug", "privileged": false, "release_channel": ""}, "approved_roles": ["all"], "path": "governance/project/plugins/synthplug.yaml", "pin": {"files": [], "sha256": null}, "plugin_id": "synthplug", "provenance": {"gate": "HDG-0001", "method": "gov plugins register", "registered_at": "2026-09-19T03:26:58Z", "registered_by_role": "tooling-engineer", "registered_by_session": "S-te"}, "registered": true, "registry": "governance/generated/plugin-registry.json", "registry_entry": {"approved_roles": ["all"], "capability": "embed", "descriptor_path": "plugins/synthplug.yaml", "descriptor_sha256": "ad7f5535612af8167f12917bbfd45267013b45384286abb47edac8be47f84e85", "implementation_files": [], "implementation_sha256": null, "method": "gov plugins register", "permissions": {"network": true}, "plugin_id": "synthplug", "registered_at": "2026-09-19T03:26:58Z", "registered_by_role": "tooling-engineer", "registered_by_session": "S-te", "registration_gate": "HDG-0001", "required_permission_classes": ["NETWORK_READ"], "version": "1"}}
+X X4-F4-registered PASS the elevated module-form plugin is registered after a presented, answered gate -- {"descriptor_sha256": "ad7f5535612af8167f12917bbfd45267013b45384286abb47edac8be47f84e85", "implementation_files": [], "implementation_sha256": null, "registration_gate": "HDG-0001"}
+X X4-F4:428-implementation-pinned FAIL F4:428 the registered plugin's implementation bytes are hash-bound -- {"implementation_files": [], "implementation_sha256": null}
+$ gov capabilities invoke --plugin synthplug --inputs "{\"texts\": [\"a\"]}"   [role=tooling-engineer session=S-te exit=0]
+   ok {"elapsed_ms": 20, "outputs": {"dim": 2, "vectors": [[0.1, 0.2]]}, "plugin_id": "synthplug", "provider": {"id": "synthplug", "version": "1"}, "stdout_bytes": 142}
+NOTE first invocation ok=True
+$ gov capabilities invoke --plugin synthplug --inputs "{\"texts\": [\"a\"]}"   [role=tooling-engineer session=S-te exit=0]
+   ok {"elapsed_ms": 25, "outputs": {"dim": 2, "vectors": [[0.1, 0.2]]}, "plugin_id": "synthplug", "provider": {"id": "synthplug", "version": "1"}, "stdout_bytes": 142}
+X X4-F4:429-drift-fails-closed FAIL F4:429 replacing the implementation of a registered, approved, elevated plugin fails closed -- {"err": null, "invoke_ok": true, "swapped_code_executed": true}
+$ gov doctor   [role=orchestrator session=S-synth exit=0]
+X X4-F4-doctor-sees-drift FAIL doctor D028 reports the swapped implementation -- [[true, "no plugin problems"]]
+SUMMARY total=4 pass=1 fail=3 failed=['X4-F4:428-implementation-pinned', 'X4-F4:429-drift-fails-closed', 'X4-F4-doctor-sees-drift']
+[exit=0]

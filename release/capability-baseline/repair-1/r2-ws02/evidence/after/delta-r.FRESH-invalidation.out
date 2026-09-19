@@ -1,0 +1,14 @@
+# P2-AR-0023 audit-of-record probe re-run (unedited): delta-r/FRESH-invalidation label=after mode=direct
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws02 (HEAD 91d709264279061d8b1992a53949dae64c6ab7aa)
+# probe sha256 2c5ebbfcc1bedf6bfb4aa3d89cd09aaeee1e07a305aec40fa06aa1a9e247d94d; gov 37fab1175b85edd141496977e7a89f94544958bfcf501f1dd5a0d6c3e3ae0106 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws02/target/release/gov
+# date 2026-09-19T06:02:10Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-after-delta-r-FRESH-invalidation-V2EnGk/fresh-1789797730-f86443/proj
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws02/release/capability-baseline/audit-0/delta-r/evidence/FRESH-invalidation.py", line 20, in <module>
+    p = Proj("fresh")
+        ^^^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws02/release/capability-baseline/audit-0/delta-r/evidence/harness.py", line 69, in __init__
+    assert r["ok"], r
+           ~^^^^^^
+AssertionError: {'ok': False, 'command': 'init', 'error': {'code': 'AUTHORITY_DENIED', 'message': "no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an orchestrator unless explicitly assigned that role); 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: declare the assigned role with the global `--role <kernel role id>` flag or GOV_ROLE.", 'details': {'role': 'undeclared', 'declared': False, 'level': 'L0', 'kernel_level': 'L0', 'required': 'L4', 'operation': 'install_kernel', 'cause': 'ROLE_UNDECLARED', 'remediation': 'declare the assigned role with the global `--role <kernel role id>` flag or GOV_ROLE'}}, 'session': 'probe-08baf3e5', 'release_trust': {'surface': 'init', 'below_floor': False, 'marking': None, 'presented_as': 'CURRENT', 'section_6_bullet': 7, 'basis': "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}, '_exit': 1}
+[exit=1]

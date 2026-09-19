@@ -1,0 +1,94 @@
+# P2-AR-0028 cross-family re-run (unedited probe, adapter mode prereg): beta-r/D4-component-separation label=final-371794a
+# gov ec2a76fe3020c31f40f52f3d858b5d827b4b6a05da9ef7902811d41b680031b4
+$ gov --role orchestrator init --name orders-ledger --alias d4 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+D4-b1 embedding model
+====================================================================================================
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+manifest embedder before/after: {'dimensions': 512, 'id': 'hashed-ngram', 'source': 'builtin', 'version': '1'} {'dimensions': 256, 'id': 'concept-embedder', 'source': 'plugin', 'version': '1'} | query embedder: {'id': 'concept-embedder', 'version': '1', 'dimensions': 256, 'source': 'plugin'}
+derived stores changed by the embedder swap: ['chunks', 'edges', 'fts', 'vectors']
+$ gov --role orchestrator memory query 'why integer cents'  -> exit 1 ok=False error={"code": "EMBEDDER_UNAVAILABLE", "message": "embedding implementation 'concept-embedder' is pinned by MEMORY_POLICY.embedding but no `embed` plugin with that id is declared under governance/project/plugins/ (no silent fallback to the built-in embedder)", "details": {"pinned": {"id": "concept-embedder", "version": "1", "dimensions": 256, "source": "plugin"}, "usable_plugins": [], "denied": [], "rejected": []}}
+pinned embedder plugin removed -> query: EMBEDDER_UNAVAILABLE
+[FAIL] D4-b1: the embedding model is identified in the manifest, replaced through a governed pin + full rebuild, touches only the vector store, and fails closed when missing
+
+====================================================================================================
+D4-b2 embedding runtime (separately identifiable from the model?)
+====================================================================================================
+$ gov --role orchestrator plugins register --descriptor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-D4-component-separation-SWtvsj/d4-weights-desc.yaml  -> exit 0 ok=True
+gov plugins register weights-embedder -> True None {"registered": true, "plugin_id": "weights-embedder", "path": "governance/project/plugins/weights-embedder.yaml", "pin": {"sha256": "9d9caaaee5f863887d2d02abbe904d23338f5a945303ab6499cc8c29f045faa1", "files": ["/usr/bin/python3.12", "tools/probe-plugins/weights_embedder.py"]}, "provenance": {"regist
+registry entry binds: {'version': '1', 'implementation_files': ['/usr/bin/python3.12', 'tools/probe-plugins/weights_embedder.py'], 'implementation_sha256': '9d9caaaee5f863887d2d02abbe904d23338f5a945303ab6499cc8c29f045faa1', 'descriptor_sha256': '96aa6a8109daebaea21be63623e2fa7e119cc8024d5a3fda899ec025149e7614'}
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+manifest embedder identity (the only component identity recorded): {'dimensions': 64, 'id': 'weights-embedder', 'source': 'plugin', 'version': '1'}
+$ gov --role orchestrator doctor  -> exit 3 ok=False error={"code": "UNHEALTHY", "message": "doctor: UNHEALTHY (3 failed checks)", "details": {"verdict": "UNHEALTHY", "checks": [{"id": "D001", "name": "framework.lock present", "ok": true, "severity": "info", "message": "present", "remediation": "gov init / gov adopt", "enforcement": {"mode": "hard-block", "refuses": [{"at_or_above": "critical", "operations": ["task.create", "task.claim", "task.close", "cit.propose", "cit.approve", "cit.execute", "handoff.create", "release.build", "update.apply", "adopt.migrate"], "scope": "global"}], "below_threshold": "warning"}}, {"id": "D002", "name": "framework.lo
+$ gov --role orchestrator memory query 'reconciliation procedure' --route semantic --k 3  -> exit 0 ok=True
+after changing weights.json: freshness pin_mismatch= [] stale= [] | doctor: [('D028', False, "plugin concept-embedder does not match its registration: plugin 'concept-embedder' descriptor does n"), ('D025', True, 'consistent: weights-embedder (496 vectors)')] | semantic query -> True None
+incremental rebuild after the weights change: vectors re-embedded? False | manifest embedder identity unchanged: True
+$ gov --role orchestrator memory query 'reconciliation procedure' --route semantic --k 3  -> exit 1 ok=False error={"code": "PLUGIN_PIN_MISMATCH", "message": "plugin 'weights-embedder' is declared but not usable: plugin 'weights-embedder' implementation does not match its declared pin (sha256 9d9caaaee5f863887d2d02abbe904d23338f5a945303ab6499cc8c29f045faa1); re-register after review", "details": {"plugin_id": "weights-embedder", "capability": "embed", "version": "1", "source": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-D4-component-separation-SWtvsj/d4/governance/project/plugins/weights-embedder.yaml", "c
+after editing the adapter script (registered pin covers it): query -> False PLUGIN_PIN_MISMATCH
+[FAIL] D4-b2-identified: the embedding runtime / model artefact is recorded as its own identity (separate from the embed adapter)
+[FAIL] D4-b2-drift: a change of the runtime/model artefact behind an unchanged plugin identity is detected (fail closed or forced re-embed)
+
+====================================================================================================
+D4-b3 vector / index store
+====================================================================================================
+memory-manifest stores: {'index_manifest_hash': '87763899740062288a5d618c538b77bc37a1106d44c5bdb0bc59d708e40c9e62', 'state_db': '.governance-runtime/state.db', 'tables': {'artifacts': 187, 'chunks': 509, 'edges': 20, 'excluded': 0, 'symbol_refs': 40, 'symbols': 36, 'vectors': 503}} | index-manifest index_version: 4.1.5-idx3
+live store + tracked manifest carry an older store format (4.1.5-idx2) -> freshness pin_mismatch: ['index_version: expected "4.1.5-idx3" but live index has "4.1.5-idx2"']
+$ gov --role orchestrator rebuild-memory --incremental  -> exit 0 ok=True
+incremental rebuild -> mode: full escalated: pin change: index_version: expected "4.1.5-idx3" but live index has "4.1.5-idx2"
+[PASS] D4-b3: the derived store is identified (runtime path, tables, index format version); a store-format change is a governed full rebuild
+replaceability: no plugin capability exists for vector storage (API-0001 capabilities: embed, rerank, code_intel)
+
+====================================================================================================
+D4-b4 lexical engine
+====================================================================================================
+manifest lexical: {'engine': 'sqlite-fts5', 'tokenizer': 'porter unicode61'}
+$ gov --role orchestrator rebuild-memory --incremental  -> exit 0 ok=True
+tokenizer porter unicode61 -> unicode61: freshness pin_mismatch= ['lexical: expected {"engine":"sqlite-fts5","tokenizer":"unicode61"} but live index has {"engine":"sqlite-fts5","tokenizer":"porter unicode61"}'] | rebuild mode: full | stores changed: [] | 'reconciles' (no stemming now) lexical hits: ['file:docs/runbook.md']
+[PASS] D4-b4: the lexical engine/tokenizer is identified, replaceable by pin with a forced rebuild, and independent of vectors/graph
+
+====================================================================================================
+D4-b5 graph engine
+====================================================================================================
+edge store rows: 20 | graph queries run without any embedder/reranker: ['API-0101', 'D-0101', 'D-0102', 'REQ-0001', 'SCN-0001', 'TST-0001']
+graph identity recorded in the manifest?: [] (only via index_version)
+[PASS] D4-b5: the graph store/engine is a distinct component (edges table + deterministic traversal), independent of vectors/lexical (shown in b1/b4)
+
+====================================================================================================
+D4-b6 code intelligence
+====================================================================================================
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+providers before: [('builtin-generic',)] | after: [('src/app/__init__.py', 'python-ast'), ('src/app/api.py', 'python-ast'), ('src/app/models.py', 'python-ast'), ('src/core/ledger.rs', 'builtin-generic'), ('src/server/server.go', 'builtin-generic'), ('src/web/api.ts', 'builtin-generic'), ('src/web/format.ts', 'builtin-generic')] | stores changed: ['chunks', 'edges', 'fts', 'symbols', 'vectors']
+[PASS] D4-b6: code intelligence is identified per symbol (provider) and replaceable per language through the plugin registry
+
+====================================================================================================
+D4-b7 reranker
+====================================================================================================
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+manifest reranker: {'provider': 'logging-reranker', 'version': '0'} | query reranker: {'provider': 'logging-reranker', 'version': '0'} | rerank scores: [3.0, 2.0, 1.0] | stores changed: ['chunks', 'edges', 'fts', 'vectors']
+$ gov --role orchestrator memory query 'reconciliation procedure' --k 3  -> exit 1 ok=False error={"code": "RERANKER_UNAVAILABLE", "message": "MEMORY_POLICY.reranker.provider pins 'logging-reranker' but no `rerank` plugin with that id is declared (no silent fallback)", "details": null}
+pinned reranker removed -> query: RERANKER_UNAVAILABLE
+[FAIL] D4-b7: the reranker is identified, replaceable by pin, changes no stored index state, and fails closed when missing
+
+====================================================================================================
+D4-b8 retrieval router
+====================================================================================================
+router decision recorded per query: routes= ['structured', 'lexical'] strategy= fusion | explicit route override: ['lexical']
+router identity/version recorded in manifest or result?: []
+[PASS] D4-b8: the router is a distinct component whose decision is recorded per query and can be overridden per query
+
+====================================================================================================
+D4-b9 generative / query-planning model
+====================================================================================================
+plugin-descriptor capability enum: {'type': 'string', 'enum': ['embed', 'rerank', 'code_intel', 'ecosystem', 'secret_scan']}
+retrieval result component fields: ['duplicates_suppressed', 'embedder', 'evidence_coverage', 'excluded_by_authority', 'excluded_by_namespace', 'failure_record', 'hits', 'index_manifest_hash', 'index_version', 'latency_ms', 'primary_route', 'query', 'reranker', 'routes', 'strategy']
+[PASS] D4-b9: no generative model participates in retrieval (nothing can substitute for deterministic authority resolution)
+
+====================================================================================================
+D4-b10 context compiler
+====================================================================================================
+$ gov --role orchestrator task create --class implementation --objective Totals --feature F-0001 --fields '{"requirements": ["REQ-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator context compile TASK-0001  -> exit 0 ok=True
+required command failed: gov rebuild-memory: {'code': 'PLUGIN_REGISTRY_MISMATCH', 'message': "plugin 'concept-embedder' is declared but not usable: plugin 'concept-embedder' descriptor does not match the registered content (registered sha256 b21afc59a9f5, observed f4dc14187052); an edited descriptor is never authorised", 'details': {'plugin_id': 'concept-embedder', 'capability': 'embed', 'version': '1', 'source': '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0028/cf4/cf-final-371794a-beta-r-D4-component-separation-SWtvsj/d4/governance/project/plugins/concept-embedder.yaml', 'code': 'PLUGIN_REGISTRY_MISMATCH', 'reason': "plugin 'concept-embedder' descriptor does not match the registered content (registered sha256 b21afc59a9f5, observed f4dc14187052); an edited descriptor is never authorised", 'details': {'plugin_id': 'concept-embedder', 'checks': [{'check': 'registry_binding', 'ok': False, 'detail': "plugin 'concept-embedder' descriptor does not match the registered content (registered sha256 b21afc59a9f5, observed f4dc14187052); an edited descriptor is never authorised"}], 'registry': 'governance/generated/plugin-registry.json'}}}
+[exit=1]

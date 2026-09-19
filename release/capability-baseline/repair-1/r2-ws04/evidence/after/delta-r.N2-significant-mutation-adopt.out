@@ -1,0 +1,27 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): delta-r/N2-significant-mutation-adopt mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 9ed2f5fa45e35b45172edf815e23a4860a0eed3c7afe69b9a12b26b36b357e56; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:40:13Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-delta-r-N2-significant-mutation-adopt-GdCbMb/n2adopt-1789800013-c7b317/proj
+$ gov --json --session S-planner adopt baseline
+  -> ok
+$ gov --json --session S-planner adopt inventory
+  -> ok
+$ gov --json --session S-planner adopt classify
+  -> ok
+$ gov --json --session S-planner adopt map
+  -> ok
+$ gov --json --session S-planner adopt plan
+  -> ok
+$ gov --json --session S-planner adopt test-design
+  -> ok
+$ gov --json --session S-reviewer --role migration-reviewer adopt review --verdict MIGRATION_PLAN_APPROVED
+  -> ok
+$ gov --json --session S-executor --role migration-executor adopt migrate --name shipping-quotes --alias fx-brown
+  -> ok
+OBSERVE N2.adopt.migrate A6 result: {"batches": [{"at": "2026-09-19T06:40:13Z", "batch": 0, "installed": {"destructive_gates_created": ["HDG-0001", "HDG-0002", "HDG-0003"], "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIONS.yaml"], "protected_state": {"break_glass_exit": null, "floors": {"metadata_high_water": {}, "minimum_secure": {"release": "", "sequence": 0, "source_metadata_sha256": ""}, "note": "Protected Governance OS floors (Signed Release Root v1). Monotonic: values here are never lowered, reset or forgotten, including by break-glass recovery (OWNER-DECISION-0006 \u00a78).", "product": "agentic-engineering-os", "release_high_water": {"sequence": 0, "version": ""}, "updated_at": "2026-09-19T06:40:14Z"}, "marked_degraded": false}, "release_authenticity": {"authenticity": "UNKNOWN", "below_floor": false, "break_glass": null, "channel": "unspecified", "currency": "UNKNOWN", "floors": {"metadata_high_water": {}, "minimum_secure": {"release": "", "sequence": 0, "source_metadata_sha256": ""}, "note": "Protected Governance OS floors (Signed Release Root v1). Monotonic: values here are never lowered, reset or forgotten, including by break-glass recovery (OWNER-DECISION-0006 \u00a78).", "product": "agentic-engineering-os", "release_high_water": {"sequence": 0, "version": ""}, "updated_at": ""}, "ingress": "adopt", "kernel_manifest_hash": "6d26762b125fe608abeefba0531605726adc862e33e904d99e72c05ad5c1149f", "machine_id": "85f70fd80edd99a74d49bfe9905ddc66", "migrations_authorised": [], "notes": ["this machine holds no provisioned Signed Release Root trust anchor, so release authenticity is UNKNOWN and no authenticity claim is made. Provision one with `gov trust provision`. Verified-byte binding, atomic commit, the protected high-water and the D-0007 installed-integrity control all remain in force.", "no protected release floor is in force for `adopt` on this m
+OBSERVE N2.adopt.checkpoints checkpoints written during adoption: [["CKPT-00001.yaml", "significant_mutation", "execute migration batch 1"], ["CKPT-00002.yaml", "significant_mutation", "execute migration batch 2"], ["CKPT-00003.yaml", "significant_mutation", "execute migration batch 3"], ["CKPT-00004.yaml", "significant_mutation", "execute migration batch 4"], ["CKPT-00005.yaml", "significant_mutation", "execute migration batch 5"], ["CKPT-00006.yaml", "significant_mutation", "execute migration batch 6"], ["CKPT-00007.yaml", "significant_mutation", "execute migration batch 7"]]
+CHECK N2.b4.adopt PASS migration batches (significant mutations) are preceded by significant_mutation checkpoints
+      detail: [["CKPT-00001.yaml", "significant_mutation", "execute migration batch 1"], ["CKPT-00002.yaml", "significant_mutation", "execute migration batch 2"], ["CKPT-00003.yaml", "significant_mutation", "execute migration batch 3"], ["CKPT-00004.yaml", "significant_mutation", "execute migration batch 4"], ["CKPT-00005.yaml", "significant_mutation", "execute migration batch 5"], ["CKPT-00006.yaml", "significant_mutation", "execute migration batch 6"], ["CKPT-00007.yaml", "significant_mutation", "execute migration batch 7"]]
+SUMMARY checks=1 pass=1 fail=0 failed=[]
+[exit=0]

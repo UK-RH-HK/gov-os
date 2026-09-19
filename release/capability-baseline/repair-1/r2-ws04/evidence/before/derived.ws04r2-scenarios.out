@@ -1,0 +1,304 @@
+# P2-AR-0025 DERIVED probe run: ws04r2-scenarios.py mode=before (harness: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/base-tree/release/capability-baseline/audit-0/delta-r/evidence)
+# sha256 f54f0f0443d3e83b48c97fca870fdb766c0ea71bffdc6702386a19967446161f
+
+## S1 BC-P2-11: an approval binds the exact transaction, its simulated impact and the CIT
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s1-1789797258-b307e6/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-f946e7e9 rebuild-memory
+  -> ok
+$ gov --json --session probe-f946e7e9 cit propose --proposal 'probe change s1a' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s1-1789797258-b307e6/m-s1a.json --trigger behaviour_change --targets REQ-0001
+  -> ok
+CHECK S1.gate-carries-binding FAIL the gate raised for the CIT carries the transaction+impact digest as its subject (inside the signed package)
+      detail: {"binding": null, "gate": "HDG-0001"}
+$ gov --json --session probe-f946e7e9 gate present HDG-0001
+  -> ok
+$ gov --json --session probe-f946e7e9 decide HDG-0001 --option A --rationale 'approve the rounding change'
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0001.yaml
+$ gov --json --session probe-f946e7e9 cit approve CIT-0001
+  -> ok
+CHECK S1.content-edit-before-approve FAIL a manifest edited after the answer cannot be approved under that answer
+$ gov --json --session probe-f946e7e9 cit propose --proposal 'probe change s1b' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s1-1789797258-b307e6/m-s1b.json --trigger behaviour_change --targets REQ-0001
+  -> ok
+$ gov --json --session probe-f946e7e9 gate present HDG-0002
+  -> ok
+$ gov --json --session probe-f946e7e9 decide HDG-0002 --option A
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0002.yaml
+$ gov --json --session probe-f946e7e9 cit approve CIT-0002 --method auto
+  -> ok
+CHECK S1.impact-edit-refused FAIL a recorded impact edited after simulation (radius lowered) cannot be approved
+$ gov --json --session probe-f946e7e9 cit propose --proposal 'probe change s1c' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s1-1789797258-b307e6/m-s1c.json --trigger behaviour_change
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0003.yaml
+$ gov --json --session probe-f946e7e9 cit execute CIT-0003
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0003 was never presented in chat (INV-008); run `gov gate present HDG-0003`
+CHECK S1.forged-auto-approval-refused PASS a forged automatic approval on a transaction that requires a gate never executes
+      detail: {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0003 was never presented in chat (INV-008); run `gov gate present HDG-0003`"}
+$ gov --json --session probe-f946e7e9 cit propose --proposal 'probe change s1d' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s1-1789797258-b307e6/m-s1d.json --trigger editorial
+  -> ok
+$ gov --json --session probe-f946e7e9 cit simulate CIT-0004
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0004.yaml
+$ gov --json --session probe-f946e7e9 cit simulate CIT-0004
+  -> ok
+CHECK S1.copied-state-refused FAIL the sealed state of another transaction copied into a record is refused
+$ gov --json --session probe-f946e7e9 cit propose --proposal 'probe change s1e' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s1-1789797258-b307e6/m-s1e.json --trigger editorial
+  -> ok
+$ gov --json --session probe-f946e7e9 cit simulate CIT-0005
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0005.yaml
+$ gov --json --session probe-f946e7e9 cit approve CIT-0005 --method auto
+  -> ok
+CHECK S1.unsealed-state-refused FAIL a CIT record whose sealed state was removed is not a transaction gov wrote
+# RECORD WRITE (direct file write, no gov command): spec/decisions/CIT-0099.yaml
+$ gov --json --session probe-f946e7e9 cit execute CIT-0099
+  -> ok
+CHECK S1.hand-written-cit-refused FAIL a hand-written CIT record claiming APPROVED never executes
+
+## S2 BC-P2-13: materiality is derived from what a change touches, not from the label
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s2-1789797261-8593ae/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-936c331c rebuild-memory
+  -> ok
+$ gov --json --session probe-936c331c rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-936c331c cit propose --proposal 'tidy auth' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s2-1789797261-8593ae/m-auth.json
+  -> ok
+CHECK S2.auth FAIL 'editorial' label on a security_change change: derived, simulated automatically and human-gated
+      detail: {"derived": null, "gate": null, "radius": null}
+$ gov --json --session probe-936c331c cit propose --proposal 'tidy k8s' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s2-1789797261-8593ae/m-k8s.json
+  -> ok
+CHECK S2.k8s FAIL 'editorial' label on a infrastructure_cost change: derived, simulated automatically and human-gated
+      detail: {"derived": null, "gate": null, "radius": null}
+$ gov --json --session probe-936c331c cit propose --proposal 'tidy gherkin' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s2-1789797261-8593ae/m-gherkin.json
+  -> ok
+CHECK S2.gherkin FAIL 'editorial' label on a acceptance_criteria_change change: derived, simulated automatically and human-gated
+      detail: {"derived": null, "gate": null, "radius": null}
+$ gov --json --session probe-936c331c cit propose --proposal 'tidy req-criteria' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s2-1789797261-8593ae/m-req-criteria.json
+  -> ok
+CHECK S2.req-criteria FAIL 'editorial' label on a acceptance_criteria_change change: derived, simulated automatically and human-gated
+      detail: {"derived": null, "gate": null, "radius": null}
+$ gov --json --session probe-936c331c cit propose --proposal 'fix typo' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s2-1789797261-8593ae/m-doc.json
+  -> ok
+CHECK S2.editorial-stays-editorial PASS a genuinely editorial change is not made material
+$ gov --json --session probe-936c331c cit propose --proposal 'change the project policy overlay' --targets governance/project/PROJECT_POLICY.yaml
+  -> ok
+CHECK S2.declared-governance-target FAIL a CIT whose declared target is a governance path is R5 and human-gated (SKL-IMPACT-ANALYSIS V1)
+      detail: {"derived": null, "gate": "HDG-0001", "radius": "R2"}
+$ gov --json --session probe-936c331c cit classify --paths src/payments/auth.py,spec/requirements/REQ-0001.yaml
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'classify'
+
+Usage: gov-base-843d79c cit [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK S2.performed-changes-classified FAIL changes already made in the working tree are classified, and the ones that must pass a CIT even inside a task are named (the task-close API)
+      detail: []
+
+## S3 BC-P2-04: an upstream change reaches completed work, its evidence, packets and checkpoints
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s3-1789797262-929489/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-a76575ec rebuild-memory
+  -> ok
+$ gov --json --session probe-a76575ec task create --objective 'implement totals' --class discovery --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"]}'
+  -> ok
+$ gov --json --session probe-a76575ec task create --objective 'tune totals' --class discovery --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"]}'
+  -> ok
+$ gov --json --session probe-a76575ec context compile TASK-0001
+  -> ok
+$ gov --json --session probe-a76575ec task claim TASK-0001
+  -> ok
+$ gov --json --session probe-a76575ec rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-a76575ec task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s3-1789797262-929489/rep.json
+  -> ok
+$ gov --json --session probe-a76575ec rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-a76575ec context compile TASK-0002
+  -> ok
+$ gov --json --session probe-a76575ec checkpoint create --task TASK-0002 --next-action continue
+  -> ok
+CHECK S3.checkpoint-records-inputs FAIL a task checkpoint records its mandatory inputs with content hashes
+$ gov --json --session probe-a76575ec task list
+  -> ok
+$ gov --json --session probe-a76575ec cit propose --proposal 'probe change s3' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s3-1789797262-929489/m-s3.json --trigger acceptance_criteria_change --targets REQ-0001
+  -> ok
+$ gov --json --session probe-a76575ec gate present HDG-0001
+  -> ok
+$ gov --json --session probe-a76575ec decide HDG-0001 --option A --rationale 'probe relay'
+  -> ok
+$ gov --json --session probe-a76575ec cit approve CIT-0001
+  -> ok
+$ gov --json --session probe-a76575ec cit execute CIT-0001
+  -> ok
+$ gov --json --session probe-a76575ec task list
+  -> ok
+CHECK S3.cit-committed PASS the CIT commits
+CHECK S3.done-task-revalidated FAIL the DONE consumer is marked for revalidation
+CHECK S3.revalidation-task FAIL a revalidation task is generated for the completed work
+      detail: {"new": [], "revalidates": null}
+CHECK S3.report-stale FAIL the closing report is no longer green
+CHECK S3.validation-evidence-stale PASS the test obligation and scenario that validate the changed criterion are stale at R1
+CHECK S3.checkpoint-stale FAIL the checkpoint that recorded the old input is stale
+CHECK S3.packet-invalidated FAIL the stored packet of the open consumer is invalidated
+$ gov --json --session probe-a76575ec cit propagate
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'propagate'
+
+  tip: a similar subcommand exists: 'propose'
+
+Usage: gov-base-843d79c cit [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK S3.idempotent FAIL re-running propagation for a recorded change writes nothing and generates nothing
+      detail: {}
+# RECORD EDIT (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+$ gov --json --session probe-a76575ec rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-a76575ec context staleness TASK-0002
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'staleness'
+
+Usage: gov-base-843d79c context [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK S3.direct-detected-after-rebuild FAIL after an index rebuild, the direct change is still detected as stale input of the consumer
+      detail: []
+$ gov --json --session probe-a76575ec cit propagate --dry-run
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'propagate'
+
+  tip: a similar subcommand exists: 'propose'
+
+Usage: gov-base-843d79c cit [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+$ gov --json --session probe-a76575ec cit propagate
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'propagate'
+
+  tip: a similar subcommand exists: 'propose'
+
+Usage: gov-base-843d79c cit [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK S3.direct-propagated FAIL the same propagation is applied to a change made outside change control
+      detail: {"dry_run_changes": null, "result": null}
+$ gov --json --session probe-a76575ec context compile TASK-0002
+  -> ok
+CHECK S3.redelivery-recorded FAIL recompiling a stale packet records what changed since the previous delivery
+
+## S4 BC-P2-05: checkpoint staleness, handoff and session-close continuity, the watchdog
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s4-1789797268-360dd1/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-c87d6e85 rebuild-memory
+  -> ok
+$ gov --json --session probe-c87d6e85 task create --objective totals --class discovery --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"]}'
+  -> ok
+$ gov --json --session probe-c87d6e85 task create --objective refunds --class discovery --status READY --allowed src/** --fields '{"requirements": ["REQ-9999"]}'
+  -> ok
+$ gov --json --session probe-c87d6e85 context compile TASK-0001
+  -> ok
+$ gov --json --session probe-c87d6e85 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-c87d6e85 checkpoint create --task TASK-0001 --next-action implement
+  -> ok
+CHECK S4.state-reference FAIL the checkpoint records a current state reference and its packet is current
+      detail: {"packet_current": null, "state_reference": null}
+$ gov --json --session probe-c87d6e85 handoff create --to-role backend-engineer --task TASK-0002
+  -> ok
+CHECK S4.handoff-missing-refused FAIL a handoff whose mandatory input is absent is refused
+# RECORD EDIT (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+$ gov --json --session probe-c87d6e85 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-c87d6e85 checkpoint freshness CKPT-00001
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'freshness'
+
+Usage: gov-base-843d79c checkpoint [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK S4.checkpoint-freshness FAIL the checkpoint is stale once an input it recorded changed
+      detail: {}
+$ gov --json --session probe-c87d6e85 handoff create --to-role backend-engineer --task TASK-0001
+  -> ok
+CHECK S4.handoff-stale-degraded FAIL a handoff of in-progress work on a stale packet re-delivers the current inputs and is explicitly degraded
+      detail: {"degraded": null, "freshness": null}
+CHECK S4.handoff-marks-retest FAIL the in-progress work on stale inputs is marked retest_required
+$ gov --json --session probe-c87d6e85 session close --task TASK-0002
+  -> ERROR [NO_JSON] error: unrecognized subcommand 'session'
+
+  tip: some similar subcommands exist: 'lessons', 'version'
+
+Usage: gov-base-843d79c [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK S4.session-close-degraded FAIL session close writes its checkpoint and is explicitly degraded when the session's work has missing inputs
+$ gov --json --session probe-c87d6e85 checkpoint watchdog
+  -> ok
+CHECK S4.watchdog-counts-itself FAIL the watchdog counts the gov commands executed since the last checkpoint itself
+$ gov --json --session probe-c87d6e85 task status TASK-0002 BLOCKED --note waiting
+  -> ok
+$ gov --json --session probe-c87d6e85 checkpoint watchdog
+  -> ok
+CHECK S4.boundaries-observed FAIL unobserved mandatory triggers (a task transition, a provider switch) become checkpoints at the next boundary
+      detail: []
+
+## S5 BC-P2-18: contradictions are detected, never delivered together as authority, and routed
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/dr-before-delta-r-9xxcu7/s5-1789797272-3047b3/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-f57f05ac rebuild-memory
+  -> ok
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0103.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0104.yaml
+$ gov --json --session probe-f57f05ac rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-f57f05ac task create --objective 'store totals' --class discovery --status READY --allowed src/** --feature F-0001
+  -> ok
+$ gov --json --session probe-f57f05ac context manifest TASK-0001
+  -> ok
+CHECK S5.manifest-blocked FAIL the manifest is BLOCKED by the contradiction
+$ gov --json --session probe-f57f05ac context compile TASK-0001
+  -> ok
+CHECK S5.not-delivered-as-authority FAIL neither contradicting decision is delivered as active authority
+      detail: ["D-0103", "D-0104"]
+CHECK S5.routed-to-gate FAIL the contradiction is routed to a system-raised gate
+      detail: []
+$ gov --json --session probe-f57f05ac context compile TASK-0001
+  -> ok
+CHECK S5.routing-idempotent FAIL a second dispatch does not raise a second gate
+$ gov --json --session probe-f57f05ac context manifest TASK-0001
+  -> ok
+$ gov --json --session probe-f57f05ac context compile TASK-0001
+  -> ok
+CHECK S5.resolution-honoured FAIL after the answer, the governing decision is active and the other set aside
+      detail: {"active": ["D-0103", "D-0104"], "state": "COMPLETE"}
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TASK-0900.yaml
+$ gov --json --session probe-f57f05ac context manifest TASK-0900
+  -> ok
+CHECK S5.explicit-set-aside-blocks FAIL a task that explicitly depends on the set-aside decision stays blocked
+      detail: []
+SUMMARY checks=40 pass=4 fail=36 failed=['S1.gate-carries-binding', 'S1.content-edit-before-approve', 'S1.impact-edit-refused', 'S1.copied-state-refused', 'S1.unsealed-state-refused', 'S1.hand-written-cit-refused', 'S2.auth', 'S2.k8s', 'S2.gherkin', 'S2.req-criteria', 'S2.declared-governance-target', 'S2.performed-changes-classified', 'S3.checkpoint-records-inputs', 'S3.done-task-revalidated', 'S3.revalidation-task', 'S3.report-stale', 'S3.checkpoint-stale', 'S3.packet-invalidated', 'S3.idempotent', 'S3.direct-detected-after-rebuild', 'S3.direct-propagated', 'S3.redelivery-recorded', 'S4.state-reference', 'S4.handoff-missing-refused', 'S4.checkpoint-freshness', 'S4.handoff-stale-degraded', 'S4.handoff-marks-retest', 'S4.session-close-degraded', 'S4.watchdog-counts-itself', 'S4.boundaries-observed', 'S5.manifest-blocked', 'S5.not-delivered-as-authority', 'S5.routed-to-gate', 'S5.routing-idempotent', 'S5.resolution-honoured', 'S5.explicit-set-aside-blocks']
+[exit=0]

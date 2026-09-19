@@ -1,0 +1,17 @@
+## P1 unprovisioned machine
+[P1] init from an unsigned release: ok = False | authenticity = None | envelope presented_as = CURRENT
+W P1a FAIL no command-result envelope presents the unauthenticated installation as current, and each carries the disclosure -- {"status": {"presented_as": "CURRENT", "disclosure": false}, "doctor": {"presented_as": "CURRENT", "disclosure": false}, "version": {"presented_as": "CURRENT", "disclosure": false}, "gate list": {"presented_as": "CURRENT", "disclosure": false}, "kernel trust": {"presented_as": "CURRENT", "disclosure": false}, "policy overrides": {"presented_as": "CURRENT", "disclosure": false}, "update --check": {"presented_as": "CURRENT", "disclosure": false}, "init": {"presented_as": "CURRENT", "disclosure": false}}
+W P1b FAIL `gov status` makes no `verified_release` claim for an install this machine never verified -- {}
+W P1c FAIL `gov doctor`'s own report discloses that authenticity is not established -- {"presented_as": "CURRENT", "disclosure": null}
+O P1c-verdict doctor verdict = UNHEALTHY; a doctor CHECK that fails on it is WS-2's to add (IP-1: crate::srr::installation::doctor_check)
+W P1d FAIL `gov trust status` reports no verified release, and lists the installation with authenticity UNKNOWN -- {"installed_release": null, "installations": []}
+W P1e FAIL `gov update --check` neither calls the installation certified nor says there is nothing to do -- {"certification": null, "up_to_date": null, "recommendation": null}
+W P1f PASS the embedded payload (the README path) on an unprovisioned machine is not presented as current either -- UNAUTHENTICATED
+
+## P2 control: provisioned machine, authentic install
+W P2a PASS an authenticated installation on a provisioned machine is presented as current -- {"status": "CURRENT", "doctor": "CURRENT", "version": "CURRENT", "gate list": "CURRENT"}
+
+## P3 control: no installation in context
+W P3a PASS a command that acts on no installation says nothing about one (R1 hv_b b2/b4 preserved) -- {"surface": "version", "below_floor": false, "marking": null, "presented_as": "CURRENT", "section_6_bullet": 7, "basis": "OWNER-DECISION-0006 \u00a76 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED \u2014 RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws08/release/capability-baseline/repair-1/ws03/evidence/gov-role-shim.sh total=8 pass=3 fail=5 failed=['P1a', 'P1b', 'P1c', 'P1d', 'P1e']
+[exit=0]

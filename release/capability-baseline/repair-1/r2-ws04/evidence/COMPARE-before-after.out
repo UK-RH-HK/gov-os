@@ -1,0 +1,150 @@
+== alpha-r.A3-security-sensitivity: before 0/0 PASS, after 0/0 PASS
+== alpha-r.A4-budget-governance: before 0/0 PASS, after 0/0 PASS
+== alpha-r.A5-emergency-controls: before 0/0 PASS, after 0/0 PASS
+== beta-r.C1-deterministic-structured-memory: before 18/18 PASS, after 18/18 PASS
+== beta-r.C2-relationship-graph: before 7/10 PASS, after 7/10 PASS
+== beta-r.C6-temporal-memory: before 5/6 PASS, after 5/6 PASS
+== beta-r.D6-rebuild-guarantee: before 0/0 PASS, after 0/0 PASS
+== beta-r.R1-R2-legacy-and-chat-retirement: before 11/13 PASS, after 11/13 PASS
+== beta-r.X-K2-D1-W6-interactions: before 5/5 PASS, after 5/5 PASS
+== delta-r.FRESH-invalidation: before 12/13 PASS, after 12/13 PASS
+== delta-r.J1-J2-research-experiments: before 13/20 PASS, after 13/20 PASS
+== delta-r.K1-cit-p: before 12/12 PASS, after 12/12 PASS
+== delta-r.K2-cit-e: before 20/27 PASS, after 25/26 PASS
+   FAIL->PASS K2.b4.4
+   FAIL->PASS K2.b4.5
+   FAIL->PASS K2.b4.6
+   FAIL->PASS K2.w6.1
+   FAIL->PASS K2.w6.2
+   FAIL->PASS K2.b8.2
+   before-only K2.b3.2 (PASS)
+== delta-r.K3-auto-impact-simulation: before 9/19 PASS, after 16/19 PASS
+   FAIL->PASS K3.b1.mislabel
+   FAIL->PASS K3.b3.mislabel
+   FAIL->PASS K3.b7.mislabel
+   FAIL->PASS K3.b2.mislabel
+   FAIL->PASS K3.b4.mislabel
+   FAIL->PASS K3.b6.mislabel
+   FAIL->PASS K3.b8.mislabel
+== delta-r.K4-impact-radius: before 6/9 PASS, after 2/9 PASS
+   PASS->FAIL K4.a.traversal
+   PASS->FAIL K4.b.semantic_breadth
+   PASS->FAIL K4.f.human_approval
+   PASS->FAIL K4.f.auto
+== delta-r.L1-contradiction-resolution: before 15/19 PASS, after 16/19 PASS
+   FAIL->PASS L1.b1.6
+== delta-r.L2-decision-package: before 20/20 PASS, after 20/20 PASS
+== delta-r.L3-gate-presentation-attacks: before 27/39 PASS, after 29/39 PASS
+   FAIL->PASS L3.b4.s2
+   FAIL->PASS L3.b4.s3
+== delta-r.L3-supplement: before 0/2 PASS, after 0/2 PASS
+== delta-r.N1-N2-checkpoints: before 16/24 PASS, after 19/24 PASS
+   FAIL->PASS N1.b4b
+   FAIL->PASS N1.b6
+   FAIL->PASS N2.b7
+== delta-r.N2-significant-mutation-adopt: before 1/1 PASS, after 1/1 PASS
+== delta-r.N3-N4-W9-watchdog-handoff: before 13/18 PASS, after 18/18 PASS
+   FAIL->PASS N3.b1.5
+   FAIL->PASS N3.b2.1
+   FAIL->PASS N3.b3.1
+   FAIL->PASS N3.b3.2
+   FAIL->PASS N3.b3.3
+== derived.K2-cit-e.valid-fixture.P2-AR-0025: before 20/27 PASS, after 26/26 PASS
+   FAIL->PASS K2.b4.4
+   FAIL->PASS K2.b4.5
+   FAIL->PASS K2.b4.6
+   FAIL->PASS K2.w6.1
+   FAIL->PASS K2.w6.2
+   FAIL->PASS K2.b8.2
+   FAIL->PASS K2.b7.2
+   before-only K2.b3.2 (PASS)
+== derived.K4-impact-radius.derived-rows.P2-AR-0025: before 6/9 PASS, after 6/9 PASS
+== derived.ws04r2-scenarios: before 4/40 PASS, after 40/40 PASS
+   FAIL->PASS S1.gate-carries-binding
+   FAIL->PASS S1.content-edit-before-approve
+   FAIL->PASS S1.impact-edit-refused
+   FAIL->PASS S1.copied-state-refused
+   FAIL->PASS S1.unsealed-state-refused
+   FAIL->PASS S1.hand-written-cit-refused
+   FAIL->PASS S2.auth
+   FAIL->PASS S2.k8s
+   FAIL->PASS S2.gherkin
+   FAIL->PASS S2.req-criteria
+   FAIL->PASS S2.declared-governance-target
+   FAIL->PASS S2.performed-changes-classified
+   FAIL->PASS S3.checkpoint-records-inputs
+   FAIL->PASS S3.done-task-revalidated
+   FAIL->PASS S3.revalidation-task
+   FAIL->PASS S3.report-stale
+   FAIL->PASS S3.checkpoint-stale
+   FAIL->PASS S3.packet-invalidated
+   FAIL->PASS S3.idempotent
+   FAIL->PASS S3.direct-detected-after-rebuild
+   FAIL->PASS S3.direct-propagated
+   FAIL->PASS S3.redelivery-recorded
+   FAIL->PASS S4.state-reference
+   FAIL->PASS S4.handoff-missing-refused
+   FAIL->PASS S4.checkpoint-freshness
+   FAIL->PASS S4.handoff-stale-degraded
+   FAIL->PASS S4.handoff-marks-retest
+   FAIL->PASS S4.session-close-degraded
+   FAIL->PASS S4.watchdog-counts-itself
+   FAIL->PASS S4.boundaries-observed
+   FAIL->PASS S5.manifest-blocked
+   FAIL->PASS S5.not-delivered-as-authority
+   FAIL->PASS S5.routed-to-gate
+   FAIL->PASS S5.routing-idempotent
+   FAIL->PASS S5.resolution-honoured
+   FAIL->PASS S5.explicit-set-aside-blocks
+== epsilon-r.O4-suite-currency: before 0/0 PASS, after 0/0 PASS
+== epsilon-r.O5-G0-guard-matrix: before 0/0 PASS, after 0/0 PASS
+== epsilon-r.O5-scheduler-requirements: before 0/0 PASS, after 0/0 PASS
+== epsilon-r.O5-tiers-G1-G6: before 0/0 PASS, after 0/0 PASS
+== gamma-r.E1-authority: before 0/0 PASS, after 0/0 PASS
+== gamma-r.E2-roles: before 0/0 PASS, after 0/0 PASS
+== gamma-r.E3-handoffs: before 0/0 PASS, after 0/0 PASS
+== gamma-r.G1G2-command-surface: before 0/0 PASS, after 0/0 PASS
+== gamma-r.H1-lineage: before 0/0 PASS, after 0/0 PASS
+== gamma-r.I1I2-tasks: before 0/0 PASS, after 0/0 PASS
+== gamma-r.I3-generation: before 0/0 PASS, after 0/0 PASS
+== synthesis.AC16-X1-upstream-change-chain: before 6/15 PASS, after 12/15 PASS
+   FAIL->PASS X1-K2xW6-done-task-revalidated
+   FAIL->PASS X1-K2xW6-done-evidence-stale
+   FAIL->PASS X1-K2xW6-rework-generated
+   FAIL->PASS X1-K2xW6-packet-invalidated
+   FAIL->PASS X1-NxW9-checkpoint-stale-marked
+   FAIL->PASS X1-NxW9-handoff-blocked-or-degraded
+== synthesis.AC16-X2-authority-gate-chain: before 4/15 PASS, after 4/15 PASS
+== zeta-r.FR-freshness-invalidation: before 1/1 PASS, after 1/1 PASS
+== zeta-r.W01-artefact-identity: before 59/70 PASS, after 59/70 PASS
+== zeta-r.W02-typed-contracts: before 16/16 PASS, after 16/16 PASS
+== zeta-r.W03-task-input-manifest: before 12/20 PASS, after 12/20 PASS
+== zeta-r.W04-context-delivery: before 12/13 PASS, after 12/13 PASS
+== zeta-r.W04b-input-class-delivery: before 13/13 PASS, after 13/13 PASS
+== zeta-r.W05-consumption-receipt: before 10/20 PASS, after 10/20 PASS
+== zeta-r.W06-staleness-propagation: before 11/26 PASS, after 18/26 PASS
+   FAIL->PASS W6-s6-completed-task-revalidated(CIT)
+   FAIL->PASS W6-s7-closed-task-evidence-not-green(CIT)
+   FAIL->PASS W6-s2-test-evidence-invalidated(CIT)
+   FAIL->PASS W6-s3-context-packets-invalidated(CIT)
+   FAIL->PASS W6-s3-checkpoint-packet-ref-flagged(CIT)
+   FAIL->PASS W6-s5-rework-tasks-generated(CIT)
+   FAIL->PASS W6-s6-completed-task-revalidated(CIT,R2)
+== zeta-r.W07-orphan-detection: before 3/12 PASS, after 3/12 PASS
+== zeta-r.W08-lineage: before 21/24 PASS, after 21/24 PASS
+== zeta-r.W09-session-handoff-continuity: before 9/16 PASS, after 15/16 PASS
+   FAIL->PASS W9-c2-checkpoint-input-ids
+   FAIL->PASS W9-c2-state-reference-current-at-checkpoint
+   FAIL->PASS W9-c2-checkpoint-files-changed-paths-exist
+   FAIL->PASS W9-c6-handoff-missing-inputs-blocked-or-degraded
+   FAIL->PASS W9-c6-handoff-stale-inputs-blocked-or-degraded
+   FAIL->PASS AC16-NxW9-before-handoff-checkpoint-flags-stale-packet
+== zeta-r.W10-hard-invariant-attacks: before 21/23 PASS, after 21/23 PASS
+   before-only W10-a3-budget-12098 (PASS)
+   before-only W10-a3-budget-10998 (PASS)
+   after-only  W10-a3-budget-12419 (PASS)
+   after-only  W10-a3-budget-11319 (PASS)
+== zeta-r.W12-scheduler-integration: before 5/14 PASS, after 7/14 PASS
+   FAIL->PASS W12-G0-superseded-target-substitution-blocked(cit)
+   FAIL->PASS W12-G3-continuity-verified(checkpoint)
+TOTAL FAIL->PASS 88  PASS->FAIL 4

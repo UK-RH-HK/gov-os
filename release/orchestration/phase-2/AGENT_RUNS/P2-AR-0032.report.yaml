@@ -1,0 +1,115 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0032
+role: capability-repair
+objective: Repair iteration 1, round 2 integration builder — merge the nine round-2 repair branches in the P2-HO-0030 order, converge test setup on WS-8's provisioned-root harness, remove WS-2's temporary D032 relaxations, register every new subcommand with G0 at its true class, reconcile semantic conflicts minimally, run every suite and every prior R1 held-out suite through a private path; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run is the
+  round-2 integration builder: it merged the nine round-2 branches and authored only the four integration commits listed
+  in 00-INTEGRATION-REPORT.md §2 and the integration evidence (runners, a G0 probe, a secret-literal check, labelled
+  derived probe copies and adapters); it authored none of the round-2 or round-1 repairs, no audit, synthesis or
+  verification run, and it grades no repair. It read P2-HO-0030, P2-HO-0019, P2-HO-0020, P2-HO-0010, AGENT_RUNS/README.md,
+  PHASE_LEDGER P2-L-0015..0017, P2-ADJ-0002, the round-1 integration report, the nine round-2 00-REPAIR-REPORT.md files and
+  their evidence scripts and outputs, the product source and tests of the merged tree, and the prior R1 held-out suites
+  (run unedited). Other branches were read with git show / git diff only. It did not read session or agent transcripts,
+  task-output stores or user auto-memory; it spawned no sub-agents and did not contact the product owner.
+input:
+  base_commit: a7e94733add3fbe355802b971d5e94f5997dfbab
+  candidate: "none (integration branch of repair iteration 1, round 2; no candidate minted)"
+  product_code_digest: b1ab1c8c0268adfec2cd857a94d79583efbbf30e3b547e2faf610aac0cbffbb1
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0030-integration-2.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0030-integration-2.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0019-integration-1.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/orchestration/phase-2/PHASE_LEDGER.md (P2-L-0015..0017)
+  - release/orchestration/phase-2/GATES/P2-ADJ-0002-T2-CROSS-MACHINE-CONTINUITY.md
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md and evidence/ (runners, adapter)
+  - "release/capability-baseline/repair-1/r2-{ws02,ws03,ws04,ws05,ws06,ws07,ws08,ws09-11,ws10}/00-REPAIR-REPORT.md and evidence/"
+  - "branches phase2/repair-1-r2-{ws03,ws08,ws05,ws04,ws02,ws06,ws07,ws09-11,ws10} (tips 7a5d397, 9a38329, 1fa60c6, 9e80678, 9e8f06f, 33627c8, bca26c4, 4e1aade, c0d45c1)"
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests and 4.1.6-r1-4/evidence/derive.py (run unedited)
+  - runtime/src, cli/src, framework/, migrations/, tests/certification of the merged tree
+produced:
+  - "merge commits 41e79a7 (ws03), 0660970 (ws08), 0cca917 (ws05), be3ca2b (ws04), 79b0098 (ws02), 92bd0bd (ws06), d1dc020 (ws07), 3fad1c9 (ws09-11), 0f830f3 (ws10)"
+  - "runtime/src/memory/profile.rs (547d65d: compile reconciliation WS-6 x WS-7, private command_files helper with WS-6's tested semantics)"
+  - "runtime/src/cit/propagation.rs (bcf0139: WS-4 x WS-5, propagation re-seals only records whose T2 seal verified before its marker)"
+  - "tests/certification/{ws03,ws04r2,ws05,ws06,ws07,ws08_r2,repair}.rs (9c4af7e: one harness convention; builder tests on other workstreams' round-2 rules)"
+  - "tests/certification/{brownfield,migration,repair2}.rs (7491c5c: WS-2's temporary D032 relaxations removed)"
+  - release/capability-baseline/repair-1/integration-2/00-INTEGRATION-REPORT.md
+  - release/capability-baseline/repair-1/integration-2/evidence/
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib at 7491c5c: 207 passed, 0 failed (= 146 + WS-3 3 + WS-8 1 + WS-5 5 + WS-4 14 + WS-2 5 + WS-6 3 + WS-7 9 + WS-9/11 7 + WS-10 14)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/regression/cargo-test-lib.out}
+  - {id: REG-CERT, description: "cargo test --test certification at 7491c5c: 136 passed, 0 failed (58 + 78, list = 136; includes section6 9, srr 21, ws03 15, ws08_r2 10)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/regression/cargo-test-certification.part-a.out}
+  - {id: REG-CERT-AFTER-MERGES, description: "certification straight after the merges + compile reconciliation (547d65d): 109/27 — the failures the convergence and reconciliations addressed", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/regression/cargo-test-certification.after-merges-547d65d.part-b.out}
+  - {id: REG-PY, description: "Python plugin tests (capabilities/tests): 4 passed", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/regression/python-plugin-tests.out}
+  - {id: REG-FMT-WARN, description: "rustfmt --check (edition 2021) on every file changed after the last merge: 0 hunks; cargo build and cargo test --no-run: 0 warnings", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/regression/rustfmt-warnings-diffstat.out}
+  - {id: D032-RELAXATIONS-REMOVED, description: "brownfield, path migration and 4.1.2->current chain pass with the strict assertions on provisioned machines (WS-2 R3-7)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/regression/cargo-test-certification.part-a.out}
+  - {id: R1-AR0027, description: "AR-0027 unedited, private path: 26/3 (b1, b2, d3) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/r1-heldout/r1-heldout-integrated-7491c5c.out}
+  - {id: R1-AR0029, description: "AR-0029 unedited: 26/2 (b3, b6), ho_f_preservation does not compile = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/r1-heldout/r1-heldout-integrated-7491c5c.out}
+  - {id: R1-AR0031, description: "AR-0031 unedited: 27/7 (a1, a5, a8, b6, c2, c3, d2) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/r1-heldout/r1-heldout-integrated-7491c5c.out}
+  - {id: R1-AR0033, description: "AR-0033 unedited: 30/1 — only hv_a_derivation::a1, which pins 84 files / 740 functions (this tree: 118 / 1991)", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/r1-heldout/r1-heldout-integrated-7491c5c.out}
+  - {id: R1-AR0033-A1-UNPINNED, description: "labelled copy of hv_a::a1 with only the two size asserts printed: census 118 files / 1991 functions, 0 violations in all seven section-6 activities; AR-0033 derive.py: 0 violations in three splitter configurations", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/r1-heldout/r1-heldout-integrated-7491c5c.out}
+  - {id: R1-FAILURE-MESSAGES, description: "normalised failure messages of the unedited suites identical (42 lines) to the round-1 integration final run and to WS-8's round-2 run", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/r1-heldout/failure-messages-vs-prior-runs.txt}
+  - {id: R1-INVARIANTS, description: "WS-8's structural R1 invariants on the integrated tree: one verifier at 5 ingress sites, floor/break-glass/PERMITTED_OPERATIONS byte-identical to base, no new floors writer, kernel_trust free of SRR verdicts, no signing capability, owner-closed functions identical", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/builder-probes/unedited/ws08-r1-invariants.out}
+  - {id: G0-ROUND2-LABELS, description: "every round-2 label classified once at its true class (177 labels, no duplicates, classes declared): Read labels write nothing (also unfrozen), Write labels refused FROZEN/PAUSED and write nothing, undeclared refused, Write labels do write when allowed (11/11)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/g0/round2_labels_g0_probe.out}
+  - {id: SECRET-LITERAL, description: "the planted AKIA...EXAMPLE literal in framework/health is installed into no governed project's kernel (health not in payload_dirs; 718 scratch trees checked); one test keeps the machine kernel cache inside its project tree but runs no scan (O-5)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/secret-literal/check-secret-literal.out}
+  - {id: BUILDER-PROBES, description: "round-2 builders' own probes against the integrated binary, unedited and (where a path was removed by design or a fixture premise changed by another repair) through labelled derived copies: WS-2 50/51 (IF-1), WS-3 23/24 (CS.a provenance literal) and 39/39, WS-4 40/40, WS-5 37/37, WS-6 8/8 and 19/19, WS-7 26/26, WS-8 identical to WS-8's record and 17/17, WS-9/11 41/41, WS-10 35/35", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/builder-probes/COMPARE-builder-probes.out}
+  - {id: BUILDER-PROBES-UNEDITED, description: "unedited builder probes fail only on the standalone human-gate anchor P2-ADJ-0001 turned off (WS-4 through the round-1 adapter, WS-5, WS-6, WS-7, WS-9/11, WS-10), on fixture premises other merged repairs changed, and on IF-1", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-2/evidence/builder-probes/COMPARE-builder-probes.out}
+findings:
+  - id: P2-AR-0032-IF1
+    severity: MEDIUM
+    capability: W7
+    blocking: false
+    blocker_class: BC-P2-22
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-2 W7 spec-without-downstream-path counts a report's CONSUMES edge (the WS-5 receipt's inputs_consumed) as an implementation path, so in the union a feature requirement the closing receipt declares not implemented is no longer reported as a delivery gap (WS-2 probe W7.2b); routed to WS-2, not repaired (W7 reach semantics)"
+    path: release/capability-baseline/repair-1/integration-2/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0032-I1
+    severity: INFO
+    capability: E1, O3, S4
+    blocking: false
+    blocker_class: BC-P2-09
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "WS-4 x WS-5: CIT-E propagation's staleness marker broke WS-5-sealed close reports (lost recorded authorship, greenfield INDEPENDENCE_VIOLATION); reconciled in bcf0139 — propagation re-seals only records whose seal verified before its write (WS-5 IP-R3-3, first option)"
+    path: release/capability-baseline/repair-1/integration-2/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0032-O1
+    severity: LOW
+    capability: W7, O4
+    blocking: false
+    blocker_class: BC-P2-22
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "A record that became a W7 remediation subject (any persisted G4-G6 run, including the G4 after CIT-E) and is then deleted leaves a dangling AFFECTS edge: suite DEGRADED, governance-affecting closes refused until a CIT repairs the generated task (with WS-5 O-R2-1); routed to WS-2"
+    path: release/capability-baseline/repair-1/integration-2/00-INTEGRATION-REPORT.md
+  - id: P2-AR-0032-O5
+    severity: INFO
+    capability: B3
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "repair::embedded_kernel_installs_without_canonical_root keeps the embedded-kernel cache (with WS-2's health/ literal) inside its project tree; a scan would report D011 critical; the test runs no scan"
+    path: release/capability-baseline/repair-1/integration-2/evidence/secret-literal/check-secret-literal.out
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-integration
+  commit: cd423a63313ce261459f22e8ca3defe0285860be
+  evidence_path: release/capability-baseline/repair-1/integration-2/evidence
+unresolved:
+  - "IF-1 (WS-2, round 3): W7 delivery-gap detection masked by WS-5 receipts (CONSUMES counted as an implementation path)"
+  - "O-1 (WS-2 with WS-5 O-R2-1): deleted W7 remediation subject leaves a dangling AFFECTS edge; DEGRADED blocks governance-affecting closes"
+  - "O-3 (WS-10/WS-2): hand-written incomplete research presented as evidence hard-blocks task close (stated by WS-10 §6.1)"
+  - "O-5: embedded-kernel cache inside a test project tree (WS-2's planted literal would be flagged by a scan)"
+  - "O-6 (WS-6, WS-7 IP-W7-2): a refused code_intel plugin is skipped silently by the indexer"
+  - "O-7 (round 3): other OS writers that modify sealed records (WS-2 R3-1, WS-5 IP-R3-1..3) still break seals"
+  - "every builder's round-3 integration points stand as listed in its report"
+  - "AR-0033 hv_a::a1 size pin: the AC-14 verifier judges it on property (census 0 violations)"
+recommended_next_action: "Hand the integrated tip (work commit cd423a6, product tip 7491c5c, product_code_digest 797da37c...1fe1) to round 3; route IF-1 and O-1 to WS-2 (with WS-5 O-R2-1), O-7 to WS-4/WS-3/WS-5, O-5 to the test owner with WS-2's IP-R2-WS08-6."
+completed_at: "2026-09-19T08:23:00Z"

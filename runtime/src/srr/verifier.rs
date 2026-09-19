@@ -17,6 +17,7 @@
 //! | 1 | replay any interrupted install transaction | — |
 //! | 2 | copy the candidate into private staging and measure the staged bytes | `SRR_STAGING_*` |
 //! | 3 | if provisioned: timestamp → snapshot → release chain against the trusted root | `SRR_THRESHOLD_NOT_MET`, `SRR_METADATA_*` |
+//! | 3′ | if unprovisioned: only this binary's own embedded payload, in marked bootstrap mode (OWNER-DECISION-P2-0002) | `SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED` |
 //! | 4 | identity binding: product, repository, channel, platform | `SRR_WRONG_PRODUCT`, `SRR_WRONG_CHANNEL`, … |
 //! | 5 | verified-byte binding: signed digests vs the measured staged bytes | `SRR_PAYLOAD_DIGEST_MISMATCH` |
 //! | 6 | migration identity binding | `SRR_MIGRATION_NOT_AUTHORISED` |
@@ -253,12 +254,45 @@ pub struct AuthenticatedRelease {
     /// The signed release metadata's `evidence` block (digest references to provenance, SBOM, verification and
     /// certification evidence, ARCH-0003 §4). `Null` unless the release was verified against signed metadata.
     pub evidence: Value,
+    /// **OWNER-DECISION-P2-0002 requirement 2** — `Some` exactly when a machine with no trust anchor admitted this
+    /// binary's own embedded payload: the explicit bootstrap marking, tied to the binary's identity
+    /// ([`crate::kernel::binary_identity`]). Authenticity stays `UNKNOWN`; the marking travels into the protected
+    /// installation record, `framework.lock` and every disclosure, and is never presented as current, verified or
+    /// certified. `None` for every other admission.
+    pub bootstrap: Option<Value>,
 }
+
+/// The marking a bootstrap admission carries ([`AuthenticatedRelease::bootstrap`]).
+pub const BOOTSTRAP_MODE: &str = "BOOTSTRAP_EMBEDDED_PAYLOAD";
+
+/// **OWNER-DECISION-P2-0002 (Option A)** — what a machine with no administrator-provisioned trust anchor admits.
+///
+/// Contract v3 A2:143 is applied as written: release/source authenticity is established before privileged kernel
+/// material is staged for installation. An unprovisioned machine can establish it for exactly one payload — the
+/// payload embedded in the running verifier binary, whose bytes arrived with the binary through the platform/admin
+/// installation boundary (ARCH-0003 §5) — and admits it only in the marked bootstrap mode. Every other candidate,
+/// whatever the ingress (`init --source`, `update`, `adopt`, `kernel reinstall`, rollback, recovery), is refused
+/// with `SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED`; the remedy is provisioning. Whether a candidate *is* the
+/// embedded payload is decided by the digest of its staged bytes, never by its path.
+pub const UNPROVISIONED_ADMISSION_POLICY: &str =
+    "refuse_external_source_until_provisioned__embedded_payload_as_marked_bootstrap_only";
 
 impl AuthenticatedRelease {
     /// The **only** bytes an installer may read. They are the bytes that were measured and verified.
     pub fn verified_payload(&self) -> &Path {
         &self.staged.payload_dir
+    }
+    /// What admitted the bytes: signed release metadata, this machine's own record of an earlier verification, or —
+    /// on a machine with no trust anchor — the marked bootstrap of this binary's embedded payload.
+    pub fn admission(&self) -> &'static str {
+        match (&self.authenticity, self.bootstrap.is_some()) {
+            (Authenticity::Authentic, _) => "SIGNED_RELEASE_METADATA",
+            (Authenticity::PreviouslyVerifiedByThisMachine, _) => {
+                "PROTECTED_RECORD_OF_AN_EARLIER_VERIFICATION"
+            }
+            (Authenticity::Unknown, true) => BOOTSTRAP_MODE,
+            (Authenticity::Unknown, false) => "UNAUTHENTICATED",
+        }
     }
     pub fn to_value(&self) -> Value {
         json!({
@@ -271,6 +305,7 @@ impl AuthenticatedRelease {
             "machine_id": self.machine.machine_id, "release_metadata_sha256": self.release_metadata_sha256,
             "migrations_authorised": self.migrations, "notes": self.notes,
             "floors": self.floors.to_value(),
+            "admission": self.admission(), "bootstrap": self.bootstrap,
         })
     }
 }
@@ -466,6 +501,9 @@ fn admit_inner(
     // Identity for the offline-recovery case: taken from this machine's own protected record, never from the
     // payload, its manifest, its lock or the repository (ARCH-0003 §7).
     let mut offline_identity: Option<(String, u64, String)> = None;
+    // OWNER-DECISION-P2-0002: the bootstrap marking, set only when an unprovisioned machine admits this binary's
+    // own embedded payload.
+    let mut bootstrap: Option<Value> = None;
 
     if let Some(root) = root.as_ref() {
         match metadata_dir.as_ref() {
@@ -541,6 +579,31 @@ fn admit_inner(
         if metadata_dir.is_some() {
             notes.push("signed metadata accompanies this candidate but cannot be verified: no trust anchor is provisioned on this machine.".into());
         }
+        // OWNER-DECISION-P2-0002 (Option A): external-source kernel ingress is refused until the machine is
+        // provisioned. The one payload an unprovisioned machine may install is the one embedded in this verifier
+        // binary — decided by the digest of the staged bytes, never by the candidate's path — and only in the
+        // explicitly marked bootstrap mode, tied to the binary's identity.
+        let embedded = crate::kernel::embedded_payload_hash();
+        if staged.payload_hash != embedded {
+            return Err(unprovisioned_external_source_refused(
+                req.ingress,
+                req.candidate,
+                &staged.payload_hash,
+                &staged.kernel_manifest_hash,
+                &staged.version,
+            ));
+        }
+        notes.push(format!(
+            "{BOOTSTRAP_MODE}: the candidate is byte-identical to the payload embedded in this gov binary ({embedded}); OWNER-DECISION-P2-0002 admits it on a machine with no trust anchor only as a marked bootstrap installation. Its authenticity is UNKNOWN, and it is never presented as current, verified or certified."
+        ));
+        bootstrap = Some(json!({
+            "mode": BOOTSTRAP_MODE,
+            "decision": "OWNER-DECISION-P2-0002",
+            "binary": crate::kernel::binary_identity(),
+            "authenticity": Authenticity::Unknown.as_str(),
+            "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+            "remedy": "provision a trust anchor (gov trust provision) and install a signed release",
+        }));
     }
 
     // (4)(5)(6) identity, verified-byte and migration binding
@@ -799,7 +862,86 @@ fn admit_inner(
             .as_ref()
             .map(|r| r.evidence.clone())
             .unwrap_or(Value::Null),
+        bootstrap,
     })
+}
+
+/// The typed refusal of OWNER-DECISION-P2-0002 requirement 1: a machine with no trust anchor does not admit kernel
+/// material from an external source. One constructor, so the early refusal ([`refuse_external_source_if_unprovisioned`])
+/// and the authoritative one inside [`admit`] can never say different things.
+fn unprovisioned_external_source_refused(
+    ingress: Ingress,
+    candidate: &Path,
+    payload_hash: &str,
+    kernel_manifest_hash: &str,
+    version: &str,
+) -> GovError {
+    let embedded = crate::kernel::embedded_payload_hash();
+    GovError::new(
+        "SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED",
+        format!(
+            "ingress `{}` refused: this machine holds no administrator-provisioned Signed Release Root trust anchor, so the authenticity of kernel material from an external source cannot be established, and such material is not staged for installation (OWNER-DECISION-P2-0002; Contract v3 A2:143). The candidate ({version} {payload_hash}) is not the payload embedded in this gov binary. Provision this machine first (`gov trust provision --anchor <administrator root metadata>`), then install a signed release; or, to bootstrap, install this binary's own embedded payload (omit --source), which is marked as a bootstrap installation and never presented as current, verified or certified.",
+            ingress.as_str()
+        ),
+    )
+    .with_details(json!({
+        "ingress": ingress.as_str(),
+        "posture": "UNPROVISIONED",
+        "policy": UNPROVISIONED_ADMISSION_POLICY,
+        "decision": "OWNER-DECISION-P2-0002",
+        "candidate": candidate.display().to_string(),
+        "measured": {"payload_hash": payload_hash, "kernel_manifest_hash": kernel_manifest_hash, "version": version},
+        "embedded_payload_hash": embedded,
+        "staged_for_installation": false,
+        "remediation": [
+            "gov trust provision --anchor <root metadata from the administrator domain>",
+            "then: gov init|update|kernel reinstall --source <a release signed under that root>",
+            "or, to bootstrap without provisioning: omit --source so this binary's own embedded payload is installed (marked BOOTSTRAP, never presented as current, verified or certified)",
+        ],
+    }))
+}
+
+/// **OWNER-DECISION-P2-0002, taken early and read-only.** On a machine with no trust anchor, refuse `candidate` now
+/// unless it is byte-identical to the payload embedded in this binary.
+///
+/// For an ingress that must first raise a Human Decision Gate (`gov update --apply`), so a human is never asked to
+/// approve what admission will refuse, and so `gov update --check` can say so. [`admit`] stays the authority and
+/// decides again on the privately staged bytes. The candidate is measured with the product's own staging selection
+/// ([`crate::kernel::stage_payload`]) into a temporary directory outside every project, which is removed; no
+/// protected state is created, and a provisioned machine is left to [`admit`]. Protected state that cannot be
+/// resolved (the hostile override input) is a refusal, never a clearance (`AR31-B2`: fail closed).
+pub fn refuse_external_source_if_unprovisioned(ingress: Ingress, candidate: &Path) -> Result<()> {
+    let root = crate::srr::state::resolve_state_root()?;
+    if MachineState::read_only(&root).is_provisioned() {
+        return Ok(());
+    }
+    let tmp = std::env::temp_dir().join(format!(
+        "gov-admission-precheck-{}-{}",
+        std::process::id(),
+        crate::util::short_uuid()
+    ));
+    let measured = (|| -> Result<(String, String, String)> {
+        crate::kernel::stage_payload(candidate, &tmp)?;
+        let (_, files) = crate::util::hash_tree(&tmp, &[crate::kernel::KERNEL_MANIFEST])?;
+        let manifest = crate::kernel::build_manifest(&tmp)?;
+        Ok((
+            crate::util::hash_value(&serde_json::to_value(&files)?),
+            crate::kernel::manifest_hash(&manifest),
+            manifest["version"].as_str().unwrap_or("").to_string(),
+        ))
+    })();
+    let _ = std::fs::remove_dir_all(&tmp);
+    let (payload_hash, kmh, version) = measured?;
+    if payload_hash == crate::kernel::embedded_payload_hash() {
+        return Ok(());
+    }
+    Err(unprovisioned_external_source_refused(
+        ingress,
+        candidate,
+        &payload_hash,
+        &kmh,
+        &version,
+    ))
 }
 
 /// timestamp → snapshot → release, each verified against the trusted root, with monotonic version enforcement.

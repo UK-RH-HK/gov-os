@@ -59,7 +59,7 @@ fn chk(
 const ORDER: &[&str] = &[
     "D001", "D002", "D003", "D004", "D005", "D006", "D007", "D029", "D027", "D028", "D008", "D009",
     "D010", "D011", "D012", "D025", "D026", "D013", "D014", "D015", "D016", "D017", "D018", "D019",
-    "D020", "D021", "D030", "D031", "D022", "D023", "D024",
+    "D020", "D021", "D030", "D031", "D032", "D033", "D034", "D022", "D023", "D024",
 ];
 
 fn order_of(c: &Value) -> usize {
@@ -326,6 +326,13 @@ fn group_kernel_policy(p: &Project) -> Result<Vec<Value>> {
         kt.summary(),
         Some("gov kernel verify; gov kernel reinstall (or `gov kernel override --reason ...` as an L4+ role, which raises a gate)"),
     ));
+    // D032 installation authenticity (BC-P2-36; WS-8 IP-1): an installation whose release authenticity is not
+    // established fails (medium), so the doctor verdict is never HEALTHY without disclosing it
+    let mut d032 = crate::srr::installation::doctor_check(&p.root, "D032");
+    d032["enforcement"] = crate::scheduler::catalogue::get("D032")
+        .map(crate::scheduler::catalogue::enforcement)
+        .unwrap_or(json!({"mode": "warning", "refuses": []}));
+    add(d032);
     // D027 constitutional precedence: refused overrides/exceptions are a CRITICAL finding (verifier H-N1)
     let refused = pol.refused_overrides.len();
     add(chk("D027", "policy precedence respected (no override weakens security/authority/gate floors)", refused == 0, "critical", if refused == 0 { format!("{} override(s) applied within POLICY_PRECEDENCE; rules from {}", pol.applied_overrides.len(), pol.precedence.as_ref().and_then(|v| v["source"].as_str()).unwrap_or("?")) } else { format!("{refused} refused: {}", pol.refused_overrides.iter().map(|r| format!("{}.{} ({})", r["policy"].as_str().unwrap_or(""), r["key"].as_str().unwrap_or(""), r["reason"].as_str().unwrap_or(""))).collect::<Vec<_>>().join("; ")) }, Some("remove the weakening override from governance/project/PROJECT_POLICY.yaml or PROJECT_EXCEPTIONS.yaml; only strengthening overrides are applied")));
@@ -503,20 +510,80 @@ fn group_runtime(p: &Project) -> Result<Vec<Value>> {
         ),
         Some("resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids"),
     ));
-    // D015 graph
+    // D015 graph: dangling edges, records outside their canonical location (W1), stale lineage links (W8), and the
+    // records with no edge at all — each named (WS-4 IP-7)
     if let Some(d) = &db {
-        let dang = crate::graph::dangling_edges(d)
-            .map(|v| v.len())
-            .unwrap_or(0);
-        let orph = crate::graph::orphan_nodes(d).map(|v| v.len()).unwrap_or(0);
-        add(chk(
+        let dang = crate::graph::dangling_edges(d).unwrap_or_default();
+        let orph = crate::graph::orphan_nodes(d).unwrap_or_default();
+        let misplaced = crate::graph::identity::misplaced_records(Some(p), &store);
+        let stale = crate::verification::reporting::current_stale_links(&store);
+        let ok = dang.is_empty() && misplaced.is_empty() && stale.is_empty();
+        let list = |v: Vec<String>| -> String {
+            let n = v.len();
+            let mut s = v.into_iter().take(8).collect::<Vec<_>>().join(", ");
+            if n > 8 {
+                s.push_str(&format!(" (+{} more)", n - 8));
+            }
+            s
+        };
+        let mut msg = format!("{} dangling edge(s)", dang.len());
+        if !dang.is_empty() {
+            msg.push_str(&format!(
+                " [{}]",
+                list(
+                    dang.iter()
+                        .map(|e| format!(
+                            "{} {} {}",
+                            e["src"].as_str().unwrap_or("?"),
+                            e["type"].as_str().unwrap_or("?"),
+                            e["dst"].as_str().unwrap_or("?")
+                        ))
+                        .collect()
+                )
+            ));
+        }
+        msg.push_str(&format!(", {} orphan record(s)", orph.len()));
+        if !orph.is_empty() {
+            msg.push_str(&format!(" [{}]", list(orph.clone())));
+        }
+        if !misplaced.is_empty() {
+            msg.push_str(&format!(
+                ", {} record(s) outside their canonical location [{}]",
+                misplaced.len(),
+                list(
+                    misplaced
+                        .iter()
+                        .map(|m| format!(
+                            "{} at {}",
+                            m["id"].as_str().unwrap_or("?"),
+                            m["path"].as_str().unwrap_or("?")
+                        ))
+                        .collect()
+                )
+            ));
+        }
+        if !stale.is_empty() {
+            msg.push_str(&format!(
+                ", {} stale lineage link(s) [{}]",
+                stale.len(),
+                list(
+                    stale
+                        .iter()
+                        .map(|s| s["message"].as_str().unwrap_or("").to_string())
+                        .collect()
+                )
+            ));
+        }
+        let mut c = chk(
             "D015",
             "graph integrity",
-            dang == 0,
+            ok,
             "medium",
-            format!("{dang} dangling edge(s), {orph} orphan record(s)"),
-            Some("fix references in records or add missing records"),
-        ));
+            msg,
+            Some("fix references in records or add missing records; move misplaced records to their canonical directory; re-point or revalidate work linked to superseded records (through a CIT)"),
+        );
+        c["orphan_records"] = json!(orph);
+        add(c);
     }
     Ok(checks)
 }
@@ -705,7 +772,23 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
             .iter()
             .filter(|c| c["expired"].as_bool().unwrap_or(false))
             .count();
-        add(chk("D017", "session claims", exp == 0, "low", format!("{} claim(s), {exp} expired (claims store: .governance-runtime/claims.db, survives rebuilds)", cl.len()), Some("gov claims sweep")));
+        // name the store actually in use: a linked worktree shares its main worktree's store (WS-5 IP-7)
+        let store_path = crate::memory::claims::ClaimsStore::path_for(p);
+        let shown = store_path
+            .strip_prefix(&p.root)
+            .map(|r| r.display().to_string())
+            .unwrap_or_else(|_| store_path.display().to_string());
+        add(chk(
+            "D017",
+            "session claims",
+            exp == 0,
+            "low",
+            format!(
+                "{} claim(s), {exp} expired (claims store: {shown}, survives rebuilds)",
+                cl.len()
+            ),
+            Some("gov claims sweep"),
+        ));
     }
     // D018 control
     let ctl = control::state(p);
@@ -722,28 +805,57 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
         ),
         Some("gov resume (only after the reason for the pause/freeze is resolved)"),
     ));
-    // D019 gates presented
+    // D019 gates surfaced to the human (INV-008), with WS-3's presentation rule: `gov gate present` RENDERS the
+    // decision package to the human channel; a gate is PRESENTED only on the owner's signed receipt or signed answer.
+    // A gate never rendered exists only in files — the OS's duty is undone (fails). A rendered gate awaiting the
+    // owner's receipt or answer is not yet evidenced as presented, but nothing is left for the OS to do: it is
+    // reported, not failed (integration observation O-2).
     let pend = gates::pending(p);
-    let unpresented: Vec<String> = pend
+    let id_of = |g: &Value| g["id"].as_str().unwrap_or("").to_string();
+    let unrendered: Vec<String> = pend
         .iter()
-        .filter(|g| !g["presented_in_chat"].as_bool().unwrap_or(false))
-        .map(|g| g["id"].as_str().unwrap_or("").to_string())
+        .filter(|g| {
+            !g["rendered"].as_bool().unwrap_or(false)
+                && !g["presented_in_chat"].as_bool().unwrap_or(false)
+        })
+        .map(id_of)
         .collect();
+    let awaiting: Vec<String> = pend
+        .iter()
+        .filter(|g| {
+            g["rendered"].as_bool().unwrap_or(false)
+                && !g["presented_in_chat"].as_bool().unwrap_or(false)
+        })
+        .map(id_of)
+        .collect();
+    let presented = pend.len() - unrendered.len() - awaiting.len();
+    let awaiting_note = if awaiting.is_empty() {
+        String::new()
+    } else {
+        format!(
+            "; {} rendered to the human channel and awaiting the owner's signed receipt or answer (not yet evidenced as presented): {}",
+            awaiting.len(),
+            awaiting.join(", ")
+        )
+    };
     add(chk(
         "D019",
-        "human gates presented in chat",
-        unpresented.is_empty(),
+        "human gates surfaced to the human (presented = owner-signed receipt or answer)",
+        unrendered.is_empty(),
         "medium",
-        if unpresented.is_empty() {
-            format!("{} pending gate(s)", pend.len())
+        if unrendered.is_empty() {
+            format!(
+                "{} pending gate(s): {presented} presented (owner-signed receipt or answer){awaiting_note}",
+                pend.len()
+            )
         } else {
             format!(
-                "{} gate(s) exist only in files (INV-008): {}",
-                unpresented.len(),
-                unpresented.join(", ")
+                "{} gate(s) never rendered to the human channel exist only in files and are not presented (INV-008): {}{awaiting_note}",
+                unrendered.len(),
+                unrendered.join(", ")
             )
         },
-        Some("gov gate present <id> and show the package to the human"),
+        Some("gov gate present <id> renders the decision package to the human channel; the gate is presented when the owner signs a receipt or an answer (`gov trust human-channel`)"),
     ));
     // D020 adapters
     let av =
@@ -782,6 +894,100 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
             rec_problems.join("; ")
         },
         Some("fix YAML/frontmatter errors"),
+    ));
+    // D033 T2 binding (WS-3 IP-5): OS-written state that no gov operation on this machine produced as it stands,
+    // with the suite's severities (`verification::reporting::t2_severity`): tampering (BROKEN) and an unsealed gate in
+    // force fail; legacy or hand-written approval claims the OS does not honour, and records sealed on another machine
+    // (a clone), are reported without failing — they are simply not honoured.
+    let t2 = crate::t2::audit(p);
+    let unhonoured_evidence = crate::verification::currency::unhonoured_health_outputs(&store);
+    let mut failing: Vec<(String, &'static str, String)> = vec![];
+    let mut disclosed: Vec<String> = vec![];
+    for r in &t2 {
+        let id = r["id"].as_str().unwrap_or("?").to_string();
+        let rec = store.get(&id);
+        let (sev, what) = crate::verification::reporting::t2_severity(
+            r["t2"]["binding"].as_str().unwrap_or("?"),
+            rec.map(|x| x.rtype() == "human-gate").unwrap_or(false),
+            rec.map(crate::verification::reporting::t2_in_force)
+                .unwrap_or(false),
+            &r["t2"],
+        );
+        if sev == "low" {
+            disclosed.push(id);
+        } else {
+            failing.push((id, sev, what));
+        }
+    }
+    for h in &unhonoured_evidence {
+        let id = h["id"].as_str().unwrap_or("?").to_string();
+        if h["t2"]["binding"] == "BROKEN" {
+            failing.push((
+                id,
+                "high",
+                "health evidence modified after the health operation sealed it".into(),
+            ));
+        } else {
+            disclosed.push(id);
+        }
+    }
+    let worst = if failing.iter().any(|(_, s, _)| *s == "high") {
+        "high"
+    } else {
+        "medium"
+    };
+    add(chk(
+        "D033",
+        "OS-written records bound to gov operations (T2)",
+        failing.is_empty(),
+        worst,
+        if failing.is_empty() {
+            format!(
+                "no tampered OS state and no unsealed gate in force; {} record(s) not honoured on this machine (legacy, hand-written approval claims, or sealed elsewhere){}",
+                disclosed.len(),
+                if disclosed.is_empty() { String::new() } else { format!(": {}", disclosed.iter().take(10).cloned().collect::<Vec<_>>().join(", ")) }
+            )
+        } else {
+            format!(
+                "{}; the OS does not honour them (D-0007 rule 2)",
+                failing
+                    .iter()
+                    .map(|(id, _, w)| format!("{id} {w}"))
+                    .collect::<Vec<_>>()
+                    .join("; ")
+            )
+        },
+        Some("restore tampered records from version control; withdraw hand-written gates and raise them through gov (`gov gate list` shows what is unverified)"),
+    ));
+    // D034 failure memory (WS-6 IP-2): open failure records awaiting follow-up. An open tool failure (a capability the
+    // product needed failed) degrades; open retrieval-miss events are memory-quality evidence, reported only.
+    let open = crate::memory::failures::open_failures(p);
+    let tool_open: Vec<String> = open
+        .iter()
+        .filter(|f| f["failure_kind"] == "tool-failure")
+        .map(|f| f["id"].as_str().unwrap_or("?").to_string())
+        .collect();
+    add(chk(
+        "D034",
+        "failure memory followed up",
+        tool_open.is_empty(),
+        "low",
+        if open.is_empty() {
+            "no open failure records".into()
+        } else {
+            format!(
+                "{} open failure record(s) awaiting follow-up ({} tool failure(s){}): {}",
+                open.len(),
+                tool_open.len(),
+                if tool_open.is_empty() { "" } else { ": capability degraded" },
+                open.iter()
+                    .take(10)
+                    .map(|f| format!("{} ({})", f["id"].as_str().unwrap_or("?"), f["failure_kind"].as_str().unwrap_or("?")))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        },
+        Some("investigate the failure and link its follow-up task (memory::failures::link_follow_up); repair or replace the failing tool"),
     ));
     Ok(checks)
 }

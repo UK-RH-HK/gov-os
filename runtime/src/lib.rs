@@ -23,6 +23,8 @@ pub mod init;
 pub mod kernel;
 pub mod kernel_trust;
 pub mod lessons;
+/// Research, experiment and test-data lifecycles (WS-10; Contract v3 Gate J and H4).
+pub mod lifecycle;
 pub mod lock;
 pub mod memory;
 pub mod migrations;
@@ -59,7 +61,7 @@ pub const FRAMEWORK_NAME: &str = "agentic-engineering-os";
 pub const VERSION: &str = "4.1.5";
 pub const CLI_VERSION: &str = "4.1.5";
 pub const RUNTIME_VERSION: &str = "4.1.5";
-pub const INDEX_VERSION: &str = "4.1.5-idx3";
+pub const INDEX_VERSION: &str = "4.1.5-idx4";
 pub const RUNTIME_DIR: &str = ".governance-runtime";
 
 pub use error::{GovError, Result};

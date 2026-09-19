@@ -278,7 +278,7 @@ pub fn run(p: &Project, only: &[String]) -> Result<Value> {
     };
     let store = RecordStore::load(&p.root);
     let id = store.next_id("audit");
-    let rec = new_record(
+    let mut rec = new_record(
         "audit",
         &id,
         &format!("Product test run {id} ({verdict})"),
@@ -290,6 +290,14 @@ pub fn run(p: &Project, only: &[String]) -> Result<Value> {
             "actor": {"role": p.role, "session": p.session_id, "pid": std::process::id()},
         }),
     );
+    // T2 (IP-WS02-22): the record is honoured as product-test evidence only while it is exactly what this operation
+    // wrote; a hand-written or edited product-test record is reported and ignored
+    let record_binding = match crate::t2::seal_record(&mut rec, &currency::seal_operation(SCOPE)) {
+        Ok(()) => json!({"sealed": true}),
+        Err(e) => {
+            json!({"sealed": false, "code": e.code, "message": e.message, "consequence": "the record is written but not honoured as product-test evidence on this machine"})
+        }
+    };
     save_record(&p.root, &rec)?;
     let first = &results[0].0;
     let worst_exit = results.iter().map(|r| r.1).find(|c| *c != 0).unwrap_or(0);
@@ -298,7 +306,7 @@ pub fn run(p: &Project, only: &[String]) -> Result<Value> {
     } else {
         "failed"
     };
-    let ev = json!({"ran": true, "status": status, "verdict": verdict, "record": id, "families": fams, "failed_families": failed,
+    let ev = json!({"ran": true, "status": status, "verdict": verdict, "record": id, "record_binding": record_binding, "families": fams, "failed_families": failed,
                     "command": first.command, "cwd": p.root.join(&first.cwd).to_string_lossy(), "source": first.source,
                     "exit": worst_exit, "notes": notes, "at": now_iso()});
     crate::observability::emit(
@@ -349,6 +357,8 @@ pub fn latest_records(p: &Project) -> Vec<Value> {
         .of_type("audit")
         .into_iter()
         .filter(|r| r.get("scope") == SCOPE)
+        // only records a gov product-test operation on this machine wrote, as it wrote them (IP-WS02-22)
+        .filter(|r| currency::honoured(r))
         .map(|r| r.data.clone())
         .collect();
     v.sort_by(|a, b| {

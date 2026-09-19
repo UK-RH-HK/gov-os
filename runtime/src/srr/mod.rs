@@ -73,6 +73,7 @@ pub fn status() -> Result<Value> {
         "machine_id": ms.machine_id,
         "state_root": ms.root.display().to_string(),
         "posture": if ms.is_provisioned() { "PROVISIONED" } else { "UNPROVISIONED" },
+        "admission_policy": admission_policy(ms.is_provisioned()),
         "trust_anchor": root_v,
         "provisioned": ms.provisioned_record(),
         "floors": floors.to_value(),
@@ -106,6 +107,25 @@ pub fn status() -> Result<Value> {
     }))
 }
 
+/// What this machine admits at a privileged lifecycle ingress, in its posture (OWNER-DECISION-P2-0002).
+fn admission_policy(provisioned: bool) -> Value {
+    if provisioned {
+        json!({
+            "policy": "signed_release_metadata_at_every_ingress",
+            "admits": "releases authorised by signed release metadata chaining to this machine's trust anchor (or, offline, a release this machine itself verified earlier), at or above its floors",
+            "refuses": "unsigned, tampered and below-floor material at every ingress",
+        })
+    } else {
+        json!({
+            "policy": verifier::UNPROVISIONED_ADMISSION_POLICY,
+            "decision": "OWNER-DECISION-P2-0002",
+            "admits": format!("only the payload embedded in this gov binary ({}), as a marked {} installation whose authenticity is UNKNOWN and which is never presented as current, verified or certified", crate::kernel::embedded_payload_hash(), verifier::BOOTSTRAP_MODE),
+            "refuses": "kernel material from any external source (init --source, update, adopt, kernel reinstall, rollback, recovery): SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED",
+            "remediation": "gov trust provision --anchor <root metadata from the administrator domain>, then install a signed release",
+        })
+    }
+}
+
 /// `BC-P2-36`: every project this machine has installed a kernel into, with what the single verifier decided — so a
 /// machine with no trust anchor reports its installations as authenticity `UNKNOWN` instead of reporting nothing,
 /// and `installed_release` above stays what it says it is: a release this machine *verified*.
@@ -125,6 +145,7 @@ fn installations_recorded(ms: &state::MachineState, product: &str) -> Value {
                     "payload_hash": cur.get("payload_hash").cloned().unwrap_or(Value::Null),
                     "authenticity": cur.get("authenticity").cloned().unwrap_or(Value::Null),
                     "ingress": cur.get("ingress").cloned().unwrap_or(Value::Null),
+                    "admission": cur.get("admission").cloned().unwrap_or(Value::Null),
                     "at": cur.get("at").cloned().unwrap_or(Value::Null),
                     "pending": v.get("pending").map(|x| !x.is_null()).unwrap_or(false),
                 }));

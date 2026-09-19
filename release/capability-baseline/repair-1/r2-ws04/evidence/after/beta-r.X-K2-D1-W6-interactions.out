@@ -1,0 +1,72 @@
+# P2-AR-0025 audit-of-record probe re-run (unedited, through the P2-AR-0022 owner-channel adapter): beta-r/X-K2-D1-W6-interactions mode=after
+# worktree HEAD cd02bfca3dd59f4e040b737d5569d97d17195aee; product files differing from HEAD: 0
+# probe sha256 c4f143f53c940a04d5240c77c2317c76a60ca96eb15692d098e9c60c110641a1; real gov 7014aded2304770e0cb3e9060d035fffc4fe08e959b77d10ce9ccb02f603855f (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws04/target/release/gov)
+# date 2026-09-19T06:44:15Z
+$ gov --role orchestrator init --name orders-ledger --alias x-k2d1 --intent 'Order ledger with totals and reconciliation'  -> exit 0 ok=True
+$ gov --role orchestrator rebuild-memory  -> exit 0 ok=True
+
+====================================================================================================
+K2-D1-1 governed change -> CIT-E refreshes the index
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Clarify REQ-0001 statement with the refund sign convention' --trigger acceptance_criteria_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj/x-472970.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0001  -> exit 0 ok=True
+cit execute -> True COMMITTED None
+manifest REQ-0001 content hash changed: True | freshness after CIT-E: True | query for the new literal -> ['REQ-0001', 'CIT-0001', 'CIT-0001']
+[PASS] K2-D1-1: CIT-E refreshes the index inside the transaction and verifies freshness; the new content is retrievable immediately
+
+====================================================================================================
+K2-D1-2 index refresh failure inside CIT-E -> rollback
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Switch embedder via overlay edit' --trigger governance_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj/x-266160.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0002  -> exit 1 ok=False error={"code": "EMBEDDER_UNAVAILABLE", "message": "embedding implementation 'no-such-embedder' is pinned by MEMORY_POLICY.embedding but no `embed` plugin with that id is declared under governance/project/plugins/ (no silent fallback to the built-in embedder) \u2014 rolled back (4 files restored)", "details": {"rollback": {"cit": "CIT-0002", "restored": ["governance/project/PROJECT_POLICY.yaml", "spec/features/F-0001.yaml", "spec/scenarios/SCN-0001.yaml", "spec/tasks/TST-0001.yaml"], "removed": []}, "details": {"pinned": {"id": "no-such-embedder", "version": "1", "dimensions": 512, "source": "plugin"
+cit execute -> False EMBEDDER_UNAVAILABLE embedding implementation 'no-such-embedder' is pinned by MEMORY_POLICY.embedding but no `embed` plugin with that id is declared under governance/project/plugins/ (no silent fallback to the built-in embedder) — rolled bac
+$ gov --role orchestrator memory query REFUND_SIGN_MARKER --k 3  -> exit 0 ok=True
+cit_status: ROLLED_BACK | overlay restored: True | freshness: True [] | retrieval still works: True
+[PASS] K2-D1-2: a failed index refresh aborts CIT-E atomically: the change is rolled back and the index remains usable
+$ gov --role orchestrator memory query 'why integer cents rationale' --route semantic --k 3  -> exit 0 ok=True
+semantic query after the CIT outcome -> True None
+OBSERVATION: cit::execute applies the manifest, then refreshes and verifies the index with the SAME Project value whose policies/contract were cached before the mutation (runtime/src/cit/mod.rs execute: no p.invalidate() after apply_op; project.rs OnceCell caches)
+
+====================================================================================================
+K2-D1-3 CIT reclassifies docs/** as historical -> committed index?
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Archive the old docs tree' --trigger governance_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj/x-598962.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0003  -> exit 0 ok=True
+cit execute -> True COMMITTED None
+after the committed CIT: docs/runbook.md row: [('historical', 'HISTORICAL', 0, 'archive')] | freshness: True | archived runbook returned as current: False
+[PASS] K2-D1-3: a path-map change committed through CIT-E is reflected in the refreshed index (no archive-as-current after COMMITTED)
+
+====================================================================================================
+D1-W6-1 ungoverned upstream edit -> index staleness -> task close blocked
+====================================================================================================
+$ gov --role orchestrator task create --class implementation --objective 'Implement refund sign' --feature F-0001 --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"]}'  -> exit 0 ok=True
+$ gov --role orchestrator task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj/x-rep.json  -> exit 0 ok=True
+$ gov --role orchestrator task create --class documentation --objective doc --status READY --allowed docs/**  -> exit 0 ok=True
+$ gov --role orchestrator task close TASK-0002 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj/x-rep2.json  -> exit 1 ok=False error={"code": "INDEX_STALE", "message": "required index is stale (2 artefacts changed since last build); run `gov rebuild-memory --incremental` before closing", "details": {"stale": ["spec/requirements/REQ-0001.yaml"], "added": ["spec/tasks/TASK-0002.yaml"], "removed": []}}
+after the upstream edit: freshness stale: ['spec/requirements/REQ-0001.yaml'] | unrelated task close -> INDEX_STALE
+[PASS] D1-W6-1: an upstream authoritative change makes the index stale and blocks task close until refreshed
+
+====================================================================================================
+D1-W6-2 after refresh: downstream evidence / context packets
+====================================================================================================
+DONE task governed by REQ-0001: {'task_status': 'DONE', 'retest_required': None, 'staleness': None}
+context packet index snapshot before/after: 5a4ef9cb4ada 7322a3b9d11f | gov status memory: {'runtime_present': True, 'index_fresh': True, 'index_manifest_present': True, 'stale': 0, 'added': 0, 'removed': 0}
+OBSERVATION (W6, other family): after an ungoverned upstream edit and an index refresh, the DONE task is NOT flagged stale; index freshness is green
+
+====================================================================================================
+D1-W6-3 governed upstream change: staleness propagation + index refresh together
+====================================================================================================
+$ gov --role orchestrator cit propose --proposal 'Revert refund convention to negative cents' --trigger acceptance_criteria_change --targets REQ-0001 --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj/x-496155.json  -> exit 0 ok=True
+$ gov --role orchestrator cit execute CIT-0004  -> exit 0 ok=True
+cit execute -> True COMMITTED | propagation: {'cause': {'kind': 'cit', 'cit': 'CIT-0004'}, 'inputs_changed': [{'id': 'REQ-0001', 'from': 'bbe7e09b29b22a4760131f57deb3bcd8163e8011caf3f31a7a673deb652951d4', 'to': '3be07aa69a7f16d7144b92784e8e3be4c91ed7e45c3e51b5cd3aeffa26dc625b', 'cause': 'CIT CIT-0004'}], 'retest_required': [], 'revalidation_required': ['TASK-0001'], 'revalidation_tasks': [{'task': 'TASK-0003', 'revalidates': 'TASK-0001'}], 'revalidation_pending': [], 'stale_reports': ['RPT-0001'], 'stale_tests': ['SCN-0001', 'TST-0001'], 'stale_checkpoints': ['CKPT-00003'], 'stale_handoffs': [], 'invalidated_packets': ['TASK-0001'], 'plan': {'changed': ['REQ-0001'], 'open_tasks': [], 'completed_tasks': [{'id': 'TASK-0001', 'why': ['consumes REQ-0001 (requirement, declared in task.requirements, feature F-0001.requirements)', 'in the CIT-P impact set (radius R2)']}], 'reports': [{'id': 'RPT-0001', 'why': ['evidence of TASK-0001, which depends on the change']}], 'tests': [{'id': 'SCN-0001', 'why': ['CIT-P tests_required', 'acceptance evidence of feature F-0001, whose requirements changed', 'validates feature F-0001, whose requirements changed']}, {'id': 'TST-0001', 'why': ['CIT-P tests_required', 'validates changed input(s) REQ-0001', 'validates feature F-0001, whose requirements changed']}], 'checkpoints': [{'id': 'CKPT-00003', 'why': ['captured the state of TASK-0001', 'recorded input(s) REQ-0001']}], 'handoffs': [], 'packets': [{'id': 'TASK-0001', 'why': ['compiled before the change']}]}, 'touched': ['spec/requirements/REQ-0001.yaml', 'spec/tasks/TASK-0003.yaml', 'spec/tasks/TASK-0001.yaml', 'spec/reports/RPT-0001.yaml', 'spec/scenarios/SCN-0001.yaml', 'spec/tasks/TST-0001.yaml', 'spec/reports/checkpoints/CKPT-00003.yaml', '.governance-runtime/context/TASK-0001.json', '.governance-runtime/context/packets/TASK-0001/e59d81c870108c6194acb47fa92cff2c26dac5b6b8d3e7142e03194a7466964c.json']}
+TST-0001 staleness: {'stale': True, 'reason': 'CIT CIT-0004', 'at': '2026-09-19T06:44:21Z', 'causes': [{'kind': 'cit', 'cit': 'CIT-0001'}, {'kind': 'cit', 'cit': 'CIT-0003'}, {'kind': 'cit', 'cit': 'CIT-0004'}], 'inputs_changed': [{'id': 'REQ-0001', 'from': '47e96f8bc82aadf5a7fcebc96fd1528669e2c5b57ab4a57abdc75547ef50aa80', 'to': 'cb02e9de8ff7d83c62cf3de3bf2f9c300addc2bd67465ca8191a9631bc28e2b0', 'cause': 'CIT CIT-0001'}, {'id': 'file:governance/project/REPOSITORY_CONTRACT.yaml', 'from': '50154c0f70f51fdcf54891b80ee31549392f3605ccd169445b3568c4d4bface2', 'to': 'db47c305d5092f45c86e51406064a2cc2a8e86dd57295e758f3f6a40de6dec0a', 'cause': 'CIT CIT-0003'}, {'id': 'REQ-0001', 'from': 'bbe7e09b29b22a4760131f57deb3bcd8163e8011caf3f31a7a673deb652951d4', 'to': '3be07aa69a7f16d7144b92784e8e3be4c91ed7e45c3e51b5cd3aeffa26dc625b', 'cause': 'CIT CIT-0004'}], 'why': ['CIT-P tests_required', 'validates changed input(s) REQ-0001', 'validates feature F-0001, whose requirements changed']} | DONE task retest flag: True | freshness after: True
+[PASS] D1-W6-3: a governed upstream change propagates staleness to dependent tests and refreshes the index in the same transaction
+
+=== SUMMARY ===
+PASS  K2-D1-1  CIT-E refreshes the index inside the transaction and verifies freshness; the new content is retrievable immediately
+PASS  K2-D1-2  a failed index refresh aborts CIT-E atomically: the change is rolled back and the index remains usable
+PASS  K2-D1-3  a path-map change committed through CIT-E is reflected in the refreshed index (no archive-as-current after COMMITTED)
+PASS  D1-W6-1  an upstream authoritative change makes the index stale and blocks task close until refreshed
+PASS  D1-W6-3  a governed upstream change propagates staleness to dependent tests and refreshes the index in the same transaction
+probe tmp base: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ar25/pr-after-beta-r-X-K2-D1-W6-interactions-zKTkCj
+[exit=0]

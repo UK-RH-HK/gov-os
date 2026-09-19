@@ -1,4 +1,9 @@
 //! Natural-language intent routing (framework §33): deterministic T0 patterns from the kernel command contract.
+//!
+//! The router proposes commands an agent may run. It never proposes one that asserts a human identity on the
+//! agent's behalf (`--by human`, `--role human`, `--method human`; BC-P2-10): a human answer reaches the OS only
+//! through the authenticated human channel (`gov trust human-channel`), which `gov decide` relays, and a CIT's
+//! approval derives from its gate's verified answer.
 use crate::records::RecordStore;
 use crate::util::read_yaml;
 use crate::{Project, Result};
@@ -61,17 +66,26 @@ pub fn route(p: &Project, text: &str) -> Result<Value> {
         }
         "APPROVE" => {
             if let Some(g) = &pending_gate {
+                // render the package for the human; the human answers through the authenticated channel, and
+                // `decide` relays that owner-signed answer (it cannot create one)
+                commands.push(format!("gov gate present {g}"));
+                commands.push("gov trust human-channel".into());
                 commands.push(format!("gov decide {g} --option <id>"));
             }
             if let Some(c) = &pending_cit {
-                commands.push(format!("gov cit approve {c} --by human"));
+                // approval derives from the CIT gate's verified answer, recorded under the acting role
+                commands.push(format!("gov cit approve {c}"));
                 commands.push(format!("gov cit execute {c}"));
             }
             commands.push("gov continue".into());
         }
         "REJECT" => {
+            if let Some(g) = &pending_gate {
+                commands.push(format!("gov gate present {g}"));
+                commands.push(format!("gov decide {g} --option <id>"));
+            }
             if let Some(c) = &pending_cit {
-                commands.push(format!("gov cit reject {c} --by human"));
+                commands.push(format!("gov cit reject {c}"));
             }
         }
         "STATUS" => commands.push("gov status".into()),

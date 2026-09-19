@@ -1,0 +1,29 @@
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-before-shim-synthesis-AC16-X3-ingress-root-of-trust-chain-Y05NEx/tmp/alpha-r-synth-x3-csszp7eh/tampered-kernel
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for memory query ZQXJ7-SYNTH-UNIQUE-SECRET-VALUE-4471
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-before-shim-synthesis-AC16-X3-ingress-root-of-trust-chain-Y05NEx/tmp/alpha-r-synth-x3p-b9a93760/rel-tampered/kernel
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-before-shim-synthesis-AC16-X3-ingress-root-of-trust-chain-Y05NEx/tmp/alpha-r-synth-x3p-b9a93760/rel/releases/4.1.5/kernel
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for memory query ZQXJ7-SYNTH-UNIQUE-SECRET-VALUE-4471
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for rebuild-memory
+(a) role declared: orchestrator for memory query ZQXJ7-SYNTH-UNIQUE-SECRET-VALUE-4471
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for audit --no-persist
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0023/ap/ap-before-shim-synthesis-AC16-X3-ingress-root-of-trust-chain-Y05NEx/tmp/alpha-r-synth-x3p-b9a93760/rel/releases/4.1.5/kernel
+(c) gate create: package fields added ['why_now', 'current_state', 'impact', 'cost_rework', 'recommendation']
+(a) role declared: orchestrator for kernel verify
+(c) gate create: package fields added ['why_now', 'current_state', 'impact', 'cost_rework', 'recommendation']

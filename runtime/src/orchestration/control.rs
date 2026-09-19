@@ -13,7 +13,11 @@
 //!   or one of the two explicit, listed recovery allow-lists ([`FROZEN_ALLOW_LIST`], [`PAUSED_ALLOW_LIST`]).
 //!
 //! Nothing changes governed state while `FREEZE_WRITES`/`PAUSE` forbids it except the operations those two lists name,
-//! each with its reason (framework §74: the emergency controls themselves and `ROLLBACK_TRANSACTION`).
+//! each with its reason (framework §74: the emergency controls themselves and `ROLLBACK_TRANSACTION`; and the
+//! deterministic rebuild of derived index state, which cannot change project truth — round-1 observation O-4).
+//!
+//! Governed work (`scheduler::catalogue::ops`) additionally passes the health scheduler's hard-blocks at the same
+//! site ([`guard_health`], called by [`guard_write`]).
 //!
 //! The operation-level `guard_write` (kernel integrity, `OWNER-DECISION-0006` §6 bullet 1, emergency state) is
 //! unchanged and still runs inside every runtime path that called it; G0 adds the emergency-state and authority
@@ -81,7 +85,52 @@ pub fn guard_write(p: &Project, operation: &str) -> Result<()> {
     // privileged plugin/profile acquisition are refused. Inspection, backup/export, diagnosis, repair,
     // uninstall/reinstall and restoration of an authenticated release stay available (§5).
     crate::srr::breakglass::guard_light(crate::FRAMEWORK_NAME, operation)?;
-    guard_emergency_state(p, operation)
+    guard_emergency_state(p, operation)?;
+    guard_health(p, operation)
+}
+
+/// **The G0 hard-block site (Contract v3 O5 "G0 Guard — every privileged/mutating command", :807 "hard-block vs
+/// warning semantics are explicit"; BC-P2-06 "a hard-block state refuses task create/claim/close/CIT propose";
+/// integration point IP-WS02-08).** When `operation` starts, hands off or completes governed work
+/// ([`GOVERNED_WORK_OPS`]), an active hard-block that governs it refuses it (`HEALTH_HARD_BLOCK`, naming the blocking
+/// check and the remediation); a block whose check inputs changed is re-evaluated first, so a repaired condition
+/// never keeps refusing work (`scheduler::guard`). Path-scoped blocks are decided where the touched paths are known
+/// (`verification::close_gate` at task close); here the operation is guarded as a whole.
+///
+/// **Deliberately not guarded here** (their hosts own the decision, with the targets and remedies in hand): operations
+/// that *apply* a sanctioned change which may itself be the remedy of the blocking condition. `cit approve`/`cit
+/// execute` (a governance-change CIT is how a D014 duplicate-id or supersession conflict is repaired — certification
+/// `brownfield_adoption_end_to_end`; WS-4 IP-WS02-05 passes the targets), `update --apply` (OWNER-DECISION-0006 §5
+/// keeps restoration of an authenticated release available below floor, and an update is the remedy of the D006/D007
+/// findings of an older installed release; WS-8 IP-WS02-12), `adopt migrate` (lifecycle ingress; WS-9 IP-WS02-18) and
+/// `release build` (no project guard; WS-8 IP-WS02-13). Guarding them at this generic site refused their own remedy.
+pub fn guard_health(p: &Project, operation: &str) -> Result<()> {
+    if let Some(op) = governed_work_op(operation) {
+        crate::scheduler::guard(p, op, &[])?;
+    }
+    Ok(())
+}
+
+/// Operation labels (as passed to [`guard_write`] and classified in [`COMMAND_GUARDS`]) that start, hand off or
+/// complete governed work, with their scheduler vocabulary operation (`scheduler::catalogue::ops`). `continue --claim`
+/// claims through `tasks::claim` ("task claim") and a forced close passes "task close", so both are covered.
+pub const GOVERNED_WORK_OPS: &[(&str, &str)] = &[
+    ("task create", crate::scheduler::catalogue::ops::TASK_CREATE),
+    ("task claim", crate::scheduler::catalogue::ops::TASK_CLAIM),
+    ("task close", crate::scheduler::catalogue::ops::TASK_CLOSE),
+    ("cit propose", crate::scheduler::catalogue::ops::CIT_PROPOSE),
+    (
+        "handoff create",
+        crate::scheduler::catalogue::ops::HANDOFF_CREATE,
+    ),
+];
+
+/// The scheduler operation `label` names, if it is governed work.
+pub fn governed_work_op(label: &str) -> Option<&'static str> {
+    GOVERNED_WORK_OPS
+        .iter()
+        .find(|(l, _)| *l == label)
+        .map(|(_, op)| *op)
 }
 
 /// The emergency-control half of the guard: refuse `operation` while FREEZE_WRITES or PAUSE is in force.
@@ -232,6 +281,12 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("cit rollback", "rollback_cit", Write),
     g("cit list", "read", Read),
     g("cit show", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-13): materiality classification of a manifest or of performed changes (read-only)
+    g("cit classify", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-04): propagating detected upstream changes writes staleness markers and revalidation
+    // tasks (the CIT-P analysis applied to a change already made); the dry run reads only
+    g("cit propagate", "simulate_cit", Write),
+    g("cit propagate --dry-run", "read", Read),
     g("context compile", "compile_context", Write),
     // integration P2-AR-0022 (WS-4, BC-P2-17/19/20): resolution, verification and display of the manifest and of the
     // packet history, and a dry-run receipt validation — none of them writes
@@ -239,8 +294,14 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("context verify", "read", Read),
     g("context show", "read", Read),
     g("context receipt", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-04): derived staleness of a task (reads records and the packet cache)
+    g("context staleness", "read", Read),
     g("checkpoint", "checkpoint", Write),
     g("checkpoint latest", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-05): derived freshness of a checkpoint (reads records and the packet cache)
+    g("checkpoint freshness", "read", Read),
+    // WS-4 (P2-AR-0025, BC-P2-05): writes the before_session_close checkpoint (and any unobserved trigger's)
+    g("session close", "checkpoint", Write),
     g("skills list", "read", Read),
     g("skills resolve", "read", Read),
     g("tools list", "read", Read),
@@ -259,7 +320,14 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("memory benchmark", "memory_benchmark", Read),
     g("memory benchmark --record", "memory_benchmark", Write),
     g("memory select", "memory_select", Write),
+    // round 2 (WS-6 IP-6, framework §18): an agent-reported retrieval miss is a memory-quality failure event (the
+    // write passes guard_write inside `memory::failures::record`); the open-failure list reads failure records
+    g("memory miss", "record_failure_memory", Write),
+    g("memory failures", "read", Read),
     g("memory heldout-starter", "regenerate_heldout_set", Write),
+    // WS-6 round 2 (BC-P2-28, BC-P2-30): report only — graph integrity and the retrieval profile's identity/governance
+    g("memory integrity", "read", Read),
+    g("memory profile", "read", Read),
     g("gate create", "create_gate", Write),
     g("gate present", "present_gate", Write),
     g("gate list", "read", Read),
@@ -320,10 +388,40 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("health skills", "read", Read),
     g("health skills --record", "record_skill_binding", Write),
     g("health close-check", "record_audit", Write),
+    // WS-2 round 2 (P2-AR-0023): the G6 entry point validates the oracle/report (read-only) and records the
+    // qualification run's health as a governance-suite EVIDENCE record, exactly as `health run` does
+    g("health qualify", "record_audit", Write),
     // WS-1/12 (BC-P2-51): the Qualification Oracle format tool reads documents held in verifier custody and the
     // format compiled into this binary; it opens no project
     outside("oracle format", "qualification tooling: prints the Qualification Oracle format compiled into this binary; opens no project"),
     outside("oracle validate", "qualification tooling: read-only validation of verifier-custody oracle / score-report documents; opens no governed project"),
+    // ---- WS-10 (P2-AR-0031, BC-P2-46/47/48): research, experiment and test-data lifecycles (runtime/src/lifecycle).
+    // Every transition writes a governed spec record (spec/research, spec/experiments, spec/data) and T2-seals it:
+    // `mutate_spec_other`, the class of governed spec records other than decisions (= `lifecycle::RECORD_AUTHORITY`;
+    // an L1 class for research-agent/data-author is WS-3's to declare, IP-WS10-01). A promotion records an
+    // owner-signed human approval of experimental output entering production (and may raise the gate for it):
+    // `approve_cit_human`, the class that applies a human-answered gate to a production change
+    // (= `lifecycle::PROMOTE_AUTHORITY`). show/check/trace read records, VCS history and the working tree only.
+    g("research record", "mutate_spec_other", Write),
+    g("research update", "mutate_spec_other", Write),
+    g("research conclude", "mutate_spec_other", Write),
+    g("research withdraw", "mutate_spec_other", Write),
+    g("research sync", "mutate_spec_other", Write),
+    g("research show", "read", Read),
+    g("research check", "read", Read),
+    g("experiment design", "mutate_spec_other", Write),
+    g("experiment update", "mutate_spec_other", Write),
+    g("experiment run", "mutate_spec_other", Write),
+    g("experiment reproduce", "mutate_spec_other", Write),
+    g("experiment conclude", "mutate_spec_other", Write),
+    g("experiment abandon", "mutate_spec_other", Write),
+    g("experiment promote", "approve_cit_human", Write),
+    g("experiment show", "read", Read),
+    g("experiment check", "read", Read),
+    g("data register", "mutate_spec_other", Write),
+    g("data show", "read", Read),
+    g("scenario trace", "read", Read),
+    g("scenario check", "read", Read),
 ];
 
 /// **The FREEZE_WRITES recovery allow-list** — the only writes permitted while writes are frozen, with the reason.
@@ -334,7 +432,12 @@ pub const FROZEN_ALLOW_LIST: &[(&str, &str)] = &[
     ("resume", "emergency control (framework §74): the only way out of the freeze (L4, resume_control)"),
     ("cit rollback", "ROLLBACK_TRANSACTION (framework §74): restoring a transaction's pre-execution snapshot is an emergency control, not new work"),
     ("telemetry emit", "observability evidence: 'recovery from emergency controls is auditable' (Contract v3 A5); it appends to the telemetry log only"),
+    ("rebuild-memory", REBUILD_REASON),
+    ("memory rebuild", REBUILD_REASON),
 ];
+
+/// O-4 (round-1 integration): why rebuilding the derived index is a recovery operation under both emergency controls.
+const REBUILD_REASON: &str = "derived-state recovery (Contract v3 B3/D6; framework §19): it rebuilds only the derived index and its generated manifests from Git and the authoritative records, deterministically (MEMORY_POLICY.rebuild.must_reproduce_manifest_hash), so it cannot change project truth, while inspection under the control (status, memory query, the context packet) depends on it; any governed record it would write (failure memory) still passes guard_write and is reported not_recorded";
 
 /// **The PAUSE recovery allow-list** — the only writes permitted while execution is paused, with the reason.
 pub const PAUSED_ALLOW_LIST: &[(&str, &str)] = &[
@@ -345,6 +448,8 @@ pub const PAUSED_ALLOW_LIST: &[(&str, &str)] = &[
     ("cit rollback", "ROLLBACK_TRANSACTION (framework §74)"),
     ("telemetry emit", "observability evidence (Contract v3 A5)"),
     ("gate present", "surfacing a pending question to the human is not agent work: the human must be able to see what the paused work is waiting on (it records the OS rendering of the package, nothing else)"),
+    ("rebuild-memory", REBUILD_REASON),
+    ("memory rebuild", REBUILD_REASON),
 ];
 
 /// Commands that exist to act on an unverified installed kernel: their own authority refusal is the one reported.
@@ -431,6 +536,41 @@ mod tests {
                 "{l} is allow-listed but is not a write"
             );
             assert!(why.len() > 10);
+        }
+    }
+
+    #[test]
+    fn governed_work_labels_are_classified_writes_and_remedies_are_never_governed_work() {
+        for (label, op) in GOVERNED_WORK_OPS {
+            let c = command_guard(label).unwrap_or_else(|| panic!("'{label}' is not classified"));
+            assert_eq!(c.effect, Effect::Write, "{label}");
+            assert!(crate::scheduler::catalogue::ops::ALL.contains(op), "{op}");
+        }
+        for remedy in [
+            "cit approve",
+            "cit execute",
+            "update --apply",
+            "update --rollback",
+            "adopt migrate",
+            "doctor",
+            "audit",
+            "health run",
+            "recover",
+            "rebuild-memory",
+            "memory rebuild",
+            "pause",
+            "freeze writes",
+            "resume",
+            "kernel reinstall",
+            "kernel verify",
+            "gate present",
+            "gate answer",
+            "checkpoint",
+        ] {
+            assert!(
+                governed_work_op(remedy).is_none(),
+                "{remedy} must stay available under a hard-block"
+            );
         }
     }
 

@@ -57,15 +57,73 @@ pub fn embedded_payload_hash() -> String {
     .clone()
 }
 
+/// The identity of the running `gov` binary, as far as a bootstrap installation is tied to it (OWNER-DECISION-P2-0002
+/// requirement 2: "the verifier binary's own embedded payload may be installed on an unprovisioned machine only as an
+/// explicitly marked bootstrap mode tied to the binary's own identity").
+///
+/// The embedded payload digest is compiled into the binary, so "this payload is the binary's own" is decided by
+/// content ([`embedded_payload_hash`]), never by a path. The executable digest records *which* binary did it; it is
+/// best-effort (a binary that cannot read itself reports why) and identifies nothing a caller could choose.
+pub fn binary_identity() -> Value {
+    static EXE: std::sync::OnceLock<String> = std::sync::OnceLock::new();
+    let exe = EXE
+        .get_or_init(|| match std::env::current_exe().and_then(std::fs::read) {
+            Ok(bytes) => crate::util::sha256_hex(&bytes),
+            Err(e) => format!("unavailable: {e}"),
+        })
+        .clone();
+    json!({
+        "gov_version": VERSION,
+        "cli_version": crate::CLI_VERSION,
+        "embedded_kernel_version": embedded::version(),
+        "embedded_commit": embedded::commit(),
+        "embedded_payload_hash": embedded_payload_hash(),
+        "executable_sha256": exe,
+    })
+}
+
+/// The embedded payload's listing — `(relative path, sha256)` for every embedded file, sorted — and its digest, which
+/// names the cache directory. Computed once per process from the embedded bytes alone.
+fn embedded_listing() -> &'static (Vec<(String, String)>, String) {
+    static L: std::sync::OnceLock<(Vec<(String, String)>, String)> = std::sync::OnceLock::new();
+    L.get_or_init(|| {
+        let mut listing: Vec<(String, String)> = embedded::files()
+            .iter()
+            .map(|(p, b)| (p.to_string(), crate::util::sha256_hex(b)))
+            .collect();
+        listing.sort();
+        let id = crate::util::sha256_text(&serde_json::to_string(&listing).unwrap_or_default());
+        (listing, id)
+    })
+}
+
+/// The name of the marker [`embedded_kernel_dir`] writes last into a materialised cache directory.
+const CACHE_COMPLETE_MARKER: &str = ".complete";
+
+/// Is `dir` **exactly** the embedded payload? Every listed file present with its digest, no other file (the
+/// completion marker aside), and the marker naming this listing.
+///
+/// IP-WS02-15 (root cause of the corrupt-cache defect WS-2 found, repair-1/ws02 §2): the old test was "`KERNEL.yaml`
+/// and `.complete` exist", which a directory holding 61 of 127 files — the result of several threads materialising into
+/// one shared `.staging-<pid>` — passed. A cache is now re-used only when its content is the listing.
+fn cache_matches_listing(dir: &Path) -> bool {
+    let (listing, id) = embedded_listing();
+    match std::fs::read_to_string(dir.join(CACHE_COMPLETE_MARKER)) {
+        Ok(m) if m.trim() == id.as_str() => {}
+        _ => return false,
+    }
+    let Ok((_, on_disk)) = hash_tree(dir, &[CACHE_COMPLETE_MARKER]) else {
+        return false;
+    };
+    on_disk.len() == listing.len()
+        && listing
+            .iter()
+            .all(|(rel, sha)| on_disk.get(rel).map(|h| h == sha).unwrap_or(false))
+}
+
 /// Where [`embedded_kernel_dir`] materialises the embedded payload, computed without writing anything.
 fn embedded_kernel_path() -> Result<PathBuf> {
-    let files = embedded::files();
-    let mut listing: Vec<(String, String)> = files
-        .iter()
-        .map(|(p, b)| (p.to_string(), crate::util::sha256_hex(b)))
-        .collect();
-    listing.sort();
-    let id = crate::util::sha256_text(&serde_json::to_string(&listing)?);
+    let id = &embedded_listing().1;
     let base = std::env::var("GOV_KERNEL_CACHE")
         .ok()
         .map(PathBuf::from)
@@ -85,41 +143,91 @@ fn embedded_kernel_path() -> Result<PathBuf> {
         .join(format!("{}-{}", embedded::version(), &id[..12])))
 }
 
-/// Materialise the embedded payload into a per-user cache directory (idempotent, content-addressed).
+/// Materialise the embedded payload into a per-user cache directory (content-addressed, verified before re-use).
+///
+/// **IP-WS02-15 — the root cause, fixed here rather than serialised around.** The old implementation staged into
+/// `kernels/.staging-<pid>`, shared by every thread of one process, and re-used any directory holding `KERNEL.yaml`
+/// and `.complete`. Two threads materialising at once interleaved their writes and removals and left a corrupt cache
+/// marked complete, which later `gov init` runs installed (or, under OWNER-DECISION-P2-0002, would refuse as
+/// not-the-embedded-payload). Now:
+///
+/// * an existing directory is re-used only when its content **is** the embedded listing ([`cache_matches_listing`]);
+/// * every call stages into its own directory (`.staging-<pid>-<uuid>`), checks it against the listing, and publishes
+///   it with one `rename`; a loser of that race keeps the winner's directory when it verifies;
+/// * a directory that does not verify is moved aside (never deleted in place under a reader) and replaced.
+///
+/// A directory verified once is remembered for the rest of the process, so the per-file check is paid once.
 pub fn embedded_kernel_dir() -> Result<PathBuf> {
-    let files = embedded::files();
-    let mut listing: Vec<(String, String)> = files
-        .iter()
-        .map(|(p, b)| (p.to_string(), crate::util::sha256_hex(b)))
-        .collect();
-    listing.sort();
-    let id = crate::util::sha256_text(&serde_json::to_string(&listing)?);
+    static VERIFIED: std::sync::Mutex<Option<PathBuf>> = std::sync::Mutex::new(None);
     let dir = embedded_kernel_path()?;
-    if dir.join("KERNEL.yaml").exists() && dir.join(".complete").exists() {
+    if let Ok(v) = VERIFIED.lock() {
+        if v.as_ref() == Some(&dir) && dir.join(CACHE_COMPLETE_MARKER).exists() {
+            return Ok(dir);
+        }
+    }
+    let remember = |d: &Path| {
+        if let Ok(mut v) = VERIFIED.lock() {
+            *v = Some(d.to_path_buf());
+        }
+    };
+    if cache_matches_listing(&dir) {
+        remember(&dir);
         return Ok(dir);
     }
     let kernels = dir
         .parent()
         .map(|p| p.to_path_buf())
         .unwrap_or_else(|| std::env::temp_dir().join("gov-cache").join("kernels"));
-    let staging = kernels.join(format!(".staging-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&staging);
-    for (rel, bytes) in files {
-        let p = staging.join(rel);
-        if let Some(d) = p.parent() {
-            std::fs::create_dir_all(d)?;
+    std::fs::create_dir_all(&kernels)
+        .map_err(|e| GovError::io(&format!("mkdir {}", kernels.display()), e))?;
+    let unique = format!("{}-{}", std::process::id(), crate::util::short_uuid());
+    let staging = kernels.join(format!(".staging-{unique}"));
+    let write_all = || -> Result<()> {
+        for (rel, bytes) in embedded::files() {
+            let p = staging.join(rel);
+            if let Some(d) = p.parent() {
+                std::fs::create_dir_all(d)?;
+            }
+            std::fs::write(&p, bytes)?;
         }
-        std::fs::write(&p, bytes)?;
+        std::fs::write(
+            staging.join(CACHE_COMPLETE_MARKER),
+            embedded_listing().1.as_bytes(),
+        )?;
+        Ok(())
+    };
+    if let Err(e) = write_all() {
+        let _ = std::fs::remove_dir_all(&staging);
+        return Err(e);
     }
-    std::fs::write(staging.join(".complete"), id.as_bytes())?;
-    if dir.exists() {
+    if !cache_matches_listing(&staging) {
         let _ = std::fs::remove_dir_all(&staging);
-    } else if let Err(e) = std::fs::rename(&staging, &dir) {
+        return Err(GovError::new(
+            "KERNEL_CACHE_CORRUPT",
+            format!("the embedded kernel payload could not be materialised intact under {}; the staged copy does not match the payload embedded in this binary", kernels.display()),
+        ));
+    }
+    // Another process may have published a verified directory meanwhile; keep it. Otherwise move the unverified
+    // directory aside (a reader holding paths under it sees the replacement, with identical content, at the same
+    // path) and publish ours.
+    if dir.exists() && !cache_matches_listing(&dir) {
+        let aside = kernels.join(format!(".stale-{unique}"));
+        let _ = std::fs::rename(&dir, &aside);
+        let _ = std::fs::remove_dir_all(&aside);
+    }
+    if let Err(e) = std::fs::rename(&staging, &dir) {
         let _ = std::fs::remove_dir_all(&staging);
-        if !dir.join(".complete").exists() {
+        if !cache_matches_listing(&dir) {
             return Err(GovError::io("materialise embedded kernel", e));
         }
     }
+    if !cache_matches_listing(&dir) {
+        return Err(GovError::new(
+            "KERNEL_CACHE_CORRUPT",
+            format!("the embedded kernel cache at {} does not match the payload embedded in this binary after materialisation", dir.display()),
+        ));
+    }
+    remember(&dir);
     Ok(dir)
 }
 
@@ -415,9 +523,10 @@ pub struct KernelVerification {
     /// The files match `KERNEL_MANIFEST.json` (the original D-0007 comparison, on its own).
     pub matches_manifest: bool,
     /// `BC-P2-35`: the installed files differ from what this machine committed into this project (its protected
-    /// installation record), whatever `KERNEL_MANIFEST.json` and `framework.lock` say. When the divergence is
-    /// enforced (the machine holds a trust anchor) the differing files are included in `modified` / `missing` /
-    /// `added` and `ok` is false; otherwise (OD-P2-02) they are reported in `protected_record_divergence` only.
+    /// installation record), whatever `KERNEL_MANIFEST.json` and `framework.lock` say. An enforced divergence puts the
+    /// differing files in `modified` / `missing` / `added` and makes `ok` false; since OWNER-DECISION-P2-0002 every
+    /// divergence is enforced, on a machine with no trust anchor as well (the payload embedded in the running binary
+    /// never diverges there: it is the bootstrap baseline).
     pub diverges_from_protected_record: bool,
     pub protected_record_enforced: bool,
     pub protected_record_payload_hash: String,
@@ -518,6 +627,47 @@ mod tests {
         stage_payload(&src, &dst).unwrap();
         let m = build_manifest(&dst).unwrap();
         assert_eq!(m["payload_hash"].as_str().unwrap(), embedded_payload_hash());
+        let _ = std::fs::remove_dir_all(&base);
+    }
+
+    /// IP-WS02-15: a cache directory is re-used only when it is exactly the embedded listing — the old test
+    /// (`KERNEL.yaml` and `.complete` present) accepted a directory missing files, and would have accepted one with
+    /// extra files or a marker naming another listing.
+    #[test]
+    fn a_kernel_cache_is_reused_only_when_it_is_exactly_the_embedded_listing() {
+        let base =
+            std::env::temp_dir().join(format!("gov-ws08-cache-{}", crate::util::short_uuid()));
+        let write_all = |d: &Path| {
+            for (rel, bytes) in embedded::files() {
+                let p = d.join(rel);
+                std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+                std::fs::write(&p, bytes).unwrap();
+            }
+            std::fs::write(
+                d.join(CACHE_COMPLETE_MARKER),
+                embedded_listing().1.as_bytes(),
+            )
+            .unwrap();
+        };
+        let exact = base.join("exact");
+        write_all(&exact);
+        assert!(cache_matches_listing(&exact));
+        let missing = base.join("missing");
+        write_all(&missing);
+        std::fs::remove_file(missing.join("policies").join("SECURITY_POLICY.yaml")).unwrap();
+        assert!(missing.join("KERNEL.yaml").exists() && !cache_matches_listing(&missing));
+        let extra = base.join("extra");
+        write_all(&extra);
+        std::fs::write(extra.join("policies").join("INJECTED.yaml"), "x: 1\n").unwrap();
+        assert!(!cache_matches_listing(&extra));
+        let altered = base.join("altered");
+        write_all(&altered);
+        std::fs::write(altered.join("KERNEL.yaml"), "framework: other\n").unwrap();
+        assert!(!cache_matches_listing(&altered));
+        let marker = base.join("marker");
+        write_all(&marker);
+        std::fs::write(marker.join(CACHE_COMPLETE_MARKER), "another-listing").unwrap();
+        assert!(!cache_matches_listing(&marker));
         let _ = std::fs::remove_dir_all(&base);
     }
 }

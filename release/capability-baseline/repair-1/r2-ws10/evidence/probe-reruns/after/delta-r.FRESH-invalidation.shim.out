@@ -1,0 +1,73 @@
+# P2-AR-0031 audit-of-record probe re-run (unedited): delta-r/FRESH-invalidation mode=shim
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws10 (HEAD 25edc5a67bd725c5fe0420540879a3ef02d0f673); product files differing from HEAD: 0
+# probe sha256 2c5ebbfcc1bedf6bfb4aa3d89cd09aaeee1e07a305aec40fa06aa1a9e247d94d; gov eb9e9e6e599fcc085969b649039d2c116a1cae20e0c5b4c3fbe1a7243844a211 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/mirror-shim-after/target/release/gov
+# date 2026-09-19T04:56:56Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-delta-r-FRESH-invalidation-Mf2MuR/fresh-1789793816-204c3f/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+OBSERVE F.base green audit written by gov init: {"green": true, "id": "AUD-0001", "inputs_hash": "a7c789ff78b1d67112beda147072e681d1ef9eb219805cf56071a044f9d12ed3", "record_keys": ["actor", "auditor_role", "cache_mode", "checks", "complete", "created", "deep", "families", "findings", "finished_at", "green", "health_result", "id", "inputs", "inputs_hash", "machine_trust", "parallelism", "repository", "reproducible", "result_hash", "run_at", "run_summary", "runtime", "scope", "session", "started_at", "state_class", "status", "suite_verdict", "tier", "title", "trigger", "type", "verdict"], "verdict": "HEALTHY"}
+CHECK F.base.1 PASS immediately after init the green audit is current (inputs_hash equal)
+      detail: {"green": "a7c789ff78b1d67112beda147072e681d1ef9eb219805cf56071a044f9d12ed3", "now": "a7c789ff78b1d67112beda147072e681d1ef9eb219805cf56071a044f9d12ed3"}
+CHECK F.PROJECT_POLICY PASS changing HUMAN_GATE_POLICY override (L family) (governance/project/PROJECT_POLICY.yaml) invalidates the prior green governance evidence (inputs_hash changes)
+      detail: {"inputs_hash_changed": true}
+CHECK F.MODEL_ROUTING_OVERRIDES PASS changing MODEL_ROUTING_OVERRIDES provider map (M family) (governance/project/MODEL_ROUTING_OVERRIDES.yaml) invalidates the prior green governance evidence (inputs_hash changes)
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/decisions/HDG-0500.yaml
+CHECK F.HDG-0500 PASS changing a Human Decision Gate record (L3) (spec/decisions/HDG-0500.yaml) invalidates the prior green governance evidence (inputs_hash changes)
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/research/RES-0500.yaml
+OBSERVE F.RES-0500 changing a research record (J1) (spec/research/RES-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.RES-0500.inv PASS a change to a research record (J1) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/experiments/EXP-0500.yaml
+OBSERVE F.EXP-0500 changing an experiment record (J2) (spec/experiments/EXP-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.EXP-0500.inv PASS a change to an experiment record (J2) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/reports/checkpoints/CKPT-09999.yaml
+OBSERVE F.CKPT-09999 changing a checkpoint record (N1) (spec/reports/checkpoints/CKPT-09999.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.CKPT-09999.inv PASS a change to a checkpoint record (N1) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/planning/HND-0500.yaml
+OBSERVE F.HND-0500 changing a handoff record (N4) (spec/planning/HND-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.HND-0500.inv PASS a change to a handoff record (N4) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TASK-0500.yaml
+OBSERVE F.TASK-0500 changing a task record (K2 retest flags live here) (spec/tasks/TASK-0500.yaml): inputs_hash changed?: {"inputs_hash_changed": true}
+CHECK F.TASK-0500.inv PASS a change to a task record (K2 retest flags live here) invalidates prior green evidence for the capability it feeds
+      detail: {"inputs_hash_changed": true}
+
+## consequence of staleness at task close (governance-touching work)
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-delta-r-FRESH-invalidation-Mf2MuR/fresh2-1789793837-7f0b25/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+$ gov --json --session probe-f78fb3ef task create --objective 'touch governance' --class governance --status READY --allowed governance/project/**
+  -> ok
+$ gov --json --session probe-f78fb3ef task claim TASK-0001
+  -> ok
+$ gov --json --session probe-f78fb3ef rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-f78fb3ef task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-delta-r-FRESH-invalidation-Mf2MuR/fresh2-1789793837-7f0b25/rep.json
+  -> ERROR [GOVERNANCE_SUITE_STALE] task touches governance paths but the last green governance record is obsolete; run `gov audit` first
+CHECK F.close.1 PASS after an input change the stale green record blocks governance-touching task close
+      detail: {"code": "GOVERNANCE_SUITE_STALE", "details": null, "message": "task touches governance paths but the last green governance record is obsolete; run `gov audit` first"}
+$ gov --json --session probe-f78fb3ef adapters generate
+  -> ok
+$ gov --json --session probe-f78fb3ef audit
+  -> ok
+$ gov --json --session probe-f78fb3ef task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-delta-r-FRESH-invalidation-Mf2MuR/fresh2-1789793837-7f0b25/rep.json
+  -> ok
+CHECK F.close.2 PASS after a fresh green audit the close succeeds (re-check before reliance)
+      detail: {"verdict": "HEALTHY"}
+
+## runtime/kernel implementation change: a different gov binary with the same kernel payload
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0031/ap-shim-after-delta-r-FRESH-invalidation-Mf2MuR/fresh3-1789793848-1a0a63/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+OBSERVE F.impl.bins binaries: {"modified_sha256": "761a3775891b8485", "original_sha256": "cc0a7530541d0ddb"}
+$ <modified gov binary> --json audit --no-persist  -> inputs_hash 5f021057239e3af817ec01ee4c33e95ca877d227fa4cb1b7a2fff4cd3ae2d808
+CHECK F.impl.1 FAIL running a different runtime/CLI implementation invalidates the green record produced by the previous implementation
+      detail: {"audit_record_has_binary_identity": false, "green_inputs_hash": "5f021057239e3af817ec01ee4c33e95ca877d227fa4cb1b7a2fff4cd3ae2d808", "under_modified_binary": "5f021057239e3af817ec01ee4c33e95ca877d227fa4cb1b7a2fff4cd3ae2d808"}
+
+## which governance-suite families would re-check family-delta behaviour after invalidation?
+OBSERVE F.families governance-suite families (TEST_POLICY.governance_families): ["adapter_portability", "audit_reproducibility", "authority_role_limits", "change_control_integrity", "command_contract_consistency", "concurrency_claims", "context_reproducibility", "continuity_checkpoint_handoff", "fresh_agent_reconstruction", "graph_integrity", "human_gate_integrity", "index_freshness", "memory_retrieval_regression", "model_routing_integrity", "mutation_scope", "path_map_compliance", "plugin_governance", "policy_enforcement_coverage", "policy_precedence", "product_test_health", "product_traceability", "recovery_rebuild", "schema_invariants", "secrets_sensitivity_indexing", "skill_regression"]
+CHECK F.families.1 PASS the re-check the product runs on stale evidence includes a family that exercises J/K/L/M/N behaviour
+      detail: ["adapter_portability", "audit_reproducibility", "authority_role_limits", "change_control_integrity", "command_contract_consistency", "concurrency_claims", "context_reproducibility", "continuity_checkpoint_handoff", "fresh_agent_reconstruction", "graph_integrity", "human_gate_integrity", "index_freshness", "memory_retrieval_regression", "model_routing_integrity", "mutation_scope", "path_map_compliance", "plugin_governance", "policy_enforcement_coverage", "policy_precedence", "product_test_health", "product_traceability", "recovery_rebuild", "schema_invariants", "secrets_sensitivity_indexing", "skill_regression"]
+SUMMARY checks=13 pass=12 fail=1 failed=['F.impl.1']
+[exit=0]

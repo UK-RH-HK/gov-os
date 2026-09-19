@@ -301,7 +301,253 @@ enum Cmd {
         #[command(subcommand)]
         op: OracleCmd,
     },
+    // ---- WS-4 (P2-AR-0025, BC-P2-05) additive block: session boundary
+    /// Session boundary: checkpoint before the session closes, degraded when its work's inputs are stale or missing
+    Session {
+        #[command(subcommand)]
+        op: SessionCmd,
+    },
+    // ---- WS-10 (P2-AR-0031) additive block: research, experiment and test-data lifecycles (Gate J, Gate H4)
+    /// Research outputs as governed evidence (Contract v3 J1): record, update, conclude, withdraw, show, check, sync
+    Research {
+        #[command(subcommand)]
+        op: ResearchCmd,
+    },
+    /// Experiment lifecycle (Contract v3 J2): design, run, reproduce, conclude, promote, abandon, show, check
+    Experiment {
+        #[command(subcommand)]
+        op: ExperimentCmd,
+    },
+    /// Data requirements and test datasets with provenance and recorded authorship (Contract v3 H4)
+    Data {
+        #[command(subcommand)]
+        op: DataCmd,
+    },
+    /// The FEATURE → SCENARIOS → DATA → TEST DATA → SUCCESS/FAILURE → INDEPENDENT TESTS chain (Contract v3 H4)
+    Scenario {
+        #[command(subcommand)]
+        op: ScenarioCmd,
+    },
 }
+// ---- WS-4 (P2-AR-0025, BC-P2-05) additive block
+#[derive(Subcommand)]
+enum SessionCmd {
+    /// Close the session: checkpoint every unobserved trigger, then write the before_session_close checkpoint and
+    /// state the input freshness it closed under (never refused; explicitly degraded when inputs are stale/missing)
+    Close {
+        #[arg(long, default_value = "gov continue")]
+        next_action: String,
+        #[arg(long)]
+        task: Option<String>,
+    },
+}
+// ---- WS-10 (P2-AR-0031) additive block: lifecycle subcommands (runtime/src/lifecycle)
+#[derive(Subcommand)]
+enum ResearchCmd {
+    /// Record a research output: complete → CONCLUDED (EVIDENCE); with --draft → FRAMED/IN_PROGRESS, held reference-only
+    Record {
+        /// The research fields (JSON/YAML, or @file): question, reason, method, sources|data, measurements, uncertainty, conclusion, confidence
+        #[arg(long)]
+        fields: String,
+        #[arg(long)]
+        draft: bool,
+        /// The task the research was done for (recorded as influenced)
+        #[arg(long)]
+        task: Option<String>,
+    },
+    /// Update unfinished (FRAMED/IN_PROGRESS) research; it stays reference-only
+    Update {
+        id: String,
+        #[arg(long)]
+        fields: String,
+    },
+    /// FRAMED/IN_PROGRESS → CONCLUDED: every J1 field recorded; the research becomes EVIDENCE
+    Conclude {
+        id: String,
+        #[arg(long)]
+        fields: Option<String>,
+    },
+    /// FRAMED/IN_PROGRESS → WITHDRAWN
+    Withdraw {
+        id: String,
+        #[arg(long)]
+        reason: String,
+    },
+    /// A research record, its evidence standing, recorded and derived influences, T2 binding and identity
+    Show { id: String },
+    /// Standing of every research record and the research findings
+    Check,
+    /// Record every missing influence backlink on research and experiment records
+    Sync,
+}
+#[derive(Subcommand)]
+enum ExperimentCmd {
+    /// Record an experiment in DESIGNED (hypothesis|question, method, data|data_provenance|inputs; outputs outside production)
+    Design {
+        #[arg(long)]
+        fields: String,
+    },
+    /// Amend an experiment (its design only while DESIGNED)
+    Update {
+        id: String,
+        #[arg(long)]
+        fields: String,
+    },
+    /// DESIGNED → RUNNING: record the primary run's results; every input is bound by SHA-256
+    Run {
+        id: String,
+        #[arg(long)]
+        results: String,
+        #[arg(long)]
+        environment: Option<String>,
+        #[arg(long)]
+        task: Option<String>,
+    },
+    /// Record a reproduction run; the OS judges agreement and recomputes reproducibility
+    Reproduce {
+        id: String,
+        #[arg(long)]
+        results: String,
+        #[arg(long)]
+        environment: Option<String>,
+    },
+    /// RUNNING → CONCLUDED: interpretation, decision_influence, confidence, reproducibility procedure/environment
+    Conclude {
+        id: String,
+        #[arg(long)]
+        fields: String,
+    },
+    /// CONCLUDED → PROMOTED: without --gate raise the promotion gate; with --gate apply the owner-signed approval
+    Promote {
+        id: String,
+        /// Comma-separated production paths the promotion approves
+        #[arg(long)]
+        paths: String,
+        #[arg(long)]
+        gate: Option<String>,
+        #[arg(long)]
+        cit: Option<String>,
+    },
+    /// Any non-final state → ABANDONED
+    Abandon {
+        id: String,
+        #[arg(long)]
+        reason: String,
+    },
+    /// An experiment, its standing, runs, reproducibility, input drift, influences and T2 binding
+    Show { id: String },
+    /// Standing of every experiment and the experiment findings (incl. production-merge detection)
+    Check,
+}
+#[derive(Subcommand)]
+enum DataCmd {
+    /// Register a data requirement or a test dataset (provenance, content binding, OS-recorded authorship)
+    Register {
+        #[arg(long)]
+        fields: String,
+    },
+    /// A data record: kind, provenance, authorship, what it realises, which tests use it, its gaps
+    Show { id: String },
+}
+#[derive(Subcommand)]
+enum ScenarioCmd {
+    /// Trace a feature's or scenario's chain with every gap
+    Trace { id: String },
+    /// Every chain gap in the project
+    Check,
+}
+fn lifecycle_arg(s: &Option<String>) -> Result<Value> {
+    match s {
+        None => Ok(Value::Null),
+        Some(_) => parse_json_arg(s),
+    }
+}
+fn lifecycle_cmd(cli: &Cli) -> Result<Value> {
+    use gov_runtime::lifecycle::{experiment as ex, research as rs, scenario as sc};
+    let p = open_project(cli, true)?;
+    match &cli.cmd {
+        Cmd::Research { op } => match op {
+            ResearchCmd::Record {
+                fields,
+                draft,
+                task,
+            } => rs::record(
+                &p,
+                parse_json_arg(&Some(fields.clone()))?,
+                *draft,
+                task.as_deref(),
+            ),
+            ResearchCmd::Update { id, fields } => {
+                rs::update(&p, id, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ResearchCmd::Conclude { id, fields } => rs::conclude(&p, id, lifecycle_arg(fields)?),
+            ResearchCmd::Withdraw { id, reason } => rs::withdraw(&p, id, reason),
+            ResearchCmd::Show { id } => rs::show(&p, id),
+            ResearchCmd::Check => rs::check(&p),
+            ResearchCmd::Sync => gov_runtime::lifecycle::sync_influences(&p),
+        },
+        Cmd::Experiment { op } => match op {
+            ExperimentCmd::Design { fields } => {
+                ex::design(&p, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ExperimentCmd::Update { id, fields } => {
+                ex::update(&p, id, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ExperimentCmd::Run {
+                id,
+                results,
+                environment,
+                task,
+            } => ex::run(
+                &p,
+                id,
+                parse_json_arg(&Some(results.clone()))?,
+                lifecycle_arg(environment)?,
+                task.as_deref(),
+            ),
+            ExperimentCmd::Reproduce {
+                id,
+                results,
+                environment,
+            } => ex::reproduce(
+                &p,
+                id,
+                parse_json_arg(&Some(results.clone()))?,
+                lifecycle_arg(environment)?,
+            ),
+            ExperimentCmd::Conclude { id, fields } => {
+                ex::conclude(&p, id, parse_json_arg(&Some(fields.clone()))?)
+            }
+            ExperimentCmd::Promote {
+                id,
+                paths,
+                gate,
+                cit,
+            } => ex::promote(
+                &p,
+                id,
+                &csv(&Some(paths.clone())),
+                gate.as_deref(),
+                cit.as_deref(),
+            ),
+            ExperimentCmd::Abandon { id, reason } => ex::abandon(&p, id, reason),
+            ExperimentCmd::Show { id } => ex::show(&p, id),
+            ExperimentCmd::Check => ex::check(&p),
+        },
+        Cmd::Data { op } => match op {
+            DataCmd::Register { fields } => {
+                sc::register(&p, parse_json_arg(&Some(fields.clone()))?)
+            }
+            DataCmd::Show { id } => sc::show(&p, id),
+        },
+        Cmd::Scenario { op } => match op {
+            ScenarioCmd::Trace { id } => sc::trace_cmd(&p, id),
+            ScenarioCmd::Check => sc::check(&p),
+        },
+        _ => Err(GovError::new("USAGE", "not a lifecycle command")),
+    }
+}
+// ---- end WS-10 additive block
 /// `gov oracle` (P2-AR-0014, BC-P2-51). Read-only: it validates documents and changes no governed state.
 #[derive(Subcommand)]
 enum OracleCmd {
@@ -387,6 +633,27 @@ enum HealthCmd {
         task: String,
         #[arg(long)]
         report: String,
+    },
+    // WS-2 round 2 (P2-AR-0023) additive: the G6 entry point (ws01-12 IP-4)
+    /// G6: record the health of a qualification run (synthetic repository, chaos, soak, hidden test) — only when its hidden oracle conforms and is separate, and its score report is bound to that oracle
+    Qualify {
+        /// synthetic-repository | chaos | soak | hidden-test
+        #[arg(long, default_value = "synthetic-repository")]
+        kind: String,
+        /// The verifier-owned hidden oracle (qualification-oracle document)
+        #[arg(long)]
+        oracle: PathBuf,
+        /// The candidate run's qualification-score-report, scored against that oracle
+        #[arg(long)]
+        report: PathBuf,
+        /// Public qualification suite root the oracle must be kept out of
+        #[arg(long = "public-suite")]
+        public_suite: Vec<PathBuf>,
+        /// Other qualification repository roots the oracle must be kept out of (this repository always is)
+        #[arg(long)]
+        repository: Vec<PathBuf>,
+        #[arg(long)]
+        run_id: Option<String>,
     },
 }
 fn health_cmd(cli: &Cli, op: &HealthCmd) -> Result<Value> {
@@ -474,6 +741,24 @@ fn health_cmd(cli: &Cli, op: &HealthCmd) -> Result<Value> {
             }
             gov_runtime::verification::close_gate(&p, &t, &rep, &touched, false)
         }
+        HealthCmd::Qualify {
+            kind,
+            oracle,
+            report,
+            public_suite,
+            repository,
+            run_id,
+        } => sch::qualification_run(
+            &p,
+            &sch::QualificationRun {
+                kind: kind.clone(),
+                run_id: run_id.clone(),
+                oracle: oracle.clone(),
+                score_report: report.clone(),
+                public_suites: public_suite.clone(),
+                repositories: repository.clone(),
+            },
+        ),
         HealthCmd::Skills {
             skill,
             record,
@@ -704,6 +989,23 @@ enum CitCmd {
     Show {
         id: String,
     },
+    // ---- WS-4 (P2-AR-0025, BC-P2-13/04) additive variants
+    /// Materiality of a CIT's manifest, or of changes already made to the given paths (read-only; BC-P2-13)
+    Classify {
+        /// a CIT id: classify its mutation manifest
+        #[arg(long)]
+        id: Option<String>,
+        /// comma-separated repository paths: classify their change since --base (default HEAD)
+        #[arg(long)]
+        paths: Option<String>,
+        #[arg(long)]
+        base: Option<String>,
+    },
+    /// Detect upstream changes made outside change control and propagate them as CIT-E would (BC-P2-04)
+    Propagate {
+        #[arg(long)]
+        dry_run: bool,
+    },
 }
 #[derive(Subcommand)]
 enum ContextCmd {
@@ -733,6 +1035,11 @@ enum ContextCmd {
         task: String,
         #[arg(long)]
         file: String,
+    },
+    // ---- WS-4 (P2-AR-0025, BC-P2-04) additive variant
+    /// Derived staleness of a task: what its work consumed, which inputs changed since, whether that was propagated
+    Staleness {
+        task: String,
     },
 }
 // ---- WS-4 (P2-AR-0017, BC-P2-21): artefact identity and record-level lineage
@@ -777,6 +1084,11 @@ enum CheckpointCmd {
         task: Option<String>,
         #[arg(long, default_value = "gov continue")]
         next_action: String,
+    },
+    // ---- WS-4 (P2-AR-0025, BC-P2-05) additive variant
+    /// Whether a checkpoint (default: the latest) still describes the material state it captured
+    Freshness {
+        id: Option<String>,
     },
 }
 #[derive(Subcommand)]
@@ -856,7 +1168,9 @@ enum MemoryCmd {
         #[arg(long)]
         record: bool,
     },
-    /// Pin a benchmarked candidate through a decision record and a full rebuild
+    /// Change the retrieval profile through the governed path (BC-P2-30): benchmark evidence (--research), the
+    /// change-control gate for its radius (raised on the first call; --gate once an answer authorises it), a full
+    /// re-index and a recorded held-out regression (rolled back when it does not hold)
     Select {
         candidate: String,
         #[arg(long)]
@@ -864,12 +1178,33 @@ enum MemoryCmd {
         /// Recorded as who selected (default: the acting role); it asserts no human approval
         #[arg(long)]
         by: Option<String>,
+        /// The answered change-control gate raised for this exact change
+        #[arg(long)]
+        gate: Option<String>,
     },
+    /// Graph integrity: orphan, dangling, stale, reversed and ill-typed relationships (BC-P2-28)
+    Integrity,
+    /// The retrieval profile: embedder and reranker component identities (adapter, model artefact, runtime) and
+    /// whether a decision governs it (BC-P2-30)
+    Profile,
     /// Generate a starter held-out set from the live index (only when the file has no queries)
     HeldoutStarter {
         #[arg(long)]
         force: bool,
     },
+    /// Report a retrieval miss (framework §18): the query and the artefacts that should have answered it are
+    /// recorded as a memory-quality failure event (deduplicated by signature, never indexed)
+    Miss {
+        #[arg(long)]
+        query: String,
+        /// Record ids or paths that should have been returned (repeatable)
+        #[arg(long = "expected")]
+        expected: Vec<String>,
+        #[arg(long)]
+        detail: Option<String>,
+    },
+    /// Failure records whose follow-up is not yet linked to governed work
+    Failures,
 }
 #[derive(Subcommand)]
 enum GateCmd {
@@ -1076,6 +1411,11 @@ fn declared_role(cli: &Cli) -> Result<gov_runtime::authority::ActingRole> {
             AdoptCmd::VerifyMemory { verifier_role, .. } => verifier_role.clone(),
             _ => None,
         },
+        // the auto-install conditions (install authority, no privilege escalation) are the acting role's: a
+        // subcommand `--role` is the same declaration, never a second role for one invocation
+        Cmd::Tools {
+            op: ToolsCmd::Install { role, .. },
+        } => role.clone(),
         _ => None,
     }
     .filter(|f| !f.trim().is_empty());
@@ -1094,6 +1434,24 @@ fn declared_role(cli: &Cli) -> Result<gov_runtime::authority::ActingRole> {
         }),
         _ => Ok(base),
     }
+}
+
+/// The producing actor of an adoption stage as the caller declared it (WS-9/11 IP-3): the session from `--session` or
+/// `GOV_SESSION` and the acting role this process installed. `None` when no session was declared, so the stage can
+/// record its documented fallback instead of an invented session.
+fn adopt_actor(cli: &Cli) -> Option<gov_runtime::migrations::identity::Actor> {
+    let session = cli
+        .session
+        .clone()
+        .or_else(|| std::env::var("GOV_SESSION").ok())
+        .filter(|s| !s.trim().is_empty())?;
+    let role = gov_runtime::authority::installed_acting_role()
+        .and_then(|r| r.role.clone())
+        .or_else(|| gov_runtime::authority::resolve_acting_role(cli.role.as_deref()).role);
+    Some(gov_runtime::migrations::identity::Actor::declared(
+        &session,
+        role.as_deref(),
+    ))
 }
 
 /// The G0 label of an invocation (`orchestration::control::COMMAND_GUARDS`): every command maps to exactly one.
@@ -1213,6 +1571,14 @@ fn g0_label(cmd: &Cmd) -> String {
             CitCmd::Rollback { .. } => "cit rollback",
             CitCmd::List => "cit list",
             CitCmd::Show { .. } => "cit show",
+            CitCmd::Classify { .. } => "cit classify",
+            CitCmd::Propagate { dry_run } => {
+                if *dry_run {
+                    "cit propagate --dry-run"
+                } else {
+                    "cit propagate"
+                }
+            }
         }),
         Cmd::Context { op } => s(match op {
             ContextCmd::Compile { .. } => "context compile",
@@ -1220,10 +1586,12 @@ fn g0_label(cmd: &Cmd) -> String {
             ContextCmd::Verify { .. } => "context verify",
             ContextCmd::Show { .. } => "context show",
             ContextCmd::Receipt { .. } => "context receipt",
+            ContextCmd::Staleness { .. } => "context staleness",
         }),
         Cmd::Checkpoint { op } => s(match op {
             CheckpointCmd::Create { .. } | CheckpointCmd::Watchdog { .. } => "checkpoint",
             CheckpointCmd::Latest => "checkpoint latest",
+            CheckpointCmd::Freshness { .. } => "checkpoint freshness",
         }),
         Cmd::Skills { op } => s(match op {
             SkillsCmd::List => "skills list",
@@ -1256,6 +1624,10 @@ fn g0_label(cmd: &Cmd) -> String {
             }
             MemoryCmd::Select { .. } => "memory select",
             MemoryCmd::HeldoutStarter { .. } => "memory heldout-starter",
+            MemoryCmd::Miss { .. } => "memory miss",
+            MemoryCmd::Failures => "memory failures",
+            MemoryCmd::Integrity => "memory integrity",
+            MemoryCmd::Profile => "memory profile",
         }),
         Cmd::Gate { op } => s(match op {
             GateCmd::Create { .. } => "gate create",
@@ -1351,10 +1723,44 @@ fn g0_label(cmd: &Cmd) -> String {
                 }
             }
             HealthCmd::CloseCheck { .. } => "health close-check",
+            HealthCmd::Qualify { .. } => "health qualify",
         }),
         Cmd::Oracle { op } => s(match op {
             OracleCmd::Format => "oracle format",
             OracleCmd::Validate { .. } => "oracle validate",
+        }),
+        // WS-4 (P2-AR-0025) additive arm
+        Cmd::Session { op } => s(match op {
+            SessionCmd::Close { .. } => "session close",
+        }),
+        // WS-10 (P2-AR-0031) additive arms
+        Cmd::Research { op } => s(match op {
+            ResearchCmd::Record { .. } => "research record",
+            ResearchCmd::Update { .. } => "research update",
+            ResearchCmd::Conclude { .. } => "research conclude",
+            ResearchCmd::Withdraw { .. } => "research withdraw",
+            ResearchCmd::Show { .. } => "research show",
+            ResearchCmd::Check => "research check",
+            ResearchCmd::Sync => "research sync",
+        }),
+        Cmd::Experiment { op } => s(match op {
+            ExperimentCmd::Design { .. } => "experiment design",
+            ExperimentCmd::Update { .. } => "experiment update",
+            ExperimentCmd::Run { .. } => "experiment run",
+            ExperimentCmd::Reproduce { .. } => "experiment reproduce",
+            ExperimentCmd::Conclude { .. } => "experiment conclude",
+            ExperimentCmd::Promote { .. } => "experiment promote",
+            ExperimentCmd::Abandon { .. } => "experiment abandon",
+            ExperimentCmd::Show { .. } => "experiment show",
+            ExperimentCmd::Check => "experiment check",
+        }),
+        Cmd::Data { op } => s(match op {
+            DataCmd::Register { .. } => "data register",
+            DataCmd::Show { .. } => "data show",
+        }),
+        Cmd::Scenario { op } => s(match op {
+            ScenarioCmd::Trace { .. } => "scenario trace",
+            ScenarioCmd::Check => "scenario check",
         }),
     }
 }
@@ -1400,6 +1806,27 @@ fn cit_gate_precheck(p: &Project, cit_id: &str) -> Result<()> {
     gov_runtime::orchestration::gates::require_honoured_answers(p, &[gate])
 }
 
+/// `gov continue` with the derived index as the dispatch sees it (WS-4 IP-6). **Integration point (WS-5,
+/// `status::continue_work`)**: once `continue_work` takes the handle (`db: impl Into<context::IndexHandle<'a>>`),
+/// this body becomes the single call `gov_runtime::status::continue_work(p, index, claim)`. Until then an
+/// unavailable index is refused typed, with its cause and the remediation, instead of failing inside the command.
+fn continue_with_index(
+    p: &Project,
+    index: gov_runtime::context::IndexHandle,
+    claim: bool,
+) -> Result<Value> {
+    match index {
+        gov_runtime::context::IndexHandle::Open(d) => {
+            gov_runtime::status::continue_work(p, d, claim)
+        }
+        gov_runtime::context::IndexHandle::Unavailable(e) => Err(GovError::new(
+            "INDEX_UNAVAILABLE",
+            format!("the derived index cannot be opened ({}: {}); the dispatch path that compiles the packet without it (IndexHandle::Unavailable) is not wired into `status::continue_work` in this build. Remediation: `gov rebuild-memory` rebuilds the derived index from Git and the authoritative records (it is permitted under FREEZE_WRITES/PAUSE)", e.code, e.message),
+        )
+        .with_details(json!({"cause": e.code, "message": e.message, "remediation": "gov rebuild-memory"}))),
+    }
+}
+
 fn db(p: &Project) -> Result<RuntimeDb> {
     let d = RuntimeDb::open(&p.db_path())?;
     d.init_schema()?;
@@ -1422,7 +1849,15 @@ fn run(cli: &Cli) -> Result<Value> {
             gov_runtime::init::init(&root, gov_runtime::init::InitOptions { source: source.clone(), project_name: pn, alias: al, mode: "init".into(), force: *force, intent: intent.clone(), skip_index: *skip_index, channel: channel.clone(), break_glass: *break_glass })
         }
         Cmd::Status => { let p = open_project(cli, true)?; gov_runtime::status::status(&p) }
-        Cmd::Continue { claim } => { let p = open_project(cli, true)?; let d = db(&p)?; gov_runtime::status::continue_work(&p, &d, *claim) }
+        Cmd::Continue { claim } => {
+            let p = open_project(cli, true)?;
+            // WS-4 IP-6 / BC-P2-19 (W10): the derived index is optional for dispatch — it is opened here and handed on
+            // as an `IndexHandle`, `Unavailable` (with the reason) when it cannot be opened, never a hard failure
+            match gov_runtime::context::open_index(&p) {
+                Ok(d) => continue_with_index(&p, gov_runtime::context::IndexHandle::Open(&d), *claim),
+                Err(e) => continue_with_index(&p, gov_runtime::context::IndexHandle::Unavailable(e), *claim),
+            }
+        }
         Cmd::Decide { gate, option, by, rationale, answer_file, evidence } => { let p = open_project(cli, true)?; gov_runtime::orchestration::gates::answer(&p, gate, &gov_runtime::orchestration::gates::AnswerRequest { option: option.clone(), by: by.clone(), rationale: rationale.clone(), answer_file: answer_file.clone(), evidence: evidence.clone() }) }
         Cmd::Audit { deep, family, no_persist } => { let p = open_project(cli, true)?; run_audit(&p, *deep, family.clone(), !no_persist) }
         Cmd::Verify { what } => { let p = open_project(cli, true)?; if what == "governance" { run_audit(&p, false, vec![], true) } else { gov_runtime::verification::product_suite(&p) } }
@@ -1438,7 +1873,12 @@ fn run(cli: &Cli) -> Result<Value> {
             let session = cli.session.clone().or(std::env::var("GOV_SESSION").ok()).unwrap_or_else(gov_runtime::util::new_session_id);
             use gov_runtime::adopt as a;
             match stage {
-                AdoptCmd::Baseline => a::a0_baseline(&root, &session), AdoptCmd::Inventory => a::a1_inventory(&root), AdoptCmd::Classify => a::a2_classify(&root), AdoptCmd::Map => a::a3_map(&root), AdoptCmd::Plan => a::a4_plan(&root), AdoptCmd::TestDesign => a::a5_test_design(&root),
+                AdoptCmd::Baseline => a::a0_baseline(&root, &session), AdoptCmd::Inventory => a::a1_inventory(&root), AdoptCmd::Classify => a::a2_classify(&root),
+                // WS-9/11 IP-3 (BC-P2-08): the producer recorded in the catalogue and the plan is the invocation's declared
+                // session and role; with no declared session the stage falls back to the A0 planner session (recorded as such)
+                AdoptCmd::Map => match adopt_actor(cli) { Some(actor) => a::a3_map_by(&root, &actor), None => a::a3_map(&root) },
+                AdoptCmd::Plan => match adopt_actor(cli) { Some(actor) => a::a4_plan_by(&root, &actor), None => a::a4_plan(&root) },
+                AdoptCmd::TestDesign => a::a5_test_design(&root),
                 AdoptCmd::Review { verdict, reviewer_session, reviewer_role: _, notes } => a::a5_review(&root, verdict, reviewer_session.as_deref().unwrap_or(&session), &acting, notes.as_deref()),
                 AdoptCmd::Migrate { batch, source, gate_answer, name: pn, alias } => { let pn2 = pn.clone().unwrap_or_else(|| root.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or("project".into())); let al = alias.clone().unwrap_or_else(|| format!("project-{}", &gov_runtime::util::sha256_text(&pn2)[..6])); a::a6_migrate(&root, *batch, source.as_deref(), gate_answer, &pn2, &al, &session) }
                 AdoptCmd::VerifyMigration { verdict, verifier_role: _ } => a::a7_verify_migration(&root, verdict.as_deref(), &session, &acting),
@@ -1466,19 +1906,21 @@ fn run(cli: &Cli) -> Result<Value> {
                     let r = gov_runtime::srr::staging::recover(&ms)?;
                     Ok(json!({"replayed": r}))
                 }
-                TrustCmd::HumanChannel { provision } => match provision {
-                    Some(f) => gov_runtime::human_channel::provision_standalone(Path::new(f), project_root.as_deref()),
-                    None => {
-                        // the project's policy (when there is one) may only tighten the standalone-anchor switch
-                        let allowed = project_root
-                            .as_deref()
-                            .map(|r| Project::open(&gov_runtime::project::find_root(r).unwrap_or(r.to_path_buf())))
-                            .filter(|p| p.is_installed())
-                            .map(|p| gov_runtime::orchestration::gates::standalone_anchor_allowed(&p))
-                            .unwrap_or(true);
-                        gov_runtime::human_channel::status(allowed)
+                TrustCmd::HumanChannel { provision } => {
+                    // HUMAN_GATE_POLICY.human_channel.standalone_anchor_when_unprovisioned: the project's verified
+                    // policy when there is one (a project may only tighten it), else the kernel compiled into this
+                    // binary (P2-ADJ-0001: off)
+                    let allowed = project_root
+                        .as_deref()
+                        .map(|r| Project::open(&gov_runtime::project::find_root(r).unwrap_or(r.to_path_buf())))
+                        .filter(|p| p.is_installed())
+                        .map(|p| gov_runtime::orchestration::gates::standalone_anchor_allowed(&p))
+                        .unwrap_or_else(gov_runtime::human_channel::standalone_allowed_by_embedded_kernel);
+                    match provision {
+                        Some(f) => gov_runtime::human_channel::provision_standalone(Path::new(f), project_root.as_deref(), allowed),
+                        None => gov_runtime::human_channel::status(allowed),
                     }
-                },
+                }
             }
         }
         Cmd::Contract { op } => {
@@ -1530,6 +1972,9 @@ fn run(cli: &Cli) -> Result<Value> {
                 CitCmd::Rollback { id, reason } => c::rollback(&p, id, reason.as_deref()),
                 CitCmd::List => Ok(json!(c::list(&p))),
                 CitCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found"))) }
+                // WS-4 (P2-AR-0025) additive arms
+                CitCmd::Classify { id, paths, base } => c::classify(&p, id.as_deref(), &csv(paths), base.as_deref()),
+                CitCmd::Propagate { dry_run } => c::propagate_detected(&p, *dry_run),
             }
         }
         // WS-4 (P2-AR-0017): the context commands do not require the derived index — mandatory inputs are resolved
@@ -1543,6 +1988,8 @@ fn run(cli: &Cli) -> Result<Value> {
                 ContextCmd::Verify { task, hash } => { let pk = ctx::load_packet(&p, task, hash.as_deref())?; ctx::verify_delivery(&p, &pk) }
                 ContextCmd::Show { task, hash } => ctx::load_packet(&p, task, hash.as_deref()),
                 ContextCmd::Receipt { task, file } => { let s = gov_runtime::records::RecordStore::load(&p.root); Ok(ctx::receipt::validate(&p, &s, task, &load_file_value(file)?)?.to_value()) }
+                // WS-4 (P2-AR-0025) additive arm
+                ContextCmd::Staleness { task } => { let s = gov_runtime::records::RecordStore::load(&p.root); gov_runtime::cit::propagation::task_staleness(&p, &s, task) }
             }
         }
         Cmd::Artefact { op } => {
@@ -1565,6 +2012,15 @@ fn run(cli: &Cli) -> Result<Value> {
                 CheckpointCmd::Create { next_action, task, trigger, step, tests_status } => gov_runtime::checkpoints::create(&p, &d, json!({"next_action": next_action, "task": task, "trigger": trigger, "last_completed_step": step, "tests_status": tests_status})),
                 CheckpointCmd::Latest => Ok(gov_runtime::checkpoints::latest(&p).unwrap_or(Value::Null)),
                 CheckpointCmd::Watchdog { utilisation, ops, task, next_action } => gov_runtime::checkpoints::watchdog(&p, &d, *utilisation, *ops, task.as_deref(), next_action),
+                // WS-4 (P2-AR-0025) additive arm
+                CheckpointCmd::Freshness { id } => gov_runtime::checkpoints::freshness(&p, id.as_deref()),
+            }
+        }
+        // WS-4 (P2-AR-0025, BC-P2-05) additive arm
+        Cmd::Session { op } => {
+            let p = open_project(cli, true)?; let d = db(&p)?;
+            match op {
+                SessionCmd::Close { next_action, task } => gov_runtime::checkpoints::session_close(&p, &d, next_action, task.as_deref()),
             }
         }
         Cmd::Skills { op } => { let p = open_project(cli, true)?; match op { SkillsCmd::List => Ok(json!(gov_runtime::skills::list_skills(&p))), SkillsCmd::Resolve { task } => { let s = gov_runtime::records::RecordStore::load(&p.root); let t = s.get(task).map(|r| r.data.clone()).ok_or_else(|| GovError::new("TASK_NOT_FOUND", format!("{task} not found")))?; gov_runtime::skills::resolve(&p, &t) } } }
@@ -1574,7 +2030,8 @@ fn run(cli: &Cli) -> Result<Value> {
                 ToolsCmd::List => { let mut t = gov_runtime::tools::kernel_tools(&p); t.extend(gov_runtime::tools::project_tools(&p)); Ok(json!({"tools": t, "mcp_servers": gov_runtime::tools::mcp_servers(&p)})) }
                 ToolsCmd::Registry => gov_runtime::tools::generate_registry(&p),
                 ToolsCmd::Resolve { role, capability } => gov_runtime::tools::resolve(&p, role.as_deref().unwrap_or(&p.role), capability),
-                ToolsCmd::Install { descriptor, role, execute } => { let d = load_file_value(descriptor)?; gov_runtime::tools::install(&p, d, role.as_deref().unwrap_or(&p.role), *execute) }
+                // BC-P2-08: the conditions are evaluated for the acting role (`declared_role` reconciled any `--role` here)
+                ToolsCmd::Install { descriptor, role: _, execute } => { let d = load_file_value(descriptor)?; gov_runtime::tools::install(&p, d, &p.role, *execute) }
                 ToolsCmd::Health => Ok(json!(gov_runtime::tools::health(&p))),
             }
         }
@@ -1585,8 +2042,21 @@ fn run(cli: &Cli) -> Result<Value> {
                 MemoryCmd::Query { query, k, route, include_historical } => { let d = db(&p)?; let r = gov_runtime::retrieval::retrieve(&p, &d, query, gov_runtime::retrieval::RetrieveOptions { k: *k, route: route.clone(), include_historical: *include_historical, log: true, ..Default::default() })?; gov_runtime::observability::emit(&p, "retrieval", json!({"routes": r.routes, "hits": r.hits.len(), "latency_ms": r.latency_ms}))?; Ok(serde_json::to_value(&r)?) }
                 MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if r["measured"].as_bool().unwrap_or(false) && !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
                 MemoryCmd::Benchmark { candidates, heldout, record } => gov_runtime::memory::benchmark::run(&p, candidates, heldout.clone(), *record),
-                MemoryCmd::Select { candidate, research, by } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), by.as_deref().unwrap_or(&acting)),
+                MemoryCmd::Select { candidate, research, by, gate } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), gate.as_deref(), by.as_deref().unwrap_or(&acting)),
+                MemoryCmd::Integrity => { let d = db(&p).ok(); let store = gov_runtime::records::RecordStore::load(&p.root); Ok(serde_json::to_value(gov_runtime::memory::integrity::check(&p, &store, d.as_ref())?)?) }
+                MemoryCmd::Profile => { let mut v = gov_runtime::memory::profile::status(&p); v["live_index"] = db(&p).ok().map(|d| json!({"embedder": d.get_meta("embedder"), "reranker": d.get_meta("reranker"), "components": {"embedder": d.get_meta("embedder_identity"), "reranker": d.get_meta("reranker_identity")}})).unwrap_or(Value::Null); Ok(v) }
                 MemoryCmd::HeldoutStarter { force } => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let existing = gov_runtime::util::read_yaml(&hp).ok().and_then(|h| h["queries"].as_array().map(|a| a.len())).unwrap_or(0); if existing > 0 && !force { return Err(GovError::new("USAGE", format!("{} already has {existing} queries (use --force to overwrite)", hp.display()))); } let set = gov_runtime::memory::heldout::generate_starter(&p, &d, "gov memory heldout-starter")?; gov_runtime::util::write_yaml(&hp, &set)?; Ok(json!({"path": hp.display().to_string(), "queries": set["queries"].as_array().map(|a| a.len()).unwrap_or(0)})) }
+                MemoryCmd::Miss { query, expected, detail } => {
+                    // WS-6 IP-6: an agent-reported miss; the write passes guard_write inside `failures::record`, and a
+                    // refused write is reported typed rather than as success
+                    let ev = gov_runtime::memory::failures::retrieval_miss_event(query, expected, json!({"detail": detail}), vec!["reported by an agent (to be root-caused: chunking / metadata / routing / graph / lexical / stale index / knowledge gap)".into()], "memory miss", "reported");
+                    let o = gov_runtime::memory::failures::record(&p, ev, false);
+                    if o.status == "not_recorded" {
+                        return Err(GovError::new("FAILURE_NOT_RECORDED", format!("the retrieval miss was not recorded: {}", o.reason.clone().unwrap_or_default())).with_details(o.to_value()));
+                    }
+                    Ok(o.to_value())
+                }
+                MemoryCmd::Failures => Ok(json!({"open": gov_runtime::memory::failures::open_failures(&p)})),
                 MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
                 MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?)?),
                 MemoryCmd::Graph { node, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::neighbours(&d, node, *depth)?)) }
@@ -1612,8 +2082,24 @@ fn run(cli: &Cli) -> Result<Value> {
                 let lock = p.lock()?.clone();
                 // Privileged lifecycle ingress `reinstall`: the one verification policy (ARCH-0003 §3.6).
                 let src = gov_runtime::kernel::resolve_kernel_source(source.as_deref().map(Path::new).or_else(|| lock["source"].as_str().filter(|s| Path::new(s).exists()).map(Path::new)))?;
+                // BC-P2-38 (WS-8 IP-3): bind the request to the pinned payload, so a candidate that is not the pinned
+                // release is refused right after measurement — before any floor, break-glass entry or owner
+                // authorisation is consumed. The pin is bound only when it is unambiguous: framework.lock agrees with
+                // this machine's protected record of what it committed into the project (BC-P2-35), or no such record
+                // exists. When they disagree (a pin rewritten together with the kernel, or another machine's update
+                // pulled in), the precise check inside `kernel::install_kernel` decides before anything moves
+                // (KERNEL_PIN_REWRITTEN naming the values to restore, or the lock-pinned release admitted).
+                let lock_pin = lock["release_hash"].as_str().map(String::from);
+                let recorded_pin = gov_runtime::srr::installation::project_record(&p.root)
+                    .and_then(|r| r.current)
+                    .map(|c| c.payload_hash);
+                let pin = match (&lock_pin, &recorded_pin) {
+                    (Some(l), Some(r)) if l != r => None,
+                    _ => lock_pin.clone(),
+                };
                 let auth = gov_runtime::srr::admit(
                     gov_runtime::srr::AdmissionRequest::new(gov_runtime::srr::Ingress::Reinstall, &src)
+                        .with_pinned_payload(pin)
                         .with_break_glass(*break_glass)
                         .with_reason(Some("gov kernel reinstall".into())),
                 )?;
@@ -1676,6 +2162,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 },
             ),
         },
+        Cmd::Research { .. } | Cmd::Experiment { .. } | Cmd::Data { .. } | Cmd::Scenario { .. } => lifecycle_cmd(cli), // WS-10 additive arm
         Cmd::Mcp { .. } => Err(GovError::new("MCP_NOT_IMPLEMENTED", "the repository-intelligence MCP server (MCP-REPO-001) is registered as planned; this release exposes the same operations through the CLI JSON contract (API-0002)")),
     }.inspect(|_v| { let _ = name; })
 }
@@ -1751,6 +2238,12 @@ fn command_name(c: &Cmd) -> &'static str {
         Cmd::Artefact { .. } => "artefact",
         Cmd::Health { .. } => "health", // WS-2 additive arm
         Cmd::Oracle { .. } => "oracle",
+        Cmd::Session { .. } => "session", // WS-4 additive arm
+        // WS-10 (P2-AR-0031) additive arms
+        Cmd::Research { .. } => "research",
+        Cmd::Experiment { .. } => "experiment",
+        Cmd::Data { .. } => "data",
+        Cmd::Scenario { .. } => "scenario",
     }
 }
 

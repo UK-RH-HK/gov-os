@@ -1,0 +1,14 @@
+# P2-AR-0026 audit-of-record probe re-run (unedited): delta-r/L3-supplement mode=after
+# worktree HEAD 090eded736d1995e21bfe24fd73280f3b837dece; product files differing from HEAD: 0
+# probe sha256 459dd0295d487e80336f4d5cd6d4722fcd3c35a763cad73585d5d85c1c60dd3c; real gov 6d3db3c0fd51804da94091e261e3e4feb3ca10223da707de045528bd84708e9a via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws05/target/release/gov
+# date 2026-09-19T05:52:08Z
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0026/ap2/ap-after-delta-r-L3-supplement-7lcq5d/l3s-1789797128-e12b80/proj
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws05/release/capability-baseline/audit-0/delta-r/evidence/L3-supplement.py", line 13, in <module>
+    p = Proj("l3s")
+        ^^^^^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws05/release/capability-baseline/audit-0/delta-r/evidence/harness.py", line 69, in __init__
+    assert r["ok"], r
+           ~^^^^^^
+AssertionError: {'ok': False, 'command': 'init', 'error': {'code': 'AUTHORITY_DENIED', 'message': "no acting role was declared, so the invocation carries no privileged authority (framework §23: no worker behaves as an orchestrator unless explicitly assigned that role); 'install_kernel' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation: declare the assigned role with the global `--role <kernel role id>` flag or GOV_ROLE.", 'details': {'role': 'undeclared', 'declared': False, 'level': 'L0', 'kernel_level': 'L0', 'required': 'L4', 'operation': 'install_kernel', 'cause': 'ROLE_UNDECLARED', 'remediation': 'declare the assigned role with the global `--role <kernel role id>` flag or GOV_ROLE'}}, 'session': 'probe-38210cf7', 'release_trust': {'surface': 'init', 'below_floor': False, 'marking': None, 'presented_as': 'CURRENT', 'section_6_bullet': 7, 'basis': "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}, '_exit': 1}
+[exit=1]
