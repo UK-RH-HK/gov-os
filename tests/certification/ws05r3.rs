@@ -335,6 +335,63 @@ fn a_security_finding_generates_remediation_that_stays_available_under_its_block
     assert_eq!(n, sec.len());
 }
 
+/// BC-P2-24 / AC-5 "remediation from each health failure", on a RED result that the event's own records make stale
+/// (epsilon-r O5 S8): the doctor records a secret in product source, the audit that follows writes its governance-
+/// suite record, which changes the doctor check's inputs before generation reads the health state. Generation
+/// re-evaluates the stale failure (as the guard re-evaluates a stale block) instead of dropping it: one security
+/// remediation for the one condition, remedying the doctor check and the path-map family that both report it, plus
+/// the unrelated audit finding; nothing is generated twice.
+#[test]
+fn a_red_result_made_stale_by_the_events_own_records_is_reevaluated_not_dropped() {
+    let (root, g) = fresh("ws5r3-red");
+    write_file(
+        &root,
+        "src/creds.rs",
+        "pub const K: &str = \"AKIAIOSFODNN7EXAMPLE\";\n",
+    );
+    let adapter = root.join("governance/generated/adapters/api/system-instruction.txt");
+    let mut text = std::fs::read_to_string(&adapter).unwrap();
+    text.push_str("\n#tamper\n");
+    std::fs::write(&adapter, text).unwrap();
+    let d = g.run(&["doctor"]);
+    assert!(!d.ok(), "{}", d.envelope);
+    let a = g.run(&["audit"]);
+    assert!(!a.ok(), "{}", a.envelope);
+    let _ = g.run(&["continue"]);
+    let _ = g.run(&["task", "replan"]);
+    let gen = generated(&root);
+    let remedies = |t: &Value| -> Vec<String> {
+        t["remedies"]
+            .as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let secret: Vec<&Value> = of_source(&gen, "security-finding")
+        .into_iter()
+        .filter(|t| remedies(t).contains(&"D011".to_string()))
+        .collect();
+    assert_eq!(secret.len(), 1, "one remediation for the secret: {gen:?}");
+    assert!(
+        remedies(secret[0]).contains(&"path_map_compliance".to_string()),
+        "the doctor check and the path-map family report one condition: {}",
+        secret[0]
+    );
+    assert!(
+        gen.iter()
+            .any(|t| remedies(t).contains(&"adapter_portability".to_string())),
+        "{gen:?}"
+    );
+    // reconciling again generates nothing
+    let n = gen.len();
+    let again = g.ok(&["task", "generate"]);
+    assert!(again["created"].as_array().unwrap().is_empty(), "{again}");
+    assert_eq!(generated(&root).len(), n);
+}
+
 /// BC-P2-24 failed tests: a recorded failing product-test family generates one repair task derived from the failing
 /// run; a second failing run of the same streak generates nothing new.
 #[test]

@@ -49,6 +49,11 @@
 //!   one post-command site), inside `task close`, `continue` and `task replan`, and on demand (`gov task generate`).
 //!   Read-only commands never write: an event a read-only command observes and records durably (a retrieval miss, a
 //!   doctor result in the health state) is turned into work by the next governed operation.
+//! * **Current conditions only.** A failing health result whose check inputs changed since it was recorded (often
+//!   only because the run's own audit record or generated task was written) is re-evaluated first, exactly as the
+//!   scheduler's guard re-evaluates a stale block ([`reevaluate_stale_failures`]); work is generated from the
+//!   condition as it is now. A dry run, or a run whose writes are refused, does not re-evaluate and leaves stale
+//!   failures for the next generation.
 //! * **No loops.** Findings about generated work itself never generate work.
 use crate::orchestration::control;
 use crate::records::{Record, RecordStore};
@@ -1341,6 +1346,12 @@ pub fn reconcile(p: &Project, o: &Options) -> Result<Value> {
     } else {
         control::guard_write(p, "work generation")
     };
+    // failing health results whose inputs changed since they were recorded are re-evaluated before they are read
+    let reevaluated = if !o.dry_run && writable.is_ok() {
+        reevaluate_stale_failures(p, &Config::load(p))
+    } else {
+        json!({"families": [], "doctor": false})
+    };
     // the performance detector records durable failure memory first (it is itself a governed write)
     {
         let store = RecordStore::load(&p.root);
@@ -1440,7 +1451,7 @@ pub fn reconcile(p: &Project, o: &Options) -> Result<Value> {
         "candidates": cands.len(), "by_source": by_source,
         "created": created, "augmented": augmented,
         "skipped": skipped, "pending": pending, "errors": errors,
-        "adopted": adopted,
+        "adopted": adopted, "reevaluated": reevaluated,
         "not_generated": writable.err().map(|e| json!({"code": e.code, "message": e.message, "effect": "nothing was generated; the events remain and are generated from once writes are allowed"})),
     });
     if !o.dry_run && (!created_is_empty(&out) || !augmented_is_empty(&out)) {
@@ -1472,6 +1483,82 @@ fn augmented_is_empty(v: &Value) -> bool {
 }
 
 /// A compact view of a reconciliation for a command result: the tasks created and augmented, or why none were.
+/// **Re-evaluate the failing health results generation would read but whose check inputs changed** since they were
+/// recorded — the targeted re-evaluation the scheduler's guard performs for a stale block (named families through
+/// the scheduler, doctor checks through the doctor), recording no audit. Only failures that could generate work are
+/// re-evaluated: at or above the severity threshold, not excluded, not outside governed project work, and not
+/// already remedied by open work (an open task naming the check in `remedies` — its outcome could not change what is
+/// generated; the guard re-evaluates it when an operation needs it). Returns what was re-evaluated; a
+/// re-evaluation that fails leaves the result stale (it then generates nothing).
+pub fn reevaluate_stale_failures(p: &Project, cfg: &Config) -> Value {
+    let st = crate::scheduler::store::load_state(p);
+    let Some(checks) = st["checks"].as_object() else {
+        return json!({"families": [], "doctor": false});
+    };
+    let covered: BTreeSet<String> = RecordStore::load(&p.root)
+        .of_type("task")
+        .into_iter()
+        .filter(|t| !matches!(t.get("task_status").as_str(), "DONE" | "CANCELLED"))
+        .flat_map(|t| t.list("remedies"))
+        .collect();
+    let threshold = crate::scheduler::catalogue::rank(&cfg.severity_threshold());
+    let excluded = cfg.list("excluded_checks");
+    let wanted: Vec<String> = checks
+        .iter()
+        .filter(|(id, e)| {
+            let canonical = cfg.canonical_check(id);
+            !e["ok"].as_bool().unwrap_or(true)
+                && crate::scheduler::catalogue::rank(e["max_severity"].as_str().unwrap_or("none"))
+                    >= threshold
+                && !excluded.contains(*id)
+                && !excluded.contains(&canonical)
+                && cfg.outside_remedy(id).is_none()
+                && cfg.outside_remedy(&canonical).is_none()
+                && !covered.contains(*id)
+        })
+        .map(|(id, _)| id.clone())
+        .collect();
+    if wanted.is_empty() {
+        return json!({"families": [], "doctor": false});
+    }
+    let stale: BTreeSet<String> = crate::scheduler::status(p)
+        .ok()
+        .and_then(|s| s["stale_checks"].as_array().cloned())
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|x| x.as_str().map(|s| s.to_string()))
+        .collect();
+    let families = crate::scheduler::suite_families(p);
+    let is_doctor = |id: &str| {
+        id.len() == 4 && id.starts_with('D') && id[1..].chars().all(|c| c.is_ascii_digit())
+    };
+    let fams: Vec<String> = wanted
+        .iter()
+        .filter(|id| stale.contains(*id) && families.contains(*id))
+        .cloned()
+        .collect();
+    let doctor = wanted.iter().any(|id| stale.contains(id) && is_doctor(id));
+    let mut errors = vec![];
+    if !fams.is_empty() {
+        let mut o = crate::scheduler::RunOptions::new(
+            crate::scheduler::Tier::G0,
+            crate::scheduler::Trigger::new("work generation"),
+        );
+        o.selection = crate::scheduler::Selection::Explicit(fams.clone());
+        o.surface = "work generation".into();
+        o.record = crate::scheduler::RecordPolicy::Never;
+        if let Err(e) = crate::scheduler::run_suite(p, &o) {
+            errors.push(json!({"families": fams, "code": e.code, "message": e.message}));
+        }
+    }
+    if doctor {
+        if let Err(e) = crate::doctor::run(p) {
+            errors.push(json!({"doctor": true, "code": e.code, "message": e.message}));
+        }
+    }
+    json!({"families": fams, "doctor": doctor, "errors": errors})
+}
+
 pub fn summary(report: &Value) -> Value {
     json!({"created": report["created"].as_array().map(|a| a.iter().map(|x| x["task"].clone()).collect::<Vec<_>>()).unwrap_or_default(),
            "augmented": report["augmented"].as_array().map(|a| a.iter().map(|x| x["task"].clone()).collect::<Vec<_>>()).unwrap_or_default(),
@@ -1768,6 +1855,7 @@ mod tests {
         assert!(cfg.trivial(" n/a. "));
         assert!(!cfg.trivial("u32 overflows at 4.2M cents"));
         assert_eq!(cfg.canonical_check("D015"), "graph_integrity");
+        assert_eq!(cfg.canonical_check("D011"), "path_map_compliance");
     }
 
     #[test]
