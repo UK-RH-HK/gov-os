@@ -152,3 +152,159 @@ fn upstream_export_gate_fails_closed_and_sanitises() {
         .to_string()
         .contains("forbidden outbound path"));
 }
+
+/// Repair-1 WS-11 regression (builder evidence, not acceptance), BC-P2-50: the export gate fails closed on what would
+/// leave — repository content (renamed, re-indented with CRLF, excerpted, hex-encoded, raw spec) and derived-index data
+/// (chunk ids, a short run of a stored embedding, an embedding-length number array) — whatever the fixture is called and
+/// although it declares `synthetic: true`; a genuinely synthetic fixture still passes; a packet edited after prepare
+/// cannot be submitted; the approval is recorded as the unauthenticated channel it is, bound to the packet.
+#[test]
+fn export_gate_fails_closed_on_content_whatever_the_name() {
+    let root = tmp("upstream-content");
+    let proj = root.join("project");
+    std::fs::create_dir_all(&proj).unwrap();
+    write(&proj, "README.md", "# svc\n");
+    write(
+        &proj,
+        "src/billing.rs",
+        "pub fn quote_cents(weight_grams: u64, zone: char) -> u64 {\n    let base = match zone { 'A' => 350, 'B' => 420, _ => 610 };\n    base + weight_grams / 100 * 17\n}\n\npub fn surcharge_for_remote_postcodes(postcode: &str) -> u64 {\n    if postcode.starts_with(\"IV\") || postcode.starts_with(\"HS\") { 250 } else { 0 }\n}\n",
+    );
+    write(
+        &proj,
+        "spec/requirements/REQ-0001.yaml",
+        "id: REQ-0001\ntype: requirement\ntitle: Remote postcode surcharge\nstatus: ACTIVE\nstatement: Deliveries to Highlands and Islands postcodes carry a 2.50 surcharge on every quote.\n",
+    );
+    git_init_commit(&proj);
+    let g = Gov::new(&proj, "S-up");
+    g.ok(&["init", "--name", "svc", "--alias", "proj-beta"]);
+    g.ok(&["rebuild-memory"]);
+    let lesson = |id: &str, files: serde_json::Value| {
+        json!({"id": id, "type": "lesson", "title": "t", "status": "ACTIVE", "scope": "FRAMEWORK", "lifecycle": "corroborated", "category": "c",
+            "problem_statement": "p", "generic_failure_mode": "g", "impact": "i", "suggested_change": "s", "sources": ["RPT-1"],
+            "synthetic_reproducer": {"synthetic": true, "description": "d", "files": files}})
+    };
+    let src = read(&proj, "src/billing.rs");
+    let db = gov_runtime::memory::db::RuntimeDb::open(&proj.join(".governance-runtime/state.db"))
+        .unwrap();
+    let chunk_id = db
+        .query(
+            "SELECT chunk_id FROM chunks WHERE chunk_id LIKE 'file:src/%' LIMIT 1",
+            &[],
+        )
+        .unwrap()[0]["chunk_id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let vec: Vec<f64> = serde_json::from_str(
+        db.query(
+            "SELECT vec FROM vectors WHERE chunk_id LIKE 'file:src/%' LIMIT 1",
+            &[],
+        )
+        .unwrap()[0]["vec"]
+            .as_str()
+            .unwrap(),
+    )
+    .unwrap();
+    // the 12-value window of the stored vector with the most non-zero components (short of the length rule)
+    let best = (0..vec.len().saturating_sub(12))
+        .max_by_key(|i| vec[*i..*i + 12].iter().filter(|x| **x != 0.0).count())
+        .unwrap();
+    let window: Vec<String> = vec[best..best + 12]
+        .iter()
+        .map(|x| format!("{x}"))
+        .collect(); // zeros print as `0`
+    let hex: String = src.bytes().map(|b| format!("{b:02x}")).collect();
+    let excerpt: String = src.lines().skip(5).take(3).collect::<Vec<_>>().join("\n");
+    let many: Vec<String> = (0..96).map(|i| format!("0.{:03}", i * 7 % 997)).collect();
+    let cases: Vec<(&str, serde_json::Value, &str)> = vec![
+        (
+            "L-0101",
+            json!({"example.txt": src.clone()}),
+            "copy of project file",
+        ),
+        (
+            "L-0102",
+            json!({"repro/billing.rs": src.replace('\n', "\r\n").replace("    ", "\t")}),
+            "raw project content",
+        ),
+        (
+            "L-0103",
+            json!({"snippet.rs": excerpt}),
+            "raw project content",
+        ),
+        (
+            "L-0104",
+            json!({"req.yaml": read(&proj, "spec/requirements/REQ-0001.yaml")}),
+            "project",
+        ),
+        ("L-0105", json!({"blob.txt": hex}), "opaque"),
+        (
+            "L-0106",
+            json!({"ids.txt": format!("see {chunk_id} for context")}),
+            "chunk id",
+        ),
+        (
+            "L-0107",
+            json!({"vec.json": format!("[{}]", window.join(", "))}),
+            "embedding vector",
+        ),
+        (
+            "L-0108",
+            json!({"numbers.json": format!("[{}]", many.join(","))}),
+            "numbers",
+        ),
+    ];
+    for (id, files, why) in &cases {
+        write_yaml(
+            &proj,
+            &format!("spec/lessons/{id}.yaml"),
+            &lesson(id, files.clone()),
+        );
+        let o = g.err(&["upstream", "prepare", id]);
+        assert_eq!(o.error_code(), "UPSTREAM_BLOCKED", "{id}");
+        let reasons = o.details()["reasons"].to_string();
+        assert!(reasons.contains(why), "{id}: expected '{why}' in {reasons}");
+    }
+    // control: a genuinely synthetic reproducer passes
+    write_yaml(
+        &proj,
+        "spec/lessons/L-0110.yaml",
+        &lesson(
+            "L-0110",
+            json!({"scenario.yaml": "steps:\n  - create a record and index it\n  - change the record after indexing\n  - attempt to close the task\n"}),
+        ),
+    );
+    let ok = g.ok(&["upstream", "prepare", "L-0110"]);
+    let pkt = ok["packet_id"].as_str().unwrap().to_string();
+    // a packet edited after prepare is refused at submission
+    let inbox = root.join("canonical").join("lessons").join("inbox");
+    std::fs::create_dir_all(&inbox).unwrap();
+    let pp = format!(".governance-runtime/outbound/{pkt}/packet.yaml");
+    let original = read(&proj, &pp);
+    let mut tampered = yaml(&proj, &pp);
+    tampered["synthetic_fixture"]["files"]["scenario.yaml"] = json!(src.clone());
+    write_yaml(&proj, &pp, &tampered);
+    let e = g.err(&[
+        "upstream",
+        "submit",
+        &pkt,
+        "--destination",
+        inbox.to_str().unwrap(),
+        "--approved-by",
+        "owner",
+    ]);
+    assert_eq!(e.error_code(), "UPSTREAM_BLOCKED");
+    write(&proj, &pp, &original);
+    let s = g.ok(&[
+        "upstream",
+        "submit",
+        &pkt,
+        "--destination",
+        inbox.to_str().unwrap(),
+        "--approved-by",
+        "owner",
+    ]);
+    assert_eq!(s["approval"]["authenticated"], false);
+    assert_eq!(s["approval"]["binds"]["packet_id"], pkt.as_str());
+    assert_eq!(s["approval"]["binds"]["payload_hash"], s["payload_hash"]);
+}

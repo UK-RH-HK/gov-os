@@ -116,7 +116,7 @@ impl Default for ContentControls {
             reproduced_lines_max: 1,
             long_line_chars: 48,
             prose_consecutive_lines: 3,
-            max_numeric_array: 32,
+            max_numeric_array: 64,
             max_opaque_blob_chars: 200,
         }
     }
@@ -252,7 +252,8 @@ fn index_prints(p: &Project) -> IndexPrints {
 
 fn float_rx() -> &'static Regex {
     static R: std::sync::OnceLock<Regex> = std::sync::OnceLock::new();
-    R.get_or_init(|| Regex::new(r"-?\d+\.\d+(?:[eE][-+]?\d+)?").unwrap())
+    // integers included: a dump that writes zero components as `0` must not break the run or the alignment
+    R.get_or_init(|| Regex::new(r"-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?").unwrap())
 }
 
 /// Consecutive float runs of `text`: (longest run length, the sequence of every float in order).
