@@ -121,8 +121,10 @@ pub fn relocate(p: &Project) -> Result<Vec<Value>> {
 }
 
 /// Location anomalies for doctor D028 and the `plugin_governance` family: a second registry at the legacy location
-/// that differs from the authoritative one (it is never read). A registry that simply has not been moved yet is
-/// not a plugin finding — it is still honoured — and is reported by [`crate::paths::misplaced_os_state`].
+/// that differs from the authoritative one. It is never read, so no authorisation relies on it: it is disclosed at
+/// `low` severity (the availability rule of P2-HO-0031 — a finding that governs no reliance must not degrade the suite
+/// and refuse unrelated work). A registry that simply has not been moved yet is not a plugin finding — it is still
+/// honoured — and is reported by [`crate::paths::misplaced_os_state`].
 pub fn location_findings(p: &Project) -> Vec<Value> {
     let (at, legacy) = (path(p), legacy_path(p));
     if !(at.exists() && legacy.exists()) {
@@ -132,7 +134,7 @@ pub fn location_findings(p: &Project) -> Vec<Value> {
         return vec![];
     }
     vec![
-        json!({"severity": "medium", "plugin_id": "", "code": "PLUGIN_REGISTRY_LOCATION_CONFLICT", "path": LEGACY_REGISTRY_PATH,
+        json!({"severity": "low", "plugin_id": "", "code": "PLUGIN_REGISTRY_LOCATION_CONFLICT", "path": LEGACY_REGISTRY_PATH,
         "message": format!("a second plugin registry exists at the legacy location {LEGACY_REGISTRY_PATH} and differs from the registry at {REGISTRY_PATH}; it is never read (the registry at {REGISTRY_PATH} is authoritative). Remove it, or — if it is the one the OS last wrote — restore it over {REGISTRY_PATH} from version control and re-register what differs")}),
     ]
 }
@@ -484,6 +486,7 @@ mod tests {
             location_findings(&p)[0]["code"],
             "PLUGIN_REGISTRY_LOCATION_CONFLICT"
         );
+        assert_eq!(location_findings(&p)[0]["severity"], "low");
         // an identical copy is simply removed
         std::fs::write(legacy_path(&p), &bytes).unwrap();
         assert_eq!(
