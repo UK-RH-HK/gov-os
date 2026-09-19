@@ -1,5 +1,9 @@
-//! Emergency controls (framework §74): PAUSE, FREEZE_WRITES, CANCEL_AGENTS, RESUME. Authority-checked; state lives in
-//! the runtime directory (never inside the rebuild-deleted index) and is honoured by every mutating operation.
+//! Emergency controls (framework §74): PAUSE, FREEZE_WRITES, CANCEL_AGENTS, RESUME. Authority-checked and honoured by
+//! every mutating operation. **Where the state lives (BC-P2-31):** in the OS's non-rebuildable operational store,
+//! `paths::store_path(root, "emergency-control")` (`.governance-state/control.json`), never in the derived runtime
+//! directory that `rebuild-memory` and framework §19's disaster recovery may delete. A control file an older writer
+//! left at the legacy location (`<runtime dir>/control.json`) is still honoured — the stricter of the two states is
+//! in force — and the next control command moves it (`paths::relocate_legacy`) and removes the legacy copy.
 //!
 //! ## G0 — the guard every command passes (Contract v3 O5 "G0 Guard — every privileged/mutating command"; BC-P2-08)
 //!
@@ -27,12 +31,48 @@ use crate::util::{now_iso, read_json, write_json};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 
+/// Where the emergency-control state belongs (BC-P2-31; `paths::OS_STORES` "emergency-control").
 pub fn path(p: &Project) -> std::path::PathBuf {
+    crate::paths::store_path(&p.root, "emergency-control")
+        .unwrap_or_else(|| p.root.join(crate::paths::STATE_DIR).join("control.json"))
+}
+
+/// Where writers before BC-P2-31 kept it: inside the derived runtime directory.
+fn legacy_path(p: &Project) -> std::path::PathBuf {
     p.runtime_dir().join("control.json")
 }
 
+fn running() -> Value {
+    json!({"mode": "RUNNING", "writes_frozen": false, "agents_cancelled": false, "updated_at": null, "reason": null})
+}
+
+/// The control state in force. Reading never moves or writes anything. When both the store and a legacy copy exist
+/// (an older binary wrote the legacy one), the stricter state is in force: frozen if either is frozen, paused if
+/// either is paused, agents cancelled if either says so.
 pub fn state(p: &Project) -> Value {
-    read_json(&path(p)).unwrap_or(json!({"mode": "RUNNING", "writes_frozen": false, "agents_cancelled": false, "updated_at": null, "reason": null}))
+    let cur = read_json(&path(p)).ok();
+    let legacy = read_json(&legacy_path(p)).ok();
+    match (cur, legacy) {
+        (Some(c), None) => c,
+        (None, Some(l)) => l,
+        (None, None) => running(),
+        (Some(c), Some(l)) => {
+            let mut s = c;
+            if l["writes_frozen"].as_bool().unwrap_or(false) {
+                s["writes_frozen"] = json!(true);
+            }
+            if l["agents_cancelled"].as_bool().unwrap_or(false) {
+                s["agents_cancelled"] = json!(true);
+            }
+            if l["mode"].as_str() == Some("PAUSED") {
+                s["mode"] = json!("PAUSED");
+            }
+            if s != l {
+                s["legacy_state"] = l;
+            }
+            s
+        }
+    }
 }
 
 pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
@@ -44,7 +84,15 @@ pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
             "emergency_control"
         },
     )?;
+    // BC-P2-31: the state belongs in the operational store; a legacy file is moved there first (an identical copy is
+    // simply removed). If both locations hold different states, `state` already applies the stricter one, and this
+    // explicit control command's result replaces both.
+    crate::paths::ensure_state_dir(&p.root)?;
+    let _ = crate::paths::relocate_legacy(&p.root, "emergency-control");
     let mut s = state(p);
+    if let Some(o) = s.as_object_mut() {
+        o.remove("legacy_state");
+    }
     match mode {
         "PAUSE" => {
             s["mode"] = json!("PAUSED");
@@ -73,6 +121,11 @@ pub fn set(p: &Project, mode: &str, reason: Option<&str>) -> Result<Value> {
     s["session"] = json!(p.session_id);
     s["role"] = json!(p.role);
     write_json(&path(p), &s)?;
+    let legacy = legacy_path(p);
+    if legacy.exists() {
+        std::fs::remove_file(&legacy)
+            .map_err(|e| GovError::io(&format!("remove {}", legacy.display()), e))?;
+    }
     Ok(s)
 }
 
@@ -258,6 +311,15 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     outside("trust recover-transactions", "machine trust domain: replays interrupted install transactions (crash recovery of the verifier's own journal)"),
     outside("trust human-channel", "machine trust domain: read-only report of the authenticated human channel"),
     outside("trust human-channel --provision", "machine trust domain (administrator): the human-channel anchor write asks OWNER-DECISION-0006 §6 bullet 4 inside the write and refuses a provisioned or already-anchored machine"),
+    // round 3 (P2-ADJ-0002): the T2 binding authority that makes OS-written facts portable across the owner's
+    // provisioned machines. The report reads machine state only; provisioning is an administrator write into machine
+    // state that asks OWNER-DECISION-0006 §6 bullet 4 inside the write, refuses an unprovisioned machine, a
+    // repository-sourced bundle and any authorisation this machine's trusted root does not verify; the reseal
+    // rewrites governed records (their seals), so it is a project write of its own class (L4), and its dry run reads
+    outside("trust t2-binding", "machine trust domain: read-only report of the T2 binding authorities and the sealing scope"),
+    outside("trust t2-binding --provision", "machine trust domain (administrator): the T2 binding authority write asks OWNER-DECISION-0006 §6 bullet 4 inside the write and admits only an authorisation this machine's trusted root verifies"),
+    g("trust t2-binding --reseal", "reseal_t2_bindings", Write),
+    g("trust t2-binding --reseal --dry-run", "read", Read),
     outside("contract verify", "canonical-repository tooling: read-only"),
     outside("contract compile", "canonical-repository release tooling (regenerates the compiled contract views of the canonical repository, not a governed project)"),
     g("upstream prepare", "upstream_prepare", Write),
@@ -344,6 +406,10 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("adapters generate", "generate_adapters", Write),
     g("adapters verify", "read", Read),
     outside("release build", "canonical-repository release tooling: certification is refused below floor inside `release::build` (§6 bullet 3); it writes no governed project"),
+    // round 3 (WS-8 r2 IP-R2-WS08-7): a governed project's own product-release record (`spec/releases/REL-*`, record
+    // type and relations WS-4, writer `release::record` WS-8) is authoritative project state: a Write of its own
+    // class. Classified here ahead of the CLI arm so the command can never run unguarded once it lands.
+    g("release record", "record_release", Write),
     outside("release verify", "canonical-repository release tooling: read-only"),
     g("kernel verify", "read", Read),
     g("kernel trust", "read", Read),

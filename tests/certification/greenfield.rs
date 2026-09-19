@@ -38,7 +38,19 @@ fn greenfield_end_to_end() {
         assert!(exists(&root, f), "{f} missing after init");
     }
     assert!(read(&root, ".gitignore").contains(".governance-runtime/"));
-    assert_eq!(r["adapters"], 5);
+    // round 3 (P2-AR-0034, WS-4 r2 R2-12): the kernel's adapters now include the provider lifecycle hooks, so init
+    // generates one output per kernel adapter directory (generic, cli, api, ide, mcp, hooks)
+    let kernel_adapters = std::fs::read_dir(canonical_root().join("framework/adapters"))
+        .unwrap()
+        .flatten()
+        .filter(|e| e.path().join("adapter.yaml").exists())
+        .count();
+    assert_eq!(kernel_adapters, 6);
+    assert_eq!(r["adapters"], kernel_adapters);
+    assert!(exists(
+        &root,
+        "governance/generated/adapters/hooks/provider-hooks.json"
+    ));
     assert!(
         r["index"]["ecosystems"].as_u64().unwrap() >= 1,
         "Cargo ecosystem must be detected"

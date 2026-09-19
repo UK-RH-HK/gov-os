@@ -14,6 +14,8 @@ Canonical sources: governance/kernel/ (immutable) and governance/project/ (overl
 2. Run `gov continue` to obtain the correct next work and your bounded authority.
 3. Compile a context packet with `gov context compile <TASK-ID>` before acting on a task.
 4. Checkpoint at every mandatory trigger: {{checkpoint_triggers}}.
+   A harness that runs commands on its own lifecycle events wires the generated provider hooks
+   (governance/generated/adapters/hooks/provider-hooks.json): before compaction, at session end and before a model switch.
 5. Return results as a structured worker return contract, never only as chat.
 
 ## Boundaries

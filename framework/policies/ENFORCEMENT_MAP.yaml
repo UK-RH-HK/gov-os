@@ -26,9 +26,9 @@ keys:
   TOOL_POLICY.plugins.require_valid_descriptor: {informational: "always true: an invalid descriptor is rejected by capabilities::host::discover_all and can never execute; declared strengthen-only so no overlay can relax it"}
   TOOL_POLICY.plugins.min_authority: {enforced_by: [capabilities::governance::authorize, tools::plugin_tools]}
   TOOL_POLICY.plugins.registry_path: {informational: "documents where the OS writes the authoritative plugin registry; the path is a kernel constant read by capabilities::registry (REGISTRY_PATH) and is immutable under POLICY_PRECEDENCE"}
-  TOOL_POLICY.plugins.registration_binds: {informational: "documents the fields a registration binds (plugin_id, version, descriptor_sha256, implementation_sha256); enforced structurally by capabilities::registry::standing"}
-  TOOL_POLICY.plugins.elevated_permission_classes: {enforced_by: [capabilities::governance::authorize, capabilities::governance::register]}
-  TOOL_POLICY.plugins.refuse_on_pin_drift: {enforced_by: [capabilities::governance::authorize]}
+  TOOL_POLICY.plugins.registration_binds: {informational: "documents the fields a registration binds (plugin_id, version, descriptor_sha256, implementation_sha256, registration_subject_sha256 and the registration_gate whose owner-signed answer approved exactly that subject); enforced structurally by capabilities::registry::standing and re-checked at every execution by capabilities::governance::authorize"}
+  TOOL_POLICY.plugins.elevated_permission_classes: {enforced_by: [capabilities::governance::authorize, capabilities::governance::register], note: "classifies DECLARED elevation, which is shown in the registration gate's package and raises its impact radius; it never decides whether a gate is needed — every executable plugin needs a registration approved by a gate raised for exactly it, whatever it declares (BC-P2-39; Contract v3 F4:426; ARCH-0003 §9)"}
+  TOOL_POLICY.plugins.refuse_on_pin_drift: {enforced_by: [capabilities::governance::authorize], note: "drift of any bound implementation or descriptor byte always fails closed (Contract v3 F4:429); a false value is reported, never obeyed"}
   TOOL_POLICY.plugins.timeout_seconds: {enforced_by: [capabilities::governance::invoke_timeout]}
   # ---- MEMORY_POLICY
   MEMORY_POLICY.runtime_dir: {enforced_by: [project::runtime_dir_name]}
@@ -111,7 +111,7 @@ keys:
   HUMAN_GATE_POLICY.agent_resolvable_when.*: {enforced_by: [gates::answer]}
   HUMAN_GATE_POLICY.decision_package_fields: {enforced_by: [gates::build]}
   HUMAN_GATE_POLICY.package_non_substantive_values: {enforced_by: [gates::build]}
-  HUMAN_GATE_POLICY.human_only_triggers: {enforced_by: [gates::answer, gates::verified_answer_in]}
+  HUMAN_GATE_POLICY.human_only_triggers: {enforced_by: [gates::answer, gates::verified_answer_in], note: "the kernel floor is gates::HUMAN_ONLY_TRIGGERS (round 3 adds upstream_export and experiment_promotion); the policy may add triggers, never remove them (POLICY_PRECEDENCE additive)"}
   HUMAN_GATE_POLICY.system_gate_package.*: {enforced_by: [gates::build]}
   HUMAN_GATE_POLICY.human_channel.*: {enforced_by: [gates::standalone_anchor_allowed, human_channel::anchor, human_channel::provision_standalone]}
   HUMAN_GATE_POLICY.prioritisation: {enforced_by: [gates::build]}

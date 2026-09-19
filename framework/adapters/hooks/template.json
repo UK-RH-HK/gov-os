@@ -1,0 +1,21 @@
+{
+  "framework": "{{framework}}",
+  "version": "{{version}}",
+  "project": "{{project_name}}",
+  "kind": "provider-lifecycle-hooks",
+  "purpose": "Wire these into the harness's lifecycle hooks so the checkpoint triggers the harness owns fire without relying on the agent (CHECKPOINT_POLICY.mandatory_triggers: {{checkpoint_triggers}}). The watchdog (gov checkpoint watchdog) and the boundary observer still checkpoint any trigger a harness cannot hook, at the next execution boundary.",
+  "environment": {"GOV_ROLE": "the acting role the harness declared for the session (L1 or above: checkpoint authority)", "GOV_SESSION": "the session id the harness declared"},
+  "hooks": [
+    {"event": "pre_compaction", "when": "immediately before the harness compacts or truncates the model context", "checkpoint_trigger": "before_compaction", "blocking": true,
+     "command": ["gov", "checkpoint", "create", "--trigger", "before_compaction", "--next-action", "resume after context compaction: run gov status, then gov continue"],
+     "shell": "gov checkpoint create --trigger before_compaction --next-action 'resume after context compaction: run gov status, then gov continue'"},
+    {"event": "session_end", "when": "when the agent session ends (normally or on interruption)", "checkpoint_trigger": "before_session_close", "blocking": true,
+     "command": ["gov", "session", "close", "--next-action", "gov continue"],
+     "shell": "gov session close --next-action 'gov continue'"},
+    {"event": "model_switch", "when": "before the harness switches the model or provider serving the session", "checkpoint_trigger": "before_model_switch", "blocking": true,
+     "command": ["gov", "checkpoint", "create", "--trigger", "before_model_switch", "--next-action", "resume on the new model: run gov status, then gov continue"],
+     "shell": "gov checkpoint create --trigger before_model_switch --next-action 'resume on the new model: run gov status, then gov continue'"}
+  ],
+  "on_failure": "A hook command that fails is reported by the harness and never blocks the human; gov session close is never refused (it states its degradation), and a refused checkpoint names its cause (e.g. AUTHORITY_DENIED for an undeclared role).",
+  "invariants": {{invariants_json}}
+}

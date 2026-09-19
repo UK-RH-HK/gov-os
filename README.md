@@ -57,11 +57,19 @@ lessons/inbox/  upstream lesson packets                          change-proposal
 ```bash
 cargo build --release                 # produces target/release/gov (no Python/Node required to run the core)
 bin/gov version                       # shim: builds on first use
-bin/gov init --name my-project --alias proj-x --intent "..."      # greenfield
+# provision, then install (OWNER-DECISION-P2-0002): the administrator anchors the machine on the Signed Release Root
+bin/gov trust provision --anchor <root metadata from the administrator domain>
+bin/gov init --source <release signed under it> --name my-project --alias proj-x --intent "..."   # greenfield
+bin/gov trust t2-binding --provision <bundle>   # optional, on each of the owner's machines: OS-written facts portable
 bin/gov adopt baseline && bin/gov adopt inventory && ...          # brownfield, stages A0–A11
 bin/gov doctor && bin/gov status && bin/gov continue              # daily operation
 cargo test                            # unit + certification suite (implementer evidence)
 ```
+A machine with no trust anchor refuses external-source kernel ingress (`SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED`) and
+installs only the binary's embedded payload, as a marked bootstrap installation that is never presented as current,
+verified or certified; a dev/test machine provisions a throw-away root. OS-written facts (gates, decisions, CIT state,
+plugin registrations, governed evidence) sealed on one of the owner's provisioned machines are honoured on the others
+once each holds the owner's T2 binding authority (`gov trust t2-binding`; docs/ARCHITECTURE.md §4.8).
 Optional Python capability plugins: `capabilities/python` (`python3 -m govos_capabilities.code_intel_python_ast`).
 
 ## Documentation
