@@ -1,0 +1,106 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0016
+role: capability-repair
+objective: Repair iteration 1, round 1, WS-3 — implement the repair-delta requirements for BC-P2-08, 09, 10, 12 (answer side), 18 (resolution rules), 45, 49; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run is a
+  builder: it authored the WS-3 product changes on branch phase2/repair-1-ws03 and their regression evidence, and it
+  grades none of them. It authored no audit, synthesis or verification run and no other workstream's repair. It read
+  P2-HO-0010, P2-HO-0013, repair-delta.md (§0, §2, §3 and its classes), owner-decisions-required.md §A, the
+  audit-of-record probes and outputs that its classes cite, the Contract v3 and framework sections those classes cite,
+  ARCH-0003, D-0007, the OWNER-DECISION-0006 break-glass precedent in runtime/src/srr/** (read only, never edited), the
+  prior R1 held-out suites (run unedited), and the product source and tests. It did not read session or agent
+  transcripts, task-output stores or user auto-memory; it spawned no sub-agents and did not contact the product owner.
+input:
+  base_commit: c6b60bc760a0bb42907f74210fd9e644a420851a
+  candidate: "none (repair branch; base product_code_digest equals cap2-candidate-0)"
+  product_code_digest: 8e5577f9864f9036275b6d0813ca865f4471d4f0e7a4835c6652a87565bfad33
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0013-repair-1-ws03.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0013-repair-1-ws03.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+  - release/capability-baseline/audit-0/synthesis/owner-decisions-required.md
+  - release/capability-baseline/audit-0/{alpha-r,gamma-r,delta-r,epsilon-r,zeta-r,synthesis}/evidence (probes cited by the WS-3 classes)
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (cited lines)
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md (§23, §50-§53, §74)
+  - spec/architecture/ARCH-0003.yaml
+  - spec/decisions/D-0007.yaml
+  - runtime/src/srr/** (read only)
+  - release/verification/4.1.6-r1*/evidence/heldout-tests (run unedited)
+  - runtime/src, cli/src, framework/, tests/certification at c6b60bc
+produced:
+  - runtime/src/t2.rs
+  - runtime/src/human_channel.rs
+  - runtime/src/authority.rs
+  - runtime/src/project.rs
+  - runtime/src/orchestration/control.rs
+  - runtime/src/orchestration/gates.rs
+  - runtime/src/policy.rs
+  - runtime/src/policy_precedence.rs
+  - runtime/src/routing.rs
+  - runtime/src/lib.rs (pub mod lines only)
+  - cli/src/main.rs
+  - framework/policies/{AUTHORITY_POLICY,HUMAN_GATE_POLICY,POLICY_PRECEDENCE,ENFORCEMENT_MAP}.yaml
+  - framework/schemas/{human-gate,decision,model-routing-overrides}.schema.json
+  - framework/roles/ROLES.yaml (comments)
+  - tests/certification/ws03.rs (new, 12 tests) and tests/certification/main.rs (mod ws03)
+  - tests/certification/{brownfield,greenfield,migration,update,failure_injection,repair,repair2,repair3,srr}.rs (updated for intended behaviour changes; reasons in 00-REPAIR-REPORT.md §10)
+  - release/capability-baseline/repair-1/ws03/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/ws03/claims.yaml
+  - release/capability-baseline/repair-1/ws03/evidence/
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib at the final code", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/REGRESSION-lib.out}
+  - {id: REG-CERT, description: "cargo test --test certification (91 = 79 base + 12 new; includes section6.rs)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/REGRESSION-certification.out}
+  - {id: R1-HELDOUT, description: "all four prior R1 held-out suites unedited: base 110/12, candidate 109/13; delta only hv_a::a1 pinned tree scale (84/740 vs 86/846)", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws03/evidence/R1-HELDOUT-RERUN-candidate-final.out}
+  - {id: R1-HELDOUT-A1-CENSUS, description: "hv_a::a1 census with only the two scale pins printed: 0 violations in every §6 activity", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/R1-HELDOUT-hv_a-a1-detail-final.out}
+  - {id: NAMED-CHECKS-BASE, description: "discriminating named-check harness on the base binary (negative control): 35 of 36 FAIL", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/ws03-named-checks.base-c6b60bc.out}
+  - {id: NAMED-CHECKS-CANDIDATE, description: "same harness on the final binary: 37 of 37 PASS (BC-P2-08/09/10/12/18/45/49 lines)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/ws03-named-checks.candidate-final.out}
+  - {id: AUDIT-PROBES-UNEDITED, description: "audit-of-record probes re-run unedited on the final binary (most stop at setup because of the repaired defaults; see report §0.2)", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/final-unedited}
+  - {id: AUDIT-PROBES-ROLESHIM, description: "delta-r and A5 probes with a role-declaring adapter", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/final-roleshim}
+  - {id: O5-G0-DERIVED, description: "derived G0 guard matrix: no mutation under FREEZE_WRITES/PAUSE outside the allow-lists", result: PASS, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/final-derived.O5-G0-guard-matrix.out}
+  - {id: X2-E1xG2, description: "worker writes to OS-written records refused at task close (WS-5 integration IP-1)", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/final-unedited/synthesis.AC16-X2-authority-gate-chain.out}
+  - {id: X2-L3xU, description: "suite reports forged approvals (WS-2 integration IP-5)", result: FAIL, evidence_path: release/capability-baseline/repair-1/ws03/evidence/probes/final-unedited/synthesis.AC16-X2-authority-gate-chain.out}
+findings:
+  - id: P2-AR-0016-N1
+    severity: INFO
+    capability: AC-14
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "R1 held-out hv_a::a1 pins the certified tree size (84 files / 740 fns); any repair that adds modules fails the pin while the §6 census stays at 0 violations"
+    path: release/capability-baseline/repair-1/ws03/00-REPAIR-REPORT.md
+  - id: P2-AR-0016-N2
+    severity: INFO
+    capability: AC-3, AC-16
+    blocking: false
+    blocker_class: BC-P2-10
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "HC-1 bootstrap premise equals R1's: on a machine with no release root and no anchor, the first provisioner anchors the human channel (relates to pending OD-P2-02; one kernel switch)"
+    path: release/capability-baseline/repair-1/ws03/00-REPAIR-REPORT.md
+  - id: P2-AR-0016-N3
+    severity: INFO
+    capability: AC-3, AC-4, AC-16
+    blocking: false
+    blocker_class: BC-P2-09
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "Acceptance lines X2-E1xG2, X2-L3xU, L3.b5.9/b5.10, F4.b2.x, FRESH.4, L3.b4.t5, L3s.1/2, L1.b1.6, W3-r3, Q1.6-8 need other workstreams to call the WS-3 APIs (integration points IP-1..IP-10)"
+    path: release/capability-baseline/repair-1/ws03/claims.yaml
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-ws03
+  commit: 76ffaaadaaf543b79d1239c85c2e3fddeaaaf313
+  evidence_path: release/capability-baseline/repair-1/ws03/evidence
+unresolved:
+  - "integration points IP-1..IP-11 (00-REPAIR-REPORT.md §9) for WS-2, WS-4, WS-5, WS-6, WS-7, WS-8, WS-9, WS-11 and docs"
+  - "non-blocking owner question linked to OD-P2-02: standalone human-channel anchor on machines with no Signed Release Root (00-REPAIR-REPORT.md §12)"
+recommended_next_action: Integrate phase2/repair-1-ws03 first among round-1 branches (semantic owner of cli/src/main.rs and of the role, T2 and gate APIs), then wire IP-1..IP-10 in their owning workstreams' rounds.
+completed_at: "2026-09-19T01:14:02Z"
