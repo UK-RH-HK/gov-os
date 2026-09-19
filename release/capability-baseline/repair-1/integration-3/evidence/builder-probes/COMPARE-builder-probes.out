@@ -1,0 +1,30 @@
+# P2-AR-0041 — round-3 builders' own probes against the integrated binary (release gov 81a9b9ee…6570, built from
+# 22d43ce; the final commit e3b6cfb adds one certification test only — runtime/, cli/, framework/ identical, same binary)
+# vs what each builder recorded on its own branch. Runner: run-builder-probes.sh (unedited probes read from the builders'
+# merged evidence directories; labelled derived copies in derived/, each header lists every change).
+#
+# builder / probe                                   | builder's record (own branch)          | integrated, unedited                         | integrated, labelled derived copy
+# --------------------------------------------------+----------------------------------------+----------------------------------------------+-----------------------------------------
+# WS-2 WS02-r3-supplementary.py                     | 64/65, AV.2b-e2e FAIL (after.out)      | 51/54: groups IF1, G2, W11 cannot run —       | 64/65 (chain-na): AV.2b-e2e FAIL->PASS
+#                                                   |                                        |  TASK-0001 blocked by the computed scenario   |  (IP-R3-WS02-01 done); G2.a PASS->FAIL:
+#                                                   |                                        |  chain (WS-5 r3 IP-WS10-12); every line that  |  close still refused, but first by WS-5's
+#                                                   |                                        |  ran PASS                                     |  in-task materiality (see report §6)
+# WS-3 R3-WS03-probes.py                            | 26/26 (after a0cb4e3 / f50e37c)        | 10/26: the removed `trust t2-binding`         | 26/26 (unified): after change h (T2C.a
+#                                                   |                                        |  surface (P2-ADJ-0002 unified) and T2C.a's    |  edits the registry where WS-7 moved it);
+#                                                   |                                        |  pre-WS-7 registry path                       |  first run before change h: 25/26
+# WS-4 ws04r3_observe.rs (observational)            | 22 PASS / 0 FAIL (after-ff529e9)       | 19 PASS / 0 FAIL: obs_b panics at setup       | 22 PASS / 0 FAIL (claim-time): obs_b's
+#                                                   |                                        |  (its `discovery` task writes src/**: WS-5's  |  class `refactor`; B1 reads the system CIT
+#                                                   |                                        |  BC-P2-13 hook) so B1-B3 are not observed     |  the next claim records (WS-5)
+# WS-6 SUPP-ws06-r3.py (RUN-SUPP.sh)                | 16/16                                  | 16/16                                        | —
+# WS-7 ws07_r3_named_checks.py                      | 11/11                                  | 11/11                                        | —
+# WS-7 ip_task_close_registration.py (IP-W7R3-1)    | close refused MUTATION_SCOPE_VIOLATION | registry no longer undeclared/out of scope    | —
+#                                                   |  for governance/registry/…json         |  (IP-W7R3-1 done); close now refused          |
+#                                                   |                                        |  MATERIAL_CHANGE_REQUIRES_CIT for the plugin  |
+#                                                   |                                        |  descriptor governance/project/plugins/p1.yaml|
+#                                                   |                                        |  (WS-5 BC-P2-13; open item INT3-O1)           |
+# WS-8 r1-invariants.sh                             | all expectations hold                  | identical except one line: floors_path(…)    | —
+#                                                   |                                        |  outside state.rs = 1 (WS-2's read-only       |
+#                                                   |                                        |  sha_opt(&ms.floors_path(product)) in the     |
+#                                                   |                                        |  currency fingerprint, verification/          |
+#                                                   |                                        |  currency.rs:460 — a digest read, no writer)  |
+# WS-9/11 tiny_unprovisioned_adoption.py            | 7: 5 PASS, 2 OBS, 0 FAIL               | 7: 5 PASS, 2 OBS, 0 FAIL                     | —

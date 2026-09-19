@@ -1,0 +1,45 @@
+# P2-AR-0035 observational probe: label=integrated commit=22d43cec7ab7bf87122158e9196464814e94ea2e
+# probe sha256 aa0c51a90dd2e784a2b3074bd65dd951b846d7419e11211eedcf663f062ba166
+# scratch /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/P2-AR-0041/bp2/bp-ws04-J6ACSQ/observe-integrated-1789832772-954563
+# date 2026-09-19T15:46:13Z
+# gov 371e9998404351cd77b950d41372345f1c1882b55644759c98692d85bb0896f6
+
+running 4 tests
+OBSERVE A1-cit-record-sealed-after-approve PASS spec/decisions/CIT-0001.yaml os_binding present: true
+
+thread 'ws04r3_observe::obs_b_direct_propagation_and_concurrent_close' (960223) panicked at cli/../tests/certification/common.rs:197:9:
+gov task close TASK-0001 --report /tmp/gov-cert-obs-b-ea6db18d6c37b2315bcb1/.governance-runtime/reports/a.json failed (exit 1): {"code":"MATERIAL_CHANGE_REQUIRES_CIT","message":"task TASK-0001 made material change(s) outside change control: behaviour_change src/totals.rs (src/totals.rs). Contract v3:638-647 / framework §47-48: a material change completes only through CIT-P/CIT-E, whatever task it is made in. Restore these paths and propose the change as a Change-Impact Transaction (`gov cit propose --targets … --manifest …`, simulate, approve, execute) while this task is claimed — its recorded writes then cover exactly this content — or narrow the work to non-material changes","details":{"task":"TASK-0001","class":"discovery","refused":[{"path":"src/totals.rs","class":"behaviour_change","subject":"src/totals.rs","rule":"product source","evidence":"src/totals.rs created (repository contract class source)"}],"accepted":[],"rule_source":"cit::materiality (kernel floor) at task close","remediation":"gov cit propose / simulate / approve / execute inside the claim window"}}
+stderr: 
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+ws04r3_observe::obs_b_direct_propagation_and_concurrent_close --- FAILED
+OBSERVE D1-reversed-relationship-rolls-back PASS execute ok=false code=VERIFICATION_FAILED REQ-0003 present=false
+OBSERVE A2-committed-cit-record-sealed PASS spec/decisions/CIT-0001.yaml os_binding: "cit execute (G4 health)"
+OBSERVE C1-snapshot-in-state-store PASS state store: true, runtime dir: false
+OBSERVE C2-rollback-survives-deleting-runtime-dir PASS rollback ok=true code=
+OBSERVE C3-producer-manifest-complete PASS delivery_state "COMPLETE" missing []
+OBSERVE C4-ungoverned-research-flagged PASS RES-0001 authority_flag "EVIDENCE_NOT_GOVERNED"
+OBSERVE C5-no-output-not-untraceable PASS errors []
+OBSERVE C6-scenario-consumes-data-requirement PASS SCN-0001 edges [{"src":"SCN-0001","type":"CONSUMES","dst":"DATA-0001"},{"src":"SCN-0001","type":"GOVERNED_BY","dst":"REQ-0001"},{"src":"SCN-0001","type":"REALISES","dst":"F-0001"}]
+OBSERVE C7-decision-derived-from-cited-evidence PASS D-0050 edges [{"src":"D-0050","type":"DERIVED_FROM","dst":"RES-0001"}]
+OBSERVE C8-finished-cit-links-not-stale PASS stale links from CIT-0099: false
+OBSERVE C9-retrieval-profile-pins-named PASS findings [{"class":"governance_change","subject":"governance/project/PROJECT_POLICY.yaml","rule":"governance path","evidence":"governance/project/PROJECT_POLICY.yaml modified","requires_cit_in_task":true},{"class":"governance_change","subject":"governance/project/PROJECT_POLICY.yaml","rule":"retrieval profile pins","evidence":"governance/project/PROJECT_POLICY.yaml: retrieval-profile pins changed (MEMORY_POLICY.embedding.provider): every semantic answer and context packet is produced differently; a governed profile change needs benchmark evidence and a held-out regression (`gov memory select`)","requires_cit_in_task":true}]
+OBSERVE C10-release-record-has-canonical-location PASS canonical_dir "spec/releases"
+OBSERVE D2-experimental-output-needs-promotion PASS approve ok=false code=EXPERIMENT_NOT_PROMOTED; executed=false; src/charge.py present=false
+.OBSERVE C11-checkpoint-sealed PASS spec/reports/checkpoints/CKPT-00002.yaml os_binding present: true
+.test ws04r3_observe::obs_a_cit_records_and_rollback_decisions has been running for over 60 seconds
+OBSERVE A3-rollback-decision-rejected PASS D-0002 status "REJECTED"; rollback ok=true
+OBSERVE A4-rollback-decision-not-reported-as-tampering PASS os_binding_integrity findings naming D-0002: []
+OBSERVE A5-auto-decision-resealed-by-rollback PASS rollback result approval_decision: {"decision":"D-0001","resealed":true,"sealed_before":true}
+OBSERVE A6-hand-removed-secret-flag-still-refused PASS execute ok=false code=SECRET_IN_MANIFEST docs/keys.md written=false
+.
+failures:
+
+failures:
+    ws04r3_observe::obs_b_direct_propagation_and_concurrent_close
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 188 filtered out; finished in 108.28s
+
+error: test failed, to rerun pass `-p gov-cli --test certification`
+[observe exit=101]
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 192 filtered out; finished in 0.00s
+[ignored-test exit=0]

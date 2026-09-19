@@ -1,0 +1,95 @@
+# P2-AR-0041 identity and scope
+## digests
+### a53d15b (Phase 2: record P2-AR-0033 (WS-2 r3); round-3 builders complete; P2-ADJ-0003 (H4)
+commit: a53d15b6cef813bc474f03aa8ca39cbfcc6e0b57
+product_code_digest: 797da37c8532528e1b8f3d924e2b7b7a304bb567bd928ce80126e8e120161fe1
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### 53897c1 (Phase 2: round-2 integration merged (e8e1ff2) and reproduced 207/136; round-3 cl)
+commit: 53897c1a44157e5af81b176017bc7ded6a63b9cd
+product_code_digest: 797da37c8532528e1b8f3d924e2b7b7a304bb567bd928ce80126e8e120161fe1
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### 8972c16 (P2-AR-0041: merge phase2/repair-1-r3-ws09-11 (P2-AR-0040, WS-9/11 round 3))
+commit: 8972c16ef16fb47a9c5af8478b1da9f0bda56680
+product_code_digest: d8f7a330e530f958686252b4ebeff1c76baa1dd40d27dbf122bdf0efa44f5243
+governed_state_digest: 51b122a75163abbb0e3a4070bf698e545b804a78a2f5994d581eaeb26471887a
+### 22d43ce (P2-AR-0041: remaining routed integration points (WS-2, WS-3, WS-4, WS-5, WS-6, W)
+commit: 22d43cec7ab7bf87122158e9196464814e94ea2e
+product_code_digest: 2dca81ffab31e8eb56e81d68903f618e78e62a0d29a43f503c7927e09ec0c940
+governed_state_digest: 2514b9fb46b140351f2898fbd99965a99cff4f19823c667c5affa200373235be
+## builder tips (round 3, all from 53897c1)
+### phase2/repair-1-r3-ws03 7d0e0e0
+product_code_digest: c653a0cb16388a8a7d5f5f81df9fb3007bbbe824a7e05c6789b830588dbbf458
+governed_state_digest: 51b122a75163abbb0e3a4070bf698e545b804a78a2f5994d581eaeb26471887a
+### phase2/repair-1-r3-ws08 a88d268
+product_code_digest: 7a3da864a51b94cae96c914a55b6c10bc2c756b8edd5750a2f1c104d77fbf757
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### phase2/repair-1-r3-ws05 0403458
+product_code_digest: 658fcb124ab9e1b3eda730039876db4d9fec8aab54a1d9b9cd62f339a3538abc
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### phase2/repair-1-r3-ws04 6094199
+product_code_digest: 67d7f7b87e62893cb4dcbc375d0b8232599907475c623736e3200a4c16b14b41
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### phase2/repair-1-r3-ws02 65c3bd7
+product_code_digest: edf5177d609c24bd077ba5cc61532e4001a966b0b03ba1034ace3be3981cf709
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### phase2/repair-1-r3-ws06 3694df8
+product_code_digest: d01dca822266aa146bbb2e5d4862610cbcbf3f5244d9430af62cbd0df94acaf7
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### phase2/repair-1-r3-ws07 d3809db
+product_code_digest: 82de1a979e56017ce8218d92317a96223efe5a43bd3f35e8169681ebf0f2acc4
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+### phase2/repair-1-r3-ws09-11 2ec4656
+product_code_digest: 4dedf0279de64c5b070103a1efdb219e790e2dd96e60be968161131372ff7225
+governed_state_digest: 8f191e3906850368eb82bc886d5a095a788469103ed7318a9236462464ae948f
+## Contract v3 sha256
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+## frozen gate contract sha256
+d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e  release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+## release binary
+81a9b9ee33303347099a9d53630e532ea108a5230a8b0c9bad182de54de56570  target/release/gov
+## merge parents
+26f9a7d a53d15b6cef813bc474f03aa8ca39cbfcc6e0b57 7d0e0e07e859d1287801edf4aae95bd5cc4a7910 | P2-AR-0041: merge phase2/repair-1-r3-ws03 (P2-AR-0034, WS-3 round 3)
+020d6fd 26f9a7d901e4f23610dbac26b2a5d92b9b1299f5 a88d2681f3bfd9320eaf2e5dd8d87458593db8a7 | P2-AR-0041: merge phase2/repair-1-r3-ws08 (P2-AR-0039, WS-8 round 3)
+f656cb7 020d6fd1482a37a68153771cc2053a3f423f7d4f 0403458d3f6c56508681e69a09dc5153cd80592c | P2-AR-0041: merge phase2/repair-1-r3-ws05 (P2-AR-0036, WS-5 round 3)
+09cfc78 f656cb729048a197659d1c74bf8db2a05d84c8bd 6094199768b52b339b8bc0d5923848ec6d88e659 | P2-AR-0041: merge phase2/repair-1-r3-ws04 (P2-AR-0035, WS-4 round 3)
+7726854 09cfc78d8cec27fb2ff2307973030989688fdf2b 65c3bd71317fca311186fcc7b8100199d15ab400 | P2-AR-0041: merge phase2/repair-1-r3-ws02 (P2-AR-0033, WS-2 round 3)
+e26dd1b 772685443afe6840b9df4bdc2058d82433fb9671 3694df84e03269e0c17de28b84f44b36b40b8703 | P2-AR-0041: merge phase2/repair-1-r3-ws06 (P2-AR-0037, WS-6 round 3)
+73ac04b e26dd1b1e767aac2de2554b185adc18c99bedba5 d3809db3a2bdda73c48bd8b624e334c11c387557 | P2-AR-0041: merge phase2/repair-1-r3-ws07 (P2-AR-0038, WS-7 round 3)
+8972c16 73ac04bd5a7eb2e41e6d903b437ff371e2e88a94 2ec465648365fe238c29ce1443bee2da26690fc3 | P2-AR-0041: merge phase2/repair-1-r3-ws09-11 (P2-AR-0040, WS-9/11 round 3)
+## files the merges brought in beyond the eight branches (expect none): diff of (8972c16 vs a53d15b) paths minus union of branch paths
+## protected paths changed by this run after the merges (8972c16..22d43ce; expect none)
+## other workstreams' repair-1 directories changed after the merges (expect none)
+## product files changed after the merges (8972c16..22d43ce)
+ cli/src/main.rs                          |   77 +-
+ framework/KERNEL.yaml                    |   19 +-
+ framework/policies/AUTHORITY_POLICY.yaml |    3 +-
+ migrations/M-4.1.5-4.1.6.yaml            |    9 +-
+ runtime/src/cit/binding.rs               |   17 +-
+ runtime/src/cit/mod.rs                   |   10 +-
+ runtime/src/doctor.rs                    |    5 +-
+ runtime/src/lifecycle/mod.rs             |   10 +-
+ runtime/src/memory/integrity.rs          |   11 +-
+ runtime/src/migrations/references.rs     |   19 +-
+ runtime/src/orchestration/control.rs     |   53 +-
+ runtime/src/orchestration/dag.rs         |    3 +
+ runtime/src/orchestration/generation.rs  |   17 +-
+ runtime/src/orchestration/readiness.rs   |    4 +
+ runtime/src/orchestration/tasks.rs       |  174 ++--
+ runtime/src/project.rs                   |    4 +
+ runtime/src/recovery.rs                  |   15 +-
+ runtime/src/release.rs                   |    3 +-
+ runtime/src/scheduler/catalogue.rs       |   20 +-
+ runtime/src/scheduler/mod.rs             |   63 +-
+ runtime/src/srr/binding.rs               |  337 ++++---
+ runtime/src/srr/mod.rs                   |    5 +-
+ runtime/src/t2.rs                        | 1426 ++++++++++++++----------------
+ runtime/src/update.rs                    |  140 +--
+ runtime/src/verification/lineage.rs      |    4 +-
+ runtime/src/verification/mod.rs          |    8 +-
+ runtime/src/verification/reporting.rs    |    5 +-
+ tests/certification/common.rs            |    5 +-
+ tests/certification/integration_r3.rs    |  325 +++++++
+ tests/certification/main.rs              |    1 +
+ tests/certification/ws03_r3.rs           |  485 +++++-----
+ tests/certification/ws04r3.rs            |   48 +-
+ 32 files changed, 1934 insertions(+), 1391 deletions(-)
