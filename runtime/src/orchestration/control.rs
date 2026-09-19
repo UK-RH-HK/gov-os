@@ -309,6 +309,8 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     outside("trust root-update", "machine trust domain (administrator): succession requires the outgoing and incoming root quorums; §6 bullet 4 enforced inside the trust-anchor write"),
     outside("trust break-glass", "machine trust domain: read-only report of where an owner-signed authorisation must be placed"),
     outside("trust recover-transactions", "machine trust domain: replays interrupted install transactions (crash recovery of the verifier's own journal)"),
+    // P2-AR-0039 (WS-8, P2-ADJ-0002): additive
+    outside("trust bind", "machine trust domain (administrator): installs the owner's T2 binding authority, verified against the provisioned root's `t2-binding` delegation; OWNER-DECISION-0006 §6 bullet 4 is enforced inside the binding-authority write"),
     outside("trust human-channel", "machine trust domain: read-only report of the authenticated human channel"),
     outside("trust human-channel --provision", "machine trust domain (administrator): the human-channel anchor write asks OWNER-DECISION-0006 §6 bullet 4 inside the write and refuses a provisioned or already-anchored machine"),
     // round 3 (P2-ADJ-0002): the T2 binding authority that makes OS-written facts portable across the owner's

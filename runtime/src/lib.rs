@@ -58,9 +58,11 @@ pub mod util;
 pub mod verification;
 
 pub const FRAMEWORK_NAME: &str = "agentic-engineering-os";
-pub const VERSION: &str = "4.1.5";
-pub const CLI_VERSION: &str = "4.1.5";
-pub const RUNTIME_VERSION: &str = "4.1.5";
+// P2-AR-0039 (WS-8, kernel payload/version consistency): the working tree is the next release, 4.1.6 (branch
+// release/4.1.6-rc1, migration M-4.1.5-4.1.6); release/releases/4.1.5 is immutable and its payload differs from this one.
+pub const VERSION: &str = "4.1.6";
+pub const CLI_VERSION: &str = "4.1.6";
+pub const RUNTIME_VERSION: &str = "4.1.6";
 pub const INDEX_VERSION: &str = "4.1.5-idx4";
 pub const RUNTIME_DIR: &str = ".governance-runtime";
 

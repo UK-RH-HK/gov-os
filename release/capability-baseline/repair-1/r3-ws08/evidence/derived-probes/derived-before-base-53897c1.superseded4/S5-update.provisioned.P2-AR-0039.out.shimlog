@@ -1,0 +1,31 @@
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-S5-update.provisioned.P2-AR-0039-ZbKBxs/alpha-r-s5-6ukor4gc/s14/kernel
+(a) role declared: orchestrator for update --check --source
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for gate present HDG-0001
+(b) decide HDG-0001 --option A: owner-signed answer relayed by orchestrator (probe role was human)
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for update --rollback --reason
+(a) role declared: orchestrator for trust break-glass
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for update --rollback --break-glass
+(a) role declared: orchestrator for update --rollback --break-glass
+(a) role declared: orchestrator for trust status
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for update --check --source
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for update --check --source
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-S5-update.provisioned.P2-AR-0039-ZbKBxs/alpha-r-s5-u7-eb8n39tb/s14/kernel
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for gate present HDG-0001
+(b) decide HDG-0001 --option A: owner-signed answer relayed by orchestrator (probe role was human)
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-S5-update.provisioned.P2-AR-0039-ZbKBxs/alpha-r-s5-prov-ne43p8r9/rel/releases/4.1.5/kernel
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for update --apply --source
+(a) role declared: orchestrator for update --rollback

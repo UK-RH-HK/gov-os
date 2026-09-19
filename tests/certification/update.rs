@@ -70,7 +70,7 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
         .contains("not touched"));
     // --- apply without approval → gate; --approve without an answered gate does nothing (INV-008) ---
     let e = g.err(&["update", "--apply", "--source", signed_source()]);
-    assert_eq!(e.error_code(), "HUMAN_GATE_REQUIRED");
+    assert_eq!(e.error_code(), "HUMAN_GATE_REQUIRED", "{}", e.envelope);
     let gid = e.details()["gate"].as_str().unwrap().to_string();
     assert_eq!(
         g.ok(&[

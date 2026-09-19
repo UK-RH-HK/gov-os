@@ -37,6 +37,37 @@ pub fn key(seed: u8) -> TestKey {
     }
 }
 
+/// A test key pair whose seed is drawn at run time and never written anywhere (P2-AR-0039: the T2 binding
+/// authority's test material keeps no private key or shared secret in the repository, not even a published one).
+/// TEST MATERIAL ONLY.
+pub fn ephemeral_key() -> TestKey {
+    let mut seed = [0u8; 32];
+    let draw = (0..8)
+        .map(|_| gov_runtime::util::short_uuid())
+        .collect::<Vec<_>>()
+        .join("");
+    seed.copy_from_slice(&hex::decode(gov_runtime::util::sha256_text(&draw)).unwrap());
+    let signing = SigningKey::from_bytes(&seed);
+    let public_hex = hex::encode(signing.verifying_key().to_bytes());
+    let keyid = gov_runtime::util::sha256_hex(&signing.verifying_key().to_bytes());
+    TestKey {
+        signing,
+        public_hex,
+        keyid,
+    }
+}
+
+/// 32 random bytes drawn at run time (a T2 binding key for the certification suite). TEST MATERIAL ONLY.
+pub fn ephemeral_secret() -> [u8; 32] {
+    let draw = (0..8)
+        .map(|_| gov_runtime::util::short_uuid())
+        .collect::<Vec<_>>()
+        .join("");
+    let mut k = [0u8; 32];
+    k.copy_from_slice(&hex::decode(gov_runtime::util::sha256_text(&draw)).unwrap());
+    k
+}
+
 /// Build a signed envelope. The signature covers the **exact bytes** of the `signed` member as they are written,
 /// which is what the verifier extracts with `serde_json::value::RawValue`.
 pub fn envelope(signed: &Value, keys: &[&TestKey]) -> String {
