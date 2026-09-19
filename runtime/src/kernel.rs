@@ -629,4 +629,45 @@ mod tests {
         assert_eq!(m["payload_hash"].as_str().unwrap(), embedded_payload_hash());
         let _ = std::fs::remove_dir_all(&base);
     }
+
+    /// IP-WS02-15: a cache directory is re-used only when it is exactly the embedded listing — the old test
+    /// (`KERNEL.yaml` and `.complete` present) accepted a directory missing files, and would have accepted one with
+    /// extra files or a marker naming another listing.
+    #[test]
+    fn a_kernel_cache_is_reused_only_when_it_is_exactly_the_embedded_listing() {
+        let base =
+            std::env::temp_dir().join(format!("gov-ws08-cache-{}", crate::util::short_uuid()));
+        let write_all = |d: &Path| {
+            for (rel, bytes) in embedded::files() {
+                let p = d.join(rel);
+                std::fs::create_dir_all(p.parent().unwrap()).unwrap();
+                std::fs::write(&p, bytes).unwrap();
+            }
+            std::fs::write(
+                d.join(CACHE_COMPLETE_MARKER),
+                embedded_listing().1.as_bytes(),
+            )
+            .unwrap();
+        };
+        let exact = base.join("exact");
+        write_all(&exact);
+        assert!(cache_matches_listing(&exact));
+        let missing = base.join("missing");
+        write_all(&missing);
+        std::fs::remove_file(missing.join("policies").join("SECURITY_POLICY.yaml")).unwrap();
+        assert!(missing.join("KERNEL.yaml").exists() && !cache_matches_listing(&missing));
+        let extra = base.join("extra");
+        write_all(&extra);
+        std::fs::write(extra.join("policies").join("INJECTED.yaml"), "x: 1\n").unwrap();
+        assert!(!cache_matches_listing(&extra));
+        let altered = base.join("altered");
+        write_all(&altered);
+        std::fs::write(altered.join("KERNEL.yaml"), "framework: other\n").unwrap();
+        assert!(!cache_matches_listing(&altered));
+        let marker = base.join("marker");
+        write_all(&marker);
+        std::fs::write(marker.join(CACHE_COMPLETE_MARKER), "another-listing").unwrap();
+        assert!(!cache_matches_listing(&marker));
+        let _ = std::fs::remove_dir_all(&base);
+    }
 }
