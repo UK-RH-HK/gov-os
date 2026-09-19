@@ -37,8 +37,33 @@ reconciled without choosing a trade-off the sources leave open, stop that item a
 ## Other known round-3 integration items
 
 - `governance/registry/` into `tasks::OS_MANAGED_PREFIXES` (WS-7 IP-W7R3-1 — **required**: plugin registration inside a claimed
-  task is otherwise refused at close; WS-3 IP-R3-WS03-3) unless WS-5 already did it.
+  task is otherwise refused at close; WS-3 IP-R3-WS03-3). WS-5 did not add it (checked on `phase2/repair-1-r3-ws05`).
 - **IP-R3-WS04-01 (integration-critical):** `gates::answer`/`revoke` write CIT records without re-sealing, so a CIT declined inside another task's claim window fails that task's close (`MUTATION_SCOPE_VIOLATION`). In order: apply WS-4's `release/capability-baseline/repair-1/r3-ws04/evidence/IP-R3-WS04-01.gates-reseal.patch` (or an equivalent re-seal of previously-verified CIT records in `gates.rs`), then add `cit` to `t2::SEALED_RECORD_TYPES` (WS-3 IP-R3-WS03-2), then un-ignore `ws04r3::a_cit_declined_during_another_tasks_claim_does_not_block_its_close`. WS-4 measured the end state at lib 215/0, certification 145/0.
+- **WS-5 round 3 (P2-AR-0036, report `r3-ws05/00-REPAIR-REPORT.md` §7.2), in addition:**
+  - **Task-record sealing (WS-5 r2 IP-R3-1, final step — integration-critical, ordered):** only after WS-3's and WS-4's
+    re-sealing of the task records they rewrite is merged, seal task records on every OS write (including generated tasks
+    written by `orchestration::generation`) and add `task` to `t2::SEALED_RECORD_TYPES`. Doing it earlier makes their unsealed
+    rewrites refusable at close. Prove it with a close inside another task's claim window.
+  - Declared additive exceptions to review under WS-3's role/guard semantics: `TaskCmd::Generate`, its `g0_label` and `run`
+    arms and the post-command `generation::after_command` hook in `cli/src/main.rs` (R3-WS5-1); `task generate` (Write,
+    `replan_tasks`) and `task generate --dry-run` (Read) in `COMMAND_GUARDS` (R3-WS5-2); `pub mod generation;` (R3-WS5-3).
+    The post-command hook must respect the availability rule and must not run for commands the guard refused.
+  - CLI `task show` calls `orchestration::tasks::show` (R3-WS5-4).
+  - The claims store moved to `paths::store_path(root, "claims")`: the scheduler sandbox, currency input and doctor D017/D026
+    must read it there (R3-WS5-5; WS-6 IP-R2-12). Emergency-control state to `store_path(root, "emergency-control")` with
+    `relocate_legacy` (R3-WS5-6; WS-6 IP-R2-8) unless WS-3/WS-6 already did it — D6-b2-B must pass.
+  - `recovery::recover` writes report `evidence`/`discoveries`/`unresolved` items as strings per the report schema (R3-WS5-7,
+    HIGH, pre-existing): a recovery report must pass `schema_invariants` with remediation work closed, not only while it is open.
+  - OS writes made into governed records inside another task's claim window (`cit::propagation` markers incl. those
+    `detect_and_propagate` now writes at claim; `lifecycle::record_influence`) are attributed (seal or recorded write set) so
+    close never reads them as the worker's mutations (R3-WS5-8) — same family as IP-R3-WS04-01; solve both with one mechanism.
+  - `KERNEL.yaml` `schema_versions`: `task` 1.2.0, `test-obligation` 1.1.0 (R3-WS5-9; falls under the kernel-mirroring item below).
+  - Measure the per-write generation/reconciliation and claim-time checkpoint cost against the Gate U SLOs and report it
+    (R3-WS5-10); the sandbox `memory_retrieval_regression` symbol route returning nothing (R3-WS5-11, pre-existing): fix if in
+    reach, otherwise report it as stopped with the evidence.
+  - Integration regression check: WS-5 changed existing tests in greenfield, repair, repair2, ws03, ws04r2, ws05 and ws06
+    (report §8); re-check every other builder's tests that create, claim or close tasks, because generation now runs after
+    every governed write and new generated tasks take the next sequential id.
 - WS-10's research write commands: declare `record_research_evidence: L1`, `lifecycle::RECORD_AUTHORITY` and the 12
   `COMMAND_GUARDS` entries together (WS-3 IP-R3-WS03-4).
 - Kernel version 4.1.6 (WS-8): every schema version bumped by any round-3 builder must be mirrored in `KERNEL.yaml`

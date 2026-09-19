@@ -18,4 +18,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/r3-ws05/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0036.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 533f7d9e6940e24ea00d213d1257623b4ce6638a
+  branch_tip_commit: 0403458d3f6c56508681e69a09dc5153cd80592c
+  branch_product_code_digest: 658fcb124ab9e1b3eda730039876db4d9fec8aab54a1d9b9cd62f339a3538abc
+  agent_model_self_reported: claude-opus-5[1m] (Claude Opus 5, 1M context)
+  claims: {'BC-P2-24': 'REPAIRED_CLAIMED', 'BC-P2-13': 'REPAIRED_CLAIMED', 'WS-4 r2 R2-1': 'REPAIRED_CLAIMED', 'WS-4 r2 R2-2': 'REPAIRED_CLAIMED', 'WS-4 r2 R2-3': 'REPAIRED_CLAIMED', 'WS-4 r2 R2-5': 'CONFIRMED', 'WS-4 r2 R2-6': 'REPAIRED_CLAIMED', 'WS-10 r2 IP-WS10-11': 'REPAIRED_CLAIMED', 'WS-10 r2 IP-WS10-12': 'REPAIRED_CLAIMED', 'WS-10 r2 IP-WS10-13': 'REPAIRED_CLAIMED', 'BC-P2-31': 'REPAIRED_CLAIMED', 'Availability rule (P2-HO-0031)': 'REPAIRED_CLAIMED'}
+  orchestrator_checks: "Scope checked against P2-HO-0035: product files within owned set (orchestration/{tasks,dag,readiness}.rs, memory/claims.rs, status.rs, task+test-obligation schemas, framework/taxonomy/WORK_GENERATION.yaml) plus new orchestration/generation.rs; declared additive exceptions cli/src/main.rs, orchestration/control.rs (COMMAND_GUARDS), orchestration/mod.rs routed to integration-3 as R3-WS5-1..3. Existing builder tests changed with reasons (report s8). Builder-reported lib 215/0, certification 146/0; R1 AR-0027 26/3, AR-0029 26/2 (ho_f no-compile), AR-0031 27/7, AR-0033 30/1 (hv_a::a1 size pin) \u2014 census 119 files/2060 functions, 0 s6 violations; matches baselines. IP-R3-1 final step (task sealing) deliberately deferred to integration after WS-3/WS-4 re-sealing. New IPs R3-WS5-1..11 routed to P2-HO-0040. Claims are builder claims, not acceptance."
