@@ -97,7 +97,10 @@ pub fn run(p: &Project) -> Result<Report> {
         });
     }
     // Independent check groups run concurrently, each on its own project handle and database connection
-    // (Contract v3:803). Every group is a pure reader of the live repository.
+    // (Contract v3:803). Every group is a pure reader of the live repository. Kernel trust is resolved once here, before
+    // the groups start, so an embedded-baseline substitution is never materialised by two threads at once (see
+    // `scheduler::run_suite`).
+    let _ = crate::kernel_trust::trust(&p.root);
     let root = p.root.clone();
     let (session, role) = (p.session_id.clone(), p.role.clone());
     type Group = fn(&Project) -> Result<Vec<Value>>;

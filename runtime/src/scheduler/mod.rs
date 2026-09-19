@@ -633,6 +633,11 @@ pub fn run_suite(p: &Project, opts: &RunOptions) -> Result<SuiteOutcome> {
     let workers = max_workers
         .min(n_tasks)
         .max(if n_tasks > 0 { 1 } else { 0 });
+    // Resolve kernel trust once, on this thread, before any worker starts. Workers then read the cached verdict, and
+    // an untrusted kernel's embedded-baseline substitution is materialised exactly once: `kernel::embedded_kernel_dir`
+    // stages into a per-process directory, so concurrent first materialisations from threads of one process would
+    // interleave and leave a corrupt cache marked complete (integration point for WS-8, see the repair report).
+    let _ = crate::kernel_trust::trust(&p.root);
     let queue = Mutex::new(queue);
     let done: Mutex<Vec<Done>> = Mutex::new(vec![]);
     let store_live = RecordStore::load(&p.root);
