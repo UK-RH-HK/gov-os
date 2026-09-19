@@ -102,17 +102,25 @@ pub fn open_index(p: &Project) -> Result<RuntimeDb> {
     Ok(d)
 }
 
-/// Compile the packet for `task_id` with the index already open.
-pub fn compile(p: &Project, db: &RuntimeDb, task_id: &str) -> Result<Value> {
-    compile_inner(p, Ok(db), task_id)
+/// The derived index as the compiler sees it: open, or unavailable with the reason it could not be opened.
+/// Existing callers pass `&RuntimeDb` unchanged (`From<&RuntimeDb>`).
+pub enum IndexHandle<'a> {
+    Open(&'a RuntimeDb),
+    Unavailable(GovError),
+}
+
+impl<'a> From<&'a RuntimeDb> for IndexHandle<'a> {
+    fn from(d: &'a RuntimeDb) -> Self {
+        IndexHandle::Open(d)
+    }
 }
 
 /// Compile the packet for `task_id`, opening the index itself and **tolerating its absence or damage**: the
 /// mandatory inputs never depend on the index (W10 line 1170). Use this at every dispatch boundary.
 pub fn compile_tolerant(p: &Project, task_id: &str) -> Result<Value> {
     match open_index(p) {
-        Ok(db) => compile_inner(p, Ok(&db), task_id),
-        Err(e) => compile_inner(p, Err(e), task_id),
+        Ok(db) => compile(p, &db, task_id),
+        Err(e) => compile(p, IndexHandle::Unavailable(e), task_id),
     }
 }
 
@@ -121,18 +129,13 @@ fn degradation(stage: &str, e: &GovError) -> Value {
 }
 
 /// The supplementary block: retrieval over the derived index. Never fails; failures are recorded as degradations.
-fn retrieved_block(
-    p: &Project,
-    db: std::result::Result<&RuntimeDb, GovError>,
-    query: &str,
-    k: usize,
-) -> (Value, Vec<Value>) {
+fn retrieved_block(p: &Project, db: IndexHandle, query: &str, k: usize) -> (Value, Vec<Value>) {
     let mut degr = vec![];
     let mut ret = json!({"query": query, "retrieval_strategy": Value::Null, "routes": [], "index_snapshot": {"index_version": Value::Null, "manifest_hash": Value::Null},
         "ranked_evidence": [], "lessons_failures": [], "code_references": []});
     let db = match db {
-        Ok(d) => d,
-        Err(e) => {
+        IndexHandle::Open(d) => d,
+        IndexHandle::Unavailable(e) => {
             degr.push(degradation("open_index", &e));
             return (ret, degr);
         }
@@ -229,11 +232,10 @@ fn packets_dir(p: &Project, task_id: &str) -> std::path::PathBuf {
         .join(task_id)
 }
 
-fn compile_inner(
-    p: &Project,
-    db: std::result::Result<&RuntimeDb, GovError>,
-    task_id: &str,
-) -> Result<Value> {
+/// Compile the context packet for `task_id`. `db` is the open index (`&RuntimeDb`) or
+/// [`IndexHandle::Unavailable`]; only the supplementary block depends on it.
+pub fn compile<'a>(p: &Project, db: impl Into<IndexHandle<'a>>, task_id: &str) -> Result<Value> {
+    let db: IndexHandle<'a> = db.into();
     let store = RecordStore::load(&p.root);
     let task = store
         .get(task_id)
