@@ -77,6 +77,7 @@ pub fn run(
                 incremental: false,
                 db_path: Some(db_path.clone()),
                 embed_override: Some(cand.embed.clone()),
+                record_failures: Some(false),
             },
         ) {
             Ok(r) => r,

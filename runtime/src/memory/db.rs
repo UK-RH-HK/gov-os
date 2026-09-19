@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS retrieval_log (id INTEGER PRIMARY KEY AUTOINCREMENT, ts TEXT, query TEXT, routes TEXT, hits TEXT, latency_ms REAL);
 CREATE TABLE IF NOT EXISTS excluded (path TEXT PRIMARY KEY, reason TEXT, detail TEXT);
 CREATE TABLE IF NOT EXISTS capability (key TEXT PRIMARY KEY, value TEXT, updated_at TEXT);
+CREATE TABLE IF NOT EXISTS derivation (path TEXT PRIMARY KEY, artifact_id TEXT, key TEXT);
 "#;
 
 pub struct RuntimeDb {
@@ -183,6 +184,8 @@ impl RuntimeDb {
                 .execute("DELETE FROM symbols WHERE path=?1", params![p])?;
             self.conn
                 .execute("DELETE FROM symbol_refs WHERE path=?1", params![p])?;
+            self.conn
+                .execute("DELETE FROM derivation WHERE path=?1", params![p])?;
         }
         self.conn.execute(
             "DELETE FROM artifacts WHERE artifact_id=?1",
@@ -200,6 +203,7 @@ impl RuntimeDb {
             "symbol_refs",
             "artifacts",
             "excluded",
+            "derivation",
         ] {
             self.conn.execute(&format!("DELETE FROM {t}"), [])?;
         }

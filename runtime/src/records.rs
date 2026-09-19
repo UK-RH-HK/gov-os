@@ -149,28 +149,12 @@ impl Record {
         }
     }
 
-    /// Indexable text: title + salient string fields + body.
+    /// Indexable text: title, every content section of [`Record::text_sections`] (list-valued and nested fields
+    /// included) and the Markdown body — the whole governed content of the record, nothing selected by field name.
     pub fn text(&self) -> String {
         let mut parts = vec![self.title()];
-        for k in [
-            "summary",
-            "objective",
-            "question",
-            "proposal",
-            "rationale",
-            "problem_statement",
-            "conclusion",
-            "statement",
-            "mission",
-            "product_intent",
-            "generic_failure_mode",
-            "suggested_change",
-            "work_completed",
-        ] {
-            let v = self.get(k);
-            if !v.is_empty() {
-                parts.push(v);
-            }
+        for (name, text) in self.text_sections() {
+            parts.push(format!("{name}\n{text}"));
         }
         if let Some(b) = self.data.get("body").and_then(|v| v.as_str()) {
             parts.push(b.to_string());
@@ -178,38 +162,105 @@ impl Record {
         if !self.body.is_empty() {
             parts.push(self.body.clone());
         }
-        for k in [
-            "given",
-            "when",
-            "then",
-            "acceptance_criteria",
-            "outcomes",
-            "options",
-            "consequences",
-            "discoveries",
-            "risks",
-        ] {
-            if let Some(a) = self.data.get(k).and_then(|v| v.as_array()) {
-                for x in a {
-                    match x {
-                        Value::String(s) => parts.push(s.clone()),
-                        Value::Object(o) => parts.push(
-                            o.get("description")
-                                .and_then(|d| d.as_str())
-                                .unwrap_or("")
-                                .to_string(),
-                        ),
-                        _ => {}
-                    }
-                }
-            }
-        }
         parts
             .into_iter()
-            .filter(|p| !p.is_empty())
+            .filter(|p| !p.trim().is_empty())
             .collect::<Vec<_>>()
             .join("\n")
     }
+
+    /// Record fields whose content is carried elsewhere in the index: `id`/`type`/`status`/`state_class` are
+    /// columns of the artefact row, `title` is the document chunk, `body` is chunked as Markdown sections.
+    pub const NON_CONTENT_FIELDS: &'static [&'static str] =
+        &["id", "type", "title", "body", "status", "state_class"];
+    /// A field whose own rendering reaches this many characters becomes its own named section.
+    pub const OWN_SECTION_MIN_CHARS: usize = 40;
+    /// Name of the section grouping the record's short fields.
+    pub const FIELDS_SECTION: &'static str = "fields";
+
+    /// Every piece of governed record content as named sections for the index (BC-P2-25, Contract v3:239, :249,
+    /// :274): string, number, boolean, list-valued and nested fields at any depth (scenario steps, acceptance
+    /// criteria, decision options, a worker's nested `return`, …). A field whose rendering is long becomes its own
+    /// section named after the field; short fields are grouped, in record order, into one [`Self::FIELDS_SECTION`]
+    /// section so a record's small facts stay together. Lists render as `- item` lines and objects as `key: value`
+    /// lines (nested values indented), so literal phrases stay contiguous for lexical search and every section
+    /// carries its field name as provenance. Only [`Self::NON_CONTENT_FIELDS`] are left out, because they are held
+    /// elsewhere. Deterministic: follows the record's own key order.
+    pub fn text_sections(&self) -> Vec<(String, String)> {
+        let mut own: Vec<(String, String)> = vec![];
+        let mut grouped: Vec<String> = vec![];
+        if let Some(m) = self.data.as_object() {
+            for (k, v) in m {
+                if Self::NON_CONTENT_FIELDS.contains(&k.as_str()) {
+                    continue;
+                }
+                let rendered = Self::render_value(v, "").join("\n");
+                if rendered.trim().is_empty() {
+                    continue;
+                }
+                if rendered.chars().count() >= Self::OWN_SECTION_MIN_CHARS {
+                    own.push((k.clone(), rendered));
+                } else if rendered.contains('\n') {
+                    grouped.push(format!("{k}:\n{rendered}"));
+                } else {
+                    grouped.push(format!("{k}: {rendered}"));
+                }
+            }
+        }
+        let mut out = vec![];
+        if !grouped.is_empty() {
+            out.push((Self::FIELDS_SECTION.to_string(), grouped.join("\n")));
+        }
+        out.extend(own);
+        out
+    }
+
+    /// Plain-text rendering of a record value as indented lines: scalars as themselves (multi-line strings keep
+    /// their lines), lists as `- item` lines, objects as `key: value` lines, nested containers indented two spaces
+    /// per level (YAML-like, so a reader and a lexical phrase query see the content as written). Empty values
+    /// render as no lines.
+    fn render_value(v: &Value, indent: &str) -> Vec<String> {
+        let deeper = format!("{indent}  ");
+        match v {
+            Value::Null => vec![],
+            Value::String(s) => s
+                .trim_end()
+                .lines()
+                .map(|l| format!("{indent}{}", l.trim_end()))
+                .filter(|l| !l.trim().is_empty())
+                .collect(),
+            Value::Bool(b) => vec![format!("{indent}{b}")],
+            Value::Number(n) => vec![format!("{indent}{n}")],
+            Value::Array(a) => {
+                let mut lines = vec![];
+                for x in a {
+                    let sub = Self::render_value(x, &deeper);
+                    let Some(first) = sub.first() else { continue };
+                    let head = first.strip_prefix(deeper.as_str()).unwrap_or(first);
+                    lines.push(format!("{indent}- {head}"));
+                    lines.extend(sub.iter().skip(1).cloned());
+                }
+                lines
+            }
+            Value::Object(o) => {
+                let mut lines = vec![];
+                for (k, x) in o {
+                    let sub = Self::render_value(x, &deeper);
+                    if sub.is_empty() {
+                        continue;
+                    }
+                    if sub.len() == 1 && !matches!(x, Value::Array(_) | Value::Object(_)) {
+                        lines.push(format!("{indent}{k}: {}", sub[0].trim_start()));
+                    } else {
+                        lines.push(format!("{indent}{k}:"));
+                        lines.extend(sub);
+                    }
+                }
+                lines
+            }
+        }
+    }
+
     /// Long text fields usable as sections for chunking.
     pub fn text_fields(&self) -> Vec<(String, String)> {
         let mut out = vec![];
