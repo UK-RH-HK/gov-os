@@ -1,0 +1,97 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0028
+role: capability-repair
+objective: Repair iteration 1, round 2, WS-7 (plugin and tool trust) — BC-P2-39, BC-P2-40, BC-P2-41, BC-P2-11 (plugin side), BC-P2-09 (registry side) and the integration points routed to WS-7 (WS-3 IP-6, WS-6 IP-3); claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run authored
+  only the WS-7 repair (commits 138472e, 371794a) and its report and evidence (f9e83ac); it authored no audit, synthesis,
+  verification, other repair or integration run, and it grades no repair. It read P2-HO-0026, P2-HO-0020, P2-HO-0010,
+  AGENT_RUNS/README.md and its own run claim, repair-delta.md (§0-§4), owner-decisions-required.md, blocker-classes.yaml and
+  findings.yaml (synthesis and gamma-r), the gamma-r F2F3/F4/FRESH probes and outputs and the synthesis LEAD-X4 probe, the
+  round-1 integration report and its evidence runners and owner-channel adapter, the WS-3 and WS-6 round-1 reports (IP-6,
+  IP-3) and WS-3's hc_owner.py, OWNER-DECISION-P2-0002 and P2-ADJ-0001, D-0005, D-0007, ARCH-0003, API-0001, Contract v3
+  F2-F4, the R1 held-out suites (run unedited) and the product source/tests of its worktree. Other families' audit probes
+  were run unedited (outputs only in its own evidence directory). It did not read session or agent transcripts, task-output
+  stores or user auto-memory; it spawned no sub-agents and did not contact the product owner.
+input:
+  base_commit: 843d79c33e8a8db8b223611abc23d317edbc82a1
+  candidate: "none (repair iteration 1 round 2 branch; no candidate minted)"
+  product_code_digest: e9ff786cbc6bac4fa8fea700950f888f1d79459f04478880bf2cf273947fcbcc
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0026-repair-1-r2-ws07.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0026-repair-1-r2-ws07.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0020-repair-1-round-2-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0010-repair-1-common-protocol.md
+  - release/orchestration/phase-2/AGENT_RUNS/README.md
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-0028.run.yaml
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0001-STANDALONE-HUMAN-GATE-ANCHOR.md
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+  - release/capability-baseline/audit-0/synthesis/owner-decisions-required.md
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  - release/capability-baseline/audit-0/synthesis/findings.yaml
+  - release/capability-baseline/audit-0/gamma-r/findings.yaml
+  - "release/capability-baseline/audit-0/gamma-r/evidence/{F4-plugins,F2F3-tools,FRESH-invalidation}.{sh,out}, lib.sh"
+  - release/capability-baseline/audit-0/synthesis/evidence/LEAD-X4-registered-module-plugin-unpinned.py and lib/synth.py
+  - "release/capability-baseline/audit-0/beta-r/evidence/C5-code-structural-memory.py, C8-failure-memory.py (run unedited)"
+  - release/capability-baseline/repair-1/integration/00-INTEGRATION-REPORT.md and evidence runners, gov-owner-channel-shim.py
+  - release/capability-baseline/repair-1/ws03/00-REPAIR-REPORT.md, claims.yaml, evidence/hc_owner.py
+  - release/capability-baseline/repair-1/ws06/00-REPAIR-REPORT.md
+  - spec/decisions/D-0005.yaml
+  - spec/decisions/D-0007.yaml
+  - spec/architecture/ARCH-0003.yaml
+  - spec/interfaces/API-0001.yaml
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (F2-F4)
+  - "release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests (run unedited), 4.1.6-r1-4/evidence/derive.py"
+  - runtime/src (capabilities, tools, t2, orchestration/gates, srr/plugins, srr/breakglass, memory/failures, policy_coverage), cli/src/main.rs, tests/certification
+produced:
+  - runtime/src/capabilities/binding.rs (new)
+  - runtime/src/capabilities/governance.rs
+  - runtime/src/capabilities/registry.rs
+  - runtime/src/capabilities/host.rs
+  - runtime/src/capabilities/mod.rs
+  - runtime/src/tools.rs
+  - framework/policies/TOOL_POLICY.yaml
+  - framework/schemas/plugin-descriptor.schema.json
+  - framework/schemas/plugin-registry.schema.json
+  - framework/schemas/tool.schema.json
+  - capabilities/PROTOCOL.md
+  - tests/certification/ws07.rs (new)
+  - "tests/certification/main.rs (additive: mod ws07;)"
+  - "tests/certification/{arch,repair,repair2,repair3}.rs (builder tests updated to the new behaviour; see report §9)"
+  - release/capability-baseline/repair-1/r2-ws07/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r2-ws07/claims.yaml
+  - release/capability-baseline/repair-1/r2-ws07/evidence/
+tests_or_attacks:
+  - {id: REG-lib, description: "cargo test --lib at 371794a", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/regression/cargo-test-lib.out}
+  - {id: REG-cert, description: "cargo test --test certification at 371794a (105/0, section6 9/9)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/regression/cargo-test-certification.out}
+  - {id: R1-heldout, description: "all four R1 held-out suites unedited on a private scratch path, before 843d79c and after 371794a: identical (26/3, 26/2 + ho_f not compiling, 27/7, 30/1 hv_a::a1 size pin); census 106 files / 1494 functions, 0 violations", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/r1-heldout/}
+  - {id: P-F4.b1, description: "gamma-r F4.b1 under-declaring plugin runs unregistered (base FAIL)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out}
+  - {id: P-F4.b3b4, description: "gamma-r F4.b3/b4 TOFU reset and interpreter-only command (base FAIL)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out}
+  - {id: P-F4.b5, description: "gamma-r F4.b5 pending gate returned, F4.b5.x unrelated gate not honoured (shim; base FAIL)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out}
+  - {id: P-F4.b2x, description: "gamma-r F4.b2.x forged registry entry refused and reported by the suite (shim; base FAIL)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out}
+  - {id: P-F4.b6, description: "gamma-r F4.b6 unrelated record as security review (shim; base FAIL)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out}
+  - {id: P-F3b, description: "gamma-r F2F3 F3 (b) approved install gate proceeds (shim; base FAIL)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out}
+  - {id: P-X4, description: "synthesis LEAD-X4 module-form plugin bound, swap fails closed, doctor reports (shim; base 1/4)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/probes/final-371794a-shim/synthesis.LEAD-X4-registered-module-plugin-unpinned.out}
+  - {id: P-FRESH.4, description: "gamma-r FRESH.4 registry change stales green evidence — not discriminating in this probe (its audit is not green on either tree)", result: NOT_RUN, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/probes/final-371794a-shim/gamma-r.FRESH-invalidation.out}
+  - {id: W7-named, description: "WS-7 named checks through legitimate paths (base 3/24 pass, final 26/26)", result: PASS, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/probes/ws07-named-checks.final-371794a.out}
+  - {id: XF-disclosure, description: "other families' probes with hand-declared fixture plugins: expected changes disclosed; prereg adapter shows capabilities work with governed plugins", result: CONFIRMED, evidence_path: release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/COMPARE-cross-family.out}
+findings: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r2-ws07
+  commit: f9e83acf52bda093260ae9c493bc414c70abed00
+  evidence_path: release/capability-baseline/repair-1/r2-ws07/
+unresolved:
+  - "IP-W7-1 (WS-5): seal task-close reports so a security-class close report can be a T2-verified security review; until then every tool install needing the security condition goes to the owner's gate"
+  - "IP-W7-2 (WS-6): record a degradation when a declared code_intel plugin is refused by plugin governance (beta-r C5-b8-degrade)"
+  - "IP-W7-3/4 (WS-3): ENFORCEMENT_MAP descriptions; optional plugins registry CLI view"
+  - "IP-W7-5 (release): KERNEL.yaml schema_versions"
+  - "IP-W7-6 (records owner): amend API-0001 governance clause, D-0005 consequence 3 and docs through a governed change"
+  - "cross-family: audit probes whose fixtures declare executable plugins by hand now observe refusal (beta-r C5/D4/D5/D6, alpha-r A3, gamma-r F5); see evidence/cross-family/"
+recommended_next_action: Integrate WS-7 with the other round-2 branches; route IP-W7-1..6 to round 3; the integration builder re-runs the cross-family probes with the prereg adapter or registered fixtures.
+completed_at: "2026-09-19T05:24:30Z"
