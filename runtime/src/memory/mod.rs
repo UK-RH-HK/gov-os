@@ -10,4 +10,6 @@ pub mod embeddings;
 pub mod failures;
 pub mod heldout;
 pub mod indexer;
+pub mod integrity;
 pub mod manifest;
+pub mod profile;

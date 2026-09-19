@@ -1,11 +1,17 @@
 //! Evidence-based embedder/reranker selection (framework §14.3): benchmark candidates on the held-out set, record a
-//! research record with measurements, and (optionally) pin the selected implementation through a decision record.
+//! research record with measurements, and pin the selected implementation through the governed change
+//! (`memory::profile::select`: evidence, change-control gate, re-index, recorded regression — BC-P2-30).
+//!
+//! Every measured row carries the candidate's **retrieval profile** (the pinned embedder and reranker with their
+//! component identities, `memory::profile`), so the evidence binds what was measured, not a label: a plugin, model
+//! artefact or runtime changed after the benchmark no longer matches the evidence. The research record is T2-sealed
+//! and carries the version and content hash of the benchmark result (WS-4 IP-13).
 use crate::memory::db::RuntimeDb;
 use crate::memory::embedder::EmbedSpec;
 use crate::memory::indexer::{rebuild, IndexOptions};
 use crate::records::{new_record, save_record, RecordStore};
 use crate::retrieval::run_heldout_with;
-use crate::util::{read_yaml, write_yaml};
+use crate::util::read_yaml;
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 use std::path::PathBuf;
@@ -27,7 +33,12 @@ pub fn parse_candidate(p: &Project, s: &str) -> Result<Candidate> {
     let parts: Vec<&str> = base.split(':').collect();
     let embed = match parts[0] {
         "builtin" => EmbedSpec { id: "hashed-ngram".into(), version: "1".into(), dimensions: parts.get(1).and_then(|d| d.parse().ok()).unwrap_or(policy.dimensions), source: "builtin".into() },
-        "plugin" => { let id = parts.get(1).ok_or_else(|| GovError::new("USAGE", "plugin:<id>[:dim]"))?.to_string(); EmbedSpec { id, version: "1".into(), dimensions: parts.get(2).and_then(|d| d.parse().ok()).unwrap_or(policy.dimensions), source: "plugin".into() } }
+        "plugin" => {
+            let id = parts.get(1).ok_or_else(|| GovError::new("USAGE", "plugin:<id>[:dim]"))?.to_string();
+            // the revision is the one the declared plugin executes (A0-D5-01: never a hard-coded "1")
+            let version = crate::capabilities::governance::plugin_set(p).find("embed", None, Some(&id)).map(|d| d.version).unwrap_or_default();
+            EmbedSpec { id, version, dimensions: parts.get(2).and_then(|d| d.parse().ok()).unwrap_or(policy.dimensions), source: "plugin".into() }
+        }
         "current" => policy,
         other => return Err(GovError::new("USAGE", format!("unknown candidate '{other}' (builtin[:dim] | plugin:<id>[:dim] | current, optionally +rerank:<id>)"))),
     };
@@ -70,6 +81,14 @@ pub fn run(
                 std::fs::remove_file(&f)?;
             }
         }
+        // what this row measures: the candidate's retrieval profile with its component identities
+        let profile = match crate::memory::profile::candidate_profile(p, &cand) {
+            Ok((prof, _)) => prof,
+            Err(e) => {
+                rows.push(json!({"candidate": c, "error": e.to_string(), "code": e.code, "usable": false}));
+                continue;
+            }
+        };
         let t0 = std::time::Instant::now();
         let rep = match rebuild(
             p,
@@ -100,7 +119,7 @@ pub fn run(
             .and_then(|a| a.iter().find(|x| x["category"] == "symbol"))
             .map(|x| x["recall"].clone())
             .unwrap_or(Value::Null);
-        rows.push(json!({"candidate": c, "usable": true, "embedder": cand.embed.to_value(), "reranker": cand.reranker, "recall_at_k": h["recall_at_k"], "mrr": h["mrr"], "precision_at_k": h["precision_at_k"], "stale_hit_rate": h["stale_hit_rate"], "superseded_hit_rate": h["superseded_hit_rate"], "forbidden_violations": h["forbidden_violations"], "symbol_recall": sym, "avg_query_latency_ms": h["avg_latency_ms"], "index_ms": index_ms, "vectors": rep.counts["vectors"], "dimensions": cand.embed.dimensions, "measured": h["measured"], "queries": h["queries"], "by_category": h["by_category"]}));
+        rows.push(json!({"candidate": c, "usable": true, "profile": profile.to_value(), "embedder": cand.embed.to_value(), "reranker": cand.reranker, "recall_at_k": h["recall_at_k"], "mrr": h["mrr"], "precision_at_k": h["precision_at_k"], "stale_hit_rate": h["stale_hit_rate"], "superseded_hit_rate": h["superseded_hit_rate"], "forbidden_violations": h["forbidden_violations"], "symbol_recall": sym, "avg_query_latency_ms": h["avg_latency_ms"], "index_ms": index_ms, "vectors": rep.counts["vectors"], "dimensions": cand.embed.dimensions, "measured": h["measured"], "queries": h["queries"], "by_category": h["by_category"]}));
         drop(db);
         for suf in ["", "-wal", "-shm"] {
             let f = PathBuf::from(format!("{}{suf}", db_path.display()));
@@ -132,66 +151,38 @@ pub fn run(
     if record {
         let store = RecordStore::load(&p.root);
         let id = store.next_id("research");
-        let rec = new_record(
+        let heldout_sha = crate::util::sha256_file(&held_path).unwrap_or_default();
+        let result = json!({"format": crate::memory::profile::BENCHMARK_FORMAT, "heldout_sha256": heldout_sha, "rows": out["rows"], "recommended": out["recommended"]});
+        let content_hash = crate::util::sha256_hex(crate::util::canonical_json(&result).as_bytes());
+        let mut rec = new_record(
             "research",
             &id,
             &format!(
                 "Embedding/reranker benchmark ({} candidates)",
                 candidates.len()
             ),
-            json!({"question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?", "reason": "framework §14.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration", "method": format!("For each candidate: full re-index into an isolated database, then the held-out set ({} queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.", out["queries"]), "sources": [held_path.strip_prefix(&p.root).unwrap_or(&held_path).to_string_lossy()], "measurements": {"rows": out["rows"].clone()}, "uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending", "conclusion": format!("recommended: {}", out["recommended"]), "confidence": if out["queries"].as_u64().unwrap_or(0) >= 10 { 0.7 } else { 0.4 }, "influences": [], "state_class": "EVIDENCE"}),
+            json!({"question": "Which embedding/reranking implementation best serves this repository's held-out retrieval queries?", "reason": "framework §14.3: retrieval model selection is evidence-driven; pins are changed only through a measured migration", "method": format!("For each candidate: full re-index into an isolated database, then the held-out set ({} queries) with Recall@K, MRR, precision@K, stale/superseded hit rates, symbol recall, latency and index cost.", out["queries"]), "sources": [held_path.strip_prefix(&p.root).unwrap_or(&held_path).to_string_lossy()], "measurements": {"rows": out["rows"].clone()}, "uncertainty": "held-out set size and category coverage bound the confidence; paraphrase placeholders are pending", "conclusion": format!("recommended: {}", out["recommended"]), "confidence": if out["queries"].as_u64().unwrap_or(0) >= 10 { 0.7 } else { 0.4 }, "influences": [], "state_class": "EVIDENCE",
+                // IP-13: the version and content hash of the benchmark result this record carries
+                "version": "1", "content_hash": content_hash,
+                "benchmark": {"format": crate::memory::profile::BENCHMARK_FORMAT, "heldout_sha256": heldout_sha, "candidates": candidates, "recommended": out["recommended"], "result_sha256": content_hash},
+                "tags": ["memory", "retrieval-benchmark"]}),
         );
+        // T2: the evidence a profile change rests on must be what the OS measured (memory::profile::select)
+        crate::t2::seal_record(&mut rec, "memory benchmark")?;
         save_record(&p.root, &rec)?;
         out["research_record"] = json!(id);
+        out["content_hash"] = json!(content_hash);
     }
     Ok(out)
 }
 
-/// Pin a benchmarked candidate: decision record with alternatives + overlay override + full rebuild.
+/// Pin a benchmarked candidate through the governed retrieval-profile change (`memory::profile::select`).
 pub fn select(
     p: &Project,
     candidate: &str,
     research_record: Option<&str>,
+    gate: Option<&str>,
     by: &str,
 ) -> Result<Value> {
-    crate::authority::require(p, "memory_select")?;
-    crate::orchestration::control::guard_write(p, "memory select")?;
-    let cand = parse_candidate(p, candidate)?;
-    let store = RecordStore::load(&p.root);
-    let alternatives: Vec<Value> = research_record
-        .and_then(|r| store.get(r))
-        .and_then(|r| r.data["measurements"]["rows"].as_array().cloned())
-        .unwrap_or_default();
-    let did = store.next_id("decision");
-    let dec = new_record(
-        "decision",
-        &did,
-        &format!("Pin embedding implementation {}", cand.embed.describe()),
-        json!({"question": "Which embedding/reranking implementation is pinned for this repository's semantic memory?", "options": alternatives.iter().map(|a| json!({"id": a["candidate"], "description": format!("recall@k {} mrr {} precision {} latency {} ms", a["recall_at_k"], a["mrr"], a["precision_at_k"], a["avg_query_latency_ms"])})).collect::<Vec<_>>(), "chosen_option": candidate, "rationale": format!("selected on held-out evidence{}", research_record.map(|r| format!(" ({r})")).unwrap_or_default()), "approved_by": by, "approved_at": crate::util::now_iso(), "human_approved": crate::authority::level_of(p, &p.role).map(|l| l >= 5).unwrap_or(false), "approved_by_kind": if crate::authority::level_of(p, &p.role).map(|l| l >= 5).unwrap_or(false) { "human" } else { "agent" }, "approved_by_role": p.role, "impact_radius": "R3", "reversibility": "re-pin and rebuild", "confidence": 0.7, "derived_from": research_record.map(|r| vec![r.to_string()]).unwrap_or_default(), "tags": ["memory", "embedder-selection"], "state_class": "AUTHORITATIVE"}),
-    );
-    save_record(&p.root, &dec)?;
-    let pp_path = p.overlay_dir().join("PROJECT_POLICY.yaml");
-    let mut pp = read_yaml(&pp_path)?;
-    let mut over = pp.get("policy_overrides").cloned().unwrap_or(json!({}));
-    over["MEMORY_POLICY.embedding.provider"] = json!(cand.embed.id);
-    over["MEMORY_POLICY.embedding.version"] = json!(cand.embed.version);
-    over["MEMORY_POLICY.embedding.dimensions"] = json!(cand.embed.dimensions);
-    if let Some(r) = &cand.reranker {
-        over["MEMORY_POLICY.reranker.provider"] = json!(r);
-    }
-    pp["policy_overrides"] = over;
-    write_yaml(&pp_path, &pp)?;
-    let mut p2 =
-        Project::open(&p.root).with_session(Some(p.session_id.clone()), Some(p.role.clone()));
-    p2.invalidate();
-    let rep = rebuild(
-        &p2,
-        IndexOptions {
-            incremental: false,
-            ..Default::default()
-        },
-    )?;
-    Ok(
-        json!({"decision": did, "pinned": cand.embed.to_value(), "reranker": cand.reranker, "rebuilt": rep.manifest_hash}),
-    )
+    crate::memory::profile::select(p, candidate, research_record, gate, by)
 }

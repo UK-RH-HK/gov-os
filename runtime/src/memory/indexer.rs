@@ -73,6 +73,14 @@ pub struct IndexReport {
     pub coverage: Value,
     /// Failure-memory outcomes for tool failures this build observed.
     pub failures: Vec<Value>,
+    /// Graph integrity of the built index (BC-P2-28): orphan, dangling, stale, reversed and ill-typed relationships
+    /// raised as findings (`memory::integrity`).
+    pub graph_integrity: Value,
+    /// Governance state of the retrieval profile the build used (BC-P2-30, `memory::profile::governance`).
+    pub retrieval_profile: Value,
+    /// Non-rebuildable OS state still kept inside the derived runtime or generated directory (BC-P2-31,
+    /// `paths::misplaced_os_state`).
+    pub os_state: Vec<Value>,
 }
 
 pub fn lexical_config(p: &Project) -> Value {
@@ -83,9 +91,21 @@ pub fn chunking_config(p: &Project) -> Value {
     json!({"max_chars": pol.get_i64("MEMORY_POLICY", "chunking.max_chars", 1200).max(200), "overlap_chars": pol.get_i64("MEMORY_POLICY", "chunking.overlap_chars", 120), "levels": ["document", "section", "child"], "chunker": crate::memory::chunking::CHUNKER_VERSION})
 }
 
-/// The pins the live index must satisfy: embedder, reranker, chunking, lexical engine, index format version.
+/// The pins the live index must satisfy: embedder (with the component identity of the implementation that would
+/// execute now: adapter, model artefact, runtime — BC-P2-30), reranker, chunking, lexical engine, index format
+/// version.
 pub fn expected_pins(p: &Project) -> Value {
-    json!({"embedder": EmbedSpec::from_policy(p).to_value(), "reranker": RerankSpec::from_policy(p).to_value(), "chunking": chunking_config(p), "lexical": lexical_config(p), "index_version": INDEX_VERSION})
+    expected_pins_with(p, &plugin_set(p))
+}
+
+/// [`expected_pins`] against a plugin set the caller already classified for the acting role.
+pub fn expected_pins_with(
+    p: &Project,
+    plugins: &crate::capabilities::governance::PluginSet,
+) -> Value {
+    let spec = EmbedSpec::from_policy(p);
+    let embedder = crate::memory::profile::expected_embedder_pin(p, &spec, plugins);
+    json!({"embedder": embedder, "reranker": RerankSpec::from_policy(p).to_value(), "chunking": chunking_config(p), "lexical": lexical_config(p), "index_version": INDEX_VERSION})
 }
 pub fn live_pins(db: &RuntimeDb) -> Value {
     json!({"embedder": db.get_meta("embedder").unwrap_or(Value::Null), "reranker": db.get_meta("reranker").unwrap_or(Value::Null), "chunking": db.get_meta("chunking").unwrap_or(Value::Null), "lexical": db.get_meta("lexical").unwrap_or(Value::Null), "index_version": db.get_meta("index_version").unwrap_or(Value::Null)})
@@ -958,11 +978,12 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
             return Err(e); // pinned reranker must exist too
         }
     };
-    let expected = {
-        let mut e = expected_pins(p);
-        e["embedder"] = spec.to_value();
-        e
-    };
+    // BC-P2-30: the executed components (adapter, model artefact, inference runtime) are identified and bound
+    let emb_identity = crate::memory::profile::embedder_identity(p, &embed, None);
+    let rr_identity = crate::memory::profile::reranker_identity(p, reranker.as_ref(), None);
+    let emb_pin = crate::memory::profile::embedder_pin(&spec, &emb_identity);
+    let rr_pin = crate::memory::profile::reranker_pin(reranker.as_ref(), &rr_identity);
+    let expected = json!({"embedder": emb_pin, "reranker": RerankSpec::from_policy(p).to_value(), "chunking": chunking_config(p), "lexical": lexical_config(p), "index_version": INDEX_VERSION});
     // --- decide mode: incremental only when the live pins match; otherwise escalate to a full rebuild
     let mut incremental = opts.incremental && !benchmark_mode;
     if incremental {
@@ -972,7 +993,17 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
                 incremental = false;
                 report.escalated_to_full = Some("runtime database has no schema".into());
             } else {
-                let diffs = pin_differences(&expected, &live_pins(&live));
+                let mut diffs = pin_differences(&expected, &live_pins(&live));
+                // the runtime's bytes are machine-local: bound through runtime meta, not the manifest core
+                let live_rt = live
+                    .get_meta("embedder_identity")
+                    .and_then(|v| v["runtime_digest"].as_str().map(|s| s.to_string()));
+                if live_rt.as_deref() != Some(emb_identity.runtime_digest.as_str()) {
+                    diffs.push(format!(
+                        "embedding runtime: {} changed or unrecorded",
+                        emb_identity.runtime["id"].as_str().unwrap_or("?")
+                    ));
+                }
                 if !diffs.is_empty() {
                     incremental = false;
                     report.escalated_to_full = Some(format!("pin change: {}", diffs.join("; ")));
@@ -1453,15 +1484,11 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         }
     }
     db.commit()?;
-    // --- pins + capability memory
-    db.set_meta("embedder", &emb_spec.to_value())?;
-    db.set_meta(
-        "reranker",
-        &reranker
-            .as_ref()
-            .map(|r| r.spec.to_value())
-            .unwrap_or(json!({"provider": "none", "version": "0"})),
-    )?;
+    // --- pins (with the executed component identity, BC-P2-30) + capability memory
+    db.set_meta("embedder", &emb_pin)?;
+    db.set_meta("embedder_identity", &emb_identity.to_record())?;
+    db.set_meta("reranker", &rr_pin)?;
+    db.set_meta("reranker_identity", &rr_identity.to_record())?;
     db.set_meta("chunking", &chunking)?;
     db.set_meta("lexical", &lexical_config(p))?;
     db.set_meta("index_version", &json!(INDEX_VERSION))?;
@@ -1475,19 +1502,36 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         &json!(report.supersession_conflicts),
     )?;
     db.set_meta("index_coverage", &report.coverage)?;
+    if !benchmark_mode {
+        // BC-P2-28: graph integrity of what was just built, raised as findings (G1-equivalent)
+        let store = crate::records::RecordStore::load(&p.root);
+        let gi = crate::memory::integrity::check(p, &store, Some(&db))?;
+        db.set_meta("graph_integrity", &gi.summary(200))?;
+        report.graph_integrity = gi.summary(20);
+        // BC-P2-30: is the profile this build used governed (kernel pin or a profile decision)?
+        report.retrieval_profile = crate::memory::profile::governance(
+            p,
+            &crate::memory::profile::Profile::of(emb_pin.clone(), rr_pin.clone()),
+        );
+        db.set_meta("retrieval_profile", &report.retrieval_profile)?;
+        // BC-P2-31: non-rebuildable OS state still kept where the derived runtime directory is rebuilt
+        report.os_state = crate::paths::misplaced_os_state(&p.root);
+    }
     let excluded_all = db.query("SELECT path, reason FROM excluded ORDER BY path", &[])?;
-    let manifest = build_index_manifest(
+    let mut manifest = build_index_manifest(
         p,
         &db,
-        &emb_spec.to_value(),
+        &emb_pin,
         &chunking,
         &excluded_all,
         &lexical_config(p),
-        &reranker
-            .as_ref()
-            .map(|r| r.spec.to_value())
-            .unwrap_or(json!({"provider": "none"})),
+        &rr_pin,
     )?;
+    // outside the hashed core: the machine-local runtime bytes and the governance state
+    manifest["components"] = json!({"embedder": emb_identity.manifest_value(), "reranker": rr_identity.manifest_value()});
+    manifest["retrieval_profile"] = json!({"digest": crate::memory::profile::Profile::of(emb_pin.clone(), rr_pin.clone()).digest,
+        "state": report.retrieval_profile.get("state"), "decision": report.retrieval_profile.get("decision")});
+    let manifest = crate::util::sorted(&manifest);
     report.manifest_hash = manifest["manifest_hash"].as_str().unwrap_or("").to_string();
     report.counts = db.counts();
     db.set_meta("index_manifest_hash", &manifest["manifest_hash"])?;
@@ -1513,11 +1557,8 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
         let db2 = RuntimeDb::open(&final_db)?;
         write_manifests(p, &db2, &manifest)?;
     }
-    report.embedder = emb_spec.to_value();
-    report.reranker = reranker
-        .as_ref()
-        .map(|r| r.spec.to_value())
-        .unwrap_or(json!({"provider": "none"}));
+    report.embedder = emb_pin.clone();
+    report.reranker = rr_pin.clone();
     report.ecosystems = eco;
     // --- failure memory: adapter failures observed by this build (BC-P2-32); a new record is indexed at once
     if record_failures {

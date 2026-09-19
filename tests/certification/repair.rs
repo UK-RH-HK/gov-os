@@ -268,7 +268,9 @@ fn benchmark_records_evidence_and_selection_pins_through_decision() {
     }
     let res_id = b["research_record"].as_str().unwrap().to_string();
     assert!(exists(&root, &format!("spec/research/{res_id}.yaml")));
-    let sel = g.ok(&[
+    // BC-P2-30 (A0-D5-02, WS-6 round 2): a profile change pins governance/project/** (radius R5), so the first call
+    // raises the change-control gate and applies nothing; it is applied only on the owner-signed answer to that gate.
+    let pending = g.ok(&[
         "memory",
         "select",
         "builtin:64",
@@ -277,6 +279,19 @@ fn benchmark_records_evidence_and_selection_pins_through_decision() {
         "--by",
         "owner",
     ]);
+    assert_eq!(pending["applied"], false, "{pending}");
+    let gid = pending["human_gate"].as_str().unwrap().to_string();
+    crate::ws03::human_decide(&g, &gid, "A");
+    let sel = g.ok(&[
+        "memory",
+        "select",
+        "builtin:64",
+        "--research",
+        &res_id,
+        "--gate",
+        &gid,
+    ]);
+    assert_eq!(sel["applied"], true, "{sel}");
     let did = sel["decision"].as_str().unwrap();
     assert!(exists(&root, &format!("spec/decisions/{did}.yaml")));
     assert_eq!(

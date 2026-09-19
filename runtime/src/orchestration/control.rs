@@ -260,6 +260,9 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("memory benchmark --record", "memory_benchmark", Write),
     g("memory select", "memory_select", Write),
     g("memory heldout-starter", "regenerate_heldout_set", Write),
+    // WS-6 round 2 (BC-P2-28, BC-P2-30): report only — graph integrity and the retrieval profile's identity/governance
+    g("memory integrity", "read", Read),
+    g("memory profile", "read", Read),
     g("gate create", "create_gate", Write),
     g("gate present", "present_gate", Write),
     g("gate list", "read", Read),

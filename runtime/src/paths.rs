@@ -1,20 +1,323 @@
 //! Repository contract and path map: what belongs where, what may be indexed, who may write it, what must never leave.
+//!
+//! **The OS's own state is classified by the kernel, not by the overlay (BC-P2-31; Contract v3 B1:188 "Generated/
+//! runtime state is distinguished from authoritative tracked state", B3:202 "Deleting derived state cannot delete
+//! project truth", D6:352; D-0007 T2).** The project overlay (`REPOSITORY_CONTRACT.yaml`) maps the project's layout.
+//! The stores the OS itself keeps and cannot rebuild — session claims, the emergency-control state, claim-time tree
+//! snapshots, rollback snapshots and the OS-written plugin registry — are declared once, in [`OS_STORES`], with the
+//! location each belongs in and the location its writer used before this repair. [`RepositoryContract::decide`]
+//! applies those declarations after the overlay's rules, so no overlay rule (a blanket `.governance-runtime/**:
+//! derived`, `governance/generated/**: generated`) can make the product call non-rebuildable state derived or
+//! generated. The declarations only ever *strengthen* (never index, never retrieve, never export, OS-only
+//! mutation), and a `secret` classification still wins.
+//!
+//! Where the stores belong: machine-local operational state in [`STATE_DIR`] (untracked, self-ignored by Git,
+//! never walked, never indexed, never deleted by a rebuild); the plugin registry at [`PLUGIN_REGISTRY_PATH`]
+//! (tracked, OS-written T2). The writers are other workstreams' code: they call [`store_path`] for the location and
+//! [`relocate_legacy`] once to move an existing store; [`misplaced_os_state`] reports every store still found where
+//! the product (framework §81/§19) treats the directory as derived or generated.
 use crate::util::{glob_match, read_yaml};
-use crate::Result;
+use crate::{GovError, Result};
 use serde_json::{json, Map, Value};
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 pub const SECRET_CLASS: &str = "secret";
+/// Non-rebuildable OS operational state: authoritative for what it records, never derived, never indexed.
+pub const OPERATIONAL_CLASS: &str = "operational";
+/// Directory (repository root) of the OS's non-rebuildable, machine-local operational state (BC-P2-31). It is not
+/// the derived runtime directory (`crate::RUNTIME_DIR`, framework §81), which may be deleted and rebuilt.
+pub const STATE_DIR: &str = ".governance-state";
+/// Where the OS-written plugin registry (D-0007 T2: "authoritative project state written by the OS") belongs:
+/// tracked, and outside `governance/generated/` (T3, regenerable views).
+pub const PLUGIN_REGISTRY_PATH: &str = "governance/registry/plugin-registry.json";
 pub const ALWAYS_EXCLUDED_DIRS: &[&str] = &[
     ".git",
     "node_modules",
     "__pycache__",
     ".pytest_cache",
     ".governance-runtime",
+    ".governance-state",
     ".venv",
     "venv",
     "target",
 ];
+
+/// One store the OS keeps that cannot be rebuilt from Git and the governed records.
+#[derive(Debug, Clone, Copy)]
+pub struct OsStore {
+    pub id: &'static str,
+    pub what: &'static str,
+    /// [`OPERATIONAL_CLASS`] (machine-local) or `authoritative` (tracked OS-written T2 state).
+    pub class: &'static str,
+    pub tracked: bool,
+    /// Repository-relative globs covering the store where it belongs.
+    pub patterns: &'static [&'static str],
+    /// Repository-relative globs covering where its writer kept it before BC-P2-31 (inside the derived runtime
+    /// directory or the generated-views directory). Classified exactly like `patterns`, so the product never calls
+    /// the store derived wherever it currently is.
+    pub legacy_patterns: &'static [&'static str],
+    /// `(legacy path, path where it belongs)` pairs — files or directories — that [`relocate_legacy`] moves.
+    pub moves: &'static [(&'static str, &'static str)],
+    /// The writer that owns the store's location (it must resolve it through [`store_path`]).
+    pub writer: &'static str,
+}
+
+/// The OS's non-rebuildable stores (BC-P2-31). Everything else the OS keeps under `crate::RUNTIME_DIR` is derived
+/// (index, caches, packets, observations) and may be deleted and rebuilt (framework §19).
+pub const OS_STORES: &[OsStore] = &[
+    OsStore {
+        id: "claims",
+        what: "session claims (Contract v3 C1 'claims' current truth; E4)",
+        class: OPERATIONAL_CLASS,
+        tracked: false,
+        patterns: &[".governance-state/claims.db*"],
+        legacy_patterns: &[".governance-runtime/claims.db*"],
+        moves: &[
+            (".governance-runtime/claims.db", ".governance-state/claims.db"),
+            (".governance-runtime/claims.db-wal", ".governance-state/claims.db-wal"),
+            (".governance-runtime/claims.db-shm", ".governance-state/claims.db-shm"),
+        ],
+        writer: "memory::claims::ClaimsStore::path_for / open (WS-5)",
+    },
+    OsStore {
+        id: "emergency-control",
+        what: "emergency-control state: FREEZE_WRITES / PAUSE / CANCEL_AGENTS (framework §74)",
+        class: OPERATIONAL_CLASS,
+        tracked: false,
+        patterns: &[".governance-state/control.json"],
+        legacy_patterns: &[".governance-runtime/control.json"],
+        moves: &[(
+            ".governance-runtime/control.json",
+            ".governance-state/control.json",
+        )],
+        writer: "orchestration::control::path (WS-3)",
+    },
+    OsStore {
+        id: "claim-trees",
+        what: "claim-time working-tree snapshots and carried mutations a task close attributes against",
+        class: OPERATIONAL_CLASS,
+        tracked: false,
+        patterns: &[".governance-state/tasks", ".governance-state/tasks/**"],
+        legacy_patterns: &[".governance-runtime/tasks", ".governance-runtime/tasks/**"],
+        moves: &[(".governance-runtime/tasks", ".governance-state/tasks")],
+        writer: "orchestration::tasks::task_runtime_dir (WS-5)",
+    },
+    OsStore {
+        id: "cit-snapshots",
+        what: "change-transaction rollback snapshots (CHANGE_POLICY.rollback)",
+        class: OPERATIONAL_CLASS,
+        tracked: false,
+        patterns: &[".governance-state/cit", ".governance-state/cit/**"],
+        legacy_patterns: &[".governance-runtime/cit", ".governance-runtime/cit/**"],
+        moves: &[(".governance-runtime/cit", ".governance-state/cit")],
+        writer: "cit::snapshot_dir / prune_snapshots (WS-4)",
+    },
+    OsStore {
+        id: "update-snapshots",
+        what: "framework-update rollback snapshots (gov update --rollback)",
+        class: OPERATIONAL_CLASS,
+        tracked: false,
+        patterns: &[".governance-state/update", ".governance-state/update/**"],
+        legacy_patterns: &[".governance-runtime/update", ".governance-runtime/update/**"],
+        moves: &[(".governance-runtime/update", ".governance-state/update")],
+        writer: "update::snapshot_dir (WS-8)",
+    },
+    OsStore {
+        id: "migration-snapshots",
+        what: "migration batch snapshots and rollback material",
+        class: OPERATIONAL_CLASS,
+        tracked: false,
+        patterns: &[".governance-state/migration", ".governance-state/migration/**"],
+        legacy_patterns: &[".governance-runtime/migration", ".governance-runtime/migration/**"],
+        moves: &[(".governance-runtime/migration", ".governance-state/migration")],
+        writer: "migrations::executor::snapshot_dir (WS-9)",
+    },
+    OsStore {
+        id: "plugin-registry",
+        what: "the OS-written plugin registry, the only proof of registration (D-0007 T2)",
+        class: "authoritative",
+        tracked: true,
+        patterns: &[PLUGIN_REGISTRY_PATH],
+        legacy_patterns: &["governance/generated/plugin-registry.json"],
+        moves: &[(
+            "governance/generated/plugin-registry.json",
+            PLUGIN_REGISTRY_PATH,
+        )],
+        writer: "capabilities::registry::REGISTRY_PATH / path (WS-7)",
+    },
+];
+
+/// The store declared under `id`.
+pub fn os_store(id: &str) -> Option<&'static OsStore> {
+    OS_STORES.iter().find(|s| s.id == id)
+}
+
+/// The kernel rules [`RepositoryContract::decide`] applies after the overlay's (see the module documentation).
+fn os_rules() -> &'static [Value] {
+    static RULES: OnceLock<Vec<Value>> = OnceLock::new();
+    RULES.get_or_init(|| {
+        let rule = |pattern: &str, s: Option<&OsStore>, legacy: bool| {
+            let (class, id, tracked, what) = match s {
+                Some(s) => (s.class, s.id, s.tracked, s.what),
+                None => (
+                    OPERATIONAL_CLASS,
+                    "state-dir",
+                    false,
+                    "non-rebuildable machine-local OS operational state",
+                ),
+            };
+            json!({"pattern": pattern, "class": class, "namespace": if tracked { "governance" } else { "runtime" },
+                   "semantic_index": false, "lexical_index": false, "graph_index": false, "code_index": false,
+                   "default_retrieval": false, "mutation": "os-only", "export": "denied", "rebuildable": false,
+                   "os_store": id, "tracked": tracked, "legacy_location": legacy, "store": what,
+                   "source": "kernel: paths::OS_STORES (BC-P2-31)"})
+        };
+        let mut v = vec![
+            rule(STATE_DIR, None, false),
+            rule(&format!("{STATE_DIR}/**"), None, false),
+        ];
+        for s in OS_STORES {
+            for pat in s.legacy_patterns {
+                v.push(rule(pat, Some(s), true));
+            }
+            for pat in s.patterns {
+                v.push(rule(pat, Some(s), false));
+            }
+        }
+        v
+    })
+}
+
+/// The absolute location a store belongs at (its first declared move target), e.g. `store_path(root, "claims")`
+/// is `<root>/.governance-state/claims.db`. Writers resolve their location here (BC-P2-31).
+pub fn store_path(root: &Path, id: &str) -> Option<PathBuf> {
+    os_store(id)
+        .and_then(|s| s.moves.first())
+        .map(|(_, to)| root.join(to))
+}
+
+/// The state directory of `root`, created on first use with a `.gitignore` that ignores its whole content, so the
+/// directory never shows in `git status`, never reaches a commit and never counts as a worker mutation, whatever the
+/// project's own `.gitignore` says.
+pub fn ensure_state_dir(root: &Path) -> Result<PathBuf> {
+    let d = root.join(STATE_DIR);
+    std::fs::create_dir_all(&d)?;
+    let gi = d.join(".gitignore");
+    if !gi.exists() {
+        std::fs::write(
+            &gi,
+            "# Governance OS non-rebuildable operational state (claims, emergency control, rollback snapshots).\n# Machine-local and never derived: `gov rebuild-memory` never touches it; do not delete it (BC-P2-31).\n*\n",
+        )?;
+    }
+    Ok(d)
+}
+
+fn move_path(from: &Path, to: &Path) -> Result<()> {
+    if let Some(parent) = to.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    if std::fs::rename(from, to).is_ok() {
+        return Ok(());
+    }
+    // a different filesystem: copy, then remove the original
+    if from.is_dir() {
+        crate::util::copy_dir(from, to)?;
+        std::fs::remove_dir_all(from)?;
+    } else {
+        std::fs::copy(from, to)?;
+        std::fs::remove_file(from)?;
+    }
+    Ok(())
+}
+
+/// Move a store from where its writer kept it before BC-P2-31 to where it belongs. Idempotent: nothing to move is
+/// `Ok(vec![])`. A legacy file whose destination already exists with identical bytes is removed; different bytes at
+/// both places is `STATE_LOCATION_CONFLICT` (nothing is overwritten). The writer calls this under its own store
+/// lock, before opening the store (a relocated SQLite store moves with its `-wal`/`-shm` files).
+pub fn relocate_legacy(root: &Path, id: &str) -> Result<Vec<Value>> {
+    let s =
+        os_store(id).ok_or_else(|| GovError::new("USAGE", format!("unknown OS store '{id}'")))?;
+    let mut moved = vec![];
+    for (from, to) in s.moves {
+        let (f, t) = (root.join(from), root.join(to));
+        if !f.exists() {
+            continue;
+        }
+        if to.starts_with(STATE_DIR) {
+            ensure_state_dir(root)?;
+        }
+        if t.exists() {
+            let same =
+                f.is_file() && t.is_file() && std::fs::read(&f).ok() == std::fs::read(&t).ok();
+            if !same {
+                return Err(GovError::new("STATE_LOCATION_CONFLICT", format!("{} exists both at its legacy location {from} and where it belongs {to} with different content; nothing was moved or overwritten", s.what))
+                    .with_details(json!({"store": s.id, "legacy": from, "location": to, "remediation": format!("keep the current copy at {to} and remove {from}, or move {from} over it after checking which one the OS last wrote")})));
+            }
+            std::fs::remove_file(&f)?;
+            moved.push(json!({"store": s.id, "from": from, "to": to, "action": "removed identical legacy copy"}));
+            continue;
+        }
+        move_path(&f, &t)?;
+        moved.push(json!({"store": s.id, "from": from, "to": to, "action": "moved"}));
+    }
+    Ok(moved)
+}
+
+/// Every OS store still found where its writer kept it before BC-P2-31: inside the derived runtime directory
+/// (framework §81/§19: deleted and rebuilt) or the generated-views directory. Deleting those directories would lose
+/// it (A0-D6-01, A0-D6-02). Empty once every writer resolves its location through [`store_path`].
+pub fn misplaced_os_state(root: &Path) -> Vec<Value> {
+    let mut out = vec![];
+    for s in OS_STORES {
+        for (from, to) in s.moves {
+            if root.join(from).exists() {
+                let dir = if from.starts_with(crate::RUNTIME_DIR) {
+                    "the derived runtime directory (framework §81; deleted and rebuilt under §19)"
+                } else {
+                    "the generated-views directory (governance/generated/, regenerable T3 views)"
+                };
+                out.push(json!({"store": s.id, "what": s.what, "found_at": from, "belongs_at": to, "class": s.class,
+                    "writer": s.writer, "severity": "medium",
+                    "message": format!("{} ({}) is kept at {from}, inside {dir}; it is non-rebuildable {} state and belongs at {to} (BC-P2-31)", s.id, s.what, s.class)}));
+            }
+        }
+    }
+    out
+}
+
+/// Every existing file under the derived runtime directory and `governance/generated/` that `contract` classifies
+/// derived or generated — what framework §19's disaster-recovery procedure may delete. By construction it never
+/// contains an [`OS_STORES`] file, wherever its writer keeps it.
+pub fn derived_deletion_set(root: &Path, contract: &RepositoryContract) -> Vec<String> {
+    let mut out = vec![];
+    for base in [crate::RUNTIME_DIR, "governance/generated"] {
+        let dir = root.join(base);
+        if !dir.is_dir() {
+            continue;
+        }
+        for e in walkdir::WalkDir::new(&dir)
+            .sort_by_file_name()
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .filter(|e| e.file_type().is_file())
+        {
+            let rel = e
+                .path()
+                .strip_prefix(root)
+                .unwrap_or(e.path())
+                .to_string_lossy()
+                .replace('\\', "/");
+            if matches!(
+                contract.decide(&rel).class().as_str(),
+                "derived" | "generated"
+            ) {
+                out.push(rel);
+            }
+        }
+    }
+    out
+}
 
 #[derive(Debug, Clone)]
 pub struct PathDecision {
@@ -105,6 +408,10 @@ fn class_defaults(cls: &str) -> Value {
         "runtime-data" => {
             json!({"semantic_index": false, "lexical_index": false, "graph_index": false})
         }
+        OPERATIONAL_CLASS => {
+            json!({"semantic_index": false, "lexical_index": false, "graph_index": false, "code_index": false,
+                   "default_retrieval": false, "mutation": "os-only", "export": "denied"})
+        }
         "devops" => json!({"semantic_index": true, "lexical_index": true}),
         "tooling" => json!({"semantic_index": true, "lexical_index": true, "code_index": true}),
         _ => json!({}),
@@ -188,14 +495,16 @@ impl RepositoryContract {
         }
         "root".to_string()
     }
-    /// Ordered rules; later rules override earlier ones. A `secret` classification can never be downgraded.
+    /// Ordered rules; later rules override earlier ones. A `secret` classification can never be downgraded. The
+    /// kernel's classification of the OS's own non-rebuildable stores ([`OS_STORES`]) is applied after the
+    /// overlay's rules, so the overlay cannot classify them derived or generated (BC-P2-31).
     pub fn decide(&self, path: &str) -> PathDecision {
         let path = path.replace('\\', "/");
         let path = path.trim_start_matches("./").to_string();
         let mut attrs = base_defaults();
         let mut matched: Option<String> = None;
         let mut secret_locked = false;
-        for rule in &self.rules {
+        for rule in self.rules.iter().chain(os_rules().iter()) {
             let pat = rule.get("pattern").and_then(|v| v.as_str()).unwrap_or("");
             if pat.is_empty() || !glob_match(pat, &path) {
                 continue;
@@ -378,5 +687,158 @@ mod tests {
         assert!(!a.default_retrieval() && a.class() == "historical" && a.flag("lexical_index"));
         assert_eq!(c.decide("spec/x.yaml").namespace(), "spec");
         assert_eq!(c.decide("README.md").class(), "unknown");
+    }
+
+    fn tmp(tag: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!(
+            "gov-paths-{tag}-{}-{}",
+            std::process::id(),
+            crate::util::short_uuid()
+        ));
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    /// BC-P2-31: wherever a non-rebuildable OS store is (where its writer kept it before the repair, or where it
+    /// belongs), the product never classifies it derived or generated — not under the shipped template (whose
+    /// blanket rules call `.governance-runtime/**` derived and `governance/generated/**` generated) and not under an
+    /// overlay that tries to; while everything else in those directories stays derived/generated.
+    #[test]
+    fn os_stores_are_never_classified_derived_or_generated() {
+        let shipped: Value = serde_yaml::from_str(include_str!(
+            "../../framework/overlay-templates/REPOSITORY_CONTRACT.yaml"
+        ))
+        .unwrap();
+        let hostile = json!({"paths": [{"pattern": "**", "class": "derived"}, {"pattern": ".governance-state/**", "class": "derived"},
+            {"pattern": "governance/**", "class": "generated"}, {"pattern": ".governance-runtime/**", "class": "derived"}]});
+        for data in [shipped, hostile] {
+            let c = RepositoryContract::new(data);
+            for s in OS_STORES {
+                let mut paths: Vec<String> = s
+                    .moves
+                    .iter()
+                    .flat_map(|(a, b)| [a.to_string(), b.to_string()])
+                    .collect();
+                paths.extend(
+                    [
+                        "claims.db",
+                        "tasks/TASK-0001/claim-tree.json",
+                        "cit/CIT-0001/snapshot/x.yaml",
+                    ]
+                    .iter()
+                    .map(|f| format!("{STATE_DIR}/{f}")),
+                );
+                for path in paths {
+                    let probe = if path.ends_with("/tasks")
+                        || path.ends_with("/cit")
+                        || path.ends_with("/update")
+                        || path.ends_with("/migration")
+                    {
+                        format!("{path}/x/y.json")
+                    } else {
+                        path.clone()
+                    };
+                    let d = c.decide(&probe);
+                    assert!(
+                        !matches!(d.class().as_str(), "derived" | "generated"),
+                        "{} at {probe} classified {}",
+                        s.id,
+                        d.class()
+                    );
+                    assert!(
+                        !d.flag("semantic_index")
+                            && !d.flag("lexical_index")
+                            && !d.default_retrieval()
+                            && d.str("mutation") == "os-only",
+                        "{probe}: {:?}",
+                        d.attrs
+                    );
+                }
+            }
+            assert_eq!(
+                c.decide(&format!("{STATE_DIR}/anything.bin")).class(),
+                OPERATIONAL_CLASS
+            );
+        }
+        // the rest of the runtime and generated directories keep the overlay's classification
+        let c = RepositoryContract::new(
+            serde_yaml::from_str(include_str!(
+                "../../framework/overlay-templates/REPOSITORY_CONTRACT.yaml"
+            ))
+            .unwrap(),
+        );
+        assert_eq!(c.decide(".governance-runtime/state.db").class(), "derived");
+        assert_eq!(
+            c.decide(".governance-runtime/context/TASK-1.json").class(),
+            "derived"
+        );
+        assert_eq!(
+            c.decide("governance/generated/index-manifest.json").class(),
+            "generated"
+        );
+        assert_eq!(
+            c.decide("governance/generated/plugin-registry.json")
+                .class(),
+            "authoritative"
+        );
+        // a secret classification still wins over the kernel store rules
+        let s = RepositoryContract::new(
+            json!({"paths": [{"pattern": ".governance-state/**", "class": "secret"}]}),
+        );
+        assert!(s.decide(".governance-state/control.json").is_secret());
+    }
+
+    #[test]
+    fn legacy_stores_relocate_and_are_reported_until_moved() {
+        let root = tmp("reloc");
+        let rt = root.join(crate::RUNTIME_DIR);
+        std::fs::create_dir_all(rt.join("cit/CIT-0001/snapshot")).unwrap();
+        std::fs::write(rt.join("claims.db"), b"claims").unwrap();
+        std::fs::write(rt.join("control.json"), b"{\"mode\":\"FROZEN\"}").unwrap();
+        std::fs::write(rt.join("cit/CIT-0001/snapshot/a.yaml"), b"a").unwrap();
+        std::fs::write(rt.join("state.db"), b"index").unwrap();
+        let found: Vec<String> = misplaced_os_state(&root)
+            .iter()
+            .map(|f| f["store"].as_str().unwrap().to_string())
+            .collect();
+        assert_eq!(found, vec!["claims", "emergency-control", "cit-snapshots"]);
+        let c = RepositoryContract::new(
+            json!({"paths": [{"pattern": ".governance-runtime/**", "class": "derived"}]}),
+        );
+        assert_eq!(
+            derived_deletion_set(&root, &c),
+            vec![".governance-runtime/state.db".to_string()]
+        );
+        for id in ["claims", "emergency-control", "cit-snapshots"] {
+            assert!(!relocate_legacy(&root, id).unwrap().is_empty());
+        }
+        assert!(misplaced_os_state(&root).is_empty());
+        assert_eq!(
+            std::fs::read(store_path(&root, "claims").unwrap()).unwrap(),
+            b"claims"
+        );
+        assert!(root
+            .join(".governance-state/cit/CIT-0001/snapshot/a.yaml")
+            .is_file());
+        assert!(
+            std::fs::read_to_string(root.join(".governance-state/.gitignore"))
+                .unwrap()
+                .lines()
+                .any(|l| l.trim() == "*")
+        );
+        // idempotent; a second, different copy at the old place is a typed conflict and nothing is overwritten
+        assert!(relocate_legacy(&root, "claims").unwrap().is_empty());
+        std::fs::write(rt.join("claims.db"), b"other").unwrap();
+        let e = relocate_legacy(&root, "claims").unwrap_err();
+        assert_eq!(e.code, "STATE_LOCATION_CONFLICT");
+        assert_eq!(
+            std::fs::read(root.join(".governance-state/claims.db")).unwrap(),
+            b"claims"
+        );
+        // an identical legacy copy is simply removed
+        std::fs::write(rt.join("claims.db"), b"claims").unwrap();
+        relocate_legacy(&root, "claims").unwrap();
+        assert!(!rt.join("claims.db").exists());
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

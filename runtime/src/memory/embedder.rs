@@ -123,10 +123,18 @@ impl Embedder {
             )));
         }
         match plugins.find("embed", None, Some(&spec.id)) {
-            Some(desc) => Ok(Embedder::Plugin {
-                desc,
-                spec: spec.clone(),
-            }),
+            Some(desc) => {
+                // BC-P2-30 (A0-D5-01): the pin names the revision that executes; a descriptor at another revision
+                // is a different implementation, never silently served under the old pin
+                if desc.version != spec.version {
+                    return Err(GovError::new("EMBEDDER_REVISION_MISMATCH", format!("MEMORY_POLICY.embedding pins {}@{} but the declared `embed` plugin is at revision {}; the pinned revision is not what would execute. Re-select the profile (gov memory benchmark + gov memory select) or restore revision {} of the plugin", spec.id, spec.version, desc.version, spec.version))
+                        .with_details(json!({"pinned": spec.to_value(), "descriptor_version": desc.version, "descriptor": desc.source, "remediation": "gov memory benchmark --candidate current --candidate plugin:<id> --record; gov memory select plugin:<id> --research <RES>"})));
+                }
+                Ok(Embedder::Plugin {
+                    desc,
+                    spec: spec.clone(),
+                })
+            }
             None => {
                 if let Some(e) = plugins.refusal(&spec.id) {
                     return Err(e);
@@ -212,8 +220,15 @@ pub fn live_spec(db: &RuntimeDb) -> Option<EmbedSpec> {
         .and_then(|v| EmbedSpec::from_value(&v))
 }
 
-/// Query-time embedder: MUST be the implementation the live index was built with, and it must equal the policy pin.
+/// Query-time embedder: MUST be the implementation the live index was built with, and it must equal the policy pin —
+/// by pin (id, revision, dimensions) and, component for component, by content (adapter, model artefact, inference
+/// runtime: `memory::profile::verify_live_embedder`, BC-P2-30).
 pub fn for_query(p: &Project, db: &RuntimeDb) -> Result<Embedder> {
+    for_query_with(p, db, &plugin_set(p))
+}
+
+/// [`for_query`] against a plugin set the caller already classified for the acting role.
+pub fn for_query_with(p: &Project, db: &RuntimeDb, plugins: &PluginSet) -> Result<Embedder> {
     let pinned = EmbedSpec::from_policy(p);
     let live = live_spec(db).ok_or_else(|| {
         GovError::new(
@@ -225,8 +240,15 @@ pub fn for_query(p: &Project, db: &RuntimeDb) -> Result<Embedder> {
         return Err(GovError::new("EMBEDDER_MISMATCH", format!("the live index was built with {} but MEMORY_POLICY pins {}; run `gov rebuild-memory` (full) before querying", live.describe(), pinned.describe()))
             .with_details(json!({"live": live.to_value(), "pinned": pinned.to_value(), "remediation": "gov rebuild-memory"})));
     }
-    let plugins = plugin_set(p);
-    Embedder::resolve(&live, &plugins)
+    let emb = Embedder::resolve(&live, plugins)?;
+    crate::memory::profile::verify_live_embedder(p, db, &emb)?;
+    Ok(emb)
+}
+
+/// A reranker revision pin that names no revision (the kernel's `0` placeholder for "no reranker"): the executed
+/// revision is then bound by the index manifest and the profile is reported as not governed by revision.
+pub fn unpinned_revision(v: &str) -> bool {
+    v.is_empty() || v == "0"
 }
 
 pub struct Reranker {
@@ -241,7 +263,15 @@ impl Reranker {
             return Ok(None);
         }
         match plugins.find("rerank", None, Some(&spec.provider)) {
-            Some(desc) => Ok(Some(Reranker { desc, spec })),
+            Some(desc) => {
+                // BC-P2-30: a revision pin binds the executed revision (a `0`/empty pin names none; the executed
+                // revision is then bound by the index manifest instead)
+                if !unpinned_revision(&spec.version) && desc.version != spec.version {
+                    return Err(GovError::new("RERANKER_REVISION_MISMATCH", format!("MEMORY_POLICY.reranker pins {}@{} but the declared `rerank` plugin is at revision {}; re-select the profile (gov memory select) or restore revision {}", spec.provider, spec.version, desc.version, spec.version))
+                        .with_details(json!({"pinned": spec.to_value(), "descriptor_version": desc.version, "descriptor": desc.source})));
+                }
+                Ok(Some(Reranker { desc, spec }))
+            }
             None => {
                 if let Some(e) = plugins.refusal(&spec.provider) {
                     return Err(e);
@@ -249,6 +279,32 @@ impl Reranker {
                 Err(GovError::new("RERANKER_UNAVAILABLE", format!("MEMORY_POLICY.reranker.provider pins '{}' but no `rerank` plugin with that id is declared (no silent fallback)", spec.provider)))
             }
         }
+    }
+    /// A named `rerank` plugin at the revision it declares (benchmark candidates `+rerank:<id>`).
+    pub fn resolve_id(p: &Project, plugins: &PluginSet, id: &str) -> Result<Reranker> {
+        let desc = match plugins.find("rerank", None, Some(id)) {
+            Some(d) => d,
+            None => {
+                return Err(plugins.refusal(id).unwrap_or_else(|| {
+                    GovError::new(
+                        "RERANKER_UNAVAILABLE",
+                        format!("rerank plugin '{id}' not declared"),
+                    )
+                }))
+            }
+        };
+        let candidates = p
+            .policies()
+            .get_i64("MEMORY_POLICY", "retrieval.rerank_candidates", 24)
+            .max(1) as usize;
+        Ok(Reranker {
+            spec: RerankSpec {
+                provider: id.to_string(),
+                version: desc.version.clone(),
+                candidates,
+            },
+            desc,
+        })
     }
     /// Returns (id, score) pairs; candidates without a score keep their fusion order after the scored ones.
     pub fn rerank(
