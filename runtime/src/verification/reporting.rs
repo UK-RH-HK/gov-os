@@ -292,6 +292,14 @@ pub fn hidden_oracle_material(abs: &std::path::Path) -> bool {
 pub fn os_binding_integrity(p: &Project, store: &RecordStore, f: &mut Family) {
     let fam = f.id.clone();
     let mut counts = std::collections::BTreeMap::<String, usize>::new();
+    // this machine's binding status (WS-3 IP-R3-WS03-6, WS-8 IP-R3-WS08-3): how T2 facts written here are sealed
+    let status = crate::t2::binding_status();
+    let bound = status["bound"] == true;
+    for (sev, msg) in binding_status_findings(&status) {
+        let mut x = finding(sev, &fam, msg, None);
+        x["subjects"] = json!(["t2-binding"]);
+        f.findings.push(x);
+    }
     for r in crate::t2::audit(p) {
         let id = r["id"].as_str().unwrap_or("?").to_string();
         let path = r["path"].as_str().map(|s| s.to_string());
@@ -299,7 +307,13 @@ pub fn os_binding_integrity(p: &Project, store: &RecordStore, f: &mut Family) {
         *counts.entry(b.clone()).or_insert(0) += 1;
         let rec = store.get(&id);
         let is_gate = rec.map(|x| x.rtype() == "human-gate").unwrap_or(false);
-        let (sev, what) = t2_severity(&b, is_gate, rec.map(t2_in_force).unwrap_or(false), &r["t2"]);
+        let (sev, what) = t2_severity_on(
+            &b,
+            is_gate,
+            rec.map(t2_in_force).unwrap_or(false),
+            &r["t2"],
+            bound,
+        );
         f.findings.push(finding(
             sev,
             &fam,
@@ -399,7 +413,65 @@ pub fn os_binding_integrity(p: &Project, store: &RecordStore, f: &mut Family) {
             f.findings.push(x);
         }
     }
-    f.detail = json!({"unverified_by_binding": counts, "gates_unverified": gates_unverified, "binding_key": crate::t2::binding_key_id()});
+    f.detail = json!({"unverified_by_binding": counts, "gates_unverified": gates_unverified, "binding_key": crate::t2::binding_key_id(),
+        "binding_status": binding_status_view(&status)});
+}
+
+/// **This machine's T2 binding status as the suite and doctor report it** (WS-3 IP-R3-WS03-6, WS-8 IP-R3-WS08-3;
+/// P2-ADJ-0002): `t2::binding_status()` reduced to what a reader needs — whether the machine is bound to the owner's
+/// binding authority, the scope new seals take and why, the sealing key, and the authority's standing.
+pub fn binding_status_view(s: &Value) -> Value {
+    json!({"bound": s["bound"], "provisioned": s["provisioned"], "portable": s["portable"], "sealing": s["sealing"],
+        "sealing_key_id": s["sealing_key_id"], "sealing_key_is_authority_active_key": s["sealing_key_is_authority_active_key"],
+        "authority_id": s["authority"]["authority_id"], "authority_error": s["authority_error"]})
+}
+
+/// What the binding status itself raises, `(severity, message)`:
+/// * **medium** — an installed binding authority that is not honoured now (`authority_error`: expired, revoked by
+///   root succession, not delegated, this machine not listed, …): the owner's T2 facts are not honoured here and new
+///   seals fall back to the machine scope; or a machine bound to the authority that does not seal with its active
+///   key (WS-8 IP-R3-WS08-3);
+/// * **low** (a disclosure) — a provisioned machine that seals in its own machine scope: what it writes is honoured
+///   on this machine only, not on the owner's other provisioned machines (WS-3 IP-R3-WS03-6).
+///
+/// An unprovisioned machine raises nothing here: its bootstrap posture is disclosed by `installation_authenticity`
+/// and D032 (OWNER-DECISION-P2-0002), and machine-scope sealing is all it can do.
+pub fn binding_status_findings(s: &Value) -> Vec<(&'static str, String)> {
+    let mut v = vec![];
+    if let Some(e) = s["authority_error"].as_object() {
+        v.push(("medium", format!(
+            "this machine's T2 binding authority is not honoured now ({}: {}): T2 facts sealed under it are not honoured here, and new seals fall back to this machine's own scope (honoured on this machine only); the administrator binds a renewed or re-delegated authority ({})",
+            e.get("code").and_then(|x| x.as_str()).unwrap_or("?"),
+            e.get("message").and_then(|x| x.as_str()).unwrap_or(""),
+            crate::t2::PROVISION_COMMAND
+        )));
+    } else if s["bound"] == true && s["sealing_key_is_authority_active_key"] != true {
+        v.push(("medium", format!(
+            "this machine is bound to the owner's T2 binding authority but new seals are not made with the authority's active key (sealing key {}; {}): what it writes now is not portable to the owner's other machines; the administrator installs the active key ({})",
+            s["sealing_key_id"], s["sealing"]["reason"].as_str().unwrap_or("-"), crate::t2::PROVISION_COMMAND
+        )));
+    } else if s["provisioned"] == true && s["portable"] == false {
+        v.push(("low", format!(
+            "this provisioned machine seals T2 facts in its own machine scope ({}): they are honoured on this machine only, not on the owner's other provisioned machines after a clone or pull (P2-ADJ-0002); binding the owner's authority ({}) and `{}` make them portable",
+            s["sealing"]["reason"].as_str().unwrap_or("-"), crate::t2::PROVISION_COMMAND, crate::t2::RESEAL_COMMAND
+        )));
+    }
+    v
+}
+
+/// [`t2_severity`] on a machine whose binding status is known: on a machine **bound** to the owner's authority, a
+/// FOREIGN record was sealed by a machine that authority does not authorise — said as such (WS-8 IP-R3-WS08-3).
+pub fn t2_severity_on(
+    binding: &str,
+    is_gate: bool,
+    in_force: bool,
+    t2: &Value,
+    bound: bool,
+) -> (&'static str, String) {
+    if binding == "FOREIGN" && bound {
+        return ("low", "was sealed by a machine the owner's T2 binding authority does not authorise (FOREIGN on this machine, which is bound to that authority): it was written by a machine the owner did not authorise and is not honoured here".to_string());
+    }
+    t2_severity(binding, is_gate, in_force, t2)
 }
 
 fn registry_severity(code: &str) -> &'static str {
@@ -590,15 +662,10 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
         Ok(mut v) => {
             if !v["complete"].as_bool().unwrap_or(false) {
                 let contract = p.contract();
-                let mut confirmed: Vec<Value> = vec![];
-                let mut artefacts: Vec<Value> = vec![];
-                for g in v["gaps"].as_array().cloned().unwrap_or_default() {
-                    if gap_is_heading_marker_artefact(p, db, &g) {
-                        artefacts.push(g);
-                    } else {
-                        confirmed.push(g);
-                    }
-                }
+                // IP-R3-WS02-10 with WS-6 IP-R3-WS06-4 (round 4): the verifier compares Markdown headings by their text
+                // on both sides and lists every uncovered line (`memory::coverage`, chunker 3; WS-6 R3-4), so every
+                // gap it reports is a confirmed gap — WS-2's heading-marker confirmation step is retired
+                let confirmed: Vec<Value> = v["gaps"].as_array().cloned().unwrap_or_default();
                 let listed: u64 = v["gaps"]
                     .as_array()
                     .map(|a| a.iter().map(|g| g["count"].as_u64().unwrap_or(0)).sum())
@@ -628,7 +695,6 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
                 if !old.is_empty() {
                     f.findings.push(finding("low", &fam, format!("index content coverage incomplete in historical (archived) material only: {} (BC-P2-25; excluded from default retrieval)", names(&old, 6)), None));
                 }
-                v["verifier_heading_marker_artefacts"] = json!(artefacts);
                 v["confirmed_gaps"] = json!(confirmed.len());
             }
             f.detail = v;
@@ -643,54 +709,6 @@ pub fn index_content_coverage(p: &Project, db: Option<&RuntimeDb>, f: &mut Famil
             None,
         )),
     }
-}
-
-/// `memory::coverage::verify` compares a Markdown heading line with its `#` markers removed against chunk lines, but a
-/// chunk may hold the heading **with** its markers (e.g. consecutive heading lines with no body between them); such a
-/// line is held, not missing (WS-6 integration point recorded in the report). A gap row is a verifier artefact when,
-/// re-checking the artefact's whole current content the way the verifier does but with heading markers removed on
-/// both sides, every non-empty line is held by one of its chunks. Anything else is a confirmed gap.
-fn gap_is_heading_marker_artefact(p: &Project, db: &RuntimeDb, g: &Value) -> bool {
-    let norm = |l: &str| -> String {
-        let t = l.trim().trim_start_matches('#');
-        t.split_whitespace().collect::<Vec<_>>().join(" ")
-    };
-    let aid = g["artifact_id"].as_str().unwrap_or("");
-    let rel = g["path"].as_str().unwrap_or("");
-    let Ok(text) = crate::util::read_text(&p.root.join(rel)) else {
-        return false;
-    };
-    let is_record = db
-        .query(
-            "SELECT record_type FROM artifacts WHERE artifact_id=?1",
-            &[&aid],
-        )
-        .ok()
-        .and_then(|r| r.first().map(|x| x["record_type"].as_str() != Some("file")))
-        .unwrap_or(false);
-    let expected = crate::memory::coverage::expected_content(rel, &text, is_record);
-    let chunks: Vec<String> = db
-        .query("SELECT text FROM chunks WHERE artifact_id=?1", &[&aid])
-        .unwrap_or_default()
-        .iter()
-        .map(|r| r["text"].as_str().unwrap_or("").to_string())
-        .collect();
-    if chunks.is_empty() {
-        return false;
-    }
-    let held: std::collections::HashSet<String> = chunks
-        .iter()
-        .flat_map(|c| c.lines().map(norm).collect::<Vec<_>>())
-        .collect();
-    expected.lines().all(|l| {
-        let n = norm(l);
-        if n.is_empty() || held.contains(&n) {
-            return true;
-        }
-        // a long line may be split across chunks: the verifier accepts it when a chunk holds its head
-        let head: String = l.trim().chars().take(300).collect();
-        l.trim().chars().count() > 600 && chunks.iter().any(|c| c.contains(&head))
-    })
 }
 
 // ------------------------------------------------------------------------------------ task_contract_integrity
@@ -1083,38 +1101,116 @@ mod tests {
         assert!(t2_in_force(s.get("D-0002").unwrap()));
     }
 
+    /// WS-3 IP-R3-WS03-6 / WS-8 IP-R3-WS08-3 (P2-AR-0043): what the binding status raises, from `t2::binding_status()`.
+    #[test]
+    fn binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope() {
+        // the owner's bound machine sealing with the active key: nothing
+        let owner = json!({"bound": true, "provisioned": true, "portable": true, "sealing_key_is_authority_active_key": true,
+            "authority_error": null, "sealing": {"scope": "provisioned"}});
+        assert!(binding_status_findings(&owner).is_empty());
+        // an installed authority not honoured now (expired, revoked, not delegated, machine not listed): medium
+        let expired = json!({"bound": false, "provisioned": true, "portable": false, "sealing_key_is_authority_active_key": false,
+            "authority_error": {"code": "T2_BINDING_AUTHORITY_EXPIRED", "message": "expired"}, "sealing": {"scope": "machine", "reason": "r"}});
+        let f = binding_status_findings(&expired);
+        assert_eq!(f.len(), 1);
+        assert_eq!(f[0].0, "medium");
+        assert!(
+            f[0].1.contains("T2_BINDING_AUTHORITY_EXPIRED"),
+            "{}",
+            f[0].1
+        );
+        // bound but not sealing with the authority's active key: medium
+        let stale_key = json!({"bound": true, "provisioned": true, "portable": false, "sealing_key_is_authority_active_key": false,
+            "authority_error": null, "sealing": {"scope": "machine", "reason": "does not hold the active key"}});
+        assert_eq!(binding_status_findings(&stale_key)[0].0, "medium");
+        // provisioned, no authority installed: machine scope disclosed (low)
+        let anchor_only = json!({"bound": false, "provisioned": true, "portable": false, "sealing_key_is_authority_active_key": false,
+            "authority_error": null, "sealing": {"scope": "machine", "reason": "no T2 binding authority is installed here"}});
+        let f = binding_status_findings(&anchor_only);
+        assert_eq!((f.len(), f[0].0), (1, "low"));
+        assert!(
+            f[0].1.contains("honoured on this machine only"),
+            "{}",
+            f[0].1
+        );
+        // unprovisioned (bootstrap): nothing here (installation_authenticity and D032 disclose the posture)
+        let bootstrap = json!({"bound": false, "provisioned": false, "portable": false, "authority_error": null,
+            "sealing": {"scope": "machine"}});
+        assert!(binding_status_findings(&bootstrap).is_empty());
+        // FOREIGN on an owner-bound machine is said as such; elsewhere as before
+        let t2 = json!({});
+        assert!(t2_severity_on("FOREIGN", false, false, &t2, true)
+            .1
+            .contains("did not authorise"));
+        assert_eq!(
+            t2_severity_on("FOREIGN", false, false, &t2, false),
+            t2_severity("FOREIGN", false, false, &t2)
+        );
+        assert_eq!(
+            t2_severity_on("BROKEN", true, true, &t2, true),
+            t2_severity("BROKEN", true, true, &t2)
+        );
+    }
+
+    /// IP-R3-WS02-10 (round 4, P2-AR-0043): WS-2's heading-marker confirmation step is retired because WS-6's markers
+    /// in `memory::coverage` (chunker 3, R3-4) made it redundant: the verifier itself compares Markdown headings by
+    /// their text on both sides. This test is replaced under its name by the property that still holds, asserted on
+    /// the same fixture through the verifier and the family that rely on it: a document whose headings a chunk holds
+    /// with their markers has no gap; a body line no chunk holds is a confirmed gap, reported at `medium`.
     #[test]
     fn a_coverage_gap_is_confirmed_unless_every_line_is_held_with_its_heading_markers() {
         let dir = std::env::temp_dir().join(format!("gov-cov-{}", crate::util::short_uuid()));
         std::fs::create_dir_all(&dir).unwrap();
-        std::fs::write(dir.join("a.md"), "# no input change\n# second heading\n").unwrap();
-        std::fs::write(
-            dir.join("b.md"),
-            "# held heading\nbody line no chunk holds\n",
-        )
-        .unwrap();
+        let a_text = "# no input change\n# second heading\n";
+        let b_text = "# held heading\nbody line no chunk holds\n";
+        std::fs::write(dir.join("a.md"), a_text).unwrap();
+        std::fs::write(dir.join("b.md"), b_text).unwrap();
         let p = Project::open(&dir);
         let db = RuntimeDb::open_memory().unwrap();
         db.init_schema().unwrap();
-        for (aid, text) in [
-            ("file:a.md", "a.md\n# no input change\n# second heading"),
-            ("file:b.md", "b.md\n# held heading"),
+        for (aid, file, chunk) in [
+            (
+                "file:a.md",
+                a_text,
+                "a.md\n# no input change\n# second heading",
+            ),
+            ("file:b.md", b_text, "b.md\n# held heading"),
         ] {
+            let hash = crate::util::sha256_hex(file.as_bytes());
             db.exec(
-                "INSERT INTO artifacts(artifact_id, path, record_type, status) VALUES (?1, ?2, 'file', 'ACTIVE')",
-                &[&aid, &aid.trim_start_matches("file:")],
+                "INSERT INTO artifacts(artifact_id, path, record_type, status, content_hash) VALUES (?1, ?2, 'file', 'ACTIVE', ?3)",
+                &[&aid, &aid.trim_start_matches("file:"), &hash.as_str()],
             )
             .unwrap();
             db.exec(
                 "INSERT INTO chunks(chunk_id, artifact_id, text) VALUES (?1, ?1, ?2)",
-                &[&aid, &text],
+                &[&aid, &chunk],
             )
             .unwrap();
         }
-        let a = json!({"artifact_id": "file:a.md", "path": "a.md", "count": 2, "lines": [{"line": 1, "text": "no input change"}]});
-        assert!(gap_is_heading_marker_artefact(&p, &db, &a));
-        let b = json!({"artifact_id": "file:b.md", "path": "b.md", "count": 1, "lines": [{"line": 2, "text": "body line no chunk holds"}]});
-        assert!(!gap_is_heading_marker_artefact(&p, &db, &b));
+        // the verifier: headings held with their markers are no gap; the unheld body line is the only gap
+        let v = crate::memory::coverage::verify(&p, &db).unwrap();
+        let gaps = v["gaps"].as_array().unwrap();
+        assert_eq!(gaps.len(), 1, "{v}");
+        assert_eq!(gaps[0]["path"], "b.md", "{v}");
+        assert!(
+            gaps[0].to_string().contains("body line no chunk holds"),
+            "{v}"
+        );
+        assert!(!v.to_string().contains("no input change"), "{v}");
+        // the family reports exactly that gap as confirmed current material
+        let mut f = Family {
+            id: "index_content_coverage".into(),
+            ok: true,
+            findings: vec![],
+            detail: Value::Null,
+        };
+        index_content_coverage(&p, Some(&db), &mut f);
+        assert_eq!(f.detail["confirmed_gaps"], 1, "{}", f.detail);
+        assert_eq!(f.findings.len(), 1, "{:?}", f.findings);
+        assert_eq!(f.findings[0]["severity"], "medium");
+        assert!(f.findings[0]["message"].as_str().unwrap().contains("b.md"));
+        assert!(!f.findings[0]["message"].as_str().unwrap().contains("a.md"));
         let _ = std::fs::remove_dir_all(&dir);
     }
 

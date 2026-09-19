@@ -1057,15 +1057,46 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
     let unhonoured_evidence = crate::verification::currency::unhonoured_health_outputs(&store);
     let mut failing: Vec<(String, &'static str, String)> = vec![];
     let mut disclosed: Vec<String> = vec![];
+    // this machine's T2 binding status (WS-3 IP-R3-WS03-6, WS-8 IP-R3-WS08-3; P2-ADJ-0002): an authority installed
+    // here that is not honoured now fails; a provisioned machine sealing in its own scope is disclosed
+    let binding_status = crate::t2::binding_status();
+    let bound = binding_status["bound"] == true;
+    let mut binding_notes: Vec<String> = vec![];
+    for (sev, msg) in crate::verification::reporting::binding_status_findings(&binding_status) {
+        if sev == "low" {
+            binding_notes.push(msg);
+        } else {
+            failing.push(("T2 binding authority".into(), sev, msg));
+        }
+    }
+    let sealing_note = match binding_status["sealing"]["scope"].as_str() {
+        Some("provisioned") => format!(
+            "T2 sealing: portable (owner authority {}, key {}){}",
+            binding_status["sealing"]["authority_id"]
+                .as_str()
+                .unwrap_or("?"),
+            binding_status["sealing"]["key_id"].as_str().unwrap_or("?"),
+            if bound {
+                "; on this owner-bound machine a FOREIGN record was written by a machine the owner did not authorise"
+            } else {
+                ""
+            }
+        ),
+        _ => format!(
+            "T2 sealing: machine scope ({})",
+            binding_status["sealing"]["reason"].as_str().unwrap_or("-")
+        ),
+    };
     for r in &t2 {
         let id = r["id"].as_str().unwrap_or("?").to_string();
         let rec = store.get(&id);
-        let (sev, what) = crate::verification::reporting::t2_severity(
+        let (sev, what) = crate::verification::reporting::t2_severity_on(
             r["t2"]["binding"].as_str().unwrap_or("?"),
             rec.map(|x| x.rtype() == "human-gate").unwrap_or(false),
             rec.map(crate::verification::reporting::t2_in_force)
                 .unwrap_or(false),
             &r["t2"],
+            bound,
         );
         if sev == "low" {
             disclosed.push(id);
@@ -1145,13 +1176,14 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
         worst,
         if failing.is_empty() {
             format!(
-                "no tampered OS state and no unsealed gate in force; {} record(s) not honoured on this machine (legacy, hand-written approval claims, or sealed elsewhere){}",
+                "no tampered OS state and no unsealed gate in force; {} record(s) not honoured on this machine (legacy, hand-written approval claims, or sealed elsewhere){}. {sealing_note}{}",
                 disclosed.len(),
-                if disclosed.is_empty() { String::new() } else { format!(": {}", disclosed.iter().take(10).cloned().collect::<Vec<_>>().join(", ")) }
+                if disclosed.is_empty() { String::new() } else { format!(": {}", disclosed.iter().take(10).cloned().collect::<Vec<_>>().join(", ")) },
+                if binding_notes.is_empty() { String::new() } else { format!(". {}", binding_notes.join("; ")) }
             )
         } else {
             format!(
-                "{}; the OS does not honour them (D-0007 rule 2)",
+                "{}; the OS does not honour them (D-0007 rule 2). {sealing_note}",
                 failing
                     .iter()
                     .map(|(id, _, w)| format!("{id} {w}"))
@@ -1159,7 +1191,7 @@ fn group_records_state(p: &Project) -> Result<Vec<Value>> {
                     .join("; ")
             )
         },
-        Some("restore tampered records from version control; withdraw hand-written gates and raise them through gov (`gov gate list` shows what is unverified)"),
+        Some("restore tampered records from version control; withdraw hand-written gates and raise them through gov (`gov gate list` shows what is unverified); an authority that is not honoured is renewed by the administrator (`gov trust bind`); `gov trust status` shows the T2 binding"),
     ));
     // D034 failure memory (WS-6 IP-2): open failure records awaiting follow-up. An open tool failure (a capability the
     // product needed failed) degrades; open retrieval-miss events are memory-quality evidence, reported only.

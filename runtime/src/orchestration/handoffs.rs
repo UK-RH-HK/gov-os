@@ -166,15 +166,34 @@ fn reliance_paths(p: &Project, store: &RecordStore, task: &str) -> Vec<String> {
 }
 
 pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
-    control::guard_write(p, "handoff create")?;
+    // the write guard (kernel trust, break-glass, FREEZE_WRITES / PAUSE); the health half is decided below, on the one
+    // availability host API, with the handoff's subjects and the task's declared remedies in hand (round 4, WS-4
+    // IP-R3-WS04-11: the generic whole-operation guard refused the handoff of the very work that repairs a block)
+    control::guard_write_host(p, "handoff create")?;
     crate::authority::require(p, "create_handoff")?;
     let store = RecordStore::load(&p.root);
-    // G0 (tier contract, IP-WS02-05/07): an active hard-block governing what the handoff relies on refuses it
+    // G0 (tier contract, IP-WS02-05/07) under the availability rule: an active hard-block governing what the handoff
+    // relies on refuses it — except the handoff of work that remedies that block (the task declares the block's check
+    // among its `remedies` and its subjects reach the block's), which stays available like creating and claiming it
     let task_named = fields["task"].as_str().unwrap_or("").to_string();
-    crate::scheduler::guard(
+    let (subjects, remedies) = match store.get(&task_named) {
+        Some(t) => {
+            let mut s = reliance_paths(p, &store, &task_named);
+            s.extend(crate::verification::close_subjects(
+                &t.data,
+                &t.list("allowed_paths"),
+            ));
+            s.sort();
+            s.dedup();
+            (s, crate::orchestration::tasks::remedies_of(&t.data))
+        }
+        None => (vec![], vec![]),
+    };
+    let admission = crate::scheduler::admit(
         p,
-        crate::scheduler::catalogue::ops::HANDOFF_CREATE,
-        &reliance_paths(p, &store, &task_named),
+        &crate::scheduler::Request::new(crate::scheduler::catalogue::ops::HANDOFF_CREATE)
+            .with_subjects(&subjects)
+            .with_remedies(&remedies),
     )?;
     let id = store.next_id("handoff");
     let o = fields
@@ -308,6 +327,11 @@ pub fn create(p: &Project, mut fields: Value) -> Result<Value> {
     let mut out = rec.data.clone();
     out["stale_inputs"] = freshness["stale_inputs"].clone();
     out["record_binding"] = binding;
+    if admission.is_remedy() {
+        out["availability"] = json!({
+            "rule": "a hard-block does not refuse the handoff of work that remedies it (availability rule, P2-HO-0031): the task declares the blocking check among its remedies and its subjects reach the block's; its close commits only once the block is cleared",
+            "remedies": remedies, "remedied_blocks": admission.remedy_for});
+    }
     Ok(out)
 }
 

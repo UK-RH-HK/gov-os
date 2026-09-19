@@ -1156,8 +1156,9 @@ fn command_tests_execute_only_governed_commands_for_permitted_roles() {
     for b in ["1", "2", "3", "4", "5", "6", "7"] {
         executor.ok(&["adopt", "migrate", "--batch", b]);
     }
-    // A7: the designated verifier runs the approved command test by its protocol duty (TOOL_PERMISSIONS does not
-    // list migration-verifier), and the verification report records it
+    // A7: the designated verifier runs the approved command test, authorised by TOOL_PERMISSIONS, which lists
+    // migration-verifier with RUN_TESTS since round 4 (IP-R3-WS09-4: the policy states what the protocol duty grants;
+    // before, the designated duty was the basis), and the verification report records it
     planner
         .with_session("S-verifier")
         .with_role("migration-verifier")
@@ -1169,7 +1170,7 @@ fn command_tests_execute_only_governed_commands_for_permitted_roles() {
         );
         assert!(
             report.contains("\"role\": \"migration-verifier\"")
-                && report.contains("whose duty is to run the approved independent tests"),
+                && report.contains("TOOL_PERMISSIONS.roles.migration-verifier"),
             "{report}"
         );
     }

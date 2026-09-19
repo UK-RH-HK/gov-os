@@ -461,7 +461,7 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     // it re-establishes currency (as `audit` does); `--no-persist` never does (as `audit --no-persist`). The
     // product-test run records a product-tests EVIDENCE audit record; the close check runs the G2 tier with the
     // same record policy as a run. `skills --record` binds skill versions in the tracked, OS-written
-    // governance/generated/skill-bindings.json (`skills::record` requires `record_skill_binding`). The rest read
+    // governance/registry/skill-bindings.json (`skills::record` requires `record_skill_binding`). The rest read
     // (their runtime-local cache, ledger and observation files are derived, machine-local state).
     g("health run", "record_audit", Write),
     g("health run --no-persist", "read", Read),

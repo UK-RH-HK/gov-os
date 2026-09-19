@@ -407,3 +407,330 @@ fn a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_onc
     assert_eq!(mb["upstream_changes"]["propagated"], true, "{mb}");
     assert_eq!(system_transactions(&g).len(), 2);
 }
+
+/// The family `id` of a `--family <id>` audit run (result or refusal details), with the run's findings of that
+/// family as `findings`.
+fn suite_family(g: &Gov, id: &str) -> Value {
+    let o = g.run(&["audit", "--no-persist", "--family", id]);
+    let r = if o.ok() { o.result() } else { o.details() };
+    let mut fam = match &r["families"] {
+        Value::Array(a) => a
+            .iter()
+            .find(|f| f["id"] == id)
+            .cloned()
+            .unwrap_or(Value::Null),
+        Value::Object(m) => m.get(id).cloned().unwrap_or(Value::Null),
+        _ => Value::Null,
+    };
+    assert!(!fam.is_null(), "no {id} family in {r}");
+    if fam["findings"].as_array().is_none() {
+        fam["findings"] = json!(r["findings"]
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .filter(|f| f["family"] == id)
+            .collect::<Vec<_>>());
+    }
+    fam
+}
+
+fn binding_family(g: &Gov) -> Value {
+    suite_family(g, "os_binding_integrity")
+}
+
+/// **WS-3 IP-R3-WS03-6 and WS-8 IP-R3-WS08-3 (P2-ADJ-0002 observability).** Doctor D033 and the
+/// `os_binding_integrity` family report this machine's T2 binding status (`t2::binding_status()`): on the owner's
+/// bound machine the sealing is portable and nothing is raised; on a machine provisioned from the owner's root but not
+/// given the binding authority, the machine-scope sealing is disclosed (low: what it writes is honoured there only),
+/// D033 still passes, and the family names the scope and why. (The medium cases — an installed authority not honoured
+/// now, a bound machine not sealing with the active key — are the lib test
+/// `verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope`.)
+#[test]
+fn the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed(
+) {
+    let (root, g) = fresh("r4-t2status");
+    git_commit_all(&root, "baseline");
+    // the owner's machine: bound, portable
+    let (ok, msg) = doctor_check(&g, "D033");
+    assert!(ok, "{msg}");
+    assert!(msg.contains("T2 sealing: portable"), "{msg}");
+    let fam = binding_family(&g);
+    let st = &fam["detail"]["binding_status"];
+    assert_eq!(
+        (st["bound"].as_bool(), st["portable"].as_bool()),
+        (Some(true), Some(true)),
+        "{fam}"
+    );
+    assert!(
+        !fam["findings"].to_string().contains("machine scope"),
+        "{fam}"
+    );
+    // a machine provisioned from the owner's root without the binding authority: machine scope, disclosed
+    let (_c, gc) = clone_to_machine(&root, "r4-t2status-c", "S-C", MachineKind::AnchorOnly);
+    verify_pinned_release(&gc, None);
+    let (ok_c, msg_c) = doctor_check(&gc, "D033");
+    assert!(ok_c, "a disclosure does not fail D033: {msg_c}");
+    assert!(
+        msg_c.contains("T2 sealing: machine scope")
+            && msg_c.contains("honoured on this machine only"),
+        "{msg_c}"
+    );
+    let fam_c = binding_family(&gc);
+    let st_c = &fam_c["detail"]["binding_status"];
+    assert_eq!(
+        (
+            st_c["bound"].as_bool(),
+            st_c["provisioned"].as_bool(),
+            st_c["portable"].as_bool()
+        ),
+        (Some(false), Some(true), Some(false)),
+        "{fam_c}"
+    );
+    assert_eq!(st_c["sealing"]["scope"], "machine", "{fam_c}");
+    let disclosure = fam_c["findings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|f| {
+            f["message"]
+                .as_str()
+                .unwrap_or("")
+                .contains("seals T2 facts in its own machine scope")
+        })
+        .cloned()
+        .unwrap_or(Value::Null);
+    assert_eq!(disclosure["severity"], "low", "{fam_c}");
+}
+
+/// **WS-6 IP-R3-WS06-4 (with WS-2 IP-R3-WS02-10).** A repository-contract rule that never decides a path — a later
+/// rule matches every path it matches and applies something else (last-match; WS-6 r2 O-1, detected generally by
+/// `RepositoryContract::shadowed_rules`) — is reported by the `path_map_compliance` family, low, naming the dead rule
+/// and the rule that overrides it. The shipped contract has none.
+#[test]
+fn a_repository_contract_rule_that_never_decides_is_reported() {
+    let (root, g) = fresh("r4-shadowed");
+    let rel = "governance/project/REPOSITORY_CONTRACT.yaml";
+    let fam = suite_family(&g, "path_map_compliance");
+    assert_eq!(fam["detail"]["shadowed_rules"], json!([]), "{fam}");
+    // list the refining rule before the general rule it refines: `product/tests/**` then never decides
+    let mut c = yaml(&root, rel);
+    let rules = c["paths"].as_array_mut().unwrap();
+    let i = rules
+        .iter()
+        .position(|r| r["pattern"] == "product/tests/**")
+        .unwrap();
+    let tests_rule = rules.remove(i);
+    let j = rules
+        .iter()
+        .position(|r| r["pattern"] == "product/**")
+        .unwrap();
+    rules.insert(j, tests_rule);
+    write_yaml(&root, rel, &c);
+    let fam = suite_family(&g, "path_map_compliance");
+    let shadowed = fam["detail"]["shadowed_rules"].as_array().unwrap().clone();
+    assert_eq!(shadowed.len(), 1, "{fam}");
+    assert_eq!(shadowed[0]["rule"], "product/tests/**");
+    assert_eq!(shadowed[0]["overridden_by"], "product/**");
+    let f = fam["findings"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|f| {
+            f["message"]
+                .as_str()
+                .unwrap_or("")
+                .contains("never decides")
+        })
+        .cloned()
+        .unwrap_or(Value::Null);
+    assert_eq!(f["severity"], "low", "{fam}");
+    assert_eq!(f["path"], rel, "{f}");
+}
+
+/// **WS-7 IP-W7R3-5 with WS-6 IP-R3-WS06-7 (brownfield projects must not lose registrations).** Upgrading a project an
+/// earlier release installed moves the tracked OS stores it kept in the regenerable views — the plugin registry and
+/// the skill content bindings — to `governance/registry/`, bytes unchanged (migration op `relocate_os_stores`), so
+/// they survive deleting `governance/generated/` from the moment of the upgrade; `gov update --rollback` restores the
+/// layout the previous release reads, byte for byte (the update snapshot covers `governance/registry/`).
+#[test]
+fn an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout() {
+    let root = tmp("r4-update-stores");
+    let proj = root.join("project");
+    std::fs::create_dir_all(&proj).unwrap();
+    write(&proj, "README.md", "# stores project\n");
+    git_init_commit(&proj);
+    let g = Gov::new(&proj, "S-r4-upd");
+    provision(&g);
+    let prev = canonical_root().join("fixtures/update/previous-release/4.1.1");
+    let prev = signed_copy(&prev, "r4-update-4.1.1", sequence_of("4.1.1"));
+    g.ok(&[
+        "init",
+        "--source",
+        prev.to_str().unwrap(),
+        "--name",
+        "stores-project",
+        "--alias",
+        "fx-stores",
+    ]);
+    // what an earlier release wrote in the regenerable views
+    let (reg_legacy, bind_legacy) = (
+        "governance/generated/plugin-registry.json",
+        "governance/generated/skill-bindings.json",
+    );
+    write(
+        &proj,
+        reg_legacy,
+        "{\"schema_version\": \"1.1.0\", \"plugins\": {}}\n",
+    );
+    write(
+        &proj,
+        bind_legacy,
+        "{\"schema\": \"gov.skill-bindings/1\", \"note\": \"4.1.1\", \"versions\": {}}\n",
+    );
+    let (reg_bytes, bind_bytes) = (
+        std::fs::read(proj.join(reg_legacy)).unwrap(),
+        std::fs::read(proj.join(bind_legacy)).unwrap(),
+    );
+    g.ok(&["rebuild-memory"]);
+    git_commit_all(&proj, "4.1.1 state with stores in the generated views");
+    let e = g.err(&["update", "--apply", "--source", signed_source()]);
+    assert_eq!(e.error_code(), "HUMAN_GATE_REQUIRED", "{}", e.envelope);
+    let gid = e.details()["gate"].as_str().unwrap().to_string();
+    g.ok(&["gate", "present", &gid]);
+    crate::ws03::human_decide(&g, &gid, "A");
+    let ap = g.ok(&[
+        "update",
+        "--apply",
+        "--source",
+        signed_source(),
+        "--approve",
+        "--by",
+        "owner",
+    ]);
+    assert_eq!(ap["applied"], true, "{ap}");
+    // moved at the upgrade, bytes unchanged
+    assert_eq!(
+        std::fs::read(proj.join("governance/registry/plugin-registry.json")).unwrap(),
+        reg_bytes
+    );
+    assert_eq!(
+        std::fs::read(proj.join("governance/registry/skill-bindings.json")).unwrap(),
+        bind_bytes
+    );
+    assert!(!exists(&proj, reg_legacy) && !exists(&proj, bind_legacy));
+    // they survive deleting the regenerable views
+    std::fs::remove_dir_all(proj.join("governance/generated")).unwrap();
+    assert!(exists(&proj, "governance/registry/plugin-registry.json"));
+    assert!(exists(&proj, "governance/registry/skill-bindings.json"));
+    git(&proj, &["checkout", "--", "governance/generated"]);
+    g.ok(&["rebuild-memory"]);
+    // rollback: the layout the previous release reads, byte for byte
+    break_glass(&g, &prev, "r4-update-stores-rollback");
+    let rb = g.ok(&["update", "--rollback", "--break-glass"]);
+    assert_eq!(rb["rolled_back_to"], "4.1.1", "{rb}");
+    assert_eq!(std::fs::read(proj.join(reg_legacy)).unwrap(), reg_bytes);
+    assert_eq!(std::fs::read(proj.join(bind_legacy)).unwrap(), bind_bytes);
+    assert!(
+        !proj.join("governance/registry").exists(),
+        "the registry directory the update created is not left behind"
+    );
+}
+
+/// **WS-6 IP-R3-WS06-7 (BC-P2-31, writer side).** The first-seen skill content bindings are OS-written tracked state
+/// that cannot be rebuilt: they are written where the kernel's store declaration puts them (`governance/registry/`,
+/// `paths::OS_STORES` `skill-bindings`), a file an earlier release kept in `governance/generated/` is read as it is
+/// until the next binding write moves it (bytes and entries unchanged), and reading never moves anything.
+#[test]
+fn skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write() {
+    let (root, g) = fresh("r4-skill-bindings");
+    let legacy = "governance/generated/skill-bindings.json";
+    let planted = json!({"schema": "gov.skill-bindings/1", "note": "written by an earlier release",
+        "versions": {"SKL-PLANTED@1": {"content_sha256": "0".repeat(64)}}});
+    write(&root, legacy, &planted.to_string());
+    // reading (the regression without --record) moves nothing
+    let _ = g.run(&["health", "skills", "--skill", "SKL-IMPACT-ANALYSIS"]);
+    assert!(exists(&root, legacy));
+    assert!(!exists(&root, "governance/registry/skill-bindings.json"));
+    // the next binding write moves the file first, keeping what it held, then writes there
+    let _ = g.run(&[
+        "health",
+        "skills",
+        "--record",
+        "--skill",
+        "SKL-IMPACT-ANALYSIS",
+    ]);
+    assert!(!exists(&root, legacy), "the legacy file was moved");
+    let b = json(&root, "governance/registry/skill-bindings.json");
+    assert!(
+        b["versions"].get("SKL-PLANTED@1").is_some(),
+        "the moved bindings keep their entries: {b}"
+    );
+}
+
+/// **WS-4 IP-R3-WS04-11 (availability rule, end to end).** Under a critical block — a secret in product source — the
+/// handoff of the remediation the OS generated (it declares the blocking checks among its `remedies`, and its subjects
+/// reach the leaking file) is admitted as the block's remedy and says so; handing off unrelated work is refused,
+/// typed, naming the block. (Before, the generic whole-operation guard refused both.)
+#[test]
+fn the_remediation_handoff_stays_available_under_the_block_it_repairs() {
+    let (root, g) = fresh("r4-handoff-remedy");
+    let other = create(&g, "documentation", "unrelated docs", "docs/**");
+    write(
+        &root,
+        "src/creds.rs",
+        "pub const K: &str = \"AKIAIOSFODNN7EXAMPLE\";\npub const S: &str = \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\";\n",
+    );
+    let a = g.run(&["audit"]);
+    assert!(
+        !a.ok(),
+        "a secret in product source is unhealthy: {}",
+        a.envelope
+    );
+    let mut remediation: Option<Value> = None;
+    for e in std::fs::read_dir(root.join("spec/tasks"))
+        .unwrap()
+        .flatten()
+    {
+        let n = e.file_name().to_string_lossy().to_string();
+        if !n.starts_with("TASK-") {
+            continue;
+        }
+        let t = yaml(&root, &format!("spec/tasks/{n}"));
+        if t["generation"]["source"] == "security-finding"
+            && t["allowed_paths"].to_string().contains("src/creds.rs")
+        {
+            remediation = Some(t);
+        }
+    }
+    let rem = remediation.expect("the security finding generated its remediation");
+    assert!(!rem["remedies"].as_array().unwrap().is_empty(), "{rem}");
+    let rid = rem["id"].as_str().unwrap().to_string();
+    // unrelated work is not handed off under the block
+    let e = g.err(&[
+        "handoff",
+        "create",
+        "--to-role",
+        "backend-engineer",
+        "--task",
+        &other,
+    ]);
+    assert_eq!(e.error_code(), "HEALTH_HARD_BLOCK", "{}", e.envelope);
+    // the remediation is: handed off as the block's remedy
+    let h = g.ok(&[
+        "handoff",
+        "create",
+        "--to-role",
+        "security-engineer",
+        "--task",
+        &rid,
+    ]);
+    let remedied = h["availability"]["remedied_blocks"].as_array().unwrap();
+    assert!(!remedied.is_empty(), "{h}");
+    for b in remedied {
+        assert!(
+            rem["remedies"].as_array().unwrap().contains(&b["check"]),
+            "{h}"
+        );
+    }
+}

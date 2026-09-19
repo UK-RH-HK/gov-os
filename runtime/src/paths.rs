@@ -31,6 +31,12 @@ pub const STATE_DIR: &str = ".governance-state";
 /// Where the OS-written plugin registry (D-0007 T2: "authoritative project state written by the OS") belongs:
 /// tracked, and outside `governance/generated/` (T3, regenerable views).
 pub const PLUGIN_REGISTRY_PATH: &str = "governance/registry/plugin-registry.json";
+/// Where the OS-written first-seen skill content bindings belong (WS-6 IP-R3-WS06-7): beside the plugin registry,
+/// tracked, outside the regenerable views — a binding records the content a skill version was first seen with and
+/// cannot be rebuilt from anything else.
+pub const SKILL_BINDINGS_PATH: &str = "governance/registry/skill-bindings.json";
+/// The project's repository contract (the path map of the project overlay).
+pub const REPOSITORY_CONTRACT_REL: &str = "governance/project/REPOSITORY_CONTRACT.yaml";
 pub const ALWAYS_EXCLUDED_DIRS: &[&str] = &[
     ".git",
     "node_modules",
@@ -145,6 +151,19 @@ pub const OS_STORES: &[OsStore] = &[
             PLUGIN_REGISTRY_PATH,
         )],
         writer: "capabilities::registry::REGISTRY_PATH / path (WS-7)",
+    },
+    OsStore {
+        id: "skill-bindings",
+        what: "the first-seen skill content bindings: each skill version bound to the content its passing scenarios ran on (not rebuildable)",
+        class: "authoritative",
+        tracked: true,
+        patterns: &[SKILL_BINDINGS_PATH],
+        legacy_patterns: &["governance/generated/skill-bindings.json"],
+        moves: &[(
+            "governance/generated/skill-bindings.json",
+            SKILL_BINDINGS_PATH,
+        )],
+        writer: "skills::bindings_path / record (WS-2; WS-6 IP-R3-WS06-7)",
     },
 ];
 
@@ -981,6 +1000,7 @@ mod tests {
                 "plugin-registry",
                 rel(crate::capabilities::registry::path(&p)),
             ),
+            ("skill-bindings", rel(crate::skills::bindings_path(&p))),
             (
                 "migration-snapshots",
                 rel(crate::migrations::executor::snapshot_dir(&root, 3).join("x.json")),

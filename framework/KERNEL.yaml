@@ -23,7 +23,7 @@ schema_versions:
   handoff: 1.0.0
   lesson: 1.0.0
   upstream-packet: 1.2.0
-  migration: 1.2.0
+  migration: 1.3.0
   context-packet: 1.1.0
   index-manifest: 1.2.0
   skill: 1.0.0

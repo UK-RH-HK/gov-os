@@ -3120,11 +3120,25 @@ mod tests {
             ex.governed.last().unwrap().command,
             vec!["python3", "-m", "pytest", "-q"]
         );
+        // round 4 (P2-AR-0043, IP-R3-WS09-4): the template states what the designated verifier's duty grants — the
+        // policy lists migration-verifier with RUN_TESTS and the reviewer with READ_REPO only
         let v = command_policy(&dir, &b, "A7", "migration-verifier");
         assert!(v.permissions.contains(&"RUN_TESTS".to_string()));
-        assert!(v.permission_basis.contains("designated role"));
+        assert!(
+            v.permission_basis
+                .starts_with("TOOL_PERMISSIONS.roles.migration-verifier"),
+            "{}",
+            v.permission_basis
+        );
         let r = command_policy(&dir, &b, "A7", "migration-reviewer");
-        assert!(r.permissions.is_empty(), "{:?}", r.permissions);
+        assert!(
+            !r.permissions.contains(&"RUN_TESTS".to_string()),
+            "{:?}",
+            r.permissions
+        );
+        // a policy that does not list the verifier: the designated duty still grants RUN_TESTS (and nothing else does)
+        let (p, basis) = test_permissions(None, "A7", "migration-verifier", "overlay");
+        assert!(p.contains(&"RUN_TESTS".to_string()) && basis.contains("designated role"));
         let t =
             json!({"id": "RT-1", "kind": "command", "command": ["python3", "-m", "pytest", "-q"]});
         assert!(verify::command_test_refusal(&t, &v).is_none());
