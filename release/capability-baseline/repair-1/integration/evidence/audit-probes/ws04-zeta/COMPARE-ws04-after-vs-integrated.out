@@ -1,0 +1,228 @@
+== COMPARE-ws04-after-vs-integrated: before pass=0/0 after pass=0/0
+== FR-freshness-invalidation: before pass=7/13 after pass=13/13
+   FAIL->PASS  FR-invalidates[authoritative requirement (spec/requirements)]
+   FAIL->PASS  FR-invalidates[authoritative interface (spec/interfaces)]
+   FAIL->PASS  FR-invalidates[authoritative architecture (spec/architecture)]
+   FAIL->PASS  FR-invalidates[task input manifest (spec/tasks)]
+   FAIL->PASS  FR-invalidates[relevant source file (src/)]
+   FAIL->PASS  FR-invalidates[relevant index manifest (governance/generated)]
+== W00-harness-smoke: before pass=1/1 after pass=1/1
+== W01-artefact-identity: before pass=71/84 after pass=0/0
+   only before W1-b1-specification(requirement): PASS
+   only before W1-b2-specification(requirement): PASS
+   only before W1-b3-specification(requirement): PASS
+   only before W1-b4-specification(requirement): PASS
+   only before W1-b5-specification(requirement): PASS
+   only before W1-b6-specification(requirement): PASS
+   only before W1-b7-specification(requirement): FAIL
+   only before W1-b1-specification(feature): PASS
+   only before W1-b2-specification(feature): PASS
+   only before W1-b3-specification(feature): PASS
+   only before W1-b4-specification(feature): PASS
+   only before W1-b5-specification(feature): PASS
+   only before W1-b6-specification(feature): PASS
+   only before W1-b7-specification(feature): FAIL
+   only before W1-b1-scenario: PASS
+   only before W1-b2-scenario: PASS
+   only before W1-b3-scenario: PASS
+   only before W1-b4-scenario: PASS
+   only before W1-b5-scenario: PASS
+   only before W1-b6-scenario: PASS
+   only before W1-b7-scenario: FAIL
+   only before W1-b1-decision: PASS
+   only before W1-b2-decision: PASS
+   only before W1-b3-decision: PASS
+   only before W1-b4-decision: PASS
+   only before W1-b5-decision: PASS
+   only before W1-b6-decision: PASS
+   only before W1-b7-decision: FAIL
+   only before W1-b1-dataset: PASS
+   only before W1-b2-dataset: PASS
+   only before W1-b3-dataset: PASS
+   only before W1-b4-dataset: PASS
+   only before W1-b5-dataset: PASS
+   only before W1-b6-dataset: PASS
+   only before W1-b7-dataset: FAIL
+   only before W1-b1-experiment: PASS
+   only before W1-b2-experiment: PASS
+   only before W1-b3-experiment: PASS
+   only before W1-b4-experiment: PASS
+   only before W1-b5-experiment: PASS
+   only before W1-b6-experiment: PASS
+   only before W1-b7-experiment: FAIL
+   only before W1-b1-architecture record: PASS
+   only before W1-b2-architecture record: PASS
+   only before W1-b3-architecture record: PASS
+   only before W1-b4-architecture record: PASS
+   only before W1-b5-architecture record: PASS
+   only before W1-b6-architecture record: PASS
+   only before W1-b7-architecture record: FAIL
+   only before W1-b1-interface: PASS
+   only before W1-b2-interface: PASS
+   only before W1-b3-interface: PASS
+   only before W1-b4-interface: PASS
+   only before W1-b5-interface: PASS
+   only before W1-b6-interface: PASS
+   only before W1-b7-interface: FAIL
+   only before W1-b1-test design: PASS
+   only before W1-b2-test design: PASS
+   only before W1-b3-test design: PASS
+   only before W1-b4-test design: PASS
+   only before W1-b5-test design: PASS
+   only before W1-b6-test design: PASS
+   only before W1-b7-test design: FAIL
+   only before W1-b1-task: PASS
+   only before W1-b2-task: PASS
+   only before W1-b3-task: PASS
+   only before W1-b4-task: PASS
+   only before W1-b5-task: PASS
+   only before W1-b6-task: PASS
+   only before W1-b7-task: FAIL
+   only before W1-b8-superseded_by-computed: PASS
+   only before W1-b8-SUPERSEDES-edge: PASS
+   only before W1-b9-consumers-recorded: PASS
+   only before W1-b9-dataset-consumers-recorded: PASS
+   only before W1-move-keeps-id: PASS
+   only before W1-move-still-delivered: PASS
+   only before W1-b3-noncanonical-location-flagged: FAIL
+   only before W1-b7-gate-decision-provenance: PASS
+   only before W1-b7-audit-provenance: PASS
+   only before W1-b1-audit-finding-id-stable: FAIL
+   only before W1-benchmark-result-has-id: PASS
+   only before W1-b7-benchmark-provenance: PASS
+   only before W1-b6-benchmark-hash-in-record: FAIL
+   only before W1-b6-benchmark-hash-in-manifest: PASS
+== W01b-migration-plan-identity: before pass=1/9 after pass=9/9
+   FAIL->PASS  W1-b1-migplan-stable-id
+   FAIL->PASS  W1-b2-migplan-type
+   FAIL->PASS  W1-b4-migplan-authority
+   FAIL->PASS  W1-b6-migplan-version-hash
+   FAIL->PASS  W1-b7-migplan-provenance
+   FAIL->PASS  W1-b8-migplan-lineage
+   FAIL->PASS  W1-b9-migplan-consumers
+   FAIL->PASS  W1-b8-migplan-replan-keeps-history
+== W02-typed-contracts: before pass=16/16 after pass=16/16
+== W03-task-input-manifest: before pass=12/20 after pass=12/20
+   still FAIL  W3-m2-required-state-enforced
+   still FAIL  W3-m3-hash-pin-enforced
+   still FAIL  W3-r1-create-READY-with-missing-input
+   still FAIL  W3-r1-replan-READY-with-missing-input
+   still FAIL  W3-r1-status-READY-with-missing-input
+   still FAIL  W3-r1-claim-with-missing-input
+   still FAIL  W3-r1-missing-task-dependency-bypass-via-status
+   still FAIL  W3-r3-conflict-triggers-handling
+== W04-context-delivery: before pass=14/15 after pass=14/15
+   still FAIL  W4-b3-over-budget-governed-at-dispatch
+== W04b-input-class-delivery: before pass=14/14 after pass=0/0
+   only before W4b-delivered-deterministically:dataset(required_data): PASS
+   only before W4b-delivered-deterministically:experiment(derived_from): PASS
+   only before W4b-delivered-deterministically:research(derived_from): PASS
+   only before W4b-delivered-deterministically:interface(task.interfaces): PASS
+   only before W4b-delivered-deterministically:test-design(acceptance_tests): PASS
+   only before W4b-delivered-deterministically:architecture(implicit, all ACTIVE): PASS
+   only before W4b-impact-reaches-declaring-task:DATA-0001: PASS
+   only before W4b-impact-reaches-declaring-task:EXP-0001: PASS
+   only before W4b-impact-reaches-declaring-task:RES-0001: PASS
+   only before W4b-impact-reaches-declaring-task:API-0009: PASS
+   only before W4b-impact-reaches-declaring-task:TST-0002: PASS
+   only before W4b-impact-reaches-declaring-task:ARCH-0001: PASS
+   only before W4b-stale-input-marked-in-packet: PASS
+   only before W4b-benchmark-result-consumed-by-decision: PASS
+== W05-consumption-receipt: before pass=9/20 after pass=10/20
+   FAIL->PASS  W5-c2-no-claim-observed-paths-correct
+   still FAIL  W5-c1-refuses-missing-traceability
+   still FAIL  W5-r1-inputs-supplied-in-receipt
+   still FAIL  W5-r3-requirements-implemented-recorded
+   still FAIL  W5-r4-decisions-applied-recorded
+   still FAIL  W5-r5-acceptance-evidence-bound-to-declared-tests
+   still FAIL  W5-r6-task-close-requires-unknowns
+   still FAIL  W5-c3-task-to-code-edge
+   still FAIL  W5-r3r4-fabricated-trace-refused
+   still FAIL  W5-c2-untraceable-implementation-detected
+   still FAIL  W5-c2-untraceable-implementation-reported-by-audit
+== W06-staleness-propagation: before pass=11/27 after pass=0/0
+   only before W6-s4-cit-computes-impacted-nodes: PASS
+   only before W6-A-cit-executed: PASS
+   only before W6-s1-open-dependent-task-stale(CIT): PASS
+   only before W6-s6-completed-task-revalidated(CIT): FAIL
+   only before W6-s7-closed-task-evidence-not-green(CIT): FAIL
+   only before W6-s2-test-evidence-invalidated(CIT): FAIL
+   only before W6-s3-context-packets-invalidated(CIT): FAIL
+   only before W6-s3-checkpoint-packet-ref-flagged(CIT): FAIL
+   only before W6-s5-rework-tasks-generated(CIT): FAIL
+   only before W6-s1-stale-open-task-blocked(CIT): PASS
+   only before W6-s2-test-evidence-invalidated(CIT,R2): PASS
+   only before W6-s6-completed-task-revalidated(CIT,R2): FAIL
+   only before W6-s2-stale-test-evidence-blocks-consumers(CIT,R2): PASS
+   only before AC16-W6xD1-content-hash-detects-upstream-change: PASS
+   only before W6-s1-open-dependent-task-stale(direct): FAIL
+   only before W6-s6-completed-task-revalidated(direct): FAIL
+   only before W6-s2-test-evidence-invalidated(direct): FAIL
+   only before AC16-W6xD1-stale-index-blocks-close: PASS
+   only before W6-s3-context-packets-invalidated(direct): FAIL
+   only before AC16-W6xD1-rebuild-does-not-license-stale-consumption: FAIL
+   only before W6-s1-direct-change-forces-cit: FAIL
+   only before AC16-W6xO4-green-goes-stale-on-requirement-change: FAIL
+   only before W6-s7-stale-evidence-surfaced(direct): FAIL
+   only before W6-B2-concurrent-upstream-change-detected-at-close: PASS
+   only before W6-s7-retest-flag-not-cleared-by-close: FAIL
+   only before W6-s4-graph-impact(REQ): PASS
+   only before W6-s4-graph-impact(dataset consumed via task.required_data): PASS
+== W07-orphan-detection: before pass=3/12 after pass=3/12
+   still FAIL  W7-o1-expected-consumer-not-consuming
+   still FAIL  W7-o2-requirement-without-impl-or-test
+   still FAIL  W7-o3-research-never-consumed
+   still FAIL  W7-o4-acceptance-test-without-requirement
+   still FAIL  W7-o2b-linked-requirement-without-impl-or-test
+   still FAIL  W7-o3b-linked-research-never-consumed
+   still FAIL  W7-o4b-feature-only-acceptance-test
+   still FAIL  W7-o5-unjustified-code
+   still FAIL  W7-o6-orphans-produce-governed-remediation
+== W08-lineage: before pass=21/24 after pass=21/24
+   still FAIL  W8-l1-forward-reaches:release
+   still FAIL  W8-l3-missing-task-to-code-link-detected
+   still FAIL  W8-l4-stale-link-to-superseded-detected
+== W09-session-handoff-continuity: before pass=9/16 after pass=9/16
+   still FAIL  W9-c2-checkpoint-input-ids
+   still FAIL  W9-c2-state-reference-current-at-checkpoint
+   still FAIL  W9-c2-checkpoint-files-changed-paths-exist
+   still FAIL  W9-c6-handoff-missing-inputs-blocked-or-degraded
+   still FAIL  W9-c6-handoff-stale-inputs-blocked-or-degraded
+   still FAIL  AC16-NxW9-before-handoff-checkpoint-flags-stale-packet
+   still FAIL  AC16-NxW9-doctor-checkpoint-freshness
+== W10-hard-invariant-attacks: before pass=21/23 after pass=21/23
+   still FAIL  W10-a4-derived-index-corrupted-continue
+   still FAIL  W10-a5-product-tests-delivery-against-declaration
+   only before W10-a3-budget-11486: PASS
+   only before W10-a3-budget-10386: PASS
+   only after  W10-a3-budget-12098: PASS
+   only after  W10-a3-budget-10998: PASS
+== W11-quantitative-health: before pass=4/13 after pass=4/13
+   still FAIL  W11-m1-required-input-delivery-accuracy
+   still FAIL  W11-m2-current-version-selection-accuracy
+   still FAIL  W11-m3-superseded-input-leakage-rate
+   still FAIL  W11-m4-missing-required-input-detection
+   still FAIL  W11-m5-staleness-propagation-accuracy
+   still FAIL  W11-m6-requirement-to-code-traceability-coverage
+   still FAIL  W11-m7-requirement-to-test-traceability-coverage
+   still FAIL  W11-m8-orphan-detection-recall-fp
+   still FAIL  W11-m9-fresh-agent-reconstruction-correctness
+== W12-scheduler-integration: before pass=5/17 after pass=0/0
+   only before W12-G0-current-version-substitution-blocked(claim): FAIL
+   only before W12-G0-superseded-target-substitution-blocked(cit): FAIL
+   only before W12-G0-authority-substitution-blocked(cit execute): PASS
+   only before W12-G1-mutation-detected(index): PASS
+   only before W12-G1-dependency-evidence-invalidated: FAIL
+   only before W12-G2-input-consumption-traceability-verified-at-close: FAIL
+   only before W12-G3-continuity-verified(stale packet handoff): FAIL
+   only before W12-G3-continuity-verified(missing input handoff): FAIL
+   only before W12-G3-continuity-verified(checkpoint): FAIL
+   only before W12-G4-cit-wider-propagation: PASS
+   only before W12-G4-propagation-after-noncit-architecture-change: FAIL
+   only before W12-G5-audits-superseded-consumption: FAIL
+   only before AC16-W12xO5-health-state-reflects-superseded-consumption: FAIL
+   only before W12-G5-audits-missing-input: PASS
+   only before AC16-W12xO5-health-state-reflects-missing-input: PASS
+   only before W12-G5-audits-end-to-end-lineage: FAIL
+   only before AC16-W12xO5-tier-scheduler-present: FAIL
+TOTAL FAIL->PASS=15 PASS->FAIL=0

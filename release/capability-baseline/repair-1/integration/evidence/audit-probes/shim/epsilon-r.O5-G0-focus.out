@@ -1,0 +1,35 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): epsilon-r/O5-G0-focus mode=shim
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 b81c921e1e628ca71f1ea596760b6b3184bb3b88241a9cc1ee031ae4acdcf4c5; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/mirror-shim/target/release/gov
+# date 2026-09-19T02:46:39Z
+
+=== 1 init --force as independent-auditor (L0; install_kernel requires L4) while FREEZE_WRITES is active
+exit=0 true
+L0 task create (control): exit=4 FROZEN
+L0 init --force: exit=4 {"err": "FROZEN", "ok": false, "version": null}
+files changed: 
+project override after re-init: {'MEMORY_POLICY.freshness.max_index_age_hours': 24}
+control state after: {'agents_cancelled': False, 'mode': 'RUNNING', 'reason': 'incident', 'role': 'orchestrator', 'session': 'S-probe', 'updated_at': '2026-09-19T02:46:40Z', 'writes_frozen': True}
+
+=== 2 memory heldout-starter --force as L0 while frozen: the governed held-out retrieval test set is regenerated
+before: queries 20 has HQ-900: True
+exit=0 true
+L0 heldout-starter --force: exit=4 {"err": "FROZEN", "ok": false, "r": null}
+after : queries 20 has HQ-900: True generated_by: gov init
+
+=== 3 adopt baseline as L0 while frozen
+exit=0 true
+L0 adopt baseline: exit=4 {"err": "FROZEN", "ok": false, "stage": null}
+files changed: 
+
+=== 4 audit (persist), adapters generate, tools registry while frozen
+exit=0 true
+audit: exit=4 FROZEN
+adapters generate: exit=4 FROZEN
+tools registry: exit=4 FROZEN
+files changed: 
+
+=== 5 route --record while frozen with a cost above BUDGET_POLICY: a human gate is minted under FREEZE_WRITES
+exit=0 true
+route --record: exit=4 {"err": "FROZEN", "gate": null, "ok": false, "threshold": null}
+[exit=0]

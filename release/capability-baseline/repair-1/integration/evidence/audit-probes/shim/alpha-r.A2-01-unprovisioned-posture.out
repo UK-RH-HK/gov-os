@@ -1,0 +1,91 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): alpha-r/A2-01-unprovisioned-posture mode=shim
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 0e629a6496140f3ef8c3cd84724b219cdfb215b60cf028b303c586421404a193; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/mirror-shim/target/release/gov
+# date 2026-09-19T02:39:29Z
+## [U0] trust posture of a fresh machine
+$ gov trust status
+  -> ok (exit 0) {"machine_id": "367064dff64dcbda3094b48a3b21c08f", "state_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-01-unprovisioned-posture-xr3RVl/alpha-r-a2-unprov-n2yrrf8_/home/.local/state/governance-os/machine", "posture": "UNPROVISIONED", "trust_anchor": null, "provisioned": null, "floors": {"product": "agentic-engineering-os", "metadata_high_water": {}, "release_high_water": {"version": "", "sequence": 0}, "minimum_secure": {"release": "", "sequence": 0, "source_metadata_sha256": ""}, "updated_at": "", "note": …
+
+## [U1] a release is built, then one payload file is TAMPERED after the build (pre-install tampering)
+tampered file: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-01-unprovisioned-posture-xr3RVl/alpha-r-a2-unprov-n2yrrf8_/rel/releases/4.1.5/kernel/policies/SECURITY_POLICY.yaml -> never_index_classes: []
+$ gov release verify /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-01-unprovisioned-posture-xr3RVl/alpha-r-a2-unprov-n2yrrf8_/rel/releases/4.1.5
+  -> ok (exit 0) {"version": "4.1.5", "ok": false, "modified": ["policies/SECURITY_POLICY.yaml"], "missing": [], "added": [], "release_hash_matches_kernel": true, "certification": {"effective_status": "UNCERTIFIED", "authenticated": false, "basis": "this machine holds no Signed Release Root trust anchor, so no certification claim can be authenticated; the candidate is treated as uncertified", "unsigned_manifest_claim": {"certified_at": "", "implementer_evidence": "", "independent_verifier": "", "status": "READY_FOR_INDEPENDENT_OS_VERIFICATION"}}}
+
+## [U2] gov init --source <tampered release> on the UNPROVISIONED machine
+$ gov init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-01-unprovisioned-posture-xr3RVl/alpha-r-a2-unprov-n2yrrf8_/rel/releases/4.1.5/kernel --name pu --alias pu-a --skip-index
+  -> ok (exit 0) {"root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-alpha-r-A2-01-unprovisioned-posture-xr3RVl/alpha-r-a2-unprov-n2yrrf8_/p-unprov", "version": "4.1.5", "release_hash": "014b90f83ad69c27bc4af6d196607f8e7d4225a58ea1d17565ef7dbaaa0d7b3f", "source": "source:agentic-engineering-os@4.1.5", "kernel_files": 122, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EXCEPTIONS.yaml"], "tools": 16…
+[U2] release_authenticity.authenticity = UNKNOWN | posture = UNPROVISIONED | currency = UNKNOWN
+[U2] notes: ["this machine holds no provisioned Signed Release Root trust anchor, so release authenticity is UNKNOWN and no authenticity claim is made. Provision one with `gov trust provision`. Verified-byte binding, atomic commit, the protected high-water and the D-0007 installed-integrity control all remain in force.", "no protected release floor is in force for `init` on this machine: none has been established from a verified release yet. Provision a trust anchor and install a signed release to establish one."]
+[U2] installed SECURITY_POLICY carries the tampered line: True
+[U2] effective SECURITY_POLICY.never_index_classes = []
+[U2] gov kernel trust: verified = True | installed kernel 4.1.5 intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record
+[U2] framework.lock:
+framework: agentic-engineering-os
+version: 4.1.5
+release_commit: unverified
+release_hash: 014b90f83ad69c27bc4af6d196607f8e7d4225a58ea1d17565ef7dbaaa0d7b3f
+source: source:agentic-engineering-os@4.1.5
+installed_at_commit: 164922895a4d0b103b17e7fdb1beb90f00c6c0ca
+installed_at: '2026-09-19T02:39:29Z'
+kernel_manifest_hash: 58ea3a2756c982c33716e6de49fe48b946bc02ebd984c7faa192dd00bacd9ca9
+cli_version: 4.1.5
+schema_versions:
+  capability-profile: 1.0.0
+  checkpoint: 1.0.0
+  cit: 1.0.0
+  context-packet: 1.0.0
+  data-sensitivity: 1.0.0
+  decision: 1.1.0
+  feature: 1.0.0
+  framework-change-proposal: 1.0.0
+  framework-lock: 1.1.0
+  handoff: 1.0.0
+  index-manifest: 1.0.0
+  kernel-manifest: 1.0.0
+  lesson: 1.0.0
+  migration: 1.1.0
+  model-routing-overrides: 1.0.0
+  plugin-descriptor: 1.2.0
+  plugin-registry: 1.0.0
+  project-exceptions: 1.0.0
+  project-policy: 1.0.0
+  record: 1.0.0
+  release-manifest: 1.2.0
+  repository-contract: 1.0.0
+  skill: 1.0.0
+  task: 1.0.0
+  tool: 1.2.0
+  tool-permissions: 1.0.0
+  upstream-packet: 1.0.0
+lock_schema_version: 1.1.0
+authenticity: UNKNOWN
+sequence: null
+channel: null
+release_metadata_sha256: null
+identity_basis:
+  established_by: 'not established: installed on a machine with no Signed Release Root trust anchor (authenticity UNKNOWN)'
+  version: declared by the installed payload's KERNEL.yaml (not authenticated)
+  release_hash: measured digest of the installed payload (verified-byte binding at install)
+  kernel_manifest_hash: digest of the manifest committed from the measured staging copy
+  release_commit: no verified source binds a release commit for this payload; unsigned claims (a manifest.json beside the source, a checkout's Git HEAD) are not recorded as identity
+  source: an unauthenticated kernel source
+  note: framework.lock records a release identity; it never establishes trust (OWNER-DIRECTIVE-0004). Post-install integrity is checked against this machine's protected installation record, which a repository cannot rewrite.
+
+[U2] gov status.release_trust = {"posture": "UNPROVISIONED", "authenticity": "UNKNOWN", "verified_release": null, "verified_payload_hash": null, "currency": "UNKNOWN_BETWEEN_INGRESSES", "revocation_knowledge": "only revocations this machine has received; no claim about unseen or future revocations", "marking": null, "below_floor": false, "detail": "gov trust status"}
+[U2] gov status.framework   = {"name": "agentic-engineering-os", "version": "4.1.5", "release_hash": "014b90f83ad69c27bc4af6d196607f8e7d4225a58ea1d17565ef7dbaaa0d7b3f", "cli_version": "4.1.5", "installed_at": "2026-09-19T02:39:29Z"}
+[U2] envelope release_trust.presented_as = UNAUTHENTICATED
+[U2] doctor verdict = DEGRADED | release_trust = {"surface": "doctor", "below_floor": false, "marking": null, "presented_as": "UNAUTHENTICATED", "section_6_bullet": 7, "authenticity_established": false, "disclosure": ["release authenticity UNKNOWN: this machine holds no provisioned Signed Release Root trust anchor, so no installation on it can be 
+[U2] doctor failing checks: [('D009', 'medium', 'derived runtime absent'), ('D010', 'medium', 'no index manifest'), ('D021', 'medium', 'no green governance record')]
+[U2] doctor checks mentioning authenticity/posture: ['D026']
+[U2] trust status: posture = UNPROVISIONED | installed_release = null | floors = {"version": "", "sequence": 0}
+
+## [U3] gov init with the EMBEDDED payload (the README path) on the unprovisioned machine
+[U3] ok = True | authenticity = UNKNOWN | source = embedded:agentic-engineering-os@4.1.5
+
+## [U4] a source directory that regenerates its OWN identity (consistent manifest + manifest.json claiming CERTIFIED)
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/mirror-shim/release/capability-baseline/audit-0/alpha-r/evidence/A2-01-unprovisioned-posture.py", line 65, in <module>
+    print("[U4] attacker built a release with certification.status =", b2["result"]["certification"]["status"])
+                                                                       ~~^^^^^^^^^^
+KeyError: 'result'
+[exit=1]

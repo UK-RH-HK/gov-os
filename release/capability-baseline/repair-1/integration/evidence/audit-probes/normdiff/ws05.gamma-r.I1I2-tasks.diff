@@ -1,0 +1,8 @@
+# normalised diff: release/capability-baseline/repair-1/ws05/evidence/probe-reruns/gamma-r/I1I2-tasks.repaired.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/gamma-r.I1I2-tasks.out
+# changed lines: 2
+--- recorded (builder branch)
++++ integrated
+@@ -50 +50 @@
+-  skills resolved= [{'id': 'SKL-BACKEND-IMPL', 'version': '1.0.0', 'source': 'kernel'}] missing= ['SKL-DOES-NOT-EXIST'] gap= True
++  skills resolved= [{'id': 'SKL-BACKEND-IMPL', 'version': '1.0.0', 'source': 'kernel', 'content_sha256': '<hex>'}] missing= ['SKL-DOES-NOT-EXIST'] gap= True

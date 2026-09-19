@@ -1,0 +1,25 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): alpha-r/S3-S4-role-flag-authority mode=shim
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 1b8db61c472894690bed92eb598bb21d7552e52e089362dd39fc400f0aafb3c3; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/mirror-shim/target/release/gov
+# date 2026-09-19T02:45:35Z
+## [R1] gov init --force (install_kernel requires L4)
+[R1] --role independent-auditor (L0) init --force                      -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLI
+[R1] GOV_ROLE=independent-auditor init --force                         -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLI
+[R1] control: --role independent-auditor kernel reinstall (same install_kernel class) -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'install_kernel'; 'install_kernel' requires L4 (AUTHORITY_POLI
+
+## [R2] gov adopt stages under a declared low-authority role
+[R2] --role independent-auditor adopt baseline                         -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY
+[R2] --role independent-auditor adopt inventory                        -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY
+[R2] --role independent-auditor adopt classify                         -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY
+[R2] --role independent-auditor adopt map                              -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY
+[R2] --role independent-auditor adopt plan                             -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY
+[R2] --role independent-auditor adopt test-design                      -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'adoption_plan'; 'adoption_plan' requires L3 (AUTHORITY_POLICY
+[R2] adopt review                                                      -> REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+[R2] --role independent-auditor (L0) adopt migrate --batch 0 (kernel install, migrate_execute L3) -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_PO
+[R2] --role independent-auditor (L0) adopt migrate (all batches)       -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_PO
+[R2] GOV_ROLE=independent-auditor adopt migrate --batch 2              -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_PO
+[R2] verify-migration                                                  -> REFUSED ADOPTION_NOT_STARTED: run `gov adopt baseline` (A0) first
+[R2] --role independent-auditor (L0) adopt extract-legacy (migrate_execute L3) -> REFUSED AUTHORITY_DENIED: role 'independent-auditor' (L0) may not perform 'migrate_execute'; 'migrate_execute' requires L3 (AUTHORITY_PO
+
+DONE
+[exit=0]

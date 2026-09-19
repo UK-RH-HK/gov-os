@@ -1,0 +1,18 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): synthesis/AC16-X3-ingress-root-of-trust-chain mode=integrated
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 084822d55912dd189ae581267688f8f34bdbc5b17c29acb62780e2f93bc3b211; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+# date 2026-09-19T02:28:36Z
+X X3a-S3xA2-unprovisioned-refuses-unauthenticated PASS S3<->A2:143 on the default (unprovisioned) posture, privileged kernel material whose authenticity cannot be established is not installed -- {"init_ok": false, "authenticity": null, "posture": null}
+[X3b] trust provision ok = True
+X X3b-S3xA2-provisioned-refuses-tampered PASS S3<->A2 on a provisioned machine the release tampered after signing is refused at init -- {"ok": false, "code": "AUTHORITY_DENIED"}
+[X3c] authentic install ok = False authenticity = None
+[X3c-before-tamper] {"effective_never_index_classes": null, "rebuild_ok": false, "secret_retrieved_by": [], "status.release_trust": {"authenticity": null, "posture": null, "verified_release": null, "verified_payload_hash": null}, "envelope.presented_as": "CURRENT", "doctor": "UNHEALTHY", "doctor_failing": [["D001", "missing"]], "audit": null, "audit_findings": []}
+X X3c-baseline-secret-excluded PASS baseline: on an authentic install the path-classified secret is not retrievable -- []
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/audit-0/synthesis/evidence/AC16-X3-ingress-root-of-trust-chain.py", line 127, in <module>
+    weaken(os.path.join(kd, "policies", "SECURITY_POLICY.yaml"))
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/audit-0/synthesis/evidence/AC16-X3-ingress-root-of-trust-chain.py", line 44, in weaken
+    t = open(policy_file).read()
+        ^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-integrated-synthesis-AC16-X3-ingress-root-of-trust-chain-XQAWre/tmp/alpha-r-synth-x3p-asml2ulh/pc/governance/kernel/policies/SECURITY_POLICY.yaml'
+[exit=1]

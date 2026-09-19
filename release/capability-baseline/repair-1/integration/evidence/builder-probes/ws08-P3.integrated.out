@@ -1,0 +1,16 @@
+# P2-AR-0022 builder-probe re-run: probe=ws08-P3 mode=integrated
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov sha256 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332; invoked as /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+# date 2026-09-19T02:07:08Z
+# $ env GOV=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov PROBE_TMP=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws08-P3-integrated-1789783628 timeout 900 python3 WS08-P3-certification-and-lock-identity.py
+## C1/C2 provisioned machine, update gating
+W C1a FAIL an unsigned CERTIFIED claim does not waive the Human Decision Gate -- {"certification": null, "human_gate_required": null, "certification_basis": null}
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/repair-1/ws08/evidence/WS08-P3-certification-and-lock-identity.py", line 44, in <module>
+    "`gov update --apply` stops at the gate; nothing is installed", {"code": err(ap), "lock_version": lock(p)["version"]})
+                                                                                                      ^^^^^^^
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/repair-1/ws08/evidence/ws08_common.py", line 120, in lock
+    return yaml.safe_load(open(os.path.join(proj, "governance/framework.lock")))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/bp/bp-ws08-P3-integrated-1789783628/alpha-r-ws08-p3-M-fv83n4t5/p/governance/framework.lock'
+[exit=1]

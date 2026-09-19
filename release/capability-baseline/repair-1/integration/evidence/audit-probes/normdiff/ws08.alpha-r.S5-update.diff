@@ -1,0 +1,36 @@
+# normalised diff: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/S5-update.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/alpha-r.S5-update.out
+# changed lines: 23
+--- recorded (builder branch)
++++ integrated
+@@ -10,5 +10,5 @@
+-[U2] apply after the gate: True | applied = True | from 4.1.4 to 4.1.5
+-[U2] migrations = ['M-4.1.4-4.1.5'] | operations = [{"op": "note", "file": "", "dry_run": false}, {"op": "note", "file": "", "dry_run": false}, {"op": "set_lock_field", "file": "", "dry_run": false}, {"op": "require_index_rebuild", "file": "", "dry_run": false}, {"op": "regenerate_adapters", "file": "", "dry_run": false}]
+-[U2] overlay_keys_changed = [] | overlay_reconciled = []
+-[U2] index_manifest = <hex> | doctor = DEGRADED | audit = HEALTHY | lock = {'release_commit': 'unverified', 'source': 'source:agentic-engineering-os@4.1.5', 'authenticity': 'UNKNOWN', 'version': '4.1.5'}
+-[U2] release_authenticity = UNKNOWN
++[U2] apply after the gate: False | applied = None | from None to None
++[U2] migrations = None | operations = null
++[U2] overlay_keys_changed = None | overlay_reconciled = None
++[U2] index_manifest = None | doctor = None | audit = None | lock = None
++[U2] release_authenticity = None
+@@ -18 +18 @@
+-[U3] spec/ changes since the pre-update commit (git status): ['?? spec/decisions/D-0002.yaml', '?? spec/decisions/HDG-0001.yaml', '?? spec/reports/checkpoints/CKPT-00001.yaml', '?? spec/reports/checkpoints/CKPT-00002.yaml', '?? spec/reports/checkpoints/LATEST.yaml', '?? spec/reports/framework-updates.jsonl']
++[U3] spec/ changes since the pre-update commit (git status): ['?? spec/decisions/D-0002.yaml', '?? spec/decisions/HDG-0001.yaml', '?? spec/reports/checkpoints/CKPT-00001.yaml', '?? spec/reports/checkpoints/LATEST.yaml', '?? spec/reports/framework-updates.jsonl']
+@@ -23 +23 @@
+-[U3] lock now: {'version': '4.1.5', 'release_commit': 'unverified', 'source': 'source:agentic-engineering-os@4.1.5'}
++[U3] lock now: {'version': '4.1.4', 'release_commit': 'unverified', 'source': 'source:agentic-engineering-os@4.1.4'}
+@@ -26 +26 @@
+-[U4] {"event": "update", "from": "4.1.4", "to": "4.1.5", "by": "product-owner", "session": "S-<hex>", "role": "orchestrator", "result": "committed", "release_commit": "unverified", "source": "source:agentic-engineering-os@4.1.5"}
++[U4] {"event": "rollback", "from": "4.1.5", "to": "4.1.4", "by": "S-<hex>", "session": "S-<hex>", "role": "orchestrator", "result": "rolled_back", "release_commit": null, "source": null}
+@@ -29 +29 @@
+-[U5] rollback: True | rolled_back_to = 4.1.4 | kernel_ok = True | doctor = DEGRADED | error = None
++[U5] rollback: False | rolled_back_to = None | kernel_ok = None | doctor = None | error = SNAPSHOT_MISSING
+@@ -31 +31 @@
+-[U5] ledger rollback entry: {"event": "rollback", "from": "4.1.5", "to": "4.1.4", "rolled_back_update": {"from": "4.1.4", "to": "4.1.5", "applied_at": "<ts>", "migrations": ["M-4.1.4-4.1.5"], "by": "product-owner", "session": "S-<hex>"}, "authority_level": "L4", "reason": "probe rollback", "resulting_lock": {"version": "4.1.4", "release_hash": "<hex>", "release_commit": "unverified", "source": "source:agentic-engineering-os@4.1.4", "lock_hash
++[U5] ledger rollback entry: {"event": "rollback", "from": "4.1.5", "to": "4.1.4", "rolled_back_update": {"from": "4.1.4", "to": "4.1.5", "applied_at": "<ts>", "migrations": ["M-4.1.4-4.1.5"], "by": "product-owner", "session": "S-<hex>"}, "authority_level": "L4", "reason": "automatic: VERIFICATION_FAILED (doctor reports critical findings after update: D027)", "resulting_lock": {"version": "4.1.4", "release_hash": "<hex>", "release_commit": "un
+@@ -43 +43 @@
+-[U7] last ledger entry: {"event": "rollback", "from": "4.1.5", "to": "4.1.4", "reason": "probe rollback", "result": "rolled_back"}
++[U7] last ledger entry: {"event": "rollback", "from": "4.1.5", "to": "4.1.4", "reason": "automatic: VERIFICATION_FAILED (doctor reports critical findings after update: D027)", "result": "rolled_back"}
+@@ -52 +51,0 @@
+-[S5-update exit=0]

@@ -1,0 +1,28 @@
+## R1 provisioned machine: consistent rewrite of the installed AUTHORITY_POLICY after an authentic install
+[R1] init ok = True | authenticity = AUTHENTIC
+[R1] gate raised and presented before the rewrite: HDG-0001
+W R1a PASS `gov kernel verify` detects the consistent rewrite and names the file -- {"ok": false, "modified": ["policies/AUTHORITY_POLICY.yaml"]}
+W R1b PASS the installed kernel is untrusted T1: the embedded baseline is substituted (D-0007 rule 1) -- {"verified": false, "summary": "installed kernel FAILED verification (kernel payload is not the payload this machine committed into this project (26ea7d2d48a0e9ec1b152b24a671a6190da0dc0c20e0d05b61b2122db857dd72), whatever KERNEL_MANIFEST.json and framework.lock say: modified [\"policies/AUTHORITY_POLICY.yaml\"] missing [] added []. A post-install rewrite, or a change made without an ingress on this machine: verify the release framework.lock pins with `gov kernel reinstall --source <signed release>`); constitutional policy is read from the embedded baseline 4.1.5 and mutating operations are refused (KERNEL_TAMPERED)"}
+W R1c PASS an L1 worker still cannot record a human answer to a Human Decision Gate after the rewrite -- {"ok": false, "code": "AUTHORITY_DENIED"}
+W R1d PASS mutating operations fail closed (KERNEL_TAMPERED) -- KERNEL_TAMPERED
+W R1e PASS doctor is UNHEALTHY and D003 names the rewritten file -- {"verdict": "UNHEALTHY", "D003": [{"id": "D003", "name": "kernel payload integrity", "ok": false, "severity": "critical", "message": "modified=[\"policies/AUTHORITY_POLICY.yaml\"] missing=[] added=[]", "remediation": "gov kernel reinstall --source <release> (kernel is immutable, INV-007)", "enforcement": {"mode": "hard-block", "refuses": [{"at_or_above": "critical", "operations": ["task.create", "task.claim", "task.close", "cit.propose", "cit.approve", "cit.execute", "handoff.create", "release.build", "update.apply", "adopt.migrate"], "scope": "global"}], "below_threshold": "warning"}}]}
+W R1f PASS the rewritten installation is not presented as current -- UNAUTHENTICATED
+W R1h PASS a reinstall against the rewritten pin is refused before anything moves, naming the pin this machine recorded -- {"code": "KERNEL_PIN_REWRITTEN", "installation_unchanged": true, "recorded": {"release_hash": "26ea7d2d48a0e9ec1b152b24a671a6190da0dc0c20e0d05b61b2122db857dd72", "kernel_manifest_hash": "97899990d335bee2354af1227615b5c843cdf8fae0fc31488b6a0de68f568424", "release_version": "4.1.5", "ingress": "init", "at": "2026-09-19T02:16:26Z"}}
+W R1g PASS remedy: pin restored, `gov kernel reinstall --source <signed release>` restores a trusted kernel; the L3 floor is back -- {"reinstall": true, "verified": true, "gate_create": true, "l1_decide": "AUTHORITY_DENIED"}
+
+## R2 unprovisioned machine: consistent rewrite of a project this machine installed
+W R2a PASS on the default posture the rewrite is REPORTED: kernel trust names the divergence and the presentation discloses it -- {"protected_record": {"state": "DIVERGED_NOT_ENFORCED", "basis": "the installed payload 014b90f83ad69c27bc4af6d196607f8e7d4225a58ea1d17565ef7dbaaa0d7b3f is not the payload 26ea7d2d48a0e9ec1b152b24a671a6190da0dc0c20e0d05b61b2122db857dd72 this machine installed into this project. This machine holds no trust anchor, so its record is itself unauthenticated: the divergence is reported, not enforced (OD-P2-02 is with the owner)"}, "presented_as": "UNAUTHENTICATED", "disclosure": "release authenticity UNKNOWN: this machine holds no provisioned Signed Release Root trust anchor, so no installation on it can be authenticated. It is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and ins"}
+O R2b not enforced on the unprovisioned posture (OD-P2-02 is with the owner): kernel trust verified=True, task create -> True
+
+## R3 a second provisioned machine that did not install the project (git clone)
+W R3a PASS machine B refuses privileged work on a kernel it never verified (ARCH-0003 §8) -- KERNEL_UNANCHORED
+W R3b PASS machine B does not present the unverified installation as current -- UNAUTHENTICATED
+W R3c PASS after `gov kernel reinstall --source <the pinned signed release>` machine B works on it and presents it as current -- {"reinstall": true, "task_create": true, "presented_as": "CURRENT"}
+
+## R4 the same provisioned machine, the project copied to a new path
+W R4a PASS the machine's verified-release ledger anchors a payload it verified, wherever the project now sits -- {"task_create": true, "protected_record": null}
+
+## R5 installed while unprovisioned, then the machine is provisioned
+W R5a PASS an install made before provisioning is not a verification: privileged work waits for one -- KERNEL_UNANCHORED
+W R5b PASS verifying the pinned signed release anchors it -- {"reinstall": true, "task_create": true}
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/release/capability-baseline/repair-1/ws03/evidence/gov-role-shim.sh total=15 pass=15 fail=0 failed=[]

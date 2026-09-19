@@ -1,0 +1,31 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): synthesis/AC06-oracle-format-search mode=integrated
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 801336027d49d3dabccc4e051dccf90fb327510aa97751e3b221d6a09fbbb273; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-integration/target/release/gov
+# date 2026-09-19T02:28:38Z
+## tracked files whose NAME mentions oracle/fault/qualif/scoring (outside audit evidence):
+AC06-oracle-format-search.out
+AC06-oracle-format-search.sh
+## tracked files whose CONTENT defines V1-V4 field identifiers (snake/kebab/camel):
+  fault[_-]?id                             <none>
+  hidden[_-]?authoritative[_-]?truth       <none>
+  injected[_-]?repository[_-]?state        <none>
+  expected[_-]?detection                   <none>
+  expected[_-]?governed[_-]?action         <none>
+  forbidden[_-]?outcomes                   <none>
+  expected[_-]?target[_-]?path             <none>
+  must[_-]?be[_-]?indexed                  <none>
+  expected[_-]?retrieval[_-]?results       <none>
+  detection[_-]?recall                     <none>
+  impact[_-]?map[_-]?accuracy              <none>
+  path[_-]?map[_-]?accuracy                <none>
+## kernel schemas (framework/schemas) naming oracle/fault/qualification:
+ls: cannot access 'framework/schemas': No such file or directory
+  <none>
+## gate register entry:
+grep: release/orchestration/phase-2/GATES/GATE-REGISTER.yaml: No such file or directory
+## CLI surface:
+  gov qualify        unrecognised
+  gov oracle         unrecognised
+  gov score          unrecognised
+  gov qualification  unrecognised
+[exit=0]

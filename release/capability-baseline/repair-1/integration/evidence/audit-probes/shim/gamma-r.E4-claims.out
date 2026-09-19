@@ -1,0 +1,90 @@
+# P2-AR-0022 audit-of-record probe re-run (unedited): gamma-r/E4-claims mode=shim
+# worktree HEAD 811317b5bbf93cd2a71c911d895c4ce67c44114a; product files differing from HEAD: 0
+# probe sha256 5359b16777464767904912140a5f8b6b1412dc92d56861afbf54354a7446bc05; gov 7095d1881185190904d7ec7172fbeaf46f248fc277cf3e61d715f63a30670332 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/mirror-shim/target/release/gov
+# date 2026-09-19T02:37:36Z
+project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/ap-shim-gamma-r-E4-claims-1JtARo/e4
+
+==== E4.b1 sessions claim tasks (claim record: task, session, role, lease) ====
+  claim: {'task_id': 'TASK-A', 'session_id': 'S-alpha', 'role': 'backend-engineer', 'claimed_at': '2026-09-19T02:37:38Z', 'expires_at': '2026-09-19T06:37:38Z'} baseline files: 174
+  task status now: task_status: IN_PROGRESS
+  claim store: claims.db
+$ is there any worktree/branch identity in a claim? (schema of the claims table)
+   CREATE TABLE claims (task_id TEXT PRIMARY KEY, session_id TEXT, role TEXT, claimed_at TEXT, expires_at TEXT)
+$ the same session re-claiming renews its own lease
+exit=0 ok=true
+
+==== E4.b2 claim collision is detected (sequential) ====
+$ a second session claims TASK-A while S-alpha holds it
+exit=1 ok=false code=TASK_CLAIMED msg=TASK-A is claimed by session S-alpha until "2026-09-19T06:37:38Z"
+$ the second session tries to close / release it without --force
+exit=1 ok=false code=TASK_CLAIMED msg=TASK-A is claimed by another session; --force requires L3+
+exit=1 ok=false code=TASK_CLAIMED msg=TASK-A is held by S-alpha; releasing another session's claim requires --force (L3+)
+
+==== E4.b2.race claim collision under true concurrency (3 sessions launched simultaneously per trial) ====
+  trial  1: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X1']
+  trial  2: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y2']
+  trial  3: successes=1 [ X:TASK_CLAIMED Y:TASK_CLAIMED Z:OK] final holder=['S-Z3']
+  trial  4: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y4']
+  trial  5: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X5']
+  trial  6: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y6']
+  trial  7: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y7']
+  trial  8: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X8']
+  trial  9: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y9']
+  trial 10: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y10']
+  trial 11: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X11']
+  trial 12: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y12']
+  trial 13: successes=1 [ X:TASK_CLAIMED Y:OK Z:TASK_CLAIMED] final holder=['S-Y13']
+  trial 14: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X14']
+  trial 15: successes=1 [ X:OK Y:TASK_CLAIMED Z:TASK_CLAIMED] final holder=['S-X15']
+  SUMMARY: trials=15  more-than-one-session-told-it-holds-the-claim=0  exactly-one=15  none=0
+
+==== E4.b3 claims survive derived-memory rebuild ====
+exit=0 ok=true
+  before:
+    TASK-B S-gamma backend-engineer expires 2026-09-19T06:37:42Z 
+$ delete the derived index (state.db) and rebuild; then gov memory rebuild (full)
+exit=0 ok=true
+exit=0 ok=true
+  after:
+    TASK-B S-gamma backend-engineer expires 2026-09-19T06:37:42Z 
+$ the claim still binds: another session is refused
+exit=1 ok=false code=TASK_CLAIMED msg=TASK-B is claimed by session S-gamma until "2026-09-19T06:37:42Z"
+$ claims live in .governance-runtime/claims.db: a fresh clone (no runtime dir) has no claims (derived runtime is machine-local)
+  clone claims: []
+
+==== E4.b4 stale (expired) claims have governed recovery ====
+$ age S-gamma's lease on TASK-B into the past (simulating a dead session) directly in claims.db
+    TASK-B S-gamma backend-engineer expires 2020-01-01T00:00:00Z expired
+  suite concurrency_claims: {'ok': True, 'findings': 1, 'detail': {'claims': 1, 'expired': 1}, 'status': 'executed', 'cached_from': None} ['1 expired claim(s) not swept']
+$ sweep by L1 (sweep_claims L3) is refused; recover --dry-run reports; recover (L3) sweeps and records a report
+exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'sweep_claims'; 'sweep_claims' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+  dry-run items: [{'kind': 'claims', 'expired': 1, 'classification': 'COMPLETE_UNVERIFIED'}]
+  recover ok= True actions= [{'claims_swept': 1}] report= None
+  report: RPT-0001.yaml
+$ alternatively an expired lease no longer blocks: a new session may take the task
+exit=0 ok=true
+exit=0 ok=true
+$ force release of a live claim needs L3 (force_release_task)
+exit=1 ok=false code=CLAIM_SCOPE_CONFLICT msg=TASK-D: its mutation scope unrestricted (the task declares no allowed_paths) overlaps live claim(s) of other sessions: TASK-C (session S-zeta, scope unrestricted (the task declares no allowed_paths)); parallel work is permitted only on disjoint mutation scopes — wait for them to close or release, or
+exit=1 ok=false code=AUTHORITY_DENIED msg=role 'product-spec-agent' (L2) may not perform 'force_release_task'; 'force_release_task' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation: use a role whose kernel level meets AUTHORITY_POLICY.authority_levels_required.
+exit=0 ok=true
+
+==== E4.b5 parallel work only where dependency / mutation constraints permit ====
+$ dependency: TASK-DEP-B depends on open TASK-DEP-A; both stored READY
+  dag: TASK-DEP-B blocked: [['dependency TASK-DEP-A is READY']]
+$ a session claims TASK-DEP-B directly (task claim checks only the stored task_status)
+exit=0 ok=true
+  TASK-DEP-B status now: task_status: IN_PROGRESS
+$ and closes it while its dependency is still open
+exit=0 ok=true
+  TASK-DEP-A status: task_status: READY  TASK-DEP-B status: task_status: DONE
+$ gov continue --claim never offers a dependency-blocked task (it offers only DAG-runnable ones)
+  continue offers: TASK-DEP-A parallel: ['TASK-A', 'TASK-B', 'TASK-C', 'TASK-D', 'TASK-RACE1']
+$ mutation overlap: two READY tasks with the same allowed_paths are claimed concurrently by two sessions
+exit=0 ok=true
+exit=1 ok=false code=CLAIM_SCOPE_CONFLICT msg=TASK-M2: its mutation scope ["src/**"] overlaps live claim(s) of other sessions: TASK-M1 (session S-m1, scope ["src/**"]); parallel work is permitted only on disjoint mutation scopes — wait for them to close or release, or narrow the task's allowed_paths
+$ first closer (S-m1, declares src/lib.rs); second closer (S-m2, declares src/extra/m2.rs)
+exit=1 ok=false code=MUTATION_SCOPE_VIOLATION msg=task TASK-M1: the repository shows mutations the report does not declare or the contract does not allow (undeclared: ["src/extra/m2.rs"]; out of scope: []); declare every change in files_changed, route out-of-scope changes through a CIT, or amend the task contract
+exit=1 ok=false code=CLAIM_REQUIRED msg=TASK-M2 is not claimed by session S-m2; claim it first (`gov task claim TASK-M2`) — the claim records the mutation baseline, scope and working tree the close is checked against
+END
+[exit=0]

@@ -1,0 +1,8 @@
+# normalised diff: release/capability-baseline/repair-1/ws03/evidence/probes/final-unedited/synthesis.AC16-X2-authority-gate-chain.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/integrated/synthesis.AC16-X2-authority-gate-chain.out
+# changed lines: 2
+--- recorded (builder branch)
++++ integrated
+@@ -22 +22 @@
+-   ok {"checkpoint": "CKPT-00001", "degraded": [], "report": "RPT-0001", "task": "TASK-W", "task_status": "DONE"}
++   ok {"checkpoint": "CKPT-00001", "degraded": [], "overrides": [], "report": "RPT-0001", "task": "TASK-W", "task_status": "DONE"}

@@ -1,0 +1,30 @@
+# normalised diff: release/capability-baseline/repair-1/ws09-11/evidence/after/S4-adopt-raw-sql-chat-store.out
+#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim-raw-sql/alpha-r.S4-adopt-end-to-end.RAW_SQL_STORE.out
+# changed lines: 18
+--- recorded (builder branch)
++++ integrated
+@@ -9 +9 @@
+-[A0] adoption branch/worktree created? branches before: ['*', 'main'] after: ['*', 'main'] | worktrees: <path>  0daedfe [main]
++[A0] adoption branch/worktree created? branches before: ['*', 'main'] after: ['*', 'main'] | worktrees: <path>  b4eedf3 [main]
+@@ -74,3 +74,3 @@
+-[A5-arbitrary-role] ok {"stage": "A5", "verdict": {"verdict": "MIGRATION_PLAN_APPROVED", "session": "S-y", "role": "definitely-not-a-kernel-role", "at": "<ts>", "tests": 40, "notes": null}}
+-[A5] ok {"stage": "A5", "verdict": {"verdict": "MIGRATION_PLAN_APPROVED", "session": "<session>", "role": "migration-reviewer", "at": "<ts>", "tests": 40, "notes": "reviewed map and scaffold"}}
+-[A5] A5 verdict record: {'verdict': 'MIGRATION_PLAN_APPROVED', 'session': '<session>', 'role': 'migration-reviewer', 'at': '<ts>', 'tests': 40, 'notes': 'reviewed map and scaffold'}
++[A5-arbitrary-role] REFUSED UNKNOWN_ROLE: role 'definitely-not-a-kernel-role' is not defined in the kernel ROLES.yaml; use a kernel role id (e.g. orchestrator, backend-engineer, change-controller)
++[A5] ok {"stage": "A5", "verdict": {"verdict": "MIGRATION_PLAN_APPROVED", "session": "<session>", "role": "orchestrator", "at": "<ts>", "tests": 40, "notes": "reviewed map and scaffold"}}
++[A5] A5 verdict record: {'verdict': 'MIGRATION_PLAN_APPROVED', 'session': '<session>', 'role': 'orchestrator', 'at': '<ts>', 'tests': 40, 'notes': 'reviewed map and scaffold'}
+@@ -108 +108 @@
+-[A9] ok {"counts": {"artifacts": 225, "chunks": 582, "vectors": 559, "edges": 18, "symbols": 16, "symbol_refs": 18, "excluded": 4}, "excluded": 4, "secret_blocked": [], "heldout_generated": 31}
++[A9] ok {"counts": {"artifacts": 225, "chunks": 756, "vectors": 729, "edges": 20, "symbols": 16, "symbol_refs": 18, "excluded": 4}, "excluded": 4, "secret_blocked": [], "heldout_generated": 31}
+@@ -113 +113 @@
+-[A10] ok {"verdict": "MEMORY_ACCEPTED_FOR_V4_AUDIT", "heldout": {"recall_at_k": 0.<hex>, "mrr": 0.<hex>, "pass": true, "queries": 29, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0, "forbidden_violations": 0, "failed": [{"id": "HQ-021", "query": "\"How many times should gateway calls be retried?\"", "category": "lexical_literal", "routes": ["lexical_exact"], "expected": ["D-0001"], "got": ["D-0002"], "recall": 0.0, "precision": 0.0, "rr": 0.0, "forbidden_hits": [], "latency_ms": 1, "pass": false}, {"id": "HQ-027", "query": "what depends on D-0001", "category": "graph_impact", "routes": ["graph"], "expected": ["D-0001"], "got": ["D-0002"], "recall": 0.0, "precision": 0.0, "rr":
++[A10] ok {"verdict": "MEMORY_ACCEPTED_FOR_V4_AUDIT", "heldout": {"recall_at_k": 0.<hex>, "mrr": 0.<hex>, "pass": true, "queries": 29, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0, "forbidden_violations": 0, "failed": [{"id": "HQ-021", "query": "\"rationale: legacy gateway rate limits\"", "category": "lexical_literal", "routes": ["lexical_exact"], "expected": ["D-0001"], "got": ["D-L96e47cdee6", "D-L96e47cdee6"], "recall": 0.0, "precision": 0.0, "rr": 0.0, "forbidden_hits": [], "latency_ms": 1, "pass": false}, {"id": "HQ-022", "query": "\"How many times should gateway calls be retried?\"", "category": "lexical_literal", "routes": ["lexical_exact"], "expected": ["D-0001"], "g
+@@ -116 +116 @@
+-[A11] ok {"verdict": "NOT_ADOPTED_HEALTHY", "audit_verdict": "UNHEALTHY", "doctor": "UNHEALTHY", "findings": {"critical": 0, "high": 2, "medium": 2, "low": 0}}
++[A11] ok {"verdict": "NOT_ADOPTED_HEALTHY", "audit_verdict": "UNHEALTHY", "doctor": "UNHEALTHY", "findings": {"critical": 0, "high": 2, "medium": 2, "low": 10}}
+@@ -132 +132 @@
+-[A11] doctor_failed: [('D010', 'stale: 0 changed, 1 added, 0 removed'), ('D014', '0 supersession conflict(s), 1 duplicate id(s)'), ('D015', '1 dangling edge(s), 25 orphan record(s)'), ('D021', 'no green governance record')]
++[A11] doctor_failed: [('D010', 'stale: 0 changed, 1 added, 0 removed'), ('D014', '1 supersession conflict(s), 1 duplicate id(s)'), ('D015', '1 dangling edge(s), 25 orphan record(s)'), ('D021', 'no green governance record'), ('D031', 'schema_invariants (high) refuses ["task.close","cit.execute","release.build","up')]
+@@ -138 +138 @@
+-[T3] verdicts: {'A5': ('MIGRATION_PLAN_APPROVED', '<session>', 'migration-reviewer'), 'A7': ('MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD', '<session>', 'migration-verifier'), 'A10': ('MEMORY_ACCEPTED_FOR_V4_AUDIT', 'S-memv', 'memory-verifier'), 'A11': ('NOT_ADOPTED_HEALTHY', None, None)}
++[T3] verdicts: {'A5': ('MIGRATION_PLAN_APPROVED', '<session>', 'orchestrator'), 'A7': ('MIGRATION_ACCEPTED_FOR_MEMORY_REBUILD', '<session>', 'orchestrator'), 'A10': ('MEMORY_ACCEPTED_FOR_V4_AUDIT', 'S-memv', 'orchestrator'), 'A11': ('NOT_ADOPTED_HEALTHY', None, None)}
