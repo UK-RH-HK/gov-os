@@ -1,0 +1,42 @@
+# P2-AR-0034 R3-WS03-probes NEGATIVE CONTROL: base binary 53897c1 (gov sha256 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82), probe at the evidence commit's content
+CHECK ADJ2.a FAIL the owner's T2 binding authority installs on a provisioned machine and new seals take the provisioned scope -- error: unrecognized subcommand 't2-binding'
+
+Usage: gov-base-53897c1 trust [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK ADJ2.setup PASS machine A wrote a gate answer + decision, a pending gate, CIT state, a plugin registration and a suite record -- {"decide": null, "cit": "CIT-0001", "reg": true, "invoke": null}
+CHECK ADJ2.b FAIL a gate the owner answered on machine A is honoured on the owner's machine B (answer verified) -- {"binding": "KEY_UNAVAILABLE", "reason": "this machine holds no T2 binding key, so no record sealed anywhere can be verified here"}
+CHECK ADJ2.c FAIL every T2 record and every governed evidence record written on A is honoured on B (os_binding_integrity reports nothing unverified) -- {"KEY_UNAVAILABLE": 7, "health-output:KEY_UNAVAILABLE": 2}
+CHECK ADJ2.d FAIL a gate raised on A is answered by the owner on B -- T2_UNBOUND
+CHECK ADJ2.e FAIL a CIT simulated and answered on A is approved and executed on B (its sealed state and gate honoured) -- {"approve": "T2_UNBOUND", "execute": "T2_UNBOUND"}
+CHECK ADJ2.f FAIL a plugin registered and approved on A runs on B -- PLUGIN_REGISTRATION_UNBOUND
+CHECK ADJ2.g FAIL the governance-suite records written on A (sealed under the owner's authority) are honoured health evidence on B -- {"suite_records": [], "unverified": {"KEY_UNAVAILABLE": 7, "health-output:KEY_UNAVAILABLE": 2}}
+CHECK ADJ2.h FAIL what B wrote (a gate answer, a CIT execution) is honoured on A after a pull -- {"t2": {"binding": "VERIFIED", "key_id": "492ea276a99ccb94", "operation": "gate create", "at": "2026-09-19T10:32:47Z"}, "cit": "SIMULATED"}
+CHECK ADJ2.i FAIL on a machine provisioned WITHOUT the owner's binding authority, A's gate, CIT state and registration are refused -- {"gate": {"binding": "KEY_UNAVAILABLE", "reason": "this machine holds no T2 binding key, so no record sealed anywhere can be verified here"}, "cit": "T2_UNBOUND", "plugin": "PLUGIN_REGISTRATION_UNBOUND"}
+CHECK ADJ2.j FAIL a gate written on that unauthorised machine is refused on B (FOREIGN, machine scope; present T2_UNBOUND) -- {"t2": {"binding": "KEY_UNAVAILABLE", "reason": "this machine holds no T2 binding key, so no record sealed anywhere can be verified here"}, "present": "T2_UNBOUND"}
+CHECK ADJ2.k FAIL an unprovisioned machine cannot install the authority and honours none of A's records -- {"install": "error: unrecognized subcommand 't2-binding'\n\nUsage: gov-base-53897c1 trust [OPTIONS] <COMMAND>\n\nFor more information, try '--help'.\n"}
+CHECK ADJ2.l FAIL a gate an unprovisioned machine wrote is refused on B -- {"binding": "KEY_UNAVAILABLE", "reason": "this machine holds no T2 binding key, so no record sealed anywhere can be verified here"}
+CHECK ADJ2.m FAIL another owner's root does not authorise the owner's bundle; what that machine seals is FOREIGN on B -- {"owner-bundle": null, "own": null, "t2": {"binding": "KEY_UNAVAILABLE", "reason": "this machine holds no T2 binding key, so no record sealed anywhere can be verified here"}}
+CHECK ADJ2.n FAIL a hand-edited decision written on A is BROKEN on B -- {"KEY_UNAVAILABLE": 10, "health-output:KEY_UNAVAILABLE": 2}
+CHECK ADJ2.o FAIL the binding key is in no tracked file and is kept 0600 in machine state -- {"leaks": [], "mode": null}
+CHECK ADJ2.p FAIL a root successor that drops the binding role revokes the authority on B (UNAUTHORISED) and sealing falls back -- {"root-update": null, "t2": {"binding": "KEY_UNAVAILABLE", "reason": "this machine holds no T2 binding key, so no record sealed anywhere can be verified here"}, "sealing": null}
+CHECK RESEAL.a FAIL reseal makes what the machine sealed while provisioned portable, and nothing it sealed while unprovisioned -- {"dry": [], "reseal": null, "mid@R2": "KEY_UNAVAILABLE", "early@R2": "KEY_UNAVAILABLE"}
+CHECK G0.a FAIL the reseal is an L4 project write (an L2 role is refused) -- error: unrecognized subcommand 't2-binding'
+
+Usage: gov-base-53897c1 trust [OPTIONS] <COMMAND>
+
+For more information, try '--help'.
+
+CHECK CS.a FAIL FREEZE_WRITES is recorded in the operational store, not the derived runtime directory -- {"store": false, "legacy": true}
+CHECK CS.b FAIL deleting the whole derived runtime directory does not lift the freeze -- {"control": {"mode": "RUNNING", "writes_frozen": false, "agents_cancelled": false, "updated_at": null, "reason": null}, "task create": null}
+CHECK CS.c FAIL a legacy freeze left by an older binary is honoured, and the next control command resolves it into the store -- FROZEN
+CHECK T2C.a FAIL a hand-edited plugin-registry entry (and the registry document) is reported by the T2 audit -- {}
+CHECK HOOKS.a FAIL the generated provider hooks call gov checkpoint / session close and record the triggers
+CHECK HO.a FAIL agent resolution is refused for upstream_export and experiment_promotion gates (control: an ordinary low-radius gate resolves) -- {"upstream_export": "ok", "experiment_promotion": "ok", "vendor_note": "ok"}
+CHECK EV.a FAIL a gate resting on non-governed (draft) research is refused -- HDG-0604
+SUMMARY gov=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0034/bin/gov-base-53897c1 total=26 pass=1 fail=25 failed=['ADJ2.a', 'ADJ2.b', 'ADJ2.c', 'ADJ2.d', 'ADJ2.e', 'ADJ2.f', 'ADJ2.g', 'ADJ2.h', 'ADJ2.i', 'ADJ2.j', 'ADJ2.k', 'ADJ2.l', 'ADJ2.m', 'ADJ2.n', 'ADJ2.o', 'ADJ2.p', 'RESEAL.a', 'G0.a', 'CS.a', 'CS.b', 'CS.c', 'T2C.a', 'HOOKS.a', 'HO.a', 'EV.a']
+
+real	1m2.512s
+user	0m20.645s
+sys	0m9.199s
