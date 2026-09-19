@@ -4,6 +4,22 @@ use crate::util::{is_text_file, read_text, write_text};
 use crate::Result;
 use std::path::Path;
 
+/// Whether the file at `rel` is a governed record (or JSON document) carrying a T2 seal (`t2::SEAL_FIELD`): state an
+/// OS operation wrote and bound (a Human Decision Gate, the decision derived from its answer, ...).
+fn os_sealed(rel: &str, text: &str) -> bool {
+    if !text.contains(crate::t2::SEAL_FIELD) {
+        return false;
+    }
+    if rel.ends_with(".json") {
+        return serde_json::from_str::<serde_json::Value>(text)
+            .map(|v| v.get(crate::t2::SEAL_FIELD).is_some())
+            .unwrap_or(false);
+    }
+    crate::records::parse_record_text(text, rel)
+        .map(|r| r.data.get(crate::t2::SEAL_FIELD).is_some())
+        .unwrap_or(false)
+}
+
 fn py_module(path: &str) -> Option<String> {
     let p = path.strip_suffix(".py")?;
     let p = p.strip_suffix("/__init__").unwrap_or(p);
@@ -92,6 +108,13 @@ pub fn update_references_in(
             continue;
         }
         let Ok(text) = read_text(&abs) else { continue };
+        // A record an OS operation sealed (T2, BC-P2-09) is never rewritten here: its path mentions record what the OS
+        // wrote at the time (for a gate, the package the human is asked to answer), and rewriting them would break
+        // its binding, so the gate could no longer be presented or its answer honoured. The dependency proof already
+        // treats these records as history, not dependencies (`references::EVENT_RECORD_TYPES`).
+        if os_sealed(&rel, &text) {
+            continue;
+        }
         let mut new_text = text.clone();
         for (from, to) in moves {
             if from == to {
