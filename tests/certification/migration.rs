@@ -461,7 +461,8 @@ fn adoption_dependency_proof_citations_and_rerun_identity() {
     for g in cat2.iter().filter(|x| x["requires_human_gate"] == true) {
         let gid = g["human_gate"].as_str().expect("gate per gated entry");
         executor.ok(&["gate", "present", gid]);
-        executor.ok(&["decide", gid, "--option", "B", "--by", "owner"]);
+        // BC-P2-10 (WS-3): the human's answer comes through the owner-signed channel, not `--by owner`
+        crate::ws03::human_decide(&executor, gid, "B");
     }
     executor.ok(&["adopt", "migrate", "--batch", "7"]);
     let v = planner

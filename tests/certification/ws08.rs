@@ -24,6 +24,31 @@ fn provision(root: &Path, g: &Gov, p: &Publisher) {
     g.ok(&["trust", "provision", "--anchor", rf.to_str().unwrap()]);
 }
 
+/// As [`provision`], with the root also delegating the `human-gate` role to the test owner's key
+/// (`crate::ws03::owner`): on a provisioned machine the authenticated human channel is that delegation
+/// (BC-P2-10, integration P2-AR-0022), so a test that answers a gate provisions a root that delegates it.
+fn provision_with_human_gate(root: &Path, g: &Gov, p: &Publisher) {
+    let mut doc = root_doc(
+        1,
+        &far_future(),
+        &[&p.root_a, &p.root_b, &p.root_c],
+        2,
+        &[&p.release],
+        &p.snapshot,
+        &p.timestamp,
+        Some(&p.recovery),
+    );
+    let owner = crate::ws03::owner();
+    let (kid, entry) = key_entry(&owner);
+    doc["keys"][kid.as_str()] = entry;
+    doc["roles"]["human-gate"] = json!({"keyids": [owner.keyid.clone()], "threshold": 1});
+    let dir = root.join("admin-domain");
+    std::fs::create_dir_all(&dir).unwrap();
+    let rf = dir.join("root-1.json");
+    std::fs::write(&rf, envelope(&doc, &[&p.root_a, &p.root_b])).unwrap();
+    g.ok(&["trust", "provision", "--anchor", rf.to_str().unwrap()]);
+}
+
 /// A release of the current framework: `<dir>/kernel` + signed metadata.
 fn current_release(p: &Publisher, dir: &Path, metadata_version: u64, sequence: u64) -> PathBuf {
     std::fs::create_dir_all(dir).unwrap();
@@ -101,8 +126,8 @@ fn update_through_gate(g: &Gov, source: &Path) -> Out {
     }
     let gid = first.details()["gate"].as_str().unwrap_or("").to_string();
     assert!(!gid.is_empty(), "no gate raised: {}", first.envelope);
-    g.ok(&["gate", "present", &gid]);
-    g.ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
+    // BC-P2-10 (WS-3): the human answers through the owner-signed channel (renders the package, then decides)
+    crate::ws03::human_decide(g, &gid, "A");
     g.run(&[
         "update",
         "--apply",
@@ -315,7 +340,7 @@ fn framework_lock_records_the_verified_identity_and_its_basis() {
 fn a_provisioned_machine_rolls_back_to_a_release_it_verified() {
     let (root, proj, g) = project("ws08-rollback");
     let p = Publisher::new();
-    provision(&root, &g, &p);
+    provision_with_human_gate(&root, &g, &p);
     let prev = previous_release(&p, &root.join("prev"), 1, 10);
     init(&g, &prev);
     let hi = current_release(&p, &root.join("hi"), 2, 20);
@@ -365,7 +390,7 @@ fn a_provisioned_machine_rolls_back_to_a_release_it_verified() {
 fn refused_lifecycle_commands_leave_the_installation_as_they_found_it() {
     let (root, proj, g) = project("ws08-atomic");
     let p = Publisher::new();
-    provision(&root, &g, &p);
+    provision_with_human_gate(&root, &g, &p);
     let prev = previous_release(&p, &root.join("prev"), 1, 10);
     init(&g, &prev);
     let manifest_before = read(&proj, "governance/kernel/KERNEL_MANIFEST.json");
