@@ -1,7 +1,9 @@
 //! Repair iteration 1, round-3 integration (P2-AR-0041): the end states the integration handoff (P2-HO-0040) asks to
 //! be proven on the integrated tree — task records sealed on every OS write with `task` a sealed record kind (WS-5 r2
 //! IP-R3-1, final step), proven with a close inside another task's claim window; the OS writes other operations make
-//! inside a claim window attributed rather than read as the worker's (R3-WS5-8).
+//! inside a claim window attributed rather than read as the worker's (R3-WS5-8); a CIT invalidating DONE work leaves the
+//! graph well typed (IP-R3-WS02-07); and WS-2's G2 readiness duty at close still reached in the union behind WS-5's
+//! in-task materiality rule.
 //!
 //! Integration regression evidence (Contract v3 O3), not acceptance evidence. Black-box through the `gov` JSON
 //! contract on the one provisioned-root harness; closes carry consumption receipts (`crate::ws05::receipt`).
@@ -322,4 +324,111 @@ fn a_cit_invalidating_done_work_leaves_graph_integrity_and_d015_clean() {
         !d015.contains(&rid),
         "D015 does not report the revalidation task: {d015}"
     );
+}
+
+/// WS-2 G2 readiness at close (BC-P2-07, `verification::close_readiness`) × WS-5 in-task materiality (BC-P2-13): in
+/// the union a task's own hand edit of its feature's readiness is refused earlier, as a material change outside change
+/// control (`MATERIAL_CHANGE_REQUIRES_CIT`, WS-2 probe G2.a). The G2 duty still stands: when the feature's
+/// pre-implementation readiness regresses through change control inside the claim window (a CIT the owner approved),
+/// materiality accepts the write and the close is refused `TASK_READINESS_REGRESSED`.
+#[test]
+fn a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2() {
+    let (root, g) = fresh("int3-g2");
+    let na: &[(&str, &str)] = &[
+        (
+            "representative_test_data",
+            "literal order values inside the acceptance test; no dataset",
+        ),
+        (
+            "independent_acceptance_tests",
+            "the unit test is the acceptance evidence for this integration test",
+        ),
+    ];
+    let ready = readiness_all_present_except(&[], na);
+    write_yaml(
+        &root,
+        "spec/features/F-0931.yaml",
+        &json!({"id": "F-0931", "type": "feature", "title": "Order totals", "status": "ACTIVE", "capability_category": "backend",
+                "requirements": ["REQ-0931"], "scenarios": ["SCN-0931"], "acceptance_tests": ["TST-0931"], "readiness": ready}),
+    );
+    write_yaml(
+        &root,
+        "spec/requirements/REQ-0931.yaml",
+        &json!({"id": "REQ-0931", "type": "requirement", "title": "totals are exact", "status": "ACTIVE", "feature": "F-0931",
+                "kind": "functional", "acceptance_criteria": ["2 x 199 = 398"]}),
+    );
+    write_yaml(
+        &root,
+        "spec/scenarios/SCN-0931.yaml",
+        &json!({"id": "SCN-0931", "type": "scenario", "title": "append two orders", "status": "ACTIVE", "feature": "F-0931",
+                "actor": "clerk", "given": ["an empty ledger"], "when": ["two orders are appended"], "then": ["the total is 398"],
+                "success_criteria": ["exact"], "failure_criteria": ["drift"],
+                "data_requirements_not_applicable": "literal values inside the test"}),
+    );
+    write_yaml(
+        &root,
+        "spec/tasks/TST-0931.yaml",
+        &json!({"id": "TST-0931", "type": "test-obligation", "title": "totals unit test", "status": "ACTIVE", "feature": "F-0931",
+                "family": "unit", "scenario": "SCN-0931"}),
+    );
+    git_commit_all(&root, "spec");
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let t = g.ok(&[
+        "task",
+        "create",
+        "--class",
+        "implementation",
+        "--objective",
+        "implement totals",
+        "--feature",
+        "F-0931",
+        "--status",
+        "READY",
+        "--allowed",
+        "src/**",
+        "--fields",
+        &json!({"requirements": ["REQ-0931"], "scenarios": ["SCN-0931"], "acceptance_tests": ["TST-0931"]}).to_string(),
+    ])["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    git_commit_all(&root, "task");
+    g.ok(&["context", "compile", &t]);
+    g.ok(&["task", "claim", &t]);
+    write_file(&root, "src/totals.rs", "pub fn total() -> i64 { 398 }\n");
+    // the regression arrives through change control while the task is claimed
+    let regressed = readiness_all_present_except(&["security_privacy"], na);
+    let mf = root.join(".governance-runtime/mf-g2.json");
+    std::fs::write(
+        &mf,
+        json!([{"op": "set_field", "target": "F-0931", "field": "readiness", "value": regressed}])
+            .to_string(),
+    )
+    .unwrap();
+    let cit = g.ok(&[
+        "cit",
+        "propose",
+        "--proposal",
+        "security review withdrawn",
+        "--trigger",
+        "acceptance_criteria_change",
+        "--targets",
+        "F-0931",
+        "--manifest",
+        mf.to_str().unwrap(),
+    ])["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    let sim = g.ok(&["cit", "simulate", &cit]);
+    if let Some(gate) = sim["human_gate"].as_str() {
+        crate::ws03::human_decide(&g, gate, "A");
+    }
+    g.ok(&["cit", "approve", &cit, "--method", "human"]);
+    g.ok(&["cit", "execute", &cit]);
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let rep = receipt(&g, &root, &t, "g2", "totals", &["src/totals.rs"], "passed");
+    let c = g.run(&["task", "close", &t, "--report", &rep]);
+    assert!(!c.ok(), "{}", c.envelope);
+    assert_eq!(c.error_code(), "TASK_READINESS_REGRESSED", "{}", c.envelope);
 }
