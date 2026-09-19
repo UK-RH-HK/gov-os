@@ -1,0 +1,137 @@
+# P2-AR-0032 builder-probe re-run: probe=ws04-r2-scenarios label=derived-runs-r1-adapter
+# worktree HEAD 7491c5ca78ee2a7772571892cede623416e84324; product files differing from HEAD: 0
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/target/release/gov sha256 5ff6ce9cbf7c3864bb5245881bd32cd804a5d47e0debf128d04fce0f85016b82
+# scratch /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555
+# evidence adapter (derived, labelled): /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/gov-owner-channel-shim.root-channel.P2-AR-0032.py (sha256 0dcb65734ae4964bc476fd7ab0935e9ef40075fe6259b853285b59ea34d59f3b)
+# date 2026-09-19T08:18:54Z
+# $ env TMPDIR=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/tmp PYTHONPATH=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/mirror/release/capability-baseline/audit-0/delta-r/evidence GOV_BIN=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/mirror/target/release/gov PROBE_SCRATCH=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555 ZPROBE_SCRATCH=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555 timeout 1500 python3 /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-integration/release/capability-baseline/repair-1/r2-ws04/evidence/derived/ws04r2-scenarios.py
+
+## S1 BC-P2-11: an approval binds the exact transaction, its simulated impact and the CIT
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s1-1789805934-441fb6/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-0a7e5e99 rebuild-memory
+  -> ok
+$ gov --json --session probe-0a7e5e99 cit propose --proposal 'probe change s1a' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s1-1789805934-441fb6/m-s1a.json --trigger behaviour_change --targets REQ-0001
+  -> ok
+$ gov --json --session probe-0a7e5e99 gate show HDG-0001
+  -> ok
+CHECK S1.gate-carries-binding PASS the gate raised for the CIT carries the transaction+impact digest as its subject (inside the signed package)
+      detail: {"binding": "6583d051065323a9df47d5cb72c72f5ede74ee1f782ec4f5f78963b9eb5a7355", "gate": "HDG-0001"}
+$ gov --json --session probe-0a7e5e99 gate present HDG-0001
+  -> ok
+$ gov --json --session probe-0a7e5e99 decide HDG-0001 --option A --rationale 'approve the rounding change'
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0001.yaml
+$ gov --json --session probe-0a7e5e99 cit approve CIT-0001
+  -> ERROR [APPROVAL_STALE] CIT-0001: the transaction content (proposal/trigger/targets/mutation manifest) changed after it was simulated; approval binds the exact content — run `gov cit simulate CIT-0001` and obtain a decision for the transaction as it stands
+CHECK S1.content-edit-before-approve PASS a manifest edited after the answer cannot be approved under that answer
+      detail: {"code": "APPROVAL_STALE", "details": {"content_sha256": "af20bb883397b9233a6a99c14dfd554ee57a60319e2508a6cd23c06a094207d6", "sealed_content_sha256": "0ae8c13fc387bf4d81ccc6a81dec877f906c2cc573293a191ef91143a78f0847"}, "message": "CIT-0001: the transaction content (proposal/trigger/targets/mutation manifest) changed after it was simulated; approval binds the exact content \u2014 run `gov cit simulate CIT-0001` and obtain a decision for the transaction as it stands"}
+$ gov --json --session probe-0a7e5e99 cit propose --proposal 'probe change s1b' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s1-1789805934-441fb6/m-s1b.json --trigger behaviour_change --targets REQ-0001
+  -> ok
+$ gov --json --session probe-0a7e5e99 gate present HDG-0002
+  -> ok
+$ gov --json --session probe-0a7e5e99 decide HDG-0002 --option A
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0002.yaml
+$ gov --json --session probe-0a7e5e99 cit approve CIT-0002 --method auto
+  -> ERROR [APPROVAL_STALE] CIT-0002: the recorded impact is not the impact gov simulated; approval binds the simulated impact — re-simulate CIT-0002
+CHECK S1.impact-edit-refused PASS a recorded impact edited after simulation (radius lowered) cannot be approved
+      detail: {"code": "APPROVAL_STALE", "details": {"impact_sha256": "5c9539e4bdbdb61df1ebbe3fb07f25b66259394967f9aad6286bdc978c7ce3d8", "sealed_impact_sha256": "48034ecfcff44c06940dbc91f17e08d614d1aec86fc811deb1c46b92a8e049fc"}, "message": "CIT-0002: the recorded impact is not the impact gov simulated; approval binds the simulated impact \u2014 re-simulate CIT-0002"}
+$ gov --json --session probe-0a7e5e99 cit propose --proposal 'probe change s1c' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s1-1789805934-441fb6/m-s1c.json --trigger behaviour_change
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0003.yaml
+$ gov --json --session probe-0a7e5e99 cit execute CIT-0003
+  -> ERROR [GATE_NOT_PRESENTED] human gate HDG-0003 was never presented to the human (INV-008); run `gov gate present HDG-0003` and obtain the owner's answer
+CHECK S1.forged-auto-approval-refused PASS a forged automatic approval on a transaction that requires a gate never executes
+      detail: {"code": "GATE_NOT_PRESENTED", "details": null, "message": "human gate HDG-0003 was never presented to the human (INV-008); run `gov gate present HDG-0003` and obtain the owner's answer"}
+$ gov --json --session probe-0a7e5e99 cit propose --proposal 'probe change s1d' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s1-1789805934-441fb6/m-s1d.json --trigger editorial
+  -> ok
+$ gov --json --session probe-0a7e5e99 cit simulate CIT-0004
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0004.yaml
+$ gov --json --session probe-0a7e5e99 cit simulate CIT-0004
+  -> ERROR [CIT_STATE_MISMATCH] CIT-0004 carries the sealed state of CIT-0001: a transaction's state cannot be copied into another record
+CHECK S1.copied-state-refused PASS the sealed state of another transaction copied into a record is refused
+      detail: {"code": "CIT_STATE_MISMATCH", "details": null, "message": "CIT-0004 carries the sealed state of CIT-0001: a transaction's state cannot be copied into another record"}
+$ gov --json --session probe-0a7e5e99 cit propose --proposal 'probe change s1e' --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s1-1789805934-441fb6/m-s1e.json --trigger editorial
+  -> ok
+$ gov --json --session probe-0a7e5e99 cit simulate CIT-0005
+  -> ok
+# RECORD EDIT (direct file write, no gov command): spec/decisions/CIT-0005.yaml
+$ gov --json --session probe-0a7e5e99 cit approve CIT-0005 --method auto
+  -> ERROR [T2_UNBOUND] CIT-0005 (spec/decisions/CIT-0005.yaml) cannot establish Change-Impact Transaction state (status, simulated impact, approval, execution): it is T2 state that no gov operation on this machine produced as it stands (binding UNSEALED). D-0007 rule 2: such a record is a request, recorded and ignored. Restore it from version control, or withdraw and re-raise it through gov.
+CHECK S1.unsealed-state-refused PASS a CIT record whose sealed state was removed is not a transaction gov wrote
+      detail: {"code": "T2_UNBOUND", "details": {"field": "os_state", "path": "spec/decisions/CIT-0005.yaml", "record": "CIT-0005", "remediation": "a CIT's state is established only by `gov cit propose|simulate|approve|execute`; re-propose the change through gov (a record written or edited outside gov is a request, not a transaction)", "t2": {"binding": "UNSEALED", "reason": "no OS seal: the record was not written by a gov operation (hand-written, legacy, or written by a writer that has not adopted the T2 primitive)"}}, "message": "CIT-0005 (spec/decisions/CIT-0005.yaml) cannot establish Change-Impact Transaction state (status, simulated impact, approval, execution): it is T2 state that no gov operation on this machine produced as it stands (binding UNSEALED). D-0007 rule 2: such a record is a request, recorded and ignored. Restore it from version control, or withdraw and re-raise it through gov."}
+# RECORD WRITE (direct file write, no gov command): spec/decisions/CIT-0099.yaml
+$ gov --json --session probe-0a7e5e99 cit execute CIT-0099
+  -> ERROR [T2_UNBOUND] CIT-0099 (spec/decisions/CIT-0099.yaml) cannot establish Change-Impact Transaction state (status, simulated impact, approval, execution): it is T2 state that no gov operation on this machine produced as it stands (binding UNSEALED). D-0007 rule 2: such a record is a request, recorded and ignored. Restore it from version control, or withdraw and re-raise it through gov.
+CHECK S1.hand-written-cit-refused PASS a hand-written CIT record claiming APPROVED never executes
+      detail: {"code": "T2_UNBOUND", "details": {"field": "os_state", "path": "spec/decisions/CIT-0099.yaml", "record": "CIT-0099", "remediation": "a CIT's state is established only by `gov cit propose|simulate|approve|execute`; re-propose the change through gov (a record written or edited outside gov is a request, not a transaction)", "t2": {"binding": "UNSEALED", "reason": "no OS seal: the record was not written by a gov operation (hand-written, legacy, or written by a writer that has not adopted the T2 primitive)"}}, "message": "CIT-0099 (spec/decisions/CIT-0099.yaml) cannot establish Change-Impact Transaction state (status, simulated impact, approval, execution): it is T2 state that no gov operation on this machine produced as it stands (binding UNSEALED). D-0007 rule 2: such a record is a request, recorded and ignored. Restore it from version control, or withdraw and re-raise it through gov."}
+
+## S2 BC-P2-13: materiality is derived from what a change touches, not from the label
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s2-1789805940-8b9cc3/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-afca0da9 rebuild-memory
+  -> ok
+$ gov --json --session probe-afca0da9 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-afca0da9 cit propose --proposal 'tidy auth' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s2-1789805940-8b9cc3/m-auth.json
+  -> ok
+CHECK S2.auth PASS 'editorial' label on a security_change change: derived, simulated automatically and human-gated
+      detail: {"derived": ["security_change"], "gate": "HDG-0001", "radius": "R2"}
+$ gov --json --session probe-afca0da9 cit propose --proposal 'tidy k8s' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s2-1789805940-8b9cc3/m-k8s.json
+  -> ok
+CHECK S2.k8s PASS 'editorial' label on a infrastructure_cost change: derived, simulated automatically and human-gated
+      detail: {"derived": ["infrastructure_cost"], "gate": "HDG-0002", "radius": "R1"}
+$ gov --json --session probe-afca0da9 cit propose --proposal 'tidy gherkin' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s2-1789805940-8b9cc3/m-gherkin.json
+  -> ok
+CHECK S2.gherkin PASS 'editorial' label on a acceptance_criteria_change change: derived, simulated automatically and human-gated
+      detail: {"derived": ["acceptance_criteria_change"], "gate": "HDG-0003", "radius": "R1"}
+$ gov --json --session probe-afca0da9 cit propose --proposal 'tidy req-criteria' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s2-1789805940-8b9cc3/m-req-criteria.json
+  -> ok
+CHECK S2.req-criteria PASS 'editorial' label on a acceptance_criteria_change change: derived, simulated automatically and human-gated
+      detail: {"derived": ["acceptance_criteria_change"], "gate": "HDG-0004", "radius": "R1"}
+$ gov --json --session probe-afca0da9 cit propose --proposal 'fix typo' --trigger editorial --manifest /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s2-1789805940-8b9cc3/m-doc.json
+  -> ok
+CHECK S2.editorial-stays-editorial PASS a genuinely editorial change is not made material
+      detail: {"declared_trigger": "editorial", "derived_classes": [], "effective_trigger": "editorial", "effective_triggers": [], "findings": [], "label_understates": false, "material": false, "requires_cit_in_task": [], "rule_source": "cit::materiality (kernel floor; Contract v3:638-647)"}
+$ gov --json --session probe-afca0da9 cit propose --proposal 'change the project policy overlay' --targets governance/project/PROJECT_POLICY.yaml
+  -> ok
+CHECK S2.declared-governance-target PASS a CIT whose declared target is a governance path is R5 and human-gated (SKL-IMPACT-ANALYSIS V1)
+      detail: {"derived": ["governance_change"], "gate": "HDG-0005", "radius": "R5"}
+$ gov --json --session probe-afca0da9 cit classify --paths src/payments/auth.py,spec/requirements/REQ-0001.yaml
+  -> ok
+CHECK S2.performed-changes-classified PASS changes already made in the working tree are classified, and the ones that must pass a CIT even inside a task are named (the task-close API)
+      detail: ["security_change", "security_change", "acceptance_criteria_change"]
+
+## S3 BC-P2-04: an upstream change reaches completed work, its evidence, packets and checkpoints
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s3-1789805942-db4911/proj
+# gov init ok: version 4.1.5 doctor DEGRADED
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/requirements/REQ-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/scenarios/SCN-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TST-0001.yaml
+$ gov --json --session probe-c8396054 rebuild-memory
+  -> ok
+$ gov --json --session probe-c8396054 task create --objective 'implement totals' --class discovery --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"]}'
+  -> ok
+$ gov --json --session probe-c8396054 task create --objective 'tune totals' --class discovery --status READY --allowed src/** --fields '{"requirements": ["REQ-0001"], "scenarios": ["SCN-0001"], "acceptance_tests": ["TST-0001"]}'
+  -> ok
+$ gov --json --session probe-c8396054 context compile TASK-0001
+  -> ok
+$ gov --json --session probe-c8396054 task claim TASK-0001
+  -> ok
+$ gov --json --session probe-c8396054 rebuild-memory --incremental
+  -> ok
+$ gov --json --session probe-c8396054 task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s3-1789805942-db4911/rep.json
+  -> ERROR [RECEIPT_INVALID] TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING, INPUT_NOT_ACKNOWLEDGED, TEST_EVIDENCE_MISSING). Remediation: return the fields in the packet's receipt_contract — the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none') | required inputs not recorded as consumed: REQ-0001, SCN-0001, TST-0001; list each as 'ID@<content_hash>' | declared acceptance tests without evidence in acceptance_evidence: TST-0001
+unexpected failure: gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0032/bp/bp-derived-runs-r1-adapter-ws04-r2-scenarios-1789805934-2790555/s3-1789805942-db4911/rep.json: {'code': 'RECEIPT_INVALID', 'message': "TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING, INPUT_NOT_ACKNOWLEDGED, TEST_EVIDENCE_MISSING). Remediation: return the fields in the packet's receipt_contract — the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none') | required inputs not recorded as consumed: REQ-0001, SCN-0001, TST-0001; list each as 'ID@<content_hash>' | declared acceptance tests without evidence in acceptance_evidence: TST-0001", 'details': {'task': 'TASK-0001', 'ok': False, 'errors': [{'code': 'RECEIPT_FIELDS_MISSING', 'message': "the consumption receipt lacks context_packet_hash, inputs_consumed, deviations, unresolved (or unknowns); every field is required (an empty list states 'none')", 'ids': ['context_packet_hash', 'inputs_consumed', 'deviations', 'unresolved (or unknowns)']}, {'code': 'INPUT_NOT_ACKNOWLEDGED', 'message': "required inputs not recorded as consumed: REQ-0001, SCN-0001, TST-0001; list each as 'ID@<content_hash>'", 'ids': ['REQ-0001', 'SCN-0001', 'TST-0001']}, {'code': 'TEST_EVIDENCE_MISSING', 'message': 'declared acceptance tests without evidence in acceptance_evidence: TST-0001', 'ids': ['TST-0001']}], 'warnings': [], 'manifest_hash': '8c44ef59ca74f6e69de480f47849e65ffa856a7e464dc97ead9cfdc33f6e5fb1', 'packet_hash': None, 'traceability_required': False, 'receipt': {'context_packet_hash': None, 'inputs_consumed': [], 'outputs_produced': ['src/totals.rs'], 'requirements_implemented': [], 'scenarios_implemented': [], 'features_implemented': [], 'decisions_applied': [], 'constraints_applied': [], 'acceptance_evidence': [], 'deviations': [], 'unresolved': []}}}
+[exit=1]
