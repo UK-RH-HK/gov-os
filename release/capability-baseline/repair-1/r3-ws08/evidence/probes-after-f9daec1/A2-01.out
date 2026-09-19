@@ -1,0 +1,11 @@
+## [U0] trust posture of a fresh machine
+$ gov trust status
+  -> ok (exit 0) {"machine_id": "7bd9245a410217f03f792a3553f7affb", "state_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-after-f9daec1-A2-01-uEMOU8/alpha-r-a2-unprov-wh3qxyf0/home/.local/state/governance-os/machine", "posture": "UNPROVISIONED", "admission_policy": {"policy": "refuse_external_source_until_provisioned__embedded_payload_as_marked_bootstrap_only", "decision": "OWNER-DECISION-P2-0002", "admits": "only the payload embedded in this gov binary (3ca1bdf160911a4667447ba87dfd5a0ad22376cf62b030da51fbdb38626cfa8f)…
+
+## [U1] a release is built, then one payload file is TAMPERED after the build (pre-install tampering)
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws08/release/capability-baseline/audit-0/alpha-r/evidence/A2-01-unprovisioned-posture.py", line 22, in <module>
+    before = open(sp).read()
+             ^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-after-f9daec1-A2-01-uEMOU8/alpha-r-a2-unprov-wh3qxyf0/rel/releases/4.1.5/kernel/policies/SECURITY_POLICY.yaml'
+[A2-01 exit=1]

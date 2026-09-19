@@ -1,0 +1,4 @@
+# P2-AR-0039: normalised failure/panic messages of the unedited suites, before (base 53897c1) vs after (f9daec1), and vs the round-2 integration's run (7491c5c)
+lines before: 42, after: 42, integration-2: 42
+## diff before vs after (empty = identical)
+## diff integration-2 vs after (empty = identical)

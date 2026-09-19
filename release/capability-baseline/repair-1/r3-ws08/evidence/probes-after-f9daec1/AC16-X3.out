@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws08/release/capability-baseline/audit-0/synthesis/evidence/AC16-X3-ingress-root-of-trust-chain.py", line 75, in <module>
+    assert b.get("ok"), b
+           ^^^^^^^^^^^
+AssertionError: {'ok': False, 'command': 'release', 'error': {'code': 'VERSION_MISMATCH', 'message': 'framework/KERNEL.yaml version "4.1.6" != requested 4.1.5', 'details': None}, 'session': '', 'release_trust': {'surface': 'release', 'below_floor': False, 'marking': None, 'presented_as': 'CURRENT', 'section_6_bullet': 7, 'basis': "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."}, '_exit': 1}
+[AC16-X3 exit=1]

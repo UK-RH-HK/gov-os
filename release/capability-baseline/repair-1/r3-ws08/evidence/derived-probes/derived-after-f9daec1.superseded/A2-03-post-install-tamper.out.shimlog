@@ -1,0 +1,24 @@
+(a) role declared: orchestrator for trust provision --anchor
+(a) role declared: orchestrator for release build --version
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-03-post-install-tamper-io3JkS/alpha-r-a2-tamper-0ps7rxuo/rel/releases/4.1.5/kernel
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for audit --no-persist --family
+(a) role declared: orchestrator for kernel reinstall --source
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for audit --no-persist --family
+(a) role declared: orchestrator for init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-after-f9daec1-A2-03-post-install-tamper-io3JkS/alpha-r-a2-tamper-0ps7rxuo/rel/releases/4.1.5/kernel
+(a) role declared: orchestrator for kernel verify
+(a) role declared: orchestrator for policy effective SECURITY_POLICY
+(a) role declared: orchestrator for task create --objective
+(a) role declared: orchestrator for doctor
+(a) role declared: orchestrator for status
+(a) role declared: orchestrator for audit --no-persist --family
+(a) role declared: orchestrator for trust status

@@ -1,0 +1,25 @@
+## [V0] authentic 4.1.5 (seq 10) installed on a provisioned machine
+[V0] kernel on disk: version=4.1.5 payload_hash=e7dc5b06404fb401… | lock: version=4.1.5 release_hash=e7dc5b06404fb401…
+[V0] kernel verify ok=True trust.verified=True problems=[]
+[V0] protected installed record: version=4.1.5 seq=10 payload_hash=e7dc5b06404fb401… | floors.release_high_water={'version': '4.1.5', 'sequence': 10}
+[V0] ordinary governed mutation (task create): ok
+
+## [V1] gov kernel reinstall --source <authentic 4.1.6, seq 20> (above floor, no break-glass)
+$ gov kernel reinstall --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/probe-before-base-53897c1-A2-08-Mfjnjf/alpha-r-a2-reinst-61pp92bm/r16/releases/4.1.6/kernel
+  -> REFUSED (exit 1) code=KERNEL_MISMATCH msg=ingress `reinstall` restores the pinned release: the candidate's payload cd8756d4fd6c5c4a22f176b7f581548c7d8b2268e4115511eca1c6951a3dacf7 is not the payload framework.lock pins (e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df); use `gov update` for a version change or `gov update --rollback` to return to the previous release
+
+## [V2] state after the refused reinstall
+[V2] kernel on disk: version=4.1.5 payload_hash=e7dc5b06404fb401… | lock: version=4.1.5 release_hash=e7dc5b06404fb401…
+[V2] kernel verify ok=True trust.verified=True problems=[]
+[V2] protected installed record: version=4.1.5 seq=10 payload_hash=e7dc5b06404fb401… | floors.release_high_water={'version': '4.1.5', 'sequence': 10}
+[V2] ordinary governed mutation (task create): ok
+
+## [V3] remedy: reinstall the release the lock names (authentic 4.1.5)
+[V3] reinstall 4.1.5 -> ok
+[V3] kernel on disk: version=4.1.5 payload_hash=e7dc5b06404fb401… | lock: version=4.1.5 release_hash=e7dc5b06404fb401…
+[V3] kernel verify ok=True trust.verified=True problems=[]
+[V3] protected installed record: version=4.1.5 seq=10 payload_hash=e7dc5b06404fb401… | floors.release_high_water={'version': '4.1.5', 'sequence': 10}
+[V3] ordinary governed mutation (task create): ok
+
+DONE
+[A2-08 exit=0]

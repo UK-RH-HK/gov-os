@@ -1,0 +1,69 @@
+## [K0] baseline: release signed by release-1 under root v1
+[K0] ok = True | authenticity = AUTHENTIC
+
+## [K1] root succession v1 -> v2 (rotate root-c -> root-d, rotate release-1 -> release-2)
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-3-skip.json
+  -> REFUSED (exit 1) code=SRR_ROOT_VERSION_NOT_SUCCESSOR msg=candidate root version 3 is not the immediate successor of the trusted root version 1 (succession must be applied one version at a time so that every intermediate revocation takes effect)
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-2-unauth.json
+  -> REFUSED (exit 1) code=SRR_ROOT_SUCCESSION_UNAUTHORISED msg=the trusted root's quorum did not authorise this successor: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-2-unauth.json: role 'root' requires 2 valid signature(s) from its authorised keys, found 0
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-2-notself.json
+  -> REFUSED (exit 1) code=SRR_ROOT_SUCCESSION_UNAUTHORISED msg=the candidate root is not self-signed by its own quorum: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-2-notself.json: role 'root' requires 2 valid signature(s) from its authorised keys, found 0
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-2-expired.json
+  -> REFUSED (exit 1) code=SRR_METADATA_EXPIRED msg=candidate root version 2: expired at 2001-01-01T00:00:00Z against the declared local clock 2026-09-19T10:42:49Z
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-2.json
+  -> ok (exit 0) {"root_updated": true, "from_version": 1, "to_version": 2, "product": "agentic-engineering-os", "expires": "2099-01-01T00:00:00Z", "revoked_keyids": ["1ad1c7296c7e37c89ba8498ca788e4a4e1c8866521f77193116c0825e8042945", "b39f31cc59ec9514decc2c29ee1e33c9c3333bc1ecb7f055ae911ee9a49ef9d4"], "note": "Keys and delegations absent from the accepted successor are revoked from this moment. Succession is applied one version at a time so that no intermediate revocation is skipped (SRR-R0-L1)."}
+[K1] accepted v2; revoked_keyids = ['1ad1c7296c7e37c89ba8498ca788e4a4e1c8866521f77193116c0825e8042945', 'b39f31cc59ec9514decc2c29ee1e33c9c3333bc1ecb7f055ae911ee9a49ef9d4'] | release-1 keyid = b39f31cc59ec … root-c keyid = 1ad1c7296c7e …
+
+## [K2] revocation by omission: release-1 no longer authorises releases; release-2 does
+$ gov init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/s2-old/kernel --name p2 --alias p2-a --skip-index
+  -> REFUSED (exit 1) code=SRR_THRESHOLD_NOT_MET msg=/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/s2-old/metadata/release.json: role 'release' requires 1 valid signature(s) from its authorised keys, found 0
+[K2] release-2 signed release: ok = True | authenticity = AUTHENTIC
+
+## [K3] replay of the old root v1 through root-update
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-1.json
+  -> REFUSED (exit 1) code=SRR_ROOT_VERSION_NOT_SUCCESSOR msg=candidate root version 1 is not the immediate successor of the trusted root version 2 (succession must be applied one version at a time so that every intermediate revocation takes effect)
+
+## [K4] recovery from loss of one root key: root-b is lost; v3 is authorised by root-a + root-d (2-of-3 of v2)
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-3.json
+  -> ok (exit 0) {"root_updated": true, "from_version": 2, "to_version": 3, "product": "agentic-engineering-os", "expires": "2099-01-01T00:00:00Z", "revoked_keyids": ["0fd6ec2196ceafebbd7a31dffb13b109c6b149da5e0521a6bb1e82a7313f2021"], "note": "Keys and delegations absent from the accepted successor are revoked from this moment. Succession is applied one version at a time so that no intermediate revocation is skipped (SRR-R0-L1)."}
+[K4] a v4 attempted with the LOST key root-b + root-c (no longer trusted) is refused:
+$ gov trust root-update --anchor /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-4-lost.json
+  -> REFUSED (exit 1) code=SRR_ROOT_SUCCESSION_UNAUTHORISED msg=the trusted root's quorum did not authorise this successor: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/admin/root-4-lost.json: role 'root' requires 2 valid signature(s) from its authorised keys, found 0
+[K4] trust anchor now: version = 3 | roles = {"recovery": {"threshold": 1, "keys": 1}, "release": {"threshold": 1, "keys": 1}, "root": {"threshold": 2, "keys": 3}, "snapshot": {"threshold": 1, "keys": 1}, "timestamp": {"threshold": 1, "keys": 1}} | metadata_high_water.root = 3
+
+## [K5] revocation of old releases by a signed minimum secure release
+[K5] authentic release seq 30 carrying minimum_secure_sequence 30: ok = True | floors.minimum_secure = {"release": "4.1.5", "sequence": 30, "source_metadata_sha256": "fb40d0101729631e595f216843cda3fd0eebd62711fa571d4ee0d66143d2d32a"}
+$ gov init --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-rot-otr5apub/s5-old/kernel --name p5b --alias p5b-a --skip-index
+  -> REFUSED (exit 1) code=SRR_BELOW_FLOOR msg=ingress `init` would place this machine on release 4.1.5, below its floor (4.1.5). The floors are a property of the machine and bind every privileged lifecycle ingress. Below-floor recovery is refused by default and is admissible only as an explicit owner-authorised emergency recovery mode (OWNER-DECISION-0006).
+[K5b] a minimum_secure_release published WITHOUT minimum_secure_sequence (AR27-N5):
+[K5b] floors after a release declaring minimum_secure_release 9.9.9 with no sequence: {"release": "", "sequence": 0, "source_metadata_sha256": ""}
+
+## [K6] break-glass recovery below floor (owner-signed recovery-role token)
+[K6] installed authentic seq 20: ok = True | floor = {"version": "4.1.5", "sequence": 20}
+[K6a] kernel reinstall --source <authentic older release, seq 10> --break-glass (token present)
+$ gov kernel reinstall --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-bg-pdlr431h/old/kernel --break-glass
+  -> REFUSED (exit 1) code=KERNEL_MISMATCH msg=ingress `reinstall` restores the pinned release: the candidate's payload 9dfb3d2d295caaf96fd0331ffc3f9b7b6c50e7e6c95c8845c607cdc9e8ed811a is not the payload framework.lock pins (e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df); use `gov update` for a version change or `gov update --rollback` to return to the previous release
+[K6a] after: kernel verify ok = True | trust.verified = True | problems = []
+[K6a] installed KERNEL_MANIFEST payload_hash = e7dc5b06404fb401 … | lock.release_hash = e7dc5b06404fb401 … | older payload = 9dfb3d2d295caaf9 …
+[K6a] trust status: degraded = null | installed_release.payload_hash = e7dc5b06404fb401 …
+[K6a] normal privileged operation (task create) while below floor: ok
+[K6a] exit: reinstall the authentic at-floor release (seq 20)
+$ gov kernel reinstall --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-bg-pdlr431h/new/kernel
+  -> ok (exit 0) {"reinstalled": true, "version": "4.1.5", "payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df", "release_authenticity": {"ingress": "reinstall", "product": "agentic-engineering-os", "release_version": "4.1.5", "sequence": 20, "channel": "stable", "repository": "private/agentic-engineering-os", "authenticity": "AUTHENTIC", "currency": "CURRENT", "posture": "PROVISIONED", "payload_hash": "e7dc5b06404fb401292cd873038f94cec3799b6feebd052151aa3ba2ddc2f2df", "kernel_manifest_hash": "a831188b208e7dcb7047203942e6ded0db6f0f38780a9865125ead564dbc9b46", "below_floor": false,…
+[K6a] after exit attempt: degraded = null | kernel verify ok = True | trust.verified = True
+
+[K6c] alternative restoration path: gov init --force --break-glass --source <authentic older release> (fresh token)
+$ gov init --force --break-glass --source /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-bg-pdlr431h/old/kernel --name pg --alias pga --skip-index
+  -> ok (exit 0) {"root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2-ar-0039-probes/derived-before-base-53897c1-A2-05-rotation-revocation-recovery-9E1dt4/alpha-r-a2-bg-pdlr431h/pg", "version": "4.1.5", "release_hash": "9dfb3d2d295caaf96fd0331ffc3f9b7b6c50e7e6c95c8845c607cdc9e8ed811a", "source": "release:agentic-engineering-os@4.1.5", "kernel_files": 123, "overlay_written": ["PROJECT_POLICY.yaml", "REPOSITORY_CONTRACT.yaml", "CAPABILITY_PROFILE.yaml", "TOOL_PERMISSIONS.yaml", "MODEL_ROUTING_OVERRIDES.yaml", "DATA_SENSITIVITY.yaml", "PROJECT_EX…
+[K6c] after: kernel verify ok = True | trust.verified = True | lock.release_hash = 9dfb3d2d295caaf9 … | degraded marking = DEGRADED — RECOVERY ONLY | floors.release_high_water = {"version": "4.1.5", "sequence": 20}
+[K6c] normal privileged operation (task create) while marked: REFUSED SRR_BELOW_FLOOR_REFUSED
+[K6c] gov status envelope release_trust.presented_as = BELOW_FLOOR_RECOVERY_ONLY | marking = DEGRADED — RECOVERY ONLY
+
+[K6b] update --rollback --break-glass after an authenticated update (the rollback ingress)
+[K6b] update 4.1.5 -> 4.1.6 applied = None
+$ gov update --rollback --break-glass
+  -> REFUSED (exit 1) code=SNAPSHOT_MISSING msg=no unconsumed update snapshot under .governance-runtime/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)
+[K6b] after rollback attempt: lock.version = 4.1.5
+
+DONE
+[A2-05-rotation-revocation-recovery exit=0]
