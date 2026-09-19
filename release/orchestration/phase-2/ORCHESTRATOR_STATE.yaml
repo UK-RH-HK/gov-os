@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-19T16:40:57Z'
-state_hash: 5f3356a60cc7d60b9109e22a7cae37f11aa0b48c5b7ad98a4abd183ccaaff50d
+updated_at: '2026-09-19T18:02:26Z'
+state_hash: 7e56656d6cdcfa36cee36c9d787e3cd1e7db7597f5c633aa327d146af79b19a8
 lifecycle_state: P2_REPAIR_ITERATION_1
-loop_status: P2_REPAIR_1_ROUND_3_RUNNING
+loop_status: SAFE_HOLD_USAGE_LIMIT
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -250,8 +250,8 @@ agent_runs:
   - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0042, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
-  - {run_id: P2-AR-0043, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
+  - {run_id: P2-AR-0042, role: capability-repair, status: RUNNING, at_safe_hold: 'branch tip 9bafcb3; uncommitted work in refs/safe-hold/P2-AR-0042 7d94516; no report', run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
+  - {run_id: P2-AR-0043, role: capability-repair, status: RUNNING, at_safe_hold: 'branch tip cae2f67 (no commits); uncommitted work in refs/safe-hold/P2-AR-0043 b7e1e55; no report', run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -301,18 +301,16 @@ completed_stages:
       COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on the
       pinned model under P2-HO-0008 / P2-HO-0009.
 
-continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0001-orchestrator-continuity.md
-latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0007.yaml
+continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md
+latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0008.yaml
 next_deterministic_action: >-
-  AWAIT_REPAIR_1_ROUND_4 — round 3 integrated (merge e4cb662, product_code_digest 1d3e9f59...85df7; orchestrator reproduced
-  lib 262/0, certification 189/0). Two parallel round-4 builders from the merged tree: P2-AR-0042 WS-1 BC-P2-02 evidence map
-  (P2-HO-0041, branch phase2/repair-1-r4-ws01) and P2-AR-0043 residual integration points (P2-HO-0042, branch
-  phase2/repair-1-r4-residual); if this session was replaced, detect completion by their reports on those branches. On
-  each completion: verify scope, record. When both are done: merge both (fresh integration builder if they conflict or if
-  the evidence map no longer verifies after the residual merge), reproduce regression and `gov contract verify`; then mint
-  cap2-candidate-1 (tag, product_code_digest) and dispatch verification iteration 1 (AC-14 R1-preservation verifier, AC-6
-  oracle-format reviewer, six family verifiers with fresh held-out tests incl. cross-machine and availability attacks,
-  fresh synthesis verifier labelling RESIDUAL vs MATERIALLY_NEW).
+  SAFE_HOLD — owner-ordered usage-preservation hold (2026-09-19). Do NOT start any builder, integration, candidate minting,
+  independent verification or repair round, and launch no replacement or follow-on agent, until the owner explicitly says
+  the usage limit has reset. Then RESUME_ROUND_4 per HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md "Resume procedure":
+  determine P2-AR-0042 / P2-AR-0043 state from their branches (report present = completed -> record; no report and no live
+  agent = INCOMPLETE -> preserve worktree to refs/safe-hold, re-dispatch fresh from the same handoff on a new branch); when
+  both are complete, merge (or fresh integration builder), reproduce regression and gov contract verify, mint
+  cap2-candidate-1, dispatch verification iteration 1 (P2-HO-0043..0047). Model routing and acceptance criteria unchanged.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
@@ -323,6 +321,7 @@ current_prohibitions:
   - {action: amending or superseding D-0007, until: an explicit owner-authorised transition record}
   - {action: reconstructing or paraphrasing Contract v3 content, until: never}
   - {action: starting Phase 3 or selecting a provisional retrieval profile, until: never in this session}
+  - {action: starting any builder, integration, candidate minting, independent verification, repair round, or replacement/follow-on agent, until: the owner explicitly confirms the usage limit has reset (SAFE_HOLD 2026-09-19)}
   - {action: merging to main, publishing, or certifying a release, until: never in Phase 2}
   - {action: any role reading/listing/searching session or agent transcripts, task-output stores or user auto-memory, until: never}
   - {action: writing held-out test content, in-progress verdicts or unreviewed findings into user auto-memory, until: never}

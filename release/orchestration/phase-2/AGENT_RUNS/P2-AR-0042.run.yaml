@@ -18,3 +18,12 @@ expected_output_path: release/capability-baseline/repair-1/r4-ws01/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
 status: RUNNING
+at_safe_hold:
+  date: '2026-09-19'
+  agent: still running when the owner ordered SAFE_HOLD; not stopped by the orchestrator
+  branch_tip: 9bafcb3
+  uncommitted_files_snapshotted: 9
+  safe_hold_ref: refs/safe-hold/P2-AR-0042
+  safe_hold_commit: 7d94516f6b63a4da91454de211dc0e82e194be7e
+  report_present: false
+  note: the snapshot is recovery material made with a temporary index, not a builder commit; the builder's worktree, index and branch were not touched
