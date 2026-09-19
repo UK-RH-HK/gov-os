@@ -642,7 +642,7 @@ fn observe_against(
     }
     changed.retain(|f| !os_managed(f) && !contract_generated(p, f));
     let closed = closed_states(store, doc, &id);
-    let own_scope = claims::scope_of_task(t);
+    let own_scope = reserved_scope(p, t).unwrap_or_else(|| claims::scope_of_task(t));
     let wt = claims::worktree_id(p);
     let others: Vec<(Value, Vec<String>, BTreeMap<String, String>)> = claims::live(p)
         .unwrap_or_default()
@@ -736,15 +736,33 @@ pub fn observed_mutations(p: &Project, id: &str) -> (Vec<String>, Value) {
     }
 }
 
+/// The mutation scope the task's claim reserved when it was granted (None when there is no claim with a recorded
+/// scope, or the reservation is unrestricted). The close is held to it: a task record widened after the claim was
+/// granted cannot widen what the claim may close with — the reservation is what other sessions' claims were
+/// checked against.
+pub fn reserved_scope(p: &Project, t: &Record) -> Option<Vec<String>> {
+    let c = claims::get(p, &t.id()).ok().flatten()?;
+    if c["scope"].is_null() {
+        return None;
+    }
+    let s = claims::scope_of_claim(&c);
+    if s.iter().any(|x| x == claims::UNRESTRICTED) {
+        None
+    } else {
+        Some(s)
+    }
+}
+
 /// Mutation-scope check for a task: forbidden paths, kernel, contract-prohibited paths, and (when allowed_paths is
-/// declared) anything outside it that is not in `governed` — the paths a CIT executed inside this task's claim
-/// window touched ([`cit_window_paths`]).
+/// declared) anything outside it — or outside the scope its claim reserved — that is not in `governed`: the paths a
+/// CIT executed inside this task's claim window touched ([`cit_window_paths`]).
 pub fn scope_violations(
     p: &Project,
     task: &crate::records::Record,
     files: &[String],
     governed: &BTreeSet<String>,
 ) -> Vec<String> {
+    let reserved = reserved_scope(p, task);
     let allowed = task.list("allowed_paths");
     let mut forbidden = task.list("forbidden_paths");
     forbidden.push("governance/kernel/**".into());
@@ -778,6 +796,14 @@ pub fn scope_violations(
             out.push(format!(
                 "{f}: outside allowed_paths {allowed:?} and not governed by a CIT executed while this task was claimed"
             ));
+            continue;
+        }
+        if let Some(r) = &reserved {
+            if !claims::path_in_scope(r, f) && !governed.contains(f) {
+                out.push(format!(
+                    "{f}: outside the scope {r:?} the task's claim reserved (the task record was widened after the claim was granted; release and claim again to reserve the new scope)"
+                ));
+            }
         }
     }
     out
