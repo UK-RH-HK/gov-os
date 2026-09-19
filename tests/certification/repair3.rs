@@ -236,7 +236,7 @@ fn plugin_descriptors_can_never_authorise_themselves() {
                 .is_null()
     );
     l4.ok(&["gate", "present", &gate]);
-    l4.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&l4, &gate, "A");
     let mut d = yaml(&root, "governance/project/plugins/p-elev.yaml");
     d["registration_gate"] = json!(gate);
     write_yaml(&root, "governance/project/plugins/p-elev.yaml", &d);
@@ -431,7 +431,7 @@ fn constitutional_floors_require_a_verified_kernel() {
         "an unanswered gate is not an override"
     );
     g.ok(&["gate", "present", &gate]);
-    g.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gate, "A");
     g.ok(&["rebuild-memory"]);
     // ... and it does not survive a different tampering
     let mut sec2 = yaml(&root, sec_path);
@@ -524,10 +524,30 @@ fn policy_exceptions_require_a_real_governing_decision() {
         refused_reason(&g, "EXC-0001")
     );
 
-    // 5. in scope, approved, active -> applied
+    // 5. in scope, approved, active -> applied. WS-3 / BC-P2-09: "approved" is a T2 fact, so the governing decision
+    // is one a gov operation wrote — the human's owner-signed answer to a gate that asked for exactly this scope. The
+    // same content hand-written into spec/decisions/ is a request, recorded and ignored (D-0007 rule 2).
     let mut d = base.clone();
     d["authorises_exceptions"] = json!(["EXC-0001"]);
     write_yaml(&root, "spec/decisions/D-0001.yaml", &d);
+    assert!(
+        refused_reason(&g, "EXC-0001").contains("T2 binding"),
+        "a hand-written decision cannot authorise an exception: {}",
+        refused_reason(&g, "EXC-0001")
+    );
+    let eg = g.ok(&[
+        "gate",
+        "create",
+        "--question",
+        "May the tool-call budget be raised for this migration?",
+        "--fields",
+        &crate::ws03::package(json!({"decision_scope": {"authorises_exceptions": ["EXC-0001"]}})),
+    ]);
+    let governed = crate::ws03::human_decide(&g, eg["id"].as_str().unwrap(), "A")["decision"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    set_exceptions(exc(&governed));
     assert!(
         applied(&g, "EXC-0001"),
         "{}",
@@ -540,6 +560,7 @@ fn policy_exceptions_require_a_real_governing_decision() {
     assert!(doctor_check(&g, "D027").0);
 
     // 6. superseded / rejected / revoked / expired decisions all invalidate it
+    set_exceptions(exc("D-0001"));
     for (field, value) in [
         ("superseded_by", json!("D-0002")),
         ("status", json!("REJECTED")),
@@ -572,12 +593,45 @@ fn policy_exceptions_require_a_real_governing_decision() {
         "{}",
         refused_reason(&g, "EXC-0001")
     );
-    // an L4 approver is sufficient without a human
+    // an L4 approver is sufficient without a human — when the L4 approval is an OS-recorded agent resolution
+    // (raised by another session, assessed within HUMAN_GATE_POLICY.agent_resolvable_when, BC-P2-18)
     let mut strong = weak.clone();
     strong["approved_by_role"] = json!("orchestrator");
     strong["owner_role"] = json!("orchestrator");
     write_yaml(&root, "spec/decisions/D-0001.yaml", &strong);
+    assert!(
+        !applied(&g, "EXC-0001"),
+        "hand-written, it is not an approval"
+    );
+    let ag = g.with_session("S-raiser").ok(&[
+        "gate",
+        "create",
+        "--question",
+        "Raise the tool-call budget for one migration window?",
+        "--fields",
+        &crate::ws03::package(
+            json!({"impact_radius": "R1", "confidence": 0.95, "reversibility": "reversible",
+            "decision_scope": {"authorises_exceptions": ["EXC-0001"]}}),
+        ),
+    ]);
+    let agid = ag["id"].as_str().unwrap().to_string();
+    g.ok(&["gate", "present", &agid]);
+    let agent_dec = g.ok(&[
+        "decide",
+        &agid,
+        "--option",
+        "A",
+        "--by",
+        "orchestrator",
+        "--rationale",
+        "bounded, reversible budget headroom",
+    ])["decision"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    set_exceptions(exc(&agent_dec));
     assert!(applied(&g, "EXC-0001"));
+    set_exceptions(exc("D-0001"));
 
     // 8. a decision scoped to another project
     let mut other = d.clone();
@@ -679,7 +733,8 @@ fn lower_trust_inputs_cannot_manufacture_higher_trust_facts() {
     rec["decision"] = json!("D-FAKE");
     write_yaml(&root, &format!("spec/decisions/{cid}.yaml"), &rec);
     let gate = rec["human_gate"].as_str().unwrap().to_string();
-    g.ok(&["gate", "present", &gate]);
+    // (WS-3 / BC-P2-10: presented to the human = the owner's signed receipt of the rendered package)
+    crate::ws03::human_receipt(&g, &gate);
     let e = g.err(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     assert_eq!(
         e.error_code(),

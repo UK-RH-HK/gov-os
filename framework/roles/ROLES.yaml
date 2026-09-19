@@ -1,4 +1,6 @@
 version: 1.0.0
+# An invocation that declares no role (neither --role nor GOV_ROLE) acts as `undeclared` with L0 authority: no spawned
+# worker behaves as an orchestrator unless explicitly assigned that role (framework §23; BC-P2-08).
 authority_levels:
   L0: {name: read-only analyst/auditor, mutation: none}
   L1: {name: worker, mutation: scoped source/document mutation}
@@ -38,4 +40,7 @@ roles:
   - {id: migration-reviewer, name: Independent Migration Reviewer & Test Author, level: L0, minimum_tier: T3, default_reasoning: high}
   - {id: migration-verifier, name: Independent Migration Verifier, level: L0, minimum_tier: T3, default_reasoning: high}
   - {id: memory-verifier, name: Independent Memory Verifier, level: L0, minimum_tier: T3, default_reasoning: high}
+  # L5 is never conferred by a role declaration (--role / GOV_ROLE are caller claims, D-0007 T5): a declared `human`
+  # role carries L0. Human answers and approvals are owner-signed documents verified against the
+  # administrator-provisioned `human-gate` anchor (runtime human_channel; BC-P2-10).
   - {id: human, name: Human / Product Owner, level: L5, minimum_tier: none, default_reasoning: none}

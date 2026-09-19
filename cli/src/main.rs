@@ -17,7 +17,8 @@ struct Cli {
     /// Session id (default: $GOV_SESSION or a new id)
     #[arg(long, global = true)]
     session: Option<String>,
-    /// Acting role (default: $GOV_ROLE or orchestrator)
+    /// Acting role, as assigned to this caller (else $GOV_ROLE). With neither, the invocation carries no privileged
+    /// authority (L0). The `human` role is never conferred by a declaration: human answers are owner-signed.
     #[arg(long, global = true)]
     role: Option<String>,
     #[command(subcommand)]
@@ -56,15 +57,25 @@ enum Cmd {
         #[arg(long)]
         claim: bool,
     },
-    /// Answer a Human Decision Gate
+    /// Answer a Human Decision Gate: apply an owner-signed human answer, or (--by <acting agent role>) resolve within
+    /// HUMAN_GATE_POLICY.agent_resolvable_when
     Decide {
         gate: String,
+        /// The option (must be one the gate offers; for a human answer it must equal the option the owner signed)
         #[arg(long)]
-        option: String,
-        #[arg(long, default_value = "human")]
-        by: String,
+        option: Option<String>,
+        /// Agent resolution: the acting agent role resolving as itself. Any other value is a request label, never
+        /// an identity; a human answer's identity is the owner's signature.
+        #[arg(long)]
+        by: Option<String>,
         #[arg(long)]
         rationale: Option<String>,
+        /// Owner-signed `human-gate-answer` document (default: the human-channel inbox)
+        #[arg(long)]
+        answer_file: Option<PathBuf>,
+        /// Governed record ids the resolution relied on (repeatable)
+        #[arg(long = "evidence")]
+        evidence: Vec<String>,
     },
     /// Run the governance verification suite and record an audit
     Audit {
@@ -132,8 +143,10 @@ enum Cmd {
         source: Option<String>,
         #[arg(long)]
         approve: bool,
-        #[arg(long, default_value = "human")]
-        by: String,
+        /// Recorded as who requested the apply (default: the acting role); approval itself comes only from the
+        /// answered Human Decision Gate
+        #[arg(long)]
+        by: Option<String>,
         #[arg(long)]
         reason: Option<String>,
     },
@@ -321,8 +334,9 @@ enum AdoptCmd {
         verdict: String,
         #[arg(long)]
         reviewer_session: Option<String>,
-        #[arg(long, default_value = "migration-reviewer")]
-        reviewer_role: String,
+        /// Must equal the declared acting role when both are given (one role per invocation); alone, it declares it
+        #[arg(long)]
+        reviewer_role: Option<String>,
         #[arg(long)]
         notes: Option<String>,
     },
@@ -342,16 +356,18 @@ enum AdoptCmd {
     VerifyMigration {
         #[arg(long)]
         verdict: Option<String>,
-        #[arg(long, default_value = "migration-verifier")]
-        verifier_role: String,
+        /// Must equal the declared acting role when both are given (one role per invocation); alone, it declares it
+        #[arg(long)]
+        verifier_role: Option<String>,
     },
     ExtractLegacy,
     BuildMemory,
     VerifyMemory {
         #[arg(long)]
         verdict: Option<String>,
-        #[arg(long, default_value = "memory-verifier")]
-        verifier_role: String,
+        /// Must equal the declared acting role when both are given (one role per invocation); alone, it declares it
+        #[arg(long)]
+        verifier_role: Option<String>,
     },
     Audit {
         #[arg(long)]
@@ -448,15 +464,18 @@ enum CitCmd {
     },
     Approve {
         id: String,
-        #[arg(long, default_value = "human")]
-        by: String,
+        /// Recorded as who applied the approval (default: the acting role); human approval is derived from the
+        /// answered gate, never from this field
+        #[arg(long)]
+        by: Option<String>,
         #[arg(long, default_value = "human")]
         method: String,
     },
     Reject {
         id: String,
-        #[arg(long, default_value = "human")]
-        by: String,
+        /// Recorded as who rejected (default: the acting role)
+        #[arg(long)]
+        by: Option<String>,
         #[arg(long)]
         reason: Option<String>,
     },
@@ -585,8 +604,9 @@ enum MemoryCmd {
         candidate: String,
         #[arg(long)]
         research: Option<String>,
-        #[arg(long, default_value = "human")]
-        by: String,
+        /// Recorded as who selected (default: the acting role); it asserts no human approval
+        #[arg(long)]
+        by: Option<String>,
     },
     /// Generate a starter held-out set from the live index (only when the file has no queries)
     HeldoutStarter {
@@ -604,8 +624,18 @@ enum GateCmd {
     },
     Present {
         id: String,
+        /// Owner-signed `human-gate-receipt` (the human acknowledges the rendered package); default: none. With
+        /// `--receipt-inbox`, the human-channel inbox is searched.
+        #[arg(long)]
+        receipt_file: Option<PathBuf>,
+        #[arg(long)]
+        receipt_inbox: bool,
     },
     List,
+    /// A gate as the OS sees it: T2 binding, what it authorises, whether its answer verifies
+    Show {
+        id: String,
+    },
     Revoke {
         id: String,
         #[arg(long)]
@@ -695,6 +725,13 @@ enum TrustCmd {
     BreakGlass,
     /// Replay any interrupted install transaction and report what was done
     RecoverTransactions,
+    /// The authenticated human channel for Human Decision Gate answers: anchor, inbox, what a signed answer binds
+    HumanChannel {
+        /// Administrator: install the owner's public `human-gate` keys (a self-signed `human-channel-anchor`
+        /// document from the administrator domain) on a machine without a Signed Release Root
+        #[arg(long)]
+        provision: Option<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -763,12 +800,310 @@ fn open_project(cli: &Cli, need_install: bool) -> Result<Project> {
         None => gov_runtime::project::find_root(&std::env::current_dir()?)
             .unwrap_or(std::env::current_dir()?),
     };
-    let p = Project::open(&root).with_session(cli.session.clone(), cli.role.clone());
+    // the acting role is the process-wide declaration installed by `run` (BC-P2-08)
+    let p = Project::open(&root).with_session(cli.session.clone(), None);
     if need_install {
         p.require_installed()?;
     }
     Ok(p)
 }
+/// **BC-P2-08 — the one acting-role resolution for this invocation.** The global `--role` (else `GOV_ROLE`) is the
+/// declaration; the adopt stages' own `--reviewer-role` / `--verifier-role` may declare it when nothing else does,
+/// and must agree with it when both are given. Nothing declared means no privileged authority.
+fn declared_role(cli: &Cli) -> Result<gov_runtime::authority::ActingRole> {
+    let base = gov_runtime::authority::resolve_acting_role(cli.role.as_deref());
+    let stage_flag = match &cli.cmd {
+        Cmd::Adopt { stage } | Cmd::Migrate { stage } => match stage {
+            AdoptCmd::Review { reviewer_role, .. } => reviewer_role.clone(),
+            AdoptCmd::VerifyMigration { verifier_role, .. } => verifier_role.clone(),
+            AdoptCmd::VerifyMemory { verifier_role, .. } => verifier_role.clone(),
+            _ => None,
+        },
+        _ => None,
+    }
+    .filter(|f| !f.trim().is_empty());
+    match stage_flag {
+        Some(f) if base.is_declared() && f != base.id() => Err(GovError::new(
+            "ROLE_CONFLICT",
+            format!(
+                "two different acting roles were declared for one invocation ('{}' via {} and '{f}' via the stage flag); declare one role",
+                base.id(),
+                base.source.as_str()
+            ),
+        )),
+        Some(f) if !base.is_declared() => Ok(gov_runtime::authority::ActingRole {
+            role: Some(f),
+            source: gov_runtime::authority::RoleSource::Flag,
+        }),
+        _ => Ok(base),
+    }
+}
+
+/// The G0 label of an invocation (`orchestration::control::COMMAND_GUARDS`): every command maps to exactly one.
+fn g0_label(cmd: &Cmd) -> String {
+    let s = |x: &str| x.to_string();
+    match cmd {
+        Cmd::Version => s("version"),
+        Cmd::Init { .. } => s("init"),
+        Cmd::Status => s("status"),
+        Cmd::Continue { claim } => s(if *claim {
+            "continue --claim"
+        } else {
+            "continue"
+        }),
+        Cmd::Decide { .. } => s("gate answer"),
+        Cmd::Audit { no_persist, .. } => s(if *no_persist {
+            "audit --no-persist"
+        } else {
+            "audit"
+        }),
+        Cmd::Verify { what } => s(if what == "governance" {
+            "verify governance"
+        } else {
+            "verify product"
+        }),
+        Cmd::Pause { .. } => s("pause"),
+        Cmd::FreezeWrites { .. } => s("freeze writes"),
+        Cmd::CancelAgents { .. } => s("cancel agents"),
+        Cmd::Resume => s("resume"),
+        Cmd::Doctor => s("doctor"),
+        Cmd::RebuildMemory { .. } => s("rebuild-memory"),
+        Cmd::Recover { dry_run } => s(if *dry_run {
+            "recover --dry-run"
+        } else {
+            "recover"
+        }),
+        Cmd::Adopt { stage } | Cmd::Migrate { stage } => format!(
+            "adopt {}",
+            match stage {
+                AdoptCmd::Baseline => "baseline",
+                AdoptCmd::Inventory => "inventory",
+                AdoptCmd::Classify => "classify",
+                AdoptCmd::Map => "map",
+                AdoptCmd::Plan => "plan",
+                AdoptCmd::TestDesign => "test-design",
+                AdoptCmd::Review { .. } => "review",
+                AdoptCmd::Migrate { .. } => "migrate",
+                AdoptCmd::VerifyMigration { .. } => "verify-migration",
+                AdoptCmd::ExtractLegacy => "extract-legacy",
+                AdoptCmd::BuildMemory => "build-memory",
+                AdoptCmd::VerifyMemory { .. } => "verify-memory",
+                AdoptCmd::Audit { .. } => "audit",
+                AdoptCmd::Status => "status",
+                AdoptCmd::Rollback { .. } => "rollback",
+            }
+        ),
+        Cmd::Update {
+            apply, rollback, ..
+        } => s(if *rollback {
+            "update --rollback"
+        } else if *apply {
+            "update --apply"
+        } else {
+            "update --check"
+        }),
+        Cmd::Trust { op } => s(match op {
+            TrustCmd::Status => "trust status",
+            TrustCmd::Provision { .. } => "trust provision",
+            TrustCmd::RootUpdate { .. } => "trust root-update",
+            TrustCmd::BreakGlass => "trust break-glass",
+            TrustCmd::RecoverTransactions => "trust recover-transactions",
+            TrustCmd::HumanChannel { provision } => {
+                if provision.is_some() {
+                    "trust human-channel --provision"
+                } else {
+                    "trust human-channel"
+                }
+            }
+        }),
+        Cmd::Contract { op } => s(match op {
+            ContractCmd::Verify => "contract verify",
+            ContractCmd::Compile => "contract compile",
+        }),
+        Cmd::Upstream { op } => s(match op {
+            UpstreamCmd::Prepare { .. } => "upstream prepare",
+            UpstreamCmd::Submit { .. } => "upstream submit",
+        }),
+        Cmd::Task { op } => s(match op {
+            TaskCmd::Create { .. } => "task create",
+            TaskCmd::List { .. } => "task list",
+            TaskCmd::Show { .. } => "task show",
+            TaskCmd::Status { .. } => "task status",
+            TaskCmd::Claim { .. } => "task claim",
+            TaskCmd::Release { force, .. } => {
+                if *force {
+                    "task release --force"
+                } else {
+                    "task release"
+                }
+            }
+            TaskCmd::Close { force, .. } => {
+                if *force {
+                    "task close --force"
+                } else {
+                    "task close"
+                }
+            }
+            TaskCmd::Dag => "task dag",
+            TaskCmd::Replan => "replan",
+        }),
+        Cmd::Cit { op } => s(match op {
+            CitCmd::Propose { .. } => "cit propose",
+            CitCmd::Simulate { .. } => "cit simulate",
+            CitCmd::Approve { .. } => "cit approve",
+            CitCmd::Reject { .. } => "cit reject",
+            CitCmd::Execute { .. } => "cit execute",
+            CitCmd::Rollback { .. } => "cit rollback",
+            CitCmd::List => "cit list",
+            CitCmd::Show { .. } => "cit show",
+        }),
+        Cmd::Context { .. } => s("context compile"),
+        Cmd::Checkpoint { op } => s(match op {
+            CheckpointCmd::Create { .. } | CheckpointCmd::Watchdog { .. } => "checkpoint",
+            CheckpointCmd::Latest => "checkpoint latest",
+        }),
+        Cmd::Skills { op } => s(match op {
+            SkillsCmd::List => "skills list",
+            SkillsCmd::Resolve { .. } => "skills resolve",
+        }),
+        Cmd::Tools { op } => s(match op {
+            ToolsCmd::List => "tools list",
+            ToolsCmd::Registry => "tools registry",
+            ToolsCmd::Resolve { .. } => "tools resolve",
+            ToolsCmd::Install { .. } => "tools install",
+            ToolsCmd::Health => "tools health",
+        }),
+        Cmd::Handoff { op } => s(match op {
+            HandoffCmd::Create { .. } => "handoff create",
+            HandoffCmd::Return { .. } => "handoff return",
+        }),
+        Cmd::Memory { op } => s(match op {
+            MemoryCmd::Query { .. } => "memory query",
+            MemoryCmd::Verify => "memory verify",
+            MemoryCmd::Freshness => "memory freshness",
+            MemoryCmd::Rebuild { .. } => "memory rebuild",
+            MemoryCmd::Graph { .. } => "memory graph",
+            MemoryCmd::Impact { .. } => "memory impact",
+            MemoryCmd::Benchmark { record, .. } => {
+                if *record {
+                    "memory benchmark --record"
+                } else {
+                    "memory benchmark"
+                }
+            }
+            MemoryCmd::Select { .. } => "memory select",
+            MemoryCmd::HeldoutStarter { .. } => "memory heldout-starter",
+        }),
+        Cmd::Gate { op } => s(match op {
+            GateCmd::Create { .. } => "gate create",
+            GateCmd::Present { .. } => "gate present",
+            GateCmd::List => "gate list",
+            GateCmd::Show { .. } => "gate show",
+            GateCmd::Revoke { .. } => "gate revoke",
+        }),
+        Cmd::Readiness { op } => s(match op {
+            ReadinessCmd::Check { .. } => "readiness check",
+            ReadinessCmd::Plan { .. } => "readiness plan",
+        }),
+        Cmd::Intent { .. } => s("intent"),
+        Cmd::Route { record, report, .. } => s(if record.is_some() {
+            "route --record"
+        } else if *report {
+            "route --report"
+        } else {
+            "route"
+        }),
+        Cmd::Telemetry { op } => s(match op {
+            TelemetryCmd::Summary => "telemetry summary",
+            TelemetryCmd::Emit { .. } => "telemetry emit",
+        }),
+        Cmd::Adapters { op } => s(match op {
+            AdaptersCmd::Generate => "adapters generate",
+            AdaptersCmd::Verify => "adapters verify",
+        }),
+        Cmd::Release { op } => s(match op {
+            ReleaseCmd::Build { .. } => "release build",
+            ReleaseCmd::Verify { .. } => "release verify",
+        }),
+        Cmd::Kernel { op } => s(match op {
+            KernelCmd::Verify => "kernel verify",
+            KernelCmd::Trust => "kernel trust",
+            KernelCmd::Reinstall { .. } => "kernel reinstall",
+            KernelCmd::Override { .. } => "kernel override",
+        }),
+        Cmd::Capabilities { op } => s(match op {
+            CapCmd::Ecosystems => "capabilities ecosystems",
+            CapCmd::Plugins => "capabilities plugins",
+            CapCmd::Invoke { .. } => "capabilities invoke",
+            CapCmd::ServeEmbed { .. } => "capabilities serve-embed",
+        }),
+        Cmd::Claims { op } => s(match op {
+            ClaimsCmd::List => "claims list",
+            ClaimsCmd::Sweep => "claims sweep",
+        }),
+        Cmd::Mcp { .. } => s("mcp"),
+        Cmd::Lessons { .. } => s("lessons cluster"),
+        Cmd::Plugins { op } => s(match op {
+            PluginsCmd::Register { .. } => "plugins register",
+            PluginsCmd::Unregister { .. } => "plugins unregister",
+            PluginsCmd::Registry => "plugins registry",
+            PluginsCmd::List => "plugins list",
+            PluginsCmd::Health { ping } => {
+                if *ping {
+                    "plugins health --ping"
+                } else {
+                    "plugins health"
+                }
+            }
+        }),
+        Cmd::Policy { op } => s(match op {
+            PolicyCmd::Overrides => "policy overrides",
+            PolicyCmd::Effective { .. } => "policy effective",
+        }),
+    }
+}
+
+/// **G0 (Contract v3 O5; BC-P2-08)**: every invocation passes the guard for its label before anything runs —
+/// emergency-control state (FREEZE_WRITES / PAUSE, with the explicit recovery allow-lists) and the authority class of
+/// the command, evaluated for the role the caller declared (against the project's verified policy, or before the
+/// first install against the kernel embedded in this binary).
+fn g0(cli: &Cli) -> Result<()> {
+    use gov_runtime::orchestration::control;
+    let label = g0_label(&cli.cmd);
+    let guard = control::command_guard(&label).ok_or_else(|| {
+        GovError::new(
+            "G0_UNCLASSIFIED",
+            format!(
+                "command '{label}' has no G0 classification; an unclassified command is refused"
+            ),
+        )
+    })?;
+    if let control::Scope::Outside(_) = guard.scope {
+        return Ok(());
+    }
+    let p = match &cli.cmd {
+        // lifecycle ingress into a repository that may have no installation yet: the command's own root
+        Cmd::Init { .. } | Cmd::Adopt { .. } | Cmd::Migrate { .. } => {
+            let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
+            Project::open(&root).with_session(cli.session.clone(), None)
+        }
+        _ => open_project(cli, false)?,
+    };
+    control::g0(&p, &label)?;
+    Ok(())
+}
+
+/// BC-P2-09 at the product surface: CIT approval/execution reads its gate's answer itself, so the gate it names must
+/// be one gov wrote and whose answer verifies (`gates::require_honoured_answers`).
+fn cit_gate_precheck(p: &Project, cit_id: &str) -> Result<()> {
+    let store = gov_runtime::records::RecordStore::load(&p.root);
+    let gate = store
+        .get(cit_id)
+        .map(|c| c.get("human_gate"))
+        .unwrap_or_default();
+    gov_runtime::orchestration::gates::require_honoured_answers(p, &[gate])
+}
+
 fn db(p: &Project) -> Result<RuntimeDb> {
     let d = RuntimeDb::open(&p.db_path())?;
     d.init_schema()?;
@@ -777,6 +1112,11 @@ fn db(p: &Project) -> Result<RuntimeDb> {
 
 fn run(cli: &Cli) -> Result<Value> {
     let name = command_name(&cli.cmd);
+    // BC-P2-08: resolve the acting role once and make it the role of every Project this process opens — including
+    // those `init` and every `adopt`/`migrate` stage open internally — then pass the G0 guard.
+    gov_runtime::authority::install_acting_role(declared_role(cli)?)?;
+    g0(cli)?;
+    let acting = gov_runtime::authority::default_role_id();
     match &cli.cmd {
         Cmd::Version => Ok(json!({"framework": gov_runtime::FRAMEWORK_NAME, "version": gov_runtime::VERSION, "cli_version": gov_runtime::CLI_VERSION, "runtime_version": gov_runtime::RUNTIME_VERSION, "index_version": gov_runtime::INDEX_VERSION})),
         Cmd::Init { source, name: pname, alias, intent, force, skip_index, channel, break_glass } => {
@@ -787,7 +1127,7 @@ fn run(cli: &Cli) -> Result<Value> {
         }
         Cmd::Status => { let p = open_project(cli, true)?; gov_runtime::status::status(&p) }
         Cmd::Continue { claim } => { let p = open_project(cli, true)?; let d = db(&p)?; gov_runtime::status::continue_work(&p, &d, *claim) }
-        Cmd::Decide { gate, option, by, rationale } => { let p = open_project(cli, true)?; gov_runtime::orchestration::gates::answer(&p, gate, option, by, rationale.as_deref()) }
+        Cmd::Decide { gate, option, by, rationale, answer_file, evidence } => { let p = open_project(cli, true)?; gov_runtime::orchestration::gates::answer(&p, gate, &gov_runtime::orchestration::gates::AnswerRequest { option: option.clone(), by: by.clone(), rationale: rationale.clone(), answer_file: answer_file.clone(), evidence: evidence.clone() }) }
         Cmd::Audit { deep, family, no_persist } => { let p = open_project(cli, true)?; run_audit(&p, *deep, family.clone(), !no_persist) }
         Cmd::Verify { what } => { let p = open_project(cli, true)?; if what == "governance" { run_audit(&p, false, vec![], true) } else { gov_runtime::verification::product_suite(&p) } }
         Cmd::Pause { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "PAUSE", reason.as_deref()) }
@@ -803,18 +1143,19 @@ fn run(cli: &Cli) -> Result<Value> {
             use gov_runtime::adopt as a;
             match stage {
                 AdoptCmd::Baseline => a::a0_baseline(&root, &session), AdoptCmd::Inventory => a::a1_inventory(&root), AdoptCmd::Classify => a::a2_classify(&root), AdoptCmd::Map => a::a3_map(&root), AdoptCmd::Plan => a::a4_plan(&root), AdoptCmd::TestDesign => a::a5_test_design(&root),
-                AdoptCmd::Review { verdict, reviewer_session, reviewer_role, notes } => a::a5_review(&root, verdict, reviewer_session.as_deref().unwrap_or(&session), reviewer_role, notes.as_deref()),
+                AdoptCmd::Review { verdict, reviewer_session, reviewer_role: _, notes } => a::a5_review(&root, verdict, reviewer_session.as_deref().unwrap_or(&session), &acting, notes.as_deref()),
                 AdoptCmd::Migrate { batch, source, gate_answer, name: pn, alias } => { let pn2 = pn.clone().unwrap_or_else(|| root.file_name().map(|f| f.to_string_lossy().to_string()).unwrap_or("project".into())); let al = alias.clone().unwrap_or_else(|| format!("project-{}", &gov_runtime::util::sha256_text(&pn2)[..6])); a::a6_migrate(&root, *batch, source.as_deref(), gate_answer, &pn2, &al, &session) }
-                AdoptCmd::VerifyMigration { verdict, verifier_role } => a::a7_verify_migration(&root, verdict.as_deref(), &session, verifier_role),
+                AdoptCmd::VerifyMigration { verdict, verifier_role: _ } => a::a7_verify_migration(&root, verdict.as_deref(), &session, &acting),
                 AdoptCmd::ExtractLegacy => a::a8_extract_legacy(&root), AdoptCmd::BuildMemory => a::a9_build_memory(&root, &session),
-                AdoptCmd::VerifyMemory { verdict, verifier_role } => a::a10_verify_memory(&root, verdict.as_deref(), &session, verifier_role),
+                AdoptCmd::VerifyMemory { verdict, verifier_role: _ } => a::a10_verify_memory(&root, verdict.as_deref(), &session, &acting),
                 AdoptCmd::Audit { accept_exceptions } => a::a11_audit(&root, *accept_exceptions), AdoptCmd::Status => a::status(&root), AdoptCmd::Rollback { batch } => a::rollback_batch(&root, *batch),
             }
         }
         Cmd::Update { check, apply, rollback, channel, break_glass, source, approve, by, reason } => {
             let mut p = open_project(cli, true)?;
             if *rollback { return gov_runtime::update::rollback_opts(&mut p, None, reason.as_deref(), *break_glass); }
-            if *apply { return gov_runtime::update::apply_update_opts(&mut p, source.as_deref(), *approve, by, channel.clone(), *break_glass); }
+            let by = by.clone().unwrap_or_else(|| acting.clone());
+            if *apply { gov_runtime::orchestration::gates::require_honoured_answers(&p, &gov_runtime::orchestration::gates::answered_gates_for_trigger(&p, "framework_update"))?; return gov_runtime::update::apply_update_opts(&mut p, source.as_deref(), *approve, &by, channel.clone(), *break_glass); }
             let _ = check; gov_runtime::update::check(&p, source.as_deref())
         }
         Cmd::Trust { op } => {
@@ -829,6 +1170,19 @@ fn run(cli: &Cli) -> Result<Value> {
                     let r = gov_runtime::srr::staging::recover(&ms)?;
                     Ok(json!({"replayed": r}))
                 }
+                TrustCmd::HumanChannel { provision } => match provision {
+                    Some(f) => gov_runtime::human_channel::provision_standalone(Path::new(f), project_root.as_deref()),
+                    None => {
+                        // the project's policy (when there is one) may only tighten the standalone-anchor switch
+                        let allowed = project_root
+                            .as_deref()
+                            .map(|r| Project::open(&gov_runtime::project::find_root(r).unwrap_or(r.to_path_buf())))
+                            .filter(|p| p.is_installed())
+                            .map(|p| gov_runtime::orchestration::gates::standalone_anchor_allowed(&p))
+                            .unwrap_or(true);
+                        gov_runtime::human_channel::status(allowed)
+                    }
+                },
             }
         }
         Cmd::Contract { op } => {
@@ -874,9 +1228,9 @@ fn run(cli: &Cli) -> Result<Value> {
                     if let Some(m) = manifest { f["mutation_manifest"] = load_file_value(m)?; }
                     if let Some(t) = title { f["title"] = json!(t); } c::propose(&p, f) }
                 CitCmd::Simulate { id } => { let d = db(&p)?; c::simulate(&p, &d, id) }
-                CitCmd::Approve { id, by, method } => c::approve(&p, id, by, method),
-                CitCmd::Reject { id, by, reason } => c::reject(&p, id, by, reason.as_deref()),
-                CitCmd::Execute { id } => { let d = db(&p)?; c::execute(&p, &d, id) }
+                CitCmd::Approve { id, by, method } => { cit_gate_precheck(&p, id)?; c::approve(&p, id, by.as_deref().unwrap_or(&acting), method) }
+                CitCmd::Reject { id, by, reason } => c::reject(&p, id, by.as_deref().unwrap_or(&acting), reason.as_deref()),
+                CitCmd::Execute { id } => { cit_gate_precheck(&p, id)?; let d = db(&p)?; c::execute(&p, &d, id) }
                 CitCmd::Rollback { id, reason } => c::rollback(&p, id, reason.as_deref()),
                 CitCmd::List => Ok(json!(c::list(&p))),
                 CitCmd::Show { id } => { let s = gov_runtime::records::RecordStore::load(&p.root); s.get(id).map(|r| r.data.clone()).ok_or_else(|| GovError::new("CIT_NOT_FOUND", format!("{id} not found"))) }
@@ -909,7 +1263,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 MemoryCmd::Query { query, k, route, include_historical } => { let d = db(&p)?; let r = gov_runtime::retrieval::retrieve(&p, &d, query, gov_runtime::retrieval::RetrieveOptions { k: *k, route: route.clone(), include_historical: *include_historical, log: true, ..Default::default() })?; gov_runtime::observability::emit(&p, "retrieval", json!({"routes": r.routes, "hits": r.hits.len(), "latency_ms": r.latency_ms}))?; Ok(serde_json::to_value(&r)?) }
                 MemoryCmd::Verify => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let held = gov_runtime::util::read_yaml(&hp)?; let r = gov_runtime::retrieval::run_heldout(&p, &d, &held)?; if r["measured"].as_bool().unwrap_or(false) && !r["pass"].as_bool().unwrap_or(false) { return Err(GovError::new("VERIFICATION_FAILED", "held-out memory regression failed").with_details(r)); } Ok(r) }
                 MemoryCmd::Benchmark { candidates, heldout, record } => gov_runtime::memory::benchmark::run(&p, candidates, heldout.clone(), *record),
-                MemoryCmd::Select { candidate, research, by } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), by),
+                MemoryCmd::Select { candidate, research, by } => gov_runtime::memory::benchmark::select(&p, candidate, research.as_deref(), by.as_deref().unwrap_or(&acting)),
                 MemoryCmd::HeldoutStarter { force } => { let d = db(&p)?; let hp = p.root.join(p.policies().get_str("MEMORY_POLICY", "regression.heldout_file", "governance/tests/memory/heldout.yaml")); let existing = gov_runtime::util::read_yaml(&hp).ok().and_then(|h| h["queries"].as_array().map(|a| a.len())).unwrap_or(0); if existing > 0 && !force { return Err(GovError::new("USAGE", format!("{} already has {existing} queries (use --force to overwrite)", hp.display()))); } let set = gov_runtime::memory::heldout::generate_starter(&p, &d, "gov memory heldout-starter")?; gov_runtime::util::write_yaml(&hp, &set)?; Ok(json!({"path": hp.display().to_string(), "queries": set["queries"].as_array().map(|a| a.len()).unwrap_or(0)})) }
                 MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
                 MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, ..Default::default() })?)?),
@@ -917,7 +1271,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 MemoryCmd::Impact { seeds, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::impact_set(&d, &csv(&Some(seeds.clone())), *depth)?)) }
             }
         }
-        Cmd::Gate { op } => { let p = open_project(cli, true)?; match op { GateCmd::Create { question, fields } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } f["question"] = json!(question); gov_runtime::orchestration::gates::create(&p, f) } GateCmd::Present { id } => { let (d, text) = gov_runtime::orchestration::gates::present(&p, id)?; if !cli.json { println!("{text}"); } Ok(json!({"gate": d, "chat_text": text})) } GateCmd::Revoke { id, reason } => gov_runtime::orchestration::gates::revoke(&p, id, reason.as_deref()), GateCmd::List => Ok(json!(gov_runtime::orchestration::gates::pending(&p))) } }
+        Cmd::Gate { op } => { let p = open_project(cli, true)?; match op { GateCmd::Create { question, fields } => { let mut f = parse_json_arg(fields)?; if !f.is_object() { f = json!({}); } f["question"] = json!(question); gov_runtime::orchestration::gates::create(&p, f) } GateCmd::Present { id, receipt_file, receipt_inbox } => { let (d, text) = gov_runtime::orchestration::gates::present(&p, id)?; if !cli.json { println!("{text}"); } let mut out = json!({"gate": d, "chat_text": text}); if receipt_file.is_some() || *receipt_inbox { out["receipt"] = gov_runtime::orchestration::gates::acknowledge(&p, id, receipt_file.as_deref())?; } Ok(out) } GateCmd::Revoke { id, reason } => gov_runtime::orchestration::gates::revoke(&p, id, reason.as_deref()), GateCmd::List => { let mut v = gov_runtime::orchestration::gates::pending(&p); v.extend(gov_runtime::orchestration::gates::unverified(&p)); Ok(json!(v)) } GateCmd::Show { id } => gov_runtime::orchestration::gates::inspect(&p, id) } }
         Cmd::Readiness { op } => { let p = open_project(cli, true)?; match op { ReadinessCmd::Check { feature } => Ok(serde_json::to_value(gov_runtime::orchestration::readiness::check(&p, feature)?)?), ReadinessCmd::Plan { feature } => { gov_runtime::authority::require(&p, "readiness_plan")?; gov_runtime::orchestration::readiness::plan(&p, feature) } } }
         Cmd::Intent { text } => { let p = open_project(cli, true)?; gov_runtime::orchestration::intents::route(&p, text) }
         Cmd::Route { task, class, radius, record, report } => { let p = open_project(cli, true)?; if *report { return gov_runtime::routing::report(&p); }
@@ -1110,11 +1464,16 @@ fn main() {
                 );
             } else {
                 let banner = mark(json!({}));
-                if banner["release_trust"]["below_floor"].as_bool().unwrap_or(true) {
+                if banner["release_trust"]["below_floor"]
+                    .as_bool()
+                    .unwrap_or(true)
+                {
                     println!(
                         "{}: {}",
                         banner["release_trust"]["marking"].as_str().unwrap_or(""),
-                        banner["release_trust"]["operator_note"].as_str().unwrap_or("")
+                        banner["release_trust"]["operator_note"]
+                            .as_str()
+                            .unwrap_or("")
                     );
                 }
                 print!(
@@ -1128,11 +1487,16 @@ fn main() {
                 println!("{}", serde_json::to_string_pretty(&mark(json!({"ok": false, "command": name, "error": {"code": e.code, "message": e.message, "details": e.details}, "session": session}))).unwrap());
             } else {
                 let banner = mark(json!({}));
-                if banner["release_trust"]["below_floor"].as_bool().unwrap_or(true) {
+                if banner["release_trust"]["below_floor"]
+                    .as_bool()
+                    .unwrap_or(true)
+                {
                     eprintln!(
                         "{}: {}",
                         banner["release_trust"]["marking"].as_str().unwrap_or(""),
-                        banner["release_trust"]["operator_note"].as_str().unwrap_or("")
+                        banner["release_trust"]["operator_note"]
+                            .as_str()
+                            .unwrap_or("")
                     );
                 }
                 eprintln!("error [{}]: {}", e.code, e.message);

@@ -1685,7 +1685,17 @@ fn section_6_effects_are_enforced_inside_their_sinks() {
     // lifts is indistinguishable from a broken product.
     let r = g.ok(&["trust", "root-update", "--anchor", successor.to_str().unwrap()]);
     assert_eq!(r["to_version"], 2);
-    assert!(g.run(&["gate", "create", "--question", "approve something?"]).ok());
+    // (WS-3 / BC-P2-49: a gate is raised only with a complete decision package, so the positive case supplies one)
+    assert!(g
+        .run(&[
+            "gate",
+            "create",
+            "--question",
+            "approve something?",
+            "--fields",
+            &crate::ws03::package(serde_json::json!({}))
+        ])
+        .ok());
 }
 
 /// `AR29-B2` second limb and `AR29-N4`, measured end to end: `update --apply` is on the `OWNER-DECISION-0006` §5

@@ -43,10 +43,9 @@ impl Project {
             .ok()
             .filter(|s| !s.is_empty())
             .unwrap_or_else(new_session_id);
-        let role = std::env::var("GOV_ROLE")
-            .ok()
-            .filter(|s| !s.is_empty())
-            .unwrap_or_else(|| "orchestrator".into());
+        // BC-P2-08: the acting role is the one the caller declared, resolved once per process
+        // (`authority::install_acting_role`), else GOV_ROLE, else `undeclared` (L0). Never a silent orchestrator.
+        let role = crate::authority::default_role_id();
         Project {
             root,
             session_id,
@@ -187,7 +186,22 @@ impl Project {
             RUNTIME_DIR.into()
         }
     }
+    /// The **effective** project policy: the `PROJECT_POLICY.yaml` overlay after every key has been evaluated
+    /// against POLICY_PRECEDENCE (BC-P2-45). A switch that would weaken a kernel floor (e.g.
+    /// `readiness.enforce_pre_implementation_cells: false`) is refused, reported in
+    /// `PolicySet.refused_overrides` (doctor D027, suite family `policy_precedence`, `gov policy overrides`) and
+    /// replaced here by the kernel value, so every reader of this accessor sees the enforced value. The raw file is
+    /// `overlay().get("PROJECT_POLICY.yaml")`.
     pub fn project_policy(&self) -> Value {
+        if self.is_installed() {
+            if let Some(v) = self
+                .policies()
+                .effective_overlays
+                .get("PROJECT_POLICY.yaml")
+            {
+                return v.clone();
+            }
+        }
         self.overlay().get("PROJECT_POLICY.yaml")
     }
     pub fn secret_scanner(&self) -> &SecretScanner {

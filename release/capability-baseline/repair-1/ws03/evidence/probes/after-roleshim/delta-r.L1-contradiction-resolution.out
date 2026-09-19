@@ -1,0 +1,50 @@
+# project: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/probes-shim4/delta-L1-contradiction-resolution/l1-1789778459-d34162/proj
+# gov init ok: version 4.1.5 doctor HEALTHY
+
+## setup: a feature governed by an older decision and a newer superseding one that left the older ACTIVE
+# RECORD WRITE (direct file write, no gov command): spec/features/F-0001.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0101.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0102.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0103.yaml
+# RECORD WRITE (direct file write, no gov command): spec/decisions/D-0104.yaml
+# RECORD WRITE (direct file write, no gov command): spec/tasks/TASK-0101.yaml
+$ gov --json --session probe-64606bc6 rebuild-memory
+  -> ok
+
+## b1 deterministic precedence first
+$ gov --json --session probe-64606bc6 context compile TASK-0101
+  -> ok
+CHECK L1.b1.1 PASS supersession precedence: only the superseding decision is active authority in the task context packet
+      detail: {"active": ["D-0102", "D-0103", "D-0104"]}
+CHECK L1.b1.2 PASS the superseded-but-ACTIVE decision is flagged UNKNOWN_OR_CONFLICTING, never authority
+      detail: [{"authority_flag": "UNKNOWN_OR_CONFLICTING", "chosen_option": "3", "id": "D-0101", "path": "spec/decisions/D-0101.yaml", "rationale": "initial", "reason": "superseded by a later decision but still marked ACTIVE; resolve via CIT before relying on it", "status": "ACTIVE", "superseded_by": "D-0102", "title": "Retry limit is 3", "type": "decision"}]
+$ gov --json --session probe-64606bc6 audit --no-persist
+  -> ERROR [UNHEALTHY] governance suite UNHEALTHY: 0 critical, 2 high
+CHECK L1.b1.3 PASS the governance suite reports the supersession contradiction (schema_invariants, high)
+      detail: [{"family": "schema_invariants", "id": "GF-0002", "message": "D-0101 is superseded by D-0102 but still ACTIVE (UNKNOWN_OR_CONFLICTING authority)", "path": "spec/decisions/D-0101.yaml", "severity": "high"}]
+$ gov --json --session probe-64606bc6 doctor
+  -> ERROR [UNHEALTHY] doctor: UNHEALTHY (2 failed checks)
+CHECK L1.b1.4 PASS gov doctor D014 reports the authority ambiguity
+      detail: [{"id": "D014", "message": "1 supersession conflict(s), 0 duplicate id(s)", "name": "authority unambiguous (no supersession conflicts / duplicate ids)", "ok": false, "remediation": "resolve via CIT: set superseded records to SUPERSEDED; remove duplicate ids", "severity": "high"}]
+OBSERVE L1.b1.5 two ACTIVE decisions with contradictory choices and no supersession link (D-0103 postgres vs D-0104 mysql) as seen by the task context and the suite: {"audit_mentions": [], "context_active": ["D-0102", "D-0103", "D-0104"]}
+$ gov --json --session probe-64606bc6 context compile TASK-0101
+  -> ok
+CHECK L1.b1.6 FAIL a contradiction that deterministic precedence cannot resolve (two ACTIVE decisions, no supersession) is detected rather than both being delivered as active authority
+      detail: {"active": ["D-0102", "D-0103", "D-0104"]}
+$ gov --json --session probe-64606bc6 policy overrides
+  -> ok
+CHECK L1.b1.7 PASS project overrides that would widen agent resolution / auto-approval are refused by deterministic policy precedence
+      detail: [{"kernel_value": "R1", "key": "agent_resolvable_when.max_radius", "policy": "HUMAN_GATE_POLICY", "reason": "HUMAN_GATE_POLICY.agent_resolvable_when.max_radius: \"R4\" would weaken the kernel maximum \"R1\" (POLICY_PRECEDENCE mode 'ceiling', rule HUMAN_GATE_POLICY.agent_resolvable_when.max_radius)", "source": "PROJECT_POLICY.policy_overrides", "value": "R4"}, {"kernel_value": 0.8, "key": "agent_resolvable_when.min_confidence", "policy": "HUMAN_GATE_POLICY", "reason": "HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence: 0.1 would weaken the kernel minimum 0.8 (POLICY_PRECEDENCE mode 'floor', rule HUMAN_GATE_POLICY.agent_resolvable_when.min_confidence)", "source": "PROJECT_POLICY.policy_overrides", "value": 0.1}, {"kernel_value": "R1", "key": "auto_approve_max_radius", "policy": "CHANGE_POLICY", "reason": "CHANGE_POLICY.auto_approve_max_radius: \"R5\" would weaken the kernel maximum \"R1\" (POLICY_PRECEDENCE mode 'ceiling', rule CHANGE_POLICY.auto_approve_max_radius)", "source": "PROJECT_POLICY.policy_overrides", "value": "R5"}]
+$ gov --json --session probe-64606bc6 policy effective HUMAN_GATE_POLICY
+  -> ok
+CHECK L1.b1.8 PASS effective agent_resolvable_when is unchanged (R1 / 0.8)
+      detail: {"independent_assessment": true, "max_radius": "R1", "min_confidence": 0.8, "require_assessed": true, "reversible": true}
+$ gov --json --session probe-64606bc6 policy overrides
+  -> ok
+OBSERVE L1.b1.9 PROJECT_POLICY restored: []
+
+## b2 agent resolution only when low impact + high confidence + reversible, by an L3+ acting role
+$ gov --json --session probe-64606bc6 gate create --question 'Resolve retry-limit contradiction' --fields '{"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R1", "confidence": 0.9, "reversibility": "reversible"}'
+  -> ERROR [GATE_PACKAGE_INCOMPLETE] a Human Decision Gate is raised only with a complete decision package (Contract v3 L2; HUMAN_GATE_POLICY.decision_package_fields). Missing: ["why_now", "current_state", "impact", "cost_rework", "recommendation"]. Invalid: []. Supply them in --fields; nothing is defaulted to 'not assessed'.
+unexpected failure: gov gate create --question Resolve retry-limit contradiction --fields {"options": [{"id": "A", "description": "keep 5"}, {"id": "B", "description": "revert to 3"}], "impact_radius": "R1", "confidence": 0.9, "reversibility": "reversible"}: {'code': 'GATE_PACKAGE_INCOMPLETE', 'message': 'a Human Decision Gate is raised only with a complete decision package (Contract v3 L2; HUMAN_GATE_POLICY.decision_package_fields). Missing: ["why_now", "current_state", "impact", "cost_rework", "recommendation"]. Invalid: []. Supply them in --fields; nothing is defaulted to \'not assessed\'.', 'details': {'missing': ['why_now', 'current_state', 'impact', 'cost_rework', 'recommendation'], 'invalid': [], 'required_fields': ['question', 'why_now', 'current_state', 'options', 'impact', 'reversibility', 'cost_rework', 'recommendation', 'confidence', 'permitted_next_actions'], 'non_substantive_values': ['', 'not assessed', 'unassessed', 'tbd', 'todo', '?', '-', '...', 'unknown']}}
+exit=1

@@ -73,7 +73,7 @@ fn update_from_previous_release_preserves_project_and_rolls_back() {
         false
     );
     g.ok(&["gate", "present", &gid]);
-    g.ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gid, "A");
     // --- apply with approval (spec/ measured from here: the gate record above is legitimate governance state) ---
     let spec_before = tree_hash(&proj.join("spec"), &["audits/**", "reports/**"]);
     let ap = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);

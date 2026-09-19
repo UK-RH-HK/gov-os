@@ -89,3 +89,15 @@ authority_levels_required:
   mutate_spec_decisions: L3
   mutate_spec_other: L2
   mutate_product_source: L1
+  # G0 (BC-P2-08): every command that writes authoritative, governed, governed-test, derived or evidence state has a
+  # class. The CLI maps every invocation to one class (orchestration::control::COMMAND_GUARDS); an invocation that
+  # declares no role carries L0, and a declared `human` role carries L0 (human authority is owner-signed).
+  record_audit: L0           # audit / verify governance persist an EVIDENCE audit record (independent auditors are L0)
+  replan_tasks: L2           # task replan rewrites READY/BLOCKED/WAITING_HUMAN on authoritative task records
+  compile_context: L0        # context compile writes a derived, rebuildable packet cache
+  regenerate_heldout_set: L3 # memory heldout-starter overwrites the governed retrieval held-out test set
+  generate_adapters: L2      # adapters generate rewrites governance/generated/adapters
+  generate_tool_registry: L2 # tools registry rewrites governance/generated/tool-registry.json
+  emit_telemetry: L0         # telemetry emit appends observability evidence
+  adoption_plan: L3          # adopt baseline / inventory / classify / map / plan / test-design
+  adoption_review: L0        # adopt review / verify-migration / verify-memory / audit (independent L0 roles; a role must still be declared)

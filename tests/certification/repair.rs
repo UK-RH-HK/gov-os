@@ -391,14 +391,18 @@ fn authority_levels_are_enforced_on_executable_paths() {
             .error_code(),
         "UNKNOWN_ROLE"
     );
-    // orchestrator (L4) creates a gate; an L1 agent cannot answer it; a relayed human answer by L4 can; `human` can
+    // orchestrator (L4) creates a gate; an L1 agent cannot answer it; a relayed human answer by L4 can.
+    // (WS-3 / BC-P2-49 + BC-P2-10: gates carry a complete package, and the human answer is owner-signed — a
+    // `--role human` claim is no longer an identity and carries no authority.)
     let gate = g.ok(&[
         "gate",
         "create",
         "--question",
         "Ship?",
         "--fields",
-        r#"{"impact_radius": "R3", "reversibility": "irreversible", "confidence": 0.5}"#,
+        &crate::ws03::package(
+            json!({"impact_radius": "R3", "reversibility": "irreversible", "confidence": 0.5}),
+        ),
     ]);
     let gid = gate["id"].as_str().unwrap().to_string();
     g.ok(&["gate", "present", &gid]);
@@ -415,34 +419,53 @@ fn authority_levels_are_enforced_on_executable_paths() {
         "AUTHORITY_DENIED"
     );
     assert_eq!(
-        g.err(&["decide", &gid, "--option", "A", "--by", "orchestrator"])
-            .error_code(),
+        g.err(&[
+            "decide",
+            &gid,
+            "--option",
+            "A",
+            "--by",
+            "orchestrator",
+            "--rationale",
+            "x"
+        ])
+        .error_code(),
         "AUTHORITY_DENIED",
         "agent resolution outside agent_resolvable_when (R3, irreversible) is refused even for L4"
     );
-    let d = g
-        .with_role("human")
-        .ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
+    assert_eq!(
+        g.with_role("human")
+            .err(&["decide", &gid, "--option", "A", "--by", "owner"])
+            .error_code(),
+        "AUTHORITY_DENIED",
+        "a declared `human` role is a claim, not the human"
+    );
+    let d = crate::ws03::human_decide(&g, &gid, "A");
     assert_eq!(d["answered_by_kind"], "human");
-    // agent-resolvable gate (R1, high confidence, reversible) can be answered by an L3+ agent
+    // agent-resolvable gate (R1, high confidence, reversible) raised by one session can be answered by an L3+
+    // agent in another (BC-P2-18: the assessment must not rest solely on the resolver's own declaration)
     let g2 = g.ok(&[
         "gate",
         "create",
         "--question",
         "trivial?",
         "--fields",
-        r#"{"impact_radius": "R1", "reversibility": "reversible", "confidence": 0.95}"#,
+        &crate::ws03::package(
+            json!({"impact_radius": "R1", "reversibility": "reversible", "confidence": 0.95}),
+        ),
     ]);
     let gid2 = g2["id"].as_str().unwrap().to_string();
     g.ok(&["gate", "present", &gid2]);
     assert_eq!(
-        g.with_role("change-controller").ok(&[
+        g.with_role("change-controller").with_session("S-cc").ok(&[
             "decide",
             &gid2,
             "--option",
             "A",
             "--by",
-            "change-controller"
+            "change-controller",
+            "--rationale",
+            "trivial and reversible"
         ])["answered_by_kind"],
         "agent"
     );
@@ -720,7 +743,7 @@ fn destructive_migration_requires_answered_gate_record() {
         "GATE_NOT_PRESENTED"
     );
     executor.ok(&["gate", "present", &gid]);
-    executor.ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&executor, &gid, "A");
     executor.ok(&["adopt", "migrate", "--batch", "7"]);
     assert!(
         !exists(&root, "src/app/old_export.py"),
@@ -928,7 +951,7 @@ fn update_approval_requires_presented_answered_gate() {
     let gid = ap["human_gate"].as_str().unwrap().to_string();
     assert_eq!(yaml(&proj, "governance/framework.lock")["version"], "4.1.1");
     g.ok(&["gate", "present", &gid]);
-    g.ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gid, "A");
     let ap2 = g.ok(&["update", "--apply", "--approve", "--by", "owner"]);
     assert_eq!(ap2["applied"], true);
     assert_eq!(
@@ -1244,7 +1267,7 @@ fn smaller_findings_regressions() {
     let cid = c["id"].as_str().unwrap().to_string();
     let gate = c["simulation"]["human_gate"].as_str().unwrap().to_string();
     g.ok(&["gate", "present", &gate]);
-    g.ok(&["decide", &gate, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gate, "A");
     let ap = g.ok(&["cit", "approve", &cid, "--by", "owner", "--method", "human"]);
     g.ok(&["cit", "execute", &cid]);
     g.ok(&["cit", "rollback", &cid, "--reason", "test"]);

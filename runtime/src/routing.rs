@@ -1,24 +1,45 @@
 //! Model routing (framework §55-58): tiers and reasoning are canonical; model/provider names live only in the overlay.
+//!
+//! BC-P2-45: the project overlay `MODEL_ROUTING_OVERRIDES.yaml` is read only through POLICY_PRECEDENCE
+//! (`PolicySet.effective_overlays`): a task-class tier, a role's minimum tier and a role's default reasoning may be
+//! raised, never lowered; a refused weakening is reported (`gov policy overrides`, doctor D027, suite family
+//! `policy_precedence`). The router additionally only ever *raises* a requirement, so no overlay value can lower a
+//! kernel floor, a role default or a task's declared minimum even if a rule were missing.
 use crate::util::{now_iso, read_json};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
 
+/// The tier a task class gets when the kernel declares no minimum for it (the implicit floor overlays may raise).
+pub const DEFAULT_CLASS_TIER: &str = "T2";
+
+/// The routing overlay as the product must read it: evaluated against POLICY_PRECEDENCE.
+pub fn effective_overrides(p: &Project) -> Value {
+    p.policies()
+        .effective_overlays
+        .get("MODEL_ROUTING_OVERRIDES.yaml")
+        .cloned()
+        .unwrap_or_else(|| p.overlay().get("MODEL_ROUTING_OVERRIDES.yaml"))
+}
+
 pub fn tier_for_class(p: &Project, class: &str) -> String {
     let pol = p.policies();
-    let over = p.overlay().get("MODEL_ROUTING_OVERRIDES.yaml");
-    if let Some(t) = over
+    let kernel = pol
+        .get(
+            "MODEL_ROUTING_POLICY",
+            &format!("task_class_minimum_tier.{class}"),
+        )
+        .and_then(|v| v.as_str().map(|s| s.to_string()))
+        .unwrap_or(DEFAULT_CLASS_TIER.into());
+    let over = effective_overrides(p);
+    match over
         .get("task_class_overrides")
         .and_then(|m| m.get(class))
         .and_then(|v| v.as_str())
     {
-        return t.to_string();
+        // a project may raise the class minimum, never lower it
+        Some(t) if tier_rank(t) > tier_rank(&kernel) => t.to_string(),
+        _ => kernel,
     }
-    pol.get(
-        "MODEL_ROUTING_POLICY",
-        &format!("task_class_minimum_tier.{class}"),
-    )
-    .and_then(|v| v.as_str().map(|s| s.to_string()))
-    .unwrap_or("T2".into())
 }
 
 fn tier_rank(t: &str) -> u8 {
@@ -48,7 +69,7 @@ pub fn route(
     radius: Option<&str>,
 ) -> Result<Value> {
     let pol = p.policies();
-    let over = p.overlay().get("MODEL_ROUTING_OVERRIDES.yaml");
+    let over = effective_overrides(p);
     let class = task
         .and_then(|t| t["class"].as_str())
         .or(class)
@@ -98,8 +119,12 @@ pub fn route(
                 tier = t.into();
             }
         }
+        // a project role override may raise the reasoning requirement, never lower it below the task's declared
+        // minimum or the role's kernel default (A0-M1-02)
         if let Some(rr) = ro["default_reasoning"].as_str() {
-            reasoning = rr.into();
+            if reason_rank(rr) > reason_rank(&reasoning) {
+                reasoning = rr.into();
+            }
         }
     }
     if let Some(rd) = radius {
@@ -225,7 +250,7 @@ pub fn record(p: &Project, mut ev: Value) -> Result<Value> {
         {
             let g = crate::orchestration::gates::create_system(
                 p,
-                json!({"question": format!("Budget threshold exceeded: {t}. Continue spending on {task_label}?"), "why_now": "delegated budget exhausted", "current_state": format!("spent today {:.2}", spent_today + cost), "options": [{"id": "A", "description": "raise the budget"}, {"id": "B", "description": "stop this workstream"}], "impact": "cost", "reversibility": "reversible", "recommendation": "B", "confidence": 0.7, "trigger": "budget_threshold", "impact_radius": "R1"}),
+                json!({"question": format!("Budget threshold exceeded: {t}. Continue spending on {task_label}?"), "why_now": "delegated budget exhausted", "current_state": format!("spent today {:.2}", spent_today + cost), "options": [{"id": "A", "description": "raise the budget and continue this workstream", "authorises_blocked_work": true}, {"id": "B", "description": "stop this workstream", "authorises_blocked_work": false}], "impact": format!("further model/API spend on {task_label} beyond BUDGET_POLICY"), "reversibility": "reversible: stopping later forfeits only the spend already made", "cost_rework": format!("{:.2} spent today; stopping now loses no completed work, continuing adds spend without a delegated budget", spent_today + cost), "recommendation": "B unless the workstream is on the critical path", "confidence": 0.7, "trigger": "budget_threshold", "impact_radius": "R1"}),
             )?;
             o.insert("threshold_exceeded".into(), json!(t));
             o.insert("human_gate".into(), g["id"].clone());

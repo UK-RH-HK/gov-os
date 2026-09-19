@@ -260,7 +260,14 @@ fn injected_failures_are_detected_and_recovered() {
     std::fs::remove_file(root.join("governance/project/plugins/bad.yaml")).unwrap();
     assert!(doctor_check(&g, "D025").0);
     // 12. a gate that exists only in a file is not presented (INV-008)
-    let gate = g.ok(&["gate", "create", "--question", "Ship it?"]);
+    let gate = g.ok(&[
+        "gate",
+        "create",
+        "--question",
+        "Ship it?",
+        "--fields",
+        &crate::ws03::package(json!({})),
+    ]);
     let gid = gate["id"].as_str().unwrap().to_string();
     assert_eq!(
         g.err(&["decide", &gid, "--option", "A"]).error_code(),
@@ -269,7 +276,7 @@ fn injected_failures_are_detected_and_recovered() {
     let (ok, _) = doctor_check(&g, "D019");
     assert!(!ok);
     g.ok(&["gate", "present", &gid]);
-    g.ok(&["decide", &gid, "--option", "A", "--by", "owner"]);
+    crate::ws03::human_decide(&g, &gid, "A");
     // 13. handoff that returns files outside its authority is rejected (mutation scope)
     let t2 = g.ok(&[
         "task",
