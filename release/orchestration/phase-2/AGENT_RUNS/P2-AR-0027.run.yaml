@@ -19,4 +19,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/r2-ws06/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0027.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: eba9d720289e524cf849c8de6c5c09a2deb2780e
+  branch_tip_commit: 33627c84428bd815bc8c11cd2bb181e33d1ea4bf
+  branch_product_code_digest: 99704522e6a85cd077521e34eb35a722a49c50afd428d34a9ce1fa70420ea262
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-28': 'REPAIRED_CLAIMED', 'BC-P2-30': 'REPAIRED_CLAIMED', 'BC-P2-31': 'PARTIAL'}
+  orchestrator_checks: scope conforms (memory/**, retrieval, paths.rs, index-manifest schema; new memory/integrity.rs, memory/profile.rs, tests/certification/ws06.rs; additive CLI (memory select --gate, memory integrity/profile) + control.rs Read labels; repair.rs select step now goes through the owner-signed gate — it had asserted the R5-without-gate defect; declared); lib 149/0, certification 104/0; 0 PASS->FAIL on re-run audit probes; R1 held-out via private per-run paths at baselines, census 107 files/1527 fns, 0 §6 violations. BC-P2-31 PARTIAL: classification + location API done; writer moves routed to WS-3/4/5/7/8/9 (IP-R2-7..11) for round 3

@@ -19,4 +19,12 @@ worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2
 expected_output_path: release/capability-baseline/repair-1/r2-ws08/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: b9cdc888eb69e7310ca6cd423e3a8a35a21b770b
+  branch_tip_commit: 9a38329a0a115aa48ecd8489fe0015e0ab31d34a
+  branch_product_code_digest: 37087f1308754f86a20d505da9474d11b2ff7d27d36eb09ce148a316ab4c4966
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: {'BC-P2-36': 'REPAIRED_CLAIMED', 'BC-P2-35': 'REPAIRED_CLAIMED', 'OWNER-DECISION-P2-0002-R3': 'PARTIAL', 'OWNER-DECISION-P2-0002-R4': 'PARTIAL'}
+  orchestrator_checks: scope conforms (WS-8-owned srr/{verifier,installation,mod,staging}, kernel, kernel_trust, lock, init, update, release, lock schema; tests/certification/common.rs helpers + new ws08_r2.rs + setup-only edits in 12 test files (provisioned throw-away root; no assertion weakened; declared §3.2); fixture READMEs; breakglass.rs/state.rs/plugins.rs/spec/docs/Contract untouched); lib 147/0, certification 110/0 in default and XDG_CACHE modes; R1 held-out via private path on own tree (105 files/1468 fns) at baselines incl. normalised failure messages, AR-0033 only hv_a::a1 size pin; 5 admit / 5 install_kernel / 1 by_admit; floor/break-glass block byte-identical; PERMITTED_OPERATIONS unchanged. OWNER-DECISION-P2-0002 admission implemented; IP-WS02-16 NOT_REPAIRED — found a planted AKIA...EXAMPLE secret literal in WS-2's framework/health/SKILL_SCENARIO_CHECKS.yaml that the kernel scanner flags once installed (-> WS-2 round 3); IP-16 NOT_REPAIRED (needs WS-4 record type + WS-3 CLI) -> round 3; heavy test-setup overlap with WS-3/WS-9 round-2 test edits expected at integration
