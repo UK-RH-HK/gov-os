@@ -95,10 +95,6 @@
           "kept": {
             "type": "string",
             "description": "duplicate_id: the path of the occurrence the index holds"
-          },
-          "size": {
-            "type": "integer",
-            "description": "too_large / not_utf8 / unreadable: the file size in bytes"
           }
         },
         "required": [
@@ -106,7 +102,7 @@
           "reason"
         ]
       },
-      "description": "Every file the index does not hold although the path map would index it, or holds out by the path map's own exclusion, with the reason and what decided it (R2-10: freshness judges exactly what a build indexes). Reasons: secret_class / sensitivity:<class> (path map; re-derived by freshness, never trusted from here), too_large, not_utf8, unreadable (a property of the file; re-read by freshness), secret_content and duplicate_id (content-level: carry the content_hash and derivation key they were decided under and hold only while both still match; a duplicate names the record id and the occurrence the index holds, which is the one the record store resolves the id to). Binary files are reported by the build, not listed. Part of the hashed core."
+      "description": "Every file the index does not hold although the path map would index it, or holds out by the path map's own exclusion, with the reason and what decided it (R2-10: freshness judges exactly what a build indexes). Reasons: secret_class / sensitivity:<class> (path map; re-derived by freshness, never trusted from here), too_large, not_utf8, unreadable (a property of the file; re-read by freshness; the size is in the build report), secret_content and duplicate_id (content-level: carry the content_hash and derivation key they were decided under and hold only while both still match; a duplicate names the record id and the occurrence the index holds, which is the one the record store resolves the id to). Binary files are reported by the build, not listed. Part of the hashed core."
     },
     "components": {
       "type": "object",

@@ -60,7 +60,8 @@ pub fn build_index_manifest(
     }
     // each exclusion with what decided it: a content-level exclusion (secret content, duplicate record id) carries
     // the content hash and derivation key it was decided under — freshness honours it only while both still match —
-    // and a duplicate names the id and the occurrence the index holds; a size exclusion records the size
+    // and a duplicate names the id and the occurrence the index holds (a file-level exclusion's size stays in the
+    // build report: freshness re-reads the file, and a size that changes above the limit changes nothing indexed)
     let mut ex: Vec<Value> = excluded
         .iter()
         .map(|e| {
@@ -70,7 +71,7 @@ pub fn build_index_manifest(
                 .and_then(|d| d.as_str())
                 .and_then(|d| serde_json::from_str(d).ok())
                 .unwrap_or(Value::Null);
-            for k in ["content_hash", "derivation", "id", "kept", "size"] {
+            for k in ["content_hash", "derivation", "id", "kept"] {
                 if let Some(v) = detail.get(k).filter(|v| !v.is_null()) {
                     o[k] = v.clone();
                 }
