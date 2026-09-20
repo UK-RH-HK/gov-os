@@ -1,0 +1,69 @@
+# P2-AR-0053 R4-O1 probe run
+# probe sha256 86a6d8b7af923b4a358c16d251ffb8c0bebd3519f57fcd4cd238451c85cfc818
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual-b HEAD 55af19999e22acacc8c201db212e8ff6b47b4c5d dirty-product-files 6
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual-b/target/release/gov sha256 a6e4d18f7b1dd89cf0e4bf3a74faad86cb4ee17001086881ccccc867bd8a9641
+# date 2026-09-20T13:29:30Z
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual-b/target/release/gov
+# O1: installation inside a claimed task, tool path declared in the task's allowed paths
+[r4o1-declared] install ok: True installed: True gates answered: ['HDG-0002', 'HDG-0001'] approval: {"mode": "human_gate", "gate": "HDG-0002", "option": "A", "by_kind": "human", "answered_by": "product owner", "decision": "D-0001", "installation_sha256": "bed7f12a38a4e30bb074ad96a5e32f2b33e03d0b60a3
+[r4o1-declared] change_transaction in result: {"cit": "CIT-0001", "cit_status": "COMMITTED", "human_gate": "HDG-0001", "radius": "R5", "effective_triggers": ["governance_change", "security_change"], "binding_sha256": "1e29e7ad4c20abff77d57232367cf4222e948044c047eff2cffd91a9e6c00f80", "consequences": ["0 artefacts affected within radius R5 (grap
+[r4o1-declared] descriptor on disk: True
+[r4o1-declared] cit list: [{"id": "CIT-0001", "title": "Install tool TOOL-R4O1", "cit_status": "COMMITTED", "trigger": "security_change", "effective_trigger": "governance_change", "radius": "R5", "human_gate": "HDG-0001", "decision": "D-0002", "state": {"binding": "VERIFIED", "cit_status": "COMMITTED", "op": "cit execute", "at": "2026-09-20T13:29:36Z"}, "origin": "system", "record_seal": "VERIFIED"}]
+[r4o1-declared] working-tree changes during the task:
+ M governance/generated/adapter-manifest.json
+ M governance/generated/adapters/mcp/mcp-connections.json
+ M governance/generated/tool-registry.json
+?? governance/generated/index-manifest.json
+?? governance/generated/memory-manifest.json
+?? governance/project/tools/
+?? spec/audits/AUD-0002.yaml
+?? spec/decisions/CIT-0001.yaml
+?? spec/decisions/D-0001.yaml
+?? spec/decisions/D-0002.yaml
+?? spec/decisions/HDG-0001.yaml
+?? spec/decisions/HDG-0002.yaml
+?? spec/reports/checkpoints/CKPT-00001.yaml
+?? spec/reports/checkpoints/LATEST.yaml
+?? spec/tasks/TASK-0001.yaml
+?? spec/tasks/TASK-0002.yaml
+?? spec/tasks/TASK-0003.yaml
+
+[r4o1-declared] close ok: True code: None
+[r4o1-declared] refused: null
+[r4o1-declared] accepted: null
+[r4o1-declared] undeclared: null out_of_scope: null
+
+# O2: installation inside a claimed task, tool path NOT declared
+[r4o1-undeclared] install ok: True installed: True gates answered: ['HDG-0002', 'HDG-0001'] approval: {"mode": "human_gate", "gate": "HDG-0002", "option": "A", "by_kind": "human", "answered_by": "product owner", "decision": "D-0001", "installation_sha256": "bed7f12a38a4e30bb074ad96a5e32f2b33e03d0b60a3
+[r4o1-undeclared] change_transaction in result: {"cit": "CIT-0001", "cit_status": "COMMITTED", "human_gate": "HDG-0001", "radius": "R5", "effective_triggers": ["governance_change", "security_change"], "binding_sha256": "1e29e7ad4c20abff77d57232367cf4222e948044c047eff2cffd91a9e6c00f80", "consequences": ["0 artefacts affected within radius R5 (grap
+[r4o1-undeclared] descriptor on disk: True
+[r4o1-undeclared] cit list: [{"id": "CIT-0001", "title": "Install tool TOOL-R4O1", "cit_status": "COMMITTED", "trigger": "security_change", "effective_trigger": "governance_change", "radius": "R5", "human_gate": "HDG-0001", "decision": "D-0002", "state": {"binding": "VERIFIED", "cit_status": "COMMITTED", "op": "cit execute", "at": "2026-09-20T13:29:45Z"}, "origin": "system", "record_seal": "VERIFIED"}]
+[r4o1-undeclared] working-tree changes during the task:
+ M governance/generated/adapter-manifest.json
+ M governance/generated/adapters/mcp/mcp-connections.json
+ M governance/generated/tool-registry.json
+?? governance/generated/index-manifest.json
+?? governance/generated/memory-manifest.json
+?? governance/project/tools/
+?? spec/audits/AUD-0002.yaml
+?? spec/decisions/CIT-0001.yaml
+?? spec/decisions/D-0001.yaml
+?? spec/decisions/D-0002.yaml
+?? spec/decisions/HDG-0001.yaml
+?? spec/decisions/HDG-0002.yaml
+?? spec/reports/checkpoints/CKPT-00001.yaml
+?? spec/reports/checkpoints/LATEST.yaml
+?? spec/tasks/TASK-0001.yaml
+?? spec/tasks/TASK-0002.yaml
+?? spec/tasks/TASK-0003.yaml
+
+[r4o1-undeclared] close ok: True code: None
+[r4o1-undeclared] refused: null
+[r4o1-undeclared] accepted: null
+[r4o1-undeclared] undeclared: null out_of_scope: null
+
+# O3 (control): the same installation with no task claimed
+[control] install ok: True installed: True gates answered: ['HDG-0002', 'HDG-0001']
+[control] descriptor on disk: True
+[control] cit list: [{"id": "CIT-0001", "title": "Install tool TOOL-R4O1", "cit_status": "COMMITTED", "trigger": "security_change", "effective_trigger": "governance_change", "radius": "R5", "human_gate": "HDG-0001", "decision": "D-0002", "state": {"binding": "VERIFIED", "cit_status": "COMMITTED", "op": "cit execute", "at": "2026-09-20T13:29:52Z"}, "origin": "system", "record_seal": "VERIFIED"}]
+[exit=0]

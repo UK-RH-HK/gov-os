@@ -1,0 +1,12 @@
+# P2-AR-0053 certification summary: union of the nine chunk runs vs the full test list (all at ab0a075)
+cert-c1.ab0a075.out: # chunk: arch brownfield failure_injection greenfield integration_r3 migration multi_machine HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T13:49:21Z | test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 179 filtered out; finished in 389.39s
+cert-c2.ab0a075.out: # chunk: r4_residual repair3 section6 HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T13:56:07Z | test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 222.54s
+cert-c3.ab0a075.out: # chunk: repair HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T13:59:53Z | test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 180 filtered out; finished in 167.87s
+cert-c4.ab0a075.out: # chunk: repair2 upstream update HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T14:02:44Z | test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 187 filtered out; finished in 227.17s
+cert-c5.ab0a075.out: # chunk: srr srr_material HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T14:06:35Z | test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 179 filtered out; finished in 39.70s
+cert-c6.ab0a075.out: # chunk: ws03 ws03_r3 ws04r2 HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T14:07:42Z | test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 170 filtered out; finished in 291.79s
+cert-c7.ab0a075.out: # chunk: ws04r3 ws05 ws05r3 HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T14:12:39Z | test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 174 filtered out; finished in 316.20s
+cert-c8.ab0a075.out: # chunk: ws06 ws06r3 ws07 HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T14:18:16Z | test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 179 filtered out; finished in 331.49s
+cert-c9.ab0a075.out: # chunk: ws08 ws08_r2 ws08_r3 HEAD ab0a0753a02b03468e2432f61c89b46861e14193 dirty=0 2026-09-20T14:23:51Z | test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 181.55s
+tests listed: 200; passed across chunks: 200; difference: 0 lines
+every chunk ran at the same commit ab0a075 with a clean product tree (dirty=0 in each header)

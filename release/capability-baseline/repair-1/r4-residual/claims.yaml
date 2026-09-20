@@ -1,0 +1,184 @@
+# Repair iteration 1, round 4, residual integration points (P2-HO-0042 and its continuation P2-HO-0048).
+#
+# Builder claims only (Contract v3 O3): nothing here says an item is accepted, verified or closed, and no claim
+# grades anyone's work, its author's included. `source` is the run that did the work: P2-AR-0043 (terminated by a
+# weekly model usage limit, its five product commits and its report in the base) or P2-AR-0053 (its continuation).
+# Statuses of P2-AR-0043's items are DERIVED FROM ITS REPORT (`00-REPAIR-REPORT.md`); its evidence is not restated
+# here as P2-AR-0053's. P2-AR-0053 re-ran the whole regression and all four R1 held-out suites on its own final tree
+# (`01-CONTINUATION-REPORT.md` §1).
+run_ids: [P2-AR-0043, P2-AR-0053]
+workstream: round-4 residual (cross-workstream)
+handoffs: [P2-HO-0042, P2-HO-0048]
+base_commit: cae2f67                                                  # P2-AR-0043's base (round-3 integrated tree)
+continuation_base_commit: 55af199                                     # P2-AR-0053's base = P2-AR-0043's tip
+final_commit: ab0a075
+product_code_digest: dcf4c59101a9442ccf56e3c6c02c760b0225c54cb5fd6725a31dc3ad36ab0a13   # at ab0a075
+governed_state_digest: c88c0bf1a0778af960c4a0f6fb644ffb4385c8152aec9a51b9c5c065d6be5f70
+
+claims:
+  # ---------------------------------------------------------------- the two round-3 integration observations
+  - item: INT3-O1
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      A plugin registration inside a claimed task is carried out by a change transaction the OS proposes and
+      simulates itself (Contract v3 K3), with the plugin's execution approval kept as its own gate (F4); the two
+      approvals name each other, CIT-E alone writes the registration, and the close accepts it on the transaction's
+      recorded writes.
+    evidence_in: 00-REPAIR-REPORT.md §1; evidence/int3-o1/
+  - item: INT3-O2
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      A direct upstream change observed by a host-run incremental rebuild is propagated there (Contract v3 W6 with
+      O5's G1 tier), deferred and reported rather than forced when a write control refuses it, idempotent, with the
+      claim-time path unchanged.
+    evidence_in: 00-REPAIR-REPORT.md §2; evidence/audit-probes/final/
+
+  # ---------------------------------------------------------------- the remaining builder integration points
+  - item: IP-R3-WS03-6
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: The T2 binding status is in the family detail; machine-scope sealing on a provisioned machine is disclosed.
+    evidence_in: 00-REPAIR-REPORT.md §3.1
+  - item: IP-R3-WS03-7
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`capabilities/PROTOCOL.md` registry-portability text replaced (P2-ADJ-0002)."
+    evidence_in: 00-REPAIR-REPORT.md §3.2
+  - item: IP-R3-WS03-9
+    source: P2-AR-0043
+    status: CONFIRMED
+    what: >-
+      A probe-premise item: the product keeps the emergency-control state at `.governance-state/control.json`
+      (BC-P2-31), so no product change is needed; WS-3's labelled derived copy of alpha-r A5 runs to the end.
+    evidence_in: 00-REPAIR-REPORT.md §3.3; evidence/audit-probes/final/
+  - item: IP-R3-WS08-3
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "D033 / `os_binding_integrity` report the T2 binding status, including a bound machine not sealing with the authority's active key."
+    evidence_in: 00-REPAIR-REPORT.md §3.1
+  - item: IP-R3-WS06-4
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "A repository-contract path-map rule that never decides is reported (low) by `path_map_compliance`."
+    evidence_in: 00-REPAIR-REPORT.md §3.4
+  - item: IP-R3-WS02-10
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      The heading-marker confirmation step is retired now that WS-6's coverage verifier compares headings by text;
+      WS-2's unit test is replaced under its own name with the property that still holds (the one replacement
+      P2-HO-0042 allows).
+    evidence_in: 00-REPAIR-REPORT.md §3.4
+  - item: IP-R3-WS06-7
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`skill-bindings.json` moved to `governance/registry/` and classified in `OS_STORES`, with the legacy file relocated on the next binding write."
+    evidence_in: 00-REPAIR-REPORT.md §3.5
+  - item: IP-R3-WS09-4
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "TOOL_PERMISSIONS lists the adoption protocol's independent roles; the A7 verifier is authorised by the policy, with the designated-duty fallback kept."
+    evidence_in: 00-REPAIR-REPORT.md §3.6
+  - item: IP-W7R3-3
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "The currency class `tools_plugins` lists the registry at its BC-P2-31 location; `project_skills` lists the new bindings location."
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-5
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      A new migration operation relocates the tracked OS stores at upgrade, bytes and seals unchanged, and the update
+      snapshot covers `governance/registry/` so a rollback restores the previous layout — brownfield projects do not
+      lose registrations.
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-6
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      The memory profile hashes with the pin's digest (the size-plus-mtime shortcut is gone) and the declared model
+      and runtime artefacts are part of the retrieval-profile identity.
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-7
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "The `plugins registry` help text names the registry's current location."
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-9
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`docs/ARCHITECTURE.md` gives the registry directory, its template rule, the store classification, the move at upgrade and the rollback."
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-R3-WS04-11
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      Block scope for `cit.propose` / `handoff.create`: a remediation handoff is a remedy of the block it repairs and
+      stays available; unrelated handoffs are refused only where the block reaches (availability rule, P2-HO-0031).
+    evidence_in: 00-REPAIR-REPORT.md §3.8
+  - item: IP-R3-WS04-09
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`docs/ARCHITECTURE.md` and `docs/COMMANDS.md` document the round-3 and round-4 behaviour listed in the report."
+    evidence_in: 00-REPAIR-REPORT.md §3.8
+
+  # ---------------------------------------------------------------- the optional list (P2-HO-0042 item 4)
+  - item: IP-W7R3-10
+    source: P2-AR-0043
+    status: DONE
+    what: "Dev-profile `sha2` at opt-level 3; the release profile is unchanged."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: IP-R3-WS03-8
+    source: P2-AR-0043
+    status: DONE
+    what: "`gov status` reports the T2 sealing scope."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: INT3-O3
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: >-
+      Routing WS-2's read-only floors digest through an `srr::state` helper would add a function to an R1-listed §6
+      file whose unchanged state WS-8's own invariant script pins; not "cheap and safe". WS-8's `r1-invariants.sh`
+      line "floors_path( outside state.rs = 1" therefore stays at 1 (R4-O3).
+    evidence_in: 00-REPAIR-REPORT.md §5, §7
+  - item: IP-R3-WS04-03
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: "A refactor of the DAG, receipt and `continue` producer-rule filters with no functional gain."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: IP-R3-WS04-06
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: "Removing `current_stale_links` would delete an existing WS-2 unit test, which P2-HO-0042 forbids."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: IP-R3-WS02-11
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: "Refusing a non-remedial CIT-E at entry reaches the same outcome more cheaply but reports less; not needed."
+    evidence_in: 00-REPAIR-REPORT.md §5
+
+  # ---------------------------------------------------------------- P2-HO-0048 item 1 (R4-O1)
+  - item: R4-O1
+    source: P2-AR-0053
+    status: OWNER_DECISION_REQUIRED
+    what: >-
+      The adjacent path P2-AR-0043 recorded and was checking when it stopped. A probe on the unchanged base confirms
+      the gap: `gov tools install` writes `governance/project/tools/<id>.yaml`, and an installation made inside a
+      claimed task is refused at the close with `MATERIAL_CHANGE_REQUIRES_CIT` (`governance_change`), exactly as the
+      plugin descriptor was in INT3-O1 — refused, never let through unattributed. The INT3-O1 mechanism is extended
+      to it (`install_tool` manifest operation, `cit::propose_installation`, `tools::apply_installation` as the CIT-E
+      side, `tools::install_write` as the one writer asking the §6 sink at its write), and the close then accepts the
+      installation on the transaction's recorded writes.
+    owner_decision_required: >-
+      Adopting it narrows an accepted requirement. Under the shipped CHANGE_POLICY a `governance_change` needs a
+      human gate, so a review-evidenced installation — which IP-W7-1 / BC-P2-41 recorded as completing with "no gate
+      raised" — now completes through its change transaction's own gate. No accepted source resolves K3 ("impact
+      simulation auto-triggers for material governance/security changes") against IP-W7-1 ("a governed security
+      review satisfies the condition without the owner's gate") for this path, so P2-AR-0053 states the choice and
+      does not take it. The two answers are: (a) accept the narrowing — IP-W7-1 means no gate for the INSTALLATION
+      subject, and the change gate stands as for any governance change (what the branch implements); or (b) keep
+      IP-W7-1 literally, which needs a rule no source states — a pre-authorisation of this change class in
+      CHANGE_POLICY, or tool descriptors ceasing to be a material governance change.
+    evidence_in: 01-CONTINUATION-REPORT.md §2; evidence/r4-o1/
