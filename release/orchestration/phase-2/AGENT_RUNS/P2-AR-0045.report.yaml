@@ -1,0 +1,271 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0045
+role: oracle-format-reviewer (verification iteration 1)
+objective: >-
+  Decide whether a Qualification Oracle format covering Contract v3 Gate V (V1-V4) exists on
+  cap2-candidate-1 as a machine-checkable definition, and whether to accept it (frozen gate contract AC-6,
+  section 9.2). No hidden fault generated; no product source modified.
+agent_model: claude-opus-5[1m]
+agent_model_note: >-
+  The dispatch pinned `claude-opus-5`. This run executed as Opus 5 with a 1M-token context window, whose
+  exact model id is `claude-opus-5[1m]`; recorded verbatim as required by P2-HO-0009 ("Record your actual
+  model identity in agent_model").
+independence_statement: >-
+  This run authored none of the Governance OS implementation, none of its tests, none of the iteration-0
+  audits (P2-AR-0001..0013), none of the repairs or integrations (P2-AR-0014..0055) and no Phase-1 role; it
+  is not the orchestrator and issues no Phase-2 verdict. It read: the handoffs P2-HO-0046, P2-HO-0043,
+  P2-HO-0000 and P2-HO-0009; Contract v3; the frozen gate contract; ORCHESTRATOR_STATE.yaml; the
+  iteration-0 synthesis inventory (blocker-classes.yaml, repair-delta.md) and epsilon-r finding A0-V1-01;
+  the candidate's format definition, validator, CLI and scheduler sources; and the evidence map. It did not
+  read any other iteration-1 verifier's evidence directory or branch, any agent transcript, any
+  task-output store, or user auto-memory. It did not spawn sub-agents, contact the product owner, or reuse
+  the builder's samples: the sample corpus here was authored from Contract v3 Gate V and the schema. The
+  builder and integrator reports under release/capability-baseline/repair-1/** were treated as claims to
+  attack, never as evidence; the nine qualification_oracle unit tests are cited as regression evidence only
+  (O3).
+input:
+  base_commit: 8588813ec1ef9c832879e258ca5acfb573ae996f
+  candidate: cap2-candidate-1
+  candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0046-verify-1-oracle-format.md
+  common_protocol: release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
+  pinned_input_verification: >-
+    `git rev-list -n1 cap2-candidate-1` = 0bad524…6682; `product_identity.py` at the tag and at HEAD both
+    report the pinned product_code_digest and governed_state_digest; `git diff --stat 0bad524 HEAD` touches
+    only release/orchestration/phase-2/**; sha256sum of Contract v3 and of the frozen gate contract match.
+    No STOP condition.
+
+gate: GATE-P2-ORACLE-FORMAT
+acceptance_criterion: AC-6
+format_reviewed:
+  format: governance-os.qualification-oracle
+  format_version: 1
+  definition_path: framework/qualification-oracle/qualification-oracle.schema.json
+  format_sha256_observed: f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd
+  format_sha256_accepted: f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd
+  matches_round_1_ws01_12_reported_value: true
+  digest_definition: sha256 of the definition file's raw bytes (runtime::util::sha256_text over include_str!)
+  introducing_commit: 473c3fb
+  unchanged_since: true
+  x_format_status_at_review: >-
+    PROPOSED - no hidden fault may be generated against this format until a fresh independent oracle-format
+    reviewer issues QUALIFICATION_ORACLE_FORMAT_ACCEPTED for this format_sha256.
+  validator: runtime/src/qualification_oracle.rs
+  cli: [gov oracle format, gov oracle validate, gov health qualify]
+  g6_entry_point: runtime/src/scheduler/mod.rs::qualification_run
+  installed_into_consumer_projects: false
+
+coverage_summary:
+  method: >-
+    Gate V lines 1012-1062 extracted from the owner-source bytes by this run's own parser, then each
+    crosswalk pointer resolved through the schema ($ref, allOf, if/then) to check the field exists, is
+    required on every path to it, and is typed. The product's parse was not used.
+  owner_source_checklist_bullets: 35
+  owner_source_prose_statements: 5
+  bullets_mapped_to_required_typed_fields: 35
+  statements_mapped_to_required_typed_fields: 5
+  unmapped_or_untyped: 0
+  V1_fault_manifest: 9/9
+  V2_hidden_path_map_oracle: 7/7
+  V3_hidden_memory_oracle: 7/7
+  V4_quantitative_scoring: 12/12
+  gate_v_statements: [L1014, L1017, L1029, L1048, L1062]
+  additional_elements_carried: [W12.7, AQC-W12, PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.6]
+
+inspected:
+  - framework/qualification-oracle/qualification-oracle.schema.json
+  - runtime/src/qualification_oracle.rs
+  - runtime/src/scheduler/mod.rs
+  - runtime/src/verification/mod.rs
+  - runtime/src/verification/reporting.rs
+  - cli/src/main.rs
+  - framework/contracts/governance-capability-acceptance.yaml
+  - tests/governance/capability-evidence-map.yaml
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (lines 1012-1062, 1192-1206, 799)
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md (AC-6, section 9.2)
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml (BC-P2-51)
+  - release/capability-baseline/audit-0/epsilon-r/findings.yaml (A0-V1-01)
+  - commits 0bad524, 8588813, 473c3fb
+
+produced:
+  - release/capability-baseline/verify-1/oracle-format/00-ORACLE-FORMAT-REVIEW.md
+  - release/capability-baseline/verify-1/oracle-format/findings.yaml
+  - release/capability-baseline/verify-1/oracle-format/prior-findings-disposition.yaml
+  - release/capability-baseline/verify-1/oracle-format/samples/ (valid/, invalid/, probe/ - all FORMAT_SAMPLE)
+  - release/capability-baseline/verify-1/oracle-format/evidence/ (with RUN-ALL.sh)
+
+tests_or_attacks:
+  - id: OF-01
+    description: pinned identities - candidate commit, product_code_digest and governed_state_digest at the tag and at HEAD; Contract v3 and frozen gate contract digests
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/00-ORACLE-FORMAT-REVIEW.md
+  - id: OF-02
+    description: the format's identity and the digest the product reports (`gov oracle format`), compared with sha256sum of the definition and with the round-1 reported value
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/01-gov-oracle-format.json
+  - id: OF-03
+    description: independent coverage of every Gate V checklist bullet and prose statement against the owner-source bytes, resolved to required typed fields
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/02-coverage-crosswalk-check.out
+  - id: OF-04
+    description: 93-sample attack matrix - 3 valid accepted; 90 invalid refused with typed errors (one missing-field sample per V1-V4 bullet, 14 wrong-type/vocabulary attacks, 13 semantic and separation attacks, 11 arithmetic attacks, 6 per-fault-outcome attacks, 9 binding attacks)
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/05-RUN-ALL-samples.out
+  - id: OF-05
+    description: physical separation attacks on Contract v3:1062 - oracle stored in the public suite or the qualification repository, a copy in either (JSON and YAML), and leaks of the oracle id, the oracle digest and a verbatim hidden truth
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/06-separation-attacks.out
+  - id: OF-06
+    description: separation-scan blind spots - hidden-oracle material as a governed record type, a reflowed hidden truth, and leaked fault ids/class ids
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/06-separation-attacks.out
+  - id: OF-07
+    description: the G6 entry point - `gov health qualify` in a disposable `gov init` project against conforming/non-conforming, bound/unbound, separate/non-separate oracles, and on an unprovisioned machine
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/07-g6-entry-point.out
+  - id: OF-08
+    description: a FORMAT_SAMPLE never counts as qualification - counts_as_qualification false, and purpose laundering refused in both directions
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/13-purpose-laundering.out
+  - id: OF-09
+    description: leakage of the recorded G6 evidence - the governed repository contains 0 occurrences of the oracle id, the oracle's canonical digest, a fault id or a hidden truth after a recorded run
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/07-g6-entry-point.out
+  - id: OF-10
+    description: how deeply each V4 metric is bound to the oracle - eleven self-serving but internally consistent mutations
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/08-v4-binding-depth.out
+  - id: OF-11
+    description: retrieval_metrics.k, detected_at_tier and detection_signal are not reconciled with the oracle
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/14-retrieval-k-and-tiers.out
+  - id: OF-12
+    description: Repo A (greenfield) shape and the explicit-N/A rule - N/A accepted with a reason, invented ratio refused, omission refused, N/A without a reason refused
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/09-greenfield-and-na.out
+  - id: OF-13
+    description: 'iteration-0 mechanism "a fault-manifest record lacking every V1 field is accepted" - that record planted in a governed repository'
+    result: REFUTED
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/12-governed-repo-record.out
+  - id: OF-14
+    description: AC-10 slice for Gate V - evidence owners for all 35 bullets in the evidence map
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/11-evidence-owners-v1-v4.out
+  - id: OF-15
+    description: contract-binding chain behind the crosswalk (`gov contract verify`)
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/evidence/10-contract-verify.out
+  - id: OF-16
+    description: regression evidence only (O3) - `cargo test --release --lib qualification_oracle`, 9 passed 0 failed
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/oracle-format/00-ORACLE-FORMAT-REVIEW.md
+
+findings:
+  - id: V1-OF-01
+    severity: MEDIUM
+    capability: [V1, V2, V3]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: the hidden-oracle leak scan misses governed-record types and any reformatting of a hidden truth
+    path: release/capability-baseline/verify-1/oracle-format/findings.yaml
+  - id: V1-OF-02
+    severity: MEDIUM
+    capability: [V4]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: four V4 metrics, three count-metric ref lists and two per-fault judgements are not bound to the oracle
+    path: release/capability-baseline/verify-1/oracle-format/findings.yaml
+  - id: V1-OF-03
+    severity: LOW
+    capability: [V2, V1]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: three V2 bullets and two V1 detection sub-fields are free text with no vocabulary
+    path: release/capability-baseline/verify-1/oracle-format/findings.yaml
+  - id: V1-OF-04
+    severity: INFO
+    capability: [V4, O5]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: '`gov health history` rows report `qualification: null` for G6 results'
+    path: release/capability-baseline/verify-1/oracle-format/findings.yaml
+  - id: V1-OF-05
+    severity: INFO
+    capability: [V1, V2, V3, V4]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: the acceptance status lives inside the digested definition
+    path: release/capability-baseline/verify-1/oracle-format/findings.yaml
+  - id: V1-OF-06
+    severity: INFO
+    capability: [V1, V2, V3]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: V1-V3 carry no health-scheduler tier in the evidence map
+    path: release/capability-baseline/verify-1/oracle-format/findings.yaml
+
+prior_findings_disposition:
+  path: release/capability-baseline/verify-1/oracle-format/prior-findings-disposition.yaml
+  BC-P2-51: CLOSED
+  A0-V1-01: CLOSED
+  note: >-
+    Every limb of A0-V1-01 was re-established on this candidate with this run's own evidence: the
+    definition exists and covers Gate V; a bare fault-manifest record in a governed repository is refused
+    `high`; GATE-P2-ORACLE-FORMAT is satisfied by this acceptance; and 0 of the 35 Gate V bullets have zero
+    evidence owners.
+
+verdict: ORACLE_FORMAT_ACCEPTED
+verdict_alias_in_agent_runs_readme: QUALIFICATION_ORACLE_FORMAT_ACCEPTED
+verdict_vocabulary_note: >-
+  The dispatch and P2-HO-0046 require ORACLE_FORMAT_ACCEPTED | ORACLE_FORMAT_REJECTED | INCOMPLETE; the
+  AGENT_RUNS README's role table names the same acceptance QUALIFICATION_ORACLE_FORMAT_ACCEPTED. Both are
+  recorded so the orchestrator can match either.
+verdict_basis: >-
+  All 35 Gate V checklist bullets and all 5 Gate V prose statements map to existing, required, typed fields
+  of the definition at format_sha256 f89a3e2f…16fd, established against the owner-source bytes; 93 of 93
+  labelled samples behaved as the definition requires, with typed refusals tagged by Contract v3 element;
+  separation is checked both as a declaration and physically; and the G6 entry point records a
+  qualification run only against a conforming, separate, bound oracle, with a FORMAT_SAMPLE never counting
+  as qualification. No finding leaves AC-6 unmet.
+
+output:
+  branch: phase2/verify-1-oracle-format
+  commit: 771ebd1a9977dd610de655a12ebaf1ce00bbecc7
+  evidence_path: release/capability-baseline/verify-1/oracle-format/
+  rerun: release/capability-baseline/verify-1/oracle-format/evidence/RUN-ALL.sh
+
+unresolved:
+  - V1-OF-01 and V1-OF-02 are Phase-4 work, not AC-6 blockers; the Phase-4 handoff should carry them.
+  - >-
+    The product's own ORACLE_FORMAT_INCOMPLETE guard (which refuses a format definition that fails to map a
+    Gate V element) could not be exercised independently: the definition is compiled in with include_str!,
+    so exercising it would require rebuilding from a mutated definition, i.e. modifying product source.
+    Coverage was instead established directly against the owner-source bytes; the guard's behaviour rests on
+    a builder test.
+  - >-
+    Two artefacts were moved aside rather than deleted (`rm` is denied in this environment): an
+    evidence/__pycache__ directory and the planted FM-0001-fault-manifest.md record, both moved into the
+    session scratchpad. No product source was modified.
+
+recommended_next_action: >-
+  Record GATE-P2-ORACLE-FORMAT as satisfied for cap2-candidate-1 at format_sha256
+  f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd, and carry V1-OF-01 and V1-OF-02 into the
+  Phase-4 qualification handoff rather than into a repair round.
+completed_at: '2026-09-20T21:05:00Z'
