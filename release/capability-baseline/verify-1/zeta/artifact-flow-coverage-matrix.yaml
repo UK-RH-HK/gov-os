@@ -1,0 +1,299 @@
+schema: governance-os.phase-2.artifact-flow-coverage-matrix
+schema_version: 1
+run_id: P2-AR-0051
+family: zeta
+iteration: verify-1
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+worktree_head: 8588813ec1ef9c832879e258ca5acfb573ae996f
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+acceptance_criterion: AC-8 (frozen gate contract line 73)
+
+note: >
+  Rebuilt from scratch on this candidate by run P2-AR-0051. Every cell names the held-out probe check
+  that demonstrated it (`heldout/<file>` + check id, output in `evidence/RUN-ALL.out`), or `GAP`.
+  The iteration-0 matrix was not consulted for any cell. Columns are exactly the eleven the frozen
+  gate contract lists for AC-8.
+
+columns:
+  - producer_artefact
+  - stable_id_version
+  - relationship_type
+  - downstream_consumer_task
+  - mandatory_or_optional
+  - task_input_manifest
+  - context_packet_evidence
+  - consumption_receipt
+  - output_traceability
+  - invalidation_trigger
+  - qualification_challenge
+
+# --------------------------------------------------------------------------------------------
+# One row per governed artefact type Contract v3 W1:1080 names, plus the equivalent governed
+# outputs the same line admits ("and equivalent governed outputs").
+# --------------------------------------------------------------------------------------------
+rows:
+
+  - artefact_type: specification — requirement
+    owner_source: Contract v3:1080 "specifications"
+    producer_artefact: 'authored under spec/requirements/, or minted by governed work; `gov artefact show REQ-0001` returns the nine W1 attributes [w01_identity W1-01]'
+    stable_id_version: 'record id + declared `version` + SHA-256 of the record bytes; id and hash survive a file move and the misplacement is reported [W1-01, W1-03, W1-04]; the packet''s recorded hash equals the file''s SHA-256 [w04_delivery W4-04b]'
+    relationship_type: 'typed, directed edges: TASK -CONSUMES-> REQ, REQ -REALISES-> FEATURE; no inverted edge [w02_contracts W2-01]; SUPERSEDES both ways [W1-08]'
+    downstream_consumer_task: 'declared `consumers` and derived actual consumers are both reported; a declared consumer that does not exist is named [W1-09, W1-10]'
+    mandatory_or_optional: 'per-entry `required` true/false in the manifest; `optional_inputs` and `supplementary_context` are separate [w02_contracts W2-02, W2-02b]'
+    task_input_manifest: '`gov context manifest` names it with its slot, reason source, constraints and resolution [w03_manifest W3-01, W3-02, W3-03, W3-03b]'
+    context_packet_evidence: 'delivered in `deterministic_authority.governing_requirements` with its normative content, version and content hash; deterministic across recompiles [w04_delivery W4-01, W4-04]'
+    consumption_receipt: '`inputs_consumed: ID@<hash>` is required and validated; a wrong hash or a fabricated id is refused [w05_receipt W5-01, W5-07, W5-07b, W5-07c]'
+    output_traceability: 'report -IMPLEMENTS-> REQ and task -PRODUCES-> file edges; the requirement reaches the produced code, the report reaches the requirement [w05_receipt W5-09, W5-09b; w08_lineage W8-01, W8-02]'
+    invalidation_trigger: 'content change -> task retest_required, report stale, packet invalidated, revalidation task generated, green record obsolete [w06_staleness W6-01..W6-08]; claim and close refused [W6-09, W6-09c]'
+    qualification_challenge: 'Repo A: current spec absent from the semantic index [w10 W10-01]; superseded near-duplicate outranking it [W10-02]; version/hash pin violated [W3-03/-03b]; Repo B: spec moved while keeping its id [W1-03]'
+    status: COVERED
+
+  - artefact_type: specification — feature
+    owner_source: Contract v3:1080 "specifications"
+    producer_artefact: 'spec/features/; nine W1 attributes [w01_identity W1-01]'
+    stable_id_version: 'id + version + content hash [W1-01]'
+    relationship_type: 'FEATURE -GOVERNED_BY-> REQ, -VALIDATED_BY-> SCN/TO; task -REALISES-> feature [w02 W2-08, w08 W8-01]'
+    downstream_consumer_task: 'the feature slot of every task that realises it [w03 W3-01]'
+    mandatory_or_optional: 'mandatory: the feature slot is required when declared [W3-01]'
+    task_input_manifest: 'delivered as the `feature` slot, with its inherited requirements/scenarios/tests/interfaces and the inheritance recorded in `declared_in` [W3-01, W3-02]'
+    context_packet_evidence: '`deterministic_authority.feature` with content and hash [W4-01, W4-04]'
+    consumption_receipt: '`features_implemented` in the receipt contract''s trace [w05 W5-01, W5-02]'
+    output_traceability: 'feature -> scenario -> requirement -> task -> code -> test walk [w08 W8-01]'
+    invalidation_trigger: 'readiness regression refuses close (G2); a requirement change marks the feature impacted [w12 W12-G4; w06 W6-10]'
+    qualification_challenge: 'omit scenarios/acceptance tests so the chain is incomplete (health DEGRADED, work generated); readiness asserted but not evidenced'
+    status: COVERED
+
+  - artefact_type: scenario
+    owner_source: Contract v3:1080 "scenarios"
+    producer_artefact: 'spec/scenarios/; nine W1 attributes [W1-01]'
+    stable_id_version: 'id + content hash [W1-01]'
+    relationship_type: 'SCN -TESTS/VALIDATED_BY-> TO; SCN -CONSUMES-> DATA requirement [w02 W2-08, w08 W8-01]'
+    downstream_consumer_task: 'the scenario slot of the implementing task and the test obligation [W3-01]'
+    mandatory_or_optional: 'mandatory for implementation tasks (TEST_POLICY.implementation_task_requires) [w03 W3-06 refusal path]'
+    task_input_manifest: 'delivered in the scenario slot with its acceptance criteria [W3-01]'
+    context_packet_evidence: '`deterministic_authority.scenarios` and `acceptance_criteria` [W4-01]'
+    consumption_receipt: '`scenarios_implemented` required and validated against the manifest [W5-01, W5-07b]'
+    output_traceability: 'report -IMPLEMENTS-> SCN; scenario reaches its test obligation and test file [W5-09, W8-01]'
+    invalidation_trigger: 'a requirement change marks the feature''s scenarios stale [w06 W6-10 impact set names SCN-0001]'
+    qualification_challenge: 'scenario with no independent test / undeclared data (H4 chain incomplete) — product refuses READY [observed in the w03/w09 baselines]'
+    status: COVERED
+
+  - artefact_type: decision
+    owner_source: Contract v3:1080 "decisions"
+    producer_artefact: 'spec/decisions/; nine W1 attributes [W1-01]'
+    stable_id_version: 'id + version + content hash [W1-01]'
+    relationship_type: 'D -AFFECTS-> TASK; task -GOVERNED_BY-> D; SUPERSEDES [w02 W2-01, W2-08; w08 W8-04]'
+    downstream_consumer_task: 'decisions apply by relation whether or not the task lists them (`affects`, `governed_by`) [w03 W3-01 reason "decision applies to this task or its feature"]'
+    mandatory_or_optional: 'mandatory; a non-current or contradicted decision is delivered in `conflicting_decisions`, never as active authority [w02 W2-06; w03 W3-08]'
+    task_input_manifest: 'decision slot; research or a lesson declared there is refused, not promoted [w02 W2-04b, W2-05]'
+    context_packet_evidence: '`active_decisions` vs `conflicting_decisions`, with authority class [W2-03, W2-06]'
+    consumption_receipt: '`decisions_applied` / `constraints_applied` required [W5-01, W5-02]'
+    output_traceability: 'report -GOVERNED_BY-> D; the close report traces up to the decision it applied [W5-09]'
+    invalidation_trigger: 'supersession makes the link stale and is reported by name [w08 W8-04]; a contradiction blocks the claim and raises a gate [w03 W3-08, W3-08b]'
+    qualification_challenge: 'two ACTIVE contradictory decisions (neither becomes authority, a gate is raised); a HISTORICAL decision offered as current [W2-06]'
+    status: COVERED
+
+  - artefact_type: dataset (data requirement and test dataset)
+    owner_source: Contract v3:1080 "datasets"
+    producer_artefact: '`gov data register` (OS-recorded authorship and provenance); spec/data/ [w01 W1-01 dataset row; lib.seed_flow]'
+    stable_id_version: 'id + version + content hash [W1-01]'
+    relationship_type: 'TEST DATA -IMPLEMENTS-> DATA requirement; SCN -CONSUMES-> DATA; TO -CONSUMES-> TEST DATA [`gov scenario trace`]'
+    downstream_consumer_task: 'the `required_data` slot of the implementing task and the test obligation [W3-01]'
+    mandatory_or_optional: 'mandatory when declared (`required: true` in the manifest) [W3-01]'
+    task_input_manifest: 'dataset slot, resolved deterministically'
+    context_packet_evidence: '`deterministic_authority.datasets` with content and hash [W4-01, W4-04]'
+    consumption_receipt: 'acknowledged in `inputs_consumed` (it is a required input) [W5-01]'
+    output_traceability: 'test obligation -> test data -> scenario -> requirement (scenario trace); test-data authorship independence enforced at READY'
+    invalidation_trigger: 'a dataset content change enters `input_normative_hashes` and drives the same staleness path as any input [w06 W6-01 mechanism; w11 W11-05/-06 denominators include DATA-0002]'
+    qualification_challenge: 'test data without provenance or without recorded authorship (product refuses READY); a dataset changed after the work consumed it'
+    status: COVERED
+    reason_note: 'the manifest records no `reason` for a plainly declared `required_data` entry — see finding A1-W3-01 (W3 only; does not affect this row''s other cells).'
+
+  - artefact_type: experiment
+    owner_source: Contract v3:1080 "experiments"
+    producer_artefact: '`gov experiment design` (lifecycle-governed, refuses an incomplete design) [w01 W1-02]'
+    stable_id_version: 'id + content hash, nine W1 attributes via `gov artefact show` [W1-02]'
+    relationship_type: 'EXP -CONSUMES-> DATA; task `derived_from` -> evidence slot [records::RELATION_FIELDS; w03 manifest evidence slot]'
+    downstream_consumer_task: 'the task''s `derived_from` evidence slot [w02 W2-02 (RES-0001 as evidence slot)]'
+    mandatory_or_optional: 'mandatory when declared in `derived_from`; optional through `optional_inputs` [W2-02]'
+    task_input_manifest: 'evidence slot; a non-governed experiment carries EVIDENCE_NOT_GOVERNED and cannot present as evidence'
+    context_packet_evidence: '`deterministic_authority.evidence_inputs` [W2-04 shows the slot separation]'
+    consumption_receipt: 'acknowledged in `inputs_consumed` when required [W5-01]'
+    output_traceability: 'experiment -> decision/task it influences (`influences` -> AFFECTS) [w07 W7-03 uses the same edge for research]'
+    invalidation_trigger: 'an experiment record change enters the same content-hash staleness path'
+    qualification_challenge: 'irreproducible experiment promoted to evidence; an experiment record that never reached a decision (W7 unconsumed-research class covers the research half) [w07 W7-03]'
+    status: COVERED
+
+  - artefact_type: research output (evidence)
+    owner_source: Contract v3:1080 "equivalent governed outputs" (Gate J1)
+    producer_artefact: '`gov research record` — refuses an incomplete J1 record [w01 W1-02]'
+    stable_id_version: 'id + content hash + EVIDENCE authority class [W1-02]'
+    relationship_type: 'RES -AFFECTS-> D (`influences`); D -DERIVED_FROM-> RES (`evidence_refs`) [w07 W7-03]'
+    downstream_consumer_task: 'the decision or task it influences'
+    mandatory_or_optional: 'optional by default (`optional_inputs`), mandatory when declared in `derived_from` [W2-02]'
+    task_input_manifest: 'evidence slot; declaring it in the decision slot is refused [W2-04b]'
+    context_packet_evidence: 'delivered as evidence, never as a decision [W2-04]'
+    consumption_receipt: 'acknowledged when required'
+    output_traceability: 'research that was never consumed by the decision it named is reported by name [w07 W7-03]'
+    invalidation_trigger: 'content change enters the staleness path; W7 reports it if the decision was taken without it'
+    qualification_challenge: 'research expected to feed a decision but never consumed [W7-03]; research offered as a decision [W2-04b]'
+    status: COVERED
+
+  - artefact_type: architecture record
+    owner_source: Contract v3:1080 "architecture records"
+    producer_artefact: 'spec/architecture/; nine W1 attributes [W1-01]'
+    stable_id_version: 'id + version + content hash [W1-01]'
+    relationship_type: 'task -GOVERNED_BY-> ARCH (declared `architecture`) [records::RELATION_FIELDS; w03 W3-01]'
+    downstream_consumer_task: 'declared per task, plus the implicit rule (every ACTIVE/PROVISIONAL architecture record reaches every packet, marked implicit and not required) [W3-01 reason text]'
+    mandatory_or_optional: 'mandatory when declared, optional (implicit) otherwise — distinguished in the manifest [W3-01 vs the implicit entry]'
+    task_input_manifest: 'architecture slot with `declared_in: [task.architecture, implicit]` [W3-01]'
+    context_packet_evidence: '`deterministic_authority.architecture` with content and hash [W4-01]'
+    consumption_receipt: '`constraints_applied` [W5-01, W5-02]'
+    output_traceability: 'report -GOVERNED_BY-> ARCH; ARCH reaches the task [w08 W8-01]'
+    invalidation_trigger: 'architecture is a MILESTONE class: its change is evaluated at G4, not G1 [w12 W12-G4b]; unconsumed architecture with declared consumers is an orphan [w07 W7-01]'
+    qualification_challenge: 'architecture record whose declared consumer does not exist [W1-10, W7-01]; architecture changed after implementation'
+    status: COVERED
+
+  - artefact_type: interface
+    owner_source: Contract v3:1080 "interfaces"
+    producer_artefact: 'spec/interfaces/; nine W1 attributes [W1-01]'
+    stable_id_version: 'id + version + content hash [W1-01]'
+    relationship_type: 'task -USES-> IFC (declared `interfaces`) [records::RELATION_FIELDS]'
+    downstream_consumer_task: 'the interface slot of the task and its feature [W3-01]'
+    mandatory_or_optional: 'mandatory when declared; version/hash constraints supported [W3-02, W3-03, W3-03b]'
+    task_input_manifest: 'interface slot [W3-01]'
+    context_packet_evidence: '`deterministic_authority.interfaces` [W4-01]'
+    consumption_receipt: 'acknowledged in `inputs_consumed` [W5-01]'
+    output_traceability: 'report CONSUMES the interface; lineage walk reaches it [W8-01, W8-02]'
+    invalidation_trigger: 'content change -> staleness path; an interface change is a governed-input class in the currency key (`spec_other`/`spec_requirements` classes) [w06 W6-07]'
+    qualification_challenge: 'interface pinned to a version the record no longer carries [W3-03]'
+    status: COVERED
+
+  - artefact_type: test design (test obligation)
+    owner_source: Contract v3:1080 "test designs"
+    producer_artefact: 'authored through a governed test-design task closed by an independent session; an artefact''s own `independent_of_implementer` claim is NOT accepted as evidence [lib.seed_green; observed refusal before the governed route]'
+    stable_id_version: 'id + content hash [W1-01]'
+    relationship_type: 'TO -TESTS-> SCN, -VALIDATED_BY-> REQ, -CONSUMES-> TEST DATA [w08 W8-01]'
+    downstream_consumer_task: 'the `acceptance_tests` slot of the implementing task and its feature [W3-01]'
+    mandatory_or_optional: 'mandatory for implementation tasks; its evidence is mandatory at close [W5-05]'
+    task_input_manifest: 'test_design slot [W3-01]'
+    context_packet_evidence: '`deterministic_authority.test_designs` and `receipt_contract.tests_requiring_evidence` [W4-01, W5-01]'
+    consumption_receipt: '`acceptance_evidence` per declared test; missing evidence is refused [W5-05]'
+    output_traceability: 'report -VALIDATED_BY-> TO; requirement reaches the test file [W5-09b, W8-01]'
+    invalidation_trigger: 'an upstream requirement change marks the test obligation stale [w06 W6-10 impact names TO-0001]'
+    qualification_challenge: 'acceptance test justified by nothing [W7-04]; test obligation whose independence is only asserted (refused)'
+    status: COVERED
+
+  - artefact_type: migration plan
+    owner_source: Contract v3:1080 "migration plans"
+    producer_artefact: '`gov adopt plan` (stage A4), a `migration-plan` record with a recorded producer stamp [w01b W1b-01]'
+    stable_id_version: 'fixed id `MPLAN-GOVERNANCE-ADOPTION` + monotonic `version` + `content_hash`; a re-plan on unchanged input is idempotent and a re-plan on changed input bumps the version [w01b W1b-02, W1b-02b]'
+    relationship_type: 'supersedes `MPLAN-…@v<n>`; catalogue artefacts carry content-derived `ART-<hex>` ids and `lineage.migrated_from` [W1b-02b, W1b-03]'
+    downstream_consumer_task: '`expected_consumers` records the stages and roles that consume it (A5 review, A6 migrate, …) [W1b-01]'
+    mandatory_or_optional: 'mandatory input of the later adoption stages (stage order is enforced: A11 refuses out of order) [W1b-04]'
+    task_input_manifest: 'the adoption stage order, not the task manifest, is the consumption contract here; a plan version''s snapshot is kept under `05-plan.versions/` [W1b-02b]'
+    context_packet_evidence: 'not delivered through a task context packet (it governs the adoption stages, not a governed task) — recorded, not a gap: the stage order plus the version snapshot is the equivalent delivery proof [W1b-02b]'
+    consumption_receipt: 'stage records (A5 review verdict, A6 migration ledger) are the receipts; not exercised in this probe (A5-A11 is alpha''s scope) — PARTIAL'
+    output_traceability: 'the migration ledger names artefacts by their stable `ART-` id, so an earlier pass keeps naming the artefact it recorded [W1b-03]'
+    invalidation_trigger: 'a changed repository re-plans to a new version that supersedes the previous one, whose snapshot is retained [W1b-02b]'
+    qualification_challenge: 'Repo B re-run of the adoption from A0; an artefact moved between passes (lineage.migrated_from); a ledger line written before a re-plan'
+    status: COVERED_WITH_NOTE
+
+  - artefact_type: audit finding
+    owner_source: Contract v3:1080 "audit findings"
+    producer_artefact: 'the governance suite (`gov audit`, `gov health run`) and the adoption audit; findings carry `GF-<10 hex>` ids [w01 W1-05]'
+    stable_id_version: 'content-derived id from (family, message, path): identical across re-runs, and inserting another finding does not renumber it [W1-05]'
+    relationship_type: 'a finding''s subjects name the records it concerns; generated remediation work carries `AFFECTS` to the subject [w07 W7-07]'
+    downstream_consumer_task: 'generated remediation/investigation tasks, one per finding/orphan, idempotent [w07 W7-07, W7-07b]'
+    mandatory_or_optional: 'mandatory: unresolved audit findings are their own health family (`unresolved_audit_findings`)'
+    task_input_manifest: 'the generated task records `investigates: {kind, subject, key, path, detected_by, detected_at}` [w07 W7-07]'
+    context_packet_evidence: 'the audit record carries `inputs_hash` and the input-class snapshot it was computed over [w06 W6-07]'
+    consumption_receipt: 'the remediation is verified by the check passing on re-evaluation, not by the task''s own report (stated in the generated task''s objective) [observed in generated TASK objectives]'
+    output_traceability: 'findings -> generated work -> the record they name; a remediation that has not been done leaves the finding reported [w07 W7-08]'
+    invalidation_trigger: 'the audit''s `inputs_hash` becomes obsolete when any of 31 input classes changes, naming the classes [w06 W6-07]'
+    qualification_challenge: 'insert a new finding ahead of an existing one and confirm ids do not renumber [W1-05]'
+    status: COVERED
+
+  - artefact_type: benchmark result
+    owner_source: Contract v3:1080 "benchmark results"
+    producer_artefact: '`gov memory benchmark --record` mints a CONCLUDED research record carrying the measured rows [w01b W1b-05]'
+    stable_id_version: 'record id + `version` + `content_hash` of the benchmark result (`result_sha256`), matching the command''s own reported hash [W1b-05]'
+    relationship_type: 'the record `influences` the commissioning task; a profile change cites it (`--research`) as its evidence'
+    downstream_consumer_task: 'the retrieval-profile selection (`gov memory select --research <id>`) and the commissioning task'
+    mandatory_or_optional: 'mandatory evidence for a governed profile change (BC-P2-30 path)'
+    task_input_manifest: 'delivered through the evidence slot when a task declares it in `derived_from` [W2-02 mechanism]'
+    context_packet_evidence: '`deterministic_authority.evidence_inputs` when declared; the record itself carries the measured profile identities'
+    consumption_receipt: 'acknowledged in `inputs_consumed` when required'
+    output_traceability: 'the benchmark binds what was measured (embedder/reranker component identities), so a changed plugin or model no longer matches the evidence [W1b-05 identity block]'
+    invalidation_trigger: 'the `model_profile` input class is in the currency key, so a profile change obsoletes green evidence [w06 W6-07 class list]'
+    qualification_challenge: 'a profile pinned without benchmark evidence; a benchmark whose measured component identity no longer matches the live index'
+    status: COVERED
+
+  - artefact_type: implementation evidence (task close report)
+    owner_source: Contract v3:1080 "equivalent governed outputs"; W5:1114-1126
+    producer_artefact: '`gov task close` mints a T2-sealed `report` record from the worker return [w05 W5-00, W5-02]'
+    stable_id_version: 'record id + content hash; the report carries the `context_packet_hash` it was produced against [W5-02]'
+    relationship_type: 'task -PRODUCES-> report; report -IMPLEMENTS/GOVERNED_BY/CONSUMES/VALIDATED_BY/PRODUCES-> its trace [W5-09]'
+    downstream_consumer_task: 'revalidation work generated when its inputs change; the release record that ships it [w06 W6-05; w08 W8-01b]'
+    mandatory_or_optional: 'mandatory: a DONE task without a close report is a health finding (`product_traceability`)'
+    task_input_manifest: 'the report''s `inputs_consumed` is validated against the task''s resolved manifest [W5-07, W5-07b, W5-07c]'
+    context_packet_evidence: 'the named packet hash resolves back to the exact packet supplied [W4-05]'
+    consumption_receipt: 'the report IS the receipt; a worker-return-schema-valid document is accepted unchanged [W5-10]'
+    output_traceability: 'code/test/output paths are recorded on the task (`outputs_produced`) and reachable from the requirement [W5-09, W5-09b]'
+    invalidation_trigger: 'an upstream change marks the report stale, naming the input and both hashes [w06 W6-02]'
+    qualification_challenge: 'code returned without a receipt [W5-07]; a fabricated trace [W5-07b]; undeclared implementation in the tree [W5-08]'
+    status: COVERED
+
+  - artefact_type: release
+    owner_source: Contract v3:1147 "… -> evidence -> release"
+    producer_artefact: 'a governed `release` record under spec/releases/ naming the work it ships and the evidence that validated it [w08 W8-01b]'
+    stable_id_version: 'record id + version + content hash [records::TYPE_DIR; W8-01b walk]'
+    relationship_type: 'REL -DERIVED_FROM-> task/report, -VALIDATED_BY-> audit [W8-01b, W8-02]'
+    downstream_consumer_task: 'none downstream; it is the terminal node of the forward chain'
+    mandatory_or_optional: 'optional (a project may not cut releases); when present it is a governed record'
+    task_input_manifest: 'not a task input'
+    context_packet_evidence: 'not delivered in a packet (terminal artefact) — recorded, not a gap'
+    consumption_receipt: 'not consumed'
+    output_traceability: 'the release is reachable forward from the requirement and its upstream set names the work and evidence it rests on [W8-01b, W8-02]'
+    invalidation_trigger: 'a change to a requirement the release ships reaches it through the same impact walk [W8-02]'
+    qualification_challenge: 'change a requirement after release and confirm the release evidence is named as impacted [W8-02b]'
+    status: COVERED
+
+# --------------------------------------------------------------------------------------------
+# AC-8 determination against its three rejection conditions (frozen gate contract line 73)
+# --------------------------------------------------------------------------------------------
+ac8_determination:
+  verdict: MET
+  conditions:
+    - condition: 'semantic retrieval is relied on to rediscover mandatory inputs'
+      holds: false
+      evidence:
+        - 'the required-input resolution is byte-identical with the index database removed [w03_manifest W3-09]'
+        - 'a current spec deleted from the semantic index is still delivered as a mandatory input, with its content [w10 W10-01]'
+        - 'with the index removed or corrupt, the packet stays COMPLETE with identical input hashes and only the supplementary block is DEGRADED, with reason and remedy [w10 W10-04-remove, W10-04-corrupt]'
+        - 'the retrieved block is separately hashed and never enters the deterministic authority block [w04 W4-02; w03 W3-05]'
+      note: 'the one retrieval dependency observed is in the *supplementary* block only.'
+    - condition: 'stale versions can silently satisfy downstream work'
+      holds: false
+      evidence:
+        - 'a superseded input makes the manifest BLOCKED, is delivered flagged with its successor, and the task is not claimable [w03 W3-07; w10 W10-02b]'
+        - 'a HISTORICAL record cannot satisfy a current authoritative slot and is delivered in conflicting_decisions [w02 W2-06]'
+        - 'a declared version or content-hash constraint the input violates blocks the manifest [w03 W3-03, W3-03b]'
+        - 'a receipt acknowledging an input at a stale hash is refused (STALE_CONSUMPTION) [w05 W5-07c]'
+        - 'after a direct upstream change the work cannot be re-claimed or closed on the stale evidence [w06 W6-09, W6-09c]'
+        - 'a superseded, more semantically similar spec never replaces the current required one [w10 W10-02]'
+    - condition: 'completion cannot be traced to upstream evidence'
+      holds: false
+      evidence:
+        - 'task close refuses a completion with no consumption receipt, and names every missing field [w05 W5-07]'
+        - 'a fabricated requirement id and a missing acceptance evidence entry are refused by name [w05 W5-07b, W5-05]'
+        - 'implementation present in the tree but absent from the receipt is refused by path [w05 W5-08]'
+        - 'the persisted receipt records inputs consumed, outputs, what was implemented, what was applied, test evidence, deviations and unknowns [w05 W5-02]'
+        - 'the close report traces up to the requirement, scenario and decision it names; the requirement reaches the produced code [w05 W5-09, W5-09b]'
+        - 'forward and reverse lineage walk feature -> scenario -> requirement -> decision -> architecture -> task -> code -> test -> evidence -> release [w08 W8-01, W8-01b, W8-02]'
+  gaps_recorded:
+    - 'W3:1097 "reason for each dependency": a task that declares its inputs through the typed list fields records no reason, and nothing reports the omission (finding A1-W3-01). It affects the `task_input_manifest` column for every row, but none of the three AC-8 rejection conditions.'
+    - 'migration plan `consumption_receipt` cell is PARTIAL: stages A5-A11 were not driven here (alpha''s scope).'
+    - 'G6 hidden-fault injection is Phase 4; the Phase-2-verifiable part (the surface exists, names the kinds and fails closed on unsound evidence) holds [w12 W12-G6, W12-G6b].'

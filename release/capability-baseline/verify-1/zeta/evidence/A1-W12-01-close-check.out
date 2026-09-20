@@ -1,0 +1,14 @@
+report file /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/zv1/ev2/a1w1201.machine/bad.json omits: inputs_consumed, requirements_implemented, acceptance_evidence
+
+$ gov --json health close-check TASK-0001 --report <file>
+   ok      : True
+   allowed : True
+   keys    : ['allowed', 'degraded', 'g2', 'governance_affecting', 'reasons', 'subjects']
+
+$ gov --json task close TASK-0001 --report <the same file>
+   ok      : False
+   code    : RECEIPT_INVALID
+   message : TASK-0001: the consumption receipt does not trace this completion to its inputs (RECEIPT_FIELDS_MISSING, INPUT_NOT_ACKNOWLEDGED, TRACE_INCOMPLETE, TEST_EVIDENCE_MISSING). Remediation: return the fields in the packet's receipt_contract — the consumption receipt lacks inputs_consumed; every field is r
+
+-> the enforcing gate refuses; the surface documented as "the task-close health gate for a
+   task and report, without closing it" reports allowed: true.
