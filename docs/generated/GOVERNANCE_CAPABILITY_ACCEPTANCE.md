@@ -20,9 +20,9 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `A3` | Security, sensitivity and permissions | A | `ORIGINAL` | — | 156 | 6 | `AQC-A3` | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 17 / 1 | `G0`, `G1`, `G3`, `G4`, `G5`, `G6` |
 | `A4` | Budget/resource governance | A | `ORIGINAL` | — | 166 | 4 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 3 / 1 | none |
 | `A5` | Emergency controls | A | `ORIGINAL` | — | 172 | 6 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G0`, `G1`, `G5` |
-| `B1` | Standard repository contract | B | `ORIGINAL` | — | 184 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G4`, `G5`, `G6` |
-| `B2` | Path map | B | `ORIGINAL` | — | 190 | 5 | `AQC-B2` | `unit/integration/system test`, `governance health check`, `migration/rollback evidence`, `independent audit evidence` | 5 / 1 | `G1`, `G4`, `G5`, `G6` |
-| `B3` | Authoritative vs derived state | B | `ORIGINAL` | — | 199 | 4 | — | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 9 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `B1` | Standard repository contract | B | `ORIGINAL` | — | 184 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `B2` | Path map | B | `ORIGINAL` | — | 190 | 5 | `AQC-B2` | `unit/integration/system test`, `governance health check`, `migration/rollback evidence`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `B3` | Authoritative vs derived state | B | `ORIGINAL` | — | 199 | 4 | — | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 11 / 1 | `G1`, `G4`, `G5`, `G6` |
 | `C1` | Deterministic structured memory | C | `ORIGINAL` | — | 209 | 17 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 11 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
 | `C2` | Relationship/graph memory | C | `ORIGINAL` | — | 229 | 3 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
 | `C3` | Semantic memory | C | `ORIGINAL` | — | 234 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G4`, `G5`, `G6` |
@@ -36,8 +36,8 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `D1` | Incremental indexing/freshness | D | `ORIGINAL` | — | 307 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 8 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
 | `D2` | Retrieval router | D | `ORIGINAL` | — | 315 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G4`, `G5`, `G6` |
 | `D3` | Hierarchical retrieval | D | `ORIGINAL` | — | 323 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G1`, `G4`, `G5`, `G6` |
-| `D4` | Component separation | D | `ORIGINAL` | — | 329 | 10 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 8 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
-| `D5` | Evidence-driven retrieval model selection | D | `ORIGINAL` | — | 342 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `D4` | Component separation | D | `ORIGINAL` | — | 329 | 10 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `D5` | Evidence-driven retrieval model selection | D | `ORIGINAL` | — | 342 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G4`, `G5`, `G6` |
 | `D6` | Rebuild guarantee | D | `ORIGINAL` | — | 350 | 4 | `AQC-D6` | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 8 / 1 | `G4`, `G5`, `G6` |
 | `E1` | Authority levels | E | `ORIGINAL` | — | 362 | 4 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 12 / 1 | `G0`, `G3`, `G4`, `G5`, `G6` |
 | `E2` | Representative roles | E | `ORIGINAL` | — | 368 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G3`, `G4`, `G5`, `G6` |
@@ -45,8 +45,8 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `E4` | Concurrency/task claims | E | `ORIGINAL` | — | 387 | 5 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 11 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
 | `F1` | Skill lifecycle | F | `ORIGINAL` | — | 398 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G5`, `G6` |
 | `F2` | Tool Capability Registry | F | `ORIGINAL` | — | 404 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
-| `F3` | Missing-tool acquisition | F | `ORIGINAL` | — | 414 | 9 | — | `unit/integration/system test`, `independent held-out test`, `human-gate evidence`, `independent audit evidence` | 7 / 2 | none |
-| `F4` | Plugin trust boundary | F | `POST_VERIFICATION_HARDENING` | `POST-VERIFICATION HARDENING` | 425 | 6 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `human-gate evidence`, `independent audit evidence` | 14 / 3 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `F3` | Missing-tool acquisition | F | `ORIGINAL` | — | 414 | 9 | — | `unit/integration/system test`, `independent held-out test`, `human-gate evidence`, `independent audit evidence` | 12 / 2 | none |
+| `F4` | Plugin trust boundary | F | `POST_VERIFICATION_HARDENING` | `POST-VERIFICATION HARDENING` | 425 | 6 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `human-gate evidence`, `independent audit evidence` | 21 / 3 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
 | `F5` | MCP/A2A/tool separation | F | `ORIGINAL` | — | 433 | 4 | — | `unit/integration/system test`, `independent audit evidence` | 3 / 1 | none |
 | `G1` | Natural-language intent | G | `ORIGINAL` | — | 443 | 3 | — | `unit/integration/system test`, `independent audit evidence` | 2 / 1 | none |
 | `G2` | Small explicit human control set | G | `ORIGINAL` | — | 448 | 5 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G0`, `G5`, `G6` |
@@ -61,13 +61,13 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `J1` | Research becomes evidence | J | `ORIGINAL` | — | 596 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G2`, `G4`, `G5`, `G6` |
 | `J2` | Experiment lifecycle | J | `ORIGINAL` | — | 607 | 7 | `AQC-J2` | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 9 / 1 | `G2`, `G4`, `G5`, `G6` |
 | `K1` | CIT-P | K | `ORIGINAL` | — | 622 | 4 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 5 / 1 | none |
-| `K2` | CIT-E | K | `ORIGINAL` | — | 628 | 8 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 11 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
-| `K3` | Automatic impact simulation | K | `ORIGINAL` | — | 638 | 8 | — | `unit/integration/system test`, `independent audit evidence` | 5 / 1 | none |
+| `K2` | CIT-E | K | `ORIGINAL` | — | 628 | 8 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 14 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `K3` | Automatic impact simulation | K | `ORIGINAL` | — | 638 | 8 | — | `unit/integration/system test`, `independent audit evidence` | 9 / 1 | none |
 | `K4` | Impact radius | K | `ORIGINAL` | — | 649 | 1 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 4 / 1 | none |
 | `L1` | Contradiction resolution | L | `ORIGINAL` | — | 656 | 4 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 6 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
 | `L2` | Human Decision Gate package | L | `ORIGINAL` | — | 662 | 10 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 5 / 1 | `G3`, `G4`, `G5`, `G6` |
 | `L3` | Gate presentation | L | `ORIGINAL` | — | 674 | 5 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 13 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
-| `L4` | Non-global blocking | L | `ORIGINAL` | — | 681 | 2 | — | `automated invariant/guard`, `unit/integration/system test`, `independent audit evidence` | 6 / 1 | `G0` |
+| `L4` | Non-global blocking | L | `ORIGINAL` | — | 681 | 2 | — | `automated invariant/guard`, `unit/integration/system test`, `independent audit evidence` | 8 / 1 | `G0` |
 | `M1` | T0-T3 or equivalent capability tiers | M | `ORIGINAL` | — | 689 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G4`, `G5`, `G6` |
 | `M2` | Reasoning requirement | M | `ORIGINAL` | — | 695 | 1 | — | `unit/integration/system test`, `independent audit evidence` | 1 / 1 | none |
 | `M3` | Role defaults | M | `ORIGINAL` | — | 698 | 2 | — | `unit/integration/system test`, `independent audit evidence` | 1 / 1 | none |
@@ -80,7 +80,7 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `O2` | Governance test families | O | `ORIGINAL` | — | 763 | 17 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 18 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
 | `O3` | Independent test authorship | O | `ORIGINAL` | — | 782 | 3 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `independent audit evidence` | 3 / 5 | `G2`, `G4`, `G5`, `G6` |
 | `O4` | Governance suite currency | O | `ORIGINAL` | — | 787 | 2 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
-| `O5` | Governance Health Scheduler | O | `EXECUTION_REFINEMENT` | `NEW EXECUTION REFINEMENT` | 791 | 14 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 13 / 1 | `G0`, `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `O5` | Governance Health Scheduler | O | `EXECUTION_REFINEMENT` | `NEW EXECUTION REFINEMENT` | 791 | 14 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 16 / 1 | `G0`, `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
 | `P1` | Execution telemetry | P | `ORIGINAL` | — | 814 | 13 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
 | `P2` | Organisational questions | P | `ORIGINAL` | — | 829 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
 | `Q1` | Lesson lifecycle | Q | `ORIGINAL` | — | 844 | 8 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 4 / 1 | none |
@@ -94,8 +94,8 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `S2` | Immutable releases | S | `ORIGINAL` | — | 900 | 11 | — | `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence` | 7 / 3 | none |
 | `S3` | `gov init` | S | `ORIGINAL` | — | 913 | 6 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `clean-clone/release evidence`, `independent audit evidence` | 7 / 3 | `G1`, `G5` |
 | `S4` | `gov adopt` | S | `ORIGINAL` | — | 921 | 12 | — | `unit/integration/system test`, `migration/rollback evidence`, `human-gate evidence`, `independent audit evidence` | 8 / 1 | none |
-| `S5` | `gov update` | S | `ORIGINAL` | — | 936 | 9 | — | `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence` | 8 / 3 | none |
-| `S6` | Cross-machine mechanics | S | `ORIGINAL` | — | 947 | 3 | — | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 5 / 1 | `G4`, `G5`, `G6` |
+| `S5` | `gov update` | S | `ORIGINAL` | — | 936 | 9 | — | `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence` | 10 / 3 | none |
+| `S6` | Cross-machine mechanics | S | `ORIGINAL` | — | 947 | 3 | — | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 7 / 1 | `G4`, `G5`, `G6` |
 | `T1` | Role separation | T | `ORIGINAL` | — | 956 | 9 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G0`, `G3`, `G4`, `G5`, `G6` |
 | `T2` | Fresh-session independence | T | `ORIGINAL` | — | 967 | 2 | — | `unit/integration/system test`, `independent audit evidence` | 4 / 1 | none |
 | `T3` | Adoption evidence tree | T | `ORIGINAL` | — | 971 | 1 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
@@ -109,7 +109,7 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 | `W3` | Mandatory task-input manifest | W | `ORIGINAL` | — | 1092 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G4`, `G5`, `G6` |
 | `W4` | Context compiler delivery proof | W | `ORIGINAL` | — | 1106 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G4`, `G5`, `G6` |
 | `W5` | Consumption receipt and implementation traceability | W | `ORIGINAL` | — | 1114 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G2`, `G4`, `G5`, `G6` |
-| `W6` | Upstream-change staleness propagation | W | `ORIGINAL` | — | 1128 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `W6` | Upstream-change staleness propagation | W | `ORIGINAL` | — | 1128 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
 | `W7` | Orphan/dead-output and unexplained-output detection | W | `ORIGINAL` | — | 1138 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G4`, `G5`, `G6` |
 | `W8` | Forward and reverse lineage | W | `ORIGINAL` | — | 1146 | 5 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
 | `W9` | Session/handoff continuity of mandatory inputs | W | `ORIGINAL` | — | 1154 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G3`, `G4`, `G5`, `G6` |
@@ -487,14 +487,16 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration` — unit/integration/system test
 - `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading` — unit/integration/system test
 - `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test — adoption maps the project's own layout into the contract
+- `test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported` — unit/integration/system test — a repository-contract rule shadowed by another, so that it never decides, is reported with the rule that overrides it
+- `test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write` — unit/integration/system test — the skill bindings are authoritative tracked state, kept where the contract says and moved out of the generated directory
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
 - `B1.1`: `check:path_map_compliance`, `test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state`, `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading`
-- `B1.3`: `check:path_map_compliance`, `test:certification:brownfield::brownfield_adoption_end_to_end`
-- `B1.4`: `check:recovery_rebuild`, `doctor:D024`, `test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading`
+- `B1.3`: `check:path_map_compliance`, `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported`
+- `B1.4`: `check:recovery_rebuild`, `doctor:D024`, `test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading`, `test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write`
 
 Governed fields (evidence map; Contract v3:61-73):
 - severity: —
@@ -528,6 +530,7 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test — the path map represents document citations; references are proven before retirement
 - `test:lib:migrations::references::tests::citations_links_and_path_references_are_found` — unit/integration/system test
 - `test:certification:migration::path_migration_with_rollback_and_memory_rebuild` — migration/rollback evidence
+- `test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported` — unit/integration/system test — path-map compliance reports a rule that can never decide
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
@@ -536,7 +539,7 @@ Checklist items → owners:
 - `B2.1`: `test:certification:brownfield::brownfield_adoption_end_to_end`
 - `B2.2`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::path_migration_with_rollback_and_memory_rebuild`
 - `B2.4`: `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`, `test:lib:migrations::references::tests::citations_links_and_path_references_are_found`
-- `B2.5`: `check:path_map_compliance`
+- `B2.5`: `check:path_map_compliance`, `test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported`
 
 Governed fields (evidence map; Contract v3:61-73):
 - severity: —
@@ -571,14 +574,16 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory` — unit/integration/system test
 - `test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory` — unit/integration/system test
 - `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion` — unit/integration/system test
+- `test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write` — unit/integration/system test — an OS store stays authoritative and is never left in a generated location; reading never moves it
+- `test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout` — unit/integration/system test — the tracked stores survive deleting the generated directory across the upgrade
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
-- `B3.1`: `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated`
-- `B3.2`: `check:recovery_rebuild`, `doctor:D009`, `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated`, `test:certification:multi_machine::clone_rebuilds_identical_derived_state`
-- `B3.3`: `check:recovery_rebuild`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:certification:repair::claims_survive_full_memory_rebuild`, `test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory`, `test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`
+- `B3.1`: `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated`, `test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write`
+- `B3.2`: `check:recovery_rebuild`, `doctor:D009`, `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated`, `test:certification:multi_machine::clone_rebuilds_identical_derived_state`, `test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write`
+- `B3.3`: `check:recovery_rebuild`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:certification:repair::claims_survive_full_memory_rebuild`, `test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory`, `test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`, `test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout`
 
 Governed fields (evidence map; Contract v3:61-73):
 - severity: —
@@ -1219,13 +1224,14 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder` — unit/integration/system test
 - `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles` — unit/integration/system test
 - `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation` — unit/integration/system test
+- `test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity` — unit/integration/system test — the model and runtime artefacts a descriptor declares are part of the component identity, in the portable or the machine digest as they are placed
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
-- `D4.1`: `doctor:D025`, `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change`, `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`, `test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder`, `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles`
-- `D4.2`: `doctor:D025`, `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change`, `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles`
+- `D4.1`: `doctor:D025`, `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change`, `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`, `test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder`, `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles`, `test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity`
+- `D4.2`: `doctor:D025`, `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change`, `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles`, `test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity`
 - `D4.3`: `check:index_freshness`
 - `D4.6`: `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation`
 - `D4.7`: `doctor:D025`, `test:certification:repair::reranker_hook_invoked_and_never_silently_skipped`
@@ -1262,6 +1268,7 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression` — unit/integration/system test
 - `test:certification:repair::unmeasured_memory_recall_is_not_green` — unit/integration/system test
 - `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence` — unit/integration/system test
+- `test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity` — unit/integration/system test — the pinned revisions are identified by content, without a size-and-mtime shortcut
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
@@ -1271,7 +1278,7 @@ Checklist items → owners:
 - `D5.2`: `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`
 - `D5.3`: `check:memory_retrieval_regression`, `test:certification:repair::unmeasured_memory_recall_is_not_green`
 - `D5.4`: `check:memory_retrieval_regression`, `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`
-- `D5.5`: `doctor:D025`, `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`, `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence`
+- `D5.5`: `doctor:D025`, `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`, `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence`, `test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity`
 - `D5.6`: `test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression`
 
 Governed fields (evidence map; Contract v3:61-73):
@@ -1634,6 +1641,11 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:lib:tools::tests::anything_short_of_that_is_not_evidence` — unit/integration/system test
 - `test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated` — unit/integration/system test — a capability gap becomes one governed capability task that blocks the work needing it
 - `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target` — unit/integration/system test
+- `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction` — unit/integration/system test — approval when required, install and register complete through the OS-proposed change transaction
+- `test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing` — unit/integration/system test — the installation approval is not stood in for by the change approval
+- `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority` — unit/integration/system test — OD-P2-03: a reviewed, pinned, reversible, registered install inside the envelope needs no gate; each authority expansion does
+- `test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does` — unit/integration/system test — OD-P2-03's control: ordinary allowlisted network use alone does not require approval
+- `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write` — unit/integration/system test — a pre-authorised transaction is not a licence to install later
 
 Independent verification (Contract v3:65):
 - `heldout:release/verification/4.1.6-r1-3/evidence/heldout-tests` — independent held-out test · tests hx_d_acquisition_and_preservation::d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor — AR-0031 held-out: the acquisition sink refuses a privileged capability below floor
@@ -1641,10 +1653,11 @@ Independent verification (Contract v3:65):
 
 Checklist items → owners:
 - `F3.1`: `test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated`
-- `F3.2`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`, `test:lib:tools::tests::a_governed_review_of_this_tool_and_version_by_another_author_is_evidence`, `test:lib:tools::tests::anything_short_of_that_is_not_evidence`
-- `F3.4`: `human-gate:tools install`, `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`
-- `F3.5`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target`
+- `F3.2`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`, `test:lib:tools::tests::a_governed_review_of_this_tool_and_version_by_another_author_is_evidence`, `test:lib:tools::tests::anything_short_of_that_is_not_evidence`, `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority`
+- `F3.4`: `human-gate:tools install`, `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing`, `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority`, `test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does`, `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write`
+- `F3.5`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target`, `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`
 - `F3.6`: `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target`
+- `F3.7`: `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`
 - `F3.8`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`
 - `F3.9`: `test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated`
 
@@ -1688,6 +1701,13 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed` — unit/integration/system test
 - `test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry` — unit/integration/system test
 - `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused` — unit/integration/system test
+- `test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction` — unit/integration/system test — the registration is written only by its change transaction, into trusted OS state, with the execution gate and the transaction's gate naming each other
+- `test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing` — unit/integration/system test — an approved change without the execution approval writes nothing: PLUGIN_NOT_APPROVED and rollback
+- `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction` — unit/integration/system test — an installation's elevated approval references the gate raised for exactly it, beside its change transaction
+- `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority` — unit/integration/system test — the authority envelope is computed from trusted OS state, never the descriptor's declarations (OD-P2-03)
+- `test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does` — unit/integration/system test — ordinary allowlisted network use is not elevated; a new or unbounded boundary references a gate
+- `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write` — unit/integration/system test — the verdict is re-derived at the write: an elevated installation no gate approved is refused TOOL_INSTALL_ELEVATED
+- `test:lib:tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold` — unit/integration/system test — what the installation would hold is read from its own commands, not from what it declares
 
 Independent verification (Contract v3:65):
 - `heldout:release/verification/4.1.6-r1-4/evidence/heldout-tests` — independent held-out test · tests hv_d_sinks_and_preservation::d4_both_acquisition_primitives_ask_section_6_unconditionally — AR-0033 held-out: both acquisition primitives ask §6 without consulting the descriptor
@@ -1695,11 +1715,11 @@ Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
-- `F4.1`: `test:certification:repair3::plugin_descriptors_can_never_authorise_themselves`, `test:certification:ws07::an_executable_plugin_never_runs_on_its_own_declarations`, `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused`
-- `F4.2`: `check:plugin_governance`, `check:os_binding_integrity`, `doctor:D033`, `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them`, `test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry`
+- `F4.1`: `test:certification:repair3::plugin_descriptors_can_never_authorise_themselves`, `test:certification:ws07::an_executable_plugin_never_runs_on_its_own_declarations`, `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused`, `test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing`, `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority`, `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write`, `test:lib:tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold`
+- `F4.2`: `check:plugin_governance`, `check:os_binding_integrity`, `doctor:D033`, `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them`, `test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry`, `test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`
 - `F4.3`: `check:plugin_governance`, `doctor:D028`, `test:certification:ws07::every_byte_a_plugin_executes_is_bound`
 - `F4.4`: `check:plugin_governance`, `doctor:D028`, `test:certification:ws07::every_byte_a_plugin_executes_is_bound`, `test:certification:ws07::a_cached_pin_never_approves_changed_bytes`
-- `F4.5`: `human-gate:plugins register`, `test:certification:ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it`, `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused`
+- `F4.5`: `human-gate:plugins register`, `test:certification:ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it`, `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused`, `test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing`, `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority`, `test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does`, `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write`
 - `F4.6`: `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`
 
 Governed fields (evidence map; Contract v3:61-73):
@@ -2442,6 +2462,9 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task` — unit/integration/system test
 - `test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken` — unit/integration/system test
 - `test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal` — unit/integration/system test
+- `test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing` — unit/integration/system test — CIT-E rolls the transaction back atomically when the registration is not approved
+- `test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing` — unit/integration/system test — CIT-E rolls back atomically; a role without installation authority is refused at execute
+- `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write` — unit/integration/system test — the refusal at the write rolls back and writes nothing
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
@@ -2453,7 +2476,7 @@ Checklist items → owners:
 - `K2.4`: `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task`
 - `K2.6`: `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`
 - `K2.7`: `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences`, `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`
-- `K2.8`: `check:change_control_integrity`, `doctor:D016`, `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences`, `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`
+- `K2.8`: `check:change_control_integrity`, `doctor:D016`, `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences`, `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`, `test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing`, `test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing`, `test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write`
 
 Governed fields (evidence map; Contract v3:61-73):
 - severity: —
@@ -2490,6 +2513,10 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label` — unit/integration/system test
 - `test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p` — unit/integration/system test
 - `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control` — unit/integration/system test
+- `test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction` — unit/integration/system test — a plugin registration auto-triggers CIT-P as a governance and a security change, simulated before anything is written
+- `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction` — unit/integration/system test — a tool installation auto-triggers CIT-P as a governance and a security change
+- `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority` — unit/integration/system test — the simulated impact carries the change-class verdict for each way an installation expands authority
+- `test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change` — unit/integration/system test — the derivation: a tool descriptor is material as governance and as security, from what changes
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
@@ -2498,8 +2525,8 @@ Checklist items → owners:
 - `K3.1`: `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
 - `K3.2`: `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
 - `K3.3`: `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
-- `K3.4`: `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`
-- `K3.5`: `test:certification:repair::cit_auto_simulation_and_secret_redaction`, `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
+- `K3.4`: `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority`, `test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change`
+- `K3.5`: `test:certification:repair::cit_auto_simulation_and_secret_redaction`, `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`, `test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction`, `test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority`, `test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change`
 - `K3.7`: `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`
 
 Governed fields (evidence map; Contract v3:61-73):
@@ -2706,13 +2733,15 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block` — unit/integration/system test
 - `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion` — unit/integration/system test
 - `test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request` — unit/integration/system test
+- `test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs` — unit/integration/system test — the remediation handoff stays available under the block it repairs while unrelated work is refused
+- `test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy` — unit/integration/system test — proposals and handoffs are refused by what they rely on and admitted when they remedy
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
-- `L4.1`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block`
-- `L4.2`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`, `test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request`
+- `L4.1`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block`, `test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs`, `test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy`
+- `L4.2`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`, `test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request`, `test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs`, `test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy`
 
 Governed fields (evidence map; Contract v3:61-73):
 - severity: —
@@ -3278,13 +3307,16 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back` — unit/integration/system test
 - `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2` — unit/integration/system test
 - `test:certification:ws05::status_shows_health_and_this_projects_release_trust` — unit/integration/system test
+- `test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once` — unit/integration/system test — G1 mutation: the change observed at the rebuild invalidates the dependent evidence it reaches
+- `test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs` — unit/integration/system test — hard-block scope: the block refuses unrelated work and admits its own remedy
+- `test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy` — unit/integration/system test — the declared block semantics for cit.propose and handoff.create
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
 - `O5.1`: `g0:task close`
-- `O5.2`: `check:upstream_change_propagation`
+- `O5.2`: `check:upstream_change_propagation`, `test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once`
 - `O5.3`: `check:mutation_scope`, `test:lib:scheduler::tests::tiers_parse_and_default_selection`, `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2`
 - `O5.4`: `check:continuity_checkpoint_handoff`
 - `O5.5`: `check:upstream_change_propagation`
@@ -3292,7 +3324,7 @@ Checklist items → owners:
 - `O5.10`: `test:lib:scheduler::catalogue::tests::checks_that_write_derived_state_are_isolated`
 - `O5.11`: `check:audit_reproducibility`, `test:lib:scheduler::tests::tiers_parse_and_default_selection`
 - `O5.12`: `test:certification:ws05::status_shows_health_and_this_projects_release_trust`
-- `O5.13`: `doctor:D031`, `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped`, `test:lib:scheduler::catalogue::tests::hard_blocks_are_explicit`
+- `O5.13`: `doctor:D031`, `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped`, `test:lib:scheduler::catalogue::tests::hard_blocks_are_explicit`, `test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs`, `test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy`
 - `O5.14`: `check:audit_reproducibility`
 
 Governed fields (evidence map; Contract v3:61-73):
@@ -3888,6 +3920,8 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:lib:migrations::framework::tests::template_convergence_is_a_three_way_merge_that_keeps_customisations` — unit/integration/system test
 - `test:certification:repair::update_approval_requires_presented_answered_gate` — unit/integration/system test
 - `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion` — unit/integration/system test
+- `test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout` — migration/rollback evidence — the upgrade relocates the tracked OS stores bytes-unchanged and the rollback restores the previous layout, including the directory's absence
+- `test:lib:migrations::framework::tests::relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them` — unit/integration/system test — the relocate_os_stores migration operation: dry run, move, idempotence, a machine-local store refused
 
 Independent verification (Contract v3:65):
 - `heldout:release/verification/4.1.6-r1/evidence/heldout-tests` — independent held-out test · tests heldout_srr4::e3_install_transaction_is_atomic_and_replays_after_interruption — AR-0027 held-out: the install transaction is atomic and replays after interruption
@@ -3897,10 +3931,10 @@ Independent verification (Contract v3:65):
 Checklist items → owners:
 - `S5.1`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:ws08_r2::update_applies_only_on_a_verified_authorising_answer`, `test:certification:repair::update_approval_requires_presented_answered_gate`
 - `S5.2`: `release:update --apply`
-- `S5.3`: `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`
+- `S5.3`: `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`, `test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout`, `test:lib:migrations::framework::tests::relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them`
 - `S5.4`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`, `test:lib:migrations::framework::tests::template_convergence_is_a_three_way_merge_that_keeps_customisations`
 - `S5.7`: `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back`
-- `S5.8`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`, `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`
+- `S5.8`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`, `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`, `test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout`
 - `S5.9`: `release:update --apply`, `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`
 
 Governed fields (evidence map; Contract v3:61-73):
@@ -3931,12 +3965,14 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:repair2::framework_lock_is_release_identifying_and_portable` — unit/integration/system test
 - `test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere` — unit/integration/system test
 - `test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else` — unit/integration/system test
+- `test:certification:r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed` — unit/integration/system test — the sealing scope is reported on the owner's bound machine and machine-scope sealing is disclosed on a clone that does not honour it
+- `test:lib:verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope` — unit/integration/system test — an installed authority not honoured now is a medium finding; machine-scope sealing on a provisioned machine is a low disclosure
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
-- `S6.1`: `test:certification:multi_machine::clone_rebuilds_identical_derived_state`, `test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere`, `test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else`
+- `S6.1`: `test:certification:multi_machine::clone_rebuilds_identical_derived_state`, `test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere`, `test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else`, `test:certification:r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed`, `test:lib:verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope`
 - `S6.2`: `check:recovery_rebuild`, `test:certification:multi_machine::clone_rebuilds_identical_derived_state`
 - `S6.3`: `test:certification:repair2::framework_lock_is_release_identifying_and_portable`
 
@@ -4676,13 +4712,14 @@ Evidence owners (automated_checks, Contract v3:64):
 - `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task` — unit/integration/system test
 - `test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent` — unit/integration/system test
 - `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks` — unit/integration/system test
+- `test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once` — unit/integration/system test — a direct upstream change observed by a host-run rebuild marks dependent evidence stale there, once, and is deferred under a control rather than forced
 
 Independent verification (Contract v3:65):
 - `obligation:AC-12` — independent audit evidence
 
 Checklist items → owners:
-- `W6.1`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence`, `test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent`, `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks`
-- `W6.2`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`
+- `W6.1`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence`, `test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent`, `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks`, `test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once`
+- `W6.2`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once`
 - `W6.3`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`
 - `W6.4`: `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks`
 - `W6.5`: `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task`

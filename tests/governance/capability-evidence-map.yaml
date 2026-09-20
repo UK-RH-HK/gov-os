@@ -988,6 +988,7 @@ capabilities:
     automated_checks:
     - check:path_map_compliance
     - test:certification:brownfield::brownfield_adoption_end_to_end
+    - test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported
   - id: B1.4
     line: 188
     text: Generated/runtime state is distinguished from authoritative tracked state.
@@ -997,6 +998,7 @@ capabilities:
     - test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state
     - test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration
     - test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading
+    - test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write
   statements: []
   qualification_challenge_ids: []
   severity: null
@@ -1036,6 +1038,12 @@ capabilities:
   - id: test:certification:brownfield::brownfield_adoption_end_to_end
     class: unit/integration/system test
     exercises: adoption maps the project's own layout into the contract
+  - id: test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported
+    class: unit/integration/system test
+    exercises: a repository-contract rule shadowed by another, so that it never decides, is reported with the rule that overrides it
+  - id: test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write
+    class: unit/integration/system test
+    exercises: the skill bindings are authoritative tracked state, kept where the contract says and moved out of the generated directory
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -1114,6 +1122,7 @@ capabilities:
     text: Path-map compliance is machine-checkable.
     automated_checks:
     - check:path_map_compliance
+    - test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported
   statements: []
   qualification_challenge_ids:
   - AQC-B2
@@ -1143,6 +1152,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:migration::path_migration_with_rollback_and_memory_rebuild
     class: migration/rollback evidence
+  - id: test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported
+    class: unit/integration/system test
+    exercises: path-map compliance reports a rule that can never decide
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -1197,6 +1209,7 @@ capabilities:
     automated_checks:
     - test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration
     - test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated
+    - test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write
   - id: B3.2
     line: 201
     text: SQLite/vector/graph/lexical/code indexes are derived.
@@ -1205,6 +1218,7 @@ capabilities:
     - doctor:D009
     - test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated
     - test:certification:multi_machine::clone_rebuilds_identical_derived_state
+    - test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write
   - id: B3.3
     line: 202
     text: Deleting derived state cannot delete project truth.
@@ -1215,6 +1229,7 @@ capabilities:
     - test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory
     - test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory
     - test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
+    - test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout
   - id: B3.4
     line: 203
     text: Derived records carry provenance sufficient to reconstruct source hits.
@@ -1256,6 +1271,12 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
     class: unit/integration/system test
+  - id: test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write
+    class: unit/integration/system test
+    exercises: an OS store stays authoritative and is never left in a generated location; reading never moves it
+  - id: test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout
+    class: unit/integration/system test
+    exercises: the tracked stores survive deleting the generated directory across the upgrade
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -2859,6 +2880,7 @@ capabilities:
     - test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback
     - test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder
     - test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles
+    - test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity
   - id: D4.2
     line: 331
     text: embedding runtime
@@ -2866,6 +2888,7 @@ capabilities:
     - doctor:D025
     - test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change
     - test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles
+    - test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity
   - id: D4.3
     line: 332
     text: vector/index store
@@ -2941,6 +2964,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation
     class: unit/integration/system test
+  - id: test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity
+    class: unit/integration/system test
+    exercises: the model and runtime artefacts a descriptor declares are part of the component identity, in the portable or the machine digest as they are placed
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -3022,6 +3048,7 @@ capabilities:
     - doctor:D025
     - test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision
     - test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence
+    - test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity
   - id: D5.6
     line: 348
     text: changing them requires governed migration/reindex/regression
@@ -3056,6 +3083,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence
     class: unit/integration/system test
+  - id: test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity
+    class: unit/integration/system test
+    exercises: the pinned revisions are identified by content, without a size-and-mtime shortcut
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -3928,6 +3958,7 @@ capabilities:
     - test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed
     - test:lib:tools::tests::a_governed_review_of_this_tool_and_version_by_another_author_is_evidence
     - test:lib:tools::tests::anything_short_of_that_is_not_evidence
+    - test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
   - id: F3.3
     line: 417
     text: reversible selection
@@ -3938,12 +3969,18 @@ capabilities:
     automated_checks:
     - human-gate:tools install
     - test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation
+    - test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing
+    - test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    - test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does
+    - test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
   - id: F3.5
     line: 419
     text: install/configure
     automated_checks:
     - test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation
     - test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target
+    - test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
   - id: F3.6
     line: 420
     text: version pin
@@ -3952,7 +3989,8 @@ capabilities:
   - id: F3.7
     line: 421
     text: register
-    automated_checks: []
+    automated_checks:
+    - test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
   - id: F3.8
     line: 422
     text: health test
@@ -3990,6 +4028,21 @@ capabilities:
     exercises: a capability gap becomes one governed capability task that blocks the work needing it
   - id: test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target
     class: unit/integration/system test
+  - id: test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    class: unit/integration/system test
+    exercises: approval when required, install and register complete through the OS-proposed change transaction
+  - id: test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing
+    class: unit/integration/system test
+    exercises: the installation approval is not stood in for by the change approval
+  - id: test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    class: unit/integration/system test
+    exercises: 'OD-P2-03: a reviewed, pinned, reversible, registered install inside the envelope needs no gate; each authority expansion does'
+  - id: test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does
+    class: unit/integration/system test
+    exercises: 'OD-P2-03''s control: ordinary allowlisted network use alone does not require approval'
+  - id: test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
+    class: unit/integration/system test
+    exercises: a pre-authorised transaction is not a licence to install later
   independent_verification:
   - id: heldout:release/verification/4.1.6-r1-3/evidence/heldout-tests
     class: independent held-out test
@@ -4036,6 +4089,10 @@ capabilities:
     - test:certification:repair3::plugin_descriptors_can_never_authorise_themselves
     - test:certification:ws07::an_executable_plugin_never_runs_on_its_own_declarations
     - test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused
+    - test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing
+    - test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    - test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
+    - test:lib:tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold
   - id: F4.2
     line: 427
     text: Registration/provenance live in trusted OS state.
@@ -4045,6 +4102,7 @@ capabilities:
     - doctor:D033
     - test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them
     - test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry
+    - test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
   - id: F4.3
     line: 428
     text: Descriptor/implementation bytes are hash-bound.
@@ -4067,6 +4125,12 @@ capabilities:
     - human-gate:plugins register
     - test:certification:ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it
     - test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused
+    - test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing
+    - test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    - test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does
+    - test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
   - id: F4.6
     line: 431
     text: Security review cannot be self-attested.
@@ -4132,6 +4196,27 @@ capabilities:
     class: unit/integration/system test
   - id: test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused
     class: unit/integration/system test
+  - id: test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    class: unit/integration/system test
+    exercises: the registration is written only by its change transaction, into trusted OS state, with the execution gate and the transaction's gate naming each other
+  - id: test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing
+    class: unit/integration/system test
+    exercises: 'an approved change without the execution approval writes nothing: PLUGIN_NOT_APPROVED and rollback'
+  - id: test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    class: unit/integration/system test
+    exercises: an installation's elevated approval references the gate raised for exactly it, beside its change transaction
+  - id: test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    class: unit/integration/system test
+    exercises: the authority envelope is computed from trusted OS state, never the descriptor's declarations (OD-P2-03)
+  - id: test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does
+    class: unit/integration/system test
+    exercises: ordinary allowlisted network use is not elevated; a new or unbounded boundary references a gate
+  - id: test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
+    class: unit/integration/system test
+    exercises: 'the verdict is re-derived at the write: an elevated installation no gate approved is refused TOOL_INSTALL_ELEVATED'
+  - id: test:lib:tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold
+    class: unit/integration/system test
+    exercises: what the installation would hold is read from its own commands, not from what it declares
   independent_verification:
   - id: heldout:release/verification/4.1.6-r1-4/evidence/heldout-tests
     class: independent held-out test
@@ -6054,6 +6139,9 @@ capabilities:
     - doctor:D016
     - test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences
     - test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips
+    - test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing
+    - test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing
+    - test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
   statements: []
   qualification_challenge_ids: []
   severity: null
@@ -6098,6 +6186,15 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal
     class: unit/integration/system test
+  - id: test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing
+    class: unit/integration/system test
+    exercises: CIT-E rolls the transaction back atomically when the registration is not approved
+  - id: test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing
+    class: unit/integration/system test
+    exercises: CIT-E rolls back atomically; a role without installation authority is refused at execute
+  - id: test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
+    class: unit/integration/system test
+    exercises: the refusal at the write rolls back and writes nothing
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -6172,6 +6269,10 @@ capabilities:
     group: 639
     automated_checks:
     - test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label
+    - test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    - test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change
   - id: K3.5
     line: 644
     text: governance/policy
@@ -6182,6 +6283,10 @@ capabilities:
     - test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label
     - test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p
     - test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control
+    - test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    - test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    - test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change
   - id: K3.6
     line: 645
     text: infrastructure cost
@@ -6220,6 +6325,18 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control
     class: unit/integration/system test
+  - id: test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    class: unit/integration/system test
+    exercises: a plugin registration auto-triggers CIT-P as a governance and a security change, simulated before anything is written
+  - id: test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+    class: unit/integration/system test
+    exercises: a tool installation auto-triggers CIT-P as a governance and a security change
+  - id: test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority
+    class: unit/integration/system test
+    exercises: the simulated impact carries the change-class verdict for each way an installation expands authority
+  - id: test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change
+    class: unit/integration/system test
+    exercises: 'the derivation: a tool descriptor is material as governance and as security, from what changes'
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -6699,6 +6816,8 @@ capabilities:
     - g0:task claim
     - test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available
     - test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block
+    - test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs
+    - test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy
   - id: L4.2
     line: 683
     text: Global stop only when policy or critical-path state requires.
@@ -6708,6 +6827,8 @@ capabilities:
     - test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped
     - test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
     - test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request
+    - test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs
+    - test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy
   statements: []
   qualification_challenge_ids: []
   severity: null
@@ -6732,6 +6853,12 @@ capabilities:
     class: unit/integration/system test
   - id: test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request
     class: unit/integration/system test
+  - id: test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs
+    class: unit/integration/system test
+    exercises: the remediation handoff stays available under the block it repairs while unrelated work is refused
+  - id: test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy
+    class: unit/integration/system test
+    exercises: proposals and handoffs are refused by what they rely on and admitted when they remedy
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -8072,6 +8199,7 @@ capabilities:
     group: 792
     automated_checks:
     - check:upstream_change_propagation
+    - test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once
   - id: O5.3
     line: 795
     text: G2 Task Close — mutation scope/readiness/tests/references/memory freshness
@@ -8141,6 +8269,8 @@ capabilities:
     - doctor:D031
     - test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped
     - test:lib:scheduler::catalogue::tests::hard_blocks_are_explicit
+    - test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs
+    - test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy
   - id: O5.14
     line: 808
     text: health result provenance is recorded
@@ -8222,6 +8352,15 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws05::status_shows_health_and_this_projects_release_trust
     class: unit/integration/system test
+  - id: test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once
+    class: unit/integration/system test
+    exercises: 'G1 mutation: the change observed at the rebuild invalidates the dependent evidence it reaches'
+  - id: test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs
+    class: unit/integration/system test
+    exercises: 'hard-block scope: the block refuses unrelated work and admits its own remedy'
+  - id: test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy
+    class: unit/integration/system test
+    exercises: the declared block semantics for cit.propose and handoff.create
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -9554,6 +9693,8 @@ capabilities:
     text: compatibility/migration
     automated_checks:
     - test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger
+    - test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout
+    - test:lib:migrations::framework::tests::relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them
   - id: S5.4
     line: 940
     text: preserve project overlay
@@ -9582,6 +9723,7 @@ capabilities:
     - test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger
     - test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back
     - test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
+    - test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout
   - id: S5.9
     line: 945
     text: ledger/provenance
@@ -9618,6 +9760,12 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion
     class: unit/integration/system test
+  - id: test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout
+    class: migration/rollback evidence
+    exercises: the upgrade relocates the tracked OS stores bytes-unchanged and the rollback restores the previous layout, including the directory's absence
+  - id: test:lib:migrations::framework::tests::relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them
+    class: unit/integration/system test
+    exercises: 'the relocate_os_stores migration operation: dry run, move, idempotence, a machine-local store refused'
   independent_verification:
   - id: heldout:release/verification/4.1.6-r1/evidence/heldout-tests
     class: independent held-out test
@@ -9668,6 +9816,8 @@ capabilities:
     - test:certification:multi_machine::clone_rebuilds_identical_derived_state
     - test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere
     - test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else
+    - test:certification:r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed
+    - test:lib:verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope
   - id: S6.2
     line: 949
     text: derived runtime rebuilds locally
@@ -9704,6 +9854,12 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else
     class: unit/integration/system test
+  - id: test:certification:r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed
+    class: unit/integration/system test
+    exercises: the sealing scope is reported on the owner's bound machine and machine-scope sealing is disclosed on a clone that does not honour it
+  - id: test:lib:verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope
+    class: unit/integration/system test
+    exercises: an installed authority not honoured now is a medium finding; machine-scope sealing on a provisioned machine is a low disclosure
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence
@@ -11601,6 +11757,7 @@ capabilities:
     - test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence
     - test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent
     - test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks
+    - test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once
   - id: W6.2
     line: 1131
     text: implementation/release/test evidence is invalidated according to impact
@@ -11608,6 +11765,7 @@ capabilities:
     automated_checks:
     - check:upstream_change_propagation
     - test:certification:ws04r2::upstream_change_reaches_completed_work
+    - test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once
   - id: W6.3
     line: 1132
     text: affected context packets are invalidated
@@ -11673,6 +11831,9 @@ capabilities:
     class: unit/integration/system test
   - id: test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks
     class: unit/integration/system test
+  - id: test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once
+    class: unit/integration/system test
+    exercises: a direct upstream change observed by a host-run rebuild marks dependent evidence stale there, once, and is deferred under a control rather than forced
   independent_verification:
   - id: obligation:AC-12
     class: independent audit evidence

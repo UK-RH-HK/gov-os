@@ -122,6 +122,10 @@ capabilities:
       - {id: "test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration", items: [4]}
       - {id: "test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading", items: [1, 4]}
       - {id: "test:certification:brownfield::brownfield_adoption_end_to_end", items: [3], ex: "adoption maps the project's own layout into the contract"}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported", items: [3], ex: "a repository-contract rule shadowed by another, so that it never decides, is reported with the rule that overrides it"}
+      - {id: "test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write", items: [4], ex: "the skill bindings are authoritative tracked state, kept where the contract says and moved out of the generated directory"}
     independent:
       - {id: "obligation:AC-12"}
   B2:
@@ -131,6 +135,9 @@ capabilities:
       - {id: "test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity", items: [4], ex: "the path map represents document citations; references are proven before retirement"}
       - {id: "test:lib:migrations::references::tests::citations_links_and_path_references_are_found", items: [4]}
       - {id: "test:certification:migration::path_migration_with_rollback_and_memory_rebuild", items: [2], class: "migration/rollback evidence"}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_repository_contract_rule_that_never_decides_is_reported", items: [5], ex: "path-map compliance reports a rule that can never decide"}
     independent:
       - {id: "obligation:AC-12"}
   B3:
@@ -144,6 +151,10 @@ capabilities:
       - {id: "test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory", items: [3]}
       - {id: "test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory", items: [3]}
       - {id: "test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion", items: [3]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write", items: [1, 2], ex: "an OS store stays authoritative and is never left in a generated location; reading never moves it"}
+      - {id: "test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout", items: [3], ex: "the tracked stores survive deleting the generated directory across the upgrade"}
     independent:
       - {id: "obligation:AC-12"}
   # ================================================================ GATE C
@@ -295,6 +306,9 @@ capabilities:
       - {id: "test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder", items: [1]}
       - {id: "test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles", items: [1, 2]}
       - {id: "test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation", items: [6]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity", items: [1, 2], ex: "the model and runtime artefacts a descriptor declares are part of the component identity, in the portable or the machine digest as they are placed"}
     independent:
       - {id: "obligation:AC-12"}
   D5:
@@ -305,6 +319,9 @@ capabilities:
       - {id: "test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression", items: [6]}
       - {id: "test:certification:repair::unmeasured_memory_recall_is_not_green", items: [3]}
       - {id: "test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence", items: [1, 5]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity", items: [5], ex: "the pinned revisions are identified by content, without a size-and-mtime shortcut"}
     independent:
       - {id: "obligation:AC-12"}
   D6:
@@ -401,6 +418,13 @@ capabilities:
       - {id: "test:lib:tools::tests::anything_short_of_that_is_not_evidence", items: [2]}
       - {id: "test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated", items: [1, 9], ex: "a capability gap becomes one governed capability task that blocks the work needing it"}
       - {id: "test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target", items: [5, 6]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction", items: [4, 5, 7], ex: "approval when required, install and register complete through the OS-proposed change transaction"}
+      - {id: "test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing", items: [4], ex: "the installation approval is not stood in for by the change approval"}
+      - {id: "test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority", items: [2, 4], ex: "OD-P2-03: a reviewed, pinned, reversible, registered install inside the envelope needs no gate; each authority expansion does"}
+      - {id: "test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does", items: [4], ex: "OD-P2-03's control: ordinary allowlisted network use alone does not require approval"}
+      - {id: "test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write", items: [4], ex: "a pre-authorised transaction is not a licence to install later"}
     independent:
       - {id: *r1_31, tests: ["hx_d_acquisition_and_preservation::d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor"], ex: "AR-0031 held-out: the acquisition sink refuses a privileged capability below floor"}
       - {id: "obligation:AC-12"}
@@ -420,6 +444,15 @@ capabilities:
       - {id: "test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed", items: [6]}
       - {id: "test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry", items: [2]}
       - {id: "test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused", items: [1, 5]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction", items: [2, 5], ex: "the registration is written only by its change transaction, into trusted OS state, with the execution gate and the transaction's gate naming each other"}
+      - {id: "test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing", items: [1, 5], ex: "an approved change without the execution approval writes nothing: PLUGIN_NOT_APPROVED and rollback"}
+      - {id: "test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction", items: [5], ex: "an installation's elevated approval references the gate raised for exactly it, beside its change transaction"}
+      - {id: "test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority", items: [1, 5], ex: "the authority envelope is computed from trusted OS state, never the descriptor's declarations (OD-P2-03)"}
+      - {id: "test:certification:r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does", items: [5], ex: "ordinary allowlisted network use is not elevated; a new or unbounded boundary references a gate"}
+      - {id: "test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write", items: [1, 5], ex: "the verdict is re-derived at the write: an elevated installation no gate approved is refused TOOL_INSTALL_ELEVATED"}
+      - {id: "test:lib:tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold", items: [1], ex: "what the installation would hold is read from its own commands, not from what it declares"}
     independent:
       - {id: *r1_33, tests: ["hv_d_sinks_and_preservation::d4_both_acquisition_primitives_ask_section_6_unconditionally"], ex: "AR-0033 held-out: both acquisition primitives ask §6 without consulting the descriptor"}
       - {id: "obligation:AC-14", ex: "F4 rests on the R1 acceptance (frozen AC-4), re-verified for every changed candidate"}
@@ -580,6 +613,11 @@ capabilities:
       - {id: "test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task", items: [4]}
       - {id: "test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken", items: [3]}
       - {id: "test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal", items: [3]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing", items: [8], ex: "CIT-E rolls the transaction back atomically when the registration is not approved"}
+      - {id: "test:certification:r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing", items: [8], ex: "CIT-E rolls back atomically; a role without installation authority is refused at execute"}
+      - {id: "test:certification:r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write", items: [8], ex: "the refusal at the write rolls back and writes nothing"}
     independent:
       - {id: "obligation:AC-12"}
   K3:
@@ -589,6 +627,12 @@ capabilities:
       - {id: "test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label", items: [1, 2, 3, 4, 5, 7]}
       - {id: "test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p", items: [5]}
       - {id: "test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control", items: [1, 2, 3, 5]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction", items: [4, 5], ex: "a plugin registration auto-triggers CIT-P as a governance and a security change, simulated before anything is written"}
+      - {id: "test:certification:r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction", items: [4, 5], ex: "a tool installation auto-triggers CIT-P as a governance and a security change"}
+      - {id: "test:certification:r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority", items: [4, 5], ex: "the simulated impact carries the change-class verdict for each way an installation expands authority"}
+      - {id: "test:lib:cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change", items: [4, 5], ex: "the derivation: a tool descriptor is material as governance and as security, from what changes"}
     independent:
       - {id: "obligation:AC-12"}
   K4:
@@ -644,6 +688,10 @@ capabilities:
       - {id: "test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block", items: [1]}
       - {id: "test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion", items: [2]}
       - {id: "test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request", items: [2]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs", items: [1, 2], ex: "the remediation handoff stays available under the block it repairs while unrelated work is refused"}
+      - {id: "test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy", items: [1, 2], ex: "proposals and handoffs are refused by what they rely on and admitted when they remedy"}
     independent:
       - {id: "obligation:AC-12"}
   # ================================================================ GATE M
@@ -767,6 +815,11 @@ capabilities:
       - {id: "test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back", items: [6]}
       - {id: "test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2", items: [3]}
       - {id: "test:certification:ws05::status_shows_health_and_this_projects_release_trust", items: [12]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once", items: [2], ex: "G1 mutation: the change observed at the rebuild invalidates the dependent evidence it reaches"}
+      - {id: "test:certification:r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs", items: [13], ex: "hard-block scope: the block refuses unrelated work and admits its own remedy"}
+      - {id: "test:lib:scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy", items: [13], ex: "the declared block semantics for cit.propose and handoff.create"}
     independent:
       - {id: "obligation:AC-12"}
   # ================================================================ GATE P
@@ -893,6 +946,10 @@ capabilities:
       - {id: "test:lib:migrations::framework::tests::template_convergence_is_a_three_way_merge_that_keeps_customisations", items: [4]}
       - {id: "test:certification:repair::update_approval_requires_presented_answered_gate", items: [1]}
       - {id: "test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion", items: [8]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout", items: [3, 8], ex: "the upgrade relocates the tracked OS stores bytes-unchanged and the rollback restores the previous layout, including the directory's absence", class: "migration/rollback evidence"}
+      - {id: "test:lib:migrations::framework::tests::relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them", items: [3], ex: "the relocate_os_stores migration operation: dry run, move, idempotence, a machine-local store refused"}
     independent:
       - {id: *r1_27, tests: ["heldout_srr4::e3_install_transaction_is_atomic_and_replays_after_interruption"], ex: "AR-0027 held-out: the install transaction is atomic and replays after interruption"}
       - {id: "obligation:AC-14"}
@@ -904,6 +961,10 @@ capabilities:
       - {id: "test:certification:repair2::framework_lock_is_release_identifying_and_portable", items: [3]}
       - {id: "test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere", items: [1]}
       - {id: "test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else", items: [1]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed", items: [1], ex: "the sealing scope is reported on the owner's bound machine and machine-scope sealing is disclosed on a clone that does not honour it"}
+      - {id: "test:lib:verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope", items: [1], ex: "an installed authority not honoured now is a medium finding; machine-scope sealing on a provisioned machine is a low disclosure"}
     independent:
       - {id: "obligation:AC-12"}
   # ================================================================ GATE T
@@ -1058,6 +1119,9 @@ capabilities:
       - {id: "test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task", items: [5, 6]}
       - {id: "test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent", items: [1]}
       - {id: "test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks", items: [1, 4]}
+      # P2-AR-0054 (round-4 integration, R4-IP-2): owners for the round-4 residual branch's new tests,
+      # as P2-AR-0043 §7, P2-AR-0053 §5 and P2-AR-0055 §9 route them.
+      - {id: "test:certification:r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once", items: [1, 2], ex: "a direct upstream change observed by a host-run rebuild marks dependent evidence stale there, once, and is deferred under a control rather than forced"}
     independent:
       - {id: "obligation:AC-12"}
   W7:
