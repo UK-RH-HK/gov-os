@@ -1,0 +1,7 @@
+# P2-AR-0055 rustfmt --edition 2021 --check, each changed Rust file alone, at 4bd7468
+--- runtime/src/cit/binding.rs
+--- runtime/src/cit/mod.rs
+--- runtime/src/tools.rs
+--- tests/certification/r4_residual.rs
+--- tests/certification/ws07.rs
+[end]
