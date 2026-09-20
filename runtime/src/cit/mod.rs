@@ -327,6 +327,12 @@ fn manifest_paths(cit: &Value) -> Vec<String> {
             );
             v.push(crate::capabilities::registry::LEGACY_REGISTRY_PATH.to_string());
         }
+        // R4-O1: an installation rewrites the generated tool registry as well
+        if op["op"] == "install_tool" {
+            if let Some(r) = op["registry"].as_str() {
+                v.push(r.to_string());
+            }
+        }
         if let Some(t) = op["target"].as_str() {
             v.push(t.to_string());
         }
@@ -1007,7 +1013,7 @@ fn changed_record_ids(p: &Project, store: &RecordStore, cit: &Value) -> Vec<Stri
                     v.push(t.to_string());
                 }
             }
-            "register_plugin" => {
+            "register_plugin" | "install_tool" => {
                 if let Some(path) = op["path"].as_str().filter(|x| !x.is_empty()) {
                     v.push(format!("file:{path}"));
                 }
@@ -1154,7 +1160,11 @@ fn take_snapshot(
                 created_paths.push(to.to_string());
             }
         }
-        if op["op"] == "register_plugin" {
+        if op["op"]
+            .as_str()
+            .map(|o| HOST_PROPOSED_OPS.contains(&o))
+            .unwrap_or(false)
+        {
             for k in ["path", "registry"] {
                 if let Some(pth) = op[k].as_str() {
                     if !p.root.join(pth).exists() {
@@ -1429,6 +1439,17 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>, seals: &mut Seal
         // transaction's approval binds, and re-verifies the execution approval (Contract v3 F4)
         "register_plugin" => {
             let r = crate::capabilities::governance::apply_registration(p, op, &seals.cit)?;
+            for t in r["touched"].as_array().cloned().unwrap_or_default() {
+                if let Some(t) = t.as_str() {
+                    touched.push(t.to_string());
+                }
+            }
+        }
+        // R4-O1: a tool installation is written only here, by its change transaction's execution; the installation
+        // re-derives the request from the bytes as they are now, requires exactly the subject this transaction's
+        // approval binds, and re-verifies the installation's own approval where one was needed (Contract v3 F4)
+        "install_tool" => {
+            let r = crate::tools::apply_installation(p, op, &seals.cit)?;
             for t in r["touched"].as_array().cloned().unwrap_or_default() {
                 if let Some(t) = t.as_str() {
                     touched.push(t.to_string());
@@ -2464,27 +2485,68 @@ pub fn propose_registration(
     propose_inner(p, fields, Some(os), "register_plugin", true)
 }
 
+/// **A tool installation is carried out by a change transaction the OS proposes** (R4-O1, the adjacent path
+/// P2-AR-0043 left open beside INT3-O1; Contract v3 K3 "auto-trigger for material: … security, governance/policy";
+/// F4 "elevated permissions reference authoritative gate/decision"; framework §47-48 "the human should not need to
+/// type /impact"). `gov tools install` writes the tool's descriptor under `governance/project/tools/` — a governed
+/// path the kernel-floor materiality classifies exactly as it classifies a plugin descriptor, and which a task close
+/// refuses as a material change made outside change control. So the installation proposes this transaction itself
+/// (no worker hand-files it), with one manifest operation, `install_tool`, whose content — the descriptor as given,
+/// the installation subject, the installing role and whether the install command runs — the transaction's approval
+/// binds. CIT-P is simulated automatically and raises the transaction's own gate under CHANGE_POLICY. The
+/// installation's **own** approval stays what it was (the gate raised for exactly the installation subject when an
+/// auto-install condition failed, `tools::install`), and it names this transaction and its gate; this transaction's
+/// gate approves the **change**. Neither answer stands in for the other. CIT-E writes the descriptor
+/// ([`crate::tools::apply_installation`]), so an installation made inside a claimed task closes on the transaction's
+/// recorded writes (task close step 10a) like any other governed change.
+///
+/// `origin: system`, `system.kind: tool-installation` (OS-owned fields: [`propose`] strips them from proposer input).
+pub fn propose_installation(
+    p: &Project,
+    op: Value,
+    proposal: &str,
+    tool_id: &str,
+    subject: &str,
+) -> Result<Value> {
+    let targets: Vec<Value> = ["path", "registry"]
+        .iter()
+        .filter_map(|k| op[*k].as_str().map(|s| json!(s)))
+        .collect();
+    let fields = json!({"proposal": proposal, "title": format!("Install tool {tool_id}"),
+        "trigger": "security_change", "targets": targets, "mutation_manifest": [op]});
+    let os = json!({"origin": "system", "system": {"kind": "tool-installation", "operation": "tools install",
+        "tool_id": tool_id, "installation_subject_sha256": subject,
+        "note": "proposed by the OS for a `gov tools install` request (Contract v3 K3): the tool descriptor is written only by this transaction's execution; the installation's own approval, when an auto-install condition failed, is the gate raised for exactly the installation subject"}});
+    propose_inner(p, fields, Some(os), "install_tool", true)
+}
+
 /// Statuses of a transaction that is still a request (not finished).
 pub fn is_open_status(s: &str) -> bool {
     matches!(s, "PROPOSED" | "SIMULATED" | "APPROVED")
 }
 
-/// The one `register_plugin` operation of a registration transaction (`None` for any other transaction).
-fn registration_op_of(c: &Record) -> Option<Value> {
+/// **The manifest operations the OS itself proposes for a host operation**, each the whole manifest of its own
+/// transaction: a capability plugin's registration (INT3-O1) and a tool installation (R4-O1). Both write governed
+/// files under the OS-managed/project-plugin prefixes, so both are material governance changes that complete only
+/// through change control, and for both the host — not the worker — files the transaction.
+pub const HOST_PROPOSED_OPS: &[&str] = &["register_plugin", "install_tool"];
+
+/// The one `op` operation of a host-proposed transaction that is exactly that operation (`None` for anything else).
+fn host_op_of(c: &Record, op: &str) -> Option<Value> {
     let m = c.data["mutation_manifest"].as_array()?;
-    (m.len() == 1 && m[0]["op"] == "register_plugin").then(|| m[0].clone())
+    (m.len() == 1 && m[0]["op"] == op).then(|| m[0].clone())
 }
 
-/// The registration transactions of exactly this registration subject whose state gov sealed, newest first:
+/// The host-proposed `op` transactions of exactly this subject whose state gov sealed, newest first:
 /// `(id, cit_status)`.
-pub fn registration_transactions(p: &Project, subject: &str) -> Vec<(String, String)> {
+pub fn host_transactions(p: &Project, op: &str, subject: &str) -> Vec<(String, String)> {
     let store = RecordStore::load(&p.root);
     let mut v: Vec<(String, String)> = store
         .of_type("cit")
         .into_iter()
         .filter(|c| {
-            registration_op_of(c)
-                .map(|op| op["subject_sha256"].as_str() == Some(subject))
+            host_op_of(c, op)
+                .map(|o| o["subject_sha256"].as_str() == Some(subject))
                 .unwrap_or(false)
                 && binding::verified_state(c)
                     .map(|st| st.cit_status == c.get("cit_status"))
@@ -2496,11 +2558,14 @@ pub fn registration_transactions(p: &Project, subject: &str) -> Vec<(String, Str
     v
 }
 
-/// End the open registration transactions of `plugin_id` (of exactly `subject`, when given): the request they carry
-/// ended (its execution approval was declined). Each is marked REJECTED with a sealed state. Returns their ids.
-pub fn close_registration_requests(
+/// End the open host-proposed `op` transactions whose `id_field` is `id` (and, when given, of exactly `subject`):
+/// the request they carry ended (its own approval was declined). Each is marked REJECTED with a sealed state.
+/// Returns their ids.
+pub fn close_host_requests(
     p: &Project,
-    plugin_id: &str,
+    op: &str,
+    id_field: &str,
+    id: &str,
     subject: Option<&str>,
     why: &str,
 ) -> Vec<String> {
@@ -2510,11 +2575,11 @@ pub fn close_registration_requests(
         .into_iter()
         .filter(|c| is_open_status(&c.get("cit_status")))
         .filter(|c| {
-            registration_op_of(c)
-                .map(|op| {
-                    op["plugin_id"].as_str() == Some(plugin_id)
+            host_op_of(c, op)
+                .map(|o| {
+                    o[id_field].as_str() == Some(id)
                         && subject
-                            .map(|s| op["subject_sha256"].as_str() == Some(s))
+                            .map(|s| o["subject_sha256"].as_str() == Some(s))
                             .unwrap_or(true)
                 })
                 .unwrap_or(false)
@@ -2526,25 +2591,25 @@ pub fn close_registration_requests(
         .collect()
 }
 
-/// Journal, on the registration transaction, the execution-approval gate raised for its registration subject (the
-/// transaction's side of the cross-reference; the gate's package names the transaction and its gate). The journal
-/// is not part of the content an approval binds; the record is re-sealed only when it verified before.
-pub fn note_registration_gate(p: &Project, cit: &str, gate: &str) {
+/// Journal, on a host-proposed transaction, the subject approval gate raised for what it carries (the transaction's
+/// side of the cross-reference; the gate's package names the transaction and its gate). `note` says which approval
+/// that gate is. The journal is not part of the content an approval binds; the record is re-sealed only when it
+/// verified before.
+pub fn note_host_gate(p: &Project, cit: &str, gate: &str, note: &str, operation: &str) {
     let mut s = RecordStore::load(&p.root);
     if let Some(c) = s.get_mut(cit) {
         let was = crate::t2::verify_record(c).is_verified();
         journal(
             c,
-            json!({"at": now_iso(), "event": "execution_approval_gate_raised", "gate": gate,
-                "note": "the plugin's execution approval (Contract v3 F4) is this gate, raised for exactly the registration subject this transaction carries; this transaction's own gate approves the change"}),
+            json!({"at": now_iso(), "event": "subject_approval_gate_raised", "gate": gate, "note": note}),
         );
-        if crate::t2::seal_if_verified(c, was, "plugins register (cit note)").is_ok() {
+        if crate::t2::seal_if_verified(c, was, &format!("{operation} (cit note)")).is_ok() {
             let _ = save_record(&p.root, c);
         }
     }
 }
 
-/// Where the approval of a registration transaction stands.
+/// Where the approval of a host-proposed transaction stands.
 #[derive(Debug, Clone, PartialEq)]
 pub enum GateState {
     /// Its gate waits on an answer (a withdrawn gate is raised again by re-simulating: the request was repeated).
@@ -2555,7 +2620,7 @@ pub enum GateState {
     Ready,
 }
 
-pub fn registration_gate_state(p: &Project, cit: &str) -> GateState {
+pub fn host_gate_state(p: &Project, cit: &str) -> GateState {
     let store = RecordStore::load(&p.root);
     let Some(c) = store.get(cit) else {
         return GateState::Ready;
@@ -2589,17 +2654,17 @@ pub fn registration_gate_state(p: &Project, cit: &str) -> GateState {
     }
 }
 
-/// Approve (from its gate's verified answer) and execute a registration transaction, under the authority of the
-/// registration (`register_plugin`) — the host operation that proposed it and whose content it is. Refused for any
-/// transaction that is not exactly one `register_plugin` operation, so this path executes nothing but a registration,
-/// and CIT-E re-verifies the plugin's execution approval before it writes.
-pub fn execute_registration(p: &Project, id: &str) -> Result<Value> {
+/// Approve (from its gate's verified answer) and execute a host-proposed transaction, under the authority of the
+/// host operation (`authority`) that proposed it and whose content it is. Refused for any transaction that is not
+/// exactly one `op` operation, so this path executes nothing but that host operation, and CIT-E re-verifies the
+/// subject's own approval (Contract v3 F4) before it writes.
+pub fn execute_host_op(p: &Project, id: &str, op: &str, authority: &str) -> Result<Value> {
     let store = RecordStore::load(&p.root);
     let c = load_cit(&store, id)?;
-    if registration_op_of(&c).is_none() {
+    if host_op_of(&c, op).is_none() {
         return Err(GovError::new(
             "USAGE",
-            format!("{id} is not a plugin registration transaction (exactly one register_plugin operation)"),
+            format!("{id} is not a host-proposed {op} transaction (exactly one {op} operation)"),
         ));
     }
     if c.get("cit_status") == "SIMULATED" {
@@ -2613,11 +2678,11 @@ pub fn execute_registration(p: &Project, id: &str) -> Result<Value> {
         } else {
             "auto"
         };
-        approve_with(p, id, &p.role.clone(), method, Some("register_plugin"))?;
+        approve_with(p, id, &p.role.clone(), method, Some(authority))?;
     }
     let db = RuntimeDb::open(&p.db_path())?;
     db.init_schema()?;
-    execute_with(p, &db, id, Some("register_plugin"))
+    execute_with(p, &db, id, Some(authority))
 }
 
 pub fn list(p: &Project) -> Vec<Value> {

@@ -816,3 +816,248 @@ fn declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identi
         "the changed model artefact was served"
     );
 }
+
+// ==================================================================================================== R4-O1
+
+/// A schema-valid tool descriptor at `.r4-tool-<name>.json`, with `extra` merged over it. Its automatic
+/// installation conditions cannot all hold (no governed security review of this tool identity and version), so the
+/// installation needs a gate raised for exactly it.
+fn tool_descriptor(root: &Path, name: &str, extra: Value) -> PathBuf {
+    let mut d = json!({"tool_id": "TOOL-R4", "name": "r4", "type": "CLI", "capabilities": ["lint"],
+        "version": "1.0", "version_pin": "1.0.0", "required_permission_classes": ["READ_REPO"], "license": "MIT",
+        "reversible": true, "cost_usd": 0, "install_command": ["true"], "uninstall_command": ["true"],
+        "health_check": {"kind": "command", "command": ["true"], "expect_exit": 0}});
+    for (k, v) in extra.as_object().cloned().unwrap_or_default() {
+        d[k] = v;
+    }
+    // inside `tools/`, so a task that installs it can declare the request file it wrote
+    let rel = format!("tools/r4-tool-{name}.json");
+    write(root, &rel, &d.to_string());
+    root.join(rel)
+}
+
+fn install(g: &Gov, df: &Path) -> Value {
+    g.ok(&["tools", "install", "--descriptor", df.to_str().unwrap()])
+}
+
+/// **R4-O1 (the path adjacent to INT3-O1, WS-7 × WS-5).** `gov tools install` writes its descriptor under
+/// `governance/project/tools/`, which the kernel-floor materiality classifies exactly as it classifies a plugin
+/// descriptor — so before this repair an installation made inside a claimed task was refused at the close with
+/// `MATERIAL_CHANGE_REQUIRES_CIT`, whatever the owner had approved. Contract v3 K3 and F4 now both hold here too:
+/// the OS proposes and simulates the installation's change transaction itself (the worker files none), raises the
+/// installation gate naming that transaction and its gate, writes nothing until **both** are answered, and then
+/// writes the descriptor only by executing the transaction (CIT-E). The task then closes on the transaction's
+/// recorded writes — including when the tool path is not in the task's allowed paths, because a CIT that governs
+/// exactly that content covers it. Bound to content: a later hand edit of the installed descriptor inside another
+/// task is refused at that close.
+#[test]
+fn a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction() {
+    let (root, g) = fresh("r4-tool-close");
+    let te = g.with_role("tooling-engineer").with_session("S-tool");
+    let t = create(&g, "tooling", "install the r4 tool", "tools/**");
+    te.ok(&["task", "claim", &t]);
+    let df = tool_descriptor(&root, "a", json!({}));
+    let rel = "governance/project/tools/TOOL-R4.yaml";
+
+    // 1. the request: the OS proposes and simulates the change transaction (K3) and raises the installation gate
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], false, "{r}");
+    let inst_gate = r["human_gate"].as_str().unwrap().to_string();
+    let ct = &r["change_transaction"];
+    let cit = ct["cit"].as_str().unwrap().to_string();
+    let change_gate = ct["human_gate"].as_str().unwrap().to_string();
+    assert_ne!(inst_gate, change_gate, "{r}");
+    assert_eq!(
+        ct["cit_status"], "SIMULATED",
+        "CIT-P ran automatically: {r}"
+    );
+    let trig = ct["effective_triggers"].to_string();
+    assert!(
+        trig.contains("governance_change") && trig.contains("security_change"),
+        "an installation is a material governance and security change: {r}"
+    );
+    let c = yaml(&root, &format!("spec/decisions/{cit}.yaml"));
+    assert_eq!(c["origin"], "system", "{c}");
+    assert_eq!(c["system"]["kind"], "tool-installation", "{c}");
+    assert_eq!(c["mutation_manifest"][0]["op"], "install_tool", "{c}");
+    assert_eq!(
+        c["mutation_manifest"][0]["subject_sha256"], r["installation_sha256"],
+        "the change transaction carries exactly the installation subject: {c}"
+    );
+    assert_eq!(
+        c["mutation_manifest"][0]["role"], "tooling-engineer",
+        "the conditions were evaluated for the acting role: {c}"
+    );
+    assert_eq!(c["impact"]["human_gate_required"], true, "{c}");
+    // the two approvals name each other
+    let ig = yaml(&root, &format!("spec/decisions/{inst_gate}.yaml"));
+    assert_eq!(ig["subject"]["kind"], "tool-installation", "{ig}");
+    assert_eq!(
+        ig["subject"]["change_transaction"]["cit"],
+        json!(cit),
+        "{ig}"
+    );
+    assert_eq!(
+        ig["subject"]["change_transaction"]["human_gate"],
+        json!(change_gate),
+        "{ig}"
+    );
+    assert!(
+        c["journal"].to_string().contains(&inst_gate),
+        "the transaction records the installation approval gate: {c}"
+    );
+    assert!(!exists(&root, rel), "written before either approval");
+
+    // 2. the installation approval alone does not stand in for change control
+    crate::ws03::human_decide(&g, &inst_gate, "A");
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], false, "{r}");
+    assert_eq!(r["human_gate"], json!(change_gate), "{r}");
+    assert!(
+        !exists(&root, rel),
+        "written before the change was approved"
+    );
+
+    // 3. both approved: repeating the install approves and executes the transaction (CIT-E)
+    crate::ws03::human_decide(&g, &change_gate, "A");
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], true, "{r}");
+    assert_eq!(r["change_transaction"]["cit"], json!(cit), "{r}");
+    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
+    let c = yaml(&root, &format!("spec/decisions/{cit}.yaml"));
+    let writes = c["execution"]["writes"].to_string();
+    let now = sha256_file(&root, rel);
+    assert!(
+        writes.contains(rel) && writes.contains(&now),
+        "CIT-E recorded the descriptor it wrote: {writes}"
+    );
+    let d = yaml(&root, rel);
+    assert_eq!(d["approval"]["gate"], json!(inst_gate), "{d}");
+    assert_eq!(d["approval"]["change_transaction"], json!(cit), "{d}");
+    // repeating an installation already in force changes nothing and proposes nothing
+    let r = install(&te, &df);
+    assert_eq!(
+        (r["installed"].as_bool(), r["unchanged"].as_bool()),
+        (Some(true), Some(true)),
+        "{r}"
+    );
+    assert_eq!(
+        g.ok(&["cit", "list"]).as_array().unwrap().len(),
+        1,
+        "a repeat raised a second transaction"
+    );
+
+    // 4. the task closes on the transaction's writes although `governance/project/tools/**` is not allowed to it
+    g.ok(&["rebuild-memory", "--incremental"]);
+    write(&root, "tools/note.txt", "installed\n");
+    let rep = receipt(
+        &te,
+        &root,
+        &t,
+        &t,
+        "installed the r4 tool",
+        &["tools/note.txt", "tools/r4-tool-a.json"],
+        "not_applicable_with_reason",
+    );
+    let closed = te.ok(&["task", "close", &t, "--report", &rep]);
+    assert_eq!(closed["task_status"], "DONE", "{closed}");
+    git_commit_all(&root, "r4 tool installed");
+
+    // 5. bound to content: a hand edit of the installed descriptor inside another task is refused at its close
+    let t2 = create(
+        &g,
+        "tooling",
+        "retune the r4 tool by hand",
+        "tools/**,governance/project/tools/**",
+    );
+    te.ok(&["task", "claim", &t2]);
+    let mut d = yaml(&root, rel);
+    d["capabilities"] = json!(["lint", "format"]);
+    write_yaml(&root, rel, &d);
+    g.ok(&["rebuild-memory", "--incremental"]);
+    let rep = receipt(
+        &te,
+        &root,
+        &t2,
+        &t2,
+        "edited the descriptor",
+        &[rel],
+        "not_applicable_with_reason",
+    );
+    let e = te.err(&["task", "close", &t2, "--report", &rep]);
+    assert_eq!(
+        e.error_code(),
+        "MATERIAL_CHANGE_REQUIRES_CIT",
+        "{}",
+        e.envelope
+    );
+    assert!(e.envelope.to_string().contains(rel), "{}", e.envelope);
+}
+
+/// **R4-O1, the other direction (F4), and the autonomous path.** The change approval does not stand in for the
+/// installation approval: a transaction approved and executed directly (`gov cit approve` / `gov cit execute`)
+/// before the installation gate is answered writes nothing — CIT-E re-verifies it, refuses `TOOL_NOT_APPROVED` and
+/// rolls back. `gov cit execute` is not a way round `TOOL_PERMISSIONS.install_authority_roles` either. (The
+/// review-evidenced path, where no installation gate is asked at all, is covered by
+/// `ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`.)
+#[test]
+fn an_installation_change_approved_without_its_installation_approval_writes_nothing() {
+    let (root, g) = fresh("r4-tool-f4");
+    let te = g.with_role("tooling-engineer").with_session("S-tool");
+    let df = tool_descriptor(&root, "b", json!({}));
+    let rel = "governance/project/tools/TOOL-R4.yaml";
+    let r = install(&te, &df);
+    let inst_gate = r["human_gate"].as_str().unwrap().to_string();
+    let cit = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+    let change_gate = r["change_transaction"]["human_gate"]
+        .as_str()
+        .unwrap()
+        .to_string();
+
+    // the change alone: approve its gate and drive the transaction from the CIT commands
+    crate::ws03::human_decide(&g, &change_gate, "A");
+    g.ok(&["cit", "approve", &cit, "--method", "human"]);
+    let e = g.err(&["cit", "execute", &cit]);
+    assert_eq!(e.error_code(), "TOOL_NOT_APPROVED", "{}", e.envelope);
+    assert!(!exists(&root, rel), "the descriptor was written anyway");
+    assert_eq!(
+        yaml(&root, &format!("spec/decisions/{cit}.yaml"))["cit_status"],
+        "ROLLED_BACK"
+    );
+
+    // once the installation gate is answered, a repeated install raises a new transaction (a rolled-back one is
+    // finished) and completes through it
+    crate::ws03::human_decide(&g, &inst_gate, "A");
+    let r = install(&te, &df);
+    let cit2 = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+    assert_ne!(cit2, cit, "a rolled-back transaction is finished: {r}");
+    crate::ws03::human_decide(
+        &g,
+        r["change_transaction"]["human_gate"].as_str().unwrap(),
+        "A",
+    );
+    // nor is `gov cit execute` a way round TOOL_PERMISSIONS.install_authority_roles: a CIT role that holds no
+    // installation authority cannot drive the installation, and the transaction rolls back
+    let cc = g.with_role("change-controller").with_session("S-cc");
+    cc.ok(&["cit", "approve", &cit2, "--method", "human"]);
+    let e = cc.err(&["cit", "execute", &cit2]);
+    assert_eq!(e.error_code(), "AUTHORITY_DENIED", "{}", e.envelope);
+    assert!(!exists(&root, rel), "the descriptor was written anyway");
+
+    // the installing role repeats the request once more and it completes
+    let r = install(&te, &df);
+    let cit3 = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+    assert_ne!(cit3, cit2, "{r}");
+    crate::ws03::human_decide(
+        &g,
+        r["change_transaction"]["human_gate"].as_str().unwrap(),
+        "A",
+    );
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], true, "{r}");
+    assert_eq!(yaml(&root, rel)["approval"]["gate"], json!(inst_gate));
+    assert_eq!(
+        yaml(&root, rel)["approval"]["change_transaction"],
+        json!(cit3)
+    );
+}

@@ -302,7 +302,17 @@ no approved roles); doctor D028 and the suite family `plugin_governance` report 
 unbound entries and unapproved registrations. A tool installation's approval is likewise bound to that installation
 (`gates::create_system` trigger `tool_install`, subject = the installation digest), and a security review is evidence
 only as a T2-verified close report of a `security`-class task naming exactly that tool and version, written by another
-session and role.
+session and role. **An installation is a material governance and security change too** (R4-O1, round 4): its descriptor
+lives under `governance/project/tools/`, so `gov tools install` proposes the installation's change transaction itself
+(`origin: system`, `system.kind: tool-installation`, one `install_tool` manifest operation carrying the descriptor as
+given, the installation subject, the installing role and whether the install command runs; CIT-P simulated
+automatically, its own gate raised under CHANGE_POLICY), and CIT-E alone writes the descriptor (`tools::
+apply_installation`, which re-derives the request, requires exactly the approved subject, re-verifies the installation
+approval where a condition failed and refuses a role without installation authority). An installation made inside a
+claimed task therefore closes on the transaction's recorded writes. Where an auto-install condition failed there are two
+approvals, each naming the other; where every condition held — a governed security review evidencing the security one —
+no gate is raised for the installation subject and the transaction's own gate is the only one, because under the shipped
+`CHANGE_POLICY` a `governance_change` needs a human gate.
 
 ## 4.8 Human Decision Gates, the authenticated human channel and CIT approval
 **Decision package (BC-P2-49).** A gate is created only with substantive content for every

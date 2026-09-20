@@ -891,8 +891,8 @@ pub fn apply_registration(p: &Project, op: &Value, change_transaction: &str) -> 
     )
 }
 
-/// What `gov plugins register` reports about the registration's change transaction.
-fn change_view(p: &Project, cit: &str) -> Value {
+/// What a host operation reports about its own change transaction (`gov plugins register`, `gov tools install`).
+pub(crate) fn change_view(p: &Project, cit: &str) -> Value {
     let store = RecordStore::load(&p.root);
     match store.get(cit) {
         Some(c) => {
@@ -965,8 +965,10 @@ pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
             }
             SubjectApproval::Declined { gate, option } => {
                 // the request ends here, and so does its change transaction
-                let closed = crate::cit::close_registration_requests(
+                let closed = crate::cit::close_host_requests(
                     p,
+                    "register_plugin",
+                    "plugin_id",
                     &id,
                     Some(&subject),
                     &format!("the execution approval of this registration was declined (gate {gate}, answer '{option}')"),
@@ -978,7 +980,7 @@ pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
                 ));
             }
             SubjectApproval::Pending { gate } => {
-                let open = crate::cit::registration_transactions(p, &subject)
+                let open = crate::cit::host_transactions(p, "register_plugin", &subject)
                     .into_iter()
                     .find(|(_, st)| crate::cit::is_open_status(st))
                     .map(|(c, _)| change_view(p, &c))
@@ -1019,7 +1021,13 @@ pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
                 }
                 let g = gates::create_system(p, pkg)?;
                 let gid = g["id"].as_str().unwrap_or("").to_string();
-                crate::cit::note_registration_gate(p, &cit, &gid);
+                crate::cit::note_host_gate(
+                    p,
+                    &cit,
+                    &gid,
+                    "the plugin's execution approval (Contract v3 F4) is this gate, raised for exactly the registration subject this transaction carries; this transaction's own gate approves the change",
+                    "plugins register",
+                );
                 return Ok(common(
                     json!({"registered": false, "human_gate": gid, "state": "RAISED", "gates_not_honoured": not_honoured, "change_transaction": change,
                     "reason": format!("an executable plugin runs only after a presented, owner-answered gate raised for exactly its identity, version, implementation and permission set; and a registration is a material governance and security change, carried out by change transaction {cit} (proposed and simulated by the OS) with its own gate {}. Present both gates, have the product owner answer them through the human channel, then register again (the gate is found by its subject; citing it as registration_gate is optional)", change["human_gate"].as_str().unwrap_or("(none required)"))}),
@@ -1047,7 +1055,7 @@ pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
             ));
         }
     }
-    let linked = crate::cit::registration_transactions(p, &subject);
+    let linked = crate::cit::host_transactions(p, "register_plugin", &subject);
     let cit = match linked.iter().find(|(_, st)| crate::cit::is_open_status(st)) {
         Some((c, _)) => c.clone(),
         None => {
@@ -1069,7 +1077,7 @@ pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
         }
     };
     let change = change_view(p, &cit);
-    match crate::cit::registration_gate_state(p, &cit) {
+    match crate::cit::host_gate_state(p, &cit) {
         crate::cit::GateState::Pending(g) => Ok(common(
             json!({"registered": false, "human_gate": g, "state": if linked.iter().any(|(c, _)| c == &cit) { "PENDING" } else { "RAISED" }, "change_transaction": change, "approval": approved_by,
             "reason": format!("the registration's change transaction {cit} (proposed and simulated by the OS: Contract v3 K3) waits on its own gate {g}; present it, have the product owner answer it through the human channel, then register again")}),
@@ -1079,7 +1087,8 @@ pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
             "reason": format!("gate {g} of the registration's change transaction {cit} was declined: the change is refused and the request ends here")}),
         )),
         crate::cit::GateState::Ready => {
-            let executed = crate::cit::execute_registration(p, &cit)?;
+            let executed =
+                crate::cit::execute_host_op(p, &cit, "register_plugin", "register_plugin")?;
             let e = registry::entry(p, &id).unwrap_or(Value::Null);
             let d = crate::util::read_yaml(&prep.dest).unwrap_or(Value::Null);
             Ok(common(

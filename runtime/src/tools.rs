@@ -520,30 +520,62 @@ pub fn security_review_evidence(
     )
 }
 
-/// Install/register a tool only when every TOOL_POLICY auto-install condition holds, or when a presented,
-/// owner-answered gate raised for exactly this installation approves it; otherwise raise that gate (a decline ends
-/// the request; a pending gate is returned, never duplicated).
-pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Result<Value> {
-    crate::orchestration::control::guard_write(p, "tools install")?;
-    // **`OWNER-DECISION-0006` §6 bullet 5, at the second acquisition primitive** (`AR31-N1`).
-    //
-    // This function installs a capability — writing a descriptor into `governance/project/tools/` and optionally
-    // running its install command — and never reached `plugins::guard_acquisition`, which the census named as the
-    // sole sink for bullet 5. Below floor the operation-level guard above already refuses it, so there was no
-    // live bypass; what was missing was the effect-level control, which is the one that survives a future
-    // acquisition path taking no `Project`. The derived census (`breakglass::SECTION_6_SIGNATURES`) now finds
-    // every writer of a capability registry and requires this call in each.
-    crate::srr::plugins::guard_acquisition_below_floor("tools install")?;
-    crate::authority::require(p, "install_tool")?;
-    // the conditions are evaluated for the ACTING role: a role named on the command line is caller input (T5) and
-    // cannot lend another role's install authority or permission classes (D-0007 rule 2)
-    if role != p.role {
-        return Err(GovError::new(
-            "ROLE_CONFLICT",
-            format!("`tools install --role {role}` names a role other than the acting role '{}'; installation authority and permission classes are those of the acting role (a caller-supplied role is a request, not authority)", p.role),
-        )
-        .with_details(json!({"acting_role": p.role, "requested_role": role})));
+/// The registry view a tool installation regenerates (TOOL_POLICY `mcp.registry_path`).
+fn registry_path(p: &Project) -> String {
+    p.policies().get_str(
+        "TOOL_POLICY",
+        "mcp.registry_path",
+        "governance/generated/tool-registry.json",
+    )
+}
+
+/// The roles TOOL_PERMISSIONS gives installation authority (empty: the policy names none, and the operation's own
+/// authority class decides alone).
+fn install_authority_roles(p: &Project) -> Vec<String> {
+    p.overlay()
+        .get("TOOL_PERMISSIONS.yaml")
+        .get("install_authority_roles")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// **A tool installation request as the OS derives it, before any approval is asked or any byte is written**: the
+/// `TOOL_POLICY.auto_install_conditions` evaluated for the acting role, the governed security-review evidence, and
+/// the installation subject a gate approves. Only [`prepare_installation`] constructs one, and the one installation
+/// writer ([`install_write`]) asks the §6 acquisition sink at the instant of its write.
+struct PreparedInstall {
+    tool_id: String,
+    version: String,
+    /// the descriptor exactly as given: the bytes the request is derived from, and what the manifest operation
+    /// carries, so CIT-E can derive the same request again
+    descriptor: Value,
+    /// the role the conditions were evaluated for (D-0007 rule 2: the acting role, never a caller-supplied one)
+    role: String,
+    checks: Vec<Value>,
+    all_ok: bool,
+    failed: Vec<String>,
+    review: std::result::Result<Value, String>,
+    license: String,
+    required: Vec<String>,
+    subject_doc: Value,
+    subject: String,
+    cited: Vec<String>,
+}
+
+impl PreparedInstall {
+    fn dest_rel(&self) -> String {
+        format!("governance/project/tools/{}.yaml", self.tool_id)
     }
+}
+
+/// Derive the installation request from `descriptor` for `role`: schema-level policy checks, the auto-install
+/// conditions, the security-review evidence and the installation subject. Writes nothing and asks no approval.
+fn prepare_installation(p: &Project, descriptor: Value, role: &str) -> Result<PreparedInstall> {
     let pol = p.policies();
     if pol.get_bool("TOOL_POLICY", "health_check_required", true)
         && descriptor
@@ -566,17 +598,7 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
         }
     }
     let conditions = pol.get_list("TOOL_POLICY", "auto_install_conditions");
-    let install_roles: Vec<String> = p
-        .overlay()
-        .get("TOOL_PERMISSIONS.yaml")
-        .get("install_authority_roles")
-        .and_then(|v| v.as_array())
-        .map(|a| {
-            a.iter()
-                .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                .collect()
-        })
-        .unwrap_or_default();
+    let install_roles = install_authority_roles(p);
     let approved_licences = pol.get_list("TOOL_POLICY", "approved_licences");
     let max_cost = pol.get_f64("BUDGET_POLICY", "defaults.max_install_cost_usd", 0.0);
     let tool_id = descriptor["tool_id"].as_str().unwrap_or("").to_string();
@@ -684,72 +706,138 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
         })
         .collect();
     let all_ok = checks.iter().all(|c| c["ok"].as_bool().unwrap_or(false));
+    let failed: Vec<String> = checks
+        .iter()
+        .filter(|c| !c["ok"].as_bool().unwrap_or(false))
+        .map(|c| c["condition"].as_str().unwrap_or("").to_string())
+        .collect();
     let (subject_doc, subject) = installation_subject(&descriptor);
-    let version = installed_version(&descriptor);
-    let mut approval = json!({"mode": "autonomous", "conditions": "every TOOL_POLICY.auto_install_conditions entry held"});
-    if !all_ok {
-        let failed: Vec<String> = checks
-            .iter()
-            .filter(|c| !c["ok"].as_bool().unwrap_or(false))
-            .map(|c| c["condition"].as_str().unwrap_or("").to_string())
-            .collect();
-        // a gate id written into the descriptor is a request naming a candidate; the gate is found by its subject
-        let cited: Vec<String> = ["approval_gate", "human_gate", "registration_gate"]
-            .iter()
-            .filter_map(|k| {
-                descriptor
-                    .get(*k)
-                    .and_then(|v| v.as_str())
-                    .map(String::from)
-            })
-            .collect();
-        match approval_for_subject(p, "tool-installation", &subject, &cited) {
-            SubjectApproval::Approved(a) => {
-                approval = json!({"mode": "human_gate", "gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision, "installation_sha256": subject, "failed_conditions": failed});
-            }
-            SubjectApproval::Declined { gate, option } => {
-                return Ok(
-                    json!({"installed": false, "declined": true, "human_gate": gate, "answer": option, "installation_sha256": subject, "checks": checks,
-                    "reason": format!("the human declined gate {gate} for exactly this installation; the request ends here (a changed installation is a new request; `gov gate revoke {gate}` withdraws the refusal)")}),
-                );
-            }
-            SubjectApproval::Pending { gate } => {
-                return Ok(
-                    json!({"installed": false, "human_gate": gate, "state": "PENDING", "installation_sha256": subject, "checks": checks,
-                    "reason": format!("gate {gate} for exactly this installation is raised and not answered yet: `gov gate present {gate}`, the product owner answers it through the human channel, then run the same install again")}),
-                );
-            }
-            SubjectApproval::None { not_honoured } => {
-                let gate = gates::create_system(
-                    p,
-                    json!({"question": format!("Approve installation of tool {tool_id} {version}? Automatic installation conditions failed: {}", failed.join(", ")), "why_now": "a task requires a capability that is not available", "current_state": "tool not installed", "options": [{"id": "A", "description": format!("approve installation of exactly this descriptor (installation {subject})")}, {"id": "B", "description": "reject; find an alternative"}], "impact": format!("adds an executable capability to the environment: install {} / uninstall {}; licence {lic}; permission classes {req:?}", descriptor["install_command"], descriptor["uninstall_command"]), "reversibility": if descriptor["reversible"].as_bool().unwrap_or(false) { "reversible" } else { "irreversible or unknown" }, "recommendation": "B unless the tool is essential", "confidence": 0.6, "trigger": "tool_install", "impact_radius": "R2",
-                        "subject": {"kind": "tool-installation", "id": tool_id, "version": version, "sha256": subject}}),
-                )?;
-                return Ok(
-                    json!({"installed": false, "human_gate": gate["id"], "state": "RAISED", "installation_sha256": subject, "checks": checks, "gates_not_honoured": not_honoured,
-                    "reason": "an automatic installation condition failed: a presented, owner-answered gate raised for exactly this installation lets the same install proceed; present it, have the product owner answer it through the human channel, then run the same install again"}),
-                );
-            }
+    // a gate id written into the descriptor is a request naming a candidate; the gate is found by its subject
+    let cited: Vec<String> = ["approval_gate", "human_gate", "registration_gate"]
+        .iter()
+        .filter_map(|k| {
+            descriptor
+                .get(*k)
+                .and_then(|v| v.as_str())
+                .map(String::from)
+        })
+        .collect();
+    Ok(PreparedInstall {
+        version: installed_version(&descriptor),
+        tool_id,
+        descriptor,
+        role: role.to_string(),
+        checks,
+        all_ok,
+        failed,
+        review,
+        license: lic,
+        required: req,
+        subject_doc,
+        subject,
+        cited,
+    })
+}
+
+/// The manifest operation of an installation's change transaction: what CIT-P simulates and CIT-E applies
+/// (`cit::apply_op` → [`apply_installation`]). The approval of the transaction binds it (its content digest), so the
+/// descriptor as given, the installing role and whether the install command runs are all part of what is approved.
+fn installation_op(p: &Project, prep: &PreparedInstall, execute: bool) -> Value {
+    json!({"op": "install_tool", "tool_id": prep.tool_id, "path": prep.dest_rel(), "registry": registry_path(p),
+        "descriptor": prep.descriptor, "subject_sha256": prep.subject, "role": prep.role, "execute": execute})
+}
+
+fn installation_proposal(p: &Project, prep: &PreparedInstall, execute: bool) -> String {
+    let approval = if prep.all_ok {
+        "Every TOOL_POLICY.auto_install_conditions entry holds, so no separate installation gate is asked; this transaction is the installation's change control (Contract v3 K3)."
+    } else {
+        "Its installation is approved separately, by the Human Decision Gate raised for exactly this installation subject (BC-P2-41, Contract v3 F4); this transaction is the installation's change control (Contract v3 K3) and does not approve the installation."
+    };
+    format!(
+        "Install tool {} {} for role {}: write its installation descriptor to {} and regenerate {} (installation subject sha256 {}; install command {}). {approval}",
+        prep.tool_id,
+        prep.version,
+        prep.role,
+        prep.dest_rel(),
+        registry_path(p),
+        prep.subject,
+        if execute {
+            format!("RUN at execution: {}", prep.descriptor["install_command"])
+        } else {
+            "not run (--execute was not given)".to_string()
         }
-    }
-    let mut desc = descriptor.clone();
+    )
+}
+
+/// The Human Decision Gate package for an installation whose auto-install conditions did not all hold. It names the
+/// installation's change transaction and that transaction's own gate: each approval names the other, and neither
+/// answer stands in for the other (R4-O1, as INT3-O1 for a registration).
+fn installation_gate_package(prep: &PreparedInstall, change: &Value, execute: bool) -> Value {
+    let change_text = format!(
+        " The descriptor is written only by change transaction {} (CIT-P simulated automatically: impact radius {}, effective triggers {}), whose own gate {} approves the change itself: answering this gate approves the installation, not the change.",
+        change["cit"].as_str().unwrap_or("?"),
+        change["radius"].as_str().unwrap_or("?"),
+        change["effective_triggers"],
+        change["human_gate"].as_str().unwrap_or("(none required)"),
+    );
+    let mut subject_v = json!({"kind": "tool-installation", "id": prep.tool_id, "version": prep.version, "sha256": prep.subject});
+    subject_v["change_transaction"] = json!({"cit": change["cit"], "human_gate": change["human_gate"], "binding_sha256": change["binding_sha256"]});
+    json!({
+        "question": format!("Approve installation of tool {} {}? Automatic installation conditions failed: {}", prep.tool_id, prep.version, prep.failed.join(", ")),
+        "why_now": "a task requires a capability that is not available",
+        "current_state": "tool not installed",
+        "options": [
+            {"id": "A", "description": format!("approve installation of exactly this descriptor (installation {})", prep.subject)},
+            {"id": "B", "description": "reject; find an alternative"}
+        ],
+        "impact": format!("adds an executable capability to the environment: install {} / uninstall {}; licence {}; permission classes {:?}{}",
+            prep.descriptor["install_command"], prep.descriptor["uninstall_command"], prep.license, prep.required,
+            if execute { " (the install command runs when the change executes)" } else { "" }) + &change_text,
+        "reversibility": if prep.descriptor["reversible"].as_bool().unwrap_or(false) { "reversible" } else { "irreversible or unknown" },
+        "recommendation": "B unless the tool is essential",
+        "confidence": 0.6,
+        "trigger": "tool_install",
+        "impact_radius": "R2",
+        "subject": subject_v,
+    })
+}
+
+/// **The one writer of a tool installation** (R4-O1), reached only from [`apply_installation`], i.e. only from the
+/// execution of the installation's change transaction. It composes the tools directory itself and asks the §6
+/// acquisition sink immediately before writing (`OWNER-DECISION-0006` §6 bullet 5, `AR31-N1`: the derived census
+/// finds every writer of a capability registry and requires this call in each). Returns the descriptor as written,
+/// the health result, the failure-memory record and the install command's result.
+fn install_write(
+    p: &Project,
+    prep: &PreparedInstall,
+    approval: &Value,
+    execute: bool,
+    change_transaction: &str,
+) -> Result<(Value, Value, Value, Value)> {
+    crate::srr::plugins::guard_acquisition_below_floor("tools install")?;
+    let mut desc = prep.descriptor.clone();
     if let Some(o) = desc.as_object_mut() {
         for k in ["human_gate", "registration_gate", "approval_gate"] {
             o.remove(k);
         }
     }
+    let mut approval = approval.clone();
+    approval["change_transaction"] = json!(change_transaction);
     desc["status"] = json!("active");
     desc["installed_by"] = json!(p.session_id);
     desc["installed_at"] = json!(now_iso());
-    desc["installation_sha256"] = json!(subject);
-    desc["approval"] = approval.clone();
-    if let Ok(v) = &review {
+    desc["installation_sha256"] = json!(prep.subject);
+    desc["approval"] = approval;
+    if let Ok(v) = &prep.review {
         desc["security_review_evidence"] = v.clone();
     }
     desc["type"] = desc.get("type").cloned().unwrap_or(json!("library"));
-    desc["approved_roles"] = desc.get("approved_roles").cloned().unwrap_or(json!([role]));
+    desc["approved_roles"] = desc
+        .get("approved_roles")
+        .cloned()
+        .unwrap_or(json!([prep.role]));
     desc["capabilities"] = desc.get("capabilities").cloned().unwrap_or(json!([]));
-    desc["name"] = desc.get("name").cloned().unwrap_or(json!(tool_id));
+    desc["name"] = desc.get("name").cloned().unwrap_or(json!(prep.tool_id));
     let mut exec_result = Value::Null;
     if execute {
         let cmd: Vec<String> = desc["install_command"]
@@ -776,19 +864,260 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
         }
     }
     p.schemas()
-        .validate("tool", &desc, &format!("({tool_id})"))?;
+        .validate("tool", &desc, &format!("({})", prep.tool_id))?;
     crate::util::write_yaml(
         &p.overlay_dir()
             .join("tools")
-            .join(format!("{tool_id}.yaml")),
+            .join(format!("{}.yaml", prep.tool_id)),
         &desc,
     )?;
     let health = health_one(p, &desc);
     let failure = record_health_failure(p, &desc, &health, "tools install");
     generate_registry(p)?;
+    Ok((desc, health, failure, exec_result))
+}
+
+/// **CIT-E side of a tool installation** (the `install_tool` manifest operation; R4-O1). The request is derived
+/// again from the descriptor as the transaction carries it ([`prepare_installation`]: policy checks, conditions,
+/// the governed security review) and must be exactly the subject the transaction's approval binds; where an
+/// auto-install condition did not hold, the installation's own approval (a presented, owner-answered gate raised for
+/// exactly this subject) is re-verified here, so no route into CIT-E — `gov tools install`, `gov cit execute` or a
+/// hand-proposed transaction carrying this operation — writes an installation the owner did not approve. Returns the
+/// paths it wrote.
+pub fn apply_installation(p: &Project, op: &Value, change_transaction: &str) -> Result<Value> {
+    let role = op["role"].as_str().unwrap_or("").to_string();
+    let prep = prepare_installation(p, op["descriptor"].clone(), &role)?;
+    let want = op["subject_sha256"].as_str().unwrap_or("");
+    if prep.subject != want || op["tool_id"].as_str() != Some(prep.tool_id.as_str()) {
+        return Err(GovError::new("TOOL_INSTALLATION_STALE", format!("change transaction {change_transaction} installs tool {:?} with subject {want}, but the descriptor it carries now gives tool '{}' subject {}: the installation changed after the transaction was proposed and approved; nothing is written — install it again (`gov tools install`) for a new request", op["tool_id"], prep.tool_id, prep.subject)).with_details(json!({"cit": change_transaction, "approved_subject": want, "current_subject": prep.subject})));
+    }
+    // the acting role must itself hold installation authority: `gov cit execute` is not a way around
+    // TOOL_PERMISSIONS.install_authority_roles (D-0007 rule 2)
+    let install_roles = install_authority_roles(p);
+    if !install_roles.is_empty() && !install_roles.iter().any(|r| r == &p.role) {
+        return Err(GovError::new(
+            "AUTHORITY_DENIED",
+            format!(
+                "role '{}' is not in TOOL_PERMISSIONS.install_authority_roles {install_roles:?}",
+                p.role
+            ),
+        )
+        .with_details(
+            json!({"operation": "install_tool", "role": p.role, "cit": change_transaction}),
+        ));
+    }
+    let mut approval = json!({"mode": "autonomous", "conditions": "every TOOL_POLICY.auto_install_conditions entry held"});
+    if !prep.all_ok {
+        match approval_for_subject(p, "tool-installation", &prep.subject, &prep.cited) {
+            SubjectApproval::Approved(a) => {
+                approval = json!({"mode": "human_gate", "gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision, "installation_sha256": prep.subject, "failed_conditions": prep.failed});
+            }
+            other => {
+                let (gate, state) = match &other {
+                    SubjectApproval::Declined { gate, .. } => (json!(gate), "DECLINED"),
+                    SubjectApproval::Pending { gate } => (json!(gate), "PENDING"),
+                    _ => (Value::Null, "NONE"),
+                };
+                return Err(GovError::new("TOOL_NOT_APPROVED", format!("change transaction {change_transaction} would install tool '{}', whose automatic installation conditions do not all hold ({}), but no presented, owner-answered gate raised for exactly this installation authorises it (gate {gate}, {state}); an approved change is not an installation approval (BC-P2-41, Contract v3 F4) — nothing is written", prep.tool_id, prep.failed.join(", "))).with_details(json!({"cit": change_transaction, "tool_id": prep.tool_id, "installation_sha256": prep.subject, "installation_gate": gate, "installation_gate_state": state, "failed_conditions": prep.failed})));
+            }
+        }
+    }
+    let execute = op["execute"].as_bool().unwrap_or(false);
+    let (desc, health, failure, exec_result) =
+        install_write(p, &prep, &approval, execute, change_transaction)?;
     Ok(
-        json!({"installed": true, "tool_id": tool_id, "checks": checks, "approval": approval, "installation_sha256": subject, "installation_subject": subject_doc, "executed": execute, "exec_result": exec_result, "health": health, "failure_memory": failure, "registered_at": format!("governance/project/tools/{tool_id}.yaml")}),
+        json!({"tool_id": prep.tool_id, "touched": [prep.dest_rel(), registry_path(p)], "approval": approval,
+        "descriptor": desc, "health": health, "failure_memory": failure, "executed": execute, "exec_result": exec_result}),
     )
+}
+
+/// Install/register a tool only when every TOOL_POLICY auto-install condition holds, or when a presented,
+/// owner-answered gate raised for exactly this installation approves it; otherwise raise that gate (a decline ends
+/// the request; a pending gate is returned, never duplicated).
+///
+/// **An installation is also a material governance and security change** (R4-O1, the path adjacent to INT3-O1;
+/// Contract v3 K3 "auto-trigger for material security, governance/policy"; F4 "elevated permissions reference
+/// authoritative gate/decision"; framework §47-48 "the human should not need to type /impact"). The descriptor lives
+/// under `governance/project/tools/`, which the kernel-floor materiality classifies exactly as it classifies a plugin
+/// descriptor, so the OS itself proposes the installation's change transaction (`cit::propose_installation`: CIT-P,
+/// simulated automatically, its own gate raised under CHANGE_POLICY) and the descriptor is written **only by that
+/// transaction's execution** (CIT-E, [`apply_installation`]: snapshot, verification, index refresh, commit or
+/// rollback, per-path writes recorded and sealed). Where an auto-install condition failed there are two approvals,
+/// each for what it approves and each naming the other; where every condition held the transaction's own gate is the
+/// only one. Neither answer stands in for the other, and the worker never hand-files a transaction: repeating
+/// `gov tools install` once they are answered approves and executes it. An installation made inside a claimed task
+/// therefore closes on the transaction's recorded writes (task close step 10a), like any other governed change.
+pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Result<Value> {
+    crate::orchestration::control::guard_write(p, "tools install")?;
+    // **`OWNER-DECISION-0006` §6 bullet 5, at the second acquisition primitive** (`AR31-N1`).
+    //
+    // This function installs a capability — writing a descriptor into `governance/project/tools/` and optionally
+    // running its install command — and never reached `plugins::guard_acquisition`, which the census named as the
+    // sole sink for bullet 5. Below floor the operation-level guard above already refuses it, so there was no
+    // live bypass; what was missing was the effect-level control, which is the one that survives a future
+    // acquisition path taking no `Project`. The derived census (`breakglass::SECTION_6_SIGNATURES`) now finds
+    // every writer of a capability registry and requires this call in each; the write itself is in
+    // [`install_write`], which asks the sink again at the instant of its write.
+    crate::srr::plugins::guard_acquisition_below_floor("tools install")?;
+    crate::authority::require(p, "install_tool")?;
+    // the conditions are evaluated for the ACTING role: a role named on the command line is caller input (T5) and
+    // cannot lend another role's install authority or permission classes (D-0007 rule 2)
+    if role != p.role {
+        return Err(GovError::new(
+            "ROLE_CONFLICT",
+            format!("`tools install --role {role}` names a role other than the acting role '{}'; installation authority and permission classes are those of the acting role (a caller-supplied role is a request, not authority)", p.role),
+        )
+        .with_details(json!({"acting_role": p.role, "requested_role": role})));
+    }
+    let prep = prepare_installation(p, descriptor, role)?;
+    let subject = prep.subject.clone();
+    let tool_id = prep.tool_id.clone();
+    let common = |mut v: Value| -> Value {
+        v["installation_sha256"] = json!(subject);
+        v["checks"] = json!(prep.checks);
+        v
+    };
+    // --- 1. the installation's own approval (BC-P2-41; Contract v3 F4), asked only when a condition failed
+    let mut approval = json!({"mode": "autonomous", "conditions": "every TOOL_POLICY.auto_install_conditions entry held"});
+    if !prep.all_ok {
+        match approval_for_subject(p, "tool-installation", &subject, &prep.cited) {
+            SubjectApproval::Approved(a) => {
+                approval = json!({"mode": "human_gate", "gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision, "installation_sha256": subject, "failed_conditions": prep.failed});
+            }
+            SubjectApproval::Declined { gate, option } => {
+                // the request ends here, and so does its change transaction
+                let closed = crate::cit::close_host_requests(
+                    p,
+                    "install_tool",
+                    "tool_id",
+                    &tool_id,
+                    Some(&subject),
+                    &format!("the installation approval of this request was declined (gate {gate}, answer '{option}')"),
+                );
+                return Ok(common(
+                    json!({"installed": false, "declined": true, "human_gate": gate, "answer": option, "change_transactions_closed": closed,
+                    "reason": format!("the human declined gate {gate} for exactly this installation; the request ends here (a changed installation is a new request; `gov gate revoke {gate}` withdraws the refusal)")}),
+                ));
+            }
+            SubjectApproval::Pending { gate } => {
+                let open = crate::cit::host_transactions(p, "install_tool", &subject)
+                    .into_iter()
+                    .find(|(_, st)| crate::cit::is_open_status(st))
+                    .map(|(c, _)| crate::capabilities::governance::change_view(p, &c))
+                    .unwrap_or(Value::Null);
+                return Ok(common(
+                    json!({"installed": false, "human_gate": gate, "state": "PENDING", "change_transaction": open,
+                    "reason": format!("gate {gate} for exactly this installation is raised and not answered yet: `gov gate present {gate}`, the product owner answers it through the human channel{}, then run the same install again", open["human_gate"].as_str().map(|g| format!(" (and gate {g} of the installation's change transaction {})", open["cit"].as_str().unwrap_or("?"))).unwrap_or_default())}),
+                ));
+            }
+            SubjectApproval::None { not_honoured } => {
+                // a new request: first its change transaction (CIT-P, simulated automatically), then the
+                // installation gate, which names the transaction and its gate
+                let c = crate::cit::propose_installation(
+                    p,
+                    installation_op(p, &prep, execute),
+                    &installation_proposal(p, &prep, execute),
+                    &tool_id,
+                    &subject,
+                )?;
+                let cit = c["id"].as_str().unwrap_or("").to_string();
+                let change = crate::capabilities::governance::change_view(p, &cit);
+                let g =
+                    gates::create_system(p, installation_gate_package(&prep, &change, execute))?;
+                let gid = g["id"].as_str().unwrap_or("").to_string();
+                crate::cit::note_host_gate(
+                    p,
+                    &cit,
+                    &gid,
+                    "the installation's own approval (BC-P2-41, Contract v3 F4) is this gate, raised for exactly the installation subject this transaction carries; this transaction's own gate approves the change",
+                    "tools install",
+                );
+                return Ok(common(
+                    json!({"installed": false, "human_gate": gid, "state": "RAISED", "gates_not_honoured": not_honoured, "change_transaction": change,
+                    "reason": format!("an automatic installation condition failed ({}), so the installation needs a presented, owner-answered gate raised for exactly it; and an installation is a material governance and security change, carried out by change transaction {cit} (proposed and simulated by the OS) with its own gate {}. Present both gates, have the product owner answer them through the human channel, then run the same install again", prep.failed.join(", "), change["human_gate"].as_str().unwrap_or("(none required)"))}),
+                ));
+            }
+        }
+    }
+    // --- 2. change control: the descriptor is written only by its change transaction's execution
+    // an installation of exactly this subject, approved the same way, already in force: nothing changes
+    let dest = p
+        .overlay_dir()
+        .join("tools")
+        .join(format!("{tool_id}.yaml"));
+    if let Ok(cur) = read_yaml(&dest) {
+        if cur["installation_sha256"].as_str() == Some(subject.as_str())
+            && cur["approval"]["mode"] == approval["mode"]
+            && cur["approval"]["gate"] == approval["gate"]
+            && cur["approval"]["change_transaction"].is_string()
+        {
+            return Ok(common(
+                json!({"installed": true, "unchanged": true, "tool_id": tool_id, "path": prep.dest_rel(), "approval": cur["approval"], "installation_subject": prep.subject_doc,
+                "change_transaction": cur["approval"]["change_transaction"].as_str().map(|c| crate::capabilities::governance::change_view(p, c)).unwrap_or(Value::Null),
+                "reason": "this installation is already in force as written by its change transaction: nothing to change"}),
+            ));
+        }
+    }
+    let linked = crate::cit::host_transactions(p, "install_tool", &subject);
+    let cit = match linked.iter().find(|(_, st)| crate::cit::is_open_status(st)) {
+        Some((c, _)) => {
+            // the install command is part of what the transaction's approval binds, so a request that changes it is
+            // a different request: it cannot borrow this transaction's approval
+            let store = RecordStore::load(&p.root);
+            let recorded = store
+                .get(c)
+                .map(|r| {
+                    r.data["mutation_manifest"][0]["execute"]
+                        .as_bool()
+                        .unwrap_or(false)
+                })
+                .unwrap_or(execute);
+            if recorded != execute {
+                return Ok(common(
+                    json!({"installed": false, "change_transaction": crate::capabilities::governance::change_view(p, c),
+                    "reason": format!("the open change transaction {c} of exactly this installation was proposed {} and its approval binds that; run `gov tools install` {} again, or `gov cit reject {c}` and start a new request", if recorded { "with --execute" } else { "without --execute" }, if recorded { "with --execute" } else { "without --execute" })}),
+                ));
+            }
+            c.clone()
+        }
+        None => {
+            if let Some((c, st)) = linked.first().filter(|(_, st)| st == "REJECTED") {
+                let v = crate::capabilities::governance::change_view(p, c);
+                return Ok(common(
+                    json!({"installed": false, "declined": true, "human_gate": v["human_gate"], "change_transaction": v, "approval": approval,
+                    "reason": format!("the change transaction {c} of exactly this installation is {st} (declined through its gate, or withdrawn with the installation approval): the request ends here. A changed descriptor is a new request; withdrawing the installation approval (`gov gate revoke <gate>`) and installing again raises a new one")}),
+                ));
+            }
+            let c = crate::cit::propose_installation(
+                p,
+                installation_op(p, &prep, execute),
+                &installation_proposal(p, &prep, execute),
+                &tool_id,
+                &subject,
+            )?;
+            c["id"].as_str().unwrap_or("").to_string()
+        }
+    };
+    let change = crate::capabilities::governance::change_view(p, &cit);
+    match crate::cit::host_gate_state(p, &cit) {
+        crate::cit::GateState::Pending(g) => Ok(common(
+            json!({"installed": false, "human_gate": g, "state": if linked.iter().any(|(c, _)| c == &cit) { "PENDING" } else { "RAISED" }, "change_transaction": change, "approval": approval,
+            "reason": format!("the installation's change transaction {cit} (proposed and simulated by the OS: Contract v3 K3) waits on its own gate {g}; present it, have the product owner answer it through the human channel, then run the same install again")}),
+        )),
+        crate::cit::GateState::Declined(g) => Ok(common(
+            json!({"installed": false, "declined": true, "human_gate": g, "change_transaction": crate::capabilities::governance::change_view(p, &cit), "approval": approval,
+            "reason": format!("gate {g} of the installation's change transaction {cit} was declined: the change is refused and the request ends here")}),
+        )),
+        crate::cit::GateState::Ready => {
+            let executed = crate::cit::execute_host_op(p, &cit, "install_tool", "install_tool")?;
+            let d = read_yaml(&dest).unwrap_or(Value::Null);
+            Ok(common(
+                json!({"installed": true, "tool_id": tool_id, "path": prep.dest_rel(), "approval": d["approval"], "installation_subject": prep.subject_doc,
+                "executed": execute, "health": health_one(p, &d), "registered_at": prep.dest_rel(),
+                "change_transaction": crate::capabilities::governance::change_view(p, &cit), "execution": executed}),
+            ))
+        }
+    }
 }
 
 /// WS-6 IP-3: a failing tool health check leaves a durable tool-failure record in failure memory (idempotent per
