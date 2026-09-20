@@ -1,0 +1,419 @@
+# P2-AR-0047 — findings of the iteration-1 verification of capability family beta (C1-C10, D1-D6, R1-R3).
+#
+# Every finding below was established by a probe this verifier wrote, on `cap2-candidate-1`. Nothing here rests on a
+# builder or integrator report; those were read only to know what to attack.
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0047
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+findings:
+
+  - id: V1-BETA-01
+    capability: [C8]
+    bullet_source_lines: [277, 278, 279, 282]
+    severity: MEDIUM
+    title: Four of the seven failure classes have a record shape and no writer, so no record of them can exist
+    statement: >-
+      Contract v3 C8 requires failure memory to hold bugs, failed approaches, wrong assumptions, retrieval misses,
+      regressions, migration failures and tool failures. The product has exactly three writers: `record_tool_failure`
+      (tool-failure), `retrieval_miss_event` (retrieval-miss) and the profile/work-generation recorders (regression).
+      No code path constructs a FailureEvent of kind `bug`, `failed-approach`, `incorrect-assumption` or
+      `migration-failure`, and no command records one: `gov memory miss` records only retrieval misses. The four
+      classes exist in the `KINDS` constant (runtime/src/memory/failures.rs:48-57) and in the record schema, and the
+      compiled evidence map's only owner for checklist items C8.1, C8.2, C8.3 and C8.6 is one unit test over that
+      constant (`test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`), which exercises the data
+      model, not a behaviour. Under Contract v3:93 that is not evidence of the capability.
+      Consequence beyond the checklist: the work generator creates follow-up work from open failure-memory records
+      (runtime/src/orchestration/generation.rs:1223), so a bug or a failed approach can never generate governed
+      repair work, and the framework's learning loop (§18) never sees those classes.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:276-283 "## C8. Failure memory — bugs / failed approaches /
+      wrong assumptions / retrieval misses / regressions / migration failures / tool failures"; and line 93 "A
+      capability may not be reported PRESENT_AND_SUBSTANTIAL solely because a file/schema/policy exists."
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: [AC-3]
+    blocking: true
+    new_vs_residual: RESIDUAL
+    inventoried_class: BC-P2-32
+    label_reason: >-
+      Same capability (C8) and the same defect mechanism the class names — "a failure class the contract lists leaves
+      no durable, structured, rebuild-surviving record". Iteration 0 observed it for ad-hoc retrieval misses and tool
+      failures; the repair made exactly those two (and regressions) durable and left the other four with no writer.
+      This is an incomplete fix of the inventoried class, not a new mechanism.
+    evidence:
+      - release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-C8-failure-memory.sh.out
+    reproduction: >-
+      BETA_WT=<worktree> release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh — checks
+      C8-bug, C8-failed-approach, C8-incorrect-assumption and C8-migration-failure fail while C8-retrieval-miss,
+      C8-tool-failure, C8-regression, C8-durable and C8-not-indexed pass. Source confirmation:
+      `grep -rn "failure_kind" runtime/src/ cli/src/` shows no writer for the four classes.
+    repair_direction: >-
+      Each of the seven classes must have a governed way to come into existence and a durable, structured,
+      rebuild-surviving record when it does: a product-observed failure of that class recorded automatically where the
+      OS observes it (a failing product test family is a `regression`; a refused or rolled-back migration is a
+      `migration-failure`), and an agent-observed one recorded through a governed command in the way `gov memory
+      miss` already records a retrieval miss, so the work generator and the learning loop can act on it. The evidence
+      map's owner for each of those checklist items must then be a check that exercises the behaviour, not the
+      constant.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-02
+    capability: [C10]
+    bullet_source_lines: [297, 298, 301]
+    severity: MEDIUM
+    title: Capability memory holds no A2A agent inventory, no resolved dependencies and no observed tool versions
+    statement: >-
+      Contract v3 C10 requires capability memory to hold tools, MCP servers, A2A agents, packages/dependencies, model
+      providers, permission/credential status and environment/tool versions. Tools, MCP servers, model providers and
+      permission/credential status are held and resolved per role, and this verifier exercised each. Three are not:
+      (a) there is no inventory of the A2A agents a handoff may address — `gov handoff` addresses a ROLE, and nothing
+      records which agents exist, their contract or their availability; (b) ecosystem detection records the metadata
+      COMMAND of each detected ecosystem and whether its binary is present, and never runs it, so no package or
+      dependency set is resolved (runtime/src/capabilities/ecosystems.rs:200-240); (c) `gov tools health` records
+      availability and exit status only — of fourteen tools checked, none carried an observed version, and the
+      registry's `version` is a declared string such as "system" or "builtin". Capability memory therefore answers
+      "what is declared and permitted" and not "what is actually installed here".
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:294-301 "## C10. Capability memory — tools / MCP servers /
+      A2A agents / packages-dependencies / model providers / permission-credential status / environment-tool versions"
+    provenance_class: ORIGINAL-NORMATIVE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: null
+    label_reason: >-
+      Iteration 0 recorded exactly this defect as A0-C10-01 ("Capability memory holds no A2A agents, dependencies,
+      credential status or observed tool versions", MEDIUM, non-blocking), which the synthesis inventory left outside
+      every blocker class because it was non-blocking. Same capability, same mechanism, partially fixed: credential
+      status is now held and resolved per role; the other three are not. RESIDUAL against that finding rather than
+      against a numbered class, because the class list has none for it.
+    evidence:
+      - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-C6-C7-C10-temporal-episodic-capability.sh.out
+    reproduction: >-
+      BETA_WT=<worktree> release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh
+      — checks C10-a2a-agents, C10-packages and C10-tool-versions fail; C10-tools, C10-mcp, C10-a2a-roles,
+      C10-providers and C10-credentials pass.
+    repair_direction: >-
+      Capability memory must record, for this machine and repository: the A2A agents that may be addressed (identity,
+      contract, availability), the resolved package/dependency set of each detected ecosystem (the metadata command is
+      already known — its output must be read and held, with its own freshness), and the observed version of each
+      environment tool a health check runs, so that a drift between the declared and the installed capability set is
+      visible.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-03
+    capability: [D5, C3]
+    bullet_source_lines: [345, 346, 348]
+    severity: MEDIUM
+    title: >-
+      The held-out set the product generates leaves its semantic queries pending, so a governed profile selection can
+      rest on evidence that cannot discriminate the component being selected
+    statement: >-
+      `gov init` generates the starter held-out set with its `semantic_paraphrase` queries marked pending
+      ("paraphrase placeholders are pending"), so `gov memory verify` and `gov memory benchmark` measure only
+      exact_id, exact_path, symbol, lexical_literal and graph_impact queries — none of which depends on the embedder.
+      Every embedder candidate therefore measures identically: this verifier measured `current` (512-d) and
+      `builtin:64` at recall@k 0.9333 / MRR 0.9333, and `builtin:8` at the same values, on the generated set. The
+      gate the product raises for a profile change then reports "the candidate is not worse than the current profile
+      on every held-out measure", which is true and says nothing about semantic retrieval. Nothing refuses or flags a
+      selection made on such evidence: the pending count is reported and the change is applied. That the mechanism
+      itself is sound was confirmed by authoring three real paraphrase queries, after which the same benchmark
+      separated the candidates (semantic recall 0.667 / 0.667 / 0.333 for current, builtin:64, builtin:8) and a
+      measurably worse candidate was rolled back by its regression.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:342-348 "## D5. Evidence-driven retrieval model selection —
+      golden/held-out retrieval queries exist ... changing them requires governed migration/reindex/regression"; and
+      PHASE-2-FROZEN-GATE-CONTRACT.md §9.1, item 7's stated purpose "so sophisticated qualification is not run on
+      intentionally inadequate semantic retrieval".
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P3
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: BC-P2-30
+    label_reason: >-
+      Same capability (D5) and the same mechanism as the inventoried class — "profile changes are not bound to
+      benchmark evidence". They are now bound; what the binding does not yet require is that the evidence measure the
+      component being changed, so the binding can be satisfied vacuously. An incomplete fix of the same mechanism,
+      not a new one. It is recorded as P3 because AC-7 as interpreted in §9.1 asks for an executable, evidenced PATH,
+      which exists and was exercised end to end; the inadequacy would bite when Phase 3 selects the profile.
+    evidence:
+      - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-D4-D5-AC7-retrieval-profile.sh.out
+      - release/capability-baseline/verify-1/beta/evidence/ac7/discrimination.out
+    reproduction: >-
+      BETA_WT=<worktree> release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh — check
+      D5-heldout-discriminates fails and prints the measured categories and the pending count.
+    repair_direction: >-
+      A profile selection must not be applied on held-out evidence that contains no measured query of the class the
+      changed component serves: either the generated set must contain real semantic queries, or `gov memory select`
+      must refuse (or, at minimum, state on the gate package) that the evidence contains no measured semantic query
+      and therefore says nothing about the embedder being selected. Phase 3 must not earn
+      PROVISIONAL_RETRIEVAL_PROFILE_READY on such evidence.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-04
+    capability: [D1, C7]
+    bullet_source_lines: [313]
+    severity: MEDIUM
+    title: >-
+      The governance suite and the task-close check write into their own currency input classes, so the first close of
+      governance-affecting work is always refused as stale and the named remedy must be run twice
+    statement: >-
+      Green governance evidence is current only while the suite's input snapshot is unchanged. Two writes inside that
+      snapshot are made by the checks themselves. (a) A `gov audit` run on a settled tree changes `index_manifest`
+      and `spec_tasks` after taking its snapshot, so the green record the FIRST run writes is already obsolete: two
+      consecutive audits on an untouched provisioned corpus produced inputs_hash 65ffd464c2 then 40a119281d, with
+      those two classes differing; a third and fourth run agree, so it converges after two. (b) `gov task close`
+      runs its G2 health check before evaluating currency, and that run records the held-out set's misses as
+      memory-quality records under spec/reports/memory-quality/, which is the `evidence_records` class of the same
+      key — so the close refuses itself with GOVERNANCE_SUITE_STALE naming `evidence_records`, on a tree where
+      nothing else changed. The refusal names `gov health run` / `gov audit` as the remedy; running it once does not
+      clear the block, running it again does. The held-out suite has to call its `establish_green` helper (which
+      iterates until two runs agree) and then retry the close, and that retry is the evidence for this finding.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:111 "Stale evidence must trigger the appropriate G0-G5
+      re-check before work is allowed to rely on it"; :951-953 (L4 availability: a block's listed remedy stays
+      available); PHASE-2-FROZEN-GATE-CONTRACT.md AC-5 ("stale evidence", "hard-block vs warning semantics").
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: BC-P2-03
+    label_reason: >-
+      Same mechanism family as the inventoried class — the composition and enforcement of the green-evidence currency
+      key. Iteration 0's defect was that the key omitted input classes; the repair added them, and among the classes
+      it added are two that the suite and the close check write to themselves. An incomplete fix of the same
+      mechanism, not a new one. Non-blocking because the remedy does converge (a second run clears it) and no
+      acceptance criterion is left unmet, but it makes every first close of governance-affecting work fail with a
+      message that misdescribes the cause.
+    evidence:
+      - release/capability-baseline/verify-1/beta/evidence/currency/first-audit-not-current.out
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-C6-C7-C10-temporal-episodic-capability.sh.out
+    reproduction: >-
+      On a provisioned corpus (heldout/corpus.sh build_corpus_provisioned): `gov audit` twice and compare
+      `result.inputs`; then claim a specification task, write its output, `gov audit` once and `gov task close` —
+      the close refuses GOVERNANCE_SUITE_STALE naming evidence_records although nothing but the audit ran.
+    repair_direction: >-
+      A check's own output must not invalidate the record that check writes: the currency snapshot must be taken
+      after the run's own writes (or those writes must be excluded from the key), and the close's G2 run must not
+      record into an input class of the currency key it is about to evaluate. The refusal must also name the class
+      that changed in a way that distinguishes "your work changed it" from "this check changed it".
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-05
+    capability: [R3]
+    bullet_source_lines: [888]
+    severity: LOW
+    title: Archived material cannot be requested through any product path; `include_archive` is never set
+    statement: >-
+      Archived material is correctly excluded from default retrieval, which is what R3's first bullet requires. It is
+      also unreachable on request: the admission filter's `include_archive` option (runtime/src/retrieval/mod.rs:35,
+      :431) is never assigned `true` anywhere in the runtime or the CLI, and `--include-historical` lifts only the
+      superseded/authority filter. A deliberate reference implementation retained under archive/code-reference is
+      therefore write-only from the fabric's point of view; it is reachable only through Git or a direct file read.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:887-891 "## R3. Archive policy — historical/superseded
+      material excluded from default current retrieval ... deliberate reference implementations may be retained
+      explicitly"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: null
+    label_reason: >-
+      Iteration 0 recorded it as A0-R3-01 ("Archived material cannot be explicitly requested through the CLI", LOW,
+      non-blocking, no blocker class). Same capability, same mechanism, unchanged. R3's bullets require exclusion
+      from DEFAULT retrieval, which holds, so this remains non-blocking.
+    evidence:
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-R1-R2-R3-legacy-archive.sh.out
+    reproduction: >-
+      BETA_WT=<worktree> release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh — check
+      R3-b1-explicit fails; `grep -rn include_archive runtime/src cli/src` shows the option is only declared and read.
+    repair_direction: >-
+      An explicit request for archived material (a flag on `gov memory query`, or a route the context compiler can
+      use for a declared archive input) must reach the `include_archive` admission option, so that retained reference
+      material is reachable deliberately while staying out of default retrieval.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-06
+    capability: [C4, D2]
+    bullet_source_lines: [245, 247]
+    severity: LOW
+    title: Identifier-shaped literals are matched as a disjunction of their subtokens, so near-miss documents share the top scores
+    statement: >-
+      The lexical engine tokenises with FTS5 `porter unicode61`, which splits an identifier-shaped literal on its
+      underscores and digits, and the query is then matched as the disjunction of those subtokens. A query for
+      `pyfindbysku_marker_0042` returns, after the one chunk that contains it, three unrelated chunks whose only
+      shared token is `marker`, at scores within 0.001 of the correct hit. Recall is unaffected — the correct chunk
+      ranks first in every case this verifier tried — but precision on identifier and error-string queries is lower
+      than the ranking gap suggests, and a k of 1 is the only safe k for such a query.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:243-249 "## C4. Lexical memory — exact terms / identifiers /
+      ... / error strings"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: null
+    label_reason: >-
+      Iteration 0 recorded it as A0-C4-02 (LOW, non-blocking, no blocker class). Same capability, same mechanism,
+      unchanged on this candidate.
+    evidence:
+      - release/capability-baseline/verify-1/beta/evidence/lexical/or-of-subtokens.out
+    reproduction: >-
+      `gov memory query pyfindbysku_marker_0042 --k 5` on the held-out corpus: the second through fifth hits are
+      chunks of other files that contain only the subtoken `marker`.
+    repair_direction: >-
+      An identifier-shaped or error-string query should be matched as a phrase over its subtokens (or the literal
+      should be indexed whole alongside its subtokens), so that a document sharing one subtoken does not score within
+      a rounding error of the document containing the literal.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-07
+    capability: [D1, C2]
+    bullet_source_lines: [309]
+    severity: LOW
+    title: An edge owned by an unchanged file survives its target's deletion in the store until a full rebuild
+    statement: >-
+      `src/web/client.ts` imports `src/web/http.ts`. Removing `http.ts` without touching `client.ts` and running
+      `gov rebuild-memory --incremental` leaves the row `file:src/web/client.ts -IMPORTS-> file:src/web/http.ts` in
+      the edge store: the incremental pass re-derives the changed and removed artefacts, and the edge is owned by the
+      artefact that did not change. The consequence iteration 0 recorded — a stale edge nobody sees — no longer
+      holds: `gov memory integrity` reports it as `dangling` (count 1) and the G5 graph_integrity family carries the
+      finding, so it is visible and actionable. The row itself is removed only by a full rebuild.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:309 "Changed artefacts invalidate affected
+      chunks/nodes/symbols"; :231 "Graph integrity checks detect orphan/stale/reversed/invalid relationships"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: BC-P2-29
+    label_reason: >-
+      Same capability (D1) and the same mechanism the class names — "incremental builds leave stale edges owned by
+      unchanged files". The repair added the detection that makes it harmless rather than removing the residue, so
+      the mechanism persists in a weakened form: an incomplete fix, not a new mechanism. Non-blocking because D1's
+      bullet is about CHANGED artefacts and C2's detection bullet is met.
+    evidence:
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+    reproduction: >-
+      BETA_WT=<worktree> release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh — check
+      D1-b2-stale-edges prints `remaining=[file:src/web/http.ts], dangling=1`.
+    repair_direction: >-
+      An incremental pass that removes an artefact should also drop, or re-derive, the edges whose destination it
+      was, so that the edge store does not need a full rebuild to become consistent.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-08
+    capability: [D5, D2]
+    bullet_source_lines: [345, 346]
+    severity: MEDIUM
+    title: >-
+      The generated held-out set's two graph queries expect the seed itself, so they can never pass and every project
+      carries a permanently failing regression baseline
+    statement: >-
+      The starter generator emits, for two records, the query "what depends on <id>" with `expected_refs: [<id>]`
+      (runtime/src/memory/heldout.rs:43). The graph route correctly returns the DEPENDANTS of the seed and never the
+      seed, so these two queries score recall 0 on every project, for ever. Observed on the greenfield corpus
+      (HQ-029 "what depends on API-0001" expected [API-0001], got [F-0001, REL-0001, REQ-0001, SCN-0001, TST-0001];
+      HQ-030 likewise) and on the adopted brownfield project (HQ-027, HQ-028). Two consequences follow. (a) Every
+      project's recall@k baseline is permanently 0.93 rather than 1.0, and any later regression must be judged
+      against a baseline that is wrong for a reason unrelated to retrieval quality. (b) Each suite run records those
+      two misses as memory-quality failure records under spec/reports/memory-quality/, which is an input class of
+      the green-evidence currency key — this is one of the writes behind V1-BETA-04.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:345 "golden/held-out retrieval queries exist"; :346
+      "Recall@K/MRR/precision/stale-hit/latency/resource metrics exist"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      The mechanism — a generated held-out query whose stated expectation contradicts the route it declares, so that
+      it can never pass — is in no iteration-0 blocker class. The nearest class, BC-P2-26, concerns routing and
+      de-duplication in the retrieval pipeline, and the routing itself is correct here: it is the generated
+      EXPECTATION that is wrong. The starter generator's graph category was added by a repair round, so this is a
+      defect a repair introduced, which §8 labels materially new. It is recorded non-blocking because the regression
+      family still passes its thresholds and no acceptance criterion is left unmet.
+    evidence:
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-D4-D5-AC7-retrieval-profile.sh.out
+      - release/capability-baseline/verify-1/beta/evidence/prior/A10-verify-memory.json
+    reproduction: >-
+      `gov init` any project, then `gov memory verify`: the `failed` list contains the two graph_impact queries, and
+      `governance/tests/memory/heldout.yaml` shows each one's `expected_refs` is the id named in its own query.
+    repair_direction: >-
+      A generated graph query must expect what the graph route returns: the dependants of the seed (which the
+      generator already has, since it selected the seed from the edge table), not the seed itself. Alternatively the
+      category must be generated as pending, like the paraphrase placeholders, so that an unauthored expectation
+      never counts against the baseline.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-BETA-09
+    capability: [R2]
+    bullet_source_lines: [885]
+    severity: LOW
+    title: Retirement of a chat store is not executed as a CIT-E transaction
+    statement: >-
+      Gate R2's fourth bullet names three things on retirement: CIT-E, an index refresh and a regression. Two hold and
+      were exercised: A9 `build-memory` rebuilds the index and records its counts and manifest hash, and A10
+      `verify-memory` runs the held-out regression — and refuses a held-out set that is only the builder's starter
+      (INDEPENDENT_HELDOUT_REQUIRED) until the independent memory verifier has authored queries of their own, which
+      this verifier did before the run measured. The third does not: `gov cit list` on the adopted project is empty
+      and the A8 result carries no cit or gate reference. Retirement is governed by a different mechanism — gated
+      migration batches whose independently authored tests roll a batch back, a per-store dependency proof with its
+      scanned-file count and result, and the rebuild and regression above.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:881-885 "## R2. Chat-memory retirement — ... CIT-E/index
+      refresh/regression on retirement"
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: RESIDUAL
+    inventoried_class: null
+    label_reason: >-
+      Iteration 0 recorded it as A0-R2-01 ("Chat-store retirement is not executed as a CIT-E transaction", LOW,
+      non-blocking, left outside every blocker class). Same capability, same mechanism, unchanged. Recorded here so
+      that R2's PARTIAL status has a finding behind it rather than only a bullet-level gap note.
+    evidence:
+      - release/capability-baseline/verify-1/beta/evidence/heldout/t-R1-R2-R3-legacy-archive.sh.out
+      - release/capability-baseline/verify-1/beta/evidence/prior/A10-verify-memory.json
+    reproduction: >-
+      Run heldout/t-R1-R2-R3-legacy-archive.sh to completion, then `gov cit list` on the adopted project: the list is
+      empty although two chat stores were retired.
+    repair_direction: >-
+      Either the retirement of a memory store is proposed, simulated, gated and executed as a change-impact
+      transaction so that its impact set and atomicity are the OS's own, or the contract's bullet is read as
+      satisfied by an equivalent governed path and the equivalence is recorded where a reader of R2 will find it.
+    owner_decision_required: false
+    owner_decision_reason: null

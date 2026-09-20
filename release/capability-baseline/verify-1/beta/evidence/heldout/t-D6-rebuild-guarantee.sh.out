@@ -1,0 +1,14 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS D6-classification — no store of claims, emergency control or the plugin registry is classified derived; they are operational or authoritative in the repository contract
+PASS D6-b1-deleted — every derived memory/index store is gone
+PASS D6-b1-rebuilt — the derived state rebuilds from Git and the authoritative records alone
+PASS D6-b1-reproducible — the rebuilt index reproduces the manifest hash of the deleted one (a6ab4770f99c77e8befb4d943d2d099379a708c671f82d88a6fbd1d2318f8602)
+PASS D6-b2-authoritative — deleting derived state did not touch one byte of authoritative project truth
+PASS D6-b2-claims — the session claim survives the deletion and rebuild of all derived state
+PASS D6-b2-control — the emergency FREEZE_WRITES state survives the deletion and rebuild of all derived state
+PASS D6-b3-fresh-agent — a fresh session reconstructs the governed project state after the rebuild, with no prior conversation
+PASS D6-b3-next-action — the fresh session is told the correct next work and its bounded authority
+PASS D6-b4-path-independent — rebuilding the same repository at a different absolute path reproduces the same index manifest hash (a6ab4770f99c77e8befb4d943d2d099379a708c671f82d88a6fbd1d2318f8602)
+PASS D6-b4-no-paths — the index manifest carries no absolute machine path
+--- t-D6-rebuild-guarantee.sh: 11 passed, 0 failed

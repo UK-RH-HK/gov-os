@@ -1,0 +1,11 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS C9-b2-authority — the deterministic authority block delivers each governing record's full normative content with its content hash, not a field whitelist of ids
+PASS C9-b1-reproducible — recompiling the same task reproduces the same deterministic hash (7dd16e510f340c17ae82bb68158f39f476beb794a2881f989c2b3f9b022f8c40)
+PASS C9-b1-sensitive — changing one word of a governing requirement's normative text changes the deterministic hash (7dd16e510f340c17ae82bb68158f39f476beb794a2881f989c2b3f9b022f8c40 -> 0d3af7d3b5a23ef1e92b0423104562b55bc722d3495f7fc0f49fad5ade69ed49)
+PASS C9-b3-supplementary — the packet carries every CONTEXT_POLICY retrieved field (including semantic_candidates) in a block separate from the authority block
+PASS C9-b4-bounded — the packet is bounded by CONTEXT_POLICY.max_packet_chars and reports its budget
+PASS C9-b5-provenance — the packet records the repository commit, the compiler identity, its own hash, and cites the source of every retrieved slice
+PASS C9-b6-duplicates — byte-identical content from two different artefacts is not delivered twice
+PASS C9-b7-active-historical — a superseded decision is delivered in neither the authority block nor the retrieved slices of a current task
+--- t-C9-context-packet.sh: 8 passed, 0 failed

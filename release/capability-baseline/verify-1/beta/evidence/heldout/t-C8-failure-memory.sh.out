@@ -1,0 +1,15 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS C8-retrieval-miss — a retrieval miss is recorded as a durable structured failure record
+PASS C8-tool-failure-refusal — a pinned retrieval plugin that does not resolve is a typed refusal, never a silent fallback to the built-in
+PASS C8-tool-failure — tool failures are recorded as durable structured failure records
+PASS C8-regression — a failed held-out regression on a governed profile change is recorded as a durable failure record
+PASS C8-regression-rollback — the failed profile change is rolled back automatically and the refusal names the restored profile
+PASS C8-regression-restored — after the rollback the live retrieval profile is the previous one
+FAIL C8-bug — no governed path produces a 'bug' failure record: 'gov memory miss' records only retrieval misses, and the product's only other writers are tool-failure and regression; the kind exists in the KINDS constant and in the schema only
+FAIL C8-failed-approach — no governed path produces a 'failed-approach' failure record: 'gov memory miss' records only retrieval misses, and the product's only other writers are tool-failure and regression; the kind exists in the KINDS constant and in the schema only
+FAIL C8-incorrect-assumption — no governed path produces a 'incorrect-assumption' failure record: 'gov memory miss' records only retrieval misses, and the product's only other writers are tool-failure and regression; the kind exists in the KINDS constant and in the schema only
+FAIL C8-migration-failure — no governed path produces a 'migration-failure' failure record: 'gov memory miss' records only retrieval misses, and the product's only other writers are tool-failure and regression; the kind exists in the KINDS constant and in the schema only
+PASS C8-durable — failure memory survives deletion and full rebuild of derived state (kinds before=[retrieval-miss tool-failure] after=[retrieval-miss tool-failure])
+PASS C8-not-indexed — a recorded retrieval miss is never itself returned as the answer to the query it records
+--- t-C8-failure-memory.sh: 8 passed, 4 failed

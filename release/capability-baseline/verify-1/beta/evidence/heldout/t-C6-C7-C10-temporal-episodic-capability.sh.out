@@ -1,0 +1,25 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS C6-b1-what-changed — the OS distinguishes the commit that introduced a record from the commit that last changed it, with its content hash
+PASS C6-b2-when — the change carries its timestamp
+PASS C6-b3-why — the transaction record states why the change is made, what it changes, its derived materiality classes and when each step happened
+PASS C6-b4-causal-decision — upstream lineage from the changed requirement reaches the decision that governs it (D-0001)
+PASS C6-b5-lineage — the supersession lineage of a record is recorded and read back (REQ-0001 → REQ-0500)
+PASS C7-close — task TASK-0003 closed; episodic record RPT-0101 written by the OS
+PASS C7-session — the episodic record carries session (S-episode-1)
+PASS C7-role — the episodic record carries role (product-spec-agent)
+PASS C7-task — the episodic record carries task (TASK-0003)
+PASS C7-tools_used — the episodic record carries tools_used (TOOL-FS-001)
+PASS C7-files_changed — the episodic record carries files_changed (PRJ-note)
+PASS C7-files_read — the episodic record carries files_read (D-0001)
+PASS C7-tests — the episodic record carries tests (probe-suite)
+PASS C7-discoveries — the episodic record carries discoveries (never specified)
+PASS C10-tools — capability memory holds the tool registry with declared versions and permission classes
+PASS C10-mcp — capability memory holds registered MCP servers
+PASS C10-a2a-roles — capability memory resolves, per agent role, which tools and MCP servers that agent may use
+FAIL C10-a2a-agents — capability memory holds no A2A agent inventory (only roles and their tool exposure)
+FAIL C10-packages — ecosystem detection records only the metadata COMMAND and its availability; no package/dependency inventory is resolved or held
+PASS C10-providers — capability memory holds the configured model providers and resolves them when routing
+PASS C10-credentials — capability memory records each tool's credential scope and permission status
+FAIL C10-tool-versions — tool health records only availability/exit status; the observed version of an environment tool is never captured (the registry's 'version' is a declared string such as 'system'/'builtin')
+--- t-C6-C7-C10-temporal-episodic-capability.sh: 19 passed, 3 failed

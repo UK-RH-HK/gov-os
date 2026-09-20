@@ -1,0 +1,2214 @@
+# P2-AR-0047 — capability family beta (C1-C10, D1-D6, R1-R3), verification iteration 1.
+# Bullet text and source lines are taken from the owner source itself (Contract v3), not from any
+# derived view. `independent_evidence` names the held-out probe check that established the bullet;
+# every such check is in heldout/ and re-runnable with heldout/RUN-ALL.
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0047
+family: beta
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+capabilities:
+- capability: C1
+  title: Deterministic structured memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:209
+  governing_document_refs:
+  - framework Part IV §10 (the ten memory classes)
+  - framework Part IV §11.1
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: projects
+    source_line: 211
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: features/capabilities
+    source_line: 212
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: requirements
+    source_line: 213
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: decisions
+    source_line: 214
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: tasks
+    source_line: 215
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: scenarios
+    source_line: 216
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: tests
+    source_line: 217
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: interfaces
+    source_line: 218
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: experiments
+    source_line: 219
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: releases
+    source_line: 220
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: claims
+    source_line: 221
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/claims.rs
+    - runtime/src/paths.rs:80-86 (.governance-state/claims.db)
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh C1-claims; release/capability-baseline/verify-1/beta/heldout/t-D6-rebuild-guarantee.sh
+      D6-b2-claims
+    gap: null
+  - bullet: transactions
+    source_line: 222
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/mod.rs
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh C1-transactions (CIT-0001 proposed, listed,
+      read back)
+    gap: null
+  - bullet: statuses
+    source_line: 223
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: skill versions
+    source_line: 224
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: tool versions
+    source_line: 225
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:187-245 (TYPE_DIR/TYPE_PREFIX)
+    - runtime/src/memory/db.rs:8-30
+    automated_evidence:
+    - cargo test --lib (276/0)
+    - gov audit family schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh — the kind is created through the OS
+      operation that owns it and read back
+    gap: null
+  - bullet: model-routing records
+    source_line: 226
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/routing.rs:182-270
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh C1-model-routing (recorded and persisted
+      to routing/evidence.jsonl)
+    gap: null
+  - bullet: index manifests
+    source_line: 227
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/manifest.rs:19-88
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C1-deterministic-memory.sh C1-index-manifest; release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh
+      D1-b5-manifest
+    gap: null
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G5
+  evidence_owners:
+  - G0
+  - G2
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — the G0 write guard and the G5 schema_invariants/graph_integrity families read every
+    record kind; the held-out suite read each kind back through `gov artefact show` / the OS command that owns it
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - authoritative spec/decision
+    - schema
+    - runtime/kernel implementation
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1b-staleness-cite-currency.sh.out
+      (changing a spec record invalidates the green record)
+  qualification_coverage:
+    repo_a_challenge: a greenfield repository carrying at least one record of each of the seventeen kinds; assert each is
+      read back after a fresh clone
+    repo_b_challenge: a brownfield repository whose legacy material must become records of these kinds through adoption; assert
+      no kind is left unrepresented
+    hidden_oracle_fault_class: a record of one kind silently missing from the structured store while the file exists on disk
+    chaos_scale_soak: 'not relevant: C1 is a representation obligation, not a throughput one'
+    retrieval_challenge: exact-id retrieval of one record of each kind
+    not_challengeable: null
+  adoption_obligation: gov init/adopt must create the directories and identity rules for every kind; gov update must migrate
+    their schemas
+  residual_risk: the seventeen kinds are represented, but `release` has no JSON schema of its own, so a malformed release
+    record is caught only by the generic record rules
+  findings: []
+- capability: C2
+  title: Relationship/graph memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:229
+  governing_document_refs:
+  - framework Part IV §11.2
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Typed relationships support DEPENDS_ON/BLOCKS/IMPLEMENTS/REALISES/GOVERNED_BY/CONSTRAINS/DERIVED_FROM/SUPERSEDES/VALIDATED_BY/TESTS/USES/PRODUCES/CONSUMES/AFFECTS/GENERATED_FROM/CALLS/IMPORTS/OWNS/FAILED_BECAUSE/LEARNED_FROM
+      or equivalent.
+    source_line: 230
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/mod.rs:19-52
+    - runtime/src/records.rs:19-83
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C2-graph-memory.sh C2-b1 — one record declaring all twenty types;
+      every one read back as a typed edge
+    gap: null
+  - bullet: Graph integrity checks detect orphan/stale/reversed/invalid relationships.
+    source_line: 231
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/integrity.rs:60-200
+    automated_evidence:
+    - gov audit family graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C2-graph-memory.sh C2-b2-* — planted orphan, dangling, stale, reversed
+      and ill-typed relationships all reported
+    gap: null
+  - bullet: Impact traversal is executable.
+    source_line: 232
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/mod.rs:70-96
+    - runtime/src/graph/lineage.rs
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C2-graph-memory.sh C2-b3-impact / C2-b3-lineage
+    gap: null
+  health_scheduler_tiers:
+  - G0
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — the G5 graph_integrity family runs `memory::integrity` and reports its findings
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - authoritative spec/decision
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+  qualification_coverage:
+    repo_a_challenge: a repository with one record of each relation type; assert all twenty read back and impact traversal
+      reaches the expected set
+    repo_b_challenge: a brownfield repository whose imported relations are reversed or ill-typed; assert every one is reported
+    hidden_oracle_fault_class: an edge to a superseded target, a reversed edge and an ill-typed edge planted together
+    chaos_scale_soak: 'a graph of 10^5 edges: traversal and integrity must stay bounded'
+    retrieval_challenge: '`what depends on X` must be answered by the graph route, not by semantic similarity'
+    not_challengeable: null
+  adoption_obligation: adoption must classify imported relations and report reversed/ill-typed ones before they become authority
+  residual_risk: an edge owned by an unchanged file survives its target's deletion in the store; it is reported dangling rather
+    than removed
+  findings: []
+- capability: C3
+  title: Semantic memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:234
+  governing_document_refs:
+  - framework Part IV §11.3
+  - framework Part IV §15 (retrieval routing)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Decisions/rationale
+    source_line: 235
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs
+    - runtime/src/memory/chunking.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle unique to this class is reached
+      through --route semantic
+    gap: null
+  - bullet: lessons/failures
+    source_line: 236
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs
+    - runtime/src/memory/chunking.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle unique to this class is reached
+      through --route semantic
+    gap: null
+  - bullet: reports/research
+    source_line: 237
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs
+    - runtime/src/memory/chunking.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle unique to this class is reached
+      through --route semantic
+    gap: null
+  - bullet: experiments
+    source_line: 238
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs
+    - runtime/src/memory/chunking.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle unique to this class is reached
+      through --route semantic
+    gap: null
+  - bullet: requirements/specifications
+    source_line: 239
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs
+    - runtime/src/memory/chunking.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle unique to this class is reached
+      through --route semantic
+    gap: null
+  - bullet: selected code units
+    source_line: 240
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs
+    - runtime/src/memory/chunking.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle unique to this class is reached
+      through --route semantic
+    gap: null
+  - bullet: Semantic namespace/authority filters apply before or during retrieval.
+    source_line: 241
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:372-490 (Admission, computed once per query before any route runs)
+    automated_evidence:
+    - gov audit family secrets_sensitivity_indexing
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh C3-b7-truncation — twenty superseded better-matching
+      carriers neither appear nor exhaust the candidate pool; C3-b7-explicit — the same material is returned on explicit request,
+      so the filter is a filter and not an indexing gap
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — the G5 memory_retrieval_regression family runs the held-out set every suite run
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - model/retrieval profile
+    - relevant index manifest
+    - relevant source files
+    - authoritative spec/decision
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+  qualification_coverage:
+    repo_a_challenge: a repository where each semantic class is the only carrier of a distinctive statement; assert each is
+      retrievable by paraphrase
+    repo_b_challenge: a brownfield repository whose superseded material outranks its current material lexically
+    hidden_oracle_fault_class: twenty superseded carriers of the needle and one current carrier
+    chaos_scale_soak: 'not relevant: covered by the D5 benchmark''s latency and resource measures'
+    retrieval_challenge: paraphrase queries for decisions, lessons, research, requirements and code units
+    not_challengeable: null
+  adoption_obligation: adoption must put extracted legacy knowledge into the semantic classes, and must not embed secret or
+    archive namespaces
+  residual_risk: semantic recall rests on the built-in hashed-ngram embedder; it is adequate for the classes above but its
+    discriminating power is not measured by the generated held-out set (V1-BETA-03)
+  findings:
+  - V1-BETA-03
+- capability: C4
+  title: Lexical memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:243
+  governing_document_refs:
+  - framework Part IV §11.4
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Exact terms
+    source_line: 244
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/coverage.rs
+    automated_evidence:
+    - gov audit family index_content_coverage (0 uncovered lines)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle of this class, unique in the
+      corpus, is returned
+    gap: null
+  - bullet: identifiers
+    source_line: 245
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/coverage.rs
+    automated_evidence:
+    - gov audit family index_content_coverage (0 uncovered lines)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle of this class, unique in the
+      corpus, is returned
+    gap: null
+  - bullet: filenames
+    source_line: 246
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/coverage.rs
+    automated_evidence:
+    - gov audit family index_content_coverage (0 uncovered lines)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle of this class, unique in the
+      corpus, is returned
+    gap: null
+  - bullet: error strings
+    source_line: 247
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/coverage.rs
+    automated_evidence:
+    - gov audit family index_content_coverage (0 uncovered lines)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle of this class, unique in the
+      corpus, is returned
+    gap: null
+  - bullet: APIs/config keys
+    source_line: 248
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/coverage.rs
+    automated_evidence:
+    - gov audit family index_content_coverage (0 uncovered lines)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle of this class, unique in the
+      corpus, is returned
+    gap: null
+  - bullet: literal phrases
+    source_line: 249
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/coverage.rs
+    automated_evidence:
+    - gov audit family index_content_coverage (0 uncovered lines)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C3-C4-semantic-lexical.sh — a needle of this class, unique in the
+      corpus, is returned
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — lexical_literal and symbol categories of the held-out set run in every suite run
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - relevant index manifest
+    - authoritative spec/decision
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+  qualification_coverage:
+    repo_a_challenge: needles in list-valued and nested record fields, in module-level code and inside method bodies
+    repo_b_challenge: a brownfield repository with error strings and config keys only in legacy documents
+    hidden_oracle_fault_class: content that exists only inside a nested record field or outside every structural code unit
+    chaos_scale_soak: not relevant
+    retrieval_challenge: exact term, identifier, filename, error string, config key and literal phrase
+    not_challengeable: null
+  adoption_obligation: the adoption index must cover the same content classes as a greenfield index
+  residual_risk: an identifier-shaped literal is tokenised into subtokens and matched as their disjunction, so near-miss documents
+    share the top scores (V1-BETA-06); recall is unaffected, precision is
+  findings:
+  - V1-BETA-06
+- capability: C5
+  title: Code-structural memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:251
+  governing_document_refs:
+  - framework Part IV §11.5
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: AST/LSP/SCIP or equivalent
+    source_line: 252
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/generic.rs:27-190 (per-language rules)
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b1 — extracted unit spans compared
+      line-by-line with the source in python, rust, typescript, java and go
+    gap: null
+  - bullet: symbols/definitions/references
+    source_line: 253
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/db.rs:20-24 (symbols, symbol_refs)
+    automated_evidence:
+    - gov audit family index_content_coverage
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b2-symbols / C5-b2-refs
+    gap: null
+  - bullet: inheritance/interfaces
+    source_line: 254
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/mod.rs:29-36 (Relation)
+    - runtime/src/code_intelligence/generic.rs:1240-1300
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b3-* — inherits in python,
+      implements in java and typescript
+    gap: null
+  - bullet: calls/imports
+    source_line: 255
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs (CALLS/IMPORTS edges)
+    automated_evidence:
+    - gov audit family graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b4-imports / C5-b4-calls
+    gap: null
+  - bullet: route registrations
+    source_line: 256
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/mod.rs:38-46 (Route)
+    - runtime/src/code_intelligence/generic.rs:767-773,1047-1160
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b5-routes — a decorator route
+      (python) and a mux registration (go)
+    gap: null
+  - bullet: DB models
+    source_line: 257
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/mod.rs:48-56 (Model)
+    - runtime/src/code_intelligence/generic.rs:1240-1260
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b6-models — an ORM base class
+      (python) and an entity annotation (java)
+    gap: null
+  - bullet: test-coverage relationships
+    source_line: 258
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs (TESTS edges from tests/**)
+    automated_evidence:
+    - gov audit family product_traceability
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b7-tests
+    gap: null
+  - bullet: language-appropriate adapters are resolved via capability registry
+    source_line: 259
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/mod.rs:70-85 (provider_identity via the capability registry)
+    automated_evidence:
+    - gov audit family plugin_governance
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh C5-b8-adapter — every code artefact
+      records the resolving adapter identity, the built-in fallback named explicitly
+    gap: null
+  health_scheduler_tiers:
+  - G1
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: partial — the suite's symbol category exercises symbols; routes, models and relations are
+    exercised by the product's own tests and by this verifier's held-out probe, not by a G-tier family of their own
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - tool/plugin (the code_intel adapter)
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out (D1-b2-affected)
+  qualification_coverage:
+    repo_a_challenge: a five-language source tree with routes, ORM models, inheritance and cross-file tests
+    repo_b_challenge: a brownfield tree whose adapters are absent, so every file falls back to the built-in extractor
+    hidden_oracle_fault_class: a renamed method, a route whose handler moved, a model whose table name changed
+    chaos_scale_soak: 'a 10^5-file tree: extraction must stay incremental'
+    retrieval_challenge: qualified-symbol lookup must return the method, not the file header
+    not_challengeable: null
+  adoption_obligation: adoption must record the resolving adapter identity per artefact so a later adapter change re-derives
+    those files
+  residual_risk: extraction is regex/structural rather than a real parser; spans matched the source in all five languages
+    checked, but a construct no rule covers is silently absent rather than reported
+  findings: []
+- capability: C6
+  title: Temporal memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:261
+  governing_document_refs:
+  - framework Part IV §11.6
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: what changed
+    source_line: 262
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs (provenance/version_control)
+    automated_evidence:
+    - gov audit family lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C6-b1-what-changed
+    gap: null
+  - bullet: when
+    source_line: 263
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs
+    automated_evidence:
+    - gov audit family lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C6-b2-when
+    gap: null
+  - bullet: why
+    source_line: 264
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/mod.rs (proposal, trigger, journal)
+    - runtime/src/cit/materiality.rs
+    automated_evidence:
+    - gov audit family change_control_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C6-b3-why
+    gap: null
+  - bullet: causal decision
+    source_line: 265
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/lineage.rs
+    - runtime/src/records.rs:19-83 (GOVERNED_BY)
+    automated_evidence:
+    - gov audit family lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C6-b4-causal-decision
+      — upstream lineage from the changed requirement reaches D-0001
+    gap: null
+  - bullet: supersession/version lineage
+    source_line: 266
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/lineage.rs:26-46 (successor_map)
+    automated_evidence:
+    - gov audit family graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C6-b5-lineage
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — lineage_orphans and change_control_integrity read the same facts
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - authoritative spec/decision
+    - relevant source files
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1b-staleness-cite-currency.sh.out
+  qualification_coverage:
+    repo_a_challenge: a record amended twice and then superseded; assert the OS can say what changed, when, why and by which
+      decision
+    repo_b_challenge: a brownfield repository whose history predates governance
+    hidden_oracle_fault_class: a supersession recorded on one side only
+    chaos_scale_soak: not relevant
+    retrieval_challenge: '`what changed in X and why` must reach the transaction record'
+    not_challengeable: null
+  adoption_obligation: adoption must set supersession lineage on the contradicting records it reconciles
+  residual_risk: '`why` and the causal decision are recorded when the change goes through change control or declares its governing
+    record; an ungoverned edit carries only Git provenance'
+  findings: []
+- capability: C7
+  title: Episodic execution memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:268
+  governing_document_refs:
+  - framework Part IV §11.7
+  - framework Part XX §69
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: agent/session
+    source_line: 269
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/schemas/report.schema.json
+    - runtime/src/orchestration/tasks.rs (close)
+    - runtime/src/context/receipt.rs
+    automated_evidence:
+    - gov audit family product_traceability
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C7-session and C7-role
+      (agent/session) — read back from the report the OS wrote when the task closed
+    gap: null
+  - bullet: task/context
+    source_line: 270
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/schemas/report.schema.json
+    - runtime/src/orchestration/tasks.rs (close)
+    - runtime/src/context/receipt.rs
+    automated_evidence:
+    - gov audit family product_traceability
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C7-task (task/context)
+      — read back from the report the OS wrote when the task closed
+    gap: null
+  - bullet: tools
+    source_line: 271
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/schemas/report.schema.json
+    - runtime/src/orchestration/tasks.rs (close)
+    - runtime/src/context/receipt.rs
+    automated_evidence:
+    - gov audit family product_traceability
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C7-tools_used (tools)
+      — read back from the report the OS wrote when the task closed
+    gap: null
+  - bullet: files read/changed
+    source_line: 272
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/schemas/report.schema.json
+    - runtime/src/orchestration/tasks.rs (close)
+    - runtime/src/context/receipt.rs
+    automated_evidence:
+    - gov audit family product_traceability
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C7-files_changed and C7-files_read
+      (files read/changed) — read back from the report the OS wrote when the task closed
+    gap: null
+  - bullet: tests/outcomes
+    source_line: 273
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:1950-1960 (task_close_requires_tests_status)
+    - runtime/src/verification/product.rs
+    automated_evidence:
+    - gov audit family product_test_health
+    independent_evidence:
+    - 'release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C7-tests — and the claim
+      is corroborated, not taken on trust: a report claiming tests passed is refused (PRODUCT_TEST_EVIDENCE_REQUIRED) until
+      a product test run is on record, which the probe had to satisfy with `gov verify product`'
+    gap: null
+  - bullet: failures/discoveries
+    source_line: 274
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/schemas/report.schema.json
+    - runtime/src/orchestration/tasks.rs (close)
+    - runtime/src/context/receipt.rs
+    automated_evidence:
+    - gov audit family product_traceability
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C7-discoveries (failures/discoveries)
+      — read back from the report the OS wrote when the task closed
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G3
+  - G5
+  evidence_owners:
+  - G2
+  - G3
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — the G2 task-close path writes the record and the G5 product_traceability family reads
+    it
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - authoritative spec/decision
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1b-staleness-cite-currency.sh.out
+  qualification_coverage:
+    repo_a_challenge: a task claimed, worked and closed by a designated role in its own session
+    repo_b_challenge: a brownfield repository where the first closes happen during adoption
+    hidden_oracle_fault_class: a close report whose declared files_changed do not match the working tree
+    chaos_scale_soak: many concurrent sessions closing work
+    retrieval_challenge: '`what did session S do` must reach its close report'
+    not_challengeable: null
+  adoption_obligation: adoption's own stages must leave the same episodic record shape
+  residual_risk: the episodic record is the worker's return, validated against the packet and the working tree; its `discoveries`/`risks`
+    prose is not itself verified
+  findings:
+  - V1-BETA-04
+- capability: C8
+  title: Failure memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:276
+  governing_document_refs:
+  - framework Part IV §11.8
+  - framework Part IV §18 (retrieval learning loop)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: some bullets are executably evidenced and some are not; see the per-bullet gaps
+  na_reason_normative_text: null
+  partial_qualification_impact: 'COULD_UNDERMINE: Four of the seven failure classes (bugs, failed approaches, wrong assumptions,
+    migration failures) have a record shape and no writer. Phase-4 qualification injects faults of exactly those classes;
+    the OS''s work generator creates follow-up work from open failure-memory records (orchestration/generation.rs), so a qualification
+    scenario that injects a bug and expects the OS to record it and generate repair work cannot be satisfied by this candidate.
+    The gap is therefore not safely outside the qualification scenario.'
+  bullets:
+  - bullet: bugs
+    source_line: 277
+    status: ABSENT
+    implementation_evidence: &id001
+    - runtime/src/memory/failures.rs:48-57 (KINDS lists the class)
+    automated_evidence: &id002
+    - test:lib:memory::failures::tests::failure_kinds_signatures_and_locations (exercises the KINDS constant, not a writer)
+    independent_evidence: &id003
+    - release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh — no governed path produces a record of this
+      class
+    gap: the class exists in the KINDS constant and in the record schema, but no product code path constructs a FailureEvent
+      of it and no CLI records one, so no such record can exist (Contract v3:93)
+  - bullet: failed approaches
+    source_line: 278
+    status: ABSENT
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence: *id003
+    gap: the class exists in the KINDS constant and in the record schema, but no product code path constructs a FailureEvent
+      of it and no CLI records one, so no such record can exist (Contract v3:93)
+  - bullet: wrong assumptions
+    source_line: 279
+    status: ABSENT
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence: *id003
+    gap: the class exists in the KINDS constant and in the record schema, but no product code path constructs a FailureEvent
+      of it and no CLI records one, so no such record can exist (Contract v3:93)
+  - bullet: retrieval misses
+    source_line: 280
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/failures.rs:400-430 (retrieval_miss_event)
+    - runtime/src/retrieval/mod.rs:1289-1310
+    automated_evidence:
+    - gov audit family memory_retrieval_regression (records held-out misses)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh C8-retrieval-miss, C8-durable, C8-not-indexed
+    gap: null
+  - bullet: regressions
+    source_line: 281
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/profile.rs:1350-1365
+    - runtime/src/orchestration/generation.rs:1320-1330
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh C8-regression — a governed profile change whose
+      held-out regression failed wrote a durable `regression` record and rolled back
+    gap: null
+  - bullet: migration failures
+    source_line: 282
+    status: ABSENT
+    implementation_evidence: *id001
+    automated_evidence: *id002
+    independent_evidence: *id003
+    gap: the class exists in the KINDS constant and in the record schema, but no product code path constructs a FailureEvent
+      of it and no CLI records one, so no such record can exist (Contract v3:93)
+  - bullet: tool failures
+    source_line: 283
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/failures.rs:322-370 (ToolFailure)
+    - runtime/src/tools.rs:1790-1800
+    - runtime/src/capabilities/governance.rs:1180-1190
+    automated_evidence:
+    - gov doctor D033 (open tool failures)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh C8-tool-failure, C8-tool-failure-refusal
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: partial — the suite records held-out misses and tool-health failures; no family produces a
+    bug, failed-approach, incorrect-assumption or migration-failure record, because no product writer does
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant index manifest
+    - tool/plugin
+    - model/retrieval profile
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-C8-failure-memory.sh.out (C8-durable)
+  qualification_coverage:
+    repo_a_challenge: each of the seven failure classes provoked in turn; assert a durable record of that class
+    repo_b_challenge: a brownfield repository whose adoption provokes a migration failure
+    hidden_oracle_fault_class: 'a failure of a class with no writer: it must be recorded, not lost'
+    chaos_scale_soak: a repeated failure must not flood the tree (the signature de-duplication)
+    retrieval_challenge: a tool failure must be recalled by a later session through the fabric; a retrieval miss must never
+      answer its own query
+    not_challengeable: null
+  adoption_obligation: adoption must carry legacy failure knowledge into failure memory or the residual register
+  residual_risk: four of the seven classes have a record shape but no way to create one, so the learning loop and the work
+    generator can never act on them
+  findings:
+  - V1-BETA-01
+- capability: C9
+  title: Working memory/context packet
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:285
+  governing_document_refs:
+  - framework Part IV §16 (context packet)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: small reproducible current-task context
+    source_line: 286
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs
+    automated_evidence:
+    - gov audit family context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b1-reproducible, C9-b1-sensitive
+    gap: null
+  - bullet: deterministic authority block
+    source_line: 287
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs
+    - runtime/src/context/manifest.rs
+    automated_evidence:
+    - gov audit family context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b2-authority — each governing record's full
+      normative content and content hash
+    gap: null
+  - bullet: retrieved supplementary intelligence
+    source_line: 288
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs (retrieved_intelligence)
+    automated_evidence:
+    - gov audit family context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b3-supplementary (every CONTEXT_POLICY retrieved
+      field, including semantic_candidates)
+    gap: null
+  - bullet: bounded size
+    source_line: 289
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs (budget)
+    - framework/policies/CONTEXT_POLICY.yaml max_packet_chars
+    automated_evidence:
+    - gov audit family context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b4-bounded
+    gap: null
+  - bullet: provenance/citations
+    source_line: 290
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs (provenance)
+    - runtime/src/context/receipt.rs
+    automated_evidence:
+    - gov audit family context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b5-provenance
+    gap: null
+  - bullet: duplicate suppression
+    source_line: 291
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (duplicates_suppressed)
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b6-duplicates — a byte-identical copy of
+      an indexed file is suppressed, not delivered twice
+    gap: null
+  - bullet: active-vs-historical separation
+    source_line: 292
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:372-440 (Admission)
+    - runtime/src/context/contradictions.rs
+    automated_evidence:
+    - gov audit family authority_unambiguous
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C9-context-packet.sh C9-b7-active-historical — the superseded decision
+      is absent from the authority block, flagged in conflicting_decisions, and blocks the manifest with its remedy
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G2
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — the G5 context_reproducibility family recompiles packets and compares their deterministic
+    hash
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - authoritative spec/decision
+    - relevant index manifest
+    - relevant source files
+    - governing contract/policy
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-C9-context-packet.sh.out (C9-b1-sensitive)
+  qualification_coverage:
+    repo_a_challenge: a task with declared requirements, decisions, interfaces, scenarios and a required research input
+    repo_b_challenge: a brownfield task whose declared input was superseded during adoption
+    hidden_oracle_fault_class: a mandatory input silently missing, and a duplicate carrier of the same text
+    chaos_scale_soak: a packet whose supplementary material would exceed the budget
+    retrieval_challenge: the packet must not need semantic retrieval to find a mandatory input
+    not_challengeable: null
+  adoption_obligation: adoption must leave every adopted task with a compilable packet
+  residual_risk: the deterministic block is complete and hash-sensitive to its inputs' text; the supplementary block still
+    depends on retrieval quality
+  findings: []
+- capability: C10
+  title: Capability memory
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:294
+  governing_document_refs:
+  - framework Part IV §11.10
+  - framework Part XXI §71
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: some bullets are executably evidenced and some are not; see the per-bullet gaps
+  na_reason_normative_text: null
+  partial_qualification_impact: 'CANNOT_UNDERMINE: The missing facts are an A2A agent inventory, a resolved package/dependency
+    set and observed environment tool versions. Advanced qualification runs in synthetic repositories whose tool and agent
+    set is fixed by the harness and declared in the overlay, and every capability the qualification work needs is resolved
+    from the declared registry, which is present and exercised. The gap makes environment drift invisible in operation; it
+    cannot make a qualification scenario pass or fail wrongly.'
+  bullets:
+  - bullet: tools
+    source_line: 295
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/tools.rs:200-270 (registry)
+    automated_evidence:
+    - gov audit family plugin_governance
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-tools
+    gap: null
+  - bullet: MCP servers
+    source_line: 296
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/tools.rs:50-64 (mcp_servers)
+    automated_evidence:
+    - gov audit family plugin_governance
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-mcp — a registered
+      MCP server is held and exposed per role
+    gap: null
+  - bullet: A2A agents
+    source_line: 297
+    status: ABSENT
+    implementation_evidence:
+    - runtime/src/orchestration/handoffs.rs (typed A2A handoffs)
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-a2a-agents
+    gap: capability memory holds roles and their tool/MCP exposure, but no inventory of the A2A agents a handoff may address
+      (their identity, availability, contract or version); `gov handoff` addresses a role, and nothing records which agents
+      exist
+  - bullet: packages/dependencies
+    source_line: 298
+    status: ABSENT
+    implementation_evidence:
+    - runtime/src/capabilities/ecosystems.rs:200-240
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-packages — the ecosystem
+      entry carries the metadata COMMAND and its availability, and no resolved package set
+    gap: ecosystem detection records the command that would list dependencies and whether its binary is present; it never
+      runs it, so no package/dependency inventory is held in capability memory
+  - bullet: model providers
+    source_line: 299
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/routing.rs:15-60
+    - governance/project/MODEL_ROUTING_OVERRIDES.yaml
+    automated_evidence:
+    - gov audit family model_routing_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-providers
+    gap: null
+  - bullet: permission/credential status
+    source_line: 300
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/tools.rs:66-90 (role_permissions)
+    - framework/schemas/tool.schema.json credential_scope
+    automated_evidence:
+    - gov audit family authority_role_limits
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-credentials
+    gap: null
+  - bullet: environment/tool versions
+    source_line: 301
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/tools.rs (health_check)
+    - runtime/src/capabilities/ecosystems.rs:147 (binary_available)
+    automated_evidence:
+    - gov doctor D022 (capability gaps)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C6-C7-C10-temporal-episodic-capability.sh C10-tool-versions — 14
+      tools health-checked, none with an observed version
+    gap: the registry's `version` is a declared string ('system', 'builtin'), and the health check records only availability
+      and exit status; the version of the tool actually installed on this machine is never captured, so an environment version
+      drift is invisible
+  health_scheduler_tiers:
+  - G0
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: partial — plugin_governance and model_routing_integrity read the registries; nothing observes
+    package or tool versions
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - tool/plugin
+    - environment/tool versions
+    - model/retrieval profile
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out (an
+      adapter change re-derives the files it covers)
+  qualification_coverage:
+    repo_a_challenge: a repository declaring MCP servers, plugins and model providers; assert each is resolved per role
+    repo_b_challenge: a brownfield repository whose dependency manifests are the only record of its packages
+    hidden_oracle_fault_class: a tool whose installed version differs from the declared one
+    chaos_scale_soak: not relevant
+    retrieval_challenge: '`which tools may this role use` must be answered from capability memory'
+    not_challengeable: null
+  adoption_obligation: adoption must detect the ecosystems and record the capability gaps it found
+  residual_risk: 'capability memory answers ''what is declared and permitted'', not ''what is actually installed here'': an
+    environment drift (a different tool version, a changed dependency set) is invisible to it'
+  findings:
+  - V1-BETA-02
+- capability: D1
+  title: Incremental indexing/freshness
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:307
+  governing_document_refs:
+  - framework Part IV §13 (incremental indexing)
+  - framework Part IV §17
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Content-hash/repo-commit based invalidation.
+    source_line: 308
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/manifest.rs (freshness)
+    - runtime/src/memory/indexer.rs (content_hash, repo_commit)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh D1-b1-content-hash / D1-b1-restored
+    gap: null
+  - bullet: Changed artefacts invalidate affected chunks/nodes/symbols.
+    source_line: 309
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs (per-artefact re-derivation)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh D1-b2-affected / D1-b2-stale-edges
+    gap: null
+  - bullet: Rename/move/delete+add are handled.
+    source_line: 310
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs (added/removed sets)
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh D1-b3-rename — a git mv leaves exactly
+      one artefact
+    gap: null
+  - bullet: Model/embedder/dimension change invalidates incompatible semantic state.
+    source_line: 311
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/manifest.rs (pin_mismatch)
+    - runtime/src/memory/profile.rs
+    automated_evidence:
+    - gov doctor D010/D025
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh D1-b4-embedder / D1-b4-no-mixed
+    gap: null
+  - bullet: Index manifest records compatible component identity.
+    source_line: 312
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/manifest.rs:19-88
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh D1-b5-manifest
+    gap: null
+  - bullet: Required stale indexes degrade/block task close according to policy.
+    source_line: 313
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - 'runtime/src/orchestration/tasks.rs (close: INDEX_STALE)'
+    - framework/policies/MEMORY_POLICY.yaml freshness
+    automated_evidence:
+    - gov audit family index_freshness
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D1b-staleness-cite-currency.sh D1-b6-stale-close / D1-b6-remedy-named
+      / D1-b6-remedy-works
+    gap: null
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G5
+  evidence_owners:
+  - G1
+  - G2
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — index_freshness runs in every suite run and the G2 close path refuses on a stale index
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - relevant index manifest
+    - model/retrieval profile
+    - project path map
+    - authoritative spec/decision
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1b-staleness-cite-currency.sh.out
+      (source, spec, governance-tests and index-manifest classes each shown to invalidate the green record)
+  qualification_coverage:
+    repo_a_challenge: edits, renames, deletes, a path-map reclassification and an embedder change in sequence
+    repo_b_challenge: a brownfield repository whose adoption reclassifies half the tree
+    hidden_oracle_fault_class: a reclassified-as-archive file that the index still serves as current
+    chaos_scale_soak: 10^4 changed files in one incremental pass
+    retrieval_challenge: after a reclassification the reclassified material must leave default retrieval
+    not_challengeable: null
+  adoption_obligation: gov adopt build-memory must produce an index whose manifest is as complete as a greenfield one
+  residual_risk: an edge owned by an unchanged file survives its target's deletion in the store; the graph-integrity family
+    reports it dangling, so it is visible, but the edge itself is not removed until a full rebuild
+  findings: []
+- capability: D2
+  title: Retrieval router
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:315
+  governing_document_refs:
+  - framework Part IV §15 (retrieval routing)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: structured lookup for known IDs/paths
+    source_line: 316
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (structured/path routes)
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D2-b1-structured / D2-b1-path
+      — the known record ranks first
+    gap: null
+  - bullet: code/symbol route
+    source_line: 317
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:615-660 (structural_candidates)
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D2-b2-symbol
+    gap: null
+  - bullet: lexical route
+    source_line: 318
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (lexical route, FTS5)
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D2-b3-lexical
+    gap: null
+  - bullet: graph/impact route
+    source_line: 319
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:544-614 (graph_candidates), :992
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D2-b4-graph / D2-b4-code-impact
+      — graph answers rank first, not buried by fusion
+    gap: null
+  - bullet: semantic route
+    source_line: 320
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (semantic route)
+    - runtime/src/memory/embeddings.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D2-b5-semantic
+    gap: null
+  - bullet: multi-route fusion for complex questions
+    source_line: 321
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (reciprocal-rank fusion)
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D2-b6-fusion
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — every held-out category maps to a route and runs each suite run
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant index manifest
+    - model/retrieval profile
+    - relevant source files
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+  qualification_coverage:
+    repo_a_challenge: one query per route plus a compound question
+    repo_b_challenge: a brownfield repository where ids and paths differ from the greenfield conventions
+    hidden_oracle_fault_class: a dependency question answered by similarity instead of the graph
+    chaos_scale_soak: query latency under a large index (measured by the D5 benchmark)
+    retrieval_challenge: the six routes and their fusion
+    not_challengeable: null
+  adoption_obligation: the adopted index must answer the same route classes
+  residual_risk: route selection is heuristic over the query text; an unusual phrasing of a dependency question may miss the
+    graph route
+  findings: []
+- capability: D3
+  title: Hierarchical retrieval
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:323
+  governing_document_refs:
+  - framework Part IV §14.1 (hierarchical retrieval)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: document → section/record → child chunk
+    source_line: 324
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs:70-130
+    automated_evidence:
+    - gov audit family index_content_coverage
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D3-b1-doc-hierarchy
+    gap: null
+  - bullet: code file → module/class → function/symbol
+    source_line: 325
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/chunking.rs (code units)
+    - runtime/src/code_intelligence/generic.rs (units)
+    automated_evidence:
+    - gov audit family index_content_coverage
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D3-b2-code-hierarchy
+    gap: null
+  - bullet: child-first retrieval
+    source_line: 326
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (child chunks ranked)
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D3-b3-child-first
+    gap: null
+  - bullet: selective parent/graph-neighbour expansion
+    source_line: 327
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:1238-1250 (parent_expansion_top_n, neighbours)
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-C5-D2-D3-code-routes-hierarchy.sh D3-b4-expansion / D3-b4-selective
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — index_content_coverage checks that every line is held by a chunk at some level
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - relevant index manifest
+    - governing contract/policy (chunking pins)
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+  qualification_coverage:
+    repo_a_challenge: a long document and a class with several methods
+    repo_b_challenge: legacy documents with irregular heading structure
+    hidden_oracle_fault_class: a method whose body carries the answer while the file header does not
+    chaos_scale_soak: 'a very large file: chunking must stay bounded by max_chars'
+    retrieval_challenge: child-first retrieval with selective parent expansion
+    not_challengeable: null
+  adoption_obligation: the adopted index must use the same chunker version, or be rebuilt
+  residual_risk: none observed; the chunker version is part of the index pin, so a chunker change forces a rebuild
+  findings: []
+- capability: D4
+  title: Component separation
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:329
+  governing_document_refs:
+  - framework Part IV §14 (embeddings vs runtimes vs LLMs)
+  - decisions D-0005
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: embedding model
+    source_line: 330
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/profile.rs (model identity)
+    - runtime/src/memory/manifest.rs (components.embedder.model)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-embedding-model — separately identified
+      by the model block (id, revision, parameters, artefacts, sha256) of `components.embedder`
+    gap: null
+  - bullet: embedding runtime
+    source_line: 331
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/profile.rs (runtime identity)
+    - runtime/src/memory/manifest.rs (components.embedder.runtime)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-embedding-runtime — separately
+      identified by the runtime block (id, kind, sha256) and `runtime_digest`, distinct from the model
+    gap: null
+  - bullet: vector/index store
+    source_line: 332
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/db.rs:17-18 (vectors)
+    - runtime/src/memory/manifest.rs (counts.vectors)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-vector-store — separately identified
+      by its own `vectors` store and its own count in the manifest
+    gap: null
+  - bullet: lexical engine
+    source_line: 333
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/db.rs:16 (FTS5)
+    - runtime/src/memory/manifest.rs (lexical)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - 'release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-lexical-engine — separately identified
+      by `lexical: {engine, tokenizer}`, the tokenizer being part of the index pin'
+    gap: null
+  - bullet: graph engine
+    source_line: 334
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/db.rs:19-20 (edges)
+    - runtime/src/graph/mod.rs
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-graph-engine — separately identified
+      by its own `edges` store and its own count in the manifest
+    gap: null
+  - bullet: code intelligence
+    source_line: 335
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/mod.rs:70-85 (provider_identity)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-code-intelligence — separately
+      identified by the resolving adapter identity recorded per artefact
+    gap: null
+  - bullet: reranker
+    source_line: 336
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/profile.rs (reranker identity)
+    - runtime/src/memory/manifest.rs (components.reranker)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-reranker — separately identified
+      by its own component identity even when its provider is `none`
+    gap: null
+  - bullet: retrieval router
+    source_line: 337
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (strategy, routes, primary_route)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-retrieval-router — separately
+      identified by the strategy and the routes it used, reported on every packet and every query
+    gap: null
+  - bullet: generative/query-planning model
+    source_line: 338
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/routing.rs:15-60
+    - framework/policies/MODEL_ROUTING_POLICY.yaml
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-generative-model — separately
+      identified by resolved as a tier requirement against overlay-declared candidates, never named in kernel policy
+    gap: null
+  - bullet: context compiler
+    source_line: 339
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs (provenance.compiler)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D4-context-compiler — separately
+      identified by identified in every packet it produces (runtime and index version)
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — index_freshness reports the retrieval profile and its component identities each run
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - model/retrieval profile
+    - tool/plugin
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D4-D5-AC7-retrieval-profile.sh.out
+      (D4-replace-detected)
+  qualification_coverage:
+    repo_a_challenge: a repository whose components are each swapped in turn through the governed path
+    repo_b_challenge: a brownfield repository whose legacy index store must be replaced wholesale
+    hidden_oracle_fault_class: a component swapped under an unchanged pin
+    chaos_scale_soak: not relevant
+    retrieval_challenge: every retrieval must name the components that produced it
+    not_challengeable: null
+  adoption_obligation: adoption must record the component identities of the index it builds
+  residual_risk: 'the vector, graph and lexical stores are SQLite tables of one database: each is separately identifiable,
+    but replacing one independently is not a designed path'
+  findings: []
+- capability: D5
+  title: Evidence-driven retrieval model selection
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:342
+  governing_document_refs:
+  - framework Part IV §14.3 (evidence-driven model selection)
+  - research RES-0001
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: benchmark mechanism exists
+    source_line: 343
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/benchmark.rs:52-120
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D5-b1-b4
+    gap: null
+  - bullet: multiple candidate models/runtimes can be compared
+    source_line: 344
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/benchmark.rs:27-50 (candidate syntax)
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D5-b1-b4 — three candidates measured
+      in one run
+    gap: null
+  - bullet: golden/held-out retrieval queries exist
+    source_line: 345
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/heldout.rs
+    - governance/tests/memory/heldout.yaml
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D5-b3-heldout
+    gap: null
+  - bullet: Recall@K/MRR/precision/stale-hit/latency/resource metrics exist
+    source_line: 346
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs (run_heldout_with)
+    - runtime/src/memory/benchmark.rs
+    automated_evidence:
+    - gov audit family memory_retrieval_regression
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D5-b1-b4
+    gap: null
+  - bullet: selected embedder/reranker revisions are pinned
+    source_line: 347
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/profile.rs (component identities)
+    automated_evidence:
+    - gov audit family index_freshness
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D5-b5-pinned
+    gap: null
+  - bullet: changing them requires governed migration/reindex/regression
+    source_line: 348
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - 'runtime/src/memory/profile.rs:1000-1400 (select: evidence, gate, reindex, regression, rollback)'
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D4-D5-AC7-retrieval-profile.sh D5-b6-evidence / D5-b6-gate / D5-b6-no-forgery
+      / D5-b6-governed-change / D5-b6-governed-state; release/capability-baseline/verify-1/beta/heldout/t-C8-failure-memory.sh
+      C8-regression-rollback / C8-regression-restored
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  - G6
+  evidence_owners:
+  - G5
+  - human-gate
+  - independent-heldout
+  evidence_owner_actually_runs: true — the held-out regression runs each suite run; the selection itself is a human-gated
+    operation
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - model/retrieval profile
+    - relevant index manifest
+    - governing contract/policy
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D4-D5-AC7-retrieval-profile.sh.out
+      (D4-replace-detected, D5-b6-*)
+  qualification_coverage:
+    repo_a_challenge: benchmark three candidates, select one through the gate, and roll one back on a failed regression
+    repo_b_challenge: a brownfield repository whose legacy embedder must be replaced during adoption
+    hidden_oracle_fault_class: a pin edited directly, and a candidate that is measurably worse
+    chaos_scale_soak: benchmark cost on a large index (index_ms and vectors are reported)
+    retrieval_challenge: the held-out set is the retrieval challenge
+    not_challengeable: null
+  adoption_obligation: adoption must pin the profile it built and bind it to the evidence
+  residual_risk: the evidence a selection rests on is only as discriminating as the held-out set; the generated starter set
+    leaves its semantic queries pending and the product does not refuse or flag a selection made on it (V1-BETA-03)
+  findings:
+  - V1-BETA-03
+- capability: D6
+  title: Rebuild guarantee
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:350
+  governing_document_refs:
+  - framework Part IV §19 (rebuild guarantee)
+  - decisions D-0006
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: All derived memory/index state can be deleted and rebuilt.
+    source_line: 351
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/indexer.rs (rebuild)
+    - runtime/src/paths.rs:30-46 (STATE_DIR)
+    automated_evidence:
+    - gov audit family recovery_rebuild
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D6-rebuild-guarantee.sh D6-b1-deleted / D6-b1-rebuilt / D6-b1-reproducible
+    gap: null
+  - bullet: Fresh rebuild preserves authoritative structured state and claims where required.
+    source_line: 352
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/claims.rs
+    - runtime/src/orchestration/control.rs:37 (.governance-state/control.json)
+    automated_evidence:
+    - gov audit family recovery_rebuild
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D6-rebuild-guarantee.sh D6-b2-authoritative / D6-b2-claims / D6-b2-control
+      / D6-classification
+    gap: null
+  - bullet: Fresh-agent reconstruction succeeds after rebuild.
+    source_line: 353
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/status.rs
+    - runtime/src/orchestration (continue)
+    automated_evidence:
+    - gov audit family fresh_agent_reconstruction
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D6-rebuild-guarantee.sh D6-b3-fresh-agent / D6-b3-next-action
+    gap: null
+  - bullet: Multi-machine/path-independent rebuild is deterministic where required.
+    source_line: 354
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/manifest.rs:19-22 (manifest_hash excludes built_at and repo path)
+    automated_evidence:
+    - gov audit family recovery_rebuild
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-D6-rebuild-guarantee.sh D6-b4-path-independent / D6-b4-no-paths
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  - release-clean-clone
+  evidence_owner_actually_runs: true — the recovery_rebuild and fresh_agent_reconstruction families run each suite run
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - relevant source files
+    - authoritative spec/decision
+    - model/retrieval profile
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D6-rebuild-guarantee.sh.out
+  qualification_coverage:
+    repo_a_challenge: delete all derived state and rebuild; then rebuild the same tree at another path
+    repo_b_challenge: a brownfield repository rebuilt after adoption
+    hidden_oracle_fault_class: a claim or an emergency-control state that a rebuild silently drops
+    chaos_scale_soak: rebuild under a concurrent claim
+    retrieval_challenge: the rebuilt index must reproduce the manifest hash
+    not_challengeable: null
+  adoption_obligation: gov adopt build-memory is the same rebuild path
+  residual_risk: none observed for the derived classes; the operational store (.governance-state) is not rebuildable by construction
+    and is classified accordingly
+  findings: []
+- capability: R1
+  title: Legacy Governance Retirement
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:872
+  governing_document_refs:
+  - framework Part XX §69-70
+  - GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0 §§4-11
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: activate current authority
+    source_line: 873
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/adopt.rs (A6 migrate)
+    - runtime/src/migrations/executor.rs
+    automated_evidence:
+    - cargo test --test certification (brownfield)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b1-activate
+    gap: null
+  - bullet: mark old governance LEGACY
+    source_line: 874
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/classify.rs:18-48 (legacy_mechanisms, LEGACY_KINDS)
+    automated_evidence:
+    - gov audit family legacy_authority
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b2-legacy-marked
+    gap: null
+  - bullet: inventory
+    source_line: 875
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/inventory.rs
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b3-inventory
+    gap: null
+  - bullet: extract useful decisions/lessons/skills/evidence/research
+    source_line: 876
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/extraction.rs:1-130 (not cue-gated; residual register)
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b4-extract / R1-b4-all-kinds — planted
+      skill, research and evidence units all survive
+    gap: null
+  - bullet: reconcile contradictions
+    source_line: 877
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/classify.rs (conflicting authority)
+    - runtime/src/context/contradictions.rs
+    automated_evidence:
+    - gov audit family authority_unambiguous
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b5-contradictions
+    gap: null
+  - bullet: retire/remove duplicate mechanisms
+    source_line: 878
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/planner.rs (MOVE/DELETE_FROM_ACTIVE_TREE)
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b6-retired
+    gap: null
+  - bullet: verify no active dependency remains
+    source_line: 879
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/verify.rs:690-760 (legacy_not_active, retirement_references)
+    - runtime/src/migrations/references.rs
+    automated_evidence:
+    - gov audit family legacy_authority
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R1-b7-refs-reported / R1-b7-dependency-proof
+      / R1-b7-tests-executed
+    gap: null
+  health_scheduler_tiers:
+  - G4
+  - G5
+  evidence_owners:
+  - G5
+  - human-gate
+  - independent-heldout
+  evidence_owner_actually_runs: true — legacy_authority runs each suite run; the retirement itself is gated and independently
+    verified
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - authoritative spec/decision
+    - project path map
+    - relevant source files
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1b-staleness-cite-currency.sh.out
+  qualification_coverage:
+    repo_a_challenge: 'not relevant: R1 is a brownfield obligation'
+    repo_b_challenge: 'the brownfield fixture: two old-governance documents, three provider rule files, a duplicate decision,
+      a contradicting pair and planted secrets'
+    hidden_oracle_fault_class: a retirement whose reference is still live, and legacy knowledge with no cue word
+    chaos_scale_soak: a legacy tree of 10^4 files
+    retrieval_challenge: retired material must leave default retrieval while its extracted knowledge stays reachable
+    not_challengeable: null
+  adoption_obligation: this capability IS the adoption obligation (stages A0-A8)
+  residual_risk: the dependency proof is only as good as the reviewer's tests; the product refuses an approval that carries
+    none, which is the control that makes it sound
+  findings: []
+- capability: R2
+  title: Chat-memory retirement
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:881
+  governing_document_refs:
+  - framework Part XX §70
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: some bullets are executably evidenced and some are not; see the per-bullet gaps
+  na_reason_normative_text: null
+  partial_qualification_impact: 'CANNOT_UNDERMINE: The one unmet half of the fourth bullet is that retirement is not executed
+    as a change-impact transaction. What it IS executed as — gated migration batches whose independently authored tests roll
+    a batch back, a per-store dependency proof, a full index rebuild and a held-out regression that refuses builder-only queries
+    — carries every property CIT-E would give the qualification scenario: simulated impact, a human gate, an atomic outcome
+    and recorded evidence. A qualification repository that retires a legacy store is therefore governed and measurable either
+    way.'
+  bullets:
+  - bullet: raw chat DB is not active/default truth
+    source_line: 882
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/classify.rs (HISTORICAL)
+    - runtime/src/retrieval/mod.rs (default_retrieval)
+    automated_evidence:
+    - gov audit family secrets_sensitivity_indexing
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R2-b1-not-default / R2-b1-classified
+    gap: null
+  - bullet: unique durable knowledge extracted
+    source_line: 883
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/extraction.rs
+    automated_evidence:
+    - cargo test --lib
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R2-b2-extracted
+    gap: null
+  - bullet: dependency proof before retirement
+    source_line: 884
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/extraction.rs (dependency_proof)
+    - runtime/src/migrations/references.rs
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R2-b3-dependency-proof
+    gap: null
+  - bullet: CIT-E/index refresh/regression on retirement
+    source_line: 885
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/adopt.rs (A9 build-memory, A10 verify-memory)
+    - runtime/src/migrations/extraction.rs (dependency_proof)
+    automated_evidence:
+    - gov audit family index_freshness
+    - cargo test --test certification (brownfield)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R2-b4-reindex — A9 rebuilds the index
+      and records its counts and manifest hash; A10 then runs the held-out regression and refuses a set that is only the builder's
+      (INDEPENDENT_HELDOUT_REQUIRED), see release/capability-baseline/verify-1/beta/evidence/prior/A10-verify-memory.json.
+      `gov cit list` on the same project is empty and the A8 result carries no cit or gate reference, so no CIT-E is involved
+    gap: the index refresh and the regression both happen on retirement; the retirement is NOT executed as a CIT-E transaction
+      — it runs through the adoption stages (gated migration batches with independently authored tests, a per-store dependency
+      proof, A9 rebuild, A10 regression), which is a governed path of at least equal strength but is not the mechanism this
+      bullet names
+  health_scheduler_tiers:
+  - G4
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — secrets_sensitivity_indexing and legacy_authority cover the retired stores
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - project path map
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out
+  qualification_coverage:
+    repo_a_challenge: 'not relevant: a greenfield repository has no chat store'
+    repo_b_challenge: the brownfield fixture's .chat/sessions.jsonl and memory/chat_history.sql
+    hidden_oracle_fault_class: a chat store that answers a current question
+    chaos_scale_soak: a chat store of 10^6 lines
+    retrieval_challenge: no default query may be answered from a raw chat store
+    not_challengeable: null
+  adoption_obligation: stages A2, A3 and A8 carry this obligation
+  residual_risk: what counts as 'unique durable knowledge' is a heuristic; the residual register is the control that keeps
+    nothing silently lost
+  findings:
+  - V1-BETA-09
+- capability: R3
+  title: Archive policy
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:887
+  governing_document_refs:
+  - framework Part XX §70
+  - framework/policies/ARCHIVE_POLICY.yaml
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every checklist bullet is implemented and executably evidenced on this candidate by the held-out probe
+    named per bullet
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: historical/superseded material excluded from default current retrieval
+    source_line: 888
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/retrieval/mod.rs:428-433 (default_retrieval)
+    - framework/policies/ARCHIVE_POLICY.yaml
+    automated_evidence:
+    - gov audit family memory_retrieval_regression (superseded_hit_rate 0)
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R3-b1-default; release/capability-baseline/verify-1/beta/heldout/t-D1-incremental-freshness.sh
+      D1-reclass-retrieval
+    gap: null
+  - bullet: Git history preferred over unnecessary dead-code archive
+    source_line: 889
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/migrations/planner.rs (DELETE_FROM_ACTIVE_TREE)
+    - framework/policies/ARCHIVE_POLICY.yaml unused_code_action
+    automated_evidence:
+    - cargo test --test certification
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R3-b2-git-preferred
+    gap: null
+  - bullet: deliberate reference implementations may be retained explicitly
+    source_line: 890
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/policies/ARCHIVE_POLICY.yaml archive_when/archive_subdirs
+    automated_evidence:
+    - gov audit family path_map_compliance
+    independent_evidence:
+    - release/capability-baseline/verify-1/beta/heldout/t-R1-R2-R3-legacy-archive.sh R3-b3-reference-impl
+    gap: null
+  health_scheduler_tiers:
+  - G5
+  evidence_owners:
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — the held-out set's superseded/stale-hit rates are measured each run
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs:
+    - project path map
+    - relevant index manifest
+    invalidation_demonstrated: true
+    invalidation_evidence: release/capability-baseline/verify-1/beta/evidence/heldout/t-D1-incremental-freshness.sh.out (D1-reclass-retrieval)
+  qualification_coverage:
+    repo_a_challenge: an archive directory whose content must never answer a current query
+    repo_b_challenge: a brownfield repository whose archive is created by adoption
+    hidden_oracle_fault_class: archived material indexed as current
+    chaos_scale_soak: not relevant
+    retrieval_challenge: stale-hit and superseded-hit rates must be zero
+    not_challengeable: null
+  adoption_obligation: adoption creates the archive and its class
+  residual_risk: 'the archive is write-only from the fabric''s point of view: no product path can request it (V1-BETA-05),
+    so archived knowledge is reachable only through Git or a direct file read'
+  findings:
+  - V1-BETA-05

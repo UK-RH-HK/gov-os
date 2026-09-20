@@ -1,0 +1,26 @@
+# V1-BETA-04 — two consecutive `gov audit` runs on an untouched provisioned corpus
+run 1: audit=AUD-0002 verdict=HEALTHY green=True inputs_hash=862496c08525
+run 2: audit=AUD-0003 verdict=HEALTHY green=True inputs_hash=e151a3057138
+run 3: audit=AUD-0004 verdict=HEALTHY green=True inputs_hash=e151a3057138
+run 4: audit=AUD-0005 verdict=HEALTHY green=True inputs_hash=e151a3057138
+
+# which input classes the run itself changed (run 1 -> run 2):
+  index_manifest: 0fd6de21cf1a -> e170f594e13f
+  spec_tasks: 79ba3b6f3e43 -> 56075f9c7d5e
+
+# a task close refusing on a class that only its own G2 run wrote:
+  $ gov audit   (once)
+{"audit": "AUD-0006", "green": true}
+  $ gov task close TASK-0004
+{"ok": false, "code": "GOVERNANCE_SUITE_STALE", "message": "governance-affecting work cannot close on stale green evidence: green record \"AUD-0006\" is obsolete (inputs changed: evidence_records); run `gov health run` (re-checks only the checks the changed inputs impact) or `gov audit`"}
+  (spec/reports/memory-quality written by that close:)
+FAIL-0001.yaml
+FAIL-0002.yaml
+FAIL-0003.yaml
+FAIL-0004.yaml
+FAIL-0005.yaml
+FAIL-0006.yaml
+FAIL-0007.yaml
+FAIL-0008.yaml
+FAIL-0009.yaml
+FAIL-0010.yaml

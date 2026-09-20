@@ -1,0 +1,23 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS R1-b3-inventory — the cold inventory enumerates the whole tree and names the legacy governance, provider rule, chat-store and secret material it found
+PASS R1-b2-legacy-marked — old governance is classified GOVERNANCE_LEGACY with authority LEGACY, and nothing is left unclassified
+PASS R1-b5-contradictions — contradicting authority is detected and counted, not silently merged
+PASS R1-b7-refs-reported — the path map reports every retirement that still has an active reference, before any file moves
+PASS R1-review-independent — the migration plan is approved only with tests the independent reviewer authored (the planner's scaffold alone is refused)
+PASS R1-b7-dependency-proof — a retirement whose reference is still live fails the independent reviewer's dependency test and the batch is rolled back, with downstream batches not executed
+PASS R1-b1-activate — current authority is installed and active (kernel + overlay + lock)
+PASS R1-b6-retired — the retired legacy mechanisms are moved out of the active tree into the archive
+PASS R1-b7-tests-executed — migration verification executes every test including the reviewer's own, and proves no legacy mechanism is left active, nothing active cites archived material, and the secrets stayed isolated
+PASS R1-b4-extract — useful material is extracted out of the legacy governance into governed records
+PASS R1-b4-all-kinds — a skill procedure, a research finding and an evidence claim planted in the legacy governance all survive retirement as governed material (distilled records or the residual-knowledge register), none silently lost
+PASS R2-b1-not-default — the raw chat stores are not active or default truth: they answer no default query
+PASS R2-b1-classified — the chat stores are classified historical, not authoritative
+PASS R2-b2-extracted — the extraction pass accounts for the durable knowledge in the chat stores
+PASS R2-b3-dependency-proof — retirement of the chat stores is covered by the same executed dependency proof
+PASS R2-b4-reindex — retirement is followed by a governed index rebuild whose result is recorded
+PASS R3-b1-default — archived material (archive/governance/legacy-rules/AGENT_RULES_v2.md) is excluded from default current retrieval
+FAIL R3-b1-explicit — archived material is unreachable through the fabric on any explicit request: the admission filter's include_archive option (retrieval/mod.rs:35,431) is never set true by any caller, and no CLI flag reaches it; --include-historical lifts only the superseded/authority filter
+PASS R3-b2-git-preferred — dead/unused code is deleted from the active tree (Git history preferred) rather than copied into the archive
+PASS R3-b3-reference-impl — a deliberate reference implementation may be retained explicitly (its own archive class and subdirectory)
+--- t-R1-R2-R3-legacy-archive.sh: 19 passed, 1 failed
