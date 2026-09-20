@@ -1,0 +1,6 @@
+# P2-AR-0043: WS-3's labelled derived copy (IP-R3-WS03-9), run unedited from its own evidence directory, through the same owner-channel shim
+# derived probe release/capability-baseline/repair-1/r3-ws03/evidence/probes/derived/A5-emergency-controls.store-path.P2-AR-0034.py sha256 4166522f5398c6a434c3b966e965f656768b13c0cb86717ee01512a2904d0ed9
+# worktree HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff; real gov 512913ef3ac53f8d568f48b7cead5f241b2f54ece472a73cdf58decfa3391112 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/P2-AR-0043/ap/mirror-shim-77f94a52745d/target/release/gov
+# date 2026-09-19T19:44:59Z
+python3: can't open file '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/P2-AR-0043/ap/mirror-shim-77f94a52745d/release/capability-baseline/audit-0/alpha-r/evidence/release/capability-baseline/repair-1/r3-ws03/evidence/probes/derived/A5-emergency-controls.store-path.P2-AR-0034.py': [Errno 2] No such file or directory
+[exit=2]

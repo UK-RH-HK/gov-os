@@ -1,0 +1,37 @@
+# chunk: ws08 ws08_r2 ws08_r3  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:32:34Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.93s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 23 tests
+test ws08::certification_is_taken_only_from_the_trust_root ... ok
+test ws08_r2::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written ... ok
+test ws08::framework_lock_records_the_verified_identity_and_its_basis ... ok
+test ws08_r2::a_provisioned_machine_never_installs_in_bootstrap_mode ... ok
+test ws08_r2::a_corrupt_or_racing_embedded_kernel_cache_is_never_installed ... ok
+test ws08_r2::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress ... ok
+test ws08::a_machine_that_did_not_install_the_project_verifies_the_pinned_release_first ... ok
+test ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed ... ok
+test ws08::an_unauthenticated_installation_is_never_presented_as_current ... ok
+test ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it ... ok
+test ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record ... ok
+test ws08_r3::the_health_checks_ship_in_the_payload_exactly_when_the_kernel_scanner_finds_them_clean ... ok
+test ws08_r3::the_next_kernel_payload_is_version_consistent_and_release_build_refuses_drift ... ok
+test ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root ... ok
+test ws08_r2::an_unprovisioned_machine_does_not_trust_kernel_material_it_never_admitted ... ok
+test ws08_r2::update_applies_only_on_a_verified_authorising_answer ... ok
+test ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified ... ok
+test ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current ... ok
+test ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back ... ok
+test ws08_r3::a_binding_authority_is_not_installed_below_floor ... ok
+test ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite has been running for over 60 seconds
+test ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere has been running for over 60 seconds
+test ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite ... ok
+test ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion has been running for over 60 seconds
+test ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere ... ok
+test ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 117.23s
+
+[exit=0]

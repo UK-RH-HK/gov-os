@@ -1,0 +1,72 @@
+# P2-AR-0043: WS-3's labelled derived copy (IP-R3-WS03-9), run unedited from its own evidence directory, through the same owner-channel shim (mode as the unedited run)
+# derived probe release/capability-baseline/repair-1/r3-ws03/evidence/probes/derived/A5-emergency-controls.store-path.P2-AR-0034.py sha256 4166522f5398c6a434c3b966e965f656768b13c0cb86717ee01512a2904d0ed9
+# worktree HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff; real gov 512913ef3ac53f8d568f48b7cead5f241b2f54ece472a73cdf58decfa3391112 via /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/P2-AR-0043/ap/mirror-shim-77f94a52745d/target/release/gov
+# date 2026-09-19T19:45:15Z
+## [E5a] authority gating of the controls
+[E5a] pause as backend-engineer     -> REFUSED AUTHORITY_DENIED
+[E5a] freeze-writes as independent-auditor  -> REFUSED AUTHORITY_DENIED
+[E5a] pause as not-a-role           -> REFUSED UNKNOWN_ROLE
+
+## [E1] PAUSE (change-controller, L3)
+[E1] pause -> True | control.json = {"agents_cancelled": false, "mode": "PAUSED", "reason": "incident-42: runaway agent", "role": "change-controller", "session": "S-operator", "updated_at": "2026-09-19T19:45:19Z", "writes_frozen": false}
+[E1] task create        while PAUSED -> REFUSED PAUSED
+[E1] checkpoint create  while PAUSED -> REFUSED PAUSED
+[E1] cit propose        while PAUSED -> REFUSED PAUSED
+[E1] gate create        while PAUSED -> REFUSED PAUSED
+[E1] gov continue while PAUSED -> null | governed files changed by `continue`: []
+[E1] gov status: control.mode = PAUSED | next_action = paused: resolve the pause reason, then `gov resume`
+[E5b] pause twice (idempotent/deterministic): mode = PAUSED | writes_frozen = False
+
+## [E5c] RESUME authority: change-controller (L3) vs orchestrator (L4)
+[E5c] resume as change-controller -> REFUSED AUTHORITY_DENIED
+[E5c] resume as orchestrator -> ok | control.json = {"agents_cancelled": false, "mode": "RUNNING", "reason": null, "role": "orchestrator", "session": "S-owner", "updated_at": "2026-09-19T19:45:19Z", "writes_frozen": false}
+
+## [E2] FREEZE_WRITES: which commands still change governed state (spec/, governance/)?
+[E2] control.json = {"agents_cancelled": false, "mode": "RUNNING", "reason": "incident-43: freeze", "role": "change-controller", "session": "S-5fac00721efb", "updated_at": "2026-09-19T19:45:19Z", "writes_frozen": true}
+[E2] task create --objective                  -> REFUSED FROZEN               | governed files changed: []
+[E2] task status TASK-0002                    -> REFUSED FROZEN               | governed files changed: []
+[E2] task release TASK-0002                   -> REFUSED FROZEN               | governed files changed: []
+[E2] cit propose --proposal                   -> REFUSED FROZEN               | governed files changed: []
+[E2] gate create --question                   -> REFUSED FROZEN               | governed files changed: []
+[E2] gate present HDG-0001                    -> REFUSED FROZEN               | governed files changed: []
+[E2] decide HDG-0001 --option                 -> REFUSED FROZEN               | governed files changed: []
+[E2] handoff create --to-role                 -> REFUSED FROZEN               | governed files changed: []
+[E2] checkpoint create --next-action          -> REFUSED FROZEN               | governed files changed: []
+[E2] readiness plan F-0001                    -> REFUSED FROZEN               | governed files changed: []
+[E2] continue                                 -> REFUSED FROZEN               | governed files changed: []
+[E2] route --record /tmp/claude-1000/-home-us -> REFUSED FROZEN               | governed files changed: []
+[E2] upstream prepare L-0001                  -> REFUSED FROZEN               | governed files changed: []
+[E2] adopt baseline                           -> REFUSED FROZEN               | governed files changed: []
+[E2] rebuild-memory                           -> ok                           | governed files changed: ['governance/generated/index-manifest.json', 'governance/generated/memory-manifest.json']
+[E2] adapters generate                        -> REFUSED FROZEN               | governed files changed: []
+[E2] tools registry                           -> REFUSED FROZEN               | governed files changed: []
+[E2] claims sweep                             -> REFUSED FROZEN               | governed files changed: []
+[E2] recover                                  -> REFUSED FROZEN               | governed files changed: []
+[E2] audit                                    -> REFUSED FROZEN               | governed files changed: []
+[E2] gate revoke HDG-0001                     -> REFUSED FROZEN               | governed files changed: []
+[E2] writes_frozen still: True
+
+## [E3] CANCEL_AGENTS (claims held by S-agent-1 / S-agent-2; an open handoff)
+[E3] claims before: []
+[E3] cancel-agents -> True | control.json = {"agents_cancelled": true, "mode": "PAUSED", "reason": "incident-44: cancel all agents", "role": "change-controller", "session": "S-2d002d2edb4b", "updated_at": "2026-09-19T19:45:25Z", "writes_frozen": false}
+[E3] claims after cancel-agents: []
+[E3] handoff records after cancel-agents: [('HND-0001', 'ACTIVE', 'OPEN', 'backend-engineer')]
+[E3] cancelled agent S-agent-1 tries to close its task -> REFUSED PAUSED
+[E3] after resume, the 'cancelled' agents' claims: []
+
+## [E4] ROLLBACK_TRANSACTION (gov cit rollback) and the intent mapping
+[E4] simulate: radius = R2 | gate = HDG-0002
+[E4] approve (after the gate was presented and answered): True None
+[E4] execute: True None | file exists = True
+[E4] cit rollback as backend-engineer (L1) -> REFUSED AUTHORITY_DENIED
+[E4] cit rollback as change-controller while FROZEN -> ok | file exists after = False | cit_status = ROLLED_BACK
+[E4] gov intent 'roll back the last change' -> {"intent": "ROLLBACK", "text": "roll back the last change", "plan": ["rollback_transaction"], "commands": ["gov cit rollback <CIT>"], "pending_cit": null, "pending_gate": "HDG-0001"}
+
+## [E6] is recovery from the emergency auditable?
+[E6] control.json now = {"agents_cancelled": false, "mode": "RUNNING", "reason": null, "role": "orchestrator", "session": "S-6c1fe1f5d023", "updated_at": "2026-09-19T19:45:30Z", "writes_frozen": false}
+[E6] telemetry events for the controls (derived runtime, gitignored): [('cli.pause', 'backend-engineer', 'S-74d987b5202b', {'ok': False, 'duration_ms': 7, 'error': 'AUTHORITY_DENIED'}), ('cli.freeze-writes', 'independent-auditor', 'S-5a27cf57b6c5', {'ok': False, 'duration_ms': 8, 'error': 'AUTHORITY_DENIED'}), ('cli.pause', 'not-a-role', 'S-8e30346799df', {'ok': False, 'duration_ms': 2, 'error': 'UNKNOWN_ROLE'}), ('cli.pause', 'change-controller', 'S-operator', {'ok': True, 'duration_ms': 12, 'error': None}), ('cli.pause', 'change-controller', 'S-09a0ab983fd7', {'ok': True, 'duration_ms': 13, 'error': None}), ('cli.resume', 'change-controller', 'S-51d29772046a', {'ok': False, 'duration_ms': 8, 'error': 'AUTHORITY_DENIED'}), ('cli.resume', 'orchestrator', 'S-owner', {'ok': True, 'duration_ms': 12, 'error': None}), ('cli.freeze-writes', 'change-controller', 'S-81dc220b9064', {'ok': True, 'duration_ms': 122, 'error': None})]
+[E6] any incident reason ('incident-4x') retained anywhere after resume: {'telemetry': False, 'control.json': False, 'governed records (spec/, governance/)': []}
+[E6] .governance-runtime is gitignored: True
+
+DONE
+[exit=0]
