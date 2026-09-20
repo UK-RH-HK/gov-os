@@ -15,7 +15,8 @@ or an iteration-0 audit.
 | `t06-gate-b-contract-freshness.out` | `heldout/t06_gate_b_contract_freshness.py` — B1–B3, the derived contract views, freshness |
 | `t07-prior-findings.out` | `heldout/t07_prior_findings.py` — first-hand disposition of the remaining iteration-0 findings |
 | `cargo-lib.out` | `cargo test --lib` in this worktree (regression evidence, O3) |
-| `cargo-certification.out` | `cargo test --test certification` in this worktree (regression evidence, O3) |
+| `cargo-certification.out` | `cargo test --test certification` in this worktree — **207 passed, 0 failed** (regression evidence, O3) |
+| `cargo-certification.timing-note.md` | why that suite landed after this report was first committed |
 
 Re-run everything with `../heldout/RUN-ALL`. Each suite prints one `PASS`/`FAIL` line per check. The
 checks that fail on this candidate are the findings in `../findings.yaml`; RUN-ALL exits non-zero
