@@ -1,0 +1,40 @@
+== J1.b1-b7  every J1 field is required before a research output is governed evidence
+PASS  J1.1 question-only record refused
+PASS  J1.2 the refusal names each missing J1 field
+PASS  J1.3 a record missing 'reason' alone is refused
+PASS  J1.3 a record missing 'method' alone is refused
+PASS  J1.3 a record missing 'sources' alone is refused
+PASS  J1.3 a record missing 'measurements' alone is refused
+PASS  J1.3 a record missing 'uncertainty' alone is refused
+PASS  J1.3 a record missing 'conclusion' alone is refused
+PASS  J1.3 a record missing 'confidence' alone is refused
+== J1  a complete record becomes EVIDENCE; a draft does not
+PASS  J1.4 complete record is CONCLUDED
+PASS  J1.5 a concluded record stands as EVIDENCE
+PASS  J1.6 a draft is held reference-only (NARRATIVE), not evidence
+== J1.b8  influenced decisions/tasks are derived, reported when unrecorded, and back-filled
+   influences (before sync): {"recorded": [], "derived": ["TASK-0002"], "not_recorded": ["TASK-0002"]}
+PASS  J1.7 a task that relies on the research is derived as an influence
+PASS  J1.8 an unrecorded influence is reported as a finding
+PASS  J1.9 sync records the influence backlink
+   NOTE (not asserted): a task citing the research in an undeclared field (TASK-0003) derives ['TASK-0002']
+== J2  experiment lifecycle (hypothesis/question, method/data)
+PASS  J2.1 a design with no hypothesis/method/data is refused
+PASS  J2.2 an experiment whose declared output is in the production tree is refused at design
+PASS  J2.3 a complete design is DESIGNED
+PASS  J2.4 concluding before the run is refused (lifecycle is enforced)
+PASS  J2.5 a recorded run moves it to RUNNING (results recorded)
+PASS  J2.6 the run binds its results and its inputs by digest
+-- reproducibility is judged by the OS from the runs, not declared
+PASS  J2.7 an agreeing reproduction is judged to agree
+PASS  J2.8 a disagreeing reproduction is judged not to agree
+   reproducibility after one agreeing and one disagreeing run: {"acceptance": {"mode": "exact"}, "status": "NOT_REPRODUCED"}
+PASS  J2.9 a disagreement leaves reproducibility short of REPRODUCIBLE
+PASS  J2.10 conclusion records interpretation and decision influence
+== J2  production merge prohibited where experimental
+PASS  J2.11 an experiment-class task records production_merge_allowed: false
+PASS  J2.12 an experiment task whose mutations land in the production tree cannot close
+PASS  J2.13 experiment check reports production-merge detection
+   close with the production write reverted -> PRODUCT_TEST_EVIDENCE_REQUIRED
+PASS  J2.15 the production-merge refusal is scoped: it disappears once the production write is gone
+---- J-research-experiment.sh: 29 passed, 0 failed

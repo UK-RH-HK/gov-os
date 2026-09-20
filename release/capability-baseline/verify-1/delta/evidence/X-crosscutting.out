@@ -1,0 +1,57 @@
+== X1  the availability rule for an active health hard block
+   state=RED blocks=2
+PASS  X1.1 a high-severity condition raises an active hard block
+PASS  X1.2 every block names its scope, its subjects, the operations it refuses and its remedies
+   refuses: cit.execute,release.build,task.close,update.apply
+   remedies: cit.approve,cit.execute,cit.propose,handoff.create,task.claim,task.create,update.apply
+   operations that are both refused and listed as a remedy: cit.execute,update.apply
+     guard cit.execute -> HEALTH_HARD_BLOCK cit.execute is refused here: 1 active hard-block(s) govern it and it is admissible only as their remedy, e.g. check sche
+PASS  X1.3 'cit.execute' is admitted as the block's own remedy, not refused outright
+     guard update.apply -> HEALTH_HARD_BLOCK update.apply is refused here: 1 active hard-block(s) govern it and it is admissible only as their remedy, e.g. check sch
+PASS  X1.3 'update.apply' is admitted as the block's own remedy, not refused outright
+PASS  X1.4 handoff.create is a listed remedy (a remediation handoff can be made under the block)
+PASS  X1.5 handoff.create is actually available while the block is active
+PASS  X1.6 the block leaves 'gov task create --class documentation --objective remediation --status READY --allowed docs/** --fields {"role":"routine-documentation"}' available
+PASS  X1.6 the block leaves 'gov task dag' available
+PASS  X1.6 the block leaves 'gov health status' available
+PASS  X1.6 the block leaves 'gov gate list' available
+   task.close of the covered subject -> MUTATION_SCOPE_VIOLATION
+PASS  X1.7 the refusal of the protected operation is typed and names the subject it protects
+== X2  cross-machine continuity (P2-ADJ-0002) for gates, decisions and CIT state
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+KeyError: 'decision'
+   machine B sees the gate: {"t2": {"binding": "VERIFIED", "key_id": "verify1-delta-owner/b98e0d0132cbd646", "scope": "provisioned", "operation": "gate answer", "at": "2026-09-20T22:41:49Z"}, "answer_verified": true}
+PASS  X2.1 a gate answered on machine A is honoured on machine B
+PASS  X2.2 the owner-signed answer re-verifies on machine B against the same anchor
+PASS  X2.3 the CIT state written on machine A is honoured on machine B
+PASS  X2.4 the decision written on machine A is honoured on machine B
+PASS  X2.5 a hand-edited record is refused on machine B too
+   foreign-owner machine, gate T2 standing: {"binding": "FOREIGN", "key_id": "verify1-delta-owner/b98e0d0132cbd646", "scope": "provisioned", "reason": "sealed under binding key verify1-delta-owner/b98e0d0132cbd646, which this machine does not hold (a machine of another owner or project, or a machine whose administrator has not bound it to that authority); not verifiable on this machine"}
+PASS  X2.6 a machine provisioned from a foreign owner's root does not honour the facts
+PASS  X2.6b the owner-signed answer does not verify under a foreign root
+   foreign-owner machine, CIT state: {"alg": "hmac-sha256/t2-v2", "scope": "provisioned", "authority": "verify1-delta-owner", "key_id": "b98e0d0132cbd646", "machine": "8dd543083737a50aa3b7fa4ed9f6b3dd", "operation": "cit execute", "at": "2026-09-20T22:42:31Z", "mac": "f6aee1b618ebe3f88350376bd142afc12cb662cb503be990b5a77f3569ad7a95"}
+   unprovisioned machine human channel: {
+  "ok": true,
+  "command": "trust",
+  "result": {
+    "available": false,
+    "anchor": null,
+    "unavailable_reason": {
+      "code": "HUMAN_CHANNEL_UNAVAILABLE",
+      "message": "no authenticated human channel exists on this machine: this machine holds no Signed Release Root, and human answers
+PASS  X2.7 an unprovisioned machine has no human channel, typed
+PASS  X2.8 the refusal names provisioning as the remediation
+PASS  X2.9 no private key or shared secret is stored in the repository
+PASS  X2.10 gov verifies and never signs (no signing entry point on the product surface)
+== X3  the worker-return contract and the close receipt (D-0007 trust classes)
+PASS  X3.1 a schema-valid worker return is accepted by gov handoff return
+   the same worker return used as the close receipt -> INDEX_STALE
+PASS  X3.2 the worker return's status is no longer rejected by the close receipt schema (S0-W5-01)
+== X4  freshness: changing a relevant input makes prior green evidence stale
+   currency key before: 35f31c0457ee3d96
+   currency key after a policy change: ffb2a6b974916441
+PASS  X4.1 changing a governing policy changes the evidence currency key
+PASS  X4.2 the currency report names what changed since the latest green record
+   closing governance-affecting work on the stale record -> MUTATION_SCOPE_VIOLATION
+---- X-crosscutting.sh: 26 passed, 0 failed

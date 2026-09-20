@@ -1,0 +1,43 @@
+PASS  K2.0 baseline: an implementation task closes DONE against REQ-0001
+== K1  a proposed material change is traversed deterministically
+   radius=R1 affected=[{'node': 'F-0001', 'hop': 1, 'via': 'GOVERNED_BY → REQ-0001'}, {'node': 'RPT-0001', 'hop': 1, 'via': 'CONSUMES → REQ-0001'}, {'node': 'RPT-0002', 'hop': 1, 'via': 'CONSUMES → REQ-0001'}, {'node': 'TASK-0001', 'hop': 1, 'via': 'CONSUMES → REQ-0001'}, {'node': 'TASK-0002', 'hop': 1, 'via': 'CONSUMES → REQ-0001'}]
+PASS  K1.1 the manifest's targets seed a graph traversal that reaches linked artefacts
+PASS  K1.2 the traversal reaches the completed task that implemented the seed
+PASS  K1.3 semantic/lexical candidates supplement the deterministic set, each with its route
+PASS  K1.4 an impact radius is produced
+PASS  K1.5 human-readable consequences are surfaced
+PASS  K1.6 re-simulating the same manifest over unchanged state is deterministic (same impact digest)
+== delta duty: CIT state is sealed (T2), and a hand-edited CIT is not honoured
+PASS  K2.1 CIT state carries an OS seal
+   hand-edited CIT execute -> T2_UNBOUND
+PASS  K2.2 a hand-edited CIT record is refused: its OS seal no longer verifies
+PASS  K2.2b the governance suite reports the tampered CIT state at high severity
+== K2  the gate decides; execution without an honoured answer is refused
+PASS  K2.3 a material change raises its human gate
+PASS  K2.4 execution before the gate is answered is refused
+PASS  K2.5 the CIT is approved once the owner's signed answer is honoured
+PASS  K2.6 an approved CIT commits
+== K2  authoritative updates, propagation, derived views, index refresh
+PASS  K2.7 the authoritative record carries the change the manifest declared
+PASS  K2.8 the DONE task that implemented the seed is marked for revalidation/retest
+PASS  K2.9 a revalidation task is generated for the completed work
+PASS  K2.10 the acceptance obligation within the radius is marked stale
+PASS  K2.11 the checkpoint that captured the pre-change state is reported stale
+PASS  K2.12 CIT-E refreshes the index (manifest hash changed)
+PASS  K2.13 the executed writes are bound in the CIT's sealed state
+== K2  derived-view regeneration (the derived views are rebuilt from authoritative state by CIT-E)
+   execute -> OK ; tool registry rebuilt=1 ; adapter manifest rebuilt=1
+PASS  K2.13b CIT-E regenerates the derived views from the committed authoritative state
+== K2  verification and atomic rollback of a failed transaction
+   bad CIT execute -> VERIFICATION_FAILED
+PASS  K2.14 a transaction that fails verification is rolled back, not half-applied
+PASS  K2.15 the rollback restores every file the failed transaction wrote
+PASS  K2.16 the rollback restores the authoritative record
+== delta duty: a CIT declined inside another task's claim window
+   declined CIT=CIT-0004 gate=HDG-0004 (raised while TASK-0007 is claimed by session w)
+PASS  K2.17 a declined gate does not approve its CIT
+PASS  K2.18 a declined CIT cannot execute
+PASS  K2.19 the declined change never reached the authoritative record
+   the claimed task's close after the decline -> OK
+PASS  K2.20 the declined CIT does not block the unrelated claimed task's own close path
+---- K12-cit-p-and-e.sh: 29 passed, 0 failed
