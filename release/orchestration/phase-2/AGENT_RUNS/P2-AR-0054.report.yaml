@@ -1,0 +1,167 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0054
+role: capability-repair
+objective: >-
+  Repair iteration 1, round 4 integration builder — merge phase2/repair-1-r4-ws01 (P2-AR-0042, the BC-P2-02 evidence
+  map) and phase2/repair-1-r4-residual-c (P2-AR-0043 residual integration points, P2-AR-0053 continuation, P2-AR-0055's
+  implementation of owner decision OD-P2-03) with --no-ff; reconcile the evidence map against the residual branch's new
+  tests so that `gov contract verify` passes (IP-R4-WS01-3) and map those tests to the capabilities their own reports
+  name (R4-IP-2); regenerate the suite-to-contract matrix with the product from this run's own outputs; run every suite
+  and all four prior R1 held-out suites through a private path with the census; re-run both builders' own probes on the
+  integrated binary; carry forward every gap and integration point without closing it. The tree produced becomes
+  cap2-candidate-1. Claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run is the
+  round-4 integration builder: it merged the two round-4 branches and authored exactly one commit beyond the merges
+  (e9a2f9c, the evidence-map owners for the residual branch's new tests, written by `gov contract compile` from an
+  additive edit to P2-AR-0042's owner-spec.yaml, which P2-HO-0049 and IP-R4-WS01-3 prescribe), plus the integration
+  report and evidence. It authored none of the round-1..4 repairs, no audit, synthesis or verification run, and it
+  grades no repair, its own work included. It changed no product code, no policy, no schema, no kernel file, no
+  migration and no test. It read P2-HO-0049, P2-HO-0040, P2-HO-0030, P2-HO-0019, P2-HO-0031, P2-HO-0020, P2-HO-0010,
+  OWNER-DECISION-P2-0003, the three prior integration reports, both round-4 branches' reports, claims and evidence
+  scripts, and the product source and tests of the merged tree; the prior R1 held-out suites were run unedited. Other
+  branches were read with git show / git diff only; no branch but phase2/repair-1-r4-integration was checked out,
+  merged into, rebased, tagged or pushed, and the main checkout was not modified. It did not read session or agent
+  transcripts, task-output stores or user auto-memory; it spawned no sub-agents and did not contact the product owner.
+input:
+  base_commit: c0af4e6491d354b35ff91d6b56ac0020fec061c8
+  candidate: "none minted by this run (the integrated tip is the tree the orchestrator mints cap2-candidate-1 from)"
+  product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0049-integration-4.md
+  branches_merged:
+    - "phase2/repair-1-r4-ws01 tip d1487e8dcec37aa6903f01d28a41326b28430453 (P2-AR-0042; product_code_digest d0c6a0d4…a4c9)"
+    - "phase2/repair-1-r4-residual-c tip 854980cc0f7741c0c10ce0043cdfda13cd94fcdc (P2-AR-0043/-0053/-0055; product_code_digest 2fbbbd6c…9d82)"
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0049-integration-4.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0040-integration-3.md, P2-HO-0030-integration-2.md, P2-HO-0019-integration-1.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0031 (availability rule), P2-HO-0020 (R1 private-path rule), P2-HO-0010
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md
+  - release/capability-baseline/repair-1/integration/, integration-2/, integration-3/ (reports, runners, derived copies)
+  - release/capability-baseline/repair-1/r4-ws01/00-REPAIR-REPORT.md, claims.yaml, evidence/ (mapping, probes, matrix inputs)
+  - release/capability-baseline/repair-1/r4-residual/00-REPAIR-REPORT.md, 01-CONTINUATION-REPORT.md, 02-OD-P2-03-REPORT.md, claims.yaml, evidence/
+  - release/capability-baseline/repair-1/r3-ws07/evidence (WS-7's IP probe and named checks, run unedited)
+  - release/capability-baseline/repair-1/ws01-12/evidence/bc-p2-01 (round-1 controls, run unedited)
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests and 4.1.6-r1-4/evidence/derive.py (run unedited)
+  - runtime/src, cli/src, framework/, migrations/, tools/, tests/ of the merged tree
+produced:
+  - "merge 5ab06b6ad37c677edbc1900445727dc8836c887a (--no-ff, phase2/repair-1-r4-ws01; no conflict)"
+  - "merge c38a406ccc7bbfd463248c4ef01884c47eb9d815 (--no-ff, phase2/repair-1-r4-residual-c; no conflict; merges-only tip)"
+  - "e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740: IP-R4-WS01-3 / R4-IP-2 — 36 evidence owners for the residual branch's 19 new tests (owner-spec.yaml additive edit -> apply_owner_spec.py -> gov contract compile, which wrote the map, the source lock and the generated view)"
+  - release/capability-baseline/repair-1/integration-4/00-INTEGRATION-REPORT.md
+  - release/capability-baseline/repair-1/integration-4/suite-to-contract.json and .md (product output of `gov contract matrix`)
+  - release/capability-baseline/repair-1/integration-4/evidence/
+product_changes_beyond_the_merges:
+  - file: release/capability-baseline/repair-1/r4-ws01/evidence/mapping/owner-spec.yaml
+    change: "+64 lines: 36 evidence-owner entries across 14 capabilities (K3, F4, F3, K2, W6, O5, L4, S6, B1, B2, B3, S5, D4, D5), each under a comment naming this run and the report that routes it. Nothing existing changed or removed."
+    reason: "R4-IP-2 (P2-AR-0043 §7, P2-AR-0053 §5, P2-AR-0055 §9): the 19 tests the residual runs added owned no capability. This is the route IP-R4-WS01-3 and P2-HO-0049 prescribe, and the only file outside integration-4/ this run wrote."
+  - file: "tests/governance/capability-evidence-map.yaml, framework/contracts/contract-source.lock, docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md"
+    change: "regenerated by apply_owner_spec.py + `gov contract compile`; never hand-edited. Owners 762 -> 798 (test owners 441 -> 477); checklist items naming an owner 586 -> 587."
+    reason: "the product's own output for the owner additions above; the lock binds the new evidence_map_governed digest."
+  - file: "(none)"
+    change: "no Rust file, policy, schema, KERNEL.yaml entry, migration, fixture or test changed after the merges"
+    reason: "the two branches did not conflict and the union needed no product reconciliation; `cli/src/main.rs` and `runtime/src/orchestration/control.rs` merged as the union of both sides' additions"
+tests_or_attacks:
+  - {id: CONTRACT-VERIFY-AFTER-MERGES, description: "gov contract verify straight after the two merges, before any edit: CONTRACT_SOURCE_BOUND, 101 capabilities, 762 owners, 0 deferred — no owner of P2-AR-0042's map became unresolved (the residual branch renamed, removed and #[ignore]d nothing)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/contract/verify-after-merges.json}
+  - {id: CONTRACT-VERIFY-FINAL, description: "gov contract verify at e9a2f9c with the release binary: CONTRACT_SOURCE_BOUND, 101 capabilities, 798 owners (test 477, check 127, obligation 110, doctor 34, g0 19, human-gate 13, heldout 13, release 5), 0 deferred, nothing absent; 76 capabilities with a G-tier owner; the same 16 owned only by tests; 587/713 checklist items name an owner", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/contract/verify-final.json}
+  - {id: CONTRACT-MATRIX, description: "gov contract matrix regenerated from this run's own lib, certification, R1 held-out and G5/doctor outputs: 477 PASSED / 174 RAN / 37 NOT_IN_SUPPLIED_EVIDENCE / 110 OBLIGATION (P2-AR-0042: 441/174/37/110); all 9 named held-out tests PASSED; G5 HEALTHY (39 families, none not-ok); gov doctor DEGRADED with D032 only", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/suite-to-contract.json}
+  - {id: REG-LIB, description: "cargo test --lib at e9a2f9c: 276 passed, 0 failed, 0 ignored (262 round-3 integration + 9 P2-AR-0042 + 5 residual)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/regression/cargo-test-lib.e9a2f9c.out}
+  - {id: REG-CERT, description: "cargo test --test certification at e9a2f9c: 207 passed, 0 failed, 0 ignored (189 + 4 ws01r4 + 14 r4_residual). Fourteen module chunks, each at e9a2f9c with dirty=0; the union of the chunks equals the full test list (207 = 207, empty difference)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/regression/cargo-test-certification.SUMMARY.out}
+  - {id: REG-PY, description: "Python plugin tests (capabilities/tests): 4 passed", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/regression/python-plugin-tests.e9a2f9c.out}
+  - {id: REG-BUILD-WARN, description: "cargo build --release: 0 warnings; forced debug build of runtime, cli and every test target: 0 warnings", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/regression/warnings-check.e9a2f9c.out}
+  - {id: REG-FMT, description: "this integration changed no Rust file; rustfmt --check (edition 2021) over every Rust file the two branches changed is clean, the only rc=1 being tests/certification/main.rs whose 36 hunks are all in the untouched child modules section6.rs and srr.rs — the same file, hunks and reason the round-3 integration and both round-4 builders recorded", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/regression/rustfmt-check.out}
+  - {id: R1-AR0027, description: "AR-0027 unedited, private path: 26/3 (heldout_srr2 b1, b2; heldout_srr3 d3) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/r1-heldout/r1-heldout-final-e9a2f9c.out}
+  - {id: R1-AR0029, description: "AR-0029 unedited: 26/2 (ho_b b3, b6), ho_f_preservation does not compile = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/r1-heldout/r1-heldout-final-e9a2f9c.out}
+  - {id: R1-AR0031, description: "AR-0031 unedited: 27/7 (hx_a a1, a5, a8; hx_b b6; hx_c c2, c3; hx_d d2) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/r1-heldout/r1-heldout-final-e9a2f9c.out}
+  - {id: R1-AR0033, description: "AR-0033 unedited: 30/1 — only hv_a_derivation::a1, which pins 84 files / 740 functions (this tree: 123 / 2392) = recorded baseline", result: FAIL, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/r1-heldout/r1-heldout-final-e9a2f9c.out}
+  - {id: R1-AR0033-A1-UNPINNED, description: "S1, the labelled copy of hv_a::a1 with only its two size assertions printed (byte-identical to every prior run's copy): PASSES. Census 123 files / 2392 functions = 2304 (round-3 integration) + 36 (P2-AR-0042) + 52 (residual). §6 census derived/writers/exempt/violations: human_gate_create 50/45/1/0; human_gate_approve 1/1/0/0; release_certification 1/1/0/0; trust_policy_mutation 8/1/0/0; privileged_plugin_acquisition 13/3/0/0; floor_lower_or_reset 4/1/0/0; present_below_floor_release_as_current 1/1/0/0. S2 (AR-0033's derive.py, ROOT line only substituted): same census, 0 violations in all three splitter configurations", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/r1-heldout/r1-heldout-final-e9a2f9c.out}
+  - {id: R1-FAILURE-MESSAGES, description: "normalised failure/panic messages of the four unedited suites: 42 lines, identical (empty diff) to BOTH merged branches' own final runs (P2-AR-0042 at 9bafcb3 and P2-AR-0055 at 4bd7468), and so transitively to the round-3 integration's", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/r1-heldout/failure-messages-vs-branches.txt}
+  - {id: PROBE-WS1-OWNER-CONTROLS, description: "P2-AR-0042's owner mutation controls against the integrated chain, unedited: 29/29 as expected, including control 29 — `gov contract compile` over the committed chain rewrites the evidence map byte-identically (AC-13)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/unedited/owner-mutation-controls.out}
+  - {id: PROBE-BC-P2-01, description: "round-1 BC-P2-01 mutation controls (ws01-12), unedited: 20/20 with the round-1 codes", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/unedited/bc-p2-01-round1-mutation-controls.out}
+  - {id: PROBE-PLANTED-FAULTS, description: "P2-AR-0042's planted-fault evidence on the integrated binary, unedited: 20/20 detected across 18 gates (A B C D F G H I J K L M N O R T U W); M1, T3 and W7 report the fault as a warning-level finding while the check stays ok, exactly as recorded", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/unedited/planted-faults.out}
+  - {id: PROBE-RELEASE-TAMPER, description: "P2-AR-0042's release tamper probe, unedited: `release build` reports capability_contract CONTRACT_SOURCE_BOUND on the integrated chain; `release verify` accepts the release as written and refuses it once one byte of kernel/KERNEL.yaml changes (ok false, modified [KERNEL.yaml])", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/unedited/release-tamper.out}
+  - {id: PROBE-PRODUCT-MUTATIONS, description: "P2-AR-0042's product-mutation evidence on the integrated tree, unedited: 5/5 — each owner PASSED on the unmutated private copy and FAILED on the mutant, every mutation reverted identical-to-HEAD (E1 authority, V1 the qualification-oracle schema, W3 context::manifest, P1 greenfield via observability, Q4 upstream)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/unedited/product-mutations.out}
+  - {id: PROBE-INT3-O1, description: "WS-7's ip_task_close_registration.py on the integrated binary — unedited: the close is refused MATERIAL_CHANGE_REQUIRES_CIT for governance/project/plugins/p1.yaml (its helper answers only the first gate), as the residual branch recorded; P2-AR-0043's labelled derived copy: registered True, CIT-0001 COMMITTED origin system kind plugin-registration, triggers [governance_change, security_change], radius R5, approval gate HDG-0001 and execution gate HDG-0002 naming each other, CIT-E's writes cover the descriptor, close ok True and the task DONE", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/derived-runs/ip_task_close_registration.INT3-O1.P2-AR-0043.out}
+  - {id: PROBE-WS07-NAMED, description: "WS-7's round-3 named checks — unedited: 2 of 11 discriminating checks PASS with exactly 5 controls BROKEN, as recorded; P2-AR-0043's labelled derived copy: 11/11 and every control HOLDS. Unedited, W7R3-41.a HOLDS: a governed security review by another role lets the installation proceed with no owner gate (OD-P2-03's non-gated branch) and W7R3-41.b HOLDS (a self-attested review does not)", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/derived-runs/ws07_r3_named_checks.INT3-O1.P2-AR-0043.out}
+  - {id: PROBE-R4-O1, description: "P2-AR-0053's R4-O1 probe on the integrated binary, unedited: O1 (tool path declared) and O2 (not declared) both close DONE with no refusal; CIT-0001 COMMITTED, origin system, trigger security_change with effective trigger governance_change, radius R5, record_seal VERIFIED; O3 (control) installs with nothing to close", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/builder-probes/unedited/tools_install_task_close.out}
+  - {id: CARRIED-R4-O4-R4-O5, description: "the two carried items P2-HO-0049 asks the integrator to check: cit schema 1.3.0 agrees between framework/schemas/cit.schema.json and KERNEL.yaml with no drift for any schema, framework/schemas is a kernel payload_dir so an update delivers the vocabulary, install_tool is additive, and M-4.1.5-4.1.6 carries relocate_os_stores before require_index_rebuild (R4-O4); CHANGE_POLICY/TOOL_POLICY version 1.1.0 is not a schema version (KERNEL.yaml declares policy-CHANGE_POLICY/policy-TOOL_POLICY 1.0.0 and no schema file changed), policies ship as kernel payload, and an older adopted kernel without either key fails closed — installation_envelope absent means undetermined, class_decision returns Null and the transaction is gated exactly as before, so every installation gates until the project updates (R4-O5). Both stay open for routing", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/carried-items/r4-o4-and-r4-o5-checks.out}
+  - {id: SCOPE, description: "the merges brought in only files the two branches changed; no protected path changed (release/verification, root-of-trust, releases, orchestration/phase-1, capability-baseline/audit-0); Contract v3 and its canonical import byte-identical; every test function of both branches present at the tip; 207 certification tests with 0 ignored and 276 lib tests with 0 ignored", result: PASS, evidence_path: release/capability-baseline/repair-1/integration-4/evidence/identity-and-scope.out}
+findings: []
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r4-integration
+  commit: 7d80d19d6ded47e53dae912ea798a775775fffa7
+  product_tip: e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  release_gov_sha256: e7059b9240d74d384370a56ba8d3306a87f736607ad862e58afc93be49da839c
+  evidence_path: release/capability-baseline/repair-1/integration-4/evidence
+test_counts:
+  lib: {passed: 276, failed: 0, ignored: 0}
+  certification: {passed: 207, failed: 0, ignored: 0, chunks: 14, union_equals_full_list: true}
+  python_plugin_tests: {passed: 4, failed: 0}
+  warnings: 0
+r1_heldout:
+  AR-0027: {passed: 26, failed: 3, baseline: "26/3"}
+  AR-0029: {passed: 26, failed: 2, not_compiling: [ho_f_preservation], baseline: "26/2, ho_f non-compiling"}
+  AR-0031: {passed: 27, failed: 7, baseline: "27/7"}
+  AR-0033: {passed: 30, failed: 1, failing: ["hv_a_derivation::a1 size pin (84 files / 740 functions)"], baseline: "30/1"}
+  census:
+    files: 123
+    functions: 2392
+    section_6_violations: 0
+    derivation: "2304 (round-3 integration) + 36 (P2-AR-0042 contracts.rs) + 52 (residual branch) = 2392; no file added or removed"
+    private_path: "<worktree>/target/P2-AR-0054/r1-P2-AR-0054-private"
+    s1: "labelled copy hv_a_derivation.a1-unpinned.P2-AR-0054.rs.txt (byte-identical to every prior run's) PASSES with the size pins printed"
+    s2: "AR-0033 derive.py, ROOT line only substituted: same census, 0 violations in all three splitter configurations"
+evidence_map_reconciliation:
+  verify_after_merges: "CONTRACT_SOURCE_BOUND before any edit — no owner became unresolved; the one replaced lib test kept its name, and the residual branch's catalogue and currency changes alter no check's tiers and no check's input classes, so the derived fields stayed exactly derived"
+  action: "R4-IP-2 only: 36 owners for the 19 new tests (14 certification, 5 lib) via owner-spec.yaml -> apply_owner_spec.py -> gov contract compile"
+  capabilities_mapped: [K3, F4, F3, K2, W6, O5, L4, S6, B1, B2, B3, S5, D4, D5]
+  verify_final: "CONTRACT_SOURCE_BOUND; owners 762 -> 798; test owners 441 -> 477; 0 deferred; 76 capabilities with a G-tier owner (unchanged); the same 16 owned only by tests; checklist items naming an owner 586 -> 587"
+  ac_13: "P2-AR-0042's control 29 on the integrated chain: `gov contract compile` rewrites the evidence map byte-identically"
+matrix_census:
+  source: "gov contract matrix, run by the integrated release binary from this run's own outputs only"
+  PASSED: 477
+  RAN: 174
+  NOT_IN_SUPPLIED_EVIDENCE: 37
+  OBLIGATION: 110
+  total: 798
+  movement_from_P2_AR_0042: "441/174/37/110 -> 477/174/37/110: only the test owners moved, by the 36 added; no owner failed and none is #[ignore]d"
+  detail: "127 governance families RAN at G5 (all ok, executed); 34 doctor checks RAN (33 ok, D032 with findings — the disclosed posture of an unprovisioned bootstrap machine); 13 held-out suites RAN at their baselines with all 9 named held-out tests PASSED; the 37 are the 19 g0, 13 human-gate and 5 release owners no supplied output records a run of"
+od_p2_03: >-
+  In force and settled by the product owner. P2-AR-0055's implementation is merged exactly as it stands; this
+  integration changed nothing about it and added no test to it. On the integrated tree the three new r4_residual
+  installation tests and both ws07 installation tests pass, and WS-7's round-3 named checks, run UNEDITED, report
+  W7R3-41.a HOLDS ("the install proceeds with no owner gate" for a review-evidenced installation inside the envelope)
+  and W7R3-41.b HOLDS (a self-attested review does not). The rule, the envelope and the network allowlist are policy and
+  kernel-payload data with the governed record spec/decisions/D-0011.yaml, all merged unchanged.
+stopped: []
+unresolved:
+  - "IP-R4-WS01-1 (WS-2): contracts::owner_sources_fingerprint in the contract_binding cache key"
+  - "IP-R4-WS01-2 (WS-2, WS-8): carry evidence_owners.deferred / not_in_this_tree into the G5 family detail and PRE_RELEASE_CHECKS.json"
+  - "IP-R4-WS01-3: acted on here; the obligation stands for every later change — renaming, removing or #[ignore]ing one of the 477 mapped tests fails gov contract verify, the binding-chain test, the contract_binding family and release build"
+  - "IP-R4-WS01-4 (WS-2): a test or run of `gov health qualify` with a FORMAT_SAMPLE oracle, so G6 owners for V1-V4 and W12.7 can be mapped"
+  - "IP-R4-WS01-5 (WS-2 and the owning workstreams): tier owners for the 16 capabilities owned only by tests (C5, F5, G1, H3, K3, M2, M3, N2, Q2, Q3, Q4, R2, T2, V1, V2, V3)"
+  - "IP-R4-WS01-6 (WS-2): index_freshness did not report an edited README.md on a minimal project while it did report an edited src/lib.rs — recorded, not judged"
+  - "P2-AR-0042's disclosed gaps, unchanged in kind: 16 capabilities owned only by builder tests; 25 with no G-tier owner (9 of them with a human-gate, release or held-out owner); no G6 owner; 126 of 713 checklist items name no owner (was 127); unit-level-only invalidation proofs for the schema, migration and security/sensitivity triggers; severity null for all 101; contract_binding not mapped to a capability"
+  - "R4-IP-1 as revised by P2-AR-0055: a probe registering an executable plugin must answer both its gates; a review-evidenced tool installation inside the authorised envelope raises no gate at all, while one that expands authority or fails a condition raises the change gate"
+  - "R4-IP-2: acted on here for all 19 tests; the per-item owner claims are the integrator's and a verifier should sample them"
+  - "R4-O2: gov plugins unregister still writes the sealed registry directly and nothing uninstalls a tool, so there is no de-installation path to govern; OD-P2-03 does not speak to removal"
+  - "R4-O3: WS-8's r1-invariants.sh line `floors_path( outside state.rs = 1` stays at 1 (INT3-O3 not done)"
+  - "R4-O4: checked (no schema drift; the vocabulary ships as kernel payload; install_tool is additive; M-4.1.5-4.1.6 carries relocate_os_stores) and left open for WS-9 routing"
+  - "R4-O5: checked (the policy versions are not schema versions; an older adopted kernel fails closed and gates every installation) and left open; the optional release-manifest note is not done"
+  - "R4-O6 (optional): a read-only `gov tools envelope --descriptor f` so an auditor can inspect the envelope verdict without proposing a transaction"
+  - "INT3-O4: legacy unsealed task/CIT records rewritten by gov inside a claim window are reported (os_managed_unbound), never blessed"
+  - "R3-WS5-11: the sandbox memory_retrieval_regression symbol route, not reproduced by the round-3 integration, not reopened here"
+  - "P2-AR-0043's four optional items, not done with their reasons: INT3-O3, IP-R3-WS04-03, IP-R3-WS04-06, IP-R3-WS02-11"
+  - "AR-0033 hv_a::a1 size pin: the AC-14 verifier judges it on its property (S1 passes; census 0 violations)"
+recommended_next_action: >-
+  Mint cap2-candidate-1 from the integrated tip (product tip e9a2f9c, product_code_digest e6332fc7…2220,
+  governed_state_digest 3d2aeba2…20c0) and hand it to the fresh independent capability verification (R1 preservation
+  AC-14, oracle-format review AC-6, fresh capability verification with fresh held-out tests), with the unresolved list
+  above as the verifiers' disclosed context; route R4-O2, R4-O4, R4-O5 and the six IP-R4-WS01 items onward.
+completed_at: "2026-09-20T19:48:29Z"
