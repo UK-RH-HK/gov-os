@@ -17,7 +17,7 @@ independence_statement: >-
   read any other iteration-1 verifier's evidence directory or branch, any other family's audit-0 evidence, any
   agent transcript, any task-output store, or user auto-memory. It spawned no sub-agents and did not contact the
   product owner. It modified no product source: every file it wrote is under
-  release/capability-baseline/verify-1/epsilon/ and this report. All 163 held-out probes were authored by this run
+  release/capability-baseline/verify-1/epsilon/ and this report. All 167 held-out probes were authored by this run
   from Contract v3 and the product's observable behaviour, not copied from builder tests or builder probes, and
   none of them enters the product tree.
 input:
@@ -72,7 +72,7 @@ tests_or_attacks:
     evidence_path: release/capability-baseline/verify-1/epsilon/evidence/AC-15-regression.out
   - id: HELDOUT-RUN-ALL
     description: >-
-      163 verifier-authored held-out probes over 8 files; 163 PASS / 4 FAIL, the four failures being exactly this
+      167 verifier-authored held-out probes over 8 files; 163 PASS / 4 FAIL, the four failures being exactly this
       run's four findings
     result: PASS
     evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out

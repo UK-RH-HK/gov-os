@@ -313,7 +313,7 @@ capabilities:
         implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
         automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
         independent_evidence: ["heldout/t07_o3_independence.py", "evidence/RUN-ALL.out"]
-        independent_evidence_detail: "Held-out retrieval queries are a first-class measured artefact (`gov memory verify`: queries 12, pending 2, min 5, measured true); placeholder queries are held `pending` and not counted. This verifier also added its own held-out suite (heldout/, 163 tests), which is what O3 asks of a fresh verifier."
+        independent_evidence_detail: "Held-out retrieval queries are a first-class measured artefact (`gov memory verify`: queries 12, pending 2, min 5, measured true); placeholder queries are held `pending` and not counted. This verifier also added its own held-out suite (heldout/, 167 tests), which is what O3 asks of a fresh verifier."
         gap: null
     health_scheduler_tiers: [G2, G5, G6]
     evidence_owners: [G2, G5, G6, independent-heldout]

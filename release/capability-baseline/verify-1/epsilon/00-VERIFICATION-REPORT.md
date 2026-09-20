@@ -23,7 +23,7 @@ This is a **full re-audit**. Every iteration-0 status was treated as stale; ever
 established afresh on this candidate from my own evidence. I read the repair and integration reports under
 `release/capability-baseline/repair-1/**` only as claims to attack, and cite none of them as evidence.
 
-**What I ran.** `CARGO_BUILD_JOBS=2 cargo build --release` in my own worktree, then 163 held-out probes I wrote
+**What I ran.** `CARGO_BUILD_JOBS=2 cargo build --release` in my own worktree, then 167 held-out probes I wrote
 myself (`heldout/`, eight files plus a `RUN-ALL` driver), driving `target/release/gov` against disposable
 projects. The probes are written from Contract v3 and the product's observable behaviour, not by copying builder
 tests or builder probes; none of them enters the product tree.
