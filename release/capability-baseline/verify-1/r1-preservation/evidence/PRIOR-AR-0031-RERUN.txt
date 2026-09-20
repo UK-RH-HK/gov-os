@@ -1,0 +1,188 @@
+===== hx_a_census =====
+   Compiling signature v2.2.0
+   Compiling deranged v0.5.8
+   Compiling thiserror v1.0.69
+   Compiling zeroize v1.9.0
+   Compiling lazy_static v1.5.0
+   Compiling fraction v0.15.4
+   Compiling time v0.3.55
+   Compiling ed25519 v2.2.3
+   Compiling iso8601 v0.6.6
+   Compiling hashlink v0.9.1
+   Compiling parking_lot v0.12.5
+   Compiling uuid v1.26.1
+   Compiling url v2.5.8
+   Compiling fancy-regex v0.13.0
+   Compiling sha2 v0.10.9
+   Compiling regex v1.13.1
+   Compiling thiserror-impl v1.0.69
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-3/runtime)
+   Compiling iana-time-zone v0.1.65
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling same-file v1.0.6
+   Compiling bytecount v0.6.9
+   Compiling fallible-iterator v0.3.0
+   Compiling bitflags v2.13.2
+   Compiling ryu v1.0.23
+   Compiling unsafe-libyaml v0.2.11
+   Compiling base64 v0.22.1
+   Compiling num-cmp v0.1.0
+   Compiling jsonschema v0.18.3
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling rusqlite v0.31.0
+   Compiling walkdir v2.5.0
+   Compiling chrono v0.4.45
+   Compiling ed25519-dalek v2.2.0
+   Compiling hex v0.4.3
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 22s
+     Running tests/hx_a_census.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho31/debug/deps/hx_a_census-c3dcbbab83740b04)
+
+running 8 tests
+test a1_the_census_is_a_total_function_over_the_section_6_activities ... FAILED
+test a2_every_effect_guard_refuses_at_the_instant_of_the_effect ... ok
+test a3_an_allow_listed_operation_does_not_suspend_bullets_2_to_7 ... ok
+test a4_the_trust_anchor_sink_refuses_and_is_the_only_writer ... ok
+test a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module ... FAILED
+test a6_no_second_primitive_realises_a_named_section_6_effect ... ok
+test a7_bullet_6_has_no_primitive_because_every_floor_mutator_is_a_monotonic_raise ... ok
+test a8_bullet_7_claims_every_reporting_surface_carries_the_marking ... FAILED
+
+failures:
+
+---- a1_the_census_is_a_total_function_over_the_section_6_activities stdout ----
+
+thread 'a1_the_census_is_a_total_function_over_the_section_6_activities' (3646752) panicked at tests/hx_a_census.rs:40:5:
+assertion `left == right` failed: the set of bullets claiming no primitive changed
+  left: []
+ right: ["floor_lower_or_reset", "present_below_floor_release_as_current"]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module stdout ----
+
+thread 'a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module' (3646756) panicked at tests/hx_a_census.rs:222:5:
+OBSERVED: `section_6_effects_are_enforced_inside_their_sinks` A6 polices the bullet-2 census with one source grep for the literal `new_record("human-gate"`. Three constructions demonstrated above reach the same durable artefact without spelling it: `new_record` through a non-literal type argument, `Record::set("type", ...)` on any existing record, and a `Record` struct literal (all fields `pub`). None needs a `Clearance`, because the compile-time guarantee binds only functions inside `gates.rs` where `build` is private. No such path exists in the product today (measured: the literal occurs once), so this is the census clause being weaker than its stated form, not a live bypass.
+
+---- a8_bullet_7_claims_every_reporting_surface_carries_the_marking stdout ----
+
+thread 'a8_bullet_7_claims_every_reporting_surface_carries_the_marking' (3646759) panicked at tests/hx_a_census.rs:346:5:
+assertion `left == right` failed
+  left: "crate::srr::present::presentation — reached by every command result the CLI emits, and by doctor, update --check and the agent context packet directly"
+ right: "no primitive: every reporting surface carries the marking"
+
+
+failures:
+    a1_the_census_is_a_total_function_over_the_section_6_activities
+    a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module
+    a8_bullet_7_claims_every_reporting_surface_carries_the_marking
+
+test result: FAILED. 5 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `--test hx_a_census`
+EXIT=101
+===== hx_b_failopen =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-3/runtime)
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.97s
+     Running tests/hx_b_failopen.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho31/debug/deps/hx_b_failopen-d09a45e24b74943b)
+
+running 6 tests
+test b1_resolve_state_root_errors_only_on_the_hostile_case_never_on_the_unprovisioned_one ... ok
+test b2_an_environment_variable_suppresses_every_effect_level_section_6_check ... ok
+test b3_the_operation_level_guard_fails_open_on_the_same_input ... ok
+test b4_gate_creation_loses_its_only_enforcement_point ... ok
+test b5_the_state_carrying_guard_is_immune_because_it_resolves_nothing ... ok
+test b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution ... FAILED
+
+failures:
+
+---- b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution stdout ----
+
+thread 'b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution' (3647249) panicked at tests/hx_b_failopen.rs:263:5:
+assertion `left == right` failed: expected the fail-open in exactly `guard_light` and `guard_effect`; found 0
+  left: 0
+ right: 2
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--test hx_b_failopen`
+EXIT=101
+===== hx_c_prior_evidence =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-3/runtime)
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.05s
+     Running tests/hx_c_prior_evidence.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho31/debug/deps/hx_c_prior_evidence-f1a9ca9ce97da961)
+
+running 8 tests
+test c1_the_migrated_preservation_census_is_compared_assertion_by_assertion ... ok
+test c2_the_dropped_malleability_check_is_reproduced_and_still_holds ... FAILED
+test c2b_verify_and_verify_strict_are_one_behaviour_on_a_non_canonical_scalar ... ok
+test c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds ... FAILED
+test c3b_no_relaxation_switch_exists_in_product_source ... ok
+test c4_the_section_6_enforcement_point_census_re_derived_on_candidate_3 ... ok
+test c5_a_guard_now_sits_between_the_allow_list_entry_and_the_gate_creation ... ok
+test c6_provision_keeps_its_diagnosis_and_section_6_is_proved_at_the_sink ... ok
+
+failures:
+
+---- c2_the_dropped_malleability_check_is_reproduced_and_still_holds stdout ----
+
+thread 'c2_the_dropped_malleability_check_is_reproduced_and_still_holds' (3647993) panicked at tests/hx_c_prior_evidence.rs:91:5:
+OBSERVED: `ho_f::f1`'s behavioural half — a malleated S+L signature must be refused by BOTH `crypto::verify` and `crypto::verify_strict`, with the same error code — was not reproduced when the census moved into the product suite. `ho_f` no longer compiles, so that check runs nowhere in the candidate's evidence. It is reproduced below by this verifier; the underlying property still holds, so this is a loss of assurance coverage, not a live defect.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds stdout ----
+
+thread 'c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds' (3648001) panicked at tests/hx_c_prior_evidence.rs:148:5:
+OBSERVED: `ho_f::f2`'s second half — no `skip_verify` / `allow_unsigned` / `force_unsigned` relaxation switch appears anywhere in product source outside `REFUSED_AUTHORITY_ENV` — was not reproduced in the move. `grep -rn 'skip_verify|allow_unsigned|force_unsigned' tests/` finds nothing, so this check runs nowhere in the candidate's evidence. Reproduced below; the property still holds.
+
+
+failures:
+    c2_the_dropped_malleability_check_is_reproduced_and_still_holds
+    c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds
+
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `--test hx_c_prior_evidence`
+EXIT=101
+===== hx_d_acquisition_and_preservation =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-3/runtime)
+   Compiling srr-heldout-ar0031 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho31)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.17s
+     Running tests/hx_d_acquisition_and_preservation.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho31/debug/deps/hx_d_acquisition_and_preservation-b8e6f430aa3700ff)
+
+running 12 tests
+test d10_the_exit_policy_point_is_single_and_unchanged ... ok
+test d11_floors_are_monotonic_and_advance_only_from_verified_facts ... ok
+test d12_break_glass_is_purely_local ... ok
+test d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor ... ok
+test d2_the_descriptor_decides_whether_section_6_is_consulted_at_all ... FAILED
+test d3_tools_install_reaches_the_bullet_5_effect_without_the_sink ... ok
+test d4_the_clearance_witness_is_not_a_capability_and_its_guarantee_stops_at_the_module_boundary ... ok
+test d5_the_allow_list_is_four_entries_and_matches_exactly ... ok
+test d6_five_admit_sites_and_five_install_kernel_sites ... ok
+test d7_no_signing_capability_in_product_source ... ok
+test d8_d0007_stays_independent_of_the_srr_verdicts ... ok
+test d9_contract_v3_canonical_import_is_byte_identical_and_fails_closed ... ok
+
+failures:
+
+---- d2_the_descriptor_decides_whether_section_6_is_consulted_at_all stdout ----
+
+thread 'd2_the_descriptor_decides_whether_section_6_is_consulted_at_all' (3648759) panicked at tests/hx_d_acquisition_and_preservation.rs:47:5:
+baseline: an unprivileged remote capability is not a §6 bullet 5 effect
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    d2_the_descriptor_decides_whether_section_6_is_consulted_at_all
+
+test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `--test hx_d_acquisition_and_preservation`
+EXIT=101

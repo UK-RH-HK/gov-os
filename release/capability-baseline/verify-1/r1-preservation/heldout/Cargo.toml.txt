@@ -1,0 +1,25 @@
+# HELD-OUT INDEPENDENT VERIFICATION TESTS — P2-AR-0044, Phase-2 verification iteration 1, R1 preservation.
+# Authored by the fresh independent R1-preservation verifier. NOT product source. Lives outside the product tree
+# and outside the cargo workspace, so verifying the candidate requires no modification to any product file.
+# Independently authored: written from the frozen R1 boundary, ARCH-0003, D-0007, OD-P2-02/OD-P2-03 and the
+# product's observable behaviour — not by copying builder tests, builder probes, or the AR-0027/0029/0031/0033
+# harnesses (which are rerun separately and unedited).
+[package]
+name = "r1pres-heldout-p2ar0044"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+gov-runtime = { path = "../wt/p2-verify1-r1-preservation/runtime" }
+serde_json = { version = "1", features = ["preserve_order", "raw_value"] }
+
+[dev-dependencies]
+# TEST MATERIAL ONLY: to attack a signature-verifying trust root and an owner-signed T2 binding authority, the
+# harness must be able to SIGN and to mint binding keys. `gov` itself cannot and must not (SRR-R0-L4); that the
+# product carries no signing capability is itself asserted in p6_structural.rs.
+ed25519-dalek = { version = "2", default-features = false, features = ["std"] }
+hex = "0.4"
+sha2 = "0.10"
+
+[workspace]
