@@ -1,0 +1,306 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0050
+role: capability-verifier (verification iteration 1)
+objective: >-
+  Family epsilon (O1-O5, P1-P2, Q1-Q4, U, V1-V4) on cap2-candidate-1: full re-audit of all 146 checklist bullets
+  with the verifier's own held-out tests; AC-5 by exercising the scheduler; the availability-rule attacks; Gate U
+  SLOs and the HEALTHY conjunction; O4 currency; the V1-V4 capability statuses.
+agent_model: claude-opus-5[1m]
+independence_statement: >-
+  This run authored none of the Governance OS implementation, none of its tests, none of the iteration-0 audits,
+  none of the repairs (P2-AR-0014..0055), no integration and no Phase-1 role; it is not the orchestrator. It read,
+  as claims to attack only and cited as evidence nowhere, nothing under release/capability-baseline/repair-1/**
+  beyond what the handoffs quote. It read the iteration-0 inventory
+  (audit-0/synthesis/{blocker-classes.yaml,findings.yaml}) and its own family's audit of record
+  (audit-0/epsilon-r/findings.yaml) to dispose of prior findings, and adopted none of their statuses. It did not
+  read any other iteration-1 verifier's evidence directory or branch, any other family's audit-0 evidence, any
+  agent transcript, any task-output store, or user auto-memory. It spawned no sub-agents and did not contact the
+  product owner. It modified no product source: every file it wrote is under
+  release/capability-baseline/verify-1/epsilon/ and this report. All 163 held-out probes were authored by this run
+  from Contract v3 and the product's observable behaviour, not copied from builder tests or builder probes, and
+  none of them enters the product tree.
+input:
+  base_commit: 8588813ec1ef9c832879e258ca5acfb573ae996f
+  candidate: cap2-candidate-1
+  candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0044-verify-1-family-scopes.md
+  pinned_inputs_verified: true          # evidence/pinned-inputs.out — no STOP condition
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0044-verify-1-family-scopes.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0005-audit-0-epsilon.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0008-audit-0-epsilon-reaudit.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0031-repair-1-round-3-common.md   # the availability rule as compiled
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:749-866
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:976-1062
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:681-683                     # L4 non-global blocking
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  - release/capability-baseline/audit-0/synthesis/findings.yaml
+  - release/capability-baseline/audit-0/epsilon-r/findings.yaml
+  - runtime/src/scheduler/{mod,catalogue,sandbox,store}.rs
+  - runtime/src/verification/{mod,slo,currency,product,reporting}.rs
+  - runtime/src/{qualification_oracle,observability,upstream,lessons,release,kernel,util}.rs
+  - runtime/src/orchestration/{dag,tasks}.rs
+  - framework/health/HEALTH_SLOS.yaml
+  - framework/policies/{TEST_POLICY,POLICY_PRECEDENCE,CHANGE_POLICY}.yaml
+  - framework/schemas/{lesson,decision,test-obligation}.schema.json
+  - cli/src/main.rs
+produced:
+  - release/capability-baseline/verify-1/epsilon/00-VERIFICATION-REPORT.md
+  - release/capability-baseline/verify-1/epsilon/capability-audit.yaml
+  - release/capability-baseline/verify-1/epsilon/findings.yaml
+  - release/capability-baseline/verify-1/epsilon/prior-findings-disposition.yaml
+  - release/capability-baseline/verify-1/epsilon/heldout/            # RUN-ALL + lib.py + srr.py + t01..t08
+  - release/capability-baseline/verify-1/epsilon/evidence/
+tests_or_attacks:
+  - id: PINNED-INPUTS
+    description: candidate tag, both digests at the tag and at HEAD, Contract v3 and frozen gate contract SHA-256
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/pinned-inputs.out
+  - id: AC-15-REGRESSION
+    description: "cargo test --release --lib (276/0) and --test certification (207/0), reproduced in this worktree"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/AC-15-regression.out
+  - id: HELDOUT-RUN-ALL
+    description: >-
+      163 verifier-authored held-out probes over 8 files; 163 PASS / 4 FAIL, the four failures being exactly this
+      run's four findings
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-IMPACTED-SELECTION
+    description: a one-line source comment executed 18/39 checks and reused 21; a decision change selected a different 28
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t01_ac5_scheduler.py
+  - id: AC-5-PARALLEL
+    description: "4 workers, 4 named threads; run wall 2338 ms against 5772 ms of executed check time"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-ISOLATION
+    description: state-writing checks ran in disposable sandboxes; the live derived state was byte-identical; sandboxes disposed
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-CACHE-REUSE-AND-INVALIDATION
+    description: 32/39 reused unchanged, each naming its source result; a policy change re-executed 39; an unrelated change 18
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-STALE-EVIDENCE
+    description: a relevant input change moved the green record to non-current, naming the class; 60 checks reported stale
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-RED-YELLOW-GREEN
+    description: GREEN clean, YELLOW on a warning-only failure, RED on an active hard-block — all three observed
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-BLOCK-VS-WARNING
+    description: all 74 catalogue entries declare enforcement.mode; warning refused nothing, hard-block refused exactly its scope
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-PROVENANCE
+    description: >-
+      the health result carries tier/trigger/checks/inputs/runtime identity/repository/actor/machine trust/times,
+      but reports complete with not_evaluated 0 over a tier whose 35 doctor members it never enumerated
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/E-O5-01-doctor-tier-gap.out
+  - id: AC-5-REMEDIATION-GENERATION
+    description: a high finding generated a linked governance task declaring `remedies`, with recurrence tracking on persistence
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-NOT-WHOLE-SUITE-SERIALLY
+    description: a trivial mutation executed 18 of 39 checks concurrently in 1.3 s wall
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: AC-5-G5-TIER-COVERAGE
+    description: a G5 run, `gov audit`, `update --apply` and `release build` never execute the 35 doctor checks declared at G5
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/E-O5-01-doctor-tier-gap.out
+  - id: AC-5-TIER-DUTIES-G0-G4-G6
+    description: G0 command census under FREEZE_WRITES; G1 observes any mutation; G2 at close; G3 at handoff with input currency; G4 milestone; G6 qualification
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/G0-G3-tier-duties.out
+  - id: AVAILABILITY-RULE
+    description: >-
+      15 attacks — scoped refusal, independent work available, remedy available, no block refuses its own remedy,
+      typed refusals naming scope and subjects, committing remedy must clear its block, re-evaluation before
+      refusing, no spurious clearing, never-refused remedy commands, global stop reserved for critical
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t02_availability.py
+  - id: GATE-U-SLOS
+    description: all 15 SLOs tracked, thresholded and owned; 14 crossings each changed the health state away from GREEN
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t03_gate_u.py
+  - id: GATE-U-HEALTHY-CONJUNCTION
+    description: 13 conditions evaluated with named enforcing checks; HEALTHY only when all 13 hold; 8 flipped individually; D035 enforces it
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: O4-CURRENCY
+    description: nine input classes, each alone moving a legitimately current green record to stale, naming that class
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t04_gate_o_p.py
+  - id: O4-NO-CLOSE-ON-STALE-GREEN
+    description: a governance close is decided on a suite result the gate runs for the current inputs, never on the stale record
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/evidence/RUN-ALL.out
+  - id: O1-PRODUCT-TEST-GOVERNANCE
+    description: ten families by name, sealed records, a failing family blocks covered work, a self-attested pass is refused
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t04_gate_o_p.py
+  - id: O2-FAMILY-DETECTION
+    description: a defect of its own class injected into each family; 13 of 17 detected, 3 evidenced by their measurement
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t08_o2_detection.py
+  - id: O3-INDEPENDENCE
+    description: a self-declared `independent_of_implementer` obligation does not open the DAG gate; the refusal names why
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t07_o3_independence.py
+  - id: GATE-V-ORACLE-FORMAT-ENFORCEMENT
+    description: >-
+      every one of the 35 V1-V4 bullets is a crosswalked field; removing any of the 37 field pointers is refused
+      naming its element; arithmetic and binding checked; Contract v3:1062 separation enforced; G6 gated on it
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t05_gate_v_oracle.py
+  - id: GATE-Q-EXPORT
+    description: >-
+      PROJECT/PRODUCT refused UPSTREAM_SCOPE; content scans block a seeded packet naming each reason; remote and
+      non-inbox destinations refused; `--approved-by` refused; owner-signed gate answer accepted; inbox clean
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t06_gate_q.py
+  - id: GATE-Q-LIFECYCLE
+    description: "a FRAMEWORK lesson at `lifecycle: candidate` prepares an export packet; a lesson may record itself AUTHORITATIVE"
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t06_gate_q.py
+  - id: GATE-P-TELEMETRY
+    description: all 13 P1 fields survive in an event; 5 of the 8 P2 questions are answerable from `gov telemetry summary`
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/epsilon/heldout/t04_gate_o_p.py
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 11
+  PARTIAL: 5
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+capability_statuses:
+  O1: PRESENT_AND_SUBSTANTIAL      # 10/10 bullets
+  O2: PRESENT_AND_SUBSTANTIAL      # 17/17
+  O3: PRESENT_AND_SUBSTANTIAL      # 3/3
+  O4: PRESENT_AND_SUBSTANTIAL      # 2/2
+  O5: PARTIAL                      # 12/14 — E-O5-01
+  P1: PARTIAL                      # 9/13  — E-P2-01
+  P2: PARTIAL                      # 4/8   — E-P2-01
+  Q1: PARTIAL                      # 3/8   — E-Q1-01
+  Q2: PARTIAL                      # 1/2   — E-Q2-01
+  Q3: PRESENT_AND_SUBSTANTIAL      # 1/1
+  Q4: PRESENT_AND_SUBSTANTIAL      # 5/5
+  U:  PARTIAL                      # 27/28 — E-O5-01
+  V1: PRESENT_AND_SUBSTANTIAL      # 9/9
+  V2: PRESENT_AND_SUBSTANTIAL      # 7/7
+  V3: PRESENT_AND_SUBSTANTIAL      # 7/7
+  V4: PRESENT_AND_SUBSTANTIAL      # 12/12
+acceptance_criteria_touched:
+  AC-5: >-
+    NOT MET on this candidate, on one item (health-result provenance) and the G5 tier duty, from the single cause
+    E-O5-01. Every other AC-5 behaviour was exercised and met; the 15 availability attacks all hold.
+  AC-3: >-
+    every PARTIAL carries its argued qualification impact in capability-audit.yaml; O5 and U argue COULD_UNDERMINE
+    (same single cause), P1, P2, Q1 and Q2 argue CANNOT_UNDERMINE against what the V4 metrics measure.
+  AC-2: no capability in this family is ABSENT or UNCLEAR.
+  AC-15: reproduced green in this worktree (276/0 lib, 207/0 certification).
+findings:
+  - id: E-O5-01
+    severity: MEDIUM
+    capability: [O5, U]
+    blocking: true
+    blocker_class: BC-P2-07
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: >-
+      A tier run never executes the 35 doctor checks the catalogue declares at G1 and G5, yet reports the run
+      complete with nothing unevaluated; the RED/YELLOW/GREEN aggregate therefore rests on doctor evidence no
+      tier run refreshes
+    path: release/capability-baseline/verify-1/epsilon/findings.yaml
+  - id: E-P2-01
+    severity: LOW
+    capability: [P2, P1]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: Three of the eight organisational questions P2 names are not answerable from the telemetry the OS keeps
+    path: release/capability-baseline/verify-1/epsilon/findings.yaml
+  - id: E-Q1-01
+    severity: MEDIUM
+    capability: [Q1]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: The lesson lifecycle is modelled in the record but not enforced on the path that uses it
+    path: release/capability-baseline/verify-1/epsilon/findings.yaml
+  - id: E-Q2-01
+    severity: MEDIUM
+    capability: [Q2, Q1]
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: A lesson may record itself as AUTHORITATIVE and no check contradicts it
+    path: release/capability-baseline/verify-1/epsilon/findings.yaml
+labelling_note: >-
+  The inventory supplied (audit-0/synthesis/blocker-classes.yaml) contains blocking classes only, so a
+  non-blocking finding cannot name one. E-P2-01, E-Q1-01 and E-Q2-01 are labelled RESIDUAL with
+  `blocker_class: null`, each naming in findings.yaml the iteration-0 finding it restates (A0-P2-01/A0-P1-01,
+  A0-Q1-01, A0-Q2-01 — all recorded non-blocking at iteration 0). No finding of this run is materially new, and
+  none is a regression into a previously held capability.
+prior_findings_disposition:
+  in_scope: 38
+  CLOSED: 25
+  RESIDUAL: 6
+  NOT_APPLICABLE: 7
+  blocking_in_scope: 28
+  blocking_closed: 22
+  blocking_residual: 1
+  blocking_not_applicable: 5
+  residual_ids: [A0-O1-02, A0-O5-09, A0-P1-01, A0-P2-01, A0-Q1-01, A0-Q2-01]
+  path: release/capability-baseline/verify-1/epsilon/prior-findings-disposition.yaml
+verdict: FAMILY_VERIFICATION_COMPLETE
+output:
+  branch: phase2/verify-1-epsilon
+  commit: 55c03328e01cfad659022191140fa75bec4e68a9
+  evidence_path: release/capability-baseline/verify-1/epsilon/
+unresolved:
+  - >-
+    HEALTH_REMEDY_INCOMPLETE was not observed on its own code path (`scheduler::confirm_remedy`, called from
+    update.rs:469). The property it protects was demonstrated through `task.close`, which is refused
+    HEALTH_HARD_BLOCK because a close is never a remedy; exercising the update path needs a kernel-level
+    condition plus a signed successor release, which this run did not build.
+  - >-
+    Three O2 families (context reproducibility, product traceability, audit reproducibility) were evidenced by
+    the measurement they perform rather than by an injected failure this run could construct in a synthetic
+    project.
+  - >-
+    Five of the thirteen HEALTHY conditions (H2, H3, H6, H8, H13) were not flipped individually; they were
+    evidenced through their owning checks' demonstrated detection and the conjunction mechanism shown to fail for
+    the other eight.
+  - >-
+    Q1: that a task-closing report's lessons become lesson candidates, and that a Framework Change Proposal links
+    to a governed release, were not established (folded into E-Q1-01).
+  - >-
+    Later-lifecycle notes, never Phase-2 blockers: TEST_POLICY.product_families remains `overridable`
+    (adoption/operations); OS-produced token accounting would come from the adapter surface (operations); the
+    oracle format's PROPOSED status resolves at AC-6 and hidden faults are Phase 4; production key custody for
+    the `release` role that authenticates a certification claim is R2.
+recommended_next_action: >-
+  Route E-O5-01 to repair as an incomplete closure of BC-P2-07 — a tier run must evaluate every check its own
+  catalogue declares for that tier, whatever surface implements it, and may report `complete` only over the
+  checks it considered. The three non-blocking residuals (E-P2-01, E-Q1-01, E-Q2-01) restate iteration-0
+  non-blocking findings and need no repair for this gate; each carries its AC-3 argument. This family introduces
+  no materially new blocker class, so it contributes nothing to the convergence count.
+completed_at: 2026-09-20T23:10:00Z
