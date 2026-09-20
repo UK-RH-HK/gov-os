@@ -1,0 +1,70 @@
+schema: governance-os.phase-2.prior-findings-disposition
+schema_version: 1
+run_id: P2-AR-0045
+scope: oracle-format
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+inputs:
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  - release/capability-baseline/audit-0/synthesis/findings.yaml
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+  - release/capability-baseline/audit-0/epsilon-r/findings.yaml
+
+scope_note: >-
+  This role owns exactly one inventoried class, BC-P2-51 (capabilities V1-V4), and its single finding
+  A0-V1-01. Iteration-0 findings on other capabilities belong to the family verifiers and are not disposed
+  of here.
+
+dispositions:
+  - inventoried_class: BC-P2-51
+    class_title: Qualification Oracle format absent
+    class_capabilities: [V1, V2, V3, V4]
+    class_max_severity: HIGH
+    acceptance_criteria_blocked_at_iteration_0: [AC-2, AC-6, AC-10]
+    finding: A0-V1-01
+    finding_title: No Qualification Oracle format exists (QUALIFICATION_ORACLE_FORMAT_ABSENT)
+    disposition: CLOSED
+    limbs:
+      - limb: >-
+          "No tracked file defines a fault manifest, hidden path-map oracle, hidden memory oracle or
+          qualification scoring report … no schema, command or record type exists."
+        disposition: CLOSED
+        my_evidence: >-
+          framework/qualification-oracle/qualification-oracle.schema.json (format_sha256
+          f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd) with two document kinds, the
+          validator runtime/src/qualification_oracle.rs, and the commands `gov oracle format` /
+          `gov oracle validate`. My own extraction of Gate V from the owner-source bytes finds all 35
+          checklist bullets and 5 prose statements mapped to existing, required, typed fields, with 0
+          problems (evidence/02-coverage-crosswalk-check.out).
+      - limb: '"a fault-manifest record lacking every V1 field is accepted"'
+        disposition: CLOSED
+        my_evidence: >-
+          Exactly that record planted in a freshly `gov init`-ed governed project is refused by the
+          governance suite as `high | FM-0001 (fault-manifest) is hidden Qualification Oracle material
+          inside the governed repository`, and the finding disappears when the record is moved aside
+          (evidence/12-governed-repo-record.out). Separately, 90 invalid samples - one per V1-V4 bullet for
+          missing fields, plus wrong types, semantic contradictions, arithmetic and binding attacks - are
+          each refused with a typed error naming the Contract v3 element
+          (evidence/05-RUN-ALL-samples.out: 93 samples, 93 as expected, 0 unexpected).
+      - limb: '"GATE-P2-ORACLE-FORMAT is NOT_SATISFIED"'
+        disposition: CLOSED
+        my_evidence: >-
+          This review is the fresh independent acceptance that frozen gate contract AC-6 and section 9.2
+          require, issued before any hidden fault exists: verdict ORACLE_FORMAT_ACCEPTED for
+          format_sha256 f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd.
+      - limb: '"V1-V4 have zero evidence owners" (the AC-10 limb)'
+        disposition: CLOSED
+        my_evidence: >-
+          All 35 Gate V bullets now carry at least one evidence owner in
+          tests/governance/capability-evidence-map.yaml; 0 bullets have zero owners
+          (evidence/11-evidence-owners-v1-v4.out). V1-V3 carry an empty health_scheduler_tiers list, which
+          AC-10 does not require to be non-empty; recorded as my finding V1-OF-06 (INFO), not as a residue.
+    residual_risk: >-
+      The format is accepted; two MEDIUM findings I raise (V1-OF-01 leak-scan blind spots, V1-OF-02 V4 metrics not
+      bound to the oracle) bound what the accepted format and its validator guarantee. Both are labelled
+      MATERIALLY_NEW rather than residual: neither mechanism existed on cap2-candidate-0, where there was no
+      format, no validator and no leak scan at all. Neither blocks AC-6; both are Phase-4 work.
+    acceptance_criteria_status_from_this_scope:
+      AC-6: MET on this candidate for the format at the accepted digest.
+      AC-2: 'V1-V4 are no longer ABSENT from this scope''s evidence; the capability statuses themselves are the family verifiers'' call, not mine.'
+      AC-10: 'the Gate V slice of AC-10 (zero evidence owners) is closed; the rest of AC-10 is not in my scope.'

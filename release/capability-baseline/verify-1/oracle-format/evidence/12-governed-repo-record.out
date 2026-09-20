@@ -1,0 +1,5 @@
+--- with the bare fault-manifest record present ---
+total findings: 27 | hidden-oracle findings: 3 (1 distinct message(s))
+  - high | FM-0001 (fault-manifest) is hidden Qualification Oracle material inside the governed repository: the verifier-owned hidden oracle must stay in verifier custody, separate from the qualification reposit
+--- after moving it aside (rm is denied in this environment) ---
+total findings: 18 | hidden-oracle findings: 0 (0 distinct message(s))

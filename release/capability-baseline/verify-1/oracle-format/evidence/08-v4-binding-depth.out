@@ -1,0 +1,15 @@
+attack                                             result                           detail
+V4.5 path-map accuracy claimed perfect             ACCEPTED                         
+V4.10 chaos pass rate claimed 100/100              ACCEPTED                         
+V4.11 human-gate correctness claimed 500/500       ACCEPTED                         
+V4.12 task/readiness claimed 999/999               ACCEPTED                         
+V4.6 missed authoritative artefacts zeroed         ACCEPTED                         
+V4.7 wrong-indexing count zeroed                   ACCEPTED                         
+V4.7 wrong-indexing refs not in the oracle         ACCEPTED                         
+V4.9 retrieval metrics claimed perfect             ACCEPTED                         
+V4.2 false positives zeroed                        ACCEPTED                         
+V1.8 governed-action correctness self-asserted     ACCEPTED                         
+V1.9 forbidden outcomes silently emptied           ACCEPTED                         
+
+A score report validated WITHOUT its oracle (no --oracle):
+   ACCEPTED | binding_verified present: False

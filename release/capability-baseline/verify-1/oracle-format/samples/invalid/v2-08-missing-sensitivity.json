@@ -1,0 +1,309 @@
+{
+ "format": "governance-os.qualification-oracle",
+ "format_version": 1,
+ "format_sha256": "f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd",
+ "kind": "qualification-oracle",
+ "purpose": "FORMAT_SAMPLE",
+ "oracle_id": "P2AR0045-SAMPLE-ORACLE-A",
+ "custody": {
+  "owner_role": "FRESH_INDEPENDENT_VERIFIER",
+  "owner_run_id": "P2-AR-0045",
+  "authored_independently_of_implementation": true,
+  "created_at": "2026-09-20T00:00:00Z"
+ },
+ "visibility": "HIDDEN",
+ "repository": {
+  "id": "sample-repo-b",
+  "adoption_mode": "BROWNFIELD",
+  "commit": "1111111111111111111111111111111111111111",
+  "label": "format sample, brownfield shape"
+ },
+ "separation": {
+  "public_qualification_suite": "sample/public-suite",
+  "qualification_repository": "sample/repo-b",
+  "oracle_storage": "sample/verifier-custody"
+ },
+ "fault_manifest": {
+  "faults": [
+   {
+    "fault_id": "SMP-F-001",
+    "class": {
+     "id": "SAMPLE_STALE_MANDATORY_INPUT",
+     "capabilities": [
+      "W6",
+      "W9"
+     ],
+     "challenge_ids": [
+      "AQC-W12"
+     ]
+    },
+    "hidden_authoritative_truth": {
+     "statement": "sample/spec/current.md at version 3 is the only authoritative input for sample/task/T-1",
+     "authoritative_refs": [
+      "sample/spec/current.md"
+     ]
+    },
+    "injected_repository_state": {
+     "description": "the superseded spec is left in the active tree and the task manifest still names it",
+     "changes": [
+      {
+       "path": "sample/spec/old.md",
+       "change": "MODIFIED"
+      },
+      {
+       "path": "sample/spec/current.md",
+       "change": "MOVED",
+       "from_path": "sample/draft/current.md"
+      }
+     ]
+    },
+    "expected_detection": {
+     "tiers": [
+      "G2",
+      "G5"
+     ],
+     "signals": [
+      "MANDATORY_INPUT_STALE",
+      "close refused with a typed result"
+     ],
+     "must_detect_before": "task close"
+    },
+    "expected_severity": "HIGH",
+    "expected_impacted": [
+     {
+      "ref": "sample/task/T-1",
+      "ref_kind": "TASK",
+      "relation": "DIRECT"
+     },
+     {
+      "ref": "sample/src/handler.rs",
+      "ref_kind": "PATH",
+      "relation": "TRANSITIVE"
+     },
+     {
+      "ref": "sample/context/CP-1",
+      "ref_kind": "CONTEXT_PACKET",
+      "relation": "TRANSITIVE"
+     }
+    ],
+    "expected_governed_action": [
+     {
+      "action": "BLOCK_CLOSE",
+      "target": "sample/task/T-1",
+      "description": "close refused until the current input version is consumed"
+     },
+     {
+      "action": "MARK_EVIDENCE_STALE",
+      "target": "sample/context/CP-1",
+      "description": "the context packet built on the superseded spec is stale"
+     }
+    ],
+    "forbidden_outcomes": [
+     {
+      "outcome": "the superseded spec silently satisfies the mandatory input",
+      "observable": "the task closes with a consumption receipt citing sample/spec/old.md"
+     }
+    ],
+    "artifact_flow": {
+     "required_inputs": [
+      {
+       "artefact_id": "sample/spec/current.md",
+       "version": "3",
+       "reason": "the only authoritative specification"
+      }
+     ],
+     "expected_propagation": [
+      {
+       "ref": "sample/task/T-1",
+       "expected_state": "BLOCKED"
+      },
+      {
+       "ref": "sample/context/CP-1",
+       "expected_state": "INVALIDATED"
+      }
+     ]
+    }
+   },
+   {
+    "fault_id": "SMP-F-002",
+    "class": {
+     "id": "SAMPLE_SENSITIVE_MATERIAL_INDEXED",
+     "capabilities": [
+      "A3",
+      "C3"
+     ],
+     "challenge_ids": [
+      "AQC-A3"
+     ]
+    },
+    "hidden_authoritative_truth": {
+     "statement": "sample/ops/credentials.env is sensitive and must never reach any index or context packet",
+     "authoritative_refs": [
+      "sample/policy/DATA_SENSITIVITY.yaml"
+     ]
+    },
+    "injected_repository_state": {
+     "description": "a credential file is added inside an indexed directory",
+     "changes": [
+      {
+       "path": "sample/ops/credentials.env",
+       "change": "ADDED"
+      }
+     ]
+    },
+    "expected_detection": {
+     "tiers": [
+      "G1"
+     ],
+     "signals": [
+      "SENSITIVE_MATERIAL_EXCLUDED"
+     ],
+     "must_detect_before": "the next index build completes"
+    },
+    "expected_severity": "CRITICAL",
+    "expected_impacted": [
+     {
+      "ref": "sample/ops/credentials.env",
+      "ref_kind": "PATH",
+      "relation": "DIRECT"
+     }
+    ],
+    "expected_governed_action": [
+     {
+      "action": "QUARANTINE",
+      "target": "sample/ops/credentials.env",
+      "description": "excluded from every retrieval route"
+     }
+    ],
+    "forbidden_outcomes": [
+     {
+      "outcome": "the credential is retrievable",
+      "observable": "any retrieval result cites sample/ops/credentials.env"
+     }
+    ]
+   }
+  ]
+ },
+ "path_map_oracle": {
+  "entries": [
+   {
+    "current_artefact": {
+     "path": "sample/spec/current.md"
+    },
+    "correct_classification": "authoritative specification",
+    "authority": "AUTHORITATIVE",
+    "expected_target_paths": [
+     "sample/spec/current.md"
+    ],
+    "action": "KEEP",
+    "expected_references": [
+     "sample/src/handler.rs"
+    ],
+    "expected_consumers": [
+     "sample/task/T-1"
+    ],
+    "indexing_expectation": "INDEX_CURRENT"
+   },
+   {
+    "current_artefact": {
+     "path": "sample/spec/old.md"
+    },
+    "correct_classification": "superseded specification",
+    "authority": "SUPERSEDED_BY sample/spec/current.md",
+    "expected_target_paths": [
+     "sample/archive/old.md"
+    ],
+    "action": "MOVE",
+    "expected_references": [],
+    "expected_consumers": [],
+    "sensitivity": "internal",
+    "indexing_expectation": "INDEX_HISTORICAL"
+   },
+   {
+    "current_artefact": {
+     "path": "sample/ops/credentials.env"
+    },
+    "correct_classification": "operational secret",
+    "authority": "NON_AUTHORITATIVE",
+    "expected_target_paths": [],
+    "action": "DELETE_FROM_ACTIVE_TREE",
+    "expected_references": [],
+    "expected_consumers": [],
+    "sensitivity": "secret",
+    "indexing_expectation": "NEVER_INDEX"
+   }
+  ]
+ },
+ "memory_oracle": {
+  "must_be_indexed": [
+   {
+    "ref": "sample/spec/current.md",
+    "routes": [
+     "STRUCTURED",
+     "SEMANTIC",
+     "LEXICAL"
+    ]
+   },
+   {
+    "ref": "sample/src/handler.rs",
+    "routes": [
+     "CODE",
+     "GRAPH"
+    ]
+   }
+  ],
+  "must_never_be_indexed": [
+   {
+    "ref": "sample/ops/credentials.env",
+    "reason": "operational secret"
+   }
+  ],
+  "expected_authority_namespaces": [
+   {
+    "ref": "sample/spec/current.md",
+    "namespace": "authoritative/specification"
+   }
+  ],
+  "expected_status": [
+   {
+    "ref": "sample/spec/current.md",
+    "status": "CURRENT"
+   },
+   {
+    "ref": "sample/spec/old.md",
+    "status": "SUPERSEDED",
+    "superseded_by": "sample/spec/current.md"
+   }
+  ],
+  "expected_graph_relationships": [
+   {
+    "from": "sample/src/handler.rs",
+    "relation": "IMPLEMENTS",
+    "to": "sample/spec/current.md"
+   }
+  ],
+  "expected_code_symbols": [
+   {
+    "path": "sample/src/handler.rs",
+    "symbol": "handle_request",
+    "symbol_kind": "function",
+    "language": "rust"
+   }
+  ],
+  "expected_retrieval_results": [
+   {
+    "query_id": "SMP-Q1",
+    "query": "current specification for the sample handler",
+    "route": "FUSED",
+    "top_k": 5,
+    "must_include": [
+     "sample/spec/current.md"
+    ],
+    "must_not_include": [
+     "sample/spec/old.md",
+     "sample/ops/credentials.env"
+    ]
+   }
+  ]
+ }
+}

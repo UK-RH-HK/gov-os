@@ -1,0 +1,1 @@
+QUALIFICATION oracle + FORMAT_SAMPLE report -> ORACLE_SCORE_BINDING_MISMATCH | a report and its oracle must have the same purpose (a FORMAT_SAMPLE is never scored as QUALIFICATION)
