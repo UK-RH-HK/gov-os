@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-20T23:14:11Z'
-state_hash: 083fb6b8093e8bbbfdeceec5309260065e5785f572e0e38ed1bc041b709c7278
+updated_at: '2026-09-20T23:14:46Z'
+state_hash: 63c70ebd6faac53d6544d56633665f641a9e1550d3d07e088681264c8743534d
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_VERIFICATION_ITERATION_1_RUNNING
 
@@ -267,9 +267,11 @@ agent_runs:
   - {run_id: P2-AR-0049, role: capability-verifier, scope: delta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-delta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml}
   - {run_id: P2-AR-0050, role: capability-verifier, scope: epsilon, iteration: 1, status: COMPLETED, branch: phase2/verify-1-epsilon, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml}
   - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
+  - {run_id: P2-AR-0052, role: capability-baseline-synthesis, iteration: 1, status: RUNNING, branch: phase2/verify-1-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
-running_work: []
+running_work:
+  - {run_id: P2-AR-0052, role: capability-baseline-synthesis, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -322,16 +324,15 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md  # resume procedure; hold lifted 2026-09-20
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0010.yaml
 next_deterministic_action: >-
-  AWAIT_VERIFICATION_ITERATION_1 — eight fresh independent verifiers run on cap2-candidate-1 (0bad524): P2-AR-0044 AC-14 R1
-  preservation, P2-AR-0045 AC-6 oracle format, P2-AR-0046..0051 families alpha/beta/gamma/delta/epsilon/zeta, each on
-  branch phase2/verify-1-*. On each completion: verify its report and scope, record. When all eight are done: merge their
-  evidence into release/4.1.6-rc1 and dispatch the fresh synthesis verifier P2-AR-0052 (P2-HO-0047), the sole issuer of the
-  iteration-1 verdict. Owner stop condition (2026-09-20): if the synthesis verdict is not
-  GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, STOP after recording the verifier evidence — no further repair round, no further
-  build agents — classify every finding (blocker class, severity, normative source, RESIDUAL vs MATERIALLY_NEW), record which
-  of the 52 iteration-0 classes remain, identify whether the failure is implementation / integration / evidence /
-  architecture / orchestration, checkpoint, produce the owner decision package, and return
-  PHASE_2_POST_ROUND4_VERIFICATION_REJECTED__OWNER_REVIEW_REQUIRED. If accepted: finalise and return
+  AWAIT_SYNTHESIS_P2-AR-0052 — the fresh synthesis verifier (P2-HO-0047, branch phase2/verify-1-synthesis) verifies the eight
+  iteration-1 verifications of cap2-candidate-1, adjudicates AC-1..AC-16, checks every RESIDUAL / MATERIALLY_NEW label,
+  numbers any new classes from BC-P2-53, and issues the iteration-1 verdict. On completion: merge its evidence, record the
+  verdict and the convergence result. If it issues GOVERNANCE_CAPABILITY_BASELINE_REJECTED, the owner stop condition of
+  2026-09-20 applies — STOP after recording the verifier evidence, start no further repair round and spawn no further build
+  agents, classify the findings (blocker class, severity, normative source; residual vs materially new; which of the 52
+  iteration-0 classes remain), identify whether the failure is implementation / integration / evidence / architecture /
+  orchestration, checkpoint, produce the owner decision package and return
+  PHASE_2_POST_ROUND4_VERIFICATION_REJECTED__OWNER_REVIEW_REQUIRED. If ACCEPTED: finalise and return
   PHASE_ORCHESTRATION_COMPLETE__GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED. Phase 3 is not started in this session.
 
 current_prohibitions:
