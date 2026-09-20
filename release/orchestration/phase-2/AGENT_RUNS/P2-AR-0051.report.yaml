@@ -93,7 +93,7 @@ result:
       - 'W12-G2b — `gov health close-check` agrees with the gate it previews (finding A1-W12-01)'
   regression_evidence:
     cargo_test_lib: '276 passed; 0 failed (evidence/cargo-lib.out)'
-    cargo_test_certification: 'see evidence/cargo-certification.out'
+    cargo_test_certification: '207 passed; 0 failed (evidence/cargo-certification.out)'
 
 output:
   evidence_dir: release/capability-baseline/verify-1/zeta/
@@ -106,7 +106,13 @@ output:
     - release/capability-baseline/verify-1/zeta/heldout/
     - release/capability-baseline/verify-1/zeta/evidence/
   branch: phase2/verify-1-zeta
-  commit: 91543209676f77e6471a3fccca58829884fae666
+  commit: 8e7f68295201a510680eca462b0189055ec97d05
+  commit_note: >
+    The evidence was first committed at 91543209676f77e6471a3fccca58829884fae666, as this report
+    originally recorded. The certification regression suite was still executing then and was recorded
+    as left running; it completed green afterwards, and 8e7f682 adds the completed log and updates
+    the verification report's "what I could not establish" section. 8e7f682 is the evidence commit to
+    read; it contains everything 9154320 did, unchanged, plus that correction.
 
 not_established:
   - 'a relationship spanning two languages (FFI) or two repositories (W8.5, conditioned on "where in scope"); finding A1-W8-01'
@@ -115,7 +121,6 @@ not_established:
   - 'cross-machine continuity (P2-ADJ-0002) — alpha leads it; no W capability required it'
   - 'a lower bound on how much W11 must measure before the artifact_flow_health family may be green (several metrics are `applicable: false` in a repository with no live work)'
   - 'a capability plugin that hangs rather than failing, as a W10 outage case'
-  - 'the certification suite was started as regression evidence under heavy concurrent load; see evidence/cargo-certification.out for what it reached'
 
 prohibitions_observed:
   - no product source, test, fixture, schema, policy, doc or Cargo file was modified
