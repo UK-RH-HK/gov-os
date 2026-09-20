@@ -1,0 +1,26 @@
+    evidence map for the 19 gamma capabilities: 0/19 unmapped
+PASS  A0-E1-06: every gamma capability has an evidence class and at least one automated check
+    compiled contract view for E1: bullets
+PASS  A0-E1-06: the compiled contract view carries checklist bullets
+    independent-test gap task: TASK-0025
+    claim by backend-engineer -> ROLE_NOT_DESIGNATED ; by independent-test-designer -> ALLOWED
+PASS  A0-E1-05: a designated role binds who may claim the task it designates
+    second return by a role the handoff did not name -> ACCEPTED ; record now holds: 'SECOND return by a d'
+FAIL  A0-E3-01: a role the handoff did not name returned it, overwriting the earlier return ('SECOND return by a d')
+    continue in session B offered: None (session A holds TASK-0029)
+PASS  A0-E4-04: continue offers other work, not the task another session holds (None)
+    skills resolve (a class kernel skills cover) -> {"task": "TASK-0030", "resolved": [], "missing": [], "candidates_by_class_role": [{"id": "SKL-API-CONTRACT-REVIEW", "version": "1.0.0", "source": "kernel", "content_sha256": "acdca045bbba18e2a68ff495f6534ec7da86ae3f44cc40afc3716f967acb1236"}, {"id": "SKL-TASK-CLOSE", "version": "1.0.0", "source": "kernel", "content_sha256": "73cba03a7f239a12660660695fa7bdd2a7511d4a173aab817e896553d547f98d"}], "capability_gap": false}
+PASS  A0-F1-02 (defined half): every kernel skill defines inputs, outputs and evidence scenarios (got none)
+FAIL  A0-F1-02 (consumed half): skill resolution returns id, version, source and content hash only — a skill's declared inputs/outputs are still not consumed by any caller
+    elevated install raised installation gate=HDG-0002 change gate=HDG-0001
+    after the owner answered: installed=True gate=HDG-0001
+PASS  A0-F3-01: an install gate answered A leads to the installation
+    with PROJECT_POLICY.readiness.enforce_pre_implementation_cells=false the implementation task is blocked
+PASS  A0-H3-01: the project overlay cannot switch off pre-implementation readiness gating (task still blocked)
+    closing a task that wrote outside its scope -> MUTATION_SCOPE_VIOLATION
+PASS  A0-I2-02: a path outside the task's declared scope is refused at close (MUTATION_SCOPE_VIOLATION)
+    per_feature: {"": ["TASK-0027", "TASK-0028", "TASK-0029", "TASK-0030", "TASK-0031", "TASK-0033"], "FEAT-7001": ["TASK-0001", "TASK-0002", "TASK-0003", "TASK-0004", "TASK-0005", "TASK-0006", "TASK-0007", "TASK-0008", "TASK-0009", "TASK-0010", "TASK-0011", "TASK-0012", "TASK-0013", "TASK-0014", "TASK-0015", "TASK-
+PASS  A0-I4-01: the per-feature view respects dependency order (an end-to-end path)
+    handoff authority as recorded: {'allowed': ['**'], 'prohibited': []}
+FAIL  A0-F5-01: a handoff declared authority ('**') broader than its task's allowed paths
+---- PRIOR-FINDINGS-recheck.sh: 9 passed, 3 failed

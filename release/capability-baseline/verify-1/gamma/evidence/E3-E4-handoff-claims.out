@@ -1,0 +1,18 @@
+PASS  E3 b1-b7: every typed return element is REQUIRED by the worker-return contract (got none)
+PASS  E3: a typed handoff is created (HND-0001) (got HND-)
+PASS  E3: a typed return is accepted and recorded (got RETURNED)
+PASS  E3 b5: a lesson in the return becomes a governed PROVISIONAL lesson record (got yes)
+PASS  E3: every returned element persists in the governed record after the session ends (got all)
+PASS  E3/W5: a schema-valid worker return is accepted as the task-close receipt
+PASS  E4 b1: a task is claimed by a session (got yes)
+PASS  E4 b1/b3: a claim records its session, worktree and mutation scope (got branch,git_dir,head,scope,session_id,worktree)
+PASS  E4 b2: a second session's claim of a held task is refused (got TASK_CLAIMED)
+PASS  E4 b2: exactly one of 8 concurrent claimants wins (atomic claim) (got 1)
+PASS  E4 b3: every claim survives a full derived-memory rebuild (2 before, 2 after) (got 2)
+PASS  E4 b4: a governed stale-claim recovery operation exists and runs (claims sweep) (got ok)
+expired
+PASS  E4 b4: after governed recovery an expired claim no longer blocks the task (got yes)
+PASS  E4 b5: a task with a disjoint mutation scope is claimable in parallel (got yes)
+PASS  E4 b5: a parallel claim whose mutation scope overlaps a live claim is refused (got CLAIM_SCOPE_CONFLICT)
+PASS  E4 b5: a dependency-blocked task cannot be claimed even when its stored status says READY (got TASK_NOT_RUNNABLE)
+---- E3-E4-handoff-claims.sh: 16 passed, 0 failed

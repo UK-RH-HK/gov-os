@@ -1,0 +1,22 @@
+    gate HDG-0001 (rendered)
+PASS  BC-P2-10: 'gov decide --role human' does not record a human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: 'gov decide --by human' does not record a human approval (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: 'gov decide --by product-owner' does not record a human approval (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: 'gov decide --by 'the owner said yes in chat'' does not record a human approval (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: GOV_ROLE=human produces no human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: GOV_HUMAN_GATE_APPROVED=1 produces no human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: GOV_HUMAN=1 produces no human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: a forged answer document is refused (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: an agent may not resolve a gate outside HUMAN_GATE_POLICY.agent_resolvable_when (AUTHORITY_DENIED)
+    owner-signed answer -> {"answered_by_kind": "human", "answered_by": "gamma verification owner (test seed)", "option": "A", "decision": "D-0001"}
+PASS  L3: the owner's signed answer is accepted and recorded as a human answer
+PASS  L3: the recorded answer re-verifies against the machine's anchor at use time (got 1)
+PASS  D-0007 rule 2: a hand-written 'human_approved' decision does not authorise a change (USAGE)
+    plugin refusal -> {"code": "PLUGIN_NOT_APPROVED", "remedy": "gov plugins register --descriptor <file> (as an install-authority role); present the gate it raises; the product owner answers it through the human channel; register again"}
+PASS  L4 availability: the plugin refusal is typed and names its remedy
+PASS  L4 availability: the remedy the refusal names stays available while the block is in force (got available)
+PASS  L4 availability: an unapproved plugin blocks only plugin execution, not unrelated governed work (got ok)
+PASS  L4 availability: an unsatisfied readiness contract blocks the implementation task (got blocked)
+    readiness remedy tasks runnable: 26/26
+PASS  L4 availability: the readiness block's own remedy work stays runnable (26/26)
+---- OD-P2-01-human-approval.sh: 17 passed, 0 failed

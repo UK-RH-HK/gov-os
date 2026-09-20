@@ -1,0 +1,55 @@
+PASS  G1 b1: a human expresses intent in words, without internal command syntax (got STATUS)
+    -> gov status
+PASS  G1 b2: the same words map deterministically to the same governed operation (got PAUSE/PAUSE)
+PASS  G1 b2: every routed command is a governed operation the command contract declares (got none)
+FAIL  G1 b2: 'do not approve this change' routes to APPROVE (negation inverted)
+PASS  G1 b2: the router never proposes a command that asserts a human identity on the agent's behalf (got no)
+    classify -> {"paths": ["spec/interfaces/API-7001.yaml"], "base": "HEAD", "materiality": {"declared_trigger": "", "derived_classes": ["interface_change"], "effective_triggers": ["interface_change"], "effective_trigger": "interface_change", "material": true, "label_understates": true, "requires_cit_in_task": [{"c
+PASS  G1 b3: a consequential edit is classified material by the OS, from the change itself (got material)
+    close of a task that made a material interface change -> MATERIAL_CHANGE_REQUIRES_CIT
+PASS  G1 b3: closing a task that made a material change without change control is refused (MATERIAL_CHANGE_REQUIRES_CIT)
+PASS  G2: control 'status' is executable
+PASS  G2: control 'continue' is executable
+PASS  G2: control 'audit' is executable
+PASS  G2: control 'decide' is executable (got 1)
+PASS  G2: emergency control 'pause' is executable
+PASS  G2: emergency control 'freeze-writes' is executable
+PASS  G2: emergency control 'cancel-agents' is executable
+PASS  G2: pause/freeze actually blocks governed writes (FROZEN)
+PASS  G2: the remedy for a freeze (resume) stays available while the freeze is in force (got ok)
+PASS  G2: control 'rollback' is executable
+PASS  I1: every one of the twenty-two task classes is in the governed task contract (got none)
+PASS  I1: all twenty-two classes can actually be created as tasks () (got 22)
+    tasks in the single DAG: 24
+PASS  I2 b3: 'dependencies' are enforced (a dependent task is not runnable) (got TASK_NOT_RUNNABLE)
+PASS  I2 b8: 'allowed/forbidden paths' are enforced at close (MUTATION_SCOPE_VIOLATION)
+PASS  I2 b4/b6: an absent required tool/data blocks the task (TASK_NOT_RUNNABLE)
+    routing for TASK-0027 -> {"tier": null, "reasoning": "high", "minimum_tier": "T3", "minimum_reasoning": null}
+PASS  I2 b7: a minimum model tier / reasoning is resolved for a task
+    declared generation sources: audit-finding,cit-effect,failed-tests,failure,health-failure,human-decision,lesson,memory-health,missing-skill,missing-tool,performance-regression,proposed-decision,research-discovery,retrieval-failure,security-finding,tool-failure
+PASS  I3: 'failed tests' is a declared generation source (failed-tests)
+PASS  I3: 'audit findings' is a declared generation source (audit-finding)
+PASS  I3: 'research discoveries' is a declared generation source (research-discovery)
+PASS  I3: 'human decisions' is a declared generation source (human-decision)
+PASS  I3: 'CIT effects' is a declared generation source (cit-effect)
+PASS  I3: 'lessons' is a declared generation source (lesson)
+PASS  I3: 'missing tools' is a declared generation source (missing-tool)
+PASS  I3: 'missing skills' is a declared generation source (missing-skill)
+PASS  I3: 'retrieval failures' is a declared generation source (retrieval-failure)
+PASS  I3: 'security findings' is a declared generation source (security-finding)
+PASS  I3: 'performance regressions' is a declared generation source (performance-regression)
+    task generate --dry-run -> ERR:TypeError
+    generated on first run: 0; on an immediate second run: 0
+PASS  I3: generation is idempotent (the same events do not generate the work twice) (got 0)
+PASS  I3: every generated task records its source, subject, dedup key and the evidence that caused it (got none)
+PASS  I3: a record-backed source (a lesson) generates work linked to the causing record
+    dag -> {"runnable": 8, "blocked": 24, "waiting_human": 0, "chain": 2, "per_feature": 1, "gatedeps": 0}
+PASS  I4 b1: the DAG reports a runnable set (8)
+PASS  I4 b1: the DAG reports a blocked set (24)
+PASS  I4 b4: the DAG reports a waiting-on-human set (0)
+PASS  I4 b2: the DAG reports a critical path (2 tasks)
+PASS  I4 b3: the DAG reports a per-feature path (1 features)
+PASS  I4 b4: a task whose authorising gate is unanswered is reported as waiting on the human (got waiting)
+PASS  I4 b5: an independent branch continues while another waits for human input (got yes)
+    continue -> {"status": "NEXT_WORK", "task": "TASK-0025", "task_contract": {"id": "TASK-0025", "type": "task", "title": "A", "status": "ACTIVE", "created": "2026-09-20", "objective": "A", "class": "documentation",
+---- G1-G2-I1-I4-command-work.sh: 43 passed, 1 failed

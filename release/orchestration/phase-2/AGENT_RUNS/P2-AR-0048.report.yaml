@@ -1,0 +1,273 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0048
+role: capability-family-auditor
+objective: >-
+  Verification iteration 1, family gamma: a full independent re-audit of E1-E4, F1-F5, G1-G2, H1-H4 and I1-I4 on
+  candidate cap2-candidate-1, with my own held-out tests, and a disposition of every iteration-0 finding in scope.
+agent_model: claude-opus-5[1m]
+independence_statement: >-
+  I authored none of the Governance OS implementation, none of its tests, none of the iteration-0 audits, none of the
+  repairs (P2-AR-0014…0043) and no Phase-1 role. I read: the owner source (Contract v3), the frozen Phase-2 gate
+  contract, my handoffs (P2-HO-0043, P2-HO-0044, P2-HO-0000, P2-HO-0009, P2-HO-0003), the owner decisions
+  OD-P2-01/02/03 and the adjudications P2-ADJ-0001/0002/0003, the iteration-0 blocker-class inventory and the gamma
+  audit of record (both required to dispose of prior findings), and the product's own source, schemas and policies. I
+  did NOT read the repair or integration reports under release/capability-baseline/repair-1/**, any other iteration-1
+  verifier's evidence directory or branch, any agent or session transcript, any task-output store, or user
+  auto-memory. I modified no product source and nothing outside my evidence directory and this report. I spawned no
+  sub-agents; every command recorded here I ran myself.
+input:
+  base_commit: 8588813ec1ef9c832879e258ca5acfb573ae996f
+  candidate: cap2-candidate-1
+  candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0044-verify-1-family-scopes.md
+  identity_verification: >-
+    `python3 release/orchestration/phase-2/tools/product_identity.py HEAD` and `git rev-list -n1 cap2-candidate-1`
+    both run in this worktree; both digests and the tag commit match the dispatch. No STOP condition.
+inspected:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md:360-590 (the owner source for gamma's 19 capabilities)
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001-AGENT-ROLE-IDENTITY.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md
+  - release/capability-baseline/audit-0/synthesis/{blocker-classes.yaml,findings.yaml}
+  - release/capability-baseline/audit-0/gamma-r/findings.yaml
+  - runtime/src/{authority.rs,tools.rs,skills.rs,human_channel.rs,policy.rs,policy_precedence.rs}
+  - runtime/src/capabilities/{governance.rs,binding.rs,registry.rs,host.rs,protocol.rs}
+  - runtime/src/orchestration/{intents.rs,claims.rs,dag.rs,generation.rs,handoffs.rs,readiness.rs,tasks.rs}
+  - runtime/src/memory/claims.rs, runtime/src/lifecycle/scenario.rs, runtime/src/cit/materiality.rs
+  - framework/policies/{TOOL_POLICY,CHANGE_POLICY,AUTHORITY_POLICY,POLICY_PRECEDENCE,HUMAN_GATE_POLICY}.yaml
+  - framework/taxonomy/{READINESS_DIMENSIONS,WORK_GENERATION}.yaml, framework/schemas/*.schema.json
+  - framework/roles/ROLES.yaml, framework/commands/COMMAND_CONTRACT.yaml, framework/skills/*.yaml
+produced:
+  - release/capability-baseline/verify-1/gamma/00-VERIFICATION-REPORT.md
+  - release/capability-baseline/verify-1/gamma/capability-audit.yaml
+  - release/capability-baseline/verify-1/gamma/findings.yaml
+  - release/capability-baseline/verify-1/gamma/prior-findings-disposition.yaml
+  - release/capability-baseline/verify-1/gamma/heldout/ (11 probes, RUN-ALL, lib.sh, ownersign.py, publish_release.py)
+  - release/capability-baseline/verify-1/gamma/evidence/ (captured output of every probe run)
+tests_or_attacks:
+  - id: E1-E2-authority
+    description: "E1 L0-L5 executable, authority on every mutating path, no manufactured higher-trust fact, independent roles constrained; E2 the seven role classes and the missing governed extension"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/E1-E2-authority.out
+  - id: E3-E4-handoff-claims
+    description: "E3 the seven typed return elements and their persistence; E4 claimability, 8 concurrent claimants, rebuild survival, governed stale recovery, dependency and mutation constraints"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/E3-E4-handoff-claims.out
+  - id: F1-F2-F5-skills-tools-layers
+    description: "F1 skill lifecycle (scenarios executed, content-bound) and the missing lesson-to-skill promotion; F2 the eight registry fields; F5 the three layers; and OD-P2-03 requirement 2 — is the AUTHORISED side of the envelope trusted OS state?"
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/F1-F2-F5-skills-tools-layers.out
+    detail: "18 passed, 6 failed: V1-F4-02 (a hand edit of governance/project/TOOL_PERMISSIONS.yaml enlarged the authorised envelope, undetected), V1-F2-01, V1-F2-02, V1-F1-01, V1-F5-01"
+  - id: F3-F4-tool-install-gate
+    description: "OD-P2-03 end to end: the non-gated branch, eleven authority-expansion triggers, ordinary allowlisted network use, interpreter-wrapped evasion, review binding, and the unconditional record"
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/F3-F4-tool-install-gate.out
+    detail: "16 passed, 5 failed: V1-F4-01 (four interpreter-wrapped escalations install ungated) and V1-F3-01 (one review authorised a different installation, which then executed)"
+  - id: V1-F4-01-executed-proof
+    description: "The executed proof: an ungated installation writes outside the project root, with and without --execute (the health_check command runs either way)"
+    result: CONFIRMED
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/V1-F4-01-executed-proof.out
+  - id: F4-plugin-boundary
+    description: "F4's six bullets on the plugin side, plus D-0010 hand-declared descriptors, a forged registry entry, registration inside a claimed task, module-form pinning (BC-P2-40) and drift"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/F4-plugin-boundary.out
+  - id: G1-G2-I1-I4-command-work
+    description: "G1 intent routing and automatic impact/gate logic; G2 the control set and the availability of a freeze's remedy; I1 all 22 classes created; I2 all nine fields enforced; I3 all eleven sources; I4 the DAG views and independent branches"
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/G1-G2-I1-I4-command-work.out
+    detail: "43 passed, 1 failed: V1-G1-01 ('do not approve this change' routes to APPROVE)"
+  - id: H1-H4-spec-readiness
+    description: "H1 the seventeen lineage kinds traced end to end; H2 26 dimensions, five statuses, silent N/A invalid; H3 gap work per dimension with its designated role; H4 the chain, enforced data-author independence and bound provenance; P2-ADJ-0003"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/H1-H4-spec-readiness.out
+  - id: FRESHNESS-invalidation
+    description: "AC-10 for gamma: 31 currency input classes; a skill, a tool and a task each change the key; a green record stops being current and the changed class is named; stale evidence refuses governance-affecting work"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/FRESHNESS-invalidation.out
+  - id: OD-P2-01-human-approval
+    description: "Nine agent-supplied routes to a human approval attacked against a rendered gate; the owner's signature accepted and re-verified; the availability rule for the blocks gamma's capabilities issue"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/OD-P2-01-human-approval.out
+  - id: PRIOR-FINDINGS-recheck
+    description: "Direct re-checks for the iteration-0 findings the capability probes do not decide: A0-E1-05, A0-E1-06, A0-E3-01, A0-E4-04, A0-F1-02, A0-F3-01, A0-F5-01, A0-H3-01, A0-I2-02, A0-I4-01"
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/PRIOR-FINDINGS-recheck.out
+    detail: "9 passed, 3 failed: A0-E3-01, A0-F1-02 (consumed half) and A0-F5-01 reproduce as residuals"
+  - id: RUN-ALL
+    description: "The whole held-out suite re-run through heldout/RUN-ALL"
+    result: FAIL
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/RUN-ALL.out
+    detail: >-
+      Totals across the eleven probes: 184 passed, 17 failed; every FAIL is a recorded observation of the candidate,
+      not a harness error. The aggregate run was stopped part-way (load ~126 from other verifiers' certification
+      suites) and evidence/RUN-ALL.out records that, with the first five probe lines reproducing the individual runs
+      exactly; every probe's own full output is in evidence/<probe>.out.
+  - id: regression-lib
+    description: "cargo test --lib in this worktree (O3 regression evidence)"
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/gamma/evidence/regression-cargo-test-lib.out
+    detail: "276 passed, 0 failed"
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 12
+  PARTIAL: 7
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+bullet_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 158
+  PARTIAL: 7
+  ABSENT: 2
+  total: 167
+prior_findings_disposition:
+  in_scope_total: 40
+  CLOSED: 29
+  RESIDUAL: 10
+  NOT_APPLICABLE: 1
+findings:
+  - id: V1-F4-01
+    severity: HIGH
+    capability: "F4, F3"
+    blocking: true
+    blocker_class: null
+    new_vs_residual: MATERIALLY_NEW
+    owner_decision_required: false
+    title: "An interpreter-wrapped install command evades every authority-expansion trigger, and a command the OS cannot read is not recorded undetermined (OD-P2-03 req 3)"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F3-01
+    severity: HIGH
+    capability: "F3, F4"
+    blocking: true
+    blocker_class: BC-P2-41
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "The governed security review is bound to a tool id and version, not to the installation it authorises"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F4-02
+    severity: HIGH
+    capability: "F4, F3, E1"
+    blocking: true
+    blocker_class: BC-P2-45
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "The authorised side of the tool-installation trust envelope is an unprotected project overlay file"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-E2-01
+    severity: MEDIUM
+    capability: "E2"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "No governed extension point for project-specific roles"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-E3-01
+    severity: MEDIUM
+    capability: "E3"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "A handoff return is not bound to the role the handoff names, and a later return overwrites the earlier one"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F1-01
+    severity: MEDIUM
+    capability: "F1"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "A lesson from ordinary work cannot propose a skill update through governed promotion"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F1-02
+    severity: LOW
+    capability: "F1"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "A skill's declared inputs and outputs are defined but not consumed by any caller"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F2-01
+    severity: MEDIUM
+    capability: "F2"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "The Tool Capability Registry scopes tools to roles and permission classes but not to task classes"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F2-02
+    severity: LOW
+    capability: "F2"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "A tool's filesystem scope is a single repo_write boolean; no path scope is recorded"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F5-01
+    severity: LOW
+    capability: "F5"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "The deferred MCP layer is not reported as a capability gap by doctor or readiness, contrary to D-0004"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-F5-02
+    severity: MEDIUM
+    capability: "F5, E3"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "A handoff's authority envelope is caller-declared and may exceed the task's own allowed paths"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-G1-01
+    severity: MEDIUM
+    capability: "G1"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "Deterministic intent routing inverts negation: 'do not approve this change' routes to APPROVE"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+  - id: V1-H4-01
+    severity: LOW
+    capability: "H4, E1"
+    blocking: false
+    blocker_class: BC-P2-34
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "A test obligation's own author_role and independent_of_implementer are author-written; the product reports them as declared, not established"
+    path: release/capability-baseline/verify-1/gamma/findings.yaml
+acceptance_criteria_in_scope:
+  AC-2: "holds for gamma — no capability is ABSENT or UNCLEAR"
+  AC-3: "FAILS for gamma — F3 and F4 are PARTIAL with gaps argued COULD_UNDERMINE (V1-F3-01, V1-F4-01, V1-F4-02)"
+  AC-4: "FAILS — F4 is a POST_VERIFICATION_HARDENING capability and its tool-installation boundary is not incorporated on this candidate"
+  AC-10: "holds for gamma's capabilities — invalidation demonstrated, not assumed (evidence/FRESHNESS-invalidation.out); the product-wide question is the synthesis verifier's"
+  AC-16: "the L3 <-> E1 interaction (gate presentation respects authority) is exercised on the E1 side: evidence/OD-P2-01-human-approval.out"
+verdict: FAMILY_VERIFICATION_COMPLETE
+output:
+  branch: phase2/verify-1-gamma
+  commit: 8c405814d31e08c8fe21a09101873542b38a5e6f
+  evidence_path: release/capability-baseline/verify-1/gamma/
+unresolved:
+  - "cargo test --test certification: started in this worktree and then stopped deliberately. Three verifiers were running certification suites on this machine at once and mine was starving my own held-out suite; the certification suite is O3 regression evidence that AC-15 makes the synthesis verifier's, and the orchestrator has reproduced it at 207/0 on this candidate. I therefore have no certification number of my own. cargo test --lib completed here: 276 passed, 0 failed."
+  - "I2 b9 (production_merge_allowed) was observed only indirectly: the probe task was blocked earlier in its chain, so the merge decision was never reached."
+  - "A0-I2-03 (the one-character path truncation) is disposed NOT_APPLICABLE on observed behaviour; I did not construct its original reproduction."
+  - "gov adopt / gov migrate stages (A0-E1-01's second half) are alpha's scope; I established the shared acting-role resolution those stages use, not the stages themselves."
+  - "AC-13 (the whole contract-binding chain) and the product-wide AC-10 evidence-owner question are the synthesis verifier's; I checked only gamma's 19 capabilities in the compiled view and the evidence map."
+  - "Cross-machine continuity (P2-ADJ-0002) is alpha's lead; my probes isolate XDG_STATE_HOME per project, which simulates separate machines but does not exercise two provisioned machines of one owner exchanging OS-written facts."
+recommended_next_action: >-
+  Route V1-F4-01, V1-F3-01 and V1-F4-02 to repair as one package: they are the same surface (the OD-P2-03 tool
+  installation branch) and they compound — the OS-side derivation can be evaded, the authorised side of the envelope
+  can be edited, and the independent review that was meant to carry what the OS cannot observe is about a different
+  artefact. None needs a new owner decision; OD-P2-03 requirements 2 and 3 already state what must hold.
+completed_at: "2026-09-20T23:45:00Z"

@@ -1,0 +1,20 @@
+    currency input classes: adoption_evidence,archive,continuity_records,evidence_records,framework_lock,generated_other,governance_tests,index_manifest,kernel_migration,kernel_other,kernel_policy,kernel_schema,kernel_skills,kernel_tools,machine_trust,model_profile,overlay_other,path_map,project_policy,project_skills,research_experiments,runtime_identity,sensitivity,source,spec_architecture,spec_decisions,spec_other,spec_requirements,spec_tasks,t2_bindings,tools_plugins
+PASS  AC-10: the evidence currency key covers the input class 'tools_plugins'
+PASS  AC-10: the evidence currency key covers the input class 'project_skills'
+PASS  AC-10: the evidence currency key covers the input class 'spec_tasks'
+PASS  AC-10: the evidence currency key covers the input class 'spec_requirements'
+PASS  AC-10: the evidence currency key covers the input class 'source'
+PASS  AC-10: the evidence currency key covers the input class 'index_manifest'
+PASS  AC-10: the evidence currency key covers the input class 'machine_trust'
+PASS  AC-10 (F1): adding a project skill changes the project_skills digest
+PASS  AC-10 (F1): and the whole evidence currency key
+PASS  AC-10 (F2/F4): a change to the tool/plugin registry changes its digest
+PASS  AC-10 (I1/I2/I4): a task-DAG change changes the spec_tasks digest
+PASS  AC-10 (H2/H3): feature/readiness state is carried by the spec_requirements class
+    green record AUD-0001 current=False
+    after a tool-registry edit: current=False changed=index_manifest,machine_trust,project_skills,spec_requirements,spec_tasks,tools_plugins
+PASS  AC-10: a green governance record stops being current once a relevant input changes (got False)
+PASS  AC-10: the OS names the changed input class that invalidated it
+    close of governance work on a stale green record -> INDEX_STALE
+PASS  AC-10: governance-affecting work is refused on an obsolete green record (INDEX_STALE)
+---- FRESHNESS-invalidation.sh: 15 passed, 0 failed
