@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-20T22:13:12Z'
-state_hash: f175079282b7bcf8e40f1ac400811fc337541cf648cee4da6deefc0f69c80cda
+updated_at: '2026-09-20T22:33:46Z'
+state_hash: 8e891eb9ceeb2d81b33339bde6888521dedd385c8c2cdc4a97b2c5a96020b0f8
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_VERIFICATION_ITERATION_1_RUNNING
 
@@ -266,7 +266,7 @@ agent_runs:
   - {run_id: P2-AR-0048, role: capability-verifier, scope: gamma, iteration: 1, status: RUNNING, branch: phase2/verify-1-gamma, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml}
   - {run_id: P2-AR-0049, role: capability-verifier, scope: delta, iteration: 1, status: RUNNING, branch: phase2/verify-1-delta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml}
   - {run_id: P2-AR-0050, role: capability-verifier, scope: epsilon, iteration: 1, status: COMPLETED, branch: phase2/verify-1-epsilon, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml}
-  - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: RUNNING, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
+  - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
 running_work:
@@ -274,7 +274,6 @@ running_work:
   - {run_id: P2-AR-0047, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml}
   - {run_id: P2-AR-0048, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml}
   - {run_id: P2-AR-0049, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml}
-  - {run_id: P2-AR-0051, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
