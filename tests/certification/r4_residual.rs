@@ -1183,6 +1183,13 @@ fn a_tool_installation_is_gated_for_each_way_it_expands_authority() {
             "policy",
             json!({"install_command": ["true", "framework/policies/SECURITY_POLICY.yaml"]}),
         ),
+        // the plugin registry is trusted OS state deciding which programs the OS executes, and an installation
+        // never writes it: naming it is a governance mutation, not "what an installation writes"
+        (
+            "governance_or_security_policy_mutation",
+            "registry",
+            json!({"install_command": ["true", "governance/registry/plugin-registry.json"]}),
+        ),
         (
             "new_or_unrestricted_network_trust_boundary",
             "host",

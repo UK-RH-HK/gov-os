@@ -948,11 +948,10 @@ pub fn installation_authority(
     if commands.is_empty() {
         undetermined.push("the descriptor carries no command the OS can read (install_command, uninstall_command, health_check.command): what the installation would do outside the project cannot be determined".into());
     }
-    let own_paths = [
-        dest_rel.to_string(),
-        registry_path(p),
-        crate::paths::PLUGIN_REGISTRY_PATH.to_string(),
-    ];
+    // exactly what an installation writes, and nothing else: its own descriptor and the generated tool registry it
+    // regenerates. The plugin registry is deliberately NOT here — an installation never writes it, so a command
+    // that names it is reaching into trusted OS state that decides which programs the OS executes.
+    let own_paths = [dest_rel.to_string(), registry_path(p)];
     let mut endpoints: Vec<(String, String)> = vec![];
     for (whence, argv) in &commands {
         for (i, tok) in argv.iter().enumerate() {
@@ -975,7 +974,11 @@ pub fn installation_authority(
                     "TOOL_POLICY.installation_envelope.host_authority_tokens (kernel floor): no project authorisation covers host-level authority".into(),
                 ));
             }
-            if i > 0 && scope_flags.iter().any(|f| f == tok) {
+            if i > 0
+                && scope_flags
+                    .iter()
+                    .any(|f| f == tok || tok.starts_with(&format!("{f}=")))
+            {
                 findings.push(finding(
                     "host_level_authority",
                     format!("the installation installs with '{tok}' (outside the project)"),
