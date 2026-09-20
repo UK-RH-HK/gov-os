@@ -172,8 +172,10 @@ fn t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_
         e.envelope
     );
     let (_, msg_c) = d033(&gc);
+    // round 4 (P2-AR-0043): the count is matched exactly — A's plugin registration now also carries its change
+    // transaction and gate (INT3-O1), so C discloses 20 records, and "20 record(s)" contains "0 record(s)"
     assert!(
-        msg_c.contains(&gid) && !msg_c.contains("0 record(s) not honoured"),
+        msg_c.contains(&gid) && !msg_c.contains("; 0 record(s) not honoured"),
         "C must disclose the records it does not honour: {msg_c}"
     );
     // C writes a T2 fact of its own (sealed with its machine-local key) and commits it

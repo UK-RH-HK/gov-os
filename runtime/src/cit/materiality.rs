@@ -23,6 +23,8 @@
 //! | any other content of a requirement, scenario, feature or decision (not its planning attributes `priority`, `owner_role`, `legacy_source`); product source (repository-contract class `source`) | behaviour_change |
 //! | a `security` record; security-named paths (auth, crypto, permission, secrets, TLS, …); a removed or weakened line carrying a security check (verify/signature/authenticate/authorise/permission/…) | security_change |
 //! | `governance/**` (except `governance/generated/**`), `framework/**`, any policy/overlay configuration file | governance_change |
+//! | a capability plugin's registration: its descriptor (`governance/project/plugins/**`) or the plugin registry (either location) — which program the OS executes with the invoking account's authority (Contract v3 F4, K3; INT3-O1) | security_change |
+//! | a tool installation: its descriptor (`governance/project/tools/**`) — the install command the OS runs, the permission classes it is acquired with and the roles it is exposed to (Contract v3 F4, K3; BC-P2-41; R4-O1) | security_change |
 //! | infrastructure definitions (`infra/**`, Terraform, Kubernetes/Helm, Docker/Compose, CloudFormation, Bicep, serverless) | infrastructure_cost |
 //! | migrations (`migrations/**`, `db/migrate/**`, Alembic/Flyway), SQL carrying DDL/DML, dataset schema fields | data_migration |
 //!
@@ -644,6 +646,44 @@ fn lines_with<'a>(text: &'a str, toks: &[&str]) -> BTreeSet<&'a str> {
         .collect()
 }
 
+/// A capability plugin's registration: its descriptor or the plugin registry, at its location or the legacy one.
+pub fn is_plugin_registration_path(path: &str) -> bool {
+    glob_match("governance/project/plugins/**", path)
+        || path == crate::paths::PLUGIN_REGISTRY_PATH
+        || path == crate::capabilities::registry::LEGACY_REGISTRY_PATH
+}
+
+/// A tool installation: the installation descriptor `gov tools install` writes.
+pub fn is_tool_installation_path(path: &str) -> bool {
+    glob_match("governance/project/tools/**", path)
+}
+
+/// INT3-O1 (Contract v3 K3 "security", F4): a plugin registration decides which program the OS executes with the
+/// invoking account's authority, so it is a security change as well as a governance change. R4-O1: so does a tool
+/// installation — the descriptor carries the install command the OS runs, the permission classes the tool is
+/// acquired with and the roles it is exposed to, and the product already applies F4:431 ("security review cannot be
+/// self-attested") to it.
+fn push_plugin_registration(m: &mut Materiality, path: &str, what: &str) {
+    if is_plugin_registration_path(path) {
+        m.push(
+            "security_change",
+            path,
+            "capability plugin registration",
+            format!("{path} {what}: a capability plugin's registration decides which program the OS executes with the invoking account's authority (Contract v3 F4)"),
+            true,
+        );
+    }
+    if is_tool_installation_path(path) {
+        m.push(
+            "security_change",
+            path,
+            "tool installation",
+            format!("{path} {what}: a tool installation adds an executable capability to the environment — its install command, its permission classes and the roles it is exposed to (Contract v3 F4, BC-P2-41)"),
+            true,
+        );
+    }
+}
+
 fn classify_file(
     p: Option<&Project>,
     m: &mut Materiality,
@@ -672,6 +712,7 @@ fn classify_file(
         _ => "modified",
     };
     let lower = path.to_lowercase();
+    push_plugin_registration(m, path, what);
     if (glob_match("governance/**", path) && !glob_match("governance/generated/**", path))
         || glob_match("framework/**", path)
         || any_glob(GOVERNANCE_FILES, path).is_some()
@@ -881,6 +922,7 @@ fn classify_path_only(
         (true, false) => "removed",
         _ => "modified",
     };
+    push_plugin_registration(m, path, what);
     if (glob_match("governance/**", path) && !glob_match("governance/generated/**", path))
         || any_glob(GOVERNANCE_FILES, path).is_some()
     {
@@ -1015,6 +1057,45 @@ pub fn changes_of_manifest(p: &Project, store: &RecordStore, cit: &Value) -> Vec
                     after: Some(rec),
                 });
             }
+            // INT3-O1: a plugin registration writes its normalised descriptor and the registry
+            "register_plugin" => {
+                let path = op["path"].as_str().unwrap_or("").to_string();
+                if !path.is_empty() {
+                    out.push(Change::File {
+                        before: read_opt(p, &path),
+                        after: crate::util::to_yaml(&op["descriptor"]).ok(),
+                        path,
+                    });
+                }
+                let reg = op["registry"]
+                    .as_str()
+                    .unwrap_or(crate::paths::PLUGIN_REGISTRY_PATH)
+                    .to_string();
+                let before = read_opt(p, &reg);
+                // the entry's content is the OS's (sealed at execution); what is classified is that the file changes
+                let after = Some(format!(
+                    "{}\n# registration of {}\n",
+                    before.clone().unwrap_or_default(),
+                    op["plugin_id"].as_str().unwrap_or("")
+                ));
+                out.push(Change::File {
+                    path: reg,
+                    before,
+                    after,
+                });
+            }
+            // R4-O1: a tool installation writes its installation descriptor (the generated tool registry it also
+            // rewrites is a derived view, classified as the generated path it is)
+            "install_tool" => {
+                let path = op["path"].as_str().unwrap_or("").to_string();
+                if !path.is_empty() {
+                    out.push(Change::File {
+                        before: read_opt(p, &path),
+                        after: crate::util::to_yaml(&op["descriptor"]).ok(),
+                        path,
+                    });
+                }
+            }
             "set_lock_field" => out.push(Change::File {
                 path: "governance/framework.lock".into(),
                 before: read_opt(p, "governance/framework.lock"),
@@ -1145,6 +1226,47 @@ mod tests {
             before: before.map(String::from),
             after: after.map(String::from),
         }
+    }
+
+    /// **R4-O1** (Contract v3 K3, F4; BC-P2-41): a tool installation descriptor is derived as a material
+    /// governance **and** security change, exactly as a plugin registration is — the same reason (which program the
+    /// OS acquires and runs, with which permission classes, exposed to which roles), so a tool installation made
+    /// inside a claimed task completes only through change control, like any other material change.
+    #[test]
+    fn a_tool_installation_descriptor_is_a_governance_and_a_security_change() {
+        let m = classify(
+            None,
+            &[file(
+                "governance/project/tools/TOOL-X.yaml",
+                None,
+                Some("tool_id: TOOL-X\ninstall_command: [pip, install, x]\n"),
+            )],
+        );
+        let classes = m.classes();
+        assert!(classes.contains(&"governance_change"), "{classes:?}");
+        assert!(classes.contains(&"security_change"), "{classes:?}");
+        assert!(m.material());
+        assert!(
+            m.requiring_cit()
+                .iter()
+                .any(|f| f.rule == "tool installation"),
+            "the installation rule is what names it a security change: {:?}",
+            m.findings.iter().map(|f| f.rule).collect::<Vec<_>>()
+        );
+        // the generated tool registry the installation regenerates is a derived view, not a governance change
+        let g = classify(
+            None,
+            &[file(
+                "governance/generated/tool-registry.json",
+                None,
+                Some("{}\n"),
+            )],
+        );
+        assert!(
+            !g.classes().contains(&"governance_change"),
+            "{:?}",
+            g.classes()
+        );
     }
 
     #[test]

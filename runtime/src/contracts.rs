@@ -55,7 +55,7 @@ use crate::{GovError, Result};
 use regex::Regex;
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
 /// The owner-approved normative source at the repository root.
@@ -1345,12 +1345,12 @@ pub fn evidence_map(m: &ContractModel, existing: Option<&Value>) -> Value {
             Value::Object(o)
         })
         .collect();
-    json!({
+    let mut out = json!({
         "schema": MAP_SCHEMA_ID,
         "schema_version": DERIVED_VIEW_VERSION,
         "contract_version": CONTRACT_VERSION,
         "source_sha256": m.source_sha256,
-        "note": "capability → test/check/evidence mapping. Every field except the governed ones is derived from the owner source and checked against it by `gov contract verify`. The governed fields — the Contract v3:53-73 fields the owner source states no per-capability value for, and each checklist item's automated_checks — are populated by governed evidence mapping, never asserted by the compiler, and are preserved by `gov contract compile`. evidence_class values are drawn from Contract v3:81-91 (or NOT_YET_MAPPED), health_scheduler_tiers from O5, freshness_triggers from Contract v3:97-109.",
+        "note": MAP_NOTE,
         "governed_fields": governed_fields(),
         "gates": m.gates.iter().map(|g| json!({
             "id": g.id,
@@ -1361,12 +1361,24 @@ pub fn evidence_map(m: &ContractModel, existing: Option<&Value>) -> Value {
         })).collect::<Vec<_>>(),
         "advanced_qualification_challenges": m.challenges.iter().map(challenge_json).collect::<Vec<_>>(),
         "capabilities": rows,
-    })
+    });
+    if let Some(f) = existing.and_then(|e| e.get("freshness_invalidation")) {
+        if !f.is_null() {
+            out["freshness_invalidation"] = f.clone();
+        }
+    }
+    out
 }
+
+/// The evidence map's own note: what is source-derived, what is governed, and what the owners determine.
+const MAP_NOTE: &str = "capability → test/check/evidence mapping. Every field except the governed ones is derived from the owner source and checked against it by `gov contract verify`. The governed fields — the Contract v3:53-73 fields the owner source states no per-capability value for, each checklist item's automated_checks and the freshness_invalidation owners — are populated by governed evidence mapping, never asserted by the compiler, and are preserved by `gov contract compile`. Evidence owners (BC-P2-02, frozen AC-10) are objects {id: <kind>:<reference>, class, tiers?, record?, tests?, exercises?} in automated_checks (product and builder owners) and independent_verification (independent owners); `gov contract verify` resolves every owner against the product and fails, typed, on a capability with no running owner. evidence_class (Contract v3:81-91), health_scheduler_tiers (O5), freshness_triggers (Contract v3:97-109), adoption_obligation, operational_audit_obligation and remediation_rule are what the owners determine, derived by `gov contract compile`; the source lock binds the digest of every governed value, so none changes without a recompile.";
 
 /// The source-derived part of an evidence map: every governed value removed.
 pub fn evidence_map_projection(map: &Value) -> Value {
     let mut v = map.clone();
+    if let Some(o) = v.as_object_mut() {
+        o.remove("freshness_invalidation");
+    }
     let governed = governed_fields();
     if let Some(rows) = v.get_mut("capabilities").and_then(|r| r.as_array_mut()) {
         for row in rows {
@@ -1487,6 +1499,120 @@ fn render_elements(
     }
 }
 
+fn emit(out: &mut String, exp: &mut Vec<(String, String)>, what: String, line: String) {
+    out.push_str(&line);
+    out.push('\n');
+    exp.push((what, line));
+}
+
+/// The evidence owners and governed fields of one capability, as the generated view shows them.
+fn render_owners(
+    out: &mut String,
+    exp: &mut Vec<(String, String)>,
+    cap: &str,
+    row: Option<&Value>,
+) {
+    for (field, title) in [
+        (
+            "automated_checks",
+            "Evidence owners (automated_checks, Contract v3:64):",
+        ),
+        (
+            "independent_verification",
+            "Independent verification (Contract v3:65):",
+        ),
+    ] {
+        let owners = row
+            .and_then(|r| r.get(field))
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default();
+        emit(
+            out,
+            exp,
+            format!("{cap} {field} heading"),
+            title.to_string(),
+        );
+        if owners.is_empty() {
+            emit(
+                out,
+                exp,
+                format!("{cap} {field} none"),
+                "- none".to_string(),
+            );
+        }
+        for o in owners {
+            let id = o.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+            let mut line = format!(
+                "- `{id}` — {}",
+                o.get("class").and_then(|v| v.as_str()).unwrap_or("?")
+            );
+            let tiers = str_array(o.get("tiers"));
+            if !tiers.is_empty() {
+                line.push_str(&format!(" · {}", tiers.join(", ")));
+            }
+            if let Some(r) = o.get("record").and_then(|v| v.as_str()) {
+                line.push_str(&format!(" · record `{r}`"));
+            }
+            let tests = str_array(o.get("tests"));
+            if !tests.is_empty() {
+                line.push_str(&format!(" · tests {}", tests.join(", ")));
+            }
+            if let Some(e) = o.get("exercises").and_then(|v| v.as_str()) {
+                line.push_str(&format!(" — {e}"));
+            }
+            emit(out, exp, format!("{cap} owner {id}"), line);
+        }
+        out.push('\n');
+    }
+    let items: Vec<Value> = row.map(|r| lines_of(r, "checklist")).unwrap_or_default();
+    let named: Vec<&Value> = items
+        .iter()
+        .filter(|i| {
+            i.get("automated_checks")
+                .and_then(|v| v.as_array())
+                .map(|a| !a.is_empty())
+                .unwrap_or(false)
+        })
+        .collect();
+    if !named.is_empty() {
+        emit(
+            out,
+            exp,
+            format!("{cap} item owners heading"),
+            "Checklist items → owners:".to_string(),
+        );
+        for it in named {
+            let iid = it.get("id").and_then(|v| v.as_str()).unwrap_or("?");
+            emit(
+                out,
+                exp,
+                format!("{cap} item {iid} owners"),
+                format!("- `{iid}`: {}", render_value(it.get("automated_checks"))),
+            );
+        }
+        out.push('\n');
+    }
+    emit(
+        out,
+        exp,
+        format!("{cap} governed heading"),
+        "Governed fields (evidence map; Contract v3:61-73):".to_string(),
+    );
+    for k in governed_fields() {
+        if k == "automated_checks" || k == "independent_verification" {
+            continue;
+        }
+        emit(
+            out,
+            exp,
+            format!("{cap} governed {k}"),
+            format!("- {k}: {}", render_value(row.and_then(|r| r.get(k)))),
+        );
+    }
+    out.push('\n');
+}
+
 /// Render the generated readable view. Returns the text and the lines that must appear in it, each named by the
 /// element it carries (so a verifier reports "checklist item A1.3 missing", not only "the file differs").
 pub fn render_view(m: &ContractModel, map: &Value) -> (String, Vec<(String, String)>) {
@@ -1521,16 +1647,23 @@ pub fn render_view(m: &ContractModel, map: &Value) -> (String, Vec<(String, Stri
     exp.push(("universe summary".into(), universe));
 
     out.push_str("## Capability index\n\n");
-    out.push_str("| Capability | Title | Gate | Requirement class | Source label | Source line | Checklist items | Challenge IDs | Evidence class | Automated checks |\n|---|---|---|---|---|---|---|---|---|---|\n");
+    out.push_str("| Capability | Title | Gate | Requirement class | Source label | Source line | Checklist items | Challenge IDs | Evidence class | Owners (product / independent) | Tiers |\n|---|---|---|---|---|---|---|---|---|---|---|\n");
     for c in &m.capabilities {
         let row_v = rows.get(&c.id).copied();
-        let checks = row_v
-            .and_then(|r| r.get("automated_checks"))
-            .and_then(|v| v.as_array())
-            .map(|a| a.len().to_string())
-            .unwrap_or_else(|| "—".into());
+        let count = |k: &str| {
+            row_v
+                .and_then(|r| r.get(k))
+                .and_then(|v| v.as_array())
+                .map(|a| a.len())
+                .unwrap_or(0)
+        };
+        let checks = format!(
+            "{} / {}",
+            count("automated_checks"),
+            count("independent_verification")
+        );
         let row = format!(
-            "| `{}` | {} | {} | `{}` | {} | {} | {} | {} | {} | {} |",
+            "| `{}` | {} | {} | `{}` | {} | {} | {} | {} | {} | {} | {} |",
             c.id,
             cell(&c.title),
             c.gate,
@@ -1551,7 +1684,10 @@ pub fn render_view(m: &ContractModel, map: &Value) -> (String, Vec<(String, Stri
                     .join(", ")
             },
             cell(&render_value(row_v.and_then(|r| r.get("evidence_class")))),
-            checks
+            checks,
+            cell(&render_value(
+                row_v.and_then(|r| r.get("health_scheduler_tiers"))
+            ))
         );
         out.push_str(&row);
         out.push('\n');
@@ -1675,19 +1811,15 @@ pub fn render_view(m: &ContractModel, map: &Value) -> (String, Vec<(String, Stri
             );
             render_elements(&mut out, &mut exp, &c.id, elements);
             let row_v = rows.get(&c.id).copied();
-            let governed = governed_fields()
-                .iter()
-                .map(|k| format!("{k} {}", render_value(row_v.and_then(|r| r.get(*k)))))
-                .collect::<Vec<_>>()
-                .join("; ");
             let fields_line = format!(
-                "Contract v3:57-73 fields — stated by the owner source: id `{}`, title, source_reference, requirement_class, qualification_challenge_ids {}; governed (evidence map): {governed}.",
+                "Contract v3:57-73 fields — stated by the owner source: id `{}`, title, source_reference, requirement_class, qualification_challenge_ids {}; governed (evidence map): the owners and fields below.",
                 c.id,
                 render_value(Some(&json!(c.challenge_ids)))
             );
             out.push_str(&fields_line);
             out.push_str("\n\n");
             exp.push((format!("{} contract fields", c.id), fields_line));
+            render_owners(&mut out, &mut exp, &c.id, row_v);
         }
     }
 
@@ -1733,6 +1865,7 @@ pub fn source_lock(
     m: &ContractModel,
     compiled: &Value,
     evidence_map_source_sha256: &str,
+    evidence_map_governed_sha256: &str,
     generated_view_sha256: &str,
     schema_sha256: &str,
 ) -> Value {
@@ -1750,6 +1883,7 @@ pub fn source_lock(
         "compiled_schema_sha256": schema_sha256,
         "evidence_map": EVIDENCE_MAP,
         "evidence_map_source_sha256": evidence_map_source_sha256,
+        "evidence_map_governed_sha256": evidence_map_governed_sha256,
         "generated_view": GENERATED_VIEW,
         "generated_view_sha256": generated_view_sha256,
         "universe": {
@@ -1759,7 +1893,7 @@ pub fn source_lock(
             "qualification_challenges": m.challenges.len(),
             "carried_source_lines": m.carried_line_count(),
         },
-        "binding": "The compiled representation, the source-derived fields of the evidence map and the generated view are valid only while canonical_import_sha256 equals owner_source_sha256 and each equals a fresh derivation from that source (compiled_sha256: canonical-JSON digest of the compiled value; evidence_map_source_sha256: canonical-JSON digest of the evidence map with its governed fields removed; generated_view_sha256: SHA-256 of the view's bytes). `gov contract verify` fails on any semantic difference (Contract v3, 'Contract authority model').",
+        "binding": "The compiled representation, the source-derived fields of the evidence map and the generated view are valid only while canonical_import_sha256 equals owner_source_sha256 and each equals a fresh derivation from that source (compiled_sha256: canonical-JSON digest of the compiled value; evidence_map_source_sha256: canonical-JSON digest of the evidence map with its governed fields removed; evidence_map_governed_sha256: canonical-JSON digest of its governed values — evidence owners and every field they determine — as `gov contract compile` last wrote them; generated_view_sha256: SHA-256 of the view's bytes). `gov contract verify` fails on any semantic difference (Contract v3, 'Contract authority model') and on a governed value changed without a recompile.",
         "gate": "GATE-OWNER-CAC-UPLOAD",
         "logged_precedence_conflict": "The owner supplied the normative source at the repository root rather than at the destination path; an active owner directive outranks the frozen gate convention, so the root file is authoritative and the destination copy is a hash-bound canonical import.",
     })
@@ -2558,6 +2692,33 @@ fn uncarried_evidence_data(m: &ContractModel, existing: &Value) -> Vec<Value> {
         .collect();
     let ids: BTreeSet<String> = m.capability_ids().into_iter().collect();
     let mut d = vec![];
+    let top: BTreeSet<&str> = [
+        "schema",
+        "schema_version",
+        "contract_version",
+        "source_sha256",
+        "note",
+        "governed_fields",
+        "gates",
+        "advanced_qualification_challenges",
+        "capabilities",
+        "freshness_invalidation",
+    ]
+    .into_iter()
+    .collect();
+    if let Some(o) = existing.as_object() {
+        for (k, v) in o {
+            if !top.contains(k.as_str()) {
+                d.push(difference(
+                    "evidence_map",
+                    k,
+                    "would be discarded by regeneration",
+                    None,
+                    Some(v),
+                ));
+            }
+        }
+    }
     for row in lines_of(existing, "capabilities") {
         let id = row
             .get("capability")
@@ -2815,6 +2976,27 @@ pub fn verify(repo_root: &Path) -> Result<Value> {
         ));
     }
 
+    // 4b. the evidence owners (BC-P2-02, frozen AC-10): every capability has an owner that runs, every owner resolves,
+    // and every field the owners determine is what they determine
+    let registry = OwnerRegistry::load(repo_root);
+    let owners = owner_differences(&dv.model, &map, &registry, false);
+    if let Some(e) = owner_error(&owners) {
+        return Err(e);
+    }
+    // 4c. no governed value changed since `gov contract compile` wrote it
+    let governed_sha = crate::util::hash_value(&evidence_map_governed(&map));
+    if lock
+        .get("evidence_map_governed_sha256")
+        .and_then(|v| v.as_str())
+        != Some(governed_sha.as_str())
+    {
+        return Err(GovError::new(
+            "CONTRACT_EVIDENCE_MAP_NOT_RECOMPILED",
+            format!("{EVIDENCE_MAP}: its governed values (evidence owners and what they determine) are not the ones `gov contract compile` last resolved, derived and bound in {SOURCE_LOCK}. A governed value may change only through a recompile, which re-resolves every owner and re-derives every field the owners determine."),
+        )
+        .with_details(json!({"expected_sha256": lock.get("evidence_map_governed_sha256"), "found_sha256": governed_sha, "remedy": "gov contract compile"})));
+    }
+
     // 5. the generated view
     let view = read_text(&repo_root.join(GENERATED_VIEW)).map_err(|e| {
         GovError::new(
@@ -2866,6 +3048,7 @@ pub fn verify(repo_root: &Path) -> Result<Value> {
         &dv.model,
         &dv.compiled,
         &crate::util::hash_value(&evidence_map_projection(&evidence_map(&dv.model, None))),
+        &governed_sha,
         &sha256_text(&expected_view),
         &dv.schema_sha256,
     );
@@ -2900,12 +3083,16 @@ pub fn verify(repo_root: &Path) -> Result<Value> {
         "schema": SCHEMA,
         "evidence_map": EVIDENCE_MAP,
         "generated_view": GENERATED_VIEW,
+        "evidence_owners": owners.summary,
+        "evidence_map_governed_sha256": governed_sha,
         "checks": [
             "canonical import byte-identical to the owner source and equal to the pinned owner digest",
             "compiler line accounting: every non-blank line of the approved source carried verbatim exactly once",
             "compiled form: independent line accounting against the source text, and semantically identical to the owner source (universe incl. Gate U, checklist items, statements, challenges, labels, Contract v3:53-73 fields)",
             "compiled-form schema admits the owner universe and the compiled form",
             "evidence map: every capability, checklist item, statement, challenge and label of the owner source; every governed Contract v3:53-73 field present and drawn from the contract's vocabularies",
+            "evidence owners (BC-P2-02, frozen AC-10): every capability names at least one owner that runs; every owner resolves against the product (scheduler catalogue tiers, G0 command classification, the test harnesses' module trees, held-out suites, frozen gate contract) or, where this tree does not carry those sources, is disclosed as deferred; evidence classes, tiers, freshness triggers, adoption/operational-audit owners and the remediation rule are what the owners determine; every freshness trigger in use names an owner proving invalidation",
+            "governed values: bound by the source lock, so none changed without `gov contract compile`",
             "generated view: every element present and identical to a fresh rendering",
             "source lock: binds the source, the compiled form, the schema, the evidence map and the generated view",
         ],
@@ -2940,7 +3127,8 @@ pub fn generate(repo_root: &Path) -> Result<Value> {
             ));
         }
     }
-    let map = evidence_map(&dv.model, existing.as_ref());
+    let mut map = evidence_map(&dv.model, existing.as_ref());
+    complete_governed(&dv.model, &mut map);
     let d = evidence_map_differences(&dv.model, &map, &dv.schema)?;
     if !d.is_empty() {
         return Err(diverged(
@@ -2950,11 +3138,19 @@ pub fn generate(repo_root: &Path) -> Result<Value> {
             "correct the governed evidence-map values (vocabularies: Contract v3:81-91, :97-109, O5 tiers)",
         ));
     }
+    // every owner is resolved here, where the owners' sources are: compile never defers and never binds an owner it
+    // could not resolve (BC-P2-02)
+    let owners = owner_differences(&dv.model, &map, &OwnerRegistry::load(repo_root), true);
+    if let Some(mut e) = owner_error(&owners) {
+        e.message = format!("refusing to compile: {}", e.message);
+        return Err(e);
+    }
     let (view, _) = render_view(&dv.model, &map);
     let lock = source_lock(
         &dv.model,
         &dv.compiled,
         &crate::util::hash_value(&evidence_map_projection(&evidence_map(&dv.model, None))),
+        &crate::util::hash_value(&evidence_map_governed(&map)),
         &sha256_text(&view),
         &dv.schema_sha256,
     );
@@ -2976,6 +3172,2044 @@ pub fn generate(repo_root: &Path) -> Result<Value> {
     }))
 }
 
+// ------------------------------------------------------------------------------------------ evidence owners (BC-P2-02)
+//
+// Frozen gate contract AC-10: "every required capability has at least one evidence owner (G0 guard, G1 mutation, G2
+// task-close, G3 checkpoint/handoff, G4 milestone, G5 full suite, G6 qualification, independent held-out
+// verification, Human Decision Gate evidence, release/clean-clone evidence). No required capability has zero evidence
+// owners." Contract v3:64-65 name the fields that carry them: "automated check/test IDs" and "independent-verification
+// obligation".
+//
+// An owner is an object in a capability's `automated_checks` or, for an independent owner, in its
+// `independent_verification`: `{id: "<kind>:<reference>", class: <Contract v3:83-91 evidence class>, ...}`. `gov
+// contract verify` resolves every reference against the product itself — the scheduler catalogue, the G0 command
+// classification and the kernel payload compiled into this binary, and, from the tree, the test harnesses' module
+// trees, the independent held-out suites and the frozen gate contract — and derives what the owners determine
+// (evidence classes, health-scheduler tiers, evidence-freshness triggers, the adoption/operational-audit owners and the
+// remediation rule), so none of those can be asserted without an owner that carries it.
+
+/// One kind of evidence owner.
+#[derive(Debug, Clone, Copy)]
+pub struct OwnerKind {
+    /// The id prefix: an owner id is `<prefix>:<reference>`.
+    pub prefix: &'static str,
+    /// An independent owner (Contract v3:65; O3): named only in `independent_verification`, never as builder evidence.
+    pub independent: bool,
+    /// Runs at health-scheduler tiers: the owner states `tiers`, which must equal what the product declares.
+    pub tiered: bool,
+    /// Counts toward the minimum of one running owner per capability. An obligation the frozen gate contract assigns
+    /// to a future independent verifier is recorded, but it is not a running owner of its own.
+    pub runs: bool,
+    /// The Contract v3:83-91 evidence classes an owner of this kind may carry.
+    pub classes: &'static [&'static str],
+    /// What the reference names and how it is resolved.
+    pub resolves: &'static str,
+}
+
+/// Every kind of evidence owner the map may name.
+pub const OWNER_KINDS: &[OwnerKind] = &[
+    OwnerKind {
+        prefix: "check",
+        independent: false,
+        tiered: true,
+        runs: true,
+        classes: &["governance health check"],
+        resolves: "a governance-suite family the scheduler catalogue declares (`scheduler::catalogue`) and the kernel TEST_POLICY runs; `tiers` equals the catalogue's",
+    },
+    OwnerKind {
+        prefix: "doctor",
+        independent: false,
+        tiered: true,
+        runs: true,
+        classes: &["governance health check"],
+        resolves: "a `gov doctor` check the scheduler catalogue declares; `tiers` equals the catalogue's",
+    },
+    OwnerKind {
+        prefix: "g0",
+        independent: false,
+        tiered: true,
+        runs: true,
+        classes: &["automated invariant/guard"],
+        resolves: "a command label `orchestration::control::COMMAND_GUARDS` classifies for a governed project: the G0 guard decides every invocation of it before anything runs (`tiers: [G0]`)",
+    },
+    OwnerKind {
+        prefix: "test",
+        independent: false,
+        tiered: false,
+        runs: true,
+        classes: &[
+            "unit/integration/system test",
+            "migration/rollback evidence",
+            "clean-clone/release evidence",
+        ],
+        resolves: "`test:<harness>:<path>`: a test the harness runs (`lib` = `cargo test --lib`, `certification` = `cargo test --test certification`), resolved through the crate's module tree from its root file, and not `#[ignore]`d",
+    },
+    OwnerKind {
+        prefix: "human-gate",
+        independent: false,
+        tiered: false,
+        runs: true,
+        classes: &["human-gate evidence"],
+        resolves: "a command label `orchestration::control::COMMAND_GUARDS` classifies that produces Human Decision Gate evidence, with the `record` type it writes (a kernel record type or kernel schema)",
+    },
+    OwnerKind {
+        prefix: "release",
+        independent: false,
+        tiered: false,
+        runs: true,
+        classes: &["clean-clone/release evidence"],
+        resolves: "a command label `orchestration::control::COMMAND_GUARDS` classifies that produces release or clean-clone evidence, with the `record` type it writes (a kernel record type or kernel schema)",
+    },
+    OwnerKind {
+        prefix: "heldout",
+        independent: true,
+        tiered: false,
+        runs: true,
+        classes: &["independent held-out test"],
+        resolves: "an independent held-out suite directory `release/verification/<run>/evidence/heldout-tests` carrying its crate manifest (`Cargo.toml.txt`); each `tests` entry `<binary>::<fn>` is a `#[test]` of that suite",
+    },
+    OwnerKind {
+        prefix: "obligation",
+        independent: true,
+        tiered: false,
+        runs: false,
+        classes: &["independent held-out test", "independent audit evidence"],
+        resolves: "an acceptance criterion (`AC-<n>`) of the frozen Phase-2 gate contract whose text assigns the work to an independent verifier or reviewer",
+    },
+];
+
+/// The kind an owner id names.
+pub fn owner_kind(id: &str) -> Option<&'static OwnerKind> {
+    let (prefix, rest) = id.split_once(':')?;
+    if rest.trim().is_empty() {
+        return None;
+    }
+    OWNER_KINDS.iter().find(|k| k.prefix == prefix)
+}
+
+/// The test harnesses a `test:` owner may name: (harness, crate root file, command that runs it).
+pub const TEST_HARNESSES: &[(&str, &str, &str)] = &[
+    ("lib", "runtime/src/lib.rs", "cargo test --lib"),
+    (
+        "certification",
+        "tests/certification/main.rs",
+        "cargo test --test certification",
+    ),
+];
+/// Where the independent held-out suites live.
+pub const HELDOUT_ROOT: &str = "release/verification";
+/// The frozen Phase-2 gate contract whose acceptance criteria an `obligation:` owner names.
+pub const FROZEN_GATE_CONTRACT: &str =
+    "release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md";
+
+/// Allowed capability statuses: the frozen gate contract §4 vocabulary, which compiles Contract v3:93
+/// (`PRESENT_AND_SUBSTANTIAL`), :1202-1203 (`ABSENT`, `UNCLEAR`, `PARTIAL`) and V8.2 CAP-1's `N/A_WITH_REASON`
+/// (Contract v3:514-515: "silent N/A is invalid").
+pub const STATUS_VOCABULARY: &[&str] = &[
+    "PRESENT_AND_SUBSTANTIAL",
+    "PARTIAL",
+    "ABSENT",
+    "UNCLEAR",
+    "N/A_WITH_REASON",
+];
+/// Contract v3:62 applicability rule, as the Phase-2 sources state it for every capability.
+pub const APPLICABILITY_RULE: &str = "required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127";
+/// Contract v3:72 N/A requirements, as the sources state them for every capability.
+pub const NA_REQUIREMENTS: &str = "N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)";
+/// The Contract v3:115-127 lifecycle points the adoption obligation refers to.
+const ADOPTION_POINTS: &[&str] = &["`gov adopt`", "post-adoption acceptance"];
+/// The Contract v3:115-127 lifecycle point the periodic operational-audit obligation refers to.
+const OPERATIONAL_POINTS: &[&str] = &["periodic operational governance-health audits"];
+const ADOPTION_WITH: &str = "re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)";
+const ADOPTION_WITHOUT: &str = "no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)";
+const OPERATIONAL_WITH: &str = "re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)";
+const OPERATIONAL_WITHOUT: &str = "no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)";
+const REMEDIATION_TIERED: &str = "a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)";
+const REMEDIATION_UNTIERED: &str = "a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on";
+
+// --------------------------------------------------------------------------- the test harnesses' module trees
+
+/// One `#[test]` function found in a harness's module tree.
+#[derive(Debug, Clone, PartialEq)]
+pub struct TestSite {
+    /// Repository-relative file.
+    pub file: String,
+    pub line: usize,
+    pub ignored: bool,
+}
+
+/// Replace the contents of comments, string, byte-string, raw-string and character literals with spaces, keeping
+/// every newline and every byte offset, so braces, attributes and items can be read without being fooled by text.
+fn blank_non_code(src: &str) -> String {
+    let b = src.as_bytes();
+    let n = b.len();
+    let mut out: Vec<u8> = Vec::with_capacity(n);
+    let blank = |c: u8| if c == b'\n' { b'\n' } else { b' ' };
+    let ident = |c: u8| c.is_ascii_alphanumeric() || c == b'_';
+    let mut i = 0;
+    while i < n {
+        let c = b[i];
+        let prev_ident = i > 0 && ident(b[i - 1]);
+        if c == b'/' && i + 1 < n && b[i + 1] == b'/' {
+            while i < n && b[i] != b'\n' {
+                out.push(b' ');
+                i += 1;
+            }
+            continue;
+        }
+        if c == b'/' && i + 1 < n && b[i + 1] == b'*' {
+            let mut depth = 0usize;
+            while i < n {
+                if i + 1 < n && b[i] == b'/' && b[i + 1] == b'*' {
+                    depth += 1;
+                    out.extend_from_slice(b"  ");
+                    i += 2;
+                } else if i + 1 < n && b[i] == b'*' && b[i + 1] == b'/' {
+                    depth = depth.saturating_sub(1);
+                    out.extend_from_slice(b"  ");
+                    i += 2;
+                    if depth == 0 {
+                        break;
+                    }
+                } else {
+                    out.push(blank(b[i]));
+                    i += 1;
+                }
+            }
+            continue;
+        }
+        // raw strings: r"…", r#"…"#, br"…", br#"…"#
+        if !prev_ident && (c == b'r' || (c == b'b' && i + 1 < n && b[i + 1] == b'r')) {
+            let mut j = if c == b'b' { i + 2 } else { i + 1 };
+            let mut hashes = 0usize;
+            while j < n && b[j] == b'#' {
+                hashes += 1;
+                j += 1;
+            }
+            if j < n && b[j] == b'"' {
+                out.extend_from_slice(&b[i..=j]);
+                j += 1;
+                loop {
+                    if j >= n {
+                        break;
+                    }
+                    if b[j] == b'"'
+                        && n >= j + 1 + hashes
+                        && b[j + 1..j + 1 + hashes].iter().all(|x| *x == b'#')
+                    {
+                        out.push(b'"');
+                        out.extend(std::iter::repeat(b'#').take(hashes));
+                        j += 1 + hashes;
+                        break;
+                    }
+                    out.push(blank(b[j]));
+                    j += 1;
+                }
+                i = j;
+                continue;
+            }
+        }
+        // strings and byte strings
+        if c == b'"' || (!prev_ident && c == b'b' && i + 1 < n && b[i + 1] == b'"') {
+            let start = if c == b'b' { i + 1 } else { i };
+            out.extend_from_slice(&b[i..=start]);
+            let mut j = start + 1;
+            while j < n {
+                if b[j] == b'\\' && j + 1 < n {
+                    out.push(b' ');
+                    out.push(blank(b[j + 1]));
+                    j += 2;
+                    continue;
+                }
+                if b[j] == b'"' {
+                    out.push(b'"');
+                    j += 1;
+                    break;
+                }
+                out.push(blank(b[j]));
+                j += 1;
+            }
+            i = j;
+            continue;
+        }
+        // character literals (a lifetime has no closing quote)
+        if c == b'\'' {
+            if i + 3 < n && b[i + 1] == b'\\' {
+                if let Some(end) = b[i + 3..].iter().take(12).position(|x| *x == b'\'') {
+                    let stop = i + 3 + end;
+                    out.push(b'\'');
+                    out.extend(std::iter::repeat(b' ').take(stop - i - 1));
+                    out.push(b'\'');
+                    i = stop + 1;
+                    continue;
+                }
+            } else if i + 1 < n {
+                let width = match b[i + 1] {
+                    x if x < 0x80 => 1,
+                    x if x >= 0xF0 => 4,
+                    x if x >= 0xE0 => 3,
+                    _ => 2,
+                };
+                if i + 1 + width < n && b[i + 1 + width] == b'\'' {
+                    out.push(b'\'');
+                    out.extend(std::iter::repeat(b' ').take(width));
+                    out.push(b'\'');
+                    i += width + 2;
+                    continue;
+                }
+            }
+        }
+        out.push(c);
+        i += 1;
+    }
+    String::from_utf8(out).unwrap_or_default()
+}
+
+#[derive(Debug, Clone, PartialEq)]
+enum Tok {
+    Ident(String),
+    Punct(char),
+}
+
+fn tokens(code: &str) -> Vec<(Tok, usize)> {
+    let mut v = vec![];
+    let mut line = 1usize;
+    let chars: Vec<char> = code.chars().collect();
+    let mut i = 0;
+    while i < chars.len() {
+        let c = chars[i];
+        if c == '\n' {
+            line += 1;
+            i += 1;
+        } else if c.is_alphabetic() || c == '_' {
+            let s = i;
+            while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {
+                i += 1;
+            }
+            v.push((Tok::Ident(chars[s..i].iter().collect()), line));
+        } else if c.is_whitespace() || c.is_ascii_digit() {
+            i += 1;
+        } else {
+            v.push((Tok::Punct(c), line));
+            i += 1;
+        }
+    }
+    v
+}
+
+/// The directory a file module's child `mod x;` files live in.
+fn child_dir(file: &Path) -> PathBuf {
+    let dir = file.parent().map(Path::to_path_buf).unwrap_or_default();
+    match file.file_name().and_then(|f| f.to_str()) {
+        Some("lib.rs") | Some("main.rs") | Some("mod.rs") => dir,
+        _ => dir.join(
+            file.file_stem()
+                .and_then(|s| s.to_str())
+                .unwrap_or_default(),
+        ),
+    }
+}
+
+fn scan_module_file(
+    repo_root: &Path,
+    file: &Path,
+    module: &[String],
+    out: &mut BTreeMap<String, TestSite>,
+    seen: &mut BTreeSet<PathBuf>,
+) {
+    if !seen.insert(file.to_path_buf()) {
+        return;
+    }
+    let Ok(src) = std::fs::read_to_string(file) else {
+        return;
+    };
+    let rel = crate::util::rel_posix(file, repo_root);
+    let toks = tokens(&blank_non_code(&src));
+    // the brace stack: Some(name) for an inline module, None for any other block
+    let mut stack: Vec<Option<String>> = vec![];
+    let (mut test_attr, mut ignore_attr) = (false, false);
+    let mut i = 0;
+    let at = |i: usize| toks.get(i).map(|t| &t.0);
+    while i < toks.len() {
+        match &toks[i].0 {
+            Tok::Punct('#') => {
+                let mut j = i + 1;
+                if at(j) == Some(&Tok::Punct('!')) {
+                    j += 1;
+                }
+                if at(j) == Some(&Tok::Punct('[')) {
+                    let mut depth = 0i32;
+                    let mut k = j;
+                    let mut inner: Vec<&Tok> = vec![];
+                    while k < toks.len() {
+                        match &toks[k].0 {
+                            Tok::Punct('[') => depth += 1,
+                            Tok::Punct(']') => {
+                                depth -= 1;
+                                if depth == 0 {
+                                    break;
+                                }
+                            }
+                            t => inner.push(t),
+                        }
+                        k += 1;
+                    }
+                    match inner.first() {
+                        Some(Tok::Ident(a)) if a == "test" && inner.len() == 1 => test_attr = true,
+                        Some(Tok::Ident(a)) if a == "ignore" => ignore_attr = true,
+                        _ => {}
+                    }
+                    i = k + 1;
+                    continue;
+                }
+                i += 1;
+            }
+            Tok::Ident(w) if w == "mod" => {
+                if let (Some(Tok::Ident(name)), next) = (at(i + 1), at(i + 2)) {
+                    let name = name.clone();
+                    if next == Some(&Tok::Punct('{')) {
+                        stack.push(Some(name));
+                        test_attr = false;
+                        ignore_attr = false;
+                        i += 3;
+                        continue;
+                    }
+                    if next == Some(&Tok::Punct(';')) {
+                        let inline: Vec<String> = stack.iter().flatten().cloned().collect();
+                        if stack.iter().all(|f| f.is_some()) {
+                            let mut dir = child_dir(file);
+                            for m in &inline {
+                                dir = dir.join(m);
+                            }
+                            let cand = [
+                                dir.join(format!("{name}.rs")),
+                                dir.join(&name).join("mod.rs"),
+                            ];
+                            if let Some(f) = cand.iter().find(|p| p.is_file()) {
+                                let mut child: Vec<String> = module.to_vec();
+                                child.extend(inline);
+                                child.push(name);
+                                scan_module_file(repo_root, f, &child, out, seen);
+                            }
+                        }
+                        test_attr = false;
+                        ignore_attr = false;
+                        i += 3;
+                        continue;
+                    }
+                }
+                i += 1;
+            }
+            Tok::Ident(w) if w == "fn" => {
+                if let Some(Tok::Ident(name)) = at(i + 1) {
+                    if test_attr && stack.iter().all(|f| f.is_some()) {
+                        let mut path: Vec<String> = module.to_vec();
+                        path.extend(stack.iter().flatten().cloned());
+                        path.push(name.clone());
+                        out.insert(
+                            path.join("::"),
+                            TestSite {
+                                file: rel.clone(),
+                                line: toks[i].1,
+                                ignored: ignore_attr,
+                            },
+                        );
+                    }
+                }
+                test_attr = false;
+                ignore_attr = false;
+                i += 2;
+            }
+            Tok::Punct('{') => {
+                stack.push(None);
+                test_attr = false;
+                ignore_attr = false;
+                i += 1;
+            }
+            Tok::Punct('}') => {
+                stack.pop();
+                i += 1;
+            }
+            Tok::Punct(';') => {
+                test_attr = false;
+                ignore_attr = false;
+                i += 1;
+            }
+            _ => i += 1,
+        }
+    }
+}
+
+/// Every `#[test]` function a harness runs, by the path the harness lists it under (`module::…::fn`), read by
+/// following the crate's module tree from its root file exactly as the compiler does (`mod x;` → `x.rs` or
+/// `x/mod.rs`; inline `mod x { … }`), with comments and literals blanked. `None` when the tree does not carry the
+/// harness's root file. The certification suite checks this index against the harness's own `--list`.
+pub fn test_index(repo_root: &Path, harness: &str) -> Option<BTreeMap<String, TestSite>> {
+    let (_, entry, _) = TEST_HARNESSES.iter().find(|h| h.0 == harness)?;
+    let root_file = repo_root.join(entry);
+    if !root_file.is_file() {
+        return None;
+    }
+    let mut out = BTreeMap::new();
+    scan_module_file(repo_root, &root_file, &[], &mut out, &mut BTreeSet::new());
+    Some(out)
+}
+
+/// A digest of what owner references are resolved against in the tree: every test each harness runs (its path, file
+/// and whether it is `#[ignore]`d — not its line), every file of every independent held-out suite, and the frozen gate
+/// contract. A `verify` result computed before a test was renamed, ignored or removed, or a suite or criterion
+/// changed, is not current after it; a cache keyed by the contract chain alone would miss that (integration point for
+/// the `contract_binding` family's cache key).
+pub fn owner_sources_fingerprint(repo_root: &Path) -> String {
+    let mut v = Map::new();
+    for (h, _, _) in TEST_HARNESSES {
+        v.insert(
+            (*h).to_string(),
+            json!(test_index(repo_root, h).map(|idx| idx
+                .iter()
+                .map(|(k, s)| json!([k, s.file, s.ignored]))
+                .collect::<Vec<_>>())),
+        );
+    }
+    let mut suites: Vec<Value> = vec![];
+    if let Ok(rd) = std::fs::read_dir(repo_root.join(HELDOUT_ROOT)) {
+        let mut runs: Vec<PathBuf> = rd.flatten().map(|e| e.path()).collect();
+        runs.sort();
+        for run in runs {
+            let dir = run.join("evidence").join("heldout-tests");
+            let Ok(files) = std::fs::read_dir(&dir) else {
+                continue;
+            };
+            let mut files: Vec<PathBuf> = files.flatten().map(|e| e.path()).collect();
+            files.sort();
+            for f in files {
+                if let Ok(b) = std::fs::read(&f) {
+                    suites.push(json!([
+                        crate::util::rel_posix(&f, repo_root),
+                        crate::util::sha256_hex(&b)
+                    ]));
+                }
+            }
+        }
+    }
+    v.insert("heldout".into(), Value::Array(suites));
+    v.insert(
+        "gate_contract".into(),
+        json!(
+            std::fs::read_to_string(repo_root.join(FROZEN_GATE_CONTRACT))
+                .ok()
+                .map(|t| sha256_text(&t))
+        ),
+    );
+    crate::util::hash_value(&Value::Object(v))
+}
+
+/// The `#[test]` functions of one held-out suite file (`<suite>/<binary>.rs`), by `<binary>::<fn>`.
+fn heldout_tests(file: &Path, repo_root: &Path, binary: &str) -> BTreeMap<String, TestSite> {
+    let mut out = BTreeMap::new();
+    scan_module_file(
+        repo_root,
+        file,
+        &[binary.to_string()],
+        &mut out,
+        &mut BTreeSet::new(),
+    );
+    out
+}
+
+// --------------------------------------------------------------------------- resolution
+
+/// The outcome of resolving one owner reference.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Resolution {
+    /// It exists and runs; the value locates it (file and line, catalogue declaration, guard class …).
+    Resolved(Value),
+    /// This tree does not carry what the reference is resolved in (a release-tooling tree with no test sources); the
+    /// reason is disclosed. `gov contract compile` never defers: it resolves every owner where the sources are.
+    Deferred(String),
+    /// It does not exist, or does not run as named.
+    Unresolved(String),
+}
+
+/// Everything owner references are resolved against.
+pub struct OwnerRegistry {
+    root: PathBuf,
+    tests: BTreeMap<&'static str, Option<BTreeMap<String, TestSite>>>,
+    suite_families: BTreeSet<String>,
+    gate_contract: Option<String>,
+    heldout_present: bool,
+}
+
+fn embedded_suite_families() -> BTreeSet<String> {
+    crate::kernel::embedded::files()
+        .iter()
+        .find(|(p, _)| *p == "policies/TEST_POLICY.yaml")
+        .and_then(|(_, b)| serde_yaml::from_slice::<Value>(b).ok())
+        .and_then(|v| {
+            v.get("governance_families").and_then(|l| {
+                l.as_array().map(|a| {
+                    a.iter()
+                        .filter_map(|x| x.as_str().map(String::from))
+                        .collect()
+                })
+            })
+        })
+        .unwrap_or_default()
+}
+
+fn record_type_known(t: &str) -> bool {
+    crate::records::TYPE_DIR.iter().any(|(ty, _)| *ty == t)
+        || crate::kernel::embedded::files()
+            .iter()
+            .any(|(p, _)| *p == format!("schemas/{t}.schema.json"))
+}
+
+impl OwnerRegistry {
+    /// Read everything the tree carries. Nothing is required: what is absent defers the owners resolved in it.
+    pub fn load(repo_root: &Path) -> Self {
+        let mut tests = BTreeMap::new();
+        for (h, _, _) in TEST_HARNESSES {
+            tests.insert(*h, test_index(repo_root, h));
+        }
+        OwnerRegistry {
+            root: repo_root.to_path_buf(),
+            tests,
+            suite_families: embedded_suite_families(),
+            gate_contract: std::fs::read_to_string(repo_root.join(FROZEN_GATE_CONTRACT)).ok(),
+            heldout_present: repo_root.join(HELDOUT_ROOT).is_dir(),
+        }
+    }
+
+    /// The test index of a harness, when the tree carries it.
+    pub fn tests(&self, harness: &str) -> Option<&BTreeMap<String, TestSite>> {
+        self.tests.get(harness).and_then(|t| t.as_ref())
+    }
+
+    /// What the tree does not carry, by owner kind (for disclosure).
+    pub fn absent_sources(&self) -> Vec<String> {
+        let mut v = vec![];
+        for (h, entry, _) in TEST_HARNESSES {
+            if self.tests(h).is_none() {
+                v.push(format!("test harness `{h}` ({entry})"));
+            }
+        }
+        if !self.heldout_present {
+            v.push(format!("independent held-out suites ({HELDOUT_ROOT})"));
+        }
+        if self.gate_contract.is_none() {
+            v.push(format!("frozen gate contract ({FROZEN_GATE_CONTRACT})"));
+        }
+        v
+    }
+
+    /// Resolve an owner reference by its id alone (tiers, class and record are checked by [`owner_differences`]).
+    pub fn resolve_id(&self, id: &str, record: Option<&str>, tests: &[String]) -> Resolution {
+        use crate::orchestration::control::{Scope, COMMAND_GUARDS};
+        use crate::scheduler::catalogue::{self, Surface};
+        let Some(kind) = owner_kind(id) else {
+            return Resolution::Unresolved(format!(
+                "not an owner id: `<kind>:<reference>` with kind one of {}",
+                OWNER_KINDS
+                    .iter()
+                    .map(|k| k.prefix)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ));
+        };
+        let reference = &id[kind.prefix.len() + 1..];
+        match kind.prefix {
+            "check" | "doctor" => {
+                let want = if kind.prefix == "check" {
+                    Surface::Family
+                } else {
+                    Surface::Doctor
+                };
+                match catalogue::get(reference) {
+                    Some(def) if def.surface == want => {
+                        if want == Surface::Family && !self.suite_families.contains(reference) {
+                            return Resolution::Unresolved(format!("`{reference}` is declared in the scheduler catalogue but the kernel TEST_POLICY governance_families does not run it"));
+                        }
+                        Resolution::Resolved(json!({
+                            "declared_in": "runtime/src/scheduler/catalogue.rs",
+                            "surface": if want == Surface::Family { "governance-family" } else { "doctor" },
+                            "tiers": def.tiers.iter().map(|t| t.as_str()).collect::<Vec<_>>(),
+                            "duty": def.duty,
+                            "enforcement": catalogue::enforcement(def)["mode"],
+                        }))
+                    }
+                    Some(_) => Resolution::Unresolved(format!(
+                        "`{reference}` is a scheduler check of the other surface (use `{}:`)",
+                        if kind.prefix == "check" {
+                            "doctor"
+                        } else {
+                            "check"
+                        }
+                    )),
+                    None => Resolution::Unresolved(format!(
+                        "no check `{reference}` in the scheduler catalogue"
+                    )),
+                }
+            }
+            "g0" | "human-gate" | "release" => {
+                let Some(g) = COMMAND_GUARDS.iter().find(|c| c.label == reference) else {
+                    return Resolution::Unresolved(format!(
+                        "no command `{reference}` in orchestration::control::COMMAND_GUARDS"
+                    ));
+                };
+                let scope = match g.scope {
+                    Scope::Project => "project".to_string(),
+                    Scope::Outside(why) => format!("outside a governed project: {why}"),
+                };
+                if kind.prefix == "g0" {
+                    if !matches!(g.scope, Scope::Project) {
+                        return Resolution::Unresolved(format!(
+                            "`{reference}` is not guarded by G0 ({scope})"
+                        ));
+                    }
+                    return Resolution::Resolved(
+                        json!({"declared_in": "runtime/src/orchestration/control.rs", "authority": g.authority, "effect": format!("{:?}", g.effect), "scope": scope, "tiers": ["G0"]}),
+                    );
+                }
+                match record {
+                    None => Resolution::Unresolved(format!(
+                        "a `{}:` owner names the `record` type its command writes",
+                        kind.prefix
+                    )),
+                    Some(r) if !record_type_known(r) => Resolution::Unresolved(format!(
+                        "`{r}` is neither a kernel record type nor a kernel schema"
+                    )),
+                    Some(r) => Resolution::Resolved(
+                        json!({"declared_in": "runtime/src/orchestration/control.rs", "authority": g.authority, "scope": scope, "record": r}),
+                    ),
+                }
+            }
+            "test" => {
+                let Some((harness, path)) = reference.split_once(':') else {
+                    return Resolution::Unresolved(
+                        "a test owner is `test:<harness>:<path>`".into(),
+                    );
+                };
+                let Some((_, entry, cmd)) = TEST_HARNESSES.iter().find(|h| h.0 == harness) else {
+                    return Resolution::Unresolved(format!(
+                        "unknown test harness `{harness}` (lib, certification)"
+                    ));
+                };
+                match self.tests.get(harness).and_then(|t| t.as_ref()) {
+                    None => Resolution::Deferred(format!(
+                        "this tree does not carry {entry}, the root of `{cmd}`"
+                    )),
+                    Some(idx) => match idx.get(path) {
+                        None => Resolution::Unresolved(format!(
+                            "`{cmd}` has no test `{path}` (resolved from {entry})"
+                        )),
+                        Some(s) if s.ignored => Resolution::Unresolved(format!(
+                            "`{path}` is #[ignore]d: `{cmd}` does not run it"
+                        )),
+                        Some(s) => Resolution::Resolved(
+                            json!({"harness": harness, "command": cmd, "file": s.file, "line": s.line}),
+                        ),
+                    },
+                }
+            }
+            "heldout" => {
+                let rel = reference.trim_end_matches('/');
+                let shaped = rel.starts_with(&format!("{HELDOUT_ROOT}/"))
+                    && rel.ends_with("/heldout-tests")
+                    && !rel.split('/').any(|s| s == ".." || s.is_empty());
+                if !shaped {
+                    return Resolution::Unresolved(format!(
+                        "a held-out owner names a directory {HELDOUT_ROOT}/<run>/evidence/heldout-tests"
+                    ));
+                }
+                if !self.heldout_present {
+                    return Resolution::Deferred(format!(
+                        "this tree does not carry {HELDOUT_ROOT}"
+                    ));
+                }
+                let dir = self.root.join(rel);
+                if !dir.join("Cargo.toml.txt").is_file() {
+                    return Resolution::Unresolved(format!(
+                        "{rel} does not carry a held-out suite (no Cargo.toml.txt)"
+                    ));
+                }
+                let mut located = vec![];
+                for t in tests {
+                    let Some((bin, _)) = t.split_once("::") else {
+                        return Resolution::Unresolved(format!(
+                            "held-out test `{t}` is not `<binary>::<fn>`"
+                        ));
+                    };
+                    let file = dir.join(format!("{bin}.rs"));
+                    let found = heldout_tests(&file, &self.root, bin);
+                    match found.get(t.as_str()) {
+                        Some(s) => located.push(json!({"test": t, "file": s.file, "line": s.line})),
+                        None => {
+                            return Resolution::Unresolved(format!(
+                                "the held-out suite {rel} has no test `{t}`"
+                            ))
+                        }
+                    }
+                }
+                Resolution::Resolved(json!({"suite": rel, "tests": located}))
+            }
+            "obligation" => {
+                let ok_id = reference.starts_with("AC-")
+                    && reference[3..].chars().all(|c| c.is_ascii_digit())
+                    && reference.len() > 3;
+                if !ok_id {
+                    return Resolution::Unresolved(
+                        "an obligation names an acceptance criterion `AC-<n>` of the frozen gate contract".into(),
+                    );
+                }
+                let Some(text) = &self.gate_contract else {
+                    return Resolution::Deferred(format!(
+                        "this tree does not carry {FROZEN_GATE_CONTRACT}"
+                    ));
+                };
+                let row = text
+                    .lines()
+                    .enumerate()
+                    .find(|(_, l)| l.starts_with(&format!("| {reference} |")));
+                match row {
+                    None => Resolution::Unresolved(format!(
+                        "the frozen gate contract has no criterion {reference}"
+                    )),
+                    Some((_, l))
+                        if !["independent verifier", "independent reviewer", "independent wherever"]
+                            .iter()
+                            .any(|w| l.to_lowercase().contains(w)) =>
+                    {
+                        Resolution::Unresolved(format!(
+                            "{reference} does not assign its work to an independent verifier or reviewer"
+                        ))
+                    }
+                    Some((n, _)) => Resolution::Resolved(
+                        json!({"declared_in": FROZEN_GATE_CONTRACT, "line": n + 1}),
+                    ),
+                }
+            }
+            _ => Resolution::Unresolved("unknown owner kind".into()),
+        }
+    }
+}
+
+// --------------------------------------------------------------------------- what owners determine
+
+/// A Contract v3:97-109 freshness input a currency-class label denotes (`"governing contract/policy (governance test
+/// inputs)"` denotes `"governing contract/policy"`), or `None` for a class the contract's list does not name.
+fn freshness_input_of(label: &str, vocab: &[String]) -> Option<String> {
+    if vocab.iter().any(|v| v == label) {
+        return Some(label.to_string());
+    }
+    let head = label.split(" (").next().unwrap_or(label);
+    vocab.iter().find(|v| v.as_str() == head).cloned()
+}
+
+/// The Contract v3:97-109 inputs whose change makes an owner's evidence stale. For a tier owner these are exactly the
+/// input classes the scheduler keys its result by (`catalogue::expand_deps` plus its extras), so they are what
+/// actually invalidates it; a G0 guard reads the classes every check reads; a test, held-out suite or obligation is
+/// evidence about the product build; a release is evidence about the release payload; a human-gate answer is bound
+/// to the specification and decision it governs, under the gate policy.
+pub fn owner_freshness(m: &ContractModel, id: &str) -> Vec<String> {
+    use crate::scheduler::catalogue::{self, Extra};
+    let vocab: Vec<String> = m
+        .vocab
+        .freshness_inputs
+        .iter()
+        .map(|l| l.text.clone())
+        .collect();
+    let mut labels: Vec<&str> = vec![];
+    match owner_kind(id).map(|k| k.prefix) {
+        Some("check") | Some("doctor") => {
+            if let Some(def) = catalogue::get(&id[id.find(':').map(|i| i + 1).unwrap_or(0)..]) {
+                for c in catalogue::expand_deps(def) {
+                    labels.push(crate::verification::currency::contract_class_of(c));
+                }
+                for e in def.extras {
+                    match e {
+                        Extra::LiveIndex => labels.push("relevant index manifest"),
+                        Extra::ContractSource => labels.push("governing contract/policy"),
+                        _ => {}
+                    }
+                }
+            }
+        }
+        Some("g0") => {
+            for c in catalogue::IMPLICIT_DEPS {
+                labels.push(crate::verification::currency::contract_class_of(c));
+            }
+        }
+        Some("human-gate") => {
+            labels.extend(["authoritative spec/decision", "governing contract/policy"])
+        }
+        Some("release") => labels.extend([
+            "runtime/kernel implementation",
+            "governing contract/policy",
+            "schema",
+            "migration",
+            "tool/plugin",
+        ]),
+        Some(_) => labels.push("runtime/kernel implementation"),
+        None => {}
+    }
+    let set: BTreeSet<String> = labels
+        .iter()
+        .filter_map(|l| freshness_input_of(l, &vocab))
+        .collect();
+    vocab.into_iter().filter(|v| set.contains(v)).collect()
+}
+
+fn owners_of(row: &Value, key: &str) -> Vec<Value> {
+    row.get(key)
+        .and_then(|v| v.as_array())
+        .cloned()
+        .unwrap_or_default()
+}
+
+fn owner_id(o: &Value) -> Option<&str> {
+    o.get("id").and_then(|v| v.as_str())
+}
+
+fn str_array(v: Option<&Value>) -> Vec<String> {
+    v.and_then(|x| x.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|s| s.as_str().map(String::from))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// The fields a row's owners determine, as `gov contract compile` writes them: evidence classes (Contract v3:63),
+/// health-scheduler tiers (:67), evidence-freshness triggers (:66), the adoption (:69) and periodic operational-audit
+/// (:70) obligations and the remediation rule (:73).
+pub fn derived_fields(m: &ContractModel, row: &Value) -> Map<String, Value> {
+    let mut all = owners_of(row, "automated_checks");
+    all.extend(owners_of(row, "independent_verification"));
+    let classes: BTreeSet<String> = all
+        .iter()
+        .filter_map(|o| o.get("class").and_then(|c| c.as_str()).map(String::from))
+        .collect();
+    let mut tiers: BTreeSet<String> = BTreeSet::new();
+    let mut fresh: BTreeSet<String> = BTreeSet::new();
+    let mut g5: Vec<String> = vec![];
+    let mut tiered_owner = false;
+    for o in &all {
+        let Some(id) = owner_id(o) else { continue };
+        let t = str_array(o.get("tiers"));
+        if owner_kind(id).map(|k| k.tiered).unwrap_or(false) {
+            tiered_owner = true;
+            if t.iter().any(|x| x == "G5") && !g5.contains(&id.to_string()) {
+                g5.push(id.to_string());
+            }
+        }
+        tiers.extend(t);
+        fresh.extend(owner_freshness(m, id));
+    }
+    let vocab_order = |v: &[Line], set: &BTreeSet<String>| -> Vec<String> {
+        v.iter()
+            .filter(|l| set.contains(&l.text))
+            .map(|l| l.text.clone())
+            .collect()
+    };
+    let mut d = Map::new();
+    d.insert(
+        "evidence_class".into(),
+        if all.is_empty() {
+            json!(NOT_YET_MAPPED)
+        } else {
+            json!(vocab_order(&m.vocab.evidence_classes, &classes))
+        },
+    );
+    d.insert(
+        "health_scheduler_tiers".into(),
+        json!(m
+            .tier_ids()
+            .into_iter()
+            .filter(|t| tiers.contains(t))
+            .collect::<Vec<_>>()),
+    );
+    d.insert(
+        "freshness_triggers".into(),
+        json!(vocab_order(&m.vocab.freshness_inputs, &fresh)),
+    );
+    d.insert(
+        "adoption_obligation".into(),
+        json!({"lifecycle_points": ADOPTION_POINTS, "owners": g5, "rule": if g5.is_empty() { ADOPTION_WITHOUT } else { ADOPTION_WITH }}),
+    );
+    d.insert(
+        "operational_audit_obligation".into(),
+        json!({"lifecycle_points": OPERATIONAL_POINTS, "owners": g5, "rule": if g5.is_empty() { OPERATIONAL_WITHOUT } else { OPERATIONAL_WITH }}),
+    );
+    d.insert(
+        "remediation_rule".into(),
+        json!(if tiered_owner {
+            REMEDIATION_TIERED
+        } else {
+            REMEDIATION_UNTIERED
+        }),
+    );
+    d
+}
+
+/// Fill what the owners determine, and the values the Phase-2 sources state for every capability where the map
+/// states none (applicability, allowed status, N/A requirements). `severity` is left as the map states it: no
+/// normative source states a per-capability severity, and the compiler may not invent one.
+pub fn complete_governed(m: &ContractModel, map: &mut Value) {
+    if let Some(rows) = map.get_mut("capabilities").and_then(|r| r.as_array_mut()) {
+        for row in rows.iter_mut() {
+            let derived = derived_fields(m, row);
+            let Some(o) = row.as_object_mut() else {
+                continue;
+            };
+            for (k, v) in derived {
+                o.insert(k, v);
+            }
+            if o.get("independent_verification")
+                .map(|v| v.is_null())
+                .unwrap_or(true)
+            {
+                o.insert("independent_verification".into(), json!([]));
+            }
+            if o.get("applicability").map(|v| v.is_null()).unwrap_or(true) {
+                o.insert("applicability".into(), json!(APPLICABILITY_RULE));
+            }
+            if o.get("allowed_status").map(|v| v.is_null()).unwrap_or(true) {
+                o.insert("allowed_status".into(), json!(STATUS_VOCABULARY));
+            }
+            if o.get("na_requirements")
+                .map(|v| v.is_null())
+                .unwrap_or(true)
+            {
+                o.insert("na_requirements".into(), json!(NA_REQUIREMENTS));
+            }
+        }
+    }
+}
+
+/// The governed part of an evidence map — every governed field of every row, each checklist item's owners and the
+/// freshness-invalidation owners — whose digest the source lock binds, so a governed value changed without `gov
+/// contract compile` is refused.
+pub fn evidence_map_governed(map: &Value) -> Value {
+    let governed = governed_fields();
+    let rows: Vec<Value> = lines_of(map, "capabilities")
+        .iter()
+        .map(|r| {
+            let mut o = Map::new();
+            o.insert("capability".into(), r.get("capability").cloned().unwrap_or(Value::Null));
+            for k in &governed {
+                o.insert((*k).into(), r.get(*k).cloned().unwrap_or(Value::Null));
+            }
+            o.insert(
+                "checklist".into(),
+                Value::Array(
+                    lines_of(r, "checklist")
+                        .iter()
+                        .map(|it| json!({"id": it.get("id"), "automated_checks": it.get("automated_checks")}))
+                        .collect(),
+                ),
+            );
+            Value::Object(o)
+        })
+        .collect();
+    json!({"capabilities": rows, "freshness_invalidation": map.get("freshness_invalidation").cloned().unwrap_or(Value::Null)})
+}
+
+/// The result of checking a map's owners.
+#[derive(Debug, Default)]
+pub struct OwnerCheck {
+    /// Owners that do not resolve (or, when compiling, could not be resolved in this tree).
+    pub unresolved: Vec<Value>,
+    /// Capabilities with no running owner.
+    pub missing: Vec<Value>,
+    /// Malformed or misplaced owners, and owner-determined fields that are not what the owners determine.
+    pub invalid: Vec<Value>,
+    pub summary: Value,
+}
+
+/// Check every capability's owners: each is well formed, resolves, and is placed where its independence says; every
+/// capability has at least one running owner; the fields the owners determine are exactly what they determine; each
+/// checklist item names only its capability's owners; every freshness trigger in use names an owner that proves the
+/// invalidation. `strict` (compile) refuses what this tree cannot resolve instead of deferring it.
+pub fn owner_differences(
+    m: &ContractModel,
+    map: &Value,
+    reg: &OwnerRegistry,
+    strict: bool,
+) -> OwnerCheck {
+    use crate::scheduler::catalogue;
+    let mut r = OwnerCheck::default();
+    let classes_vocab: BTreeSet<&str> = m
+        .vocab
+        .evidence_classes
+        .iter()
+        .map(|l| l.text.as_str())
+        .collect();
+    let mut by_kind: BTreeMap<String, usize> = BTreeMap::new();
+    let mut by_class: BTreeMap<String, usize> = BTreeMap::new();
+    let mut caps_by_tier: BTreeMap<String, usize> = BTreeMap::new();
+    let mut caps_by_class: BTreeMap<String, usize> = BTreeMap::new();
+    let mut deferred: Vec<Value> = vec![];
+    let (mut owners_total, mut items_total, mut items_owned) = (0usize, 0usize, 0usize);
+    let (mut tiered_caps, mut test_only, mut rows_n) = (0usize, vec![], 0usize);
+    let mut triggers_in_use: BTreeSet<String> = BTreeSet::new();
+    let mut resolved_ids: BTreeMap<String, Resolution> = BTreeMap::new();
+    let mut resolve = |id: &str, record: Option<&str>, tests: &[String]| -> Resolution {
+        let key = format!("{id}|{}|{}", record.unwrap_or(""), tests.join(","));
+        resolved_ids
+            .entry(key)
+            .or_insert_with(|| reg.resolve_id(id, record, tests))
+            .clone()
+    };
+    for row in lines_of(map, "capabilities") {
+        rows_n += 1;
+        let cap = row
+            .get("capability")
+            .and_then(|x| x.as_str())
+            .unwrap_or("?")
+            .to_string();
+        let mut running = 0usize;
+        let mut kinds_here: BTreeSet<&str> = BTreeSet::new();
+        let mut ids_here: BTreeSet<String> = BTreeSet::new();
+        for (field, independent) in [
+            ("automated_checks", false),
+            ("independent_verification", true),
+        ] {
+            let v = row.get(field);
+            let list = match v {
+                None | Some(Value::Null) if independent => vec![],
+                Some(Value::Array(a)) => a.clone(),
+                _ => {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("capabilities[{cap}].{field}"),
+                        "must be a list of owners",
+                        None,
+                        v,
+                    ));
+                    continue;
+                }
+            };
+            for (i, o) in list.iter().enumerate() {
+                let at = format!("capabilities[{cap}].{field}[{i}]");
+                let Some(id) = owner_id(o) else {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &at,
+                        "an owner is an object {id, class, …}",
+                        None,
+                        Some(o),
+                    ));
+                    continue;
+                };
+                let at = format!("capabilities[{cap}].{field}[{id}]");
+                let Some(kind) = owner_kind(id) else {
+                    r.unresolved.push(difference(
+                        "evidence_map",
+                        &at,
+                        &format!(
+                            "unknown owner kind (one of {})",
+                            OWNER_KINDS
+                                .iter()
+                                .map(|k| k.prefix)
+                                .collect::<Vec<_>>()
+                                .join(", ")
+                        ),
+                        None,
+                        Some(o),
+                    ));
+                    continue;
+                };
+                if !ids_here.insert(id.to_string()) {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &at,
+                        "named twice for this capability",
+                        None,
+                        None,
+                    ));
+                }
+                if kind.independent != independent {
+                    r.invalid.push(difference("evidence_map", &at, if kind.independent { "an independent owner belongs in independent_verification, never among builder or product evidence (Contract v3 O3; frozen AC-12)" } else { "a product or builder owner belongs in automated_checks, never in independent_verification" }, None, None));
+                }
+                let allowed: BTreeSet<&str> =
+                    ["id", "class", "tiers", "record", "tests", "exercises"]
+                        .into_iter()
+                        .collect();
+                if let Some(obj) = o.as_object() {
+                    for k in obj.keys() {
+                        if !allowed.contains(k.as_str()) {
+                            r.invalid.push(difference(
+                                "evidence_map",
+                                &format!("{at}.{k}"),
+                                "not an owner field (id, class, tiers, record, tests, exercises)",
+                                None,
+                                None,
+                            ));
+                        }
+                    }
+                }
+                let class = o.get("class").and_then(|c| c.as_str()).unwrap_or("");
+                if !classes_vocab.contains(class) {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("{at}.class"),
+                        "not an evidence class of Contract v3:81-91",
+                        Some(&json!(classes_vocab.iter().collect::<Vec<_>>())),
+                        o.get("class"),
+                    ));
+                } else if !kind.classes.contains(&class) {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("{at}.class"),
+                        &format!(
+                            "a `{}:` owner produces {}",
+                            kind.prefix,
+                            kind.classes.join(" or ")
+                        ),
+                        None,
+                        o.get("class"),
+                    ));
+                }
+                let record = o.get("record").and_then(|x| x.as_str());
+                if record.is_some() != matches!(kind.prefix, "human-gate" | "release") {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("{at}.record"),
+                        "`record` is stated by exactly the human-gate and release owners",
+                        None,
+                        o.get("record"),
+                    ));
+                }
+                let tests = str_array(o.get("tests"));
+                if o.get("tests").is_some() && kind.prefix != "heldout" {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("{at}.tests"),
+                        "`tests` is stated only by a held-out owner",
+                        None,
+                        None,
+                    ));
+                }
+                if let Some(e) = o.get("exercises") {
+                    if !e.is_string() {
+                        r.invalid.push(difference(
+                            "evidence_map",
+                            &format!("{at}.exercises"),
+                            "a short statement of what the owner exercises",
+                            None,
+                            Some(e),
+                        ));
+                    }
+                }
+                let stated_tiers = str_array(o.get("tiers"));
+                if o.get("tiers").is_some() != kind.tiered {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("{at}.tiers"),
+                        if kind.tiered {
+                            "a tier owner states the tiers it runs at"
+                        } else {
+                            "only a tier owner (check, doctor, g0) states tiers"
+                        },
+                        None,
+                        o.get("tiers"),
+                    ));
+                }
+                owners_total += 1;
+                *by_kind.entry(kind.prefix.to_string()).or_default() += 1;
+                *by_class.entry(class.to_string()).or_default() += 1;
+                match resolve(id, record, &tests) {
+                    Resolution::Resolved(site) => {
+                        if kind.tiered {
+                            let declared = str_array(site.get("tiers"));
+                            if declared != stated_tiers {
+                                r.unresolved.push(difference("evidence_map", &format!("{at}.tiers"), "differs from the tiers the product declares for it (scheduler catalogue / G0)", Some(&json!(declared)), Some(&json!(stated_tiers))));
+                            }
+                        }
+                        if kind.runs {
+                            running += 1;
+                        }
+                        kinds_here.insert(kind.prefix);
+                    }
+                    Resolution::Deferred(why) if !strict => {
+                        deferred.push(json!({"capability": cap, "owner": id, "reason": why}));
+                        if kind.runs {
+                            running += 1;
+                        }
+                        kinds_here.insert(kind.prefix);
+                    }
+                    Resolution::Deferred(why) => {
+                        r.unresolved.push(difference("evidence_map", &at, &format!("cannot be resolved in this tree ({why}); compile the map where the owners' sources are"), None, None));
+                    }
+                    Resolution::Unresolved(why) => {
+                        r.unresolved
+                            .push(difference("evidence_map", &at, &why, None, None));
+                    }
+                }
+            }
+        }
+        if running == 0 {
+            r.missing.push(difference("evidence_map", &format!("capabilities[{cap}]"), "has no evidence owner that runs (a G0-G6 tier check, a test the harness runs, Human Decision Gate or release evidence, or an independent held-out suite); an obligation of a future verifier alone does not own it (frozen AC-10)", None, None));
+        }
+        // what the owners determine
+        let derived = derived_fields(m, &row);
+        for (k, v) in &derived {
+            if row.get(k) != Some(v) {
+                r.invalid.push(difference("evidence_map", &format!("capabilities[{cap}].{k}"), "is not what the capability's owners determine; `gov contract compile` derives it", Some(v), row.get(k)));
+            }
+        }
+        let tiers_here = str_array(derived.get("health_scheduler_tiers"));
+        for t in &tiers_here {
+            *caps_by_tier.entry(t.clone()).or_default() += 1;
+        }
+        for c in str_array(derived.get("evidence_class")) {
+            *caps_by_class.entry(c).or_default() += 1;
+        }
+        triggers_in_use.extend(str_array(derived.get("freshness_triggers")));
+        if !tiers_here.is_empty() {
+            tiered_caps += 1;
+        } else if !kinds_here.is_empty()
+            && kinds_here
+                .iter()
+                .all(|k| *k == "test" || *k == "obligation")
+        {
+            test_only.push(json!(cap));
+        }
+        // the values the sources state for every capability
+        match row.get("allowed_status") {
+            Some(Value::Array(a))
+                if !a.is_empty()
+                    && a.iter().all(|s| {
+                        s.as_str()
+                            .map(|x| STATUS_VOCABULARY.contains(&x))
+                            .unwrap_or(false)
+                    }) => {}
+            other => r.invalid.push(difference(
+                "evidence_map",
+                &format!("capabilities[{cap}].allowed_status"),
+                "one or more statuses of the frozen gate contract §4 vocabulary",
+                Some(&json!(STATUS_VOCABULARY)),
+                other,
+            )),
+        }
+        for k in ["applicability", "na_requirements"] {
+            if !row.get(k).map(|v| v.is_string()).unwrap_or(false) {
+                r.invalid.push(difference(
+                    "evidence_map",
+                    &format!("capabilities[{cap}].{k}"),
+                    "the rule the sources state (a string)",
+                    None,
+                    row.get(k),
+                ));
+            }
+        }
+        if !matches!(
+            row.get("severity"),
+            Some(Value::Null) | Some(Value::String(_))
+        ) {
+            r.invalid.push(difference(
+                "evidence_map",
+                &format!("capabilities[{cap}].severity"),
+                "a stated severity, or null where no source states one",
+                None,
+                row.get("severity"),
+            ));
+        }
+        // checklist items name only this capability's owners
+        for it in lines_of(&row, "checklist") {
+            items_total += 1;
+            let iid = it.get("id").and_then(|x| x.as_str()).unwrap_or("?");
+            let named = it
+                .get("automated_checks")
+                .and_then(|v| v.as_array())
+                .cloned()
+                .unwrap_or_default();
+            if !named.is_empty() {
+                items_owned += 1;
+            }
+            for n in named {
+                if !n.as_str().map(|s| ids_here.contains(s)).unwrap_or(false) {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("capabilities[{cap}].checklist[{iid}].automated_checks"),
+                        "a checklist item names owners of its capability, by id",
+                        Some(&json!(ids_here.iter().collect::<Vec<_>>())),
+                        Some(&n),
+                    ));
+                }
+            }
+        }
+    }
+    // every freshness trigger in use names an owner that proves changing it invalidates prior green evidence (AC-10)
+    let proofs = map.get("freshness_invalidation");
+    let mut proven: BTreeSet<String> = BTreeSet::new();
+    match proofs {
+        None | Some(Value::Null) => {}
+        Some(Value::Array(entries)) => {
+            for (i, e) in entries.iter().enumerate() {
+                let trig = e.get("trigger").and_then(|x| x.as_str()).unwrap_or("");
+                let at = format!("freshness_invalidation[{trig}]");
+                if !m.vocab.freshness_inputs.iter().any(|l| l.text == trig) {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &format!("freshness_invalidation[{i}].trigger"),
+                        "not an evidence-freshness input of Contract v3:97-109",
+                        None,
+                        e.get("trigger"),
+                    ));
+                    continue;
+                }
+                let owners = str_array(e.get("owners"));
+                if owners.is_empty() {
+                    r.invalid.push(difference(
+                        "evidence_map",
+                        &at,
+                        "names no owner that proves the invalidation",
+                        None,
+                        None,
+                    ));
+                }
+                let mut ok = !owners.is_empty();
+                for id in owners {
+                    match resolve(&id, None, &[]) {
+                        Resolution::Resolved(_) => {}
+                        Resolution::Deferred(why) if !strict => deferred
+                            .push(json!({"freshness_trigger": trig, "owner": id, "reason": why})),
+                        Resolution::Deferred(why) | Resolution::Unresolved(why) => {
+                            ok = false;
+                            r.unresolved.push(difference(
+                                "evidence_map",
+                                &format!("{at}.owners[{id}]"),
+                                &why,
+                                None,
+                                None,
+                            ));
+                        }
+                    }
+                }
+                for k in e
+                    .as_object()
+                    .map(|o| o.keys().cloned().collect::<Vec<_>>())
+                    .unwrap_or_default()
+                {
+                    if !["trigger", "owners", "proves"].contains(&k.as_str()) {
+                        r.invalid.push(difference("evidence_map", &format!("{at}.{k}"), "not a field of a freshness-invalidation entry (trigger, owners, proves)", None, None));
+                    }
+                }
+                if ok {
+                    proven.insert(trig.to_string());
+                }
+            }
+        }
+        Some(other) => r.invalid.push(difference(
+            "evidence_map",
+            "freshness_invalidation",
+            "a list of {trigger, owners, proves}",
+            None,
+            Some(other),
+        )),
+    }
+    for t in &triggers_in_use {
+        if !proven.contains(t) {
+            r.invalid.push(difference("evidence_map", &format!("freshness_invalidation[{t}]"), "a freshness trigger in use names no owner proving that changing it invalidates prior green evidence (frozen AC-10, second sentence)", None, None));
+        }
+    }
+    let tiers_total = m.tier_ids();
+    r.summary = json!({
+        "capabilities": rows_n,
+        "owners": owners_total,
+        "owners_by_kind": by_kind,
+        "owners_by_class": by_class,
+        "capabilities_by_evidence_class": caps_by_class,
+        "capabilities_by_tier": tiers_total.iter().map(|t| (t.clone(), json!(caps_by_tier.get(t).copied().unwrap_or(0)))).collect::<Map<String, Value>>(),
+        "capabilities_with_a_tier_owner": tiered_caps,
+        "capabilities_owned_only_by_tests": test_only,
+        "checklist_items": items_total,
+        "checklist_items_naming_an_owner": items_owned,
+        "freshness_triggers_in_use": triggers_in_use,
+        "deferred": deferred,
+        "not_in_this_tree": reg.absent_sources(),
+        "catalogue_checks": catalogue::CHECKS.len(),
+    });
+    r
+}
+
+fn owner_error(chk: &OwnerCheck) -> Option<GovError> {
+    let (code, what, diffs) = if !chk.unresolved.is_empty() {
+        ("CONTRACT_EVIDENCE_OWNER_UNRESOLVED", "an evidence owner does not resolve to a check, test, suite, command or criterion that exists and runs", chk.unresolved.clone())
+    } else if !chk.missing.is_empty() {
+        ("CONTRACT_EVIDENCE_OWNER_MISSING", "a capability has no evidence owner that runs (frozen AC-10: no required capability has zero evidence owners)", chk.missing.clone())
+    } else if !chk.invalid.is_empty() {
+        ("CONTRACT_EVIDENCE_OWNER_INVALID", "an evidence owner is malformed or misplaced, or a field its owners determine is not what they determine", chk.invalid.clone())
+    } else {
+        return None;
+    };
+    let mut all = diffs;
+    for (k, v) in [
+        ("unresolved", &chk.unresolved),
+        ("missing", &chk.missing),
+        ("invalid", &chk.invalid),
+    ] {
+        if !v.is_empty() && !all.iter().any(|d| v.contains(d)) {
+            all.push(json!({"view": "evidence_map", "at": k, "problem": format!("{} further {k} difference(s)", v.len())}));
+        }
+    }
+    let mut e = diverged(
+        code,
+        &format!("{EVIDENCE_MAP}: {what}"),
+        all,
+        "name, for every capability, owners that exist and run and exercise it (never an invented one); a capability nothing exercises stays unmapped and fails here; then `gov contract compile`",
+    );
+    if let Some(o) = e.details.as_object_mut() {
+        o.insert("unresolved".into(), json!(chk.unresolved.len()));
+        o.insert("missing".into(), json!(chk.missing.len()));
+        o.insert("invalid".into(), json!(chk.invalid.len()));
+    }
+    Some(e)
+}
+
+// ------------------------------------------------------------------------------------------ suite-to-contract matrix
+
+/// Outputs of runs of the owners, supplied to the matrix as their last-run evidence. The matrix runs no owner and
+/// infers no result: an owner no supplied output covers is reported as not run in the supplied evidence.
+#[derive(Debug, Clone, Default)]
+pub struct RunEvidence {
+    /// `cargo test --lib` outputs.
+    pub lib: Vec<PathBuf>,
+    /// `cargo test --test certification` outputs.
+    pub certification: Vec<PathBuf>,
+    /// Held-out re-run outputs: per test binary a block headed `===== <suite label> :: <binary> =====`.
+    pub heldout: Vec<PathBuf>,
+    /// `gov --json health run …` and `gov --json doctor` outputs.
+    pub health: Vec<PathBuf>,
+}
+
+fn cargo_result_regex() -> &'static Regex {
+    static RX: OnceLock<Regex> = OnceLock::new();
+    RX.get_or_init(|| {
+        Regex::new(r"(?m)^test (\S+) \.\.\. (ok|FAILED|ignored)").expect("cargo result regex")
+    })
+}
+
+fn heldout_block_regex() -> &'static Regex {
+    static RX: OnceLock<Regex> = OnceLock::new();
+    RX.get_or_init(|| Regex::new(r"(?m)^===== (.+?) :: (.+?) =====$").expect("heldout block regex"))
+}
+
+/// The suite label a held-out suite's crate manifest gives (`srr-heldout-ar0027` → `AR-0027`).
+fn heldout_label(dir: &Path) -> Option<String> {
+    let t = std::fs::read_to_string(dir.join("Cargo.toml.txt")).ok()?;
+    let name = t
+        .lines()
+        .find(|l| l.trim_start().starts_with("name"))?
+        .split('"')
+        .nth(1)?
+        .to_string();
+    let tail = name.rsplit('-').next()?;
+    let digits: String = tail.chars().filter(|c| c.is_ascii_digit()).collect();
+    let letters: String = tail
+        .chars()
+        .take_while(|c| c.is_ascii_alphabetic())
+        .collect();
+    if digits.is_empty() || letters.is_empty() {
+        return None;
+    }
+    Some(format!("{}-{digits}", letters.to_uppercase()))
+}
+
+struct Supplied {
+    files: Vec<Value>,
+    tests: BTreeMap<(String, String), (String, String)>,
+    heldout: BTreeMap<String, Value>,
+    heldout_tests: BTreeMap<(String, String), (String, String)>,
+    checks: BTreeMap<String, (String, String)>,
+}
+
+fn supplied_file(repo_root: &Path, kind: &str, p: &Path) -> Result<(String, String)> {
+    let text = read_text(p).map_err(|e| {
+        GovError::new(
+            "CONTRACT_MATRIX_EVIDENCE_UNREADABLE",
+            format!("run evidence {} cannot be read: {}", p.display(), e.message),
+        )
+    })?;
+    let shown = p
+        .canonicalize()
+        .ok()
+        .and_then(|c| {
+            repo_root.canonicalize().ok().and_then(|r| {
+                c.strip_prefix(r)
+                    .ok()
+                    .map(|x| x.to_string_lossy().to_string())
+            })
+        })
+        .unwrap_or_else(|| p.display().to_string());
+    let _ = kind;
+    Ok((shown, text))
+}
+
+fn read_supplied(repo_root: &Path, ev: &RunEvidence) -> Result<Supplied> {
+    let mut s = Supplied {
+        files: vec![],
+        tests: BTreeMap::new(),
+        heldout: BTreeMap::new(),
+        heldout_tests: BTreeMap::new(),
+        checks: BTreeMap::new(),
+    };
+    for (harness, list) in [("lib", &ev.lib), ("certification", &ev.certification)] {
+        for p in list {
+            let (shown, text) = supplied_file(repo_root, harness, p)?;
+            let mut n = 0;
+            for c in cargo_result_regex().captures_iter(&text) {
+                n += 1;
+                let status = match &c[2] {
+                    "ok" => "PASSED",
+                    "FAILED" => "FAILED",
+                    _ => "IGNORED",
+                };
+                s.tests.insert(
+                    (harness.to_string(), c[1].to_string()),
+                    (status.to_string(), shown.clone()),
+                );
+            }
+            s.files.push(json!({"kind": format!("cargo test ({harness})"), "path": shown, "sha256": sha256_text(&text), "results": n}));
+        }
+    }
+    // held-out suites: map each run block's suite label to the suite directory whose manifest names it
+    let mut labels: BTreeMap<String, String> = BTreeMap::new();
+    if let Ok(rd) = std::fs::read_dir(repo_root.join(HELDOUT_ROOT)) {
+        for e in rd.flatten() {
+            let dir = e.path().join("evidence").join("heldout-tests");
+            if let Some(l) = heldout_label(&dir) {
+                labels.insert(l, crate::util::rel_posix(&dir, repo_root));
+            }
+        }
+    }
+    for p in &ev.heldout {
+        let (shown, text) = supplied_file(repo_root, "heldout", p)?;
+        let heads: Vec<(usize, usize, String, String)> = heldout_block_regex()
+            .captures_iter(&text)
+            .map(|c| {
+                let m = c.get(0).expect("match");
+                (m.start(), m.end(), c[1].to_string(), c[2].to_string())
+            })
+            .collect();
+        for (i, (_, end, label, binary)) in heads.iter().enumerate() {
+            let stop = heads.get(i + 1).map(|h| h.0).unwrap_or(text.len());
+            let body = &text[*end..stop];
+            let Some(dir) = labels.get(label) else {
+                continue;
+            };
+            let entry = s.heldout.entry(dir.clone()).or_insert_with(|| {
+                json!({"label": label, "passed": 0, "failed": 0, "failing": [], "not_compiling": [], "evidence": shown})
+            });
+            let mut ran = 0;
+            for c in cargo_result_regex().captures_iter(body) {
+                ran += 1;
+                let status = if &c[2] == "ok" {
+                    "PASSED"
+                } else if &c[2] == "FAILED" {
+                    "FAILED"
+                } else {
+                    "IGNORED"
+                };
+                let key = if status == "PASSED" {
+                    "passed"
+                } else {
+                    "failed"
+                };
+                if status != "IGNORED" {
+                    entry[key] = json!(entry[key].as_u64().unwrap_or(0) + 1);
+                }
+                let name = format!("{binary}::{}", &c[1]);
+                if status == "FAILED" {
+                    entry["failing"]
+                        .as_array_mut()
+                        .expect("array")
+                        .push(json!(name));
+                }
+                s.heldout_tests
+                    .insert((dir.clone(), name), (status.to_string(), shown.clone()));
+            }
+            if ran == 0 && (body.contains("error[E") || body.contains("could not compile")) {
+                entry["not_compiling"]
+                    .as_array_mut()
+                    .expect("array")
+                    .push(json!(binary));
+            }
+        }
+        s.files.push(json!({"kind": "held-out re-run", "path": shown, "sha256": sha256_text(&text), "blocks": heads.len()}));
+    }
+    for p in &ev.health {
+        let (shown, text) = supplied_file(repo_root, "health", p)?;
+        let v: Value = serde_json::from_str(&text).map_err(|e| {
+            GovError::new(
+                "CONTRACT_MATRIX_EVIDENCE_UNREADABLE",
+                format!("health evidence {} is not JSON: {e}", p.display()),
+            )
+        })?;
+        let r = v.get("result").unwrap_or(&v);
+        let tier = r
+            .get("tier")
+            .and_then(|t| t.as_str())
+            .unwrap_or("")
+            .to_string();
+        let mut n = 0;
+        if let Some(f) = r.get("families").and_then(|x| x.as_object()) {
+            for (id, res) in f {
+                n += 1;
+                let ok = res.get("ok").and_then(|x| x.as_bool()).unwrap_or(false);
+                let how = res.get("status").and_then(|x| x.as_str()).unwrap_or("ran");
+                s.checks.insert(
+                    format!("check:{id}"),
+                    (
+                        format!(
+                            "RAN{}: {} ({how})",
+                            if tier.is_empty() {
+                                String::new()
+                            } else {
+                                format!(" at {tier}")
+                            },
+                            if ok { "ok" } else { "findings" }
+                        ),
+                        shown.clone(),
+                    ),
+                );
+            }
+        }
+        if let Some(c) = r.get("checks").and_then(|x| x.as_array()) {
+            for chk in c {
+                let Some(id) = chk.get("id").and_then(|x| x.as_str()) else {
+                    continue;
+                };
+                n += 1;
+                let ok = chk.get("ok").and_then(|x| x.as_bool()).unwrap_or(false);
+                s.checks.insert(
+                    format!("doctor:{id}"),
+                    (
+                        format!("RAN (gov doctor): {}", if ok { "ok" } else { "findings" }),
+                        shown.clone(),
+                    ),
+                );
+            }
+        }
+        s.files.push(json!({"kind": "gov health/doctor run", "path": shown, "sha256": sha256_text(&text), "results": n, "tier": tier}));
+    }
+    Ok(s)
+}
+
+fn last_run(s: &Supplied, o: &Value) -> Value {
+    let id = owner_id(o).unwrap_or("");
+    let not_run = json!({"status": "NOT_IN_SUPPLIED_EVIDENCE"});
+    match owner_kind(id).map(|k| k.prefix) {
+        Some("test") => {
+            let rest = &id[5..];
+            let Some((h, path)) = rest.split_once(':') else {
+                return not_run;
+            };
+            match s.tests.get(&(h.to_string(), path.to_string())) {
+                Some((st, file)) => json!({"status": st, "evidence": file}),
+                None => not_run,
+            }
+        }
+        Some("check") | Some("doctor") => match s.checks.get(id) {
+            Some((st, file)) => json!({"status": st, "evidence": file}),
+            None => not_run,
+        },
+        Some("heldout") => {
+            let dir = id[8..].trim_end_matches('/');
+            match s.heldout.get(dir) {
+                None => not_run,
+                Some(agg) => {
+                    let named: Vec<Value> = str_array(o.get("tests"))
+                        .iter()
+                        .map(|t| {
+                            let st = s
+                                .heldout_tests
+                                .get(&(dir.to_string(), t.clone()))
+                                .map(|x| x.0.clone())
+                                .unwrap_or_else(|| "NOT_IN_SUPPLIED_EVIDENCE".into());
+                            json!({"test": t, "status": st})
+                        })
+                        .collect();
+                    json!({"status": format!("RAN: {} passed, {} failed", agg["passed"], agg["failed"]), "failing": agg["failing"], "not_compiling": agg["not_compiling"], "named_tests": named, "evidence": agg["evidence"]})
+                }
+            }
+        }
+        Some("obligation") => {
+            json!({"status": "OBLIGATION: discharged by the independent verification of the candidate, not by builder evidence"})
+        }
+        _ => not_run,
+    }
+}
+
+/// The suite-to-contract matrix (frozen AC-10): every capability → its owners → their tiers → their last-run
+/// evidence, generated from the evidence map after it verifies. Returns the machine-readable matrix and its Markdown
+/// rendering.
+pub fn suite_to_contract(repo_root: &Path, ev: &RunEvidence) -> Result<(Value, String)> {
+    let verified = verify(repo_root)?;
+    let dv = derive(repo_root, "")?;
+    let map: Value = crate::util::read_yaml(&repo_root.join(EVIDENCE_MAP))?;
+    let reg = OwnerRegistry::load(repo_root);
+    let chk = owner_differences(&dv.model, &map, &reg, false);
+    let supplied = read_supplied(repo_root, ev)?;
+    let mut rows = vec![];
+    let mut status_counts: BTreeMap<String, usize> = BTreeMap::new();
+    for row in lines_of(&map, "capabilities") {
+        let cap = row["capability"].as_str().unwrap_or("?").to_string();
+        let mut owners = vec![];
+        for (field, independent) in [
+            ("automated_checks", false),
+            ("independent_verification", true),
+        ] {
+            for o in owners_of(&row, field) {
+                let id = owner_id(&o).unwrap_or("").to_string();
+                let lr = last_run(&supplied, &o);
+                let head = lr["status"]
+                    .as_str()
+                    .unwrap_or("")
+                    .split([':', ' '])
+                    .next()
+                    .unwrap_or("")
+                    .to_string();
+                *status_counts.entry(head).or_default() += 1;
+                let resolved = match reg.resolve_id(
+                    &id,
+                    o.get("record").and_then(|x| x.as_str()),
+                    &str_array(o.get("tests")),
+                ) {
+                    Resolution::Resolved(v) => v,
+                    Resolution::Deferred(w) => json!({"deferred": w}),
+                    Resolution::Unresolved(w) => json!({"unresolved": w}),
+                };
+                owners.push(json!({
+                    "id": id,
+                    "kind": owner_kind(&id).map(|k| k.prefix),
+                    "independent": independent,
+                    "class": o.get("class"),
+                    "tiers": o.get("tiers").cloned().unwrap_or(json!([])),
+                    "exercises": o.get("exercises"),
+                    "resolved": resolved,
+                    "last_run": lr,
+                }));
+            }
+        }
+        let items = lines_of(&row, "checklist");
+        rows.push(json!({
+            "capability": cap,
+            "title": row["title"],
+            "gate": row["gate"],
+            "evidence_class": row["evidence_class"],
+            "health_scheduler_tiers": row["health_scheduler_tiers"],
+            "freshness_triggers": row["freshness_triggers"],
+            "checklist_items": items.len(),
+            "checklist_items_naming_an_owner": items.iter().filter(|i| i["automated_checks"].as_array().map(|a| !a.is_empty()).unwrap_or(false)).count(),
+            "owners": owners,
+        }));
+    }
+    let fresh: Vec<Value> = lines_of(&map, "freshness_invalidation")
+        .iter()
+        .map(|e| {
+            let owners: Vec<Value> = str_array(e.get("owners"))
+                .iter()
+                .map(|id| json!({"id": id, "last_run": last_run(&supplied, &json!({"id": id}))}))
+                .collect();
+            json!({"trigger": e["trigger"], "proves": e.get("proves"), "owners": owners})
+        })
+        .collect();
+    let matrix = json!({
+        "schema": "governance-os.suite-to-contract-matrix",
+        "schema_version": 1,
+        "generated_by": "gov contract matrix (runtime/src/contracts.rs::suite_to_contract), from the evidence map after `gov contract verify`",
+        "contract": {
+            "owner_source_sha256": OWNER_SOURCE_SHA256,
+            "evidence_map": EVIDENCE_MAP,
+            "evidence_map_governed_sha256": crate::util::hash_value(&evidence_map_governed(&map)),
+            "verify_verdict": verified["verdict"],
+        },
+        "run_evidence_supplied": supplied.files,
+        "summary": {
+            "owners": chk.summary,
+            "owner_last_run_status_counts": status_counts,
+        },
+        "freshness_invalidation": fresh,
+        "capabilities": rows,
+    });
+    let md = render_matrix(&matrix);
+    Ok((matrix, md))
+}
+
+fn md_cell(v: &Value) -> String {
+    let s = match v {
+        Value::Null => "—".to_string(),
+        Value::String(s) => s.clone(),
+        Value::Array(a) if a.is_empty() => "—".to_string(),
+        Value::Array(a) => a
+            .iter()
+            .map(|x| {
+                x.as_str()
+                    .map(String::from)
+                    .unwrap_or_else(|| x.to_string())
+            })
+            .collect::<Vec<_>>()
+            .join(", "),
+        o => o.to_string(),
+    };
+    s.replace('|', "\\|").replace('\n', " ")
+}
+
+fn render_matrix(mx: &Value) -> String {
+    let mut out = String::new();
+    let s = &mx["summary"]["owners"];
+    out.push_str("# Suite-to-contract matrix (frozen gate contract AC-10)\n\n");
+    out.push_str("Generated by `gov contract matrix` from `tests/governance/capability-evidence-map.yaml` after `gov contract verify`\n");
+    out.push_str("returned `CONTRACT_SOURCE_BOUND`. Every owner below was resolved by the product (scheduler catalogue, G0 command\n");
+    out.push_str("classification, the test harnesses' module trees, the held-out suites, the frozen gate contract). Last-run evidence\n");
+    out.push_str("is read from the run outputs supplied to the command, never inferred: an owner no supplied output covers is\n");
+    out.push_str("`NOT_IN_SUPPLIED_EVIDENCE`. Builder evidence is regression evidence (Contract v3 O3); independent owners are\n");
+    out.push_str("listed separately and are never builder evidence.\n\n");
+    out.push_str(&format!(
+        "Contract source SHA-256 `{}` · evidence map governed digest `{}`.\n\n",
+        md_cell(&mx["contract"]["owner_source_sha256"]),
+        md_cell(&mx["contract"]["evidence_map_governed_sha256"])
+    ));
+    out.push_str("## Run evidence supplied\n\n| Kind | File | SHA-256 |\n|---|---|---|\n");
+    for f in mx["run_evidence_supplied"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+    {
+        out.push_str(&format!(
+            "| {} | `{}` | `{}` |\n",
+            md_cell(&f["kind"]),
+            md_cell(&f["path"]),
+            md_cell(&f["sha256"])
+        ));
+    }
+    out.push_str("\n## Summary\n\n");
+    out.push_str(&format!(
+        "- capabilities: {} · owners: {} · capabilities with a G-tier owner: {} · capabilities owned only by tests (no G-tier, held-out, human-gate or release owner): {}\n",
+        s["capabilities"], s["owners"], s["capabilities_with_a_tier_owner"],
+        s["capabilities_owned_only_by_tests"].as_array().map(|a| if a.is_empty() { "none".to_string() } else { a.iter().filter_map(|x| x.as_str()).collect::<Vec<_>>().join(", ") }).unwrap_or_default()
+    ));
+    out.push_str(&format!(
+        "- checklist items naming an owner: {} of {}\n",
+        s["checklist_items_naming_an_owner"], s["checklist_items"]
+    ));
+    out.push_str(&format!(
+        "- deferred owners (sources not in this tree): {}\n\n",
+        s["deferred"].as_array().map(|a| a.len()).unwrap_or(0)
+    ));
+    out.push_str("| Owners by kind | Count |\n|---|---|\n");
+    for (k, v) in s["owners_by_kind"].as_object().cloned().unwrap_or_default() {
+        out.push_str(&format!("| `{k}` | {v} |\n"));
+    }
+    out.push_str(
+        "\n| Evidence class (Contract v3:83-91) | Owners | Capabilities |\n|---|---|---|\n",
+    );
+    for (k, v) in s["owners_by_class"]
+        .as_object()
+        .cloned()
+        .unwrap_or_default()
+    {
+        out.push_str(&format!(
+            "| {k} | {v} | {} |\n",
+            s["capabilities_by_evidence_class"][&k]
+        ));
+    }
+    out.push_str("\n| Tier (O5) | Capabilities with an owner at the tier |\n|---|---|\n");
+    for (k, v) in s["capabilities_by_tier"]
+        .as_object()
+        .cloned()
+        .unwrap_or_default()
+    {
+        out.push_str(&format!("| {k} | {v} |\n"));
+    }
+    out.push_str("\n| Owner last-run status | Owners |\n|---|---|\n");
+    for (k, v) in mx["summary"]["owner_last_run_status_counts"]
+        .as_object()
+        .cloned()
+        .unwrap_or_default()
+    {
+        out.push_str(&format!(
+            "| {} | {v} |\n",
+            if k.is_empty() { "—".into() } else { k }
+        ));
+    }
+    out.push_str("\n## Freshness triggers → owners proving invalidation (AC-10, second sentence)\n\n| Trigger (Contract v3:97-109) | Owner | Last run | What it proves |\n|---|---|---|---|\n");
+    for e in mx["freshness_invalidation"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+    {
+        for o in e["owners"].as_array().cloned().unwrap_or_default() {
+            out.push_str(&format!(
+                "| {} | `{}` | {} | {} |\n",
+                md_cell(&e["trigger"]),
+                md_cell(&o["id"]),
+                md_cell(&o["last_run"]["status"]),
+                md_cell(&e["proves"])
+            ));
+        }
+    }
+    out.push_str("\n## Capabilities\n\n");
+    let mut gate = String::new();
+    for c in mx["capabilities"].as_array().cloned().unwrap_or_default() {
+        let g = c["gate"].as_str().unwrap_or("").to_string();
+        if g != gate {
+            out.push_str(&format!("### Gate {g}\n\n"));
+            gate = g;
+        }
+        out.push_str(&format!(
+            "#### {} — {}\n\nEvidence class: {} · tiers: {} · freshness triggers: {} · checklist items naming an owner: {}/{}\n\n",
+            md_cell(&c["capability"]),
+            md_cell(&c["title"]),
+            md_cell(&c["evidence_class"]),
+            md_cell(&c["health_scheduler_tiers"]),
+            md_cell(&c["freshness_triggers"]),
+            c["checklist_items_naming_an_owner"],
+            c["checklist_items"]
+        ));
+        out.push_str("| Owner | Class | Tier(s) | Independent | Last-run evidence | Exercises |\n|---|---|---|---|---|---|\n");
+        for o in c["owners"].as_array().cloned().unwrap_or_default() {
+            let lr = &o["last_run"];
+            let ev = match lr.get("evidence") {
+                Some(Value::String(e)) => format!("{} (`{}`)", md_cell(&lr["status"]), e),
+                _ => md_cell(&lr["status"]),
+            };
+            out.push_str(&format!(
+                "| `{}` | {} | {} | {} | {} | {} |\n",
+                md_cell(&o["id"]),
+                md_cell(&o["class"]),
+                md_cell(&o["tiers"]),
+                if o["independent"].as_bool().unwrap_or(false) {
+                    "yes"
+                } else {
+                    "no"
+                },
+                ev,
+                md_cell(&o["exercises"])
+            ));
+        }
+        out.push('\n');
+    }
+    out
+}
+
+/// Write the matrix to `out` as `suite-to-contract.json` and `suite-to-contract.md`.
+pub fn write_suite_to_contract(repo_root: &Path, ev: &RunEvidence, out: &Path) -> Result<Value> {
+    let (mx, md) = suite_to_contract(repo_root, ev)?;
+    std::fs::create_dir_all(out).map_err(|e| GovError::io("creating the matrix directory", e))?;
+    crate::util::write_json(&out.join("suite-to-contract.json"), &mx)?;
+    crate::util::write_text(&out.join("suite-to-contract.md"), &md)?;
+    Ok(json!({
+        "written": [out.join("suite-to-contract.json").display().to_string(), out.join("suite-to-contract.md").display().to_string()],
+        "capabilities": mx["capabilities"].as_array().map(|a| a.len()),
+        "summary": mx["summary"],
+        "run_evidence_supplied": mx["run_evidence_supplied"],
+    }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2992,8 +5226,21 @@ mod tests {
         embedded_model().expect("the embedded approved source parses")
     }
 
-    /// A disposable copy of every file of the binding chain.
+    /// A disposable copy of every file of the binding chain, with the owners' sources (the test harnesses' crates,
+    /// the held-out suites and the frozen gate contract) linked in read-only from this checkout, so `gov contract
+    /// compile` can resolve every owner in it.
     fn fixture(tag: &str) -> PathBuf {
+        let dir = bare_fixture(tag);
+        std::fs::create_dir_all(dir.join("tests")).unwrap();
+        for rel in ["runtime", "tests/certification", "release"] {
+            std::os::unix::fs::symlink(repo().join(rel), dir.join(rel)).unwrap();
+        }
+        dir
+    }
+
+    /// A disposable copy of the binding chain only: the shape of a release-tooling tree, which carries no test
+    /// sources, no held-out suites and no gate contract.
+    fn bare_fixture(tag: &str) -> PathBuf {
         let dir =
             std::env::temp_dir().join(format!("gov-contract-{tag}-{}", crate::util::short_uuid()));
         for rel in [
@@ -3433,28 +5680,29 @@ mod tests {
 
     #[test]
     fn governed_evidence_values_survive_regeneration() {
+        // BC-P2-02 changed the governed shape (owners are objects; evidence class, tiers and freshness triggers are
+        // what the owners determine). The property is unchanged: governed values survive regeneration, a governed
+        // value changed without a recompile is detected, and data regeneration would discard is refused.
         let dir = fixture("governed");
         edit_yaml(&dir, EVIDENCE_MAP, |v| {
             let a1 = cap_index(v, "A1", "capability");
-            v["capabilities"][a1]["evidence_class"] = json!("automated invariant/guard");
-            v["capabilities"][a1]["automated_checks"] =
-                json!(["policy_precedence::floors_cannot_be_lowered"]);
-            v["capabilities"][a1]["health_scheduler_tiers"] = json!(["G0"]);
-            v["capabilities"][a1]["checklist"][1]["automated_checks"] =
-                json!(["policy_precedence::floors_cannot_be_lowered"]);
+            let owner = v["capabilities"][a1]["automated_checks"][0]["id"].clone();
+            v["capabilities"][a1]["automated_checks"][0]["exercises"] =
+                json!("a governed statement of what this owner exercises");
+            v["capabilities"][a1]["checklist"][1]["automated_checks"] = json!([owner]);
         });
-        // the view and the lock now lag the map: verify says so, and regeneration brings them up to date
-        assert_eq!(err_code(&dir).0, "CONTRACT_GENERATED_VIEW_DIVERGED");
+        // the lock (and the view) now lag the map: verify says so, and regeneration brings them up to date
+        assert_eq!(err_code(&dir).0, "CONTRACT_EVIDENCE_MAP_NOT_RECOMPILED");
         generate(&dir).expect("regenerate");
         let map = crate::util::read_yaml(&dir.join(EVIDENCE_MAP)).unwrap();
         let a1 = cap_index(&map, "A1", "capability");
         assert_eq!(
-            map["capabilities"][a1]["evidence_class"],
-            "automated invariant/guard"
+            map["capabilities"][a1]["automated_checks"][0]["exercises"],
+            "a governed statement of what this owner exercises"
         );
         assert_eq!(
             map["capabilities"][a1]["checklist"][1]["automated_checks"][0],
-            "policy_precedence::floors_cannot_be_lowered"
+            map["capabilities"][a1]["automated_checks"][0]["id"]
         );
         verify(&dir).expect("verifies after regeneration");
         // data regeneration would discard is refused, not dropped
@@ -3481,5 +5729,497 @@ mod tests {
         assert_eq!(err_code(&dir).0, "CONTRACT_SOURCE_DIVERGED");
         assert_eq!(generate(&dir).unwrap_err().code, "CONTRACT_SOURCE_DIVERGED");
         let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    // ------------------------------------------------------------------ BC-P2-02: evidence owners (P2-AR-0042)
+
+    fn listed(args: &[&str]) -> BTreeSet<String> {
+        let exe = std::env::current_exe().expect("the running test binary");
+        let o = std::process::Command::new(exe)
+            .args(args)
+            .output()
+            .expect("list the harness's tests");
+        String::from_utf8_lossy(&o.stdout)
+            .lines()
+            .filter_map(|l| l.strip_suffix(": test").map(String::from))
+            .collect()
+    }
+
+    #[test]
+    fn the_owner_resolver_lists_exactly_the_tests_the_lib_harness_runs() {
+        // the harness's own list is the authority: the resolver must agree with it exactly, both ways
+        let all = listed(&["--list", "--format", "terse"]);
+        let ignored = listed(&["--list", "--format", "terse", "--ignored"]);
+        let idx = test_index(&repo(), "lib").expect("the lib crate root");
+        let found: BTreeSet<String> = idx.keys().cloned().collect();
+        assert!(all.len() > 200, "{}", all.len());
+        assert_eq!(found, all, "resolver vs `cargo test --lib -- --list`");
+        let found_ignored: BTreeSet<String> = idx
+            .iter()
+            .filter(|(_, s)| s.ignored)
+            .map(|(k, _)| k.clone())
+            .collect();
+        assert_eq!(found_ignored, ignored);
+        let me = &idx
+            ["contracts::tests::the_owner_resolver_lists_exactly_the_tests_the_lib_harness_runs"];
+        assert_eq!(me.file, "runtime/src/contracts.rs");
+    }
+
+    #[test]
+    fn the_resolver_reads_items_not_text() {
+        let dir = std::env::temp_dir().join(format!("gov-owner-lex-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(dir.join("src/a")).unwrap();
+        std::fs::write(
+            dir.join("src/lib.rs"),
+            "//! #[test] fn doc_comment() {}\nmod a;\n#[cfg(test)]\nmod tests {\n    /* #[test] fn in_block_comment() { } */\n    #[test]\n    fn real() { let _ = \"#[test] fn in_string() {\"; let _ = '{'; let _ = r#\"}\"}\"#; }\n    #[test]\n    #[ignore = \"slow\"]\n    fn skipped() {}\n    fn helper<'a>(x: &'a str) -> &'a str { x }\n    mod inner {\n        #[test]\n        fn nested() {}\n    }\n}\n",
+        )
+        .unwrap();
+        std::fs::write(
+            dir.join("src/a.rs"),
+            "mod b;\n#[test]\nfn at_a() { let c = '\\''; let _ = c; }\n",
+        )
+        .unwrap();
+        std::fs::write(dir.join("src/a/b.rs"), "#[test] fn at_b() {}\n").unwrap();
+        let mut out = BTreeMap::new();
+        scan_module_file(
+            &dir,
+            &dir.join("src/lib.rs"),
+            &[],
+            &mut out,
+            &mut BTreeSet::new(),
+        );
+        let names: Vec<&str> = out.keys().map(|s| s.as_str()).collect();
+        assert_eq!(
+            names,
+            vec![
+                "a::at_a",
+                "a::b::at_b",
+                "tests::inner::nested",
+                "tests::real",
+                "tests::skipped"
+            ]
+        );
+        assert!(out["tests::skipped"].ignored && !out["tests::real"].ignored);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn owner_references_resolve_against_the_product() {
+        let reg = OwnerRegistry::load(&repo());
+        let ok = |id: &str, record: Option<&str>, tests: &[&str]| {
+            let t: Vec<String> = tests.iter().map(|s| s.to_string()).collect();
+            matches!(reg.resolve_id(id, record, &t), Resolution::Resolved(_))
+        };
+        assert!(ok("check:schema_invariants", None, &[]));
+        assert!(ok("doctor:D011", None, &[]));
+        assert!(ok("g0:task close", None, &[]));
+        assert!(ok(
+            "test:lib:contracts::tests::the_committed_binding_chain_verifies",
+            None,
+            &[]
+        ));
+        assert!(ok(
+            "test:certification:ws03::every_cli_command_label_is_classified_by_g0",
+            None,
+            &[]
+        ));
+        assert!(ok("human-gate:gate answer", Some("human-gate"), &[]));
+        assert!(ok("release:release build", Some("release-manifest"), &[]));
+        assert!(ok(
+            "heldout:release/verification/4.1.6-r1/evidence/heldout-tests",
+            None,
+            &["heldout_srr::a1_signature_lifted_from_a_different_document_is_refused"]
+        ));
+        assert!(ok("obligation:AC-14", None, &[]));
+        assert!(ok("obligation:AC-6", None, &[]));
+        // negatives: each is a typed non-resolution, never a pass
+        for (id, record) in [
+            ("check:no_such_family", None),
+            ("check:D011", None),
+            ("doctor:schema_invariants", None),
+            ("g0:release build", None),
+            ("g0:no such command", None),
+            ("test:lib:contracts::tests::no_such_test", None),
+            ("test:lib:contracts::tests", None),
+            ("test:bench:x", None),
+            ("human-gate:gate answer", None),
+            ("human-gate:gate answer", Some("no-such-record")),
+            (
+                "heldout:release/verification/nowhere/evidence/heldout-tests",
+                None,
+            ),
+            ("heldout:tests/certification", None),
+            ("obligation:AC-10", None),
+            ("obligation:AC-99", None),
+            ("vibes:anything", None),
+        ] {
+            assert!(
+                matches!(reg.resolve_id(id, record, &[]), Resolution::Unresolved(_)),
+                "{id} must not resolve"
+            );
+        }
+        assert!(matches!(
+            reg.resolve_id(
+                "heldout:release/verification/4.1.6-r1/evidence/heldout-tests",
+                None,
+                &["heldout_srr::no_such_test".to_string()]
+            ),
+            Resolution::Unresolved(_)
+        ));
+    }
+
+    #[test]
+    fn what_the_owners_determine_is_derived_from_the_product() {
+        let m = model();
+        let row = json!({"automated_checks": [
+            {"id": "check:graph_integrity", "class": "governance health check", "tiers": ["G1", "G2", "G4", "G5", "G6"]},
+            {"id": "g0:task close", "class": "automated invariant/guard", "tiers": ["G0"]},
+            {"id": "test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named", "class": "unit/integration/system test"}],
+            "independent_verification": [{"id": "obligation:AC-12", "class": "independent audit evidence"}]});
+        let d = derived_fields(&m, &row);
+        assert_eq!(
+            d["evidence_class"],
+            json!([
+                "automated invariant/guard",
+                "unit/integration/system test",
+                "governance health check",
+                "independent audit evidence"
+            ])
+        );
+        assert_eq!(
+            d["health_scheduler_tiers"],
+            json!(["G0", "G1", "G2", "G4", "G5", "G6"])
+        );
+        // graph_integrity keys its result by the records, the index manifest and the path map (plus the implicit
+        // classes): those are exactly the inputs that make its evidence stale
+        let fresh: Vec<String> = str_array(d.get("freshness_triggers"));
+        for t in [
+            "governing contract/policy",
+            "runtime/kernel implementation",
+            "schema",
+            "project path map",
+            "authoritative spec/decision",
+            "relevant index manifest",
+        ] {
+            assert!(fresh.contains(&t.to_string()), "{t}: {fresh:?}");
+        }
+        assert!(!fresh.contains(&"model/retrieval profile".to_string()));
+        assert_eq!(
+            d["adoption_obligation"]["owners"],
+            json!(["check:graph_integrity"])
+        );
+        assert_eq!(d["remediation_rule"], REMEDIATION_TIERED);
+        let bare = derived_fields(&m, &json!({"automated_checks": []}));
+        assert_eq!(bare["evidence_class"], NOT_YET_MAPPED);
+    }
+
+    #[test]
+    fn every_capability_names_a_running_owner_and_every_owner_resolves() {
+        let m = model();
+        let map = crate::util::read_yaml(&repo().join(EVIDENCE_MAP)).unwrap();
+        let chk = owner_differences(&m, &map, &OwnerRegistry::load(&repo()), true);
+        assert!(chk.unresolved.is_empty(), "{:#?}", chk.unresolved);
+        assert!(chk.missing.is_empty(), "{:#?}", chk.missing);
+        assert!(chk.invalid.is_empty(), "{:#?}", chk.invalid);
+        assert_eq!(chk.summary["capabilities"], 101);
+        assert_eq!(chk.summary["deferred"], json!([]));
+        for row in lines_of(&map, "capabilities") {
+            let running = owners_of(&row, "automated_checks")
+                .iter()
+                .chain(owners_of(&row, "independent_verification").iter())
+                .filter(|o| owner_kind(owner_id(o).unwrap()).unwrap().runs)
+                .count();
+            assert!(running > 0, "{}", row["capability"]);
+        }
+    }
+
+    /// Mutation controls for BC-P2-02: each makes `gov contract verify` fail with its own typed error.
+    #[test]
+    fn an_owner_mutation_is_a_typed_failure() {
+        type M = Box<dyn Fn(&mut Value)>;
+        let first_test_owner = |v: &Value, cap: &str| -> usize {
+            let i = cap_index(v, cap, "capability");
+            v["capabilities"][i]["automated_checks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .position(|o| o["id"].as_str().unwrap().starts_with("test:"))
+                .expect("a test owner")
+        };
+        let first_tier_owner = |v: &Value, cap: &str| -> usize {
+            let i = cap_index(v, cap, "capability");
+            v["capabilities"][i]["automated_checks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .position(|o| o["id"].as_str().unwrap().starts_with("check:"))
+                .expect("a check owner")
+        };
+        let cases: Vec<(&str, M, &str)> = vec![
+            (
+                "zero owners (Gate U)",
+                Box::new(|v: &mut Value| {
+                    let u = cap_index(v, "U", "capability");
+                    v["capabilities"][u]["automated_checks"] = json!([]);
+                    v["capabilities"][u]["independent_verification"] = json!([]);
+                    for it in v["capabilities"][u]["checklist"].as_array_mut().unwrap() {
+                        it["automated_checks"] = json!([]);
+                    }
+                }),
+                "CONTRACT_EVIDENCE_OWNER_MISSING",
+            ),
+            (
+                "only an obligation of a future verifier",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "A1", "capability");
+                    v["capabilities"][c]["automated_checks"] = json!([]);
+                    v["capabilities"][c]["independent_verification"] =
+                        json!([{"id": "obligation:AC-12", "class": "independent audit evidence"}]);
+                    for it in v["capabilities"][c]["checklist"].as_array_mut().unwrap() {
+                        it["automated_checks"] = json!([]);
+                    }
+                }),
+                "CONTRACT_EVIDENCE_OWNER_MISSING",
+            ),
+            (
+                "a test owner that does not exist",
+                Box::new(move |v: &mut Value| {
+                    let c = cap_index(v, "W3", "capability");
+                    let t = first_test_owner(v, "W3");
+                    v["capabilities"][c]["automated_checks"][t]["id"] =
+                        json!("test:lib:context::manifest::tests::no_such_test");
+                }),
+                "CONTRACT_EVIDENCE_OWNER_UNRESOLVED",
+            ),
+            (
+                "a check the catalogue does not declare",
+                Box::new(move |v: &mut Value| {
+                    let c = cap_index(v, "B2", "capability");
+                    let t = first_tier_owner(v, "B2");
+                    v["capabilities"][c]["automated_checks"][t]["id"] =
+                        json!("check:path_map_vibes");
+                }),
+                "CONTRACT_EVIDENCE_OWNER_UNRESOLVED",
+            ),
+            (
+                "a tier the catalogue does not declare for the check",
+                Box::new(move |v: &mut Value| {
+                    let c = cap_index(v, "B2", "capability");
+                    let t = first_tier_owner(v, "B2");
+                    v["capabilities"][c]["automated_checks"][t]["tiers"] = json!(["G0"]);
+                }),
+                "CONTRACT_EVIDENCE_OWNER_UNRESOLVED",
+            ),
+            (
+                "an independent owner filed as builder evidence",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "A2", "capability");
+                    let ind = v["capabilities"][c]["independent_verification"][0].clone();
+                    v["capabilities"][c]["automated_checks"]
+                        .as_array_mut()
+                        .unwrap()
+                        .push(ind);
+                }),
+                "CONTRACT_EVIDENCE_OWNER_INVALID",
+            ),
+            (
+                "an evidence class claimed without an owner that carries it",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "C4", "capability");
+                    v["capabilities"][c]["evidence_class"]
+                        .as_array_mut()
+                        .unwrap()
+                        .push(json!("synthetic-repository evidence"));
+                }),
+                "CONTRACT_EVIDENCE_OWNER_INVALID",
+            ),
+            (
+                "a tier claimed without an owner that runs there",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "Q2", "capability");
+                    v["capabilities"][c]["health_scheduler_tiers"] = json!(["G6"]);
+                }),
+                "CONTRACT_EVIDENCE_OWNER_INVALID",
+            ),
+            (
+                "an owner class outside Contract v3:81-91",
+                Box::new(move |v: &mut Value| {
+                    let c = cap_index(v, "E4", "capability");
+                    let t = first_test_owner(v, "E4");
+                    v["capabilities"][c]["automated_checks"][t]["class"] = json!("vibes");
+                }),
+                "CONTRACT_EVIDENCE_OWNER_INVALID",
+            ),
+            (
+                "a freshness trigger outside Contract v3:97-109",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "D1", "capability");
+                    v["capabilities"][c]["freshness_triggers"] = json!(["the weather"]);
+                }),
+                "CONTRACT_EVIDENCE_MAP_DIVERGED",
+            ),
+            (
+                "an evidence class outside Contract v3:81-91",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "D1", "capability");
+                    v["capabilities"][c]["evidence_class"] = json!(["vibes"]);
+                }),
+                "CONTRACT_EVIDENCE_MAP_DIVERGED",
+            ),
+            (
+                "a status outside the frozen gate contract §4",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "D2", "capability");
+                    v["capabilities"][c]["allowed_status"] = json!(["GREEN_ENOUGH"]);
+                }),
+                "CONTRACT_EVIDENCE_MAP_DIVERGED",
+            ),
+            (
+                "a freshness trigger in use with no owner proving its invalidation",
+                Box::new(|v: &mut Value| {
+                    v["freshness_invalidation"]
+                        .as_array_mut()
+                        .unwrap()
+                        .retain(|e| e["trigger"] != "project path map");
+                }),
+                "CONTRACT_EVIDENCE_OWNER_INVALID",
+            ),
+            (
+                "a checklist item naming an owner its capability does not have",
+                Box::new(|v: &mut Value| {
+                    let c = cap_index(v, "A1", "capability");
+                    v["capabilities"][c]["checklist"][0]["automated_checks"] =
+                        json!(["check:graph_integrity"]);
+                }),
+                "CONTRACT_EVIDENCE_OWNER_INVALID",
+            ),
+            (
+                "a valid owner swapped in without a recompile",
+                Box::new(move |v: &mut Value| {
+                    let c = cap_index(v, "W8", "capability");
+                    let t = first_test_owner(v, "W8");
+                    v["capabilities"][c]["automated_checks"][t]["exercises"] =
+                        json!("edited by hand after the last compile");
+                }),
+                "CONTRACT_EVIDENCE_MAP_NOT_RECOMPILED",
+            ),
+        ];
+        for (name, mutate, want) in cases {
+            let dir = fixture("owners");
+            edit_yaml(&dir, EVIDENCE_MAP, |v| mutate(v));
+            let (code, details) = err_code(&dir);
+            assert_eq!(code, want, "{name}: {details}");
+            let _ = std::fs::remove_dir_all(&dir);
+        }
+    }
+
+    #[test]
+    fn a_tree_without_the_owners_sources_defers_and_discloses_and_never_compiles() {
+        // a release-tooling tree (the chain only): verify binds the chain and discloses what it could not resolve
+        let dir = bare_fixture("bare");
+        let r = verify(&dir).expect("the chain verifies where the sources are absent");
+        assert_eq!(r["verdict"], "CONTRACT_SOURCE_BOUND");
+        let deferred = r["evidence_owners"]["deferred"].as_array().unwrap();
+        assert!(!deferred.is_empty());
+        assert!(deferred.iter().all(|d| d["reason"]
+            .as_str()
+            .unwrap()
+            .contains("this tree does not carry")));
+        assert_eq!(
+            r["evidence_owners"]["not_in_this_tree"]
+                .as_array()
+                .unwrap()
+                .len(),
+            4
+        );
+        // an owner that no tree could resolve is still refused (a catalogue check is resolved in the binary)
+        edit_yaml(&dir, EVIDENCE_MAP, |v| {
+            let c = cap_index(v, "B2", "capability");
+            let t = v["capabilities"][c]["automated_checks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .position(|o| o["id"].as_str().unwrap().starts_with("check:"))
+                .unwrap();
+            v["capabilities"][c]["automated_checks"][t]["id"] = json!("check:path_map_vibes");
+        });
+        assert_eq!(err_code(&dir).0, "CONTRACT_EVIDENCE_OWNER_UNRESOLVED");
+        let _ = std::fs::remove_dir_all(&dir);
+        // compile never defers: it binds only owners it resolved
+        let dir = bare_fixture("bare-compile");
+        let e = generate(&dir).unwrap_err();
+        assert_eq!(e.code, "CONTRACT_EVIDENCE_OWNER_UNRESOLVED");
+        assert!(e.message.starts_with("refusing to compile"));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_matrix_is_generated_from_the_map_with_the_supplied_run_evidence() {
+        let dir = std::env::temp_dir().join(format!("gov-matrix-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let lib = dir.join("lib.out");
+        std::fs::write(
+            &lib,
+            "test contracts::tests::the_committed_binding_chain_verifies ... ok\ntest scheduler::tests::tiers_parse_and_default_selection ... FAILED\n",
+        )
+        .unwrap();
+        let ev = RunEvidence {
+            lib: vec![lib],
+            ..Default::default()
+        };
+        let (mx, md) = suite_to_contract(&repo(), &ev).expect("matrix");
+        assert_eq!(mx["capabilities"].as_array().unwrap().len(), 101);
+        assert_eq!(mx["contract"]["verify_verdict"], "CONTRACT_SOURCE_BOUND");
+        let owners: Vec<&Value> = mx["capabilities"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .flat_map(|c| c["owners"].as_array().unwrap().iter())
+            .collect();
+        let status_of = |id: &str| {
+            owners
+                .iter()
+                .find(|o| o["id"] == id)
+                .map(|o| o["last_run"]["status"].clone())
+        };
+        if let Some(s) = status_of("test:lib:scheduler::tests::tiers_parse_and_default_selection") {
+            assert_eq!(s, "FAILED");
+        }
+        // nothing is inferred: an owner the supplied evidence does not cover is reported as such
+        assert!(owners
+            .iter()
+            .any(|o| o["last_run"]["status"] == "NOT_IN_SUPPLIED_EVIDENCE"));
+        for c in m_ids() {
+            assert!(md.contains(&format!("#### {c} — ")), "{c}");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_owner_sources_fingerprint_follows_what_owners_resolve_against() {
+        let dir = std::env::temp_dir().join(format!("gov-owner-fp-{}", crate::util::short_uuid()));
+        std::fs::create_dir_all(dir.join("runtime/src")).unwrap();
+        let lib = |body: &str| std::fs::write(dir.join("runtime/src/lib.rs"), body).unwrap();
+        lib("#[cfg(test)]\nmod tests {\n    #[test]\n    fn owner() {}\n}\n");
+        let a = owner_sources_fingerprint(&dir);
+        // an edit that renames, ignores or removes nothing does not change it (line numbers are not part of it)
+        lib("// a comment\n#[cfg(test)]\nmod tests {\n    #[test]\n    fn owner() {}\n}\n");
+        assert_eq!(owner_sources_fingerprint(&dir), a);
+        lib("#[cfg(test)]\nmod tests {\n    #[test]\n    fn owner_renamed() {}\n}\n");
+        let b = owner_sources_fingerprint(&dir);
+        assert_ne!(b, a, "a renamed owner test changes the fingerprint");
+        lib(
+            "#[cfg(test)]\nmod tests {\n    #[test]\n    #[ignore]\n    fn owner_renamed() {}\n}\n",
+        );
+        assert_ne!(
+            owner_sources_fingerprint(&dir),
+            b,
+            "an ignored owner test changes it"
+        );
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    fn m_ids() -> Vec<String> {
+        model().capability_ids()
     }
 }

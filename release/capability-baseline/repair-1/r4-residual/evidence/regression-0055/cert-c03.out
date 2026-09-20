@@ -1,0 +1,19 @@
+# chunk: migration multi_machine  HEAD 4bd74683159279549fb757adf56b4a571c73f3d2  dirty=0  2026-09-20T17:22:24Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual-c/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual-c/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.30s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 5 tests
+test migration::command_tests_execute_only_governed_commands_for_permitted_roles ... ok
+test migration::adoption_dependency_proof_citations_and_rerun_identity has been running for over 60 seconds
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts has been running for over 60 seconds
+test migration::adoption_dependency_proof_citations_and_rerun_identity ... ok
+test multi_machine::clone_rebuilds_identical_derived_state ... ok
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts ... ok
+test migration::path_migration_with_rollback_and_memory_rebuild has been running for over 60 seconds
+test migration::path_migration_with_rollback_and_memory_rebuild ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 166.08s
+
+[exit=0]

@@ -339,6 +339,8 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     g("trust reseal --dry-run", "read", Read),
     outside("contract verify", "canonical-repository tooling: read-only"),
     outside("contract compile", "canonical-repository release tooling (regenerates the compiled contract views of the canonical repository, not a governed project)"),
+    // P2-AR-0042 (BC-P2-02): additive, like `contract verify` it opens no governed project
+    outside("contract matrix", "canonical-repository tooling: reads the contract chain and the run outputs it is given, and writes the suite-to-contract matrix only into the --out directory it is given, never a governed project"),
     g("upstream prepare", "upstream_prepare", Write),
     g("upstream submit", "upstream_submit", Write),
     g("task create", "create_task", Write),
@@ -461,7 +463,7 @@ pub const COMMAND_GUARDS: &[CommandGuard] = &[
     // it re-establishes currency (as `audit` does); `--no-persist` never does (as `audit --no-persist`). The
     // product-test run records a product-tests EVIDENCE audit record; the close check runs the G2 tier with the
     // same record policy as a run. `skills --record` binds skill versions in the tracked, OS-written
-    // governance/generated/skill-bindings.json (`skills::record` requires `record_skill_binding`). The rest read
+    // governance/registry/skill-bindings.json (`skills::record` requires `record_skill_binding`). The rest read
     // (their runtime-local cache, ledger and observation files are derived, machine-local state).
     g("health run", "record_audit", Write),
     g("health run --no-persist", "read", Read),

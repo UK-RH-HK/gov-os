@@ -121,9 +121,22 @@ fn guard_paths(store: &RecordStore, cit: &Value) -> Vec<String> {
     v
 }
 
-pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
+pub fn propose(p: &Project, fields: Value) -> Result<Value> {
+    propose_inner(p, fields, None, "propose_cit", false)
+}
+
+/// [`propose`] with the fields only the OS writes (`origin`, `system`) supplied by an OS host, the authority class the
+/// host operation carries, and simulation forced (Contract v3 K3: a material change is simulated whether or not the
+/// derived index exists yet — an empty index simulates against the records and paths alone).
+fn propose_inner(
+    p: &Project,
+    mut fields: Value,
+    os_fields: Option<Value>,
+    authority: &str,
+    always_simulate: bool,
+) -> Result<Value> {
     control::guard_write(p, "cit propose")?;
-    crate::authority::require(p, "propose_cit")?;
+    crate::authority::require(p, authority)?;
     let store = RecordStore::load(&p.root);
     let id = store.next_id("cit");
     let o = fields
@@ -148,6 +161,9 @@ pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
         crate::t2::SEAL_FIELD,
         "auto_simulated",
         "cit_status",
+        // OS-owned: a transaction the OS itself proposed or recorded (schema `origin`/`system`)
+        "origin",
+        "system",
     ] {
         o.remove(k);
     }
@@ -172,6 +188,11 @@ pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
         );
     }
     o.insert("cit_status".into(), json!("PROPOSED"));
+    if let Some(Value::Object(os)) = &os_fields {
+        for (k, v) in os {
+            o.insert(k.clone(), v.clone());
+        }
+    }
     o.entry("proposed_by").or_insert(json!(p.role));
     o.entry("trigger").or_insert(json!("behaviour_change"));
     o.entry("targets").or_insert(json!([]));
@@ -248,8 +269,28 @@ pub fn propose(p: &Project, mut fields: Value) -> Result<Value> {
         .get_list("CHANGE_POLICY", "auto_simulate_triggers");
     let effective = mat.effective_triggers(&declared);
     let wants_sim = auto.contains(&declared) || effective.iter().any(|t| auto.contains(t));
-    if wants_sim && p.db_path().exists() {
+    if (wants_sim || always_simulate) && (always_simulate || p.db_path().exists()) {
+        if always_simulate && !freshness(p).fresh {
+            // CIT-P's impact analysis (graph reach, semantic candidates) runs on the index as the repository stands
+            // now, as CIT-E's verification does: bring the derived index current first. Best effort: the change may be
+            // the very thing the build needs (re-registering the pinned embedder), so a failed build leaves the
+            // simulation on the index as it stands — unless there is none, which is refused with the build's cause.
+            if let Err(e) = crate::memory::indexer::rebuild(
+                p,
+                crate::memory::indexer::IndexOptions {
+                    incremental: true,
+                    ..Default::default()
+                },
+            ) {
+                if !p.db_path().exists() {
+                    return Err(e);
+                }
+            }
+        }
         let db = RuntimeDb::open(&p.db_path())?;
+        if always_simulate {
+            db.init_schema()?;
+        }
         if db.has_schema() {
             let sim = simulate_inner(p, &db, &id)?;
             let mut data = RecordStore::load(&p.root)
@@ -274,6 +315,22 @@ fn manifest_paths(cit: &Value) -> Vec<String> {
         for k in ["path", "to"] {
             if let Some(s) = op[k].as_str() {
                 v.push(s.to_string());
+            }
+        }
+        // a registration writes the registry too (and moves a registry still at its legacy location)
+        if op["op"] == "register_plugin" {
+            v.push(
+                op["registry"]
+                    .as_str()
+                    .unwrap_or(crate::paths::PLUGIN_REGISTRY_PATH)
+                    .to_string(),
+            );
+            v.push(crate::capabilities::registry::LEGACY_REGISTRY_PATH.to_string());
+        }
+        // R4-O1: an installation rewrites the generated tool registry as well
+        if op["op"] == "install_tool" {
+            if let Some(r) = op["registry"].as_str() {
+                v.push(r.to_string());
             }
         }
         if let Some(t) = op["target"].as_str() {
@@ -407,6 +464,34 @@ fn gates_of(store: &RecordStore, id: &str) -> Vec<Record> {
     v
 }
 
+/// **The governed change-class verdict for a transaction** (`CHANGE_POLICY.change_classes`; OD-P2-03, governed
+/// record `D-0011`). A change class states, as policy data an auditor reads and `gov policy effective CHANGE_POLICY`
+/// shows, when transactions of that class need a human gate — the question the radius and trigger rules otherwise
+/// answer. Only a transaction whose **whole** manifest is exactly one operation of the class qualifies, so nothing
+/// can be smuggled into a pre-authorised transaction beside it. `Null` for every other transaction, which is gated
+/// exactly as before.
+fn class_decision(p: &Project, cit: &Value) -> Value {
+    let ops = cit["mutation_manifest"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    if ops.len() != 1 {
+        return Value::Null;
+    }
+    match ops[0]["op"].as_str() {
+        Some("install_tool") => crate::tools::installation_change_decision(p, &ops[0]),
+        _ => Value::Null,
+    }
+}
+
+/// Is this transaction's recorded (and bound) impact one a governed change class pre-authorised, so that it may be
+/// approved without a human gate although its radius exceeds `CHANGE_POLICY.auto_approve_max_radius`? Read only
+/// from the impact `gov` simulated and sealed: a hand-edited impact fails the binding check before this is reached.
+fn class_pre_authorised(impact: &Value) -> bool {
+    let c = &impact["change_class"];
+    c["class"].is_string() && c["gate_required"] == json!(false)
+}
+
 fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let pol = p.policies();
     let store = RecordStore::load(&p.root);
@@ -455,8 +540,21 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
         &format!("semantic_candidates_by_radius.{radius}"),
         8,
     ) as usize;
+    // Semantic candidates are advisory (excluded from the impact an approval binds: `binding::impact_of`). A query
+    // that cannot run because of the retrieval profile itself — the pinned embedder unusable or not the one the live
+    // index was built with — must not make change control impossible, least of all for the change that repairs the
+    // profile (re-registering the pinned embedder; availability rule, P2-HO-0031): the simulation records why the
+    // candidates are unavailable and the graph reach stands. No index at all is still refused (nothing to simulate on).
+    let mut candidates_unavailable = Value::Null;
     let candidates = if k > 0 {
-        retrieve(p, db, rec.get("proposal").as_str(), RetrieveOptions { k, ..Default::default() })?.hits.into_iter().map(|h| json!({"artifact_id": h.artifact_id, "path": h.path, "score": h.score, "routes": h.routes})).collect::<Vec<_>>()
+        match retrieve(p, db, rec.get("proposal").as_str(), RetrieveOptions { k, ..Default::default() }) {
+            Ok(r) => r.hits.into_iter().map(|h| json!({"artifact_id": h.artifact_id, "path": h.path, "score": h.score, "routes": h.routes})).collect::<Vec<_>>(),
+            Err(e) if e.code == "INDEX_MISSING" => return Err(e),
+            Err(e) => {
+                candidates_unavailable = json!({"code": e.code, "message": e.message});
+                vec![]
+            }
+        }
     } else {
         vec![]
     };
@@ -492,10 +590,18 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let pre = propagation::plan(p, &store, &changed, None, None);
     let human_triggers = pol.get_list("CHANGE_POLICY", "human_gate_triggers");
     let auto_max = pol.get_str("CHANGE_POLICY", "auto_approve_max_radius", "R1");
-    let human_gate_required = radius_rank(&radius) > radius_rank(&auto_max)
+    let by_radius_or_trigger = radius_rank(&radius) > radius_rank(&auto_max)
         || human_triggers.contains(&declared)
         || effective.iter().any(|t| human_triggers.contains(t));
-    let consequences = vec![
+    // **OD-P2-03** (governed record `D-0011`): a change class whose human-gate rule an owner decision settles
+    // rather than the radius and trigger rules. The verdict is computed here, from this transaction's own manifest
+    // and trusted OS state ([`class_decision`]), and recorded in the bound impact — which branch applied and why —
+    // so the transaction itself states it. It only ever removes the gate the rule pre-authorises; a class the rule
+    // does not cover, or a condition it cannot evaluate, keeps the gate (fail closed).
+    let change_class = class_decision(p, &rec.data);
+    let pre_authorised = change_class["gate_required"] == json!(false);
+    let human_gate_required = by_radius_or_trigger && !pre_authorised;
+    let mut consequences = vec![
         format!("{} artefacts affected within radius {radius} (graph depth {})", affected.len(), pol.get_i64("CHANGE_POLICY", &format!("graph_traversal_depth_by_radius.{radius}"), 2)),
         format!("{} open task(s) will be marked retest-required", tasks.len().max(pre.open_tasks.len())),
         format!("{} completed task(s) will be marked for revalidation, with revalidation tasks generated", pre.done_tasks.len()),
@@ -505,11 +611,26 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
         if human_gate_required { "human approval required before execution".into() } else { "eligible for automatic approval under CHANGE_POLICY".into() },
         "rollback: snapshot of every touched file is taken before execution; `gov cit rollback` restores it".into(),
     ];
+    if let Some(why) = change_class["why"].as_str() {
+        consequences.push(format!(
+            "{} ({}): {why}",
+            change_class["class"].as_str().unwrap_or("change class"),
+            change_class["rule"].as_str().unwrap_or("CHANGE_POLICY")
+        ));
+    }
+    if !candidates_unavailable.is_null() {
+        consequences.push(format!(
+            "semantic candidates unavailable ({}): the retrieval profile cannot answer the query now; the graph reach above stands",
+            candidates_unavailable["code"].as_str().unwrap_or("?")
+        ));
+    }
     let routing = crate::routing::route(p, None, Some("governance"), None, Some(&radius))?;
     let mut impact = json!({"radius": radius, "seeds": seeds, "affected": affected.iter().map(|a| json!({"node": a.node, "hop": a.hop, "via": a.via})).collect::<Vec<_>>(), "affected_tasks": tasks, "tests_required": tests, "features": features, "other": other,
         "completed_tasks_to_revalidate": pre.done_tasks.keys().cloned().collect::<Vec<_>>(),
         "material_classes": mat.classes(), "effective_triggers": effective,
-        "semantic_candidates": candidates, "consequences": consequences, "human_gate_required": human_gate_required, "minimum_model_tier": routing["minimum_tier"], "simulated_at": now_iso(), "index_snapshot": db.get_meta("index_manifest_hash")});
+        "semantic_candidates": candidates, "semantic_candidates_unavailable": candidates_unavailable, "consequences": consequences, "human_gate_required": human_gate_required,
+        "human_gate_by_radius_or_trigger": by_radius_or_trigger, "change_class": change_class,
+        "minimum_model_tier": routing["minimum_tier"], "simulated_at": now_iso(), "index_snapshot": db.get_meta("index_manifest_hash")});
     let impact_sha = binding::impact_digest(&impact);
     let bind = binding::binding_digest(id, &content, &impact_sha);
     impact["content_sha256"] = json!(content);
@@ -733,14 +854,28 @@ fn promotion_check(p: &Project, store: &RecordStore, cit: &Record) -> Result<()>
 /// and simulated impact. Without a gate only the automatic path within CHANGE_POLICY.auto_approve_max_radius exists,
 /// and it is recorded as an agent decision (human_approved: false).
 pub fn approve(p: &Project, id: &str, by: &str, method: &str) -> Result<Value> {
+    approve_with(p, id, by, method, None)
+}
+
+/// [`approve`] under the authority of an OS host operation (`authority`) instead of the CIT approval classes: used
+/// only for a transaction the host itself proposed and whose content it checked ([`execute_registration`]). Every
+/// other check — the guards, the sealed state, the content and impact binding, the gate answer read through
+/// `gates::verified_answer` — is the same.
+fn approve_with(
+    p: &Project,
+    id: &str,
+    by: &str,
+    method: &str,
+    authority: Option<&str>,
+) -> Result<Value> {
     control::guard_write(p, "cit approve")?;
     crate::authority::require(
         p,
-        if method == "human" {
+        authority.unwrap_or(if method == "human" {
             "approve_cit_human"
         } else {
             "approve_cit_auto"
-        },
+        }),
     )?;
     let pol = p.policies();
     let store = RecordStore::load(&p.root);
@@ -831,16 +966,31 @@ pub fn approve(p: &Project, id: &str, by: &str, method: &str) -> Result<Value> {
             return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("{id} requires a human decision gate but none is recorded; run `gov cit simulate {id}`")));
         }
         let auto_max = pol.get_str("CHANGE_POLICY", "auto_approve_max_radius", "R1");
-        if radius_rank(radius.as_str().unwrap_or("R5")) > radius_rank(&auto_max) {
+        // **OD-P2-03**: a transaction a governed change class pre-authorised is approvable above the automatic
+        // radius, because the class's own conditions — not the radius — are what the owner's decision made the
+        // test. The verdict is read from the impact `gov` simulated and sealed, whose binding this function has
+        // already verified, and the decision record below names the rule and the owner decision that allowed it.
+        let class = &r.data["impact"]["change_class"];
+        let pre_authorised = class_pre_authorised(&r.data["impact"]);
+        if !pre_authorised && radius_rank(radius.as_str().unwrap_or("R5")) > radius_rank(&auto_max)
+        {
             return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("radius {radius} exceeds CHANGE_POLICY.auto_approve_max_radius {auto_max}; re-simulate to raise a gate")));
         }
         if decision_id.is_empty() {
             let did = store.next_id("decision");
+            let rationale = if pre_authorised {
+                format!("pre-authorised by owner decision {} (governed record {}) under {}: {}. No human gate was required; radius {radius}",
+                    class["owner_decision"].as_str().unwrap_or("?"), class["decision_record"].as_str().unwrap_or("?"),
+                    class["rule"].as_str().unwrap_or("CHANGE_POLICY.change_classes"), class["why"].as_str().unwrap_or(""))
+            } else {
+                format!("automatic approval within CHANGE_POLICY.auto_approve_max_radius (radius {radius}); no human gate was required")
+            };
             let mut d = new_record(
                 "decision",
                 &did,
                 &format!("Auto-approve {id}"),
-                json!({"question": format!("Execute change {id}?"), "options": [{"id": "A", "description": proposal}], "chosen_option": "A", "rationale": format!("automatic approval within CHANGE_POLICY.auto_approve_max_radius (radius {radius}); no human gate was required"), "approved_by": by, "approved_at": now_iso(), "human_approved": false, "approved_by_kind": "agent", "impact_radius": radius, "reversibility": "snapshot rollback", "confidence": 0.9, "cit": id, "state_class": "AUTHORITATIVE", "tags": [trigger], "binding_sha256": st.binding_sha256}),
+                json!({"question": format!("Execute change {id}?"), "options": [{"id": "A", "description": proposal}], "chosen_option": "A", "rationale": rationale, "approved_by": by, "approved_at": now_iso(), "human_approved": false, "approved_by_kind": "agent", "impact_radius": radius, "reversibility": "snapshot rollback", "confidence": 0.9, "cit": id, "state_class": "AUTHORITATIVE", "tags": [trigger], "binding_sha256": st.binding_sha256,
+                    "change_class": class.clone()}),
             );
             crate::t2::seal_record(&mut d, "cit approve (auto)")?;
             save_record(&p.root, &d)?;
@@ -920,6 +1070,11 @@ fn changed_record_ids(p: &Project, store: &RecordStore, cit: &Value) -> Vec<Stri
             "append_record" => {
                 if let Some(t) = op["record"]["id"].as_str() {
                     v.push(t.to_string());
+                }
+            }
+            "register_plugin" | "install_tool" => {
+                if let Some(path) = op["path"].as_str().filter(|x| !x.is_empty()) {
+                    v.push(format!("file:{path}"));
                 }
             }
             "write_file" | "delete_file" | "move_file" => {
@@ -1062,6 +1217,19 @@ fn take_snapshot(
         if op["op"] == "move_file" {
             if let Some(to) = op["to"].as_str() {
                 created_paths.push(to.to_string());
+            }
+        }
+        if op["op"]
+            .as_str()
+            .map(|o| HOST_PROPOSED_OPS.contains(&o))
+            .unwrap_or(false)
+        {
+            for k in ["path", "registry"] {
+                if let Some(pth) = op[k].as_str() {
+                    if !p.root.join(pth).exists() {
+                        created_paths.push(pth.to_string());
+                    }
+                }
             }
         }
     }
@@ -1325,6 +1493,28 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>, seals: &mut Seal
             crate::tools::generate_registry(p)?;
             crate::adapters::generate(p)?;
         }
+        // INT3-O1: a plugin registration is written only here, by its change transaction's execution; the
+        // registration re-derives the request from the bytes as they are now, requires exactly the subject this
+        // transaction's approval binds, and re-verifies the execution approval (Contract v3 F4)
+        "register_plugin" => {
+            let r = crate::capabilities::governance::apply_registration(p, op, &seals.cit)?;
+            for t in r["touched"].as_array().cloned().unwrap_or_default() {
+                if let Some(t) = t.as_str() {
+                    touched.push(t.to_string());
+                }
+            }
+        }
+        // R4-O1: a tool installation is written only here, by its change transaction's execution; the installation
+        // re-derives the request from the bytes as they are now, requires exactly the subject this transaction's
+        // approval binds, and re-verifies the installation's own approval where one was needed (Contract v3 F4)
+        "install_tool" => {
+            let r = crate::tools::apply_installation(p, op, &seals.cit)?;
+            for t in r["touched"].as_array().cloned().unwrap_or_default() {
+                if let Some(t) = t.as_str() {
+                    touched.push(t.to_string());
+                }
+            }
+        }
         "set_lock_field" => {
             return Err(GovError::new(
                 "USAGE",
@@ -1341,10 +1531,28 @@ fn apply_op(p: &Project, op: &Value, touched: &mut Vec<String>, seals: &mut Seal
     Ok(())
 }
 
+/// Refusals of the retrieval profile itself, as the indexer raises them: the pinned embedder or reranker cannot run
+/// as pinned (not registered or approved as declared, not usable by the acting role, another revision or identity
+/// than the pin, unavailable). A declared plugin that is not usable is refused naming it (`PluginSet::refusal`).
+fn is_retrieval_profile_refusal(e: &GovError) -> bool {
+    e.code.starts_with("EMBEDDER_")
+        || e.code.starts_with("RERANKER_")
+        || e.code.starts_with("PLUGIN_")
+        || e.details
+            .get("plugin_id")
+            .and_then(|v| v.as_str())
+            .is_some()
+}
+
 /// CIT-E: snapshot -> apply -> propagate -> regenerate -> refresh index -> verify -> commit or rollback.
 pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
+    execute_with(p, db, id, None)
+}
+
+/// [`execute`] under the authority of an OS host operation (see [`approve_with`]).
+fn execute_with(p: &Project, db: &RuntimeDb, id: &str, authority: Option<&str>) -> Result<Value> {
     control::guard_write(p, "cit execute")?;
-    crate::authority::require(p, "execute_cit")?;
+    crate::authority::require(p, authority.unwrap_or("execute_cit"))?;
     let pol = p.policies();
     let store = RecordStore::load(&p.root);
     let rec = load_cit(&store, id)?;
@@ -1486,15 +1694,19 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let plan = propagation::plan(p, &store, &changed, Some(&rec.data["impact"]), None);
     let snapshot = take_snapshot(p, id, &rec.data, &store, &plan.paths(p, &store))?;
     // verification compares against a FRESH pre-execution baseline (A0-K2-03): damage already in the working tree but
-    // not yet indexed is not attributed to this transaction
+    // not yet indexed is not attributed to this transaction. A baseline the retrieval profile refused to build is
+    // remembered: the same refusal after the manifest is not this transaction's damage either (below)
+    let mut pre_refresh: Option<GovError> = None;
     if pol.get_bool("CHANGE_POLICY", "propagation.refresh_index", true) {
-        let _ = crate::memory::indexer::rebuild(
+        if let Err(e) = crate::memory::indexer::rebuild(
             p,
             crate::memory::indexer::IndexOptions {
                 incremental: true,
                 ..Default::default()
             },
-        );
+        ) {
+            pre_refresh = Some(e);
+        }
     }
     let dangling_before: std::collections::BTreeSet<String> = graph::dangling_edges(db)?
         .iter()
@@ -1567,15 +1779,40 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
             crate::tools::generate_registry(p)?;
             crate::adapters::generate(p)?;
         }
+        // K2 memory/index refresh. A0-K2-03 for the index itself: when the retrieval profile refused to build the index
+        // before the manifest was applied as well (the pinned embedder or reranker cannot run as pinned — e.g. a
+        // registration of its next revision, which the profile's pin then refuses), the refusal is not attributed to
+        // this transaction: it is recorded, the index stays as it was (index_freshness keeps reporting it), and the
+        // freshness verification, which could not pass before either, is not what decides this commit. Any other
+        // refresh failure, or a refusal this transaction introduced, fails the verification as before.
+        let mut index_refresh = json!({"refreshed": true});
         if pol.get_bool("CHANGE_POLICY", "propagation.refresh_index", true) {
-            crate::memory::indexer::rebuild(
+            match crate::memory::indexer::rebuild(
                 p,
                 crate::memory::indexer::IndexOptions {
                     incremental: true,
                     ..Default::default()
                 },
-            )?;
+            ) {
+                Ok(_) => {}
+                Err(e)
+                    if is_retrieval_profile_refusal(&e)
+                        && pre_refresh
+                            .as_ref()
+                            .map(is_retrieval_profile_refusal)
+                            .unwrap_or(false) =>
+                {
+                    let b = pre_refresh.as_ref().unwrap();
+                    index_refresh = json!({"refreshed": false, "code": e.code, "message": e.message,
+                        "before": {"code": b.code, "message": b.message},
+                        "rule": "A0-K2-03: the retrieval profile refused to build the index before this transaction was applied as well; the refusal is not attributed to it, the index stays as it was and index_freshness reports it"});
+                }
+                Err(e) => return Err(e),
+            }
+        } else {
+            index_refresh = json!({"refreshed": false, "reason": "CHANGE_POLICY.propagation.refresh_index is false"});
         }
+        let refusal_pre_existing = index_refresh.get("before").is_some();
         // verification
         let mut problems = vec![];
         let required = pol.get_list("CHANGE_POLICY", "verification_required");
@@ -1633,7 +1870,7 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
                 ));
             }
         }
-        if required.iter().any(|r| r == "index_freshness") {
+        if required.iter().any(|r| r == "index_freshness") && !refusal_pre_existing {
             let f = freshness(p);
             if !f.fresh {
                 problems.push(format!(
@@ -1653,6 +1890,7 @@ pub fn execute(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
         }
         let mut v = prop;
         v["touched"] = json!(touched.clone());
+        v["index_refresh"] = index_refresh;
         v["relationship_integrity"] = integrity_report;
         v["t2_seals"] = seals.to_value();
         Ok(v)
@@ -2269,6 +2507,241 @@ pub fn rollback(p: &Project, id: &str, reason: Option<&str>) -> Result<Value> {
 
 pub fn interrupted(p: &Project) -> Vec<Value> {
     RecordStore::load(&p.root).of_type("cit").into_iter().filter(|c| c.get("cit_status") == "EXECUTING").map(|c| json!({"id": c.id(), "started": c.data["execution"]["started"], "session": c.data["execution"]["session"], "snapshot_present": snapshot_dir(p, &c.id()).join("snapshot.json").exists()})).collect()
+}
+
+// ------------------------------------------------------------------ a plugin registration as a change transaction
+
+/// **A plugin registration is carried out by a change transaction the OS proposes** (INT3-O1, WS-5 × WS-7; Contract
+/// v3 K3 "auto-trigger for material: … security, governance/policy"; F4 "elevated permissions reference
+/// authoritative gate/decision"; framework §47-48 "the human should not need to type /impact"). A registration writes
+/// the plugin's descriptor under `governance/project/plugins/` and its sealed registry entry: a material governance
+/// and security change (`materiality`). `gov plugins register` therefore proposes this transaction itself (no worker
+/// hand-files it), with one manifest operation, `register_plugin`, whose content — the normalised descriptor and the
+/// registration subject — the transaction's approval binds. CIT-P is simulated automatically and raises the
+/// transaction's own gate under CHANGE_POLICY. The plugin's **execution** approval stays what it was (the gate raised
+/// for exactly the registration subject, `capabilities::governance`), and it names this transaction and its gate; this
+/// transaction's gate approves the **change**. Neither answer stands in for the other. CIT-E writes the registration
+/// ([`crate::capabilities::governance::apply_registration`]), so a registration made inside a claimed task closes on
+/// the transaction's recorded writes (task close step 10a) like any other governed change.
+///
+/// `origin: system`, `system.kind: plugin-registration` (OS-owned fields: [`propose`] strips them from proposer input).
+pub fn propose_registration(
+    p: &Project,
+    op: Value,
+    proposal: &str,
+    plugin_id: &str,
+    subject: &str,
+) -> Result<Value> {
+    let targets: Vec<Value> = ["path", "registry"]
+        .iter()
+        .filter_map(|k| op[*k].as_str().map(|s| json!(s)))
+        .collect();
+    let fields = json!({"proposal": proposal, "title": format!("Register capability plugin {plugin_id}"),
+        "trigger": "security_change", "targets": targets, "mutation_manifest": [op]});
+    let os = json!({"origin": "system", "system": {"kind": "plugin-registration", "operation": "plugins register",
+        "plugin_id": plugin_id, "registration_subject_sha256": subject,
+        "note": "proposed by the OS for a `gov plugins register` request (Contract v3 K3): the registration is written only by this transaction's execution; the plugin's execution approval is the gate raised for exactly the registration subject"}});
+    propose_inner(p, fields, Some(os), "register_plugin", true)
+}
+
+/// **A tool installation is carried out by a change transaction the OS proposes** (R4-O1, the adjacent path
+/// P2-AR-0043 left open beside INT3-O1; Contract v3 K3 "auto-trigger for material: … security, governance/policy";
+/// F4 "elevated permissions reference authoritative gate/decision"; framework §47-48 "the human should not need to
+/// type /impact"). `gov tools install` writes the tool's descriptor under `governance/project/tools/` — a governed
+/// path the kernel-floor materiality classifies exactly as it classifies a plugin descriptor, and which a task close
+/// refuses as a material change made outside change control. So the installation proposes this transaction itself
+/// (no worker hand-files it), with one manifest operation, `install_tool`, whose content — the descriptor as given,
+/// the installation subject, the installing role and whether the install command runs — the transaction's approval
+/// binds. CIT-P is simulated automatically and raises the transaction's own gate under CHANGE_POLICY. The
+/// installation's **own** approval stays what it was (the gate raised for exactly the installation subject when an
+/// auto-install condition failed, `tools::install`), and it names this transaction and its gate; this transaction's
+/// gate approves the **change**. Neither answer stands in for the other. CIT-E writes the descriptor
+/// ([`crate::tools::apply_installation`]), so an installation made inside a claimed task closes on the transaction's
+/// recorded writes (task close step 10a) like any other governed change.
+///
+/// `origin: system`, `system.kind: tool-installation` (OS-owned fields: [`propose`] strips them from proposer input).
+pub fn propose_installation(
+    p: &Project,
+    op: Value,
+    proposal: &str,
+    tool_id: &str,
+    subject: &str,
+) -> Result<Value> {
+    let targets: Vec<Value> = ["path", "registry"]
+        .iter()
+        .filter_map(|k| op[*k].as_str().map(|s| json!(s)))
+        .collect();
+    let fields = json!({"proposal": proposal, "title": format!("Install tool {tool_id}"),
+        "trigger": "security_change", "targets": targets, "mutation_manifest": [op]});
+    let os = json!({"origin": "system", "system": {"kind": "tool-installation", "operation": "tools install",
+        "tool_id": tool_id, "installation_subject_sha256": subject,
+        "note": "proposed by the OS for a `gov tools install` request (Contract v3 K3): the tool descriptor is written only by this transaction's execution; the installation's own approval, when an auto-install condition failed, is the gate raised for exactly the installation subject"}});
+    propose_inner(p, fields, Some(os), "install_tool", true)
+}
+
+/// Statuses of a transaction that is still a request (not finished).
+pub fn is_open_status(s: &str) -> bool {
+    matches!(s, "PROPOSED" | "SIMULATED" | "APPROVED")
+}
+
+/// **The manifest operations the OS itself proposes for a host operation**, each the whole manifest of its own
+/// transaction: a capability plugin's registration (INT3-O1) and a tool installation (R4-O1). Both write governed
+/// files under the OS-managed/project-plugin prefixes, so both are material governance changes that complete only
+/// through change control, and for both the host — not the worker — files the transaction.
+pub const HOST_PROPOSED_OPS: &[&str] = &["register_plugin", "install_tool"];
+
+/// The one `op` operation of a host-proposed transaction that is exactly that operation (`None` for anything else).
+fn host_op_of(c: &Record, op: &str) -> Option<Value> {
+    let m = c.data["mutation_manifest"].as_array()?;
+    (m.len() == 1 && m[0]["op"] == op).then(|| m[0].clone())
+}
+
+/// The host-proposed `op` transactions of exactly this subject whose state gov sealed, newest first:
+/// `(id, cit_status)`.
+pub fn host_transactions(p: &Project, op: &str, subject: &str) -> Vec<(String, String)> {
+    let store = RecordStore::load(&p.root);
+    let mut v: Vec<(String, String)> = store
+        .of_type("cit")
+        .into_iter()
+        .filter(|c| {
+            host_op_of(c, op)
+                .map(|o| o["subject_sha256"].as_str() == Some(subject))
+                .unwrap_or(false)
+                && binding::verified_state(c)
+                    .map(|st| st.cit_status == c.get("cit_status"))
+                    .unwrap_or(false)
+        })
+        .map(|c| (c.id(), c.get("cit_status")))
+        .collect();
+    v.sort_by(|a, b| b.0.cmp(&a.0));
+    v
+}
+
+/// End the open host-proposed `op` transactions whose `id_field` is `id` (and, when given, of exactly `subject`):
+/// the request they carry ended (its own approval was declined). Each is marked REJECTED with a sealed state.
+/// Returns their ids.
+pub fn close_host_requests(
+    p: &Project,
+    op: &str,
+    id_field: &str,
+    id: &str,
+    subject: Option<&str>,
+    why: &str,
+) -> Vec<String> {
+    let store = RecordStore::load(&p.root);
+    let ids: Vec<String> = store
+        .of_type("cit")
+        .into_iter()
+        .filter(|c| is_open_status(&c.get("cit_status")))
+        .filter(|c| {
+            host_op_of(c, op)
+                .map(|o| {
+                    o[id_field].as_str() == Some(id)
+                        && subject
+                            .map(|s| o["subject_sha256"].as_str() == Some(s))
+                            .unwrap_or(true)
+                })
+                .unwrap_or(false)
+        })
+        .map(|c| c.id())
+        .collect();
+    ids.into_iter()
+        .filter(|id| reject_sealed(p, id, why).is_ok())
+        .collect()
+}
+
+/// Journal, on a host-proposed transaction, the subject approval gate raised for what it carries (the transaction's
+/// side of the cross-reference; the gate's package names the transaction and its gate). `note` says which approval
+/// that gate is. The journal is not part of the content an approval binds; the record is re-sealed only when it
+/// verified before.
+pub fn note_host_gate(p: &Project, cit: &str, gate: &str, note: &str, operation: &str) {
+    let mut s = RecordStore::load(&p.root);
+    if let Some(c) = s.get_mut(cit) {
+        let was = crate::t2::verify_record(c).is_verified();
+        journal(
+            c,
+            json!({"at": now_iso(), "event": "subject_approval_gate_raised", "gate": gate, "note": note}),
+        );
+        if crate::t2::seal_if_verified(c, was, &format!("{operation} (cit note)")).is_ok() {
+            let _ = save_record(&p.root, c);
+        }
+    }
+}
+
+/// Where the approval of a host-proposed transaction stands.
+#[derive(Debug, Clone, PartialEq)]
+pub enum GateState {
+    /// Its gate waits on an answer (a withdrawn gate is raised again by re-simulating: the request was repeated).
+    Pending(String),
+    /// Its gate was answered with a non-authorising option: the change is refused.
+    Declined(String),
+    /// Approved already, or answered and ready to approve; approve/execute decide the rest, typed.
+    Ready,
+}
+
+pub fn host_gate_state(p: &Project, cit: &str) -> GateState {
+    let store = RecordStore::load(&p.root);
+    let Some(c) = store.get(cit) else {
+        return GateState::Ready;
+    };
+    if c.get("cit_status") != "SIMULATED" {
+        return GateState::Ready;
+    }
+    let g = c.get("human_gate");
+    if g.is_empty() {
+        return GateState::Ready;
+    }
+    match gates::verified_answer(p, &g) {
+        Ok(a) if a.authorises_blocked_work => GateState::Ready,
+        Ok(_) => GateState::Declined(g),
+        Err(e) if e.code == "GATE_NOT_ANSWERED" => GateState::Pending(g),
+        Err(e) if e.code == "GATE_REVOKED" => {
+            // the owner withdrew the question and the request is repeated: simulate again, which raises a fresh gate
+            // for the transaction as it stands (a withdrawn gate is never reused)
+            let fresh = RuntimeDb::open(&p.db_path())
+                .and_then(|db| db.init_schema().map(|_| db))
+                .and_then(|db| simulate_inner(p, &db, cit));
+            match fresh
+                .ok()
+                .and_then(|v| v["human_gate"].as_str().map(String::from))
+            {
+                Some(ng) => GateState::Pending(ng),
+                None => GateState::Ready,
+            }
+        }
+        Err(_) => GateState::Ready,
+    }
+}
+
+/// Approve (from its gate's verified answer) and execute a host-proposed transaction, under the authority of the
+/// host operation (`authority`) that proposed it and whose content it is. Refused for any transaction that is not
+/// exactly one `op` operation, so this path executes nothing but that host operation, and CIT-E re-verifies the
+/// subject's own approval (Contract v3 F4) before it writes.
+pub fn execute_host_op(p: &Project, id: &str, op: &str, authority: &str) -> Result<Value> {
+    let store = RecordStore::load(&p.root);
+    let c = load_cit(&store, id)?;
+    if host_op_of(&c, op).is_none() {
+        return Err(GovError::new(
+            "USAGE",
+            format!("{id} is not a host-proposed {op} transaction (exactly one {op} operation)"),
+        ));
+    }
+    if c.get("cit_status") == "SIMULATED" {
+        let gate = c.get("human_gate");
+        let method = if !gate.is_empty()
+            && gates::verified_answer(p, &gate)
+                .map(|a| a.by_kind == "human")
+                .unwrap_or(false)
+        {
+            "human"
+        } else {
+            "auto"
+        };
+        approve_with(p, id, &p.role.clone(), method, Some(authority))?;
+    }
+    let db = RuntimeDb::open(&p.db_path())?;
+    db.init_schema()?;
+    execute_with(p, &db, id, Some(authority))
 }
 
 pub fn list(p: &Project) -> Vec<Value> {

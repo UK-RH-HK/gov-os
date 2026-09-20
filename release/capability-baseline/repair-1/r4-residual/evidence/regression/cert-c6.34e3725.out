@@ -1,0 +1,45 @@
+# chunk: ws03 ws03_r3 ws04r2  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:21:02Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.04s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 30 tests
+test ws03::every_cli_command_label_is_classified_by_g0 ... ok
+test ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate ... ok
+test ws03::hand_written_gate_and_decision_records_are_not_honoured ... ok
+test ws03::presentation_is_recorded_only_from_an_owner_signed_receipt ... ok
+test ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere ... ok
+test ws03::blocked_work_is_released_only_by_an_authorising_answer ... ok
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment ... ok
+test ws03_r3::a_t2_binding_authority_is_admitted_only_from_the_administrator_domain_under_this_machines_root ... ok
+test ws03::the_decision_package_is_enforced ... ok
+test ws03_r3::emergency_control_state_lives_in_the_operational_store ... ok
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations ... ok
+test ws03::cit_approval_consumes_only_honoured_gate_answers ... ok
+test ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals ... ok
+test ws03_r3::gate_operations_keep_os_sealed_task_records_verifiable_and_never_bless_others ... ok
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor ... ok
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them ... ok
+test ws03::human_answers_come_only_from_the_owner_signed_channel has been running for over 60 seconds
+test ws03::human_answers_come_only_from_the_owner_signed_channel ... ok
+test ws03_r3::root_succession_that_drops_the_binding_role_revokes_its_records_and_sealing_falls_back ... ok
+test ws03_r3::gates_cite_only_governed_research_and_record_its_influence ... ok
+test ws03_r3::reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_else ... ok
+test ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close ... ok
+test ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only ... ok
+test ws04r2::contradictions_are_blocked_and_routed ... ok
+test ws04r2::materiality_is_derived_not_labelled ... ok
+test ws04r2::cit_approval_binds_content_impact_and_transaction ... ok
+test ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else has been running for over 60 seconds
+test ws03_r3::the_t2_audit_covers_the_plugin_registry ... ok
+test ws04r2::checkpoint_and_handoff_continuity has been running for over 60 seconds
+test ws04r2::upstream_change_reaches_completed_work has been running for over 60 seconds
+test ws04r2::upstream_change_reaches_completed_work ... ok
+test ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else ... ok
+test ws04r2::checkpoint_and_handoff_continuity ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 168 filtered out; finished in 212.09s
+
+[exit=0]

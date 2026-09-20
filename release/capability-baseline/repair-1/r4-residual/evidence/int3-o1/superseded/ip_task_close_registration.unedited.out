@@ -1,0 +1,24 @@
+# P2-AR-0043 INT3-O1 probe run: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/release/capability-baseline/repair-1/r3-ws07/evidence/ip_task_close_registration.py
+# probe sha256 1c90ecd29e800081485974f0b9322d0eccc8e84d55a772fd23986df94bf682bf
+# tree /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual HEAD cae2f67cf919d1506b914bf0c98c75c49e755293 dirty-product-files 8
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/release/gov sha256 073e7ea7eae7977cf13ef3e60f229d6a092941e84950a700cc909918fb58ed1a
+# date 2026-09-19T17:48:25Z
+# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/release/gov
+registered: False None
+# working-tree changes during the task:
+?? governance/generated/index-manifest.json
+?? governance/generated/memory-manifest.json
+?? governance/project/plugins/
+?? spec/decisions/CIT-0001.yaml
+?? spec/decisions/D-0001.yaml
+?? spec/decisions/HDG-0001.yaml
+?? spec/decisions/HDG-0002.yaml
+?? spec/tasks/TASK-0001.yaml
+?? spec/tasks/TASK-0002.yaml
+?? spec/tasks/TASK-0003.yaml
+?? tools/
+
+close ok: False code: MATERIAL_CHANGE_REQUIRES_CIT
+undeclared: null out_of_scope: null t2_violations: null
+message: task TASK-0001 made material change(s) outside change control: security_change governance/project/plugins/p1.yaml (governance/project/plugins/p1.yaml); governance_change governance/project/plugins/p1.yaml (governance/project/plugins/p1.yaml). Contract v3:638-647 / framework §47-48: a material change completes only through CIT-P/CIT-E, whatever task it is made in. Restore these paths and propose the change as a Change-Impact Transaction (`gov cit propose --targets … --manifest …`, simulate, appro
+[exit=0]

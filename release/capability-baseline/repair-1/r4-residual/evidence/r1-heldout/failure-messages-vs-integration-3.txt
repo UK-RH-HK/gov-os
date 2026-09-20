@@ -1,0 +1,5 @@
+# normalised failure messages of the unedited R1 suites (failure_messages.py, copied unchanged from integration-3)
+# this run (34e3725, r1-heldout-final-34e3725.out) vs round-3 integration (22d43ce, repair-1/integration-3/evidence/r1-heldout/r1-heldout-integrated-22d43ce.out)
+# lines: now 42, round-3 integration 42
+# diff vs round-3 integration:
+(empty)

@@ -150,12 +150,26 @@ pub const RELY_ON_STATE: &[&str] = &[
 /// for work that **declares** it remedies the block's check (a task's `remedies`, set by the work generator on the
 /// remediation it generates, or by the creator of repair work) **and** whose subjects reach the block's
 /// ([`DECLARED_REMEDY_OPS`]); its close commits only once the block is cleared (the close re-evaluates it).
+///
+/// Round 4 (WS-4 IP-R3-WS04-11), **block scope and remedy semantics of `cit.propose` and `handoff.create`**, with the
+/// subjects their hosts now pass (the transaction's manifest paths and targets; the handed-off task's record, the
+/// inputs its manifest delivers and the paths it may change):
+///
+/// | block | `cit.propose` | `handoff.create` |
+/// |---|---|---|
+/// | critical (`CRIT_ALL`, global) | refused, **except** a proposal whose subjects reach the block's (the change that repairs it; its execution must clear the block before it commits) | refused, **except** the handoff of work that declares the block's check among its `remedies` and whose subjects reach the block's (handing off the repairing task, like creating and claiming it) |
+/// | an interrupted transaction (D016, global) | refused, no remedy but `gov recover` (never refused): no change starts on a half-applied repository | not refused |
+/// | high, subject-scoped (`HIGH_RELY_WORK`, graph, gates, `change_control_integrity`) | proposing relies on nothing: not refused, and on the block's subjects it is the block's remedy | not refused: handing off relies on the inputs, which the claim and the close judge |
+///
+/// A remedy proposal or handoff commits nothing; the committing step (CIT-E, the close) is where the block must be
+/// cleared.
 pub const WORK_REMEDIES: &[&str] = &[
     ops::CIT_PROPOSE,
     ops::CIT_APPROVE,
     ops::CIT_EXECUTE,
     ops::TASK_CREATE,
     ops::TASK_CLAIM,
+    ops::HANDOFF_CREATE,
 ];
 /// [`WORK_REMEDIES`] plus `update --apply` (the remedy of a condition in the kernel, lock or overlay).
 pub const ALL_REMEDIES: &[&str] = &[
@@ -164,12 +178,13 @@ pub const ALL_REMEDIES: &[&str] = &[
     ops::CIT_EXECUTE,
     ops::TASK_CREATE,
     ops::TASK_CLAIM,
+    ops::HANDOFF_CREATE,
     ops::UPDATE_APPLY,
 ];
 /// Remedy operations that are admitted as a block's remedy only when the request **declares** the block's check among
-/// the checks it remedies (`scheduler::Request::with_remedies`), besides reaching its subjects: starting work is the
-/// remedy only of the conditions that work says it repairs.
-pub const DECLARED_REMEDY_OPS: &[&str] = &[ops::TASK_CREATE, ops::TASK_CLAIM];
+/// the checks it remedies (`scheduler::Request::with_remedies`), besides reaching its subjects: starting, claiming or
+/// handing off work is the remedy only of the conditions that work says it repairs.
+pub const DECLARED_REMEDY_OPS: &[&str] = &[ops::TASK_CREATE, ops::TASK_CLAIM, ops::HANDOFF_CREATE];
 
 /// **Block scope** (Contract v3 L4 "Independent runnable branches continue. Global stop only when policy or
 /// critical-path state requires"; O5 :807 "hard-block vs warning semantics are explicit"). A hard-block refuses the

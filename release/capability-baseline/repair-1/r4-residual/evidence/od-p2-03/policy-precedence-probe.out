@@ -1,0 +1,130 @@
+# project: /tmp/gov-cert-r4-od3-apt-2fdddc18d7195e66648221
+# gov: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual-c/target/release/gov sha256 3f847ec2bb21a779cf23048ab1cb0f7b30dfe0ac677cc6ac13f28b1e6d89fcc3
+
+## before: the shipped rule and envelope as the project reads them
+{
+ "tool_installation": {
+  "owner_decision": "OD-P2-03",
+  "decision_record": "D-0011",
+  "manifest_op": "install_tool",
+  "subject_paths": [
+   "governance/project/tools/**"
+  ],
+  "non_gated_conditions": {
+   "authenticated_and_pinned": "version_pinned_and_recorded",
+   "independently_governed_reviewed": "licence_and_security_satisfied",
+   "registered": "tool_registered",
+   "reversible": "installation_reversible",
+   "within_authorised_envelope": "authority_envelope"
+  },
+  "authority_expansion_triggers": [
+   "privilege_escalation",
+   "broader_filesystem_or_project_access",
+   "new_secret_or_credential_access",
+   "host_level_authority",
+   "governance_or_security_policy_mutation",
+   "new_or_unrestricted_network_trust_boundary"
+  ],
+  "envelope_sources": [
+   "TOOL_PERMISSIONS.yaml",
+   "AUTHORITY_POLICY",
+   "DATA_SENSITIVITY.yaml",
+   "SECURITY_POLICY",
+   "REPOSITORY_CONTRACT.yaml",
+   "TOOL_POLICY.installation_envelope"
+  ],
+  "fail_closed": true
+ }
+}
+{
+ "host_authority_classes": [
+  "SYSTEM_INSTALL",
+  "DEPLOY_STAGING",
+  "DEPLOY_PRODUCTION",
+  "CLOUD_WRITE"
+ ],
+ "credential_classes": [
+  "SECRET_READ"
+ ],
+ "network_classes": [
+  "NETWORK_READ",
+  "NETWORK_WRITE"
+ ],
+ "privilege_tokens": [
+  "sudo",
+  "su",
+  "doas",
+  "pkexec",
+  "runas",
+  "setcap",
+  "setuid",
+  "chown",
+  "chmod"
+ ],
+ "host_authority_tokens": [
+  "systemctl",
+  "service",
+  "launchctl",
+  "apt",
+  "apt-get",
+  "aptitude",
+  "yum",
+  "dnf",
+  "apk",
+  "brew",
+  "pacman",
+  "zypper",
+  "choco",
+  "winget",
+  "msiexec",
+  "rpm",
+  "dpkg",
+  "installer",
+  "mount",
+  "crontab",
+  "docker",
+  "podman",
+  "kubectl",
+  "insmod",
+  "modprobe",
+  "useradd",
+  "usermod",
+  "update-alternatives"
+ ],
+ "host_scope_flags": [
+  "-g",
+  "--global",
+  "--system",
+  "--user"
+ ],
+ "credential_patterns": [
+  "*TOKEN*",
+  "*SECRET*",
+  "*PASSWORD*",
+  "*PASSWD*",
+  "*API_KEY*",
+  "*A
+
+## the project tries to weaken both: empty two envelope floors, drop five expansion triggers, drop a condition
+PROJECT_POLICY.policy_overrides written:
+  CHANGE_POLICY.change_classes.tool_installation.authority_expansion_triggers
+  CHANGE_POLICY.change_classes.tool_installation.non_gated_conditions.within_authorised_envelope
+  TOOL_POLICY.installation_envelope.credential_patterns
+  TOOL_POLICY.installation_envelope.host_authority_tokens
+
+## gov policy overrides
+applied:
+refused:
+   TOOL_POLICY.installation_envelope.host_authority_tokens -> TOOL_POLICY.installation_envelope.host_authority_tokens: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutable', rule TOOL_POLICY.*)
+   TOOL_POLICY.installation_envelope.credential_patterns -> TOOL_POLICY.installation_envelope.credential_patterns: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutable', rule TOOL_POLICY.*)
+   CHANGE_POLICY.change_classes.tool_installation.authority_expansion_triggers -> CHANGE_POLICY.change_classes.tool_installation.authority_expansion_triggers: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutable', rule CHANGE_POLICY.*)
+   CHANGE_POLICY.change_classes.tool_installation.non_gated_conditions.within_authorised_envelope -> CHANGE_POLICY.change_classes.tool_installation.non_gated_conditions.within_authorised_envelope: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECEDENCE mode 'immutable', rule CHANGE_POLICY.*)
+
+## after: the effective rule and envelope (must be the shipped ones, unchanged)
+triggers: ['privilege_escalation', 'broader_filesystem_or_project_access', 'new_secret_or_credential_access', 'host_level_authority', 'governance_or_security_policy_mutation', 'new_or_unrestricted_network_trust_boundary']
+within_authorised_envelope -> authority_envelope
+host_authority_tokens: 28 tokens
+credential_patterns: ['*TOKEN*', '*SECRET*', '*PASSWORD*', '*PASSWD*', '*API_KEY*', '*APIKEY*', '*CREDENTIAL*', '*PRIVATE_KEY*', '*ACCESS_KEY*']
+
+## and the network allowlist the envelope compares against is not policy at all: it is kernel tool-registry payload
+governance/kernel/tools/registry/TOOLS.yaml network_allowlist: {'approved_registries': ['registry.npmjs.org', 'pypi.org', 'files.pythonhosted.org', 'crates.io', 'static.crates.io', 'index.crates.io', 'proxy.golang.org', 'rubygems.org', 'repo.maven.apache.org'], 'allowlisted_services': []}

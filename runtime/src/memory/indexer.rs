@@ -55,6 +55,15 @@ pub struct IndexOptions {
     /// that operation records its own boundary (accepted CIT, task transition, migration batch) and a record written
     /// in the middle of it would become part of what it verifies. Default: off.
     pub observe_boundaries: bool,
+    /// **Propagate the direct upstream changes this build observes (INT3-O2; Contract v3 W6 "when an authoritative
+    /// upstream artefact changes … dependent task evidence becomes stale", "however made"; O5/W12 G1 "invalidates
+    /// affected dependency/lineage evidence after material mutations").** A change made outside change control that
+    /// an index build observes is a mutation observed at G1, so its dependants are marked when it is observed
+    /// (`cit::propagation::detect_and_propagate`, recorded as a sealed system transaction), not only at the next
+    /// claim (which keeps propagating too). For a build a host runs as its own operation (`gov rebuild-memory`,
+    /// `gov memory rebuild`); never inside another governed operation, whose own boundary records its effects.
+    /// Default: off.
+    pub propagate_direct_changes: bool,
 }
 
 #[derive(Debug, Clone, serde::Serialize, Default)]
@@ -94,6 +103,9 @@ pub struct IndexReport {
     /// With `IndexOptions::observe_boundaries`: the mutation this build observed and the checkpoints it wrote
     /// (`null` otherwise).
     pub boundaries: Value,
+    /// With `IndexOptions::propagate_direct_changes`: the direct upstream changes this build observed and what was
+    /// propagated (or why it was deferred to the next claim) (`null` otherwise).
+    pub upstream_changes: Value,
 }
 
 pub fn lexical_config(p: &Project) -> Value {
@@ -2057,6 +2069,30 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
             report.counts = again.counts;
         }
     }
+    // --- INT3-O2: a direct upstream change this build observed is propagated when it is observed (G1), for the builds
+    // a host runs as an operation of its own (see `IndexOptions::propagate_direct_changes`)
+    if opts.propagate_direct_changes && !benchmark_mode {
+        report.upstream_changes = propagate_observed_changes(p_in);
+        if report.upstream_changes["propagated"] == true
+            && report.upstream_changes["touched"]
+                .as_array()
+                .map(|a| !a.is_empty())
+                .unwrap_or(false)
+        {
+            // the markers are repository content: the index this build leaves behind includes them
+            let again = rebuild(
+                p_in,
+                IndexOptions {
+                    incremental: true,
+                    record_failures: Some(false),
+                    ..Default::default()
+                },
+            )?;
+            report.indexed += again.indexed;
+            report.manifest_hash = again.manifest_hash;
+            report.counts = again.counts;
+        }
+    }
     // --- R2-11: a significant mutation this build observed is a checkpoint boundary (for the builds a host runs as
     // an operation of its own; see `IndexOptions::observe_boundaries`)
     if opts.observe_boundaries && !benchmark_mode {
@@ -2078,6 +2114,28 @@ pub fn rebuild(p_in: &Project, opts: IndexOptions) -> Result<IndexReport> {
     report.duration_ms = started.elapsed().as_millis();
     let _ = PluginDescriptor::from_value(&Value::Null, "");
     Ok(report)
+}
+
+/// INT3-O2: propagate the direct upstream changes an index build observed (see
+/// [`IndexOptions::propagate_direct_changes`]). Propagation writes governed records (staleness and retest marks,
+/// packet invalidation, and revalidation work when the acting role may create tasks), so it passes the write guard of
+/// the operation it is (`cit propagate`: kernel trust, break-glass, FREEZE_WRITES/PAUSE). Refused, it is **deferred**,
+/// never forced: the build stands (rebuilding the derived index stays available under every control), the detection
+/// is reported, and the next claim (or governed build) propagates. Idempotent: an input already propagated is not
+/// detected again, and a build that detects nothing records nothing.
+fn propagate_observed_changes(p: &Project) -> Value {
+    if let Err(e) = crate::orchestration::control::guard_write(p, "cit propagate") {
+        let detected = crate::cit::propagation::detect_and_propagate(p, "index rebuild", true)
+            .map(|v| v["detected"].clone())
+            .unwrap_or(Value::Null);
+        return json!({"propagated": false, "detected": detected,
+            "deferred": {"code": e.code, "message": e.message},
+            "note": "propagation writes governed records and was refused by the write guard; the rebuild stands and the next claim (or a governed build) propagates"});
+    }
+    match crate::cit::propagation::detect_and_propagate(p, "index rebuild", false) {
+        Ok(v) => v,
+        Err(e) => json!({"propagated": false, "error": {"code": e.code, "message": e.message}}),
+    }
 }
 
 /// The artefacts an index build added, changed (content hash) or removed relative to the index before it, by path.

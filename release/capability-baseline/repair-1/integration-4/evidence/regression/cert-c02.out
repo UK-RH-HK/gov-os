@@ -1,0 +1,18 @@
+# chunk: failure_injection integration_r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:30:48Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.36s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 6 tests
+test integration_r3::a_legacy_unsealed_task_rewritten_by_gov_inside_a_claim_window_is_reported_not_refused ... ok
+test integration_r3::a_cit_invalidating_done_work_leaves_graph_integrity_and_d015_clean ... ok
+test integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2 ... ok
+test failure_injection::injected_failures_are_detected_and_recovered has been running for over 60 seconds
+test integration_r3::a_task_record_written_outside_gov_inside_a_claim_window_is_refused_at_close ... ok
+test integration_r3::task_records_are_sealed_and_os_writes_inside_another_claim_window_are_honoured ... ok
+test failure_injection::injected_failures_are_detected_and_recovered ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 201 filtered out; finished in 153.59s
+
+[exit=0]

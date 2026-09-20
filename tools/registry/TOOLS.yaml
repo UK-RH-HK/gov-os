@@ -1,4 +1,27 @@
 version: 1.0.0
+# **The network allowlist an installation's trust boundary is compared against** (OD-P2-03 requirement 2; governed
+# record spec/decisions/D-0011.yaml; the rule is CHANGE_POLICY.change_classes.tool_installation and the envelope is
+# TOOL_POLICY.installation_envelope). It lives HERE, in the kernel tool registry, and not in kernel policy, because
+# registry hostnames are ecosystem knowledge and INV-005 keeps kernel data free of language and toolchain
+# assumptions - the same reason the language-native tools below live here. This document is part of the verified
+# kernel payload, so a project can no more alter it than it can alter the policy.
+#
+# Ordinary use of one of these hosts, by a role that already holds a network permission class, is NOT by itself an
+# authority expansion. Any other host, or a network class with no endpoint the OS can derive, is a new or
+# unrestricted network trust boundary and raises the Human Gate.
+network_allowlist:
+  approved_registries:
+    - registry.npmjs.org
+    - pypi.org
+    - files.pythonhosted.org
+    - crates.io
+    - static.crates.io
+    - index.crates.io
+    - proxy.golang.org
+    - rubygems.org
+    - repo.maven.apache.org
+  # project- or site-specific services the owner has authorised; empty in the shipped kernel
+  allowlisted_services: []
 tools:
   - {tool_id: TOOL-FS-001, name: filesystem, type: CLI, capabilities: [read_file, write_file, list_dir], permissions: {repo_write: true, network: false}, credential_scope: none, status: active, version: builtin, approved_roles: [all], health_check: {kind: builtin}, required_permission_classes: [READ_REPO], reversible: true, license: n/a}
   - {tool_id: TOOL-GIT-001, name: git, type: CLI, capabilities: [git_status, git_diff, git_log, git_mv, git_commit], permissions: {repo_write: true, network: false}, credential_scope: none, status: active, version: system, approved_roles: [all], health_check: {kind: command, command: [git, --version], expect_exit: 0}, required_permission_classes: [READ_REPO, WRITE_REPO_SCOPED], reversible: true, license: GPL-2.0}

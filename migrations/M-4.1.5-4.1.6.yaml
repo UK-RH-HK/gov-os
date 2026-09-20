@@ -19,10 +19,11 @@ human_gate: none
 affected_indexes: [lexical, semantic, graph, code]
 overlay_template_changes:
   - {file: REPOSITORY_CONTRACT.yaml, handled_by: "op:sync_overlay_template", reason: "the 4.1.6 repository contract states the BC-P2-31 classification (.governance-state/** operational, the plugin registry location authoritative, runtime-directory rules that do not match the OS's legacy store paths), the evidence class of spec/reports/memory-quality/** (retrieval-miss failure records, never indexed) and a rule order under which the specific spec/ rules decide their paths; delivered to installed 4.1.5 projects by the three-way template convergence below"}
+  - {file: TOOL_PERMISSIONS.yaml, handled_by: "op:sync_overlay_template", reason: "the 4.1.6 tool permissions state what the adoption protocol's independent roles are granted (repair-1 r3-ws09-11 IP-R3-WS09-4): migration-verifier READ_REPO and RUN_TESTS (the A7 verifier runs every approved migration test), migration-reviewer and memory-verifier READ_REPO; delivered to installed 4.1.5 projects by the three-way template convergence below"}
 operations:
   - {op: note, text: "4.1.6 converges each project overlay file with this release's overlay templates: what the project never customised follows the new template (values, rules added or removed, rule order); what it customised is kept, and a customisation the template also changed is kept and reported (update result, operations[].conflicts)."}
   - {op: note, text: "Research and experiment records follow schema 1.1.0 (WS-10 IP-WS10-16): an incomplete research or experiment record presented as evidence is a HIGH schema finding after this update. Remediation: mark it state_class NARRATIVE, or complete it with `gov research conclude` / `gov experiment design`. The migration does not touch spec/ (INV-013), so such records are reported, never rewritten."}
-  - {op: note, text: "Non-rebuildable OS state (session claims, emergency-control state, claim-time trees, CIT, update and migration rollback snapshots) belongs in .governance-state/ (machine-local, ignored by Git, never derived) and the plugin registry in governance/registry/ (paths::OS_STORES, BC-P2-31). A store found at its earlier location inside .governance-runtime/ or governance/generated/ is moved there by its writer on first use and reported until then; adoption batch snapshots move to .governance-state/migration/."}
+  - {op: note, text: "Non-rebuildable OS state (session claims, emergency-control state, claim-time trees, CIT, update and migration rollback snapshots) belongs in .governance-state/ (machine-local, ignored by Git, never derived), and the plugin registry and the skill content bindings in governance/registry/ (paths::OS_STORES, BC-P2-31). The tracked stores (plugin registry, skill bindings) are moved there by this update (relocate_os_stores, bytes and seals unchanged; `gov update --rollback` restores the previous layout); a machine-local store found at its earlier location inside .governance-runtime/ is moved there by its writer on first use and reported until then; adoption batch snapshots move to .governance-state/migration/."}
   - op: sync_overlay_template
     file: CAPABILITY_PROFILE.yaml
     base_release: "4.1.5"
@@ -142,6 +143,7 @@ operations:
       install_authority_roles: [tooling-engineer, orchestrator]
       tool_allowlist: {}
       mcp_servers: {}
+  - {op: relocate_os_stores}
   - {op: require_index_rebuild, index: all}
   - {op: regenerate_adapters}
 rollback: >

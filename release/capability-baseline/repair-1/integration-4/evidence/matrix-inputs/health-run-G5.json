@@ -1,0 +1,1824 @@
+{
+  "ok": true,
+  "command": "health",
+  "result": {
+    "audit": "",
+    "verdict": "HEALTHY",
+    "green": true,
+    "families": {
+      "schema_invariants": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "records_checked": 1
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "graph_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "dangling": 0,
+          "orphans": 1,
+          "orphan_records": [
+            "AUD-0001"
+          ],
+          "edge_types": {},
+          "integrity": {
+            "ok": true,
+            "checked_records": 1,
+            "checked_edges": 0,
+            "counts": {}
+          },
+          "resolved_investigation_links": [],
+          "lineage": {
+            "misplaced_records": 0,
+            "stale_links": 0,
+            "dangling_blocks": 0
+          }
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "index_freshness": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "checked": 164,
+          "stale": [],
+          "added": [],
+          "removed": [],
+          "retrieval_profile": {
+            "state": "KERNEL_DEFAULT",
+            "governed": true,
+            "decision": null,
+            "digest": "8df15571734ac50e6917bba3d1375f91734e2667b758738225a9fecc0bb03bfe"
+          }
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "memory_retrieval_regression": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "status": "PASS",
+          "recall_at_k": 1.0,
+          "mrr": 1.0,
+          "precision_at_k": 1.0,
+          "queries": 13,
+          "pending": 2,
+          "failed": [],
+          "failed_results": [],
+          "isolated_in_sandbox": true
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "authority_role_limits": {
+        "ok": true,
+        "findings": 0,
+        "detail": null,
+        "status": "executed",
+        "cached_from": null
+      },
+      "mutation_scope": {
+        "ok": true,
+        "findings": 0,
+        "detail": null,
+        "status": "executed",
+        "cached_from": null
+      },
+      "path_map_compliance": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "unmatched": 0,
+          "secret_content_outside_secret_class": [],
+          "hidden_oracle_material": [],
+          "shadowed_rules": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "context_reproducibility": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "delivery": [],
+          "isolated_in_sandbox": true
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "concurrency_claims": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "claims": 0,
+          "expired": 0
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "adapter_portability": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "ok": true,
+          "adapters_checked": 6,
+          "invariants": 15,
+          "problems": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "skill_regression": {
+        "ok": true,
+        "findings": 7,
+        "detail": {
+          "skills": [
+            {
+              "skill": "SKL-API-CONTRACT-REVIEW",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "acdca045bbba18e2a68ff495f6534ec7da86ae3f44cc40afc3716f967acb1236",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "write": "spec/interfaces/API-9901.yaml"
+                    },
+                    {
+                      "step": 1,
+                      "gov": [
+                        "cit",
+                        "propose",
+                        "--proposal",
+                        "remove field currency from API-9901 (breaking change)",
+                        "--trigger",
+                        "interface_change",
+                        "--targets",
+                        "API-9901"
+                      ],
+                      "ok": true,
+                      "code": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "skill": "SKL-BACKEND-IMPL",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "6560a87320d757f8927c7a9df5a7df9374a2090e50dfce7700c3509f02d95351",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "gov": [
+                        "task",
+                        "create",
+                        "--class",
+                        "refactor",
+                        "--objective",
+                        "skill scenario SKL-BACKEND-IMPL V1",
+                        "--allowed",
+                        "src/**",
+                        "--status",
+                        "READY"
+                      ],
+                      "ok": true,
+                      "code": null
+                    },
+                    {
+                      "step": 1,
+                      "gov": [
+                        "task",
+                        "claim",
+                        "TASK-0001"
+                      ],
+                      "ok": true,
+                      "code": null
+                    },
+                    {
+                      "step": 2,
+                      "write": "governance/project/SKILL-SCENARIO-PROBE.md"
+                    },
+                    {
+                      "step": 3,
+                      "write": ".governance-runtime/skill-scenario-report.json"
+                    },
+                    {
+                      "step": 4,
+                      "gov": [
+                        "task",
+                        "close",
+                        "TASK-0001",
+                        "--report",
+                        "<sandbox>/.governance-runtime/skill-scenario-report.json"
+                      ],
+                      "ok": false,
+                      "code": "MUTATION_SCOPE_VIOLATION"
+                    }
+                  ]
+                },
+                {
+                  "scenario": "V2",
+                  "status": "declared-agent",
+                  "reason": "the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family"
+                }
+              ]
+            },
+            {
+              "skill": "SKL-DB-MIGRATION",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "f546ba87982b7d9deb20f161c8e647465e7d5db8ed81c1c6762369013fb75ab7",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "declared-agent",
+                  "reason": "requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness"
+                }
+              ]
+            },
+            {
+              "skill": "SKL-IMPACT-ANALYSIS",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "076be95766a50672fbc31f3dd26dfb41b25b9c47eb0b4d2f53d94589371016a5",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "gov": [
+                        "cit",
+                        "propose",
+                        "--proposal",
+                        "skill scenario SKL-IMPACT-ANALYSIS V1: change the project policy overlay",
+                        "--targets",
+                        "governance/project/PROJECT_POLICY.yaml"
+                      ],
+                      "ok": true,
+                      "code": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "skill": "SKL-LIVE-MIGRATION",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "8a1d89a5fb1184f967bdfd9bddfab8431669a906fb0dd830e1298b0bb86f1749",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "declared-qualification",
+                  "reason": "needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run"
+                }
+              ]
+            },
+            {
+              "skill": "SKL-MEMORY-RECONSTRUCTION",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "b6f617d5aef91530236dba450589bdf81d333daf5c1b003d979893c729ed086b",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "write": "config/.env.skill-scenario"
+                    },
+                    {
+                      "step": 1,
+                      "gov": [
+                        "rebuild-memory"
+                      ],
+                      "ok": true,
+                      "code": null
+                    },
+                    {
+                      "step": 2,
+                      "gov": [
+                        "doctor"
+                      ],
+                      "ok": true,
+                      "code": null
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "skill": "SKL-REPO-ADOPTION",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "6e682ea64be09d5e3470ce48c3b15d558f93bdc31baa70da4378eb7456807bc4",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "declared-qualification",
+                  "reason": "adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run"
+                },
+                {
+                  "scenario": "V2",
+                  "status": "declared-qualification",
+                  "reason": "adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run"
+                }
+              ]
+            },
+            {
+              "skill": "SKL-RESEARCH-BENCHMARK",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "c1348248d394aacf2652b726b37f3659321973ac0ed341451b6a43bb6357e325",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "write": "spec/research/RES-9901.yaml"
+                    },
+                    {
+                      "step": 1,
+                      "gov": [
+                        "audit",
+                        "--no-persist",
+                        "--family",
+                        "schema_invariants"
+                      ],
+                      "ok": false,
+                      "code": "UNHEALTHY"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "skill": "SKL-TASK-CLOSE",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "73cba03a7f239a12660660695fa7bdd2a7511d4a173aab817e896553d547f98d",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "gov": [
+                        "task",
+                        "create",
+                        "--class",
+                        "validation",
+                        "--objective",
+                        "skill scenario SKL-TASK-CLOSE V1",
+                        "--allowed",
+                        "docs/**",
+                        "--status",
+                        "READY"
+                      ],
+                      "ok": true,
+                      "code": null
+                    },
+                    {
+                      "step": 1,
+                      "gov": [
+                        "task",
+                        "claim",
+                        "TASK-0001"
+                      ],
+                      "ok": true,
+                      "code": null
+                    },
+                    {
+                      "step": 2,
+                      "write": "docs/skill-scenario-task-close.md"
+                    },
+                    {
+                      "step": 3,
+                      "write": ".governance-runtime/skill-scenario-report.json"
+                    },
+                    {
+                      "step": 4,
+                      "gov": [
+                        "task",
+                        "close",
+                        "TASK-0001",
+                        "--report",
+                        "<sandbox>/.governance-runtime/skill-scenario-report.json"
+                      ],
+                      "ok": false,
+                      "code": "INDEX_STALE"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "skill": "SKL-TEST-DESIGN",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "3f2432dd5233602e852aadb19d6921f1962a3fffa61a4a98875c1300c007f60b",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "declared-agent",
+                  "reason": "the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34"
+                }
+              ]
+            },
+            {
+              "skill": "SKL-THREAT-MODEL",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "1c67af5e5ab8f01d9ebf3f23ab0637f33b48aa4f884a30620fd9dbb36fbfeefb",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "declared-agent",
+                  "reason": "the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness"
+                }
+              ]
+            },
+            {
+              "skill": "SKL-TOOL-INSTALL",
+              "version": "1.0.0",
+              "source": "kernel",
+              "content_sha256": "818bdaa23e5a9797e5a8106ee37e2cdb221875a644c13ab6902f08ba0a858418",
+              "binding": "unbound",
+              "scenarios": [
+                {
+                  "scenario": "V1",
+                  "status": "passed",
+                  "transcript": [
+                    {
+                      "step": 0,
+                      "write": ".governance-runtime/skill-scenario-tool.json"
+                    },
+                    {
+                      "step": 1,
+                      "gov": [
+                        "tools",
+                        "install",
+                        "--descriptor",
+                        "<sandbox>/.governance-runtime/skill-scenario-tool.json"
+                      ],
+                      "ok": true,
+                      "code": null
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "executed_passed": 7,
+          "executed_failed": 0,
+          "declared_not_executed": 7,
+          "unexecutable": 0,
+          "not_run": 0,
+          "runner": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/target/release/gov"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "command_contract_consistency": {
+        "ok": true,
+        "findings": 0,
+        "detail": null,
+        "status": "executed",
+        "cached_from": null
+      },
+      "secrets_sensitivity_indexing": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "secret_artifacts": 0,
+          "leaked_chunks": 0,
+          "excluded": 0
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "recovery_rebuild": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "deep": false,
+          "tracked": "5d6c45dadd962265b8e1b3d5f662491e70503b5cf893710cec610cd6ca7c9f9c",
+          "live": "5d6c45dadd962265b8e1b3d5f662491e70503b5cf893710cec610cd6ca7c9f9c",
+          "misplaced_os_state": [],
+          "isolated_in_sandbox": true
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "fresh_agent_reconstruction": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "reads": 4,
+          "budget": 25,
+          "status_chars": 8100,
+          "next_action": "no runnable tasks: run readiness planning or discovery"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "product_traceability": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "tasks": 0,
+          "done": 0,
+          "task_traceability": 1.0,
+          "features": 0,
+          "untraceable_closed_tasks": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "audit_reproducibility": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "compared": [
+            {
+              "check": "schema_invariants",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "graph_integrity",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "index_freshness",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "memory_retrieval_regression",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "authority_role_limits",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "mutation_scope",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "path_map_compliance",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "adapter_portability",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "command_contract_consistency",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "secrets_sensitivity_indexing",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "product_traceability",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "policy_enforcement_coverage",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "policy_precedence",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "product_test_health",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "human_gate_integrity",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "change_control_integrity",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "continuity_checkpoint_handoff",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "model_routing_integrity",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "lineage_orphans",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "index_content_coverage",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "upstream_change_propagation",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "authority_unambiguous",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "legacy_authority",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "feature_readiness",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "unresolved_audit_findings",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "research_experiment_data_lifecycle",
+              "method": "double-run",
+              "equal": true
+            },
+            {
+              "check": "schema_invariants",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "index_freshness",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "authority_role_limits",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "mutation_scope",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "path_map_compliance",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "adapter_portability",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "command_contract_consistency",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "product_traceability",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "policy_enforcement_coverage",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "policy_precedence",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "plugin_governance",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "product_test_health",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "human_gate_integrity",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "change_control_integrity",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "continuity_checkpoint_handoff",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "model_routing_integrity",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "contract_binding",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "upstream_change_propagation",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "authority_unambiguous",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "legacy_authority",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "feature_readiness",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            },
+            {
+              "check": "unresolved_audit_findings",
+              "method": "cached-identical-key",
+              "cached_from": "HR-20260920T192752053Z-980fcf1c",
+              "equal": true
+            }
+          ],
+          "mismatches": 0,
+          "note": "every executed DoubleRun check runs twice concurrently; every refreshed check is compared with its cached result under an identical key"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "policy_enforcement_coverage": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "total_keys": 332,
+          "enforced": 311,
+          "informational": 21,
+          "uncovered": [],
+          "map_entries_without_policy_key": [],
+          "ok": true
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "policy_precedence": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "applied": [],
+          "refused": [],
+          "precedence": {
+            "source": "installed kernel (verified)",
+            "rules": 110,
+            "default_mode": "immutable",
+            "layers": [
+              "constitution_hard_invariants",
+              "security_and_authority_policy",
+              "framework_kernel_policy",
+              "project_policy_overrides_and_exceptions",
+              "active_decisions_and_specifications",
+              "task_contracts_and_mutation_manifests",
+              "retrieved_or_inferred_context"
+            ],
+            "governing_sets": [
+              {
+                "source": "installed kernel",
+                "rules": 110,
+                "default_mode": "immutable"
+              }
+            ],
+            "kernel_verified": true
+          }
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "plugin_governance": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "role": "orchestrator",
+          "usable": [],
+          "denied": 0,
+          "rejected": 0
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "product_test_health": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "applicable": false,
+          "notes": [
+            "no product test command configured (PROJECT_POLICY.tests) or detectable with an available toolchain (capability gap)"
+          ],
+          "families": {}
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "human_gate_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "pending": 0,
+          "answered": 0,
+          "work_in_progress_on_unanswered_gates": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "change_control_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "cits_by_status": {}
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "continuity_checkpoint_handoff": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "handoffs": 0,
+          "checkpoints": 0,
+          "latest": null,
+          "latest_freshness": null
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "model_routing_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "task_classes": {}
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "lineage_orphans": {
+        "ok": true,
+        "findings": 1,
+        "detail": {
+          "orphans": 0,
+          "by_kind": {
+            "unconsumed-output": {
+              "count": 0,
+              "contract": "Contract v3:1139"
+            },
+            "spec-without-downstream-path": {
+              "count": 0,
+              "contract": "Contract v3:1140"
+            },
+            "unconsumed-research": {
+              "count": 0,
+              "contract": "Contract v3:1141"
+            },
+            "unjustified-acceptance-test": {
+              "count": 0,
+              "contract": "Contract v3:1142"
+            },
+            "unjustified-code": {
+              "count": 0,
+              "contract": "Contract v3:1143"
+            }
+          },
+          "subjects": [],
+          "research": {
+            "consumed": [],
+            "pending_decisions": [],
+            "incomplete": []
+          },
+          "tests": {
+            "test_obligations_checked": 0
+          },
+          "code": {
+            "files_checked": 1,
+            "justified": 0,
+            "justifications": {},
+            "baseline_unlinked": [
+              "src/lib.rs"
+            ],
+            "unexplained": [],
+            "code_graph_available": true,
+            "baseline_available": true
+          },
+          "baseline": {
+            "available": true,
+            "commits": [
+              "752a9766af51762abd67a4acc808d808c0d3d4d9"
+            ],
+            "paths": 178,
+            "adoption_moves": 0,
+            "note": "governance baseline: 1 commit(s), 178 path(s), 0 adoption move(s)"
+          },
+          "resolved_investigations": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "os_binding_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "unverified_by_binding": {},
+          "gates_unverified": 0,
+          "binding_key": "7456fa3bb6f9b84d",
+          "binding_status": {
+            "bound": false,
+            "provisioned": false,
+            "portable": false,
+            "sealing": {
+              "scope": "machine",
+              "machine_key_id": "7456fa3bb6f9b84d",
+              "alg": "hmac-sha256/t2-v1",
+              "honoured_on": "this machine only",
+              "reason": "this machine is unprovisioned (no Signed Release Root): its seals are machine-scope and are not honoured on any other machine (P2-ADJ-0002; OWNER-DECISION-P2-0002)"
+            },
+            "sealing_key_id": "7456fa3bb6f9b84d",
+            "sealing_key_is_authority_active_key": false,
+            "authority_id": null,
+            "authority_error": null
+          }
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "installation_authenticity": {
+        "ok": true,
+        "findings": 1,
+        "detail": {
+          "project_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/target/P2-AR-0054/tier-runs/proj",
+          "installed": true,
+          "machine_posture": "UNPROVISIONED",
+          "authenticity": "UNKNOWN",
+          "authenticity_established": false,
+          "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+          "bootstrap": {
+            "authenticity": "UNKNOWN",
+            "binary": {
+              "cli_version": "4.1.6",
+              "embedded_commit": "e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740",
+              "embedded_kernel_version": "4.1.6",
+              "embedded_payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5",
+              "executable_sha256": "e7059b9240d74d384370a56ba8d3306a87f736607ad862e58afc93be49da839c",
+              "gov_version": "4.1.6"
+            },
+            "decision": "OWNER-DECISION-P2-0002",
+            "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+            "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+            "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+          },
+          "integrity": {
+            "intact": true,
+            "protected_record": "MATCHED",
+            "basis": "byte-identical to the payload embedded in the running gov binary: the bootstrap baseline a machine with no trust anchor may hold (OWNER-DECISION-P2-0002); its authenticity is UNKNOWN"
+          },
+          "bound_release": {
+            "release_version": "4.1.6",
+            "sequence": 0,
+            "channel": "unspecified",
+            "payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5",
+            "kernel_manifest_hash": "a95e28fbeae9647ce208fad3b397d1f945c565e8c65012ab35ffd2524d5492ed",
+            "authenticity": "UNKNOWN",
+            "posture_at_install": "UNPROVISIONED",
+            "release_metadata_sha256": "",
+            "ingress": "init",
+            "at": "2026-09-20T19:27:51Z",
+            "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+            "bootstrap": {
+              "authenticity": "UNKNOWN",
+              "binary": {
+                "cli_version": "4.1.6",
+                "embedded_commit": "e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740",
+                "embedded_kernel_version": "4.1.6",
+                "embedded_payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5",
+                "executable_sha256": "e7059b9240d74d384370a56ba8d3306a87f736607ad862e58afc93be49da839c",
+                "gov_version": "4.1.6"
+              },
+              "decision": "OWNER-DECISION-P2-0002",
+              "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+              "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+              "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+            }
+          },
+          "lock_version": "4.1.6",
+          "disclosure": "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.6), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "contract_binding": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "applicable": false,
+          "reason": "the audited repository carries no owner-source contract chain and GOV_CANONICAL_ROOT names no OS checkout"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "index_content_coverage": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "check": "index_content_coverage",
+          "checked_artifacts": 164,
+          "stale_skipped": 0,
+          "uncovered_lines": 0,
+          "complete": true,
+          "gaps": [],
+          "unlisted_artefacts": 0,
+          "comparison": "markdown headings by text on both sides (chunker 3)"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "task_contract_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "production_merge_violations": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "upstream_change_propagation": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "unpropagated": [],
+          "invalidated_completed_tasks": [],
+          "retest_open_tasks": [],
+          "stale_reports": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "authority_unambiguous": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "contradictions": 0,
+          "unresolved": 0,
+          "detail": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "legacy_authority": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "legacy_mechanisms": 0,
+          "unmarked": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "feature_readiness": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "active_features": 0,
+          "features": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "unresolved_audit_findings": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "unresolved_critical": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "research_experiment_data_lifecycle": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "by_code": {}
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "artifact_flow_health": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "w11_metrics": {
+            "required_input_delivery_accuracy": {
+              "metric": "required_input_delivery_accuracy",
+              "contract": "Contract v3:1175",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "detail": {
+                "misses": [],
+                "over": "mandatory inputs of live tasks whose context packet was delivered"
+              }
+            },
+            "current_version_selection_accuracy": {
+              "metric": "current_version_selection_accuracy",
+              "contract": "Contract v3:1176",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "detail": {
+                "misses": [],
+                "over": "inputs delivered in stored context packets"
+              }
+            },
+            "superseded_input_leakage_rate": {
+              "metric": "superseded_input_leakage_rate",
+              "contract": "Contract v3:1177",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "detail": {
+                "leaks": [],
+                "over": "governing inputs (declared, delivered or consumed per receipt) of live and DONE tasks; a flagged (stale/retest) task is not a leak"
+              }
+            },
+            "missing_required_input_detection": {
+              "metric": "missing_required_input_detection",
+              "contract": "Contract v3:1178",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "missing_required_inputs": 0,
+              "detail": {
+                "tasks": []
+              }
+            },
+            "staleness_propagation_accuracy": {
+              "metric": "staleness_propagation_accuracy",
+              "contract": "Contract v3:1179",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "detail": {
+                "unpropagated": [],
+                "over": "(task, input) pairs whose input changed since the work consumed it"
+              }
+            },
+            "requirement_to_code_traceability_coverage": {
+              "metric": "requirement_to_code_traceability_coverage",
+              "contract": "Contract v3:1180",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "detail": {
+                "uncovered": []
+              }
+            },
+            "requirement_to_test_traceability_coverage": {
+              "metric": "requirement_to_test_traceability_coverage",
+              "contract": "Contract v3:1181",
+              "value": null,
+              "numerator": 0,
+              "denominator": 0,
+              "applicable": false,
+              "detail": {
+                "uncovered": []
+              }
+            },
+            "orphan_detection": {
+              "metric": "orphan_detection",
+              "contract": "Contract v3:1182",
+              "orphans_detected": 0,
+              "by_kind": {
+                "unconsumed-output": {
+                  "count": 0,
+                  "contract": "Contract v3:1139"
+                },
+                "spec-without-downstream-path": {
+                  "count": 0,
+                  "contract": "Contract v3:1140"
+                },
+                "unconsumed-research": {
+                  "count": 0,
+                  "contract": "Contract v3:1141"
+                },
+                "unjustified-acceptance-test": {
+                  "count": 0,
+                  "contract": "Contract v3:1142"
+                },
+                "unjustified-code": {
+                  "count": 0,
+                  "contract": "Contract v3:1143"
+                }
+              },
+              "orphan_detection_precision": null,
+              "orphan_detection_false_positive_rate": null,
+              "orphan_detection_recall": null,
+              "recall_source": "not measurable in the governed repository: the true orphan set is known only to a qualification oracle (G6)",
+              "investigations": {
+                "resolved_true_positive": 0,
+                "resolved_false_positive": 0,
+                "open": 0,
+                "false_positives": []
+              },
+              "applicable": true
+            },
+            "fresh_agent_reconstruction_correctness": {
+              "metric": "fresh_agent_reconstruction_correctness",
+              "contract": "Contract v3:1183",
+              "value": 1.0,
+              "numerator": 1,
+              "denominator": 1,
+              "applicable": true,
+              "probes": [
+                {
+                  "probe": "status packet within the read budget",
+                  "ok": true,
+                  "reads": 4,
+                  "budget": 25
+                }
+              ]
+            }
+          },
+          "targets": [
+            {
+              "metric": "required_input_delivery_accuracy",
+              "min": 1.0
+            },
+            {
+              "metric": "current_version_selection_accuracy",
+              "min": 1.0
+            },
+            {
+              "metric": "missing_required_input_detection",
+              "min": 1.0
+            },
+            {
+              "metric": "staleness_propagation_accuracy",
+              "min": 1.0
+            },
+            {
+              "metric": "requirement_to_code_traceability_coverage",
+              "min": 1.0
+            },
+            {
+              "metric": "requirement_to_test_traceability_coverage",
+              "min": 1.0
+            },
+            {
+              "metric": "orphan_detection_precision",
+              "min": 1.0
+            },
+            {
+              "metric": "fresh_agent_reconstruction_correctness",
+              "min": 1.0
+            }
+          ],
+          "max_superseded_input_leakage_rate": 0.0
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "health_slos": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "slos": [
+            {
+              "id": "governance_suite_freshness",
+              "value": {
+                "current": true,
+                "green": "AUD-0001",
+                "changed_classes": []
+              },
+              "threshold": {
+                "rule": "the latest honoured green record is current (TEST_POLICY.green_record_currency: inputs_hash)"
+              },
+              "owner": "D021",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "product_test_health",
+              "value": null,
+              "threshold": {
+                "max_failing_families": 0
+              },
+              "owner": "product_test_health",
+              "applicable": false,
+              "crossed": false
+            },
+            {
+              "id": "retrieval_recall_at_k",
+              "value": {
+                "recall_at_k": 1.0,
+                "mrr": 1.0,
+                "queries": 13,
+                "latest_outcome_ok": true
+              },
+              "threshold": {
+                "value": 0.8,
+                "source": "MEMORY_POLICY.regression.min_recall_at_k"
+              },
+              "owner": "memory_retrieval_regression",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "stale_index_count",
+              "value": {
+                "stale_index_count": 0,
+                "manifest_present": true,
+                "age_hours": 0.0
+              },
+              "threshold": {
+                "value": 0.0,
+                "source": "MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close"
+              },
+              "owner": "index_freshness",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "orphan_graph_count",
+              "value": {
+                "orphan_graph_nodes": 0
+              },
+              "threshold": {
+                "value": 0.0,
+                "source": "framework/health/HEALTH_SLOS.yaml"
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "unresolved_contradictions",
+              "value": {
+                "unresolved_contradictions": 0,
+                "contradictions": 0,
+                "supersession_conflicts": 0,
+                "duplicate_ids": 0
+              },
+              "threshold": {
+                "max": 0
+              },
+              "owner": "authority_unambiguous",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "unresolved_human_gates",
+              "value": {
+                "open_gates": 0,
+                "oldest_open_hours": 0.0
+              },
+              "threshold": {
+                "max_open": {
+                  "value": 4.0,
+                  "source": "BUDGET_POLICY.defaults.max_parallel_agents"
+                },
+                "max_age_hours": 72.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "task_traceability",
+              "value": {
+                "task_traceability": 1.0,
+                "traced": 0,
+                "tasks": 0
+              },
+              "threshold": {
+                "min": 0.8,
+                "min_population": 3.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "feature_readiness_coverage",
+              "value": {
+                "feature_readiness_coverage": 1.0,
+                "active_features": 0
+              },
+              "threshold": {
+                "min_mean": 0.5,
+                "min_population": 1.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "context_packet_size",
+              "value": {
+                "largest_packet_chars": 0,
+                "packets": 0
+              },
+              "threshold": {
+                "value": 60000.0,
+                "source": "CONTEXT_POLICY.max_packet_chars"
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "tokens_per_completed_task",
+              "value": {
+                "tokens_per_completed_task": null,
+                "done_tasks": 0,
+                "done_tasks_with_token_accounting": 0
+              },
+              "threshold": {
+                "value": 2000000.0,
+                "source": "framework/health/HEALTH_SLOS.yaml"
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "first_pass_completion",
+              "value": {
+                "first_pass_completion_rate": 1.0,
+                "reports": 0,
+                "first_pass": 0
+              },
+              "threshold": {
+                "min": 0.5,
+                "min_population": 1.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "handoff_failure",
+              "value": {
+                "handoff_failure_rate": 0.0,
+                "returned": 0,
+                "failed": 0
+              },
+              "threshold": {
+                "max_rate": 0.5,
+                "min_population": 1.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "memory_rebuild_success",
+              "value": {
+                "latest_outcome_ok": true,
+                "latest_result": "HR-20260920T192752053Z-980fcf1c",
+                "detail": {
+                  "deep": false,
+                  "isolated_in_sandbox": true,
+                  "live": "6c555dfeaa7a4bb1511f9a8a134a66138711bad4127807936c417e140fee065e",
+                  "misplaced_os_state": [],
+                  "tracked": "6c555dfeaa7a4bb1511f9a8a134a66138711bad4127807936c417e140fee065e"
+                }
+              },
+              "threshold": {
+                "rule": "reproducible"
+              },
+              "owner": "recovery_rebuild",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "fresh_agent_reconstruction_success",
+              "value": {
+                "latest_outcome_ok": true,
+                "latest_result": "HR-20260920T192752053Z-980fcf1c",
+                "detail": null
+              },
+              "threshold": {
+                "policy": "CONTEXT_POLICY.fresh_agent_read_budget_files"
+              },
+              "owner": "fresh_agent_reconstruction",
+              "applicable": true,
+              "crossed": false
+            }
+          ],
+          "crossed": [],
+          "declarations": "framework/health/HEALTH_SLOS.yaml"
+        },
+        "status": "executed",
+        "cached_from": null
+      }
+    },
+    "findings": [
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-BACKEND-IMPL V2: not executed by the governance suite — declared agent: the expectation is the status an implementing agent reports for its own work; the product side (a failing product family is recorded, makes health UNHEALTHY and refuses the close of covered work) is checked by the product_test_health family",
+        "path": "governance/kernel/skills/SKL-BACKEND-IMPL.yaml",
+        "id": "GF-00c34907dc"
+      },
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-DB-MIGRATION V1: not executed by the governance suite — declared agent: requires a project database and an agent-authored destructive migration; executed by the G6 agent-qualification harness",
+        "path": "governance/kernel/skills/SKL-DB-MIGRATION.yaml",
+        "id": "GF-b812c60f4a"
+      },
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-LIVE-MIGRATION V1: not executed by the governance suite — declared qualification: needs a brownfield repository with a failing post-batch test; exercised by the G6 synthetic-repository adoption run",
+        "path": "governance/kernel/skills/SKL-LIVE-MIGRATION.yaml",
+        "id": "GF-57891444b6"
+      },
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-REPO-ADOPTION V1: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run",
+        "path": "governance/kernel/skills/SKL-REPO-ADOPTION.yaml",
+        "id": "GF-a27025f122"
+      },
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-REPO-ADOPTION V2: not executed by the governance suite — declared qualification: adoption stages run on a brownfield repository before installation; exercised by the G6 synthetic-repository adoption run",
+        "path": "governance/kernel/skills/SKL-REPO-ADOPTION.yaml",
+        "id": "GF-b96f819333"
+      },
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-TEST-DESIGN V1: not executed by the governance suite — declared agent: the expectation concerns how a test-design agent records authorship and readiness; independence from recorded authorship is BC-P2-34",
+        "path": "governance/kernel/skills/SKL-TEST-DESIGN.yaml",
+        "id": "GF-359b638ccd"
+      },
+      {
+        "severity": "low",
+        "family": "skill_regression",
+        "message": "SKL-THREAT-MODEL V1: not executed by the governance suite — declared agent: the expectation concerns the content of an agent-authored threat model; executed by the G6 agent-qualification harness",
+        "path": "governance/kernel/skills/SKL-THREAT-MODEL.yaml",
+        "id": "GF-f484339c57"
+      },
+      {
+        "severity": "low",
+        "family": "lineage_orphans",
+        "message": "1 source/test file(s) predate governance (governance baseline) and are not yet linked to an active requirement/decision/spec: src/lib.rs (W7 baseline code; adopted as it was, not produced by governed work)",
+        "id": "GF-7295ce8639"
+      },
+      {
+        "severity": "low",
+        "family": "installation_authenticity",
+        "message": "installation authenticity not established (UNPROVISIONED machine; admission BOOTSTRAP_EMBEDDED_PAYLOAD): this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.6), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).",
+        "path": "governance/framework.lock",
+        "id": "GF-e4e8527e36"
+      }
+    ],
+    "inputs_hash": "6c2d19ee80c893e11e921ecf36db4030a7be33c085c2f4b736c4d5cd557b47da",
+    "inputs": {
+      "adoption_evidence": "822b4f2f824a8cef92d00d93b123285ca02aec37923f713d10736da04fc9b0f7",
+      "archive": "c8b3f94a2e204e2e1db367526c950592fe19c5d031e085a95b6e0c4ba7f22a32",
+      "continuity_records": "0a283da5d4a3dcb101ac187cc7519957f7eee472469a06897f1f655298463d06",
+      "evidence_records": "5cbe895af14e22679cac0f53a23b257d33ae7dcbba836bedee4da84ad360e3c3",
+      "framework_lock": "ce6ea159bf722054eaec26a9c06528d4ea1943e4698fc2a0688ae5d0e9e47058",
+      "generated_other": "100f7aa32158500952b234b3b1ff85f9f455bc78929e737890b9cc2d1ce85c09",
+      "governance_tests": "855da519cb37b1f952f8c796e4af915c749f1c3f3da3c83100bcc6f094cb28d9",
+      "index_manifest": "6e46b74dd3e90f4a2f02c9eff10f53f25444faa0cafb360cf76b94f58dd57259",
+      "kernel_migration": "317f172c9ade4146ab42ac94443020d12eceb522e920b632803562e29cbd6da3",
+      "kernel_other": "f35fafa89080a5ea69c95735827a6f1d19483e6648b5e1ccd401efe0a9861eca",
+      "kernel_policy": "fcef19c58c58141b173fa64128314623c38bcda21ed9536bfc12f58245f10f8c",
+      "kernel_schema": "11b23b1ee1f1ed4824599b2bbeaa96bcb4c6e3ce1b9d561ada170b6a87873a85",
+      "kernel_skills": "6e31eccb31d969cc41784e1edffb11f39d125f0330eb5cb58eef6c1b42b158dc",
+      "kernel_tools": "bb5cdf8ae61da2e79faa22c7973380d43c1aba74798535634c01ac09a48c51bf",
+      "machine_trust": "166afc0f35da320e4c5477c1e324f39af1498fdbed965de1927db25d8a5e8543",
+      "model_profile": "cecbab4a91d1462ae74f17c53bb122e3e4560052c0475686c16e0cc4014e5a21",
+      "overlay_other": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "path_map": "ecb21109abe2cda9e9d29340ce50a1eea1e3de6772c8dba3ec98a911f0e09a92",
+      "project_policy": "fa9a33d52ba939c40f92ea6908410bc2e2e22bcfdb6c8398e393f6ed6c3e206c",
+      "project_skills": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "research_experiments": "e3a82313fb651f80fe10959ffda54e6937d14cded5277cba9a0f3284bf31790e",
+      "runtime_identity": "c6649da2ee1f418bf6282abe3d77a1e511db45e53df8736bd0665ed580eabed1",
+      "sensitivity": "bb49a7bf386eb9b893a8502c9cdf8bdeb6365179b8636a20b701209c0ef83445",
+      "source": "356ea824c364c0a33cd7789b7237efc6455f519769dd4362483efebb187a7397",
+      "spec_architecture": "407c9a9a7c2cb386af840a067443872aaa21c6b0c7b056608080a1c66ec5417e",
+      "spec_decisions": "79bb9e8afb80ef8a7be8b8b929e26fb6d32843cc4fcc69ff4a43a7cecd60a3bf",
+      "spec_other": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "spec_requirements": "53826741b82fe2afe4ccca7b3049000dde1f1ef8f12ce064423da1b64a3b9862",
+      "spec_tasks": "396b721ce4bd79a0dd6163b5225d15385f87a8ce37a3be4b6c7b6713207a7d6b",
+      "t2_bindings": "f815690b32600e14fd6fc794bbefaf5bf5cb98db5e4c5b40608cacbf97fd8cc2",
+      "tools_plugins": "947049c6357ed52792b0037df99e66344ef59fb9eb2e955417cbc6ea6fbb2be9"
+    },
+    "result_hash": "b759a0adfa3bbcc1abdd4a4963af2a7db9f98bb44f0f8745f37c327bbfad1ac7",
+    "reproducible": true,
+    "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 9
+    },
+    "complete": true,
+    "suite_verdict": "HEALTHY",
+    "health_result": "HR-20260920T192753392Z-f2f633b4",
+    "tier": "G5",
+    "summary": {
+      "executed": 39,
+      "reused": 0,
+      "not_evaluated": 0,
+      "complete": true,
+      "executed_checks": [
+        "schema_invariants",
+        "graph_integrity",
+        "index_freshness",
+        "memory_retrieval_regression",
+        "authority_role_limits",
+        "mutation_scope",
+        "path_map_compliance",
+        "context_reproducibility",
+        "concurrency_claims",
+        "adapter_portability",
+        "skill_regression",
+        "command_contract_consistency",
+        "secrets_sensitivity_indexing",
+        "recovery_rebuild",
+        "fresh_agent_reconstruction",
+        "product_traceability",
+        "audit_reproducibility",
+        "policy_enforcement_coverage",
+        "policy_precedence",
+        "plugin_governance",
+        "product_test_health",
+        "human_gate_integrity",
+        "change_control_integrity",
+        "continuity_checkpoint_handoff",
+        "model_routing_integrity",
+        "lineage_orphans",
+        "os_binding_integrity",
+        "installation_authenticity",
+        "contract_binding",
+        "index_content_coverage",
+        "task_contract_integrity",
+        "upstream_change_propagation",
+        "authority_unambiguous",
+        "legacy_authority",
+        "feature_readiness",
+        "unresolved_audit_findings",
+        "research_experiment_data_lifecycle",
+        "artifact_flow_health",
+        "health_slos"
+      ],
+      "reused_checks": [],
+      "not_evaluated_checks": []
+    },
+    "parallelism": {
+      "workers": 4,
+      "threads_used": [
+        "gov-health-0",
+        "gov-health-1",
+        "gov-health-2",
+        "gov-health-3"
+      ],
+      "process_id": 3378588
+    },
+    "cache_mode": "refresh",
+    "state": "YELLOW",
+    "blocks": [],
+    "runtime": {
+      "cli_version": "4.1.6",
+      "runtime_version": "4.1.6",
+      "index_version": "4.1.5-idx5",
+      "binary_sha256": "e7059b9240d74d384370a56ba8d3306a87f736607ad862e58afc93be49da839c",
+      "binary_name": "gov"
+    },
+    "repository": {
+      "git_commit": "752a9766af51762abd67a4acc808d808c0d3d4d9",
+      "git_dirty_files": 1,
+      "content_key": "6c2d19ee80c893e11e921ecf36db4030a7be33c085c2f4b736c4d5cd557b47da",
+      "root_name": "proj"
+    },
+    "record_binding": null,
+    "remediation": null,
+    "failure_memory": null,
+    "qualification": null
+  },
+  "session": "S-tier",
+  "release_trust": {
+    "surface": "health",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "UNAUTHENTICATED",
+    "section_6_bullet": 7,
+    "authenticity_established": false,
+    "disclosure": [
+      "BOOTSTRAP installation (OWNER-DECISION-P2-0002): the installed kernel is a gov binary's embedded payload, installed on a machine with no provisioned Signed Release Root trust anchor. Release authenticity UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+    ],
+    "detail": "gov kernel trust; gov trust status",
+    "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 §6 bullet 7 was also asked and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking."
+  }
+}

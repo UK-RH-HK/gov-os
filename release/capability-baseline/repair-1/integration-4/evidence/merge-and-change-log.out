@@ -1,0 +1,68 @@
+# P2-AR-0054 — merges and every change after them. 2026-09-20T19:31:09Z
+
+## Commit graph (base c0af4e6 .. HEAD)
+* e9a2f9c Integration 4: map the round-4 residual branch's 19 new tests into the evidence map (IP-R4-WS01-3, R4-IP-2)
+*   c38a406 Integration 4 (P2-AR-0054): merge phase2/repair-1-r4-residual-c (P2-AR-0043 residual IPs, P2-AR-0053 continuation, P2-AR-0055 OD-P2-03)
+|\  
+| * 854980c P2-AR-0055 r4-residual: OD-P2-03 report, claims.yaml entry and this run's evidence
+| * 4bd7468 P2-AR-0055 r4-residual: registry hostnames are ecosystem knowledge, so they live in the tool registry (INV-005)
+| * 7da93a2 P2-AR-0055 r4-residual: the plugin registry is not "what an installation writes"
+| * 6c42f34 P2-AR-0055 r4-residual: an approval binds the change-class verdict it was granted under
+| * 55206af P2-AR-0055 r4-residual: OD-P2-03 — a tool installation needs the Human Gate only when it expands authority
+| * d96c8ab P2-AR-0053 r4-residual: continuation report, claims.yaml for the whole run, and this run's evidence
+| * ab0a075 P2-AR-0053 r4-residual: R4-O1 — a tool installation is carried out by a change transaction the OS proposes
+| * 55af199 P2-AR-0043 r4-residual: repair report and evidence (recovered)
+| * 34e3725 P2-AR-0043 r4-residual: ws04r2 direct-change assertions follow INT3-O2 (the host-run rebuild propagates what it observes)
+| * 3a384d8 P2-AR-0043 r4-residual: the registration writer carries the §6 signature and asks the acquisition sink at its write
+| * e5336d9 P2-AR-0043 r4-residual: retrieval-profile identity (IP-W7R3-6); docs and help text; gov status T2 sealing; test count fix
+| * 00615f1 P2-AR-0043 r4-residual: T2 binding status in D033/os_binding_integrity; shadowed-rule finding; heading-marker step retired; skill bindings and registry relocation; TOOL_PERMISSIONS independent roles; remediation handoffs
+| * e752bed P2-AR-0043 r4-residual: INT3-O1 registration through an OS-proposed change transaction; INT3-O2 propagation at host-run rebuilds; IP-W7R3-10
+* 5ab06b6 Integration 4 (P2-AR-0054): merge phase2/repair-1-r4-ws01 (P2-AR-0042, BC-P2-02 evidence map)
+* d1487e8 P2-AR-0042 run report: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION (work commit 2ed8ab1, product 9bafcb3)
+* 2ed8ab1 P2-AR-0042 r4-ws01: report, claims, suite-to-contract matrix (gov contract matrix) and evidence
+* 9bafcb3 P2-AR-0042 r4-ws01: mapping review (owners that only guard authority removed; routed IP owners added); owner_sources_fingerprint for the contract_binding cache key
+* 5aebf23 P2-AR-0042 r4-ws01: evidence owners for all 101 capabilities, resolved and enforced by gov contract verify; suite-to-contract matrix (BC-P2-02)
+
+===== merge 5ab06b6
+parents: c0af4e6491d354b35ff91d6b56ac0020fec061c8 d1487e8dcec37aa6903f01d28a41326b28430453
+subject: Integration 4 (P2-AR-0054): merge phase2/repair-1-r4-ws01 (P2-AR-0042, BC-P2-02 evidence map)
+--- git show --cc (empty body = no conflict was resolved inside the merge commit) ---
+(end of --cc output for 5ab06b6)
+
+===== merge c38a406
+parents: 5ab06b6ad37c677edbc1900445727dc8836c887a 854980cc0f7741c0c10ce0043cdfda13cd94fcdc
+subject: Integration 4 (P2-AR-0054): merge phase2/repair-1-r4-residual-c (P2-AR-0043 residual IPs, P2-AR-0053 continuation, P2-AR-0055 OD-P2-03)
+--- git show --cc (empty body = no conflict was resolved inside the merge commit) ---
+(end of --cc output for c38a406)
+
+## The one commit after the merges
+commit e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740
+Author: Usain <usain@immortalcommunicate.com>
+Date:   Sun Sep 20 19:23:11 2026 +0100
+
+    Integration 4: map the round-4 residual branch's 19 new tests into the evidence map (IP-R4-WS01-3, R4-IP-2)
+    
+    `gov contract verify` already returned CONTRACT_SOURCE_BOUND straight after the two merges: the residual branch
+    renamed, removed and `#[ignore]`d nothing, so no owner of P2-AR-0042's map became unresolved. What was missing was
+    R4-IP-2: the 19 tests the residual runs added (14 certification, 5 lib) owned no capability.
+    
+    Route, exactly as P2-AR-0042 documents it (its report §11, IP-R4-WS01-3): 36 owner entries added to
+    `release/capability-baseline/repair-1/r4-ws01/evidence/mapping/owner-spec.yaml` under a labelled comment (nothing
+    existing changed or removed), then its `apply_owner_spec.py`, then `gov contract compile`. The map, the source lock
+    and the generated view are the product's own output; none was hand-edited.
+    
+    The capabilities are the ones the residual reports themselves name (P2-AR-0043 §7 R4-IP-2, P2-AR-0053 §5,
+    P2-AR-0055 §9): K3/F4/F3/K2 for the registration and installation tests, W6/O5 for the rebuild-time propagation,
+    S6 for the T2 binding status, B1/B2 for the shadowed rule, B1/B3/S5 for the store relocation, D4/D5 for the
+    retrieval-profile identity, L4/O5 for the availability handoffs.
+    
+    `gov contract verify`: CONTRACT_SOURCE_BOUND, 101 capabilities, 798 owners (was 762), 0 deferred, nothing absent
+    from the tree. Test owners 441 -> 477. Checklist items naming an owner 586 -> 587. 76 capabilities keep a G-tier
+    owner and the same 16 are owned only by tests, so P2-AR-0042's disclosed gaps are unchanged.
+    
+    Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+
+ docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md                            | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----------------------------
+ framework/contracts/contract-source.lock                                      |   4 +--
+ release/capability-baseline/repair-1/r4-ws01/evidence/mapping/owner-spec.yaml |  64 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/governance/capability-evidence-map.yaml                                 | 163 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-

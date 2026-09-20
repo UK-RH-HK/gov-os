@@ -61,9 +61,9 @@ paths:
     lexical_index: false
     graph_index: false
     namespace: governance
-  # OS-written state kept in governance/generated/ that is not regenerable: the plugin registry where writers before
-  # BC-P2-31 kept it (it belongs in governance/registry/ and is moved there by the OS), and the first-seen skill
-  # content bindings
+  # OS-written state kept in governance/generated/ that is not regenerable: the plugin registry and the first-seen
+  # skill content bindings where writers before BC-P2-31 kept them (both belong in governance/registry/ and are moved
+  # there by the OS)
   - pattern: "governance/generated/plugin-registry.json"
     class: authoritative
     mutation: os-only

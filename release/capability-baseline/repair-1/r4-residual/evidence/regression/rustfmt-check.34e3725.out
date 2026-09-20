@@ -1,0 +1,107 @@
+# P2-AR-0043 rustfmt --edition 2021 --check on every Rust file changed since the base cae2f67 (each file alone)
+rc=0 cli/src/main.rs
+rc=0 runtime/src/adopt.rs
+rc=0 runtime/src/capabilities/governance.rs
+rc=0 runtime/src/cit/materiality.rs
+rc=0 runtime/src/cit/mod.rs
+rc=0 runtime/src/doctor.rs
+rc=0 runtime/src/memory/benchmark.rs
+rc=0 runtime/src/memory/indexer.rs
+rc=0 runtime/src/memory/profile.rs
+rc=0 runtime/src/migrations/framework.rs
+rc=0 runtime/src/orchestration/control.rs
+rc=0 runtime/src/orchestration/handoffs.rs
+rc=0 runtime/src/paths.rs
+rc=0 runtime/src/scheduler/catalogue.rs
+rc=0 runtime/src/scheduler/mod.rs
+rc=0 runtime/src/skills.rs
+rc=0 runtime/src/status.rs
+rc=0 runtime/src/update.rs
+rc=0 runtime/src/verification/currency.rs
+rc=0 runtime/src/verification/mod.rs
+rc=0 runtime/src/verification/reporting.rs
+rc=1 tests/certification/main.rs
+rc=0 tests/certification/migration.rs
+rc=0 tests/certification/r4_residual.rs
+rc=0 tests/certification/repair2.rs
+rc=0 tests/certification/repair3.rs
+rc=0 tests/certification/ws04r2.rs
+rc=0 tests/certification/ws04r3.rs
+rc=0 tests/certification/ws05r3.rs
+rc=0 tests/certification/ws07.rs
+rc=0 tests/certification/ws08_r3.rs
+# tests/certification/main.rs rc=1: the files with hunks (rustfmt follows its child modules), at 34e3725 and at the base cae2f67
+## 34e3725
+      1 tests/certification/section6.rs:1024:
+      1 tests/certification/section6.rs:1060:
+      1 tests/certification/section6.rs:273:
+      1 tests/certification/section6.rs:312:
+      1 tests/certification/section6.rs:451:
+      1 tests/certification/section6.rs:560:
+      1 tests/certification/section6.rs:56:
+      1 tests/certification/section6.rs:582:
+      1 tests/certification/section6.rs:589:
+      1 tests/certification/section6.rs:655:
+      1 tests/certification/section6.rs:682:
+      1 tests/certification/section6.rs:708:
+      1 tests/certification/section6.rs:724:
+      1 tests/certification/section6.rs:802:
+      1 tests/certification/section6.rs:809:
+      1 tests/certification/section6.rs:816:
+      1 tests/certification/section6.rs:859:
+      1 tests/certification/section6.rs:925:
+      1 tests/certification/section6.rs:944:
+      1 tests/certification/section6.rs:987:
+      1 tests/certification/section6.rs:994:
+      1 tests/certification/srr.rs:1175:
+      1 tests/certification/srr.rs:1254:
+      1 tests/certification/srr.rs:1550:
+      1 tests/certification/srr.rs:1573:
+      1 tests/certification/srr.rs:1587:
+      1 tests/certification/srr.rs:1622:
+      1 tests/certification/srr.rs:1688:
+      1 tests/certification/srr.rs:1766:
+      1 tests/certification/srr.rs:1888:
+      1 tests/certification/srr.rs:1956:
+      1 tests/certification/srr.rs:1964:
+      1 tests/certification/srr.rs:2022:
+      1 tests/certification/srr.rs:2029:
+      1 tests/certification/srr.rs:2036:
+      1 tests/certification/srr.rs:2105:
+## cae2f67 (tests/certification checked out from the base)
+      1 tests/certification/section6.rs:1024:
+      1 tests/certification/section6.rs:1060:
+      1 tests/certification/section6.rs:273:
+      1 tests/certification/section6.rs:312:
+      1 tests/certification/section6.rs:451:
+      1 tests/certification/section6.rs:560:
+      1 tests/certification/section6.rs:56:
+      1 tests/certification/section6.rs:582:
+      1 tests/certification/section6.rs:589:
+      1 tests/certification/section6.rs:655:
+      1 tests/certification/section6.rs:682:
+      1 tests/certification/section6.rs:708:
+      1 tests/certification/section6.rs:724:
+      1 tests/certification/section6.rs:802:
+      1 tests/certification/section6.rs:809:
+      1 tests/certification/section6.rs:816:
+      1 tests/certification/section6.rs:859:
+      1 tests/certification/section6.rs:925:
+      1 tests/certification/section6.rs:944:
+      1 tests/certification/section6.rs:987:
+      1 tests/certification/section6.rs:994:
+      1 tests/certification/srr.rs:1175:
+      1 tests/certification/srr.rs:1254:
+      1 tests/certification/srr.rs:1550:
+      1 tests/certification/srr.rs:1573:
+      1 tests/certification/srr.rs:1587:
+      1 tests/certification/srr.rs:1622:
+      1 tests/certification/srr.rs:1688:
+      1 tests/certification/srr.rs:1766:
+      1 tests/certification/srr.rs:1888:
+      1 tests/certification/srr.rs:1956:
+      1 tests/certification/srr.rs:1964:
+      1 tests/certification/srr.rs:2022:
+      1 tests/certification/srr.rs:2029:
+      1 tests/certification/srr.rs:2036:
+      1 tests/certification/srr.rs:2105:

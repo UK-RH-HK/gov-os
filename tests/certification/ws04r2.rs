@@ -382,18 +382,22 @@ fn upstream_change_reaches_completed_work() {
     edit(&root, "spec/requirements/REQ-0001.yaml", |d| {
         d["statement"] = json!("direct edit")
     });
-    g.ok(&["rebuild-memory", "--incremental"]);
+    // round 4 (P2-AR-0043, INT3-O2): the host-run rebuild that observes the direct change propagates it (G1), so the
+    // change is detected from what the work consumed AND already propagated when the rebuild returns; before, the
+    // rebuild only observed it and `gov cit propagate` (or the next claim) propagated it
+    let rb = g.ok(&["rebuild-memory", "--incremental"]);
+    assert_eq!(rb["upstream_changes"]["propagated"], true, "{rb}");
     let st = g.ok(&["context", "staleness", &open]);
     assert!(
         st["stale_inputs"]
             .as_array()
             .unwrap()
             .iter()
-            .any(|x| x["id"] == "REQ-0001" && x["propagated"] == false),
+            .any(|x| x["id"] == "REQ-0001" && x["propagated"] == true),
         "{st}"
     );
     let pr = g.ok(&["cit", "propagate"]);
-    assert_eq!(pr["propagated"], true, "{pr}");
+    assert_eq!(pr["changes"], 0, "nothing left to propagate: {pr}");
     assert_eq!(
         g.ok(&["context", "staleness", &open])["stale_inputs"][0]["propagated"],
         true

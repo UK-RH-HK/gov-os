@@ -1,0 +1,142 @@
+{
+  "ok": true,
+  "command": "contract",
+  "result": {
+    "written": [
+      "release/capability-baseline/repair-1/r4-ws01/suite-to-contract.json",
+      "release/capability-baseline/repair-1/r4-ws01/suite-to-contract.md"
+    ],
+    "capabilities": 101,
+    "summary": {
+      "owners": {
+        "capabilities": 101,
+        "owners": 762,
+        "owners_by_kind": {
+          "check": 127,
+          "doctor": 34,
+          "g0": 19,
+          "heldout": 13,
+          "human-gate": 13,
+          "obligation": 110,
+          "release": 5,
+          "test": 441
+        },
+        "owners_by_class": {
+          "automated invariant/guard": 19,
+          "clean-clone/release evidence": 12,
+          "governance health check": 161,
+          "human-gate evidence": 13,
+          "independent audit evidence": 105,
+          "independent held-out test": 18,
+          "migration/rollback evidence": 8,
+          "unit/integration/system test": 426
+        },
+        "capabilities_by_evidence_class": {
+          "automated invariant/guard": 9,
+          "clean-clone/release evidence": 7,
+          "governance health check": 74,
+          "human-gate evidence": 13,
+          "independent audit evidence": 101,
+          "independent held-out test": 7,
+          "migration/rollback evidence": 6,
+          "unit/integration/system test": 100
+        },
+        "capabilities_by_tier": {
+          "G0": 9,
+          "G1": 44,
+          "G2": 32,
+          "G3": 25,
+          "G4": 69,
+          "G5": 74,
+          "G6": 71
+        },
+        "capabilities_with_a_tier_owner": 76,
+        "capabilities_owned_only_by_tests": [
+          "C5",
+          "F5",
+          "G1",
+          "H3",
+          "K3",
+          "M2",
+          "M3",
+          "N2",
+          "Q2",
+          "Q3",
+          "Q4",
+          "R2",
+          "T2",
+          "V1",
+          "V2",
+          "V3"
+        ],
+        "checklist_items": 713,
+        "checklist_items_naming_an_owner": 586,
+        "freshness_triggers_in_use": [
+          "authoritative spec/decision",
+          "governing contract/policy",
+          "migration",
+          "model/retrieval profile",
+          "project path map",
+          "relevant index manifest",
+          "relevant source files",
+          "runtime/kernel implementation",
+          "schema",
+          "security/sensitivity policy",
+          "tool/plugin"
+        ],
+        "deferred": [],
+        "not_in_this_tree": [],
+        "catalogue_checks": 74
+      },
+      "owner_last_run_status_counts": {
+        "NOT_IN_SUPPLIED_EVIDENCE": 37,
+        "OBLIGATION": 110,
+        "PASSED": 441,
+        "RAN": 174
+      }
+    },
+    "run_evidence_supplied": [
+      {
+        "kind": "cargo test (lib)",
+        "path": "release/capability-baseline/repair-1/r4-ws01/evidence/regression/cargo-test-lib.9bafcb3.out",
+        "sha256": "97a14deaf18a5218feb7085a2af15ef6856cf83fd5bfd31137d67e61949bb6a3",
+        "results": 271
+      },
+      {
+        "kind": "cargo test (certification)",
+        "path": "release/capability-baseline/repair-1/r4-ws01/evidence/regression/cargo-test-certification.9bafcb3.out",
+        "sha256": "f0dc68da238ba3450fec1eaac12f5ebab5b5db0d41c6587f7941fa830e57c152",
+        "results": 193
+      },
+      {
+        "kind": "held-out re-run",
+        "path": "release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/r1-heldout-9bafcb3.out",
+        "sha256": "8f33b877600b4a8b5145447e6b78ddbc463418911c04ffa1f42eb8f97e3c18c5",
+        "blocks": 20
+      },
+      {
+        "kind": "gov health/doctor run",
+        "path": "release/capability-baseline/repair-1/r4-ws01/evidence/matrix-inputs/health-run-G5.json",
+        "sha256": "7d28d0b4fe87ef6aef94d04adbdfbcbc066d63bc43399dde45d57dd0e115d687",
+        "results": 39,
+        "tier": "G5"
+      },
+      {
+        "kind": "gov health/doctor run",
+        "path": "release/capability-baseline/repair-1/r4-ws01/evidence/matrix-inputs/doctor.json",
+        "sha256": "e18f8e65dffeaa98df6e29e9d90754f5bf806346d94bad4fac6acdef772eb564",
+        "results": 35,
+        "tier": ""
+      }
+    ]
+  },
+  "session": "",
+  "release_trust": {
+    "surface": "contract",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "CURRENT",
+    "section_6_bullet": 7,
+    "basis": "OWNER-DECISION-0006 §6 bullet 7 was asked at crate::srr::present::presentation and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking. This states the machine's break-glass posture only; it is not a currency claim about the wider release channel, which `gov trust status` reports as UNKNOWN between ingresses."
+  }
+}

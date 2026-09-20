@@ -48,7 +48,7 @@ use crate::records::{new_record, save_record, Record, RecordStore};
 use crate::util::{canonical_json, read_yaml, sha256_file, sha256_hex};
 use crate::{GovError, Project, Result};
 use serde_json::{json, Value};
-use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 /// Tag carried by every retrieval-profile decision.
@@ -83,28 +83,13 @@ impl FileId {
     }
 }
 
-type StatCache = HashMap<String, (u64, String, String)>;
-
-fn stat_cache(recorded: Option<&Value>) -> StatCache {
-    let mut m = HashMap::new();
-    if let Some(files) = recorded.and_then(|r| r["files"].as_array()) {
-        for f in files {
-            if let (Some(k), Some(s), Some(t), Some(d)) = (
-                f["key"].as_str(),
-                f["size"].as_u64(),
-                f["mtime_ns"].as_str(),
-                f["sha256"].as_str(),
-            ) {
-                m.insert(k.to_string(), (s, t.to_string(), d.to_string()));
-            }
-        }
-    }
-    m
-}
-
-/// Hash `abs` under `key`, reusing the recorded digest when size and modification time are unchanged (query-time
-/// checks stat the files; builds pass no cache and hash everything).
-fn file_id(key: &str, abs: &Path, cache: &StatCache) -> Option<FileId> {
+/// Hash `abs` under `key` with the digest the plugin pin uses (`capabilities::binding::content_sha256`: the running
+/// `gov` executable by its kept label, every other file afresh in each process, memoised inside it). WS-7 IP-W7R3-6
+/// (round 4): the size-and-modification-time shortcut that reused a digest recorded by an earlier process is gone —
+/// a same-size rewrite inside one timestamp tick kept both and the changed bytes were served as the recorded
+/// identity (the defect class WS-7 closed for the pin itself) — and the profile now identifies each component by
+/// exactly the digest the registration pin binds.
+fn file_id(key: &str, abs: &Path) -> Option<FileId> {
     let md = std::fs::metadata(abs).ok()?;
     if !md.is_file() {
         return None;
@@ -115,10 +100,7 @@ fn file_id(key: &str, abs: &Path, cache: &StatCache) -> Option<FileId> {
         .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
         .map(|d| d.as_nanos() as i128)
         .unwrap_or(0);
-    let sha256 = match cache.get(key) {
-        Some((s, t, d)) if *s == md.len() && *t == mtime_ns.to_string() => d.clone(),
-        _ => sha256_file(abs).ok()?,
-    };
+    let sha256 = crate::capabilities::binding::content_sha256(abs)?;
     Some(FileId {
         key: key.to_string(),
         abs: abs.to_path_buf(),
@@ -484,7 +466,6 @@ fn walk_scope(dir: &Path, out: &mut Vec<PathBuf>) {
 fn plugin_runtime(
     desc: &PluginDescriptor,
     root: &Path,
-    cache: &StatCache,
     hashed: &[FileId],
 ) -> (Value, Value, Vec<FileId>) {
     let cmd0 = placeholders(
@@ -532,7 +513,7 @@ fn plugin_runtime(
                 key: format!("runtime:{}", r.display()),
                 ..f.clone()
             })
-            .or_else(|| file_id(&format!("runtime:{}", r.display()), r, cache))
+            .or_else(|| file_id(&format!("runtime:{}", r.display()), r))
     });
     let kind = if resolved.is_none() {
         "unresolved"
@@ -550,16 +531,14 @@ fn plugin_identity(
     role: &str,
     desc: &PluginDescriptor,
     extra_model: Value,
-    recorded: Option<&Value>,
 ) -> ComponentIdentity {
     let root = p.root.as_path();
-    let cache = stat_cache(recorded);
     let (impl_files, package_dirs) = implementation_files(desc, root);
     let mut files: Vec<FileId> = vec![];
     let mut implementation = vec![];
     for f in &impl_files {
         let key = portable_key(root, f);
-        if let Some(fid) = file_id(&key, f, &cache) {
+        if let Some(fid) = file_id(&key, f) {
             implementation.push(json!({"path": key, "sha256": fid.sha256}));
             files.push(fid);
         }
@@ -637,15 +616,65 @@ fn plugin_identity(
             continue;
         }
         let key = portable_key(root, &f);
-        if let Some(fid) = file_id(&key, &f, &cache) {
+        if let Some(fid) = file_id(&key, &f) {
             artefacts.push(json!({"path": key, "sha256": fid.sha256}));
+            files.push(fid);
+        }
+    }
+    // --- WS-7 IP-W7R3-6 (IP-R2-13's consumer side; Contract v3 D4 "embedding model / embedding runtime / reranker
+    // independently identifiable"): the model and runtime artefacts the descriptor DECLARES — the same files the
+    // registration binds (`binding::declared_paths`) — are part of the identity. A declared model artefact inside the
+    // repository is repository content (the model digest, in the index manifest's hashed core); one outside it is
+    // machine-local, like the runtime (runtime meta: the machine digest). Declared runtime artefacts are runtime
+    // identity; their id (repository content) is portable, their bytes machine-local.
+    let mut model_declared = false;
+    let (mut local_model, mut runtime_artefacts) = (vec![], vec![]);
+    for dp in crate::capabilities::binding::declared_paths(desc, root) {
+        if dp.role != "model" && dp.role != "runtime" {
+            continue;
+        }
+        let mut paths = vec![];
+        if dp.abs.is_dir() {
+            walk_scope(&dp.abs, &mut paths);
+        } else {
+            paths.push(dp.abs.clone());
+        }
+        for f in paths {
+            let key = if dp.in_repository {
+                portable_key(root, &f)
+            } else {
+                format!("external:{}", f.display())
+            };
+            if dp.role == "model" {
+                model_declared = true;
+            }
+            if dp.role == "model"
+                && dp.in_repository
+                && artefacts
+                    .iter()
+                    .any(|a| a["path"].as_str() == Some(key.as_str()))
+            {
+                continue;
+            }
+            let Some(fid) = file_id(&key, &f) else {
+                continue;
+            };
+            match (dp.role.as_str(), dp.in_repository) {
+                ("model", true) => {
+                    artefacts.push(json!({"path": key, "sha256": fid.sha256, "declared": true}))
+                }
+                ("model", false) => local_model.push(json!({"path": key, "sha256": fid.sha256})),
+                _ => runtime_artefacts.push(json!({"path": key, "sha256": fid.sha256})),
+            }
             files.push(fid);
         }
     }
     artefacts.sort_by(|a, b| a["path"].as_str().cmp(&b["path"].as_str()));
     let scope: Vec<String> = scopes.iter().map(|s| portable_key(root, s)).collect();
-    let mut model = json!({"id": format!("{}@{}", desc.plugin_id, desc.version), "revision": desc.version,
-        "declared": false, "scope": scope, "artefacts": artefacts, "notes": notes});
+    let dm = desc.raw.get("model").cloned().unwrap_or(Value::Null);
+    let mut model = json!({"id": dm["id"].as_str().map(String::from).unwrap_or_else(|| format!("{}@{}", desc.plugin_id, desc.version)),
+        "revision": dm.get("revision").cloned().unwrap_or(json!(desc.version)),
+        "declared": model_declared, "scope": scope, "artefacts": artefacts, "notes": notes});
     if let (Some(m), Some(x)) = (model.as_object_mut(), extra_model.as_object()) {
         for (k, v) in x {
             m.insert(k.clone(), v.clone());
@@ -654,17 +683,27 @@ fn plugin_identity(
     model["sha256"] = json!(h(
         &json!({"id": model["id"], "artefacts": model["artefacts"], "parameters": model.get("parameters")})
     ));
-    let (runtime, observed, rt_files) = plugin_runtime(desc, root, &cache, &files);
+    let (mut runtime, mut observed, rt_files) = plugin_runtime(desc, root, &files);
     files.extend(rt_files);
+    if let Some(id) = desc.raw["runtime"]["id"].as_str() {
+        runtime["declared_id"] = json!(id);
+    }
+    if !runtime_artefacts.is_empty() {
+        observed["declared_artefacts"] = json!(runtime_artefacts);
+    }
+    if !local_model.is_empty() {
+        observed["machine_local_model_artefacts"] = json!(local_model);
+    }
     ComponentIdentity::finish(role, adapter, model, runtime, observed, files)
 }
 
-/// The identity of the embedder that would execute (`recorded`: a prior [`ComponentIdentity::to_record`] whose stat
-/// data lets unchanged files skip re-hashing).
+/// The identity of the embedder that would execute. `_recorded` (a prior [`ComponentIdentity::to_record`]) is no
+/// longer used to skip hashing: a digest is never taken from stat data an earlier process recorded (WS-7
+/// IP-W7R3-6); the parameter is kept for the callers that pass it.
 pub fn embedder_identity(
     p: &Project,
     emb: &Embedder,
-    recorded: Option<&Value>,
+    _recorded: Option<&Value>,
 ) -> ComponentIdentity {
     match emb {
         Embedder::Builtin(_) => builtin_embedder(&emb.spec()),
@@ -673,20 +712,20 @@ pub fn embedder_identity(
             "embedder",
             desc,
             json!({"parameters": {"dimensions": spec.dimensions}}),
-            recorded,
         ),
     }
 }
 
-/// The identity of the reranker that would execute (`None`: no reranker is pinned).
+/// The identity of the reranker that would execute (`None`: no reranker is pinned; `_recorded` as for
+/// [`embedder_identity`]).
 pub fn reranker_identity(
     p: &Project,
     rr: Option<&Reranker>,
-    recorded: Option<&Value>,
+    _recorded: Option<&Value>,
 ) -> ComponentIdentity {
     match rr {
         None => no_reranker(),
-        Some(r) => plugin_identity(p, "reranker", &r.desc, json!({}), recorded),
+        Some(r) => plugin_identity(p, "reranker", &r.desc, json!({})),
     }
 }
 

@@ -112,6 +112,8 @@ pub const PATH_CLASSES: &[ClassDef] = &[
             "governance/project/TOOL_PERMISSIONS.yaml",
             "governance/project/CAPABILITY_PROFILE.yaml",
             "governance/generated/tool-registry.json",
+            // the plugin registry where it belongs (BC-P2-31; WS-7 IP-W7R3-3) and where writers before round 3 kept it
+            "governance/registry/plugin-registry.json",
             "governance/generated/plugin-registry.json",
             "governance/generated/mcp*",
         ],
@@ -121,6 +123,8 @@ pub const PATH_CLASSES: &[ClassDef] = &[
         contract_class: "skill (versioned method)",
         patterns: &[
             "governance/project/skills/**",
+            // where the bindings belong (WS-6 IP-R3-WS06-7) and where writers before round 4 kept them
+            "governance/registry/skill-bindings.json",
             "governance/generated/skill-bindings.json",
         ],
     },
