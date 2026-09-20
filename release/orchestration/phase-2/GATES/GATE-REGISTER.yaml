@@ -56,7 +56,7 @@ gates:
 
   - id: GATE-P2-R1-PRESERVATION
     title: R1 acceptance remains valid for the candidate under verification
-    status: SATISFIED_FOR_CANDIDATE_1 (P2-AR-0044, verification iteration 1: R1_PRESERVED; evidence release/capability-baseline/verify-1/r1-preservation/)
+    status: 'SATISFIED_FOR_CANDIDATE_1 (P2-AR-0044, verification iteration 1: R1_PRESERVED; evidence release/capability-baseline/verify-1/r1-preservation/)'
     satisfier: fresh independent verifier (frozen contract AC-14, section 9.3)
     note: >-
       cap2-candidate-0 carried product code byte-identical to srr1-r1-accepted, so AC-14 was satisfied by the existing

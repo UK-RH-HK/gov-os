@@ -111,6 +111,11 @@ def verify(text, state):
             d = product_code_digest(commit)
             if d != cand["product_code_digest"]:
                 problems.append(f"candidate {cand.get('id')}: product_code_digest recomputes to {d}")
+    try:
+        with open(GATES) as fh:
+            yaml.load(fh, Loader=UniqueKeyLoader)
+    except (yaml.YAMLError, OSError) as e:
+        problems.append(f"GATES/GATE-REGISTER.yaml is not valid YAML: {str(e).splitlines()[0]}")
     for rf in sorted(os.listdir(os.path.join(PHASE_DIR, "AGENT_RUNS"))):
         if rf.endswith(".yaml"):
             try:
