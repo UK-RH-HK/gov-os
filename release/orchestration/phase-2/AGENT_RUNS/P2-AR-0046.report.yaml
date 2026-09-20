@@ -1,0 +1,285 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0046
+role: capability-verifier (verification iteration 1)
+objective: "Family alpha (A1-A5, B1-B3, S1-S6, T1-T3): full re-audit of all 100 owner-source checklist bullets on cap2-candidate-1 with the verifier's own held-out tests; lead the cross-machine attack."
+agent_model: claude-opus-5[1m]
+independence_statement: >-
+  This run authored none of the Governance OS implementation, none of its tests or fixtures, none of
+  the iteration-0 audits, none of the repairs (P2-AR-0014..0055), no integration and no Phase-1 role.
+  Read: P2-HO-0043 and P2-HO-0044 and through them P2-HO-0000 and P2-HO-0009; the frozen gate
+  contract; Contract v3; the three governing documents; OD-P2-01/02/03 and P2-ADJ-0001/0002/0003; the
+  iteration-0 synthesis inventory (blocker-classes.yaml, findings.yaml) as the convergence input; and
+  product source, schemas, policies and fixtures as needed. Did NOT read any other iteration-1
+  verifier's evidence directory or branch, any agent transcript, any task-output store, or user
+  auto-memory, and cited no repair or integration report as evidence. Modified no product source:
+  every file written is under release/capability-baseline/verify-1/alpha/ plus this report. Spawned
+  no sub-agent; contacted no owner.
+input:
+  base_commit: 8588813ec1ef9c832879e258ca5acfb573ae996f
+  candidate: cap2-candidate-1
+  candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0044-verify-1-family-scopes.md
+  common_protocol: release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
+pinned_input_verification:
+  tag_commit_matches_dispatch: true
+  head_digests_match_candidate: true
+  tag_digests_match_candidate: true
+  contract_v3_sha256_matches: true
+  frozen_gate_contract_sha256_matches: true
+  owner_source_alpha_bullet_count: 100
+  stop: false
+  note: "`product_identity.py cap2-candidate-1` prints the annotated tag OBJECT id (f75eb7db...) on its `commit:` line; both digests it prints are correct and equal to HEAD's (V1-AC09-01, the same tooling issue as S0-AC09-01)."
+inspected:
+  - "Governance_OS_Capability_Acceptance_Contract_v3.md lines 130-203 and 894-973 (the owner source that defines the audit universe)"
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001/0002/0003 and P2-ADJ-0001/0002/0003"
+  - "release/capability-baseline/audit-0/synthesis/{blocker-classes.yaml,findings.yaml}"
+  - "runtime/src/srr/** (verifier, metadata, staging, state, binding, breakglass, installation, provision, present, plugins, crypto)"
+  - "runtime/src/{t2,kernel_trust,kernel,lock,init,adopt,update,release,recovery,policy,policy_precedence,authority,paths,project,human_channel,routing,observability,contracts}.rs"
+  - "runtime/src/{migrations,orchestration,memory,scheduler,verification,security}/**"
+  - "framework/{policies,roles,constitution,contracts,schemas}/**"
+  - "tests/governance/capability-evidence-map.yaml, framework/contracts/governance-capability-acceptance.yaml"
+  - "cli/src/main.rs"
+  - "fixtures/brownfield/project (copied into scratch, never modified in place)"
+produced:
+  - release/capability-baseline/verify-1/alpha/00-VERIFICATION-REPORT.md
+  - release/capability-baseline/verify-1/alpha/capability-audit.yaml
+  - release/capability-baseline/verify-1/alpha/findings.yaml
+  - release/capability-baseline/verify-1/alpha/prior-findings-disposition.yaml
+  - release/capability-baseline/verify-1/alpha/heldout/ (7 suites, lib/, RUN-ALL)
+  - release/capability-baseline/verify-1/alpha/evidence/
+tests_or_attacks:
+  - id: t01-a2-root-of-trust
+    description: "A2 bullets 143-152: authenticity established before staging, integrity vs authenticity as separate predicates, the shared non-circular ingress root, post-install tamper detection (including a mutually consistent payload+manifest+lock rewrite), pre-install tamper detection, a source that cannot mint its own identity, framework.lock as a record, the bootstrap marking, rotation/revocation/recovery, offline verification"
+    result: FAIL
+    detail: "54/55 — the one failure is the update-ingress instance of V1-S5-01"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t01-a2-root-of-trust.out
+  - id: t02-cross-machine
+    description: "the cross-machine attack: five machines (two bound owner machines, one provisioned-unbound, one unprovisioned, one foreign owner); forged, hand-written, foreign, unprovisioned, wrong-signer, expired, rolled-back, unauthorised-key and wrong-machine authorities each refused with a typed result; nothing secret in any repository; gov verifies and never signs; the second machine's anchoring path and its availability rule"
+    result: PASS
+    detail: "74/74"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t02-cross-machine.out
+  - id: t03-gate-a
+    description: "A1 precedence and floors (including the BC-P2-45 routing overlay), A3 security/sensitivity/permissions/export, A4 budgets executed to the Human Decision Gate, A5 emergency controls with a twelve-command sweep under FREEZE_WRITES and PAUSE measured against tracked state"
+    result: FAIL
+    detail: "53/58 — V1-A4-01 (1) and the A5 checks behind V1-A5-01 (2) and V1-A5-02 (2)"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t03-gate-a.out
+  - id: t04-adopt-roles
+    description: "S4 A0-A11 driven end to end on a brownfield tree and on a greenfield-adopted tree (verdict ADOPTED_HEALTHY); T1-T3 role separation, fresh-session independence and the evidence tree; APPROVAL_STALE for a semantically changed plan, weakened tests and a changed catalogue; relocated OS stores through adopt on a legacy tree; B2.3 unknown artefacts"
+    result: FAIL
+    detail: "67/68 — the one failure is V1-S4-01"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t04-adopt-roles.out
+  - id: t05-release-init-update
+    description: "S1 canonical repo, S2 immutable releases (eleven bullets against a release built and verified here), S3 gov init, S5 the complete update lifecycle: check/impact, the owner-signed human answer through the protected inbox, the commit, overlay preservation, index rebuild, verification, the ledger, health admission, and a break-glass rollback"
+    result: FAIL
+    detail: "59/61 — V1-S2-01 and V1-S5-01"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t05-release-init-update.out
+  - id: t06-gate-b-contract-freshness
+    description: "B1-B3; the derived contract views for all 17 alpha capabilities (100 bullets verbatim, requirement classes, Gate U, evidence owners, and divergence detection in both the compiled form and the evidence map); freshness invalidation for four input classes from a legitimately green baseline"
+    result: FAIL
+    detail: "80/81 — the one failure is V1-B2-01"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t06-gate-b-contract-freshness.out
+  - id: t07-prior-findings
+    description: "first-hand disposition of the iteration-0 findings the capability suites do not already re-establish (A0-A5-02, A0-A2-05, A0-A3-01/02, A0-B1-01, A0-S4-01, A0-S5-01, S0-AC09-01)"
+    result: FAIL
+    detail: "11/15 — V1-A3-01, the two A0 checks behind V1-S4-02, and V1-AC09-01"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/t07-prior-findings.out
+  - id: regression-lib
+    description: "`cargo test --lib` reproduced in this worktree (O3 regression evidence)"
+    result: PASS
+    detail: "276 passed, 0 failed"
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/cargo-lib.out
+  - id: regression-certification
+    description: "`cargo test --test certification` started in this worktree (O3 regression evidence)"
+    result: NOT_RUN
+    detail: "did not finish inside this run's window; the host was running several Phase-2 verifiers at load average >160. No capability status depends on it; it leaves one input of AC-15 unestablished by this run."
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/cargo-certification.NOT-COMPLETED.md
+held_out_totals:
+  suites: 7
+  checks: 412
+  passed: 398
+  failed: 14
+  note: "every failing check is one of the findings below and nothing else"
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 11
+  PARTIAL: 6
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+bullet_status_summary:
+  total: 100
+  PRESENT_AND_SUBSTANTIAL: 91
+  PARTIAL: 9
+capability_statuses:
+  A1: PRESENT_AND_SUBSTANTIAL
+  A2: PRESENT_AND_SUBSTANTIAL
+  A3: PRESENT_AND_SUBSTANTIAL
+  A4: PARTIAL
+  A5: PARTIAL
+  B1: PRESENT_AND_SUBSTANTIAL
+  B2: PARTIAL
+  B3: PRESENT_AND_SUBSTANTIAL
+  S1: PRESENT_AND_SUBSTANTIAL
+  S2: PARTIAL
+  S3: PRESENT_AND_SUBSTANTIAL
+  S4: PARTIAL
+  S5: PARTIAL
+  S6: PRESENT_AND_SUBSTANTIAL
+  T1: PRESENT_AND_SUBSTANTIAL
+  T2: PRESENT_AND_SUBSTANTIAL
+  T3: PRESENT_AND_SUBSTANTIAL
+prior_findings_disposition_summary:
+  dispositions: 34
+  CLOSED: 24
+  RESIDUAL: 10
+  NOT_APPLICABLE: 0
+  closed_classes_for_this_family: [BC-P2-01, BC-P2-02, BC-P2-03, BC-P2-21, BC-P2-31, BC-P2-34, BC-P2-35, BC-P2-36, BC-P2-38, BC-P2-45, BC-P2-52]
+  residual_classes_for_this_family: [BC-P2-08, BC-P2-33, BC-P2-37]
+findings:
+  - id: V1-S4-01
+    severity: HIGH
+    capability: S4
+    blocking: true
+    blocker_class: BC-P2-33
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "`gov adopt migrate` (A6) is hard-blocked on a brownfield tree whose secret-bearing files A2 already classified SECRET; the classification is not propagated to the project sensitivity overlay and no adoption stage is a listed remedy of the blocks"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-S5-01
+    severity: MEDIUM
+    capability: "S5, A2"
+    blocking: true
+    blocker_class: BC-P2-37
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "`gov update` reports ok: true / 'already up to date' for a tampered, foreign-signed or below-floor source, deciding from the candidate's unauthenticated declared version before the single verification policy runs"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-A5-01
+    severity: MEDIUM
+    capability: A5
+    blocking: false
+    blocker_class: BC-P2-08
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "`gov rebuild-memory` and `gov memory rebuild` change tracked OS-managed manifests under FREEZE_WRITES and PAUSE"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-A4-01
+    severity: MEDIUM
+    capability: A4
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "the network-call budget is observed (over_budget) but not enforced"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-A5-02
+    severity: LOW
+    capability: A5
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "recovery from an emergency control leaves no durable, reasoned record"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-A5-03
+    severity: LOW
+    capability: A5
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "CANCEL_AGENTS sets a flag and pauses but revokes no claim or handoff"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-B2-01
+    severity: LOW
+    capability: B2
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "SPLIT and MERGE path-map actions are refused PLAN_UNSUPPORTED by the migration executor"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-S2-01
+    severity: LOW
+    capability: S2
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "the release manifest records adapter versions but no capability or plugin versions"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-S4-02
+    severity: LOW
+    capability: S4
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "the A0 safety baseline creates no adoption branch or worktree and takes no restorable snapshot"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-A3-01
+    severity: LOW
+    capability: A3
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: true
+    title: "unclassified personal/customer data is indexed and retrievable; the kernel sensitivity policy classifies credentials, not personal data"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+  - id: V1-AC09-01
+    severity: INFO
+    capability: "(phase-2 tooling)"
+    blocking: false
+    blocker_class: null
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "`product_identity.py <tag>` prints the annotated tag object id under the label `commit`"
+    path: release/capability-baseline/verify-1/alpha/findings.yaml
+convergence_note: >-
+  Every finding this run raises is RESIDUAL against the iteration-0 inventory. Family alpha
+  introduced no materially-new blocker class in verification iteration 1.
+cross_machine_attack:
+  machines: 5
+  checks: 74
+  failures: 0
+  result: PASS
+  summary: >-
+    OS-written facts (gate, audit, task and CIT records, all portable-scope sealed under the owner's
+    T2 binding authority) are honoured on the owner's other provisioned, bound machine after a Git
+    clone, and a fact that machine writes is honoured back on the first. A record edited by hand is
+    BROKEN, one with its seal stripped is UNSEALED, one from a provisioned-but-unbound machine, an
+    unprovisioned machine or a foreign owner is FOREIGN, and one sealed under a key a newer authority
+    revoked is UNAUTHORISED; each refusal is typed and states its reason, and the broken record makes
+    the governance suite fail by name. Binding authorities are refused when signed by a
+    root-delegated key that is not the t2-binding role or by an unknown key (SRR_THRESHOLD_NOT_MET),
+    when expired (T2_BINDING_AUTHORITY_EXPIRED), when rolled back after a rotation
+    (T2_BINDING_AUTHORITY_ROLLBACK), for a key they do not authorise (T2_BINDING_KEY_NOT_AUTHORISED),
+    for another machine (T2_BINDING_MACHINE_NOT_AUTHORISED) and on an unprovisioned machine
+    (T2_BINDING_UNPROVISIONED). No binding key or role private key appears anywhere in the
+    repository, the trust surface exposes no signing subcommand and the binary carries no signing
+    symbol (SRR-R0-L4). A second machine is KERNEL_UNANCHORED until it verifies the release the
+    project pins (ARCH-0003 §8); that refusal names its remedy and leaves status, doctor, kernel
+    trust and kernel verify available. An unprovisioned machine refuses external-source ingress
+    (OD-P2-02) and installs the embedded payload only as a marked BOOTSTRAP_EMBEDDED_PAYLOAD with
+    authenticity UNKNOWN, disclosed by status, doctor and audit.
+verdict: FAMILY_VERIFICATION_COMPLETE
+output:
+  branch: phase2/verify-1-alpha
+  commit: 2697acbd6b7e28a5fa382853414bf7a765083bc8
+  evidence_path: release/capability-baseline/verify-1/alpha/
+unresolved:
+  - "`cargo test --test certification` did not finish inside this run's window (host load average >160 with several verifiers running). `cargo test --lib` reproduced 276 passed / 0 failed. No capability status depends on it, but one input of AC-15 is unestablished by this run: see evidence/cargo-certification.NOT-COMPLETED.md."
+  - "BC-P2-03 freshness: a change to the machine trust anchor and a change to the `gov` binary were not exercised as invalidation triggers; four of the six input classes named in A0-B3-01 were."
+  - "V1-A5-03: CANCEL_AGENTS claim revocation was not exercised end to end (the probe could not establish a claimed task on its fixture); the finding rests on the absence of any consumer of `agents_cancelled` outside control::state."
+  - "A11 against a brownfield tree's full legacy surface was reached only through its STAGE_ORDER gating; its audit was exercised on a greenfield-adopted tree, where it returned ADOPTED_HEALTHY."
+  - "AC-14 (R1 preservation) belongs to P2-AR-0044; this run re-established the R1-relevant A2 behaviour for the areas it exercises but did not re-run the R1 held-out suites."
+recommended_next_action: >-
+  Route V1-S4-01 (S4 / BC-P2-33) and V1-S5-01 (S5, A2 / BC-P2-37) to repair as residuals of
+  inventoried classes — both are incomplete fixes of a class that is still open, not new mechanisms.
+  Have a completed `cargo test --test certification` read before AC-15 is judged.
+completed_at: 2026-09-20T22:41:00Z

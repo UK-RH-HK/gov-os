@@ -1,0 +1,462 @@
+schema: governance-os.phase-2.prior-findings-disposition
+schema_version: 1
+run_id: P2-AR-0046
+family: alpha
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+
+inputs:
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
+  - release/capability-baseline/audit-0/synthesis/findings.yaml
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md
+note: >-
+  Every disposition below rests on this verification's own executable evidence on cap2-candidate-1
+  (heldout/t01..t07). No iteration-0 status was adopted. Where a finding's capability lies in
+  another family, only the part that touches an alpha capability is disposed of here.
+
+dispositions:
+
+  # ------------------------------------------------------------------ A2 / root of trust
+  - id: A0-A2-01
+    capability: [A2]
+    blocker_class: [BC-P2-35]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t01_a2_root_of_trust.py :: A2-b4-consistent-post-install-rewrite-detected"
+      - evidence/t01-a2-root-of-trust.out
+    reason: >-
+      A mutually consistent rewrite of the installed payload, KERNEL_MANIFEST.json and
+      framework.lock is refused: `gov kernel verify` reports ok=false naming the modified file and
+      `gov kernel trust` states "kernel payload is not the payload this machine committed into this
+      project (348e1922…), whatever KERNEL_MANIFEST.json and framework.lock say". `gov doctor` does
+      not report HEALTHY over it. The machine's protected installation record is consulted after
+      install, which is exactly what the finding said was missing.
+
+  - id: A0-A2-02
+    capability: [A2, S3, S5]
+    blocker_class: [BC-P2-36]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t01_a2_root_of_trust.py :: A2-b1-*, A2-b8-*"
+      - "heldout/t02_cross_machine.py :: S6-D-unprovisioned-external-ingress-refused"
+    reason: >-
+      On an unprovisioned machine an external-source ingress is refused
+      (SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED, details.staged_for_installation=false, nothing left
+      in the staging area, no kernel installed). The one admissible payload — this binary's embedded
+      one — installs as admission BOOTSTRAP_EMBEDDED_PAYLOAD with authenticity UNKNOWN; the command
+      envelope reports presented_as=UNAUTHENTICATED (never CURRENT) and `gov status`, `gov doctor`
+      and `gov audit` all disclose the bootstrap marking.
+
+  - id: A0-A2-03
+    capability: [A2, S6]
+    blocker_class: [BC-P2-37]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t01_a2_root_of_trust.py :: A2-b7-lock-records-authenticity-basis, A2-b7-lock-binds-the-verified-release-metadata-digest, A2-b7-lock-independent-of-machine-cache-path"
+    reason: >-
+      framework.lock now records authenticity=AUTHENTIC, admission=SIGNED_RELEASE_METADATA, sequence,
+      channel, the verified release.json digest and an explicit identity_basis block stating that the
+      lock records an identity and never establishes trust. Two installs under different
+      XDG_CACHE_HOME values produce byte-identical locks apart from install timestamps.
+
+  - id: A0-A2-04
+    capability: [A2, A3, S2, S5]
+    blocker_class: [BC-P2-37]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t01_a2_root_of_trust.py :: A2-b8-unsigned-CERTIFIED-claim-refused"
+      - "heldout/t05_release_init_update.py :: S5-b2-authenticated-source…"
+    reason: >-
+      `gov release build --certification CERTIFIED` is refused
+      (RELEASE_CERTIFICATION_REQUIRES_SIGNED_METADATA), so no role can mint a certification claim.
+      `gov update --check` reports certification_basis.authenticated=false with the unsigned
+      manifest.json claim recorded as `unsigned_claim` and explicitly disposed of as "a request,
+      recorded and ignored", and the Human Decision Gate is required because the target is
+      uncertified.
+
+  - id: A0-A2-05
+    capability: [A2]
+    blocker_class: []
+    disposition: CLOSED
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-A2-05-a-completed-swap-leaves-no-superseded-kernel-tree-behind, A0-A2-05-interrupted-install-transactions-are-replayable-and-reported"
+    reason: >-
+      A completed `gov kernel reinstall` leaves no additional directory beside
+      `governance/kernel`, and `gov trust recover-transactions` runs and reports the (empty) replay
+      set.
+
+  # ------------------------------------------------------------------ A1 / precedence and views
+  - id: A0-A1-01
+    capability: [A1]
+    blocker_class: []
+    disposition: CLOSED
+    evidence:
+      - "heldout/t03_gate_a.py :: A1-b1-constitution-and-invariants-are-machine-readable"
+      - "heldout/t01_a2_root_of_trust.py :: A2-b4-*"
+      - "heldout/t02_cross_machine.py :: S6-unanchored-second-machine-refusal-is-typed"
+    reason: >-
+      `gov policy overrides` reports the precedence source as "installed kernel (verified)" with
+      kernel_verified=true, and a kernel this machine has not verified refuses privileged work with
+      KERNEL_UNANCHORED / KERNEL_TAMPERED while constitutional policy falls back to the embedded
+      baseline. The constitution layer is no longer read from an unverified installed kernel.
+
+  - id: A0-A1-02
+    capability: [A1, A2, A3, A4, A5, B1, B2, B3, S1, S2, S3, S4, S5, S6, T1, T2, T3]
+    blocker_class: [BC-P2-01, BC-P2-02]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t06_gate_b_contract_freshness.py :: BC-P2-01-compiled-contract-carries-*, BC-P2-02-*-has-an-evidence-owner-and-at-least-one-automated-check, BC-P2-01-Gate-U-is-represented-in-the-compiled-contract, AC13-a-semantic-divergence-in-the-compiled-view-is-detected"
+    reason: >-
+      The compiled contract carries all 100 alpha checklist bullets verbatim, with A2's
+      requirement_class POST_VERIFICATION_HARDENING, alongside Gate U and a capability_count of 101.
+      The evidence map gives every one of the 17 alpha capabilities a non-NOT_YET_MAPPED evidence
+      class and at least one automated check. `gov contract verify` refuses a copy whose compiled
+      A2 bullet text was altered, and refuses one whose evidence-map row for A2 was gutted.
+
+  # ------------------------------------------------------------------ BC-P2-03 / currency
+  - id: A0-B3-01
+    capability: [A2, B1, B2, B3, S4, S6, T2, T3]
+    blocker_class: [BC-P2-03]
+    disposition: CLOSED
+    scope: alpha capabilities only
+    evidence:
+      - "heldout/t06_gate_b_contract_freshness.py :: AC10-changing-`an authoritative spec decision`/-`product source`/-`the project policy overlay`/-`the index manifest`-invalidates-prior-green-evidence"
+    reason: >-
+      From a legitimately green baseline (audit green=true, verdict HEALTHY), changing an
+      authoritative spec decision, product source, the project policy overlay and the index manifest
+      each makes the subsequent governed operation report the state as no longer green. Two input
+      classes named in the original finding — the machine trust anchor and the `gov` binary itself —
+      were not exercised here and are recorded under "could not establish"; the beta/epsilon families
+      own the rest of BC-P2-03.
+
+  # ------------------------------------------------------------------ BC-P2-08 / authority and guards
+  - id: A0-A5-01
+    capability: [A5]
+    blocker_class: [BC-P2-08]
+    disposition: RESIDUAL
+    residual_finding: V1-A5-01
+    evidence:
+      - "heldout/t03_gate_a.py :: A5-FREEZE_WRITES-no-command-changes-tracked-governed-state, A5-PAUSE-no-command-changes-tracked-governed-state"
+    reason: >-
+      Every record-writing and lifecycle command tested is now refused under FREEZE_WRITES and PAUSE
+      (task.create, gate.create, cit.propose, adopt.baseline, audit, adapters.generate, continue,
+      recover, route --record, release record). Two commands still change tracked OS-managed state
+      while the control is in force: `gov rebuild-memory` and `gov memory rebuild` rewrite
+      `governance/generated/index-manifest.json` (and `memory-manifest.json`).
+
+  - id: A0-S4-03
+    capability: [S3, S4, T1]
+    blocker_class: [BC-P2-08]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t01_a2_root_of_trust.py (first run) :: `gov init` with no --role → AUTHORITY_DENIED"
+      - "heldout/t03_gate_a.py :: A3-b4-an-undeclared-role-cannot-reinstall-the-kernel, A3-b4-L0-role-cannot-reinstall-the-kernel"
+      - "heldout/t04_adopt_roles.py :: T1-A5-the-planner-cannot-perform-the-independent-review, T2-A5/A7/A10-*-may-not-continue-the-*-session, T1-authorship-of-*-is-recorded"
+    reason: >-
+      `gov init` with no declared role is refused with AUTHORITY_DENIED naming the required L4 and
+      the `--role` remedy; an L0 role is refused too. Every adoption stage records the declared role
+      and session, refuses an undeclared session (ADOPTION_SESSION_UNDECLARED), and the designated
+      independent stages refuse a non-designated role and a builder's session (INDEPENDENCE).
+
+  # ------------------------------------------------------------------ BC-P2-31 / relocated stores
+  - id: S0-B1B3-01
+    capability: [B1, B3, D6, C1]
+    blocker_class: [BC-P2-31]
+    disposition: CLOSED
+    scope: B1 and B3 only (D6/C1 are beta's)
+    evidence:
+      - "heldout/t04_adopt_roles.py :: BC-P2-31-* , B3-deleting-the-derived-runtime-directory-does-not-delete-project-truth"
+      - "heldout/t06_gate_b_contract_freshness.py :: B3-b3-*"
+    reason: >-
+      claims.db and control.json now live in `.governance-state/` (an OS store), not in the derived
+      `.governance-runtime/`. A control file left by an older binary at the legacy location is still
+      honoured (strictest state wins) and is relocated on the next control command. Moving
+      `.governance-runtime/` away entirely leaves project truth, the OS stores and adoption intact,
+      and `gov rebuild-memory` rebuilds the derived state.
+
+  # ------------------------------------------------------------------ BC-P2-33 / legacy retirement
+  - id: A0-S4-02
+    capability: [S4]
+    blocker_class: [BC-P2-33]
+    disposition: RESIDUAL
+    residual_finding: V1-S4-01
+    evidence:
+      - "heldout/t04_adopt_roles.py :: S4-A6-is-not-hard-blocked-on-a-brownfield-tree-A2-already-classified"
+    reason: >-
+      The planner/test-scaffold contradiction itself is gone: A5 now requires reviewer-authored tests
+      and the scaffold's secret-store tests pass. But a brownfield tree carrying a secret-bearing
+      source file still stalls adoption at A6: the health checks D011 and path_map_compliance
+      hard-block `adopt.migrate` for files that `gov adopt classify` (A2) already classified SECRET,
+      because the adoption classification is not propagated into the project's DATA_SENSITIVITY
+      overlay. The block lists no adoption stage among its remedies.
+
+  - id: S0-S4-01
+    capability: [S4, B2, R1]
+    blocker_class: [BC-P2-33]
+    disposition: CLOSED
+    scope: S4 and B2 only (R1 is beta's)
+    evidence:
+      - "heldout/t04_adopt_roles.py :: S4-A1/A2/A3-* run twice on the same tree (the `unknown` and `adopt` trees), S4-A6-every-planned-batch-executes"
+    reason: >-
+      Re-running the adoption stages on a tree that already carries an installed kernel does not
+      classify the OS's own generated adapter as legacy provider rules: the second pass classifies
+      the governance tree as GOVERNANCE_CURRENT (149 artefacts) and GENERATED (2), and the produced
+      plan archives only the fixture's own legacy provider rules.
+
+  # ------------------------------------------------------------------ BC-P2-34 / independence
+  - id: A0-T2-01
+    capability: [T2, T1, T3, S4, A3]
+    blocker_class: [BC-P2-34]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t04_adopt_roles.py :: T2-A5-an-approval-on-the-planner-scaffold-alone-is-refused, T3-A5-approval-binds-digests-of-what-was-reviewed, T3-A6-execution-refuses-a-plan-changed-after-approval, T2-A10-the-builder-starter-set-alone-is-refused"
+    reason: >-
+      A5 refuses an approval whose tests are all the planner's scaffold
+      (INDEPENDENT_TESTS_REQUIRED), records the reviewer's own test ids and binds digests of the
+      catalogue/plan/tests; A6 refuses once the approved plan changes (APPROVAL_STALE); A10 refuses
+      while every held-out query is the builder's starter set (INDEPENDENT_HELDOUT_REQUIRED) and
+      accepts only against queries the verifier authored. Independence is no longer a self-declared
+      boolean: it is the designated kernel role plus a session that authored no builder stage.
+
+  # ------------------------------------------------------------------ BC-P2-38 / rollback / reinstall
+  - id: A0-S5-02
+    capability: [S5, A2]
+    blocker_class: [BC-P2-38]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t01_a2_root_of_trust.py :: A2-b10-offline-refusal-leaves-installation-unchanged"
+      - "heldout/t05_release_init_update.py :: S5-b8-rollback-below-the-floor-is-refused-by-default, S5-b8-rollback-with-an-owner-signed-authorisation-restores-the-release"
+    reason: >-
+      A refused reinstall reports installation_changed=false and leaves the installed kernel,
+      framework.lock and the protected records untouched (the pinned-payload check runs after
+      measurement and before any commit). On a provisioned machine `gov update --rollback` is refused
+      SRR_BELOW_FLOOR by default and succeeds with an owner-signed `recovery` authorisation in the
+      protected inbox, restoring 4.1.6 and marking the machine DEGRADED — RECOVERY ONLY.
+
+  # ------------------------------------------------------------------ BC-P2-45 / overlay bypass
+  - id: A0-M1-02
+    capability: [M1, M2, M3]
+    blocker_class: [BC-P2-45]
+    disposition: CLOSED
+    scope: the A1 part only (M1-M3 are delta's)
+    evidence:
+      - "heldout/t03_gate_a.py :: A1-b2-lowered-kernel-tier-floor-does-not-take-effect, A1-b6-the-weakening-attempt-is-observable"
+    reason: >-
+      A project MODEL_ROUTING_OVERRIDES that lowers `tier_floors.governance` to T1 and
+      `reasoning_minimums.governance` to low changes nothing: `gov route --class governance` still
+      returns minimum_tier T3 / reasoning high, and `gov policy overrides` lists the attempt under
+      `refused` with the POLICY_PRECEDENCE reason.
+  - id: A0-H3-01
+    capability: [H3]
+    blocker_class: [BC-P2-45]
+    disposition: CLOSED
+    scope: the A1 part only (H3 is gamma's)
+    evidence:
+      - "heldout/t03_gate_a.py :: A1-b2-weakening-PROJECT_POLICY.yaml-is-refused-or-reported"
+    reason: >-
+      `PROJECT_POLICY.readiness.enforce_pre_implementation_cells: false` is listed under `refused`
+      with kernel_value true; it does not reach the effective policy.
+
+  # ------------------------------------------------------------------ BC-P2-52 / doc citations
+  - id: A0-B2-02
+    capability: [B2]
+    blocker_class: [BC-P2-52]
+    disposition: CLOSED
+    evidence:
+      - "heldout/t06_gate_b_contract_freshness.py :: B2-b4-documentation-citations-are-represented, B2-b4-a-cited-file-records-its-document-consumer"
+    reason: >-
+      A markdown document that links to two source files is catalogued with those links, and each
+      cited source file records the document among its consumers, so the path map answers Repo B's
+      "hidden cross-references".
+
+  # ------------------------------------------------------------------ BC-P2-21 / artefact identity
+  - id: S0-W1-01
+    capability: [W1, T3, S4]
+    blocker_class: [BC-P2-21]
+    disposition: CLOSED
+    scope: S4 and T3 only (W1 is zeta's)
+    evidence:
+      - "heldout/t04_adopt_roles.py :: S4-A3-target-path-map-is-produced (catalogue id PMAP-GOVERNANCE-ADOPTION with a content_hash and a version), T3-A5-approval-binds-digests…, S4-A6-every-planned-batch-executes"
+    reason: >-
+      The catalogue and plan carry stable ids (PMAP-/MPLAN-GOVERNANCE-ADOPTION), a version and a
+      content_hash; artefact ids (ART-xxxxxxxx) are content-derived and the approval binds the
+      catalogue/plan digests, so a re-plan cannot silently rename what the ledger refers to.
+
+  # ------------------------------------------------------------------ remaining alpha-r findings
+  - id: A0-A4-01
+    capability: [A4]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-A4-01
+    evidence:
+      - "heldout/t03_gate_a.py :: A4-b4-network-spend-to-date-is-observable, A4-b2-network-call-budget-is-enforced-not-only-reported"
+    reason: >-
+      Spend to date is now observable (`gov telemetry summary` reports network_calls_by_task and
+      over_budget) and the model/API spend and parallel-agent budgets are enforced with a Human
+      Decision Gate. The network-call budget is still only reported: emitting further network.call
+      events beyond the delegated budget succeeds.
+
+  - id: A0-A5-02
+    capability: [A5]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-A5-03
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-A5-02-CANCEL_AGENTS-revokes-the-claims-it-cancels (vacuous: no claim could be established, see below)"
+      - "grep over runtime/ and cli/: `agents_cancelled` has no consumer outside runtime/src/orchestration/control.rs"
+    reason: >-
+      The probe could not establish a claimed task (TASK_NOT_RUNNABLE), so the revocation behaviour
+      was not exercised end to end and the check passed vacuously. The static position is unchanged:
+      `agents_cancelled` is written by `control::set` and read only by `control::state`; no claim or
+      handoff revocation call site exists. Recorded as residual rather than closed.
+
+  - id: A0-A5-03
+    capability: [A5]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-A5-02
+    evidence:
+      - "heldout/t03_gate_a.py :: A5-b6-the-control-record-retains-the-entry-and-exit-history, A5-b6-recovery-leaves-a-durable-reasoned-record"
+    reason: >-
+      `gov resume` takes no reason, and `control::set` overwrites the single current-state file:
+      after a resume the record reads {mode: RUNNING, reason: null} with no history. The only trace
+      of entry and exit is `.governance-runtime/telemetry/events.jsonl`, which is derived, untracked
+      and deletable.
+
+  - id: A0-B2-01
+    capability: [B2]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-B2-01
+    evidence:
+      - "heldout/t06_gate_b_contract_freshness.py :: B2-b2-SPLIT-and-MERGE-are-executable-not-only-declared"
+      - "runtime/src/migrations/executor.rs:505"
+    reason: >-
+      SPLIT and MERGE are in the catalogue vocabulary and are schema-valid, but the migration
+      executor refuses them with PLAN_UNSUPPORTED "requires a manual CIT".
+
+  - id: A0-S2-01
+    capability: [S2]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-S2-01
+    evidence:
+      - "heldout/t05_release_init_update.py :: S2-b-capability-plugin-versions-are-recorded"
+    reason: >-
+      The release manifest records adapter_versions (api/cli/generic/ide/mcp) but no
+      capability or plugin versions.
+
+  - id: A0-S3-01
+    capability: [S3]
+    blocker_class: []
+    disposition: CLOSED
+    evidence:
+      - "heldout/t05_release_init_update.py :: S3-init-records-the-authenticity-basis-of-what-it-installed"
+      - "heldout/t01_a2_root_of_trust.py :: A2-b8-unsigned-CERTIFIED-claim-refused"
+    reason: >-
+      `gov init` records authenticity, admission, sequence and the verified release-metadata digest
+      in framework.lock, and no release can carry an unsigned CERTIFIED claim at all, so the
+      "a REJECTED release installs silently" shape no longer exists: what installs is recorded, and
+      certification is authenticated only through signed release metadata.
+
+  - id: A0-S4-01
+    capability: [S4]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-S4-02
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-S4-01-A0-creates-an-adoption-branch-or-worktree, A0-S4-01-A0-takes-a-restorable-snapshot-of-the-tree"
+    reason: >-
+      A0 pins the baseline commit, counts dirty files, runs baseline tests and emits freeze advice
+      ("interrupted work detected: review items before A1; broad edits are frozen by protocol"), but
+      it still creates no adoption branch or worktree and takes no restorable snapshot: the branch is
+      unchanged and the result carries no snapshot reference.
+
+  - id: A0-S5-01
+    capability: [S5]
+    blocker_class: []
+    disposition: CLOSED
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-S5-01-a-refused-update-leaves-no-snapshot-behind, A0-S5-01-rollback-does-not-record-a-rollback-of-an-update-that-never-happened"
+    reason: >-
+      A refused update leaves `.governance-state/update/` empty, and `gov update --rollback` with no
+      unconsumed snapshot is refused SNAPSHOT_MISSING instead of recording a rollback.
+
+  - id: A0-A3-01
+    capability: [A3]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-A3-01
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-A3-01-unclassified-customer-data-is-excluded-without-a-project-classification"
+    reason: >-
+      A CSV of names, e-mail addresses and a card number that the project has not classified is
+      indexed and returned by retrieval. The behaviour still matches Contract v3:158 ("excluded
+      according to policy") because the kernel's secret patterns do not cover personal data and
+      DATA_SENSITIVITY ships no default personal-data class; it is recorded as a residual
+      observation, not a contract breach.
+
+  - id: A0-A3-02
+    capability: [A3]
+    blocker_class: []
+    disposition: CLOSED
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-A3-02-an-overlay-that-grants-elevated-permissions-is-refused-or-reported"
+    reason: >-
+      A project TOOL_PERMISSIONS overlay granting shell.exec/fs.write/net.any to an L1 role makes the
+      governance suite fail, so the grant is observable; and the tool-installation authority envelope
+      is computed from trusted OS state rather than from the descriptor (OD-P2-03), which is gamma's
+      to grade in detail.
+
+  - id: A0-B1-01
+    capability: [B1]
+    blocker_class: []
+    disposition: CLOSED
+    evidence:
+      - "heldout/t07_prior_findings.py :: A0-B1-01-root-level-project-files-are-covered-by-the-repository-contract"
+      - "heldout/t06_gate_b_contract_freshness.py :: B1-b1-*, B1-b3-*"
+    reason: >-
+      The repository contract ships explicit `roots` and `paths` rules with class, owner_role,
+      mutation, namespace and per-index flags, covering src/**, governance/**, spec/**,
+      governance/generated/*-manifest.json and the runtime directory; the suite raises no unmapped
+      root-level artefact for a tree carrying a Makefile and a pyproject.toml.
+
+  # ------------------------------------------------------------------ phase-2 tooling
+  - id: S0-AC09-01
+    capability: ["(phase-2 tooling)"]
+    blocker_class: []
+    disposition: RESIDUAL
+    residual_finding: V1-AC09-01
+    evidence:
+      - "heldout/t07_prior_findings.py :: S0-AC09-01-product_identity-prints-the-commit-for-a-tag-name"
+    reason: >-
+      `product_identity.py cap2-candidate-1` prints commit f75eb7dbeb9eae311d0a159ebf2845f135093adb,
+      the annotated tag's object id, while `git rev-list -n1 cap2-candidate-1` is
+      0bad524d836f179964ffbac31972856ea6434682. The digests it prints are correct and identical to
+      HEAD's, so the candidate identity verifies; only the printed "commit" line is the tag object.
+
+  # ------------------------------------------------------------------ classes owned elsewhere
+  - id: BC-P2-21
+    capability: [W1, W2, S4]
+    disposition: CLOSED
+    scope: the S4 part only
+    evidence: [heldout/t04_adopt_roles.py]
+    reason: >-
+      For S4 the adoption catalogue, plan and approval carry stable, content-derived identity and the
+      approval binds their digests; W1/W2 edge semantics belong to zeta.
+  - id: BC-P2-45
+    capability: [A1, M1, M2, M3, H3]
+    disposition: CLOSED
+    scope: the A1 part only
+    evidence: [heldout/t03_gate_a.py]
+    reason: See A0-M1-02 and A0-H3-01 above.
+  - id: BC-P2-03
+    capability: [O4, U, B3, D1, W6]
+    disposition: CLOSED
+    scope: the B3 part only
+    evidence: [heldout/t06_gate_b_contract_freshness.py]
+    reason: See A0-B3-01 above; O4/U/D1/W6 belong to epsilon, beta and zeta.
+
+not_applicable: []
