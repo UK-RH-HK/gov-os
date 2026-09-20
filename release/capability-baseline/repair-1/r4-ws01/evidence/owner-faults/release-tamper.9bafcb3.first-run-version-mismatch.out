@@ -1,0 +1,7 @@
+# release build ok=False capability_contract=None error=VERSION_MISMATCH
+CONTROL release verify (as written) ok=False result_ok=None error=IO_ERROR
+Traceback (most recent call last):
+  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-ws01/release/capability-baseline/repair-1/r4-ws01/evidence/owner-faults/release-tamper.py", line 52, in <module>
+    with open(victim, "a") as fh:
+         ^^^^^^^^^^^^^^^^^
+TypeError: expected str, bytes or os.PathLike object, not NoneType

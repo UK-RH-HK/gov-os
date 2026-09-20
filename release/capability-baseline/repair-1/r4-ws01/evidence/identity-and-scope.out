@@ -1,0 +1,40 @@
+# P2-AR-0042 identity and scope (2026-09-19T18:20:37Z)
+## base
+commit: cae2f67cf919d1506b914bf0c98c75c49e755293
+product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+governed_state_digest: 2514b9fb46b140351f2898fbd99965a99cff4f19823c667c5affa200373235be
+## final product commit
+commit: 9bafcb35468afa1b568fc7b46b2811c0829ffbdf
+product_code_digest: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9
+governed_state_digest: 75502102b1fff0fa01643b14c26634f0257b2551c289b5071acace5a3943958c
+## files changed cae2f67..9bafcb3 (product and evidence)
+ cli/src/main.rs                                    |    29 +
+ docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md |  3574 ++++++-
+ framework/contracts/contract-source.lock           |     9 +-
+ .../governance-capability-acceptance.schema.json   |   197 +-
+ .../r4-ws01/evidence/mapping/apply_owner_spec.py   |    89 +
+ .../r4-ws01/evidence/mapping/owner-spec.yaml       |  1149 +++
+ .../evidence/owner-faults/planted-faults.py        |   236 +
+ .../owner-faults/product-mutations.5aebf23.out     |    17 +
+ .../evidence/owner-faults/product-mutations.sh     |    55 +
+ .../evidence/owner-faults/release-tamper.py        |    59 +
+ .../evidence/r1-heldout/failure_messages.py        |    18 +
+ .../hv_a_derivation.a1-unpinned.P2-AR-0042.rs.txt  |   589 ++
+ .../r4-ws01/evidence/r1-heldout/run-r1-heldout.sh  |   141 +
+ .../cargo-test-certification.5aebf23.out           |   300 +
+ .../evidence/regression/cargo-test-lib.5aebf23.out |   280 +
+ runtime/src/contracts.rs                           |  3006 +++++-
+ runtime/src/orchestration/control.rs               |     2 +
+ tests/certification/main.rs                        |     1 +
+ tests/certification/ws01r4.rs                      |   302 +
+ tests/governance/capability-evidence-map.yaml      | 10290 ++++++++++++++++---
+ 20 files changed, 18280 insertions(+), 2063 deletions(-)
+## protected paths changed (must be empty): release/verification release/root-of-trust release/releases release/orchestration/phase-1 release/capability-baseline/audit-0, other repair-1 dirs, Contract v3
+(end)
+## Contract v3 sha256
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e  release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+## release binary
+2817913a5368b0e506a00a96c790f04cff5ae54988715d0dee90a4f4e2066ad5  target/release/gov
+2817913a5368b0e506a00a96c790f04cff5ae54988715d0dee90a4f4e2066ad5  target/P2-AR-0042/gov-release-9bafcb3

@@ -1,0 +1,137 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0042
+role: capability-repair
+objective: Repair iteration 1, round 4, WS-1 (BC-P2-02) — every one of the 101 capabilities names at least one evidence owner that actually runs, with the Contract v3:53-73 governed fields populated; gov contract verify enforces it (typed failures for zero owners, unresolved owners, out-of-vocabulary values and governed mutations without recompile); the product generates the suite-to-contract matrix; AC-13 preserved; regression and R1 through a private path; claims only, never acceptance.
+agent_model: "claude-opus-5[1m]"
+independence_statement: >-
+  Model Claude Opus 5 with 1M-token context (model id claude-opus-5[1m]), fresh context for this run. This run authored
+  only the round-4 WS-1 work on phase2/repair-1-r4-ws01 (commits 5aebf23, 9bafcb3, 2ed8ab1 and this report); it authored
+  none of the round-1..3 repairs or integrations, no audit, synthesis or verification run, and it grades nothing. It read
+  P2-HO-0041, P2-HO-0031, P2-HO-0020, P2-HO-0010, the round-3 integration report, repair-delta §0-§4 (BC-P2-01/02), the
+  frozen gate contract, Contract v3, the round-1 WS-1 report and every report routed by P2-HO-0041 (round 1-3 builders),
+  the prior run reports' shape, the product source and tests of the tree, and the four R1 held-out suites (run unedited).
+  It did not read session or agent transcripts, task-output stores (one tool call moved an early trial into a background
+  task store; that output was not read, and the run was repeated into its own file) or user auto-memory; it spawned no
+  sub-agents and did not contact the product owner. P2-AR-0043 worked in parallel on other files; this run touched none
+  of them.
+input:
+  base_commit: cae2f67cf919d1506b914bf0c98c75c49e755293
+  candidate: "none (repair iteration 1, round 4 builder branch; no candidate minted)"
+  product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0041-repair-1-r4-ws01-evidence-map.md
+inspected:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0041-repair-1-r4-ws01-evidence-map.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0031, P2-HO-0020, P2-HO-0010
+  - release/capability-baseline/repair-1/integration-3/00-INTEGRATION-REPORT.md (and its r1-heldout runner)
+  - release/capability-baseline/audit-0/synthesis/repair-delta.md (§0, BC-P2-01, BC-P2-02, §2-§4)
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - Governance_OS_Capability_Acceptance_Contract_v3.md (lines 1-1255)
+  - "release/capability-baseline/repair-1/{ws01-12,ws02,ws04,ws05,ws06,ws08,ws09-11,r2-ws02,r2-ws04,r2-ws05,r2-ws06,r2-ws08,r2-ws09-11,r2-ws10,r3-ws04,r3-ws06,r3-ws08,r3-ws09-11}/00-REPAIR-REPORT.md (routed IPs)"
+  - runtime/src (contracts.rs, scheduler/catalogue.rs, verification/*, orchestration/control.rs, kernel.rs, records.rs, doctor.rs, srr/breakglass.rs), cli/src/main.rs, tests/certification/*.rs, framework/
+  - release/verification/4.1.6-r1{,-2,-3,-4}/evidence/heldout-tests (run unedited) and 4.1.6-r1-4/evidence/derive.py
+produced:
+  - "5aebf23: evidence owners for all 101 capabilities resolved and enforced by gov contract verify; gov contract matrix; schema; map; lock; generated view; tests/certification/ws01r4.rs"
+  - "9bafcb3: mapping review (owners that only guard authority removed, routed IP owners added); contracts::owner_sources_fingerprint"
+  - "2ed8ab1: report, claims, matrix and evidence (no product file)"
+  - release/capability-baseline/repair-1/r4-ws01/00-REPAIR-REPORT.md
+  - release/capability-baseline/repair-1/r4-ws01/claims.yaml
+  - release/capability-baseline/repair-1/r4-ws01/suite-to-contract.md
+  - release/capability-baseline/repair-1/r4-ws01/suite-to-contract.json
+  - release/capability-baseline/repair-1/r4-ws01/evidence/
+tests_or_attacks:
+  - {id: REG-LIB, description: "cargo test --lib at 9bafcb3: 271 passed, 0 failed (262 + 9 new contracts tests); at 5aebf23: 270/0", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/regression/cargo-test-lib.9bafcb3.out}
+  - {id: REG-CERT, description: "cargo test --test certification at 9bafcb3: 193 passed, 0 failed, 0 ignored (189 + 4 ws01r4); at 5aebf23: 193/0", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/regression/cargo-test-certification.9bafcb3.out}
+  - {id: REG-BUILD, description: "cargo build --release at 9bafcb3: 0 warnings; test builds 0 warnings; rustfmt clean on contracts.rs, ws01r4.rs, main.rs, control.rs (main.rs --check hunks only in untouched section6.rs/srr.rs)", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/regression/cargo-build-release.9bafcb3.out}
+  - {id: VERIFY-BOUND, description: "gov contract verify at 9bafcb3: CONTRACT_SOURCE_BOUND; 101 capabilities, 762 owners, 0 deferred, nothing absent from the tree; every capability has a running owner", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/matrix-inputs/gov-contract-matrix.9bafcb3.json}
+  - {id: OWNER-MUTATION-CONTROLS, description: "29/29 typed failures through gov contract verify/compile (zero owners, obligation-only, renamed/ignored test, uncatalogued check, wrong tier, unguarded g0, missing held-out test/suite, non-independent AC, unknown record, unknown kind, out-of-vocabulary class/tier/trigger/status, misplaced independent owner, unowned class/tier/trigger, missing invalidation owner, foreign item owner, governed edits without recompile, chain-only tree defers and refuses compile, compile preserves governed fields byte-identically)", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/mutation-controls/owner-mutation-controls.9bafcb3.out}
+  - {id: BC-P2-01-ROUND1-CONTROLS, description: "round-1 mutation-controls.py (P2-AR-0014) run unedited against the 9bafcb3 release binary: 20/20 PASS, same codes (AC-13 preserved)", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/mutation-controls/bc-p2-01-round1-mutation-controls.9bafcb3.out}
+  - {id: OWNER-PLANTED-FAULTS, description: "PLANTED-FAULT: one tier owner per gate reports a planted fault it did not report before — 20/20 cases over gates A B C D F G H I J K L M N O R T U W (M1, T3, W7 raise warning-level findings; the check stays ok)", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/owner-faults/planted-faults.9bafcb3.out}
+  - {id: OWNER-RELEASE-TAMPER, description: "PLANTED-FAULT gate S: release:release verify accepts a built 4.1.6 release as written and refuses it after one byte is appended to kernel/KERNEL.yaml (modified [KERNEL.yaml])", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/owner-faults/release-tamper.9bafcb3.out}
+  - {id: OWNER-MUTATIONS, description: "MUTATION gates E, P, Q, V, W: the owner test passes on the unmutated private copy and fails on the mutant (authority undeclared level; telemetry never read; hex/base64 export not blocked; oracle expected_severity not required; superseded inputs not blocked) — 5/5", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/owner-faults/product-mutations.5aebf23.out}
+  - {id: MATRIX, description: "gov contract matrix from the committed map with this run's lib/certification/R1/G5/doctor outputs: 101 capabilities; owner last-run status PASSED 441, RAN 174 (doctor:D032 findings = unprovisioned-bootstrap disclosure; held-out suites at baseline, all 10 named held-out tests PASSED), NOT_IN_SUPPLIED_EVIDENCE 37 (g0/human-gate/release), OBLIGATION 110", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/suite-to-contract.md}
+  - {id: R1-AR0027, description: "AR-0027 unedited, private path target/P2-AR-0042/r1-P2-AR-0042-private: 26/3 (b1, b2, d3) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/r1-heldout-9bafcb3.out}
+  - {id: R1-AR0029, description: "AR-0029 unedited: 26/2 (b3, b6), ho_f_preservation does not compile = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/r1-heldout-9bafcb3.out}
+  - {id: R1-AR0031, description: "AR-0031 unedited: 27/7 (a1, a5, a8, b6, c2, c3, d2) = recorded baseline", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/r1-heldout-9bafcb3.out}
+  - {id: R1-AR0033, description: "AR-0033 unedited: 30/1 — only hv_a_derivation::a1, which pins 84 files / 740 functions (this tree: 123 / 2340)", result: FAIL, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/r1-heldout-9bafcb3.out}
+  - {id: R1-AR0033-A1-UNPINNED, description: "labelled copy of hv_a::a1 with only the two size asserts printed: census 123 files / 2340 functions, 0 violations in all seven section-6 activities (human_gate_create 49/44/1/0, identical per activity to the round-3 integration); derive.py: 0 violations in three splitter configurations", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/r1-heldout-9bafcb3.out}
+  - {id: R1-FAILURE-MESSAGES, description: "normalised failure messages of the unedited suites identical to the round-3 integration run (42 lines, empty diff)", result: PASS, evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence/r1-heldout/failure-messages-vs-integration-3.txt}
+findings:
+  - id: P2-AR-0042-G1
+    severity: MEDIUM
+    capability: C5, F5, G1, H3, K3, M2, M3, N2, Q2, Q3, Q4, R2, T2, V1, V2, V3
+    blocking: false
+    blocker_class: BC-P2-02
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "16 capabilities are owned only by builder regression tests (plus the AC-12/AC-6 obligation): no G-tier, held-out, human-gate or release owner exists for them; under a reading of AC-10's parenthetical list that excludes builder tests they are the capabilities without an owner of the listed kinds (report §9.1, what each would need)"
+    path: release/capability-baseline/repair-1/r4-ws01/00-REPAIR-REPORT.md
+  - id: P2-AR-0042-G2
+    severity: LOW
+    capability: V1, V2, V3, V4, W12
+    blocking: false
+    blocker_class: BC-P2-07
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "G6 `gov health qualify` (scheduler::qualification_run, which validates oracle and report files) is exercised by no test or run, so no G6 owner is mapped for V1-V4 or W12.7 (IP-R4-WS01-4)"
+    path: release/capability-baseline/repair-1/r4-ws01/00-REPAIR-REPORT.md
+  - id: P2-AR-0042-G3
+    severity: LOW
+    capability: "H2, I1, H1, P1, D4, P2, Q1, S2, N1 and 31 others"
+    blocking: false
+    blocker_class: BC-P2-02
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "127 of 713 checklist items name no owner (per-item owners are builder claims; list in evidence/mapping/owner-census.9bafcb3.out)"
+    path: release/capability-baseline/repair-1/r4-ws01/evidence/mapping/owner-census.9bafcb3.out
+  - id: P2-AR-0042-G4
+    severity: INFO
+    capability: all
+    blocking: false
+    blocker_class: BC-P2-03
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: "invalidation on schema, migration and security/sensitivity-policy change is proven at unit level only (class membership + class change changes the key); no end-to-end scenario changes those inputs specifically"
+    path: release/capability-baseline/repair-1/r4-ws01/00-REPAIR-REPORT.md
+verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+output:
+  branch: phase2/repair-1-r4-ws01
+  commit: 2ed8ab1158f69b966c1cc7bb799c910d262bec15
+  product_tip: 9bafcb35468afa1b568fc7b46b2811c0829ffbdf
+  product_code_digest: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9
+  governed_state_digest: 75502102b1fff0fa01643b14c26634f0257b2551c289b5071acace5a3943958c
+  evidence_path: release/capability-baseline/repair-1/r4-ws01/evidence
+  matrix: [release/capability-baseline/repair-1/r4-ws01/suite-to-contract.md, release/capability-baseline/repair-1/r4-ws01/suite-to-contract.json]
+test_counts:
+  lib: {passed: 271, failed: 0, ignored: 0}
+  certification: {passed: 193, failed: 0, ignored: 0}
+  warnings: 0
+r1_heldout:
+  AR-0027: {passed: 26, failed: 3, baseline: "26/3"}
+  AR-0029: {passed: 26, failed: 2, not_compiling: [ho_f_preservation], baseline: "26/2, ho_f non-compiling"}
+  AR-0031: {passed: 27, failed: 7, baseline: "27/7"}
+  AR-0033: {passed: 30, failed: 1, failing: [hv_a_derivation::a1 size pin], baseline: "30/1"}
+  census: {files: 123, functions: 2340, section_6_violations: 0, private_path: "<worktree>/target/P2-AR-0042/r1-P2-AR-0042-private", run_at: 9bafcb3}
+owners:
+  capabilities: 101
+  total: 762
+  by_kind: {test: 441, check: 127, obligation: 110, doctor: 34, g0: 19, human-gate: 13, heldout: 13, release: 5}
+  by_class_owners: {unit/integration/system test: 426, governance health check: 161, independent audit evidence: 105, automated invariant/guard: 19, independent held-out test: 18, human-gate evidence: 13, clean-clone/release evidence: 12, migration/rollback evidence: 8}
+  capabilities_by_class: {unit/integration/system test: 100, independent audit evidence: 101, governance health check: 74, human-gate evidence: 13, automated invariant/guard: 9, independent held-out test: 7, clean-clone/release evidence: 7, migration/rollback evidence: 6}
+  capabilities_by_tier: {G0: 9, G1: 44, G2: 32, G3: 25, G4: 69, G5: 74, G6: 71}
+  capabilities_with_a_tier_owner: 76
+  capabilities_without_a_tier_owner_but_gate_release_or_heldout_owner: [A4, F3, K1, K4, Q1, S1, S2, S4, S5]
+  capabilities_owned_only_by_tests: [C5, F5, G1, H3, K3, M2, M3, N2, Q2, Q3, Q4, R2, T2, V1, V2, V3]
+  zero_owner_capabilities: []
+  checklist_items_naming_an_owner: "586/713"
+unresolved:
+  - "IP-R4-WS01-1 (WS-2): add contracts::owner_sources_fingerprint(root) to the contract_binding cache key (scheduler Extra::ContractSource / reporting::contract_files)"
+  - "IP-R4-WS01-2 (WS-2, WS-8): carry verify's evidence_owners (deferred, not_in_this_tree) into the contract_binding detail and PRE_RELEASE_CHECKS.json"
+  - "IP-R4-WS01-3 (round-4 integrator and later builders): the map names 441 tests; renaming/removing/ignoring one fails gov contract verify — re-run verify after merging P2-AR-0043; update owner-spec.yaml/map and recompile"
+  - "IP-R4-WS01-4 (WS-2): exercise gov health qualify so G6 owners exist for V1-V4 and W12.7"
+  - "IP-R4-WS01-5 (WS-2 and owners): tier owners for the 16 test-only capabilities"
+  - "IP-R4-WS01-6 (WS-2): index_freshness did not report an edited README.md (did report src/lib.rs) — recorded, not judged"
+recommended_next_action: "Integrate phase2/repair-1-r4-ws01 (work commit 2ed8ab1, product 9bafcb3, product_code_digest d0c6a0d4…a4c9) with P2-AR-0043's branch, re-run gov contract verify on the union (IP-R4-WS01-3), then mint cap2-candidate-1 for independent capability verification; the verifier samples owners per gate and judges §9's gaps."
+completed_at: "2026-09-19T18:21:53Z"

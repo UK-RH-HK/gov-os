@@ -13,109 +13,109 @@ Universe: 101 capabilities in 23 gates; 713 checklist items; 8 advanced-qualific
 
 ## Capability index
 
-| Capability | Title | Gate | Requirement class | Source label | Source line | Checklist items | Challenge IDs | Evidence class | Automated checks |
-|---|---|---|---|---|---|---|---|---|---|
-| `A1` | Canonical authority and policy precedence | A | `ORIGINAL` | — | 132 | 6 | `AQC-A1` | `NOT_YET_MAPPED` | 0 |
-| `A2` | Authentic root of trust | A | `POST_VERIFICATION_HARDENING` | `POST-VERIFICATION HARDENING` | 142 | 10 | `AQC-A2` | `NOT_YET_MAPPED` | 0 |
-| `A3` | Security, sensitivity and permissions | A | `ORIGINAL` | — | 156 | 6 | `AQC-A3` | `NOT_YET_MAPPED` | 0 |
-| `A4` | Budget/resource governance | A | `ORIGINAL` | — | 166 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `A5` | Emergency controls | A | `ORIGINAL` | — | 172 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `B1` | Standard repository contract | B | `ORIGINAL` | — | 184 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `B2` | Path map | B | `ORIGINAL` | — | 190 | 5 | `AQC-B2` | `NOT_YET_MAPPED` | 0 |
-| `B3` | Authoritative vs derived state | B | `ORIGINAL` | — | 199 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `C1` | Deterministic structured memory | C | `ORIGINAL` | — | 209 | 17 | — | `NOT_YET_MAPPED` | 0 |
-| `C2` | Relationship/graph memory | C | `ORIGINAL` | — | 229 | 3 | — | `NOT_YET_MAPPED` | 0 |
-| `C3` | Semantic memory | C | `ORIGINAL` | — | 234 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `C4` | Lexical memory | C | `ORIGINAL` | — | 243 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `C5` | Code-structural memory | C | `ORIGINAL` | — | 251 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `C6` | Temporal memory | C | `ORIGINAL` | — | 261 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `C7` | Episodic execution memory | C | `ORIGINAL` | — | 268 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `C8` | Failure memory | C | `ORIGINAL` | — | 276 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `C9` | Working memory/context packet | C | `ORIGINAL` | — | 285 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `C10` | Capability memory | C | `ORIGINAL` | — | 294 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `D1` | Incremental indexing/freshness | D | `ORIGINAL` | — | 307 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `D2` | Retrieval router | D | `ORIGINAL` | — | 315 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `D3` | Hierarchical retrieval | D | `ORIGINAL` | — | 323 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `D4` | Component separation | D | `ORIGINAL` | — | 329 | 10 | — | `NOT_YET_MAPPED` | 0 |
-| `D5` | Evidence-driven retrieval model selection | D | `ORIGINAL` | — | 342 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `D6` | Rebuild guarantee | D | `ORIGINAL` | — | 350 | 4 | `AQC-D6` | `NOT_YET_MAPPED` | 0 |
-| `E1` | Authority levels | E | `ORIGINAL` | — | 362 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `E2` | Representative roles | E | `ORIGINAL` | — | 368 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `E3` | Typed A2A handoffs | E | `ORIGINAL` | — | 377 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `E4` | Concurrency/task claims | E | `ORIGINAL` | — | 387 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `F1` | Skill lifecycle | F | `ORIGINAL` | — | 398 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `F2` | Tool Capability Registry | F | `ORIGINAL` | — | 404 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `F3` | Missing-tool acquisition | F | `ORIGINAL` | — | 414 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `F4` | Plugin trust boundary | F | `POST_VERIFICATION_HARDENING` | `POST-VERIFICATION HARDENING` | 425 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `F5` | MCP/A2A/tool separation | F | `ORIGINAL` | — | 433 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `G1` | Natural-language intent | G | `ORIGINAL` | — | 443 | 3 | — | `NOT_YET_MAPPED` | 0 |
-| `G2` | Small explicit human control set | G | `ORIGINAL` | — | 448 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `H1` | SPEC lineage | H | `ORIGINAL` | — | 460 | 17 | — | `NOT_YET_MAPPED` | 0 |
-| `H2` | 26-dimension Feature/Capability Readiness Contract | H | `ORIGINAL` | — | 480 | 31 | — | `NOT_YET_MAPPED` | 0 |
-| `H3` | Readiness generates work | H | `ORIGINAL` | — | 517 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `H4` | Scenarios drive data/tests | H | `ORIGINAL` | — | 524 | 3 | `AQC-H4` | `NOT_YET_MAPPED` | 0 |
-| `I1` | Unified task DAG | I | `ORIGINAL` | — | 535 | 22 | — | `NOT_YET_MAPPED` | 0 |
-| `I2` | Task contract | I | `ORIGINAL` | — | 560 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `I3` | Dynamic generation | I | `ORIGINAL` | — | 571 | 11 | — | `NOT_YET_MAPPED` | 0 |
-| `I4` | Parallel execution | I | `ORIGINAL` | — | 585 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `J1` | Research becomes evidence | J | `ORIGINAL` | — | 596 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `J2` | Experiment lifecycle | J | `ORIGINAL` | — | 607 | 7 | `AQC-J2` | `NOT_YET_MAPPED` | 0 |
-| `K1` | CIT-P | K | `ORIGINAL` | — | 622 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `K2` | CIT-E | K | `ORIGINAL` | — | 628 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `K3` | Automatic impact simulation | K | `ORIGINAL` | — | 638 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `K4` | Impact radius | K | `ORIGINAL` | — | 649 | 1 | — | `NOT_YET_MAPPED` | 0 |
-| `L1` | Contradiction resolution | L | `ORIGINAL` | — | 656 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `L2` | Human Decision Gate package | L | `ORIGINAL` | — | 662 | 10 | — | `NOT_YET_MAPPED` | 0 |
-| `L3` | Gate presentation | L | `ORIGINAL` | — | 674 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `L4` | Non-global blocking | L | `ORIGINAL` | — | 681 | 2 | — | `NOT_YET_MAPPED` | 0 |
-| `M1` | T0-T3 or equivalent capability tiers | M | `ORIGINAL` | — | 689 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `M2` | Reasoning requirement | M | `ORIGINAL` | — | 695 | 1 | — | `NOT_YET_MAPPED` | 0 |
-| `M3` | Role defaults | M | `ORIGINAL` | — | 698 | 2 | — | `NOT_YET_MAPPED` | 0 |
-| `M4` | Empirical routing | M | `ORIGINAL` | — | 702 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `N1` | Structured checkpoint | N | `ORIGINAL` | — | 717 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `N2` | Mandatory triggers | N | `ORIGINAL` | — | 729 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `N3` | Provider-independent checkpoint watchdog | N | `ORIGINAL` | — | 739 | 3 | — | `NOT_YET_MAPPED` | 0 |
-| `N4` | Worker return contract | N | `ORIGINAL` | — | 744 | 1 | — | `NOT_YET_MAPPED` | 0 |
-| `O1` | Product test families | O | `ORIGINAL` | — | 751 | 10 | — | `NOT_YET_MAPPED` | 0 |
-| `O2` | Governance test families | O | `ORIGINAL` | — | 763 | 17 | — | `NOT_YET_MAPPED` | 0 |
-| `O3` | Independent test authorship | O | `ORIGINAL` | — | 782 | 3 | — | `NOT_YET_MAPPED` | 0 |
-| `O4` | Governance suite currency | O | `ORIGINAL` | — | 787 | 2 | — | `NOT_YET_MAPPED` | 0 |
-| `O5` | Governance Health Scheduler | O | `EXECUTION_REFINEMENT` | `NEW EXECUTION REFINEMENT` | 791 | 14 | — | `NOT_YET_MAPPED` | 0 |
-| `P1` | Execution telemetry | P | `ORIGINAL` | — | 814 | 13 | — | `NOT_YET_MAPPED` | 0 |
-| `P2` | Organisational questions | P | `ORIGINAL` | — | 829 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `Q1` | Lesson lifecycle | Q | `ORIGINAL` | — | 844 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `Q2` | Decision vs lesson | Q | `ORIGINAL` | — | 854 | 2 | — | `NOT_YET_MAPPED` | 0 |
-| `Q3` | PROJECT/PRODUCT/FRAMEWORK scope | Q | `ORIGINAL` | — | 858 | 1 | — | `NOT_YET_MAPPED` | 0 |
-| `Q4` | Upstream Export Gate | Q | `ORIGINAL` | — | 861 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `R1` | Legacy Governance Retirement | R | `ORIGINAL` | — | 872 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `R2` | Chat-memory retirement | R | `ORIGINAL` | — | 881 | 4 | — | `NOT_YET_MAPPED` | 0 |
-| `R3` | Archive policy | R | `ORIGINAL` | — | 887 | 3 | — | `NOT_YET_MAPPED` | 0 |
-| `S1` | Canonical OS repo | S | `ORIGINAL` | — | 896 | 2 | — | `NOT_YET_MAPPED` | 0 |
-| `S2` | Immutable releases | S | `ORIGINAL` | — | 900 | 11 | — | `NOT_YET_MAPPED` | 0 |
-| `S3` | `gov init` | S | `ORIGINAL` | — | 913 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `S4` | `gov adopt` | S | `ORIGINAL` | — | 921 | 12 | — | `NOT_YET_MAPPED` | 0 |
-| `S5` | `gov update` | S | `ORIGINAL` | — | 936 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `S6` | Cross-machine mechanics | S | `ORIGINAL` | — | 947 | 3 | — | `NOT_YET_MAPPED` | 0 |
-| `T1` | Role separation | T | `ORIGINAL` | — | 956 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `T2` | Fresh-session independence | T | `ORIGINAL` | — | 967 | 2 | — | `NOT_YET_MAPPED` | 0 |
-| `T3` | Adoption evidence tree | T | `ORIGINAL` | — | 971 | 1 | — | `NOT_YET_MAPPED` | 0 |
-| `U` | Framework Health SLOs | U | `ORIGINAL` | — | 976 | 28 | — | `NOT_YET_MAPPED` | 0 |
-| `V1` | Fault manifest | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1016 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `V2` | Hidden path-map oracle | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1028 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `V3` | Hidden memory oracle | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1038 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `V4` | Quantitative qualification scoring | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1047 | 12 | — | `NOT_YET_MAPPED` | 0 |
-| `W1` | Stable artefact identity | W | `ORIGINAL` | — | 1068 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `W2` | Typed output → input contracts | W | `ORIGINAL` | — | 1082 | 8 | — | `NOT_YET_MAPPED` | 0 |
-| `W3` | Mandatory task-input manifest | W | `ORIGINAL` | — | 1092 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `W4` | Context compiler delivery proof | W | `ORIGINAL` | — | 1106 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `W5` | Consumption receipt and implementation traceability | W | `ORIGINAL` | — | 1114 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `W6` | Upstream-change staleness propagation | W | `ORIGINAL` | — | 1128 | 7 | — | `NOT_YET_MAPPED` | 0 |
-| `W7` | Orphan/dead-output and unexplained-output detection | W | `ORIGINAL` | — | 1138 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `W8` | Forward and reverse lineage | W | `ORIGINAL` | — | 1146 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `W9` | Session/handoff continuity of mandatory inputs | W | `ORIGINAL` | — | 1154 | 6 | — | `NOT_YET_MAPPED` | 0 |
-| `W10` | Deterministic mandatory inputs outrank retrieval | W | `ORIGINAL` | — | 1162 | 5 | — | `NOT_YET_MAPPED` | 0 |
-| `W11` | Artifact-flow quantitative health | W | `ORIGINAL` | — | 1173 | 9 | — | `NOT_YET_MAPPED` | 0 |
-| `W12` | Health-scheduler integration | W | `ORIGINAL` | — | 1185 | 7 | `AQC-W12` | `NOT_YET_MAPPED` | 0 |
+| Capability | Title | Gate | Requirement class | Source label | Source line | Checklist items | Challenge IDs | Evidence class | Owners (product / independent) | Tiers |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `A1` | Canonical authority and policy precedence | A | `ORIGINAL` | — | 132 | 6 | `AQC-A1` | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 13 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `A2` | Authentic root of trust | A | `POST_VERIFICATION_HARDENING` | `POST-VERIFICATION HARDENING` | 142 | 10 | `AQC-A2` | `unit/integration/system test`, `governance health check`, `independent held-out test`, `migration/rollback evidence`, `independent audit evidence` | 22 / 6 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `A3` | Security, sensitivity and permissions | A | `ORIGINAL` | — | 156 | 6 | `AQC-A3` | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 17 / 1 | `G0`, `G1`, `G3`, `G4`, `G5`, `G6` |
+| `A4` | Budget/resource governance | A | `ORIGINAL` | — | 166 | 4 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 3 / 1 | none |
+| `A5` | Emergency controls | A | `ORIGINAL` | — | 172 | 6 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G0`, `G1`, `G5` |
+| `B1` | Standard repository contract | B | `ORIGINAL` | — | 184 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `B2` | Path map | B | `ORIGINAL` | — | 190 | 5 | `AQC-B2` | `unit/integration/system test`, `governance health check`, `migration/rollback evidence`, `independent audit evidence` | 5 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `B3` | Authoritative vs derived state | B | `ORIGINAL` | — | 199 | 4 | — | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 9 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `C1` | Deterministic structured memory | C | `ORIGINAL` | — | 209 | 17 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 11 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `C2` | Relationship/graph memory | C | `ORIGINAL` | — | 229 | 3 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `C3` | Semantic memory | C | `ORIGINAL` | — | 234 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `C4` | Lexical memory | C | `ORIGINAL` | — | 243 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `C5` | Code-structural memory | C | `ORIGINAL` | — | 251 | 8 | — | `unit/integration/system test`, `independent audit evidence` | 7 / 1 | none |
+| `C6` | Temporal memory | C | `ORIGINAL` | — | 261 | 5 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `C7` | Episodic execution memory | C | `ORIGINAL` | — | 268 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G2`, `G3`, `G4`, `G5`, `G6` |
+| `C8` | Failure memory | C | `ORIGINAL` | — | 276 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G5` |
+| `C9` | Working memory/context packet | C | `ORIGINAL` | — | 285 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G4`, `G5`, `G6` |
+| `C10` | Capability memory | C | `ORIGINAL` | — | 294 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `D1` | Incremental indexing/freshness | D | `ORIGINAL` | — | 307 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 8 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `D2` | Retrieval router | D | `ORIGINAL` | — | 315 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G4`, `G5`, `G6` |
+| `D3` | Hierarchical retrieval | D | `ORIGINAL` | — | 323 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `D4` | Component separation | D | `ORIGINAL` | — | 329 | 10 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 8 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `D5` | Evidence-driven retrieval model selection | D | `ORIGINAL` | — | 342 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `D6` | Rebuild guarantee | D | `ORIGINAL` | — | 350 | 4 | `AQC-D6` | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 8 / 1 | `G4`, `G5`, `G6` |
+| `E1` | Authority levels | E | `ORIGINAL` | — | 362 | 4 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 12 / 1 | `G0`, `G3`, `G4`, `G5`, `G6` |
+| `E2` | Representative roles | E | `ORIGINAL` | — | 368 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G3`, `G4`, `G5`, `G6` |
+| `E3` | Typed A2A handoffs | E | `ORIGINAL` | — | 377 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G2`, `G3`, `G4`, `G5`, `G6` |
+| `E4` | Concurrency/task claims | E | `ORIGINAL` | — | 387 | 5 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 11 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `F1` | Skill lifecycle | F | `ORIGINAL` | — | 398 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G5`, `G6` |
+| `F2` | Tool Capability Registry | F | `ORIGINAL` | — | 404 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `F3` | Missing-tool acquisition | F | `ORIGINAL` | — | 414 | 9 | — | `unit/integration/system test`, `independent held-out test`, `human-gate evidence`, `independent audit evidence` | 7 / 2 | none |
+| `F4` | Plugin trust boundary | F | `POST_VERIFICATION_HARDENING` | `POST-VERIFICATION HARDENING` | 425 | 6 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `human-gate evidence`, `independent audit evidence` | 14 / 3 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `F5` | MCP/A2A/tool separation | F | `ORIGINAL` | — | 433 | 4 | — | `unit/integration/system test`, `independent audit evidence` | 3 / 1 | none |
+| `G1` | Natural-language intent | G | `ORIGINAL` | — | 443 | 3 | — | `unit/integration/system test`, `independent audit evidence` | 2 / 1 | none |
+| `G2` | Small explicit human control set | G | `ORIGINAL` | — | 448 | 5 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G0`, `G5`, `G6` |
+| `H1` | SPEC lineage | H | `ORIGINAL` | — | 460 | 17 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `H2` | 26-dimension Feature/Capability Readiness Contract | H | `ORIGINAL` | — | 480 | 31 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `H3` | Readiness generates work | H | `ORIGINAL` | — | 517 | 5 | — | `unit/integration/system test`, `independent audit evidence` | 3 / 1 | none |
+| `H4` | Scenarios drive data/tests | H | `ORIGINAL` | — | 524 | 3 | `AQC-H4` | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G2`, `G4`, `G5`, `G6` |
+| `I1` | Unified task DAG | I | `ORIGINAL` | — | 535 | 22 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `I2` | Task contract | I | `ORIGINAL` | — | 560 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G2`, `G4`, `G5`, `G6` |
+| `I3` | Dynamic generation | I | `ORIGINAL` | — | 571 | 11 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G4`, `G5`, `G6` |
+| `I4` | Parallel execution | I | `ORIGINAL` | — | 585 | 5 | — | `automated invariant/guard`, `unit/integration/system test`, `independent audit evidence` | 6 / 1 | `G0` |
+| `J1` | Research becomes evidence | J | `ORIGINAL` | — | 596 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G2`, `G4`, `G5`, `G6` |
+| `J2` | Experiment lifecycle | J | `ORIGINAL` | — | 607 | 7 | `AQC-J2` | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 9 / 1 | `G2`, `G4`, `G5`, `G6` |
+| `K1` | CIT-P | K | `ORIGINAL` | — | 622 | 4 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 5 / 1 | none |
+| `K2` | CIT-E | K | `ORIGINAL` | — | 628 | 8 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 11 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `K3` | Automatic impact simulation | K | `ORIGINAL` | — | 638 | 8 | — | `unit/integration/system test`, `independent audit evidence` | 5 / 1 | none |
+| `K4` | Impact radius | K | `ORIGINAL` | — | 649 | 1 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 4 / 1 | none |
+| `L1` | Contradiction resolution | L | `ORIGINAL` | — | 656 | 4 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 6 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `L2` | Human Decision Gate package | L | `ORIGINAL` | — | 662 | 10 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 5 / 1 | `G3`, `G4`, `G5`, `G6` |
+| `L3` | Gate presentation | L | `ORIGINAL` | — | 674 | 5 | — | `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence` | 13 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `L4` | Non-global blocking | L | `ORIGINAL` | — | 681 | 2 | — | `automated invariant/guard`, `unit/integration/system test`, `independent audit evidence` | 6 / 1 | `G0` |
+| `M1` | T0-T3 or equivalent capability tiers | M | `ORIGINAL` | — | 689 | 4 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G4`, `G5`, `G6` |
+| `M2` | Reasoning requirement | M | `ORIGINAL` | — | 695 | 1 | — | `unit/integration/system test`, `independent audit evidence` | 1 / 1 | none |
+| `M3` | Role defaults | M | `ORIGINAL` | — | 698 | 2 | — | `unit/integration/system test`, `independent audit evidence` | 1 / 1 | none |
+| `M4` | Empirical routing | M | `ORIGINAL` | — | 702 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G4`, `G5`, `G6` |
+| `N1` | Structured checkpoint | N | `ORIGINAL` | — | 717 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 3 / 1 | `G3`, `G4`, `G5`, `G6` |
+| `N2` | Mandatory triggers | N | `ORIGINAL` | — | 729 | 8 | — | `unit/integration/system test`, `independent audit evidence` | 5 / 1 | none |
+| `N3` | Provider-independent checkpoint watchdog | N | `ORIGINAL` | — | 739 | 3 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 3 / 1 | `G3`, `G4`, `G5`, `G6` |
+| `N4` | Worker return contract | N | `ORIGINAL` | — | 744 | 1 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 3 / 1 | `G2`, `G4`, `G5`, `G6` |
+| `O1` | Product test families | O | `ORIGINAL` | — | 751 | 10 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `O2` | Governance test families | O | `ORIGINAL` | — | 763 | 17 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 18 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `O3` | Independent test authorship | O | `ORIGINAL` | — | 782 | 3 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `independent audit evidence` | 3 / 5 | `G2`, `G4`, `G5`, `G6` |
+| `O4` | Governance suite currency | O | `ORIGINAL` | — | 787 | 2 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `O5` | Governance Health Scheduler | O | `EXECUTION_REFINEMENT` | `NEW EXECUTION REFINEMENT` | 791 | 14 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 13 / 1 | `G0`, `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `P1` | Execution telemetry | P | `ORIGINAL` | — | 814 | 13 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `P2` | Organisational questions | P | `ORIGINAL` | — | 829 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `Q1` | Lesson lifecycle | Q | `ORIGINAL` | — | 844 | 8 | — | `unit/integration/system test`, `human-gate evidence`, `independent audit evidence` | 4 / 1 | none |
+| `Q2` | Decision vs lesson | Q | `ORIGINAL` | — | 854 | 2 | — | `unit/integration/system test`, `independent audit evidence` | 2 / 1 | none |
+| `Q3` | PROJECT/PRODUCT/FRAMEWORK scope | Q | `ORIGINAL` | — | 858 | 1 | — | `unit/integration/system test`, `independent audit evidence` | 1 / 1 | none |
+| `Q4` | Upstream Export Gate | Q | `ORIGINAL` | — | 861 | 5 | — | `unit/integration/system test`, `independent audit evidence` | 4 / 1 | none |
+| `R1` | Legacy Governance Retirement | R | `ORIGINAL` | — | 872 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G1`, `G4`, `G5`, `G6` |
+| `R2` | Chat-memory retirement | R | `ORIGINAL` | — | 881 | 4 | — | `unit/integration/system test`, `migration/rollback evidence`, `independent audit evidence` | 5 / 1 | none |
+| `R3` | Archive policy | R | `ORIGINAL` | — | 887 | 3 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G4`, `G5`, `G6` |
+| `S1` | Canonical OS repo | S | `ORIGINAL` | — | 896 | 2 | — | `unit/integration/system test`, `clean-clone/release evidence`, `independent audit evidence` | 4 / 1 | none |
+| `S2` | Immutable releases | S | `ORIGINAL` | — | 900 | 11 | — | `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence` | 7 / 3 | none |
+| `S3` | `gov init` | S | `ORIGINAL` | — | 913 | 6 | — | `unit/integration/system test`, `governance health check`, `independent held-out test`, `clean-clone/release evidence`, `independent audit evidence` | 7 / 3 | `G1`, `G5` |
+| `S4` | `gov adopt` | S | `ORIGINAL` | — | 921 | 12 | — | `unit/integration/system test`, `migration/rollback evidence`, `human-gate evidence`, `independent audit evidence` | 8 / 1 | none |
+| `S5` | `gov update` | S | `ORIGINAL` | — | 936 | 9 | — | `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence` | 8 / 3 | none |
+| `S6` | Cross-machine mechanics | S | `ORIGINAL` | — | 947 | 3 | — | `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence` | 5 / 1 | `G4`, `G5`, `G6` |
+| `T1` | Role separation | T | `ORIGINAL` | — | 956 | 9 | — | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G0`, `G3`, `G4`, `G5`, `G6` |
+| `T2` | Fresh-session independence | T | `ORIGINAL` | — | 967 | 2 | — | `unit/integration/system test`, `independent audit evidence` | 4 / 1 | none |
+| `T3` | Adoption evidence tree | T | `ORIGINAL` | — | 971 | 1 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `U` | Framework Health SLOs | U | `ORIGINAL` | — | 976 | 28 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 18 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `V1` | Fault manifest | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1016 | 9 | — | `unit/integration/system test`, `independent audit evidence` | 4 / 2 | none |
+| `V2` | Hidden path-map oracle | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1028 | 7 | — | `unit/integration/system test`, `independent audit evidence` | 3 / 2 | none |
+| `V3` | Hidden memory oracle | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1038 | 7 | — | `unit/integration/system test`, `independent audit evidence` | 3 / 2 | none |
+| `V4` | Quantitative qualification scoring | V | `NEW TESTING REFINEMENT` | `NEW TESTING REFINEMENT` | 1047 | 12 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 2 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `W1` | Stable artefact identity | W | `ORIGINAL` | — | 1068 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `W2` | Typed output → input contracts | W | `ORIGINAL` | — | 1082 | 8 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `W3` | Mandatory task-input manifest | W | `ORIGINAL` | — | 1092 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 9 / 1 | `G4`, `G5`, `G6` |
+| `W4` | Context compiler delivery proof | W | `ORIGINAL` | — | 1106 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G4`, `G5`, `G6` |
+| `W5` | Consumption receipt and implementation traceability | W | `ORIGINAL` | — | 1114 | 9 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 5 / 1 | `G2`, `G4`, `G5`, `G6` |
+| `W6` | Upstream-change staleness propagation | W | `ORIGINAL` | — | 1128 | 7 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 6 / 1 | `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
+| `W7` | Orphan/dead-output and unexplained-output detection | W | `ORIGINAL` | — | 1138 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 4 / 1 | `G4`, `G5`, `G6` |
+| `W8` | Forward and reverse lineage | W | `ORIGINAL` | — | 1146 | 5 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 7 / 1 | `G1`, `G2`, `G4`, `G5`, `G6` |
+| `W9` | Session/handoff continuity of mandatory inputs | W | `ORIGINAL` | — | 1154 | 6 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 2 / 1 | `G3`, `G4`, `G5`, `G6` |
+| `W10` | Deterministic mandatory inputs outrank retrieval | W | `ORIGINAL` | — | 1162 | 5 | — | `unit/integration/system test`, `governance health check`, `independent audit evidence` | 3 / 1 | `G4`, `G5`, `G6` |
+| `W11` | Artifact-flow quantitative health | W | `ORIGINAL` | — | 1173 | 9 | — | `governance health check`, `independent audit evidence` | 2 / 1 | `G1`, `G3`, `G4`, `G5`, `G6` |
+| `W12` | Health-scheduler integration | W | `ORIGINAL` | — | 1185 | 7 | `AQC-W12` | `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence` | 8 / 1 | `G0`, `G1`, `G2`, `G3`, `G4`, `G5`, `G6` |
 
 ## Contract-level definitions (owner-source preamble)
 
@@ -208,7 +208,45 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** inject contradictory project policies, obsolete provider rules, active/superseded decisions, malicious exceptions, and attempted authority/sensitivity weakening. <sub>AQC-A1 · L140</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `A1`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-A1`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `A1`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-A1`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:policy_precedence` — governance health check · G4, G5, G6 — refuses and reports every weakening override; precedence rules present; policy read from a verified kernel
+- `doctor:D027` — governance health check · G1, G5 — policy precedence respected: a weakening override is a critical hard-block finding
+- `doctor:D029` — governance health check · G1, G5 — constitutional policy is read from a verified kernel
+- `check:authority_unambiguous` — governance health check · G1, G3, G4, G5, G6 — contradictions between current authoritative records are reported until resolved
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6 — superseded-but-ACTIVE authority is reported
+- `test:certification:repair2::project_policy_cannot_weaken_constitutional_floors` — unit/integration/system test — every weakening of authority/sensitivity/gate/change/export floors is refused, reported, auditable
+- `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them` — unit/integration/system test — every overlay input goes through POLICY_PRECEDENCE
+- `test:certification:repair3::constitutional_floors_require_a_verified_kernel` — unit/integration/system test — tampered kernel policy fails closed with KERNEL_TAMPERED
+- `test:certification:repair3::policy_exceptions_require_a_real_governing_decision` — unit/integration/system test — a malicious exception without a real decision is refused
+- `test:lib:policy_precedence::tests::overlay_documents_may_raise_floors_but_never_lower_them` — unit/integration/system test
+- `test:lib:context::contradictions::tests::precedence_resolves_first_and_undecidable_pairs_are_detected` — unit/integration/system test — deterministic precedence decides active decisions first
+- `test:certification:repair::context_packet_layers_and_contradiction_flags` — unit/integration/system test — the packet carries the authority layers above retrieved context and flags superseded-but-ACTIVE decisions
+- `test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas` — unit/integration/system test — constitution, policies and registries are machine-readable and schema-valid
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `A1.1`: `doctor:D029`, `test:certification:repair3::constitutional_floors_require_a_verified_kernel`, `test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas`
+- `A1.2`: `check:policy_precedence`, `doctor:D027`, `doctor:D029`, `test:certification:repair2::project_policy_cannot_weaken_constitutional_floors`, `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`, `test:certification:repair3::constitutional_floors_require_a_verified_kernel`, `test:lib:policy_precedence::tests::overlay_documents_may_raise_floors_but_never_lower_them`
+- `A1.3`: `check:policy_precedence`, `doctor:D027`, `test:certification:repair2::project_policy_cannot_weaken_constitutional_floors`, `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`, `test:certification:repair3::policy_exceptions_require_a_real_governing_decision`, `test:lib:policy_precedence::tests::overlay_documents_may_raise_floors_but_never_lower_them`
+- `A1.4`: `check:authority_unambiguous`, `check:schema_invariants`, `test:lib:context::contradictions::tests::precedence_resolves_first_and_undecidable_pairs_are_detected`
+- `A1.5`: `test:certification:repair::context_packet_layers_and_contradiction_flags`
+- `A1.6`: `check:policy_precedence`, `doctor:D027`, `test:certification:repair2::project_policy_cannot_weaken_constitutional_floors`, `test:certification:repair3::constitutional_floors_require_a_verified_kernel`, `test:certification:repair3::policy_exceptions_require_a_real_governing_decision`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:policy_precedence","doctor:D027","doctor:D029","check:authority_unambiguous","check:schema_invariants"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:policy_precedence","doctor:D027","doctor:D029","check:authority_unambiguous","check:schema_invariants"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### A2. Authentic root of trust
 
@@ -227,7 +265,63 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** tampered source payload, stale/forged manifest, wrong key, altered security policy, modified migration, downgrade/replay attempt, interrupted install. <sub>AQC-A2 · L154</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `A2`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-A2`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `A2`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-A2`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `doctor:D003` — governance health check · G1, G5 — kernel payload integrity against the installed manifest
+- `doctor:D004` — governance health check · G1, G5 — lock matches the kernel manifest
+- `doctor:D032` — governance health check · G1, G5 — installation authenticity established, else disclosed (never presented as certified)
+- `check:installation_authenticity` — governance health check · G1, G4, G5, G6 — an installation whose release authenticity is not established is disclosed with its admission
+- `check:mutation_scope` — governance health check · G2, G4, G5, G6 — kernel payload unmodified (INV-007)
+- `test:certification:srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance` — unit/integration/system test
+- `test:certification:srr::an_unsigned_source_is_refused_once_a_trust_anchor_exists` — unit/integration/system test
+- `test:certification:srr::wrong_key_wrong_product_and_wrong_channel_all_fail_closed` — unit/integration/system test
+- `test:certification:srr::modified_metadata_payload_and_migration_all_fail_closed` — unit/integration/system test
+- `test:certification:srr::installed_integrity_authenticity_and_admissibility_stay_three_separate_predicates` — unit/integration/system test
+- `test:certification:srr::environment_repository_and_caller_inputs_cannot_create_trust_or_approval` — unit/integration/system test
+- `test:certification:srr::root_succession_requires_both_quorums_no_gaps_and_revokes_by_omission` — unit/integration/system test
+- `test:certification:srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network` — unit/integration/system test
+- `test:certification:ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record` — unit/integration/system test
+- `test:certification:ws08::framework_lock_records_the_verified_identity_and_its_basis` — unit/integration/system test
+- `test:certification:ws08::an_unauthenticated_installation_is_never_presented_as_current` — unit/integration/system test
+- `test:certification:ws08_r2::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress` — unit/integration/system test
+- `test:certification:ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current` — unit/integration/system test
+- `test:certification:ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified` — migration/rollback evidence
+- `test:lib:srr::installation::tests::a_consistent_rewrite_diverges_from_the_protected_record_and_names_the_file` — unit/integration/system test
+- `test:certification:ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed` — unit/integration/system test
+- `test:certification:ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root` — unit/integration/system test — the binding authority rotates keys with retired-key standing and is admitted only from the provisioned root
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1/evidence/heldout-tests` — independent held-out test · tests heldout_srr::a1_signature_lifted_from_a_different_document_is_refused, heldout_srr2::c2_identity_and_payload_binding_fail_closed, heldout_srr4::e4_intact_is_not_authentic_and_the_two_controls_are_independent — AR-0027 held-out: signature, identity/payload binding, integrity vs authenticity
+- `heldout:release/verification/4.1.6-r1-2/evidence/heldout-tests` — independent held-out test · tests ho_e_rootexpiry::e2_root_rotation_is_possible_under_the_implemented_profile — AR-0029 held-out: root rotation under the implemented profile
+- `heldout:release/verification/4.1.6-r1-3/evidence/heldout-tests` — independent held-out test — AR-0031 held-out suite (census, fail-open, prior evidence, acquisition)
+- `heldout:release/verification/4.1.6-r1-4/evidence/heldout-tests` — independent held-out test · tests hv_d_sinks_and_preservation::d7_frozen_r1_preservation_still_holds — AR-0033 held-out: frozen R1 preservation
+- `obligation:AC-14` — independent held-out test — R1 preservation re-verified by a fresh independent verifier for every changed candidate
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `A2.1`: `doctor:D032`, `check:installation_authenticity`, `test:certification:srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance`, `test:certification:srr::an_unsigned_source_is_refused_once_a_trust_anchor_exists`, `test:certification:ws08_r2::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress`
+- `A2.2`: `test:certification:srr::installed_integrity_authenticity_and_admissibility_stay_three_separate_predicates`
+- `A2.3`: `test:certification:ws08_r2::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress`, `test:certification:ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified`
+- `A2.4`: `doctor:D003`, `doctor:D004`, `check:mutation_scope`, `test:certification:ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record`, `test:lib:srr::installation::tests::a_consistent_rewrite_diverges_from_the_protected_record_and_names_the_file`, `test:certification:ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed`
+- `A2.5`: `test:certification:srr::an_unsigned_source_is_refused_once_a_trust_anchor_exists`, `test:certification:srr::wrong_key_wrong_product_and_wrong_channel_all_fail_closed`, `test:certification:srr::modified_metadata_payload_and_migration_all_fail_closed`
+- `A2.6`: `test:certification:srr::environment_repository_and_caller_inputs_cannot_create_trust_or_approval`
+- `A2.7`: `doctor:D004`, `test:certification:ws08::framework_lock_records_the_verified_identity_and_its_basis`
+- `A2.8`: `doctor:D032`, `check:installation_authenticity`, `test:certification:ws08::an_unauthenticated_installation_is_never_presented_as_current`, `test:certification:ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current`
+- `A2.9`: `test:certification:srr::root_succession_requires_both_quorums_no_gaps_and_revokes_by_omission`, `test:certification:srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network`, `test:certification:ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root`
+- `A2.10`: `test:certification:srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance`, `test:certification:srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent held-out test`, `migration/rollback evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["doctor:D003","doctor:D004","doctor:D032","check:installation_authenticity","check:mutation_scope"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["doctor:D003","doctor:D004","doctor:D032","check:installation_authenticity","check:mutation_scope"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### A3. Security, sensitivity and permissions
 
@@ -242,7 +336,49 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** seeded secrets, restricted research, confidential project files, malicious plugin descriptors, weakened project policy. <sub>AQC-A3 · L164</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `A3`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-A3`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `A3`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-A3`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:secrets_sensitivity_indexing` — governance health check · G1, G4, G5, G6 — no secret-class artefact, secret pattern or never-index class in the index
+- `check:path_map_compliance` — governance health check · G1, G4, G5, G6 — every governed file matches a contract rule; no secret content outside secret-class paths
+- `doctor:D011` — governance health check · G1, G5 — secrets outside the secret class are a critical hard-block
+- `doctor:D012` — governance health check · G1, G5 — no secrets in the index
+- `check:authority_role_limits` — governance health check · G3, G4, G5, G6 — tool permissions name kernel roles; no worker handed the orchestrator role
+- `check:policy_precedence` — governance health check · G4, G5, G6 — a weakening sensitivity override is refused
+- `g0:capabilities invoke` — automated invariant/guard · G0 — plugin execution is guarded by the execute_plugin authority class
+- `test:certification:repair::sensitivity_classes_and_namespaces_are_enforced` — unit/integration/system test
+- `test:lib:paths::tests::secret_classification_can_never_be_downgraded` — unit/integration/system test
+- `test:lib:security::secrets::tests::detects_and_redacts` — unit/integration/system test
+- `test:certification:migration::command_tests_execute_only_governed_commands_for_permitted_roles` — unit/integration/system test
+- `test:lib:migrations::verify::tests::a_command_test_runs_only_a_governed_command_for_a_permitted_role` — unit/integration/system test
+- `test:certification:repair::authority_levels_are_enforced_on_executable_paths` — unit/integration/system test
+- `test:certification:repair3::plugin_descriptors_can_never_authorise_themselves` — unit/integration/system test — malicious plugin descriptors are inert
+- `test:certification:repair::destructive_migration_requires_answered_gate_record` — unit/integration/system test
+- `human-gate:adopt migrate` — human-gate evidence · record `human-gate` — a destructive migration batch executes only after a presented, answered gate
+- `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises` — unit/integration/system test — outbound export is default-deny and fails closed
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `A3.1`: `check:secrets_sensitivity_indexing`, `check:path_map_compliance`, `test:certification:repair::sensitivity_classes_and_namespaces_are_enforced`
+- `A3.2`: `check:secrets_sensitivity_indexing`, `check:path_map_compliance`, `doctor:D011`, `doctor:D012`, `test:certification:repair::sensitivity_classes_and_namespaces_are_enforced`, `test:lib:security::secrets::tests::detects_and_redacts`
+- `A3.3`: `check:policy_precedence`, `test:certification:repair::sensitivity_classes_and_namespaces_are_enforced`, `test:lib:paths::tests::secret_classification_can_never_be_downgraded`
+- `A3.4`: `check:authority_role_limits`, `g0:capabilities invoke`, `test:certification:migration::command_tests_execute_only_governed_commands_for_permitted_roles`, `test:lib:migrations::verify::tests::a_command_test_runs_only_a_governed_command_for_a_permitted_role`, `test:certification:repair::authority_levels_are_enforced_on_executable_paths`, `test:certification:repair3::plugin_descriptors_can_never_authorise_themselves`
+- `A3.5`: `test:certification:repair::destructive_migration_requires_answered_gate_record`, `human-gate:adopt migrate`
+- `A3.6`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G0`, `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:secrets_sensitivity_indexing","check:path_map_compliance","doctor:D011","doctor:D012","check:authority_role_limits","check:policy_precedence"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:secrets_sensitivity_indexing","check:path_map_compliance","doctor:D011","doctor:D012","check:authority_role_limits","check:policy_precedence"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### A4. Budget/resource governance
 
@@ -253,7 +389,33 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Exceeding delegated limits creates the required Human Decision Gate. <sub>A4.3 · L169</sub>
 - [ ] Budget state and interventions are observable. <sub>A4.4 · L170</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `A4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `A4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:repair::budget_parallel_agents_threshold_raises_gate` — unit/integration/system test — the parallel-agent budget and the routing-cost threshold are executable; exceeding raises a Human Decision Gate named in the refusal
+- `test:lib:memory::claims::tests::budget_is_decided_in_the_same_transaction` — unit/integration/system test
+- `human-gate:task claim` — human-gate evidence · record `human-gate` — a claim over the delegated parallel-agent limit raises the Human Decision Gate
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `A4.1`: `test:certification:repair::budget_parallel_agents_threshold_raises_gate`
+- `A4.2`: `test:certification:repair::budget_parallel_agents_threshold_raises_gate`, `test:lib:memory::claims::tests::budget_is_decided_in_the_same_transaction`
+- `A4.3`: `test:certification:repair::budget_parallel_agents_threshold_raises_gate`, `human-gate:task claim`
+- `A4.4`: `test:certification:repair::budget_parallel_agents_threshold_raises_gate`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `authoritative spec/decision`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### A5. Emergency controls
 
@@ -266,7 +428,41 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Emergency commands are deterministic and authority-gated. <sub>A5.5 · L177</sub>
 - [ ] Recovery from emergency controls is auditable. <sub>A5.6 · L178</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `A5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `A5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `g0:pause` — automated invariant/guard · G0 — PAUSE is an authority-gated (emergency_control) G0-classified command
+- `g0:freeze writes` — automated invariant/guard · G0
+- `g0:cancel agents` — automated invariant/guard · G0
+- `g0:resume` — automated invariant/guard · G0 — leaving emergency controls needs resume_control authority
+- `doctor:D018` — governance health check · G1, G5 — the control state is reported
+- `test:certification:ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations` — unit/integration/system test
+- `test:certification:repair::freeze_writes_is_honoured_by_adopt_and_upstream` — unit/integration/system test
+- `test:certification:ws03_r3::emergency_control_state_lives_in_the_operational_store` — unit/integration/system test
+- `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences` — unit/integration/system test — a failing transaction rolls back atomically
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `A5.1`: `g0:pause`, `test:certification:ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations`, `test:certification:ws03_r3::emergency_control_state_lives_in_the_operational_store`
+- `A5.2`: `g0:freeze writes`, `test:certification:ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations`, `test:certification:repair::freeze_writes_is_honoured_by_adopt_and_upstream`, `test:certification:ws03_r3::emergency_control_state_lives_in_the_operational_store`
+- `A5.3`: `g0:cancel agents`
+- `A5.4`: `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences`
+- `A5.5`: `g0:pause`, `g0:freeze writes`, `g0:cancel agents`, `g0:resume`, `test:certification:ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations`
+- `A5.6`: `doctor:D018`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `security/sensitivity policy`
+- health_scheduler_tiers: `G0`, `G1`, `G5`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["doctor:D018"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["doctor:D018"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate B — Repository Contract, Paths and State
 
@@ -281,7 +477,36 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Repository contract maps project-specific layout without cosmetic refactoring. <sub>B1.3 · L187</sub>
 - [ ] Generated/runtime state is distinguished from authoritative tracked state. <sub>B1.4 · L188</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `B1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `B1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:path_map_compliance` — governance health check · G1, G4, G5, G6 — every governed file matches a repository-contract rule
+- `check:recovery_rebuild` — governance health check · G4, G5, G6 — non-rebuildable OS state is kept outside the derived directories
+- `doctor:D024` — governance health check · G1, G5 — .governance-runtime is ignored by git
+- `test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state` — unit/integration/system test
+- `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration` — unit/integration/system test
+- `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading` — unit/integration/system test
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test — adoption maps the project's own layout into the contract
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `B1.1`: `check:path_map_compliance`, `test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state`, `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading`
+- `B1.3`: `check:path_map_compliance`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `B1.4`: `check:recovery_rebuild`, `doctor:D024`, `test:certification:ws06r3::the_repository_contract_states_where_the_os_keeps_its_state`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:lib:paths::tests::the_shipped_template_states_the_store_classification_under_any_reading`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:path_map_compliance","check:recovery_rebuild","doctor:D024"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:path_map_compliance","check:recovery_rebuild","doctor:D024"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### B2. Path map
 
@@ -295,7 +520,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** Repo B starts without a path map; includes misplaced specs, duplicate authority, provider rules, dead code, generated files in wrong locations and hidden cross-references. <sub>AQC-B2 · L197</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `B2`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-B2`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `B2`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-B2`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:path_map_compliance` — governance health check · G1, G4, G5, G6 — path-map compliance is machine-checked on every governed file
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test — A2 classification and A3 target path map with KEEP/MOVE/RETIRE actions
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test — the path map represents document citations; references are proven before retirement
+- `test:lib:migrations::references::tests::citations_links_and_path_references_are_found` — unit/integration/system test
+- `test:certification:migration::path_migration_with_rollback_and_memory_rebuild` — migration/rollback evidence
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `B2.1`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `B2.2`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::path_migration_with_rollback_and_memory_rebuild`
+- `B2.4`: `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`, `test:lib:migrations::references::tests::citations_links_and_path_references_are_found`
+- `B2.5`: `check:path_map_compliance`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `migration/rollback evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:path_map_compliance"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:path_map_compliance"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### B3. Authoritative vs derived state
 
@@ -306,7 +559,38 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Deleting derived state cannot delete project truth. <sub>B3.3 · L202</sub>
 - [ ] Derived records carry provenance sufficient to reconstruct source hits. <sub>B3.4 · L203</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `B3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `B3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:recovery_rebuild` — governance health check · G4, G5, G6 — tracked manifest matches the live index; deep: two full rebuilds reproduce it
+- `doctor:D009` — governance health check · G1, G5 — the derived runtime is present or rebuildable
+- `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration` — unit/integration/system test
+- `test:certification:repair::claims_survive_full_memory_rebuild` — unit/integration/system test
+- `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated` — unit/integration/system test
+- `test:certification:multi_machine::clone_rebuilds_identical_derived_state` — clean-clone/release evidence
+- `test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory` — unit/integration/system test
+- `test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory` — unit/integration/system test
+- `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `B3.1`: `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated`
+- `B3.2`: `check:recovery_rebuild`, `doctor:D009`, `test:lib:paths::tests::os_stores_are_never_classified_derived_or_generated`, `test:certification:multi_machine::clone_rebuilds_identical_derived_state`
+- `B3.3`: `check:recovery_rebuild`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:certification:repair::claims_survive_full_memory_rebuild`, `test:certification:ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory`, `test:lib:migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:recovery_rebuild","doctor:D009"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:recovery_rebuild","doctor:D009"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate C — Development Knowledge Fabric
 
@@ -336,7 +620,54 @@ Must represent current truth for: <sub>L210 · lead_in</sub>
 - [ ] model-routing records <sub>C1.16 · L226</sub>
 - [ ] index manifests <sub>C1.17 · L227</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6 — every structured record is valid against its kernel schema; lifecycle/state classes; duplicate ids
+- `doctor:D023` — governance health check · G1, G5 — records parse
+- `test:lib:records::tests::parse_yaml_and_markdown_records` — unit/integration/system test
+- `test:lib:graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage` — unit/integration/system test
+- `test:lib:memory::claims::tests::concurrent_claims_of_one_task_grant_exactly_one` — unit/integration/system test
+- `test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken` — unit/integration/system test — transactions are sealed structured records
+- `test:lib:orchestration::dag::tests::task_state_names_are_stable` — unit/integration/system test
+- `test:lib:skills::tests::content_digest_ignores_annotations_and_detects_method_changes` — unit/integration/system test
+- `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation` — unit/integration/system test — a tool installation is recorded by tool identity and version
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — project, feature, requirement, scenario, tests and routing records drive the whole greenfield flow
+- `check:index_freshness` — governance health check · G1, G2, G4, G5, G6 — the tracked index manifest is current truth for the index
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C1.1`: `check:schema_invariants`, `doctor:D023`, `test:certification:greenfield::greenfield_end_to_end`
+- `C1.2`: `check:schema_invariants`, `doctor:D023`, `test:certification:greenfield::greenfield_end_to_end`
+- `C1.3`: `check:schema_invariants`, `doctor:D023`, `test:lib:records::tests::parse_yaml_and_markdown_records`, `test:certification:greenfield::greenfield_end_to_end`
+- `C1.4`: `check:schema_invariants`, `doctor:D023`, `test:lib:records::tests::parse_yaml_and_markdown_records`
+- `C1.5`: `check:schema_invariants`, `doctor:D023`, `test:certification:greenfield::greenfield_end_to_end`
+- `C1.6`: `check:schema_invariants`
+- `C1.7`: `check:schema_invariants`, `test:certification:greenfield::greenfield_end_to_end`
+- `C1.8`: `check:schema_invariants`
+- `C1.9`: `check:schema_invariants`
+- `C1.10`: `test:lib:graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage`
+- `C1.11`: `test:lib:memory::claims::tests::concurrent_claims_of_one_task_grant_exactly_one`
+- `C1.12`: `test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken`
+- `C1.13`: `test:lib:orchestration::dag::tests::task_state_names_are_stable`
+- `C1.14`: `test:lib:skills::tests::content_digest_ignores_annotations_and_detects_method_changes`
+- `C1.15`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`
+- `C1.16`: `test:certification:greenfield::greenfield_end_to_end`
+- `C1.17`: `check:index_freshness`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:schema_invariants","doctor:D023","check:index_freshness"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:schema_invariants","doctor:D023","check:index_freshness"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C2. Relationship/graph memory
 
@@ -346,7 +677,36 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Graph integrity checks detect orphan/stale/reversed/invalid relationships. <sub>C2.2 · L231</sub>
 - [ ] Impact traversal is executable. <sub>C2.3 · L232</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — orphan, dangling, stale, reversed, ill-typed relationships and supersession cycles
+- `doctor:D015` — governance health check · G1, G5 — graph integrity
+- `test:certification:ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles` — unit/integration/system test
+- `test:lib:memory::integrity::tests::signatures_judge_direction_and_type` — unit/integration/system test
+- `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning` — unit/integration/system test
+- `test:lib:graph::tests::inverse_storage_is_read_back_in_the_direction_of_its_meaning` — unit/integration/system test
+- `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C2.1`: `test:lib:memory::integrity::tests::signatures_judge_direction_and_type`, `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning`, `test:lib:graph::tests::inverse_storage_is_read_back_in_the_direction_of_its_meaning`
+- `C2.2`: `check:graph_integrity`, `doctor:D015`, `test:certification:ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles`, `test:lib:memory::integrity::tests::signatures_judge_direction_and_type`
+- `C2.3`: `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `project path map`, `authoritative spec/decision`, `relevant index manifest`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:graph_integrity","doctor:D015"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:graph_integrity","doctor:D015"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C3. Semantic memory
 
@@ -360,7 +720,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] selected code units <sub>C3.6 · L240</sub>
 - [ ] Semantic namespace/authority filters apply before or during retrieval. <sub>C3.7 · L241</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:memory_retrieval_regression` — governance health check · G4, G5, G6 — held-out retrieval regression (recall@k, MRR, stale/forbidden hits) against the live index
+- `check:index_content_coverage` — governance health check · G1, G4, G5, G6 — every governed record's content and every indexed code line is held by a chunk
+- `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback` — unit/integration/system test
+- `test:certification:repair::sensitivity_classes_and_namespaces_are_enforced` — unit/integration/system test — namespaces filter by role during retrieval
+- `test:lib:memory::chunking::tests::record_sections_hold_list_and_nested_content` — unit/integration/system test
+- `test:certification:ws06r3::the_index_holds_research_and_experiments_at_their_evidence_standing` — unit/integration/system test
+- `test:lib:memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C3.1`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::record_sections_hold_list_and_nested_content`
+- `C3.2`: `check:index_content_coverage`
+- `C3.3`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::record_sections_hold_list_and_nested_content`, `test:certification:ws06r3::the_index_holds_research_and_experiments_at_their_evidence_standing`
+- `C3.4`: `check:index_content_coverage`, `test:certification:ws06r3::the_index_holds_research_and_experiments_at_their_evidence_standing`
+- `C3.5`: `check:index_content_coverage`, `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`, `test:lib:memory::chunking::tests::record_sections_hold_list_and_nested_content`
+- `C3.6`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line`
+- `C3.7`: `test:certification:repair::sensitivity_classes_and_namespaces_are_enforced`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:memory_retrieval_regression","check:index_content_coverage"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:memory_retrieval_regression","check:index_content_coverage"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C4. Lexical memory
 
@@ -373,7 +766,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] APIs/config keys <sub>C4.5 · L248</sub>
 - [ ] literal phrases <sub>C4.6 · L249</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:index_content_coverage` — governance health check · G1, G4, G5, G6 — every non-empty line of indexed text is held, so exact terms and literal phrases are retrievable
+- `test:lib:retrieval::tests::bare_file_names_reach_the_path_route` — unit/integration/system test
+- `test:certification:repair::implementation_prerequisites_and_symbol_route` — unit/integration/system test — bare identifiers reach the symbol route
+- `test:lib:memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk` — unit/integration/system test
+- `test:certification:ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C4.1`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk`
+- `C4.2`: `test:certification:repair::implementation_prerequisites_and_symbol_route`
+- `C4.3`: `test:lib:retrieval::tests::bare_file_names_reach_the_path_route`
+- `C4.6`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk`, `test:certification:ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:index_content_coverage"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:index_content_coverage"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C5. Code-structural memory
 
@@ -388,7 +809,41 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] test-coverage relationships <sub>C5.7 · L258</sub>
 - [ ] language-appropriate adapters are resolved via capability registry <sub>C5.8 · L259</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:lib:code_intelligence::generic::tests::no_symbols_from_comments_or_strings` — unit/integration/system test
+- `test:lib:code_intelligence::generic::tests::inheritance_routes_and_models_across_languages` — unit/integration/system test
+- `test:lib:code_intelligence::generic::tests::trait_method_declarations_are_single_line_units` — unit/integration/system test
+- `test:lib:memory::indexer::tests::import_resolution_covers_src_layouts_and_crates` — unit/integration/system test
+- `test:lib:memory::indexer::tests::test_paths_by_convention` — unit/integration/system test
+- `test:certification:repair::implementation_prerequisites_and_symbol_route` — unit/integration/system test
+- `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation` — unit/integration/system test — a declared code_intel adapter is resolved through the capability registry; a refused one is a recorded degradation
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C5.1`: `test:lib:code_intelligence::generic::tests::no_symbols_from_comments_or_strings`
+- `C5.2`: `test:lib:code_intelligence::generic::tests::no_symbols_from_comments_or_strings`, `test:lib:code_intelligence::generic::tests::trait_method_declarations_are_single_line_units`, `test:certification:repair::implementation_prerequisites_and_symbol_route`
+- `C5.3`: `test:lib:code_intelligence::generic::tests::inheritance_routes_and_models_across_languages`
+- `C5.4`: `test:lib:memory::indexer::tests::import_resolution_covers_src_layouts_and_crates`
+- `C5.5`: `test:lib:code_intelligence::generic::tests::inheritance_routes_and_models_across_languages`
+- `C5.6`: `test:lib:code_intelligence::generic::tests::inheritance_routes_and_models_across_languages`
+- `C5.7`: `test:lib:memory::indexer::tests::test_paths_by_convention`
+- `C5.8`: `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### C6. Temporal memory
 
@@ -400,7 +855,36 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] causal decision <sub>C6.4 · L265</sub>
 - [ ] supersession/version lineage <sub>C6.5 · L266</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C6`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C6`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — supersession cycles and stale lineage links
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6 — superseded-but-ACTIVE authority
+- `test:certification:ws04r2::cit_approval_binds_content_impact_and_transaction` — unit/integration/system test — a transaction binds what changes to the decision that approved it
+- `test:lib:graph::lineage::tests::a_finished_transactions_links_are_history_not_stale_links` — unit/integration/system test
+- `test:certification:repair2::incremental_rebuild_follows_record_relocation` — unit/integration/system test — a relocated record keeps its identity
+- `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C6.1`: `test:certification:ws04r2::cit_approval_binds_content_impact_and_transaction`, `test:lib:graph::lineage::tests::a_finished_transactions_links_are_history_not_stale_links`, `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees`
+- `C6.2`: `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees`
+- `C6.4`: `test:certification:ws04r2::cit_approval_binds_content_impact_and_transaction`
+- `C6.5`: `check:graph_integrity`, `check:schema_invariants`, `test:lib:graph::lineage::tests::a_finished_transactions_links_are_history_not_stale_links`, `test:certification:repair2::incremental_rebuild_follows_record_relocation`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:graph_integrity","check:schema_invariants"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:graph_integrity","check:schema_invariants"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C7. Episodic execution memory
 
@@ -413,7 +897,38 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] tests/outcomes <sub>C7.5 · L273</sub>
 - [ ] failures/discoveries <sub>C7.6 · L274</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C7`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C7`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — handoffs and checkpoints reference known tasks; the latest checkpoint describes the material state
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — DONE tasks are closed by a report
+- `test:certification:ws05::close_requires_and_persists_the_consumption_receipt` — unit/integration/system test
+- `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract` — unit/integration/system test
+- `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees` — unit/integration/system test
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test — a checkpoint records the task and the input ids/hashes it was working from
+- `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C7.1`: `check:continuity_checkpoint_handoff`
+- `C7.2`: `check:continuity_checkpoint_handoff`, `check:product_traceability`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`, `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `C7.4`: `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`, `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees`
+- `C7.5`: `check:product_traceability`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`, `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `C7.6`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:continuity_checkpoint_handoff","check:product_traceability"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:continuity_checkpoint_handoff","check:product_traceability"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C8. Failure memory
 
@@ -427,7 +942,39 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] migration failures <sub>C8.6 · L282</sub>
 - [ ] tool failures <sub>C8.7 · L283</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C8`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C8`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `doctor:D034` — governance health check · G1, G5 — recorded failures are followed up
+- `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations` — unit/integration/system test
+- `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation` — unit/integration/system test — tool health failures are durable failure records
+- `test:certification:ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals` — unit/integration/system test — `gov memory miss` records an agent-reported retrieval miss
+- `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation` — unit/integration/system test
+- `test:lib:graph::identity::tests::failure_and_plan_records_have_canonical_locations` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C8.1`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`, `test:lib:graph::identity::tests::failure_and_plan_records_have_canonical_locations`
+- `C8.2`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`
+- `C8.3`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`
+- `C8.4`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`, `test:certification:ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals`
+- `C8.5`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`
+- `C8.6`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`
+- `C8.7`: `test:lib:memory::failures::tests::failure_kinds_signatures_and_locations`, `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`
+- health_scheduler_tiers: `G1`, `G5`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["doctor:D034"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["doctor:D034"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C9. Working memory/context packet
 
@@ -441,7 +988,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] duplicate suppression <sub>C9.6 · L291</sub>
 - [ ] active-vs-historical separation <sub>C9.7 · L292</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C9`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C9`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:context_reproducibility` — governance health check · G4, G5, G6 — the deterministic authority block of a compiled packet is reproducible; delivered inputs verify against the manifest
+- `test:certification:repair::context_packet_layers_and_contradiction_flags` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — two compilations of one task's packet are identical
+- `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C9.1`: `check:context_reproducibility`, `test:certification:greenfield::greenfield_end_to_end`
+- `C9.2`: `check:context_reproducibility`, `test:certification:repair::context_packet_layers_and_contradiction_flags`
+- `C9.3`: `test:certification:repair::context_packet_layers_and_contradiction_flags`, `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations`
+- `C9.7`: `test:certification:repair::context_packet_layers_and_contradiction_flags`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:context_reproducibility"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:context_reproducibility"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### C10. Capability memory
 
@@ -455,7 +1029,38 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] permission/credential status <sub>C10.6 · L300</sub>
 - [ ] environment/tool versions <sub>C10.7 · L301</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `C10`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `C10`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:plugin_governance` — governance health check · G4, G5, G6 — plugin descriptors valid, registered, pinned and authorised
+- `doctor:D028` — governance health check · G1, G5
+- `doctor:D022` — governance health check · G1, G5 — native toolchains and their versions
+- `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands` — unit/integration/system test
+- `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them` — unit/integration/system test
+- `test:certification:arch::ecosystem_resolution_follows_the_governed_project_not_the_os` — unit/integration/system test
+- `test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas` — unit/integration/system test — the tool and MCP registries validate against their kernel schemas
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `C10.1`: `check:plugin_governance`, `doctor:D028`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`, `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them`
+- `C10.2`: `test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas`
+- `C10.4`: `test:certification:arch::ecosystem_resolution_follows_the_governed_project_not_the_os`
+- `C10.6`: `check:plugin_governance`, `doctor:D028`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`
+- `C10.7`: `doctor:D022`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:plugin_governance","doctor:D028","doctor:D022"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:plugin_governance","doctor:D028","doctor:D022"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate D — Indexing, Retrieval and Context
 
@@ -472,7 +1077,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Index manifest records compatible component identity. <sub>D1.5 · L312</sub>
 - [ ] Required stale indexes degrade/block task close according to policy. <sub>D1.6 · L313</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `D1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `D1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:index_freshness` — governance health check · G1, G2, G4, G5, G6 — tracked index manifest matches the working tree and the policy pins
+- `doctor:D010` — governance health check · G1, G5
+- `doctor:D025` — governance health check · G1, G5 — semantic index consistent with the pinned embedder/reranker
+- `test:certification:ws06r3::freshness_judges_exactly_what_the_indexer_indexes` — unit/integration/system test
+- `test:certification:repair2::incremental_rebuild_follows_record_relocation` — unit/integration/system test
+- `test:certification:repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index` — unit/integration/system test
+- `test:certification:failure_injection::injected_failures_are_detected_and_recovered` — unit/integration/system test — a file edited after indexing blocks task close INDEX_STALE
+- `test:lib:memory::indexer::tests::admission_decides_every_skip_reason_from_the_file` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `D1.1`: `check:index_freshness`, `doctor:D010`, `test:certification:ws06r3::freshness_judges_exactly_what_the_indexer_indexes`
+- `D1.2`: `doctor:D010`, `test:certification:ws06r3::freshness_judges_exactly_what_the_indexer_indexes`, `test:lib:memory::indexer::tests::admission_decides_every_skip_reason_from_the_file`
+- `D1.3`: `test:certification:repair2::incremental_rebuild_follows_record_relocation`
+- `D1.4`: `doctor:D025`, `test:certification:repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index`
+- `D1.5`: `check:index_freshness`, `doctor:D025`
+- `D1.6`: `test:certification:repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index`, `test:certification:failure_injection::injected_failures_are_detected_and_recovered`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:index_freshness","doctor:D010","doctor:D025"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:index_freshness","doctor:D010","doctor:D025"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### D2. Retrieval router
 
@@ -485,7 +1123,37 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] semantic route <sub>D2.5 · L320</sub>
 - [ ] multi-route fusion for complex questions <sub>D2.6 · L321</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `D2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `D2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:memory_retrieval_regression` — governance health check · G4, G5, G6 — held-out queries through the router against the live index
+- `test:lib:retrieval::tests::bare_file_names_reach_the_path_route` — unit/integration/system test
+- `test:certification:repair::implementation_prerequisites_and_symbol_route` — unit/integration/system test
+- `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact` — unit/integration/system test
+- `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback` — unit/integration/system test
+- `test:certification:repair::reranker_hook_invoked_and_never_silently_skipped` — unit/integration/system test — the pinned reranker runs between fusion and filtering
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `D2.1`: `test:lib:retrieval::tests::bare_file_names_reach_the_path_route`
+- `D2.2`: `test:certification:repair::implementation_prerequisites_and_symbol_route`
+- `D2.4`: `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact`
+- `D2.5`: `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`
+- `D2.6`: `test:certification:repair::reranker_hook_invoked_and_never_silently_skipped`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:memory_retrieval_regression"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:memory_retrieval_regression"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### D3. Hierarchical retrieval
 
@@ -496,7 +1164,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] child-first retrieval <sub>D3.3 · L326</sub>
 - [ ] selective parent/graph-neighbour expansion <sub>D3.4 · L327</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `D3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `D3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:index_content_coverage` — governance health check · G1, G4, G5, G6 — every record section and code line is held by a chunk of the hierarchy
+- `test:lib:memory::chunking::tests::hierarchical_chunks` — unit/integration/system test
+- `test:lib:memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line` — unit/integration/system test
+- `test:lib:memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `D3.1`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::hierarchical_chunks`, `test:lib:memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides`
+- `D3.2`: `check:index_content_coverage`, `test:lib:memory::chunking::tests::hierarchical_chunks`, `test:lib:memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:index_content_coverage"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:index_content_coverage"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### D4. Component separation
 
@@ -515,7 +1208,39 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 are independently identifiable and replaceable where designed. <sub>L340 · qualifier</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `D4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `D4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `doctor:D025` — governance health check · G1, G5 — embedder/reranker pins and the embedding runtime identity
+- `check:index_freshness` — governance health check · G1, G2, G4, G5, G6 — the live retrieval profile is governed
+- `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change` — unit/integration/system test
+- `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback` — unit/integration/system test
+- `test:certification:repair::reranker_hook_invoked_and_never_silently_skipped` — unit/integration/system test
+- `test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder` — unit/integration/system test
+- `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles` — unit/integration/system test
+- `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `D4.1`: `doctor:D025`, `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change`, `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`, `test:certification:arch::plugin_protocol_is_language_neutral_bash_embedder`, `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles`
+- `D4.2`: `doctor:D025`, `test:certification:ws06::embedder_components_are_identified_bound_and_fail_closed_on_change`, `test:lib:capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles`
+- `D4.3`: `check:index_freshness`
+- `D4.6`: `test:certification:ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation`
+- `D4.7`: `doctor:D025`, `test:certification:repair::reranker_hook_invoked_and_never_silently_skipped`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["doctor:D025","check:index_freshness"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["doctor:D025","check:index_freshness"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### D5. Evidence-driven retrieval model selection
 
@@ -528,7 +1253,38 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] selected embedder/reranker revisions are pinned <sub>D5.5 · L347</sub>
 - [ ] changing them requires governed migration/reindex/regression <sub>D5.6 · L348</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `D5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `D5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:memory_retrieval_regression` — governance health check · G4, G5, G6 — recall@k, MRR, stale/superseded/forbidden hits over held-out queries
+- `doctor:D025` — governance health check · G1, G5
+- `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision` — unit/integration/system test
+- `test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression` — unit/integration/system test
+- `test:certification:repair::unmeasured_memory_recall_is_not_green` — unit/integration/system test
+- `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `D5.1`: `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`, `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence`
+- `D5.2`: `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`
+- `D5.3`: `check:memory_retrieval_regression`, `test:certification:repair::unmeasured_memory_recall_is_not_green`
+- `D5.4`: `check:memory_retrieval_regression`, `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`
+- `D5.5`: `doctor:D025`, `test:certification:repair::benchmark_records_evidence_and_selection_pins_through_decision`, `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence`
+- `D5.6`: `test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:memory_retrieval_regression","doctor:D025"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:memory_retrieval_regression","doctor:D025"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### D6. Rebuild guarantee
 
@@ -541,7 +1297,38 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** deliberately missing index coverage, stale chunks, wrong authority namespace, archive indexed as current, renamed files duplicated, graph edges stale, deleted indexes, wrong embedder pins. <sub>AQC-D6 · L356</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `D6`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-D6`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `D6`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-D6`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:recovery_rebuild` — governance health check · G4, G5, G6 — deep: two full rebuilds in a sandbox reproduce the manifest
+- `check:fresh_agent_reconstruction` — governance health check · G4, G5, G6
+- `test:certification:multi_machine::clone_rebuilds_identical_derived_state` — clean-clone/release evidence
+- `test:certification:repair::claims_survive_full_memory_rebuild` — unit/integration/system test
+- `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration` — unit/integration/system test
+- `test:certification:ws05r3::claims_and_claim_baselines_survive_deleting_the_derived_runtime` — unit/integration/system test
+- `test:certification:ws07::the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — a fresh agent in a new session reconstructs state after the rebuild
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `D6.1`: `check:recovery_rebuild`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`
+- `D6.2`: `test:certification:repair::claims_survive_full_memory_rebuild`, `test:certification:ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration`, `test:certification:ws05r3::claims_and_claim_baselines_survive_deleting_the_derived_runtime`, `test:certification:ws07::the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written`
+- `D6.3`: `check:fresh_agent_reconstruction`, `test:certification:greenfield::greenfield_end_to_end`
+- `D6.4`: `test:certification:multi_machine::clone_rebuilds_identical_derived_state`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:recovery_rebuild","check:fresh_agent_reconstruction"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:recovery_rebuild","check:fresh_agent_reconstruction"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate E — Agent Organisation and Independent Work
 
@@ -556,7 +1343,42 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Lower roles cannot manufacture higher-trust facts. <sub>E1.3 · L365</sub>
 - [ ] Independent auditors/testers are appropriately constrained. <sub>E1.4 · L366</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `E1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `E1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `g0:task close` — automated invariant/guard · G0 — every command is decided by G0 against the declared role's authority class (close_task)
+- `g0:cit execute` — automated invariant/guard · G0
+- `g0:update --apply` — automated invariant/guard · G0
+- `check:authority_role_limits` — governance health check · G3, G4, G5, G6 — no worker handed the orchestrator role; independent roles constrained by tool permissions
+- `test:certification:repair::authority_levels_are_enforced_on_executable_paths` — unit/integration/system test
+- `test:certification:ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere` — unit/integration/system test
+- `test:certification:ws03::every_cli_command_label_is_classified_by_g0` — unit/integration/system test
+- `test:lib:orchestration::control::tests::every_authority_class_exists_in_the_kernel_authority_policy` — unit/integration/system test
+- `test:certification:repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts` — unit/integration/system test
+- `test:lib:authority::tests::undeclared_is_level_zero_and_never_orchestrator` — unit/integration/system test
+- `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role` — unit/integration/system test
+- `test:certification:ws05::close_observes_os_written_state_no_os_operation_produced` — unit/integration/system test — a worker writing OS-written (T2) state inside its task is refused at close
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `E1.1`: `g0:task close`, `test:certification:repair::authority_levels_are_enforced_on_executable_paths`, `test:lib:orchestration::control::tests::every_authority_class_exists_in_the_kernel_authority_policy`, `test:lib:authority::tests::undeclared_is_level_zero_and_never_orchestrator`
+- `E1.2`: `g0:task close`, `g0:cit execute`, `g0:update --apply`, `test:certification:repair::authority_levels_are_enforced_on_executable_paths`, `test:certification:ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere`, `test:certification:ws03::every_cli_command_label_is_classified_by_g0`
+- `E1.3`: `test:certification:repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts`, `test:certification:ws05::close_observes_os_written_state_no_os_operation_produced`
+- `E1.4`: `check:authority_role_limits`, `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G0`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:authority_role_limits"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:authority_role_limits"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### E2. Representative roles
 
@@ -570,7 +1392,37 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] security/release roles <sub>E2.6 · L374</sub>
 - [ ] project-specific roles through governed extension <sub>E2.7 · L375</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `E2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `E2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:authority_role_limits` — governance health check · G3, G4, G5, G6 — tool permissions name kernel roles
+- `test:lib:authority::tests::embedded_kernel_check_refuses_undeclared_and_human_claims` — unit/integration/system test — only declared kernel roles carry authority
+- `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role` — unit/integration/system test
+- `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source` — unit/integration/system test — every designated role of generated work is a kernel role
+- `test:certification:ws05::independence_is_established_from_recorded_authorship` — unit/integration/system test
+- `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `E2.1`: `check:authority_role_limits`
+- `E2.2`: `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source`
+- `E2.4`: `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`, `test:certification:ws05::independence_is_established_from_recorded_authorship`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`
+- `E2.5`: `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`
+- `E2.6`: `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:authority_role_limits"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:authority_role_limits"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### E3. Typed A2A handoffs
 
@@ -586,7 +1438,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 persist beyond conversation lifetime. <sub>L385 · qualifier</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `E3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `E3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — handoffs reference known tasks
+- `check:mutation_scope` — governance health check · G2, G4, G5, G6 — returned handoffs carry no authority violations
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test — a handoff on stale inputs is refreshed and explicitly degraded
+- `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract` — unit/integration/system test
+- `test:lib:context::receipt::tests::worker_return_maps_to_a_schema_valid_report` — unit/integration/system test
+- `test:certification:ws05::close_requires_and_persists_the_consumption_receipt` — unit/integration/system test
+- `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once` — unit/integration/system test — discoveries, proposed decisions and lessons in a worker return become governed work
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `E3.1`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:lib:context::receipt::tests::worker_return_maps_to_a_schema_valid_report`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`
+- `E3.2`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:lib:context::receipt::tests::worker_return_maps_to_a_schema_valid_report`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`
+- `E3.3`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:lib:context::receipt::tests::worker_return_maps_to_a_schema_valid_report`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`
+- `E3.4`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `E3.5`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `E3.6`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `E3.7`: `check:continuity_checkpoint_handoff`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:continuity_checkpoint_handoff","check:mutation_scope"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:continuity_checkpoint_handoff","check:mutation_scope"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### E4. Concurrency/task claims
 
@@ -598,7 +1483,42 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Stale claims have governed recovery. <sub>E4.4 · L391</sub>
 - [ ] Parallel work is allowed only where dependency/mutation constraints permit. <sub>E4.5 · L392</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `E4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `E4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:concurrency_claims` — governance health check · G3, G4, G5, G6 — session claims reference known tasks; expired claims swept
+- `doctor:D017` — governance health check · G1, G5
+- `doctor:D026` — governance health check · G1, G5 — the claims store is present and intact
+- `test:lib:memory::claims::tests::concurrent_claims_of_one_task_grant_exactly_one` — unit/integration/system test
+- `test:lib:memory::claims::tests::concurrent_processes_claiming_one_task_grant_exactly_one` — unit/integration/system test
+- `test:lib:memory::claims::tests::overlapping_scopes_of_other_sessions_are_refused_and_disjoint_ones_granted` — unit/integration/system test
+- `test:lib:memory::claims::tests::a_claim_is_bound_to_its_worktree_and_renewal_keeps_claimed_at` — unit/integration/system test
+- `test:lib:memory::claims::tests::release_and_sweep_only_touch_the_rows_they_decided_on` — unit/integration/system test
+- `test:lib:orchestration::claims::tests::overlap_is_sound_against_glob_match` — unit/integration/system test
+- `test:certification:repair::claims_survive_full_memory_rebuild` — unit/integration/system test
+- `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `E4.1`: `doctor:D017`, `test:lib:memory::claims::tests::a_claim_is_bound_to_its_worktree_and_renewal_keeps_claimed_at`
+- `E4.2`: `test:lib:memory::claims::tests::concurrent_claims_of_one_task_grant_exactly_one`, `test:lib:memory::claims::tests::concurrent_processes_claiming_one_task_grant_exactly_one`, `test:certification:repair::claims_survive_full_memory_rebuild`
+- `E4.3`: `doctor:D026`, `test:certification:repair::claims_survive_full_memory_rebuild`
+- `E4.4`: `check:concurrency_claims`, `doctor:D017`, `test:lib:memory::claims::tests::release_and_sweep_only_touch_the_rows_they_decided_on`
+- `E4.5`: `test:lib:memory::claims::tests::overlapping_scopes_of_other_sessions_are_refused_and_disjoint_ones_granted`, `test:lib:orchestration::claims::tests::overlap_is_sound_against_glob_match`, `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:concurrency_claims","doctor:D017","doctor:D026"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:concurrency_claims","doctor:D017","doctor:D026"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate F — Skills, Tools, MCP and Capabilities
 
@@ -613,7 +1533,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Skill regression is testable. <sub>F1.3 · L401</sub>
 - [ ] Lessons can propose skill updates through governed promotion. <sub>F1.4 · L402</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `F1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `F1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:skill_regression` — governance health check · G5, G6 — skill schema; version identifies content; validation scenarios executed in sandboxes
+- `test:lib:skills::tests::content_digest_ignores_annotations_and_detects_method_changes` — unit/integration/system test
+- `test:lib:skills::tests::every_kernel_scenario_has_a_bound_check_or_declared_mode` — unit/integration/system test
+- `test:lib:skills::tests::lookup_and_expectations` — unit/integration/system test
+- `test:lib:skills::tests::scenario_plans` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `F1.1`: `check:skill_regression`, `test:lib:skills::tests::content_digest_ignores_annotations_and_detects_method_changes`
+- `F1.2`: `test:lib:skills::tests::lookup_and_expectations`
+- `F1.3`: `check:skill_regression`, `test:lib:skills::tests::every_kernel_scenario_has_a_bound_check_or_declared_mode`, `test:lib:skills::tests::scenario_plans`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `security/sensitivity policy`
+- health_scheduler_tiers: `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:skill_regression"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:skill_regression"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### F2. Tool Capability Registry
 
@@ -628,7 +1575,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] provenance/hash pin <sub>F2.7 · L411</sub>
 - [ ] installation/approval status <sub>F2.8 · L412</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `F2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `F2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:plugin_governance` — governance health check · G4, G5, G6 — plugin descriptors valid, registered, pinned and authorised
+- `doctor:D028` — governance health check · G1, G5
+- `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands` — unit/integration/system test
+- `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them` — unit/integration/system test
+- `test:certification:ws07::every_byte_a_plugin_executes_is_bound` — unit/integration/system test
+- `test:certification:repair::plugin_host_large_response_through_cli` — unit/integration/system test — the executable transport completes large responses
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `F2.1`: `check:plugin_governance`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`
+- `F2.2`: `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`, `test:certification:repair::plugin_host_large_response_through_cli`
+- `F2.3`: `check:plugin_governance`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`
+- `F2.4`: `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`
+- `F2.5`: `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`
+- `F2.6`: `check:plugin_governance`, `doctor:D028`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`
+- `F2.7`: `check:plugin_governance`, `doctor:D028`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`, `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them`, `test:certification:ws07::every_byte_a_plugin_executes_is_bound`
+- `F2.8`: `check:plugin_governance`, `doctor:D028`, `test:certification:repair2::plugins_are_governed_capabilities_not_arbitrary_commands`, `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:plugin_governance","doctor:D028"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:plugin_governance","doctor:D028"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### F3. Missing-tool acquisition
 
@@ -644,7 +1624,41 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] health test <sub>F3.8 · L422</sub>
 - [ ] continue task <sub>F3.9 · L423</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `F3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `F3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `human-gate:tools install` — human-gate evidence · record `human-gate` — an answered gate raised for exactly that installation lets the governed install proceed
+- `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation` — unit/integration/system test
+- `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed` — unit/integration/system test
+- `test:lib:tools::tests::a_governed_review_of_this_tool_and_version_by_another_author_is_evidence` — unit/integration/system test
+- `test:lib:tools::tests::anything_short_of_that_is_not_evidence` — unit/integration/system test
+- `test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated` — unit/integration/system test — a capability gap becomes one governed capability task that blocks the work needing it
+- `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1-3/evidence/heldout-tests` — independent held-out test · tests hx_d_acquisition_and_preservation::d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor — AR-0031 held-out: the acquisition sink refuses a privileged capability below floor
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `F3.1`: `test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated`
+- `F3.2`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`, `test:lib:tools::tests::a_governed_review_of_this_tool_and_version_by_another_author_is_evidence`, `test:lib:tools::tests::anything_short_of_that_is_not_evidence`
+- `F3.4`: `human-gate:tools install`, `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`
+- `F3.5`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`, `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target`
+- `F3.6`: `test:certification:srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target`
+- `F3.8`: `test:certification:ws07::a_tool_installation_is_approved_only_for_that_installation`
+- `F3.9`: `test:lib:orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent held-out test`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `authoritative spec/decision`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### F4. Plugin trust boundary
 
@@ -657,7 +1671,48 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Elevated permissions reference authoritative gate/decision. <sub>F4.5 · L430</sub>
 - [ ] Security review cannot be self-attested. <sub>F4.6 · L431</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `F4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `F4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:plugin_governance` — governance health check · G4, G5, G6 — registered, pinned and authorised; first governed use recorded on this machine
+- `doctor:D028` — governance health check · G1, G5
+- `check:os_binding_integrity` — governance health check · G1, G2, G3, G4, G5, G6 — plugin-registry entries no gov operation produced are reported and not honoured
+- `doctor:D033` — governance health check · G1, G5
+- `human-gate:plugins register` — human-gate evidence · record `human-gate` — an executable registration is authorised only by an owner-answered gate raised for exactly it
+- `test:certification:repair3::plugin_descriptors_can_never_authorise_themselves` — unit/integration/system test
+- `test:certification:ws07::an_executable_plugin_never_runs_on_its_own_declarations` — unit/integration/system test
+- `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them` — unit/integration/system test
+- `test:certification:ws07::every_byte_a_plugin_executes_is_bound` — unit/integration/system test
+- `test:certification:ws07::a_cached_pin_never_approves_changed_bytes` — unit/integration/system test
+- `test:certification:ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it` — unit/integration/system test
+- `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed` — unit/integration/system test
+- `test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry` — unit/integration/system test
+- `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1-4/evidence/heldout-tests` — independent held-out test · tests hv_d_sinks_and_preservation::d4_both_acquisition_primitives_ask_section_6_unconditionally — AR-0033 held-out: both acquisition primitives ask §6 without consulting the descriptor
+- `obligation:AC-14` — independent held-out test — F4 rests on the R1 acceptance (frozen AC-4), re-verified for every changed candidate
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `F4.1`: `test:certification:repair3::plugin_descriptors_can_never_authorise_themselves`, `test:certification:ws07::an_executable_plugin_never_runs_on_its_own_declarations`, `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused`
+- `F4.2`: `check:plugin_governance`, `check:os_binding_integrity`, `doctor:D033`, `test:certification:ws07::registry_entries_are_honoured_only_as_the_os_wrote_them`, `test:certification:ws03_r3::the_t2_audit_covers_the_plugin_registry`
+- `F4.3`: `check:plugin_governance`, `doctor:D028`, `test:certification:ws07::every_byte_a_plugin_executes_is_bound`
+- `F4.4`: `check:plugin_governance`, `doctor:D028`, `test:certification:ws07::every_byte_a_plugin_executes_is_bound`, `test:certification:ws07::a_cached_pin_never_approves_changed_bytes`
+- `F4.5`: `human-gate:plugins register`, `test:certification:ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it`, `test:lib:srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused`
+- `F4.6`: `test:certification:ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent held-out test`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:plugin_governance","doctor:D028","check:os_binding_integrity","doctor:D033"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:plugin_governance","doctor:D028","check:os_binding_integrity","doctor:D033"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### F5. MCP/A2A/tool separation
 
@@ -668,7 +1723,33 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Knowledge Fabric = knowing <sub>F5.3 · L436</sub>
 - [ ] No layer silently substitutes for another. <sub>F5.4 · L437</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `F5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `F5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas` — unit/integration/system test — the tool registry and the MCP registry are separate schema-validated registries
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test — agent-to-agent handoffs are typed records of their own
+- `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback` — unit/integration/system test — the knowledge fabric never silently falls back to another implementation
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `F5.1`: `test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas`
+- `F5.2`: `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `F5.3`: `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`
+- `F5.4`: `test:certification:repair::embedder_replaceable_end_to_end_and_no_silent_fallback`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ## Gate G — Human Command Surface
 
@@ -682,7 +1763,31 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Intent maps deterministically to governed operations. <sub>G1.2 · L445</sub>
 - [ ] Consequential changes automatically invoke required impact/gate logic. <sub>G1.3 · L446</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `G1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `G1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:ws05::status_shows_health_and_this_projects_release_trust` — unit/integration/system test — `gov intent "approve it"` maps to the governed gate command for the pending gate
+- `test:certification:repair::cit_auto_simulation_and_secret_redaction` — unit/integration/system test — consequential policy changes trigger impact simulation automatically
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `G1.1`: `test:certification:ws05::status_shows_health_and_this_projects_release_trust`
+- `G1.2`: `test:certification:ws05::status_shows_health_and_this_projects_release_trust`
+- `G1.3`: `test:certification:repair::cit_auto_simulation_and_secret_redaction`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### G2. Small explicit human control set
 
@@ -696,7 +1801,40 @@ At minimum equivalent controls for: <sub>L449 · lead_in</sub>
 - [ ] audit <sub>G2.4 · L453</sub>
 - [ ] pause/freeze/rollback as applicable <sub>G2.5 · L454</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `G2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `G2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:command_contract_consistency` — governance health check · G5, G6 — the command contract's operations are implemented CLI commands
+- `g0:status` — automated invariant/guard · G0
+- `g0:continue` — automated invariant/guard · G0
+- `g0:gate answer` — automated invariant/guard · G0
+- `g0:audit` — automated invariant/guard · G0
+- `g0:freeze writes` — automated invariant/guard · G0
+- `test:certification:ws05::status_shows_health_and_this_projects_release_trust` — unit/integration/system test
+- `test:certification:ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — continue, decide and audit in the greenfield flow
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `G2.1`: `check:command_contract_consistency`, `g0:status`, `test:certification:ws05::status_shows_health_and_this_projects_release_trust`
+- `G2.2`: `check:command_contract_consistency`, `g0:continue`, `test:certification:greenfield::greenfield_end_to_end`
+- `G2.3`: `check:command_contract_consistency`, `g0:gate answer`, `test:certification:greenfield::greenfield_end_to_end`
+- `G2.4`: `check:command_contract_consistency`, `g0:audit`, `test:certification:greenfield::greenfield_end_to_end`
+- `G2.5`: `check:command_contract_consistency`, `g0:freeze writes`, `test:certification:ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`
+- health_scheduler_tiers: `G0`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:command_contract_consistency"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:command_contract_consistency"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate H — Specification and Readiness
 
@@ -726,7 +1864,41 @@ The system can trace: <sub>L461 · lead_in</sub>
 - [ ] acceptance/test obligations <sub>H1.16 · L477</sub>
 - [ ] live evidence <sub>H1.17 · L478</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `H1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `H1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — features have scenarios/tests; DONE implementation traces to its requirements
+- `check:lineage_orphans` — governance health check · G4, G5, G6 — specs without implementation/test path; research never consumed
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — task DAG: cycles, missing dependencies
+- `test:lib:graph::identity::tests::citation_and_scenario_chain_fields_are_relation_edges` — unit/integration/system test
+- `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells` — unit/integration/system test
+- `test:lib:graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — feature -> scenario -> requirement -> tasks -> acceptance obligation in one flow
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `H1.5`: `test:lib:graph::identity::tests::citation_and_scenario_chain_fields_are_relation_edges`, `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells`
+- `H1.6`: `check:product_traceability`, `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells`, `test:certification:greenfield::greenfield_end_to_end`
+- `H1.7`: `test:lib:graph::identity::tests::citation_and_scenario_chain_fields_are_relation_edges`, `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells`
+- `H1.8`: `check:product_traceability`, `check:lineage_orphans`, `test:lib:graph::identity::tests::citation_and_scenario_chain_fields_are_relation_edges`, `test:certification:greenfield::greenfield_end_to_end`
+- `H1.9`: `check:lineage_orphans`
+- `H1.15`: `check:graph_integrity`, `test:certification:greenfield::greenfield_end_to_end`
+- `H1.16`: `check:product_traceability`, `check:lineage_orphans`, `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells`, `test:certification:greenfield::greenfield_end_to_end`
+- `H1.17`: `check:product_traceability`, `test:lib:graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:product_traceability","check:lineage_orphans","check:graph_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:product_traceability","check:lineage_orphans","check:graph_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### H2. 26-dimension Feature/Capability Readiness Contract
 
@@ -771,7 +1943,39 @@ Statuses: <sub>L509 · lead_in</sub>
 
 and silent N/A is invalid. <sub>L515 · qualifier</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `H2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `H2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:feature_readiness` — governance health check · G1, G2, G4, G5, G6 — every active feature states readiness explicitly; silent N/A and invalid cells reported
+- `test:lib:orchestration::readiness::tests::not_applicable_cells_need_a_reason` — unit/integration/system test
+- `test:lib:orchestration::readiness::tests::every_pre_implementation_chain_gap_belongs_to_a_chain_cell` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — readiness gaps block implementation and are closed cell by cell
+- `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `H2.4`: `test:lib:orchestration::readiness::tests::every_pre_implementation_chain_gap_belongs_to_a_chain_cell`
+- `H2.5`: `test:lib:orchestration::readiness::tests::every_pre_implementation_chain_gap_belongs_to_a_chain_cell`
+- `H2.7`: `test:lib:orchestration::readiness::tests::every_pre_implementation_chain_gap_belongs_to_a_chain_cell`
+- `H2.27`: `check:feature_readiness`, `test:certification:greenfield::greenfield_end_to_end`
+- `H2.28`: `check:feature_readiness`, `test:certification:greenfield::greenfield_end_to_end`, `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2`
+- `H2.29`: `check:feature_readiness`
+- `H2.30`: `check:feature_readiness`
+- `H2.31`: `check:feature_readiness`, `test:lib:orchestration::readiness::tests::not_applicable_cells_need_a_reason`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:feature_readiness"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:feature_readiness"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### H3. Readiness generates work
 
@@ -783,7 +1987,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Missing independent test → independent test-design task. <sub>H3.4 · L521</sub>
 - [ ] Production implementation does not become READY before required prerequisite cells satisfy policy. <sub>H3.5 · L522</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `H3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `H3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — `readiness plan` generates the gap tasks in the same DAG; implementation stays blocked until the cells are satisfied
+- `test:lib:orchestration::tasks::tests::independent_work_is_recognised_by_class_role_or_readiness_cell` — unit/integration/system test
+- `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `H3.1`: `test:certification:greenfield::greenfield_end_to_end`
+- `H3.4`: `test:certification:greenfield::greenfield_end_to_end`, `test:lib:orchestration::tasks::tests::independent_work_is_recognised_by_class_role_or_readiness_cell`
+- `H3.5`: `test:certification:greenfield::greenfield_end_to_end`, `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### H4. Scenarios drive data/tests
 
@@ -795,7 +2024,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** deliberately omit scenarios, test datasets, failure criteria, NFRs, security analysis, performance targets, recovery and operations documentation. <sub>AQC-H4 · L529</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `H4`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-H4`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `H4`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-H4`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:research_experiment_data_lifecycle` — governance health check · G2, G4, G5, G6 — scenario -> data -> test-data chain
+- `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells` — unit/integration/system test
+- `test:lib:lifecycle::scenario::tests::every_missing_link_is_a_typed_gap` — unit/integration/system test
+- `test:lib:lifecycle::scenario::tests::data_author_independence_uses_recorded_authorship_and_honours_only_an_approved_waiver` — unit/integration/system test
+- `test:lib:lifecycle::scenario::tests::provenance_is_read_real_data_needs_approval_and_changes_are_detected` — unit/integration/system test
+- `test:certification:ws05::independence_is_established_from_recorded_authorship` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `H4.1`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells`, `test:lib:lifecycle::scenario::tests::every_missing_link_is_a_typed_gap`
+- `H4.2`: `test:lib:lifecycle::scenario::tests::data_author_independence_uses_recorded_authorship_and_honours_only_an_approved_waiver`, `test:certification:ws05::independence_is_established_from_recorded_authorship`
+- `H4.3`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::scenario::tests::provenance_is_read_real_data_needs_approval_and_changes_are_detected`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:research_experiment_data_lifecycle"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:research_experiment_data_lifecycle"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate I — Dynamic Work System
 
@@ -830,7 +2087,39 @@ Supports: <sub>L536 · lead_in</sub>
 - [ ] memory <sub>I1.21 · L557</sub>
 - [ ] governance <sub>I1.22 · L558</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `I1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `I1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — task DAG cycles, missing dependencies, `blocks` naming no task
+- `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag` — unit/integration/system test
+- `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — specification, data, implementation and test-design tasks in one DAG
+- `test:certification:ws05r3::an_experiment_task_closes_only_through_its_lifecycle` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `I1.2`: `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source`
+- `I1.3`: `test:certification:ws05r3::an_experiment_task_closes_only_through_its_lifecycle`
+- `I1.4`: `test:certification:greenfield::greenfield_end_to_end`
+- `I1.6`: `test:certification:greenfield::greenfield_end_to_end`
+- `I1.8`: `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag`, `test:certification:greenfield::greenfield_end_to_end`
+- `I1.9`: `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source`
+- `I1.10`: `test:certification:greenfield::greenfield_end_to_end`
+- `I1.17`: `test:lib:orchestration::generation::tests::the_taxonomy_declares_every_source`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `project path map`, `authoritative spec/decision`, `relevant index manifest`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:graph_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:graph_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### I2. Task contract
 
@@ -846,7 +2135,41 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] allowed/forbidden paths <sub>I2.8 · L568</sub>
 - [ ] production-merge permission <sub>I2.9 · L569</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `I2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `I2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:task_contract_integrity` — governance health check · G2, G4, G5, G6 — output of a task whose contract forbids production merge is not in the production tree
+- `test:certification:repair::task_close_enforces_mutation_scope` — unit/integration/system test
+- `test:certification:repair2::task_close_uses_observed_mutations_not_self_attestation` — unit/integration/system test
+- `test:lib:orchestration::tasks::tests::cited_evidence_and_remedies_are_read_from_the_contract` — unit/integration/system test
+- `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input` — unit/integration/system test
+- `test:certification:ws05r3::an_experiment_task_closes_only_through_its_lifecycle` — unit/integration/system test
+- `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them` — unit/integration/system test — `route --class` returns the minimum tier a task class requires
+- `test:certification:ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote` — unit/integration/system test — an out-of-scope path is covered only while its content is exactly what the in-window CIT wrote
+- `test:lib:cit::binding::tests::coverage_is_bound_to_the_content_a_committed_cit_wrote` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `I2.2`: `test:lib:orchestration::tasks::tests::cited_evidence_and_remedies_are_read_from_the_contract`, `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input`
+- `I2.3`: `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input`
+- `I2.4`: `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input`
+- `I2.7`: `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`
+- `I2.8`: `test:certification:repair::task_close_enforces_mutation_scope`, `test:certification:repair2::task_close_uses_observed_mutations_not_self_attestation`, `test:certification:ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote`, `test:lib:cit::binding::tests::coverage_is_bound_to_the_content_a_committed_cit_wrote`
+- `I2.9`: `check:task_contract_integrity`, `test:certification:ws05r3::an_experiment_task_closes_only_through_its_lifecycle`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:task_contract_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:task_contract_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### I3. Dynamic generation
 
@@ -866,7 +2189,44 @@ Tasks can be generated from: <sub>L572 · lead_in</sub>
 - [ ] security findings <sub>I3.10 · L582</sub>
 - [ ] performance regressions <sub>I3.11 · L583</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `I3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `I3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:lineage_orphans` — governance health check · G4, G5, G6 — orphans generate linked investigation work
+- `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once` — unit/integration/system test
+- `test:certification:ws05r3::a_failing_product_test_family_generates_repair_work` — unit/integration/system test
+- `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block` — unit/integration/system test
+- `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task` — unit/integration/system test
+- `test:lib:orchestration::generation::tests::generation_is_idempotent_per_occurrence_and_subject` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `I3.1`: `test:certification:greenfield::greenfield_end_to_end`
+- `I3.2`: `test:certification:ws05r3::a_failing_product_test_family_generates_repair_work`, `test:lib:orchestration::generation::tests::generation_is_idempotent_per_occurrence_and_subject`
+- `I3.3`: `check:lineage_orphans`, `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block`, `test:lib:orchestration::generation::tests::generation_is_idempotent_per_occurrence_and_subject`
+- `I3.4`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `I3.5`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `I3.6`: `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task`
+- `I3.7`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `I3.8`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `I3.9`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `I3.10`: `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block`
+- `I3.11`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:lineage_orphans"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:lineage_orphans"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### I4. Parallel execution
 
@@ -878,7 +2238,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] human-gate dependencies <sub>I4.4 · L589</sub>
 - [ ] independent branches continue while one branch waits for human input <sub>I4.5 · L590</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `I4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `I4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `g0:task claim` — automated invariant/guard · G0 — G0 admission refuses only work a scoped hard-block governs
+- `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag` — unit/integration/system test
+- `test:certification:ws05::gates_decide_runnability_and_completion` — unit/integration/system test
+- `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available` — unit/integration/system test
+- `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block` — unit/integration/system test
+- `test:lib:orchestration::dag::tests::explicit_hold_is_only_a_status_set_by_task_status_and_still_in_force` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `I4.1`: `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag`, `test:lib:orchestration::dag::tests::explicit_hold_is_only_a_status_set_by_task_status_and_still_in_force`
+- `I4.4`: `test:certification:ws05::gates_decide_runnability_and_completion`
+- `I4.5`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`
+- health_scheduler_tiers: `G0`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate J — Research and Experimentation
 
@@ -899,7 +2287,40 @@ Each governed research output records: <sub>L597 · lead_in</sub>
 - [ ] confidence <sub>J1.7 · L604</sub>
 - [ ] influenced decisions/tasks <sub>J1.8 · L605</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `J1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `J1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:research_experiment_data_lifecycle` — governance health check · G2, G4, G5, G6 — research evidence complete before it is relied on; influence backlinks
+- `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing` — unit/integration/system test
+- `test:lib:lifecycle::research::tests::findings_name_incomplete_evidence_unsupported_decisions_and_missing_backlinks` — unit/integration/system test
+- `test:certification:ws03_r3::gates_cite_only_governed_research_and_record_its_influence` — unit/integration/system test
+- `test:lib:lifecycle::tests::influence_is_derived_through_edges_evidence_refs_and_gates` — unit/integration/system test
+- `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `J1.1`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.2`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.3`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.4`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.5`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.6`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.7`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::j1_completeness_decides_evidence_standing`
+- `J1.8`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::research::tests::findings_name_incomplete_evidence_unsupported_decisions_and_missing_backlinks`, `test:certification:ws03_r3::gates_cite_only_governed_research_and_record_its_influence`, `test:lib:lifecycle::tests::influence_is_derived_through_edges_evidence_refs_and_gates`, `test:certification:ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:research_experiment_data_lifecycle"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:research_experiment_data_lifecycle"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### J2. Experiment lifecycle
 
@@ -915,7 +2336,42 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** unsupported research conclusion, irreproducible experiment, decision taken before required evidence, conflicting scientific reference data. <sub>AQC-J2 · L616</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `J2`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-J2`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `J2`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-J2`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:research_experiment_data_lifecycle` — governance health check · G2, G4, G5, G6 — irreproducible experiments; experimental task output in the production tree
+- `check:task_contract_integrity` — governance health check · G2, G4, G5, G6 — experiment output is not in the production tree
+- `human-gate:experiment promote` — human-gate evidence · record `human-gate` — a promotion is a human decision
+- `test:lib:lifecycle::experiment::tests::the_state_machine_admits_only_its_transitions` — unit/integration/system test
+- `test:lib:lifecycle::experiment::tests::reproductions_are_judged_by_the_os_under_the_fixed_rule` — unit/integration/system test
+- `test:lib:lifecycle::experiment::tests::standing_requires_os_written_concluded_reproduced_experiments_on_unchanged_inputs` — unit/integration/system test
+- `test:lib:lifecycle::experiment::tests::experimental_output_copied_into_production_is_found_unless_promoted` — unit/integration/system test
+- `test:certification:ws04r3::experimental_output_reaches_production_only_through_a_promotion` — unit/integration/system test
+- `test:certification:ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `J2.1`: `test:lib:lifecycle::experiment::tests::the_state_machine_admits_only_its_transitions`
+- `J2.2`: `test:lib:lifecycle::experiment::tests::standing_requires_os_written_concluded_reproduced_experiments_on_unchanged_inputs`
+- `J2.3`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::experiment::tests::reproductions_are_judged_by_the_os_under_the_fixed_rule`
+- `J2.4`: `test:lib:lifecycle::experiment::tests::the_state_machine_admits_only_its_transitions`
+- `J2.5`: `test:lib:lifecycle::experiment::tests::standing_requires_os_written_concluded_reproduced_experiments_on_unchanged_inputs`
+- `J2.6`: `check:research_experiment_data_lifecycle`, `test:lib:lifecycle::experiment::tests::standing_requires_os_written_concluded_reproduced_experiments_on_unchanged_inputs`
+- `J2.7`: `check:task_contract_integrity`, `human-gate:experiment promote`, `test:lib:lifecycle::experiment::tests::experimental_output_copied_into_production_is_found_unless_promoted`, `test:certification:ws04r3::experimental_output_reaches_production_only_through_a_promotion`, `test:certification:ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:research_experiment_data_lifecycle","check:task_contract_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:research_experiment_data_lifecycle","check:task_contract_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate K — Change Control and Impact
 
@@ -930,7 +2386,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Impact radius is produced. <sub>K1.3 · L625</sub>
 - [ ] Human-readable consequences are surfaced. <sub>K1.4 · L626</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `K1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `K1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `human-gate:cit simulate` — human-gate evidence · record `human-gate` — simulation produces the impact radius and, where the radius requires it, a Human Decision Gate that surfaces the consequences
+- `test:certification:repair::cit_auto_simulation_and_secret_redaction` — unit/integration/system test
+- `test:certification:ws04r2::materiality_is_derived_not_labelled` — unit/integration/system test
+- `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — `cit simulate` produces the impact and its radius; the gate carries the consequences
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `K1.1`: `test:certification:repair::cit_auto_simulation_and_secret_redaction`, `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact`
+- `K1.3`: `human-gate:cit simulate`, `test:certification:repair::cit_auto_simulation_and_secret_redaction`, `test:certification:greenfield::greenfield_end_to_end`
+- `K1.4`: `human-gate:cit simulate`, `test:certification:greenfield::greenfield_end_to_end`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `authoritative spec/decision`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### K2. CIT-E
 
@@ -945,7 +2428,44 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] verification <sub>K2.7 · L635</sub>
 - [ ] commit or rollback/block atomically <sub>K2.8 · L636</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `K2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `K2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:change_control_integrity` — governance health check · G3, G4, G5, G6 — no interrupted CIT; committed CITs carry an approval
+- `doctor:D016` — governance health check · G1, G5 — no interrupted transactions
+- `human-gate:gate answer` — human-gate evidence · record `human-gate` — the final decision of a gated change is the owner's answer
+- `test:certification:ws04r2::cit_approval_binds_content_impact_and_transaction` — unit/integration/system test
+- `test:certification:repair2::cit_approval_derives_only_from_an_answered_gate` — unit/integration/system test
+- `test:certification:ws04r2::upstream_change_reaches_completed_work` — unit/integration/system test
+- `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences` — unit/integration/system test
+- `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips` — unit/integration/system test
+- `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task` — unit/integration/system test
+- `test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken` — unit/integration/system test
+- `test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `K2.1`: `check:change_control_integrity`, `human-gate:gate answer`, `test:certification:ws04r2::cit_approval_binds_content_impact_and_transaction`, `test:certification:repair2::cit_approval_derives_only_from_an_answered_gate`
+- `K2.2`: `test:certification:ws04r2::cit_approval_binds_content_impact_and_transaction`
+- `K2.3`: `test:certification:ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken`, `test:certification:ws04r3::a_governed_change_reseals_only_what_the_os_may_seal`
+- `K2.4`: `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task`
+- `K2.6`: `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`
+- `K2.7`: `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences`, `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`
+- `K2.8`: `check:change_control_integrity`, `doctor:D016`, `test:certification:ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences`, `test:certification:ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:change_control_integrity","doctor:D016"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:change_control_integrity","doctor:D016"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### K3. Automatic impact simulation
 
@@ -962,7 +2482,37 @@ Auto-trigger for material: <sub>L639 · lead_in</sub>
 - [ ] acceptance criteria <sub>K3.7 · L646</sub>
 - [ ] data migration <sub>K3.8 · L647</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `K3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `K3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:repair::cit_auto_simulation_and_secret_redaction` — unit/integration/system test — automatic CIT-P on policy triggers
+- `test:certification:ws04r2::materiality_is_derived_not_labelled` — unit/integration/system test
+- `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label` — unit/integration/system test
+- `test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p` — unit/integration/system test
+- `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `K3.1`: `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
+- `K3.2`: `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
+- `K3.3`: `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
+- `K3.4`: `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`
+- `K3.5`: `test:certification:repair::cit_auto_simulation_and_secret_redaction`, `test:certification:ws04r2::materiality_is_derived_not_labelled`, `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`, `test:lib:cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p`, `test:certification:ws05r3::material_changes_inside_a_task_complete_only_through_change_control`
+- `K3.7`: `test:lib:cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### K4. Impact radius
 
@@ -970,7 +2520,31 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 - [ ] R0-R5 or equivalent affects traversal/test scope/model tier/agents/human approval/rollback. <sub>K4.1 · L650</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `K4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `K4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `human-gate:cit simulate` — human-gate evidence · record `human-gate` — an R2+ radius makes the simulated change require a human gate before approval
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — a behaviour change simulates to radius R2 with a required human gate and an impact set naming the governed task
+- `test:lib:orchestration::gates::tests::radii_are_validated` — unit/integration/system test
+- `test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression` — unit/integration/system test — the change-control gate for the change's radius is required
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `K4.1`: `human-gate:cit simulate`, `test:certification:greenfield::greenfield_end_to_end`, `test:lib:orchestration::gates::tests::radii_are_validated`, `test:certification:ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `authoritative spec/decision`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ## Gate L — Human Decision Gates and Contradictions
 
@@ -985,7 +2559,36 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] human escalation for consequential uncertainty <sub>L1.3 · L659</sub>
 - [ ] rationale/evidence recorded <sub>L1.4 · L660</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `L1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `L1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:authority_unambiguous` — governance health check · G1, G3, G4, G5, G6 — unresolved contradictions are reported by name until resolved
+- `human-gate:gate answer` — human-gate evidence · record `human-gate` — a contradiction precedence cannot resolve is routed to a system gate resolved only by its verified answer
+- `test:certification:ws04r2::contradictions_are_blocked_and_routed` — unit/integration/system test
+- `test:certification:ws03::agent_resolution_needs_an_assessed_and_independent_assessment` — unit/integration/system test
+- `test:lib:context::contradictions::tests::precedence_resolves_first_and_undecidable_pairs_are_detected` — unit/integration/system test
+- `test:lib:context::contradictions::tests::explicit_keys_questions_forks_and_declared_conflicts` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `L1.1`: `check:authority_unambiguous`, `test:certification:ws04r2::contradictions_are_blocked_and_routed`, `test:lib:context::contradictions::tests::precedence_resolves_first_and_undecidable_pairs_are_detected`, `test:lib:context::contradictions::tests::explicit_keys_questions_forks_and_declared_conflicts`
+- `L1.2`: `test:certification:ws03::agent_resolution_needs_an_assessed_and_independent_assessment`
+- `L1.3`: `check:authority_unambiguous`, `human-gate:gate answer`, `test:certification:ws04r2::contradictions_are_blocked_and_routed`, `test:lib:context::contradictions::tests::explicit_keys_questions_forks_and_declared_conflicts`
+- `L1.4`: `test:certification:ws03::agent_resolution_needs_an_assessed_and_independent_assessment`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:authority_unambiguous"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:authority_unambiguous"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### L2. Human Decision Gate package
 
@@ -1002,7 +2605,41 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] confidence <sub>L2.9 · L671</sub>
 - [ ] exact permitted next actions <sub>L2.10 · L672</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `L2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `L2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:human_gate_integrity` — governance health check · G3, G4, G5, G6 — answers are offered options of presented gates
+- `human-gate:gate create` — human-gate evidence · record `human-gate` — a gate is created only with a complete decision package
+- `test:certification:ws03::the_decision_package_is_enforced` — unit/integration/system test
+- `test:lib:orchestration::gates::tests::reversibility_is_assessed_explicitly_or_not_at_all` — unit/integration/system test
+- `test:lib:orchestration::gates::tests::options_authorise_blocked_work_explicitly_or_by_the_approve_convention` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `L2.1`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.2`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.3`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.4`: `check:human_gate_integrity`, `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`, `test:lib:orchestration::gates::tests::options_authorise_blocked_work_explicitly_or_by_the_approve_convention`
+- `L2.5`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.6`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`, `test:lib:orchestration::gates::tests::reversibility_is_assessed_explicitly_or_not_at_all`
+- `L2.7`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.8`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.9`: `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`
+- `L2.10`: `check:human_gate_integrity`, `human-gate:gate create`, `test:certification:ws03::the_decision_package_is_enforced`, `test:lib:orchestration::gates::tests::options_authorise_blocked_work_explicitly_or_by_the_approve_convention`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:human_gate_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:human_gate_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### L3. Gate presentation
 
@@ -1014,7 +2651,44 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Declined/revoked/stale/other-CIT gates cannot authorise execution. <sub>L3.4 · L678</sub>
 - [ ] Human approval cannot be fabricated by agent/CLI metadata. <sub>L3.5 · L679</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `L3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `L3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:human_gate_integrity` — governance health check · G3, G4, G5, G6 — no work completed past an unanswered blocking gate
+- `doctor:D019` — governance health check · G1, G5 — human gates presented
+- `check:os_binding_integrity` — governance health check · G1, G2, G3, G4, G5, G6 — gate/decision records no gov operation produced are reported and not honoured
+- `human-gate:gate present` — human-gate evidence · record `human-gate` — presentation is recorded only from an owner-signed receipt
+- `test:certification:ws03::presentation_is_recorded_only_from_an_owner_signed_receipt` — unit/integration/system test
+- `test:certification:ws03::human_answers_come_only_from_the_owner_signed_channel` — unit/integration/system test
+- `test:certification:ws03::hand_written_gate_and_decision_records_are_not_honoured` — unit/integration/system test
+- `test:certification:repair2::cit_approval_derives_only_from_an_answered_gate` — unit/integration/system test
+- `test:certification:ws03::cit_approval_consumes_only_honoured_gate_answers` — unit/integration/system test
+- `test:certification:ws03::blocked_work_is_released_only_by_an_authorising_answer` — unit/integration/system test
+- `test:certification:repair::update_approval_requires_presented_answered_gate` — unit/integration/system test
+- `test:certification:ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers` — unit/integration/system test
+- `test:certification:ws05::gates_decide_runnability_and_completion` — unit/integration/system test — a declined or withdrawn gate returns the work to blocked; gated work cannot complete while its gate withholds authorisation
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `L3.1`: `doctor:D019`, `test:certification:ws03::presentation_is_recorded_only_from_an_owner_signed_receipt`
+- `L3.2`: `doctor:D019`, `human-gate:gate present`, `test:certification:ws03::presentation_is_recorded_only_from_an_owner_signed_receipt`
+- `L3.3`: `check:human_gate_integrity`, `test:certification:repair2::cit_approval_derives_only_from_an_answered_gate`, `test:certification:repair::update_approval_requires_presented_answered_gate`, `test:certification:ws05::gates_decide_runnability_and_completion`
+- `L3.4`: `check:human_gate_integrity`, `test:certification:repair2::cit_approval_derives_only_from_an_answered_gate`, `test:certification:ws03::cit_approval_consumes_only_honoured_gate_answers`, `test:certification:ws03::blocked_work_is_released_only_by_an_authorising_answer`, `test:certification:ws05::gates_decide_runnability_and_completion`
+- `L3.5`: `check:os_binding_integrity`, `test:certification:ws03::human_answers_come_only_from_the_owner_signed_channel`, `test:certification:ws03::hand_written_gate_and_decision_records_are_not_honoured`, `test:certification:ws03::cit_approval_consumes_only_honoured_gate_answers`, `test:certification:ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:human_gate_integrity","doctor:D019","check:os_binding_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:human_gate_integrity","doctor:D019","check:os_binding_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### L4. Non-global blocking
 
@@ -1023,7 +2697,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Independent runnable branches continue. <sub>L4.1 · L682</sub>
 - [ ] Global stop only when policy or critical-path state requires. <sub>L4.2 · L683</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `L4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `L4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `g0:task claim` — automated invariant/guard · G0 — the G0 admission applies a block only within its scope
+- `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available` — unit/integration/system test
+- `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped` — unit/integration/system test
+- `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block` — unit/integration/system test
+- `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion` — unit/integration/system test
+- `test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `L4.1`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:certification:ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block`
+- `L4.2`: `g0:task claim`, `test:lib:scheduler::tests::subject_scoped_blocks_leave_independent_work_available`, `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`, `test:lib:scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`
+- health_scheduler_tiers: `G0`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate M — Model Routing
 
@@ -1038,7 +2739,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] strong engineering route <sub>M1.3 · L692</sub>
 - [ ] frontier/high-reasoning route <sub>M1.4 · L693</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `M1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `M1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:model_routing_integrity` — governance health check · G4, G5, G6 — every task class in use resolves to a routing tier
+- `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them` — unit/integration/system test — provider models are tiered T1..T3 and class floors resolve through `route --class`
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `M1.1`: `check:model_routing_integrity`
+- `M1.2`: `check:model_routing_integrity`, `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`
+- `M1.3`: `check:model_routing_integrity`
+- `M1.4`: `check:model_routing_integrity`, `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `authoritative spec/decision`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:model_routing_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:model_routing_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### M2. Reasoning requirement
 
@@ -1046,7 +2772,28 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 - [ ] low/medium/high/extra-high or equivalent minimum can be declared/enforced. <sub>M2.1 · L696</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `M2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `M2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them` — unit/integration/system test — a task's declared minimum reasoning is enforced by routing
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `M2.1`: `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### M3. Role defaults
 
@@ -1055,7 +2802,29 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] orchestration/memory/audit default to strong enough tier. <sub>M3.1 · L699</sub>
 - [ ] provider names are mapped externally without rewriting project state. <sub>M3.2 · L700</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `M3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `M3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them` — unit/integration/system test — role default tiers/reasoning cannot be lowered by the overlay; provider names are mapped in MODEL_ROUTING_OVERRIDES
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `M3.1`: `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`
+- `M3.2`: `test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### M4. Empirical routing
 
@@ -1072,7 +2841,36 @@ Telemetry can compare: <sub>L703 · lead_in</sub>
 - [ ] repair count <sub>M4.7 · L710</sub>
 - [ ] reviewer findings <sub>M4.8 · L711</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `M4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `M4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:model_routing_integrity` — governance health check · G4, G5, G6 — routing evidence names known task classes
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — routing evidence with model, class, effort, cost, latency, pass, repairs and findings is recorded and reported
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `M4.1`: `test:certification:greenfield::greenfield_end_to_end`
+- `M4.2`: `check:model_routing_integrity`, `test:certification:greenfield::greenfield_end_to_end`
+- `M4.3`: `test:certification:greenfield::greenfield_end_to_end`
+- `M4.4`: `test:certification:greenfield::greenfield_end_to_end`
+- `M4.5`: `test:certification:greenfield::greenfield_end_to_end`
+- `M4.6`: `test:certification:greenfield::greenfield_end_to_end`
+- `M4.7`: `test:certification:greenfield::greenfield_end_to_end`
+- `M4.8`: `test:certification:greenfield::greenfield_end_to_end`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `authoritative spec/decision`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:model_routing_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:model_routing_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate N — Checkpoints, Compaction and Handoffs
 
@@ -1094,7 +2892,34 @@ Records: <sub>L718 · lead_in</sub>
 - [ ] context packet hash <sub>N1.8 · L726</sub>
 - [ ] memory snapshot/state reference <sub>N1.9 · L727</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `N1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `N1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — the latest-checkpoint pointer resolves and still describes the material state it captured
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test — a checkpoint carries the next action and a governed-state reference, and is judged stale when that state changes
+- `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `N1.1`: `check:continuity_checkpoint_handoff`
+- `N1.2`: `check:continuity_checkpoint_handoff`
+- `N1.3`: `check:continuity_checkpoint_handoff`, `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `N1.6`: `test:lib:checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees`
+- `N1.9`: `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:continuity_checkpoint_handoff"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:continuity_checkpoint_handoff"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### N2. Mandatory triggers
 
@@ -1109,7 +2934,38 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] before session close <sub>N2.7 · L736</sub>
 - [ ] before known compaction <sub>N2.8 · L737</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `N2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `N2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers` — unit/integration/system test
+- `test:lib:checkpoints::tests::material_decisions_are_gate_derived_human_or_wide` — unit/integration/system test
+- `test:certification:ws06r3::a_significant_mutation_observed_at_rebuild_is_a_checkpoint_boundary` — unit/integration/system test
+- `test:certification:ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close` — unit/integration/system test
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `N2.1`: `test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers`
+- `N2.2`: `test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers`, `test:lib:checkpoints::tests::material_decisions_are_gate_derived_human_or_wide`
+- `N2.4`: `test:certification:ws06r3::a_significant_mutation_observed_at_rebuild_is_a_checkpoint_boundary`
+- `N2.5`: `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `N2.6`: `test:lib:checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers`
+- `N2.7`: `test:certification:ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close`, `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `N2.8`: `test:certification:ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### N3. Provider-independent checkpoint watchdog
 
@@ -1119,7 +2975,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Can mark checkpoint stale when material state changed. <sub>N3.2 · L741</sub>
 - [ ] Handoff/session close can be blocked or degraded when checkpoint freshness violates policy. <sub>N3.3 · L742</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `N3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `N3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — a checkpoint that no longer describes the material state is stale
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test
+- `test:certification:ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `N3.1`: `test:certification:ws04r2::checkpoint_and_handoff_continuity`, `test:certification:ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close`
+- `N3.2`: `check:continuity_checkpoint_handoff`, `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `N3.3`: `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:continuity_checkpoint_handoff"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:continuity_checkpoint_handoff"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### N4. Worker return contract
 
@@ -1127,7 +3008,30 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 - [ ] structured result survives subagent conversation death. <sub>N4.1 · L745</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `N4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `N4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — DONE tasks are closed by a persisted report
+- `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract` — unit/integration/system test
+- `test:certification:ws05::close_requires_and_persists_the_consumption_receipt` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `N4.1`: `check:product_traceability`, `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:product_traceability"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:product_traceability"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate O — Verification and Continuous Governance Health
 
@@ -1148,7 +3052,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] recovery <sub>O1.9 · L760</sub>
 - [ ] live/smoke <sub>O1.10 · L761</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `O1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `O1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:product_test_health` — governance health check · G2, G4, G5, G6 — per-family product-test evidence: recorded, current for its inputs, passing
+- `doctor:D030` — governance health check · G1, G5
+- `test:certification:ws05r3::a_failing_product_test_family_generates_repair_work` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — `verify product` runs the project's native test toolchain
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `O1.1`: `check:product_test_health`, `doctor:D030`, `test:certification:ws05r3::a_failing_product_test_family_generates_repair_work`, `test:certification:greenfield::greenfield_end_to_end`
+- `O1.2`: `check:product_test_health`, `doctor:D030`
+- `O1.3`: `check:product_test_health`, `doctor:D030`
+- `O1.4`: `check:product_test_health`, `doctor:D030`
+- `O1.5`: `check:product_test_health`, `doctor:D030`
+- `O1.6`: `check:product_test_health`, `doctor:D030`
+- `O1.7`: `check:product_test_health`, `doctor:D030`
+- `O1.8`: `check:product_test_health`, `doctor:D030`
+- `O1.9`: `check:product_test_health`, `doctor:D030`
+- `O1.10`: `check:product_test_health`, `doctor:D030`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `relevant source files`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:product_test_health","doctor:D030"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:product_test_health","doctor:D030"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### O2. Governance test families
 
@@ -1172,7 +3109,61 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] product traceability <sub>O2.16 · L779</sub>
 - [ ] audit reproducibility <sub>O2.17 · L780</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `O2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `O2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6
+- `check:index_freshness` — governance health check · G1, G2, G4, G5, G6
+- `check:memory_retrieval_regression` — governance health check · G4, G5, G6
+- `check:authority_role_limits` — governance health check · G3, G4, G5, G6
+- `check:mutation_scope` — governance health check · G2, G4, G5, G6
+- `check:path_map_compliance` — governance health check · G1, G4, G5, G6
+- `check:context_reproducibility` — governance health check · G4, G5, G6
+- `check:concurrency_claims` — governance health check · G3, G4, G5, G6
+- `check:adapter_portability` — governance health check · G4, G5, G6
+- `check:skill_regression` — governance health check · G5, G6
+- `check:command_contract_consistency` — governance health check · G5, G6
+- `check:secrets_sensitivity_indexing` — governance health check · G1, G4, G5, G6
+- `check:recovery_rebuild` — governance health check · G4, G5, G6
+- `check:fresh_agent_reconstruction` — governance health check · G4, G5, G6
+- `check:product_traceability` — governance health check · G2, G4, G5, G6
+- `check:audit_reproducibility` — governance health check · G4, G5, G6
+- `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `O2.1`: `check:schema_invariants`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.2`: `check:graph_integrity`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.3`: `check:index_freshness`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.4`: `check:memory_retrieval_regression`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.5`: `check:authority_role_limits`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.6`: `check:mutation_scope`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.7`: `check:path_map_compliance`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.8`: `check:context_reproducibility`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.9`: `check:concurrency_claims`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.10`: `check:adapter_portability`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.11`: `check:skill_regression`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.12`: `check:command_contract_consistency`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.13`: `check:secrets_sensitivity_indexing`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.14`: `check:recovery_rebuild`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.15`: `check:fresh_agent_reconstruction`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.16`: `check:product_traceability`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+- `O2.17`: `check:audit_reproducibility`, `test:lib:scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:schema_invariants","check:graph_integrity","check:index_freshness","check:memory_retrieval_regression","check:authority_role_limits","check:mutation_scope","check:path_map_compliance","check:context_reproducibility","check:concurrency_claims","check:adapter_portability","check:skill_regression","check:command_contract_consistency","check:secrets_sensitivity_indexing","check:recovery_rebuild","check:fresh_agent_reconstruction","check:product_traceability","check:audit_reproducibility"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:schema_invariants","check:graph_integrity","check:index_freshness","check:memory_retrieval_regression","check:authority_role_limits","check:mutation_scope","check:path_map_compliance","check:context_reproducibility","check:concurrency_claims","check:adapter_portability","check:skill_regression","check:command_contract_consistency","check:secrets_sensitivity_indexing","check:recovery_rebuild","check:fresh_agent_reconstruction","check:product_traceability","check:audit_reproducibility"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### O3. Independent test authorship
 
@@ -1182,7 +3173,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Builder tests remain regression evidence, not independent certification. <sub>O3.2 · L784</sub>
 - [ ] Fresh verifier adds held-out tests. <sub>O3.3 · L785</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `O3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `O3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — test obligations within policy families and independence
+- `test:certification:ws05::independence_is_established_from_recorded_authorship` — unit/integration/system test
+- `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1/evidence/heldout-tests` — independent held-out test — held-out tests a fresh R1 verifier added (AR-0027)
+- `heldout:release/verification/4.1.6-r1-2/evidence/heldout-tests` — independent held-out test — held-out tests a fresh R1 verifier added (AR-0029)
+- `heldout:release/verification/4.1.6-r1-3/evidence/heldout-tests` — independent held-out test — held-out tests a fresh R1 verifier added (AR-0031)
+- `heldout:release/verification/4.1.6-r1-4/evidence/heldout-tests` — independent held-out test — held-out tests a fresh R1 verifier added (AR-0033)
+- `obligation:AC-12` — independent audit evidence — builder evidence counts as regression evidence only
+
+Checklist items → owners:
+- `O3.1`: `check:product_traceability`, `test:certification:ws05::independence_is_established_from_recorded_authorship`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent held-out test`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:product_traceability"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:product_traceability"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### O4. Governance suite currency
 
@@ -1191,7 +3209,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] A green result becomes stale when relevant inputs change. <sub>O4.1 · L788</sub>
 - [ ] Governance-affecting work cannot close on stale green evidence. <sub>O4.2 · L789</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `O4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `O4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `doctor:D021` — governance health check · G1, G5 — governance suite green and current for its inputs
+- `check:audit_reproducibility` — governance health check · G4, G5, G6 — a cached result is served only under an identical input key
+- `test:lib:verification::currency::tests::snapshot_attributes_changes_to_classes_and_ignores_its_own_outputs` — unit/integration/system test
+- `test:lib:verification::currency::tests::governance_affecting_by_class_and_by_touched_inputs` — unit/integration/system test
+- `test:lib:verification::currency::tests::health_outputs_are_recognised_by_content_not_by_name` — unit/integration/system test
+- `test:certification:ws05r3::a_red_result_made_stale_by_the_events_own_records_is_reevaluated_not_dropped` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `O4.1`: `doctor:D021`, `check:audit_reproducibility`, `test:lib:verification::currency::tests::snapshot_attributes_changes_to_classes_and_ignores_its_own_outputs`, `test:lib:verification::currency::tests::health_outputs_are_recognised_by_content_not_by_name`, `test:certification:ws05r3::a_red_result_made_stale_by_the_events_own_records_is_reevaluated_not_dropped`
+- `O4.2`: `doctor:D021`, `test:lib:verification::currency::tests::governance_affecting_by_class_and_by_touched_inputs`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["doctor:D021","check:audit_reproducibility"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["doctor:D021","check:audit_reproducibility"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### O5. Governance Health Scheduler
 
@@ -1217,7 +3262,50 @@ Scheduler requirements: <sub>L801 · lead_in</sub>
 - [ ] hard-block vs warning semantics are explicit <sub>O5.13 · L807</sub>
 - [ ] health result provenance is recorded <sub>O5.14 · L808</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `O5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `O5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `g0:task close` — automated invariant/guard · G0 — G0 decides every command against active hard-blocks
+- `check:upstream_change_propagation` — governance health check · G1, G2, G3, G4, G5, G6 — G1/G4 dependency and lineage invalidation
+- `check:mutation_scope` — governance health check · G2, G4, G5, G6 — G2 mutation scope
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — G3 checkpoint/handoff freshness
+- `check:audit_reproducibility` — governance health check · G4, G5, G6 — every executed check reproduced its result; provenance recorded
+- `doctor:D031` — governance health check · G1, G5 — no active health hard-block
+- `test:lib:scheduler::tests::tiers_parse_and_default_selection` — unit/integration/system test — G5 selects every check fresh; G2 selects its tier's checks and reuses the cache
+- `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped` — unit/integration/system test
+- `test:lib:scheduler::catalogue::tests::checks_that_write_derived_state_are_isolated` — unit/integration/system test
+- `test:lib:scheduler::catalogue::tests::hard_blocks_are_explicit` — unit/integration/system test
+- `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back` — unit/integration/system test
+- `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2` — unit/integration/system test
+- `test:certification:ws05::status_shows_health_and_this_projects_release_trust` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `O5.1`: `g0:task close`
+- `O5.2`: `check:upstream_change_propagation`
+- `O5.3`: `check:mutation_scope`, `test:lib:scheduler::tests::tiers_parse_and_default_selection`, `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2`
+- `O5.4`: `check:continuity_checkpoint_handoff`
+- `O5.5`: `check:upstream_change_propagation`
+- `O5.6`: `test:lib:scheduler::tests::tiers_parse_and_default_selection`, `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back`
+- `O5.10`: `test:lib:scheduler::catalogue::tests::checks_that_write_derived_state_are_isolated`
+- `O5.11`: `check:audit_reproducibility`, `test:lib:scheduler::tests::tiers_parse_and_default_selection`
+- `O5.12`: `test:certification:ws05::status_shows_health_and_this_projects_release_trust`
+- `O5.13`: `doctor:D031`, `test:lib:scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped`, `test:lib:scheduler::catalogue::tests::hard_blocks_are_explicit`
+- `O5.14`: `check:audit_reproducibility`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G0`, `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:upstream_change_propagation","check:mutation_scope","check:continuity_checkpoint_handoff","check:audit_reproducibility","doctor:D031"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:upstream_change_propagation","check:mutation_scope","check:continuity_checkpoint_handoff","check:audit_reproducibility","doctor:D031"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate P — Observability and Telemetry
 
@@ -1241,7 +3329,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] decisions <sub>P1.12 · L826</sub>
 - [ ] human interventions <sub>P1.13 · L827</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `P1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `P1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:health_slos` — governance health check · G1, G3, G4, G5, G6 — reads execution telemetry (tokens, handoffs, retries) for the Gate U SLOs
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — `telemetry summary` reports the events of the flow
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `P1.1`: `test:certification:greenfield::greenfield_end_to_end`
+- `P1.2`: `test:certification:greenfield::greenfield_end_to_end`
+- `P1.6`: `check:health_slos`
+- `P1.11`: `check:health_slos`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:health_slos"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:health_slos"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### P2. Organisational questions
 
@@ -1258,7 +3371,31 @@ Telemetry supports analysis of: <sub>L830 · lead_in</sub>
 - [ ] cost by task/feature <sub>P2.7 · L837</sub>
 - [ ] first-pass completion <sub>P2.8 · L838</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `P2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `P2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:health_slos` — governance health check · G1, G3, G4, G5, G6 — first-pass completion and tokens per completed task computed from telemetry
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — routing evidence reports cost and pass/fail by task class
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `P2.3`: `test:certification:greenfield::greenfield_end_to_end`
+- `P2.7`: `test:certification:greenfield::greenfield_end_to_end`
+- `P2.8`: `check:health_slos`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:health_slos"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:health_slos"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate Q — Learning, Lessons and Upstream Improvement
 
@@ -1277,7 +3414,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] human approval where required <sub>Q1.7 · L851</sub>
 - [ ] governed version <sub>Q1.8 · L852</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `Q1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `Q1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `human-gate:upstream prepare` — human-gate evidence · record `human-gate` — preparing an export raises the approval gate for exactly that packet
+- `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises` — unit/integration/system test — a lesson's scope decides eligibility; export needs the owner's answer; an exported lesson is promoted
+- `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once` — unit/integration/system test — a lesson candidate generates governed work
+- `test:certification:upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `Q1.2`: `test:certification:ws05r3::every_event_source_generates_linked_governed_work_once`
+- `Q1.4`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`
+- `Q1.7`: `human-gate:upstream prepare`, `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`, `test:certification:upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet`
+- `Q1.8`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `authoritative spec/decision`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### Q2. Decision vs lesson
 
@@ -1286,7 +3450,30 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Lessons are evidence, not authority. <sub>Q2.1 · L855</sub>
 - [ ] Decisions record chosen action. <sub>Q2.2 · L856</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `Q2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `Q2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block` — unit/integration/system test — non-authoritative material cannot satisfy an authoritative input
+- `test:certification:ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate` — unit/integration/system test — a decision records the chosen action through an answered gate
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `Q2.1`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`
+- `Q2.2`: `test:certification:ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### Q3. PROJECT/PRODUCT/FRAMEWORK scope
 
@@ -1294,7 +3481,28 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 - [ ] Only FRAMEWORK candidates are eligible for upstream export. <sub>Q3.1 · L859</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `Q3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `Q3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises` — unit/integration/system test — only FRAMEWORK-scope lessons reach the export gate
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `Q3.1`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### Q4. Upstream Export Gate
 
@@ -1306,7 +3514,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] synthetic reproducer preference <sub>Q4.4 · L865</sub>
 - [ ] no raw project/customer/vector-store export <sub>Q4.5 · L866</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `Q4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `Q4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises` — unit/integration/system test
+- `test:certification:upstream::export_gate_fails_closed_on_content_whatever_the_name` — unit/integration/system test
+- `test:certification:upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet` — unit/integration/system test
+- `test:certification:ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `Q4.1`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`
+- `Q4.2`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`, `test:certification:upstream::export_gate_fails_closed_on_content_whatever_the_name`
+- `Q4.3`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`, `test:certification:upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet`, `test:certification:ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only`
+- `Q4.4`: `test:certification:upstream::upstream_export_gate_fails_closed_and_sanitises`
+- `Q4.5`: `test:certification:upstream::export_gate_fails_closed_on_content_whatever_the_name`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ## Gate R — Legacy, Archive and Historical State
 
@@ -1324,7 +3560,37 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] retire/remove duplicate mechanisms <sub>R1.6 · L878</sub>
 - [ ] verify no active dependency remains <sub>R1.7 · L879</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `R1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `R1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:legacy_authority` — governance health check · G1, G4, G5, G6 — no legacy governance mechanism remains active without LEGACY registration
+- `doctor:D013` — governance health check · G1, G5 — legacy governance mechanisms retired
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `R1.1`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `R1.2`: `check:legacy_authority`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `R1.3`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `R1.4`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `R1.5`: `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+- `R1.6`: `check:legacy_authority`, `doctor:D013`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `R1.7`: `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:legacy_authority","doctor:D013"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:legacy_authority","doctor:D013"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### R2. Chat-memory retirement
 
@@ -1335,7 +3601,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] dependency proof before retirement <sub>R2.3 · L884</sub>
 - [ ] CIT-E/index refresh/regression on retirement <sub>R2.4 · L885</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `R2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `R2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test — A8 legacy memory extraction and retirement
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test
+- `test:lib:migrations::extraction::tests::sql_dump_literals_are_read` — unit/integration/system test
+- `test:lib:migrations::extraction::tests::units_are_classified_without_requiring_decision_or_lesson_cues` — unit/integration/system test
+- `test:certification:migration::path_migration_with_rollback_and_memory_rebuild` — migration/rollback evidence
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `R2.1`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `R2.2`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:lib:migrations::extraction::tests::sql_dump_literals_are_read`, `test:lib:migrations::extraction::tests::units_are_classified_without_requiring_decision_or_lesson_cues`
+- `R2.3`: `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+- `R2.4`: `test:certification:migration::path_migration_with_rollback_and_memory_rebuild`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `migration/rollback evidence`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### R3. Archive policy
 
@@ -1345,7 +3639,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Git history preferred over unnecessary dead-code archive <sub>R3.2 · L889</sub>
 - [ ] deliberate reference implementations may be retained explicitly <sub>R3.3 · L890</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `R3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `R3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:memory_retrieval_regression` — governance health check · G4, G5, G6 — stale and superseded hits are measured against held-out queries
+- `test:lib:migrations::references::tests::a_dependency_proof_sees_live_code_and_ignores_archive_and_leaving_files` — unit/integration/system test
+- `test:certification:repair::context_packet_layers_and_contradiction_flags` — unit/integration/system test
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test — a retained reference keeps its original rather than being re-pointed at archived material
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `R3.1`: `check:memory_retrieval_regression`, `test:lib:migrations::references::tests::a_dependency_proof_sees_live_code_and_ignores_archive_and_leaving_files`, `test:certification:repair::context_packet_layers_and_contradiction_flags`
+- `R3.3`: `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:memory_retrieval_regression"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:memory_retrieval_regression"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate S — Release, Distribution, Init, Adopt and Update
 
@@ -1358,7 +3677,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] framework/runtime/CLI/tools/migrations/tests/fixtures/lessons/change-proposals/release/docs separation exists. <sub>S1.1 · L897</sub>
 - [ ] canonical OS developed once, consumer repos do not rebuild it independently. <sub>S1.2 · L898</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `S1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `S1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `release:release build` — clean-clone/release evidence · record `release-manifest` — a release is built from the canonical tree only
+- `test:certification:repair3::current_release_payload_identity_and_hygiene` — unit/integration/system test
+- `test:certification:arch::kernel_data_contains_no_language_or_toolchain_assumptions` — unit/integration/system test
+- `test:certification:repair::embedded_kernel_installs_without_canonical_root` — clean-clone/release evidence
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `S1.1`: `release:release build`, `test:certification:repair3::current_release_payload_identity_and_hygiene`, `test:certification:arch::kernel_data_contains_no_language_or_toolchain_assumptions`
+- `S1.2`: `release:release build`, `test:certification:repair::embedded_kernel_installs_without_canonical_root`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### S2. Immutable releases
 
@@ -1376,7 +3720,42 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] human decisions <sub>S2.10 · L910</sub>
 - [ ] rollback <sub>S2.11 · L911</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `S2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `S2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `release:release build` — clean-clone/release evidence · record `release-manifest` — the immutable manifest and PRE_RELEASE_CHECKS evidence
+- `release:release verify` — clean-clone/release evidence · record `release-manifest` — the built release is verified as written
+- `test:certification:repair2::release_build_reproduces_released_versions_from_their_commit` — clean-clone/release evidence
+- `test:certification:ws08_r2::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written` — clean-clone/release evidence
+- `test:certification:ws08_r3::the_next_kernel_payload_is_version_consistent_and_release_build_refuses_drift` — unit/integration/system test
+- `test:lib:kernel::tests::the_payload_declares_the_schema_versions_it_ships_and_carries_no_secret` — unit/integration/system test
+- `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back` — migration/rollback evidence
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1/evidence/heldout-tests` — independent held-out test · tests heldout_srr::a1_signature_lifted_from_a_different_document_is_refused — AR-0027 held-out: signed release metadata verification
+- `obligation:AC-14` — independent held-out test
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `S2.1`: `release:release build`, `test:certification:repair2::release_build_reproduces_released_versions_from_their_commit`
+- `S2.2`: `release:release build`, `test:certification:repair2::release_build_reproduces_released_versions_from_their_commit`, `test:certification:ws08_r2::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written`
+- `S2.3`: `release:release build`, `release:release verify`, `test:certification:repair2::release_build_reproduces_released_versions_from_their_commit`, `test:certification:ws08_r2::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written`
+- `S2.4`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`
+- `S2.5`: `release:release build`, `test:certification:ws08_r3::the_next_kernel_payload_is_version_consistent_and_release_build_refuses_drift`, `test:lib:kernel::tests::the_payload_declares_the_schema_versions_it_ships_and_carries_no_secret`
+- `S2.6`: `release:release build`
+- `S2.11`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### S3. `gov init`
 
@@ -1389,7 +3768,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] health checks <sub>S3.5 · L918</sub>
 - [ ] reference retrieval profile bootstrap when certified <sub>S3.6 · L919</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `S3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `S3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `release:init` — clean-clone/release evidence · record `framework-lock` — a clean install records the verified identity in framework.lock
+- `doctor:D001` — governance health check · G1, G5 — framework.lock present after init
+- `doctor:D006` — governance health check · G1, G5 — project overlay present and valid
+- `test:certification:repair::embedded_kernel_installs_without_canonical_root` — clean-clone/release evidence
+- `test:certification:srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance` — unit/integration/system test
+- `test:certification:ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — init creates the overlay, contract and adapters; memory is built; health is audited
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1/evidence/heldout-tests` — independent held-out test · tests heldout_srr2::c1_floor_binds_a_non_rollback_ingress_after_a_verified_install — AR-0027 held-out: the floor binds ingress after a verified install
+- `obligation:AC-14` — independent held-out test
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `S3.1`: `release:init`, `test:certification:repair::embedded_kernel_installs_without_canonical_root`, `test:certification:srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance`, `test:certification:ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current`
+- `S3.2`: `release:init`, `doctor:D006`, `test:certification:repair::embedded_kernel_installs_without_canonical_root`, `test:certification:greenfield::greenfield_end_to_end`
+- `S3.3`: `release:init`, `test:certification:repair::embedded_kernel_installs_without_canonical_root`, `test:certification:greenfield::greenfield_end_to_end`
+- `S3.4`: `test:certification:greenfield::greenfield_end_to_end`
+- `S3.5`: `doctor:D001`, `test:certification:greenfield::greenfield_end_to_end`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent held-out test`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G5`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["doctor:D001","doctor:D006"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["doctor:D001","doctor:D006"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### S4. `gov adopt`
 
@@ -1410,7 +3822,46 @@ Stages are executable/evidenced: <sub>L922 · lead_in</sub>
 - [ ] A10 independent memory verification <sub>S4.11 · L933</sub>
 - [ ] A11 full project audit <sub>S4.12 · L934</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `S4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `S4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `human-gate:adopt migrate` — human-gate evidence · record `human-gate` — a destructive batch waits for a presented, answered gate
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test
+- `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts` — unit/integration/system test
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test
+- `test:certification:migration::path_migration_with_rollback_and_memory_rebuild` — migration/rollback evidence
+- `test:lib:adopt::tests::a11_names_the_installation_posture_when_it_is_the_only_reason` — unit/integration/system test
+- `test:lib:adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound` — unit/integration/system test
+- `test:lib:migrations::executor::tests::a_rollback_restores_only_what_its_batch_recorded` — migration/rollback evidence
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `S4.1`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `S4.2`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `S4.3`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `S4.4`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+- `S4.5`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+- `S4.6`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`
+- `S4.7`: `human-gate:adopt migrate`, `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::path_migration_with_rollback_and_memory_rebuild`, `test:lib:migrations::executor::tests::a_rollback_restores_only_what_its_batch_recorded`
+- `S4.8`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:lib:adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound`
+- `S4.9`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `S4.10`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::path_migration_with_rollback_and_memory_rebuild`
+- `S4.11`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`
+- `S4.12`: `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:lib:adopt::tests::a11_names_the_installation_posture_when_it_is_the_only_reason`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `migration/rollback evidence`, `human-gate evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `authoritative spec/decision`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### S5. `gov update`
 
@@ -1426,7 +3877,43 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] rollback <sub>S5.8 · L944</sub>
 - [ ] ledger/provenance <sub>S5.9 · L945</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `S5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `S5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `release:update --apply` — clean-clone/release evidence · record `framework-lock` — an applied update records the verified release identity and its ledger
+- `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back` — migration/rollback evidence
+- `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger` — migration/rollback evidence
+- `test:certification:ws08_r2::update_applies_only_on_a_verified_authorising_answer` — unit/integration/system test
+- `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back` — unit/integration/system test
+- `test:lib:migrations::framework::tests::template_convergence_is_a_three_way_merge_that_keeps_customisations` — unit/integration/system test
+- `test:certification:repair::update_approval_requires_presented_answered_gate` — unit/integration/system test
+- `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `heldout:release/verification/4.1.6-r1/evidence/heldout-tests` — independent held-out test · tests heldout_srr4::e3_install_transaction_is_atomic_and_replays_after_interruption — AR-0027 held-out: the install transaction is atomic and replays after interruption
+- `obligation:AC-14` — independent held-out test
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `S5.1`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:ws08_r2::update_applies_only_on_a_verified_authorising_answer`, `test:certification:repair::update_approval_requires_presented_answered_gate`
+- `S5.2`: `release:update --apply`
+- `S5.3`: `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`
+- `S5.4`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`, `test:lib:migrations::framework::tests::template_convergence_is_a_three_way_merge_that_keeps_customisations`
+- `S5.7`: `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back`
+- `S5.8`: `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`, `test:certification:ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back`, `test:certification:ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion`
+- `S5.9`: `release:update --apply`, `test:certification:update::update_from_previous_release_preserves_project_and_rolls_back`, `test:certification:repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent held-out test`, `migration/rollback evidence`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### S6. Cross-machine mechanics
 
@@ -1436,7 +3923,34 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] derived runtime rebuilds locally <sub>S6.2 · L949</sub>
 - [ ] machine-specific absolute paths do not define release identity <sub>S6.3 · L950</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `S6`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `S6`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:recovery_rebuild` — governance health check · G4, G5, G6 — the derived runtime is rebuilt locally and reproduces the tracked manifest
+- `test:certification:multi_machine::clone_rebuilds_identical_derived_state` — clean-clone/release evidence
+- `test:certification:repair2::framework_lock_is_release_identifying_and_portable` — unit/integration/system test
+- `test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere` — unit/integration/system test
+- `test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `S6.1`: `test:certification:multi_machine::clone_rebuilds_identical_derived_state`, `test:certification:ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere`, `test:certification:ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else`
+- `S6.2`: `check:recovery_rebuild`, `test:certification:multi_machine::clone_rebuilds_identical_derived_state`
+- `S6.3`: `test:certification:repair2::framework_lock_is_release_identifying_and_portable`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `clean-clone/release evidence`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:recovery_rebuild"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:recovery_rebuild"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate T — Independent Adoption and Audit Roles
 
@@ -1456,7 +3970,42 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] comprehensive independent auditor <sub>T1.8 · L964</sub>
 - [ ] operator/CTO <sub>T1.9 · L965</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `T1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `T1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:authority_role_limits` — governance health check · G3, G4, G5, G6 — independent roles are constrained by their tool permissions
+- `g0:adopt review` — automated invariant/guard · G0
+- `g0:adopt verify-migration` — automated invariant/guard · G0
+- `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts` — unit/integration/system test
+- `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role` — unit/integration/system test
+- `test:lib:adopt::tests::command_test_permissions_come_from_policy_and_the_designated_duty` — unit/integration/system test
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `T1.1`: `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `T1.2`: `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `T1.3`: `g0:adopt review`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`
+- `T1.4`: `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `T1.5`: `g0:adopt verify-migration`, `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`, `test:lib:adopt::tests::command_test_permissions_come_from_policy_and_the_designated_duty`
+- `T1.6`: `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+- `T1.7`: `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`
+- `T1.8`: `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:lib:adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role`
+- `T1.9`: `check:authority_role_limits`, `test:certification:brownfield::brownfield_adoption_end_to_end`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G0`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:authority_role_limits"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:authority_role_limits"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### T2. Fresh-session independence
 
@@ -1465,7 +4014,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] independent roles do not simply continue builder/executor context. <sub>T2.1 · L968</sub>
 - [ ] held-out tests/evidence separation is enforced. <sub>T2.2 · L969</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `T2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `T2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts` — unit/integration/system test — an independent stage runs in a declared session that authored no builder stage
+- `test:certification:ws05::independence_is_established_from_recorded_authorship` — unit/integration/system test
+- `test:lib:migrations::identity::tests::a_session_is_declared_only_by_the_caller_and_never_twice` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::the_hidden_oracle_is_kept_out_of_the_public_suite_and_the_repository` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `T2.1`: `test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts`, `test:certification:ws05::independence_is_established_from_recorded_authorship`, `test:lib:migrations::identity::tests::a_session_is_declared_only_by_the_caller_and_never_twice`
+- `T2.2`: `test:lib:qualification_oracle::tests::the_hidden_oracle_is_kept_out_of_the_public_suite_and_the_repository`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### T3. Adoption evidence tree
 
@@ -1473,7 +4047,32 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 - [ ] inventory → classification → path map → migration plan → independent tests → migration → independent verification → memory → memory verification → full audit is traceable. <sub>T3.1 · L972</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `T3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `T3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:os_binding_integrity` — governance health check · G1, G2, G3, G4, G5, G6 — the adoption baseline no gov operation produced is reported and not honoured
+- `test:certification:brownfield::brownfield_adoption_end_to_end` — unit/integration/system test
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test
+- `test:lib:adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound` — unit/integration/system test
+- `test:lib:adopt::tests::the_approval_digest_ignores_os_bookkeeping_but_not_what_happens_to_an_artefact` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `T3.1`: `check:os_binding_integrity`, `test:certification:brownfield::brownfield_adoption_end_to_end`, `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`, `test:lib:adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound`, `test:lib:adopt::tests::the_approval_digest_ignores_os_bookkeeping_but_not_what_happens_to_an_artefact`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `authoritative spec/decision`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:os_binding_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:os_binding_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate U — Framework Health SLOs
 
@@ -1517,7 +4116,72 @@ A repository is HEALTHY only when: <sub>L995 · lead_in</sub>
 - [ ] fresh strong agent reconstructs state within budget <sub>U.27 · L1007</sub>
 - [ ] derived memory is rebuildable <sub>U.28 · L1008</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `U`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `U`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:health_slos` — governance health check · G1, G3, G4, G5, G6 — every framework-health SLO computed against its declared threshold
+- `doctor:D035` — governance health check · G1, G5 — repository HEALTHY only under the thirteen conditions
+- `check:authority_unambiguous` — governance health check · G1, G3, G4, G5, G6
+- `check:legacy_authority` — governance health check · G1, G4, G5, G6
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6
+- `check:index_freshness` — governance health check · G1, G2, G4, G5, G6
+- `check:memory_retrieval_regression` — governance health check · G4, G5, G6
+- `check:secrets_sensitivity_indexing` — governance health check · G1, G4, G5, G6
+- `check:feature_readiness` — governance health check · G1, G2, G4, G5, G6
+- `check:product_traceability` — governance health check · G2, G4, G5, G6
+- `check:product_test_health` — governance health check · G2, G4, G5, G6
+- `check:unresolved_audit_findings` — governance health check · G1, G3, G4, G5, G6
+- `check:fresh_agent_reconstruction` — governance health check · G4, G5, G6
+- `check:recovery_rebuild` — governance health check · G4, G5, G6
+- `doctor:D021` — governance health check · G1, G5
+- `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold` — unit/integration/system test
+- `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds` — unit/integration/system test
+- `test:certification:repair::unmeasured_memory_recall_is_not_green` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `U.1`: `check:health_slos`, `doctor:D021`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.2`: `check:health_slos`, `check:product_test_health`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.3`: `check:health_slos`, `check:memory_retrieval_regression`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`, `test:certification:repair::unmeasured_memory_recall_is_not_green`
+- `U.4`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.5`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.6`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.7`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.8`: `check:health_slos`, `check:product_traceability`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.9`: `check:health_slos`, `check:feature_readiness`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.10`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.11`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.12`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.13`: `check:health_slos`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.14`: `check:health_slos`, `check:recovery_rebuild`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.15`: `check:health_slos`, `check:fresh_agent_reconstruction`, `test:lib:verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold`
+- `U.16`: `doctor:D035`, `check:authority_unambiguous`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.17`: `doctor:D035`, `check:legacy_authority`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.18`: `doctor:D035`, `check:schema_invariants`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.19`: `doctor:D035`, `check:index_freshness`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.20`: `doctor:D035`, `check:memory_retrieval_regression`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`, `test:certification:repair::unmeasured_memory_recall_is_not_green`
+- `U.21`: `doctor:D035`, `check:secrets_sensitivity_indexing`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.22`: `doctor:D035`, `check:feature_readiness`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.23`: `doctor:D035`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.24`: `doctor:D035`, `check:product_traceability`, `check:product_test_health`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.25`: `doctor:D035`, `doctor:D021`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.26`: `doctor:D035`, `check:unresolved_audit_findings`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.27`: `doctor:D035`, `check:fresh_agent_reconstruction`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+- `U.28`: `doctor:D035`, `check:recovery_rebuild`, `test:lib:verification::slo::tests::healthy_only_when_every_condition_holds`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:health_slos","doctor:D035","check:authority_unambiguous","check:legacy_authority","check:schema_invariants","check:index_freshness","check:memory_retrieval_regression","check:secrets_sensitivity_indexing","check:feature_readiness","check:product_traceability","check:product_test_health","check:unresolved_audit_findings","check:fresh_agent_reconstruction","check:recovery_rebuild","doctor:D021"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:health_slos","doctor:D035","check:authority_unambiguous","check:legacy_authority","check:schema_invariants","check:index_freshness","check:memory_retrieval_regression","check:secrets_sensitivity_indexing","check:feature_readiness","check:product_traceability","check:product_test_health","check:unresolved_audit_findings","check:fresh_agent_reconstruction","check:recovery_rebuild","doctor:D021"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate V — Qualification Oracle
 
@@ -1541,7 +4205,40 @@ Each injected defect records: <sub>L1017 · lead_in</sub>
 - [ ] expected governed action <sub>V1.8 · L1025</sub>
 - [ ] forbidden outcomes <sub>V1.9 · L1026</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `V1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `V1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::the_record_the_audit_used_is_rejected` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-6` — independent audit evidence — the oracle format is accepted by a fresh independent reviewer before any hidden fault exists
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `V1.1`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::the_record_the_audit_used_is_rejected`
+- `V1.2`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V1.3`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V1.4`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V1.5`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V1.6`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V1.7`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V1.8`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V1.9`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### V2. Hidden path-map oracle
 
@@ -1557,7 +4254,37 @@ For brownfield Repo B: <sub>L1029 · lead_in</sub>
 - [ ] expected references/consumers <sub>V2.6 · L1035</sub>
 - [ ] sensitivity/indexing expectation <sub>V2.7 · L1036</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `V2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `V2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-6` — independent audit evidence
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `V2.1`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V2.2`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V2.3`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V2.4`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V2.5`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V2.6`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V2.7`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### V3. Hidden memory oracle
 
@@ -1571,7 +4298,37 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] expected code symbols <sub>V3.6 · L1044</sub>
 - [ ] expected retrieval results <sub>V3.7 · L1045</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `V3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `V3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-6` — independent audit evidence
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `V3.1`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V3.2`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V3.3`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V3.4`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`, `test:lib:qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records`
+- `V3.5`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V3.6`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+- `V3.7`: `test:lib:qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source`, `test:lib:qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `independent audit evidence`
+- freshness_triggers: `runtime/kernel implementation`
+- health_scheduler_tiers: none
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":[],"rule":"no owner of this capability runs inside an adopted project: the adopted release carries the capability on that release's own evidence (its test and independent owners), which is re-established for every release (Contract v3:122-123)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":[],"rule":"no owner runs at a project's periodic operational audit: the capability is re-established with each release's evidence (Contract v3:126)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing owner test or held-out result is a failed test (Contract v3 I3:574): the candidate's regression is not green (frozen AC-15) and the failure is repaired as governed work before the capability is relied on`
 
 ### V4. Quantitative qualification scoring
 
@@ -1594,7 +4351,45 @@ Report: <sub>L1048 · lead_in</sub>
 
 The permanent public qualification suite and fresh verifier hidden oracle must remain separate. <sub>L1062 · qualifier</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `V4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `V4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:path_map_compliance` — governance health check · G1, G4, G5, G6 — no hidden Qualification Oracle material in any governed file (the public suite and the hidden oracle stay separate)
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6 — no hidden Qualification Oracle record in the governed repository
+- `test:lib:qualification_oracle::tests::score_arithmetic_is_checked` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::a_score_report_is_bound_to_its_sealed_oracle` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names` — unit/integration/system test
+- `test:lib:qualification_oracle::tests::the_hidden_oracle_is_kept_out_of_the_public_suite_and_the_repository` — unit/integration/system test — the permanent public suite and the verifier's hidden oracle remain separate
+
+Independent verification (Contract v3:65):
+- `obligation:AC-6` — independent audit evidence
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `V4.1`: `test:lib:qualification_oracle::tests::score_arithmetic_is_checked`, `test:lib:qualification_oracle::tests::a_score_report_is_bound_to_its_sealed_oracle`, `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.2`: `test:lib:qualification_oracle::tests::score_arithmetic_is_checked`, `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.3`: `test:lib:qualification_oracle::tests::score_arithmetic_is_checked`, `test:lib:qualification_oracle::tests::a_score_report_is_bound_to_its_sealed_oracle`, `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.4`: `test:lib:qualification_oracle::tests::score_arithmetic_is_checked`, `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.5`: `test:lib:qualification_oracle::tests::score_arithmetic_is_checked`, `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.6`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.7`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.8`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.9`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.10`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.11`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+- `V4.12`: `test:lib:qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:path_map_compliance","check:schema_invariants"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:path_map_compliance","check:schema_invariants"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## Gate W — Artifact Flow, Dependency Consumption and End-to-End Traceability
 
@@ -1618,7 +4413,44 @@ Every material output that may feed downstream work has: <sub>L1069 · lead_in</
 
 Applies to specifications, scenarios, decisions, datasets, experiments, architecture records, interfaces, test designs, migration plans, audit findings, benchmark results and equivalent governed outputs. <sub>L1080 · qualifier</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W1`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — records outside their canonical location (W1)
+- `check:schema_invariants` — governance health check · G1, G2, G4, G5, G6 — ids, types, lifecycle/state classes valid; duplicate ids
+- `test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct` — unit/integration/system test
+- `test:lib:graph::identity::tests::misplaced_records_are_reported_and_subdirectories_are_canonical` — unit/integration/system test
+- `test:lib:graph::identity::tests::failure_and_plan_records_have_canonical_locations` — unit/integration/system test
+- `test:lib:graph::tests::producer_and_report_edges_point_from_producer_to_product` — unit/integration/system test
+- `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning` — unit/integration/system test
+- `test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named` — unit/integration/system test
+- `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity` — unit/integration/system test — the migration plan and catalogue keep their identity across a re-run (WS-9 item 6)
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W1.1`: `check:schema_invariants`, `test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct`, `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+- `W1.2`: `check:schema_invariants`, `test:lib:graph::identity::tests::failure_and_plan_records_have_canonical_locations`
+- `W1.3`: `check:graph_integrity`, `test:lib:graph::identity::tests::misplaced_records_are_reported_and_subdirectories_are_canonical`, `test:lib:graph::identity::tests::failure_and_plan_records_have_canonical_locations`
+- `W1.4`: `check:schema_invariants`
+- `W1.5`: `check:schema_invariants`
+- `W1.6`: `test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct`, `test:certification:migration::adoption_dependency_proof_citations_and_rerun_identity`
+- `W1.7`: `test:lib:graph::tests::producer_and_report_edges_point_from_producer_to_product`
+- `W1.8`: `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning`
+- `W1.9`: `test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:graph_integrity","check:schema_invariants"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:graph_integrity","check:schema_invariants"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W2. Typed output → input contracts
 
@@ -1633,7 +4465,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Output schemas define what downstream stages may consume. <sub>W2.7 · L1089</sub>
 - [ ] Relationships such as `EVIDENCE_FOR`, `CONSTRAINS`, `IMPLEMENTS`, `TESTS`, `GENERATES`, `VALIDATES`, `SUPERSEDES` or equivalent are machine-usable. <sub>W2.8 · L1090</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W2`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — ill-typed and reversed relationships
+- `test:lib:context::manifest::tests::output_contracts_in_the_schema_are_the_enforced_table` — unit/integration/system test
+- `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block` — unit/integration/system test
+- `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning` — unit/integration/system test
+- `test:certification:ws04r3::the_manifest_applies_the_producer_rule_and_flags_ungoverned_evidence` — unit/integration/system test
+- `test:certification:ws03_r3::gates_cite_only_governed_research_and_record_its_influence` — unit/integration/system test
+- `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W2.1`: `check:graph_integrity`, `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning`
+- `W2.2`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`, `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations`
+- `W2.3`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`
+- `W2.4`: `test:certification:ws04r3::the_manifest_applies_the_producer_rule_and_flags_ungoverned_evidence`, `test:certification:ws03_r3::gates_cite_only_governed_research_and_record_its_influence`
+- `W2.6`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`
+- `W2.7`: `test:lib:context::manifest::tests::output_contracts_in_the_schema_are_the_enforced_table`
+- `W2.8`: `check:graph_integrity`, `test:lib:graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `project path map`, `authoritative spec/decision`, `relevant index manifest`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:graph_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:graph_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W3. Mandatory task-input manifest
 
@@ -1654,7 +4519,44 @@ Rules: <sub>L1100 · lead_in</sub>
 - [ ] Conflicting mandatory inputs trigger contradiction handling. <sub>W3.8 · L1103</sub>
 - [ ] Required inputs are resolved deterministically, not by semantic retrieval ranking. <sub>W3.9 · L1104</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W3`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:context_reproducibility` — governance health check · G4, G5, G6 — every dispatchable task's delivered inputs verify against its declared manifest
+- `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input` — unit/integration/system test
+- `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block` — unit/integration/system test
+- `test:lib:context::manifest::tests::state_version_and_hash_constraints_are_enforced` — unit/integration/system test
+- `test:lib:context::manifest::tests::version_constraints` — unit/integration/system test
+- `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations` — unit/integration/system test
+- `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag` — unit/integration/system test
+- `test:certification:ws04r2::contradictions_are_blocked_and_routed` — unit/integration/system test
+- `test:lib:context::manifest::tests::a_specification_producer_is_not_held_to_what_its_feature_still_lacks` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W3.1`: `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input`, `test:lib:context::manifest::tests::a_specification_producer_is_not_held_to_what_its_feature_still_lacks`
+- `W3.2`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`, `test:lib:context::manifest::tests::state_version_and_hash_constraints_are_enforced`
+- `W3.3`: `test:lib:context::manifest::tests::state_version_and_hash_constraints_are_enforced`, `test:lib:context::manifest::tests::version_constraints`
+- `W3.4`: `test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input`, `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations`
+- `W3.5`: `test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations`
+- `W3.6`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`, `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag`
+- `W3.7`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`
+- `W3.8`: `test:certification:ws04r2::contradictions_are_blocked_and_routed`
+- `W3.9`: `check:context_reproducibility`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:context_reproducibility"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:context_reproducibility"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W4. Context compiler delivery proof
 
@@ -1667,7 +4569,35 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Context packet hash/provenance proves what the worker was supplied. <sub>W4.5 · L1111</sub>
 - [ ] Missing required input causes refusal or explicit blocked state. <sub>W4.6 · L1112</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W4`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:context_reproducibility` — governance health check · G4, G5, G6 — the deterministic block is reproducible and delivered inputs verify against the manifest
+- `test:certification:repair::context_packet_layers_and_contradiction_flags` — unit/integration/system test
+- `test:certification:greenfield::greenfield_end_to_end` — unit/integration/system test — two compilations give the same packet hash
+- `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W4.1`: `check:context_reproducibility`, `test:certification:repair::context_packet_layers_and_contradiction_flags`
+- `W4.2`: `test:certification:repair::context_packet_layers_and_contradiction_flags`
+- `W4.4`: `check:context_reproducibility`
+- `W4.5`: `check:context_reproducibility`, `test:certification:greenfield::greenfield_end_to_end`
+- `W4.6`: `test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:context_reproducibility"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:context_reproducibility"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W5. Consumption receipt and implementation traceability
 
@@ -1688,7 +4618,40 @@ Task close: <sub>L1123 · lead_in</sub>
 - [ ] detects undocumented/untraceable implementation <sub>W5.8 · L1125</sub>
 - [ ] links code/test/output evidence back to authoritative upstream inputs <sub>W5.9 · L1126</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W5`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — DONE tasks closed by a report; DONE implementation traces to its requirements (W5/W8)
+- `test:certification:ws05::close_requires_and_persists_the_consumption_receipt` — unit/integration/system test
+- `test:certification:ws04r3::untraceable_implementation_is_judged_on_what_was_produced` — unit/integration/system test
+- `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract` — unit/integration/system test
+- `test:lib:cit::propagation::tests::receipts_name_consumed_hashes` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W5.1`: `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`, `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`, `test:lib:cit::propagation::tests::receipts_name_consumed_hashes`
+- `W5.2`: `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`, `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `W5.3`: `check:product_traceability`, `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `W5.4`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `W5.5`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `W5.6`: `test:lib:context::receipt::tests::worker_return_and_report_are_one_contract`
+- `W5.7`: `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`
+- `W5.8`: `check:product_traceability`, `test:certification:ws04r3::untraceable_implementation_is_judged_on_what_was_produced`
+- `W5.9`: `check:product_traceability`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `security/sensitivity policy`
+- health_scheduler_tiers: `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:product_traceability"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:product_traceability"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W6. Upstream-change staleness propagation
 
@@ -1704,7 +4667,39 @@ When an authoritative upstream artefact changes: <sub>L1129 · lead_in</sub>
 - [ ] `COMPLETE` does not imply permanently valid <sub>W6.6 · L1135</sub>
 - [ ] stale evidence cannot remain green merely because the original task closed successfully <sub>W6.7 · L1136</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W6`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W6`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:upstream_change_propagation` — governance health check · G1, G2, G3, G4, G5, G6 — completed work, evidence and packets invalidated by an upstream change and not yet revalidated
+- `test:certification:ws04r2::upstream_change_reaches_completed_work` — unit/integration/system test
+- `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence` — unit/integration/system test
+- `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task` — unit/integration/system test
+- `test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent` — unit/integration/system test
+- `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W6.1`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence`, `test:lib:cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent`, `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks`
+- `W6.2`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`
+- `W6.3`: `check:upstream_change_propagation`, `test:certification:ws04r2::upstream_change_reaches_completed_work`
+- `W6.4`: `test:certification:ws04r2::upstream_change_reaches_completed_work`, `test:certification:ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks`
+- `W6.5`: `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task`
+- `W6.6`: `test:certification:ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task`
+- `W6.7`: `check:upstream_change_propagation`, `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:upstream_change_propagation"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:upstream_change_propagation"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W7. Orphan/dead-output and unexplained-output detection
 
@@ -1717,7 +4712,36 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Implementation/code with no active requirement/decision/spec justification is detectable. <sub>W7.5 · L1143</sub>
 - [ ] Orphans produce governed investigation/remediation rather than silent deletion. <sub>W7.6 · L1144</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W7`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W7`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:lineage_orphans` — governance health check · G4, G5, G6 — every orphan by name; generates linked investigation work
+- `test:lib:verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not` — unit/integration/system test
+- `test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named` — unit/integration/system test
+- `test:certification:ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W7.1`: `check:lineage_orphans`, `test:lib:verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not`, `test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named`, `test:certification:ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles`
+- `W7.2`: `check:lineage_orphans`, `test:lib:verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not`
+- `W7.3`: `check:lineage_orphans`, `test:lib:verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not`
+- `W7.4`: `check:lineage_orphans`, `test:lib:verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not`
+- `W7.5`: `check:lineage_orphans`, `test:lib:verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not`
+- `W7.6`: `check:lineage_orphans`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:lineage_orphans"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:lineage_orphans"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W8. Forward and reverse lineage
 
@@ -1731,7 +4755,37 @@ Governance can answer: <sub>L1147 · lead_in</sub>
 - [ ] stale lineage link detection <sub>W8.4 · L1151</sub>
 - [ ] cross-language/cross-repository relationships where in scope <sub>W8.5 · L1152</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W8`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W8`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — DONE implementation traces to its requirements
+- `check:graph_integrity` — governance health check · G1, G2, G4, G5, G6 — stale lineage links (W8)
+- `test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named` — unit/integration/system test
+- `test:lib:graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage` — unit/integration/system test
+- `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact` — unit/integration/system test
+- `test:lib:graph::lineage::tests::a_finished_transactions_links_are_history_not_stale_links` — unit/integration/system test
+- `test:certification:ws04r3::untraceable_implementation_is_judged_on_what_was_produced` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W8.1`: `check:product_traceability`, `test:lib:graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage`
+- `W8.2`: `test:lib:graph::tests::implicit_architecture_consumers_are_reached_by_impact`
+- `W8.3`: `test:certification:ws04r3::untraceable_implementation_is_judged_on_what_was_produced`
+- `W8.4`: `check:graph_integrity`, `test:lib:graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named`, `test:lib:graph::lineage::tests::a_finished_transactions_links_are_history_not_stale_links`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G2`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:product_traceability","check:graph_integrity"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:product_traceability","check:graph_integrity"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W9. Session/handoff continuity of mandatory inputs
 
@@ -1744,7 +4798,31 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 - [ ] Compaction cannot silently remove mandatory project state. <sub>W9.5 · L1159</sub>
 - [ ] Handoff with stale/missing required-input state is blocked or explicitly degraded. <sub>W9.6 · L1160</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W9`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W9`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — the latest checkpoint still describes the material state it captured
+- `test:certification:ws04r2::checkpoint_and_handoff_continuity` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W9.1`: `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `W9.2`: `check:continuity_checkpoint_handoff`, `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+- `W9.6`: `check:continuity_checkpoint_handoff`, `test:certification:ws04r2::checkpoint_and_handoff_continuity`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `authoritative spec/decision`
+- health_scheduler_tiers: `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:continuity_checkpoint_handoff"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:continuity_checkpoint_handoff"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W10. Deterministic mandatory inputs outrank retrieval
 
@@ -1762,7 +4840,32 @@ Verify: <sub>L1166 · lead_in</sub>
 - [ ] retrieval/index outage does not erase deterministic required dependencies <sub>W10.4 · L1170</sub>
 - [ ] required-input delivery is independently testable <sub>W10.5 · L1171</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W10`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W10`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:context_reproducibility` — governance health check · G4, G5, G6 — required-input delivery is verified independently of retrieval
+- `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block` — unit/integration/system test
+- `test:certification:repair::context_packet_layers_and_contradiction_flags` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W10.1`: `test:certification:repair::context_packet_layers_and_contradiction_flags`
+- `W10.2`: `test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block`
+- `W10.5`: `check:context_reproducibility`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:context_reproducibility"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:context_reproducibility"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W11. Artifact-flow quantitative health
 
@@ -1780,7 +4883,37 @@ Track where applicable: <sub>L1174 · lead_in</sub>
 - [ ] orphan-output detection recall/false positives <sub>W11.8 · L1182</sub>
 - [ ] fresh-agent reconstruction correctness <sub>W11.9 · L1183</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W11`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W11`, title, source_reference, requirement_class, qualification_challenge_ids none; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `check:artifact_flow_health` — governance health check · G4, G5, G6 — the nine artifact-flow metrics
+- `check:health_slos` — governance health check · G1, G3, G4, G5, G6 — task traceability and fresh-agent reconstruction SLOs
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W11.1`: `check:artifact_flow_health`
+- `W11.2`: `check:artifact_flow_health`
+- `W11.3`: `check:artifact_flow_health`
+- `W11.4`: `check:artifact_flow_health`
+- `W11.5`: `check:artifact_flow_health`
+- `W11.6`: `check:artifact_flow_health`, `check:health_slos`
+- `W11.7`: `check:artifact_flow_health`, `check:health_slos`
+- `W11.8`: `check:artifact_flow_health`
+- `W11.9`: `check:artifact_flow_health`, `check:health_slos`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G1`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:artifact_flow_health","check:health_slos"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:artifact_flow_health","check:health_slos"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ### W12. Health-scheduler integration
 
@@ -1796,7 +4929,40 @@ Source: `framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3
 
 **Advanced qualification challenge:** intentionally omit current specs from semantic index, index superseded specs with higher semantic similarity, change specs after implementation, move files while retaining stable IDs, omit task dependency declarations, return code without consumption receipts, create contradictory mandatory inputs, induce context pressure, switch model/session, and create orphan authoritative outputs. The hidden oracle defines the correct required input/version and expected downstream propagation. <sub>AQC-W12 · L1194</sub>
 
-Contract v3:57-73 fields — stated by the owner source: id `W12`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-W12`; governed (evidence map): severity —; applicability —; evidence_class `NOT_YET_MAPPED`; automated_checks none; independent_verification —; freshness_triggers —; health_scheduler_tiers —; adoption_obligation —; operational_audit_obligation —; allowed_status —; na_requirements —; remediation_rule —.
+Contract v3:57-73 fields — stated by the owner source: id `W12`, title, source_reference, requirement_class, qualification_challenge_ids `AQC-W12`; governed (evidence map): the owners and fields below.
+
+Evidence owners (automated_checks, Contract v3:64):
+- `g0:task close` — automated invariant/guard · G0 — G0 refuses privileged operations under active blocks
+- `check:upstream_change_propagation` — governance health check · G1, G2, G3, G4, G5, G6 — G1/G4 dependency and lineage invalidation
+- `check:product_traceability` — governance health check · G2, G4, G5, G6 — G2 traceability at close; G5 end-to-end lineage
+- `check:continuity_checkpoint_handoff` — governance health check · G3, G4, G5, G6 — G3 mandatory-input continuity across checkpoint/handoff
+- `check:lineage_orphans` — governance health check · G4, G5, G6 — G5 orphan states
+- `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence` — unit/integration/system test
+- `test:certification:ws05::close_requires_and_persists_the_consumption_receipt` — unit/integration/system test
+- `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2` — unit/integration/system test
+
+Independent verification (Contract v3:65):
+- `obligation:AC-12` — independent audit evidence
+
+Checklist items → owners:
+- `W12.1`: `g0:task close`
+- `W12.2`: `check:upstream_change_propagation`, `test:certification:ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence`
+- `W12.3`: `check:product_traceability`, `test:certification:ws05::close_requires_and_persists_the_consumption_receipt`, `test:certification:integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2`
+- `W12.4`: `check:continuity_checkpoint_handoff`
+- `W12.5`: `check:upstream_change_propagation`
+- `W12.6`: `check:product_traceability`, `check:lineage_orphans`
+
+Governed fields (evidence map; Contract v3:61-73):
+- severity: —
+- applicability: `required: every capability of the owner source is required unless it is recorded N/A_WITH_REASON (frozen gate contract AC-2, §4); the same contract applies at every lifecycle point of Contract v3:115-127`
+- evidence_class: `automated invariant/guard`, `unit/integration/system test`, `governance health check`, `independent audit evidence`
+- freshness_triggers: `governing contract/policy`, `runtime/kernel implementation`, `schema`, `migration`, `tool/plugin`, `model/retrieval profile`, `project path map`, `authoritative spec/decision`, `relevant source files`, `relevant index manifest`, `security/sensitivity policy`
+- health_scheduler_tiers: `G0`, `G1`, `G2`, `G3`, `G4`, `G5`, `G6`
+- adoption_obligation: `{"lifecycle_points":["`gov adopt`","post-adoption acceptance"],"owners":["check:upstream_change_propagation","check:product_traceability","check:continuity_checkpoint_handoff","check:lineage_orphans"],"rule":"re-established in the adopted project by the owners listed, which run at G5: `gov adopt` runs the full suite at A11 and post-adoption acceptance re-runs it (Contract v3:122-123; O5 G5)"}`
+- operational_audit_obligation: `{"lifecycle_points":["periodic operational governance-health audits"],"owners":["check:upstream_change_propagation","check:product_traceability","check:continuity_checkpoint_handoff","check:lineage_orphans"],"rule":"re-evaluated by the owners listed at every periodic operational audit (`gov audit` runs the G5 full suite) (Contract v3:126; O5 G5)"}`
+- allowed_status: `PRESENT_AND_SUBSTANTIAL`, `PARTIAL`, `ABSENT`, `UNCLEAR`, `N/A_WITH_REASON`
+- na_requirements: `N/A only as N/A_WITH_REASON citing the exact normative text that places the obligation outside the lifecycle being judged; silent N/A is invalid (Contract v3:514-515; frozen gate contract AC-2, §4)`
+- remediation_rule: `a failing finding of a tier owner is an audit finding that generates linked, governed remediation work (`orchestration::generation`; Contract v3 I3:573-575; frozen AC-5); a hard-block owner refuses what relies on the failing state and admits that work as the block's remedy (availability rule, P2-HO-0031)`
 
 ## PRE-ADVANCED-QUALIFICATION ACCEPTANCE GATE (line 1197)
 

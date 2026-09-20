@@ -18,6 +18,7 @@ mod srr;
 mod srr_material;
 mod update;
 mod upstream;
+mod ws01r4;
 mod ws03;
 mod ws03_r3;
 mod ws04r2;
