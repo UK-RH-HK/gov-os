@@ -1,0 +1,115 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0044
+scope: verify-1/r1-preservation (AC-14)
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+worktree_head: 8588813ec1ef9c832879e258ca5acfb573ae996f
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+
+# Scope note. This run establishes AC-14 (R1 preservation): whether
+# `ROT_PHASE1_CANDIDATE_ACCEPTED_R1` remains valid for this candidate. A finding here blocks AC-14 only if it
+# falsifies one of the twelve frozen R1 items. Neither finding below does; both are recorded for the family
+# verifiers and the synthesis verifier, who own the capability acceptance criteria.
+
+findings:
+  - id: V1-R1P-01
+    capability: [D6, B1]
+    bullet_source_lines: []
+    severity: LOW
+    title: '`relocate_legacy` discards a non-rebuildable OS store whose bytes it never compared'
+    statement: >-
+      `paths::relocate_legacy` decides whether a legacy copy is safe to delete with
+      `f.is_file() && t.is_file() && std::fs::read(&f).ok() == std::fs::read(&t).ok()`
+      (runtime/src/paths.rs:270-271). When BOTH files exist but neither can be read, both sides are `None`, the
+      comparison succeeds, and the function removes the legacy copy and reports
+      `"action": "removed identical legacy copy"` — although no byte of either file was ever read. The stores this
+      function moves are, in the module's own words, "non-rebuildable" (claims DB, emergency-control state, CIT
+      rollback snapshots, framework-update and migration rollback snapshots), so the wrong answer here is silent
+      loss of state that cannot be reconstructed from Git and the governed records. Demonstrated behaviourally:
+      with different content in both places and mode 0o000 on each, `relocate_legacy` returned
+      `Ok([... "removed identical legacy copy"])` and the legacy file no longer existed.
+    normative_source: >-
+      runtime/src/paths.rs:254-256, the function's own stated contract: "A legacy file whose destination already
+      exists with identical bytes is removed; different bytes at both places is `STATE_LOCATION_CONFLICT`
+      (nothing is overwritten)." The observed behaviour removes a file whose bytes were never compared, so the
+      product contradicts its own contract. Framework §19 / BC-P2-31 place non-rebuildable OS state outside what
+      may be deleted and rebuilt.
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P2
+    falsifies_or_proposes: FALSIFIES_PHASE2_REQUIREMENT
+    blocks_acceptance_criteria: []
+    blocking: false
+    blocking_reason: >-
+      Does not falsify any of the twelve frozen R1 items, so it does not block AC-14. Item 6
+      ("staging/install/rollback/recovery are atomic and crash-safe") is the kernel install transaction, which is
+      unaffected: `srr/staging.rs` and `write_durable` are untouched and the AR-0027 `heldout_srr4::e3` atomic
+      install-transaction test passes. Whether it bears on a capability acceptance criterion (D6/B1) is for the
+      family verifier who owns those capabilities and for the synthesis verifier.
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      Same capability area as BC-P2-31 (non-rebuildable authoritative state), but NOT the same mechanism.
+      BC-P2-31's inventoried mechanism is state "stored in, or classified as, derived/generated state" — a
+      location and classification defect. This is a different mechanism: an incorrect identity comparison inside
+      `relocate_legacy`, a function that did not exist at `cap2-candidate-0` and was written by the repair that
+      closed BC-P2-31. Frozen gate contract §8 makes a new mechanism, and a regression a repair introduced,
+      MATERIALLY_NEW. I have not shaded it into a residual to let the phase finish; equally, it is LOW and
+      non-blocking for AC-14, and I say so plainly rather than inflating it.
+    evidence:
+      - heldout/p3_stores_and_tools.rs (test c5_an_unreadable_legacy_store_is_not_removed_without_comparison)
+      - evidence/HELDOUT-P2AR0044-c5-unreadable-store.txt
+    reproduction: >-
+      cd <heldout crate>; AR0044_GOV_BIN=<candidate>/target/release/gov
+      cargo test --test p3_stores_and_tools c5 -- --test-threads=1 --nocapture
+    repair_direction: >-
+      A legacy OS store may be removed only when its bytes have actually been read and found equal to the
+      destination's. A read that fails is not evidence of equality: it must produce the typed
+      `STATE_LOCATION_CONFLICT` (or a distinct typed unreadable-store refusal) and leave both files in place,
+      consistently with the function's stated contract that nothing is overwritten when the two differ.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-R1P-02
+    capability: []
+    bullet_source_lines: []
+    severity: INFO
+    title: '`product_identity.py` prints an annotated tag''s tag-object id in its `commit:` line'
+    statement: >-
+      `release/orchestration/phase-2/tools/product_identity.py` resolves its argument with `git rev-parse <rev>`
+      and prints the result as `commit:`. For an ANNOTATED tag that returns the tag object, not the commit.
+      `python3 product_identity.py srr1-r1-accepted` prints
+      `commit: b78b5c68b163fbaf6a9395a9ebfe249935622560` while `git rev-list -n1 srr1-r1-accepted` gives
+      `c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112`. The digests are unaffected — `rev-parse <tagobj>:<path>` still
+      resolves through to the commit's tree, and `bd4d65d9…0547` reproduces exactly — so this is presentational
+      only. It is recorded because every iteration-1 verifier is instructed to verify a pinned commit identity
+      with this tool and to treat a mismatch as a STOP; a verifier comparing the printed `commit:` against a
+      pinned commit sha for an annotated tag would see a spurious mismatch.
+    normative_source: >-
+      P2-HO-0043 "Pinned inputs (verify each before relying on it; a mismatch is a STOP)"; P2-HO-0000 "Do not
+      contact the product owner. If you hit a genuine STOP (a pinned identity does not verify) … stop."
+    provenance_class: IMPLEMENTATION-CHOICE
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    blocking_reason: >-
+      Orchestration tooling, not product source; no product behaviour and no R1 item depends on it. Both pinned
+      digests for this candidate and for the reference verified exactly.
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      Not a product capability at all, so it is in no inventoried class; the iteration-0 inventory covers product
+      capabilities. Recorded as MATERIALLY_NEW because there is no class it belongs to, not because it is a
+      material blocker — it is INFO.
+    evidence:
+      - evidence/PINNED-INPUTS.txt
+    reproduction: >-
+      python3 release/orchestration/phase-2/tools/product_identity.py srr1-r1-accepted;
+      git rev-list -n1 srr1-r1-accepted; git rev-parse srr1-r1-accepted
+    repair_direction: >-
+      The tool should resolve to a commit (`git rev-parse <rev>^{commit}`, or `git rev-list -n1 <rev>`) before
+      printing `commit:`, so that the identity it prints is the identity a dispatch message pins.
+    owner_decision_required: false
+    owner_decision_reason: null

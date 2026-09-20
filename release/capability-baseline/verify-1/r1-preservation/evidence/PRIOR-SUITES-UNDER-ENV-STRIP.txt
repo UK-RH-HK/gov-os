@@ -1,0 +1,130 @@
+########## AR-0027 (STRIP) ##########
+===== heldout_srr =====
+test a10_malleable_and_small_order_signatures_are_refused_by_verify_strict ... ok
+test a11_unsupported_key_scheme_is_refused ... ok
+test a12_spec_version_and_role_type_confusion_are_refused ... ok
+test a1_signature_lifted_from_a_different_document_is_refused ... ok
+test a2_keyid_cannot_be_pointed_at_another_keys_material ... ok
+test a3_role_confusion_a_timestamp_key_cannot_authorise_a_release ... ok
+test a4_threshold_cannot_be_reached_by_repeating_one_key ... ok
+test a5_unsatisfiable_threshold_is_refused_at_parse_time ... ok
+test a6_zero_threshold_is_refused ... ok
+test a7_trailing_bytes_after_the_envelope_are_refused ... ok
+test a8_a_duplicate_signed_member_is_refused_rather_than_last_wins ... ok
+test a9_unsigned_and_empty_signature_lists_are_refused ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+===== heldout_srr2 =====
+test b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms ... FAILED
+test b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison ... FAILED
+test c1_floor_binds_a_non_rollback_ingress_after_a_verified_install ... ok
+test c2_identity_and_payload_binding_fail_closed ... ok
+test c3_provisioned_machine_refuses_unsigned_input_and_anchor_removal_fails_closed ... ok
+test c4_returning_a_machine_to_the_unprovisioned_posture ... ok
+test c5_environment_cannot_carry_authority ... ok
+test c6_floors_survive_project_deletion ... ok
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.62s
+error: test failed, to rerun pass `--test heldout_srr2`
+===== heldout_srr3 =====
+test d1_break_glass_authority_cannot_be_manufactured ... ok
+test d2_valid_break_glass_enters_marks_and_is_single_use ... ok
+test d3_below_floor_refusal_surface_against_owner_decision_0006_section_6 ... FAILED
+test d4_exit_policy_is_one_point_at_the_stricter_reading ... ok
+test d5_break_glass_is_purely_local ... ok
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.55s
+error: test failed, to rerun pass `--test heldout_srr3`
+===== heldout_srr4 =====
+test e1_an_expired_trust_anchor_still_authorises_a_release_install ... ok
+test e2_timestamp_and_snapshot_are_optional_and_their_expiry_does_not_refuse ... ok
+test e3_install_transaction_is_atomic_and_replays_after_interruption ... ok
+test e4_intact_is_not_authentic_and_the_two_controls_are_independent ... ok
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+########## AR-0029 (STRIP) ##########
+===== ho_a_allowlist =====
+test a1_the_decision_function_is_exact_match_under_every_near_miss_i_could_construct ... ok
+test a2_refusal_is_the_default_for_labels_that_exist_in_neither_table ... ok
+test a3_the_real_guard_on_a_marked_machine_permits_exactly_the_four ... ok
+test a4_refusal_classes_are_reporting_only_and_never_load_bearing ... ok
+test a5_an_unmarked_machine_is_not_refused_anything ... ok
+test a6_the_exit_policy_point_is_single_and_still_the_stricter_reading ... ok
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+===== ho_b_coverage =====
+test b1_trust_root_update_mutates_trust_policy_while_the_machine_is_marked_degraded ... ok
+test b2_the_trust_anchor_actually_moves_while_marked ... ok
+test b3_census_of_section_6_operations_against_their_enforcement_points ... FAILED
+test b4_provision_cannot_re_anchor_a_provisioned_machine ... ok
+test b5_section_5_inspection_diagnosis_and_restoration_remain_available_below_floor ... ok
+test b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls ... FAILED
+test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+error: test failed, to rerun pass `--test ho_b_coverage`
+===== ho_c_deadlock =====
+test c1_an_unreadable_marking_refuses_everything_outside_the_allow_list ... ok
+test c2_the_restore_half_of_the_claim_holds ... ok
+test c3_an_unreadable_marking_cannot_be_cleared_by_meeting_the_exit_condition ... ok
+test c4_the_machine_reports_not_degraded_while_refusing_as_degraded ... ok
+test c5_a_readable_marking_clears_when_the_exit_condition_is_met ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+===== ho_d_expiry =====
+test d1_the_canonical_form_gate_accepts_exactly_the_form_the_profile_emits ... ok
+test d2_expiry_is_fail_closed_in_all_four_directions ... ok
+test d3_fail_closed_does_not_brick_an_ordinary_document ... ok
+test d4_the_canonical_gate_is_syntactic_only ... ok
+test d5_every_expiry_consumer_inherits_the_gate ... ok
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+===== ho_e_rootexpiry =====
+test e1_the_profile_is_honest_about_what_an_expired_anchor_does_not_bar ... ok
+test e2_root_rotation_is_possible_under_the_implemented_profile ... ok
+test e3_the_alternative_would_make_rotation_permanently_impossible ... ok
+test e4_the_enforced_half_of_the_profile_is_real ... ok
+test e5_trusted_root_carries_no_vestigial_expiry_branch ... ok
+test e6_an_expired_anchor_does_not_bar_verifying_release_metadata_against_it ... ok
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+===== ho_f_preservation =====
+error: cannot construct `AuthenticatedRelease` with struct literal syntax due to private fields
+error: could not compile `srr-heldout-ar0029` (test "ho_f_preservation") due to 1 previous error
+########## AR-0031 (STRIP) ##########
+===== hx_a_census =====
+test a1_the_census_is_a_total_function_over_the_section_6_activities ... FAILED
+test a2_every_effect_guard_refuses_at_the_instant_of_the_effect ... ok
+test a3_an_allow_listed_operation_does_not_suspend_bullets_2_to_7 ... ok
+test a4_the_trust_anchor_sink_refuses_and_is_the_only_writer ... ok
+test a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module ... FAILED
+test a6_no_second_primitive_realises_a_named_section_6_effect ... ok
+test a7_bullet_6_has_no_primitive_because_every_floor_mutator_is_a_monotonic_raise ... ok
+test a8_bullet_7_claims_every_reporting_surface_carries_the_marking ... FAILED
+test result: FAILED. 5 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+error: test failed, to rerun pass `--test hx_a_census`
+===== hx_b_failopen =====
+test b1_resolve_state_root_errors_only_on_the_hostile_case_never_on_the_unprovisioned_one ... ok
+test b2_an_environment_variable_suppresses_every_effect_level_section_6_check ... ok
+test b3_the_operation_level_guard_fails_open_on_the_same_input ... ok
+test b4_gate_creation_loses_its_only_enforcement_point ... ok
+test b5_the_state_carrying_guard_is_immune_because_it_resolves_nothing ... ok
+test b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution ... FAILED
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+error: test failed, to rerun pass `--test hx_b_failopen`
+===== hx_c_prior_evidence =====
+test c1_the_migrated_preservation_census_is_compared_assertion_by_assertion ... ok
+test c2_the_dropped_malleability_check_is_reproduced_and_still_holds ... FAILED
+test c2b_verify_and_verify_strict_are_one_behaviour_on_a_non_canonical_scalar ... ok
+test c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds ... FAILED
+test c3b_no_relaxation_switch_exists_in_product_source ... ok
+test c4_the_section_6_enforcement_point_census_re_derived_on_candidate_3 ... ok
+test c5_a_guard_now_sits_between_the_allow_list_entry_and_the_gate_creation ... ok
+test c6_provision_keeps_its_diagnosis_and_section_6_is_proved_at_the_sink ... ok
+test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+error: test failed, to rerun pass `--test hx_c_prior_evidence`
+===== hx_d_acquisition_and_preservation =====
+test d10_the_exit_policy_point_is_single_and_unchanged ... ok
+test d11_floors_are_monotonic_and_advance_only_from_verified_facts ... ok
+test d12_break_glass_is_purely_local ... ok
+test d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor ... ok
+test d2_the_descriptor_decides_whether_section_6_is_consulted_at_all ... FAILED
+test d3_tools_install_reaches_the_bullet_5_effect_without_the_sink ... ok
+test d4_the_clearance_witness_is_not_a_capability_and_its_guarantee_stops_at_the_module_boundary ... ok
+test d5_the_allow_list_is_four_entries_and_matches_exactly ... ok
+test d6_five_admit_sites_and_five_install_kernel_sites ... ok
+test d7_no_signing_capability_in_product_source ... ok
+test d8_d0007_stays_independent_of_the_srr_verdicts ... ok
+test d9_contract_v3_canonical_import_is_byte_identical_and_fails_closed ... ok
+test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+error: test failed, to rerun pass `--test hx_d_acquisition_and_preservation`

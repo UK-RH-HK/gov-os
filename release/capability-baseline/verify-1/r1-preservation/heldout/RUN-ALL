@@ -1,0 +1,164 @@
+#!/usr/bin/env bash
+# P2-AR-0044 — run every held-out test this run authored, plus the four prior R1 suites unedited.
+#
+# Prints one PASS/FAIL line per test. Nothing here enters the product tree: the crates are assembled in a private
+# scratch directory and the product is compiled from the worktree unmodified.
+#
+#   ./RUN-ALL [<scratch dir>]
+#
+# Requires: cargo on PATH, and a worktree at the candidate.
+set -uo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# <evidence>/heldout -> repo root
+WT="$(cd "$HERE/../../../../.." && pwd)"
+SCRATCH="${1:-${TMPDIR:-/tmp}/p2ar0044-runall-$$}"
+export PATH="$HOME/.cargo/bin:$PATH"
+export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-2}"
+
+# Every refused-authority variable is stripped, plus GOV_MACHINE_STATE_DIR, so no ambient environment decides a
+# result; the suites set what they need deliberately and locally.
+STRIP=(env -u GOV_BREAK_GLASS -u GOV_BREAKGLASS -u GOV_TRUST_OVERRIDE -u GOV_SKIP_VERIFY
+       -u GOV_ALLOW_UNSIGNED -u GOV_RELEASE_AUTHORITY -u GOV_HUMAN_GATE_APPROVED
+       -u GOV_FLOOR_OVERRIDE -u GOV_MINIMUM_SECURE_RELEASE -u GOV_MACHINE_STATE_DIR)
+
+VER="$WT/release/verification"
+mkdir -p "$SCRATCH/wt" "$SCRATCH/logs"
+echo "worktree: $WT"
+echo "scratch:  $SCRATCH"
+echo
+
+# ---------------------------------------------------------------------------- identity (a mismatch is a STOP)
+echo "== candidate identity =="
+python3 "$WT/release/orchestration/phase-2/tools/product_identity.py" HEAD
+echo
+
+# ---------------------------------------------------------------------------- build the product
+echo "== building the candidate =="
+( cd "$WT" && cargo build --release ) >"$SCRATCH/logs/build-release.log" 2>&1 || { echo "FAIL build --release"; exit 1; }
+CARGO_TARGET_DIR="$SCRATCH/target-dbg" bash -c "cd '$WT' && cargo build --bin gov" \
+  >"$SCRATCH/logs/build-debug.log" 2>&1 || { echo "FAIL build --bin gov"; exit 1; }
+export AR0044_GOV_BIN="$WT/target/release/gov"
+export AR0033_GOV_BIN="$SCRATCH/target-dbg/debug/gov"
+echo "ok"
+echo
+
+# the pre-repair export AR-0033's hv_a::a2 grades with the candidate's signatures
+mkdir -p "$SCRATCH/base"
+( cd "$WT" && git archive 30aa98a10fd7f5ed85439b0d676761080519ceed runtime/src cli/src ) | tar -x -C "$SCRATCH/base"
+export AR0033_BASE_SRC="$SCRATCH/base"
+
+# ---------------------------------------------------------------------------- one test binary -> PASS/FAIL lines
+run_suite () {          # $1 crate dir, $2 test name
+  # NB: separate `local` statements — a single `local a=$1 b=$a` expands $a before `local` assigns it.
+  local dir="$1"
+  local t="$2"
+  local log="$SCRATCH/logs/$(basename "$dir")-$t.log"
+  ( cd "$dir" && CARGO_TARGET_DIR="$SCRATCH/target-$(basename "$dir")" \
+      "${STRIP[@]}" cargo test --test "$t" -- --test-threads=1 ) >"$log" 2>&1
+  if grep -q "^error\(\[\|:\)" "$log" && ! grep -q "^running " "$log"; then
+    echo "FAIL  $(basename "$dir")::$t  (did not compile — see $log)"
+    grep -m3 "^error" "$log" | sed 's/^/        /'
+    return
+  fi
+  grep -E "^test [a-zA-Z0-9_]+ \.\.\." "$log" | while read -r _ name _ res; do
+    case "$res" in ok) echo "PASS  $(basename "$dir")::$t::$name" ;;
+                   *)  echo "FAIL  $(basename "$dir")::$t::$name" ;; esac
+  done
+  grep -E "^test result" "$log" | sed "s/^/      [$(basename "$dir")::$t] /"
+}
+
+# ---------------------------------------------------------------------------- my own held-out suite
+echo "== P2-AR-0044 held-out tests =="
+MINE="$SCRATCH/ho-p2ar0044"
+mkdir -p "$MINE/tests/common"
+ln -sfn "$WT" "$SCRATCH/wt/p2-verify1-r1-preservation"
+cp "$HERE/Cargo.toml.txt" "$MINE/Cargo.toml"
+cp "$HERE/kit.rs"         "$MINE/tests/common/mod.rs"
+cp "$HERE"/p[0-9]_*.rs    "$MINE/tests/"
+for t in p1_t2_binding p2_update_and_kernel p3_stores_and_tools p6_structural; do
+  run_suite "$MINE" "$t"
+done
+echo
+
+# ---------------------------------------------------------------------------- the four prior R1 suites, unedited
+echo "== prior R1 held-out suites, byte-identical (AR-0027 / AR-0029 / AR-0031 / AR-0033) =="
+stage () {              # $1 crate, $2 verification dir, $3 shared-module file, $4.. tests
+  local crate="$1"
+  local d="$SCRATCH/$1"
+  local s="$VER/$2/evidence/heldout-tests"
+  local cf
+  mkdir -p "$d/tests/common"
+  cp "$s/Cargo.toml.txt" "$d/Cargo.toml"
+  shift 2; cf="$1"; shift
+  case "$cf" in
+    forge.rs) cp "$s/forge.rs" "$d/tests/common/forge.rs" ;;           # included by #[path]
+    common.rs) cp "$s/common.rs" "$d/tests/common/mod.rs" ;;           # IS the module
+    *) cp "$s/$cf" "$d/tests/common/$cf"; printf 'pub mod %s;\n' "${cf%.rs}" > "$d/tests/common/mod.rs" ;;
+  esac
+  for t in "$@"; do cp "$s/$t.rs" "$d/tests/$t.rs"; done
+  # byte identity, asserted rather than assumed
+  for f in "$d"/tests/*.rs "$d"/tests/common/*.rs "$d/Cargo.toml"; do
+    local b; b="$(basename "$f")"
+    [ "$b" = "mod.rs" ] && continue                                    # one generated line of plumbing
+    [ "$b" = "Cargo.toml" ] && b="Cargo.toml.txt"
+    if cmp -s "$s/$b" "$f"; then echo "  IDENTICAL $crate/$b"; else echo "  DIFFERS   $crate/$b  <-- STOP"; fi
+  done
+}
+ln -sfn "$WT" "$SCRATCH/wt/srr1-r1-verify"
+ln -sfn "$WT" "$SCRATCH/wt/srr1-r1-verify-2"
+ln -sfn "$WT" "$SCRATCH/wt/srr1-r1-verify-3"
+ln -sfn "$WT" "$SCRATCH/wt/srr1-r1-verify-4"
+
+stage ho27 4.1.6-r1   forge.rs  heldout_srr heldout_srr2 heldout_srr3 heldout_srr4
+stage ho29 4.1.6-r1-2 mint.rs   ho_a_allowlist ho_b_coverage ho_c_deadlock ho_d_expiry ho_e_rootexpiry ho_f_preservation
+stage ho31 4.1.6-r1-3 bench.rs  hx_a_census hx_b_failopen hx_c_prior_evidence hx_d_acquisition_and_preservation
+stage ho33 4.1.6-r1-4 common.rs hv_a_derivation hv_b_bullet7 hv_c_failclosed hv_d_sinks_and_preservation
+
+for t in heldout_srr heldout_srr2 heldout_srr3 heldout_srr4; do run_suite "$SCRATCH/ho27" "$t"; done
+for t in ho_a_allowlist ho_b_coverage ho_c_deadlock ho_d_expiry ho_e_rootexpiry ho_f_preservation; do run_suite "$SCRATCH/ho29" "$t"; done
+for t in hx_a_census hx_b_failopen hx_c_prior_evidence hx_d_acquisition_and_preservation; do run_suite "$SCRATCH/ho31" "$t"; done
+for t in hv_a_derivation hv_b_bullet7 hv_c_failclosed hv_d_sinks_and_preservation; do run_suite "$SCRATCH/ho33" "$t"; done
+echo
+
+# ---------------------------------------------------------------------------- AR-0033 hv_a::a1 on its property
+echo "== AR-0033 hv_a::a1, size assertions PRINTED rather than asserted (labelled copy) =="
+python3 - "$VER/4.1.6-r1-4/evidence/heldout-tests/hv_a_derivation.rs" \
+          "$SCRATCH/ho33/tests/hv_a_derivation_labelled_sizes_printed.rs" <<'PY'
+import sys
+src, out = sys.argv[1], sys.argv[2]
+t = open(src).read()
+a = ('    assert_eq!(files.len(), 84, "the product tree is not the size the census claims");\n'
+     '    assert_eq!(funcs.len(), 740, "my splitter does not agree with the candidate\'s function count");\n')
+b = ('    // P2-AR-0044 LABELLED COPY: the two SIZE assertions are PRINTED, not asserted, because this tree is\n'
+     '    // legitimately larger. Every other line, including the violations assertion, is unchanged.\n'
+     '    println!("SIZE (printed, not asserted): files={} (AR-0033 pinned 84)", files.len());\n'
+     '    println!("SIZE (printed, not asserted): functions={} (AR-0033 pinned 740)", funcs.len());\n')
+assert a in t, "the size assertions are not where they were"
+open(out, "w").write(t.replace(a, b, 1).replace(
+    "fn a1_the_derived_census_reproduces_independently_at_the_claimed_scale",
+    "fn a1_LABELLED_property_only_violations_must_be_empty"))
+PY
+( cd "$SCRATCH/ho33" && CARGO_TARGET_DIR="$SCRATCH/target-ho33" "${STRIP[@]}" \
+    cargo test --test hv_a_derivation_labelled_sizes_printed a1_LABELLED -- --test-threads=1 --nocapture ) \
+  >"$SCRATCH/logs/hv_a-a1-labelled.log" 2>&1
+grep -E "SIZE \(printed|violations|^test result" "$SCRATCH/logs/hv_a-a1-labelled.log" | sed 's/^/  /'
+echo
+
+# ---------------------------------------------------------------------------- AR-0033's standalone derivation probe
+echo "== AR-0033 derive.py, ROOT retargeted at this candidate =="
+sed "2s|^ROOT = .*|ROOT = \"$WT\"|" "$VER/4.1.6-r1-4/evidence/derive.py" > "$SCRATCH/derive.py"
+( cd "$SCRATCH" && python3 derive.py ) 2>&1 | tee "$SCRATCH/logs/derive-py.log" | grep -E "^---|violations [1-9]" | sed 's/^/  /'
+echo "  (zero violations in every configuration => PASS; see $SCRATCH/logs/derive-py.log)"
+echo
+
+# ---------------------------------------------------------------------------- regression
+echo "== regression (the candidate's own suites) =="
+( cd "$WT" && CARGO_TARGET_DIR="$SCRATCH/target-dbg" "${STRIP[@]}" cargo test --lib ) \
+  >"$SCRATCH/logs/regression-lib.log" 2>&1
+grep -E "^test result" "$SCRATCH/logs/regression-lib.log" | sed 's/^/  cargo test --lib: /'
+( cd "$WT" && CARGO_TARGET_DIR="$SCRATCH/target-dbg" "${STRIP[@]}" cargo test --test certification ) \
+  >"$SCRATCH/logs/regression-certification.log" 2>&1
+grep -E "^test result" "$SCRATCH/logs/regression-certification.log" | sed 's/^/  cargo test --test certification: /'
+echo
+echo "logs: $SCRATCH/logs"

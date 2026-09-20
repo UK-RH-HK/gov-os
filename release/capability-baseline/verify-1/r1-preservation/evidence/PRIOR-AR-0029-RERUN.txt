@@ -1,0 +1,112 @@
+===== ho_a_allowlist =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho29)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.96s
+     Running tests/ho_a_allowlist.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho29/debug/deps/ho_a_allowlist-fddab24de54a00f4)
+
+running 6 tests
+test a1_the_decision_function_is_exact_match_under_every_near_miss_i_could_construct ... ok
+test a2_refusal_is_the_default_for_labels_that_exist_in_neither_table ... ok
+test a3_the_real_guard_on_a_marked_machine_permits_exactly_the_four ... ok
+test a4_refusal_classes_are_reporting_only_and_never_load_bearing ... ok
+test a5_an_unmarked_machine_is_not_refused_anything ... ok
+test a6_the_exit_policy_point_is_single_and_still_the_stricter_reading ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+EXIT=0
+===== ho_b_coverage =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho29)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.03s
+     Running tests/ho_b_coverage.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho29/debug/deps/ho_b_coverage-8929b2325a787b09)
+
+running 6 tests
+test b1_trust_root_update_mutates_trust_policy_while_the_machine_is_marked_degraded ... ok
+test b2_the_trust_anchor_actually_moves_while_marked ... ok
+test b3_census_of_section_6_operations_against_their_enforcement_points ... FAILED
+test b4_provision_cannot_re_anchor_a_provisioned_machine ... ok
+test b5_section_5_inspection_diagnosis_and_restoration_remain_available_below_floor ... ok
+test b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls ... FAILED
+
+failures:
+
+---- b3_census_of_section_6_operations_against_their_enforcement_points stdout ----
+
+thread 'b3_census_of_section_6_operations_against_their_enforcement_points' (3569362) panicked at tests/ho_b_coverage.rs:157:5:
+root_update unexpectedly guards; re-derive this census
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls stdout ----
+
+thread 'b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls' (3569365) panicked at tests/ho_b_coverage.rs:310:5:
+a guard now sits between the allow-list entry and the gate creation
+
+
+failures:
+    b3_census_of_section_6_operations_against_their_enforcement_points
+    b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls
+
+test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+error: test failed, to rerun pass `--test ho_b_coverage`
+EXIT=101
+===== ho_c_deadlock =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho29)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.30s
+     Running tests/ho_c_deadlock.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho29/debug/deps/ho_c_deadlock-9d4c3f02bc42f146)
+
+running 5 tests
+test c1_an_unreadable_marking_refuses_everything_outside_the_allow_list ... ok
+test c2_the_restore_half_of_the_claim_holds ... ok
+test c3_an_unreadable_marking_cannot_be_cleared_by_meeting_the_exit_condition ... ok
+test c4_the_machine_reports_not_degraded_while_refusing_as_degraded ... ok
+test c5_a_readable_marking_clears_when_the_exit_condition_is_met ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+EXIT=0
+===== ho_d_expiry =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho29)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.67s
+     Running tests/ho_d_expiry.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho29/debug/deps/ho_d_expiry-2ac16f4d9cf8a0f9)
+
+running 5 tests
+test d1_the_canonical_form_gate_accepts_exactly_the_form_the_profile_emits ... ok
+test d2_expiry_is_fail_closed_in_all_four_directions ... ok
+test d3_fail_closed_does_not_brick_an_ordinary_document ... ok
+test d4_the_canonical_gate_is_syntactic_only ... ok
+test d5_every_expiry_consumer_inherits_the_gate ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+EXIT=0
+===== ho_e_rootexpiry =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho29)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.20s
+     Running tests/ho_e_rootexpiry.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho29/debug/deps/ho_e_rootexpiry-4ee2ac990fc8327e)
+
+running 6 tests
+test e1_the_profile_is_honest_about_what_an_expired_anchor_does_not_bar ... ok
+test e2_root_rotation_is_possible_under_the_implemented_profile ... ok
+test e3_the_alternative_would_make_rotation_permanently_impossible ... ok
+test e4_the_enforced_half_of_the_profile_is_real ... ok
+test e5_trusted_root_carries_no_vestigial_expiry_branch ... ok
+test e6_an_expired_anchor_does_not_bar_verifying_release_metadata_against_it ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+EXIT=0
+===== ho_f_preservation =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-2/runtime)
+   Compiling srr-heldout-ar0029 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho29)
+error: cannot construct `AuthenticatedRelease` with struct literal syntax due to private fields
+   --> tests/ho_f_preservation.rs:179:18
+179 |     let forged = gov_runtime::srr::AuthenticatedRelease {
+    = note: ...and other private field `admitted` that was not provided
+
+error: could not compile `srr-heldout-ar0029` (test "ho_f_preservation") due to 1 previous error
+EXIT=101

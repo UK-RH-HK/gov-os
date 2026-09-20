@@ -1,0 +1,80 @@
+P2-AR-0044 — the product-tree diff srr1-r1-accepted..cap2-candidate-1, and which frozen R1 items each
+changed area touches. Derived with git, not taken from any report.
+
+$ git diff --shortstat srr1-r1-accepted^{commit} 0bad524 -- runtime cli tests framework capabilities migrations tools fixtures bin scripts Cargo.toml Cargo.lock
+ 204 files changed, 116505 insertions(+), 4817 deletions(-)
+
+== files added (A) / modified (M), by status ==
+     61 A
+    143 M
+
+== every changed file under runtime/src, cli/src and the kernel payload that touches an R1 item ==
+(added/modified lines, path)
+2	2	Cargo.lock
+7	1	Cargo.toml
+1387	46	cli/src/main.rs
+53	17	framework/KERNEL.yaml
+16	3	framework/contracts/contract-source.lock
+6367	204	framework/contracts/governance-capability-acceptance.yaml
+17	0	framework/policies/AUTHORITY_POLICY.yaml
+69	1	framework/policies/CHANGE_POLICY.yaml
+5	1	framework/policies/CHECKPOINT_POLICY.yaml
+9	4	framework/policies/CONTEXT_POLICY.yaml
+12	3	framework/policies/ENFORCEMENT_MAP.yaml
+28	1	framework/policies/HUMAN_GATE_POLICY.yaml
+6	0	framework/policies/LEARNING_POLICY.yaml
+7	0	framework/policies/MEMORY_POLICY.yaml
+32	1	framework/policies/POLICY_PRECEDENCE.yaml
+4	2	framework/policies/TEST_POLICY.yaml
+55	7	framework/policies/TOOL_POLICY.yaml
+2100	345	runtime/src/adopt.rs
+298	8	runtime/src/authority.rs
+1009	0	runtime/src/capabilities/binding.rs
+955	301	runtime/src/capabilities/governance.rs
+3	0	runtime/src/capabilities/host.rs
+2	0	runtime/src/capabilities/mod.rs
+564	0	runtime/src/capabilities/pincache.rs
+17	0	runtime/src/capabilities/protocol.rs
+405	39	runtime/src/capabilities/registry.rs
+6134	243	runtime/src/contracts.rs
+12	3	runtime/src/init.rs
+542	74	runtime/src/kernel.rs
+187	12	runtime/src/kernel_trust.rs
+144	2	runtime/src/lock.rs
+710	4	runtime/src/paths.rs
+434	5	runtime/src/policy_precedence.rs
+309	70	runtime/src/records.rs
+13	2	runtime/src/recovery.rs
+393	3	runtime/src/release.rs
+1132	0	runtime/src/scheduler/catalogue.rs
+2299	0	runtime/src/scheduler/mod.rs
+143	0	runtime/src/scheduler/sandbox.rs
+143	0	runtime/src/scheduler/store.rs
+832	0	runtime/src/srr/binding.rs
+1166	0	runtime/src/srr/installation.rs
+57	1	runtime/src/srr/mod.rs
+81	14	runtime/src/srr/present.rs
+5	3	runtime/src/srr/staging.rs
+37	2	runtime/src/srr/state.rs
+355	33	runtime/src/srr/verifier.rs
+1673	0	runtime/src/t2.rs
+1664	76	runtime/src/tools.rs
+318	76	runtime/src/update.rs
+
+== the NEW files in the trust/admission path (absent at srr1-r1-accepted) ==
+runtime/src/capabilities/binding.rs
+runtime/src/capabilities/pincache.rs
+runtime/src/scheduler/catalogue.rs
+runtime/src/scheduler/mod.rs
+runtime/src/scheduler/sandbox.rs
+runtime/src/scheduler/store.rs
+runtime/src/srr/binding.rs
+runtime/src/srr/installation.rs
+runtime/src/t2.rs
+runtime/src/verification/currency.rs
+runtime/src/verification/families_ext.rs
+runtime/src/verification/flow.rs
+runtime/src/verification/lineage.rs
+runtime/src/verification/product.rs
+runtime/src/verification/reporting.rs
+runtime/src/verification/slo.rs

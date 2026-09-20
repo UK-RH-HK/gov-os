@@ -1,0 +1,25 @@
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/wt/srr1-r1-verify-4/runtime)
+   Compiling srr-heldout-ar0033 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/ho33)
+  --> tests/hv_a_derivation_labelled_sizes_printed.rs:18:4
+18 | fn a1_LABELLED_property_only_violations_must_be_empty() {
+   = note: `#[warn(non_snake_case)]` (part of `#[warn(nonstandard_style)]`) on by default
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.05s
+     Running tests/hv_a_derivation_labelled_sizes_printed.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-private-rerun/target-ho33/debug/deps/hv_a_derivation_labelled_sizes_printed-5779ebb30014b708)
+
+running 1 test
+test a1_LABELLED_property_only_violations_must_be_empty ... independent walk: 123 files, 2392 functions
+SIZE (printed, not asserted): files=123 (AR-0033 pinned 84)
+SIZE (printed, not asserted): functions=2392 (AR-0033 pinned 740)
+AR-0033 independent §6 census:
+  human_gate_create: derived 50 / writers 45 / exempt 1 / violations 0
+  human_gate_approve: derived 1 / writers 1 / exempt 0 / violations 0
+  release_certification: derived 1 / writers 1 / exempt 0 / violations 0
+  trust_policy_mutation: derived 8 / writers 1 / exempt 0 / violations 0
+  privileged_plugin_acquisition: derived 13 / writers 3 / exempt 0 / violations 0
+  floor_lower_or_reset: derived 4 / writers 1 / exempt 0 / violations 0
+  present_below_floor_release_as_current: derived 1 / writers 1 / exempt 0 / violations 0
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.16s
+

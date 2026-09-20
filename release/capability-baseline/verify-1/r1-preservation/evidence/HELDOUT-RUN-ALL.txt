@@ -1,0 +1,104 @@
+P2-AR-0044 — the 41 held-out tests this run authored, against cap2-candidate-1.
+Candidate product_code_digest e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+Environment stripped of the nine refused-authority variables plus GOV_MACHINE_STATE_DIR; --test-threads=1.
+The one FAILING test, p3::c5, is deliberate: its failure IS finding V1-R1P-01.
+
+===== p1_t2_binding =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/wt/p2-verify1-r1-preservation/runtime)
+   Compiling r1pres-heldout-p2ar0044 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/ho)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.50s
+     Running tests/p1_t2_binding.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/target/debug/deps/p1_t2_binding-4a36b9d1079117f5)
+
+running 13 tests
+test a10_owner_facts_travel_between_bound_machines_and_no_further ... ok
+test a11_gov_has_no_command_that_mints_a_binding_authority ... ok
+test a12_an_expired_or_non_canonical_authority_is_refused ... ok
+test a13_no_binding_secret_is_written_into_the_repository ... ok
+test a1_repository_content_cannot_manufacture_a_verified_t2_fact ... ok
+test a2_a_foreign_machines_seal_is_not_honoured ... ok
+test a3_an_unprovisioned_machine_cannot_be_bound ... ok
+test a4_only_the_root_delegated_role_can_create_a_binding_authority ... ok
+test a5_the_authority_cannot_come_from_the_repository_or_the_environment ... ok
+test a6_authority_rollback_and_conflict_fail_closed ... ok
+test a7_an_unauthorised_or_mismatched_key_is_refused ... ok
+test a8_a_root_without_the_delegation_authorises_nothing ... ok
+test a9_a_machine_the_authority_does_not_list_is_refused ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.87s
+
+
+===== p2_update_and_kernel =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/wt/p2-verify1-r1-preservation/runtime)
+   Compiling r1pres-heldout-p2ar0044 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/ho)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.90s
+     Running tests/p2_update_and_kernel.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/target/debug/deps/p2_update_and_kernel-7f68fc47695e7de9)
+
+running 9 tests
+test b1_external_kernel_material_is_refused_before_staging_until_provisioned ... ok
+test b2_the_embedded_payload_bootstrap_stays_available_and_is_marked ... ok
+test b3_the_environment_cannot_admit_a_kernel ... ok
+test b4_cli_strings_are_requests_not_authority ... ok
+test b5_break_glass_cannot_be_claimed_on_the_command_line ... ok
+test b6_the_installed_payload_matches_what_kernel_yaml_declares ... ok
+test b7_post_install_tampering_is_detected_as_an_integrity_fault ... ok
+test b8_rollback_is_one_of_the_named_gate_free_remedies ... ok
+test b9_the_protected_high_water_never_goes_backwards ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 79.71s
+
+
+===== p3_stores_and_tools =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/wt/p2-verify1-r1-preservation/runtime)
+   Compiling r1pres-heldout-p2ar0044 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/ho)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 29.18s
+     Running tests/p3_stores_and_tools.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/target/debug/deps/p3_stores_and_tools-90d7626fd4fb655b)
+
+running 11 tests
+test c1_every_os_store_resolves_into_the_state_directory ... ok
+test c2_a_disaster_recovery_deletion_never_sweeps_an_os_store ... ok
+test c3_relocation_never_overwrites_a_conflicting_store ... ok
+test c4_repository_resident_authoritative_stores_are_not_writable_by_project_content ... ok
+test c5_an_unreadable_legacy_store_is_not_removed_without_comparison ... FAILED
+test d1_a_quiet_descriptor_that_installs_with_sudo_is_still_an_expansion ... ok
+test d2_no_declaration_in_a_descriptor_clears_the_expansion_verdict ... ok
+test d3_an_underivable_installation_is_gated_fail_closed ... ok
+test d4_an_unauthorised_role_cannot_carry_an_installation ... ok
+test d5_project_content_cannot_enlarge_the_network_allowlist ... ok
+test d6_an_installation_aimed_elsewhere_is_not_an_installation ... ok
+
+failures:
+
+---- c5_an_unreadable_legacy_store_is_not_removed_without_comparison stdout ----
+relocate_legacy -> Ok([Object {"store": String("emergency-control"), "from": String(".governance-runtime/control.json"), "to": String(".governance-state/control.json"), "action": String("removed identical legacy copy")}])
+legacy file still present: false
+
+thread 'c5_an_unreadable_legacy_store_is_not_removed_without_comparison' (4123899) panicked at tests/p3_stores_and_tools.rs:400:5:
+non-rebuildable legacy state was removed although its bytes were never compared (both files unreadable, so `read().ok() == read().ok()` was None == None): Ok([Object {"store": String("emergency-control"), "from": String(".governance-runtime/control.json"), "to": String(".governance-state/control.json"), "action": String("removed identical legacy copy")}])
+
+
+failures:
+    c5_an_unreadable_legacy_store_is_not_removed_without_comparison
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 99.98s
+
+error: test failed, to rerun pass `--test p3_stores_and_tools`
+
+===== p6_structural =====
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/wt/p2-verify1-r1-preservation/runtime)
+   Compiling r1pres-heldout-p2ar0044 v0.0.0 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/ho)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.40s
+     Running tests/p6_structural.rs (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0044-r1pres/p2ar0044-mine/target/debug/deps/p6_structural-5119a5e7e81dc9fe)
+
+running 8 tests
+test f1_the_section_5_allow_list_is_four_entries_and_exact_match ... ok
+test f2_every_install_kernel_site_is_paired_with_an_admit_site ... ok
+test f3_the_admission_token_has_exactly_one_constructor ... ok
+test f4_no_clearance_is_constructed_outside_breakglass ... ok
+test f5_d0007_integrity_never_claims_authenticity_or_admissibility ... ok
+test f6_the_product_cannot_sign ... ok
+test f7_contract_v3_canonical_import_is_byte_identical_and_pinned ... ok
+test f8_no_floor_mutator_lowers_a_floor ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.95s
+
+
