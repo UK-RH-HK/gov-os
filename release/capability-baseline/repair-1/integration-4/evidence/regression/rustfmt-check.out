@@ -1,0 +1,76 @@
+# P2-AR-0054 rustfmt (edition 2021) --check, 2026-09-20T19:17:17Z, HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740
+## Rust files changed after the merges (c38a406..HEAD):
+  (none — this integration changed no Rust file)
+
+## rustfmt --check over every Rust file the two merged branches changed (cae2f67..HEAD), to show the merges left formatted code:
+--- cli/src/main.rs : rc=0 hunks=0
+--- runtime/src/adopt.rs : rc=0 hunks=0
+--- runtime/src/capabilities/governance.rs : rc=0 hunks=0
+--- runtime/src/cit/binding.rs : rc=0 hunks=0
+--- runtime/src/cit/materiality.rs : rc=0 hunks=0
+--- runtime/src/cit/mod.rs : rc=0 hunks=0
+--- runtime/src/contracts.rs : rc=0 hunks=0
+--- runtime/src/doctor.rs : rc=0 hunks=0
+--- runtime/src/memory/benchmark.rs : rc=0 hunks=0
+--- runtime/src/memory/indexer.rs : rc=0 hunks=0
+--- runtime/src/memory/profile.rs : rc=0 hunks=0
+--- runtime/src/migrations/framework.rs : rc=0 hunks=0
+--- runtime/src/orchestration/control.rs : rc=0 hunks=0
+--- runtime/src/orchestration/handoffs.rs : rc=0 hunks=0
+--- runtime/src/paths.rs : rc=0 hunks=0
+--- runtime/src/scheduler/catalogue.rs : rc=0 hunks=0
+--- runtime/src/scheduler/mod.rs : rc=0 hunks=0
+--- runtime/src/skills.rs : rc=0 hunks=0
+--- runtime/src/status.rs : rc=0 hunks=0
+--- runtime/src/tools.rs : rc=0 hunks=0
+--- runtime/src/update.rs : rc=0 hunks=0
+--- runtime/src/verification/currency.rs : rc=0 hunks=0
+--- runtime/src/verification/mod.rs : rc=0 hunks=0
+--- runtime/src/verification/reporting.rs : rc=0 hunks=0
+--- tests/certification/main.rs : rc=1 hunks=36
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:1024:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:1060:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:273:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:312:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:451:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:560:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:56:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:582:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:589:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:655:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:682:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:708:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:724:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:802:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:809:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:816:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:859:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:925:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:944:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:987:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/section6.rs:994:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1175:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1254:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1550:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1573:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1587:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1622:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1688:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1766:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1888:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1956:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:1964:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:2022:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:2029:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:2036:
+     Diff in /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/tests/certification/srr.rs:2105:
+--- tests/certification/migration.rs : rc=0 hunks=0
+--- tests/certification/r4_residual.rs : rc=0 hunks=0
+--- tests/certification/repair2.rs : rc=0 hunks=0
+--- tests/certification/repair3.rs : rc=0 hunks=0
+--- tests/certification/ws01r4.rs : rc=0 hunks=0
+--- tests/certification/ws04r2.rs : rc=0 hunks=0
+--- tests/certification/ws04r3.rs : rc=0 hunks=0
+--- tests/certification/ws05r3.rs : rc=0 hunks=0
+--- tests/certification/ws07.rs : rc=0 hunks=0
+--- tests/certification/ws08_r3.rs : rc=0 hunks=0

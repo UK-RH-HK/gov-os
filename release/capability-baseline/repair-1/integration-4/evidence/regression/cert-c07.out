@@ -1,0 +1,27 @@
+# chunk: repair2 upstream update  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:43:37Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.39s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 13 tests
+test repair2::framework_lock_is_release_identifying_and_portable ... ok
+test repair2::incremental_rebuild_follows_record_relocation ... ok
+test repair2::interface_contract_kernel_yaml_and_migration_substance_are_consistent ... ok
+test repair2::cit_approval_derives_only_from_an_answered_gate has been running for over 60 seconds
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger has been running for over 60 seconds
+test repair2::cit_approval_derives_only_from_an_answered_gate ... ok
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger ... ok
+test repair2::release_build_reproduces_released_versions_from_their_commit ... ok
+test repair2::plugins_are_governed_capabilities_not_arbitrary_commands has been running for over 60 seconds
+test repair2::task_close_uses_observed_mutations_not_self_attestation ... ok
+test repair2::project_policy_cannot_weaken_constitutional_floors ... ok
+test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
+test upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet ... ok
+test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
+test upstream::export_gate_fails_closed_on_content_whatever_the_name ... ok
+test repair2::plugins_are_governed_capabilities_not_arbitrary_commands ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 194 filtered out; finished in 223.85s
+
+[exit=0]

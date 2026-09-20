@@ -1,0 +1,17 @@
+# P2-AR-0054 certification summary: union of the fourteen chunk runs vs the full test list (all at e9a2f9c)
+cert-c01.out: chunk: arch brownfield greenfield  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:26:20Z | test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 197 filtered out; finished in 245.68s
+cert-c02.out: chunk: failure_injection integration_r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:30:48Z | test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 201 filtered out; finished in 153.59s
+cert-c03.out: chunk: migration multi_machine  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:33:32Z | test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 202 filtered out; finished in 163.20s
+cert-c04.out: chunk: repair3 ws01r4  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:36:34Z | test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 122.58s
+cert-c05.out: chunk: section6 srr srr_material  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:38:45Z | test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 60.93s
+cert-c06.out: chunk: repair  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:39:58Z | test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 187 filtered out; finished in 199.50s
+cert-c07.out: chunk: repair2 upstream update  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:43:37Z | test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 194 filtered out; finished in 223.85s
+cert-c08.out: chunk: ws03 ws03_r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:47:42Z | test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 182 filtered out; finished in 224.26s
+cert-c09.out: chunk: ws04r2 ws04r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:51:45Z | test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 193 filtered out; finished in 300.61s
+cert-c10.out: chunk: ws05 ws05r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:57:11Z | test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 190 filtered out; finished in 215.66s
+cert-c11.out: chunk: ws06 ws06r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T19:01:08Z | test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 106.78s
+cert-c12.out: chunk: ws07  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T19:03:02Z | test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 270.68s
+cert-c13.out: chunk: ws08 ws08_r2 ws08_r3  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T19:07:58Z | test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 184 filtered out; finished in 191.36s
+cert-c14.out: chunk: r4_residual  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T19:11:29Z | test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 193 filtered out; finished in 282.39s
+tests listed: 207; passed across chunks: 207; difference: 0 lines
+every chunk ran at the same commit e9a2f9c with a clean product tree (dirty=0 in each header)

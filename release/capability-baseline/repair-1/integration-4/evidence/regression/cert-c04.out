@@ -1,0 +1,21 @@
+# chunk: repair3 ws01r4  HEAD e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740  dirty=0  2026-09-20T18:36:34Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.35s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 9 tests
+test repair3::current_release_payload_identity_and_hygiene ... ok
+test repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts ... ok
+test repair3::policy_exceptions_require_a_real_governing_decision ... ok
+test repair3::constitutional_floors_require_a_verified_kernel ... ok
+test ws01r4::a_tree_without_the_owners_sources_discloses_deferred_owners_and_refuses_to_compile ... ok
+test ws01r4::the_owner_resolver_lists_exactly_the_tests_the_certification_harness_runs ... ok
+test ws01r4::the_suite_to_contract_matrix_is_generated_from_the_products_own_map ... ok
+test ws01r4::gov_contract_verify_enforces_the_evidence_owners ... ok
+test repair3::plugin_descriptors_can_never_authorise_themselves has been running for over 60 seconds
+test repair3::plugin_descriptors_can_never_authorise_themselves ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 122.58s
+
+[exit=0]

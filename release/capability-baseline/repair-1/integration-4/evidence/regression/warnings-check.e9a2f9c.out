@@ -1,0 +1,12 @@
+# P2-AR-0054 forced debug build of every test target at e9a2f9c15c27cdb88a5d43c0f003ce1c3b7b9740 2026-09-20T18:25:54Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.58s
+--- cargo test --no-run ---
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-integration/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.68s
+  Executable unittests src/main.rs (target/debug/deps/gov-2aa83ce48142029e)
+  Executable ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+  Executable unittests src/lib.rs (target/debug/deps/gov_runtime-c01e7b895fc352c0)
+[exit=0]

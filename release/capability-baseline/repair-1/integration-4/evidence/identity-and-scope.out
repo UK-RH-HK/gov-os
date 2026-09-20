@@ -1,0 +1,60 @@
+# P2-AR-0054 — round-4 integration: identity and scope. 2026-09-20T19:29:33Z
+
+## Commits (base c0af4e6; both branches fork from cae2f67, whose product tree equals the base's)
+--- cae2f67  Phase 2: record P2-AR-0041 (round-3 integration, merge e4cb662; reproduced lib 262/0, certification 189/0); round 4 as two parallel builders P2-AR-0042 (BC-P2-02 evidence map, P2-HO-0041) and P2-AR-0043 (residual IPs, P2-HO-0042)
+product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+governed_state_digest: 2514b9fb46b140351f2898fbd99965a99cff4f19823c667c5affa200373235be
+--- c0af4e6  Phase 2: record P2-AR-0055 (OD-P2-03 implemented); claim P2-AR-0054 round-4 integration; refresh P2-HO-0049 for the final residual branch
+product_code_digest: 1d3e9f590ad63c7e16b63662652959fea76773ff642c1fe57705cbe929785df7
+governed_state_digest: 2514b9fb46b140351f2898fbd99965a99cff4f19823c667c5affa200373235be
+--- d1487e8  P2-AR-0042 run report: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION (work commit 2ed8ab1, product 9bafcb3)
+product_code_digest: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9
+governed_state_digest: 75502102b1fff0fa01643b14c26634f0257b2551c289b5071acace5a3943958c
+--- 854980c  P2-AR-0055 r4-residual: OD-P2-03 report, claims.yaml entry and this run's evidence
+product_code_digest: 2fbbbd6c995ab3aa57d0e03f93198535efd27f9612988dd229efe3a6dfab9d82
+governed_state_digest: 4bfc1ae838a6e09d69614dbdc305f5c63e2261873864f2f218e2ee4f4959e336
+--- 5ab06b6  Integration 4 (P2-AR-0054): merge phase2/repair-1-r4-ws01 (P2-AR-0042, BC-P2-02 evidence map)
+product_code_digest: d0c6a0d4bb82b11f458c3082c6c86a9e6ce8e46c888b02f466ca497bf595a4c9
+governed_state_digest: 75502102b1fff0fa01643b14c26634f0257b2551c289b5071acace5a3943958c
+--- c38a406  Integration 4 (P2-AR-0054): merge phase2/repair-1-r4-residual-c (P2-AR-0043 residual IPs, P2-AR-0053 continuation, P2-AR-0055 OD-P2-03)
+product_code_digest: 30ee6e9aaece806cbe8c6c057b491b40ddcb99ebd817736d505673871f66835f
+governed_state_digest: 02df908b44013943bffd7d569fa3aab1e7d852cb65fe017d3763229bb7a137c8
+--- e9a2f9c  Integration 4: map the round-4 residual branch's 19 new tests into the evidence map (IP-R4-WS01-3, R4-IP-2)
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+
+## Merge parents
+5ab06b6 parents: c0af4e6491d354b35ff91d6b56ac0020fec061c8 d1487e8dcec37aa6903f01d28a41326b28430453
+c38a406 parents: 5ab06b6ad37c677edbc1900445727dc8836c887a 854980cc0f7741c0c10ce0043cdfda13cd94fcdc
+
+## Release binary built from e9a2f9c
+e7059b9240d74d384370a56ba8d3306a87f736607ad862e58afc93be49da839c  target/release/gov
+
+## Contract v3 and the frozen gate contract (must be unchanged)
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e  release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+git diff c0af4e6..HEAD over the owner source and canonical import (must be empty):
+
+## Protected paths: nothing changed under them (must be empty)
+
+## Files changed after the merges (c38a406..HEAD)
+ docs/generated/GOVERNANCE_CAPABILITY_ACCEPTANCE.md | 119 +++++++++------
+ framework/contracts/contract-source.lock           |   4 +-
+ .../r4-ws01/evidence/mapping/owner-spec.yaml       |  64 ++++++++
+ tests/governance/capability-evidence-map.yaml      | 163 ++++++++++++++++++++-
+ 4 files changed, 306 insertions(+), 44 deletions(-)
+
+## The merges brought in only files the two branches changed (must be empty)
+
+## No other workstream's repair-1/ directory changed after the merges, except the one file P2-HO-0049 routes
+release/capability-baseline/repair-1/r4-ws01/evidence/mapping/owner-spec.yaml
+
+## Test census at HEAD
+certification tests listed: 207
+certification tests listed as ignored: 0
+lib tests listed: 276
+lib tests listed as ignored: 0
+
+## Every test name of each branch still exists at HEAD (none renamed or removed by the integration)
+  (no MISSING lines above = every test function of both branches is present at HEAD)
