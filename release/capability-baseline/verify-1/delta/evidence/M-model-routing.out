@@ -1,0 +1,54 @@
+== M1  the four tiers exist as routing outcomes, not merely as policy text
+   documentation/implementation/architecture at a low role -> T1 T2 T3
+PASS  M1.1 lightweight (T1), strong-engineering (T2) and frontier (T3) are reachable routing outcomes
+   every declared task class routes to one of: T1 T2 T3 
+FAIL  M1.2 a deterministic / no-LLM (T0) route is reachable  -- no task class routes to T0; reachable tiers were: T1 T2 T3 
+   NOTE gov intent (COMMAND_CONTRACT calls this the deterministic T0 routing surface): {"intent": "UNKNOWN", "text": "show me the task dag", "plan": [], "suggestion": "Try: status, continue, discover <topic>, approve, reject, pause, audit"}
+== M1/M3  a project overlay may raise a floor, never lower it (POLICY_PRECEDENCE)
+PASS  M1.3 an overlay that lowers the kernel tier floor for security does not take effect
+PASS  M3.1 an overlay that lowers the orchestrator's reasoning default does not take effect
+PASS  M1.4 an overlay that raises a floor does take effect
+   gov policy overrides: {"applied": [{"policy": "MODEL_ROUTING_OVERRIDES", "key": "task_class_overrides.documentation", "value": "T3", "source": "MODEL_ROUTING_OVERRIDES.yaml", "mode": "floor", "kernel_value": "T1"}], "refused": [{"policy": "MODEL_ROUTING_OVERRIDES", "key": "role_overrides.orchestrator.default_reasoning", "value": "low", "source": "MODEL_ROUTING_OVERRIDES.yaml", "kernel_value": "high", "reason": "MODEL_R
+PASS  M1.5 the refused weakening is reported, not silently ignored
+== M2  a reasoning minimum can be declared on a task and is enforced upward
+   routing for the declared task: T3 extra_high
+PASS  M2.1 a declared minimum reasoning and tier are honoured
+PASS  M2.2 a task cannot declare its way below its role's reasoning floor
+== M3  provider names live only in the overlay; project state stays canonical
+   candidates from the overlay: {"candidates": [], "chosen": null, "note": "no provider models configured in MODEL_ROUTING_OVERRIDES.yaml; tier requirement returned for the harness to satisfy"}
+   chosen after mapping providers in the overlay: {"provider": "provider-alpha", "model": "alpha-large", "tier": "T3", "max_reasoning": "extra_high", "cost_per_1k_in": 0.5, "cost_per_1k_out": 1.0}
+PASS  M3.2 provider/model names are mapped in the overlay and resolved by the router
+PASS  M3.3 mapping providers rewrites no project state (no provider name in spec/**)
+PASS  M3.4 the orchestrator role defaults to a strong enough tier (T3)
+PASS  M3.4 the memory-engineer role defaults to a strong enough tier (T3)
+PASS  M3.4 the independent-auditor role defaults to a strong enough tier (T3)
+== M4  telemetry can compare the eight dimensions
+PASS  M4.0 routing evidence is recorded
+PASS  M4.1 every recorded run carries 'model'
+PASS  M4.1 every recorded run carries 'provider'
+PASS  M4.1 every recorded run carries 'task_class'
+PASS  M4.1 every recorded run carries 'reasoning_effort'
+PASS  M4.1 every recorded run carries 'cost'
+PASS  M4.1 every recorded run carries 'latency_ms'
+PASS  M4.1 every recorded run carries 'pass'
+PASS  M4.1 every recorded run carries 'repair_count'
+PASS  M4.1 every recorded run carries 'reviewer_findings'
+PASS  M4.2 a run missing a declared evidence field is refused at record time
+   gov route --report rows:
+      {"provider": "provider-alpha", "model": "alpha-large", "task_class": "implementation", "runs": 2, "pass_rate": 0.5, "avg_cost": 0.5, "avg_latency_ms": 2550.0, "avg_repairs": 1.5}
+      {"provider": "provider-alpha", "model": "alpha-small", "task_class": "implementation", "runs": 1, "pass_rate": 1.0, "avg_cost": 0.05, "avg_latency_ms": 500.0, "avg_repairs": 1.0}
+   report columns: avg_cost,avg_latency_ms,avg_repairs,model,pass_rate,provider,runs,task_class
+PASS  M4.3 the comparison can group by 'provider'
+PASS  M4.3 the comparison can group by 'model'
+PASS  M4.3 the comparison can group by 'task_class'
+PASS  M4.4 the comparison reports pass/fail
+PASS  M4.4 the comparison reports cost
+PASS  M4.4 the comparison reports latency
+PASS  M4.4 the comparison reports repair count
+FAIL  M4.5 the comparison can distinguish reasoning effort  -- the report groups by provider|model|task_class only, so the two alpha-large runs at extra_high and low are merged into one row
+FAIL  M4.6 the comparison reports reviewer findings  -- no reviewer-findings column in gov route --report
+   telemetry summary model_routing: [{"provider": "provider-alpha", "model": "alpha-large", "task_class": "implementation", "runs": 2, "pass_rate": 0.5, "avg_cost": 0.5, "avg_latency_ms": 2550.0, "avg_repairs": 1.5}, {"provider": "provider-alpha", "model": "alpha-small", "task_class": "implementation", "runs": 1, "pass_rate": 1.0, "avg_cost": 0.05, "avg_latency_ms": 500.0, "avg_repairs": 1.0}]
+FAIL  M4.7 gov telemetry summary compares reasoning effort and reviewer findings  -- [{"provider": "provider-alpha", "model": "alpha-large", "task_class": "implementation", "runs": 2, "pass_rate": 0.5, "avg_cost": 0.5, "avg_latency_ms": 2550.0, "avg_repairs": 1.5}, {"provider": "provider-alpha", "model": "alpha-small", "task_class": "implementation", "runs": 1, "pass_rate": 1.0, "avg_cost": 0.05, "avg_latency_ms": 500.0, "avg_repairs": 1.0}]
+   NOTE the raw evidence keeps every dimension per run, so an offline comparison is possible:
+      [["alpha-large", "extra_high", true, 0], ["alpha-large", "low", false, 7], ["alpha-small", "medium", true, 2]]
+---- M-model-routing.sh: 30 passed, 4 failed

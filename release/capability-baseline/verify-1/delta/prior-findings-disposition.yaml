@@ -1,0 +1,457 @@
+schema: governance-os.phase-2.prior-findings-disposition
+schema_version: 1
+run_id: P2-AR-0049
+family: delta
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+scope: >-
+  Every iteration-0 finding whose capability set intersects family delta (J1-J2, K1-K4, L1-L4, M1-M4, N1-N4): the 26
+  findings of the delta audit of record (release/capability-baseline/audit-0/delta-r/findings.yaml, A0-*) and the two
+  synthesis findings that touch L3 and N4 (release/capability-baseline/audit-0/synthesis/findings.yaml, S0-*). Each is
+  disposed on this candidate with this run's own evidence; no iteration-0 status is adopted.
+summary:
+  total: 28
+  closed: 23
+  residual: 5
+  not_applicable: 0
+dispositions:
+  - id: A0-J1-01
+    capability: [J1]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-47
+    disposition: CLOSED
+    reason: >-
+      Every J1 field is now required before a research output stands as governed evidence, not only for the benchmark
+      producer. A record carrying only a question is refused RESEARCH_INCOMPLETE and the refusal names each missing
+      field; removing any one of reason, method, sources/data, measurements, uncertainty, conclusion or confidence is
+      refused on its own; a complete record is CONCLUDED with state_class EVIDENCE and a --draft record is held
+      NARRATIVE (reference-only). The influence backlink is no longer empty by construction: a task that relies on the
+      research derives an influence, `gov research check` reports INFLUENCE_NOT_RECORDED, and `gov research sync`
+      records it.
+    evidence: [evidence/J-research-experiment.out (J1.1-J1.9)]
+
+  - id: A0-J1-02
+    capability: [J1, J2, K1, K2, K3, K4, L1, L2, L3, L4, M1, M2, M3, M4, N1, N2, N3, N4]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-01, BC-P2-02
+    disposition: CLOSED
+    reason: >-
+      Reconciling the three derived views against the owner source for all 18 family-delta capabilities: the compiled
+      form (framework/contracts/governance-capability-acceptance.yaml) and the evidence map
+      (tests/governance/capability-evidence-map.yaml) now each carry all 93 checklist bullets, verbatim and in order,
+      with their source lines; every capability appears in the generated view; and every capability declares a
+      non-empty `evidence_class` and an `independent_verification` obligation. The iteration-0 defect (no bullet, no
+      contract field, no evidence owner) is gone.
+    residual_note: >-
+      Nine of the 93 bullets still carry an empty `automated_checks` list; raised as V1-DELTA-01 (LOW, non-blocking,
+      RESIDUAL of BC-P2-02).
+    evidence: [evidence/derived-view-reconciliation.out]
+
+  - id: A0-J1-03
+    capability: [J1, J2, K1, K2, K3, K4, L1, L2, L3, L4, M1, M2, M3, M4, N1, N2, N3, N4]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-03
+    disposition: CLOSED
+    reason: >-
+      The evidence currency key now covers 31 input classes, including exactly the record classes family delta depends
+      on that iteration 0 found missing: `research_experiments` (research/experiment records), `continuity_records`
+      (checkpoint/handoff records), `spec_tasks` (task manifests and test obligations), `evidence_records`,
+      `index_manifest`, `source`, `path_map`, `tools_plugins`, `model_profile`, `adoption_evidence`, plus the non-file
+      classes `runtime_identity` (the runtime/kernel implementation), `machine_trust` and `t2_bindings`. Writing a
+      research record and a checkpoint changes the key and `gov health currency` names the changed classes with their
+      Contract v3 labels. Changing a governing policy changes the key as well.
+    evidence:
+      - evidence/currency-and-role-checks.out
+      - evidence/X-crosscutting.out (X4.1, X4.2)
+
+  - id: A0-J2-01
+    capability: [J2]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-48
+    disposition: CLOSED
+    reason: >-
+      The experiment lifecycle exists and is enforced: `gov experiment design/run/reproduce/conclude/promote/abandon`,
+      with DESIGNED -> RUNNING -> CONCLUDED order enforced (concluding before a run is EXPERIMENT_TRANSITION_INVALID),
+      required design fields (EXPERIMENT_DESIGN_INCOMPLETE), inputs bound by SHA-256, reproducibility judged by the OS
+      from the recorded runs rather than declared, and interpretation and decision influence required at conclusion.
+      The production-merge prohibition is enforced twice: a design whose declared outputs sit in the production tree is
+      refused (EXPERIMENT_OUTPUT_IN_PRODUCTION), and an experiment-class task whose mutations land in the production
+      tree cannot close (PRODUCTION_MERGE_NOT_ALLOWED), with the refusal disappearing when they do not.
+    evidence: [evidence/J-research-experiment.out (J2.1-J2.15)]
+
+  - id: A0-K2-01
+    capability: [K2]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-04
+    disposition: CLOSED
+    reason: >-
+      CIT-E propagation now reaches completed work and everything that rests on it. After a committed CIT changed
+      REQ-0001's acceptance criteria, the DONE task that implemented it was marked for revalidation with its reasons,
+      a revalidation task was generated, its closing reports were marked, the acceptance obligation and the scenario
+      went stale, the stored context packets were invalidated and the checkpoints that recorded the pre-change inputs
+      were reported STALE by `gov checkpoint freshness`. The execution record names each affected artefact with the
+      reason it was reached.
+    evidence:
+      - evidence/K12-cit-p-and-e.out (K2.8-K2.11)
+      - evidence/N-checkpoints-and-handoffs.out (N3.3)
+
+  - id: A0-K2-02
+    capability: [K2]
+    iteration_0_severity: LOW
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: CLOSED
+    reason: >-
+      Re-run in its original shape: a transaction that writes a tool descriptor into governance/project/tools/ and also
+      introduces a dangling reference fails verification and is ROLLED_BACK. The descriptor file is removed, the
+      regenerated tool registry does not list it, the authoritative record is restored, and the derived views' content
+      digest (taken with the regeneration timestamp stripped) is identical before and after. Only the `generated_at`
+      timestamp inside the derived views moves, which carries no rolled-back content; recorded as an observation, not a
+      finding.
+    evidence: [evidence/D-prior-findings.out (D.K2-02, D.K2-02a, D.K2-02b, D.K2-02c)]
+
+  - id: A0-K2-03
+    capability: [K2]
+    iteration_0_severity: LOW
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: CLOSED
+    reason: >-
+      With an unrelated, not-yet-indexed dangling reference already present in the tree, a harmless editorial CIT
+      executes and commits; the pre-existing damage is not attributed to the transaction.
+    evidence: [evidence/D-prior-findings.out (D.K2-03)]
+
+  - id: A0-K3-01
+    capability: [K3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-13
+    disposition: CLOSED
+    reason: >-
+      Materiality is no longer the proposer's label. Each of the eight Contract v3 classes was proposed with the
+      declared trigger set to `editorial`: each was derived as its true class (`label_understates: true`),
+      auto-simulated and raised its human gate. The same eight changes made inside an ordinary task whose contract
+      allowed every path were refused at close with MATERIAL_CHANGE_REQUIRES_CIT, the refusal naming each class, its
+      subject and its rule — except behaviour changes to product source, which the kernel rule classifies as material
+      but leaves to the implementation task's own contract, and which are still detected and propagated.
+    evidence: [evidence/K34-materiality-and-radius.out (K3.architecture … K3.migration, K3.intask.*)]
+
+  - id: A0-K4-01
+    capability: [K4]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: RESIDUAL
+    reason: >-
+      Partly closed, partly unchanged. Closed: the model-tier part — MODEL_ROUTING_POLICY.radius_minimum_tier maps the
+      radius to a tier floor and the router applies it (T1 T1 T2 T2 T3 T3 across R0..R5 at a role whose own floor does
+      not saturate it). Unchanged: nothing determines the specialist agents or reviewers a change needs at any radius,
+      and the rollback consequence the OS states is byte-identical at R0 and R5. Raised as V1-K4-01 (MEDIUM,
+      non-blocking, RESIDUAL of this finding). A CIT's own minimum_model_tier remains T3 at every radius because CIT-P
+      routes the governance class; that is saturation of a floor, not the defect.
+    evidence: [evidence/K34-materiality-and-radius.out (K4.1-K4.7)]
+
+  - id: A0-L1-01
+    capability: [L1, L2]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-18
+    disposition: CLOSED
+    reason: >-
+      Agent resolution no longer fails open on an unassessed value, and is no longer judged on the resolving session's
+      own declaration. A reversibility value cannot be left unassessed at all (a package with a placeholder or missing
+      reversibility is refused GATE_PACKAGE_INCOMPLETE), and HUMAN_GATE_POLICY.agent_resolvable_when now carries
+      `require_assessed: true` and `independent_assessment: true`: the session that declared the assessment is refused
+      AUTHORITY_DENIED when it tries to resolve on it, while another session's L3+ role may resolve within policy.
+    evidence: [evidence/L12-contradictions-and-package.out (L1.6-L1.9, L2.2, L2.3)]
+
+  - id: A0-L1-02
+    capability: [L1]
+    iteration_0_severity: LOW
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: CLOSED
+    reason: >-
+      An agent resolution without `--rationale` is refused (USAGE), and the decision now has a place to record
+      evidence: `gov decide --evidence <id>` attaches governed record ids to the resolution, and an id that does not
+      resolve to a governed record is refused.
+    evidence: [evidence/D-prior-findings.out (D.L1-02, D.L1-02b, D.L1-02c)]
+
+  - id: A0-L1-03
+    capability: [L1]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-18
+    disposition: CLOSED
+    reason: >-
+      Two current, contradictory decisions with no supersession link are detected as a DECISION_CONFLICT with their
+      evidence and a detection confidence, both sides are flagged in the task's input manifest, the manifest's
+      delivery_state is BLOCKED, the task cannot be claimed (TASK_NOT_RUNNABLE), and dispatch routes the contradiction
+      to a system-raised Human Decision Gate whose package is complete and substantive. A superseded record is still
+      resolved by precedence and is not raised as a contradiction.
+    evidence: [evidence/L12-contradictions-and-package.out (L1.1-L1.5, L2.8)]
+
+  - id: A0-L2-01
+    capability: [L2]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-49
+    disposition: CLOSED
+    reason: >-
+      The package is enforced. A gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing any
+      one of why_now, current_state, options, impact, reversibility, cost_rework, recommendation or confidence is
+      refused; the placeholder values '', 'not assessed' and 'tbd' are not substantive content; a gate with no options
+      is refused; an option the package does not offer is refused even when the owner signed it; and the permitted next
+      actions are derived by the OS for the exact gate, naming its id with no `<gate>` placeholder. A system-raised
+      (contradiction) gate carries a complete, substantive package with four real options.
+    evidence: [evidence/L12-contradictions-and-package.out (L2.1-L2.8)]
+
+  - id: A0-L3-01
+    capability: [L3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-10
+    disposition: CLOSED
+    reason: >-
+      Human approval is no longer derived from caller-declared metadata. `--by human`, `--by <any string>`,
+      `--role human`, `GOV_ROLE=human` and `GOV_HUMAN_GATE_APPROVED=1` all fail to produce an approval, and an
+      invocation that declares no role carries no privileged authority at all (AUTHORITY_DENIED on gate create, decide
+      and revoke, which also disposes the L3 side of S0-E1-01). The only thing that produces a human answer is an
+      owner-signed `human-gate-answer` verified against the provisioned root's `human-gate` delegation, bound to the
+      gate, its OS-issued instance nonce and the digest of the exact rendered package. P2-ADJ-0001 holds: the standalone
+      anchor is off by default, so an unprovisioned machine has no human channel and says so with its remediation.
+    evidence:
+      - evidence/L34-presentation-and-blocking.out (L3.14-L3.17)
+      - evidence/currency-and-role-checks.out
+      - evidence/X-crosscutting.out (X2.7, X2.8)
+
+  - id: A0-L3-02
+    capability: [L3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-09
+    disposition: CLOSED
+    reason: >-
+      Gate and decision records are T2-sealed state. A hand-written ANSWERED gate with by_kind human, plus a matching
+      decision record carrying human_approved, is not honoured: `gov gate show` reports the T2 binding BROKEN with the
+      operation and time it was sealed at, and the governance suite reports it in the `os_binding_integrity` family at
+      high severity. Flipping `presented_in_chat` in the file does not make the gate answerable. The same refusal holds
+      on the owner's second provisioned machine, and a record sealed for this owner is FOREIGN under another owner's
+      root.
+    evidence:
+      - evidence/L34-presentation-and-blocking.out (L3.3, L3.18, L3.19)
+      - evidence/X-crosscutting.out (X2.5, X2.6)
+
+  - id: A0-L3-03
+    capability: [L3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-11
+    disposition: CLOSED
+    reason: >-
+      An approval is bound to what it authorises. Appending an operation to an approved CIT's mutation manifest and
+      executing is refused APPROVAL_STALE and the widened operation never runs. An answer the owner signed for one gate
+      cannot authorise another (the signed document binds the gate id, its instance nonce and the package digest, so a
+      re-bound answer fails before anything else).
+    evidence: [evidence/L34-presentation-and-blocking.out (L3.23, L3.24, L3.25)]
+
+  - id: A0-L3-04
+    capability: [L3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-12
+    disposition: CLOSED
+    reason: >-
+      Blocked work becomes runnable only on an authorising answer. A declining answer (option B, `authorises_blocked_work`
+      false) leaves the blocked task blocked; an authorising answer makes it claimable; revoking the gate afterwards
+      withdraws that authorisation and the same task can no longer be claimed; and a task whose gate is presented but
+      unanswered stays blocked.
+    evidence: [evidence/L34-presentation-and-blocking.out (L3.13, L3.20-L3.22)]
+
+  - id: A0-L3-05
+    capability: [L3]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-10
+    disposition: CLOSED
+    reason: >-
+      Presentation is no longer self-attested. `gov gate present` records that the OS rendered the package, with the
+      package digest and an explicit note that this is not a human receipt; `presented_in_chat` stays false for a plain
+      rendering, for a `--json` rendering and for an L1 worker's rendering. Only an owner-signed `human-gate-receipt`
+      (or the signed answer itself) over the exact package digest sets it, and a receipt signed by a key the root
+      delegates nothing to is refused HUMAN_RECEIPT_UNAUTHENTICATED and leaves the gate unpresented.
+    evidence: [evidence/L34-presentation-and-blocking.out (L3.4-L3.10)]
+
+  - id: A0-M1-01
+    capability: [M1]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: RESIDUAL
+    reason: >-
+      Unchanged. Routing every task class the kernel declares, at the lowest-floor engineering role, returns only T1,
+      T2 and T3; no class, role, radius, task declaration or overlay can reach T0, because every rule raises and never
+      lowers. Raised as V1-M1-01 (MEDIUM, non-blocking, RESIDUAL of this finding).
+    evidence: [evidence/M-model-routing.out (M1.2)]
+
+  - id: A0-M1-02
+    capability: [M1, M2, M3]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-45
+    disposition: CLOSED
+    reason: >-
+      The project routing overlay can no longer lower a kernel floor. `MODEL_ROUTING_OVERRIDES.task_class_overrides`
+      setting security to T1 leaves security routing at T3; `role_overrides.orchestrator.default_reasoning: low` leaves
+      the orchestrator's reasoning at high; a strengthening (documentation to T3) does take effect; and `gov policy
+      overrides` lists the applied override and the refused weakenings with their kernel values and reasons, so nothing
+      is silently ignored. A task cannot declare its way below its role's reasoning floor either.
+    evidence: [evidence/M-model-routing.out (M1.3-M1.5, M2.2, M3.1)]
+
+  - id: A0-M2-01
+    capability: [M2]
+    iteration_0_severity: LOW
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: RESIDUAL
+    reason: >-
+      Unchanged. `gov route --record` accepts a recorded run of a task that declares `minimum_reasoning: extra_high`
+      and `minimum_model_tier: T3` at reasoning `low` on a model with no tier, with no refusal and no flag. The
+      requirement is stated by the router and recorded, not checked against the evidence. This does not change M2's
+      bullet status — the bullet requires that a minimum "can be declared/enforced", and the router does enforce it
+      when it routes — so it is carried as a later-lifecycle note rather than a new finding.
+    evidence: [evidence/D-prior-findings.out (D.M2-01)]
+
+  - id: A0-M4-01
+    capability: [M4]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: RESIDUAL
+    reason: >-
+      Unchanged. `gov route --report` and the `model_routing` block of `gov telemetry summary` still group by
+      provider|model|task_class and aggregate runs, pass_rate, avg_cost, avg_latency_ms and avg_repairs only: two runs
+      of one model at extra_high and at low merge into one row, and reviewer_findings appears in no column, although
+      both are required at record time and kept per run in the raw evidence. Raised as V1-M4-01 (MEDIUM, non-blocking,
+      RESIDUAL of this finding).
+    evidence: [evidence/M-model-routing.out (M4.1-M4.7)]
+
+  - id: A0-M4-02
+    capability: [M4]
+    iteration_0_severity: LOW
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: RESIDUAL
+    reason: >-
+      Unchanged. A run recorded with cost "expensive", latency_ms "slow" and repair_count "many" is accepted and then
+      aggregated as 0.0 / 0.0 / 0.0; a run recorded with the MODEL_ROUTING_POLICY field names `latency` and `pass_fail`
+      is accepted through the alias check but reported as 0 ms latency and pass_rate 0.0. Carried as a later-lifecycle
+      note on the quality of the routing evidence; it does not change M4's bullet statuses, which V1-M4-01 already
+      records.
+    evidence: [evidence/D-prior-findings.out (D.M4-02, D.M4-02b)]
+
+  - id: A0-N1-01
+    capability: [N1]
+    iteration_0_severity: LOW
+    iteration_0_blocking: false
+    blocker_class: null
+    disposition: CLOSED
+    reason: >-
+      Both halves are closed. `open_questions` is no longer hard-wired empty: the OS derives it from the pending gates
+      and the blocking contradictions of the checkpoint's task, and a checkpoint taken with a gate pending records that
+      gate's id and question. `files_changed` expands a new untracked directory into its individual files rather than
+      recording the directory.
+    evidence: [evidence/D-prior-findings.out (D.N1-01, D.N1-01b)]
+
+  - id: A0-N2-01
+    capability: [N2]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-05
+    disposition: CLOSED
+    reason: >-
+      All eight mandatory triggers fire on this candidate. Four are checkpointed by the operation itself (accepted CIT,
+      before handoff, before session close via the new `gov session close`, and the watchdog's compaction boundary);
+      four are observed as boundaries by `checkpoints::observe_boundaries` and checkpointed at the next gov invocation
+      (task transition, material decision, significant mutation, and before a model/provider switch, detected from a
+      change in the effective routing digest).
+    evidence: [evidence/N-checkpoints-and-handoffs.out (N2.1-N2.9)]
+
+  - id: A0-N3-01
+    capability: [N3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-05
+    disposition: CLOSED
+    reason: >-
+      All three halves are closed. Staleness exists: after a committed CIT changed an input a checkpoint had recorded,
+      `gov checkpoint freshness` reports STALE and names the upstream change, its cause and the changed input.
+      Freshness governs the boundaries: `gov session close` is explicitly degraded and not resumable over stale state
+      (and is never refused), and `gov handoff create` over the same state reports the stale inputs, the invalidated
+      previous packet and the refreshed one. The watchdog no longer counts only caller-supplied numbers: with the
+      caller's counters at zero it fires on gov commands and changed files it observed itself, from the command log and
+      git, with no proprietary hook.
+    evidence: [evidence/N-checkpoints-and-handoffs.out (N3.1-N3.6)]
+
+  - id: S0-E1-01
+    capability: [E1, L3]
+    iteration_0_severity: HIGH
+    iteration_0_blocking: true
+    blocker_class: BC-P2-08
+    disposition: CLOSED
+    reason: >-
+      Disposed for family delta's side (L3) only; E1 belongs to family gamma. An invocation that declares neither
+      `--role` nor `GOV_ROLE` now carries no privileged authority: `gov gate create`, `gov decide` and `gov gate revoke`
+      are each refused AUTHORITY_DENIED naming the level the operation requires and the remediation, and ROLES.yaml
+      records the rule explicitly (an undeclared invocation is L0). Combined with A0-L3-01, the compound attack
+      iteration 0 described — an undeclared invocation recording a human approval through `gov decide`'s defaults — is
+      closed at both ends.
+    evidence: [evidence/currency-and-role-checks.out, evidence/L34-presentation-and-blocking.out (L3.14-L3.17)]
+
+  - id: S0-W5-01
+    capability: [W5, N4, E3]
+    iteration_0_severity: MEDIUM
+    iteration_0_blocking: true
+    blocker_class: BC-P2-20
+    disposition: CLOSED
+    reason: >-
+      Disposed for family delta's side (N4) only; W5 and E3 belong to families zeta and gamma. The schema collision is
+      gone: a worker return that satisfies worker-return.schema.json (with `status: success`) is accepted by
+      `gov handoff return`, and passing the same file to `gov task close --report` no longer fails SCHEMA_INVALID — the
+      close proceeds to its ordinary content checks. The structured result itself survives the sub-session: it is
+      persisted as a governed record on disk and read back by a fresh session with no conversation state, and the
+      return carries the OS's own `receipt_validation` of the claim against the task's input manifest.
+    evidence:
+      - evidence/X-crosscutting.out (X3.1, X3.2)
+      - evidence/N-checkpoints-and-handoffs.out (N4.1-N4.4)
+
+blocker_classes_touching_delta:
+  note: >-
+    The routing list in P2-HO-0044 names eighteen iteration-0 classes as touching family delta's capabilities. This is
+    delta's judgement of each class for delta's capabilities only; a class spanning several families is judged by each
+    for its own, and the synthesis verifier reconciles.
+  classes:
+    BC-P2-01: CLOSED for delta's 18 capabilities — the compiled form carries every checklist bullet verbatim (A0-J1-02).
+    BC-P2-02: RESIDUAL — the evidence map declares evidence owners for every delta capability, but 9 of 93 bullets carry no automated check (V1-DELTA-01).
+    BC-P2-03: CLOSED for delta — the currency key covers research/experiment, continuity, task and runtime-identity classes (A0-J1-03).
+    BC-P2-04: CLOSED for K2 — propagation reaches completed work, its evidence, packets and checkpoints (A0-K2-01).
+    BC-P2-05: CLOSED for N2/N3 — all eight triggers fire, staleness exists, handoff and session close are degraded (A0-N2-01, A0-N3-01).
+    BC-P2-09: CLOSED for L3 — gate/decision/CIT records are T2-sealed and a hand-written one is not honoured (A0-L3-02).
+    BC-P2-10: CLOSED for L3 — human answers and presentation come only from owner-signed documents (A0-L3-01, A0-L3-05).
+    BC-P2-11: CLOSED for L3 — an approval is bound to the subject and content it authorises (A0-L3-03).
+    BC-P2-12: CLOSED for L3 — declined, revoked, withdrawn and pending gates authorise nothing (A0-L3-04).
+    BC-P2-13: CLOSED for K3 — materiality is derived from what the change touches, in CITs and inside tasks (A0-K3-01).
+    BC-P2-14: NOT_JUDGED_BY_DELTA for its I2 half; for J2 it is CLOSED — production_merge_allowed now has an enforcing consumer at task close (A0-J2-01).
+    BC-P2-18: CLOSED for L1 — undecidable contradictions are detected, block and escalate; agent resolution needs an assessed, independent, in-policy case (A0-L1-01, A0-L1-03).
+    BC-P2-20: CLOSED for N4 — the worker return is schema-compatible with the close receipt and survives the sub-session (S0-W5-01).
+    BC-P2-29: NOT_JUDGED_BY_DELTA for D1/R3; for K2 it is CLOSED — CIT-E refreshes the index inside the transaction and the refresh is recorded (A0-K2-01, evidence K2.12).
+    BC-P2-45: CLOSED for M1/M2/M3 — the routing overlay cannot lower a kernel floor and the refusal is reported (A0-M1-02).
+    BC-P2-47: CLOSED for J1 — research output completeness is required (A0-J1-01).
+    BC-P2-48: CLOSED for J2 — the experiment lifecycle exists and is enforced (A0-J2-01).
+    BC-P2-49: CLOSED for L2 — the decision package is enforced (A0-L2-01).

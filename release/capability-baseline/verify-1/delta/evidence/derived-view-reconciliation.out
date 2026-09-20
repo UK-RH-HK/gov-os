@@ -1,0 +1,74 @@
+=== owner source (Contract v3:594-747)
+  J1: line 596, 8 bullets, title 'Research becomes evidence'
+  J2: line 607, 7 bullets, title 'Experiment lifecycle'
+  K1: line 622, 4 bullets, title 'CIT-P'
+  K2: line 628, 8 bullets, title 'CIT-E'
+  K3: line 638, 8 bullets, title 'Automatic impact simulation'
+  K4: line 649, 1 bullets, title 'Impact radius'
+  L1: line 656, 4 bullets, title 'Contradiction resolution'
+  L2: line 662, 10 bullets, title 'Human Decision Gate package'
+  L3: line 674, 5 bullets, title 'Gate presentation'
+  L4: line 681, 2 bullets, title 'Non-global blocking'
+  M1: line 689, 4 bullets, title 'T0-T3 or equivalent capability tiers'
+  M2: line 695, 1 bullets, title 'Reasoning requirement'
+  M3: line 698, 2 bullets, title 'Role defaults'
+  M4: line 702, 8 bullets, title 'Empirical routing'
+  N1: line 717, 9 bullets, title 'Structured checkpoint'
+  N2: line 729, 8 bullets, title 'Mandatory triggers'
+  N3: line 739, 3 bullets, title 'Provider-independent checkpoint watchdog'
+  N4: line 744, 1 bullets, title 'Worker return contract'
+  total bullets: 93
+
+=== reconciliation: compiled form, evidence map, generated view
+  J1: compiled bullets MATCH (8), evidence-map bullets MATCH (8), evidence_class=['unit/integration/system test', 'governance health check', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  J2: compiled bullets MATCH (7), evidence-map bullets MATCH (7), evidence_class=['unit/integration/system test', 'governance health check', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  K1: compiled bullets MATCH (4), evidence-map bullets MATCH (4), evidence_class=['unit/integration/system test', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=1, in generated view=True
+  K2: compiled bullets MATCH (8), evidence-map bullets MATCH (8), evidence_class=['unit/integration/system test', 'governance health check', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=1, in generated view=True
+  K3: compiled bullets MATCH (8), evidence-map bullets MATCH (8), evidence_class=['unit/integration/system test', 'independent audit evidence'], bullets without automated_checks=2, in generated view=True
+  K4: compiled bullets MATCH (1), evidence-map bullets MATCH (1), evidence_class=['unit/integration/system test', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  L1: compiled bullets MATCH (4), evidence-map bullets MATCH (4), evidence_class=['unit/integration/system test', 'governance health check', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  L2: compiled bullets MATCH (10), evidence-map bullets MATCH (10), evidence_class=['unit/integration/system test', 'governance health check', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  L3: compiled bullets MATCH (5), evidence-map bullets MATCH (5), evidence_class=['unit/integration/system test', 'governance health check', 'human-gate evidence', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  L4: compiled bullets MATCH (2), evidence-map bullets MATCH (2), evidence_class=['automated invariant/guard', 'unit/integration/system test', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  M1: compiled bullets MATCH (4), evidence-map bullets MATCH (4), evidence_class=['unit/integration/system test', 'governance health check', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  M2: compiled bullets MATCH (1), evidence-map bullets MATCH (1), evidence_class=['unit/integration/system test', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  M3: compiled bullets MATCH (2), evidence-map bullets MATCH (2), evidence_class=['unit/integration/system test', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  M4: compiled bullets MATCH (8), evidence-map bullets MATCH (8), evidence_class=['unit/integration/system test', 'governance health check', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  N1: compiled bullets MATCH (9), evidence-map bullets MATCH (9), evidence_class=['unit/integration/system test', 'governance health check', 'independent audit evidence'], bullets without automated_checks=4, in generated view=True
+  N2: compiled bullets MATCH (8), evidence-map bullets MATCH (8), evidence_class=['unit/integration/system test', 'independent audit evidence'], bullets without automated_checks=1, in generated view=True
+  N3: compiled bullets MATCH (3), evidence-map bullets MATCH (3), evidence_class=['unit/integration/system test', 'governance health check', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+  N4: compiled bullets MATCH (1), evidence-map bullets MATCH (1), evidence_class=['unit/integration/system test', 'governance health check', 'independent audit evidence'], bullets without automated_checks=0, in generated view=True
+
+  capabilities with a reconciliation problem: ['K1', 'K2', 'K3', 'N1', 'N2']
+
+=== bullets with no automated check declared in the evidence map
+  K1.2 (line 624): 'Semantic/lexical/code candidates can supplement impact.'
+  K2.5 (line 633): 'derived-view regeneration'
+  K3.6 (line 645): 'infrastructure cost'
+  K3.8 (line 647): 'data migration'
+  N1.4 (line 722): 'pending decisions/questions'
+  N1.5 (line 723): 'open transactions'
+  N1.7 (line 725): 'test status'
+  N1.8 (line 726): 'context packet hash'
+  N2.3 (line 732): 'accepted CIT'
+  total: 9 of 93
+
+=== independent_verification declared per capability
+  J1: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  J2: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  K1: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  K2: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  K3: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  K4: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  L1: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  L2: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  L3: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  L4: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  M1: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  M2: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  M3: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  M4: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  N1: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  N2: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  N3: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]
+  N4: [{'id': 'obligation:AC-12', 'class': 'independent audit evidence'}]

@@ -1,0 +1,68 @@
+P2-AR-0049 — evidence-currency and undeclared-role checks used in prior-findings-disposition.yaml
+
+== A0-J1-03: the evidence currency key's input classes (gov health currency, snapshot.classes)
+[
+"adoption_evidence",
+"archive",
+"continuity_records",
+"evidence_records",
+"framework_lock",
+"generated_other",
+"governance_tests",
+"index_manifest",
+"kernel_migration",
+"kernel_other",
+"kernel_policy",
+"kernel_schema",
+"kernel_skills",
+"kernel_tools",
+"machine_trust",
+"model_profile",
+"overlay_other",
+"path_map",
+"project_policy",
+"project_skills",
+"research_experiments",
+"runtime_identity",
+"sensitivity",
+"source",
+"spec_architecture",
+"spec_decisions",
+"spec_other",
+"spec_requirements",
+"spec_tasks",
+"t2_bindings",
+"tools_plugins"
+]
+
+changed_classes after writing a research record and a checkpoint:
+[
+ {
+  "class": "continuity_records",
+  "contract_class": "checkpoint/handoff records"
+ },
+ {
+  "class": "evidence_records",
+  "contract_class": "implementation/test evidence records"
+ },
+ {
+  "class": "index_manifest",
+  "contract_class": "relevant index manifest"
+ },
+ {
+  "class": "research_experiments",
+  "contract_class": "research/experiment records"
+ },
+ {
+  "class": "spec_tasks",
+  "contract_class": "authoritative spec/decision (task manifests, test obligations)"
+ }
+]
+
+== S0-E1-01 (L3 side): an invocation that declares no role
+--- gov gate revoke HDG-0001 --reason x (no --role, no GOV_ROLE):
+{"code": "AUTHORITY_DENIED", "message": "no acting role was declared, so the invocation carries no privileged authority (framework \u00a723: no worker behaves as an orchestrator unless explicitly assigned that role); 'revoke_gate' requires L4 (AUTHORITY_POLICY.authority_levels_required). Remediation
+--- gov decide HDG-0001 --option A (no --role, no GOV_ROLE):
+{"code": "AUTHORITY_DENIED", "message": "no acting role was declared, so the invocation carries no privileged authority (framework \u00a723: no worker behaves as an orchestrator unless explicitly assigned that role); 'answer_gate' requires L3 (AUTHORITY_POLICY.authority_levels_required). Remediation
+--- gov gate create --question q --fields {} (no --role, no GOV_ROLE):
+{"code": "AUTHORITY_DENIED", "message": "no acting role was declared, so the invocation carries no privileged authority (framework \u00a723: no worker behaves as an orchestrator unless explicitly assigned that role); 'create_gate' requires L2 (AUTHORITY_POLICY.authority_levels_required). Remediation

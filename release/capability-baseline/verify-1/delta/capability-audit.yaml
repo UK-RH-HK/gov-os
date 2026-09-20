@@ -1,0 +1,1276 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0049
+family: delta
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+capabilities:
+  - capability: J1
+    title: "Research becomes evidence"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:598-605
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XII §45"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All eight bullets are executably evidenced on this candidate: each J1 field is individually required before a research output becomes governed evidence, and the influence backlink is derived, reported when unrecorded and back-filled."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "question/reason"
+        source_line: 598
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'question/reason' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "method"
+        source_line: 599
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'method' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "sources/data"
+        source_line: 600
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'sources/data' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "measurements"
+        source_line: 601
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'measurements' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "uncertainty"
+        source_line: 602
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'uncertainty' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "conclusion"
+        source_line: 603
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'conclusion' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "confidence"
+        source_line: 604
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)"]
+        automated_evidence: ["cargo test --lib lifecycle::research::tests", "gov research check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.1-J1.5: a record without 'confidence' is refused RESEARCH_INCOMPLETE and the refusal names the field; a record carrying all seven is CONCLUDED with state_class EVIDENCE"
+        gap: null
+      - bullet: "influenced decisions/tasks"
+        source_line: 605
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/research.rs:52-70 (missing_fields)", "runtime/src/lifecycle/research.rs:240-343 (record)", "runtime/src/lifecycle/research.rs:389-433 (conclude)", "runtime/src/lifecycle/mod.rs:332-381 (cited_evidence / influenced_by)", "runtime/src/lifecycle/mod.rs:383-430 (record_influence/sync_influences)"]
+        automated_evidence: ["gov research check (INFLUENCE_NOT_RECORDED)", "gov research sync"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J1.7-J1.9: a task that relies on the research is derived as an influence, the unrecorded backlink is a governance finding, and `gov research sync` records it"
+        gap: null
+    health_scheduler_tiers: [G2, G5]
+    evidence_owners: [G2, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — the governance suite family research_experiment_data_lifecycle runs at G2/G5 and produced the INFLUENCE_NOT_RECORDED finding on this candidate (evidence/J-research-experiment.out J1.8)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "A greenfield repository where a decision cites a research record that was never concluded: the OS must hold it NARRATIVE and refuse it as citable evidence."
+      repo_b_challenge: "A brownfield tree with a docs/research directory of prose notes carrying ids: adoption must not promote them to EVIDENCE, and `gov research check` must list each as REFERENCE_ONLY with its missing fields."
+      hidden_oracle_fault_class: "A research record whose measurements do not support its conclusion, cited by a decision — detected only if the oracle scores content, not fields."
+      chaos_scale_soak: "10k research records with dense influence graphs: `gov research sync` must stay linear and must not lose a backlink."
+      retrieval_challenge: "A question whose answer is in a concluded research record that is not linked to the asking task: retrieval must surface it as supplementary, never as authority."
+      not_challengeable: null
+    adoption_obligation: "gov init/adopt must place spec/research/ under the repository contract and index it; post-adoption, `gov research check` must report every legacy research record that is not concluded, so a brownfield tree's narrative notes are not silently promoted to evidence."
+    residual_risk: "A concluded record's *content* is not judged: the OS checks that every J1 field is present and that influences are recorded, not that the measurements support the conclusion. An unsupported research conclusion is a Phase-4 hidden-fault class."
+    findings: []
+  - capability: J2
+    title: "Experiment lifecycle"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:608-614
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XII §46"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All seven bullets are executably evidenced: the lifecycle states are enforced in order, reproducibility is judged by the OS from the recorded runs rather than declared, and an experiment task whose mutations land in the production tree cannot close."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "hypothesis/question"
+        source_line: 608
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.1/J2.3: a design with no hypothesis/method/data is refused EXPERIMENT_DESIGN_INCOMPLETE; a complete one is DESIGNED"
+        gap: null
+      - bullet: "method/data"
+        source_line: 609
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.1/J2.6: method and data/inputs are required at design, and the run binds every input by SHA-256"
+        gap: null
+      - bullet: "reproducibility"
+        source_line: 610
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.7-J2.9: an agreeing reproduction is judged to agree, a disagreeing one is not, and reproducibility falls to NOT_REPRODUCED"
+        gap: null
+      - bullet: "results"
+        source_line: 611
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.5/J2.6: the run records its results and their digest and moves the experiment to RUNNING"
+        gap: null
+      - bullet: "interpretation"
+        source_line: 612
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.10: conclusion records the interpretation and moves the experiment to CONCLUDED"
+        gap: null
+      - bullet: "decision influence"
+        source_line: 613
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.10: conclusion records decision_influence; J2.4 shows the lifecycle order is enforced"
+        gap: null
+      - bullet: "production merge prohibited where experimental"
+        source_line: 614
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/experiment.rs:919-1114 (design)", "runtime/src/lifecycle/experiment.rs:1115-1180 (run)", "runtime/src/lifecycle/experiment.rs:1181-1239 (reproduce)", "runtime/src/lifecycle/experiment.rs:1240-1345 (conclude)", "runtime/src/orchestration/tasks.rs:2129 (PRODUCTION_MERGE_NOT_ALLOWED)"]
+        automated_evidence: ["cargo test --lib lifecycle::experiment::tests", "gov experiment check"]
+        independent_evidence:
+          - "evidence/J-research-experiment.out J2.2/J2.11-J2.15: a design whose output is in the production tree is refused; an experiment task records production_merge_allowed false and its close is refused PRODUCTION_MERGE_NOT_ALLOWED when its mutations land in production, and the refusal disappears when they do not"
+        gap: null
+    health_scheduler_tiers: [G2, G5]
+    evidence_owners: [G2, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — the same family reports production-merge detection on this candidate (evidence/J-research-experiment.out J2.13)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "An experiment whose declared outputs are under spec/experiments/**, promoted through a gate: the promotion must require an owner-signed answer."
+      repo_b_challenge: "A brownfield tree with an experiments/ directory already merged into production: adoption must flag it and refuse to treat its output as governed."
+      hidden_oracle_fault_class: "An experiment concluded from a single run with reproducibility declared rather than judged."
+      chaos_scale_soak: "Interleaved reproduce calls from several sessions on one experiment: the judged verdict must be a deterministic function of the recorded runs."
+      retrieval_challenge: "not relevant: experiment standing is read from the record, never retrieved semantically."
+      not_challengeable: null
+    adoption_obligation: "adopt/post-adoption must classify any pre-existing experiment directory and refuse to treat its outputs as production until promoted; `gov experiment check` must run in the adoption baseline."
+    residual_risk: "Reproducibility is judged by comparing recorded results under an acceptance mode; a reproduction that agrees because both runs share a hidden defect is not detected. Phase-4 fault class."
+    findings: []
+  - capability: K1
+    title: "CIT-P"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:623-626
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIII §47-48", "CIT-0001"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All four bullets are executably evidenced: a change proposed as editorial is derived material and traversed deterministically from the manifest's targets, semantic/lexical candidates supplement it with their routes, a radius is produced and eight human-readable consequences are surfaced."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Proposed material change triggers deterministic graph traversal."
+        source_line: 623
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:124-432 (propose)", "runtime/src/cit/mod.rs:433-855 (simulate)", "runtime/src/cit/materiality.rs:1159 (classify_paths)", "runtime/src/graph/mod.rs (traversal)"]
+        automated_evidence: ["cargo test --test certification ws04*", "gov cit simulate"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K1.1/K3.*: a change proposed as `editorial` to a governed record is derived material and auto-simulated; the traversal seeds on the manifest's targets and reaches F-0001, the reports and both tasks over typed edges"
+          - "evidence/K34-materiality-and-radius.out"
+        gap: null
+      - bullet: "Semantic/lexical/code candidates can supplement impact."
+        source_line: 624
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:124-432 (propose)", "runtime/src/cit/mod.rs:433-855 (simulate)", "runtime/src/cit/materiality.rs:1159 (classify_paths)", "runtime/src/graph/mod.rs (traversal)"]
+        automated_evidence: ["cargo test --test certification ws04*", "gov cit simulate"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K1.3: the impact carries semantic_candidates, each with its `routes` (lexical + semantic), alongside the deterministic set"
+          - "evidence/K34-materiality-and-radius.out"
+        gap: null
+      - bullet: "Impact radius is produced."
+        source_line: 625
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:124-432 (propose)", "runtime/src/cit/mod.rs:433-855 (simulate)", "runtime/src/cit/materiality.rs:1159 (classify_paths)", "runtime/src/graph/mod.rs (traversal)"]
+        automated_evidence: ["cargo test --test certification ws04*", "gov cit simulate"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K1.4/K4.1: an impact radius is produced (R1 for the requirement change, R0 and R5 for the two K4 cases)"
+          - "evidence/K34-materiality-and-radius.out"
+        gap: null
+      - bullet: "Human-readable consequences are surfaced."
+        source_line: 626
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:124-432 (propose)", "runtime/src/cit/mod.rs:433-855 (simulate)", "runtime/src/cit/materiality.rs:1159 (classify_paths)", "runtime/src/graph/mod.rs (traversal)"]
+        automated_evidence: ["cargo test --test certification ws04*", "gov cit simulate"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K1.5: eight human-readable consequences are produced, naming retest, revalidation, stale tests, readiness, material classes, approval and rollback"
+          - "evidence/K34-materiality-and-radius.out"
+        gap: null
+    health_scheduler_tiers: [G1, G2, G4]
+    evidence_owners: [G1, G2, G4, independent-heldout]
+    evidence_owner_actually_runs: "partial — G1/G2 run the change-control families and the CIT itself simulates on every proposal; there is no scheduler check that re-derives an impact set independently of cit::simulate, so the automated owner observes the transaction rather than the traversal."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "A dense requirement/feature/scenario graph: the deterministic traversal must reach every dependent at the stated depth and no further."
+      repo_b_challenge: "A legacy tree whose links are implicit in prose: the deterministic set is small and the semantic supplement carries the load — the OS must label which is which."
+      hidden_oracle_fault_class: "A dependency declared only in a path the repository contract does not classify, so it is invisible to traversal."
+      chaos_scale_soak: "A 50k-artefact graph at R5: traversal must complete inside the Gate U SLO."
+      retrieval_challenge: "Semantic candidates on an intentionally inadequate profile must not be presented as deterministic impact."
+      not_challengeable: null
+    adoption_obligation: "adopt must build the graph and index before any CIT is proposed, or traversal is vacuous; post-adoption must re-run CIT-P over a sample of legacy records."
+    residual_risk: "Semantic candidates depend on the provisional retrieval profile (Phase 3); on an inadequate profile the supplementary set is weak, although the deterministic set is not."
+    findings: []
+  - capability: K2
+    title: "CIT-E"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:629-636
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIII §47-49", "CIT-0001"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All eight bullets are executably evidenced end to end on one transaction: gate-decided approval, the manifest's operations, the authoritative update, propagation into completed work, its evidence, packets and checkpoints, derived-view regeneration, index refresh, verification, and atomic commit or rollback."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Final decision"
+        source_line: 629
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.3-K2.6: the CIT's own human gate decides; execution before an honoured answer is refused, and the approved CIT commits"
+        gap: null
+      - bullet: "mutation manifest"
+        source_line: 630
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.7/K2.13: the manifest's declared operation is what lands, and the executed writes are bound in the CIT's sealed state"
+        gap: null
+      - bullet: "authoritative updates"
+        source_line: 631
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.7: the authoritative record carries exactly the manifest's change"
+        gap: null
+      - bullet: "staleness/retest/rework propagation"
+        source_line: 632
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.8-K2.11: the DONE task is marked for revalidation, a revalidation task is generated, the acceptance obligation goes stale and the checkpoint that captured the pre-change state is reported stale"
+        gap: null
+      - bullet: "derived-view regeneration"
+        source_line: 633
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.13b: the tool registry and the adapter manifest, deliberately damaged before execution, are rebuilt from the committed state"
+        gap: null
+      - bullet: "memory/index refresh"
+        source_line: 634
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.12: the index manifest hash changes across CIT-E (index_refresh.refreshed true in the execution record)"
+        gap: null
+      - bullet: "verification"
+        source_line: 635
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.14: a transaction that introduces a dangling reference fails verification (VERIFICATION_FAILED)"
+        gap: null
+      - bullet: "commit or rollback/block atomically"
+        source_line: 636
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:856-1000 (approve)", "runtime/src/cit/mod.rs:1548-1900 (execute)", "runtime/src/cit/propagation.rs:271-1140 (plan/apply)", "runtime/src/cit/binding.rs (writes binding)", "runtime/src/t2.rs (seal)"]
+        automated_evidence: ["cargo test --test certification ws04*/ws06*", "gov cit execute"]
+        independent_evidence:
+          - "evidence/K12-cit-p-and-e.out K2.14-K2.16: the failed transaction is ROLLED_BACK, its file write is removed and the authoritative record is restored; K2.6 shows the commit path"
+        gap: null
+    health_scheduler_tiers: [G1, G2, G4, G5]
+    evidence_owners: [G1, G2, G4, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — CIT-E runs its own verification (schema, graph integrity, index freshness) inside the transaction and the suite's graph_integrity/os_binding_integrity families observe the result (evidence/K12-cit-p-and-e.out K2.2b, K2.14)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "A CIT that invalidates a DONE task, its report, its packet and its checkpoint: every one must be marked and a revalidation task generated."
+      repo_b_challenge: "A CIT over a legacy tree where the index is stale: execution must refresh it and the verification must not attribute pre-existing damage to the transaction."
+      hidden_oracle_fault_class: "A transaction that commits the manifest but silently skips one propagation target."
+      chaos_scale_soak: "Kill the process mid-execute: `gov trust recover-transactions` must leave the tree either fully committed or fully rolled back."
+      retrieval_challenge: "not relevant: CIT-E's authoritative updates never depend on retrieval."
+      not_challengeable: null
+    adoption_obligation: "adopt/update must leave the CIT snapshot store (.governance-state/cit/) writable and outside the derived runtime directory, and must not carry a half-executed transaction across a migration (`gov trust recover-transactions`)."
+    residual_risk: "Rollback restores the files the transaction touched from its snapshot; work committed to git between execute and rollback by another process is outside the transaction's control."
+    findings: []
+  - capability: K3
+    title: "Automatic impact simulation"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:640-647
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIII §47-48"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All eight material classes are executably evidenced twice: proposed through a CIT with the declared trigger set to 'editorial' (derived material, auto-simulated, gated) and made inside an ordinary task (refused at close, except product-source behaviour, which the kernel rule leaves to the task contract and which is still classified material)."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "architecture"
+        source_line: 640
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.architecture: a architecture change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.architecture_change: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "behaviour"
+        source_line: 641
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.behaviour: a behaviour change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.behaviour_change: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "interfaces"
+        source_line: 642
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.interfaces: a interfaces change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.interface_change: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "security"
+        source_line: 643
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.security: a security change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.security_change: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "governance/policy"
+        source_line: 644
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.governance: a governance/policy change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.governance_change: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "infrastructure cost"
+        source_line: 645
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.infrastructure: a infrastructure cost change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.infrastructure_cost: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "acceptance criteria"
+        source_line: 646
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.acceptance: a acceptance criteria change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.acceptance_criteria_change: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+      - bullet: "data migration"
+        source_line: 647
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs:1-1158 (the eight classes; kernel floor)", "runtime/src/cit/mod.rs:124-432 (effective triggers = declared + derived)", "runtime/src/orchestration/tasks.rs:2160 (MATERIAL_CHANGE_REQUIRES_CIT)", "framework/policies/CHANGE_POLICY.yaml auto_simulate_triggers/human_gate_triggers"]
+        automated_evidence: ["cargo test --test certification repair2/ws04r3", "gov cit classify"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K3.migration: a data migration change proposed with the declared trigger 'editorial' is derived material, auto-simulated and gated"
+          - "evidence/K34-materiality-and-radius.out K3.intask.data_migration: the same change made inside an ordinary task is refused at close (for product-source behaviour, classified and left to the task contract, as the kernel rule states)"
+        gap: null
+    health_scheduler_tiers: [G1, G2]
+    evidence_owners: [G1, G2, independent-heldout]
+    evidence_owner_actually_runs: "true — task close calls the same classifier at G2 (evidence/K34-materiality-and-radius.out K3.intask.*), and `gov cit classify` exposes it read-only."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Each of the eight classes proposed with the declared trigger set to 'editorial': each must be derived, simulated and gated per CHANGE_POLICY."
+      repo_b_challenge: "A brownfield tree whose repository contract does not yet classify the product directory: the behaviour class must be absent and adoption must say so, rather than silently reporting 'not material'."
+      hidden_oracle_fault_class: "A security check removed by a rename rather than an edit, so the content heuristic does not see a weakened line."
+      chaos_scale_soak: "A manifest of 500 operations spanning all eight classes: classification must stay complete and bounded."
+      retrieval_challenge: "not relevant: materiality is derived from records, paths and content, never from retrieval."
+      not_challengeable: null
+    adoption_obligation: "adopt must classify the brownfield tree against the repository contract before materiality can be derived from paths; an unclassified product tree yields no behaviour_change class."
+    residual_risk: "Materiality is derived from record type, repository-contract class, path patterns and content heuristics. A material change in a path class the repository contract does not classify (a tree adopted with an incomplete contract) is not derived; the contract's own classification is the adoption obligation."
+    findings: []
+  - capability: K4
+    title: "Impact radius"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:650-650
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIII §49"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "The radius is produced and drives traversal depth, semantic breadth, test scope and human approval, and MODEL_ROUTING_POLICY.radius_minimum_tier maps it to a model tier. Two of the six effects the bullet names are not produced at all: the agents/reviewers a change needs, and a radius-differentiated rollback."
+    na_reason_normative_text: null
+    partial_qualification_impact: "CANNOT_UNDERMINE. The two missing effects are allocation and recovery *planning* outputs, not governance decisions: the radius already decides what is traversed, what is retested, whether the human must approve, and (through radius_minimum_tier) the tier floor, and rollback itself is implemented and demonstrated atomically (K2.14-K2.16). A qualification scenario is scored on whether the OS admitted or refused work and whether propagation reached the right artefacts; neither depends on the OS naming reviewers or varying the rollback text by radius. The risk it leaves is under-resourcing a wide change, which qualification measures as a rework/repair count, not as a governance failure."
+    bullets:
+      - bullet: "R0-R5 or equivalent affects traversal/test scope/model tier/agents/human approval/rollback."
+        source_line: 650
+        status: PARTIAL
+        implementation_evidence: ["runtime/src/cit/mod.rs:433-855 (radius -> depth, semantic breadth, gate)", "framework/policies/CHANGE_POLICY.yaml graph_traversal_depth_by_radius / semantic_candidates_by_radius / human_gate_triggers", "framework/policies/MODEL_ROUTING_POLICY.yaml radius_minimum_tier", "runtime/src/routing.rs:64-180 (route)"]
+        automated_evidence: ["cargo test --test certification ws04*", "gov cit simulate", "gov route --radius"]
+        independent_evidence:
+          - "evidence/K34-materiality-and-radius.out K4.1-K4.5: the radius is produced and sets the traversal depth (0 at R0, 5 at R5), the semantic breadth (0 vs 24 candidates), whether human approval is required (false vs true) and, through MODEL_ROUTING_POLICY.radius_minimum_tier, the model tier (T1 T1 T2 T2 T3 T3 across R0..R5); the test set is the tests inside the traversed radius (evidence/K12-cit-p-and-e.out K2.10)"
+          - "evidence/K34-materiality-and-radius.out K4.6/K4.7 (both FAIL): the rollback consequence the OS states is byte-identical at R0 and R5, and no output of the impact names the agents or reviewers the change needs"
+        gap: "Two of the six effects the bullet lists are absent: the radius does not determine the agents/reviewers, and it does not differentiate the rollback consequence or plan."
+    health_scheduler_tiers: [G1, G2]
+    evidence_owners: [G1, G2, independent-heldout]
+    evidence_owner_actually_runs: "partial — the radius and its traversal/approval effects are observed at G1/G2; nothing observes the two effects that are absent, because there is nothing to observe."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "One change proposed at each radius: traversal depth, semantic breadth, test set and approval must differ as the policy states."
+      repo_b_challenge: "A legacy tree where a single edit reaches three modules: the radius must rise to R3+ from the cross-module threshold, not from the proposer's label."
+      hidden_oracle_fault_class: "A change whose true blast radius exceeds its computed one because a dependency is undeclared."
+      chaos_scale_soak: "not relevant: the radius computation is bounded by the traversal it configures."
+      retrieval_challenge: "Semantic breadth at R4/R5 on a weak profile must not inflate the impact set with noise presented as impact."
+      not_challengeable: null
+    adoption_obligation: "the radius rules are kernel policy; adopt must not let a project overlay lower them (POLICY_PRECEDENCE floors)."
+    residual_risk: "Agent allocation and a radius-differentiated rollback strategy are not produced. Orchestration compensates today by routing all change control at T3."
+    findings: [V1-K4-01]
+  - capability: L1
+    title: "Contradiction resolution"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:657-660
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIV §50"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All four bullets are executably evidenced: precedence resolves supersession before any contradiction is raised, an undecidable contradiction blocks the manifest and is routed to a gate, agent resolution is confined to an assessed, independent, in-policy case, and the rationale is recorded with evidence references checked against governed records."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "deterministic precedence first"
+        source_line: 657
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/context/contradictions.rs:1-600 (precedence, detect_among, route, resolution)", "runtime/src/context/manifest.rs:1029 (contradictions block the manifest)", "runtime/src/orchestration/gates.rs:1357-1700 (answer: agent_resolvable_when, independent assessment, rationale)", "framework/policies/HUMAN_GATE_POLICY.yaml agent_resolvable_when/human_only_triggers"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov context manifest", "gov decide"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L1.1: a superseded input is resolved by precedence and is not raised as a contradiction"
+        gap: null
+      - bullet: "low-impact/reversible/high-confidence agent resolution where allowed"
+        source_line: 658
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/context/contradictions.rs:1-600 (precedence, detect_among, route, resolution)", "runtime/src/context/manifest.rs:1029 (contradictions block the manifest)", "runtime/src/orchestration/gates.rs:1357-1700 (answer: agent_resolvable_when, independent assessment, rationale)", "framework/policies/HUMAN_GATE_POLICY.yaml agent_resolvable_when/human_only_triggers"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov context manifest", "gov decide"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L1.6-L1.8: the session that declared the assessment may not resolve on it; another session's L3+ agent may, within agent_resolvable_when, and the rationale is recorded"
+        gap: null
+      - bullet: "human escalation for consequential uncertainty"
+        source_line: 659
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/context/contradictions.rs:1-600 (precedence, detect_among, route, resolution)", "runtime/src/context/manifest.rs:1029 (contradictions block the manifest)", "runtime/src/orchestration/gates.rs:1357-1700 (answer: agent_resolvable_when, independent assessment, rationale)", "framework/policies/HUMAN_GATE_POLICY.yaml agent_resolvable_when/human_only_triggers"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov context manifest", "gov decide"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L1.2-L1.5/L1.9: an undecidable contradiction blocks the task's manifest, the task cannot be claimed, a contradiction gate is raised at dispatch, and an irreversible R4 human-only gate is refused to an agent"
+        gap: null
+      - bullet: "rationale/evidence recorded"
+        source_line: 660
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/context/contradictions.rs:1-600 (precedence, detect_among, route, resolution)", "runtime/src/context/manifest.rs:1029 (contradictions block the manifest)", "runtime/src/orchestration/gates.rs:1357-1700 (answer: agent_resolvable_when, independent assessment, rationale)", "framework/policies/HUMAN_GATE_POLICY.yaml agent_resolvable_when/human_only_triggers"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov context manifest", "gov decide"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L1.8: the resolution's rationale is stored on the decision; `gov decide --evidence` refuses an evidence id that is not a governed record (runtime/src/orchestration/gates.rs:1414-1424)"
+        gap: null
+    health_scheduler_tiers: [G2, G5]
+    evidence_owners: [G2, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — contradictions are detected by the suite (verification/reporting.rs:843-847 uses contradictions::detect_all) and block the manifest at dispatch."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Two current decisions on one decision_key: the task must be blocked, the gate raised and the resolution must set one aside."
+      repo_b_challenge: "A legacy tree with a decision superseded only in prose: precedence must not resolve it, so it must surface as a contradiction."
+      hidden_oracle_fault_class: "Two decisions that contradict only in prose with no shared key, delivered together as authority."
+      chaos_scale_soak: "1k decisions with a dense supersession forest: detection must stay bounded and deterministic."
+      retrieval_challenge: "A contradiction between an authoritative decision and a retrieved supplementary note must never be treated as a contradiction between authorities."
+      not_challengeable: null
+    adoption_obligation: "adopt must detect contradictions among legacy decisions before work is dispatched; the adoption baseline records them."
+    residual_risk: "Detection covers declared conflicts, supersession forks and decision conflicts keyed on decision_key/question/subject. Two decisions that contradict only in prose, with no shared key, are not detected."
+    findings: []
+  - capability: L2
+    title: "Human Decision Gate package"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:663-672
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIV §51-52"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All ten package fields are enforced as substantive content on agent-raised and system-raised gates alike, options must be real, answers must name an offered option even when owner-signed, and the permitted next actions are derived by the OS for the exact gate."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "plain-language question"
+        source_line: 663
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'plain-language question' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "why now"
+        source_line: 664
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'why now' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "current state"
+        source_line: 665
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'current state' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "options"
+        source_line: 666
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.2/L2.4/L2.6/L2.7: a package with no options is refused, and an option the package does not offer is refused even when the owner signed it"
+        gap: null
+      - bullet: "impact"
+        source_line: 667
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'impact' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "reversibility"
+        source_line: 668
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'reversibility' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "cost/rework"
+        source_line: 669
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'cost/rework' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "recommendation"
+        source_line: 670
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'recommendation' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "confidence"
+        source_line: 671
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.1-L2.3: a gate with only a question is refused GATE_PACKAGE_INCOMPLETE; a package missing 'confidence' is refused; a placeholder value ('', 'not assessed', 'tbd') is not substantive content"
+        gap: null
+      - bullet: "exact permitted next actions"
+        source_line: 672
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs:78-297 (package_fields, non_substantive, validate_package)", "runtime/src/orchestration/gates.rs:298-378 (option_authorises, next_actions)", "framework/policies/HUMAN_GATE_POLICY.yaml decision_package_fields/package_non_substantive_values/system_gate_package"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov gate create"]
+        independent_evidence:
+          - "evidence/L12-contradictions-and-package.out L2.5: the permitted next actions name this gate id and carry no `<gate>` placeholder; L2.8: a system-raised (contradiction) gate carries a complete, substantive package with four real options"
+        gap: null
+    health_scheduler_tiers: [G2, G3, human-gate]
+    evidence_owners: [G2, G3, human-gate, independent-heldout]
+    evidence_owner_actually_runs: "true — package validation runs on every gate creation, and the human-gate evidence class is the signed answer itself."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Every gate trigger raised in turn: each package must be complete and substantive with real options and OS-derived next actions."
+      repo_b_challenge: "A legacy 'approvals' file imported at adoption: it must not become an answered gate."
+      hidden_oracle_fault_class: "A package whose impact and reversibility statements are plausible but wrong."
+      chaos_scale_soak: "not relevant: package validation is per-gate."
+      retrieval_challenge: "not relevant: package content is authored, not retrieved."
+      not_challengeable: null
+    adoption_obligation: "adopt must not import legacy 'approvals' as answered gates; they have no package and no signed answer."
+    residual_risk: "The package's fields are checked for substance, not for accuracy: a gate can carry a plausible but wrong impact statement. Phase-4 fault class."
+    findings: []
+  - capability: L3
+    title: "Gate presentation"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:675-679
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIV §51-53", "ARCH-0003 §3, §8", "OWNER-DIRECTIVE-0004"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All five bullets are executably evidenced, including the full fabrication attack surface: CLI flags, environment variables, role claims and hand-written gate/decision records all fail to produce a human approval, and only an owner-signed document verified against the provisioned root's human-gate delegation does."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Gate in a file only is NOT presented."
+        source_line: 675
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/human_channel.rs:1-806 (anchor, signed answer, receipt, use-time re-verification)", "runtime/src/orchestration/gates.rs:787-874 (present, acknowledge)", "runtime/src/orchestration/gates.rs:970-1270 (verified_answer_in, task_gate_authorisation, human_approval_for)", "runtime/src/t2.rs (records are OS-sealed state)", "framework/policies/HUMAN_GATE_POLICY.yaml human_channel.standalone_anchor_when_unprovisioned: false (P2-ADJ-0001)"]
+        automated_evidence: ["cargo test --test certification ws03*/ws03_r3", "gov gate present/decide", "gov audit os_binding_integrity"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L3.1-L3.3: a newly raised gate is PENDING and not presented; hand-writing presented_in_chat in the record does not make it answerable (GATE_NOT_PRESENTED)"
+          - "evidence/X-crosscutting.out X2.1-X2.8: the answer re-verifies on the owner's second provisioned machine, is FOREIGN under another owner's root, and an unprovisioned machine has no human channel at all"
+        gap: null
+      - bullet: "It must surface in active human interface."
+        source_line: 676
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/human_channel.rs:1-806 (anchor, signed answer, receipt, use-time re-verification)", "runtime/src/orchestration/gates.rs:787-874 (present, acknowledge)", "runtime/src/orchestration/gates.rs:970-1270 (verified_answer_in, task_gate_authorisation, human_approval_for)", "runtime/src/t2.rs (records are OS-sealed state)", "framework/policies/HUMAN_GATE_POLICY.yaml human_channel.standalone_anchor_when_unprovisioned: false (P2-ADJ-0001)"]
+        automated_evidence: ["cargo test --test certification ws03*/ws03_r3", "gov gate present/decide", "gov audit os_binding_integrity"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L3.4-L3.10: rendering to an agent's stdout, in --json, or by an L1 worker never marks it presented to the human; only an owner-signed receipt (or the signed answer) does, and a receipt signed by an undelegated key is refused HUMAN_RECEIPT_UNAUTHENTICATED"
+          - "evidence/X-crosscutting.out X2.1-X2.8: the answer re-verifies on the owner's second provisioned machine, is FOREIGN under another owner's root, and an unprovisioned machine has no human channel at all"
+        gap: null
+      - bullet: "Presented ≠ answered."
+        source_line: 677
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/human_channel.rs:1-806 (anchor, signed answer, receipt, use-time re-verification)", "runtime/src/orchestration/gates.rs:787-874 (present, acknowledge)", "runtime/src/orchestration/gates.rs:970-1270 (verified_answer_in, task_gate_authorisation, human_approval_for)", "runtime/src/t2.rs (records are OS-sealed state)", "framework/policies/HUMAN_GATE_POLICY.yaml human_channel.standalone_anchor_when_unprovisioned: false (P2-ADJ-0001)"]
+        automated_evidence: ["cargo test --test certification ws03*/ws03_r3", "gov gate present/decide", "gov audit os_binding_integrity"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L3.11-L3.13: an acknowledged gate is still only PRESENTED, carries no answer, and the work it blocks stays blocked"
+          - "evidence/X-crosscutting.out X2.1-X2.8: the answer re-verifies on the owner's second provisioned machine, is FOREIGN under another owner's root, and an unprovisioned machine has no human channel at all"
+        gap: null
+      - bullet: "Declined/revoked/stale/other-CIT gates cannot authorise execution."
+        source_line: 678
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/human_channel.rs:1-806 (anchor, signed answer, receipt, use-time re-verification)", "runtime/src/orchestration/gates.rs:787-874 (present, acknowledge)", "runtime/src/orchestration/gates.rs:970-1270 (verified_answer_in, task_gate_authorisation, human_approval_for)", "runtime/src/t2.rs (records are OS-sealed state)", "framework/policies/HUMAN_GATE_POLICY.yaml human_channel.standalone_anchor_when_unprovisioned: false (P2-ADJ-0001)"]
+        automated_evidence: ["cargo test --test certification ws03*/ws03_r3", "gov gate present/decide", "gov audit os_binding_integrity"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L3.20-L3.25: a declining answer leaves the task blocked; a revoked gate withdraws the authorisation it had given; an answer signed for one gate cannot authorise another; and a CIT approval does not survive a widened manifest (APPROVAL_STALE)"
+          - "evidence/X-crosscutting.out X2.1-X2.8: the answer re-verifies on the owner's second provisioned machine, is FOREIGN under another owner's root, and an unprovisioned machine has no human channel at all"
+        gap: null
+      - bullet: "Human approval cannot be fabricated by agent/CLI metadata."
+        source_line: 679
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/human_channel.rs:1-806 (anchor, signed answer, receipt, use-time re-verification)", "runtime/src/orchestration/gates.rs:787-874 (present, acknowledge)", "runtime/src/orchestration/gates.rs:970-1270 (verified_answer_in, task_gate_authorisation, human_approval_for)", "runtime/src/t2.rs (records are OS-sealed state)", "framework/policies/HUMAN_GATE_POLICY.yaml human_channel.standalone_anchor_when_unprovisioned: false (P2-ADJ-0001)"]
+        automated_evidence: ["cargo test --test certification ws03*/ws03_r3", "gov gate present/decide", "gov audit os_binding_integrity"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L3.14-L3.19: --by human, --by <any string>, --role human, GOV_ROLE=human and GOV_HUMAN_GATE_APPROVED all fail to produce a human approval; a hand-written ANSWERED gate plus a matching decision record is T2 BROKEN, is not honoured, and is reported by the governance suite"
+          - "evidence/X-crosscutting.out X2.1-X2.8: the answer re-verifies on the owner's second provisioned machine, is FOREIGN under another owner's root, and an unprovisioned machine has no human channel at all"
+        gap: null
+    health_scheduler_tiers: [G0, G2, G3, human-gate]
+    evidence_owners: [G0, G2, G3, human-gate, independent-heldout]
+    evidence_owner_actually_runs: "true — os_binding_integrity reports a forged gate at high severity on this candidate (evidence/L34-presentation-and-blocking.out L3.19), and every consumer re-verifies the signed answer at use time."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "The full fabrication battery (flags, environment, role claims, forged records, another gate's signed answer, a widened manifest) against a provisioned machine."
+      repo_b_challenge: "A cloned repository on the owner's second machine and on a foreign owner's machine: the first honours the answer, the second does not."
+      hidden_oracle_fault_class: "A gate answered, then re-bound to a different subject by an edit the seal does not cover."
+      chaos_scale_soak: "Concurrent `gov decide` calls with the same signed answer: replay must be refused after the first."
+      retrieval_challenge: "not relevant: gate authority never comes from retrieval."
+      not_challengeable: null
+    adoption_obligation: "adopt/init must leave the machine provisioned with a root delegating `human-gate` before any governed answer is possible (OWNER-DECISION-P2-0002); an unprovisioned machine has no human channel at all."
+    residual_risk: "The support envelope is ARCH-0003 §1: a process that can write the administrator's machine state is outside it. `gov trust human-channel` reports whether the anchor is writable by the invoking account."
+    findings: []
+  - capability: L4
+    title: "Non-global blocking"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:682-683
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XIV §54"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "Both bullets are executably evidenced, together with the availability rule: a gate holds only its own branch, independent work stays runnable and claimable, every refusal is typed and names its scope, listed remedies stay available (including handoff.create), and only the explicit global stop refuses everything that mutates."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Independent runnable branches continue."
+        source_line: 682
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs (runnable/blocked/waiting_human, human_gate_dependencies)", "runtime/src/orchestration/gates.rs:582-603 (block_tasks), 1227-1270 (task_gate_authorisation)", "runtime/src/orchestration/control.rs (FREEZE_WRITES/PAUSE and gov resume)", "runtime/src/scheduler/catalogue.rs:83-170 (scoped hard blocks and their remedies)"]
+        automated_evidence: ["cargo test --test certification ws05*", "gov task dag", "gov health status"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L4.1-L4.3: the gate holds its own branch in waiting_human while the independent branch stays runnable and is actually claimed, and the DAG names the human-gate dependencies"
+          - "evidence/L34-presentation-and-blocking.out AV.1-AV.6 and evidence/X-crosscutting.out X1.1-X1.7: every refusal is typed and names its subject, the block's remedies stay available (including handoff.create), and no block refuses its own remedy (cit.execute and update.apply are admitted as remedies)"
+        gap: null
+      - bullet: "Global stop only when policy or critical-path state requires."
+        source_line: 683
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs (runnable/blocked/waiting_human, human_gate_dependencies)", "runtime/src/orchestration/gates.rs:582-603 (block_tasks), 1227-1270 (task_gate_authorisation)", "runtime/src/orchestration/control.rs (FREEZE_WRITES/PAUSE and gov resume)", "runtime/src/scheduler/catalogue.rs:83-170 (scoped hard blocks and their remedies)"]
+        automated_evidence: ["cargo test --test certification failure_injection", "gov freeze-writes / gov resume"]
+        independent_evidence:
+          - "evidence/L34-presentation-and-blocking.out L4.4-L4.6: only the explicit global stop (FREEZE_WRITES, a policy state an L4 sets) refuses everything that mutates; read-only planning stays available under it and `gov resume` lifts it"
+        gap: null
+    health_scheduler_tiers: [G0, G2, G5]
+    evidence_owners: [G0, G2, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — G0 is the hard-block guard exercised in evidence/X-crosscutting.out X1.*, and the DAG is recomputed on every dispatch."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "A plan with one gated branch and three independent ones: the three must run to completion while the gate waits."
+      repo_b_challenge: "A legacy tree where two branches share an undeclared file: the OS treats them as independent — the qualification must measure the resulting conflict."
+      hidden_oracle_fault_class: "A block whose declared scope is narrower than what it actually refuses."
+      chaos_scale_soak: "Many concurrent claims under an active block: the refusal set must stay exactly the protected one."
+      retrieval_challenge: "not relevant: blocking is graph- and policy-driven."
+      not_challengeable: null
+    adoption_obligation: "adopt must generate the DAG before dispatch, or 'independent branch' has no meaning; FREEZE_WRITES/PAUSE state must survive adoption."
+    residual_risk: "Independence is judged from the declared graph. Two branches that share an undeclared file dependency are treated as independent."
+    findings: []
+  - capability: M1
+    title: "T0-T3 or equivalent capability tiers"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:690-693
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XV §55-56"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "Three of the four tiers are reachable routing outcomes and the overlay cannot lower a kernel floor, but no class, role or radius resolves to the declared T0 deterministic/no-LLM tier."
+    na_reason_normative_text: null
+    partial_qualification_impact: "COULD_UNDERMINE only for a qualification design that scores cost or determinism of routing; it CANNOT_UNDERMINE the governance properties under test. No T0 route means deterministic work cannot be *routed* to a no-LLM tier, but the deterministic work the contract lists (SQL, graph, AST, parsing, validation, tests, generation) is performed by the OS itself outside the router, and every governance decision in this baseline was produced deterministically with no model at all. The concrete exposure is cost and latency on trivial classes, which Phase-4 measures through M4 telemetry rather than as a governance fault."
+    bullets:
+      - bullet: "deterministic/no-LLM route"
+        source_line: 690
+        status: ABSENT
+        implementation_evidence: ["runtime/src/routing.rs:24-180 (tier_for_class, route)", "framework/policies/MODEL_ROUTING_POLICY.yaml tiers/task_class_minimum_tier", "framework/roles/ROLES.yaml minimum_tier", "runtime/src/policy_precedence.rs (overlay floors)"]
+        automated_evidence: ["gov route --class <every declared class>"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M1.2 (FAIL): routing every task class the kernel declares, at the lowest-floor role, yields only T1, T2 and T3; no class, role or radius resolves to T0, and the overlay can only raise"
+        gap: "No routing outcome resolves to the declared T0 (deterministic / no-LLM) tier: the kernel's lowest task-class minimum is T1 and every kernel role's minimum_tier is >= T1."
+      - bullet: "lightweight route"
+        source_line: 691
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:24-180 (tier_for_class, route)", "framework/policies/MODEL_ROUTING_POLICY.yaml tiers/task_class_minimum_tier", "framework/roles/ROLES.yaml minimum_tier", "runtime/src/policy_precedence.rs (overlay floors)"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov route"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M1.1/M1.3-M1.5: the lightweight route is reached (documentation -> T1, implementation -> T2, architecture/security -> T3), an overlay that lowers a kernel floor does not take effect and the refused weakening is reported by `gov policy overrides`"
+        gap: null
+      - bullet: "strong engineering route"
+        source_line: 692
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:24-180 (tier_for_class, route)", "framework/policies/MODEL_ROUTING_POLICY.yaml tiers/task_class_minimum_tier", "framework/roles/ROLES.yaml minimum_tier", "runtime/src/policy_precedence.rs (overlay floors)"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov route"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M1.1/M1.3-M1.5: the strong engineering route is reached (documentation -> T1, implementation -> T2, architecture/security -> T3), an overlay that lowers a kernel floor does not take effect and the refused weakening is reported by `gov policy overrides`"
+        gap: null
+      - bullet: "frontier/high-reasoning route"
+        source_line: 693
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:24-180 (tier_for_class, route)", "framework/policies/MODEL_ROUTING_POLICY.yaml tiers/task_class_minimum_tier", "framework/roles/ROLES.yaml minimum_tier", "runtime/src/policy_precedence.rs (overlay floors)"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov route"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M1.1/M1.3-M1.5: the frontier/high-reasoning route is reached (documentation -> T1, implementation -> T2, architecture/security -> T3), an overlay that lowers a kernel floor does not take effect and the refused weakening is reported by `gov policy overrides`"
+        gap: null
+    health_scheduler_tiers: [G2, G5]
+    evidence_owners: [G2, G5, independent-heldout]
+    evidence_owner_actually_runs: "partial — `gov policy overrides` and doctor D027 observe a refused weakening (evidence/M-model-routing.out M1.5); no check asserts that a T0 route exists, which is why the absence is silent."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Route every task class and role and assert the tier floor; then attempt to lower each through the overlay."
+      repo_b_challenge: "A legacy overlay that already lowers a floor: adoption must refuse the weakening and report it."
+      hidden_oracle_fault_class: "A task routed below its class floor through a path the precedence evaluator does not cover."
+      chaos_scale_soak: "not relevant: routing is a pure function of policy and the task."
+      retrieval_challenge: "not relevant."
+      not_challengeable: null
+    adoption_obligation: "adopt writes MODEL_ROUTING_OVERRIDES.yaml from the overlay template; it must not be able to lower a kernel tier floor."
+    residual_risk: "No routing outcome resolves to T0, so the deterministic tier is declared but not selectable; deterministic work is instead performed by the OS itself outside the router."
+    findings: [V1-M1-01]
+  - capability: M2
+    title: "Reasoning requirement"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:696-696
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XV §56"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "The single bullet is executably evidenced: a task declares a minimum reasoning level, the router honours it, and a task cannot declare its way below its role's floor."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "low/medium/high/extra-high or equivalent minimum can be declared/enforced."
+        source_line: 696
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:64-180 (task minimum_reasoning/minimum_model_tier raise the requirement)", "framework/policies/MODEL_ROUTING_POLICY.yaml reasoning_levels", "framework/roles/ROLES.yaml default_reasoning"]
+        automated_evidence: ["cargo test --test certification ws03*", "gov route --task"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M2.1/M2.2: a task declaring extra_high/T3 routes at T3 extra_high, and a task declaring 'low' cannot route below its role's floor (high)"
+        gap: null
+    health_scheduler_tiers: [G2]
+    evidence_owners: [G2, independent-heldout]
+    evidence_owner_actually_runs: "true — the router applies the minimum on every route; `gov route --record` accepts a run below it without flagging (recorded as a later-lifecycle note)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Tasks declaring each reasoning level: the router must honour the maximum of task, role and radius."
+      repo_b_challenge: "A legacy task schema without minimum_reasoning: migration must supply the role default rather than 'low'."
+      hidden_oracle_fault_class: "A run recorded at a lower effort than the task declared, accepted without a flag."
+      chaos_scale_soak: "not relevant."
+      retrieval_challenge: "not relevant."
+      not_challengeable: null
+    adoption_obligation: "a task's declared minimum survives adoption/migration of the task schema."
+    residual_risk: "The router states the minimum; whether the harness actually runs the model at that reasoning level is recorded, not enforced, at run time (`gov route --record` accepts a lower-effort run)."
+    findings: []
+  - capability: M3
+    title: "Role defaults"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:699-700
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XV §57"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "Both bullets are executably evidenced: orchestration, memory and audit roles route at T3, and provider/model names resolve only from the overlay, leaving project state free of them."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "orchestration/memory/audit default to strong enough tier."
+        source_line: 699
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml (orchestrator/memory-engineer/independent-auditor minimum_tier T3)", "runtime/src/routing.rs:24-180 (providers/models read only from MODEL_ROUTING_OVERRIDES.yaml)"]
+        automated_evidence: ["gov route --role"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M3.1/M3.4: orchestration, memory and audit roles route at T3, and an overlay that lowers the orchestrator's reasoning default is refused"
+        gap: null
+      - bullet: "provider names are mapped externally without rewriting project state."
+        source_line: 700
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml (orchestrator/memory-engineer/independent-auditor minimum_tier T3)", "runtime/src/routing.rs:24-180 (providers/models read only from MODEL_ROUTING_OVERRIDES.yaml)"]
+        automated_evidence: ["gov route", "grep over spec/**"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M3.2/M3.3: mapping providers in the overlay makes the router choose provider-alpha/alpha-large, and no provider or model name appears anywhere in project state (spec/**)"
+        gap: null
+    health_scheduler_tiers: [G2]
+    evidence_owners: [G2, independent-heldout]
+    evidence_owner_actually_runs: "true — role floors are applied on every route and the overlay is evaluated through POLICY_PRECEDENCE."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Map two providers in the overlay and assert the chosen model and that no provider name enters project state."
+      repo_b_challenge: "A legacy project that hard-codes model names in spec records: adoption must flag them as project state that should live in the overlay."
+      hidden_oracle_fault_class: "A role whose floor is bypassed because the project declared a same-named role outside the kernel taxonomy."
+      chaos_scale_soak: "not relevant."
+      retrieval_challenge: "not relevant."
+      not_challengeable: null
+    adoption_obligation: "adopt must keep provider/model names out of project state; only the overlay carries them."
+    residual_risk: "Role minimum tiers come from the kernel ROLES.yaml; a project that declares its own roles outside the kernel taxonomy has no floor."
+    findings: []
+  - capability: M4
+    title: "Empirical routing"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:704-711
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XV §58"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "Six of the eight dimensions are comparable on the product's comparison surface. Reasoning effort and reviewer findings are required at record time and kept in the raw evidence, but neither `gov route --report` nor `gov telemetry summary` can group by or report them, so the comparison merges runs that differ only in reasoning effort and shows no reviewer-findings figure."
+    na_reason_normative_text: null
+    partial_qualification_impact: "CANNOT_UNDERMINE. Both missing dimensions are recorded per run and retained in routing/evidence.jsonl, so an advanced-qualification analysis can compute them offline; what is missing is the product's own comparison view. No governance admission, refusal or propagation decision depends on it. It does weaken the empirical-routing feedback loop the framework intends (a wrong reasoning level or a reviewer-finding regression will not surface in the product's report), which is a Phase-4 measurement-quality risk rather than a Phase-2 capability gap in what the OS enforces."
+    bullets:
+      - bullet: "model/provider"
+        source_line: 704
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.1/M4.3: every run records model and provider, and the report groups by both"
+        gap: null
+      - bullet: "task class"
+        source_line: 705
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.1/M4.3: every run records task_class and the report groups by it"
+        gap: null
+      - bullet: "reasoning effort"
+        source_line: 706
+        status: ABSENT
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.5 (FAIL): reasoning_effort is required at record time and kept in the raw evidence, but `gov route --report` and the model_routing block of `gov telemetry summary` group by provider|model|task_class only, so two runs of one model at extra_high and at low are merged into a single row (pass_rate 0.5)"
+        gap: "The comparison surface cannot separate runs by reasoning effort; the dimension exists only in the raw JSONL."
+      - bullet: "cost"
+        source_line: 707
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.1/M4.4: cost is required and reported as avg_cost"
+        gap: null
+      - bullet: "latency"
+        source_line: 708
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.1/M4.4: latency_ms is required and reported as avg_latency_ms"
+        gap: null
+      - bullet: "pass/fail"
+        source_line: 709
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.1/M4.4: pass is required and reported as pass_rate"
+        gap: null
+      - bullet: "repair count"
+        source_line: 710
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.1/M4.4: repair_count is required and reported as avg_repairs"
+        gap: null
+      - bullet: "reviewer findings"
+        source_line: 711
+        status: ABSENT
+        implementation_evidence: ["runtime/src/routing.rs:186-272 (record: every MODEL_ROUTING_POLICY.record_evidence field required)", "runtime/src/routing.rs:273-301 (report: groups by provider|model|task_class)", "runtime/src/observability.rs (telemetry mirror)", "framework/policies/MODEL_ROUTING_POLICY.yaml record_evidence"]
+        automated_evidence: ["gov route --record", "gov route --report", "gov telemetry summary"]
+        independent_evidence:
+          - "evidence/M-model-routing.out M4.6/M4.7 (FAIL): reviewer_findings is required at record time (M4.2 shows a run missing a declared field is refused) but appears in no column of `gov route --report` or `gov telemetry summary`"
+        gap: "The comparison surface reports no reviewer-findings figure; the dimension exists only in the raw JSONL."
+    health_scheduler_tiers: [G2, G5]
+    evidence_owners: [G2, G5, independent-heldout]
+    evidence_owner_actually_runs: "partial — `gov route --record` enforces the declared evidence fields at G2 (evidence/M-model-routing.out M4.2); no check asserts that the comparison surface can separate them."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "model/retrieval profile"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/N-checkpoints-and-handoffs.out N2.6: changing the provider map changes the routing digest and is observed as a before_model_switch boundary, so evidence taken under the old map is superseded"
+    qualification_coverage:
+      repo_a_challenge: "Record runs that differ only in reasoning effort and only in reviewer findings, then ask the product to compare them."
+      repo_b_challenge: "A legacy routing evidence file from an earlier schema: the report must not silently mis-aggregate it."
+      hidden_oracle_fault_class: "A routing recommendation drawn from a report that merged two materially different populations."
+      chaos_scale_soak: "100k recorded runs: the report must stay bounded and must not mis-sum."
+      retrieval_challenge: "not relevant."
+      not_challengeable: null
+    adoption_obligation: "the routing evidence file lives in the derived runtime directory; adopt/update must not discard it, or the comparison loses its history."
+    residual_risk: "The comparison surface cannot separate reasoning effort or show reviewer findings, so a routing decision taken from `gov route --report` cannot see two of the eight dimensions; the raw evidence retains them."
+    findings: [V1-M4-01]
+  - capability: N1
+    title: "Structured checkpoint"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:719-727
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XVI §59"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All nine recorded items are executably evidenced on a real checkpoint, including the OS-derived open questions, the context packet hash bound to a state reference, and every mandatory input with its delivered and current hash."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "session/role/task/mode/claim"
+        source_line: 719
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: session, role, task, mode and claim are all recorded (the claim carries task_id, session_id, role and expiry)"
+        gap: null
+      - bullet: "last completed step"
+        source_line: 720
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: last_completed_step is recorded"
+        gap: null
+      - bullet: "next action"
+        source_line: 721
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: next_action is recorded"
+        gap: null
+      - bullet: "pending decisions/questions"
+        source_line: 722
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: pending_decisions and open_questions are recorded; open_questions is derived by the OS from pending gates and blocking contradictions (runtime/src/checkpoints.rs:453-489), so it is empty only when there are none"
+        gap: null
+      - bullet: "open transactions"
+        source_line: 723
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: open_transactions is recorded"
+        gap: null
+      - bullet: "files changed"
+        source_line: 724
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: files_changed is recorded (from the working tree, with untracked directories expanded)"
+        gap: null
+      - bullet: "test status"
+        source_line: 725
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1: tests_status is recorded"
+        gap: null
+      - bullet: "context packet hash"
+        source_line: 726
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1/N1.2: context_packet_hash is recorded and bound together with a state reference (repo commit, governed-state digest and the index manifest hash)"
+        gap: null
+      - bullet: "memory snapshot/state reference"
+        source_line: 727
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:363-586 (create: every CHECKPOINT_POLICY.fields entry)", "runtime/src/checkpoints.rs:301-362 (task_inputs: inputs/input_state)", "runtime/src/checkpoints.rs:146-235 (routing_digest, governed_state_digest, observe_state)", "framework/policies/CHECKPOINT_POLICY.yaml fields"]
+        automated_evidence: ["cargo test --test certification ws04r2/ws04r3", "gov checkpoint create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N1.1/N1.3: memory_snapshot is recorded, and every mandatory input is recorded with its delivered and current hash"
+        gap: null
+    health_scheduler_tiers: [G3]
+    evidence_owners: [G3, independent-heldout]
+    evidence_owner_actually_runs: "true — every checkpoint is written through checkpoints::create, which fills each declared field, and G3 is the checkpoint/handoff tier."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "A checkpoint taken mid-task: every declared field must be populated from OS state, not from the caller."
+      repo_b_challenge: "A brownfield tree with prose session summaries: they must not be accepted as checkpoints."
+      hidden_oracle_fault_class: "A checkpoint that records an index reference taken before the change it claims to capture."
+      chaos_scale_soak: "A very large working tree: files_changed must stay bounded and must not omit untracked work."
+      retrieval_challenge: "not relevant: the checkpoint records the index identity, it does not retrieve."
+      not_challengeable: null
+    adoption_obligation: "adopt must create spec/reports/checkpoints and classify it as evidence; a brownfield tree's prose 'session summaries' are not checkpoints (CHECKPOINT_POLICY.prose_summary_as_checkpoint: prohibited)."
+    residual_risk: "files_changed comes from the working tree, so a change already committed and pushed before the checkpoint is not listed as changed."
+    findings: []
+  - capability: N2
+    title: "Mandatory triggers"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:730-737
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XVI §59-60"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All eight mandatory triggers fire: four are checkpointed automatically by the operation itself and four are observed as boundaries and checkpointed at the next gov invocation."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "task transition"
+        source_line: 730
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.1: releasing and re-claiming a task is observed as a task_transition boundary and checkpointed"
+        gap: null
+      - bullet: "material decision"
+        source_line: 731
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.2: an owner-signed answer to an R3 gate is observed as a material_decision boundary and checkpointed"
+        gap: null
+      - bullet: "accepted CIT"
+        source_line: 732
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.3: executing an approved CIT writes its own checkpoint with trigger accepted_cit"
+        gap: null
+      - bullet: "significant mutation"
+        source_line: 733
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.4: 30 changed repository files cross CHECKPOINT_POLICY.watchdog.max_operations_between_checkpoints and are checkpointed as significant_mutation"
+        gap: null
+      - bullet: "before handoff"
+        source_line: 734
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.5: `gov handoff create` writes the before_handoff checkpoint automatically"
+        gap: null
+      - bullet: "before model/provider switch"
+        source_line: 735
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.6: changing the provider map is observed as a before_model_switch boundary (the routing digest changed)"
+        gap: null
+      - bullet: "before session close"
+        source_line: 736
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.7: `gov session close` writes the before_session_close checkpoint"
+        gap: null
+      - bullet: "before known compaction"
+        source_line: 737
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:236-300 (triggers_between, state_triggers)", "runtime/src/checkpoints.rs:721-745 (observe_boundaries)", "runtime/src/checkpoints.rs:746-802 (watchdog)", "runtime/src/checkpoints.rs:803-900 (session_close)", "runtime/src/cit/mod.rs:1548+ (accepted CIT)", "runtime/src/orchestration/handoffs.rs:168-337 (before_handoff)", "framework/policies/CHECKPOINT_POLICY.yaml mandatory_triggers"]
+        automated_evidence: ["cargo test --test certification ws04r2", "gov checkpoint watchdog", "gov session close"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N2.8: context utilisation over CHECKPOINT_POLICY.watchdog.context_utilisation_threshold fires a checkpoint with reason context_utilisation (the known-compaction boundary)"
+        gap: null
+    health_scheduler_tiers: [G3]
+    evidence_owners: [G3, independent-heldout]
+    evidence_owner_actually_runs: "true — four triggers checkpoint inside the operation and four are observed by checkpoints::observe_boundaries on the next gov invocation (evidence/N-checkpoints-and-handoffs.out N2.1-N2.8)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Drive all eight triggers in one session and assert a checkpoint for each."
+      repo_b_challenge: "An adopted tree with no previous checkpoint: the first boundary must establish the baseline rather than fire spuriously."
+      hidden_oracle_fault_class: "A trigger that occurs and is then masked by a later checkpoint before any gov command observes it."
+      chaos_scale_soak: "A session that runs thousands of commands: the watchdog must fire on schedule, not once."
+      retrieval_challenge: "not relevant."
+      not_challengeable: null
+    adoption_obligation: "adopt/update must preserve the previous checkpoint so the first boundary after an upgrade has a baseline to compare against."
+    residual_risk: "Boundaries are observed when a gov command runs; a session that performs work and then dies without any further gov invocation checkpoints nothing at that moment (the next session's first command observes it)."
+    findings: []
+  - capability: N3
+    title: "Provider-independent checkpoint watchdog"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:740-742
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XVI §60"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All three bullets are executably evidenced: the watchdog fires on state the OS observes itself with the caller's counters at zero, a checkpoint goes STALE when the state it captured changes, and both session close and handoff are explicitly degraded (never silently) over stale state."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Does not depend solely on proprietary hooks."
+        source_line: 740
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:746-802 (watchdog: commands_since + files_changed_since, observed by the OS)", "runtime/src/checkpoints.rs:619-720 (freshness_of/freshness)", "runtime/src/checkpoints.rs:803-900 (session_close: degraded, never refused)", "runtime/src/orchestration/handoffs.rs:33-152 (handoff_freshness)"]
+        automated_evidence: ["gov checkpoint watchdog"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N3.1/N3.6: with the caller's counters at zero the watchdog still fires on gov commands and changed files it observed itself; its inputs are the command log and git, with no proprietary hook"
+        gap: null
+      - bullet: "Can mark checkpoint stale when material state changed."
+        source_line: 741
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:746-802 (watchdog: commands_since + files_changed_since, observed by the OS)", "runtime/src/checkpoints.rs:619-720 (freshness_of/freshness)", "runtime/src/checkpoints.rs:803-900 (session_close: degraded, never refused)", "runtime/src/orchestration/handoffs.rs:33-152 (handoff_freshness)"]
+        automated_evidence: ["gov checkpoint freshness"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N3.2/N3.3: a checkpoint over current state is CURRENT, and after a CIT changed an input it recorded it is STALE, with the upstream change and the changed input named"
+        gap: null
+      - bullet: "Handoff/session close can be blocked or degraded when checkpoint freshness violates policy."
+        source_line: 742
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/checkpoints.rs:746-802 (watchdog: commands_since + files_changed_since, observed by the OS)", "runtime/src/checkpoints.rs:619-720 (freshness_of/freshness)", "runtime/src/checkpoints.rs:803-900 (session_close: degraded, never refused)", "runtime/src/orchestration/handoffs.rs:33-152 (handoff_freshness)"]
+        automated_evidence: ["gov session close", "gov handoff create"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N3.4/N3.5: session close over stale state is explicitly degraded and not resumable (never refused), and a handoff over stale state reports the stale inputs, the invalidated previous packet and the refreshed one"
+        gap: null
+    health_scheduler_tiers: [G3, G5]
+    evidence_owners: [G3, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — `gov checkpoint freshness`, `gov session close` and `gov handoff create` each compute freshness on this candidate."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "Change an input a checkpoint recorded and assert STALE, then assert session close and handoff are degraded and say why."
+      repo_b_challenge: "A tree with no git history: the file counter degrades, so the command counter must carry the watchdog."
+      hidden_oracle_fault_class: "A checkpoint that stays CURRENT although an input it recorded changed through a path the freshness computation does not cover."
+      chaos_scale_soak: "Long sessions with no checkpoint: the watchdog must fire from the OS's own counters."
+      retrieval_challenge: "not relevant."
+      not_challengeable: null
+    adoption_obligation: "the command log and the git history are the watchdog's inputs; adopt into a tree with no git history degrades the file-change counter (the command counter still works)."
+    residual_risk: "Context utilisation is necessarily caller-supplied (only the harness knows it); it can only make the watchdog fire earlier, never later."
+    findings: []
+  - capability: N4
+    title: "Worker return contract"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:745-745
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XVI §61"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "The single bullet is executably evidenced: a schema-valid structured return is accepted, persisted as a governed record, survives the sub-session and is read back by a fresh session with no conversation state."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "structured result survives subagent conversation death."
+        source_line: 745
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/handoffs.rs:338-444 (return_result)", "framework/schemas/worker-return.schema.json", "runtime/src/context/receipt.rs (receipt_validation)"]
+        automated_evidence: ["cargo test --test certification ws05*", "gov handoff return"]
+        independent_evidence:
+          - "evidence/N-checkpoints-and-handoffs.out N4.1-N4.4: a schema-valid worker return is accepted, persisted as a governed record on disk, survives the sub-session, and is read back by a fresh session with no conversation state"
+          - "evidence/X-crosscutting.out X3.1/X3.2: the same schema-valid worker return is accepted by `gov task close --report` without a schema failure (the iteration-0 collision on `status` no longer occurs)"
+        gap: null
+    health_scheduler_tiers: [G3, G5]
+    evidence_owners: [G3, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — `gov handoff return` validates against the worker-return schema and records receipt_validation against the task's manifest."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["runtime/kernel implementation", "governing contract/policy", "schema", "authoritative spec/decision", "relevant source files", "relevant index manifest"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/X-crosscutting.out X4.1/X4.2: changing a governing policy changes the evidence currency key and the currency report names the changed classes; evidence/K12-cit-p-and-e.out K2.8-K2.11 and evidence/N-checkpoints-and-handoffs.out N3.3 show a CIT invalidating completed work, its evidence, its packet and its checkpoint"
+    qualification_coverage:
+      repo_a_challenge: "A subagent returns a schema-valid result and its session ends: a fresh session must reconstruct the work from the record alone."
+      repo_b_challenge: "A legacy handoff record from an earlier schema: migration must keep the returned result readable."
+      hidden_oracle_fault_class: "A return whose claims are plausible but false, accepted because the receipt validation was not consulted at close."
+      chaos_scale_soak: "Concurrent returns on one handoff: exactly one must be recorded as the return."
+      retrieval_challenge: "not relevant: the return is read by id."
+      not_challengeable: null
+    adoption_obligation: "the handoff records live in spec/; adopt must classify them and keep them indexed."
+    residual_risk: "The return's *content* is the worker's claim; the OS validates it against the task's manifest (receipt_validation) and records the result, but a plausible false claim is caught only by the close-time checks."
+    findings: []
