@@ -1,0 +1,21 @@
+# Pinned-input verification, P2-AR-0050
+
+$ product_identity.py 0bad524d836f179964ffbac31972856ea6434682
+commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+
+$ product_identity.py HEAD
+commit: 8588813ec1ef9c832879e258ca5acfb573ae996f
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+
+$ git rev-list -n1 cap2-candidate-1
+0bad524d836f179964ffbac31972856ea6434682
+
+$ sha256sum <contract> <frozen gate contract>
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e  release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+
+$ sha256sum target/release/gov
+a2e16e21d528e3b6de5431c87084e0bdfbd32c539eb6db1537572071e94538aa  target/release/gov

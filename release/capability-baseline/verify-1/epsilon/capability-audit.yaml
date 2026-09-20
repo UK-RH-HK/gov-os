@@ -1,0 +1,1627 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0050
+iteration: verify-1
+family: epsilon
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+bullet_count: 146
+capabilities:
+  - capability: O1
+    title: "Product test families"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:751-761
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part XVII §62"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "unit"
+        source_line: 752
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "contract"
+        source_line: 753
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "integration"
+        source_line: 754
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "system"
+        source_line: 755
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "acceptance"
+        source_line: 756
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "scenario"
+        source_line: 757
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "security"
+        source_line: 758
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "performance"
+        source_line: 759
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "recovery"
+        source_line: 760
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+      - bullet: "live/smoke"
+        source_line: 761
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Ten families declared in PROJECT_POLICY.tests.families were run by name by `gov health product`; the run is sealed into a governed record (record AUD-nnnn, record_binding.sealed true). Making this family exit non-zero turns the health state RED and raises product_test_health blocks (covered-paths and, for release.build, global); a closing report claiming tests.status passed against failing recorded evidence is refused PRODUCT_TEST_EVIDENCE_REQUIRED."
+        gap: null
+    health_scheduler_tiers: [G2, G4, G5, G6]
+    evidence_owners: [G2, G4, G5, G6, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "Repo A declares all ten families with runnable commands; the harness makes one fail and the run must be refused as covered work."
+      repo_b_challenge: "Repo B (brownfield) has an undeclared legacy test runner; adoption must classify it into a family or record a reasoned N/A."
+      hidden_oracle_fault_class: "a product defect whose only signal is a failing family the repository does not declare"
+      chaos_scale_soak: "kill the family process mid-run; the recorded evidence must not read passed"
+      retrieval_challenge: "not relevant: product tests are not retrieved"
+      not_challengeable: null
+    adoption_obligation: "adopt/update must resolve or declare the product test families and record their evidence per family"
+    residual_risk: "TEST_POLICY.product_families remains `overridable`, so a project may narrow its own family vocabulary (A0-O1-02, LOW, unchanged)."
+    findings: []
+  - capability: O2
+    title: "Governance test families"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:763-780
+    governing_document_refs: ["framework Part XVII §62-63"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "schema/invariants"
+        source_line: 764
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `schema_invariants`: a duplicate authoritative record id -> 1 finding"
+        gap: null
+      - bullet: "graph integrity"
+        source_line: 765
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `graph_integrity`: an unreferenced ACTIVE requirement -> orphan findings naming it"
+        gap: null
+      - bullet: "index freshness"
+        source_line: 766
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `index_freshness`: a governed record added and not indexed -> 1 finding naming the path"
+        gap: null
+      - bullet: "retrieval regression"
+        source_line: 767
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `retrieval_regression`: a recall floor above what the index can reach -> status FAIL, 1 finding"
+        gap: null
+      - bullet: "authority/role limits"
+        source_line: 768
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `authority_role_limits`: a project role the kernel ROLES.yaml does not define -> 1 finding"
+        gap: null
+      - bullet: "mutation scope"
+        source_line: 769
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `mutation_scope`: a kernel payload file edited in place -> 1 critical finding"
+        gap: null
+      - bullet: "repository/path-map compliance"
+        source_line: 770
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `repository_path-map_compliance`: a credential in a non-secret-class path -> 1 finding naming the file"
+        gap: null
+      - bullet: "context reproducibility"
+        source_line: 771
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `context_reproducibility`: the compiled packet's deterministic hash, size and per-task delivery state are measured and reported (no fault injected: a non-deterministic packet could not be constructed in a synthetic project)"
+        gap: null
+      - bullet: "concurrency/session claims"
+        source_line: 772
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `concurrency_session_claims`: live claims are measured (claims 1, expired 0) and a second session's claim of the same task is refused TASK_CLAIMED"
+        gap: null
+      - bullet: "adapter/model portability"
+        source_line: 773
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `adapter_model_portability`: a generated adapter drifted from its manifest -> 1 finding naming the output"
+        gap: null
+      - bullet: "skill regression"
+        source_line: 774
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `skill_regression`: declared skill scenarios are executed and their outcomes reported -> 7 findings"
+        gap: null
+      - bullet: "command-contract consistency"
+        source_line: 775
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `command-contract_consistency`: a contract entry naming a command the CLI lacks -> 1 finding"
+        gap: null
+      - bullet: "secrets/sensitivity indexing"
+        source_line: 776
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `secrets_sensitivity_indexing`: a secret-class file is excluded from the index (excluded 1) and no chunk of the live index carries the planted credential (0 rows)"
+        gap: null
+      - bullet: "recovery/rebuild"
+        source_line: 777
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `recovery_rebuild`: the tracked index manifest mismatched against the live index -> 1 finding, both hashes"
+        gap: null
+      - bullet: "fresh-agent reconstruction"
+        source_line: 778
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `fresh-agent_reconstruction`: a read budget of 0 files -> 1 finding (reads 6, budget 0)"
+        gap: null
+      - bullet: "product traceability"
+        source_line: 779
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `product_traceability`: traceability from product artefacts to governed authority is measured (tasks, done, task_traceability, untraceable_closed_tasks); no fault injected"
+        gap: null
+      - bullet: "audit reproducibility"
+        source_line: 780
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t08_o2_detection.py", "heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "O2 family `audit_reproducibility`: 31 checks compared by concurrent double run, 0 mismatches, on a full no-cache run; no non-reproducible check could be constructed"
+        gap: null
+    health_scheduler_tiers: [G1, G2, G3, G4, G5, G6]
+    evidence_owners: [G1, G2, G3, G4, G5, G6, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "each of the 17 families is given one seeded defect of its own class and must raise it"
+      repo_b_challenge: "the same, over a brownfield tree where the defect predates adoption"
+      hidden_oracle_fault_class: "a defect visible to exactly one family, to detect families that never detect"
+      chaos_scale_soak: "interrupt a sandboxed family; the live tree must be unchanged"
+      retrieval_challenge: "the retrieval-regression family is scored on the hidden memory oracle's queries"
+      not_challengeable: null
+    adoption_obligation: "adopt A11 runs the full governance suite; update runs it before admitting the new kernel"
+    residual_risk: "three families (context reproducibility, product traceability, audit reproducibility) were evidenced by the measurement they perform rather than by an injected failure this verifier could construct."
+    findings: []
+  - capability: O3
+    title: "Independent test authorship"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:782-785
+    governing_document_refs: ["framework Part XVII §63", "GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md (independent roles)"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Release-critical behavioural tests are authored independently of implementation."
+        source_line: 783
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t07_o3_independence.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A test obligation in an independence-required family that declares `independent_of_implementer: true` and `author_role: qa` does not open the DAG gate; the refusal states that those are the artefact's own claims, not evidence, and that independence comes from the recorded author of the content."
+        gap: null
+      - bullet: "Builder tests remain regression evidence, not independent certification."
+        source_line: 784
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t07_o3_independence.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A passing product family is recorded as attributed evidence of the run (source PROJECT_POLICY.tests.families.<fam>, attributed true) and claims no independent certification."
+        gap: null
+      - bullet: "Fresh verifier adds held-out tests."
+        source_line: 785
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t07_o3_independence.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Held-out retrieval queries are a first-class measured artefact (`gov memory verify`: queries 12, pending 2, min 5, measured true); placeholder queries are held `pending` and not counted. This verifier also added its own held-out suite (heldout/, 167 tests), which is what O3 asks of a fresh verifier."
+        gap: null
+    health_scheduler_tiers: [G2, G5, G6]
+    evidence_owners: [G2, G5, G6, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "the builder authors an acceptance test for its own work; the DAG must refuse it"
+      repo_b_challenge: "a legacy test of unknown authorship; adoption must not certify it as independent"
+      hidden_oracle_fault_class: "a fault only a genuinely independent test would catch"
+      chaos_scale_soak: "not relevant: authorship is a record property"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adoption A5/A10 must not accept the executor's own tests as independent"
+    residual_risk: "independence rests on the recorded role and session of a sealed close report; under OD-P2-01 roles stay adapter-declared, so a single actor controlling two declared roles and sessions is outside what this mechanism can distinguish. That is the trust-class question (D-0007), not an O3 defect."
+    findings: []
+  - capability: O4
+    title: "Governance suite currency"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:787-789
+    governing_document_refs: ["framework Part XVII §64"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "A green result becomes stale when relevant inputs change."
+        source_line: 788
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "From a legitimately current green baseline, changing any one of nine input classes alone moved the record from current to stale, naming exactly that class (project_policy, spec_decisions, spec_requirements, spec_architecture, source, sensitivity, path_map, tools_plugins, model_profile); the key covers 32 declared classes including the runtime binary's sha256 and the machine trust state."
+        gap: null
+      - bullet: "Governance-affecting work cannot close on stale green evidence."
+        source_line: 789
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A governance-class close is decided on a suite result the close gate runs itself for the CURRENT inputs (close_gate.governance_affecting true, g2.complete true, g2.inputs_hash = the post-change key), never on the pre-change green record, which was stale at that moment."
+        gap: null
+    health_scheduler_tiers: [G1, G2, G4, G5]
+    evidence_owners: [G1, G2, G4, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "close governance work, then change each input class and re-close"
+      repo_b_challenge: "a brownfield tree whose green record predates adoption"
+      hidden_oracle_fault_class: "a change in an input class the candidate is expected to miss"
+      chaos_scale_soak: "interrupt the suite between the change and the record"
+      retrieval_challenge: "not relevant: currency is content-keyed, not retrieved"
+      not_challengeable: null
+    adoption_obligation: "adopt/update must establish a green record current for the post-adoption inputs"
+    residual_risk: "none beyond the classes the key declares; a class the contract adds later would need adding to it."
+    findings: []
+  - capability: O5
+    title: "Governance Health Scheduler [NEW EXECUTION REFINEMENT]"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:791-808
+    governing_document_refs: ["framework Part XVII §62-64", "framework Part XXIII §75-76"]
+    requirement_class: EXECUTION_REFINEMENT
+    status: PARTIAL
+    status_justification: "PARTIAL: the two bullets 'G5 Full Suite' and 'health result provenance is recorded' are not met (finding E-O5-01); every other tier and every other scheduler requirement is met and was exercised."
+    na_reason_normative_text: null
+    partial_qualification_impact: "COULD_UNDERMINE — argued: advanced qualification (Phase 4) is observed at G6 and scored against the hidden oracle, and G6 runs every check fresh, so a qualification run is not scored on the unrun doctor half. But AC-5 requires the scheduler to be implemented enough to OBSERVE qualification work, and the G5 hosts that surround it (`gov audit`, `update --apply`, `release build`) report a full suite while leaving 35 declared checks — 15 of them hard-blocking, 8 at critical — unevaluated, and the RED/YELLOW/GREEN signal a qualification harness would read can therefore read GREEN over stale evidence. That is enough to undermine the qualification scenario's own instrumentation, so this is recorded as blocking AC-5."
+    bullets:
+      - bullet: "G0 Guard — every privileged/mutating command"
+        source_line: 793
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "Every governed operation passes one host API. Under FREEZE_WRITES the mutating commands are refused FROZEN; under an active block the guard refuses in scope, admits remedies and re-evaluates first."
+        gap: null
+      - bullet: "G1 Mutation — changed paths/schema/secrets/index invalidation"
+        source_line: 794
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "`observe` compares the tree with the last observed state before any committing operation and at status/continue/health status, and runs the impacted G1 checks on what changed — shown by a repair made with a plain file move being observed inside a `gov health guard` call."
+        gap: null
+      - bullet: "G2 Task Close — mutation scope/readiness/tests/references/memory freshness"
+        source_line: 795
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "`tasks::close` runs a G2 tier suite itself (g2.complete true) and refuses a self-attested tests status, an undeclared mutation, a stale index and a receipt that does not trace to its inputs."
+        gap: null
+      - bullet: "G3 Checkpoint/Handoff — claims/decisions/gates/checkpoint freshness"
+        source_line: 796
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "`handoff create` carries `health: {tier: G3, …}` from a G3 run over the claims/gates/change-control/continuity checks, and judges input currency (freshness REFRESHED, naming the stale input with its delivered and current hashes)."
+        gap: null
+      - bullet: "G4 Milestone — CIT-E/migration/memory/architecture changes"
+        source_line: 797
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "G4 is declared with the milestone duty, carries 39 checks, evaluates all of them and always writes a governance-suite record; the milestone input classes are observed at G4 rather than G1."
+        gap: null
+      - bullet: "G5 Full Suite — adopt/update/release/full audit"
+        source_line: 798
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "A G5 run evaluates all 39 governance-suite families, but not the 35 doctor checks the catalogue declares at G5, and reports the run complete with not_evaluated 0 (finding E-O5-01)."
+        gap: "the 35 doctor checks the catalogue declares at this tier are not executed by a tier run (finding E-O5-01)"
+      - bullet: "G6 Qualification — synthetic repos/chaos/soak/hidden tests"
+        source_line: 799
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "`gov health qualify` records a qualification run's health for each of the four kinds, only when the hidden oracle conforms and is separate and the score report is bound to it."
+        gap: null
+      - bullet: "dependency-aware impacted-test selection"
+        source_line: 802
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "A one-line source comment executed 18 of 39 checks and reused 21; a decision-record change selected a different set of 28; the selection is derived from each check's declared input classes."
+        gap: null
+      - bullet: "independent checks run in parallel when safe"
+        source_line: 803
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "parallelism.workers 4 with four named worker threads, and a run wall clock of 2338 ms against 5772 ms of executed check time — impossible serially."
+        gap: null
+      - bullet: "isolated worktrees/processes where required"
+        source_line: 804
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "Sandbox / OwnSandboxes checks reported isolated_in_sandbox true, left the live derived state byte-identical and disposed of their sandboxes."
+        gap: null
+      - bullet: "cache keyed by relevant content/policy/framework hashes"
+        source_line: 805
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "A per-check cache keyed on the digests of exactly the declared inputs: 32 of 39 reused unchanged, each naming its source result; a project-policy change re-executed all 39; an unrelated file change re-executed 18."
+        gap: null
+      - bullet: "RED/YELLOW/GREEN or equivalent machine state"
+        source_line: 806
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "GREEN on a clean provisioned repository, YELLOW on a warning-only failure, RED on an active hard-block, all three observed."
+        gap: null
+      - bullet: "hard-block vs warning semantics are explicit"
+        source_line: 807
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "All 74 catalogue entries declare enforcement.mode; a warning failure refused nothing while a hard-block failure refused exactly its scope, with typed refusals."
+        gap: null
+      - bullet: "health result provenance is recorded"
+        source_line: 808
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t01_ac5_scheduler.py", "heldout/t02_availability.py", "evidence/RUN-ALL.out", "evidence/E-O5-01-doctor-tier-gap.out", "evidence/G0-G3-tier-duties.out"]
+        independent_evidence_detail: "The health result carries tier, trigger, per-check status/duration/cache source/enforcement, per-class input digests, runtime identity, repository state, actor, machine trust, parallelism, cache mode, selection and times — but reports `complete: true, not_evaluated: 0` over a tier whose 35 doctor members it never enumerated (finding E-O5-01)."
+        gap: "the run reports `complete: true, not_evaluated: 0` although 35 declared members of the tier were never enumerated (finding E-O5-01)"
+    health_scheduler_tiers: [G0, G1, G2, G3, G4, G5, G6]
+    evidence_owners: [G0, G1, G2, G3, G4, G5, G6, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "kernel policy/schema", "project policy overlay", "the catalogue's declared inputs per check", "runtime identity", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "a trivial mutation must select a small impacted set; a critical mutation must block in scope"
+      repo_b_challenge: "the same on a brownfield tree with a large unclassified surface"
+      hidden_oracle_fault_class: "a defect planted in an input class the scheduler must map to a check"
+      chaos_scale_soak: "kill a worker mid-run; the result must be incomplete rather than falsely complete"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "init/adopt/update install the catalogue and the health store; post-adoption runs must reach GREEN"
+    residual_risk: "E-O5-01: a third of the declared G1/G5 tier is refreshed only by `gov doctor` or by the G0 guard's block re-evaluation, and a run reports itself complete regardless."
+    findings: [E-O5-01]
+  - capability: P1
+    title: "Execution telemetry"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:814-827
+    governing_document_refs: ["framework Part XVIII §65"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "PARTIAL: four of the thirteen fields (agent/model/provider identity, skill/tool versions, token input/output, files read/written) are carried but never produced by the OS (finding E-P2-01)."
+    na_reason_normative_text: null
+    partial_qualification_impact: "CANNOT_UNDERMINE — argued: the qualification oracle scores injected-defect detection, severity, impact-map, path-map, indexing, retrieval, recovery/chaos, human-gate and task-readiness correctness (Contract v3:1049-1060). None of them is computed from token accounting or from skill/tool version attribution, so a missing OS-produced token count changes no qualification measurement. The consequence is an operational blind spot (cost and model-power analysis), not a qualification one."
+    bullets:
+      - bullet: "agent/session/model/provider"
+        source_line: 815
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The field survives in the event record and is read back, but the OS does not produce it: `observability::emit` records whatever attributes the caller supplies, with no schema on them."
+        gap: "the OS produces no value for this field; a caller may assert anything"
+      - bullet: "role/task"
+        source_line: 816
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "skill/tool versions"
+        source_line: 817
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The field survives in the event record and is read back, but the OS does not produce it: `observability::emit` records whatever attributes the caller supplies, with no schema on them."
+        gap: "the OS produces no value for this field; a caller may assert anything"
+      - bullet: "context packet"
+        source_line: 818
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "retrieval queries/hits"
+        source_line: 819
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "token input/output"
+        source_line: 820
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The field survives in the event record and is read back, but the OS does not produce it: `observability::emit` records whatever attributes the caller supplies, with no schema on them."
+        gap: "the OS produces no value for this field; a caller may assert anything"
+      - bullet: "latency/cost"
+        source_line: 821
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "files read/written"
+        source_line: 822
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The field survives in the event record and is read back, but the OS does not produce it: `observability::emit` records whatever attributes the caller supplies, with no schema on them."
+        gap: "the OS produces no value for this field; a caller may assert anything"
+      - bullet: "tests"
+        source_line: 823
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "retries/failures"
+        source_line: 824
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "handoffs"
+        source_line: 825
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "decisions"
+        source_line: 826
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+      - bullet: "human interventions"
+        source_line: 827
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Produced or carried by the OS itself and read back from `.governance-runtime/telemetry/events.jsonl` and `gov telemetry summary`."
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "a scored run must produce every P1 field for every worker step"
+      repo_b_challenge: "the same through an adapter the project already had"
+      hidden_oracle_fault_class: "a step whose telemetry is expected to show retries and a model change"
+      chaos_scale_soak: "a worker killed mid-step must leave a failure event"
+      retrieval_challenge: "retrieval queries and hits per step are scored against the memory oracle"
+      not_challengeable: null
+    adoption_obligation: "adoption records the telemetry surface the project will emit into"
+    residual_risk: "E-P2-01: four telemetry fields are caller-asserted, so token and skill-version analysis rests on whatever an adapter chooses to report."
+    findings: [E-P2-01]
+  - capability: P2
+    title: "Organisational questions"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:829-838
+    governing_document_refs: ["framework Part XVIII §66"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "PARTIAL: five of the eight questions are answerable from `gov telemetry summary`, three are not, and cost is by task class rather than by feature (finding E-P2-01)."
+    na_reason_normative_text: null
+    partial_qualification_impact: "CANNOT_UNDERMINE — same argument as P1: no V4 metric is derived from the three unanswerable questions, and the five that are answerable already cover the rework, human-gate and first-pass signals a qualification review would read."
+    bullets:
+      - bullet: "rework by role"
+        source_line: 831
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Answerable from `gov telemetry summary`: `rework_by_role` (reports, repairs, repairs per report)"
+        gap: null
+      - bullet: "retrieval effect on token use"
+        source_line: 832
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Not answerable from anything the OS aggregates (finding E-P2-01)."
+        gap: "no token accounting (retrieval effect on token use), no per-skill metric (skill repair rate), no miss aggregate in the summary (retrieval misses)"
+      - bullet: "model over/under-power"
+        source_line: 833
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Answerable from `gov telemetry summary`: `model_routing` (runs, pass rate, avg cost, avg latency, avg repairs per provider|model|task class)"
+        gap: null
+      - bullet: "skill repair rate"
+        source_line: 834
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Not answerable from anything the OS aggregates (finding E-P2-01)."
+        gap: "no token accounting (retrieval effect on token use), no per-skill metric (skill repair rate), no miss aggregate in the summary (retrieval misses)"
+      - bullet: "human-gate concentration"
+        source_line: 835
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Answerable from `gov telemetry summary`: `human_gates_by_feature`"
+        gap: null
+      - bullet: "retrieval misses"
+        source_line: 836
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Not answerable from anything the OS aggregates (finding E-P2-01)."
+        gap: "no token accounting (retrieval effect on token use), no per-skill metric (skill repair rate), no miss aggregate in the summary (retrieval misses)"
+      - bullet: "cost by task/feature"
+        source_line: 837
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Answerable from `gov telemetry summary`: `cost_by_task_class` — by task class; not by feature"
+        gap: "cost is attributed to a task class, not a feature"
+      - bullet: "first-pass completion"
+        source_line: 838
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t04_gate_o_p.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Answerable from `gov telemetry summary`: `first_pass_completion_rate`"
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "the eight questions are answered from the run's own telemetry"
+      repo_b_challenge: "the same over a brownfield history"
+      hidden_oracle_fault_class: "a known rework pattern the answers must surface"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "retrieval misses are scored against the memory oracle"
+      not_challengeable: null
+    adoption_obligation: "no adoption obligation beyond P1's"
+    residual_risk: "E-P2-01."
+    findings: [E-P2-01]
+  - capability: Q1
+    title: "Lesson lifecycle"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:844-852
+    governing_document_refs: ["framework Part XIX §67", "GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §13-15"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "PARTIAL: the lifecycle is modelled and its human-approval stage is fully established, but corroboration, scope classification, independent validation and the governed-version link rest on free edits of the record (finding E-Q1-01)."
+    na_reason_normative_text: null
+    partial_qualification_impact: "CANNOT_UNDERMINE — argued: the qualification repositories exercise detection, impact, path map, memory and governed action; the lesson lifecycle feeds the upstream export path, which Phase 4 does not execute, and whose terminal stage (human approval) IS fully established — an unvalidated lesson cannot leave the repository without the product owner's signed answer. Nothing in the lifecycle gap changes what the OS detects or refuses inside a qualification repository."
+    bullets:
+      - bullet: "execution/report"
+        source_line: 845
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The lesson record carries `sources`, and worker-return lessons become candidates."
+        gap: "this verifier did not establish that a task-closing report's lessons become candidates; iteration 0 found they do not"
+      - bullet: "lesson candidate"
+        source_line: 846
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A lesson is recorded at `lifecycle: candidate` and the state is honoured by the record store."
+        gap: null
+      - bullet: "corroboration"
+        source_line: 847
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "`corroboration` is a field of the record."
+        gap: "nothing establishes it: a lesson at `lifecycle: candidate` with no corroboration prepares an export packet (finding E-Q1-01)"
+      - bullet: "scope classification"
+        source_line: 848
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "`scope` is a field of the record and the export gate enforces eligibility from it (UPSTREAM_SCOPE for PROJECT and PRODUCT)."
+        gap: "the classification itself is a free edit of the record; the product does not re-derive it"
+      - bullet: "rule/skill/retrieval/tool proposal"
+        source_line: 849
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "`suggested_change` is carried into `gov lessons cluster`, which produces a cluster with its severity, trigger, confidence, suggested change and release action."
+        gap: null
+      - bullet: "independent validation"
+        source_line: 850
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "`validated_by` is a field of the record."
+        gap: "nothing establishes independent validation; unlike test authorship, it is not taken from a recorded author (finding E-Q1-01)"
+      - bullet: "human approval where required"
+        source_line: 851
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Export requires an answered Human Decision Gate on an authenticated channel: `--approved-by <string>` is refused HUMAN_GATE_REQUIRED, an unprovisioned machine is refused HUMAN_CHANNEL_UNAVAILABLE, and an owner-signed answer bound to the presented package's sha256, gate instance and nonce is accepted."
+        gap: null
+      - bullet: "governed version"
+        source_line: 852
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "`gov lessons cluster` writes Framework Change Proposals once a cluster's trigger threshold is met; with a single lesson it recorded `release_action: accumulate` and wrote none."
+        gap: "this verifier did not produce an FCP, nor a link from one to a governed release"
+    health_scheduler_tiers: [G4, G5]
+    evidence_owners: [G4, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "a seeded failure must yield a corroborated, classified, validated lesson"
+      repo_b_challenge: "a legacy postmortem must enter the lifecycle at the right stage"
+      hidden_oracle_fault_class: "two runs of the same failure mode: corroboration must be established, not asserted"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "lesson retrieval must not outrank authority"
+      not_challengeable: null
+    adoption_obligation: "adoption must not import legacy 'lessons' at a lifecycle stage they have not reached"
+    residual_risk: "E-Q1-01: four lifecycle stages are asserted by the record rather than established by the product."
+    findings: [E-Q1-01]
+  - capability: Q2
+    title: "Decision vs lesson"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:854-856
+    governing_document_refs: ["framework Part XIX §67"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "PARTIAL: decisions record the chosen action, but a lesson may record itself AUTHORITATIVE unchallenged (finding E-Q2-01)."
+    na_reason_normative_text: null
+    partial_qualification_impact: "CANNOT_UNDERMINE — argued: the claim buys no authority. The deterministic authority block of a compiled context packet carries no lesson field, so a lesson marked AUTHORITATIVE does not enter the authority a worker is given, and no gate, close or admission decision reads a lesson's state_class. A hidden-oracle fault of the 'superseded material treated as authoritative' class is injected into the record types the packet DOES carry, and those are governed by schema_invariants and authority_unambiguous, both of which this verifier showed detecting it."
+    bullets:
+      - bullet: "Lessons are evidence, not authority."
+        source_line: 855
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The deterministic authority block of a compiled context packet carries no lesson field, so a lesson confers no authority there."
+        gap: "a lesson record may nevertheless carry `state_class: AUTHORITATIVE` and no family raises a finding (finding E-Q2-01)"
+      - bullet: "Decisions record chosen action."
+        source_line: 856
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "`decision.schema.json` carries `chosen_option` and `rationale`; a gate answer records the chosen option through the owner-signed channel."
+        gap: null
+    health_scheduler_tiers: [G1, G4, G5]
+    evidence_owners: [G1, G4, G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "a lesson contradicting a decision must not override it"
+      repo_b_challenge: "a legacy 'lessons' document must not be admitted as authority"
+      hidden_oracle_fault_class: "a lesson that asserts the opposite of the hidden authoritative truth"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "the lesson must not displace the decision in retrieval"
+      not_challengeable: null
+    adoption_obligation: "adoption classifies legacy lesson-like documents as EVIDENCE, never AUTHORITATIVE"
+    residual_risk: "E-Q2-01: an authority claim the OS neither honours nor refuses may mislead a human reader."
+    findings: [E-Q2-01]
+  - capability: Q3
+    title: "PROJECT/PRODUCT/FRAMEWORK scope"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:858-859
+    governing_document_refs: ["Release/Distribution protocol §13"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Only FRAMEWORK candidates are eligible for upstream export."
+        source_line: 859
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "PROJECT and PRODUCT lessons are refused UPSTREAM_SCOPE at `gov upstream prepare`; only the FRAMEWORK lesson prepared a packet."
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "PROJECT, PRODUCT and FRAMEWORK lessons; only the last is eligible"
+      repo_b_challenge: "a mis-scoped legacy lesson"
+      hidden_oracle_fault_class: "a lesson whose true scope differs from its declared scope"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adoption records the project's scope so PROJECT material never becomes FRAMEWORK material"
+    residual_risk: "scope is asserted by the record (see Q1)."
+    findings: []
+  - capability: Q4
+    title: "Upstream Export Gate"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:861-866
+    governing_document_refs: ["Release/Distribution protocol §14", "framework Part XIX §68"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "sanitisation"
+        source_line: 862
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Every prepared packet reports its scans: identifiers redacted, paths removed, secret hits, code lines, and content controls measured against the project corpus and the known index chunks."
+        gap: null
+      - bullet: "secret/sensitivity scan"
+        source_line: 863
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A lesson carrying an AWS key is refused UPSTREAM_BLOCKED, naming each secret pattern and the field it was found in."
+        gap: null
+      - bullet: "outbound allowlist/default deny"
+        source_line: 864
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A remote destination is refused REMOTE_TRANSPORT_NOT_CONFIGURED and a destination that is not a canonical lessons/inbox is refused UPSTREAM_DESTINATION — default deny on both axes."
+        gap: null
+      - bullet: "synthetic reproducer preference"
+        source_line: 865
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "The delivered inbox held `packet.yaml` and the declared synthetic reproducer's files and nothing else."
+        gap: null
+      - bullet: "no raw project/customer/vector-store export"
+        source_line: 866
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t06_gate_q.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "No secret, customer identifier, project path or project name was present anywhere in the delivered inbox; raw code and dumped rows are refused by the content controls rather than by filename."
+        gap: null
+    health_scheduler_tiers: [G5]
+    evidence_owners: [G5, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "packets seeded with secrets, customer names, paths, raw code and vector rows"
+      repo_b_challenge: "the same drawn from real brownfield material"
+      hidden_oracle_fault_class: "a secret the scanner is expected to miss by pattern but catch by content"
+      chaos_scale_soak: "interrupt a submission; nothing partial may reach the inbox"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adoption must classify sensitivity before any packet can be prepared"
+    residual_risk: "content controls are heuristics over a measured corpus; a novel encoding is a Phase-4 challenge."
+    findings: []
+  - capability: U
+    title: "Framework Health SLOs"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:976-1008
+    governing_document_refs: ["framework Part XXIII §75-76"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "PARTIAL: all fifteen SLOs are tracked and thresholded and fourteen crossings were shown to change the health state; the fifteenth (governance-suite freshness) crosses but its owning check is never run by a tier (finding E-O5-01). All thirteen HEALTHY conditions are enforced by named checks and the conjunction holds only when all thirteen hold."
+    na_reason_normative_text: null
+    partial_qualification_impact: "COULD_UNDERMINE — argued the same way as O5, and for the same single cause: the SLO whose crossing does not reach the machine state is governance-suite freshness, which is exactly the signal a qualification harness would use to decide whether the evidence it is about to score is current. It is not a second defect: repairing E-O5-01 repairs it."
+    bullets:
+      - bullet: "governance-suite freshness"
+        source_line: 979
+        status: PARTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold (TEST_POLICY.green_record_currency) and owner D021; crossing it was demonstrated (current false, changed class named)."
+        gap: "its owning check D021 is a doctor check no tier run executes, so the crossing leaves the RED/YELLOW/GREEN state GREEN until `gov doctor` runs (finding E-O5-01)"
+      - bullet: "product-test health"
+        source_line: 980
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "retrieval Recall@K"
+        source_line: 981
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "stale-index count"
+        source_line: 982
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "orphan-graph count"
+        source_line: 983
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "unresolved contradictions"
+        source_line: 984
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "unresolved human gates"
+        source_line: 985
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "task traceability %"
+        source_line: 986
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "feature readiness coverage"
+        source_line: 987
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "context packet size"
+        source_line: 988
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "tokens/completed task"
+        source_line: 989
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "first-pass completion"
+        source_line: 990
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "handoff failure"
+        source_line: 991
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "memory rebuild success"
+        source_line: 992
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "fresh-agent reconstruction success"
+        source_line: 993
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Computed with a declared threshold and a declared owning check; this verifier crossed it and the health state changed away from GREEN."
+        gap: null
+      - bullet: "authority unambiguous"
+        source_line: 996
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "no accidental legacy authority"
+        source_line: 997
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks whose detection this verifier demonstrated individually (heldout/t08_o2_detection.py); the condition was observed holding, and the conjunction is enforced by the same mechanism that was shown to fail for the eight conditions this verifier flipped."
+        gap: null
+      - bullet: "deterministic state consistent"
+        source_line: 998
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks whose detection this verifier demonstrated individually (heldout/t08_o2_detection.py); the condition was observed holding, and the conjunction is enforced by the same mechanism that was shown to fail for the eight conditions this verifier flipped."
+        gap: null
+      - bullet: "graph/index freshness passes"
+        source_line: 999
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "retrieval meets thresholds"
+        source_line: 1000
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "sensitive material isolated"
+        source_line: 1001
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks whose detection this verifier demonstrated individually (heldout/t08_o2_detection.py); the condition was observed holding, and the conjunction is enforced by the same mechanism that was shown to fail for the eight conditions this verifier flipped."
+        gap: null
+      - bullet: "feature readiness explicit"
+        source_line: 1002
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "task runnable/blocked state correct"
+        source_line: 1003
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks whose detection this verifier demonstrated individually (heldout/t08_o2_detection.py); the condition was observed holding, and the conjunction is enforced by the same mechanism that was shown to fail for the eight conditions this verifier flipped."
+        gap: null
+      - bullet: "tests/traceability satisfy policy"
+        source_line: 1004
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "governance suite current/green"
+        source_line: 1005
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "no unresolved critical audit finding"
+        source_line: 1006
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "fresh strong agent reconstructs state within budget"
+        source_line: 1007
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks; this verifier drove it from HOLDS to FAILS and the repository verdict left HEALTHY with it named."
+        gap: null
+      - bullet: "derived memory is rebuildable"
+        source_line: 1008
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t03_gate_u.py", "heldout/t08_o2_detection.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "Evaluated by named enforcing checks whose detection this verifier demonstrated individually (heldout/t08_o2_detection.py); the condition was observed holding, and the conjunction is enforced by the same mechanism that was shown to fail for the eight conditions this verifier flipped."
+        gap: null
+    health_scheduler_tiers: [G1, G3, G4, G5, G6]
+    evidence_owners: [G1, G3, G4, G5, G6, independent-heldout]
+    evidence_owner_actually_runs: "true — every named tier was executed on this candidate and its membership reported (`gov health checks`, `gov health run --tier <G>`), except that a G1 or G5 run does not execute the doctor half of its own declared membership (finding E-O5-01)."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["every input class of the currency key", "the latest outcome of every owning check", "the effective policy values the thresholds name"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "each SLO driven across its threshold and each condition violated in turn"
+      repo_b_challenge: "a brownfield tree that starts below several thresholds"
+      hidden_oracle_fault_class: "a repository the oracle declares UNHEALTHY for exactly one condition"
+      chaos_scale_soak: "a killed rebuild must fail memory_rebuild_success"
+      retrieval_challenge: "Recall@K is scored against the hidden memory oracle"
+      not_challengeable: null
+    adoption_obligation: "adopt A11 and post-adoption health must evaluate every SLO and every condition"
+    residual_risk: "E-O5-01 as it reaches Gate U: the governance-suite-freshness crossing does not move the machine state."
+    findings: [E-O5-01]
+  - capability: V1
+    title: "Fault manifest"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1016-1026
+    governing_document_refs: ["framework Part XXIV"]
+    requirement_class: TESTING_REFINEMENT
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "fault ID"
+        source_line: 1018
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "class"
+        source_line: 1019
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "hidden authoritative truth"
+        source_line: 1020
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "injected repository state"
+        source_line: 1021
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected detection"
+        source_line: 1022
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected severity"
+        source_line: 1023
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected impacted artefacts/nodes"
+        source_line: 1024
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected governed action"
+        source_line: 1025
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "forbidden outcomes"
+        source_line: 1026
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+    health_scheduler_tiers: [G6]
+    evidence_owners: [G6, independent-heldout]
+    evidence_owner_actually_runs: "true — the named tier was executed on this candidate and its membership reported."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "the fault manifest of Repo A is validated before any fault is injected"
+      repo_b_challenge: "the same for Repo B"
+      hidden_oracle_fault_class: "this capability IS the oracle format"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "none: the oracle is verifier-owned and lives outside the repository"
+    residual_risk: "the format is PROPOSED until the AC-6 reviewer accepts it; no hidden fault may be generated before."
+    findings: []
+  - capability: V2
+    title: "Hidden path-map oracle"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1028-1036
+    governing_document_refs: ["framework Part XXIV"]
+    requirement_class: TESTING_REFINEMENT
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "current artefact"
+        source_line: 1030
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "correct classification"
+        source_line: 1031
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "authority"
+        source_line: 1032
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected target path"
+        source_line: 1033
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE"
+        source_line: 1034
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected references/consumers"
+        source_line: 1035
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "sensitivity/indexing expectation"
+        source_line: 1036
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+    health_scheduler_tiers: [G6]
+    evidence_owners: [G6, independent-heldout]
+    evidence_owner_actually_runs: "true — the named tier was executed on this candidate and its membership reported."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "not relevant: V2 is the brownfield oracle"
+      repo_b_challenge: "the path-map oracle of Repo B"
+      hidden_oracle_fault_class: "this capability IS the oracle format"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "none, as V1"
+    residual_risk: "as V1"
+    findings: []
+  - capability: V3
+    title: "Hidden memory oracle"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1038-1045
+    governing_document_refs: ["framework Part XXIV"]
+    requirement_class: TESTING_REFINEMENT
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "which material must be indexed"
+        source_line: 1039
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "which must never be indexed"
+        source_line: 1040
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected authority namespace"
+        source_line: 1041
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected current/superseded status"
+        source_line: 1042
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected graph relationships"
+        source_line: 1043
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected code symbols"
+        source_line: 1044
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+      - bullet: "expected retrieval results"
+        source_line: 1045
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element."
+        gap: null
+    health_scheduler_tiers: [G6]
+    evidence_owners: [G6, independent-heldout]
+    evidence_owner_actually_runs: "true — the named tier was executed on this candidate and its membership reported."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "the memory oracle of Repo A"
+      repo_b_challenge: "the memory oracle of Repo B"
+      hidden_oracle_fault_class: "this capability IS the oracle format"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "the expected retrieval results are the retrieval challenge"
+      not_challengeable: null
+    adoption_obligation: "none, as V1"
+    residual_risk: "as V1"
+    findings: []
+  - capability: V4
+    title: "Quantitative qualification scoring"
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1047-1060
+    governing_document_refs: ["framework Part XXIV"]
+    requirement_class: TESTING_REFINEMENT
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "PRESENT_AND_SUBSTANTIAL: every checklist bullet is implemented and executably evidenced on this candidate by this verifier's own held-out probes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "injected defect detection recall"
+        source_line: 1049
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "false positives"
+        source_line: 1050
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "severity accuracy"
+        source_line: 1051
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "impact-map accuracy"
+        source_line: 1052
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "path-map accuracy"
+        source_line: 1053
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "missed authoritative artefacts"
+        source_line: 1054
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "wrong-indexing count"
+        source_line: 1055
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "stale-index count"
+        source_line: 1056
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "retrieval metrics"
+        source_line: 1057
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "recovery/chaos pass rate"
+        source_line: 1058
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "human-gate correctness"
+        source_line: 1059
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+      - bullet: "task/readiness correctness"
+        source_line: 1060
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: [runtime/src/scheduler/, runtime/src/verification/, runtime/src/qualification_oracle.rs, runtime/src/observability.rs, runtime/src/upstream.rs, framework/health/HEALTH_SLOS.yaml, framework/qualification-oracle/]
+        automated_evidence: ["cargo test --release --lib (276 passed, 0 failed)", "cargo test --release --test certification (207 passed, 0 failed)"]
+        independent_evidence: ["heldout/t05_gate_v_oracle.py", "evidence/RUN-ALL.out"]
+        independent_evidence_detail: "A field of the machine-checkable format, mapped to this owner-source line by the product's own crosswalk; removing it from a conforming document is refused, naming the pointer and this element. Score arithmetic and the oracle binding are checked, not trusted."
+        gap: null
+    health_scheduler_tiers: [G6]
+    evidence_owners: [G6, independent-heldout]
+    evidence_owner_actually_runs: "true — the named tier was executed on this candidate and its membership reported."
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation", "governing contract/policy", "authoritative spec/decision", "relevant index manifest", "runtime/kernel implementation", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "heldout/t04_gate_o_p.py (nine input classes, each one alone moving the green record from current to stale) and heldout/t01_ac5_scheduler.py (AC5-5, AC5-5b, AC5-6: cache invalidation and stale-evidence reporting)"
+    qualification_coverage:
+      repo_a_challenge: "the score report of Repo A, bound to its oracle"
+      repo_b_challenge: "the score report of Repo B"
+      hidden_oracle_fault_class: "this capability IS the scoring format"
+      chaos_scale_soak: "the chaos pass rate is one of its metrics"
+      retrieval_challenge: "the retrieval metrics are among its twelve"
+      not_challengeable: null
+    adoption_obligation: "none, as V1"
+    residual_risk: "as V1"
+    findings: []

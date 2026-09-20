@@ -1,0 +1,15 @@
+### G3 — handoff.create runs the G3 tier and judges input currency
+health   : {"tier": "G3", "verdict": "HEALTHY", "health_result": "HR-20260920T215754499Z-cb865e3a", "counts": {"critical": 0, "high": 0, "medium": 0, "low": 4}}
+freshness: "REFRESHED" [{"id": "D-G3", "delivered": "dbab5bbf89384b5f7f22205279f1be3ff54b252ee7c0fbd39f010d9662aef864", "current": "a5a276c8e7bb9bf8f8176435691752cb41e7bba9862eaa4bec7d170dc70ffba6"}]
+policy   : handoff: unsatisfied mandatory inputs -> refused (HANDOFF_INPUTS_UNSATISFIED); stale packet -> re-delivered at current inputs, degraded when work was in progress on the stale inputs; session close: ne
+
+### G0 — every privileged/mutating command is guarded (census under FREEZE_WRITES)
+task create --objective x --title x --class governance --allowed docs/x FROZEN
+task status TASK-0001 READY                                FROZEN
+gate create --question q --fields {}                       FROZEN
+adapters generate                                          FROZEN
+memory heldout-starter                                     FROZEN
+adopt baseline                                             FROZEN
+telemetry emit --name x --attrs {}                         OK
+plugins list                                               OK
+(telemetry emit and plugins list are machine-local derived state / read-only, allowed by design)
