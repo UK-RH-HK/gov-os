@@ -306,13 +306,36 @@ session and role. **An installation is a material governance and security change
 lives under `governance/project/tools/`, so `gov tools install` proposes the installation's change transaction itself
 (`origin: system`, `system.kind: tool-installation`, one `install_tool` manifest operation carrying the descriptor as
 given, the installation subject, the installing role and whether the install command runs; CIT-P simulated
-automatically, its own gate raised under CHANGE_POLICY), and CIT-E alone writes the descriptor (`tools::
-apply_installation`, which re-derives the request, requires exactly the approved subject, re-verifies the installation
-approval where a condition failed and refuses a role without installation authority). An installation made inside a
-claimed task therefore closes on the transaction's recorded writes. Where an auto-install condition failed there are two
-approvals, each naming the other; where every condition held — a governed security review evidencing the security one —
-no gate is raised for the installation subject and the transaction's own gate is the only one, because under the shipped
-`CHANGE_POLICY` a `governance_change` needs a human gate.
+automatically), and CIT-E alone writes the descriptor (`tools::apply_installation`, which re-derives the request,
+requires exactly the approved subject, re-verifies the installation approval where a condition failed and refuses a
+role without installation authority). An installation made inside a claimed task therefore closes on the transaction's
+recorded writes.
+
+**Whether that transaction needs the owner's gate is `OD-P2-03`** (product owner, 2026-09-20; governed record
+`D-0011`), stated as policy data in `CHANGE_POLICY.change_classes.tool_installation` with
+`TOOL_POLICY.installation_envelope`, so `gov policy effective CHANGE_POLICY` and an auditor read the rule rather than
+inferring it from code. **It does not** when the tool is authenticated and pinned, independently governed-reviewed,
+registered, reversible and stays entirely inside the project's already-authorised permission and trust envelope — each
+condition mapped to the `TOOL_POLICY.auto_install_conditions` entry that decides it, and a condition the policy does
+not declare cannot hold. **It does** when the installation expands authority: privilege escalation, broader filesystem
+or project access, new secret or credential access, host-level authority, governance or security-policy mutation, or a
+new or unrestricted network trust boundary. Ordinary network use already authorised by project or tool policy (an
+approved registry, an allowlisted service, by a role that already holds a network class) is not by itself elevated.
+
+The envelope is computed by `tools::installation_authority` from **trusted OS state** — `TOOL_PERMISSIONS`,
+`AUTHORITY_POLICY`, `DATA_SENSITIVITY`/`SECURITY_POLICY`, the path map and the tool policy's own lists — never from
+the descriptor's declarations (Contract v3 F4 "a descriptor cannot authorise itself"; BC-P2-39). What the installation
+would hold is derived from the request *and* from what the OS can observe of the installation itself, so a descriptor
+that declares nothing elevated and installs with `sudo`, reaches outside the project, names a credential or fetches
+from an unlisted host is an expansion all the same; the command-token lists are a kernel floor, not a safety proof,
+which is why the non-gated branch also requires the independent governed review. Anything that cannot be evaluated is
+an expansion and gates. Every installation is recorded either way: CIT-P records the branch and why in the
+transaction's bound impact (`impact.change_class`), `cit::approve` names the rule and the owner decision in the
+auto-approval decision record, the installed descriptor's `approval.authorised_by` carries the owner decision, the
+governed record, the branch, the bound independent review and the transaction, and CIT-E derives the verdict again at
+the write — refusing `TOOL_INSTALL_ELEVATED` and rolling back if the installation would now expand authority and no
+gate approved the transaction. Where an auto-install condition failed the installation's own gate (BC-P2-41) is
+unchanged and independent of this: there are then two approvals, each naming the other.
 
 ## 4.8 Human Decision Gates, the authenticated human channel and CIT approval
 **Decision package (BC-P2-49).** A gate is created only with substantive content for every

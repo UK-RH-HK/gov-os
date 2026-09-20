@@ -90,10 +90,13 @@ evidence, the change gate for its radius, full re-index, recorded regression, ro
 T2 binding and whether it is honoured) ·
 `gov policy overrides | effective <POLICY>` · `gov adapters generate|verify` ·
 `gov tools list|registry|resolve --capability c [--role r]|install --descriptor f [--execute]|health`
-(`install` returns the installation's change transaction `change_transaction` with its own gate, and — when an
-auto-install condition failed — the installation gate `human_gate`; present and have the owner answer what is returned,
-then repeat the same install: the transaction is approved and executed and alone writes the descriptor. `--execute` is
-part of what the transaction's approval binds, so every request of one installation gives it the same way) ·
+(`install` returns the installation's change transaction `change_transaction`, and `change_class` — which branch of
+`CHANGE_POLICY.change_classes.tool_installation` applies and why (OD-P2-03: an installation that stays inside the
+project's already-authorised envelope needs no gate; one that expands authority does). A gate the request needs is
+returned as `human_gate`: the transaction's own when the installation is elevated, the installation's own when an
+auto-install condition failed, both when both. Present and have the owner answer what is returned, then repeat the
+same install: the transaction is approved and executed and alone writes the descriptor. `--execute` is part of what
+the transaction's approval binds, so every request of one installation gives it the same way) ·
 `gov capabilities ecosystems|plugins|invoke --plugin id --inputs json` · `gov verify governance|product` ·
 `gov oracle format | validate <file> [--oracle f] [--public-suite d]… [--repository d]…` · `gov contract verify|compile` ·
 `gov version`

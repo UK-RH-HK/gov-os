@@ -1,5 +1,5 @@
 policy: TOOL_POLICY
-version: 1.0.0
+version: 1.1.0
 permission_classes: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS, EXEC_PLUGIN, NETWORK_READ, NETWORK_WRITE, PACKAGE_INSTALL, SYSTEM_INSTALL, DB_READ, DB_WRITE, CLOUD_READ, CLOUD_WRITE, CI_TRIGGER, SECRET_READ, DEPLOY_STAGING, DEPLOY_PRODUCTION]
 tool_types: [MCP, CLI, API, library]
 # All conditions must hold for autonomous installation; otherwise a Human Decision Gate is raised for exactly that
@@ -16,6 +16,39 @@ auto_install_conditions:
   - version_pinned_and_recorded
   - tool_registered
   - environment_reproducible
+# **The already-authorised permission and trust envelope of a tool installation** (OD-P2-03 requirement 2; governed
+# record spec/decisions/D-0011.yaml; the rule that uses it is CHANGE_POLICY.change_classes.tool_installation). This is
+# only ever the AUTHORISED side of the comparison. What an installation would hold is derived by the OS from the
+# request and from what it can observe of the installation itself; a descriptor's declarations can only ADD to that
+# demand, never enlarge this envelope and never shrink what the OS derives (Contract v3 F4 "descriptor cannot
+# authorise itself"; BC-P2-39, where declared permissions decided whether approval was needed). The token lists are a
+# KERNEL FLOOR, not a safety proof: the OS cannot confine a spawned process (see the plugins note below), so the
+# governed, independent security review carries what the OS cannot observe. Anything the OS cannot determine is an
+# expansion, and the installation is gated.
+installation_envelope:
+  # classes no role's TOOL_PERMISSIONS entry authorises for an installed tool, because they reach past the project
+  host_authority_classes: [SYSTEM_INSTALL, DEPLOY_STAGING, DEPLOY_PRODUCTION, CLOUD_WRITE]
+  credential_classes: [SECRET_READ]
+  network_classes: [NETWORK_READ, NETWORK_WRITE]
+  # command tokens the OS reads as raising privilege, or as acting on the host rather than in the project
+  privilege_tokens: [sudo, su, doas, pkexec, runas, setcap, setuid, chown, chmod]
+  host_authority_tokens: [systemctl, service, launchctl, apt, apt-get, aptitude, yum, dnf, apk, brew, pacman, zypper,
+                          choco, winget, msiexec, rpm, dpkg, installer, mount, crontab, docker, podman, kubectl,
+                          insmod, modprobe, useradd, usermod, update-alternatives]
+  # flags that make an installer act outside the project (globally, system-wide or in the user's home)
+  host_scope_flags: ["-g", "--global", "--system", "--user"]
+  # ordinary network use the project or tool policy already authorises: a tool whose every derived endpoint is one of
+  # these, installed by a role that already holds a network class, is NOT by itself elevated (OD-P2-03). A network
+  # class demanded with no derivable endpoint is an unrestricted boundary and gates.
+  approved_registries: [registry.npmjs.org, pypi.org, files.pythonhosted.org, crates.io, static.crates.io,
+                        index.crates.io, proxy.golang.org, rubygems.org, repo.maven.apache.org]
+  allowlisted_services: []
+  # argument and environment names the OS reads as credential access (case-insensitive globs)
+  credential_patterns: ["*TOKEN*", "*SECRET*", "*PASSWORD*", "*PASSWD*", "*API_KEY*", "*APIKEY*", "*CREDENTIAL*",
+                        "*PRIVATE_KEY*", "*ACCESS_KEY*"]
+  # paths whose mutation is governance or security policy mutation; the installation's own descriptor and the
+  # generated tool registry it regenerates are excluded by the OS, being exactly what an installation writes
+  policy_paths: ["framework/**", "governance/**", "spec/decisions/**", ".governance-state/**"]
 approved_licences: [MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, MPL-2.0, PSF-2.0, Python-2.0, Unlicense, CC0-1.0]
 health_check_required: true
 mcp:

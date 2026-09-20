@@ -464,6 +464,34 @@ fn gates_of(store: &RecordStore, id: &str) -> Vec<Record> {
     v
 }
 
+/// **The governed change-class verdict for a transaction** (`CHANGE_POLICY.change_classes`; OD-P2-03, governed
+/// record `D-0011`). A change class states, as policy data an auditor reads and `gov policy effective CHANGE_POLICY`
+/// shows, when transactions of that class need a human gate — the question the radius and trigger rules otherwise
+/// answer. Only a transaction whose **whole** manifest is exactly one operation of the class qualifies, so nothing
+/// can be smuggled into a pre-authorised transaction beside it. `Null` for every other transaction, which is gated
+/// exactly as before.
+fn class_decision(p: &Project, cit: &Value) -> Value {
+    let ops = cit["mutation_manifest"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    if ops.len() != 1 {
+        return Value::Null;
+    }
+    match ops[0]["op"].as_str() {
+        Some("install_tool") => crate::tools::installation_change_decision(p, &ops[0]),
+        _ => Value::Null,
+    }
+}
+
+/// Is this transaction's recorded (and bound) impact one a governed change class pre-authorised, so that it may be
+/// approved without a human gate although its radius exceeds `CHANGE_POLICY.auto_approve_max_radius`? Read only
+/// from the impact `gov` simulated and sealed: a hand-edited impact fails the binding check before this is reached.
+fn class_pre_authorised(impact: &Value) -> bool {
+    let c = &impact["change_class"];
+    c["class"].is_string() && c["gate_required"] == json!(false)
+}
+
 fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let pol = p.policies();
     let store = RecordStore::load(&p.root);
@@ -562,10 +590,18 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let pre = propagation::plan(p, &store, &changed, None, None);
     let human_triggers = pol.get_list("CHANGE_POLICY", "human_gate_triggers");
     let auto_max = pol.get_str("CHANGE_POLICY", "auto_approve_max_radius", "R1");
-    let human_gate_required = radius_rank(&radius) > radius_rank(&auto_max)
+    let by_radius_or_trigger = radius_rank(&radius) > radius_rank(&auto_max)
         || human_triggers.contains(&declared)
         || effective.iter().any(|t| human_triggers.contains(t));
-    let consequences = vec![
+    // **OD-P2-03** (governed record `D-0011`): a change class whose human-gate rule an owner decision settles
+    // rather than the radius and trigger rules. The verdict is computed here, from this transaction's own manifest
+    // and trusted OS state ([`class_decision`]), and recorded in the bound impact — which branch applied and why —
+    // so the transaction itself states it. It only ever removes the gate the rule pre-authorises; a class the rule
+    // does not cover, or a condition it cannot evaluate, keeps the gate (fail closed).
+    let change_class = class_decision(p, &rec.data);
+    let pre_authorised = change_class["gate_required"] == json!(false);
+    let human_gate_required = by_radius_or_trigger && !pre_authorised;
+    let mut consequences = vec![
         format!("{} artefacts affected within radius {radius} (graph depth {})", affected.len(), pol.get_i64("CHANGE_POLICY", &format!("graph_traversal_depth_by_radius.{radius}"), 2)),
         format!("{} open task(s) will be marked retest-required", tasks.len().max(pre.open_tasks.len())),
         format!("{} completed task(s) will be marked for revalidation, with revalidation tasks generated", pre.done_tasks.len()),
@@ -575,7 +611,13 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
         if human_gate_required { "human approval required before execution".into() } else { "eligible for automatic approval under CHANGE_POLICY".into() },
         "rollback: snapshot of every touched file is taken before execution; `gov cit rollback` restores it".into(),
     ];
-    let mut consequences = consequences;
+    if let Some(why) = change_class["why"].as_str() {
+        consequences.push(format!(
+            "{} ({}): {why}",
+            change_class["class"].as_str().unwrap_or("change class"),
+            change_class["rule"].as_str().unwrap_or("CHANGE_POLICY")
+        ));
+    }
     if !candidates_unavailable.is_null() {
         consequences.push(format!(
             "semantic candidates unavailable ({}): the retrieval profile cannot answer the query now; the graph reach above stands",
@@ -586,7 +628,9 @@ fn simulate_inner(p: &Project, db: &RuntimeDb, id: &str) -> Result<Value> {
     let mut impact = json!({"radius": radius, "seeds": seeds, "affected": affected.iter().map(|a| json!({"node": a.node, "hop": a.hop, "via": a.via})).collect::<Vec<_>>(), "affected_tasks": tasks, "tests_required": tests, "features": features, "other": other,
         "completed_tasks_to_revalidate": pre.done_tasks.keys().cloned().collect::<Vec<_>>(),
         "material_classes": mat.classes(), "effective_triggers": effective,
-        "semantic_candidates": candidates, "semantic_candidates_unavailable": candidates_unavailable, "consequences": consequences, "human_gate_required": human_gate_required, "minimum_model_tier": routing["minimum_tier"], "simulated_at": now_iso(), "index_snapshot": db.get_meta("index_manifest_hash")});
+        "semantic_candidates": candidates, "semantic_candidates_unavailable": candidates_unavailable, "consequences": consequences, "human_gate_required": human_gate_required,
+        "human_gate_by_radius_or_trigger": by_radius_or_trigger, "change_class": change_class,
+        "minimum_model_tier": routing["minimum_tier"], "simulated_at": now_iso(), "index_snapshot": db.get_meta("index_manifest_hash")});
     let impact_sha = binding::impact_digest(&impact);
     let bind = binding::binding_digest(id, &content, &impact_sha);
     impact["content_sha256"] = json!(content);
@@ -922,16 +966,31 @@ fn approve_with(
             return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("{id} requires a human decision gate but none is recorded; run `gov cit simulate {id}`")));
         }
         let auto_max = pol.get_str("CHANGE_POLICY", "auto_approve_max_radius", "R1");
-        if radius_rank(radius.as_str().unwrap_or("R5")) > radius_rank(&auto_max) {
+        // **OD-P2-03**: a transaction a governed change class pre-authorised is approvable above the automatic
+        // radius, because the class's own conditions — not the radius — are what the owner's decision made the
+        // test. The verdict is read from the impact `gov` simulated and sealed, whose binding this function has
+        // already verified, and the decision record below names the rule and the owner decision that allowed it.
+        let class = &r.data["impact"]["change_class"];
+        let pre_authorised = class_pre_authorised(&r.data["impact"]);
+        if !pre_authorised && radius_rank(radius.as_str().unwrap_or("R5")) > radius_rank(&auto_max)
+        {
             return Err(GovError::new("HUMAN_GATE_REQUIRED", format!("radius {radius} exceeds CHANGE_POLICY.auto_approve_max_radius {auto_max}; re-simulate to raise a gate")));
         }
         if decision_id.is_empty() {
             let did = store.next_id("decision");
+            let rationale = if pre_authorised {
+                format!("pre-authorised by owner decision {} (governed record {}) under {}: {}. No human gate was required; radius {radius}",
+                    class["owner_decision"].as_str().unwrap_or("?"), class["decision_record"].as_str().unwrap_or("?"),
+                    class["rule"].as_str().unwrap_or("CHANGE_POLICY.change_classes"), class["why"].as_str().unwrap_or(""))
+            } else {
+                format!("automatic approval within CHANGE_POLICY.auto_approve_max_radius (radius {radius}); no human gate was required")
+            };
             let mut d = new_record(
                 "decision",
                 &did,
                 &format!("Auto-approve {id}"),
-                json!({"question": format!("Execute change {id}?"), "options": [{"id": "A", "description": proposal}], "chosen_option": "A", "rationale": format!("automatic approval within CHANGE_POLICY.auto_approve_max_radius (radius {radius}); no human gate was required"), "approved_by": by, "approved_at": now_iso(), "human_approved": false, "approved_by_kind": "agent", "impact_radius": radius, "reversibility": "snapshot rollback", "confidence": 0.9, "cit": id, "state_class": "AUTHORITATIVE", "tags": [trigger], "binding_sha256": st.binding_sha256}),
+                json!({"question": format!("Execute change {id}?"), "options": [{"id": "A", "description": proposal}], "chosen_option": "A", "rationale": rationale, "approved_by": by, "approved_at": now_iso(), "human_approved": false, "approved_by_kind": "agent", "impact_radius": radius, "reversibility": "snapshot rollback", "confidence": 0.9, "cit": id, "state_class": "AUTHORITATIVE", "tags": [trigger], "binding_sha256": st.binding_sha256,
+                    "change_class": class.clone()}),
             );
             crate::t2::seal_record(&mut d, "cit approve (auto)")?;
             save_record(&p.root, &d)?;

@@ -75,6 +75,7 @@ keys:
   CHANGE_POLICY.verification_required: {enforced_by: [cit::execute]}
   CHANGE_POLICY.rollback.snapshot_before_execute: {enforced_by: [cit::execute]}
   CHANGE_POLICY.rollback.keep_snapshots: {enforced_by: [cit::prune_snapshots]}
+  CHANGE_POLICY.change_classes.*: {enforced_by: [cit::class_decision, tools::installation_change_decision], note: "OD-P2-03: the governed rule that decides whether a change class needs a human gate. cit::simulate_inner reads it through cit::class_decision and records the verdict in impact.change_class (which branch applied and why); tools::installation_change_decision evaluates the tool-installation class and re-evaluates it at CIT-E. A class the rule does not cover, or a condition it cannot evaluate, is gated by the ordinary radius and trigger rules (fail closed)"}
   # ---- SECURITY_POLICY
   SECURITY_POLICY.sensitivity_classes: {informational: "enumeration validated by the overlay schemas"}
   SECURITY_POLICY.never_index_classes: {enforced_by: [project::contract, paths::decide, indexer::rebuild, verification::run]}
@@ -92,6 +93,7 @@ keys:
   TOOL_POLICY.health_check_required: {enforced_by: [tools::install]}
   TOOL_POLICY.mcp.registry_path: {enforced_by: [tools::generate_registry]}
   TOOL_POLICY.mcp.scope: {informational: "role/task scoping is implemented by generate_registry role_exposure"}
+  TOOL_POLICY.installation_envelope.*: {enforced_by: [tools::installation_authority], note: "OD-P2-03: the AUTHORISED side of the envelope a tool installation is compared against, read from trusted OS state only. What the installation would hold is derived by tools::installation_authority from the request and from the installation's own commands; nothing a descriptor declares enlarges this envelope (Contract v3 F4; BC-P2-39). The token and pattern lists are a kernel floor, never a safety proof"}
   # ---- MODEL_ROUTING_POLICY
   MODEL_ROUTING_POLICY.tiers.*: {enforced_by: [tasks::create, routing::route]}
   MODEL_ROUTING_POLICY.reasoning_levels: {enforced_by: [tasks::create]}

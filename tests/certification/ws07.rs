@@ -1378,41 +1378,56 @@ fn a_governed_security_review_by_another_role_lets_the_installation_proceed() {
     let ry = yaml(&root, &rel);
     assert!(ry["os_binding"]["mac"].is_string(), "{ry}");
     assert_eq!(ry["security_review"]["verdict"], "passed");
-    // installing exactly that tool and version, citing the review: no gate is raised FOR THE INSTALLATION — the
-    // governed review stands in for the owner's answer to it (IP-W7-1, BC-P2-41).
+    // Installing exactly that tool and version, citing the review: it proceeds, and **no gate is raised at all**.
     //
-    // R4-O1 (round 4): the installation is also a material governance and security change, so it is carried out by
-    // the change transaction the OS proposes for it, and under CHANGE_POLICY (`human_gate_triggers` includes
-    // `governance_change`) that transaction's own gate is required, as it is for every other governance change.
-    // That gate is the only one raised here, and it approves the change, not the installation. Whether the
-    // review-evidenced path should keep completing with NO gate at all is an owner decision P2-AR-0053 states and
-    // does not take (its report, item 1).
+    // R4-O1 (round 4) made the installation a change transaction the OS proposes (Contract v3 K3), and OD-P2-03
+    // (product owner, 2026-09-20; governed record D-0011; the rule is
+    // CHANGE_POLICY.change_classes.tool_installation) settles whether that transaction needs the owner's gate: it
+    // does not, for a tool that is authenticated and pinned, independently governed-reviewed, registered,
+    // reversible and entirely inside the project's already-authorised permission and trust envelope. This tool is
+    // all five — READ_REPO for a role that holds it, no network, and commands that neither raise privilege nor
+    // leave the project — so the installation completes in one request with no gate, and the change transaction
+    // records which branch applied and why.
     let rvd = tool_descriptor(&root, "rv", json!({"security_review_record": rpt}));
     let install_rv = ["tools", "install", "--descriptor", rvd.to_str().unwrap()];
     let before = gate_count(&root);
     let r = te.ok(&install_rv);
     assert_eq!(security_check(&r)["ok"], true, "{r}");
+    assert_eq!(r["installed"], true, "{r}");
+    assert_eq!(gate_count(&root), before, "a gate was raised: {r}");
+    assert!(r["human_gate"].is_null(), "{r}");
+    assert_eq!(r["approval"]["mode"], "autonomous", "{r}");
+    // the change transaction still happened, and it states the branch and its authority
     let cit = r["change_transaction"]["cit"].as_str().unwrap().to_string();
-    let cg = r["human_gate"].as_str().unwrap().to_string();
+    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
+    assert!(
+        r["change_transaction"]["human_gate"].is_null(),
+        "the transaction raised a gate: {r}"
+    );
+    let c = yaml(&root, &format!("spec/decisions/{cit}.yaml"));
+    let cc = &c["impact"]["change_class"];
+    assert_eq!(cc["branch"], "not_gated", "{cc}");
+    assert_eq!(cc["owner_decision"], "OD-P2-03", "{cc}");
+    assert_eq!(cc["decision_record"], "D-0011", "{cc}");
+    assert_eq!(cc["authority_envelope"]["expands_authority"], false, "{cc}");
+    assert_eq!(c["impact"]["human_gate_required"], false, "{c}");
     assert_eq!(
-        r["change_transaction"]["human_gate"],
-        json!(cg),
-        "the only gate is the transaction's own: {r}"
+        c["impact"]["human_gate_by_radius_or_trigger"], true,
+        "the radius and trigger rules alone would have gated it; the owner's rule is what did not: {c}"
+    );
+    // the bound independent review is what the non-gated branch stands on, and the installed descriptor traces to it
+    assert_eq!(cc["security_review"]["record"], json!(rpt), "{cc}");
+    let d = yaml(&root, "governance/project/tools/TOOL-W7.yaml");
+    assert_eq!(d["approval"]["authorised_by"]["owner_decision"], "OD-P2-03");
+    assert_eq!(d["approval"]["authorised_by"]["branch"], "not_gated");
+    assert_eq!(
+        d["approval"]["authorised_by"]["security_review"]["record"],
+        json!(rpt)
     );
     assert_eq!(
-        gate_count(&root),
-        before + 1,
-        "a gate was raised for the installation subject too: {r}"
-    );
-    assert_eq!(
-        yaml(&root, &format!("spec/decisions/{cg}.yaml"))["cit"],
+        d["approval"]["authorised_by"]["change_transaction"],
         json!(cit)
     );
-    crate::ws03::human_decide(&g, &cg, "A");
-    let r = te.ok(&install_rv);
-    assert_eq!(r["installed"], true, "{r}");
-    assert_eq!(r["approval"]["mode"], "autonomous", "{r}");
-    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
     // the review does not cover another version
     let r = te.ok(&[
         "tools",

@@ -739,6 +739,584 @@ fn prepare_installation(p: &Project, descriptor: Value, role: &str) -> Result<Pr
     })
 }
 
+// =============================================================================================================
+// OD-P2-03: does this installation stay inside the project's already-authorised permission and trust envelope?
+// =============================================================================================================
+
+/// The trusted OS state the **authorised** side of the envelope is read from (OD-P2-03 requirement 2; governed
+/// record `D-0011`). A descriptor is never one of them: Contract v3 F4 ("a descriptor cannot authorise itself") and
+/// BC-P2-39, whose defect was a declaration deciding whether approval was needed. What a descriptor declares is a
+/// *request*: it can only ever **add** to what the installation is taken to demand, never enlarge this envelope and
+/// never shrink what the OS derives for itself.
+const ENVELOPE_SOURCES: &[&str] = &[
+    "TOOL_PERMISSIONS.yaml roles.<acting role>: the permission classes the project has already authorised for it",
+    "TOOL_PERMISSIONS.yaml install_authority_roles",
+    "AUTHORITY_POLICY.authority_levels_required.install_tool",
+    "REPOSITORY_CONTRACT.yaml: the path map (which paths may be mutated, and their class)",
+    "DATA_SENSITIVITY.yaml + SECURITY_POLICY: sensitivity classes and secret path patterns",
+    "TOOL_POLICY.installation_envelope: host-authority/credential/network classes, the command-token floor, the approved registries and allowlisted services",
+];
+
+/// One entry of `TOOL_POLICY.installation_envelope`.
+fn envelope_list(p: &Project, key: &str) -> Vec<String> {
+    p.policies()
+        .get_list("TOOL_POLICY", &format!("installation_envelope.{key}"))
+}
+
+/// Every command the installation carries, as `(where, argv)`. The install command is what the OS runs when the
+/// transaction executes; the uninstall and health commands are what the installed tool is.
+fn installation_commands(d: &Value) -> Vec<(String, Vec<String>)> {
+    let strs = |v: &Value| -> Vec<String> {
+        v.as_array()
+            .map(|a| {
+                a.iter()
+                    .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    };
+    let mut out = vec![];
+    for k in ["install_command", "uninstall_command"] {
+        let v = strs(&d[k]);
+        if !v.is_empty() {
+            out.push((k.to_string(), v));
+        }
+    }
+    let h = strs(&d["health_check"]["command"]);
+    if !h.is_empty() {
+        out.push(("health_check.command".to_string(), h));
+    }
+    out
+}
+
+/// The strings a token may hide: the token itself and the value of a `--flag=value`.
+fn token_values(tok: &str) -> Vec<String> {
+    let mut v = vec![tok.to_string()];
+    if let Some((_, rhs)) = tok.split_once('=') {
+        if !rhs.is_empty() {
+            v.push(rhs.to_string());
+        }
+    }
+    v
+}
+
+/// A candidate the OS reads as a filesystem path that leaves the project: absolute, home-relative,
+/// drive-qualified, or escaping with a `..` segment.
+fn leaves_project(c: &str) -> bool {
+    if c.starts_with('/') || c.starts_with('~') || c.starts_with('\\') {
+        return true;
+    }
+    if c.len() > 2 && c.as_bytes()[1] == b':' && matches!(c.as_bytes()[2], b'/' | b'\\') {
+        return true;
+    }
+    c.replace('\\', "/").split('/').any(|seg| seg == "..")
+}
+
+/// The host of a URL-ish candidate (`scheme://[user@]host[:port]/…`), if any.
+fn endpoint_host(c: &str) -> Option<String> {
+    let rest = c.split_once("://").map(|(_, r)| r)?;
+    let hostport = rest.split(['/', '?', '#']).next().unwrap_or("");
+    let host = hostport.rsplit('@').next().unwrap_or(hostport);
+    let host = host.split(':').next().unwrap_or(host);
+    (!host.is_empty()).then(|| host.to_ascii_lowercase())
+}
+
+/// Case-insensitive glob match of a name against `TOOL_POLICY.installation_envelope.credential_patterns`.
+fn matches_any_pattern(name: &str, patterns: &[String]) -> bool {
+    let up = name.to_ascii_uppercase();
+    patterns
+        .iter()
+        .any(|p| crate::util::glob_match(&p.to_ascii_uppercase(), &up))
+}
+
+/// Names a candidate carries that the OS reads as naming a credential: `NAME=value`, `${NAME}`, `$NAME`.
+fn credential_names(tok: &str) -> Vec<String> {
+    let mut out = vec![];
+    if let Some((lhs, _)) = tok.split_once('=') {
+        out.push(lhs.trim_start_matches('-').to_string());
+    }
+    let mut rest = tok;
+    while let Some(i) = rest.find('$') {
+        let after = &rest[i + 1..];
+        let after = after.strip_prefix('{').unwrap_or(after);
+        let name: String = after
+            .chars()
+            .take_while(|c| c.is_ascii_alphanumeric() || *c == '_')
+            .collect();
+        if !name.is_empty() {
+            out.push(name);
+        }
+        rest = &rest[i + 1..];
+    }
+    out
+}
+
+/// One authority-expansion finding: what the installation would hold, where the OS read it, and what the project
+/// has already authorised.
+fn finding(trigger: &str, demanded: String, from: String, authorised: String) -> Value {
+    json!({"trigger": trigger, "demanded": demanded, "derived_from": from, "authorised": authorised})
+}
+
+/// **Would this installation expand authority?** (OD-P2-03 requirement 2, and requirement 3's fail-closed rule.)
+///
+/// The comparison is: what the tool **would hold** — permissions, filesystem/project scope, secret access, host
+/// authority, policy-mutation capability and network trust boundary — against what the project **has already
+/// authorised** ([`ENVELOPE_SOURCES`]). The authorised side is trusted OS state only. The demanded side is the
+/// union of what the descriptor asks for (a request: it can only add) and what the OS derives for itself from the
+/// installation's own commands, so a descriptor that declares nothing elevated and installs with `sudo` is an
+/// expansion all the same (Contract v3 F4; BC-P2-39's defect).
+///
+/// The token and pattern lists in `TOOL_POLICY.installation_envelope` are a **kernel floor, never a safety proof**:
+/// the OS cannot confine a spawned process, so what it cannot observe is carried by the independent governed
+/// security review the non-gated branch also requires. Anything that cannot be evaluated — no envelope in policy,
+/// no role permissions, a command the OS cannot read — is an expansion and gates.
+///
+/// `op`, when given, is the installation's manifest operation: its declared paths are checked against the two an
+/// installation writes, so a transaction carrying an `install_tool` operation aimed anywhere else is a policy
+/// mutation.
+pub fn installation_authority(
+    p: &Project,
+    descriptor: &Value,
+    role: &str,
+    dest_rel: &str,
+    op: Option<&Value>,
+) -> Value {
+    let triggers = p.policies().get_list(
+        "CHANGE_POLICY",
+        "change_classes.tool_installation.authority_expansion_triggers",
+    );
+    let mut findings: Vec<Value> = vec![];
+    let mut undetermined: Vec<String> = vec![];
+    let env = p.policies().get("TOOL_POLICY", "installation_envelope");
+    if env.as_ref().and_then(|v| v.as_object()).is_none() {
+        undetermined.push("TOOL_POLICY.installation_envelope is absent: the authorised envelope cannot be determined, so the installation is treated as an expansion (fail closed)".into());
+    }
+    let role_classes = role_permissions(p, role);
+    if role_classes.is_empty() {
+        undetermined.push(format!("TOOL_PERMISSIONS.yaml authorises no permission class for role '{role}': nothing the installation asks for is inside the envelope"));
+    }
+    let host_classes = envelope_list(p, "host_authority_classes");
+    let cred_classes = envelope_list(p, "credential_classes");
+    let net_classes = envelope_list(p, "network_classes");
+    let priv_tokens = envelope_list(p, "privilege_tokens");
+    let host_tokens = envelope_list(p, "host_authority_tokens");
+    let scope_flags = envelope_list(p, "host_scope_flags");
+    let registries = envelope_list(p, "approved_registries");
+    let services = envelope_list(p, "allowlisted_services");
+    let cred_patterns = envelope_list(p, "credential_patterns");
+    let policy_paths = envelope_list(p, "policy_paths");
+    let secret_paths = p
+        .policies()
+        .get_list("SECURITY_POLICY", "secret_path_patterns");
+
+    // --- what the request declares (a request only ever ADDS to the demand)
+    let required: Vec<String> = descriptor["required_permission_classes"]
+        .as_array()
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default();
+    let perm_flag = |k: &str| descriptor["permissions"][k].as_bool().unwrap_or(false);
+
+    // --- 1. privilege escalation: a class the acting role does not already hold, or a privilege-raising command
+    for c in &required {
+        if host_classes.contains(c) || cred_classes.contains(c) {
+            continue; // their own triggers below say why they are outside any project authorisation
+        }
+        if !role_classes.contains(c) {
+            findings.push(finding(
+                "privilege_escalation",
+                format!("permission class {c}"),
+                "descriptor.required_permission_classes".into(),
+                format!("TOOL_PERMISSIONS.roles.{role} = {role_classes:?}"),
+            ));
+        }
+    }
+    if perm_flag("repo_write") && !role_classes.iter().any(|c| c == "WRITE_REPO_SCOPED") {
+        findings.push(finding(
+            "privilege_escalation",
+            "repository writes".into(),
+            "descriptor.permissions.repo_write".into(),
+            format!("TOOL_PERMISSIONS.roles.{role} = {role_classes:?}"),
+        ));
+    }
+
+    // --- the installation's own commands, read by the OS itself
+    let commands = installation_commands(descriptor);
+    if commands.is_empty() {
+        undetermined.push("the descriptor carries no command the OS can read (install_command, uninstall_command, health_check.command): what the installation would do outside the project cannot be determined".into());
+    }
+    let own_paths = [
+        dest_rel.to_string(),
+        registry_path(p),
+        crate::paths::PLUGIN_REGISTRY_PATH.to_string(),
+    ];
+    let mut endpoints: Vec<(String, String)> = vec![];
+    for (whence, argv) in &commands {
+        for (i, tok) in argv.iter().enumerate() {
+            let at = format!("{whence}[{i}] '{tok}'");
+            let bare = tok.rsplit('/').next().unwrap_or(tok).to_ascii_lowercase();
+            if priv_tokens.iter().any(|t| t == &bare) {
+                findings.push(finding(
+                    "privilege_escalation",
+                    format!("the installation runs '{bare}'"),
+                    at.clone(),
+                    "nothing the project has authorised raises privilege for an installed tool"
+                        .into(),
+                ));
+            }
+            if host_tokens.iter().any(|t| t == &bare) {
+                findings.push(finding(
+                    "host_level_authority",
+                    format!("the installation runs '{bare}', which acts on the host rather than in the project"),
+                    at.clone(),
+                    "TOOL_POLICY.installation_envelope.host_authority_tokens (kernel floor): no project authorisation covers host-level authority".into(),
+                ));
+            }
+            if i > 0 && scope_flags.iter().any(|f| f == tok) {
+                findings.push(finding(
+                    "host_level_authority",
+                    format!("the installation installs with '{tok}' (outside the project)"),
+                    at.clone(),
+                    "TOOL_POLICY.installation_envelope.host_scope_flags".into(),
+                ));
+            }
+            for name in credential_names(tok) {
+                if matches_any_pattern(&name, &cred_patterns) {
+                    findings.push(finding(
+                        "new_secret_or_credential_access",
+                        format!("the installation reads the credential '{name}'"),
+                        at.clone(),
+                        "TOOL_POLICY.installation_envelope.credential_patterns: the project authorises no new credential access to an installed tool".into(),
+                    ));
+                }
+            }
+            for c in token_values(tok) {
+                if let Some(h) = endpoint_host(&c) {
+                    endpoints.push((h, at.clone()));
+                    continue;
+                }
+                if !c.contains('/') && !c.starts_with('~') {
+                    continue; // not a path the OS can read as one
+                }
+                if leaves_project(&c) {
+                    findings.push(finding(
+                        "broader_filesystem_or_project_access",
+                        format!("the installation reaches '{c}', outside the project"),
+                        at.clone(),
+                        "the project root, as the path map (REPOSITORY_CONTRACT.yaml) scopes it"
+                            .into(),
+                    ));
+                    continue;
+                }
+                if secret_paths.iter().any(|g| crate::util::glob_match(g, &c)) {
+                    findings.push(finding(
+                        "new_secret_or_credential_access",
+                        format!("the installation reaches '{c}', a secret path"),
+                        at.clone(),
+                        "SECURITY_POLICY.secret_path_patterns".into(),
+                    ));
+                    continue;
+                }
+                if own_paths.iter().any(|o| o == &c) {
+                    continue; // exactly what an installation writes
+                }
+                if policy_paths.iter().any(|g| crate::util::glob_match(g, &c)) {
+                    findings.push(finding(
+                        "governance_or_security_policy_mutation",
+                        format!("the installation reaches '{c}', governance or security policy"),
+                        at.clone(),
+                        "TOOL_POLICY.installation_envelope.policy_paths; an installation writes only its own descriptor and the generated tool registry".into(),
+                    ));
+                    continue;
+                }
+                let d = p.contract().decide(&c);
+                let sens = d.sensitivity();
+                if sens == "restricted" || sens == "secret" {
+                    findings.push(finding(
+                        "new_secret_or_credential_access",
+                        format!("the installation reaches '{c}', classified {sens}"),
+                        at.clone(),
+                        "DATA_SENSITIVITY.yaml + SECURITY_POLICY, through the path map".into(),
+                    ));
+                } else if !matches!(d.str("mutation").as_str(), "allowed" | "") {
+                    findings.push(finding(
+                        "broader_filesystem_or_project_access",
+                        format!("the installation reaches '{c}', whose mutation the path map records as '{}'", d.str("mutation")),
+                        at.clone(),
+                        "REPOSITORY_CONTRACT.yaml (the path map)".into(),
+                    ));
+                }
+            }
+        }
+    }
+
+    // --- 2. host-level authority and 3. credential access, as permission classes
+    for c in &required {
+        if host_classes.contains(c) {
+            findings.push(finding(
+                "host_level_authority",
+                format!("permission class {c}"),
+                "descriptor.required_permission_classes".into(),
+                format!("TOOL_POLICY.installation_envelope.host_authority_classes {host_classes:?}: outside any role's authorisation"),
+            ));
+        }
+        if cred_classes.contains(c) {
+            findings.push(finding(
+                "new_secret_or_credential_access",
+                format!("permission class {c}"),
+                "descriptor.required_permission_classes".into(),
+                format!("TOOL_POLICY.installation_envelope.credential_classes {cred_classes:?}: outside any role's authorisation"),
+            ));
+        }
+    }
+    if perm_flag("secrets")
+        || !descriptor["credential_scope"]
+            .as_str()
+            .unwrap_or("")
+            .is_empty()
+    {
+        findings.push(finding(
+            "new_secret_or_credential_access",
+            format!(
+                "declared credential access (credential_scope '{}')",
+                descriptor["credential_scope"].as_str().unwrap_or("")
+            ),
+            "descriptor.permissions.secrets / descriptor.credential_scope".into(),
+            "the project authorises no new credential access to an installed tool".into(),
+        ));
+    }
+
+    // --- 5. governance or security policy mutation: the transaction's own declared paths
+    if let Some(op) = op {
+        for k in ["path", "registry"] {
+            if let Some(v) = op[k].as_str() {
+                if !own_paths.iter().any(|o| o == v) {
+                    findings.push(finding(
+                        "governance_or_security_policy_mutation",
+                        format!("the change transaction declares {k} '{v}'"),
+                        format!("mutation_manifest[0].{k}"),
+                        format!("an installation writes exactly {own_paths:?}"),
+                    ));
+                }
+            }
+        }
+    }
+    for k in ["policy_overrides", "governance_writes", "exceptions"] {
+        if descriptor.get(k).map(|v| !v.is_null()).unwrap_or(false) {
+            findings.push(finding(
+                "governance_or_security_policy_mutation",
+                format!("the descriptor declares {k}"),
+                format!("descriptor.{k}"),
+                "an installed tool mutates no policy".into(),
+            ));
+        }
+    }
+
+    // --- 6. network trust boundary. Ordinary use of an approved registry or an allowlisted service, by a role that
+    // already holds a network class, is not by itself elevated (OD-P2-03). A network class demanded with no
+    // endpoint the OS can derive is an unrestricted boundary.
+    let declared_net: Vec<&String> = required
+        .iter()
+        .filter(|c| net_classes.contains(c))
+        .collect();
+    let wants_network = !declared_net.is_empty() || perm_flag("network") || !endpoints.is_empty();
+    let authorised_hosts: Vec<String> = registries.iter().chain(services.iter()).cloned().collect();
+    if wants_network {
+        let role_net: Vec<&String> = role_classes
+            .iter()
+            .filter(|c| net_classes.contains(c))
+            .collect();
+        if role_net.is_empty() {
+            findings.push(finding(
+                "new_or_unrestricted_network_trust_boundary",
+                "network access".into(),
+                if declared_net.is_empty() {
+                    "the installation's own commands".into()
+                } else {
+                    "descriptor.required_permission_classes".to_string()
+                },
+                format!("TOOL_PERMISSIONS.roles.{role} holds no network class ({net_classes:?})"),
+            ));
+        }
+        if endpoints.is_empty() {
+            findings.push(finding(
+                "new_or_unrestricted_network_trust_boundary",
+                "network access to an endpoint the OS cannot determine".into(),
+                "descriptor.required_permission_classes / descriptor.permissions.network".into(),
+                format!("TOOL_POLICY.installation_envelope approved registries and allowlisted services {authorised_hosts:?}: an unbounded boundary is not one of them"),
+            ));
+        }
+        for (h, at) in &endpoints {
+            if !authorised_hosts.iter().any(|a| a.eq_ignore_ascii_case(h)) {
+                findings.push(finding(
+                    "new_or_unrestricted_network_trust_boundary",
+                    format!("network access to '{h}'"),
+                    at.clone(),
+                    format!("TOOL_POLICY.installation_envelope approved registries and allowlisted services {authorised_hosts:?}"),
+                ));
+            }
+        }
+    }
+
+    // a finding under a trigger the governed rule does not declare is still an expansion, but it is named as such
+    let mut fired: Vec<String> = findings
+        .iter()
+        .filter_map(|f| f["trigger"].as_str().map(|s| s.to_string()))
+        .collect();
+    fired.sort();
+    fired.dedup();
+    let undeclared: Vec<String> = fired
+        .iter()
+        .filter(|t| !triggers.is_empty() && !triggers.contains(t))
+        .cloned()
+        .collect();
+    let expands = !findings.is_empty() || !undetermined.is_empty();
+    json!({
+        "expands_authority": expands,
+        "triggers_fired": fired,
+        "triggers_declared": triggers,
+        "triggers_not_declared_by_policy": undeclared,
+        "findings": findings,
+        "undetermined": undetermined,
+        "authorised_sources": ENVELOPE_SOURCES,
+        "role": role,
+        "role_permission_classes": role_classes,
+        "network_endpoints": endpoints.iter().map(|(h, _)| h.clone()).collect::<Vec<_>>(),
+        "authorised_network_hosts": authorised_hosts,
+    })
+}
+
+/// **Which branch of `CHANGE_POLICY.change_classes.tool_installation` applies to this installation, and why**
+/// (OD-P2-03 requirements 1, 3 and 5). The governed rule names the non-gated conditions — each mapped to the
+/// `TOOL_POLICY.auto_install_conditions` entry that decides it — and the authority-expansion triggers; this
+/// function evaluates them and returns the verdict `cit::simulate_inner` records in the transaction's bound impact.
+///
+/// Fail closed and fail gated: no rule in policy, a condition the policy does not declare (so it was never
+/// evaluated), a condition that did not hold, or any authority expansion, all require the human gate.
+fn change_decision(p: &Project, prep: &PreparedInstall, op: Option<&Value>) -> Value {
+    let pol = p.policies();
+    let rule = pol.get("CHANGE_POLICY", "change_classes.tool_installation");
+    let envelope = installation_authority(p, &prep.descriptor, &prep.role, &prep.dest_rel(), op);
+    let Some(rule) = rule.as_ref().filter(|r| r.is_object()) else {
+        return json!({"class": "tool_installation", "rule": "CHANGE_POLICY.change_classes.tool_installation",
+            "branch": "gated", "gate_required": true,
+            "why": "CHANGE_POLICY declares no governed rule for the tool-installation change class, so no installation is pre-authorised: the transaction is gated by the ordinary radius and trigger rules (fail closed)",
+            "conditions": [], "authority_envelope": envelope});
+    };
+    let declared = pol.get_list("TOOL_POLICY", "auto_install_conditions");
+    let mut conditions = vec![];
+    let map = rule["non_gated_conditions"]
+        .as_object()
+        .cloned()
+        .unwrap_or_default();
+    for (owner_condition, policy_condition) in &map {
+        let pc = policy_condition.as_str().unwrap_or("");
+        if pc == "authority_envelope" {
+            let ok = !envelope["expands_authority"].as_bool().unwrap_or(true);
+            conditions.push(json!({"condition": owner_condition, "decided_by": pc, "ok": ok,
+                "detail": if ok { "the installation stays inside the project's already-authorised permission and trust envelope".to_string() }
+                          else { format!("authority expansion: {:?}{}", envelope["triggers_fired"], if envelope["undetermined"].as_array().map(|a| a.is_empty()).unwrap_or(true) { String::new() } else { format!("; undetermined: {}", envelope["undetermined"]) }) }}));
+            continue;
+        }
+        if !declared.iter().any(|d| d == pc) {
+            conditions.push(json!({"condition": owner_condition, "decided_by": pc, "ok": false,
+                "detail": format!("TOOL_POLICY.auto_install_conditions does not declare '{pc}', so this condition was never evaluated and cannot hold (fail closed)")}));
+            continue;
+        }
+        match prep
+            .checks
+            .iter()
+            .find(|c| c["condition"].as_str() == Some(pc))
+        {
+            Some(c) => conditions.push(json!({"condition": owner_condition, "decided_by": pc,
+                "ok": c["ok"].as_bool().unwrap_or(false), "detail": c["detail"]})),
+            None => conditions.push(
+                json!({"condition": owner_condition, "decided_by": pc, "ok": false,
+                "detail": format!("'{pc}' was not evaluated for this installation (fail closed)")}),
+            ),
+        }
+    }
+    if map.is_empty() {
+        conditions.push(json!({"condition": "non_gated_conditions", "decided_by": "CHANGE_POLICY", "ok": false,
+            "detail": "the governed rule names no non-gated condition, so nothing is pre-authorised (fail closed)"}));
+    }
+    let unmet: Vec<String> = conditions
+        .iter()
+        .filter(|c| !c["ok"].as_bool().unwrap_or(false))
+        .filter_map(|c| c["condition"].as_str().map(|s| s.to_string()))
+        .collect();
+    let gate_required = !unmet.is_empty();
+    let why = if !gate_required {
+        format!("not gated: every non-gated condition of CHANGE_POLICY.change_classes.tool_installation held ({}), and the installation stays inside the project's already-authorised permission and trust envelope, so under owner decision {} (governed record {}) this installation's change transaction needs no Human Gate",
+            conditions.iter().filter_map(|c| c["condition"].as_str()).collect::<Vec<_>>().join(", "),
+            rule["owner_decision"].as_str().unwrap_or("OD-P2-03"),
+            rule["decision_record"].as_str().unwrap_or("D-0011"))
+    } else if envelope["expands_authority"].as_bool().unwrap_or(true) {
+        format!("gated: this installation expands authority ({:?}); under owner decision {} a Human Gate is required{}",
+            envelope["triggers_fired"],
+            rule["owner_decision"].as_str().unwrap_or("OD-P2-03"),
+            if unmet.len() > 1 { format!("; unmet conditions {unmet:?}") } else { String::new() })
+    } else {
+        format!("gated: the non-gated conditions {unmet:?} of CHANGE_POLICY.change_classes.tool_installation did not hold, so this installation is not pre-authorised by owner decision {}",
+            rule["owner_decision"].as_str().unwrap_or("OD-P2-03"))
+    };
+    json!({
+        "class": "tool_installation",
+        "rule": "CHANGE_POLICY.change_classes.tool_installation",
+        "owner_decision": rule["owner_decision"],
+        "decision_record": rule["decision_record"],
+        "tool_id": prep.tool_id,
+        "version": prep.version,
+        "installation_sha256": prep.subject,
+        "branch": if gate_required { "gated" } else { "not_gated" },
+        "gate_required": gate_required,
+        "why": why,
+        "conditions": conditions,
+        "unmet_conditions": unmet,
+        "security_review": match &prep.review { Ok(v) => v.clone(), Err(e) => json!({"evidenced": false, "why": e}) },
+        "authority_envelope": envelope,
+    })
+}
+
+/// **What allowed this installation** (OD-P2-03 requirement 4), written into the installed descriptor's `approval`
+/// so an auditor traces any installed tool back to it: the owner decision and the governed record that carry the
+/// rule, the rule itself, which branch applied and why, the bound independent security review the non-gated branch
+/// stands on, and the change transaction that wrote it. An elevated installation is exactly the gated class, so its
+/// `approval` also names the gate that authorised it.
+fn authorised_by(decision: &Value, change_transaction: &str) -> Value {
+    json!({
+        "owner_decision": decision["owner_decision"],
+        "decision_record": decision["decision_record"],
+        "rule": decision["rule"],
+        "branch": decision["branch"],
+        "why": decision["why"],
+        "security_review": decision["security_review"],
+        "authority_envelope": {"expands_authority": decision["authority_envelope"]["expands_authority"],
+            "triggers_fired": decision["authority_envelope"]["triggers_fired"],
+            "authorised_sources": decision["authority_envelope"]["authorised_sources"]},
+        "change_transaction": change_transaction,
+    })
+}
+
+/// [`change_decision`] for an `install_tool` manifest operation: the request is derived again from the descriptor
+/// the transaction carries, so `cit::simulate_inner` and CIT-E judge the bytes as they are, never a verdict handed
+/// to them. A request that cannot be derived is gated (fail closed).
+pub fn installation_change_decision(p: &Project, op: &Value) -> Value {
+    let role = op["role"].as_str().unwrap_or("").to_string();
+    match prepare_installation(p, op["descriptor"].clone(), &role) {
+        Ok(prep) => change_decision(p, &prep, Some(op)),
+        Err(e) => {
+            json!({"class": "tool_installation", "rule": "CHANGE_POLICY.change_classes.tool_installation",
+            "branch": "gated", "gate_required": true,
+            "why": format!("gated: the installation request cannot be derived from the descriptor this transaction carries ({}: {}), so no condition can be evaluated (fail closed)", e.code, e.message),
+            "conditions": [], "authority_envelope": json!({"expands_authority": true, "undetermined": [e.message]})})
+        }
+    }
+}
+
 /// The manifest operation of an installation's change transaction: what CIT-P simulates and CIT-E applies
 /// (`cit::apply_op` → [`apply_installation`]). The approval of the transaction binds it (its content digest), so the
 /// descriptor as given, the installing role and whether the install command runs are all part of what is approved.
@@ -749,9 +1327,9 @@ fn installation_op(p: &Project, prep: &PreparedInstall, execute: bool) -> Value 
 
 fn installation_proposal(p: &Project, prep: &PreparedInstall, execute: bool) -> String {
     let approval = if prep.all_ok {
-        "Every TOOL_POLICY.auto_install_conditions entry holds, so no separate installation gate is asked; this transaction is the installation's change control (Contract v3 K3)."
+        "Every TOOL_POLICY.auto_install_conditions entry holds, so no separate installation gate is asked; this transaction is the installation's change control (Contract v3 K3). Under CHANGE_POLICY.change_classes.tool_installation (owner decision OD-P2-03, governed record D-0011) it needs a Human Gate only if the installation expands authority; the simulated impact records which branch applied and why (impact.change_class)."
     } else {
-        "Its installation is approved separately, by the Human Decision Gate raised for exactly this installation subject (BC-P2-41, Contract v3 F4); this transaction is the installation's change control (Contract v3 K3) and does not approve the installation."
+        "Its installation is approved separately, by the Human Decision Gate raised for exactly this installation subject (BC-P2-41, Contract v3 F4); this transaction is the installation's change control (Contract v3 K3) and does not approve the installation. Under CHANGE_POLICY.change_classes.tool_installation (owner decision OD-P2-03, governed record D-0011) this transaction needs its own Human Gate unless every non-gated condition holds and the installation stays inside the project's already-authorised envelope; the simulated impact records which branch applied and why (impact.change_class)."
     };
     format!(
         "Install tool {} {} for role {}: write its installation descriptor to {} and regenerate {} (installation subject sha256 {}; install command {}). {approval}",
@@ -906,11 +1484,29 @@ pub fn apply_installation(p: &Project, op: &Value, change_transaction: &str) -> 
             json!({"operation": "install_tool", "role": p.role, "cit": change_transaction}),
         ));
     }
-    let mut approval = json!({"mode": "autonomous", "conditions": "every TOOL_POLICY.auto_install_conditions entry held"});
+    // **OD-P2-03 at the instant of the write.** The branch is derived again here, from the descriptor as the
+    // transaction carries it and trusted OS state as it stands now, and an installation that expands authority is
+    // written only by a transaction a human gate approved. So a transaction pre-authorised when it was simulated,
+    // whose envelope has since changed (a role's permission classes narrowed, a path reclassified, the envelope
+    // policy tightened), does not slip through, and neither does a hand-proposed `install_tool` transaction.
+    let decision = change_decision(p, &prep, Some(op));
+    if decision["gate_required"].as_bool().unwrap_or(true) {
+        let gated = RecordStore::load(&p.root)
+            .get(change_transaction)
+            .map(|c| c.data["approval"]["gate"].is_string())
+            .unwrap_or(false);
+        if !gated {
+            return Err(GovError::new("TOOL_INSTALL_ELEVATED", format!("change transaction {change_transaction} would install tool '{}', which under {} ({}) needs a Human Gate — {} — but no gate approved this transaction; nothing is written. Re-simulate the transaction (`gov cit simulate {change_transaction}`) to raise the gate, or install again for a new request", prep.tool_id, decision["rule"].as_str().unwrap_or("CHANGE_POLICY.change_classes.tool_installation"), decision["owner_decision"].as_str().unwrap_or("OD-P2-03"), decision["why"].as_str().unwrap_or("")))
+                .with_details(json!({"cit": change_transaction, "tool_id": prep.tool_id, "change_class": decision})));
+        }
+    }
+    let mut approval = json!({"mode": "autonomous", "conditions": "every TOOL_POLICY.auto_install_conditions entry held",
+        "authorised_by": authorised_by(&decision, change_transaction)});
     if !prep.all_ok {
         match approval_for_subject(p, "tool-installation", &prep.subject, &prep.cited) {
             SubjectApproval::Approved(a) => {
-                approval = json!({"mode": "human_gate", "gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision, "installation_sha256": prep.subject, "failed_conditions": prep.failed});
+                approval = json!({"mode": "human_gate", "gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision, "installation_sha256": prep.subject, "failed_conditions": prep.failed,
+                    "authorised_by": authorised_by(&decision, change_transaction)});
             }
             other => {
                 let (gate, state) = match &other {
@@ -940,11 +1536,23 @@ pub fn apply_installation(p: &Project, op: &Value, change_transaction: &str) -> 
 /// authoritative gate/decision"; framework §47-48 "the human should not need to type /impact"). The descriptor lives
 /// under `governance/project/tools/`, which the kernel-floor materiality classifies exactly as it classifies a plugin
 /// descriptor, so the OS itself proposes the installation's change transaction (`cit::propose_installation`: CIT-P,
-/// simulated automatically, its own gate raised under CHANGE_POLICY) and the descriptor is written **only by that
-/// transaction's execution** (CIT-E, [`apply_installation`]: snapshot, verification, index refresh, commit or
-/// rollback, per-path writes recorded and sealed). Where an auto-install condition failed there are two approvals,
-/// each for what it approves and each naming the other; where every condition held the transaction's own gate is the
-/// only one. Neither answer stands in for the other, and the worker never hand-files a transaction: repeating
+/// simulated automatically) and the descriptor is written **only by that transaction's execution** (CIT-E,
+/// [`apply_installation`]: snapshot, verification, index refresh, commit or rollback, per-path writes recorded and
+/// sealed).
+///
+/// **Whether that transaction needs the owner's gate is `OD-P2-03`** (product owner, 2026-09-20; governed record
+/// `D-0011`; the rule in policy is `CHANGE_POLICY.change_classes.tool_installation` with
+/// `TOOL_POLICY.installation_envelope`). It does **not** when the tool is authenticated and pinned, independently
+/// governed-reviewed, registered, reversible **and** stays entirely inside the project's already-authorised
+/// permission and trust envelope ([`installation_authority`]); it **does** when the installation expands authority —
+/// privilege escalation, broader filesystem or project access, new secret or credential access, host-level
+/// authority, governance or security-policy mutation, or a new or unrestricted network trust boundary. Ordinary
+/// network use already authorised by project or tool policy is not by itself elevated. Anything that cannot be
+/// evaluated is gated (fail closed). Every installation is recorded either way, and the transaction states which
+/// branch applied and why ([`change_decision`], recorded as `impact.change_class`).
+///
+/// Where an auto-install condition failed there are two approvals, each for what it approves and each naming the
+/// other; neither answer stands in for the other, and the worker never hand-files a transaction: repeating
 /// `gov tools install` once they are answered approves and executes it. An installation made inside a claimed task
 /// therefore closes on the transaction's recorded writes (task close step 10a), like any other governed change.
 pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Result<Value> {
@@ -972,9 +1580,13 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
     let prep = prepare_installation(p, descriptor, role)?;
     let subject = prep.subject.clone();
     let tool_id = prep.tool_id.clone();
+    // OD-P2-03: which branch this installation is on, and why, reported with every answer the command gives — the
+    // same verdict CIT-P records in the transaction's bound impact and CIT-E re-derives at the write.
+    let decision = change_decision(p, &prep, Some(&installation_op(p, &prep, execute)));
     let common = |mut v: Value| -> Value {
         v["installation_sha256"] = json!(subject);
         v["checks"] = json!(prep.checks);
+        v["change_class"] = decision.clone();
         v
     };
     // --- 1. the installation's own approval (BC-P2-41; Contract v3 F4), asked only when a condition failed
@@ -1034,7 +1646,11 @@ pub fn install(p: &Project, descriptor: Value, role: &str, execute: bool) -> Res
                 );
                 return Ok(common(
                     json!({"installed": false, "human_gate": gid, "state": "RAISED", "gates_not_honoured": not_honoured, "change_transaction": change,
-                    "reason": format!("an automatic installation condition failed ({}), so the installation needs a presented, owner-answered gate raised for exactly it; and an installation is a material governance and security change, carried out by change transaction {cit} (proposed and simulated by the OS) with its own gate {}. Present both gates, have the product owner answer them through the human channel, then run the same install again", prep.failed.join(", "), change["human_gate"].as_str().unwrap_or("(none required)"))}),
+                    "reason": format!("an automatic installation condition failed ({}), so the installation needs a presented, owner-answered gate raised for exactly it; and an installation is a material governance and security change, carried out by change transaction {cit} (proposed and simulated by the OS){}. Present the gate(s) returned here, have the product owner answer them through the human channel, then run the same install again", prep.failed.join(", "),
+                        match change["human_gate"].as_str() {
+                            Some(g) => format!(" whose own gate {g} approves the change ({})", decision["why"].as_str().unwrap_or("")),
+                            None => format!(" which needs no gate of its own ({})", decision["why"].as_str().unwrap_or("")),
+                        })}),
                 ));
             }
         }
@@ -1411,5 +2027,70 @@ mod tests {
         let mut pin = d.clone();
         pin["version_pin"] = json!("1.2.4");
         assert_ne!(installation_subject(&pin).1, a);
+    }
+
+    /// **OD-P2-03, the half that makes "the descriptor cannot authorise itself" mechanical** (Contract v3 F4;
+    /// BC-P2-39). The authorised side of the envelope is trusted OS state; the *demanded* side is derived by the OS
+    /// from the installation's own commands as well as from what the descriptor asks for, so a descriptor that
+    /// declares nothing elevated still demands what its commands do. These are the readings that derivation rests
+    /// on: a path that leaves the project, a network endpoint, and a credential named in an argument or an
+    /// environment reference.
+    #[test]
+    fn the_os_reads_an_installations_own_commands_for_what_it_would_hold() {
+        // every command the installation carries is read, not only the one the OS runs
+        let d = json!({"install_command": ["pip", "install", "x"], "uninstall_command": ["pip", "uninstall", "x"],
+            "health_check": {"kind": "command", "command": ["x", "--version"]}});
+        let cmds = installation_commands(&d);
+        assert_eq!(
+            cmds.iter().map(|(w, _)| w.as_str()).collect::<Vec<_>>(),
+            vec![
+                "install_command",
+                "uninstall_command",
+                "health_check.command"
+            ]
+        );
+        assert!(installation_commands(&json!({})).is_empty());
+        // paths that leave the project
+        // any `..` segment counts, normalised or not: the OS does not resolve a path it will not execute, and
+        // fail closed is the direction the decision sets
+        for out in [
+            "/opt/tool/bin",
+            "~/.local/bin",
+            "../../etc/hosts",
+            "C:/Windows",
+            "a/../../b",
+            "a/b/../c",
+        ] {
+            assert!(leaves_project(out), "{out} was read as inside the project");
+        }
+        for inside in ["tools/x.sh", "x", "./a/b", "a/b/c"] {
+            assert!(
+                !leaves_project(inside),
+                "{inside} was read as outside the project"
+            );
+        }
+        // a flag hides its value, and the value is read too
+        assert_eq!(
+            token_values("--prefix=/opt/x"),
+            vec!["--prefix=/opt/x", "/opt/x"]
+        );
+        // network endpoints, with user and port stripped
+        assert_eq!(
+            endpoint_host("https://me@pypi.org:443/simple/x"),
+            Some("pypi.org".into())
+        );
+        assert_eq!(
+            endpoint_host("HTTP://Example.INVALID/x"),
+            Some("example.invalid".into())
+        );
+        assert_eq!(endpoint_host("tools/x.sh"), None);
+        // credentials named in an argument or an environment reference
+        let names = credential_names("--token=${GITHUB_TOKEN}");
+        assert!(names.contains(&"token".to_string()), "{names:?}");
+        assert!(names.contains(&"GITHUB_TOKEN".to_string()), "{names:?}");
+        let pats = vec!["*TOKEN*".to_string(), "*PASSWORD*".to_string()];
+        assert!(matches_any_pattern("GITHUB_TOKEN", &pats));
+        assert!(matches_any_pattern("token", &pats));
+        assert!(!matches_any_pattern("count", &pats));
     }
 }

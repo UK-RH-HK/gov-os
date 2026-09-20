@@ -1061,3 +1061,326 @@ fn an_installation_change_approved_without_its_installation_approval_writes_noth
         json!(cit3)
     );
 }
+
+// ============================================================================================ OD-P2-03 (R4-O1)
+
+/// A governed security review of `tool_id` at `version`, written by another session and role: the OS-written,
+/// T2-sealed report that closes a `security`-class task (IP-W7-1, BC-P2-41). Returns its record id.
+fn security_review(root: &Path, g: &Gov, tool_id: &str, version: &str) -> String {
+    let sec = g.with_session("S-sec-od3").with_role("security-engineer");
+    let t = g.ok(&[
+        "task",
+        "create",
+        "--class",
+        "security",
+        "--objective",
+        &format!("Security review of {tool_id} {version}"),
+        "--status",
+        "READY",
+    ])["id"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    sec.ok(&["task", "claim", &t]);
+    sec.ok(&["rebuild-memory", "--incremental"]);
+    let rep = crate::ws05::receipt_with(
+        &sec,
+        root,
+        &t,
+        &format!("od3-review-{tool_id}"),
+        &format!("reviewed {tool_id} {version}"),
+        &[],
+        "not_applicable_with_reason",
+        json!({"security_review": {"tool_id": tool_id, "version": version, "verdict": "passed"}}),
+    );
+    sec.ok(&["task", "close", &t, "--report", &rep])["report"]
+        .as_str()
+        .unwrap()
+        .to_string()
+}
+
+/// A reviewed, pinned, reversible, registrable descriptor of `TOOL-ENV` 1.0.0 — every non-gated condition of
+/// `CHANGE_POLICY.change_classes.tool_installation` holds — with `extra` merged over it. Each test variant adds
+/// exactly one way of reaching past the project's already-authorised envelope, so the gate it raises has one cause.
+fn envelope_descriptor(root: &Path, name: &str, review: &str, extra: Value) -> PathBuf {
+    let mut d = json!({"tool_id": "TOOL-ENV", "name": "env", "type": "CLI", "capabilities": ["lint"],
+        "version": "1.0", "version_pin": "1.0.0", "required_permission_classes": ["READ_REPO"], "license": "MIT",
+        "reversible": true, "cost_usd": 0, "install_command": ["true"], "uninstall_command": ["true"],
+        "security_review_record": review, "permissions": {"repo_write": false, "network": false},
+        "health_check": {"kind": "command", "command": ["true"], "expect_exit": 0}});
+    for (k, v) in extra.as_object().cloned().unwrap_or_default() {
+        d[k] = v;
+    }
+    let rel = format!("tools/od3-{name}.json");
+    write(root, &rel, &d.to_string());
+    root.join(rel)
+}
+
+fn hdg_count(root: &Path) -> usize {
+    std::fs::read_dir(root.join("spec/decisions"))
+        .map(|rd| {
+            rd.flatten()
+                .filter(|e| e.file_name().to_string_lossy().starts_with("HDG-"))
+                .count()
+        })
+        .unwrap_or(0)
+}
+
+/// **OD-P2-03 (product owner, 2026-09-20; governed record `D-0011`): a tool installation needs the Human Gate only
+/// when it expands authority.**
+///
+/// The ungated branch is `ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed`. This
+/// test is the gated branch, once for **each** authority-expansion trigger the governed rule declares, and the
+/// control the owner named: ordinary network use of an approved registry, by a role that already holds a network
+/// class, is **not** by itself elevated and does not gate.
+///
+/// Every variant satisfies the five non-gated conditions — authenticated and pinned, independently
+/// governed-reviewed (one review of this tool identity and version, written by another session and role),
+/// registered, reversible — and declares nothing but `READ_REPO`, which the acting role already holds. So the one
+/// thing that differs is the expansion, and the gate has exactly one cause. Four of the six are found by the OS in
+/// the installation's own commands although the descriptor declares nothing elevated: **the envelope is computed
+/// from trusted OS state and what the OS can observe, never from the descriptor's word** (Contract v3 F4 "a
+/// descriptor cannot authorise itself"; BC-P2-39, whose defect was a declaration deciding whether approval was
+/// needed).
+#[test]
+fn a_tool_installation_is_gated_for_each_way_it_expands_authority() {
+    let (root, g) = fresh("r4-od3-triggers");
+    let te = g.with_role("tooling-engineer").with_session("S-od3");
+    let review = security_review(&root, &g, "TOOL-ENV", "1.0.0");
+
+    // the control: the same tool with nothing elevated installs in one request, with no gate at all
+    let df = envelope_descriptor(&root, "base", &review, json!({}));
+    let before = hdg_count(&root);
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], true, "{r}");
+    assert_eq!(hdg_count(&root), before, "a gate was raised: {r}");
+    assert_eq!(r["change_class"]["branch"], "not_gated", "{r}");
+
+    // each trigger, on a fresh project so the installation is the same one every time
+    let cases: Vec<(&str, &str, Value)> = vec![
+        (
+            "privilege_escalation",
+            "sudo",
+            json!({"install_command": ["sudo", "true"]}),
+        ),
+        (
+            "host_level_authority",
+            "apt",
+            json!({"install_command": ["apt-get", "install", "-y", "env-tool"]}),
+        ),
+        (
+            "broader_filesystem_or_project_access",
+            "outside",
+            json!({"install_command": ["true", "/opt/env-tool/bin"]}),
+        ),
+        (
+            "new_secret_or_credential_access",
+            "creds",
+            json!({"install_command": ["true", "--token=$GITHUB_TOKEN"]}),
+        ),
+        (
+            "governance_or_security_policy_mutation",
+            "policy",
+            json!({"install_command": ["true", "framework/policies/SECURITY_POLICY.yaml"]}),
+        ),
+        (
+            "new_or_unrestricted_network_trust_boundary",
+            "host",
+            json!({"install_command": ["curl", "-sS", "https://tools.example.invalid/env-tool"]}),
+        ),
+    ];
+    for (trigger, name, extra) in cases {
+        let (root, g) = fresh(&format!("r4-od3-{name}"));
+        let te = g.with_role("tooling-engineer").with_session("S-od3");
+        let review = security_review(&root, &g, "TOOL-ENV", "1.0.0");
+        let df = envelope_descriptor(&root, name, &review, extra);
+        let before = hdg_count(&root);
+        let r = install(&te, &df);
+        assert_eq!(
+            r["installed"], false,
+            "{trigger}: an authority expansion installed without a gate: {r}"
+        );
+        assert!(
+            !exists(&root, "governance/project/tools/TOOL-ENV.yaml"),
+            "{trigger}: the descriptor was written"
+        );
+        // the five non-gated conditions still hold: the expansion is the only cause
+        let cc = &r["change_class"];
+        assert_eq!(cc["branch"], "gated", "{trigger}: {cc}");
+        assert_eq!(
+            cc["unmet_conditions"],
+            json!(["within_authorised_envelope"]),
+            "{trigger}: something other than the envelope gated it: {cc}"
+        );
+        assert_eq!(
+            cc["authority_envelope"]["triggers_fired"],
+            json!([trigger]),
+            "{trigger}: {cc}"
+        );
+        assert_eq!(cc["security_review"]["record"], json!(review), "{cc}");
+        // the gate is the change transaction's own, it is the only one raised, and it says why
+        let cit = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+        let gate = r["human_gate"].as_str().unwrap().to_string();
+        assert_eq!(r["change_transaction"]["human_gate"], json!(gate), "{r}");
+        assert_eq!(hdg_count(&root), before + 1, "{trigger}: {r}");
+        let gy = yaml(&root, &format!("spec/decisions/{gate}.yaml"));
+        assert_eq!(gy["cit"], json!(cit), "{gy}");
+        assert!(
+            gy["impact"].as_str().unwrap().contains(trigger),
+            "{trigger}: the owner is not told why: {gy}"
+        );
+        let c = yaml(&root, &format!("spec/decisions/{cit}.yaml"));
+        assert_eq!(c["impact"]["human_gate_required"], true, "{c}");
+        assert_eq!(c["impact"]["change_class"]["branch"], "gated", "{c}");
+
+        // answered, the same install proceeds — and is recorded with the branch that applied and its gate
+        crate::ws03::human_decide(&g, &gate, "A");
+        let r = install(&te, &df);
+        assert_eq!(r["installed"], true, "{trigger}: {r}");
+        assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
+        let d = yaml(&root, "governance/project/tools/TOOL-ENV.yaml");
+        assert_eq!(d["approval"]["authorised_by"]["branch"], "gated", "{d}");
+        assert_eq!(
+            d["approval"]["authorised_by"]["authority_envelope"]["triggers_fired"],
+            json!([trigger]),
+            "{d}"
+        );
+        assert_eq!(
+            d["approval"]["authorised_by"]["change_transaction"],
+            json!(cit),
+            "{d}"
+        );
+        assert_eq!(
+            d["approval"]["authorised_by"]["owner_decision"], "OD-P2-03",
+            "{d}"
+        );
+    }
+}
+
+/// **OD-P2-03's own control: ordinary network use already authorised by project or tool policy does not by itself
+/// count as elevated.** The tool fetches from an approved registry
+/// (`TOOL_POLICY.installation_envelope.approved_registries`) and asks for `NETWORK_READ`, which
+/// `TOOL_PERMISSIONS.roles.tooling-engineer` already holds, so nothing is expanded and the installation completes
+/// with no gate. Move the same request to a host the policy does not authorise — everything else identical — and it
+/// is a new network trust boundary, which gates. A network class with no endpoint the OS can determine is an
+/// unrestricted boundary, and gates too.
+#[test]
+fn ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does() {
+    let (root, g) = fresh("r4-od3-network");
+    let te = g.with_role("tooling-engineer").with_session("S-od3");
+    let review = security_review(&root, &g, "TOOL-ENV", "1.0.0");
+    let net = json!({"required_permission_classes": ["READ_REPO", "NETWORK_READ"],
+        "permissions": {"repo_write": false, "network": true}});
+
+    let mut allowed = net.clone();
+    allowed["install_command"] = json!(["curl", "-sS", "https://pypi.org/simple/env-tool"]);
+    let df = envelope_descriptor(&root, "net-ok", &review, allowed);
+    let before = hdg_count(&root);
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], true, "allowlisted network use gated: {r}");
+    assert_eq!(hdg_count(&root), before, "{r}");
+    assert_eq!(r["change_class"]["branch"], "not_gated", "{r}");
+    assert_eq!(
+        r["change_class"]["authority_envelope"]["network_endpoints"],
+        json!(["pypi.org"]),
+        "{r}"
+    );
+
+    // the same request to a host the policy does not authorise
+    let (root, g) = fresh("r4-od3-network-new");
+    let te = g.with_role("tooling-engineer").with_session("S-od3");
+    let review = security_review(&root, &g, "TOOL-ENV", "1.0.0");
+    let mut elsewhere = net.clone();
+    elsewhere["install_command"] =
+        json!(["curl", "-sS", "https://packages.example.invalid/env-tool"]);
+    let r = install(
+        &te,
+        &envelope_descriptor(&root, "net-new", &review, elsewhere),
+    );
+    assert_eq!(r["installed"], false, "{r}");
+    assert_eq!(
+        r["change_class"]["authority_envelope"]["triggers_fired"],
+        json!(["new_or_unrestricted_network_trust_boundary"]),
+        "{r}"
+    );
+
+    // a network class with no endpoint the OS can bound is unrestricted, and gates (fail closed)
+    let (root, g) = fresh("r4-od3-network-open");
+    let te = g.with_role("tooling-engineer").with_session("S-od3");
+    let review = security_review(&root, &g, "TOOL-ENV", "1.0.0");
+    let r = install(&te, &envelope_descriptor(&root, "net-open", &review, net));
+    assert_eq!(r["installed"], false, "{r}");
+    assert_eq!(
+        r["change_class"]["authority_envelope"]["triggers_fired"],
+        json!(["new_or_unrestricted_network_trust_boundary"]),
+        "{r}"
+    );
+    assert!(
+        r["change_class"]["authority_envelope"]["findings"]
+            .to_string()
+            .contains("cannot determine"),
+        "{r}"
+    );
+}
+
+/// **OD-P2-03 requirement 3 at the instant of the write: fail closed, fail gated.** A transaction pre-authorised
+/// when it was simulated is not a licence to write later: CIT-E derives the branch again, from the descriptor the
+/// transaction carries and trusted OS state **as it stands now**, and refuses `TOOL_INSTALL_ELEVATED` if the
+/// installation would now expand authority and no Human Gate approved the transaction. Here the acting role's
+/// authorised permission classes are narrowed between the request and its execution, which is exactly the window a
+/// recorded verdict would otherwise paper over. The same check is what stops a hand-proposed `install_tool`
+/// transaction from installing an elevated tool on an auto-approval.
+#[test]
+fn an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write() {
+    let (root, g) = fresh("r4-od3-toctou");
+    let te = g.with_role("tooling-engineer").with_session("S-od3");
+    let review = security_review(&root, &g, "TOOL-ENV", "1.0.0");
+    // cost_within_budget fails, so the installation needs its own gate (BC-P2-41) — but that is not one of the five
+    // non-gated conditions, and the envelope is clean, so the transaction itself is pre-authorised and gateless
+    let df = envelope_descriptor(&root, "toctou", &review, json!({"cost_usd": 25.0}));
+    let r = install(&te, &df);
+    assert_eq!(r["installed"], false, "{r}");
+    assert_eq!(r["change_class"]["branch"], "not_gated", "{r}");
+    let inst_gate = r["human_gate"].as_str().unwrap().to_string();
+    let cit = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+    assert!(
+        r["change_transaction"]["human_gate"].is_null(),
+        "the transaction was gated: {r}"
+    );
+    assert_eq!(
+        yaml(&root, &format!("spec/decisions/{cit}.yaml"))["impact"]["human_gate_required"],
+        false
+    );
+
+    // trusted OS state changes: the acting role no longer holds the class the tool asks for
+    let mut tp = yaml(&root, "governance/project/TOOL_PERMISSIONS.yaml");
+    tp["roles"]["tooling-engineer"] = json!(["RUN_TESTS", "PACKAGE_INSTALL"]);
+    write_yaml(&root, "governance/project/TOOL_PERMISSIONS.yaml", &tp);
+
+    crate::ws03::human_decide(&g, &inst_gate, "A");
+    let e = te.err(&["tools", "install", "--descriptor", df.to_str().unwrap()]);
+    assert_eq!(e.error_code(), "TOOL_INSTALL_ELEVATED", "{}", e.envelope);
+    assert!(
+        !exists(&root, "governance/project/tools/TOOL-ENV.yaml"),
+        "the descriptor was written anyway"
+    );
+    assert_eq!(
+        yaml(&root, &format!("spec/decisions/{cit}.yaml"))["cit_status"],
+        "ROLLED_BACK"
+    );
+    // the refusal carries the re-derived verdict (the rollback wraps the operation's own details)
+    let cc = &e.details()["details"]["change_class"];
+    assert_eq!(cc["branch"], "gated", "{}", e.envelope);
+    assert_eq!(
+        cc["authority_envelope"]["triggers_fired"],
+        json!(["privilege_escalation"]),
+        "{}",
+        e.envelope
+    );
+    assert_eq!(
+        cc["unmet_conditions"],
+        json!(["within_authorised_envelope"]),
+        "{}",
+        e.envelope
+    );
+}
