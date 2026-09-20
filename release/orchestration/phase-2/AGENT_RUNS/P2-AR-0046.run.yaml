@@ -53,7 +53,7 @@ outcome:
     + HOME pairs
   regression_verifier_run:
     lib: 276/0
-    certification: did not finish in its window (host load >160); recorded in evidence/cargo-certification.NOT-COMPLETED.md; the orchestrator reproduced 207/0 at the candidate
+    certification: 207/0 (4910 s) - completed after the first commit and merged as an addendum; both AC-15 inputs are now reproduced independently by this verifier and match P2-AR-0054's claim
   blocking_findings:
   - 'V1-S4-01 HIGH RESIDUAL of BC-P2-33 - on a brownfield tree gov adopt classify marks src/app/config.py and memory/chat_history.sql SECRET but nothing writes that into DATA_SENSITIVITY.yaml, so D011 and
     path_map_compliance (critical, global) hard-block adopt.migrate for every batch and their remedies list names no adoption stage; A6-A11 are unreachable through the documented A0-A11 sequence without
@@ -74,7 +74,11 @@ outcome:
   prior_finding_disposition: '34 recorded: 24 CLOSED, 10 RESIDUAL. Closed for this family include BC-P2-01 and -02 (compiled contract carries all 100 alpha bullets verbatim plus Gate U and 713 items; the
     evidence map maps all 101 rows), -03 (four input classes shown to invalidate green), -21, -31, -34, -35, -36, -38, -45, -52. Residual: BC-P2-08, BC-P2-33, BC-P2-37 (its version-field instance) and seven
     non-blocking'
-  could_not_establish: cargo test --test certification (host load); BC-P2-03's machine trust anchor and the gov binary as freshness triggers (four of six classes exercised); V1-A5-03 rests on the absence
-    of any consumer of agents_cancelled rather than a demonstrated claim-revocation failure; A11 against a brownfield tree's full legacy surface; AC-14 (P2-AR-0044's)
+  could_not_establish: BC-P2-03's machine trust anchor and gov binary as freshness input classes (four of six exercised); CANCEL_AGENTS claim revocation end to end; A11 against a brownfield tree's full
+    legacy surface; AC-14 (P2-AR-0044's)
   orchestrator_checks: 'Scope clean against base 8588813: only its evidence directory and run report. Evidence merged. The cross-machine attack passing 74/74 is the independent evidence P2-ADJ-0002 required.
-    Both blocking findings are labelled RESIDUAL by the verifier, so alpha adds no materially new class; the synthesis verifier checks the labels'
+    Both blocking findings are labelled RESIDUAL by the verifier, so alpha adds no materially new class; the synthesis verifier checks the labels. Addendum merged: the verifier''s own certification run
+    finished 207/0, closing its one unestablished AC-15 input; output.commit still points at the original evidence commit with follow-ups recorded beside it; verdict and every status unchanged'
+  follow_up_commits:
+  - 431c51894d65c57edae0933ffd8091ee9308b2ba (evidence/cargo-certification.out; NOT-COMPLETED placeholder rewritten as timing-note.md; report sections 2 and 9 corrected)
+  - d7e578c (amended run report with output.follow_up_commits and an amendment note)
