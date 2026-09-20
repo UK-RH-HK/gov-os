@@ -1,0 +1,6 @@
+PASS  setup: an independent governed security review of TL-EXEC 1.0.0 exists (RPT-0001)
+    installed|gate|branch|expands|undetermined = True|none|not_gated|False|0
+FAIL  OD-P2-03: an ungated installation (True|none|not_gated|False|0) executed a command that wrote OUTSIDE the project root — the authority-expansion trigger 'broader_filesystem_or_project_access' was neither fired nor recorded as undetermined
+    (no --execute) installed|gate|branch = True|none|not_gated
+FAIL  OD-P2-03: a shell-wrapped health_check command wrote OUTSIDE the project root on an ungated installation WITHOUT --execute — --execute is not the boundary
+---- V1-F4-01-executed-proof.sh: 1 passed, 2 failed

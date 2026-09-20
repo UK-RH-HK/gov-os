@@ -1,0 +1,44 @@
+PASS  F1 b1: every kernel skill carries a semantic version (12/none skills) (got none)
+PASS  F1 b1: no skill document carries or grants authority (got none)
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+  File "/usr/lib/python3.12/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+    skills resolve as an L0 role -> 
+PASS  F1 b2: every skill defines applicability (roles, task classes), inputs, outputs and evidence scenarios (got none)
+PASS  F1 b3: skill validation scenarios are actually executed (7/14/7 executed/declared/deferred)
+PASS  F1 b3: a scenario the suite does not execute states why (no silent N/A) (got 0)
+PASS  F1 b3: a skill's version is bound to its content (content_sha256 recorded) (got present)
+FAIL  F1 b4: a lesson from ordinary work cannot propose a skill update through governed promotion (upstream prepare -> UPSTREAM_SCOPE; framework-change-proposal -> no-skill-target; no skill-promotion operation exists)
+    F2 registry fields: identity/version=yes;executable/transport=yes;permissions=yes;allowed roles=yes;allowed task classes=NO;sensitivity=yes;network scope=yes;filesystem scope=NO;health status=yes;provenance=yes;hash pin=yes;installation/approval status=yes
+PASS  F2: the registry records identity/version
+PASS  F2: the registry records executable/transport
+PASS  F2: the registry records permissions
+PASS  F2: the registry records allowed roles
+PASS  F2: the registry records health status
+PASS  F2: the registry records provenance
+PASS  F2: the registry records hash pin
+PASS  F2: the registry records installation/approval status
+FAIL  F2 b4: the registry records allowed ROLES but no task-class scoping, although TOOL_POLICY.mcp.scope declares role_and_task
+FAIL  F2 b5: the registry records no filesystem scope for a tool (only a repo_write boolean)
+    tools health rows: 14
+    MCP registry: MCP-REPO-001:planned
+PASS  F5 b1/b4: the deferred MCP transport is registered as 'planned', never silently substituted (D-0004)
+FAIL  F5 b4: doctor reports the deferred MCP layer rather than passing over it (expected 'reported', got 'silent')
+PASS  F5 b2: an A2A handoff always carries an explicit authority envelope (got present)
+PASS  F5 b3/b4: the Knowledge Fabric's retrieved material is kept separate from deterministic authority in a context packet (got separate)
+PASS  OD-P2-03: an installation demanding a class the role does not hold expands authority (True|privilege_escalation|gated) (got True)
+    envelope verdict before=True|privilege_escalation|gated after=False|-|gated
+FAIL  OD-P2-03 req 2: a hand edit of governance/project/TOOL_PERMISSIONS.yaml (no gov command, no change transaction, no gate) enlarged the authorised envelope: the same installation stopped being an authority expansion (True|privilege_escalation|gated -> False|-|gated)
+FAIL  OD-P2-03 req 2: the governance suite reports an out-of-band edit of an envelope source (expected 'detected', got 'silent')
+---- F1-F2-F5-skills-tools-layers.sh: 18 passed, 6 failed

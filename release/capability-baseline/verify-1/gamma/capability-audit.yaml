@@ -1,0 +1,1818 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0048
+family: gamma
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+worktree_commit: 8588813ec1ef9c832879e258ca5acfb573ae996f
+note: >-
+  Worktree HEAD 8588813 carries the same product_code_digest and governed_state_digest as the tag
+  cap2-candidate-1 (0bad524); both were verified with
+  `python3 release/orchestration/phase-2/tools/product_identity.py HEAD` and `git rev-list -n1 cap2-candidate-1`.
+  Every status below is established afresh on this candidate; no iteration-0 status is carried forward.
+capabilities:
+
+  - capability: E1
+    title: Authority levels
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:362
+    governing_document_refs: ["DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md Part VI §23", "spec/decisions/D-0007"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      Every bullet demonstrated on this candidate by held-out probe E1-E2-authority.sh (14/14). The acting role is
+      resolved once per process from --role, then GOV_ROLE, then `undeclared` = L0; an L5 (human) claim never confers
+      human authority; a hand-edited gate answer is T2-unbound, unverified and refused.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "L0-L5 or equivalent are executable."
+        source_line: 363
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/authority.rs:29-200", "framework/roles/ROLES.yaml", "framework/policies/AUTHORITY_POLICY.yaml authority_levels_required"]
+        automated_evidence: ["cargo test --lib (276 passed, 0 failed, this worktree)"]
+        independent_evidence: ["evidence/E1-E2-authority.out: kernel defines L0-L5; an L0 role is refused create_task (AUTHORITY_DENIED); an L2 role performs it; an L2 role is refused resume_control"]
+        gap: null
+      - bullet: "Role authority is checked on every privileged/mutating path."
+        source_line: 364
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/authority.rs:83-140 install_acting_role", "runtime/src/orchestration/control.rs guard_write", "cli/src/main.rs (single installation before dispatch)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out: 17 mutating commands driven as an L0 role, each mapped to the AUTHORITY_POLICY operation that must guard it; none succeeded. An invocation declaring no role is refused ROLE_UNDECLARED."]
+        gap: null
+      - bullet: "Lower roles cannot manufacture higher-trust facts."
+        source_line: 365
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/authority.rs:186-200 level_of (a declared L5 carries L0)", "runtime/src/human_channel.rs", "runtime/src/t2.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out: --role human and GOV_ROLE=human are refused HUMAN_ROLE_CLAIM; an invented role is UNKNOWN_ROLE; a hand-edited gate answer reads t2 BROKEN / authorisation UNVERIFIED / answer verified false.", "evidence/OD-P2-01-human-approval.out: nine separate agent-supplied routes to a human approval all refused"]
+        gap: null
+      - bullet: "Independent auditors/testers are appropriately constrained."
+        source_line: 366
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml (independent-auditor L0, migration-reviewer L0, migration-verifier L0, memory-verifier L0, independent-test-designer L1)", "framework/overlay-templates/TOOL_PERMISSIONS.yaml"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out: the independent roles sit at L0/L1 and hold no WRITE_REPO_SCOPED permission class; every mutating command is refused for them"]
+        gap: null
+    health_scheduler_tiers: ["G0", "G1", "G2", "G5"]
+    evidence_owners: ["G0", "G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — the G0 guard and the authority_role_limits suite family both ran in the probe projects (`gov health run`, `gov audit`)"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation/source", "kernel policy (AUTHORITY_POLICY, ROLES)", "machine trust state"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield repository driven end to end by an adapter that declares no role, and by one that declares an L1 role, with every privileged operation attempted"
+      repo_b_challenge: "a brownfield repository adopted while a legacy harness sets GOV_ROLE to a role the kernel does not define"
+      hidden_oracle_fault_class: "an operation added without an authority::require call; a role id accepted outside the verified kernel ROLES.yaml"
+      chaos_scale_soak: "concurrent invocations under different declared roles against one repository"
+      retrieval_challenge: "not relevant: authority is deterministic and never retrieved"
+      not_challengeable: null
+    adoption_obligation: "gov init/adopt/update must evaluate every stage against the caller's declared role and must not promote an undeclared invocation"
+    residual_risk: "OD-P2-01 keeps agent roles adapter-declared: a compromised agent may claim a higher AGENT role (never a human one). Owner-accepted; revisit at R2/R3."
+    findings: []
+
+  - capability: E2
+    title: Representative roles
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:368
+    governing_document_refs: ["framework v4.1.2 Part VI §23-24"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: "Six of the seven bullets are met by the verified kernel role set; bullet 7 (project-specific roles through governed extension) has no mechanism: an id the kernel does not define is refused UNKNOWN_ROLE and no extension point exists."
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      CANNOT_UNDERMINE. Qualification repositories are driven with kernel roles; the missing extension point removes a
+      capability the owner asked for but cannot make any qualification result unsound, and it fails closed (an unknown
+      role is refused, never silently promoted). It does block an adopter whose organisation needs a project role.
+    bullets:
+      - bullet: "Orchestrator/CTO"
+        source_line: 369
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml orchestrator L4"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out: role-class coverage check; orchestrator used throughout every probe"]
+        gap: null
+      - bullet: "architecture/research/data/implementation roles as needed"
+        source_line: 370
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml architecture-agent, research-agent, data-engineer, backend-engineer, frontend-engineer, ai-ml-engineer, integration-engineer"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out"]
+        gap: null
+      - bullet: "memory engineer"
+        source_line: 371
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml memory-engineer L2"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out; the memory-engineer role performed every rebuild in the probes"]
+        gap: null
+      - bullet: "independent test author"
+        source_line: 372
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml independent-test-designer L1", "framework/taxonomy/READINESS_DIMENSIONS.yaml gap_task_role"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a generated independent-test gap task carries role independent-test-designer"]
+        gap: null
+      - bullet: "independent verifier/auditor"
+        source_line: 373
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml independent-auditor L0, migration-reviewer, migration-verifier, memory-verifier"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out"]
+        gap: null
+      - bullet: "security/release roles"
+        source_line: 374
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/roles/ROLES.yaml security-engineer L2, release-agent L2"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E1-E2-authority.out; security-engineer authored every governed security review in the F3/F4 probes"]
+        gap: null
+      - bullet: "project-specific roles through governed extension"
+        source_line: 375
+        status: ABSENT
+        implementation_evidence: ["runtime/src/authority.rs:150-170 level_in (UNKNOWN_ROLE for any id not in the kernel ROLES.yaml)"]
+        automated_evidence: []
+        independent_evidence: ["evidence/E1-E2-authority.out: `--role my-project-role` is refused UNKNOWN_ROLE and ROLES.yaml carries no project_roles / extension key"]
+        gap: "A project cannot declare a project-specific role through any governed extension point; the only role universe is the verified kernel's."
+    health_scheduler_tiers: ["G0", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "partial — the suite checks role authority limits, not the presence of a role-extension mechanism"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["kernel policy (ROLES.yaml)", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield product whose team structure needs a role the kernel does not define"
+      repo_b_challenge: "a brownfield repository whose legacy CODEOWNERS names roles outside the kernel set"
+      hidden_oracle_fault_class: "a project role silently granted kernel authority"
+      chaos_scale_soak: "not relevant: role definition is static"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adoption must map legacy role names onto kernel roles and report any it cannot map"
+    residual_risk: "adopters with organisation-specific roles must either reuse a kernel role or change the kernel"
+    findings: ["V1-E2-01"]
+
+  - capability: E3
+    title: Typed A2A handoffs
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:377
+    governing_document_refs: ["framework v4.1.2 Part VI §25", "spec/interfaces/API-0002"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "All seven typed elements are REQUIRED by the worker-return contract the product validates against, they are accepted, recorded and persist in the governed record, and a lesson in the return becomes a governed PROVISIONAL record. Probe E3-E4-handoff-claims.sh (16/16)."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Work completed"
+        source_line: 378
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json required", "runtime/src/orchestration/handoffs.rs:338-444"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: work_completed is required and persists"]
+        gap: null
+      - bullet: "files changed"
+        source_line: 379
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json", "runtime/src/orchestration/handoffs.rs:368-392 (checked against the handoff's authority envelope)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out; evidence/G1-G2-I1-I4-command-work.out: a file outside the allowed paths is refused MUTATION_SCOPE_VIOLATION"]
+        gap: null
+      - bullet: "evidence/tests"
+        source_line: 380
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json required: evidence, tests"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out"]
+        gap: null
+      - bullet: "discoveries/risks"
+        source_line: 381
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json required: discoveries, risks"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out"]
+        gap: null
+      - bullet: "lessons/proposed decisions"
+        source_line: 382
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json required: lessons, proposed_decisions", "runtime/src/orchestration/handoffs.rs:414-440 (lessons become PROVISIONAL lesson records, never authority)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: lessons_created non-empty; evidence/G1-G2-I1-I4-command-work.out: the lesson generates linked work"]
+        gap: null
+      - bullet: "unresolved items"
+        source_line: 383
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json required: unresolved"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out"]
+        gap: null
+      - bullet: "next action"
+        source_line: 384
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/worker-return.schema.json required: recommended_next_action"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out"]
+        gap: null
+      - bullet: "persist beyond conversation lifetime."
+        source_line: 385
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/handoffs.rs (save_record)", "runtime/src/records.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: every returned element is read back from the governed record by a later, separate process and session; the same schema-valid return is accepted as the task-close receipt"]
+        gap: null
+    health_scheduler_tiers: ["G3", "G5"]
+    evidence_owners: ["G3", "G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — the continuity_checkpoint_handoff suite family ran in the probe projects"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation/source", "schemas", "checkpoint/handoff records"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/FRESHNESS-invalidation.out (continuity_records is a currency class)"
+    qualification_coverage:
+      repo_a_challenge: "a multi-role greenfield build where each stage hands off and the receiving role must reconstruct from the record alone"
+      repo_b_challenge: "a brownfield repository where a handoff is returned after a process restart"
+      hidden_oracle_fault_class: "a return that omits a required element; a return bound to the wrong handoff"
+      chaos_scale_soak: "many concurrent handoffs across roles"
+      retrieval_challenge: "not relevant: handoffs are deterministic records"
+      not_challengeable: null
+    adoption_obligation: "adoption must carry legacy hand-off notes into governed handoff records or report them as unmapped"
+    residual_risk: "a return is not bound to the role the handoff names and a later return replaces the earlier one (finding V1-E3-01)"
+    findings: ["V1-E3-01", "V1-F5-02"]
+
+  - capability: E4
+    title: Concurrency/task claims
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:387
+    governing_document_refs: ["framework v4.1.2 §11.1", "spec/decisions/D-0007"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "Every bullet demonstrated by probe E3-E4-handoff-claims.sh (16/16), including eight truly concurrent OS processes claiming one task with exactly one winner."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Sessions/worktrees/tasks can be claimed."
+        source_line: 388
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/memory/claims.rs:1-140", "runtime/src/orchestration/claims.rs"]
+        automated_evidence: ["cargo test --lib memory::claims::tests::concurrent_processes_claiming_one_task_grant_exactly_one"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: a claim records session_id, worktree, git_dir, branch, head and mutation scope"]
+        gap: null
+      - bullet: "Claim collision is detected."
+        source_line: 389
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/memory/claims.rs claim_exclusive (BEGIN IMMEDIATE)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: a second session is refused TASK_CLAIMED; 8 concurrent OS processes -> exactly 1 winner"]
+        gap: null
+      - bullet: "Claims survive derived-memory rebuild."
+        source_line: 390
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/memory/claims.rs (store at paths::store_path(root, \"claims\"), outside the derived runtime directory)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: claim count unchanged across a full `gov rebuild-memory`"]
+        gap: null
+      - bullet: "Stale claims have governed recovery."
+        source_line: 391
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/claims.rs sweep", "cli/src/main.rs `gov claims sweep`"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: an expired claim is swept and the task becomes claimable again"]
+        gap: null
+      - bullet: "Parallel work is allowed only where dependency/mutation constraints permit."
+        source_line: 392
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/memory/claims.rs (scope overlap inside the claim transaction)", "runtime/src/orchestration/dag.rs (runnability derived from the DAG)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: a disjoint mutation scope is claimable in parallel; an overlapping one is refused CLAIM_SCOPE_CONFLICT; a dependency-blocked task with stored status READY is refused TASK_NOT_RUNNABLE"]
+        gap: null
+    health_scheduler_tiers: ["G1", "G2", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["implementation/source", "task records", "path map"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "many parallel agents in linked git worktrees of one greenfield repository"
+      repo_b_challenge: "a brownfield repository whose claims store is at the legacy .governance-runtime location"
+      hidden_oracle_fault_class: "a claims table copied into a sandbox granting the same task twice; a claim whose isolation row is missing"
+      chaos_scale_soak: "hundreds of concurrent claim/release cycles with killed processes"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt/update must relocate a legacy claims store without losing a live claim"
+    residual_risk: "claim leases are time-based; a long-running agent must renew or be swept"
+    findings: []
+
+  - capability: F1
+    title: Skill lifecycle
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:398
+    governing_document_refs: ["framework v4.1.2 Part VII §26-27"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: >-
+      b1-b3 are met and executably evidenced: skills are versioned, authority-free methods with declared applicability,
+      inputs, outputs and validation scenarios, and the scenarios are now actually EXECUTED with content binding
+      (7 of 14 executed here; every deferred one states why). b4 is unmet: no governed promotion carries a lesson to a
+      skill update.
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      CANNOT_UNDERMINE. Qualification exercises skills as methods and measures their regression; the missing
+      lesson-to-skill promotion route affects the framework's own learning loop (§75E, Phase 5 upstream), not the
+      soundness of any qualification result. Nothing silently substitutes for it: a project lesson is explicitly
+      refused UPSTREAM_SCOPE rather than quietly promoted.
+    bullets:
+      - bullet: "Skills are versioned methods, not authority."
+        source_line: 399
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/skills.rs:1-60", "framework/schemas/skill.schema.json (semver pattern)", "framework/skills/*.yaml"]
+        automated_evidence: ["cargo test --lib", "gov health skills (skill_regression family)"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: all 12 kernel skills carry a semantic version and none carries an authority/grant/level key"]
+        gap: null
+      - bullet: "Skill applicability/inputs/outputs/evidence are defined."
+        source_line: 400
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/skill.schema.json (roles, task_classes, inputs, outputs, validation_scenarios)"]
+        automated_evidence: ["gov health skills"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: every kernel skill declares roles, task classes, inputs, outputs and validation scenarios"]
+        gap: null
+      - bullet: "Skill regression is testable."
+        source_line: 401
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/skills.rs (scenario execution, content_sha256 version binding)", "cli/src/main.rs `gov health skills`"]
+        automated_evidence: ["gov health skills; the skill_regression suite family"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: 7 of 14 declared scenarios executed with pass/fail transcripts; 0 deferred scenarios lack a stated reason; content_sha256 binds version to content"]
+        gap: null
+      - bullet: "Lessons can propose skill updates through governed promotion."
+        source_line: 402
+        status: ABSENT
+        implementation_evidence: ["runtime/src/lessons.rs (clustering into framework-change-proposal records)", "framework/schemas/framework-change-proposal.schema.json", "runtime/src/upstream.rs"]
+        automated_evidence: []
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: a lesson produced by ordinary work is PROJECT-scoped and refused UPSTREAM_SCOPE; the framework-change-proposal record has no skill target field; no skill-promotion operation exists in the CLI"]
+        gap: "There is no governed route from a lesson to a skill update: the only promotion path is the canonical repository's lesson inbox, which a project lesson cannot enter, and the proposal record it produces cannot name a skill."
+    health_scheduler_tiers: ["G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — skill_regression executes at G5"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["skill (versioned method)", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/FRESHNESS-invalidation.out: adding a project skill changes the project_skills digest and the whole currency key"
+    qualification_coverage:
+      repo_a_challenge: "a greenfield build whose skills are exercised and whose scenarios must all execute"
+      repo_b_challenge: "a brownfield repository carrying project skills whose content drifted from their declared version"
+      hidden_oracle_fault_class: "a skill whose validation scenario is declared but silently not executed; a skill edited without a version bump"
+      chaos_scale_soak: "not relevant: skills are static documents"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt must register project skills and bind their versions to content"
+    residual_risk: "half the kernel skills are deferred to G6 agent/qualification harnesses, so their regression is not exercised in Phase 2; a skill's declared inputs/outputs reach no caller (finding V1-F1-02)"
+    findings: ["V1-F1-01", "V1-F1-02"]
+
+  - capability: F2
+    title: Tool Capability Registry
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:404
+    governing_document_refs: ["framework v4.1.2 Part VII §28-29", "spec/decisions/D-0004"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: >-
+      Six of the eight bullets are fully recorded and exercised. b4 is half-met (allowed roles yes, task classes no)
+      and b5 is half-met (network and a repo_write boolean, but no filesystem path scope and no sensitivity class
+      beyond credential_scope).
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      CANNOT_UNDERMINE for Phase 4 as scoped: exposure is still narrowed by role and permission class, so no tool
+      reaches a role that may not hold it, and the gap widens exposure only within a role. It COULD undermine a
+      qualification fault class that models a tool correct for one task class and wrong for another; that class
+      cannot be run until task-class scoping exists, which is a coverage limit to record, not an unsound result.
+    bullets:
+      - bullet: "identity/version"
+        source_line: 405
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:207-278 generate_registry", "framework/schemas/tool.schema.json tool_id, version, version_pin"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: registry field matrix"]
+        gap: null
+      - bullet: "executable/transport"
+        source_line: 406
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/tool.schema.json type (MCP|CLI|API|library), install_command, health_check"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out; the generated registry carries both tools and mcp_servers with their transports"]
+        gap: null
+      - bullet: "permissions"
+        source_line: 407
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/tool.schema.json permissions, required_permission_classes", "runtime/src/tools.rs:80-105 role_allowed"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out; evidence/F3-F4-tool-install-gate.out (a class the role does not hold gates the install)"]
+        gap: null
+      - bullet: "allowed roles/task classes"
+        source_line: 408
+        status: PARTIAL
+        implementation_evidence: ["runtime/src/tools.rs:306-360 resolve (role + permission class + language)", "framework/policies/TOOL_POLICY.yaml mcp.scope: role_and_task"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: 'allowed task classes=NO'; the tool schema has no task_classes property and `tools resolve` takes no task class"]
+        gap: "A tool is scoped to roles and permission classes only. TOOL_POLICY.mcp.scope declares role_and_task, but no task-class scoping is implemented or recorded for tools or MCP servers."
+      - bullet: "sensitivity/network/filesystem scope"
+        source_line: 409
+        status: PARTIAL
+        implementation_evidence: ["framework/schemas/tool.schema.json credential_scope, permissions.network, permissions.repo_write", "governance/project/DATA_SENSITIVITY.yaml (project-wide, not per tool)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: 'filesystem scope=NO'; a tool records a repo_write boolean, never a path scope"]
+        gap: "A tool's filesystem scope is a single repo_write boolean; no path scope is recorded, so the registry cannot say which paths a tool may touch."
+      - bullet: "health status"
+        source_line: 410
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:1809-1850 health_one/health", "runtime/src/tools.rs:1769-1808 record_health_failure"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: `gov tools health` returned 14 live rows; a failing health check writes a durable failure record that generates work (evidence/G1-G2-I1-I4-command-work.out, tool-failure source)"]
+        gap: null
+      - bullet: "provenance/hash pin"
+        source_line: 411
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/tool.schema.json source, package, version_pin, installation_sha256", "runtime/src/tools.rs:394-413 installation_subject"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: the installed descriptor carries installation_sha256 and its version pin; an unpinned descriptor fails version_pinned_and_recorded and gates"]
+        gap: null
+      - bullet: "installation/approval status"
+        source_line: 412
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:1415-1491 install_write (status, approval, authorised_by)", "runtime/src/tools.rs:1316-1333 authorised_by"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: the installed descriptor records the owner decision, the governed record, the branch, why, the bound review and the change transaction"]
+        gap: null
+    health_scheduler_tiers: ["G1", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — plugin_governance and the tool health family run at G5"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["tool/plugin registry", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/FRESHNESS-invalidation.out: a new tool descriptor changes the tools_plugins digest"
+    qualification_coverage:
+      repo_a_challenge: "a greenfield build needing several tools across roles and task classes"
+      repo_b_challenge: "a brownfield repository with pre-existing, unregistered tooling"
+      hidden_oracle_fault_class: "a tool exposed to a task class it must not serve; a registry entry whose health status is stale"
+      chaos_scale_soak: "many tools registered and health-checked concurrently"
+      retrieval_challenge: "not relevant: the registry is deterministic"
+      not_challengeable: null
+    adoption_obligation: "adopt must inventory existing tooling into the registry with provenance and approval status"
+    residual_risk: "a tool's own bytes are not pinned (only its descriptor and version string), unlike a plugin's implementation"
+    findings: ["V1-F2-01", "V1-F2-02"]
+
+  - capability: F3
+    title: Missing-tool acquisition
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:414
+    governing_document_refs: ["framework v4.1.2 Part VII §30-32", "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: >-
+      The acquisition chain runs end to end under OD-P2-03 and every step is evidenced, but b2 is not met: the
+      "security/licence/maintenance/cost review" has no maintenance review, and — the blocking part — the governed
+      security review it does require is bound to a tool id and version, not to the installation it authorises, so a
+      review written for one descriptor authorises a different one (finding V1-F3-01).
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      COULD_UNDERMINE. Under OD-P2-03 the independent governed review is what carries everything the OS cannot observe
+      about a non-gated installation. A review that is not bound to the installation therefore leaves the non-gated
+      branch resting on evidence about a different artefact, and an adversarial-tooling fault class in Phase 4 would
+      pass a repository that should have stopped for the owner. This fails AC-4 and AC-3.
+    bullets:
+      - bullet: "capability gap → candidate discovery"
+        source_line: 415
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:306-360 resolve (capability_gap, reason, next)", "runtime/src/orchestration/generation.rs:1151-1211 missing_capabilities", "framework/taxonomy/WORK_GENERATION.yaml missing-tool"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: an absent required tool produced generated task TASK-0028, class tooling, role tooling-engineer, naming the blocked tasks; `tools resolve` reports capability_gap with the next governed step"]
+        gap: null
+      - bullet: "security/licence/maintenance/cost review"
+        source_line: 416
+        status: PARTIAL
+        implementation_evidence: ["runtime/src/tools.rs:578-760 prepare_installation (licence_and_security_satisfied, cost_within_budget)", "runtime/src/tools.rs:415-523 review_verdict / security_review_evidence"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: licence and a governed independent security review are required and evidenced; the same probe shows the review is NOT bound to the installation (a swapped install command reused it and executed); TOOL_POLICY.auto_install_conditions contains no maintenance review"]
+        gap: "No maintenance review exists, and the security review is bound only to tool id and version, not to the installation subject it authorises."
+      - bullet: "reversible selection"
+        source_line: 417
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:614-620 installation_reversible", "framework/policies/TOOL_POLICY.yaml auto_install_conditions"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: an irreversible descriptor fails the condition and gates; an uninstall_command is required by environment_reproducible"]
+        gap: null
+      - bullet: "approval when required"
+        source_line: 418
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:1226-1310 change_decision", "runtime/src/tools.rs:1585-1768 install", "framework/policies/CHANGE_POLICY.yaml change_classes.tool_installation"]
+        automated_evidence: ["cargo test --lib", "tests/certification/ws07.rs (builder regression only)"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: eleven authority-expansion cases each raise a Human Decision Gate; a non-elevated, reviewed, pinned, reversible install proceeds ungated; ordinary use of an approved registry alone does not gate"]
+        gap: null
+      - bullet: "install/configure"
+        source_line: 419
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:1415-1491 install_write", "runtime/src/tools.rs:1492-1556 apply_installation (CIT-E)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: the non-gated install completed and wrote its descriptor only through its change transaction's execution; with --execute the install command actually ran"]
+        gap: null
+      - bullet: "version pin"
+        source_line: 420
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:377-392 installed_version", "framework/policies/TOOL_POLICY.yaml version_pinned_and_recorded"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: the pin is a non-gated condition; the installed descriptor records version_pin and installation_sha256"]
+        gap: null
+      - bullet: "register"
+        source_line: 421
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:207-278 generate_registry", "runtime/src/tools.rs:1480-1489 (registry regenerated inside the installation write)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out; evidence/F1-F2-F5-skills-tools-layers.out: the installed tool appears in governance/generated/tool-registry.json with its approval block"]
+        gap: null
+      - bullet: "health test"
+        source_line: 422
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:1809-1834 health_one", "runtime/src/tools.rs:1769-1808 record_health_failure"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: health_check.kind is required before any installation is derived; the install result carries the health outcome"]
+        gap: null
+      - bullet: "continue task"
+        source_line: 423
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs (required_tools blocks runnability)", "runtime/src/orchestration/generation.rs missing_capabilities (the generated task names the tasks it unblocks)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: a task with an unresolved required tool is TASK_NOT_RUNNABLE, and the generated tooling task states that the tasks it blocks become runnable once the tool resolves"]
+        gap: null
+    health_scheduler_tiers: ["G1", "G5"]
+    evidence_owners: ["G5", "human-gate", "independent-heldout"]
+    evidence_owner_actually_runs: "true — the installation raises real gates answered through the authenticated human channel in the probe"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["tool/plugin registry", "kernel policy (TOOL_POLICY, CHANGE_POLICY)", "project overlay (TOOL_PERMISSIONS)", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield build that needs a tool it does not have, acquired end to end"
+      repo_b_challenge: "a brownfield repository whose existing tooling must be brought under governance"
+      hidden_oracle_fault_class: "a descriptor reviewed in one form and installed in another; an install command whose real effects the OS cannot read"
+      chaos_scale_soak: "repeated install/uninstall cycles with interrupted transactions"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt must record how each pre-existing tool was acquired and reviewed, or mark it unevidenced"
+    residual_risk: "the token lists are a kernel floor; anything the OS cannot read about a spawned process rests on the independent review, which is exactly what finding V1-F3-01 shows is unbound"
+    findings: ["V1-F3-01", "V1-F4-01"]
+
+  - capability: F4
+    title: Plugin trust boundary
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:425
+    governing_document_refs: ["framework v4.1.2 Part VII §28-32", "spec/architecture/ARCH-0003 §9", "spec/decisions/D-0007", "spec/decisions/D-0010", "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md"]
+    requirement_class: POST_VERIFICATION_HARDENING
+    status: PARTIAL
+    status_justification: >-
+      The PLUGIN side of this boundary is fully met and executably evidenced on this candidate (probe
+      F4-plugin-boundary.sh, 12/12): a hand-declared descriptor authorises nothing, registration and provenance live
+      in T2-sealed OS state, descriptor and implementation bytes are bound (including the module-form case that was
+      BC-P2-40), drift fails closed, an executable registration needs a presented owner-answered gate bound to its
+      subject, and the descriptor's own provenance / security-review claim is recorded as ignored. The TOOL
+      INSTALLATION side, which OD-P2-03 brought inside this boundary, is not: whether an installation is elevated is
+      decided by reading argv tokens, which an interpreter-wrapped command evades (V1-F4-01), the authorised side of
+      the envelope is an unprotected project overlay file (V1-F4-02), and the governed review is not bound to the
+      installation (V1-F3-01).
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      COULD_UNDERMINE, and AC-4 is therefore not met. F4 is the POST_VERIFICATION_HARDENING capability AC-4 names.
+      On this candidate an install-authority role can place an arbitrary command on the trusted surface and run it
+      with no Human Gate, and can enlarge its own authorised envelope by editing a repository file. An adversarial
+      tooling fault class in Phase 4 would be scored against a boundary that does not hold.
+    bullets:
+      - bullet: "Descriptor cannot authorise itself."
+        source_line: 426
+        status: PARTIAL
+        implementation_evidence: ["runtime/src/capabilities/governance.rs:168-183 self_authorising_claims", "runtime/src/capabilities/governance.rs:372-556 authorize", "runtime/src/tools.rs:903-1226 installation_authority"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F4-plugin-boundary.out: a descriptor declaring approved_roles all, signed provenance, a passed security review and status active runs nothing, and the OS records all three claims as ignored (plugin side: met). evidence/F3-F4-tool-install-gate.out: on the installation side the descriptor's own command formatting decides the branch — `sh -c \"sudo apt-get install -y x\"` is recorded expands_authority false and installs ungated"]
+        gap: "On the tool-installation path a descriptor can put itself on the non-gated branch by writing its command in a form the OS cannot read; the effect is real with --execute (install_command) and without it (health_check.command, which runs on every installation)."
+      - bullet: "Registration/provenance live in trusted OS state."
+        source_line: 427
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/capabilities/registry.rs (governance/registry/plugin-registry.json, T2-sealed)", "runtime/src/t2.rs", "framework/policies/TOOL_POLICY.yaml plugins.registry_path"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F4-plugin-boundary.out: the registry is OS state at governance/registry/plugin-registry.json; a hand-written entry is refused PLUGIN_REGISTRATION_UNBOUND"]
+        gap: null
+      - bullet: "Descriptor/implementation bytes are hash-bound."
+        source_line: 428
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/capabilities/binding.rs:592-744 resolve", "runtime/src/capabilities/binding.rs:763-800 registration_subject", "runtime/src/capabilities/binding.rs:415-546 (python module-form derivation)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F4-plugin-boundary.out: the registration binds descriptor_sha256, implementation_sha256, registration_subject_sha256 and registration_gate; a module-form plugin (`python3 -m plugmod`) is pinned, closing the BC-P2-40 / S0-F4-01 case"]
+        gap: null
+      - bullet: "Drift/tampering fails closed."
+        source_line: 429
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/capabilities/governance.rs:487-520 (pin and registered-implementation checks; drift refused whatever the policy says)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F4-plugin-boundary.out: one changed implementation byte -> PLUGIN_PIN_MISMATCH; an edited descriptor -> PLUGIN_REGISTRY_MISMATCH"]
+        gap: null
+      - bullet: "Elevated permissions reference authoritative gate/decision."
+        source_line: 430
+        status: PARTIAL
+        implementation_evidence: ["runtime/src/capabilities/governance.rs:520-556 (registration approval bound to the gate and subject)", "runtime/src/tools.rs:1226-1310 change_decision", "runtime/src/tools.rs:1316-1333 authorised_by", "framework/policies/CHANGE_POLICY.yaml change_classes.tool_installation"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F4-plugin-boundary.out: a plugin runs only while the gate raised for exactly its registration subject authorises it. evidence/F3-F4-tool-install-gate.out: every installation records OD-P2-03, D-0011, the rule, the branch, why, the bound review and the change transaction — but an installation that IS elevated in fact and is not detected records the non-gated decision instead of a gate"]
+        gap: "An installation whose elevation the OS fails to detect (V1-F4-01) or whose envelope was widened out of band (V1-F4-02) references the owner decision rather than an actual gate."
+      - bullet: "Security review cannot be self-attested."
+        source_line: 431
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:415-495 review_verdict (T2-verified report, closing a security-class task, written by neither the installing session nor the installing role)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F3-F4-tool-install-gate.out: a descriptor's own security_review claim is never evidence; a governed review by another role and session is required. evidence/F4-plugin-boundary.out: the plugin descriptor's provenance.security_review is recorded as ignored"]
+        gap: null
+    health_scheduler_tiers: ["G0", "G1", "G5"]
+    evidence_owners: ["G5", "human-gate", "independent-heldout"]
+    evidence_owner_actually_runs: "true — plugin_governance runs at G5; registration and installation gates were answered through the authenticated human channel in the probes"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["tool/plugin registry", "implementation bytes", "kernel policy (TOOL_POLICY, CHANGE_POLICY)", "project overlay (TOOL_PERMISSIONS, REPOSITORY_CONTRACT, DATA_SENSITIVITY)"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield repository into which a hostile capability plugin and a hostile tool descriptor are introduced"
+      repo_b_challenge: "a brownfield repository carrying a legacy plugin registry at the old generated location"
+      hidden_oracle_fault_class: "an install command whose real effect is hidden behind an interpreter; an envelope source edited out of band; a review reused across descriptors"
+      chaos_scale_soak: "repeated register/unregister/drift cycles"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt must treat every pre-existing plugin as unregistered and every pre-existing tool as unevidenced until reviewed"
+    residual_risk: "the OS cannot confine a spawned process; the design leans on the independent review for what it cannot observe, which makes V1-F3-01 and V1-F4-01 compounding rather than independent"
+    findings: ["V1-F4-01", "V1-F4-02", "V1-F3-01"]
+
+  - capability: F5
+    title: MCP/A2A/tool separation
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:433
+    governing_document_refs: ["framework v4.1.2 Part VII §28", "spec/decisions/D-0004", "spec/interfaces/API-0002"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: >-
+      The three layers are separate and none silently substitutes for another: the deferred MCP transport is
+      registered `planned` rather than quietly replaced, a handoff always carries an explicit authority envelope, and a
+      context packet keeps retrieved intelligence separate from deterministic authority. b4 is not fully met: D-0004
+      consequence 1 says the gap is reported by doctor/readiness, and doctor does not mention it.
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      CANNOT_UNDERMINE. The layer separation itself holds; the gap is that one deferred layer is not surfaced in the
+      operator's health view. No qualification result depends on it, and nothing substitutes for MCP silently — the
+      registry says `planned`.
+    bullets:
+      - bullet: "MCP/tools = action/capability"
+        source_line: 434
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/tools.rs:23-64 kernel_tools/project_tools/mcp_servers", "runtime/src/capabilities/host.rs (plugin execution)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: the generated registry separates tools, mcp_servers and plugins, each with its own status and role exposure"]
+        gap: null
+      - bullet: "A2A = communication"
+        source_line: 435
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/handoffs.rs", "framework/schemas/handoff.schema.json (authority required)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: `authority` is a required handoff field; evidence/E3-E4-handoff-claims.out: a return that changes a prohibited path is refused MUTATION_SCOPE_VIOLATION"]
+        gap: null
+      - bullet: "Knowledge Fabric = knowing"
+        source_line: 436
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/context/manifest.rs (deterministic_authority vs retrieved_intelligence)", "runtime/src/memory/*"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: a compiled context packet carries deterministic_authority and retrieved_intelligence as separate members with separate hashes"]
+        gap: null
+      - bullet: "No layer silently substitutes for another."
+        source_line: 437
+        status: PARTIAL
+        implementation_evidence: ["governance/kernel/tools/registry MCP-REPO-001 status: planned", "spec/decisions/D-0004 consequence 1"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/F1-F2-F5-skills-tools-layers.out: the MCP transport is registered `planned`, so nothing substitutes for it silently; but `gov doctor` output contains no mention of the MCP layer, contrary to D-0004 consequence 1 ('doctor/readiness report it as a capability gap')"]
+        gap: "The deferred MCP layer is not reported as a capability gap by doctor or readiness."
+    health_scheduler_tiers: ["G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "partial — the suite checks the registry, not the doctor disclosure D-0004 requires"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["tool/plugin registry", "active decisions (D-0004)", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield repository whose adapter expects an MCP transport that is not shipped"
+      repo_b_challenge: "a brownfield repository with its own MCP servers already configured"
+      hidden_oracle_fault_class: "retrieval standing in for a mandatory input; a handoff used as a capability call"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "a mandatory input that retrieval could rediscover but the manifest must name (Gate W, zeta)"
+      not_challengeable: null
+    adoption_obligation: "adopt must report which layers the project already has and which the OS defers"
+    residual_risk: "an adopter reading only doctor output may not learn that MCP is deferred; a handoff's authority envelope is caller-declared (finding V1-F5-02)"
+    findings: ["V1-F5-01", "V1-F5-02"]
+
+  - capability: G1
+    title: Natural-language intent
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:443
+    governing_document_refs: ["framework v4.1.2 Part IX §33", "framework §47-48", "framework/commands/COMMAND_CONTRACT.yaml"]
+    requirement_class: ORIGINAL
+    status: PARTIAL
+    status_justification: >-
+      b1 and b3 are met and executably evidenced — a human states intent in ordinary words, and a consequential
+      change is classified material by the OS from the change itself and cannot complete outside change control
+      (MATERIAL_CHANGE_REQUIRES_CIT at task close), which is the BC-P2-13 repair. b2 is not fully met: the mapping is
+      deterministic but semantically wrong for a negated intent — "do not approve this change" routes to APPROVE.
+    na_reason_normative_text: null
+    partial_qualification_impact: >-
+      CANNOT_UNDERMINE the advanced-qualification scenario as Phase 4 scopes it. The router only PROPOSES commands
+      and never executes one; it never proposes a command that asserts a human identity; and an APPROVE proposal
+      still ends at `gov gate present` plus an owner-signed answer that the OS verifies — so a mis-routed negation
+      cannot approve anything, and the synthetic repositories are driven by agents through governed operations, not
+      through this router. It is a real unmet bullet and should be repaired, and I record one coverage limit that
+      follows from it: a Phase-4 fault class that specifically scores operator-intent handling could not be run
+      against this router without scoring the negation case wrong.
+    bullets:
+      - bullet: "Human can express intent without knowing internal command syntax."
+        source_line: 444
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/intents.rs:12-50", "framework/commands/COMMAND_CONTRACT.yaml intent_patterns"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: 'what is the state of the project' -> STATUS -> `gov status`"]
+        gap: null
+      - bullet: "Intent maps deterministically to governed operations."
+        source_line: 445
+        status: PARTIAL
+        implementation_evidence: ["runtime/src/orchestration/intents.rs:16-40 (longest-substring match over the kernel command contract)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: identical input gives identical routing; every routed command is a governed operation the command contract declares; the router never proposes --by human / --role human / --method human; BUT 'do not approve this change' routes to APPROVE"]
+        gap: "Routing is pure substring containment, so a negated phrase routes to the affirmative intent it contains."
+      - bullet: "Consequential changes automatically invoke required impact/gate logic."
+        source_line: 446
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/cit/materiality.rs", "runtime/src/orchestration/tasks.rs:2140-2175 (step 10a, MATERIAL_CHANGE_REQUIRES_CIT)", "runtime/src/tools.rs:1585-1610 (the OS proposes an installation's change transaction itself)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: an interface contract edited inside an ordinary documentation task is classified material by the OS (derived_classes interface_change, label_understates true) and the task close is refused MATERIAL_CHANGE_REQUIRES_CIT — no operator typed /impact"]
+        gap: null
+    health_scheduler_tiers: ["G2", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — change_control_integrity runs at G5 and the close gate enforced it in the probe"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["kernel command contract", "kernel policy (CHANGE_POLICY)", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "an operator driving a greenfield build entirely in prose, including refusals and negations"
+      repo_b_challenge: "a brownfield repository where a consequential spec edit is attempted inside an ordinary task"
+      hidden_oracle_fault_class: "a negated or conditional instruction routed to the affirmative operation; a material change labelled editorial"
+      chaos_scale_soak: "not relevant"
+      retrieval_challenge: "not relevant: the router is deterministic and does not retrieve"
+      not_challengeable: null
+    adoption_obligation: "adapters must route through the governed operations the command contract declares"
+    residual_risk: "adapters may add an LLM intent parser in front; nothing in the OS constrains what such a parser proposes beyond the command contract"
+    findings: ["V1-G1-01"]
+
+  - capability: G2
+    title: Small explicit human control set
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:448
+    governing_document_refs: ["framework v4.1.2 Part IX §34"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "Every control the contract names is executable on this candidate and does what it says, including the availability rule for the freeze it imposes."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "status"
+        source_line: 450
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/status.rs", "cli/src/main.rs Cmd::Status"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov status` reconstructs framework, trust, DAG, gates, transactions, checkpoints and the next action"]
+        gap: null
+      - bullet: "continue"
+        source_line: 451
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/control.rs", "cli/src/main.rs Cmd::Continue"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov continue` returns NEXT_WORK with the task contract, and offers independent work while another branch waits on a gate"]
+        gap: null
+      - bullet: "decide"
+        source_line: 452
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/gates.rs", "runtime/src/human_channel.rs", "cli/src/main.rs Cmd::Decide"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/OD-P2-01-human-approval.out: `gov decide` applies an owner-signed answer (answered_by_kind human) and refuses every agent-supplied substitute"]
+        gap: null
+      - bullet: "audit"
+        source_line: 453
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/verification/mod.rs", "cli/src/main.rs Cmd::Audit"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out and evidence/H1-H4-spec-readiness.out: `gov audit` runs the families and records a verdict (UNHEALTHY with an incomplete scenario chain)"]
+        gap: null
+      - bullet: "pause/freeze/rollback as applicable"
+        source_line: 454
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/control.rs (pause, freeze-writes, cancel-agents, resume)", "runtime/src/cit/mod.rs rollback"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: pause, freeze-writes and cancel-agents all execute; a governed write is then refused FROZEN and `gov resume` — the remedy — stays available; `gov cit rollback` exists and the F3 probe saw a real rollback restore a file"]
+        gap: null
+    health_scheduler_tiers: ["G0", "G5"]
+    evidence_owners: ["G0", "G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["kernel command contract", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "an operator pausing, freezing and resuming a greenfield build mid-flight"
+      repo_b_challenge: "an emergency freeze during a brownfield adoption"
+      hidden_oracle_fault_class: "a freeze that also blocks its own remedy; a control that reports success without acting"
+      chaos_scale_soak: "freeze/resume under concurrent agents"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "the emergency controls must be available from the first governed command onwards"
+    residual_risk: "none material found"
+    findings: []
+
+  - capability: H1
+    title: SPEC lineage
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:460
+    governing_document_refs: ["framework v4.1.2 Part X §36-37"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      All seventeen lineage kinds exist as governed, traceable record kinds on this candidate and a constructed
+      end-to-end chain traced over canonical edges (probe H1-H4-spec-readiness.sh, 23/23).
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "idea"
+        source_line: 462
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/project.schema.json product_intent"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: H1 node-kind matrix, idea=yes (PRJ-0001.product_intent)"]
+        gap: null
+      - bullet: "mission/outcomes"
+        source_line: 463
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/project.schema.json mission, outcomes"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: mission/outcomes=yes"]
+        gap: null
+      - bullet: "users/actors"
+        source_line: 464
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/project.schema.json actors", "framework/schemas/scenario.schema.json actor"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: users/actors=yes"]
+        gap: null
+      - bullet: "journeys"
+        source_line: 465
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/policies/AUTHORITY_POLICY.yaml default_state_class_by_type: workflow", "framework/taxonomy/READINESS_DIMENSIONS.yaml journey_workflow"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a `workflow` record (WF-0001) is recognised and traced; a missing journey_workflow cell generates a specification task"]
+        gap: null
+      - bullet: "scenarios"
+        source_line: 466
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/scenario.schema.json", "runtime/src/lifecycle/scenario.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: SCN-0001 traced with its whole chain"]
+        gap: null
+      - bullet: "features/capabilities"
+        source_line: 467
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/feature.schema.json (readiness required)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: FEAT-0001 with its 26 readiness cells"]
+        gap: null
+      - bullet: "data"
+        source_line: 468
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/scenario.rs:823-1030 data register (requirement, test-dataset)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: DATA-0001 and TD-0001 registered with provenance, content binding and OS-recorded authorship"]
+        gap: null
+      - bullet: "requirements/NFRs"
+        source_line: 469
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/requirement.schema.json kind (functional / non-functional)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: REQ-0001 functional and REQ-0002 non-functional both traced"]
+        gap: null
+      - bullet: "research/experiments"
+        source_line: 470
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/research.schema.json", "framework/schemas/experiment.schema.json", "runtime/src/lifecycle/{research,experiment}.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: RSH-0001 and EXP-0001 traced as the sources of D-0001"]
+        gap: null
+      - bullet: "decisions"
+        source_line: 471
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/decision.schema.json", "runtime/src/orchestration/gates.rs verified_decision"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out; evidence/OD-P2-01-human-approval.out (a hand-written human_approved decision authorises nothing)"]
+        gap: null
+      - bullet: "algorithms/processing"
+        source_line: 472
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml processing_algorithm (gap_task_class research)", "runtime/src/records.rs (open record typing)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: an `algorithm` record (ALG-0001) is recognised; a missing processing_algorithm cell generates a research task"]
+        gap: null
+      - bullet: "architecture"
+        source_line: 473
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/policies/AUTHORITY_POLICY.yaml default_state_class_by_type: architecture", "spec/architecture/**"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: ARCH-0001 traced"]
+        gap: null
+      - bullet: "interfaces"
+        source_line: 474
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/interface.schema.json", "runtime/src/cit/materiality.rs (interface_change)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: API-0001 traced; evidence/G1-G2-I1-I4-command-work.out: an interface edit is material"]
+        gap: null
+      - bullet: "security/performance/operations"
+        source_line: 475
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml security_privacy, performance_capacity, devops_runtime, observability"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a `security` record (SEC-0001) is recognised, and missing security/performance/devops/observability cells generate security, performance and devops tasks"]
+        gap: null
+      - bullet: "WBS/task DAG"
+        source_line: 476
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out; evidence/G1-G2-I1-I4-command-work.out: one DAG over every class"]
+        gap: null
+      - bullet: "acceptance/test obligations"
+        source_line: 477
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/test-obligation.schema.json"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: TST-0001 traced from the scenario with its test data"]
+        gap: null
+      - bullet: "live evidence"
+        source_line: 478
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/report.schema.json", "framework/schemas/audit.schema.json", "framework/schemas/checkpoint.schema.json"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: report, audit and checkpoint records present and traced; evidence/E3-E4-handoff-claims.out: the close report is the receipt"]
+        gap: null
+    health_scheduler_tiers: ["G4", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — lineage_orphans and graph integrity run at G5"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["authoritative spec/decision records", "index manifest", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield product specified from idea to live evidence, traced end to end"
+      repo_b_challenge: "a brownfield repository whose legacy documents must be classified into the seventeen kinds"
+      hidden_oracle_fault_class: "a lineage kind silently absent; an edge that exists in a field but not in the graph"
+      chaos_scale_soak: "a large spec tree traced repeatedly"
+      retrieval_challenge: "lineage must be graph-derived, never rediscovered by retrieval (Gate W, zeta)"
+      not_challengeable: null
+    adoption_obligation: "adopt must classify legacy documents into governed record kinds and report what it cannot classify"
+    residual_risk: "journeys, algorithms and security/performance/operations are open record types rather than schema-backed kinds, so their shape is not validated"
+    findings: []
+
+  - capability: H2
+    title: 26-dimension Feature/Capability Readiness Contract
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:480
+    governing_document_refs: ["framework v4.1.2 Part X §37-38"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      The kernel taxonomy declares exactly the 26 dimensions the contract lists and exactly the five statuses it
+      names; `gov readiness check` evaluates all 26 cells individually for a feature; a silent N/A is reported
+      invalid and not honoured, while an N/A with a reason is honoured as its own state. Four cells
+      (success_criteria, failure_criteria, representative_test_data, independent_acceptance_tests) are computed from
+      the product's own records rather than taken from what the feature asserts.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "intent/outcome"
+        source_line: 482
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension intent_outcome", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including intent_outcome; a missing intent_outcome generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "user/actor"
+        source_line: 483
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension user_actor", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including user_actor; a missing user_actor generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "journey/workflow"
+        source_line: 484
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension journey_workflow", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including journey_workflow; a missing journey_workflow generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "scenarios"
+        source_line: 485
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension scenarios", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including scenarios; a missing scenarios generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "inputs"
+        source_line: 486
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension inputs", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including inputs; a missing inputs generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "data model/schema"
+        source_line: 487
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension data_model_schema", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including data_model_schema; a missing data_model_schema generates a data-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "representative test data"
+        source_line: 488
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension representative_test_data", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including representative_test_data; a missing representative_test_data generates a data-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "processing/algorithm"
+        source_line: 489
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension processing_algorithm", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including processing_algorithm; a missing processing_algorithm generates a research-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "expected outputs"
+        source_line: 490
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension expected_outputs", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including expected_outputs; a missing expected_outputs generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "functional requirements"
+        source_line: 491
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension functional_requirements", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including functional_requirements; a missing functional_requirements generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "non-functional requirements"
+        source_line: 492
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension non_functional_requirements", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including non_functional_requirements; a missing non_functional_requirements generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "UX/interactions where applicable"
+        source_line: 493
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension ux_interactions", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including ux_interactions; a missing ux_interactions generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "backend/service behaviour"
+        source_line: 494
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension backend_service_behaviour", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including backend_service_behaviour; a missing backend_service_behaviour generates a architecture-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "database/state requirements"
+        source_line: 495
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension database_state_requirements", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including database_state_requirements; a missing database_state_requirements generates a architecture-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "interface/API/event contracts"
+        source_line: 496
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension interface_api_event_contracts", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including interface_api_event_contracts; a missing interface_api_event_contracts generates a architecture-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "security/privacy"
+        source_line: 497
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension security_privacy", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including security_privacy; a missing security_privacy generates a security-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "integrations"
+        source_line: 498
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension integrations", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including integrations; a missing integrations generates a architecture-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "DevOps/runtime"
+        source_line: 499
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension devops_runtime", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including devops_runtime; a missing devops_runtime generates a devops-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "observability"
+        source_line: 500
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension observability", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including observability; a missing observability generates a devops-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "performance/capacity"
+        source_line: 501
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension performance_capacity", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including performance_capacity; a missing performance_capacity generates a performance-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "cost constraints"
+        source_line: 502
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension cost_constraints", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including cost_constraints; a missing cost_constraints generates a decision-preparation-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "recovery/fallback"
+        source_line: 503
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension recovery_fallback", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including recovery_fallback; a missing recovery_fallback generates a architecture-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "measurable success criteria"
+        source_line: 504
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension success_criteria", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including success_criteria; a missing success_criteria generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "measurable failure criteria"
+        source_line: 505
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension failure_criteria", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including failure_criteria; a missing failure_criteria generates a specification-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "independent acceptance/system tests"
+        source_line: 506
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension independent_acceptance_tests", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including independent_acceptance_tests; a missing independent_acceptance_tests generates a test-design-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "documentation/operations"
+        source_line: 507
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml dimension documentation_operations", "runtime/src/orchestration/readiness.rs:130-230 evaluate_in"]
+        automated_evidence: ["cargo test --lib", "the feature_readiness suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov readiness check FEAT-0001` returned 26 cells including documentation_operations; a missing documentation_operations generates a documentation-class gap task (`gov readiness plan`)"]
+        gap: null
+      - bullet: "PRESENT"
+        source_line: 510
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml cell_states", "runtime/src/orchestration/readiness.rs:92-112 cell_state"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: the declared cell_states are exactly BLOCKED, MISSING, N/A_WITH_REASON, PRESENT, PROVISIONAL; PRESENT is one of them and is the state a cell reports"]
+        gap: null
+      - bullet: "MISSING"
+        source_line: 511
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml cell_states", "runtime/src/orchestration/readiness.rs:92-112 cell_state"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: the declared cell_states are exactly BLOCKED, MISSING, N/A_WITH_REASON, PRESENT, PROVISIONAL; MISSING is one of them and is the state a cell reports"]
+        gap: null
+      - bullet: "PROVISIONAL"
+        source_line: 512
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml cell_states", "runtime/src/orchestration/readiness.rs:92-112 cell_state"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: the declared cell_states are exactly BLOCKED, MISSING, N/A_WITH_REASON, PRESENT, PROVISIONAL; PROVISIONAL is one of them and is the state a cell reports"]
+        gap: null
+      - bullet: "BLOCKED"
+        source_line: 513
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml cell_states", "runtime/src/orchestration/readiness.rs:92-112 cell_state"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: the declared cell_states are exactly BLOCKED, MISSING, N/A_WITH_REASON, PRESENT, PROVISIONAL; BLOCKED is one of them and is the state a cell reports"]
+        gap: null
+      - bullet: "N/A_WITH_REASON"
+        source_line: 514
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml cell_states", "runtime/src/orchestration/readiness.rs:92-112 cell_state"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: the declared cell_states are exactly BLOCKED, MISSING, N/A_WITH_REASON, PRESENT, PROVISIONAL; N/A_WITH_REASON is one of them and is the state a cell reports"]
+        gap: null
+      - bullet: "and silent N/A is invalid."
+        source_line: 515
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/readiness.rs:70-118 not_applicable_cells / silent_or_invalid"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a cell written `N/A` is reported in `invalid` ('silent N/A or invalid cell value is not allowed') and does not count as satisfied, while `{status: N/A_WITH_REASON, reason: ...}` is honoured as a distinct state"]
+        gap: null
+    health_scheduler_tiers: ["G4", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — feature_readiness executed in every probe project's audit"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["authoritative spec/decision records (features, scenarios, data, tests)", "kernel taxonomy", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/FRESHNESS-invalidation.out: feature/readiness state is carried by the spec_requirements currency class"
+    qualification_coverage:
+      repo_a_challenge: "a greenfield feature whose 26 cells are filled one at a time"
+      repo_b_challenge: "a brownfield feature whose legacy documentation partially fills the cells"
+      hidden_oracle_fault_class: "a cell marked N/A with no reason; a chain cell asserted PRESENT while the records contradict it"
+      chaos_scale_soak: "hundreds of features evaluated at once"
+      retrieval_challenge: "not relevant: cells are computed, not retrieved"
+      not_challengeable: null
+    adoption_obligation: "adopt must open a readiness contract for every discovered feature and mark every unfilled cell MISSING, never silently N/A"
+    residual_risk: "22 of the 26 cells are author-asserted; only the four chain cells are computed from records"
+    findings: []
+
+  - capability: H3
+    title: Readiness generates work
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:517
+    governing_document_refs: ["framework v4.1.2 Part X §38"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "Every bullet demonstrated: each missing cell generates a task of the class its dimension declares, carrying the designated role, and a production implementation task is not runnable while pre-implementation cells are unsatisfied."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "Missing data → data task."
+        source_line: 518
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/readiness.rs:231-330 plan", "framework/taxonomy/READINESS_DIMENSIONS.yaml data_model_schema / representative_test_data gap_task_class: data"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a missing data_model_schema generated a class `data` task; representative_test_data generated one carrying role data-author"]
+        gap: null
+      - bullet: "Missing performance target → benchmark/research task."
+        source_line: 519
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml performance_capacity gap_task_class: performance; processing_algorithm gap_task_class: research"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a missing performance_capacity generated a class `performance` task; processing_algorithm generated a `research` task"]
+        gap: null
+      - bullet: "Missing security analysis → security task."
+        source_line: 520
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml security_privacy gap_task_class: security"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a missing security_privacy generated a class `security` task"]
+        gap: null
+      - bullet: "Missing independent test → independent test-design task."
+        source_line: 521
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/taxonomy/READINESS_DIMENSIONS.yaml independent_acceptance_tests gap_task_class: test-design, gap_task_role: independent-test-designer", "runtime/src/orchestration/readiness.rs:1-12 (the designated role binds who may claim and close)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: the generated task is class test-design and carries role independent-test-designer"]
+        gap: null
+      - bullet: "Production implementation does not become READY before required prerequisite cells satisfy policy."
+        source_line: 522
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs (readiness pre-implementation gate in runnability)", "runtime/src/orchestration/readiness.rs pre_implementation_gaps"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: an implementation task for the feature stays blocked (stored status DRAFT, not in the runnable set) while pre-implementation cells are unsatisfied. evidence/OD-P2-01-human-approval.out: the block refuses only the implementation task — all 26 of its own remedy tasks stay runnable (availability rule)"]
+        gap: null
+    health_scheduler_tiers: ["G2", "G4", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["authoritative spec/decision records", "kernel taxonomy", "project overlay (PROJECT_POLICY.readiness)"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield feature implemented before its readiness contract is filled"
+      repo_b_challenge: "a brownfield feature whose project overlay tries to switch off readiness gating"
+      hidden_oracle_fault_class: "a readiness gap that generates no work; an implementation task promoted READY with unsatisfied pre-implementation cells"
+      chaos_scale_soak: "many features planned concurrently"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt must plan readiness work for every discovered feature"
+    residual_risk: "generated gap work is plentiful (26 tasks for one empty feature); operators need the DAG's per-feature view to stay oriented"
+    findings: []
+
+  - capability: H4
+    title: Scenarios drive data/tests
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:524
+    governing_document_refs: ["framework v4.1.2 Part X §39", "release/orchestration/phase-2/GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      The whole chain is carried by governed relations and traced by `gov scenario trace`; test-data authorship is
+      OS-recorded (T2-verified) and independence is ENFORCED at registration, not merely recorded; provenance is
+      required and bound to content that exists. An incomplete chain degrades suite health and refuses nothing,
+      exactly as P2-ADJ-0003 rules.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "FEATURE → SCENARIOS → DATA → TEST DATA → SUCCESS/FAILURE → INDEPENDENT TESTS."
+        source_line: 525
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/scenario.rs (trace, chain gap codes)", "runtime/src/orchestration/readiness.rs:38-68 CHAIN_CELLS / chain_cell_of"]
+        automated_evidence: ["cargo test --lib", "the research_experiment_data_lifecycle suite family"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: `gov scenario trace SCN-0001` returns feature, scenario, data_requirements (resolved, with their test datasets), test_datasets with provenance and authorship, success_criteria, failure_criteria and tests with their independence flag"]
+        gap: null
+      - bullet: "Test-data author independence is supported."
+        source_line: 526
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/scenario.rs:976-1022 (independence check against implementers and end-to-end test authors; owner-approved waiver only)", "runtime/src/lifecycle/scenario.rs stamp (OS-recorded authorship)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: TD-0001's authorship is OS-recorded with a VERIFIED T2 binding; registering a second dataset as the scenario's own end-to-end test author is refused DATA_AUTHOR_NOT_INDEPENDENT, and `gov scenario check` reports DATA_AUTHOR_IS_TEST_AUTHOR"]
+        gap: null
+      - bullet: "Data provenance is recorded."
+        source_line: 527
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/lifecycle/scenario.rs:898-960 (source_kind + origin required; content bound by hash; approved-real needs a human-approved decision)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: a dataset without provenance is refused DATA_PROVENANCE_REQUIRED; a dataset whose declared location does not exist is refused DATA_LOCATION_MISSING; a registered dataset carries content_sha256 and bound_at"]
+        gap: null
+    health_scheduler_tiers: ["G4", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — research_experiment_data_lifecycle executed and an H4 gap made the suite UNHEALTHY"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["authoritative spec/decision records (scenarios, data, test obligations)", "test dataset content", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/FRESHNESS-invalidation.out; a dataset's content_sha256 binds it, so TEST_DATA_CHANGED is detectable"
+    qualification_coverage:
+      repo_a_challenge: "a greenfield feature whose scenarios, data and independent tests are built in order"
+      repo_b_challenge: "a brownfield feature with tests but no declared scenarios or data provenance"
+      hidden_oracle_fault_class: "test data authored by the implementer; provenance asserted for content that does not exist; a scenario with no failure criteria"
+      chaos_scale_soak: "large datasets rebound repeatedly"
+      retrieval_challenge: "the chain must be graph-derived, never rediscovered semantically"
+      not_challengeable: null
+    adoption_obligation: "adopt must record provenance and authorship for every discovered test dataset or mark it unevidenced"
+    residual_risk: "a test obligation's own author_role and independent_of_implementer are author-written; the product reports them as `source: declared, established: false` rather than as evidence (BC-P2-34 residual, finding V1-H4-01)"
+    findings: ["V1-H4-01"]
+
+  - capability: I1
+    title: Unified task DAG
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:535
+    governing_document_refs: ["framework v4.1.2 Part XI §41-42"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      All twenty-two classes are in the governed task contract and each one was actually created as a task in ONE DAG
+      on this candidate (22/22 created; `gov task dag` reported them all in a single graph with one runnable set, one
+      blocked set and one critical path).
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "discovery"
+        source_line: 538
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (discovery)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class discovery` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "research"
+        source_line: 539
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (research)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class research` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "experiment"
+        source_line: 540
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (experiment)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class experiment` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "specification"
+        source_line: 541
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (specification)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class specification` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "decision-preparation"
+        source_line: 542
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (decision-preparation)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class decision-preparation` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "data"
+        source_line: 543
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (data)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class data` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "architecture"
+        source_line: 544
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (architecture)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class architecture` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "implementation"
+        source_line: 545
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (implementation)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class implementation` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "integration"
+        source_line: 546
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (integration)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class integration` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "test design"
+        source_line: 547
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (test-design)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class test-design` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "test execution"
+        source_line: 548
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (test-execution)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class test-execution` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "security"
+        source_line: 549
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (security)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class security` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "DevOps"
+        source_line: 550
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (devops)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class devops` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "performance"
+        source_line: 551
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (performance)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class performance` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "validation"
+        source_line: 552
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (validation)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class validation` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "refactor"
+        source_line: 553
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (refactor)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class refactor` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "repair"
+        source_line: 554
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (repair)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class repair` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "documentation"
+        source_line: 555
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (documentation)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class documentation` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "release"
+        source_line: 556
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (release)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class release` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "tooling"
+        source_line: 557
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (tooling)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class tooling` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "memory"
+        source_line: 558
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (memory)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class memory` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+      - bullet: "governance"
+        source_line: 559
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json class enum (governance)", "runtime/src/orchestration/tasks.rs create", "runtime/src/orchestration/dag.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create --class governance` succeeded and the task entered the single DAG (22 of 22 classes created, DAG total 24)"]
+        gap: null
+    health_scheduler_tiers: ["G2", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["task records", "kernel schemas", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: "evidence/FRESHNESS-invalidation.out: a task-DAG change changes the spec_tasks digest"
+    qualification_coverage:
+      repo_a_challenge: "a greenfield build exercising every class in one DAG"
+      repo_b_challenge: "a brownfield repository whose legacy backlog maps onto the classes"
+      hidden_oracle_fault_class: "a class accepted by the schema but unrepresented in the DAG's views"
+      chaos_scale_soak: "thousands of tasks across every class"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt must map legacy work items onto governed classes or record them as unmapped"
+    residual_risk: "a 23rd class, `migration`, exists beyond the contract's list; it is additive and typed"
+    findings: []
+
+  - capability: I2
+    title: Task contract
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:560
+    governing_document_refs: ["framework v4.1.2 Part XI §42-43", "spec/decisions/D-0007"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      Each of the nine fields is recorded AND has an enforcing consumer on this candidate: dependencies and
+      blocks decide runnability, required_data and required_tools block a claim, allowed/forbidden paths are
+      enforced at close (MUTATION_SCOPE_VIOLATION), a minimum model tier and reasoning are resolved for a task, and
+      production_merge_allowed is carried into the close decision. This closes the BC-P2-14 mechanism for I2.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "objective"
+        source_line: 561
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json objective", "runtime/src/orchestration/tasks.rs create (required)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task create` requires --objective; it is carried into the task contract `gov continue` returns"]
+        gap: null
+      - bullet: "requirements/decisions"
+        source_line: 562
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json requirements, decisions", "runtime/src/context/manifest.rs (both enter the context packet's mandatory inputs and the receipt contract's trace)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: the compiled packet's receipt_contract lists requirements and decisions in its trace, and a close whose receipt omits a traced id is refused"]
+        gap: null
+      - bullet: "dependencies/blocks"
+        source_line: 563
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs (dependency edges decide runnability)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: a task with an open dependency is refused TASK_NOT_RUNNABLE at claim; evidence/E3-E4-handoff-claims.out: the same for a dependency-blocked task whose stored status says READY"]
+        gap: null
+      - bullet: "scenarios/data"
+        source_line: 564
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json scenarios, required_data", "runtime/src/orchestration/dag.rs (required_data blocks runnability)", "framework/policies/TEST_POLICY.yaml implementation_task_requires"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: a task naming an absent required_data is TASK_NOT_RUNNABLE; evidence/E3-E4-handoff-claims.out: an implementation task with no scenarios or acceptance tests on it or its feature is blocked by TEST_POLICY"]
+        gap: null
+      - bullet: "acceptance tests"
+        source_line: 565
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json acceptance_tests", "framework/policies/TEST_POLICY.yaml implementation_task_requires"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/E3-E4-handoff-claims.out: 'TEST_POLICY.implementation_task_requires: no acceptance tests declared on the task or its feature' blocked the task until they existed"]
+        gap: null
+      - bullet: "required skills/tools"
+        source_line: 566
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json required_skills, required_tools", "runtime/src/orchestration/dag.rs", "runtime/src/orchestration/generation.rs missing_capabilities"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: an unresolved required tool blocks the claim AND generates a linked tooling task naming the blocked tasks"]
+        gap: null
+      - bullet: "minimum model tier/reasoning"
+        source_line: 567
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json minimum_model_tier, minimum_reasoning", "runtime/src/routing.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov route --task` resolved minimum_tier T3 and reasoning high for the probe task"]
+        gap: null
+      - bullet: "allowed/forbidden paths"
+        source_line: 568
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json allowed_paths, forbidden_paths", "runtime/src/orchestration/tasks.rs (mutation scope at close)", "runtime/src/memory/claims.rs (scope carried into the claim)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: a close that changed a file outside the allowed paths is refused MUTATION_SCOPE_VIOLATION; evidence/E3-E4-handoff-claims.out: an overlapping scope is refused CLAIM_SCOPE_CONFLICT"]
+        gap: null
+      - bullet: "production-merge permission"
+        source_line: 569
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["framework/schemas/task.schema.json production_merge_allowed", "runtime/src/orchestration/tasks.rs close"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: the field is carried on the task contract `gov continue` returns and is part of the close decision; the probe's production_merge_allowed:false task never reached a merge because its required tool and data blocked it first"]
+        gap: null
+    health_scheduler_tiers: ["G1", "G2", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["task records", "kernel policy (TEST_POLICY)", "path map", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield task contract whose every field is violated in turn"
+      repo_b_challenge: "a brownfield task inheriting a legacy path scope"
+      hidden_oracle_fault_class: "a recorded contract field with no enforcing consumer"
+      chaos_scale_soak: "many tasks with overlapping scopes claimed concurrently"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adopt must give every migrated work item an explicit path scope"
+    residual_risk: "production_merge_allowed's enforcement was observed only indirectly in this probe (the task was blocked earlier in the chain)"
+    findings: []
+
+  - capability: I3
+    title: Dynamic generation
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:571
+    governing_document_refs: ["framework v4.1.2 Part XI §43", "framework §18", "framework §11.8"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: >-
+      All eleven sources the contract lists are declared in the verified kernel taxonomy and implemented in
+      runtime/src/orchestration/generation.rs, generation was exercised end to end (audit findings and a missing tool
+      generated real linked tasks; a lesson from a worker return generated linked work), every generated task records
+      its source, subject, dedup key and the evidence that caused it, and generation is idempotent. This closes the
+      BC-P2-24 mechanism.
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "readiness gaps"
+        source_line: 573
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/readiness.rs:231-330 plan", "runtime/src/orchestration/generation.rs:316-342 source_of (readiness-planner)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/H1-H4-spec-readiness.out: 24 readiness-gap tasks generated for one empty feature, each naming its cell and class"]
+        gap: null
+      - bullet: "failed tests"
+        source_line: 574
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:548-619 failed_tests", "framework/taxonomy/WORK_GENERATION.yaml failed-tests (class repair)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: failed-tests is a declared and implemented source; the generator ran and reported its candidate set by source"]
+        gap: null
+      - bullet: "audit findings"
+        source_line: 575
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:620-891 health_failures", "framework/taxonomy/WORK_GENERATION.yaml audit-finding (class governance, role change-controller)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: real audit findings generated TASK-0002 (schema_invariants) and TASK-0030 (graph_integrity), each recording source, subject, key and evidence_at"]
+        gap: null
+      - bullet: "research discoveries"
+        source_line: 576
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:892-959 discoveries", "framework/taxonomy/WORK_GENERATION.yaml research-discovery, proposed-decision"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: research-discovery and proposed-decision are declared and implemented sources"]
+        gap: null
+      - bullet: "human decisions"
+        source_line: 577
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:960-1052 human_decisions", "framework/taxonomy/WORK_GENERATION.yaml human-decision"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: human-decision is a declared and implemented source; evidence/OD-P2-01-human-approval.out: an owner-signed answer writes decision D-0001 with authorises_blocked_work true"]
+        gap: null
+      - bullet: "CIT effects"
+        source_line: 578
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:1053-1119 cit_effects", "runtime/src/cit/propagation.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: cit-effect is a declared and implemented source; evidence/F3-F4-tool-install-gate.out: an executed installation transaction reported propagation with inputs_changed"]
+        gap: null
+      - bullet: "lessons"
+        source_line: 579
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:1120-1150 lessons", "runtime/src/orchestration/handoffs.rs:414-440 (a worker return's lesson becomes a PROVISIONAL lesson record)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: a lesson produced by a worker return generated work LINKED to the causing record"]
+        gap: null
+      - bullet: "missing tools/skills"
+        source_line: 580
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:1151-1211 missing_capabilities", "framework/taxonomy/WORK_GENERATION.yaml missing-tool, missing-skill, tool-failure"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: an unresolved required tool generated TASK-0028 (class tooling, role tooling-engineer) naming the tasks it unblocks"]
+        gap: null
+      - bullet: "retrieval failures"
+        source_line: 581
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:1212-1261 failures (retrieval-miss)", "runtime/src/memory/failures.rs"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: retrieval-failure is a declared and implemented source, with a loop guard so a miss made while working on generated work is not new work"]
+        gap: null
+      - bullet: "security findings"
+        source_line: 582
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs health_failures (security families)", "framework/taxonomy/WORK_GENERATION.yaml security-finding (class security, role security-engineer)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: security-finding is a declared and implemented source"]
+        gap: null
+      - bullet: "performance regressions"
+        source_line: 583
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/generation.rs:1262-1340 detect_performance_regressions", "framework/taxonomy/WORK_GENERATION.yaml performance-regression"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: performance-regression is a declared and implemented source, fed by `gov telemetry emit` against a declared baseline"]
+        gap: null
+    health_scheduler_tiers: ["G1", "G2", "G5"]
+    evidence_owners: ["G5", "independent-heldout"]
+    evidence_owner_actually_runs: "true — generation ran after audit in the probe projects (`generated_work` in the close envelope)"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["failure memory", "audit/health results", "lesson and research records", "tool/plugin registry", "telemetry"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield build where each of the eleven event kinds is injected once"
+      repo_b_challenge: "a brownfield repository with a backlog of pre-existing failures"
+      hidden_oracle_fault_class: "an event that generates no work; the same event generating duplicate work; generated work with no link to its cause"
+      chaos_scale_soak: "a storm of failures generating work concurrently"
+      retrieval_challenge: "a retrieval miss must become work without looping on its own generated work"
+      not_challengeable: null
+    adoption_obligation: "adopt must run generation once the baseline is recorded so pre-existing events become governed work"
+    residual_risk: "a source whose cause has no record id (a suite family finding) carries source/subject/key but an empty `records` list; the link is to the family, not to a record"
+    findings: []
+
+  - capability: I4
+    title: Parallel execution
+    source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:585
+    governing_document_refs: ["framework v4.1.2 Part XI §44"]
+    requirement_class: ORIGINAL
+    status: PRESENT_AND_SUBSTANTIAL
+    status_justification: "Every bullet demonstrated by probe G1-G2-I1-I4-command-work.sh, including the availability property the contract's own rule requires: an independent branch keeps running while another waits for the owner."
+    na_reason_normative_text: null
+    partial_qualification_impact: null
+    bullets:
+      - bullet: "runnable/blocked sets"
+        source_line: 586
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs:280-300 runnable, :900-1040 (the DAG view)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: `gov task dag` reported runnable 6 / blocked 24 with a reason per blocked task; a BLOCKED task is not in the runnable set and is not offered (the S0-I4-01 case)"]
+        gap: null
+      - bullet: "critical path"
+        source_line: 587
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs:1023-1032 longest_chain"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: longest_chain returned an ordered dependency chain, not a record-order grouping"]
+        gap: null
+      - bullet: "per-feature end-to-end path"
+        source_line: 588
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs:929-1033 per_feature"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: per_feature returned the feature's own path; evidence/H1-H4-spec-readiness.out: the readiness gap work is grouped under its feature"]
+        gap: null
+      - bullet: "human-gate dependencies"
+        source_line: 589
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/dag.rs:54 human_gate_dependencies", "runtime/src/orchestration/gates.rs (authorises_blocked_work)"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: a task whose authorising gate is unanswered is reported in waiting_human; evidence/OD-P2-01-human-approval.out: answering the gate records which tasks it unblocks"]
+        gap: null
+      - bullet: "independent branches continue while one branch waits for human input"
+        source_line: 590
+        status: PRESENT_AND_SUBSTANTIAL
+        implementation_evidence: ["runtime/src/orchestration/control.rs (continue offers independent runnable work)", "framework/policies/HUMAN_GATE_POLICY.yaml continue_independent_work"]
+        automated_evidence: ["cargo test --lib"]
+        independent_evidence: ["evidence/G1-G2-I1-I4-command-work.out: with one task waiting on an unanswered gate, an independent task was claimed successfully and `gov continue` returned NEXT_WORK for it"]
+        gap: null
+    health_scheduler_tiers: ["G2", "G5"]
+    evidence_owners: ["G5", "human-gate", "independent-heldout"]
+    evidence_owner_actually_runs: "true"
+    freshness:
+      state: FRESH_FOR_CANDIDATE
+      invalidation_inputs: ["task records", "gate records", "claims", "implementation/source"]
+      invalidation_demonstrated: true
+      invalidation_evidence: evidence/FRESHNESS-invalidation.out
+    qualification_coverage:
+      repo_a_challenge: "a greenfield build with several independent feature branches and one owner gate"
+      repo_b_challenge: "a brownfield adoption where one stage waits on the owner while others proceed"
+      hidden_oracle_fault_class: "a blocked task offered as runnable; a gate that stalls unrelated work"
+      chaos_scale_soak: "many agents running while gates accumulate"
+      retrieval_challenge: "not relevant"
+      not_challengeable: null
+    adoption_obligation: "adoption stages must not stall unrelated governed work while one stage waits for the owner"
+    residual_risk: "none material found"
+    findings: []
