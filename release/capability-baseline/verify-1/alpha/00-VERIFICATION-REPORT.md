@@ -75,12 +75,13 @@ Seven held-out suites, re-runnable with `heldout/RUN-ALL`:
 V1-A5-01/-02; `t04` V1-S4-01; `t05` V1-S2-01 and V1-S5-01; `t06` V1-B2-01; `t07` V1-A3-01, the two
 A0 checks behind V1-S4-02 and V1-AC09-01.
 
-Regression (O3/AC-15, reproduced by me in this worktree): `cargo test --lib` → **276 passed, 0 failed**.
-`cargo test --test certification` was started in the same worktree and had not finished when this
-verification closed — the host was running several Phase-2 verifiers at a load average above 160.
-That is recorded in `evidence/cargo-certification.NOT-COMPLETED.md`, not omitted. It affects no
-capability status here (every status rests on the held-out suites), but it leaves one input of
-**AC-15** unestablished by this run. Builder tests are cited as regression evidence only.
+Regression (O3/AC-15), both reproduced by me in this worktree:
+`cargo test --lib` → **276 passed, 0 failed**; `cargo test --test certification` → **207 passed,
+0 failed** (4910s — the host was running several Phase-2 verifiers at a load average above 160, so
+the certification suite landed after the first commit of this report; see
+`evidence/cargo-certification.timing-note.md` for that sequence). Both match the integrator's claimed
+numbers, now independently reproduced. Builder tests are cited as regression evidence only; no
+capability status here rests on them.
 
 ## 3. Per-capability result
 
@@ -260,23 +261,19 @@ at least one evidence owner in the evidence map, with named automated checks and
 
 ## 9. What I could not establish
 
-1. **`cargo test --test certification`** had not finished when this verification closed; the host was
-   running several verifiers at load >160. `cargo test --lib` reproduced 276 passed / 0 failed. See
-   `evidence/cargo-certification.NOT-COMPLETED.md`; a completed run must be read before AC-15 is
-   called met.
-2. **Two BC-P2-03 input classes** — a change to the **machine trust anchor** and a change to the **`gov`
-   binary** — were not exercised as freshness triggers. I established four of the six input classes the
-   iteration-0 finding named.
-3. **CANCEL_AGENTS claim revocation** was not exercised end to end: the probe could not establish a
+1. **Two BC-P2-03 input classes** — a change to the **machine trust anchor** and a change to the
+   **`gov` binary** — were not exercised as freshness triggers. I established four of the six input
+   classes the iteration-0 finding named.
+2. **CANCEL_AGENTS claim revocation** was not exercised end to end: the probe could not establish a
    claimed task on its fixture, so `V1-A5-03` rests on the absence of any consumer of `agents_cancelled`
    outside `control::state`, not on a demonstrated failure.
-4. **A11 on the brownfield tree** was reached only through its gating behaviour (`STAGE_ORDER` while A10
+3. **A11 on the brownfield tree** was reached only through its gating behaviour (`STAGE_ORDER` while A10
    had not accepted). A11's own audit was exercised on a greenfield-adopted tree where A10 accepted.
    A11 against a brownfield tree's full legacy surface is untested here.
-5. **R2 material** — production key custody, a key ceremony, rotation/revocation drills, SBOM/licence
+4. **R2 material** — production key custody, a key ceremony, rotation/revocation drills, SBOM/licence
    provenance and private-remote publication are out of this gate and were not assessed. The keys used
    here are throw-away, drawn per run.
-6. **AC-14 (R1 preservation)** is P2-AR-0044's; I re-established the R1-relevant A2 behaviour for the
+5. **AC-14 (R1 preservation)** is P2-AR-0044's; I re-established the R1-relevant A2 behaviour for the
    areas this family exercises but did not re-run the R1 held-out suites.
 
 ## 10. Outputs

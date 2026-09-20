@@ -95,10 +95,10 @@ tests_or_attacks:
     detail: "276 passed, 0 failed"
     evidence_path: release/capability-baseline/verify-1/alpha/evidence/cargo-lib.out
   - id: regression-certification
-    description: "`cargo test --test certification` started in this worktree (O3 regression evidence)"
-    result: NOT_RUN
-    detail: "did not finish inside this run's window; the host was running several Phase-2 verifiers at load average >160. No capability status depends on it; it leaves one input of AC-15 unestablished by this run."
-    evidence_path: release/capability-baseline/verify-1/alpha/evidence/cargo-certification.NOT-COMPLETED.md
+    description: "`cargo test --test certification` reproduced in this worktree (O3 regression evidence)"
+    result: PASS
+    detail: "207 passed, 0 failed, 4910s. It finished after this report was first committed, because the host was running several Phase-2 verifiers at load average >160; added in follow-up evidence commit 431c51894d65c57edae0933ffd8091ee9308b2ba. Together with the lib result this reproduces both AC-15 inputs independently of the integrator's claim."
+    evidence_path: release/capability-baseline/verify-1/alpha/evidence/cargo-certification.out
 held_out_totals:
   suites: 7
   checks: 412
@@ -271,9 +271,11 @@ verdict: FAMILY_VERIFICATION_COMPLETE
 output:
   branch: phase2/verify-1-alpha
   commit: 2697acbd6b7e28a5fa382853414bf7a765083bc8
+  follow_up_commits:
+    - commit: 431c51894d65c57edae0933ffd8091ee9308b2ba
+      reason: "the reproduced certification suite (207 passed, 0 failed), which finished after the first commit; report §2/§9 corrected in the same pass"
   evidence_path: release/capability-baseline/verify-1/alpha/
 unresolved:
-  - "`cargo test --test certification` did not finish inside this run's window (host load average >160 with several verifiers running). `cargo test --lib` reproduced 276 passed / 0 failed. No capability status depends on it, but one input of AC-15 is unestablished by this run: see evidence/cargo-certification.NOT-COMPLETED.md."
   - "BC-P2-03 freshness: a change to the machine trust anchor and a change to the `gov` binary were not exercised as invalidation triggers; four of the six input classes named in A0-B3-01 were."
   - "V1-A5-03: CANCEL_AGENTS claim revocation was not exercised end to end (the probe could not establish a claimed task on its fixture); the finding rests on the absence of any consumer of `agents_cancelled` outside control::state."
   - "A11 against a brownfield tree's full legacy surface was reached only through its STAGE_ORDER gating; its audit was exercised on a greenfield-adopted tree, where it returned ADOPTED_HEALTHY."
@@ -281,5 +283,6 @@ unresolved:
 recommended_next_action: >-
   Route V1-S4-01 (S4 / BC-P2-33) and V1-S5-01 (S5, A2 / BC-P2-37) to repair as residuals of
   inventoried classes — both are incomplete fixes of a class that is still open, not new mechanisms.
-  Have a completed `cargo test --test certification` read before AC-15 is judged.
 completed_at: 2026-09-20T22:41:00Z
+amended_at: 2026-09-20T22:52:00Z
+amendment: "the certification suite finished green after the first commit; regression-certification is now PASS and the corresponding unresolved item is closed. No finding, status or verdict changed."
