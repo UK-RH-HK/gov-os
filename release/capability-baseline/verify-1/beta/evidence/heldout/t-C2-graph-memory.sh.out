@@ -1,0 +1,11 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS C2-b1 — all twenty contract relationship types are stored and read back as typed edges
+PASS C2-b2-orphan — graph integrity reports the planted orphan relationship
+PASS C2-b2-dangling — graph integrity reports the planted dangling relationship
+PASS C2-b2-stale — graph integrity reports the planted stale relationship
+PASS C2-b2-reversed — graph integrity reports the planted reversed relationship
+PASS C2-b2-ill_typed — graph integrity reports the planted ill_typed relationship
+PASS C2-b3-impact — gov memory impact traverses from REQ-0001 to the feature that depends on it
+PASS C2-b3-lineage — reverse (upstream) lineage traversal executes over canonical edges
+--- t-C2-graph-memory.sh: 8 passed, 0 failed

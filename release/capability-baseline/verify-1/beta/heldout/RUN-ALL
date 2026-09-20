@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# P2-AR-0047 — held-out probe suite for capability family beta (C1-C10, D1-D6, R1-R3), verification iteration 1.
+#
+#   BETA_WT=<the verifier worktree, containing target/release/gov>  ./RUN-ALL [pattern]
+#
+# Every probe builds its own disposable project (and, where the obligation needs one, its own simulated machine with
+# a throw-away Signed Release Root published by provision.py). Nothing here writes to the product tree. `rm` is not
+# used anywhere: a store that must be "deleted" is moved to a graveyard outside every project.
+#
+# Requirements: python3 with pyyaml and `cryptography`, git, and a release build of `gov` in $BETA_WT/target/release.
+set -uo pipefail
+HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+: "${BETA_WT:=$(cd "$HERE/../../../../.." && pwd)}"
+export BETA_WT
+: "${BETA_SCRATCH:=${TMPDIR:-/tmp}/p2ar0047-heldout-$(date +%Y%m%dT%H%M%S)}"
+export BETA_SCRATCH
+# where each probe's full output is written (default: this verifier's evidence directory)
+: "${BETA_EVIDENCE:=$BETA_WT/release/capability-baseline/verify-1/beta/evidence/heldout}"
+export BETA_EVIDENCE
+mkdir -p "$BETA_SCRATCH"
+
+[ -x "$BETA_WT/target/release/gov" ] || { echo "no gov binary at $BETA_WT/target/release/gov"; exit 2; }
+
+PAT=${1:-}
+TOTAL_PASS=0; TOTAL_FAIL=0; FAILED_SCRIPTS=()
+
+echo "P2-AR-0047 held-out suite — worktree $BETA_WT"
+echo "product identity: $(cd "$BETA_WT" && python3 release/orchestration/phase-2/tools/product_identity.py HEAD | tr '\n' ' ')"
+echo "scratch: $BETA_SCRATCH"
+echo
+
+for t in "$HERE"/t-*.sh; do
+  name=$(basename "$t")
+  if [ -n "$PAT" ] && [[ "$name" != *"$PAT"* ]]; then continue; fi
+  echo "=== $name"
+  out=$("$t" 2>&1)
+  # the whole output of each probe is kept beside this run, so a later reader has more than the PASS/FAIL lines
+  if [ -n "${BETA_EVIDENCE:-}" ]; then mkdir -p "$BETA_EVIDENCE"; printf '%s\n' "$out" > "$BETA_EVIDENCE/$name.out"; fi
+  echo "$out" | grep -E '^(PASS|FAIL) ' || true
+  p=$(echo "$out" | grep -c '^PASS ')
+  f=$(echo "$out" | grep -c '^FAIL ')
+  TOTAL_PASS=$((TOTAL_PASS + p)); TOTAL_FAIL=$((TOTAL_FAIL + f))
+  [ "$f" -gt 0 ] && FAILED_SCRIPTS+=("$name($f)")
+  echo "--- $name: $p passed, $f failed"
+  echo
+done
+
+echo "================================================================"
+echo "P2-AR-0047 held-out suite: $TOTAL_PASS passed, $TOTAL_FAIL failed"
+[ ${#FAILED_SCRIPTS[@]} -gt 0 ] && echo "scripts with failures: ${FAILED_SCRIPTS[*]}"
+exit 0

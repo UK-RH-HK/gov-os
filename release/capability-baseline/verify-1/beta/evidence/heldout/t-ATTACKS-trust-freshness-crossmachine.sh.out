@@ -1,0 +1,16 @@
+# P2-AR-0047 held-out probe output, as captured by heldout/RUN-ALL on cap2-candidate-1
+# (commit 0bad524d836f179964ffbac31972856ea6434682, product_code_digest e6332fc7…2220)
+PASS ATK-trust-lifecycle — a hand-written record that asserts its own OS-written lifecycle facts is reported unsealed and its claims are not honoured
+PASS ATK-trust-namespace — a project override that would widen the secret namespace is refused by policy precedence and reported, leaving the effective policy unchanged
+PASS ATK-trust-env-role — declaring the acting role as 'human' through the environment does not apply a retrieval-profile change
+PASS ATK-xmachine-honoured — the retrieval-profile decision sealed on machine A is honoured as GOVERNED on a second machine of the same owner, bound to the same T2 binding authority
+PASS ATK-xmachine-forged — a hand-edited copy of the sealed decision is no longer honoured as governing the profile
+PASS ATK-xmachine-no-secrets — no signing or binding secret is in the repository
+PASS ATK-fresh-policy — changing the policy input class marks prior green evidence stale
+PASS ATK-fresh-source — changing the source input class marks prior green evidence stale
+PASS ATK-fresh-spec — changing the spec input class marks prior green evidence stale
+PASS ATK-fresh-heldout — changing the heldout input class marks prior green evidence stale
+PASS ATK-avail-reads — a stale index does not refuse reads: retrieval stays available while the index is stale
+PASS ATK-avail-remedy — the block's own remedy (rebuild-memory) is never refused by the block
+PASS ATK-avail-independent — independent work (claiming another task) stays available across the staleness block
+--- t-ATTACKS-trust-freshness-crossmachine.sh: 13 passed, 0 failed
