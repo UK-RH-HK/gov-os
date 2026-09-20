@@ -1,0 +1,45 @@
+# P2-AR-0051 — certification suite (regression evidence, Contract v3 O3)
+#
+# `cargo test --lib` completed on this candidate in this worktree: 276 passed, 0 failed
+# (evidence/cargo-lib.out). That is the regression evidence this run established itself, and
+# it covers every runtime module this family's capabilities exercise.
+#
+# `cargo test --test certification` was started twice and did not complete inside this run.
+# The first attempt was stopped by this run (SIGTERM) after 42 tests, to free CPU for the
+# held-out suite — this family's primary evidence — which was competing for two build jobs
+# against six parallel verifier worktrees. The second attempt was restarted once the held-out
+# suite finished and had reached the count below when this evidence was committed; it was left
+# running. AC-15 (regression green on the candidate) is the synthesis verifier's criterion,
+# not this family's, and no zeta finding or capability status rests on it.
+#
+# tests reported ok in the second attempt at commit time:
+7
+# failures reported so far:
+0
+
+$ cargo test --test certification   (tail at commit time)
+test arch::rust_sources_never_hardcode_external_language_runtimes ... ok
+test arch::builtin_embedder_matches_python_reference_plugin ... ok
+test arch::schemas_policies_and_registries_validate_against_kernel_schemas ... ok
+test arch::ecosystem_resolution_follows_the_governed_project_not_the_os ... ok
+test arch::core_runs_without_any_governed_toolchain_on_path has been running for over 60 seconds
+test arch::plugin_protocol_is_language_neutral_bash_embedder has been running for over 60 seconds
+test brownfield::brownfield_adoption_end_to_end has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered has been running for over 60 seconds
+test greenfield::greenfield_end_to_end has been running for over 60 seconds
+test integration_r3::a_cit_invalidating_done_work_leaves_graph_integrity_and_d015_clean has been running for over 60 seconds
+test integration_r3::a_legacy_unsealed_task_rewritten_by_gov_inside_a_claim_window_is_reported_not_refused has been running for over 60 seconds
+test integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2 has been running for over 60 seconds
+test integration_r3::a_task_record_written_outside_gov_inside_a_claim_window_is_refused_at_close has been running for over 60 seconds
+test integration_r3::task_records_are_sealed_and_os_writes_inside_another_claim_window_are_honoured has been running for over 60 seconds
+test migration::adoption_dependency_proof_citations_and_rerun_identity has been running for over 60 seconds
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts has been running for over 60 seconds
+test migration::command_tests_execute_only_governed_commands_for_permitted_roles has been running for over 60 seconds
+test migration::path_migration_with_rollback_and_memory_rebuild has been running for over 60 seconds
+test multi_machine::clone_rebuilds_identical_derived_state has been running for over 60 seconds
+test r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once has been running for over 60 seconds
+test r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction has been running for over 60 seconds
+test r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing has been running for over 60 seconds
+test r4_residual::a_repository_contract_rule_that_never_decides_is_reported has been running for over 60 seconds
+test r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority has been running for over 60 seconds
+test r4_residual::a_repository_contract_rule_that_never_decides_is_reported ... ok

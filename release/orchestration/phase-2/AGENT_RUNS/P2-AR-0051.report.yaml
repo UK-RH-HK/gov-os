@@ -1,0 +1,128 @@
+schema: governance-os.phase-2.agent-run-report
+schema_version: 1
+run_id: P2-AR-0051
+role: capability-family-verifier
+family: zeta
+iteration: verify-1
+handoffs:
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0044-verify-1-family-scopes.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0006-audit-0-zeta.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+agent_model: claude-opus-5[1m]
+started: '2026-09-20'
+finished: '2026-09-20'
+gate: GATE-P2-CAPABILITY-BASELINE-ACCEPT
+verdict: FAMILY_VERIFICATION_COMPLETE
+
+candidate:
+  tag: cap2-candidate-1
+  commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  worktree_head: 8588813ec1ef9c832879e258ca5acfb573ae996f
+  verified_by_this_run: true
+  verification_note: >
+    `git rev-list -n1 cap2-candidate-1` -> 0bad524…; `product_identity.py HEAD` -> both digests
+    exactly as dispatched; 0bad524 is an ancestor of HEAD. `product_identity.py cap2-candidate-1`
+    echoes the annotated tag's object id f75eb7db…, which dereferences to 0bad524…; the digests it
+    reports are identical. Contract v3 sha256 4c2df291… and the frozen gate contract sha256
+    d2f33e89… both verified. No STOP.
+
+scope:
+  capabilities: [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
+  owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md:1066-1194
+  checklist_bullets: 86
+  bullets_evaluated: 86
+
+result:
+  capability_statuses:
+    W1: PRESENT_AND_SUBSTANTIAL
+    W2: PRESENT_AND_SUBSTANTIAL
+    W3: PARTIAL
+    W4: PRESENT_AND_SUBSTANTIAL
+    W5: PRESENT_AND_SUBSTANTIAL
+    W6: PRESENT_AND_SUBSTANTIAL
+    W7: PRESENT_AND_SUBSTANTIAL
+    W8: PARTIAL
+    W9: PRESENT_AND_SUBSTANTIAL
+    W10: PRESENT_AND_SUBSTANTIAL
+    W11: PRESENT_AND_SUBSTANTIAL
+    W12: PRESENT_AND_SUBSTANTIAL
+  counts:
+    PRESENT_AND_SUBSTANTIAL: 10
+    PARTIAL: 2
+    ABSENT: 0
+    UNCLEAR: 0
+    N/A_WITH_REASON: 0
+  bullets:
+    PRESENT_AND_SUBSTANTIAL: 84
+    PARTIAL: 2
+  ac8:
+    determination: MET
+    matrix: release/capability-baseline/verify-1/zeta/artifact-flow-coverage-matrix.yaml
+    rows: 15
+    columns: 11
+    rejection_conditions:
+      semantic_retrieval_relied_on_to_rediscover_mandatory_inputs: false
+      stale_versions_can_silently_satisfy_downstream_work: false
+      completion_cannot_be_traced_to_upstream_evidence: false
+  findings:
+    total: 6
+    blocking: 0
+    by_severity: {CRITICAL: 0, HIGH: 0, MEDIUM: 1, LOW: 4, INFO: 1}
+    residual: 5
+    materially_new: 1
+    materially_new_blocking: 0
+    owner_decision_required: [A1-W8-01]
+    ids: [A1-W3-01, A1-W-01, A1-W12-01, A1-W5-01, A1-W8-01, A1-W4-01]
+  prior_findings:
+    in_scope: 29
+    CLOSED: 24
+    RESIDUAL: 5
+    NOT_APPLICABLE: 0
+    prior_blocking_still_blocking: 0
+  heldout:
+    probes: 13
+    checks: 137
+    passed: 135
+    failed: 2
+    failed_checks:
+      - 'W3-04 — every required input records the reason for the dependency (finding A1-W3-01)'
+      - 'W12-G2b — `gov health close-check` agrees with the gate it previews (finding A1-W12-01)'
+  regression_evidence:
+    cargo_test_lib: '276 passed; 0 failed (evidence/cargo-lib.out)'
+    cargo_test_certification: 'see evidence/cargo-certification.out'
+
+output:
+  evidence_dir: release/capability-baseline/verify-1/zeta/
+  artefacts:
+    - release/capability-baseline/verify-1/zeta/00-VERIFICATION-REPORT.md
+    - release/capability-baseline/verify-1/zeta/capability-audit.yaml
+    - release/capability-baseline/verify-1/zeta/findings.yaml
+    - release/capability-baseline/verify-1/zeta/prior-findings-disposition.yaml
+    - release/capability-baseline/verify-1/zeta/artifact-flow-coverage-matrix.yaml
+    - release/capability-baseline/verify-1/zeta/heldout/
+    - release/capability-baseline/verify-1/zeta/evidence/
+  branch: phase2/verify-1-zeta
+  commit: 91543209676f77e6471a3fccca58829884fae666
+
+not_established:
+  - 'a relationship spanning two languages (FFI) or two repositories (W8.5, conditioned on "where in scope"); finding A1-W8-01'
+  - 'the CIT-E execution half of W6 propagation: at the R3 radius the change produced, approval correctly requires an answered Human Decision Gate, which a verifier may not manufacture. CIT-P (the impact set) and the direct-change propagation, which share the engine, were exercised end to end.'
+  - 'adoption stages A5-A11 (alpha scope), and therefore the migration plan''s consumption-receipt cell and the adoption audit''s own findings; A11 correctly refuses out of protocol order'
+  - 'cross-machine continuity (P2-ADJ-0002) — alpha leads it; no W capability required it'
+  - 'a lower bound on how much W11 must measure before the artifact_flow_health family may be green (several metrics are `applicable: false` in a repository with no live work)'
+  - 'a capability plugin that hangs rather than failing, as a W10 outage case'
+  - 'the certification suite was started as regression evidence under heavy concurrent load; see evidence/cargo-certification.out for what it reached'
+
+prohibitions_observed:
+  - no product source, test, fixture, schema, policy, doc or Cargo file was modified
+  - nothing outside release/capability-baseline/verify-1/zeta/ and this report was written
+  - no other verifier's evidence directory or branch was read
+  - no agent transcript, task-output store or user auto-memory was read
+  - no sub-agents were spawned; every command was run by this run
+  - the product owner was not contacted
+  - 'rm is denied here: nothing was deleted; disposable repositories were moved aside in the scratch area'
+  - no branch was merged, rebased, tagged or pushed; the main checkout was not touched

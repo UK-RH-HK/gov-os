@@ -1,0 +1,26 @@
+$ gov --json context manifest TASK-0020
+id           slot           req    reason    declared_in
+REQ-0001     requirement    True   None      ['task.requirements']
+SCN-0001     scenario       True   None      ['task.scenarios']
+TO-0001      test_design    True   None      ['task.acceptance_tests']
+IFC-0001     interface      True   None      ['task.interfaces']
+ARCH-0100    architecture   False  implicit input: every task context packet carries all ACTIVE/PROVISIONAL architecture records ['implicit']
+DATA-0002    dataset        True   None      ['task.required_data']
+TASK-0100    task_dependency True   None      ['task.dependencies']
+
+delivery_state : COMPLETE
+counts         : {'declared': 7, 'required': 6, 'satisfied': 6}
+missing_inputs : []
+violations     : []
+advisories     : []
+
+-> every required input declared through a typed list field carries reason: None,
+   the manifest is COMPLETE, and no surface reports the omission.
+
+the same entry declared in object form DOES carry its reason:
+   {"id": "REQ-0001", "required": true, "reason": "the requirement this work realises", "declared_in": ["task.required_inputs"]}
+
+and nothing at any health tier reports it:
+  G2 findings mentioning a missing dependency reason: 0
+  G4 findings mentioning a missing dependency reason: 0
+  G5 findings mentioning a missing dependency reason: 0

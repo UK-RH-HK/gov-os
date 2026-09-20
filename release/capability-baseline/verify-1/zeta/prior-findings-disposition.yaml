@@ -1,0 +1,472 @@
+schema: governance-os.phase-2.prior-findings-disposition
+schema_version: 1
+run_id: P2-AR-0051
+family: zeta
+iteration: verify-1
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+
+inputs:
+  - release/capability-baseline/audit-0/zeta-r/findings.yaml (27 findings, the zeta audit of record)
+  - release/capability-baseline/audit-0/synthesis/findings.yaml (2 of its 10 findings name a W capability)
+  - release/capability-baseline/audit-0/synthesis/blocker-classes.yaml (the class inventory)
+
+method: >
+  Every disposition below rests on evidence this run produced on this candidate
+  (release/capability-baseline/verify-1/zeta/heldout/, output in evidence/RUN-ALL.out). No
+  iteration-0 probe output and no iteration-0 status was adopted; the iteration-0 statements were
+  read only to know what to attack.
+
+summary:
+  total: 29
+  CLOSED: 24
+  RESIDUAL: 5
+  NOT_APPLICABLE: 0
+  blocking_prior_findings_still_open: 0
+  note: >
+    Of the 25 prior findings recorded blocking, 23 are CLOSED and 2 are RESIDUAL but no longer
+    blocking (A0-W3-03 in its reason element only, A0-W8-01 in its cross-language element only).
+    Of the 4 prior non-blocking findings, 2 are CLOSED and 2 are RESIDUAL and still non-blocking.
+
+dispositions:
+
+  - id: A0-W1-01
+    capability: [W1]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-21
+    disposition: CLOSED
+    evidence: >
+      All four elements were re-attacked. (1) Migration plan: `05-plan.yaml` is now a
+      `migration-plan` record with id MPLAN-GOVERNANCE-ADOPTION, ACTIVE, state_class DERIVED,
+      monotonic `version`, `content_hash`, a producer stamp and `expected_consumers`; re-planning
+      unchanged input is idempotent and re-planning changed input bumps the version, records
+      `supersedes: [MPLAN-…@v1]` and keeps the v0001 snapshot (checks W1b-01, W1b-02, W1b-02b).
+      (2) Audit findings: ids are content-derived `GF-<10 hex>` from (family, message, path) and are
+      identical across two consecutive `gov audit` runs; adoption catalogue ids are `ART-<12 hex>`
+      and stable across a re-classify (W1-05, W1b-03). (3) Provenance: OS-written records carry a
+      declared producer/session/role and authored records resolve `introduced_by` /
+      `last_changed_by` from version control (W1-06, W1-07, W1b-01). (4) A record outside its
+      canonical directory is reported by name with its canonical location (W1-04).
+
+  - id: A0-W2-01
+    capability: [W2, W1, W6]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-21
+    disposition: CLOSED
+    evidence: >
+      `records::RELATION_FIELDS` / `INVERSE_RELATION_FIELDS` now separate fields declared on the
+      source of an edge from fields declared on its target. Observed: `TASK-0001 -CONSUMES->
+      REQ-0001` (from `consumers`), `REQ-0001 -REALISES-> F-0001`, and no reversed CONSUMES edge
+      (W2-01). `required_data` yields a CONSUMES edge — DATA-0002's actual consumers are
+      [TASK-0001, TO-0001] — and `influences` yields AFFECTS, which is what W7's unconsumed-research
+      detection walks (W7-03). Impact from a requirement now reaches the task, its report, its test
+      obligation and its code (W8-02, W6-10).
+
+  - id: A0-W2-02
+    capability: [W2]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-17
+    disposition: CLOSED
+    evidence: >
+      Required vs optional is explicit per entry (`required: true|false`), `optional_inputs` and
+      `supplementary_context` are separate blocks (W2-02, W2-02b); every delivered input carries
+      its `state_class` into the deterministic block and a NARRATIVE or EVIDENCE record cannot fill
+      an authoritative slot (W2-03, W2-04b, W2-05); a declared input of the wrong type is
+      TYPE_MISMATCH and blocks rather than vanishing (W2-04b); the packet publishes a
+      `receipt_contract` that states what the downstream stage must return, backed by the published
+      worker-return and report schemas (W2-07).
+
+  - id: A0-W3-01
+    capability: [W3]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-16
+    disposition: CLOSED
+    evidence: >
+      `gov task status <id> READY` is refused with TASK_NOT_READY and `gov task claim` with
+      TASK_NOT_RUNNABLE when a mandatory input is absent, both naming the input; the task is in the
+      DAG's `blocked` list with the reason, and `gov continue --claim` does not offer it
+      (W3-06, W4-06b). A task stored as READY by hand with a missing input is still not offered as
+      runnable, and the W11 missing-required-input metric names it (W11-04).
+
+  - id: A0-W3-02
+    capability: [W3, W2, W10]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-17
+    disposition: CLOSED
+    evidence: >
+      A superseded requirement makes the manifest BLOCKED, is delivered flagged with
+      `superseded_by`, appears in `input_violations`, and the task is not claimable (W3-07); naming
+      a superseded spec explicitly is refused with a SUPERSEDED problem that names the successor
+      (W10-02b); a HISTORICAL decision is never in `active_decisions` and is delivered in
+      `conflicting_decisions` (W2-06); the current spec is delivered and the superseded
+      near-duplicate is not (W10-02).
+
+  - id: A0-W3-03
+    capability: [W3]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-17
+    disposition: RESIDUAL
+    residual_finding: A1-W3-01
+    still_blocking: false
+    evidence: >
+      Three of the four elements are closed and independently evidenced: an entry can declare
+      `required_status` and `required_state_class` and they are enforced (W3-02); a `version` or
+      `content_hash` constraint the input violates blocks the manifest, and a satisfied hash pin
+      starts blocking the moment the content changes (W3-03, W3-03b); `supplementary_context` is
+      declarable and is delivered in a separate non-authority block (W3-05, W2-02b); and an input
+      declared through `relations: [{type, target, note}]` IS delivered, with the note as its reason.
+      The reason element is not closed: a task that declares its inputs through the typed list
+      fields records `reason: null` for every one of them and nothing reports it. Finding A1-W3-01.
+
+  - id: A0-W3-04
+    capability: [W3]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-18
+    disposition: CLOSED
+    evidence: >
+      Two declared-conflicting ACTIVE decisions are detected as a DECLARED_CONFLICT contradiction
+      with `blocks: true`; neither is delivered as active authority (both are in
+      `conflicting_decisions`); the packet carries `contradiction_routing` and a Human Decision Gate
+      record is raised; the task cannot be claimed while the contradiction is unresolved
+      (W3-08, W3-08b).
+
+  - id: A0-W4-01
+    capability: [W4]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-19
+    disposition: CLOSED
+    evidence: >
+      Each delivered input now carries its whole record (`content`) and, for Markdown records, its
+      `body`, plus `version`, `content_hash` and `state_class`; the recorded hash equals the
+      SHA-256 of the record's bytes; editing an acceptance criterion changes both
+      `deterministic_hash` and `packet_hash`; the packet records `provenance.repo_commit`, the
+      compiler identity and `inputs_uncommitted`, and every packet is kept by hash so a recorded
+      hash resolves back to exactly what was supplied (W4-01, W4-04, W4-04b, W4-05).
+
+  - id: A0-W4-02
+    capability: [W4, W3]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-19
+    disposition: CLOSED
+    evidence: >
+      `required_data` is delivered in `deterministic_authority.datasets`, `derived_from` evidence in
+      `evidence_inputs`, task-level `interfaces` in `interfaces`, and test obligations in
+      `test_designs` with their content — all with hashes, all independent of retrieval
+      (W3-01, W4-01, W4-04, W2-02).
+
+  - id: A0-W4-03
+    capability: [W4, W9]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-19
+    disposition: CLOSED
+    evidence: >
+      A missing required input makes `delivery_state` BLOCKED and is named in `missing_inputs` with
+      its code and remediation; `ensure_dispatchable` refuses the packet; `gov continue --claim`
+      lists the task as blocked instead of dispatching it; and `gov handoff create` refuses with
+      HANDOFF_INPUTS_UNSATISFIED naming the input (W4-06, W4-06b, W9-06c).
+
+  - id: A0-W4-04
+    capability: [W4]
+    prior_severity: LOW
+    prior_blocking: false
+    class: null
+    disposition: CLOSED
+    evidence: >
+      An input declared on both the task and its feature resolves to ONE manifest entry whose
+      `declared_in` lists both sources (observed on REQ-0001 in W3-02:
+      `declared_in: ["feature F-0001.requirements", "task.required_inputs"]`), and
+      `governing_requirements` carries it once.
+
+  - id: A0-W4-05
+    capability: [W4]
+    prior_severity: INFO
+    prior_blocking: false
+    class: null
+    disposition: RESIDUAL
+    residual_finding: A1-W4-01
+    still_blocking: false
+    evidence: >
+      Unchanged and, as in iteration 0, not a breach of W4:1109: with the budget set to 2000
+      characters against 21418 characters of mandatory content, every mandatory input is delivered
+      whole and byte-identical, `budget.over_budget` is true and a `warning` is set, but
+      `delivery_state` stays COMPLETE and dispatch admits the packet (W4-03, W4-03b, W4-03c).
+
+  - id: A0-W5-01
+    capability: [W5]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-20
+    disposition: CLOSED
+    evidence: >
+      Task close refuses a completion with no consumption receipt (RECEIPT_INVALID:
+      RECEIPT_FIELDS_MISSING, INPUT_NOT_ACKNOWLEDGED, TRACEABILITY_MISSING, TRACE_INCOMPLETE,
+      TEST_EVIDENCE_MISSING), refuses a fabricated requirement id by name (UNKNOWN_REFERENCE),
+      refuses inputs acknowledged at a stale hash (STALE_CONSUMPTION) and refuses a declared
+      acceptance test with no evidence (TEST_EVIDENCE_MISSING). The persisted report records
+      inputs consumed, outputs, requirements/scenarios/features implemented, decisions and
+      constraints applied, acceptance evidence, deviations, unresolved and the packet hash
+      (W5-07, W5-07b, W5-07c, W5-05, W5-02, W5-00). A `tests.status: passed` claim the product
+      cannot evidence is itself refused (PRODUCT_TEST_EVIDENCE_REQUIRED).
+
+  - id: A0-W5-02
+    capability: [W5, W8]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-20
+    disposition: CLOSED
+    evidence: >
+      The task records `outputs_produced` and yields `TASK-0001 -PRODUCES-> file:src/export.rs` and
+      `TASK-0001 -PRODUCES-> RPT-0002`; the close report's upstream walk reaches REQ-0001, SCN-0001
+      and D-0100, and the requirement's downstream walk reaches `file:src/export.rs` and
+      `file:tests/export_acceptance.rs` (W5-09, W5-09b).
+
+  - id: A0-W5-03
+    capability: [W5, W9]
+    prior_severity: LOW
+    prior_blocking: false
+    class: null
+    disposition: RESIDUAL
+    residual_finding: A1-W5-01
+    still_blocking: false
+    evidence: >
+      `Project::git` still trims the whole stdout and `git_dirty_files` still slices `l[3..]`, so
+      the first porcelain line's path loses its first character. Its old consequences are gone —
+      task close compares against the sealed claim baseline, not this function, and checkpoints take
+      `files_changed` from the report (W5-08, W9-02, W12-G3b all pass) — but `gov recover` now
+      reports 8 of the 9 uncommitted governed paths, silently dropping the first
+      (evidence/A1-W5-01-dirty-path-truncation.out).
+
+  - id: A0-W6-01
+    capability: [W6]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-04
+    disposition: CLOSED
+    evidence: >
+      A DONE task whose authoritative input changed is marked `retest_required` with a
+      `staleness.inputs_changed` entry naming the input and both hashes; a linked revalidation task
+      (`class: validation`, `revalidates: TASK-0001`) is generated; `revalidation.required` is true;
+      and closing does not clear the flag — the re-claim is refused until re-test evidence against
+      the changed inputs is supplied (W6-01, W6-05, W6-06, W6-09, W6-09c).
+
+  - id: A0-W6-02
+    capability: [W6, W12]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-04
+    disposition: CLOSED
+    evidence: >
+      This was the harder half and it is closed. An edit made entirely outside change control is
+      detected content-wise (the SHA-256 each consumer recorded vs the bytes now) and propagated —
+      at the index rebuild (W6-01), at `gov task claim` (W6-08) and at `gov handoff create`
+      (W9-06b). An index rebuild no longer licenses stale consumption: it *causes* the propagation,
+      and the close is then refused (W6-09, W6-09c).
+
+  - id: A0-W6-03
+    capability: [W6, W4]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-04
+    disposition: CLOSED
+    evidence: >
+      The delivered packet's history copy is marked `invalidated` with the cause and the inputs that
+      changed, at both their delivered and current hashes; a recompiled packet carries
+      `input_staleness` naming the stale delivered inputs and the task's own markers; a handoff over
+      a stale packet re-delivers and records `previous_packet_invalidated: true` (W6-03, W4-05b,
+      W9-06b).
+
+  - id: A0-W6-04
+    capability: [W6]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-04
+    disposition: CLOSED
+    evidence: >
+      Propagation is no longer radius-limited: the dependency closure is computed from what each
+      consumer recorded it consumed, independent of the CIT radius. Implementation evidence (the
+      close report) is marked stale (W6-02), validation evidence (scenarios, test obligations) is in
+      the impact set (W6-10 names SCN-0001 and TO-0001), and the G4 family reports
+      `invalidated_completed_tasks` and `stale_reports` by name (W6-07b).
+
+  - id: A0-W6-05
+    capability: [W6, W12]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-03
+    disposition: CLOSED
+    evidence: >
+      The currency key now covers 31 input classes, including `spec_requirements`,
+      `spec_architecture`, `spec_tasks`, `spec_other`, `source`, `index_manifest`,
+      `research_experiments`, `evidence_records`, `continuity_records`, `adoption_evidence`,
+      `tools_plugins`, `model_profile`, `machine_trust`, `t2_bindings` and `runtime_identity`.
+      After a requirement edit the recorded green record is reported obsolete, naming the changed
+      classes (W6-07). This is judged on the currency property itself, as P2-ADJ-0003 §2 directs,
+      not on a probe precondition.
+
+  - id: A0-W7-01
+    capability: [W7]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-22
+    disposition: CLOSED
+    evidence: >
+      All five W7 classes were injected and each is detected BY NAME with its contract line:
+      unconsumed-output (ARCH-0200), spec-without-downstream-path (REQ-0900), unconsumed-research
+      (RES-0900, naming the decision that was taken without it), unjustified-acceptance-test
+      (TO-0900) and unjustified-code (src/undocumented.rs). Each orphan gets one linked, governed
+      investigation task (`generated_by: health:lineage_orphans`, `relations: [AFFECTS -> subject]`),
+      the generation is idempotent, nothing is deleted, the generated work does not count as a
+      consumer, and genuinely consumed outputs are not reported (W7-01…W7-09).
+
+  - id: A0-W8-01
+    capability: [W8]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-20
+    disposition: RESIDUAL
+    residual_finding: A1-W8-01
+    still_blocking: false
+    evidence: >
+      Closed: forward lineage now reaches code, tests, evidence and a release record
+      (feature → scenario → requirement → decision → architecture → task → code → test → report →
+      release, W8-01, W8-01b); reverse impact from a requirement reaches the implementation, its
+      tests and the release evidence, and a proposed change names them before it is applied
+      (W8-02, W8-02b); a link to a record that does not exist is detected by name (W8-03); a link
+      from current work to a superseded record is detected as a stale lineage link naming both ends
+      (W8-04). Not closed: a relationship spanning two languages or two repositories. Multi-language
+      relationships within one repository ARE captured (Python and Rust CALLS/IMPORTS edges), but no
+      edge connects a symbol in one language to a definition in another (W8-05, W8-05b). Finding
+      A1-W8-01; W8:1152 conditions the bullet on "where in scope", so it is non-blocking.
+
+  - id: A0-W9-01
+    capability: [W9]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-05
+    disposition: CLOSED
+    evidence: >
+      Checkpoints now record every mandatory input with its content hash, its normative hash, the
+      hash it was delivered at and whether it is stale, plus the packet hash (W9-02). A checkpoint
+      becomes STALE when a mandatory input changes, naming the checkpoint and the reason
+      (W12-G3b). Handoffs refuse a task with unsatisfied mandatory inputs
+      (HANDOFF_INPUTS_UNSATISFIED) and, for a stale packet, re-deliver at current inputs and record
+      `freshness.state`, the stale inputs with both hashes and
+      `previous_packet_invalidated: true` (W9-06, W9-06b, W9-06c). `gov session close` exists and
+      states the input freshness it closed under (W9-01).
+
+  - id: A0-W10-01
+    capability: [W10]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-19
+    disposition: CLOSED
+    evidence: >
+      The hard invariant holds. With the index database moved aside, and again with it replaced by
+      non-SQLite bytes, `gov context compile` succeeds, `delivery_state` is COMPLETE, `input_hashes`
+      and every delivered input block are identical to the healthy packet, and only
+      `supplementary_state` is DEGRADED — with the failing stage, its error code, the effect and the
+      remediation (W10-04-remove, W10-04-corrupt). Deleting the current spec's rows from the
+      semantic index does not stop it being delivered (W10-01), and the manifest is byte-identical
+      with the index absent (W3-09).
+
+  - id: A0-W11-01
+    capability: [W11]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-23
+    disposition: CLOSED
+    evidence: >
+      All nine metrics are computed and reported by the `artifact_flow_health` family, each citing
+      its Contract v3 line with a numerator, a denominator and an `applicable` flag, and each with a
+      declared target. Each was moved by injecting the fault it measures: coverage falls and names
+      the uncovered requirement; missing-required-input detection names the task and the input;
+      current-version selection accuracy falls to 0.875 and names the changed input; staleness
+      propagation accuracy names the (task, input) pairs; leakage is measured over 19 governing
+      inputs; orphan detection reports counts per W7 kind and its investigations' outcome;
+      fresh-agent reconstruction is measured by named probes. A metric below its target is disclosed
+      as a finding naming the metric, its value and its target, and orphan-detection recall is
+      explicitly stated as not measurable in the governed repository with the reason and the tier
+      that measures it (W11-01 … W11-11).
+
+  - id: A0-W12-01
+    capability: [W12]
+    prior_severity: HIGH
+    prior_blocking: true
+    class: BC-P2-07
+    disposition: CLOSED
+    evidence: >
+      A tiered scheduler exists (G0-G6, each with a declared duty) and each tier's Gate-W duty was
+      exercised at the tier: G0 refuses the claim that would consume a superseded input, naming it
+      and its successor, and `gov health guard` returns a scoped admission decision; G1 re-executes
+      graph_integrity, index_freshness and upstream_change_propagation after a material mutation and
+      names the unpropagated dependents; the G2 close gate refuses an invalid receipt and records
+      its health result on the report; G3 runs continuity and fresh-agent reconstruction and marks
+      the checkpoint stale on an input change; G4 runs the wider propagation and evaluates
+      architecture (milestone-class) changes; G5 audits lineage, orphans and the artifact-flow
+      metrics in one run; G6 exists as a surface, names the four injection kinds and fails closed on
+      an unsound oracle (W12-G0 … W12-01). One non-blocking divergence was found in the G2
+      *preview* surface (A1-W12-01).
+
+  - id: A0-W-01
+    capability: [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: [BC-P2-01, BC-P2-02]
+    disposition: RESIDUAL
+    residual_finding: A1-W-01
+    still_blocking: false
+    evidence: >
+      Substantially closed: `gov contract verify` reports the canonical import byte-identical to the
+      owner source and 713 checklist items carried (1026 of 1255 source lines carried verbatim); the
+      compiled contract carries all 86 Gate W bullets with their source lines, the W10 hard-invariant
+      text at line 1164 and the Gate W advanced-qualification challenge at line 1194; the evidence
+      map carries all 86 bullets with evidence classes, scheduler tiers, freshness triggers,
+      adoption and operational-audit obligations, allowed statuses, N/A requirements, remediation
+      rules and, for 77 of them, named automated checks. Not closed: nine Gate-W bullets have
+      `automated_checks: []` and `severity` is null for every capability. Finding A1-W-01; AC-10 is
+      stated at capability level and is met.
+
+  - id: S0-W1-01
+    source: audit-0/synthesis
+    capability: [W1, T3, S4]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-21
+    disposition: CLOSED
+    evidence: >
+      Adoption catalogue artefact ids are content-derived from the artefact's repository path
+      (`ART-<12 hex>`, `migrations::identity::artefact_id`) and are identical across a re-run of the
+      classification stage; 46 ids were compared before and after and none moved (W1b-03). The
+      migration plan itself keeps its id across re-plans and supersedes its previous version rather
+      than being rewritten (W1b-02, W1b-02b), so a ledger line written by an earlier pass keeps
+      naming the artefact it recorded.
+    note: >
+      The T3 and S4 aspects of this finding are alpha's; only its W1 (identity) aspect is disposed
+      of here.
+
+  - id: S0-W5-01
+    source: audit-0/synthesis
+    capability: [W5, N4, E3]
+    prior_severity: MEDIUM
+    prior_blocking: true
+    class: BC-P2-20
+    disposition: CLOSED
+    evidence: >
+      A document constructed to satisfy the published `worker-return.schema.json` — validated
+      against that schema with jsonschema, including its `status` vocabulary
+      (`success|partial|failed|blocked`) and its required `evidence`, `discoveries`, `risks`,
+      `lessons`, `proposed_decisions`, `recommended_next_action` fields — is accepted unchanged by
+      `gov task close --report` and becomes the consumption receipt (W5-10).
+    note: >
+      The N4 and E3 aspects are delta's and gamma's; only the W5 aspect is disposed of here.

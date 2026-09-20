@@ -1,0 +1,1735 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0051
+family: zeta
+iteration: verify-1
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+worktree_head: 8588813ec1ef9c832879e258ca5acfb573ae996f
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+note: A full re-audit. Every one of the 86 Gate W checklist bullets was established afresh on this candidate from
+  the owner source (Contract v3:1066-1194), with held-out probes this run authored (release/capability-baseline/verify-1/zeta/heldout/,
+  RUN-ALL). No iteration-0 status was adopted. Builder tests are cited as regression evidence only.
+capabilities:
+- capability: W1
+  title: Stable artefact identity
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1068
+  governing_document_refs:
+  - DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §§36-39 (SPEC, readiness, scenarios)
+  - … §§47-49 (change control)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: stable artefact ID
+    bullet_id: W1.1
+    source_line: 1070
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs:26-120
+    - runtime/src/records.rs:187-245
+    automated_evidence:
+    - test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct
+    - check:schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-03)
+    gap: null
+  - bullet: artefact type
+    bullet_id: W1.2
+    source_line: 1071
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs:26-120
+    automated_evidence:
+    - check:schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-01)
+    gap: null
+  - bullet: canonical path
+    bullet_id: W1.3
+    source_line: 1072
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs:31-45
+    - runtime/src/records.rs:187-220
+    automated_evidence:
+    - check:graph_integrity
+    - test:lib:graph::identity::tests::misplaced_records_are_reported_and_subdirectories_are_canonical
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-04)
+    gap: null
+  - bullet: authoritative status
+    bullet_id: W1.4
+    source_line: 1073
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:627-660 (state_class_for)
+    - runtime/src/graph/identity.rs
+    automated_evidence:
+    - check:schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-03)
+    gap: null
+  - bullet: lifecycle state
+    bullet_id: W1.5
+    source_line: 1074
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs
+    automated_evidence:
+    - check:schema_invariants
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-02)
+    gap: null
+  - bullet: version/content hash
+    bullet_id: W1.6
+    source_line: 1075
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs
+    - runtime/src/context/manifest.rs (normative_hash)
+    automated_evidence:
+    - test:lib:graph::identity::tests::content_derived_ids_are_stable_and_distinct
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-04b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-05)
+    gap: null
+  - bullet: producer/provenance
+    bullet_id: W1.7
+    source_line: 1076
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/identity.rs:36-60 (PROVENANCE_FIELDS + version control)
+    automated_evidence:
+    - test:lib:graph::identity::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-01)
+    gap: null
+  - bullet: supersedes/superseded-by lineage
+    bullet_id: W1.8
+    source_line: 1077
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/lineage.rs:26-60 (successor_map)
+    automated_evidence:
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-08)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1b-02b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-04)
+    gap: null
+  - bullet: expected downstream consumers where known
+    bullet_id: W1.9
+    source_line: 1078
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/lineage.rs (consumers_of)
+    - runtime/src/verification/lineage.rs
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-09)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-10)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-01)
+    gap: null
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G1
+  - G2
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: &id001
+    - authoritative spec/decision
+    - authoritative spec/decision (task manifests, test obligations)
+    - runtime/kernel implementation
+    - relevant index manifest
+    - relevant source files
+    - governing contract/policy
+    - implementation/test evidence records
+    - checkpoint/handoff records
+    - model/retrieval profile
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: a governed output of each of the eleven W1 artefact types, with a move that keeps
+      the id.'
+    repo_b_challenge: 'Repo B: legacy artefacts with duplicate ids, records outside their canonical location, and
+      an adoption re-run that must not renumber the catalogue.'
+    hidden_oracle_fault_class: 'hidden oracle: the correct current id/version of an artefact that was moved and
+      re-planned.'
+    chaos_scale_soak: 'not relevant: identity is not a load-bearing concurrency or scale property (re-run stability
+      is covered by the re-plan/re-audit challenge).'
+    retrieval_challenge: 'not relevant: identity is resolved from records, never from retrieval.'
+    not_challengeable: null
+  adoption_obligation: '`gov adopt` A1-A4 must give every legacy artefact a stable content-derived id and a canonical
+    target path; post-adoption acceptance re-runs `gov artefact check`.'
+  residual_risk: cross-repository identity (an artefact shared between two governed repositories) is not exercised
+    here.
+  findings:
+  - A1-W-01
+- capability: W2
+  title: Typed output → input contracts
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1082
+  governing_document_refs:
+  - … §§36-39
+  - … §2/§21 (authority precedence)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Upstream/downstream relationship type is explicit.
+    bullet_id: W2.1
+    source_line: 1083
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:18-100 (RELATION_FIELDS / INVERSE_RELATION_FIELDS)
+    automated_evidence:
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-08)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-01)
+    gap: null
+  - bullet: Required vs optional dependency is explicit.
+    bullet_id: W2.2
+    source_line: 1084
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:830-900
+    - runtime/src/context/manifest.rs:320-400
+    automated_evidence:
+    - test:lib:context::manifest::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-02b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-01)
+    gap: null
+  - bullet: Authority semantics are preserved across stages.
+    bullet_id: W2.3
+    source_line: 1085
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:60-95 (input_value, currency_flag)
+    automated_evidence:
+    - check:authority_unambiguous
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-06)
+    gap: null
+  - bullet: Research evidence cannot silently become a decision.
+    bullet_id: W2.4
+    source_line: 1086
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (slot expected_types)
+    - runtime/src/lifecycle/research.rs
+    automated_evidence:
+    - test:lib:context::manifest::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-04b)
+    gap: null
+  - bullet: Lessons cannot silently become authoritative policy.
+    bullet_id: W2.5
+    source_line: 1087
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:627-660
+    - runtime/src/context/manifest.rs (Slot::expected_types)
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-05)
+    gap: no automated check is mapped to this bullet in the evidence map; established here by independent held-out
+      evidence only (finding A1-W-01)
+  - bullet: Historical/retrieved material cannot replace current authoritative input.
+    bullet_id: W2.6
+    source_line: 1088
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:60-64 (NON_CURRENT_CLASSES)
+    - runtime/src/graph/lineage.rs:12-20 (NON_CURRENT_STATUSES)
+    automated_evidence:
+    - test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-02b)
+    gap: null
+  - bullet: Output schemas define what downstream stages may consume.
+    bullet_id: W2.7
+    source_line: 1089
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - framework/schemas/worker-return.schema.json
+    - framework/schemas/report.schema.json
+    - runtime/src/context/receipt.rs (contract_for)
+    automated_evidence:
+    - check:command_contract_consistency
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-10)
+    gap: null
+  - bullet: Relationships such as `EVIDENCE_FOR`, `CONSTRAINS`, `IMPLEMENTS`, `TESTS`, `GENERATES`, `VALIDATES`,
+      `SUPERSEDES` or equivalent are machine-usable.
+    bullet_id: W2.8
+    source_line: 1090
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:18-100
+    - runtime/src/graph/mod.rs
+    automated_evidence:
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-08)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-02)
+    gap: null
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G1
+  - G2
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: a full typed chain with EVIDENCE_FOR/CONSTRAINS/IMPLEMENTS/TESTS/VALIDATES/SUPERSEDES
+      edges.'
+    repo_b_challenge: 'Repo B: legacy links whose direction is implicit in prose; a lesson and a research note used
+      as policy.'
+    hidden_oracle_fault_class: 'hidden oracle: which record is authority for a slot, and which is evidence only.'
+    chaos_scale_soak: 'not relevant: relation typing is deterministic.'
+    retrieval_challenge: index a lesson with high similarity to a decision query and confirm it never becomes authority.
+    not_challengeable: null
+  adoption_obligation: adoption must type every carried-over relationship; a legacy link with no type is a finding.
+  residual_risk: the relation vocabulary is fixed in the kernel; a project that needs a new relation type has no
+    declared extension route.
+  findings:
+  - A1-W-01
+- capability: W3
+  title: Mandatory task-input manifest
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1092
+  governing_document_refs:
+  - … §§41-44 (task system)
+  - … §15 (context packet)
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: '8 of 9 bullets are executably evidenced; one is not fully: W3.4'
+  na_reason_normative_text: null
+  partial_qualification_impact: CANNOT_UNDERMINE. The missing element is the *reason* text recorded beside a dependency,
+    not the dependency itself. Every gap the Gate-W advanced qualification challenge names — omitted dependency
+    declarations, superseded or contradictory inputs, wrong versions, missing inputs — is detected and refused without
+    it (W3.1/.2/.3/.6/.7/.8/.9 all PRESENT_AND_SUBSTANTIAL, independently evidenced). A hidden oracle scores which
+    input and which version should have been delivered; it does not score the prose justifying the dependency. The
+    gap costs a reviewer the ability to tell an intended dependency from an accidental one, which is a review-quality
+    loss, not a qualification failure.
+  bullets:
+  - bullet: required input IDs
+    bullet_id: W3.1
+    source_line: 1094
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:820-960
+    automated_evidence:
+    - test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-01)
+    gap: null
+  - bullet: required authority/lifecycle state
+    bullet_id: W3.2
+    source_line: 1095
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (Constraints, required_status/required_state_class)
+    automated_evidence:
+    - test:lib:context::manifest::tests::state_version_and_hash_constraints_are_enforced
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-07)
+    gap: null
+  - bullet: required version/hash constraints where applicable
+    bullet_id: W3.3
+    source_line: 1096
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (Constraints::version / content_hash)
+    automated_evidence:
+    - test:lib:context::manifest::tests::version_constraints
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-03b)
+    gap: null
+  - bullet: reason for each dependency
+    bullet_id: W3.4
+    source_line: 1097
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:838-890 (the typed list fields pass reason=None)
+    automated_evidence:
+    - test:lib:context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input (asserts the reason
+      on the one object-form entry only)
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-04)
+    - release/capability-baseline/verify-1/zeta/heldout/w03_manifest.py (W3-04) and the TASK-0020 transcript in
+      evidence/A1-W3-01-no-reason.out
+    gap: 'a task that declares its mandatory inputs through the typed list fields (requirements, decisions, scenarios,
+      acceptance_tests, interfaces, architecture, required_data, derived_from, dependencies) records `reason: null`
+      for every such entry; nothing reports the omission and the manifest is COMPLETE and dispatchable. The object
+      forms (`required_inputs`, `optional_inputs`, `relations[].note`) do carry a reason. Finding A1-W3-01.'
+  - bullet: supplementary/retrieved context separately from mandatory inputs
+    bullet_id: W3.5
+    source_line: 1098
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (supplementary)
+    - runtime/src/context/mod.rs:212-240
+    automated_evidence:
+    - test:lib:context::manifest::tests::relations_notes_and_supplementary_context_are_declarations
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W2-02b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-02)
+    gap: null
+  - bullet: Task cannot become READY if a mandatory input is absent.
+    bullet_id: W3.6
+    source_line: 1101
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (require_ready)
+    - runtime/src/orchestration/dag.rs
+    - runtime/src/orchestration/tasks.rs:684-760 (claim)
+    automated_evidence:
+    - test:certification:ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-06b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-06b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-04)
+    gap: null
+  - bullet: Superseded input cannot silently satisfy a current requirement.
+    bullet_id: W3.7
+    source_line: 1102
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (SUPERSEDED problem)
+    automated_evidence:
+    - test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-02b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G0)
+    gap: null
+  - bullet: Conflicting mandatory inputs trigger contradiction handling.
+    bullet_id: W3.8
+    source_line: 1103
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/contradictions.rs
+    - runtime/src/context/mod.rs:150-165
+    automated_evidence:
+    - test:certification:ws04r2::contradictions_are_blocked_and_routed
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-08)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-08b)
+    gap: null
+  - bullet: Required inputs are resolved deterministically, not by semantic retrieval ranking.
+    bullet_id: W3.9
+    source_line: 1104
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:52-58 (records only, never the index)
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-09)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-04-remove)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-04-corrupt)
+    gap: null
+  health_scheduler_tiers:
+  - G0
+  - G2
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G0
+  - G2
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: tasks with complete manifests, and one with a version pin.'
+    repo_b_challenge: 'Repo B: tasks whose declarations are missing or name legacy ids.'
+    hidden_oracle_fault_class: 'hidden oracle: the correct required input set and version per task.'
+    chaos_scale_soak: 'chaos: remove a required record mid-run and confirm READY is withdrawn.'
+    retrieval_challenge: confirm the manifest is identical with the index absent.
+    not_challengeable: null
+  adoption_obligation: adopted tasks must declare their manifests; a task with an unsatisfiable manifest must not
+    be READY after adoption.
+  residual_risk: a task may declare its mandatory inputs with no reason and nothing reports it (A1-W3-01); a reviewer
+    cannot tell an intended dependency from an accidental one.
+  findings:
+  - A1-W3-01
+  - A1-W-01
+- capability: W4
+  title: Context compiler delivery proof
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1106
+  governing_document_refs:
+  - … §15 (context packet)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Mandatory authoritative inputs are loaded deterministically into the task context packet.
+    bullet_id: W4.1
+    source_line: 1107
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:62-90 (input_value), :330-420
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-01)
+    gap: null
+  - bullet: Required inputs are separated from supplementary semantic/lexical/graph/code retrieval.
+    bullet_id: W4.2
+    source_line: 1108
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:1-25, :212-280
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-05)
+    gap: null
+  - bullet: Required inputs cannot be displaced by context-ranking/token pressure without an explicit governed failure/degradation.
+    bullet_id: W4.3
+    source_line: 1109
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:455-495 (budget loop drops supplementary only)
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-03b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-03c)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-03)
+    gap: null
+  - bullet: Exact input IDs/versions/hashes are recorded in the context packet.
+    bullet_id: W4.4
+    source_line: 1110
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:500-520 (input_hashes, input_normative_hashes)
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-04b)
+    gap: null
+  - bullet: Context packet hash/provenance proves what the worker was supplied.
+    bullet_id: W4.5
+    source_line: 1111
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:520-545 (packet_hash, provenance, packets_dir)
+    automated_evidence:
+    - check:context_reproducibility
+    - check:audit_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-05b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-05b)
+    gap: null
+  - bullet: Missing required input causes refusal or explicit blocked state.
+    bullet_id: W4.6
+    source_line: 1112
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:381-390 (delivery_state)
+    - runtime/src/context/mod.rs:671-689 (ensure_dispatchable)
+    automated_evidence:
+    - test:lib:context::manifest::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-06b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-06c)
+    gap: null
+  health_scheduler_tiers:
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: packets compiled for every task class.'
+    repo_b_challenge: 'Repo B: brownfield tasks whose inputs live outside the canonical paths.'
+    hidden_oracle_fault_class: 'hidden oracle: the exact content each packet should have carried.'
+    chaos_scale_soak: token pressure at several budgets; index removed mid-compile.
+    retrieval_challenge: confirm the deterministic block is unchanged under every retrieval outcome.
+    not_challengeable: null
+  adoption_obligation: post-adoption acceptance compiles a packet for every dispatchable task (check:context_reproducibility
+    at G5).
+  residual_risk: 'an over-budget mandatory block is delivered whole with a warning and `delivery_state: COMPLETE`;
+    nothing refuses dispatch of a packet the model cannot hold (A1-W4-01, non-blocking).'
+  findings:
+  - A1-W4-01
+  - A1-W-01
+- capability: W5
+  title: Consumption receipt and implementation traceability
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1114
+  governing_document_refs:
+  - … §§59-61 (checkpoints, return contract)
+  - … §§41-44
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: exact required inputs supplied/consumed
+    bullet_id: W5.1
+    source_line: 1116
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/receipt.rs:1-40, validate()
+    automated_evidence:
+    - test:lib:context::receipt::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07c)
+    gap: null
+  - bullet: outputs produced
+    bullet_id: W5.2
+    source_line: 1117
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/receipt.rs
+    - runtime/src/orchestration/tasks.rs (outputs_produced)
+    automated_evidence:
+    - test:lib:context::receipt::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-09)
+    gap: null
+  - bullet: requirements/features/scenarios implemented
+    bullet_id: W5.3
+    source_line: 1118
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/receipt.rs (requirements/scenarios/features_implemented)
+    automated_evidence:
+    - test:lib:context::receipt::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07b)
+    gap: null
+  - bullet: decisions/architecture constraints applied
+    bullet_id: W5.4
+    source_line: 1119
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/receipt.rs (decisions_applied, constraints_applied)
+    automated_evidence:
+    - test:lib:context::receipt::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-02)
+    gap: null
+  - bullet: tests/acceptance evidence produced
+    bullet_id: W5.5
+    source_line: 1120
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/receipt.rs (acceptance_evidence, tests_requiring_evidence)
+    - runtime/src/verification/product.rs:470-510
+    automated_evidence:
+    - check:product_test_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-01)
+    gap: null
+  - bullet: deviations/unknowns
+    bullet_id: W5.6
+    source_line: 1121
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/receipt.rs (deviations, unresolved)
+    automated_evidence:
+    - test:lib:context::receipt::tests
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-02)
+    gap: null
+  - bullet: refuses missing mandatory traceability where required
+    bullet_id: W5.7
+    source_line: 1124
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:2205-2215 (require_receipt)
+    automated_evidence:
+    - check:product_traceability
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07c)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G2)
+    gap: null
+  - bullet: detects undocumented/untraceable implementation
+    bullet_id: W5.8
+    source_line: 1125
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/tasks.rs:2090-2115 (observed mutations vs the receipt)
+    automated_evidence:
+    - check:mutation_scope
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-08)
+    gap: null
+  - bullet: links code/test/output evidence back to authoritative upstream inputs
+    bullet_id: W5.9
+    source_line: 1126
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs:55-70 (receipt fields become edges)
+    - runtime/src/graph/mod.rs (impact_set/upstream_set)
+    automated_evidence:
+    - check:product_traceability
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-09)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-09b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-02)
+    gap: null
+  health_scheduler_tiers:
+  - G2
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G2
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: closes with honest receipts.'
+    repo_b_challenge: 'Repo B: closes whose receipts name legacy ids or omit the trace.'
+    hidden_oracle_fault_class: 'hidden oracle: the true implemented requirement set per close.'
+    chaos_scale_soak: 'chaos: interrupt a close between receipt validation and record minting.'
+    retrieval_challenge: 'not relevant: the receipt is validated against the manifest, not retrieval.'
+    not_challengeable: null
+  adoption_obligation: adopted DONE work with no close report is a `product_traceability` finding at A11.
+  residual_risk: the receipt binds what the worker declares and what the repository shows; it cannot establish that
+    the declared requirement was *correctly* implemented (that is the qualification oracle's job).
+  findings:
+  - A1-W-01
+- capability: W6
+  title: Upstream-change staleness propagation
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1128
+  governing_document_refs:
+  - … §§47-49 (change control)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: dependent task evidence becomes stale as appropriate
+    bullet_id: W6.1
+    source_line: 1130
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/propagation.rs:30-60, plan()/apply()
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-08)
+    gap: null
+  - bullet: implementation/release/test evidence is invalidated according to impact
+    bullet_id: W6.2
+    source_line: 1131
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/propagation.rs (reports, tests, scenarios, checkpoints, handoffs)
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-07b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G4)
+    gap: null
+  - bullet: affected context packets are invalidated
+    bullet_id: W6.3
+    source_line: 1132
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:160-200 (invalidated marker on the history copy)
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-05b)
+    gap: null
+  - bullet: graph/CIT computes impacted downstream nodes
+    bullet_id: W6.4
+    source_line: 1133
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/mod.rs:560-640 (impact)
+    - runtime/src/cit/propagation.rs
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-10)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-02b)
+    gap: null
+  - bullet: revalidation/rework tasks are generated
+    bullet_id: W6.5
+    source_line: 1134
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/propagation.rs (revalidation task generation)
+    - runtime/src/orchestration/generation.rs
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-05b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-10)
+    gap: null
+  - bullet: '`COMPLETE` does not imply permanently valid'
+    bullet_id: W6.6
+    source_line: 1135
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/cit/propagation.rs (DONE tasks are marked, not exempted)
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-09)
+    gap: null
+  - bullet: stale evidence cannot remain green merely because the original task closed successfully
+    bullet_id: W6.7
+    source_line: 1136
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/currency.rs:200-240 (31 input classes)
+    - runtime/src/cit/propagation.rs (require_current_inputs)
+    automated_evidence:
+    - check:upstream_change_propagation
+    - check:audit_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-09)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W6-09c)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07c)
+    gap: null
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: change a spec after implementation and confirm the full propagation.'
+    repo_b_challenge: 'Repo B: a legacy spec changed outside change control.'
+    hidden_oracle_fault_class: 'hidden oracle: the expected downstream propagation set.'
+    chaos_scale_soak: 'soak: many small changes; confirm markers accumulate and do not duplicate work.'
+    retrieval_challenge: confirm an index rebuild alone never clears staleness.
+    not_challengeable: null
+  adoption_obligation: adoption records the baseline content hashes that later staleness is judged against.
+  residual_risk: the CIT-E execution half of propagation could not be driven to completion by an agent at R3 (a
+    Human Decision Gate is correctly required); the direct-change half shares the same engine and was exercised
+    end to end.
+  findings:
+  - A1-W-01
+- capability: W7
+  title: Orphan/dead-output and unexplained-output detection
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1138
+  governing_document_refs:
+  - … §§36-39
+  - … §§41-44
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Completed authoritative outputs with expected consumers but no actual consumer are detectable.
+    bullet_id: W7.1
+    source_line: 1139
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs (unconsumed-output)
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-10)
+    gap: null
+  - bullet: Requirement/spec without downstream implementation/test path is detectable.
+    bullet_id: W7.2
+    source_line: 1140
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs (spec-without-downstream-path)
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-06)
+    gap: null
+  - bullet: Research expected to feed a decision but never consumed is visible.
+    bullet_id: W7.3
+    source_line: 1141
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs (unconsumed-research)
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-06)
+    gap: null
+  - bullet: Acceptance test without requirement/scenario is visible.
+    bullet_id: W7.4
+    source_line: 1142
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs (unjustified-acceptance-test)
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-06)
+    gap: null
+  - bullet: Implementation/code with no active requirement/decision/spec justification is detectable.
+    bullet_id: W7.5
+    source_line: 1143
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs (unjustified-code)
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-06)
+    gap: null
+  - bullet: Orphans produce governed investigation/remediation rather than silent deletion.
+    bullet_id: W7.6
+    source_line: 1144
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs:1101-1160 (generate_remediation)
+    - runtime/src/verification/mod.rs:1159-1200 (generates_remediation)
+    automated_evidence:
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-07)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-07b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-08)
+    gap: null
+  health_scheduler_tiers:
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: one injected orphan of each of the five W7 classes.'
+    repo_b_challenge: 'Repo B: legacy code and specs with no governed link.'
+    hidden_oracle_fault_class: 'hidden oracle: the true orphan set (this is the only route to recall).'
+    chaos_scale_soak: 'scale: a large repository, to bound false positives.'
+    retrieval_challenge: 'not relevant: orphan detection reads records and version control, not retrieval.'
+    not_challengeable: null
+  adoption_obligation: A11 runs the orphan audit over the adopted repository and generates its investigations.
+  residual_risk: orphan-detection recall is not measurable in the governed repository (only a G6 oracle knows the
+    true orphan set); the product states this rather than reporting a number.
+  findings:
+  - A1-W-01
+- capability: W8
+  title: Forward and reverse lineage
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1146
+  governing_document_refs:
+  - … §§36-39
+  - … §§47-49
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: '4 of 5 bullets are executably evidenced; one is not fully: W8.5'
+  na_reason_normative_text: null
+  partial_qualification_impact: CANNOT_UNDERMINE. W8:1152 conditions the bullet on 'where in scope'. The single-language
+    and single-repository relationships the contract does place in scope are captured and walkable in both directions
+    (W8.1-W8.4, independently evidenced), and the Gate-W qualification challenge does not name a cross-language
+    or cross-repository fault. Should Phase 4 place a cross-repository relationship in scope, it becomes a new obligation,
+    not an unmet one here.
+  bullets:
+  - bullet: outcome/feature → scenario → requirement → decision → architecture → task → code → test → evidence →
+      release
+    bullet_id: W8.1
+    source_line: 1148
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/lineage.rs
+    - runtime/src/graph/mod.rs (impact_set)
+    - runtime/src/records.rs:215-220 (release record type)
+    automated_evidence:
+    - check:graph_integrity
+    - check:product_traceability
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-01b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-09b)
+    gap: null
+  - bullet: reverse impact from changed requirement/decision/spec to affected implementation/tests/release evidence
+    bullet_id: W8.2
+    source_line: 1149
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/mod.rs (upstream_set)
+    - runtime/src/cit/mod.rs (impact)
+    automated_evidence:
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-02b)
+    gap: null
+  - bullet: missing lineage link detection
+    bullet_id: W8.3
+    source_line: 1150
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/memory/integrity.rs (dangling)
+    - runtime/src/graph/lineage.rs
+    automated_evidence:
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-03)
+    gap: null
+  - bullet: stale lineage link detection
+    bullet_id: W8.4
+    source_line: 1151
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/graph/lineage.rs:12-20, stale_links
+    automated_evidence:
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W1-08)
+    gap: null
+  - bullet: cross-language/cross-repository relationships where in scope
+    bullet_id: W8.5
+    source_line: 1152
+    status: PARTIAL
+    implementation_evidence:
+    - runtime/src/code_intelligence/generic.rs (multi-language extractor)
+    - runtime/src/memory/indexer.rs (symbols, symbol_refs, edges)
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W8-05b)
+    gap: 'code-level relationships are captured in more than one language in the same repository (Rust and Python
+      calls/imports become CALLS/IMPORTS edges). A single relationship spanning two languages (an FFI boundary)
+      and cross-repository relationships were not exercised: this probe governs one repository and the repository
+      contract declares no cross-language or cross-repository convention. W8:1152 conditions the bullet on ''where
+      in scope'', so this is recorded as not-established rather than unmet. No automated check is mapped to the
+      bullet.'
+  health_scheduler_tiers:
+  - G1
+  - G2
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G1
+  - G2
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: the full chain to a release record.'
+    repo_b_challenge: 'Repo B: broken and stale links, cross-language consumers.'
+    hidden_oracle_fault_class: 'hidden oracle: the correct impact set of a changed requirement.'
+    chaos_scale_soak: 'scale: deep chains, to bound traversal cost.'
+    retrieval_challenge: 'not relevant: lineage is computed from records and the code graph.'
+    not_challengeable: null
+  adoption_obligation: adoption must rebuild the lineage graph and report missing and stale links.
+  residual_risk: a single relationship spanning two languages (FFI) and cross-repository relationships are not exercised.
+  findings:
+  - A1-W8-01
+  - A1-W-01
+- capability: W9
+  title: Session/handoff continuity of mandatory inputs
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1154
+  governing_document_refs:
+  - … §§59-61 (checkpoints, return contract)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Required-input manifest persists across session end.
+    bullet_id: W9.1
+    source_line: 1155
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/checkpoints.rs
+    - runtime/src/context/manifest.rs (records-only resolution)
+    automated_evidence:
+    - check:continuity_checkpoint_handoff
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-04)
+    gap: null
+  - bullet: Checkpoint records input IDs/versions/hashes or equivalent state reference.
+    bullet_id: W9.2
+    source_line: 1156
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/checkpoints.rs (inputs, context_packet_hash, input_freshness)
+    automated_evidence:
+    - check:continuity_checkpoint_handoff
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G3b)
+    gap: null
+  - bullet: Model/provider switch reconstructs the same authoritative task inputs.
+    bullet_id: W9.3
+    source_line: 1157
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs (the authority block reads no model/routing state)
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-03)
+    gap: no automated check is mapped to this bullet in the evidence map; established here by independent held-out
+      evidence only (finding A1-W-01)
+  - bullet: Fresh agent reconstructs mandatory inputs without prior chat.
+    bullet_id: W9.4
+    source_line: 1158
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/status.rs
+    - runtime/src/verification/families_ext.rs (fresh_agent_reconstruction)
+    automated_evidence:
+    - check:fresh_agent_reconstruction
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-04)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-04b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-10)
+    gap: null
+  - bullet: Compaction cannot silently remove mandatory project state.
+    bullet_id: W9.5
+    source_line: 1159
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/records.rs (records are the state of record; the runtime dir is derived)
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-05b)
+    gap: no automated check is mapped to this bullet in the evidence map; established here by independent held-out
+      evidence only (finding A1-W-01)
+  - bullet: Handoff with stale/missing required-input state is blocked or explicitly degraded.
+    bullet_id: W9.6
+    source_line: 1160
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/orchestration/handoffs.rs:100-170 (HANDOFF_INPUTS_UNSATISFIED, freshness)
+    automated_evidence:
+    - check:continuity_checkpoint_handoff
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-06)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-06b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-06c)
+    gap: null
+  health_scheduler_tiers:
+  - G3
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G3
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: session end, model switch and fresh-agent resume.'
+    repo_b_challenge: 'Repo B: resume into a brownfield repository with no prior chat.'
+    hidden_oracle_fault_class: 'hidden oracle: the mandatory input set the resumed agent must reconstruct.'
+    chaos_scale_soak: 'chaos: kill the process mid-task and resume.'
+    retrieval_challenge: confirm reconstruction with the index absent.
+    not_challengeable: null
+  adoption_obligation: adoption ends with a checkpoint a fresh agent can resume from.
+  residual_risk: '`Project::git_dirty_files` still drops the first uncommitted path (A1-W5-01); it no longer reaches
+    worker attribution or checkpoints, but `gov recover`''s uncommitted-governance list is short by one.'
+  findings:
+  - A1-W5-01
+  - A1-W-01
+- capability: W10
+  title: Deterministic mandatory inputs outrank retrieval
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1162
+  governing_document_refs:
+  - … §15 (context packet)
+  - … §11.5/§14 (memory and retrieval)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: current spec is delivered even if absent from semantic index
+    bullet_id: W10.1
+    source_line: 1167
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs:52-58
+    - runtime/src/context/mod.rs:140-165
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-09)
+    gap: null
+  - bullet: superseded but semantically similar spec cannot replace current required spec
+    bullet_id: W10.2
+    source_line: 1168
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/manifest.rs (SUPERSEDED problem, successor_map)
+    automated_evidence:
+    - test:lib:context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-02)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-02b)
+    gap: null
+  - bullet: token pressure drops supplementary context before mandatory authoritative inputs
+    bullet_id: W10.3
+    source_line: 1169
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:455-495
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-03)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W4-03b)
+    gap: no automated check is mapped to this bullet in the evidence map; established here by independent held-out
+      evidence only (finding A1-W-01)
+  - bullet: retrieval/index outage does not erase deterministic required dependencies
+    bullet_id: W10.4
+    source_line: 1170
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs:126-165 (IndexHandle::Unavailable), :212-240
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-04-remove)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-04-corrupt)
+    gap: no automated check is mapped to this bullet in the evidence map; established here by independent held-out
+      evidence only (finding A1-W-01)
+  - bullet: required-input delivery is independently testable
+    bullet_id: W10.5
+    source_line: 1171
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/context/mod.rs (verify)
+    - runtime/src/scheduler/catalogue.rs:485-495
+    automated_evidence:
+    - check:context_reproducibility
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W10-05b)
+    gap: null
+  health_scheduler_tiers:
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: omit the current spec from the index; index a superseded near-duplicate.'
+    repo_b_challenge: 'Repo B: a legacy index that is stale for most of the repository.'
+    hidden_oracle_fault_class: 'hidden oracle: the correct required input/version.'
+    chaos_scale_soak: index outage, corruption and embedder re-pin during dispatch.
+    retrieval_challenge: the whole capability is the retrieval challenge.
+    not_challengeable: null
+  adoption_obligation: adoption must not make delivery depend on the freshly built index.
+  residual_risk: the hard invariant holds for the index and the reranker; a *plugin-provided* embedder that hangs
+    rather than failing was not exercised.
+  findings:
+  - A1-W-01
+- capability: W11
+  title: Artifact-flow quantitative health
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1173
+  governing_document_refs:
+  - … §§41-44
+  - … §14
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: required-input delivery accuracy
+    bullet_id: W11.1
+    source_line: 1175
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs:72-140
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-11)
+    gap: null
+  - bullet: current-version selection accuracy
+    bullet_id: W11.2
+    source_line: 1176
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-05)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-06)
+    gap: null
+  - bullet: superseded-input leakage rate
+    bullet_id: W11.3
+    source_line: 1177
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-08)
+    gap: null
+  - bullet: missing-required-input detection
+    bullet_id: W11.4
+    source_line: 1178
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs:200-220
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-04)
+    gap: null
+  - bullet: staleness propagation accuracy
+    bullet_id: W11.5
+    source_line: 1179
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-07)
+    gap: null
+  - bullet: requirement→code traceability coverage
+    bullet_id: W11.6
+    source_line: 1180
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-03)
+    gap: null
+  - bullet: requirement→test traceability coverage
+    bullet_id: W11.7
+    source_line: 1181
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs
+    automated_evidence:
+    - check:artifact_flow_health
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-01)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-03)
+    gap: null
+  - bullet: orphan-output detection recall/false positives
+    bullet_id: W11.8
+    source_line: 1182
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs (orphan_detection)
+    - runtime/src/verification/lineage.rs (investigations)
+    automated_evidence:
+    - check:artifact_flow_health
+    - check:lineage_orphans
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-09)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-09b)
+    gap: null
+  - bullet: fresh-agent reconstruction correctness
+    bullet_id: W11.9
+    source_line: 1183
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/flow.rs (reconstruction probes)
+    automated_evidence:
+    - check:artifact_flow_health
+    - check:fresh_agent_reconstruction
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W11-10)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-04b)
+    gap: null
+  health_scheduler_tiers:
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: inject one fault per metric and confirm each moves.'
+    repo_b_challenge: 'Repo B: measure the same metrics on an adopted repository.'
+    hidden_oracle_fault_class: 'hidden oracle: the true value of each metric (the only route to orphan recall).'
+    chaos_scale_soak: 'soak: metric stability across many runs.'
+    retrieval_challenge: retrieval leakage rate is measured over the governing inputs, not over retrieval hits.
+    not_challengeable: null
+  adoption_obligation: A11 records the initial metric values as the adopted baseline.
+  residual_risk: 'several metrics are `applicable: false` in a repository with no live work; a project could therefore
+    carry a green artifact-flow family with almost nothing measured.'
+  findings:
+  - A1-W-01
+- capability: W12
+  title: Health-scheduler integration
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:1185
+  governing_document_refs:
+  - … §§47-49
+  - Contract v3 O5 (G0-G6 health scheduler)
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: every bullet is executably evidenced on this candidate by independent held-out probes run
+    by P2-AR-0051 (see the per-bullet independent_evidence).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: G0 blocks invalid authority/current-version substitution on privileged operations.
+    bullet_id: W12.1
+    source_line: 1186
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/scheduler/mod.rs:1552-1568 (guard)
+    - runtime/src/orchestration/tasks.rs:684-760 (claim G0)
+    automated_evidence:
+    - check:graph_integrity (hard-block rule)
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G0)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G0b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W3-07)
+    gap: null
+  - bullet: G1 invalidates affected dependency/lineage evidence after material mutations.
+    bullet_id: W12.2
+    source_line: 1187
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/scheduler/mod.rs:1570-1600 (mutation observation)
+    - runtime/src/scheduler/catalogue.rs:793-800
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G1)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G1b)
+    gap: null
+  - bullet: G2 verifies task input/consumption/traceability before task close.
+    bullet_id: W12.3
+    source_line: 1188
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/mod.rs:1427-1480 (close_gate)
+    - runtime/src/orchestration/tasks.rs:2205-2215
+    automated_evidence:
+    - check:product_traceability
+    - check:task_contract_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G2)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W5-07)
+    gap: null
+  - bullet: G3 verifies mandatory-input continuity across checkpoint/handoff.
+    bullet_id: W12.4
+    source_line: 1189
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/scheduler/catalogue.rs (continuity_checkpoint_handoff, G3)
+    - runtime/src/checkpoints.rs (freshness)
+    automated_evidence:
+    - check:continuity_checkpoint_handoff
+    - check:fresh_agent_reconstruction
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G3)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G3b)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W9-06b)
+    gap: null
+  - bullet: G4 runs wider staleness/impact propagation after CIT/spec/decision/architecture changes.
+    bullet_id: W12.5
+    source_line: 1190
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/scheduler/mod.rs:1576-1585 (MILESTONE_CLASSES)
+    - runtime/src/scheduler/catalogue.rs:793-800
+    automated_evidence:
+    - check:upstream_change_propagation
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G4)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G4b)
+    gap: null
+  - bullet: G5 audits end-to-end lineage and orphan states.
+    bullet_id: W12.6
+    source_line: 1191
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/verification/lineage.rs
+    - runtime/src/verification/flow.rs
+    - runtime/src/scheduler/catalogue.rs:720-730
+    automated_evidence:
+    - check:lineage_orphans
+    - check:artifact_flow_health
+    - check:graph_integrity
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G5)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W7-07)
+    gap: null
+  - bullet: G6 injects hidden artifact-flow failures in sophisticated qualification.
+    bullet_id: W12.7
+    source_line: 1192
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence:
+    - runtime/src/scheduler/mod.rs:1913-1990 (qualification_run)
+    - runtime/src/qualification_oracle.rs
+    automated_evidence: []
+    independent_evidence:
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G6)
+    - release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (check W12-G6b)
+    gap: 'the Phase-2-verifiable part holds: the G6 surface exists, names the four injection kinds and fails closed
+      on an unsound oracle or an unbound score report. Generating and executing hidden artifact-flow faults is Phase
+      4 (frozen gate contract AC-6, §7); no automated check is mapped to the bullet.'
+  health_scheduler_tiers:
+  - G0
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - G6
+  evidence_owners:
+  - G0
+  - G1
+  - G2
+  - G3
+  - G4
+  - G5
+  - independent-heldout
+  evidence_owner_actually_runs: true — exercised at the tier by P2-AR-0051 (see W12 checks W12-G0…W12-G6 and the
+    per-bullet independent_evidence); the G6 owner exists as a surface only, which is correct for Phase 2 (AC-6
+    forbids generating a hidden fault here).
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: *id001
+    invalidation_demonstrated: true
+    invalidation_evidence: 'release/capability-baseline/verify-1/zeta/evidence/RUN-ALL.out (W6-01…W6-09c: a requirement
+      change marks the dependent task, its report, its packet and the recorded green evidence stale, and refuses
+      the claim and the close; W6-07 names the changed input classes)'
+  qualification_coverage:
+    repo_a_challenge: 'Repo A: drive each tier at its trigger event.'
+    repo_b_challenge: 'Repo B: the same, after adoption.'
+    hidden_oracle_fault_class: 'hidden oracle: which tier should have observed an injected fault.'
+    chaos_scale_soak: parallel tier runs, cache reuse and invalidation under load.
+    retrieval_challenge: 'not relevant: tier selection is deterministic.'
+    not_challengeable: null
+  adoption_obligation: A11 runs the full G5 suite; post-adoption acceptance re-runs it.
+  residual_risk: '`gov health close-check`, the advertised preview of the G2 gate, reports a close admissible that
+    the gate refuses (A1-W12-01, non-blocking).'
+  findings:
+  - A1-W12-01
+  - A1-W-01

@@ -1,0 +1,29 @@
+$ git status --porcelain      (raw, leading spaces preserved)
+   ' M governance/generated/index-manifest.json'
+   ' M governance/generated/memory-manifest.json'
+   ' M spec/decisions/D-0100.yaml'
+   ' M spec/reports/checkpoints/LATEST.yaml'
+   ' M spec/requirements/REQ-0001.yaml'
+   '?? spec/reports/RPT-0002.yaml'
+   '?? spec/reports/RPT-0003.yaml'
+   '?? spec/reports/checkpoints/CKPT-00002.yaml'
+   '?? spec/reports/checkpoints/CKPT-00003.yaml'
+
+$ gov --json recover   -> items[kind=uncommitted_governance_changes]
+   governance/generated/memory-manifest.json
+   spec/decisions/D-0100.yaml
+   spec/reports/checkpoints/LATEST.yaml
+   spec/requirements/REQ-0001.yaml
+   spec/reports/RPT-0002.yaml
+   spec/reports/RPT-0003.yaml
+   spec/reports/checkpoints/CKPT-00002.yaml
+   spec/reports/checkpoints/CKPT-00003.yaml
+
+governed paths actually uncommitted : 9
+governed paths gov recover reported : 8
+dropped                             : ['governance/generated/index-manifest.json']
+
+cause: runtime/src/project.rs:265-278 Project::git trims the whole stdout, so the first
+       porcelain line loses its leading space; :298-307 git_dirty_files then slices l[3..],
+       which removes the first character of the first path; it then fails the
+       starts_with("governance/") filter in runtime/src/recovery.rs:119-124.
