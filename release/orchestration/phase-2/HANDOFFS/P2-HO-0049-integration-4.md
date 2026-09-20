@@ -6,7 +6,7 @@
 | From | Phase-2 orchestrator (routing only) |
 | To | fresh `capability-repair` **integration builder**, run **P2-AR-0054** — not any earlier builder or integrator |
 | Base | the commit your worktree is checked out at (release branch with round 3 integrated and both round-4 runs recorded) |
-| Branches to merge | `phase2/repair-1-r4-ws01` (P2-AR-0042, evidence map) and `phase2/repair-1-r4-residual-b` (P2-AR-0053, continuing P2-AR-0043's residual integration points) |
+| Branches to merge | `phase2/repair-1-r4-ws01` (P2-AR-0042, evidence map; tip `d1487e8`) and `phase2/repair-1-r4-residual-c` (tip `854980c`: P2-AR-0043's residual IPs + P2-AR-0053's continuation + P2-AR-0055's OD-P2-03 implementation) |
 | Output directory | `release/capability-baseline/repair-1/integration-4/` |
 | Run report | `release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.report.yaml` |
 | Required verdict | `READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION` or `INCOMPLETE` |
@@ -14,8 +14,10 @@
 Method exactly as `P2-HO-0040-integration-3.md`, `P2-HO-0030-integration-2.md` and `P2-HO-0019-integration-1.md` (read them
 and the three prior integration reports under `release/capability-baseline/repair-1/integration{,-2,-3}/`). Rules of
 P2-HO-0031 (availability rule), P2-HO-0020 and P2-HO-0010 apply, including the R1 private-path census rule. Read both
-round-4 reports first: `r4-ws01/00-REPAIR-REPORT.md`, and `r4-residual/00-REPAIR-REPORT.md` plus
-`r4-residual/01-CONTINUATION-REPORT.md` and `claims.yaml`.
+round-4 reports first: `r4-ws01/00-REPAIR-REPORT.md`, and `r4-residual/00-REPAIR-REPORT.md`, `01-CONTINUATION-REPORT.md`, `02-OD-P2-03-REPORT.md` and `claims.yaml`. Read
+`GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md` too: OD-P2-03 is in force, and a review-evidenced installation **inside**
+the project's authorised envelope raises **no** human gate, while one that expands authority does (R4-IP-1 as revised by
+P2-AR-0055). Do not re-litigate it.
 
 This is the last repair round of iteration 1. The tree you produce becomes **`cap2-candidate-1`**, which fresh independent
 verifiers then grade against the frozen gate contract. Integrate; do not open new work.
@@ -41,8 +43,10 @@ verifiers then grade against the frozen gate contract. Integrate; do not open ne
 
 - P2-AR-0042's disclosed gaps (16 capabilities owned only by builder tests; 9 with no G-tier owner; no G6 owner; 127
   checklist items unowned) and its IPs `IP-R4-WS01-1`, `-2`, `-4`, `-5`, `-6`.
-- Everything the residual reports list as not done, including any `gov tools install` / `tools/<id>.yaml` item P2-AR-0053
-  leaves open, plus INT3-O4 (legacy unsealed records reported, never blessed) and R3-WS5-11 (not reproduced).
+- Everything the residual reports list as not done: R4-O2 (`gov plugins unregister` writes the sealed registry directly and
+  no tool de-installation path exists), R4-O3, R4-O4 (cit schema 1.3.0 vocabulary — confirm schema-version handling with the
+  WS-9 migration surface), R4-O5 (policy documents at 1.1.0: an older adopted kernel has neither new key and therefore gates
+  every installation — the intended fail-closed default; check the migration path says so), R4-O6 (optional), plus INT3-O4 (legacy unsealed records reported, never blessed) and R3-WS5-11 (not reproduced).
 - Record them in your report as remaining integration points for the verifiers; the orchestrator routes them onward.
 
 ## Evidence required

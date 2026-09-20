@@ -17,4 +17,20 @@ branch: phase2/repair-1-r4-residual-c
 expected_output_path: release/capability-baseline/repair-1/r4-residual/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+  work_commit: 854980c
+  product_tip_commit: 4bd7468
+  branch_tip_commit: 854980c
+  branch_product_code_digest: 2fbbbd6c995ab3aa57d0e03f93198535efd27f9612988dd229efe3a6dfab9d82
+  branch_governed_state_digest: 4bfc1ae838a6e09d69614dbdc305f5c63e2261873864f2f218e2ee4f4959e336
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: OD-P2-03 requirements 1-7 all REPAIRED_CLAIMED (claims.yaml entry sourced to P2-AR-0055)
+  regression_self_reported: {lib: 267/0, certification: 203/0/0 (fourteen chunks at 4bd7468, union = full list), python: 4/0, warnings: 0}
+  r1_self_reported: {AR-0027: 26/3, AR-0029: 26/2 (ho_f n/c), AR-0031: 27/7, AR-0033: 30/1 (size pin), census: 123 files/2356 fns, 0 s6 violations in every splitter configuration, failure messages identical to P2-AR-0053}
+  governed_records_added: [spec/decisions/D-0011.yaml (carries OD-P2-03)]
+  policy_changes: [CHANGE_POLICY.change_classes.tool_installation (1.1.0), TOOL_POLICY.installation_envelope (1.1.0), ENFORCEMENT_MAP two entries, tools/registry/TOOLS.yaml network_allowlist; POLICY_PRECEDENCE unchanged - existing immutable catch-alls cover the new keys]
+  orchestrator_checks: "Scope checked against P2-HO-0050: changed files within the residual scope (tools.rs, cit/{mod,binding}.rs, three policy files, tool registry, D-0011, docs, tests r4_residual.rs and ws07.rs); none of P2-AR-0042's owned files touched; no schema or KERNEL.yaml change; no test renamed, removed or ignored. Envelope derived from trusted OS state incl. the OS reading the installation's own commands, not descriptor declarations (F4/BC-P2-39); fail-closed asserted at request, CIT-P and CIT-E. Claims are builder claims, not acceptance."
+  disclosed_for_verifiers: ["the command-token envelope derivation is a kernel floor, not process confinement - the non-gated branch also requires the independent governed review", "privileged_plugin_acquisition census differs by splitter (13/3 vs 12/2) on tools::network_allowlist; 0 violations in every configuration"]
+  remaining_integration_points: [R4-IP-1 revised (a review-evidenced install inside the envelope expects NO gate; authority-expanding installs answer the change gate), R4-IP-2 evidence-map owners for four new tests, R4-O2 plugins unregister writes the sealed registry directly and no tool de-installation path, R4-O3 INT3-O3 not done, R4-O4 cit schema 1.3.0 vocabulary (confirm with WS-9), R4-O5 policy document versions 1.1.0 - an older adopted kernel lacks both keys and therefore gates every installation (intended fail-closed), R4-O6 optional read-only gov tools envelope]
