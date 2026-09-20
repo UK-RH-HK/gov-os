@@ -1,0 +1,282 @@
+schema: governance-os.phase-2.findings
+schema_version: 1
+run_id: P2-AR-0045
+scope: oracle-format
+gate: GATE-P2-ORACLE-FORMAT
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+verdict: ORACLE_FORMAT_ACCEPTED
+accepted_format_sha256: f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd
+accepted_format_definition: framework/qualification-oracle/qualification-oracle.schema.json
+
+findings:
+  - id: V1-OF-01
+    capability: [V1, V2, V3]
+    bullet_source_lines: [1014, 1062]
+    severity: MEDIUM
+    title: the hidden-oracle leak scan misses governed-record types and any reformatting of a hidden truth
+    statement: >-
+      `gov oracle validate --public-suite/--repository` (and therefore `gov health qualify`, which routes
+      through it) scans the public qualification suite and the qualification repositories for leaked oracle
+      material by four heuristics: a file whose text contains the literal format id
+      `governance-os.qualification-oracle` and parses as an oracle document; the oracle id; the oracle's
+      canonical digest; and a hidden authoritative truth of at least 32 characters appearing verbatim. Three
+      leak shapes pass undetected. (1) The same V1 fault manifest re-expressed as a governed record whose
+      `type` is one of `qualification_oracle::HIDDEN_ORACLE_RECORD_TYPES` (`fault-manifest`,
+      `path-map-oracle`, `hidden-path-map-oracle`, `memory-oracle`, `hidden-memory-oracle`) carries no
+      `format:` key, so `separation_scan` never parses it — although the product's own
+      `is_hidden_oracle_material` and `scan_for_hidden_oracle_material` classify exactly that as
+      hidden-oracle material, and the governance suite refuses it inside a governed repository. (2) A hidden
+      authoritative truth reflowed across two lines — what `yaml.safe_dump`, a Markdown writer or any
+      formatter does — defeats the verbatim `contains` scan. (3) Fault ids and fault class ids are not
+      scanned at all; only the oracle id is. Any of the three is enough to publish the answers to the
+      hidden oracle inside the permanent public suite while `gov oracle validate` reports
+      `separation findings: 0`.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:1062 "The permanent public qualification suite and
+      fresh verifier hidden oracle must remain separate."; :1014 "The sophisticated qualification
+      repositories must have a verifier-owned hidden oracle."
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P4
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      BC-P2-51's inventoried mechanism is the absence of any machine-checkable definition and the acceptance
+      of a bare fault-manifest record; on cap2-candidate-0 no leak-detection scan existed at all. The
+      mechanism here is a limitation of machinery the repair introduced, in a capability that was ABSENT at
+      iteration 0 rather than previously held, so it is not the same mechanism as the inventoried class. It
+      is adjacent to BC-P2-51 and should be read alongside it.
+    evidence:
+      - evidence/06-separation-attacks.sh
+      - evidence/06-separation-attacks.out
+      - evidence/12-governed-repo-record.out
+    reproduction: >-
+      bash release/capability-baseline/verify-1/oracle-format/evidence/06-separation-attacks.sh <workspace>
+      — attacks A7, A8, A9 and A11 are ACCEPTED with `findings=0`, while A1-A6 and A10 are refused
+      ORACLE_SEPARATION_VIOLATED.
+    repair_direction: >-
+      The separation scan must recognise every shape the product itself calls hidden-oracle material: parse
+      candidate files whose text matches HIDDEN_ORACLE_RECORD_TYPES as well as the format id, and compare
+      hidden authoritative truths on normalised whitespace rather than verbatim bytes, and include fault ids
+      and fault class ids among the scanned identifiers. Contract v3:1062 is a property of the material, not
+      of one serialisation of it.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-OF-02
+    capability: [V4]
+    bullet_source_lines: [1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060]
+    severity: MEDIUM
+    title: four V4 metrics, three count-metric ref lists and two per-fault judgements are not bound to the oracle
+    statement: >-
+      The score report's binding to its sealed oracle covers oracle identity, canonical digest, repository
+      id and commit, purpose, coverage of every injected fault, the impacted-artefact counts, the path-map
+      denominator and the retrieval query count, and it derives recall, severity accuracy and impact-map
+      accuracy from the report's own per-fault outcomes. Everything else is a number the scorer asserts.
+      Against the valid oracle sample, `gov oracle validate --oracle` ACCEPTS a report that claims
+      path_map_accuracy 3/3 while its outcomes record failures (V4.5's numerator is unconstrained beyond
+      <= denominator), recovery_chaos_pass_rate 100/100, human_gate_correctness 500/500,
+      task_readiness_correctness 999/999, missed_authoritative_artefacts and wrong_indexing_count zeroed or
+      populated with refs that appear nowhere in the oracle's must_be_indexed / must_never_be_indexed sets,
+      retrieval metrics all 1.0, false_positives zeroed, every governed_action_correct flipped to true and
+      every forbidden_outcomes_observed emptied. It also accepts detected_at_tier G0 where the oracle expects
+      G2/G5, a detection_signal unrelated to the oracle's signals, and retrieval_metrics.k of 1 or 99
+      against queries whose top_k is 5. Some of these (false positives) are by definition not oracle-derived;
+      the per-fault tier/signal, the wrong-indexing and missed-artefact ref lists, and per-path-entry
+      correctness are oracle-derived and are simply not cross-checked.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:1047-1060 (V4 "Quantitative qualification scoring",
+      Report: path-map accuracy, missed authoritative artefacts, wrong-indexing count, stale-index count,
+      retrieval metrics, recovery/chaos pass rate, human-gate correctness, task/readiness correctness);
+      :1014 the scoring is against a verifier-owned hidden oracle.
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P4
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      BC-P2-51 recorded the absence of a format and its acceptance criterion was that the format validate a
+      well-formed sample and reject samples missing each V1-V4 field; that criterion is met. The depth to
+      which each V4 metric is anchored in oracle content is a distinct mechanism that the inventory does not
+      describe and that could not exist before the format did.
+    evidence:
+      - evidence/08-v4-binding-depth.py
+      - evidence/08-v4-binding-depth.out
+      - evidence/14-retrieval-k-and-tiers.out
+    reproduction: >-
+      python3 release/capability-baseline/verify-1/oracle-format/evidence/08-v4-binding-depth.py — all
+      eleven self-serving mutations are ACCEPTED; then evidence/14-retrieval-k-and-tiers.out for k,
+      detected_at_tier and detection_signal.
+    repair_direction: >-
+      For Phase 4 to read a score report as evidence rather than as a claim, every metric the oracle can
+      determine must be cross-checked against it: detected_at_tier against expected_detection.tiers,
+      detection_signal against expected_detection.signals, wrong-indexing and missed-artefact refs against
+      the memory oracle's must_never_be_indexed / must_be_indexed sets, retrieval_metrics.k against the
+      queries' top_k, and path-map accuracy against per-entry outcomes the report records the way it records
+      per-fault outcomes. Where the oracle cannot determine a metric (chaos/soak, human-gate and
+      task/readiness rates), the oracle format needs a place to declare the expectations those rates are
+      measured against, or Phase 4 must name another independent evidence route for them.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-OF-03
+    capability: [V2, V1]
+    bullet_source_lines: [1031, 1032, 1036, 1022]
+    severity: LOW
+    title: three V2 bullets and two V1 detection sub-fields are free text with no vocabulary
+    statement: >-
+      `path_map_oracle.entries[].correct_classification`, `.authority` and `.sensitivity`, and
+      `fault_manifest.faults[].expected_detection.signals[]` and `.must_detect_before`, are `$defs/text`
+      (any non-blank string). The product has its own vocabularies for the first three (path-map artefact
+      classifications, the AUTHORITY_POLICY lifecycle statuses and state classes, and the DATA_SENSITIVITY
+      levels) and typed error codes for detection signals, but the format binds to none of them. A Phase-4
+      scorer must therefore compare the oracle's strings with the product's outputs by hand, which is the
+      main reason V4.5 path-map accuracy cannot be machine-derived (see V1-OF-02).
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:1031 "correct classification", :1032 "authority",
+      :1036 "sensitivity/indexing expectation", :1022 "expected detection"; frozen gate contract AC-6
+      ("machine-checkable definition").
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P4
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      Contract v3 enumerates no vocabulary for these bullets, so free text is not a contract violation and
+      the bullets are covered by required typed fields; the inventory records only the format's absence.
+      This is a new observation about the strength of a field that did not exist at iteration 0.
+    evidence:
+      - evidence/02-coverage-crosswalk-check.out
+      - evidence/08-v4-binding-depth.out
+    reproduction: >-
+      python3 release/capability-baseline/verify-1/oracle-format/evidence/02-coverage-crosswalk-check.py —
+      V2.2, V2.3 and V2.7 (sensitivity) resolve to `$defs/text`; `gov oracle format` shows the same in the
+      embedded schema.
+    repair_direction: >-
+      Where the product owns a vocabulary that the oracle is describing, the format should draw the value
+      from it (as it already does for capability ids, advanced-qualification challenge ids and G0-G6 tiers,
+      which it validates against the owner source), so that an oracle entry and a product output can be
+      compared mechanically rather than by a human reading two strings.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-OF-04
+    capability: [V4, O5]
+    bullet_source_lines: [1047]
+    severity: INFO
+    title: '`gov health history` rows report `qualification: null` for G6 results'
+    statement: >-
+      After a successful `gov health qualify` run, the persisted health record carries the full
+      qualification block (`gov health show <id>`: kind, run id, oracle commitment, format_sha256, purpose,
+      separation roots, score-report digest, binding_verified and the twelve V4 metrics). The listing
+      `gov health history` shows the same record with `qualification: null`, so a reviewer scanning history
+      cannot see which G6 results carried a qualification or whether one counted. This is a projection gap
+      in the history view, not in the recorded evidence.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:799 "G6 Qualification - synthetic
+      repos/chaos/soak/hidden tests"; frozen gate contract AC-5 (health-result provenance).
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P2
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      Observed while exercising the G6 entry point for AC-6. It concerns the scheduler's history view (AC-5),
+      not the oracle format; recorded here so it is not lost, and left to the capability owner.
+    evidence:
+      - evidence/07-g6-entry-point.out
+    reproduction: >-
+      In a project where `gov health qualify` has recorded a G6 result: `gov --json health history` shows
+      the G6 row with `qualification: null`, while `gov --json health show <that id>` shows the populated
+      block.
+    repair_direction: The history projection should carry the qualification summary for G6 rows.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-OF-05
+    capability: [V1, V2, V3, V4]
+    bullet_source_lines: [1206]
+    severity: INFO
+    title: the acceptance status lives inside the digested definition
+    statement: >-
+      The definition carries `x-format-status: "PROPOSED - no hidden fault may be generated against this
+      format until a fresh independent oracle-format reviewer issues QUALIFICATION_ORACLE_FORMAT_ACCEPTED
+      for this format_sha256"`. Because `format_sha256` is the SHA-256 of the definition's bytes, editing
+      that string to record acceptance changes the digest, and every document naming the accepted digest is
+      then refused with `a document is valid only against the exact (reviewed) format version it names`.
+      The acceptance must therefore be recorded outside the file - which is what frozen contract section 9.2
+      prescribes and what this review and P2-AR-0045.report.yaml do. Correspondingly, the product can check
+      that a document names *this exact* format version; it holds no list of accepted digests and cannot
+      itself attest that the version was accepted.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:1206 "Qualification Oracle format is accepted
+      before generating hidden faults."; frozen gate contract AC-6 and section 9.2.
+    provenance_class: NECESSARY-DERIVED
+    lifecycle: P4
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      A property of the accepted artefact, noted so Phase 4 does not edit the definition to mark it accepted
+      and silently invalidate every oracle written against it. The inventory says nothing about it.
+    evidence:
+      - evidence/01-gov-oracle-format.json
+      - evidence/05-RUN-ALL-samples.out
+    reproduction: >-
+      `gov oracle format` prints x-format-status and format_sha256; sample
+      invalid/type-13-wrong-format-digest.json shows that a document naming any other digest is refused.
+    repair_direction: >-
+      Phase 4 must cite the accepted digest from this phase's evidence rather than mutate the definition; if
+      the format is ever revised, the revision needs its own fresh independent acceptance under AC-6.
+    owner_decision_required: false
+    owner_decision_reason: null
+
+  - id: V1-OF-06
+    capability: [V1, V2, V3]
+    bullet_source_lines: [1016, 1028, 1038]
+    severity: INFO
+    title: V1-V3 carry no health-scheduler tier in the evidence map
+    statement: >-
+      In `tests/governance/capability-evidence-map.yaml` the V1, V2 and V3 rows carry
+      `health_scheduler_tiers: []` (V4 carries G1, G2, G4, G5, G6). Every one of the 35 Gate V bullets has at
+      least one evidence owner, so AC-10's "no required capability has zero evidence owners" holds through
+      unit/integration tests and independent audit evidence (obligations AC-6 and AC-12); but no scheduler
+      tier observes V1-V3 on this candidate. That is consistent with the oracle's content being authored in
+      Phase 4 rather than run in Phase 2, and is recorded rather than raised as a gap.
+    normative_source: >-
+      Governance_OS_Capability_Acceptance_Contract_v3.md:75-111 (evidence owners), :799 (G0-G6); frozen gate
+      contract AC-10.
+    provenance_class: VERIFIER-HARDENING
+    lifecycle: P4
+    falsifies_or_proposes: PROPOSES_STRONGER_LATER_ASSURANCE
+    blocks_acceptance_criteria: []
+    blocking: false
+    new_vs_residual: MATERIALLY_NEW
+    inventoried_class: null
+    label_reason: >-
+      BC-P2-51's AC-10 limb was "V1-V4 have zero evidence owners", and that limb is closed: 0 of 35 bullets
+      lack an owner. The remaining observation - that the owners are tests and independent audit rather than
+      a scheduler tier - is a different, new observation, not a residue of the inventoried mechanism.
+    evidence:
+      - evidence/11-evidence-owners-v1-v4.py
+      - evidence/11-evidence-owners-v1-v4.out
+    reproduction: python3 release/capability-baseline/verify-1/oracle-format/evidence/11-evidence-owners-v1-v4.py
+    repair_direction: >-
+      If Phase 4 wants a tier to observe V1-V3, G6 is the tier the contract names; the G6 entry point already
+      records a qualification run's oracle conformance, so declaring that observation on the V1-V3 rows would
+      close the gap without new machinery.
+    owner_decision_required: false
+    owner_decision_reason: null

@@ -1,0 +1,28 @@
+ok= True
+{
+ "contract_version": "v3",
+ "owner_source": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+ "owner_source_present_in_tree": true,
+ "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3",
+ "canonical_import": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md",
+ "canonical_import_byte_identical": true,
+ "compiled": "framework/contracts/governance-capability-acceptance.yaml",
+ "capability_count": 101,
+ "gate_count": 23,
+ "checklist_item_count": 713,
+ "statement_count": 37,
+ "qualification_challenge_count": 8,
+ "source_lines": {
+  "total": 1255,
+  "carried_verbatim": 1026,
+  "blank_or_thematic_break": 229
+ },
+ "labelled_capabilities": [
+  {
+   "capability": "A2",
+   "requirement_class_label": "POST-VERIFICATION HARDENING",
+   "requirement_class": "POST_VERIFICATION_HARDENING"
+  },
+  {
+   "capability": "F4",
+   "requirement

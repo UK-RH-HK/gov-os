@@ -1,0 +1,4 @@
+greenfield report, path-map accuracy explicit N/A    ACCEPTED                         
+greenfield report, path-map accuracy as a ratio      ORACLE_SCORE_BINDING_MISMATCH    /metrics/path_map_accuracy :: the oracle has no path-map oracle, so path-map accuracy is an explicit N/A
+greenfield report, path-map accuracy omitted         ORACLE_RECORD_INVALID            /metrics/path_map_accuracy :: required field 'path_map_accuracy' is missing
+greenfield report, N/A with no reason                ORACLE_RECORD_INVALID            /metrics/path_map_accuracy :: {"applicable":false} is not valid under any of the schemas listed in the 'oneOf' keyword

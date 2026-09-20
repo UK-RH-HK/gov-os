@@ -1,0 +1,95 @@
+PASS  accepted   valid/oracle-greenfield.json
+PASS  accepted   valid/oracle.json
+PASS  accepted   valid/score-report.json
+PASS  refused    invalid/arith-01-recall-value-not-quotient.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/injected_defect_detection_recall/value :: value 0.95 is not 1/2 [V4.1]
+PASS  refused    invalid/arith-02-recall-numerator-not-from-outcomes.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/injected_defect_detection_recall :: is 2/2; the per-fault outcomes give 1/2 [V4.1]
+PASS  refused    invalid/arith-03-numerator-exceeds-denominator.json  -> ORACLE_RECORD_INVALID (3 violation(s)) /metrics/injected_defect_detection_recall/value :: 1.5 is greater than the maximum of 1 [V4.1]
+PASS  refused    invalid/arith-04-severity-accuracy-wrong-denominator.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/severity_accuracy :: is 2/2; the per-fault outcomes give 1/1 [V4.3]
+PASS  refused    invalid/arith-05-impact-map-accuracy-inflated.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/impact_map_accuracy :: is 4/4; the per-fault outcomes give 2/4 [V4.4]
+PASS  refused    invalid/arith-06-false-positive-count-mismatch.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/false_positives/count :: count differs from the number of findings listed [V4.2]
+PASS  refused    invalid/arith-07-count-metric-mismatch.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/wrong_indexing_count/count :: count differs from the number of artefacts listed [V4.7]
+PASS  refused    invalid/arith-08-path-map-na-though-oracle-has-one.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /metrics/path_map_accuracy :: the oracle has a path-map oracle, so path-map accuracy is measured [V4.5]
+PASS  refused    invalid/arith-09-severity-na-though-detections-exist.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/severity_accuracy :: cannot be N/A: the report has outcomes to measure [V4.3]
+PASS  refused    invalid/arith-10-retrieval-query-count-not-from-oracle.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /metrics/retrieval_metrics/queries :: the oracle defines 1 expected retrieval results [V4.9]
+PASS  refused    invalid/arith-11-path-map-denominator-not-entry-count.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /metrics/path_map_accuracy/denominator :: the oracle has 3 path-map entries [V4.5]
+PASS  refused    invalid/bind-01-unscored-injected-fault.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /per_fault_outcomes :: the oracle's fault "SMP-F-002" has no outcome — every injected defect is scored
+PASS  refused    invalid/bind-02-outcome-for-fault-not-in-oracle.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /per_fault_outcomes/2/fault_id :: fault "SMP-F-999" is not in the oracle's fault manifest
+PASS  refused    invalid/bind-03-unbound-wrong-oracle-digest.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /binding/oracle_sha256 :: the report was scored against oracle digest Some(String("444444444444444444444444444444444
+PASS  refused    invalid/bind-04-unbound-wrong-oracle-id.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /binding/oracle_id :: the report names oracle Some(String("P2AR0045-SAMPLE-ORACLE-OTHER")); the oracle supplied 
+PASS  refused    invalid/bind-05-unbound-wrong-repository-commit.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /binding/repository/commit :: differs from the oracle's qualification repository
+PASS  refused    invalid/bind-06-report-without-oracle-digest.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /binding/oracle_sha256 :: required field 'oracle_sha256' is missing
+PASS  refused    invalid/bind-07-report-without-binding.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /binding :: required field 'binding' is missing
+PASS  refused    invalid/bind-08-qualification-report-against-sample-oracle.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /purpose :: a report and its oracle must have the same purpose (a FORMAT_SAMPLE is never scored as QUA
+PASS  refused    invalid/bind-09-no-outcomes-at-all.json  -> ORACLE_RECORD_INVALID (4 violation(s)) /per_fault_outcomes :: [] has less than 1 item
+PASS  refused    invalid/outcome-01-undetected-fault-severity-correct.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /per_fault_outcomes/1/severity_correct :: an undetected fault cannot have a correct severity
+PASS  refused    invalid/outcome-02-undetected-fault-claims-impact.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /per_fault_outcomes/1/impacted_found :: an undetected fault earns no impact-map credit
+PASS  refused    invalid/outcome-03-detected-fault-without-signal.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /per_fault_outcomes/0/detection_signal :: a detected fault records where, how and at what severity it was detected
+PASS  refused    invalid/outcome-04-impacted-found-exceeds-expected.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /per_fault_outcomes/0/impacted_found :: found 5 of 3 expected impacted artefacts
+PASS  refused    invalid/outcome-05-impacted-expected-not-from-oracle.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /per_fault_outcomes/0/impacted_found :: found 2 of 1 expected impacted artefacts
+PASS  refused    invalid/outcome-06-severity-correct-contradicts-oracle.json  -> ORACLE_SCORE_BINDING_MISMATCH (1 violation(s)) /per_fault_outcomes/0/severity_correct :: observed LOW, expected Some("HIGH"): severity_correct must be false
+PASS  refused    invalid/sem-01-duplicate-fault-id.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/1/fault_id :: fault_id "SMP-F-001" is not unique [V1.1]
+PASS  refused    invalid/sem-02-keep-with-other-target.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/expected_target_paths :: KEEP: expected_target_paths must be exactly [the current path] [V2.4]
+PASS  refused    invalid/sem-03-split-with-one-target.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/1/expected_target_paths :: SPLIT: two or more target paths [V2.4]
+PASS  refused    invalid/sem-04-delete-with-target.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/2/expected_target_paths :: DELETE_FROM_ACTIVE_TREE: no target path [V2.4]
+PASS  refused    invalid/sem-05-indexed-and-never-indexed.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /memory_oracle/must_be_indexed/2/ref :: "sample/ops/credentials.env" is also listed in must_never_be_indexed [V3.1]
+PASS  refused    invalid/sem-06-retrieval-returns-never-indexed.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /memory_oracle/expected_retrieval_results/0/must_not_include :: "sample/ops/credentials.env" is both required and forbidden in the results [V3.7]
+PASS  refused    invalid/sem-07-v2-v3-indexing-contradiction.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/indexing_expectation :: NEVER_INDEX contradicts memory_oracle.must_be_indexed for "sample/spec/current.md" [V2.7]
+PASS  refused    invalid/sem-08-superseded-by-itself.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/expected_status/1/superseded_by :: an artefact cannot be superseded by itself [V3.4]
+PASS  refused    invalid/sem-09-gate-w-fault-without-artifact-flow.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /fault_manifest/faults/0/artifact_flow :: required field 'artifact_flow' is missing [W12.7]
+PASS  refused    invalid/sem-10-brownfield-without-path-map.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle :: required field 'path_map_oracle' is missing [L1029]
+PASS  refused    invalid/sem-11-empty-fault-manifest.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults :: [] has less than 1 item [L1017]
+PASS  refused    invalid/sep-01-storage-inside-public-suite.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /separation/oracle_storage :: the hidden oracle's storage location "sample/public-suite/oracle" is not separate from the [L1062]
+PASS  refused    invalid/sep-02-storage-inside-qualification-repo.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /separation/oracle_storage :: the hidden oracle's storage location "sample/repo-b/.hidden/oracle" is not separate from t [L1062]
+PASS  refused    invalid/type-01-severity-free-text.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_severity :: "quite bad" is not one of ["CRITICAL","HIGH","MEDIUM","LOW","INFO"] [V1.6]
+PASS  refused    invalid/type-02-expected-impacted-string.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_impacted :: "the task and the handler" is not of type "array" [V1.7]
+PASS  refused    invalid/type-03-action-free-text.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/action :: "leave it where it is" is not one of ["KEEP","MOVE","RENAME","SPLIT","MERGE","EXTRACT","RE [V2.5]
+PASS  refused    invalid/type-04-tier-not-a-tier.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /fault_manifest/faults/0/expected_detection/tiers/0 :: "whenever" does not match "^G[0-9]+$" [V1.5]
+PASS  refused    invalid/type-05-indexing-expectation-free-text.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/indexing_expectation :: "probably index it" is not one of ["INDEX_CURRENT","INDEX_HISTORICAL","NEVER_INDEX"] [V2.7]
+PASS  refused    invalid/type-06-visibility-public.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /visibility :: "HIDDEN" was expected [L1014]
+PASS  refused    invalid/type-07-custody-not-independent.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /custody/authored_independently_of_implementation :: true was expected [L1014]
+PASS  refused    invalid/type-08-custody-builder-role.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /custody/owner_role :: "FRESH_INDEPENDENT_VERIFIER" was expected [L1014]
+PASS  refused    invalid/type-09-unknown-capability.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/class/capabilities/0 :: "ZZ9" is not a capability of the owner source (Contract v3) [V1.2]
+PASS  refused    invalid/type-10-unknown-challenge.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/class/challenge_ids/0 :: "AQC-NOPE" is not an advanced-qualification challenge of the owner source [V1.2]
+PASS  refused    invalid/type-11-unknown-tier-g9.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_detection/tiers/0 :: "G9" is not a Governance Health Scheduler tier of O5 (G0, G1, G2, G3, G4, G5, G6) [V1.5]
+PASS  refused    invalid/type-12-extra-field.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0 :: Additional properties are not allowed ('severity_guess' was unexpected) [L1017]
+PASS  refused    invalid/type-13-wrong-format-digest.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /format_sha256 :: the document was written against format definition 000000000000000000000000000000000000000 [PRE-ADVANCED-QUALIFICATION-ACCEPTANCE-GATE.6]
+PASS  refused    invalid/type-14-unknown-kind.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /kind :: "fault-manifest" is not one of ["qualification-oracle","qualification-score-report"]
+PASS  refused    invalid/v1-01-missing-fault-id.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/fault_id :: required field 'fault_id' is missing [V1.1]
+PASS  refused    invalid/v1-02-missing-class.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/class :: required field 'class' is missing [V1.2]
+PASS  refused    invalid/v1-03-missing-hidden-authoritative-truth.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/hidden_authoritative_truth :: required field 'hidden_authoritative_truth' is missing [V1.3]
+PASS  refused    invalid/v1-04-missing-injected-repository-state.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/injected_repository_state :: required field 'injected_repository_state' is missing [V1.4]
+PASS  refused    invalid/v1-05-missing-expected-detection.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_detection :: required field 'expected_detection' is missing [V1.5]
+PASS  refused    invalid/v1-06-missing-expected-severity.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_severity :: required field 'expected_severity' is missing [V1.6]
+PASS  refused    invalid/v1-07-missing-expected-impacted.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_impacted :: required field 'expected_impacted' is missing [V1.7]
+PASS  refused    invalid/v1-08-missing-expected-governed-action.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/expected_governed_action :: required field 'expected_governed_action' is missing [V1.8]
+PASS  refused    invalid/v1-09-missing-forbidden-outcomes.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /fault_manifest/faults/0/forbidden_outcomes :: required field 'forbidden_outcomes' is missing [V1.9]
+PASS  refused    invalid/v2-01-missing-current-artefact.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /path_map_oracle/entries/0/current_artefact :: required field 'current_artefact' is missing [V2.1]
+PASS  refused    invalid/v2-02-missing-correct-classification.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/correct_classification :: required field 'correct_classification' is missing [V2.2]
+PASS  refused    invalid/v2-03-missing-authority.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/authority :: required field 'authority' is missing [V2.3]
+PASS  refused    invalid/v2-04-missing-expected-target-paths.json  -> ORACLE_RECORD_INVALID (2 violation(s)) /path_map_oracle/entries/0/expected_target_paths :: required field 'expected_target_paths' is missing [V2.4]
+PASS  refused    invalid/v2-05-missing-action.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/action :: required field 'action' is missing [V2.5]
+PASS  refused    invalid/v2-06-missing-expected-references.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/expected_references :: required field 'expected_references' is missing [V2.6]
+PASS  refused    invalid/v2-07-missing-expected-consumers.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/expected_consumers :: required field 'expected_consumers' is missing [V2.6]
+PASS  refused    invalid/v2-08-missing-sensitivity.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/sensitivity :: required field 'sensitivity' is missing [V2.7]
+PASS  refused    invalid/v2-09-missing-indexing-expectation.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /path_map_oracle/entries/0/indexing_expectation :: required field 'indexing_expectation' is missing [V2.7]
+PASS  refused    invalid/v3-01-missing-must-be-indexed.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/must_be_indexed :: required field 'must_be_indexed' is missing [V3.1]
+PASS  refused    invalid/v3-02-missing-must-never-be-indexed.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/must_never_be_indexed :: required field 'must_never_be_indexed' is missing [V3.2]
+PASS  refused    invalid/v3-03-missing-expected-authority-namespaces.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/expected_authority_namespaces :: required field 'expected_authority_namespaces' is missing [V3.3]
+PASS  refused    invalid/v3-04-missing-expected-status.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/expected_status :: required field 'expected_status' is missing [V3.4]
+PASS  refused    invalid/v3-05-missing-expected-graph-relationships.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/expected_graph_relationships :: required field 'expected_graph_relationships' is missing [V3.5]
+PASS  refused    invalid/v3-06-missing-expected-code-symbols.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/expected_code_symbols :: required field 'expected_code_symbols' is missing [V3.6]
+PASS  refused    invalid/v3-07-missing-expected-retrieval-results.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /memory_oracle/expected_retrieval_results :: required field 'expected_retrieval_results' is missing [V3.7]
+PASS  refused    invalid/v4-01-missing-injected-defect-detection-recall.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/injected_defect_detection_recall :: required field 'injected_defect_detection_recall' is missing [V4.1]
+PASS  refused    invalid/v4-02-missing-false-positives.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/false_positives :: required field 'false_positives' is missing [V4.2]
+PASS  refused    invalid/v4-03-missing-severity-accuracy.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/severity_accuracy :: required field 'severity_accuracy' is missing [V4.3]
+PASS  refused    invalid/v4-04-missing-impact-map-accuracy.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/impact_map_accuracy :: required field 'impact_map_accuracy' is missing [V4.4]
+PASS  refused    invalid/v4-05-missing-path-map-accuracy.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/path_map_accuracy :: required field 'path_map_accuracy' is missing [V4.5]
+PASS  refused    invalid/v4-06-missing-missed-authoritative-artefacts.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/missed_authoritative_artefacts :: required field 'missed_authoritative_artefacts' is missing [V4.6]
+PASS  refused    invalid/v4-07-missing-wrong-indexing-count.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/wrong_indexing_count :: required field 'wrong_indexing_count' is missing [V4.7]
+PASS  refused    invalid/v4-08-missing-stale-index-count.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/stale_index_count :: required field 'stale_index_count' is missing [V4.8]
+PASS  refused    invalid/v4-09-missing-retrieval-metrics.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/retrieval_metrics :: required field 'retrieval_metrics' is missing [V4.9]
+PASS  refused    invalid/v4-10-missing-recovery-chaos-pass-rate.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/recovery_chaos_pass_rate :: required field 'recovery_chaos_pass_rate' is missing [V4.10]
+PASS  refused    invalid/v4-11-missing-human-gate-correctness.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/human_gate_correctness :: required field 'human_gate_correctness' is missing [V4.11]
+PASS  refused    invalid/v4-12-missing-task-readiness-correctness.json  -> ORACLE_RECORD_INVALID (1 violation(s)) /metrics/task_readiness_correctness :: required field 'task_readiness_correctness' is missing [V4.12]
+
+93 samples, 93 as expected, 0 unexpected

@@ -1,0 +1,128 @@
+{
+ "format": "governance-os.qualification-oracle",
+ "format_version": 1,
+ "format_sha256": "f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd",
+ "kind": "qualification-score-report",
+ "purpose": "FORMAT_SAMPLE",
+ "report_id": "P2AR0045-SAMPLE-REPORT-A",
+ "custody": {
+  "owner_role": "FRESH_INDEPENDENT_VERIFIER",
+  "owner_run_id": "P2-AR-0045",
+  "authored_independently_of_implementation": true,
+  "created_at": "2026-09-20T00:00:00Z"
+ },
+ "binding": {
+  "oracle_id": "P2AR0045-SAMPLE-ORACLE-A",
+  "oracle_sha256": "a2958b8f093f70f241201ee65c45d81b55204877857b64df42db6acbaf519dda",
+  "repository": {
+   "id": "sample-repo-b",
+   "commit": "1111111111111111111111111111111111111111"
+  },
+  "candidate": {
+   "commit": "2222222222222222222222222222222222222222",
+   "product_code_digest": "3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "run_id": "P2-AR-0045-SAMPLE-RUN",
+  "scored_at": "2026-09-20T01:00:00Z"
+ },
+ "metrics": {
+  "injected_defect_detection_recall": {
+   "numerator": 1,
+   "denominator": 2,
+   "value": 0.95
+  },
+  "false_positives": {
+   "count": 2,
+   "findings": [
+    "SMP-FP-1",
+    "SMP-FP-2"
+   ]
+  },
+  "severity_accuracy": {
+   "numerator": 1,
+   "denominator": 1,
+   "value": 1.0
+  },
+  "impact_map_accuracy": {
+   "numerator": 2,
+   "denominator": 4,
+   "value": 0.5
+  },
+  "path_map_accuracy": {
+   "numerator": 2,
+   "denominator": 3,
+   "value": 0.6666666666666666
+  },
+  "missed_authoritative_artefacts": {
+   "count": 1,
+   "refs": [
+    "sample/spec/current.md"
+   ]
+  },
+  "wrong_indexing_count": {
+   "count": 1,
+   "refs": [
+    "sample/ops/credentials.env"
+   ]
+  },
+  "stale_index_count": {
+   "count": 0,
+   "refs": []
+  },
+  "retrieval_metrics": {
+   "k": 5,
+   "queries": 1,
+   "recall_at_k": 1.0,
+   "mrr": 1.0,
+   "precision_at_k": 0.2,
+   "stale_hit_rate": 0.0,
+   "superseded_hit_rate": 0.0,
+   "latency_ms_p50": 12.0,
+   "latency_ms_p95": 30.0
+  },
+  "recovery_chaos_pass_rate": {
+   "numerator": 3,
+   "denominator": 4,
+   "value": 0.75
+  },
+  "human_gate_correctness": {
+   "numerator": 2,
+   "denominator": 2,
+   "value": 1.0
+  },
+  "task_readiness_correctness": {
+   "numerator": 5,
+   "denominator": 5,
+   "value": 1.0
+  }
+ },
+ "per_fault_outcomes": [
+  {
+   "fault_id": "SMP-F-001",
+   "detected": true,
+   "detected_at_tier": "G2",
+   "detection_signal": "MANDATORY_INPUT_STALE",
+   "observed_severity": "HIGH",
+   "severity_correct": true,
+   "impacted_expected": 3,
+   "impacted_found": 2,
+   "governed_action_correct": true,
+   "forbidden_outcomes_observed": []
+  },
+  {
+   "fault_id": "SMP-F-002",
+   "detected": false,
+   "detected_at_tier": null,
+   "detection_signal": null,
+   "observed_severity": null,
+   "severity_correct": false,
+   "impacted_expected": 1,
+   "impacted_found": 0,
+   "governed_action_correct": false,
+   "forbidden_outcomes_observed": [
+    "the credential is retrievable"
+   ]
+  }
+ ],
+ "notes": "labelled format sample authored by P2-AR-0045 to exercise V4; no qualification run took place"
+}
