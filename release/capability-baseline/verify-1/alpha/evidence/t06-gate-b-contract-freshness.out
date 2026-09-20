@@ -1,0 +1,83 @@
+PASS B-baseline-installed
+PASS B1-b1-boundary-`governance`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`framework`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`project`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`generated`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`runtime`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b2-native-product-architecture-is-preserved :: src/ and docs/ untouched by init
+PASS B1-b3-the-contract-maps-the-project's-own-layout-without-refactoring-it :: [{"pattern": "src/**", "class": "source", "owner_role": "backend-engineer", "semantic_index": true, "lexical_index": true, "graph_index": true, "code_index": true, "namespace": "product"}, {"pattern": "governance/kernel/**", "class": "authoritative", "owner_role": "release-agent", "mutation": "prohi
+PASS B1-b4-generated-runtime-state-is-distinguished-from-tracked-authoritative-state :: {}
+PASS B1-b4-the-derived-runtime-directory-is-not-tracked :: []
+PASS B2-adopt-baseline-executes
+PASS B2-adopt-inventory-executes
+PASS B2-adopt-classify-executes
+PASS B2-adopt-map-executes
+PASS B2-b1-every-material-artefact-is-classified :: 181 rows
+PASS B2-b1-each-carries-current-path-class-authority-and-intended-target :: 181/181 complete; sample={"artifact_id": "ART-eaaf287742ff", "type": "migration-catalogue-entry", "current_path": ".gitignore", "current_class": "TOOLING", "authority": "ACTIVE", "target_path": null, "target_class": "TOOLING", "action": "KEEP_IN_PLACE", "reason": "native pro
+PASS B2-b2-target-action-`KEEP`-is-supported :: in_produced_map=True in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`MOVE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`RENAME`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`SPLIT`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`MERGE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`EXTRACT`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`RETIRE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`DELETE_FROM_ACTIVE_TREE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+FAIL B2-b2-SPLIT-and-MERGE-are-executable-not-only-declared (A0-B2-01) :: actions with an executor in the migration engine: []
+PASS B2-b4-imports-and-consumers-are-represented :: {"ART-eaaf287742ff": [], "ART-3d1db03b377d": [], "ART-a090e26c869d": []}
+PASS B2-b4-documentation-citations-are-represented (BC-P2-52) :: {"path": "docs/design.md", "citations": ["src/app.py", "src/util.py"], "path_references": [], "consumers": []}
+PASS B2-b4-a-cited-file-records-its-document-consumer (BC-P2-52) :: {"path": "src/util.py", "consumers": ["docs/design.md", "governance/generated/index-manifest.json", "governance/tests/memory/heldout.yaml", "spec/audits/AUD-0001.yaml", "src/app.py"]}
+PASS B2-b5-path-map-compliance-is-machine-checkable :: path_map_compliance family present in the governance suite
+PASS B2-b5-the-compliance-check-reports-a-violation :: audit ok=False code=UNHEALTHY
+PASS B3-b1-git-records-remain-authoritative :: 192 tracked files
+PASS B3-b2-indexes-are-declared-derived :: index manifest + runtime db
+PASS B3-b3-deleting-derived-state-does-not-delete-project-truth :: status code=
+PASS B3-b3-derived-state-rebuilds-from-authoritative-truth
+PASS B3-b3-retrieval-is-restored-after-the-rebuild :: [{"artifact_id": "file:src/util.py", "path": "src/util.py", "chunk_id": "file:src/util.py#1", "section": "helper", "level": "section", "score": 0.03278688524590164, "routes": ["symbol", "lexical"], "s
+PASS B3-b4-derived-records-carry-provenance-sufficient-to-reconstruct-source-hits :: {"artifact_id": "file:src/util.py", "path": "src/util.py", "chunk_id": "file:src/util.py#1", "section": "helper", "record_type": "file"}
+PASS AC13-contract-verify-reports-a-bound-chain :: {"contract_version": "v3", "owner_source": "Governance_OS_Capability_Acceptance_Contract_v3.md", "owner_source_present_in_tree": true, "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3", "canonical_import": "fra
+PASS BC-P2-01-compiled-contract-carries-A1's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-A2's-10-bullets-verbatim :: want=10 got=10
+PASS BC-P2-01-compiled-contract-carries-A3's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-A4's-4-bullets-verbatim :: want=4 got=4
+PASS BC-P2-01-compiled-contract-carries-A5's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-B1's-4-bullets-verbatim :: want=4 got=4
+PASS BC-P2-01-compiled-contract-carries-B2's-5-bullets-verbatim :: want=5 got=5
+PASS BC-P2-01-compiled-contract-carries-B3's-4-bullets-verbatim :: want=4 got=4
+PASS BC-P2-01-compiled-contract-carries-S1's-2-bullets-verbatim :: want=2 got=2
+PASS BC-P2-01-compiled-contract-carries-S2's-11-bullets-verbatim :: want=11 got=11
+PASS BC-P2-01-compiled-contract-carries-S3's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-S4's-12-bullets-verbatim :: want=12 got=12
+PASS BC-P2-01-compiled-contract-carries-S5's-9-bullets-verbatim :: want=9 got=9
+PASS BC-P2-01-compiled-contract-carries-S6's-3-bullets-verbatim :: want=3 got=3
+PASS BC-P2-01-compiled-contract-carries-T1's-9-bullets-verbatim :: want=9 got=9
+PASS BC-P2-01-compiled-contract-carries-T2's-2-bullets-verbatim :: want=2 got=2
+PASS BC-P2-01-compiled-contract-carries-T3's-1-bullets-verbatim :: want=1 got=1
+PASS BC-P2-01-A2-is-compiled-as-POST_VERIFICATION_HARDENING :: POST_VERIFICATION_HARDENING
+PASS BC-P2-01-Gate-U-is-represented-in-the-compiled-contract :: U present=True bullets=28
+PASS BC-P2-01-the-compiled-contract-covers-every-owner-source-capability :: capability_count=101 checklist_item_count=713
+PASS BC-P2-02-A1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:policy_precedence", "class": "governance health check", "tiers": ["G4", "G5", "G6"], "exercises": "refuse
+PASS BC-P2-02-A2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent held-out test", "migration/rollback evidence",  automated_checks=[{"id": "doctor:D003", "class": "governance health check", "tiers": ["G1", "G5"], "exercises": "kernel payload integrity
+PASS BC-P2-02-A3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["automated invariant/guard", "unit/integration/system test", "governance health check", "human-gate evidence", "indepen automated_checks=[{"id": "check:secrets_sensitivity_indexing", "class": "governance health check", "tiers": ["G1", "G4", "G5", "G6"], "ex
+PASS BC-P2-02-A4-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "human-gate evidence", "independent audit evidence"] automated_checks=[{"id": "test:certification:repair::budget_parallel_agents_threshold_raises_gate", "class": "unit/integration/system tes
+PASS BC-P2-02-A5-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["automated invariant/guard", "unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "g0:pause", "class": "automated invariant/guard", "tiers": ["G0"], "exercises": "PAUSE is an authority-gated (em
+PASS BC-P2-02-B1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:path_map_compliance", "class": "governance health check", "tiers": ["G1", "G4", "G5", "G6"], "exercises":
+PASS BC-P2-02-B2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "migration/rollback evidence", "independent audit evidence"] automated_checks=[{"id": "check:path_map_compliance", "class": "governance health check", "tiers": ["G1", "G4", "G5", "G6"], "exercises":
+PASS BC-P2-02-B3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "clean-clone/release evidence", "independent audit evidence" automated_checks=[{"id": "check:recovery_rebuild", "class": "governance health check", "tiers": ["G4", "G5", "G6"], "exercises": "tracked
+PASS BC-P2-02-S1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "clean-clone/release evidence", "independent audit evidence"] automated_checks=[{"id": "release:release build", "class": "clean-clone/release evidence", "record": "release-manifest", "exercises": "a 
+PASS BC-P2-02-S2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "independent held-out test", "migration/rollback evidence", "clean-clone/release eviden automated_checks=[{"id": "release:release build", "class": "clean-clone/release evidence", "record": "release-manifest", "exercises": "th
+PASS BC-P2-02-S3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent held-out test", "clean-clone/release evidence", automated_checks=[{"id": "release:init", "class": "clean-clone/release evidence", "record": "framework-lock", "exercises": "a clean insta
+PASS BC-P2-02-S4-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "migration/rollback evidence", "human-gate evidence", "independent audit evidence"] automated_checks=[{"id": "human-gate:adopt migrate", "class": "human-gate evidence", "record": "human-gate", "exercises": "a destructive 
+PASS BC-P2-02-S5-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "independent held-out test", "migration/rollback evidence", "clean-clone/release eviden automated_checks=[{"id": "release:update --apply", "class": "clean-clone/release evidence", "record": "framework-lock", "exercises": "an 
+PASS BC-P2-02-S6-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "clean-clone/release evidence", "independent audit evidence" automated_checks=[{"id": "check:recovery_rebuild", "class": "governance health check", "tiers": ["G4", "G5", "G6"], "exercises": "the der
+PASS BC-P2-02-T1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["automated invariant/guard", "unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:authority_role_limits", "class": "governance health check", "tiers": ["G3", "G4", "G5", "G6"], "exercises
+PASS BC-P2-02-T2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "independent audit evidence"] automated_checks=[{"id": "test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts", "class"
+PASS BC-P2-02-T3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:os_binding_integrity", "class": "governance health check", "tiers": ["G1", "G2", "G3", "G4", "G5", "G6"],
+PASS AC13-a-semantic-divergence-in-the-compiled-view-is-detected :: ok=False code=CONTRACT_COMPILED_DIVERGED framework/contracts/governance-capability-acceptance.yaml does not faithfully represent the approved source: 2 difference(s) from the owner source Governance_OS_Capability_Acceptance_Contract_v3.md — 
+PASS AC13-a-gutted-evidence-map-is-detected :: ok=False code=CONTRACT_EVIDENCE_OWNER_INVALID
+PASS AC10-a-green-governance-record-can-be-established :: green=True verdict=HEALTHY
+PASS AC10-changing-`an authoritative spec decision`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+PASS AC10-changing-`product source`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+PASS AC10-changing-`the project policy overlay`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+PASS AC10-changing-`the index manifest`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+
+-- 80/81 checks passed

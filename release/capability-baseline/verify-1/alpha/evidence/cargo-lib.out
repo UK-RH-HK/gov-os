@@ -1,0 +1,25 @@
+test verification::reporting::tests::a_coverage_gap_is_confirmed_unless_every_line_is_held_with_its_heading_markers ... ok
+test verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope ... ok
+test verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold ... ok
+test verification::reporting::tests::t2_severity_separates_tampering_forged_gates_and_legacy_claims ... ok
+test verification::slo::tests::healthy_only_when_every_condition_holds ... ok
+test contracts::tests::the_lock_and_the_schema_are_part_of_the_binding ... ok
+test verification::currency::tests::snapshot_attributes_changes_to_classes_and_ignores_its_own_outputs ... ok
+test contracts::tests::the_committed_binding_chain_verifies ... ok
+test capabilities::pincache::tests::a_stored_digest_is_never_returned_for_changed_bytes ... ok
+test qualification_oracle::tests::well_formed_samples_validate ... ok
+test qualification_oracle::tests::the_hidden_oracle_is_kept_out_of_the_public_suite_and_the_repository ... ok
+test contracts::tests::a_semantic_difference_in_the_compiled_form_is_a_typed_failure ... ok
+test contracts::tests::regeneration_is_idempotent_over_the_committed_views ... ok
+test contracts::tests::the_matrix_is_generated_from_the_map_with_the_supplied_run_evidence ... ok
+test contracts::tests::a_tree_without_the_owners_sources_defers_and_discloses_and_never_compiles ... ok
+test qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records ... ok
+test memory::claims::tests::concurrent_processes_claiming_one_task_grant_exactly_one ... ok
+test contracts::tests::a_semantic_difference_in_the_generated_view_is_a_typed_failure ... ok
+test contracts::tests::governed_evidence_values_survive_regeneration ... ok
+test contracts::tests::a_semantic_difference_in_the_evidence_map_is_a_typed_failure ... ok
+test qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected ... ok
+test contracts::tests::an_owner_mutation_is_a_typed_failure ... ok
+
+test result: ok. 276 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.67s
+

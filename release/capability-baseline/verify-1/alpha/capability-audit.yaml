@@ -1,0 +1,1271 @@
+schema: governance-os.phase-2.capability-audit
+schema_version: 1
+run_id: P2-AR-0046
+family: alpha
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+owner_source: Governance_OS_Capability_Acceptance_Contract_v3.md (sha256 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3)
+bullet_count: 100
+independent_evidence_root: release/capability-baseline/verify-1/alpha/heldout
+
+capabilities:
+
+# =====================================================================  GATE A
+- capability: A1
+  title: Canonical authority and policy precedence
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:132
+  governing_document_refs: [DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md §§2-3, §§8-9, Part III]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: >-
+    All six bullets are executably evidenced on this candidate. The precedence layers are declared
+    and ordered, the kernel floors are enforced in effect (a lowered routing tier floor changes no
+    routing decision), a legitimate additive strengthening is applied, and every refusal is reported.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Constitution/hard invariants are identifiable and machine-readable.
+    source_line: 133
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/policy_precedence.rs, framework/constitution/HARD_INVARIANTS.yaml]
+    automated_evidence: ["cargo test --lib (276 passed)", "check:policy_precedence"]
+    independent_evidence: ["heldout/t03_gate_a.py A1-b1-*: `gov policy overrides` reports 110 precedence rules over 7 declared layers, source 'installed kernel (verified)'; HARD_INVARIANTS.yaml and framework/constitution/ parse"]
+    gap: null
+  - bullet: Security and authority floors cannot be weakened by lower-precedence policy.
+    source_line: 134
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/policy.rs:169-190, runtime/src/policy_precedence.rs]
+    automated_evidence: ["check:policy_precedence", "check:model_routing_integrity"]
+    independent_evidence: ["heldout/t03_gate_a.py: MODEL_ROUTING_OVERRIDES tier_floors.governance=T1 and reasoning_minimums=low are `refused`; `gov route --class governance` still returns minimum_tier T3 / reasoning high (BC-P2-45)"]
+    gap: null
+  - bullet: Project policy may specialise/strengthen only within allowed override modes.
+    source_line: 135
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/policies/POLICY_PRECEDENCE.yaml (110 rules; modes immutable/additive/overridable/floor/ceiling/strengthen_only_bool/shrink_only)]
+    automated_evidence: ["check:policy_precedence"]
+    independent_evidence: ["heldout/t03_gate_a.py A1-b3: an additive SECURITY_POLICY.never_index_classes override that retains the kernel entries is `applied` with mode=additive; one that drops them is refused"]
+    gap: null
+  - bullet: Active decision/spec/task context follows deterministic precedence.
+    source_line: 136
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/policy_precedence.rs (layers)]
+    automated_evidence: ["check:authority_unambiguous"]
+    independent_evidence: ["heldout/t03_gate_a.py A1-b4: the 7 layers are reported in a fixed order beginning constitution_hard_invariants and ending retrieved_or_inferred_context"]
+    gap: null
+  - bullet: Retrieved context/model inference cannot override higher authority.
+    source_line: 137
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/policy_precedence.rs, runtime/src/t2.rs (D-0007 trust classes)]
+    automated_evidence: ["check:authority_unambiguous", "check:os_binding_integrity"]
+    independent_evidence: ["heldout/t03_gate_a.py A1-b5: a research document declaring `authority: constitution` and `human_approved: true` appears in no applied override; retrieved context is the lowest layer"]
+    gap: null
+  - bullet: Invalid weakening attempts fail closed and are observable.
+    source_line: 138
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/policy.rs:186-189 (refused_overrides)]
+    automated_evidence: ["gov audit (UNHEALTHY on an overlay that weakens a floor)"]
+    independent_evidence: ["heldout/t03_gate_a.py A1-b6: each weakening appears in `refused` with policy, key, value, kernel_value and the POLICY_PRECEDENCE reason; the suite is not green"]
+    gap: null
+  health_scheduler_tiers: [G0, G1, G4, G5, G6]
+  evidence_owners: [G0, G1, G4, G5, G6, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [governing contract/policy, runtime/kernel implementation, authoritative spec/decision, security/sensitivity policy]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t06_gate_b_contract_freshness.py (AC10-changing-`the project policy overlay`)
+  qualification_coverage:
+    repo_a_challenge: a greenfield overlay that strengthens one additive key and weakens one immutable key in the same file
+    repo_b_challenge: a brownfield tree with contradictory legacy provider rules and a project overlay that lowers a kernel tier floor
+    hidden_oracle_fault_class: a weakening override that is silently applied instead of refused
+    chaos_scale_soak: "not relevant: precedence is evaluated per command from a small rule set"
+    retrieval_challenge: a retrieved document claiming constitutional authority must never enter the effective policy
+    not_challengeable: null
+  adoption_obligation: "`gov init`/`adopt` install POLICY_PRECEDENCE from the verified kernel and report every refused overlay key; post-adoption audit re-checks it"
+  residual_risk: "overlay keys the precedence table does not name fall to its default_mode (immutable); a new kernel policy key without a rule is therefore not overridable rather than silently overridable"
+  findings: []
+
+- capability: A2
+  title: Authentic root of trust
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:142
+  governing_document_refs: [GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §§8-12, ARCH-0003 §§1-8]
+  requirement_class: POST_VERIFICATION_HARDENING
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: >-
+    Every one of the ten bullets is executably evidenced on this candidate with metadata this
+    verifier signed itself. The two blocker classes that owned A2 in iteration 0 (BC-P2-35
+    post-install integrity, BC-P2-36 unauthenticated presentation) and the A2 half of BC-P2-37 are
+    closed. AC-4/AC-14: the R1 acceptance is re-established for the areas this family exercises;
+    the full R1-preservation re-run is P2-AR-0044's.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Release/source authenticity is established before any privileged kernel material is staged or installed.
+    source_line: 143
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/verifier.rs (admit, refuse_external_source_if_unprovisioned), runtime/src/srr/staging.rs]
+    automated_evidence: ["cargo test --test certification (srr, srr_material, ws08*)"]
+    independent_evidence: ["heldout/t01: unprovisioned + external source → SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED, details.staged_for_installation=false, the machine's staging directory is empty, no governance/kernel exists; provisioned + unsigned source → SRR_RELEASE_UNVERIFIED, nothing installed"]
+    gap: null
+  - bullet: Integrity and authenticity are treated as separate properties.
+    source_line: 144
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/mod.rs (three predicates), runtime/src/kernel_trust.rs]
+    automated_evidence: ["cargo test --lib kernel_trust::*"]
+    independent_evidence: ["heldout/t01 A2-b2: `gov trust status.separation` names authentic (signed metadata), intact (D-0007 installed-kernel integrity) and admissible (the floor check) as three sources; `gov kernel trust` returns an integrity verdict and never an authenticity one"]
+    gap: null
+  - bullet: Init/adopt/update/reinstall/recovery/rollback ingress paths share a non-circular trust root.
+    source_line: 145
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/verifier.rs (Ingress enum; AuthenticatedRelease sealed by `sealed::Admitted`), runtime/src/kernel.rs (install_kernel takes &AuthenticatedRelease)]
+    automated_evidence: ["cargo test --test certification srr::*"]
+    independent_evidence: ["heldout/t01 A2-b3: init and kernel reinstall both refuse a tampered source with SRR_PAYLOAD_DIGEST_MISMATCH; heldout/t05: update --apply refuses an unsigned and a foreign-signed 4.1.7 and installs only the owner-signed one; rollback is refused SRR_BELOW_FLOOR and admitted only with an owner-signed recovery token"]
+    gap: null
+  - bullet: Installed-kernel verification detects post-install tampering.
+    source_line: 146
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/kernel_trust.rs:1-60, 430-495, runtime/src/srr/installation.rs]
+    automated_evidence: ["doctor:D003", "cargo test --lib kernel_trust::*"]
+    independent_evidence: ["heldout/t01 A2-b4: a naive payload edit and a mutually consistent rewrite of payload+KERNEL_MANIFEST+framework.lock are both detected; `gov kernel trust` names the protected installation record; doctor does not report HEALTHY (BC-P2-35 closed)"]
+    gap: null
+  - bullet: Source-release authentication detects pre-install tampering.
+    source_line: 147
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/verifier.rs (per-file and aggregate digest binding)]
+    automated_evidence: ["cargo test --test certification srr::*"]
+    independent_evidence: ["heldout/t01 A2-b5: a one-line edit to a payload policy file is refused naming 'policies/SECURITY_POLICY.yaml' and both digests; a consistent payload+manifest rewrite is still refused"]
+    gap: null
+  - bullet: A source directory cannot regenerate its own trusted identity.
+    source_line: 148
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/provision.rs (refuse_repository_sourced_anchor), runtime/src/srr/verifier.rs]
+    automated_evidence: ["cargo test --test certification srr::*"]
+    independent_evidence: ["heldout/t01 A2-b6: a payload carrying its own .srr root and metadata is refused SRR_THRESHOLD_NOT_MET; a trust anchor copied into a governed project is refused SRR_ANCHOR_FROM_REPOSITORY_REFUSED"]
+    gap: null
+  - bullet: Trusted release identity is recorded, not invented, by `framework.lock`.
+    source_line: 149
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/lock.rs]
+    automated_evidence: ["release:init (framework-lock record)"]
+    independent_evidence: ["heldout/t01 A2-b7: the lock carries authenticity=AUTHENTIC, admission=SIGNED_RELEASE_METADATA, sequence, channel, release_metadata_sha256 and an identity_basis block; two installs under different XDG_CACHE_HOME produce identical locks (A0-A2-03 closed)"]
+    gap: null
+  - bullet: Bootstrap/dev/test trust modes cannot masquerade as certified production.
+    source_line: 150
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/verifier.rs (BOOTSTRAP_EMBEDDED_PAYLOAD), runtime/src/srr/present.rs, runtime/src/release.rs:80-96]
+    automated_evidence: ["cargo test --test certification ws08*"]
+    independent_evidence: ["heldout/t01 A2-b8: a bootstrap install reports authenticity UNKNOWN, admission BOOTSTRAP_EMBEDDED_PAYLOAD and presented_as UNAUTHENTICATED; status, doctor and audit all disclose it; `release build --certification CERTIFIED` is refused"]
+    gap: null
+  - bullet: Signing keys/trust anchors support rotation/revocation/recovery.
+    source_line: 151
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/metadata.rs (accept_root_succession), runtime/src/srr/breakglass.rs]
+    automated_evidence: ["cargo test --test certification srr::*"]
+    independent_evidence: ["heldout/t01 A2-b9: root v1→v2 succession accepted and the omitted release key reported revoked; a release signed by the revoked key is refused; a version gap and a replay of the outgoing root are refused; re-provisioning is refused; break-glass needs an owner-signed token (a --break-glass flag alone does not admit) and four GOV_* environment variables are refused SRR_ENV_CANNOT_CREATE_AUTHORITY. heldout/t05: an owner-signed recovery token admits a below-floor rollback and marks the machine DEGRADED"]
+    gap: null
+  - bullet: Release verification works offline after obtaining an authentic release envelope where designed.
+    source_line: 152
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/srr/verifier.rs (PreviouslyVerifiedByThisMachine), runtime/src/srr/installation.rs (verified-release ledger)]
+    automated_evidence: ["cargo test --test certification srr::*"]
+    independent_evidence: ["heldout/t01 A2-b10: a reinstall from a payload with no metadata succeeds with authenticity PREVIOUSLY_VERIFIED_BY_THIS_MACHINE; a payload this machine never verified is refused SRR_RELEASE_UNVERIFIED and the installation is unchanged"]
+    gap: null
+  health_scheduler_tiers: [G0, G1, G5, G6]
+  evidence_owners: [G0, G1, G5, G6, independent-heldout, release-clean-clone]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [runtime/kernel implementation, framework.lock, machine trust state, migration, schema]
+    invalidation_demonstrated: true
+    invalidation_evidence: "heldout/t01 (a rewritten kernel makes `gov kernel verify` and doctor refuse to call the installation intact)"
+  qualification_coverage:
+    repo_a_challenge: install a signed release, then rewrite payload+manifest+lock consistently and require detection
+    repo_b_challenge: adopt a brownfield tree from a release whose metadata was replaced by another owner's
+    hidden_oracle_fault_class: a tampered payload admitted, or a bootstrap install presented as current
+    chaos_scale_soak: interrupt the atomic swap mid-commit and require the replay to leave one consistent installation
+    retrieval_challenge: "not relevant: authenticity never depends on retrieval"
+    not_challengeable: null
+  adoption_obligation: "provision a trust anchor before any external-source ingress (OD-P2-02); every ingress records its authenticity basis in framework.lock and in the machine's protected installation record"
+  residual_risk: "ROOT_EXPIRY_PROFILE is 'reported_not_admission_blocking_r1': an expired installed anchor is reported but does not bar release admission. The product states this rather than implying otherwise; requiring short-lived freshness at trust-changing ingresses is recorded as R2 (AR27-N3)."
+  findings: []
+
+- capability: A3
+  title: Security, sensitivity and permissions
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:156
+  governing_document_refs: [framework §§20-21, Part V]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: >-
+    All six bullets are executably evidenced. The one residual (V1-A3-01, unclassified personal data
+    is indexed) is consistent with the bullet as written ("according to policy") and is recorded as
+    an owner posture question, not an unmet bullet.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Paths/datasets/tools/namespaces carry sensitivity/access classification.
+    source_line: 157
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/policies/DATA_SENSITIVITY.yaml, governance/project/REPOSITORY_CONTRACT.yaml (per-path class/namespace/index flags), runtime/src/security/]
+    automated_evidence: ["check:secrets_sensitivity_indexing", "check:path_map_compliance"]
+    independent_evidence: ["heldout/t03 A3-b1 and t06 B1: every contract path rule carries class, owner_role, mutation, namespace and per-index flags; adoption classification assigns `sensitivity: secret` to secret-bearing artefacts"]
+    gap: null
+  - bullet: Secret/credential/restricted content is excluded according to policy.
+    source_line: 158
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/security/secrets.rs, runtime/src/memory/indexer.rs]
+    automated_evidence: ["check:secrets_sensitivity_indexing", "doctor:D011"]
+    independent_evidence: ["heldout/t03 A3-b2: a seeded AWS key and a GitHub token in src/ are not returned by `gov memory query`, and the suite reports the secret-bearing files"]
+    gap: null
+  - bullet: Restricted/confidential namespaces cannot be weakened by project overrides.
+    source_line: 159
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/policy.rs (additive/immutable modes for SECURITY_POLICY keys)]
+    automated_evidence: ["check:policy_precedence"]
+    independent_evidence: ["heldout/t03 A3-b3: declaring src/.env public+indexable in the project DATA_SENSITIVITY does not make the secret retrievable"]
+    gap: null
+  - bullet: Tool execution respects role/authority/permission boundaries.
+    source_line: 160
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/authority.rs, runtime/src/tools.rs, framework/policies/TOOL_PERMISSIONS.yaml]
+    automated_evidence: ["check:authority_role_limits", "g0:authority"]
+    independent_evidence: ["heldout/t03 A3-b4: an L0 role and an undeclared role are both refused AUTHORITY_DENIED for `init --force`; heldout/t07: an overlay granting shell.exec/fs.write/net.any to an L1 role makes the suite fail"]
+    gap: null
+  - bullet: Destructive/elevated operations require correct gates.
+    source_line: 161
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/orchestration/gates.rs, runtime/src/adopt.rs:930 (destructive entries gated)]
+    automated_evidence: ["human-gate:adopt migrate", "check:human_gate_integrity"]
+    independent_evidence: ["heldout/t03 A3-b5: an L1 role cannot issue an emergency control; heldout/t04: destructive adoption entries appear under gated_entries with gate_reasons (destructive_cleanup, active_references); heldout/t05: an uncertified update stops at a Human Decision Gate that --approve does not satisfy"]
+    gap: null
+  - bullet: Outbound/export controls are default-deny where required.
+    source_line: 162
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/policies/SECURITY_POLICY.yaml (never_export_classes, on_secret_in_export_payload fail_closed), runtime/src/upstream.rs:159-210, 713-830]
+    automated_evidence: ["cargo test --test certification upstream::*"]
+    independent_evidence: ["heldout/t03 A3-b6: the policy declares never_export_classes [secret, restricted, confidential] and fail_closed; a packet carrying an AWS key is refused and nothing reaches the destination; `gov upstream prepare` on an unknown lesson and `submit` without authority are both refused"]
+    gap: null
+  health_scheduler_tiers: [G1, G4, G5, G6]
+  evidence_owners: [G0, G1, G4, G5, G6, independent-heldout, human-gate]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [security/sensitivity policy, project path map, relevant source files, tool/plugin registry]
+    invalidation_demonstrated: true
+    invalidation_evidence: "heldout/t06 (changing the project policy overlay invalidates the green record); heldout/t03 (adding a secret-bearing file makes the suite report it)"
+  qualification_coverage:
+    repo_a_challenge: seeded credentials in source, config and a test fixture; a project overlay that tries to declassify them
+    repo_b_challenge: a legacy chat store carrying secrets, plus a provider-rules file granting broad tool permissions
+    hidden_oracle_fault_class: a secret reaching the index or an export packet
+    chaos_scale_soak: a large tree where the secret scanner must stay within the index-build budget
+    retrieval_challenge: a query that targets the secret directly must return nothing
+    not_challengeable: null
+  adoption_obligation: "`gov adopt` classifies secret-bearing artefacts and the post-adoption audit re-checks exclusion; the project must classify personal data it wants excluded"
+  residual_risk: "personal data is excluded only when the project classifies it (V1-A3-01)"
+  findings: [V1-A3-01]
+
+- capability: A4
+  title: Budget/resource governance
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:166
+  governing_document_refs: [framework §§8-9, Part V]
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: >-
+    Three of four bullets are executably evidenced. Bullet 168 ("delegated thresholds are
+    executable") holds for the model/API spend and parallel-agent classes and fails for the
+    network-call class, which is reported but not enforced.
+  na_reason_normative_text: null
+  partial_qualification_impact: >-
+    CANNOT_UNDERMINE. The enforced classes cover the costs that can run away without a human
+    (model/API spend, daily spend, parallel agents, tool-install cost), each stopping at a Human
+    Decision Gate. The network-call overrun is reported by `gov telemetry summary`
+    (`over_budget`), so the scheduler and an auditor can see it, and Phase-4 qualification runs
+    offline against synthetic repositories where network spend is not a fault class.
+  bullets:
+  - bullet: Model/API/cloud/network/tool-install/parallel-agent/experiment budgets are governed.
+    source_line: 167
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/policies/BUDGET_POLICY.yaml (governed: model_spend, api_spend, cloud_changes, parallel_agents, network_calls, package_install, high_cost_experiments)]
+    automated_evidence: ["cargo test --lib routing::*"]
+    independent_evidence: ["heldout/t03 A4-b1: all seven classes the bullet names are in BUDGET_POLICY.governed"]
+    gap: null
+  - bullet: Delegated thresholds are executable, not merely declared.
+    source_line: 168
+    status: PARTIAL
+    implementation_evidence: [runtime/src/routing.rs:206-260, runtime/src/orchestration/tasks.rs:731-770, runtime/src/memory/claims.rs:403-460, runtime/src/tools.rs:603, runtime/src/observability.rs:129-152]
+    automated_evidence: ["test:certification:repair::budget_parallel_agents_threshold_raises_gate"]
+    independent_evidence: ["heldout/t03 A4-b2: a project override tightening max_parallel_agents to 1 takes effect in the effective policy; a routing record above max_task_cost_usd is stopped with threshold_exceeded and a second is stopped by the daily-spend threshold, while a record inside the budget raises no gate; but a network.call beyond max_network_calls_per_task is still accepted"]
+    gap: "the network_calls budget class is observed (over_budget) but nothing refuses work that exceeds it (V1-A4-01)"
+  - bullet: Exceeding delegated limits creates the required Human Decision Gate.
+    source_line: 169
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/routing.rs:246-258, runtime/src/orchestration/tasks.rs:758-770]
+    automated_evidence: ["check:human_gate_integrity"]
+    independent_evidence: ["heldout/t03 A4-b3: the over-budget routing record carries human_gate=HDG-0001 and the gate exists with trigger budget_threshold"]
+    gap: null
+  - bullet: Budget state and interventions are observable.
+    source_line: 170
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/observability.rs:129-160]
+    automated_evidence: ["gov telemetry summary"]
+    independent_evidence: ["heldout/t03 A4-b4: `gov telemetry summary.budget` reports max_network_calls_per_task, network_calls_by_task, over_budget, max_parallel_agents and active_sessions; the over-budget task is listed"]
+    gap: null
+  health_scheduler_tiers: [G4, G5, G6]
+  evidence_owners: [G4, G5, G6, independent-heldout, human-gate]
+  evidence_owner_actually_runs: partial — "the spend and parallelism thresholds are exercised by the certification suite and by this verification; no health check observes the network-call budget"
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [governing contract/policy, project path map, model/retrieval profile]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t03 (a tightened override changes the effective threshold immediately)
+  qualification_coverage:
+    repo_a_challenge: a workstream whose routing evidence crosses the per-task and then the daily spend thresholds
+    repo_b_challenge: an adopted repository whose legacy tooling would install packages above max_install_cost_usd
+    hidden_oracle_fault_class: a delegated threshold crossed without a gate
+    chaos_scale_soak: many concurrent sessions contending for max_parallel_agents
+    retrieval_challenge: "not relevant"
+    not_challengeable: null
+  adoption_obligation: "the project overlay may tighten but not widen the delegated budgets; post-adoption audit reports spend to date"
+  residual_risk: "network spend is measured after the fact; an agent can exhaust the budget before the overrun is visible"
+  findings: [V1-A4-01]
+
+- capability: A5
+  title: Emergency controls
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:172
+  governing_document_refs: [framework §§8-9, Part XXII]
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: >-
+    All four controls execute, are authority-gated and are deterministic. Two bullets are not fully
+    met: FREEZE_WRITES/PAUSE leave `gov rebuild-memory` and `gov memory rebuild` able to rewrite two
+    tracked generated manifests, and recovery leaves no durable reasoned record.
+  na_reason_normative_text: null
+  partial_qualification_impact: >-
+    CANNOT_UNDERMINE. Every governed record write and every lifecycle operation is refused while a
+    control is in force, so no governed fact can be created or altered during an emergency; the
+    escape is a deterministic regeneration of derived index manifests. Recovery is observable in
+    telemetry even though it is not durably recorded.
+  bullets:
+  - bullet: '`PAUSE`'
+    source_line: 173
+    status: PARTIAL
+    implementation_evidence: [runtime/src/orchestration/control.rs:78-130, 220]
+    automated_evidence: ["g0:pause"]
+    independent_evidence: ["heldout/t03: `gov pause` succeeds, is reported in status, refuses ten mutating commands with PAUSED, and is lifted by `gov resume`; `gov rebuild-memory` and `gov memory rebuild` still change governance/generated/*-manifest.json"]
+    gap: "two derived-rebuild commands mutate tracked OS-managed state under PAUSE (V1-A5-01)"
+  - bullet: '`FREEZE_WRITES`'
+    source_line: 174
+    status: PARTIAL
+    implementation_evidence: [runtime/src/orchestration/control.rs:78-130, guard_write]
+    automated_evidence: ["g0:freeze_writes"]
+    independent_evidence: ["heldout/t03: same sweep with FROZEN; the remedy `gov resume` stays available while the freeze is in force"]
+    gap: "as above (V1-A5-01)"
+  - bullet: '`CANCEL_AGENTS`'
+    source_line: 175
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/orchestration/control.rs:103-107]
+    automated_evidence: ["g0:cancel_agents"]
+    independent_evidence: ["heldout/t03: `gov cancel-agents` succeeds, pauses and is observable; heldout/t07 could not exercise claim revocation (V1-A5-03 records what is and is not established)"]
+    gap: null
+  - bullet: '`ROLLBACK_TRANSACTION`'
+    source_line: 176
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/cit/, cli `gov cit rollback`]
+    automated_evidence: ["cargo test --test certification repair::*"]
+    independent_evidence: ["heldout/t03 A5-ROLLBACK_TRANSACTION-*: a CIT is opened and `gov cit rollback` executes against it"]
+    gap: null
+  - bullet: Emergency commands are deterministic and authority-gated.
+    source_line: 177
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/orchestration/control.rs:78-86 (authority::require)]
+    automated_evidence: ["check:authority_role_limits"]
+    independent_evidence: ["heldout/t03 A5-b5: two identical `gov pause` calls produce identical state apart from the timestamp; an undeclared role is refused AUTHORITY_DENIED; an L1 role is refused"]
+    gap: null
+  - bullet: Recovery from emergency controls is auditable.
+    source_line: 178
+    status: PARTIAL
+    implementation_evidence: [runtime/src/orchestration/control.rs:110-128 (single-state file), runtime/src/observability.rs]
+    automated_evidence: ["gov telemetry summary"]
+    independent_evidence: ["heldout/t03 A5-b6: after `gov resume` the control record is {mode: RUNNING, reason: null} with no history; the only trace of the episode is the derived, untracked telemetry stream"]
+    gap: "no durable, reasoned record of entry and exit (V1-A5-02)"
+  health_scheduler_tiers: [G0, G5, G6]
+  evidence_owners: [G0, G5, G6, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [runtime/kernel implementation, authoritative spec/decision]
+    invalidation_demonstrated: false
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: freeze writes mid-task and require every mutating command to refuse and the remedy to stay available
+    repo_b_challenge: an adopted tree where a legacy control file exists at the pre-relocation path
+    hidden_oracle_fault_class: a governed write that succeeds during a freeze
+    chaos_scale_soak: a freeze issued while several sessions hold claims
+    retrieval_challenge: "not relevant"
+    not_challengeable: null
+  adoption_obligation: "the control store is relocated to .governance-state on first use and a legacy copy is honoured strictly until then"
+  residual_risk: "the control state is a single current-value file; concurrent operators overwrite each other's reason"
+  findings: [V1-A5-01, V1-A5-02, V1-A5-03]
+
+# =====================================================================  GATE B
+- capability: B1
+  title: Standard repository contract
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:184
+  governing_document_refs: [framework §§72-74, Part XXII]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: All four bullets are executably evidenced on a tree with its own src/ and docs/ layout.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Governance/framework/project/generated/runtime boundaries are explicit.
+    source_line: 185
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/project.rs (RepositoryContract), framework overlay template REPOSITORY_CONTRACT.yaml]
+    automated_evidence: ["check:path_map_compliance"]
+    independent_evidence: ["heldout/t06 B1-b1: the installed contract declares roots {governance, spec, product, archive} and per-path rules naming governance/kernel/**, governance/project/**, governance/registry/**, governance/generated/*-manifest.json with class, mutation and namespace"]
+    gap: null
+  - bullet: Good native product architecture is preserved when healthy.
+    source_line: 186
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/init.rs (overlay only), INV-013 (spec/ and product/ untouched by update)]
+    automated_evidence: ["cargo test --test certification greenfield::*"]
+    independent_evidence: ["heldout/t06 B1-b2: init leaves src/app.py, src/util.py and docs/design.md exactly as found; heldout/t05 S5-b4: an update preserves the project overlay byte for byte"]
+    gap: null
+  - bullet: Repository contract maps project-specific layout without cosmetic refactoring.
+    source_line: 187
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [governance/project/REPOSITORY_CONTRACT.yaml path rules]
+    automated_evidence: ["check:path_map_compliance"]
+    independent_evidence: ["heldout/t06 B1-b3: the contract carries a rule for src/** (class source, namespace product) rather than moving the tree; heldout/t04: the brownfield map assigns KEEP_IN_PLACE to 194 of 210 artefacts"]
+    gap: null
+  - bullet: Generated/runtime state is distinguished from authoritative tracked state.
+    source_line: 188
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/paths.rs (OS_STORES, STATE_DIR), REPOSITORY_CONTRACT class `generated`]
+    automated_evidence: ["check:recovery_rebuild", "check:index_freshness"]
+    independent_evidence: ["heldout/t06 B1-b4: the contract classes governance/generated/*-manifest.json as `generated`; .governance-runtime/ is untracked; heldout/t04: the non-rebuildable OS stores live in .governance-state and survive deleting .governance-runtime"]
+    gap: null
+  health_scheduler_tiers: [G1, G4, G5, G6]
+  evidence_owners: [G1, G4, G5, G6, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [project path map, governing contract/policy, relevant source files]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t06 (AC10-changing-`the project policy overlay`)
+  qualification_coverage:
+    repo_a_challenge: a greenfield tree with an unusual but healthy layout that the contract must map in place
+    repo_b_challenge: Repo B's misplaced specs, duplicate authority and generated files in the wrong places
+    hidden_oracle_fault_class: an authoritative store classified derived, or a derived store classified authoritative
+    chaos_scale_soak: "not relevant: the contract is a small rule set evaluated per path"
+    retrieval_challenge: per-path index flags must decide what is indexed
+    not_challengeable: null
+  adoption_obligation: "`gov adopt` A3 produces the project's target path map; post-adoption audit re-checks compliance"
+  residual_risk: "a path matching no rule falls to the contract default; an auditor must read the default to know what that means"
+  findings: []
+
+- capability: B2
+  title: Path map
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:190
+  governing_document_refs: [GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md §§6-9]
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: >-
+    Four of five bullets are executably evidenced, including documentation citations (BC-P2-52
+    closed). Bullet 192 is partial: six of the eight target actions execute; SPLIT and MERGE are
+    typed-refused as requiring a manual CIT.
+  na_reason_normative_text: null
+  partial_qualification_impact: >-
+    CANNOT_UNDERMINE. The vocabulary can express SPLIT and MERGE, the refusal is typed and names its
+    route, and nothing mis-executes silently; the qualification repositories can express a split or a
+    merge as a CIT.
+  bullets:
+  - bullet: Every material artefact can be classified by current path, class, authority and intended target.
+    source_line: 191
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (A1-A3)]
+    automated_evidence: ["cargo test --test certification brownfield::*, migration::*"]
+    independent_evidence: ["heldout/t06 B2-b1 and t04: 210 artefacts catalogued; every path-map row carries current_path, and its classification row carries class, authority, confidence and reasons, with a target action"]
+    gap: null
+  - bullet: Target action supports KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE.
+    source_line: 192
+    status: PARTIAL
+    implementation_evidence: [framework/schemas/migration-catalogue-entry.schema.json:30-40, runtime/src/migrations/executor.rs:460-512]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t06 B2-b2: all eight actions are in the catalogue vocabulary and KEEP_IN_PLACE/MOVE/EXTRACT/DELETE_FROM_ACTIVE_TREE appear in a produced map; the executor refuses SPLIT and MERGE with PLAN_UNSUPPORTED"]
+    gap: "SPLIT and MERGE are not executable (V1-B2-01)"
+  - bullet: Unknown material artefacts block destructive migration.
+    source_line: 193
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (unknown_blocking / unknown_blocking_destructive)]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t04 B2-b3: a tree carrying an unclassifiable artefact reports unknown_blocking and its destructive batches refuse with UNKNOWN_BLOCKS_DESTRUCTIVE"]
+    gap: null
+  - bullet: Imports/references/citations/consumers are represented.
+    source_line: 194
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/code_intelligence/, runtime/src/adopt.rs (citations, path_references, consumers)]
+    automated_evidence: ["check:path_map_compliance", "check:lineage_orphans"]
+    independent_evidence: ["heldout/t06 B2-b4: a markdown document that links two source files records those citations, and each cited file lists the document among its consumers (BC-P2-52 closed)"]
+    gap: null
+  - bullet: Path-map compliance is machine-checkable.
+    source_line: 195
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/scheduler/ (check path_map_compliance)]
+    automated_evidence: ["check:path_map_compliance"]
+    independent_evidence: ["heldout/t06 B2-b5: the governance suite carries a path_map_compliance family, and it reports a violation when a secret-bearing file is placed outside its class"]
+    gap: null
+  health_scheduler_tiers: [G1, G4, G5, G6]
+  evidence_owners: [G1, G4, G5, G6, independent-heldout, migration-rollback]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [project path map, relevant source files, relevant index manifest]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t06 (AC10-changing-`the index manifest`)
+  qualification_coverage:
+    repo_a_challenge: a greenfield tree whose docs cite source files that later move
+    repo_b_challenge: Repo B with no path map, hidden cross-references, dead code and an unclassifiable blob
+    hidden_oracle_fault_class: a destructive migration that runs with an UNKNOWN artefact outstanding, or a citation lost on a move
+    chaos_scale_soak: a tree of tens of thousands of files where the catalogue must stay complete
+    retrieval_challenge: the map must answer "who consumes this?" without semantic retrieval
+    not_challengeable: null
+  adoption_obligation: "A3 produces the map; A7 re-derives dependency references from a fresh scan rather than trusting the executor"
+  residual_risk: "SPLIT/MERGE plans must be executed as CITs, so their independent tests are the CIT's, not the migration's"
+  findings: [V1-B2-01]
+
+- capability: B3
+  title: Authoritative vs derived state
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:199
+  governing_document_refs: [framework §19, Part XXII]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: All four bullets are executably evidenced, including the relocated OS stores (BC-P2-31).
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: Git/project records remain authoritative.
+    source_line: 200
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/records.rs, runtime/src/paths.rs]
+    automated_evidence: ["check:recovery_rebuild"]
+    independent_evidence: ["heldout/t06 B3-b1: spec/** and governance/** are tracked; heldout/t02: a clone on the owner's second machine reconstructs the project from Git alone"]
+    gap: null
+  - bullet: SQLite/vector/graph/lexical/code indexes are derived.
+    source_line: 201
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/memory/indexer.rs, .governance-runtime/state.db]
+    automated_evidence: ["check:index_freshness"]
+    independent_evidence: ["heldout/t06 B3-b2: the runtime db and index manifest exist and .governance-runtime/ is untracked"]
+    gap: null
+  - bullet: Deleting derived state cannot delete project truth.
+    source_line: 202
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/paths.rs (OS_STORES in .governance-state), runtime/src/memory/indexer.rs (rebuild)]
+    automated_evidence: ["check:recovery_rebuild"]
+    independent_evidence: ["heldout/t06 B3-b3 and t04: moving .governance-runtime/ away leaves spec/, src/, the claims store and the emergency-control store intact; `gov rebuild-memory` restores retrieval (BC-P2-31 closed)"]
+    gap: null
+  - bullet: Derived records carry provenance sufficient to reconstruct source hits.
+    source_line: 203
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/memory/ (artifact_id, chunk_id, section, record_type)]
+    automated_evidence: ["check:memory_retrieval_regression"]
+    independent_evidence: ["heldout/t06 B3-b4: every hit carries artifact_id, path, chunk_id, section, level, status, state_class and record_type"]
+    gap: null
+  health_scheduler_tiers: [G4, G5, G6]
+  evidence_owners: [G4, G5, G6, independent-heldout, release-clean-clone]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [relevant index manifest, relevant source files, schema]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t06 (AC10-changing-`the index manifest`)
+  qualification_coverage:
+    repo_a_challenge: delete the whole derived runtime directory and require a byte-identical rebuild
+    repo_b_challenge: an adopted tree whose legacy index stores sit beside the new ones
+    hidden_oracle_fault_class: an authoritative record that exists only in the derived store
+    chaos_scale_soak: interrupt a rebuild and require the next one to be complete
+    retrieval_challenge: a rebuilt index must answer the held-out queries at the same recall
+    not_challengeable: null
+  adoption_obligation: "A9/A10 rebuild the fabric on canonical paths and verify it against held-out queries the verifier authored"
+  residual_risk: "the OS stores under .governance-state are non-rebuildable by design; their loss loses claims and control state, which is why they are excluded from the derived directory"
+  findings: []
+
+# =====================================================================  GATE S
+- capability: S1
+  title: Canonical OS repo
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:896
+  governing_document_refs: [GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md §§1-8]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: Both bullets are evidenced against the canonical tree and a consumer project.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: framework/runtime/CLI/tools/migrations/tests/fixtures/lessons/change-proposals/release/docs separation exists.
+    source_line: 897
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [the canonical repository layout]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05 S1-b1: all eleven named directories exist at the canonical root"]
+    gap: null
+  - bullet: canonical OS developed once, consumer repos do not rebuild it independently.
+    source_line: 898
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/kernel.rs (stage_payload: only the payload dirs), runtime/src/init.rs]
+    automated_evidence: ["release:init"]
+    independent_evidence: ["heldout/t05 S1-b2: an initialised consumer project contains governance/kernel and no runtime/, cli/ or Cargo.toml"]
+    gap: null
+  health_scheduler_tiers: [G5, G6]
+  evidence_owners: [G5, G6, release-clean-clone, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [runtime/kernel implementation, governing contract/policy]
+    invalidation_demonstrated: false
+    invalidation_evidence: null
+  qualification_coverage:
+    repo_a_challenge: a consumer repository that must never need the OS build inputs
+    repo_b_challenge: a brownfield tree that already vendored a copy of an older framework
+    hidden_oracle_fault_class: a consumer tree that can rebuild or alter the kernel locally
+    chaos_scale_soak: "not relevant"
+    retrieval_challenge: "not relevant"
+    not_challengeable: null
+  adoption_obligation: "adoption installs a released kernel payload; it never vendors the OS sources"
+  residual_risk: none observed
+  findings: []
+
+- capability: S2
+  title: Immutable releases
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:900
+  governing_document_refs: [release protocol §8]
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: >-
+    Ten of eleven bullets are executably evidenced against a release this verification built and
+    verified. The "adapter/capability versions" bullet is half met: adapter versions are recorded,
+    capability/plugin versions are not.
+  na_reason_normative_text: null
+  partial_qualification_impact: >-
+    CANNOT_UNDERMINE: every capability the release ships is inside the payload the signed metadata
+    binds by per-file digest, so the identity of what ships is pinned even though the capability
+    version vocabulary is not itemised in the manifest.
+  bullets:
+  - bullet: semantic versioning
+    source_line: 901
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs, runtime/src/lock.rs (compare_versions)]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05 S2-b1: the manifest version is 4.1.6 and version ordering decides update/rollback direction"]
+    gap: null
+  - bullet: release manifest
+    source_line: 902
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs::build]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05: manifest.json and manifest.yaml are produced beside the payload"]
+    gap: null
+  - bullet: file hashes
+    source_line: 903
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/kernel.rs::build_manifest]
+    automated_evidence: ["release:release verify"]
+    independent_evidence: ["heldout/t05: file_hashes covers every payload file; `gov release verify` reports ok=true and detects a single changed file"]
+    gap: null
+  - bullet: supported migrations
+    source_line: 904
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs, runtime/src/migrations/framework.rs]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05: migration_ids = [M-4.1.5-4.1.6]; the signed release metadata binds each migration by digest and the verifier refuses an unauthorised or modified one"]
+    gap: null
+  - bullet: schema versions
+    source_line: 905
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/kernel.rs::schema_version_problems]
+    automated_evidence: ["release:release build (RELEASE_KERNEL_INCONSISTENT)"]
+    independent_evidence: ["heldout/t05: 60+ schema versions recorded and mirrored into framework.lock"]
+    gap: null
+  - bullet: CLI/runtime versions
+    source_line: 906
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05: cli_version and runtime_version both 4.1.6"]
+    gap: null
+  - bullet: adapter/capability versions
+    source_line: 907
+    status: PARTIAL
+    implementation_evidence: [runtime/src/release.rs (adapter_versions)]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05 S2-b-capability-plugin-versions: adapter_versions {api, cli, generic, ide, mcp} present; no capability_versions or plugin_versions key"]
+    gap: "capability/plugin versions are not recorded (V1-S2-01)"
+  - bullet: release notes
+    source_line: 908
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05: release_notes present and RELEASE_NOTES.md written"]
+    gap: null
+  - bullet: affected indexes
+    source_line: 909
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05: required_index_rebuilds = [code, graph, lexical, semantic]"]
+    gap: null
+  - bullet: human decisions
+    source_line: 910
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/release.rs (human_gates)]
+    automated_evidence: ["release:release build"]
+    independent_evidence: ["heldout/t05: the manifest carries the human_gates field, empty for a release whose migrations need no gate; heldout/t05 S5 shows the gate path when one is required"]
+    gap: null
+  - bullet: rollback
+    source_line: 911
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs (snapshot/rollback), release manifest rollback_procedure]
+    automated_evidence: ["release:release build", "cargo test --test certification update::*"]
+    independent_evidence: ["heldout/t05: the manifest states the rollback procedure and the procedure works (S5-b8)"]
+    gap: null
+  health_scheduler_tiers: [G5, G6]
+  evidence_owners: [G5, G6, release-clean-clone, independent-heldout, migration-rollback]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [runtime/kernel implementation, schema, migration]
+    invalidation_demonstrated: true
+    invalidation_evidence: "heldout/t05 (a changed payload file makes `gov release verify` fail)"
+  qualification_coverage:
+    repo_a_challenge: build a release, verify it, then modify one payload byte and require detection
+    repo_b_challenge: adopt from a release directory whose manifest claims a certification it cannot prove
+    hidden_oracle_fault_class: a mutable release, or a manifest field an ingress believes without a signature
+    chaos_scale_soak: "not relevant"
+    retrieval_challenge: "not relevant"
+    not_challengeable: null
+  adoption_obligation: "a consumer installs only from a release directory whose metadata verifies under its own trust anchor"
+  residual_risk: "an unsigned manifest.json sits beside the signed metadata; it is reported as an unsigned claim everywhere, but an operator reading the file directly could still mistake it for authority"
+  findings: [V1-S2-01]
+
+- capability: S3
+  title: "`gov init`"
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:913
+  governing_document_refs: [release protocol §9]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: All six bullets are executably evidenced by an authentic install on a provisioned machine.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: certified kernel installation
+    source_line: 914
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/init.rs, runtime/src/kernel.rs::install_kernel]
+    automated_evidence: ["release:init", "cargo test --test certification greenfield::*"]
+    independent_evidence: ["heldout/t05 S3-b1 and t01: init installs only through the single verifier; the lock records authenticity AUTHENTIC / admission SIGNED_RELEASE_METADATA; an unsigned or tampered source is refused"]
+    gap: null
+  - bullet: project overlay creation
+    source_line: 915
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/init.rs (overlay)]
+    automated_evidence: ["release:init"]
+    independent_evidence: ["heldout/t05 S3-b2: seven overlay files are written under governance/project/"]
+    gap: null
+  - bullet: repository contract
+    source_line: 916
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/init.rs, runtime/src/project.rs]
+    automated_evidence: ["check:path_map_compliance"]
+    independent_evidence: ["heldout/t05 S3-b3 and t06 B1: REPOSITORY_CONTRACT.yaml is written with roots and per-path rules"]
+    gap: null
+  - bullet: initial memory/state
+    source_line: 917
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/memory/indexer.rs]
+    automated_evidence: ["check:index_freshness"]
+    independent_evidence: ["heldout/t05 S3-b4: the runtime db and governance/generated/index-manifest.json exist after init, with 163 artefacts indexed"]
+    gap: null
+  - bullet: health checks
+    source_line: 918
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/doctor.rs, runtime/src/verification/]
+    automated_evidence: ["gov doctor", "gov audit"]
+    independent_evidence: ["heldout/t05 S3-b5: init reports doctor HEALTHY and a conformance audit AUD-0001 with verdict HEALTHY"]
+    gap: null
+  - bullet: reference retrieval profile bootstrap when certified
+    source_line: 919
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/memory/embeddings.rs (HashedNgramEmbedder), runtime/src/retrieval/]
+    automated_evidence: ["check:memory_retrieval_regression"]
+    independent_evidence: ["heldout/t05 S3-b6: init reports the embedder id hashed-ngram with an identity digest, dimensions and a builtin adapter, and 14 held-out queries generated; `gov memory verify` runs against it"]
+    gap: null
+  health_scheduler_tiers: [G1, G5, G6]
+  evidence_owners: [G1, G5, G6, release-clean-clone, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [runtime/kernel implementation, model/retrieval profile, schema]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t06 (a green install goes stale when its inputs change)
+  qualification_coverage:
+    repo_a_challenge: init into an empty tree and require a HEALTHY first audit
+    repo_b_challenge: init into a tree that already carries legacy governance files
+    hidden_oracle_fault_class: an init that installs unauthenticated material or reports HEALTHY over it
+    chaos_scale_soak: init interrupted during the atomic swap
+    retrieval_challenge: the bootstrapped profile must answer the generated held-out queries
+    not_challengeable: null
+  adoption_obligation: "init is the documented second step after provisioning; on an unprovisioned machine only the embedded payload installs, marked BOOTSTRAP"
+  residual_risk: "the reference profile is the built-in hashed-ngram embedder; selecting a better one is Phase 3 (item 7)"
+  findings: []
+
+- capability: S4
+  title: "`gov adopt`"
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:921
+  governing_document_refs: [GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md §§3, 5-12; release protocol §10]
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: >-
+    All twelve stages exist, are authority- and independence-bound, and were driven end to end: a
+    greenfield-adopted tree reaches A11 with verdict ADOPTED_HEALTHY, and a brownfield tree reaches
+    A10 with a real MEMORY_REJECTED_NEEDS_REPAIR verdict. A6 is partial: on a brownfield tree whose
+    secret-bearing files A2 already classified SECRET, `adopt.migrate` is hard-blocked for every
+    batch until an operator edits the sensitivity overlay by hand, which is not an adoption stage.
+  na_reason_normative_text: null
+  partial_qualification_impact: >-
+    COULD_UNDERMINE. Contract v3's own advanced-qualification challenges for A3 (:164 "seeded
+    secrets") and B2 (:197 Repo B) describe exactly the tree on which A6 cannot proceed, so a
+    qualification run of the adoption path on Repo B would stall at A6 rather than measure A6-A11.
+  bullets:
+  - bullet: A0 safety baseline
+    source_line: 923
+    status: PARTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a0)]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04 S4-A0-*: A0 executes, pins the baseline commit, counts 22 dirty files, runs the baseline tests, detects interrupted work and emits freeze advice; its record is T2-sealed. heldout/t07: it creates no adoption branch or worktree and takes no snapshot"]
+    gap: "no adoption branch/worktree and no restorable snapshot (V1-S4-02)"
+  - bullet: A1 cold inventory
+    source_line: 924
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a1)]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04: 210 files catalogued by kind (chat_store, provider_rules, secret, old_governance, …) into 01-COLD-INVENTORY.jsonl"]
+    gap: null
+  - bullet: A2 classification
+    source_line: 925
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a2)]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04: 210 artefacts classified into 13 classes with authority, confidence, reasons and sensitivity"]
+    gap: null
+  - bullet: A3 target path map
+    source_line: 926
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a3)]
+    automated_evidence: ["check:path_map_compliance"]
+    independent_evidence: ["heldout/t04: 210 entries with actions {KEEP_IN_PLACE 194, MOVE 8, EXTRACT 4, DELETE_FROM_ACTIVE_TREE 4}, a catalogue id, version and content_hash"]
+    gap: null
+  - bullet: A4 migration plan
+    source_line: 927
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a4)]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t04: an 8-batch plan with a content_hash, per-batch rollback points, pre/post tests and gated_entries carrying gate_reasons"]
+    gap: null
+  - bullet: A5 independent migration review/test authoring
+    source_line: 928
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:1341-1420]
+    automated_evidence: ["test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts"]
+    independent_evidence: ["heldout/t04: the planner cannot perform it; the reviewer cannot continue the planner's session (INDEPENDENCE); an approval resting only on the scaffold is refused (INDEPENDENT_TESTS_REQUIRED); the approval records the reviewer's test ids and binds catalogue/plan/test digests"]
+    gap: null
+  - bullet: A6 controlled migration
+    source_line: 929
+    status: PARTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a6), runtime/src/migrations/executor.rs]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t04: after the out-of-band sensitivity edit all eight batches execute, independent tests run per batch (15 executed, 14 pass before the reviewer's malformed test was corrected), and a plan changed after approval is refused; before that edit every batch is refused HEALTH_HARD_BLOCK"]
+    gap: "hard-blocked on a brownfield tree whose secret-bearing files A2 classified SECRET (V1-S4-01)"
+  - bullet: A7 independent migration verification
+    source_line: 930
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:2029-2060]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t04: the verifier cannot continue the executor's session; in a fresh session A7 executes and writes 08-INDEPENDENT-MIGRATION-VERIFICATION.md re-deriving dependency references from a fresh scan"]
+    gap: null
+  - bullet: A8 legacy memory extraction/retirement
+    source_line: 931
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:2063-2100]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04: A8 executes on the catalogue A7 accepted, extracts from the legacy chat store by kind (decision/lesson/question), registers one string for review and skips secret strings"]
+    gap: null
+  - bullet: A9 new Knowledge Fabric
+    source_line: 932
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:2351]
+    automated_evidence: ["check:memory_retrieval_regression"]
+    independent_evidence: ["heldout/t04: A9 builds the fabric on canonical paths and records the builder's held-out set explicitly as regression evidence, not independent evidence"]
+    gap: null
+  - bullet: A10 independent memory verification
+    source_line: 933
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:2411-2470]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04: the builder's starter set alone is refused (INDEPENDENT_HELDOUT_REQUIRED); with verifier-authored queries A10 runs two full rebuilds, checks reproducibility and returns MEMORY_REJECTED_NEEDS_REPAIR on the brownfield tree and MEMORY_ACCEPTED_FOR_V4_AUDIT on the greenfield one"]
+    gap: null
+  - bullet: A11 full project audit
+    source_line: 934
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (a11)]
+    automated_evidence: ["gov audit (G5)"]
+    independent_evidence: ["heldout/t04: A11 refuses out of order (STAGE_ORDER) and, once A10 accepts, runs the G5 suite and returns verdict ADOPTED_HEALTHY with per-criterion checks and audit AUD-0011"]
+    gap: null
+  health_scheduler_tiers: [G1, G4, G5, G6]
+  evidence_owners: [G1, G4, G5, G6, independent-heldout, human-gate, migration-rollback]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [project path map, adoption evidence, relevant source files, security/sensitivity policy]
+    invalidation_demonstrated: true
+    invalidation_evidence: "heldout/t04 (changing the approved plan makes A6 refuse; changing the catalogue makes A8 refuse)"
+  qualification_coverage:
+    repo_a_challenge: adopt a healthy greenfield tree end to end and require ADOPTED_HEALTHY
+    repo_b_challenge: adopt Repo B (no path map, provider rules, dead code, a secret-bearing chat store, an unclassifiable blob) end to end
+    hidden_oracle_fault_class: a migration that executes a plan the reviewer did not approve, or an A10 that accepts the builder's own queries
+    chaos_scale_soak: interrupt a destructive batch and require the rollback point to restore it
+    retrieval_challenge: A10's held-out queries must be the verifier's and must pass on their own
+    not_challengeable: null
+  adoption_obligation: this capability *is* the adoption obligation; its evidence tree is the record
+  residual_risk: "adoption of a tree with secret-bearing files currently needs an operator step outside the stage sequence (V1-S4-01)"
+  findings: [V1-S4-01, V1-S4-02]
+
+- capability: S5
+  title: "`gov update`"
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:936
+  governing_document_refs: [release protocol §12]
+  requirement_class: ORIGINAL
+  status: PARTIAL
+  status_justification: >-
+    Eight of nine bullets are executably evidenced by a complete update lifecycle on a provisioned
+    machine: check/impact, the Human Decision Gate answered through the owner-signed channel, the
+    commit, overlay preservation, index rebuild, verification, the ledger and a break-glass rollback.
+    The "authenticated source" bullet is partial: when the candidate's self-declared version is not
+    newer, `gov update` reports "already up to date" without authenticating it.
+  na_reason_normative_text: null
+  partial_qualification_impact: >-
+    COULD_UNDERMINE. A qualification fault class of the shape "the update source has been tampered
+    with" is answered `ok: true` when the tampered source keeps the installed version string, so the
+    oracle would record no refusal where one is due.
+  bullets:
+  - bullet: check/impact simulation
+    source_line: 937
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs:55-140]
+    automated_evidence: ["cargo test --test certification update::*"]
+    independent_evidence: ["heldout/t05 S5-b1: `gov update --check` reports radius R3, overlay_changes, index_rebuild, breaking_changes, human_gates and named consequences, with a dry-run of the migration chain"]
+    gap: null
+  - bullet: authenticated source
+    source_line: 938
+    status: PARTIAL
+    implementation_evidence: [runtime/src/update.rs:239, 339-350, runtime/src/srr/verifier.rs::certification_of]
+    automated_evidence: ["cargo test --test certification update::*, srr::*"]
+    independent_evidence: ["heldout/t05: an unsigned and a foreign-signed 4.1.7 both fail to install; the committed update records authenticity AUTHENTIC and the verified metadata digest; certification counts only from signed metadata. But a tampered, a foreign-signed and a below-floor source that declare the installed version are each reported ok: true, 'already up to date'"]
+    gap: "the up-to-date decision is taken from the candidate's unauthenticated declared version (V1-S5-01)"
+  - bullet: compatibility/migration
+    source_line: 939
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs (supported_from_versions, migration_path)]
+    automated_evidence: ["cargo test --test certification update::*"]
+    independent_evidence: ["heldout/t05 S5-b3: compatible=true and migration_path [M-4.1.6-4.1.7]; the applied update reports the migration executed; an unsupported path is refused UPDATE_UNSUPPORTED"]
+    gap: null
+  - bullet: preserve project overlay
+    source_line: 940
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs (SNAPSHOT_DIRS, overlay reconciliation)]
+    automated_evidence: ["cargo test --test certification update::*"]
+    independent_evidence: ["heldout/t05 S5-b4: a marker line added to PROJECT_POLICY.yaml before the update is present unchanged afterwards"]
+    gap: null
+  - bullet: regenerate adapters/views
+    source_line: 941
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adapters.rs, runtime/src/update.rs]
+    automated_evidence: ["check:adapter_portability"]
+    independent_evidence: ["heldout/t05 S5-b5: the committed update reports overlay_reconciled and overlay_keys_changed, and governance/generated/ is refreshed"]
+    gap: null
+  - bullet: rebuild affected indexes
+    source_line: 942
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs, runtime/src/memory/indexer.rs]
+    automated_evidence: ["check:index_freshness"]
+    independent_evidence: ["heldout/t05 S5-b6: the committed update reports a new index_manifest digest"]
+    gap: null
+  - bullet: verify
+    source_line: 943
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs (doctor + audit after commit)]
+    automated_evidence: ["gov doctor", "gov audit"]
+    independent_evidence: ["heldout/t05 S5-b7: the committed update reports doctor and audit verdicts (DEGRADED/HEALTHY on this fixture) as part of its result"]
+    gap: null
+  - bullet: rollback
+    source_line: 944
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs::rollback_opts, runtime/src/srr/breakglass.rs]
+    automated_evidence: ["cargo test --test certification update::*, ws08*"]
+    independent_evidence: ["heldout/t05 S5-b8: rollback is refused SRR_BELOW_FLOOR by default and, with an owner-signed recovery token in the protected inbox, restores 4.1.6 and marks the machine DEGRADED; with no unconsumed snapshot it is refused SNAPSHOT_MISSING (BC-P2-38 closed)"]
+    gap: null
+  - bullet: ledger/provenance
+    source_line: 945
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/update.rs:493 (spec/reports/framework-updates.jsonl)]
+    automated_evidence: ["check:change_control_integrity"]
+    independent_evidence: ["heldout/t05 S5-b9: the ledger records at/event/from/to/by/session/role/result=committed/release_commit/source/authenticity plus the details block"]
+    gap: null
+  health_scheduler_tiers: [G1, G5, G6]
+  evidence_owners: [G1, G5, G6, release-clean-clone, human-gate, migration-rollback, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [runtime/kernel implementation, framework.lock, migration, schema, machine trust state]
+    invalidation_demonstrated: true
+    invalidation_evidence: "heldout/t05 (an update commits a new lock and the floor advances, so the previous release becomes below-floor)"
+  qualification_coverage:
+    repo_a_challenge: a clean update across one migration, with the gate answered through the owner-signed channel
+    repo_b_challenge: an update attempted on an adopted tree whose suite is not green (health admission)
+    hidden_oracle_fault_class: an update that installs an unauthenticated source, or reports a tampered source as up to date
+    chaos_scale_soak: interrupt the update between the snapshot and the commit
+    retrieval_challenge: the rebuilt index must still answer the held-out queries after the update
+    not_challengeable: null
+  adoption_obligation: "an update is admitted only when the health blocks it would remedy name its subjects; otherwise it is refused with the blocks listed"
+  residual_risk: "a below-floor rollback requires an owner-signed token and marks the machine DEGRADED — RECOVERY ONLY, which is the intended trade-off"
+  findings: [V1-S5-01]
+
+- capability: S6
+  title: Cross-machine mechanics
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:947
+  governing_document_refs: [release protocol §16; ARCH-0003 §8; P2-ADJ-0002]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: >-
+    All three bullets are executably evidenced by the five-machine attack this family leads: 74 of
+    74 checks pass. Facts an OS operation wrote on one of the owner's provisioned, bound machines are
+    honoured on the other after a clone; every other origin is refused with a typed result; no key
+    material is in any repository; `gov` verifies and never signs.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: tracked truth syncs through Git/private remote
+    source_line: 948
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/t2.rs, runtime/src/srr/binding.rs]
+    automated_evidence: ["cargo test --test certification multi_machine::*", "check:os_binding_integrity"]
+    independent_evidence: ["heldout/t02: gate, audit, task and CIT records written on machine A are all portable-scope sealed (hmac-sha256/t2-v2) and verify as VERIFIED on machine B after a git clone; a record B writes verifies on A (round trip); C (provisioned, unbound), D (unprovisioned) and E (foreign owner) each report FOREIGN; an edited record is BROKEN, an unsealed one UNSEALED, a seal under a revoked key UNAUTHORISED; wrong-signer, unknown-signer, expired, rolled-back, unauthorised-key and wrong-machine authorities are each refused with their own typed code"]
+    gap: null
+  - bullet: derived runtime rebuilds locally
+    source_line: 949
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/memory/indexer.rs, runtime/src/kernel_trust.rs (KERNEL_UNANCHORED)]
+    automated_evidence: ["check:recovery_rebuild"]
+    independent_evidence: ["heldout/t02: the clone carries no tracked runtime state; the second machine must first verify the release the project pins (`gov kernel reinstall --source`, ARCH-0003 §8) — the refusal is typed, names that remedy and leaves status, doctor, kernel trust and kernel verify available — and then `gov rebuild-memory` succeeds"]
+    gap: null
+  - bullet: machine-specific absolute paths do not define release identity
+    source_line: 950
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/lock.rs, runtime/src/kernel.rs::source_label]
+    automated_evidence: ["release:init"]
+    independent_evidence: ["heldout/t02 S6-b3: the two machines' framework.lock agree on release_hash, version and kernel_manifest_hash, and no lock value is an absolute path; heldout/t01: the lock is unchanged across XDG_CACHE_HOME values"]
+    gap: null
+  health_scheduler_tiers: [G1, G2, G3, G4, G5, G6]
+  evidence_owners: [G1, G4, G5, G6, independent-heldout, release-clean-clone]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [machine trust state, authoritative spec/decision, relevant index manifest]
+    invalidation_demonstrated: true
+    invalidation_evidence: "heldout/t02 (a new authority version revokes a key and seals made under it stop being honoured immediately)"
+  qualification_coverage:
+    repo_a_challenge: two provisioned machines of one owner sharing a repository through a private remote
+    repo_b_challenge: an adopted repository cloned to a second machine that must anchor before privileged work
+    hidden_oracle_fault_class: a forged or foreign T2 record honoured, or an owner fact refused on the owner's own machine
+    chaos_scale_soak: a rotation applied on one machine while the other is offline
+    retrieval_challenge: the second machine must rebuild retrieval locally and answer the same queries
+    not_challengeable: null
+  adoption_obligation: "each additional machine is provisioned and bound from the administrator domain, then verifies the release the project pins"
+  residual_risk: "the binding key is symmetric and shared by the owner's machines: a process with the operator's OS privileges on one of them can seal as the owner on all of them; the product states this and binds human answers to an owner signature the machines do not hold"
+  findings: []
+
+# =====================================================================  GATE T
+- capability: T1
+  title: Role separation
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:956
+  governing_document_refs: [adoption protocol §3]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: >-
+    All nine roles the bullet list names exist and are enforced. Eight are kernel roles in
+    ROLES.yaml; the Conditional Recovery Role is, by the protocol's own text, performed by the
+    interrupted session itself, and its procedure (`gov recover`) executes.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: recovery agent
+    source_line: 957
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/recovery.rs]
+    automated_evidence: ["cargo test --test certification repair::*"]
+    independent_evidence: ["heldout/t04 T1-role-`recovery agent`-*: `gov recover` executes on a tree with a half-edited file, classifies the outstanding mutations, writes a recovery report and states the freeze. The protocol (§3) says the interrupted session may perform this role, so it is a procedure rather than a separate kernel role"]
+    gap: null
+  - bullet: adoption auditor/planner
+    source_line: 958
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/roles/ROLES.yaml (orchestrator L4), runtime/src/adopt.rs (Group::Planner)]
+    automated_evidence: ["check:authority_role_limits"]
+    independent_evidence: ["heldout/t04: the planner authors A0-A4 and the test scaffold, and is refused A5 (INDEPENDENCE); its authorship is recorded in the baseline"]
+    gap: null
+  - bullet: independent migration reviewer/test author
+    source_line: 959
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs::DESIGNATED_ROLES]
+    automated_evidence: ["test:certification:migration::adoption_independence_*"]
+    independent_evidence: ["heldout/t04: A5 is performed only by migration-reviewer in a session that authored no builder stage"]
+    gap: null
+  - bullet: migration executor
+    source_line: 960
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/roles/ROLES.yaml (migration-executor), runtime/src/adopt.rs (Group::Executor)]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t04: A6/A8 run as migration-executor and its authorship is recorded"]
+    gap: null
+  - bullet: independent migration verifier
+    source_line: 961
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs::DESIGNATED_ROLES]
+    automated_evidence: ["cargo test --test certification migration::*"]
+    independent_evidence: ["heldout/t04: A7 refuses the executor's session and runs as migration-verifier in a fresh one"]
+    gap: null
+  - bullet: memory engineer
+    source_line: 962
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/roles/ROLES.yaml (memory-engineer), runtime/src/adopt.rs (Group::MemoryBuilder)]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04: A9 runs as memory-engineer and its authorship is recorded"]
+    gap: null
+  - bullet: independent memory verifier/test author
+    source_line: 963
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:2411-2470]
+    automated_evidence: ["cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04: A10 refuses the builder's session and the builder's queries, and accepts only the verifier's own held-out set"]
+    gap: null
+  - bullet: comprehensive independent auditor
+    source_line: 964
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/roles/ROLES.yaml (independent-auditor), runtime/src/adopt.rs (a11)]
+    automated_evidence: ["gov audit (G5)"]
+    independent_evidence: ["heldout/t04: A11 runs as independent-auditor in a fresh session and its authorship is recorded"]
+    gap: null
+  - bullet: operator/CTO
+    source_line: 965
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [framework/roles/ROLES.yaml (human L5), runtime/src/human_channel.rs]
+    automated_evidence: ["check:human_gate_integrity"]
+    independent_evidence: ["heldout/t05: the human role is never conferred by a declaration — an update gate is satisfied only by an owner-signed answer in the protected inbox, not by --by or --approve"]
+    gap: null
+  health_scheduler_tiers: [G3, G4, G5, G6]
+  evidence_owners: [G0, G3, G4, G5, G6, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [governing contract/policy, adoption evidence, authoritative spec/decision]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t04 (a changed plan invalidates the reviewer's approval)
+  qualification_coverage:
+    repo_a_challenge: an adoption driven by a single session that must be refused at every independent stage
+    repo_b_challenge: an adoption where the executor tries to perform the verification
+    hidden_oracle_fault_class: an independent stage accepted from a builder's role or session
+    chaos_scale_soak: "not relevant"
+    retrieval_challenge: "not relevant"
+    not_challengeable: null
+  adoption_obligation: every stage records its author (group, role, session and where each came from) in the T2-sealed baseline
+  residual_risk: "agent roles remain adapter-declared (OD-P2-01): a misbehaving agent can claim a higher agent role, never a human one"
+  findings: []
+
+- capability: T2
+  title: Fresh-session independence
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:967
+  governing_document_refs: [adoption protocol §§3, 10-12, 15]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: Both bullets are executably evidenced; BC-P2-34's alpha instances are closed.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: independent roles do not simply continue builder/executor context.
+    source_line: 968
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:345-400 (identity, Group, INDEPENDENCE)]
+    automated_evidence: ["test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts"]
+    independent_evidence: ["heldout/t04: an undeclared session is refused ADOPTION_SESSION_UNDECLARED; A5, A7 and A10 each refuse the builder's session with INDEPENDENCE and a stated cause"]
+    gap: null
+  - bullet: held-out tests/evidence separation is enforced.
+    source_line: 969
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs:1380-1420, 2411-2470]
+    automated_evidence: ["cargo test --test certification brownfield::*, migration::*"]
+    independent_evidence: ["heldout/t04: an A5 approval resting only on the planner's scaffold is refused, and A10 refuses while every held-out query is the builder's starter set; both name the builder's set as regression evidence only"]
+    gap: null
+  health_scheduler_tiers: [G3, G4, G5, G6]
+  evidence_owners: [G4, G5, G6, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [adoption evidence, authoritative spec/decision]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t04 (APPROVAL_STALE once the approved artefacts change)
+  qualification_coverage:
+    repo_a_challenge: a reviewer that adds no test of its own must be refused
+    repo_b_challenge: a memory verifier that reuses the builder's held-out set must be refused
+    hidden_oracle_fault_class: an independent verdict earned on the builder's own evidence
+    chaos_scale_soak: "not relevant"
+    retrieval_challenge: A10's accept/reject must turn on the verifier's queries
+    not_challengeable: null
+  adoption_obligation: "the baseline records which tests and queries each role authored, and the verdicts bind their digests"
+  residual_risk: "independence rests on the declared role and session (OD-P2-01); two roles run by the same operator are independent only by declaration"
+  findings: []
+
+- capability: T3
+  title: Adoption evidence tree
+  source_ref: Governance_OS_Capability_Acceptance_Contract_v3.md:971
+  governing_document_refs: [adoption protocol §5]
+  requirement_class: ORIGINAL
+  status: PRESENT_AND_SUBSTANTIAL
+  status_justification: The single bullet is executably evidenced end to end on two trees.
+  na_reason_normative_text: null
+  partial_qualification_impact: null
+  bullets:
+  - bullet: 'inventory → classification → path map → migration plan → independent tests → migration → independent verification → memory → memory verification → full audit is traceable.'
+    source_line: 972
+    status: PRESENT_AND_SUBSTANTIAL
+    implementation_evidence: [runtime/src/adopt.rs (EVIDENCE dir, baseline stage order and verdicts)]
+    automated_evidence: ["check:os_binding_integrity", "cargo test --test certification brownfield::*"]
+    independent_evidence: ["heldout/t04 T3-*: `gov adopt status` lists all twelve stages with status, verdict and author; 20 artefacts under spec/audits/GOVERNANCE-ADOPTION/ carry the chain from 00-BASELINE.yaml to the A11 audit; the baseline is T2-sealed and its record_binding verifies; verdicts bind the digests of what they accepted"]
+    gap: null
+  health_scheduler_tiers: [G1, G4, G5, G6]
+  evidence_owners: [G1, G4, G5, G6, independent-heldout]
+  evidence_owner_actually_runs: true
+  freshness:
+    state: FRESH_FOR_CANDIDATE
+    invalidation_inputs: [adoption evidence, project path map, relevant index manifest]
+    invalidation_demonstrated: true
+    invalidation_evidence: heldout/t04 (a hand-edited baseline would be refused T2_UNBOUND; a changed catalogue refuses A8)
+  qualification_coverage:
+    repo_a_challenge: a complete adoption whose evidence tree must reconstruct every decision
+    repo_b_challenge: an adoption interrupted mid-chain that must resume without losing traceability
+    hidden_oracle_fault_class: a stage recorded complete with no artefact, or a verdict not bound to what it accepted
+    chaos_scale_soak: "not relevant"
+    retrieval_challenge: a fresh agent must reconstruct the adoption from the tree alone
+    not_challengeable: null
+  adoption_obligation: the evidence tree is the adoption's record and is tracked in Git
+  residual_risk: none observed
+  findings: []
