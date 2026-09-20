@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Held-out probe suite — P2-AR-0050, Phase-2 verification iteration 1, capability family `epsilon`
+# (O1-O5, P1-P2, Q1-Q4, U, V1-V4).
+#
+# Authored by the verifier from Contract v3 and the product's observable behaviour; never part of the product tree.
+# Re-runs every probe and prints one PASS/FAIL line per test, then a per-file and overall summary.
+#
+#   ./RUN-ALL                 # all probes
+#   ./RUN-ALL t01 t03         # only the named probes
+#
+# Requirements: the candidate built in this worktree (`CARGO_BUILD_JOBS=2 cargo build --release`), python3 with
+# `cryptography` and `PyYAML` (the verifier's own administrator-domain signer, heldout/srr.py, uses them to reach the
+# provisioned posture and the authenticated human channel). Probes create disposable projects under $EPS_SCRATCH.
+set -uo pipefail
+cd "$(dirname "$0")"
+HERE="$(pwd -P)"
+WT="$(cd "$HERE/../../../../.." && pwd -P)"
+export EPS_SCRATCH="${EPS_SCRATCH:-${TMPDIR:-/tmp}/eps-heldout-$(date +%s)}"
+mkdir -p "$EPS_SCRATCH"
+
+if [ ! -x "$WT/target/release/gov" ]; then
+  echo "FAIL RUN-ALL  the candidate is not built: expected $WT/target/release/gov" >&2
+  exit 2
+fi
+echo "candidate binary : $WT/target/release/gov"
+echo "binary sha256    : $(sha256sum "$WT/target/release/gov" | cut -d' ' -f1)"
+echo "scratch          : $EPS_SCRATCH"
+echo
+
+ALL=(t01_ac5_scheduler.py t02_availability.py t03_gate_u.py t04_gate_o_p.py \
+     t05_gate_v_oracle.py t06_gate_q.py t07_o3_independence.py t08_o2_detection.py)
+SEL=()
+if [ "$#" -gt 0 ]; then
+  for a in "$@"; do for f in "${ALL[@]}"; do case "$f" in "$a"*) SEL+=("$f");; esac; done; done
+else
+  SEL=("${ALL[@]}")
+fi
+
+rc=0
+pass_total=0
+fail_total=0
+for f in "${SEL[@]}"; do
+  echo "=================================================================== $f"
+  out="$(python3 "$f" 2>&1)"
+  code=$?
+  echo "$out"
+  p=$(printf '%s\n' "$out" | grep -c '^PASS ' || true)
+  q=$(printf '%s\n' "$out" | grep -c '^FAIL ' || true)
+  pass_total=$((pass_total + p))
+  fail_total=$((fail_total + q))
+  [ "$code" -ne 0 ] && rc=1
+  echo
+done
+
+echo "==================================================================="
+echo "TOTAL: $pass_total PASS, $fail_total FAIL"
+echo "Expected failures on cap2-candidate-1 — each is a recorded finding (../findings.yaml):"
+echo "  AC5-G5-covers-its-declared-tier      -> E-O5-01"
+echo "  P2-eight-questions-answerable        -> E-P2-01"
+echo "  Q1-lifecycle-enforced-at-export      -> E-Q1-01"
+echo "  Q2-lesson-cannot-claim-authority     -> E-Q2-01"
+echo "Any other failure is a change in the product or in the environment."
+exit $rc

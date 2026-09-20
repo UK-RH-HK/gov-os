@@ -1,0 +1,5 @@
+# AC-15 regression on cap2-candidate-1, reproduced by P2-AR-0050 in its own worktree
+# CARGO_BUILD_JOBS=2 cargo test --release --lib ; cargo test --release --test certification
+
+lib          : test result: ok. 276 passed; 0 failed; 0 ignored
+certification: test result: ok. 207 passed; 0 failed; 0 ignored
