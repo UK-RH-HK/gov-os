@@ -754,13 +754,39 @@ const ENVELOPE_SOURCES: &[&str] = &[
     "AUTHORITY_POLICY.authority_levels_required.install_tool",
     "REPOSITORY_CONTRACT.yaml: the path map (which paths may be mutated, and their class)",
     "DATA_SENSITIVITY.yaml + SECURITY_POLICY: sensitivity classes and secret path patterns",
-    "TOOL_POLICY.installation_envelope: host-authority/credential/network classes, the command-token floor, the approved registries and allowlisted services",
+    "TOOL_POLICY.installation_envelope: host-authority/credential/network classes and the command-token floor",
+    "tools/registry/TOOLS.yaml network_allowlist: the approved registries and allowlisted services (ecosystem knowledge lives in the kernel tool registry, never in kernel policy - INV-005)",
 ];
 
 /// One entry of `TOOL_POLICY.installation_envelope`.
 fn envelope_list(p: &Project, key: &str) -> Vec<String> {
     p.policies()
         .get_list("TOOL_POLICY", &format!("installation_envelope.{key}"))
+}
+
+/// **The network allowlist an installation's trust boundary is compared against**: the approved registries and
+/// allowlisted services the kernel's **tool registry** carries (`tools/registry/TOOLS.yaml`, key
+/// `network_allowlist`). They are not in `TOOL_POLICY` because registry hostnames are ecosystem knowledge, which
+/// `INV-005` keeps out of kernel policy — the same reason the language-native tools live in that registry. The
+/// registry is part of the verified kernel payload, so a project can no more alter it than the policy.
+fn network_allowlist(p: &Project) -> Vec<String> {
+    let doc = read_yaml(
+        &p.kernel_dir()
+            .join("tools")
+            .join("registry")
+            .join("TOOLS.yaml"),
+    )
+    .unwrap_or(Value::Null);
+    ["approved_registries", "allowlisted_services"]
+        .iter()
+        .flat_map(|k| {
+            doc["network_allowlist"][*k]
+                .as_array()
+                .cloned()
+                .unwrap_or_default()
+        })
+        .filter_map(|v| v.as_str().map(|s| s.to_ascii_lowercase()))
+        .collect()
 }
 
 /// Every command the installation carries, as `(where, argv)`. The install command is what the OS runs when the
@@ -901,8 +927,6 @@ pub fn installation_authority(
     let priv_tokens = envelope_list(p, "privilege_tokens");
     let host_tokens = envelope_list(p, "host_authority_tokens");
     let scope_flags = envelope_list(p, "host_scope_flags");
-    let registries = envelope_list(p, "approved_registries");
-    let services = envelope_list(p, "allowlisted_services");
     let cred_patterns = envelope_list(p, "credential_patterns");
     let policy_paths = envelope_list(p, "policy_paths");
     let secret_paths = p
@@ -1126,7 +1150,7 @@ pub fn installation_authority(
         .filter(|c| net_classes.contains(c))
         .collect();
     let wants_network = !declared_net.is_empty() || perm_flag("network") || !endpoints.is_empty();
-    let authorised_hosts: Vec<String> = registries.iter().chain(services.iter()).cloned().collect();
+    let authorised_hosts: Vec<String> = network_allowlist(p);
     if wants_network {
         let role_net: Vec<&String> = role_classes
             .iter()
@@ -1149,7 +1173,7 @@ pub fn installation_authority(
                 "new_or_unrestricted_network_trust_boundary",
                 "network access to an endpoint the OS cannot determine".into(),
                 "descriptor.required_permission_classes / descriptor.permissions.network".into(),
-                format!("TOOL_POLICY.installation_envelope approved registries and allowlisted services {authorised_hosts:?}: an unbounded boundary is not one of them"),
+                format!("the kernel tool registry's approved registries and allowlisted services {authorised_hosts:?}: an unbounded boundary is not one of them"),
             ));
         }
         for (h, at) in &endpoints {
@@ -1158,7 +1182,7 @@ pub fn installation_authority(
                     "new_or_unrestricted_network_trust_boundary",
                     format!("network access to '{h}'"),
                     at.clone(),
-                    format!("TOOL_POLICY.installation_envelope approved registries and allowlisted services {authorised_hosts:?}"),
+                    format!("the kernel tool registry's approved registries and allowlisted services {authorised_hosts:?}"),
                 ));
             }
         }

@@ -37,12 +37,13 @@ installation_envelope:
                           insmod, modprobe, useradd, usermod, update-alternatives]
   # flags that make an installer act outside the project (globally, system-wide or in the user's home)
   host_scope_flags: ["-g", "--global", "--system", "--user"]
-  # ordinary network use the project or tool policy already authorises: a tool whose every derived endpoint is one of
-  # these, installed by a role that already holds a network class, is NOT by itself elevated (OD-P2-03). A network
-  # class demanded with no derivable endpoint is an unrestricted boundary and gates.
-  approved_registries: [registry.npmjs.org, pypi.org, files.pythonhosted.org, crates.io, static.crates.io,
-                        index.crates.io, proxy.golang.org, rubygems.org, repo.maven.apache.org]
-  allowlisted_services: []
+  # Ordinary network use the project or tool policy already authorises: a tool whose every derived endpoint is an
+  # approved registry or an allowlisted service, installed by a role that already holds a network class, is NOT by
+  # itself elevated (OD-P2-03). A network class demanded with no derivable endpoint is an unrestricted boundary and
+  # gates. The hostnames themselves are ECOSYSTEM knowledge, which belongs in the kernel tool registry and never in
+  # kernel policy (INV-005: kernel data carries no language or toolchain assumptions), so they are read from
+  # `tools/registry/TOOLS.yaml` key `network_allowlist` (`approved_registries`, `allowlisted_services`), beside the
+  # language-native tools. That document is part of the verified kernel payload, so a project cannot alter it either.
   # argument and environment names the OS reads as credential access (case-insensitive globs)
   credential_patterns: ["*TOKEN*", "*SECRET*", "*PASSWORD*", "*PASSWD*", "*API_KEY*", "*APIKEY*", "*CREDENTIAL*",
                         "*PRIVATE_KEY*", "*ACCESS_KEY*"]

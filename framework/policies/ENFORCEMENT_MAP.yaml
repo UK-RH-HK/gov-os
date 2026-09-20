@@ -93,7 +93,7 @@ keys:
   TOOL_POLICY.health_check_required: {enforced_by: [tools::install]}
   TOOL_POLICY.mcp.registry_path: {enforced_by: [tools::generate_registry]}
   TOOL_POLICY.mcp.scope: {informational: "role/task scoping is implemented by generate_registry role_exposure"}
-  TOOL_POLICY.installation_envelope.*: {enforced_by: [tools::installation_authority], note: "OD-P2-03: the AUTHORISED side of the envelope a tool installation is compared against, read from trusted OS state only. What the installation would hold is derived by tools::installation_authority from the request and from the installation's own commands; nothing a descriptor declares enlarges this envelope (Contract v3 F4; BC-P2-39). The token and pattern lists are a kernel floor, never a safety proof"}
+  TOOL_POLICY.installation_envelope.*: {enforced_by: [tools::installation_authority], note: "OD-P2-03: the AUTHORISED side of the envelope a tool installation is compared against, read from trusted OS state only. What the installation would hold is derived by tools::installation_authority from the request and from the installation's own commands; nothing a descriptor declares enlarges this envelope (Contract v3 F4; BC-P2-39). The token and pattern lists are a kernel floor, never a safety proof. The approved registries and allowlisted services are NOT here: registry hostnames are ecosystem knowledge, so they live in the kernel tool registry (tools/registry/TOOLS.yaml, key network_allowlist), which INV-005 requires and which the kernel payload verification covers"}
   # ---- MODEL_ROUTING_POLICY
   MODEL_ROUTING_POLICY.tiers.*: {enforced_by: [tasks::create, routing::route]}
   MODEL_ROUTING_POLICY.reasoning_levels: {enforced_by: [tasks::create]}

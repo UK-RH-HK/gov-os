@@ -323,7 +323,9 @@ new or unrestricted network trust boundary. Ordinary network use already authori
 approved registry, an allowlisted service, by a role that already holds a network class) is not by itself elevated.
 
 The envelope is computed by `tools::installation_authority` from **trusted OS state** — `TOOL_PERMISSIONS`,
-`AUTHORITY_POLICY`, `DATA_SENSITIVITY`/`SECURITY_POLICY`, the path map and the tool policy's own lists — never from
+`AUTHORITY_POLICY`, `DATA_SENSITIVITY`/`SECURITY_POLICY`, the path map, the tool policy's own lists and the kernel
+tool registry's network allowlist (`tools/registry/TOOLS.yaml` `network_allowlist`: registry hostnames are ecosystem
+knowledge, which INV-005 keeps out of kernel policy) — never from
 the descriptor's declarations (Contract v3 F4 "a descriptor cannot authorise itself"; BC-P2-39). What the installation
 would hold is derived from the request *and* from what the OS can observe of the installation itself, so a descriptor
 that declares nothing elevated and installs with `sudo`, reaches outside the project, names a credential or fetches

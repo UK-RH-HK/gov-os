@@ -69,9 +69,12 @@ consequences:
   - >-
     `TOOL_POLICY.installation_envelope` supplies the authorised side of the comparison only: the host-authority,
     credential and network permission classes, the command-token floor for privilege and host authority, the
-    approved registries and allowlisted services, the credential-name patterns and the policy paths. Its token
-    lists are a kernel floor and never a safety proof — the OS cannot confine a spawned process — which is why the
-    non-gated branch also requires the independent governed security review.
+    credential-name patterns and the policy paths. The approved registries and allowlisted services are ecosystem
+    knowledge, so they live in the kernel tool registry (`tools/registry/TOOLS.yaml`, key `network_allowlist`) and
+    not in kernel policy, which INV-005 keeps free of language and toolchain assumptions; that document is part of
+    the verified kernel payload, so a project cannot alter it either. The token lists are a kernel floor and never
+    a safety proof — the OS cannot confine a spawned process — which is why the non-gated branch also requires the
+    independent governed security review.
   - >-
     Executable form: `tools::installation_authority` computes the envelope comparison; `tools::installation_change_decision`
     decides the branch; `cit::simulate_inner` records it in the transaction's bound impact as `change_class`
