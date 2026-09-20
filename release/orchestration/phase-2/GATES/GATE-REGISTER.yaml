@@ -43,9 +43,16 @@ gates:
 
   - id: GATE-P2-ORACLE-FORMAT
     title: Qualification Oracle format (V1-V4) accepted by a fresh independent reviewer before any hidden fault exists
-    status: NOT_SATISFIED
+    status: SATISFIED
     satisfier: fresh independent reviewer (frozen contract AC-6, section 9.2)
     preconditions: [GATE-P2-FROZEN-CONTRACT]
+    satisfied_by: P2-AR-0045 (verification iteration 1) on cap2-candidate-1
+    accepted_format_sha256: f89a3e2ff882e116f4593d0f7b8fd9725c7ba491090aedadc3a942c66f4316fd
+    evidence: release/capability-baseline/verify-1/oracle-format/00-ORACLE-FORMAT-REVIEW.md
+    note: >-
+      Six findings accompany the acceptance, none blocking AC-6; two MEDIUM (V1-OF-01 leak-scan gaps, V1-OF-02 unbound score
+      metrics) are for the iteration-1 synthesis verifier to dispose of and, on its judgement, to carry into Phase 4.
+      No hidden fault exists in Phase 2. Acceptance binds this exact format digest.
 
   - id: GATE-P2-R1-PRESERVATION
     title: R1 acceptance remains valid for the candidate under verification
