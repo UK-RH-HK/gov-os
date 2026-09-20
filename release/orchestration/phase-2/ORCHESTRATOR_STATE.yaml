@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-20T20:46:23Z'
-state_hash: a1d47b6b0ed31edc352a85a299193766ada833b721a721008eaff907feef1fe0
+updated_at: '2026-09-20T21:34:54Z'
+state_hash: b17fefbae77b8fb0efa7b2ce4463ca38e3e3a6d84e165131599dd2033e5ad879
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_VERIFICATION_ITERATION_1_RUNNING
 
@@ -259,7 +259,7 @@ agent_runs:
   - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: INCOMPLETE_USAGE_LIMIT_RECOVERED, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
   - {run_id: P2-AR-0053, role: capability-repair, workstream: residual-IPs (continuation of P2-AR-0043), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-b, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
   - {run_id: P2-AR-0055, role: capability-repair, workstream: residual-IPs (OD-P2-03), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-c, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.run.yaml}
-  - {run_id: P2-AR-0044, role: capability-verifier, scope: r1-preservation, iteration: 1, status: RUNNING, branch: phase2/verify-1-r1-preservation, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml}
+  - {run_id: P2-AR-0044, role: capability-verifier, scope: r1-preservation, iteration: 1, status: COMPLETED, branch: phase2/verify-1-r1-preservation, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml}
   - {run_id: P2-AR-0045, role: capability-verifier, scope: oracle-format, iteration: 1, status: COMPLETED, branch: phase2/verify-1-oracle-format, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0045.run.yaml}
   - {run_id: P2-AR-0046, role: capability-verifier, scope: alpha, iteration: 1, status: RUNNING, branch: phase2/verify-1-alpha, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0046.run.yaml}
   - {run_id: P2-AR-0047, role: capability-verifier, scope: beta, iteration: 1, status: RUNNING, branch: phase2/verify-1-beta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml}
@@ -270,7 +270,6 @@ agent_runs:
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0044, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml}
   - {run_id: P2-AR-0046, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0046.run.yaml}
   - {run_id: P2-AR-0047, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml}
   - {run_id: P2-AR-0048, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml}

@@ -45,7 +45,7 @@ def digest(commit, paths):
 
 def main():
     commit = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
-    full = subprocess.run(["git", "-C", ROOT, "rev-parse", commit], capture_output=True, text=True).stdout.strip()
+    full = subprocess.run(["git", "-C", ROOT, "rev-parse", f"{commit}^{{commit}}"], capture_output=True, text=True).stdout.strip()  # V1-R1P-02: annotated tags resolve to the tag object without ^{commit}
     code, code_lines = digest(full, PRODUCT_CODE)
     gov, gov_lines = digest(full, GOVERNED_STATE)
     print(f"commit: {full}")
