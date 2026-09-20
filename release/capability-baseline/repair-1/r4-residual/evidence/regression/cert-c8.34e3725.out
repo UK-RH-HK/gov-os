@@ -1,0 +1,40 @@
+# chunk: ws06 ws06r3 ws07  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:28:42Z
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/runtime)
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.90s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 21 tests
+test ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles ... ok
+test ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation ... ok
+test ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap ... ok
+test ws06r3::a_significant_mutation_observed_at_rebuild_is_a_checkpoint_boundary ... ok
+test ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence ... ok
+test ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips ... ok
+test ws06r3::the_repository_contract_states_where_the_os_keeps_its_state ... ok
+test ws06r3::the_index_holds_research_and_experiments_at_their_evidence_standing ... ok
+test ws06r3::freshness_judges_exactly_what_the_indexer_indexes ... ok
+test ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression ... ok
+test ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration has been running for over 60 seconds
+test ws06::embedder_components_are_identified_bound_and_fail_closed_on_change has been running for over 60 seconds
+test ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration ... ok
+test ws07::an_executable_plugin_never_runs_on_its_own_declarations ... ok
+test ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed ... ok
+test ws07::a_tool_installation_is_approved_only_for_that_installation ... ok
+test ws07::a_cached_pin_never_approves_changed_bytes has been running for over 60 seconds
+test ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it has been running for over 60 seconds
+test ws07::declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves has been running for over 60 seconds
+test ws07::every_byte_a_plugin_executes_is_bound has been running for over 60 seconds
+test ws07::a_cached_pin_never_approves_changed_bytes ... ok
+test ws07::declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves ... ok
+test ws07::registry_entries_are_honoured_only_as_the_os_wrote_them has been running for over 60 seconds
+test ws07::the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written has been running for over 60 seconds
+test ws06::embedder_components_are_identified_bound_and_fail_closed_on_change ... ok
+test ws07::registry_entries_are_honoured_only_as_the_os_wrote_them ... ok
+test ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it ... ok
+test ws07::the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written ... ok
+test ws07::every_byte_a_plugin_executes_is_bound ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 200.15s
+
+[exit=0]

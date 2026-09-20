@@ -587,6 +587,7 @@ fn gate_package(
     subject: &str,
     required: &[String],
     previous: Option<&Value>,
+    change: Option<&Value>,
 ) -> Value {
     let files: Vec<String> = imp
         .files
@@ -616,6 +617,28 @@ fn gate_package(
             }
         })
         .unwrap_or_else(|| "No earlier registration of this plugin id is recorded.".to_string());
+    // INT3-O1 (Contract v3 K3, F4): the registration is also a material governance/security change, carried out by
+    // its own change transaction; this gate approves the plugin's execution, that transaction's own gate approves
+    // the change. Each names the other; neither answer stands in for the other.
+    let change_text = change
+        .map(|c| {
+            format!(
+                " The registration is written only by change transaction {} (CIT-P simulated automatically: impact radius {}, effective triggers {}; {}), whose own gate {} approves the change itself: answering this gate approves the plugin's execution, not the change.",
+                c["cit"].as_str().unwrap_or("?"),
+                c["radius"].as_str().unwrap_or("?"),
+                c["effective_triggers"],
+                c["consequences"]
+                    .as_array()
+                    .map(|a| a.iter().filter_map(|x| x.as_str()).collect::<Vec<_>>().join("; "))
+                    .unwrap_or_default(),
+                c["human_gate"].as_str().unwrap_or("(none required)"),
+            )
+        })
+        .unwrap_or_default();
+    let mut subject_v = json!({"kind": "plugin-registration", "id": id, "version": desc.version, "sha256": subject, "implementation_sha256": imp.sha256});
+    if let Some(c) = change {
+        subject_v["change_transaction"] = json!({"cit": c["cit"], "human_gate": c["human_gate"], "binding_sha256": c["binding_sha256"]});
+    }
     json!({
         "question": format!("Approve plugin {id} v{} ({}) to execute: it runs {:?} (working directory {}) as an unsandboxed process with the invoking account's authority?", desc.version, desc.capability, desc.command, desc.cwd.clone().unwrap_or_else(|| ".".into())),
         "why_now": "a capability plugin was submitted for registration; the OS cannot enforce the permissions a plugin declares, so every executable plugin runs only after this specific approval (BC-P2-39)",
@@ -626,53 +649,57 @@ fn gate_package(
         ],
         "impact": format!("implementation sha256 {} = {}; declared permissions {} and permission classes {:?} are shown for review and are NOT enforced at run time; roles allowed to trigger it: {:?}.{components}",
             imp.sha256, files.join("; "), desc.raw.get("permissions").cloned().unwrap_or(json!({})), required,
-            if desc.approved_roles.is_empty() { vec!["all (subject to TOOL_POLICY.plugins.min_authority)".to_string()] } else { desc.approved_roles.clone() }),
+            if desc.approved_roles.is_empty() { vec!["all (subject to TOOL_POLICY.plugins.min_authority)".to_string()] } else { desc.approved_roles.clone() }) + &change_text,
         "reversibility": "reversible: gov plugins unregister, or gov gate revoke on this gate, stops the plugin at its next execution",
         "recommendation": "A only after reviewing the command, every bound file and the declared permissions; B otherwise",
         "confidence": 0.5,
         "trigger": "privilege_elevation",
         "impact_radius": "R3",
         "plugin_id": id,
-        "subject": {"kind": "plugin-registration", "id": id, "version": desc.version, "sha256": subject, "implementation_sha256": imp.sha256},
+        "subject": subject_v,
     })
 }
 
-/// Register (or re-register) a plugin descriptor as a governed act: authority, schema, acquisition class, health,
-/// the implementation binding, and — for every executable plugin, whatever it declares — a presented, owner-answered
-/// Human Decision Gate raised for exactly this registration subject.
-pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
-    crate::orchestration::control::guard_write(p, "plugins register")?;
-    crate::authority::require(p, "register_plugin")?;
-    let install_roles: Vec<String> = p
-        .overlay()
-        .get("TOOL_PERMISSIONS.yaml")
-        .get("install_authority_roles")
-        .and_then(|v| v.as_array())
-        .map(|a| {
-            a.iter()
-                .filter_map(|x| x.as_str().map(|s| s.to_string()))
-                .collect()
-        })
-        .unwrap_or_default();
-    if !install_roles.is_empty() && !install_roles.iter().any(|r| r == &p.role) {
-        return Err(GovError::new(
-            "AUTHORITY_DENIED",
-            format!(
-                "role '{}' is not in TOOL_PERMISSIONS.install_authority_roles {install_roles:?}",
-                p.role
-            ),
-        )
-        .with_details(json!({"operation": "register_plugin", "role": p.role})));
+/// A registration request as the OS derives it **before any approval is asked or any byte is written**: the
+/// schema-valid descriptor, a healthy program, the implementation binding, the acquisition verdict (SRR-R0-L6 and
+/// `OWNER-DECISION-0006` §6 bullet 5, asked unconditionally by [`prepare`]) and the registration subject a gate
+/// approves. Only [`prepare`] constructs one; the one registration writer ([`register_write`]) asks the acquisition
+/// sink again at the instant of its write.
+struct Prepared {
+    id: String,
+    dest: std::path::PathBuf,
+    tmp: PluginDescriptor,
+    imp: Implementation,
+    /// the schema-validated descriptor and the acquisition class the sink was asked about, with the release channel
+    descriptor: Value,
+    acquisition: crate::srr::plugins::Acquisition,
+    channel: String,
+    acquisition_verdict: Value,
+    required: Vec<String>,
+    declared_elevated: Vec<String>,
+    normalized: Value,
+    subject_doc: Value,
+    subject: String,
+    previous: Option<Value>,
+    cited: Vec<String>,
+}
+
+impl Prepared {
+    fn dest_rel(&self) -> String {
+        format!("governance/project/plugins/{}.yaml", self.id)
     }
+}
+
+fn prepare(p: &Project, mut descriptor: Value) -> Result<Prepared> {
     let id = descriptor["plugin_id"].as_str().unwrap_or("").to_string();
     if id.is_empty() {
         return Err(GovError::new("USAGE", "descriptor requires plugin_id"));
     }
-    descriptor.as_object_mut().unwrap().remove("provenance");
-    descriptor
-        .as_object_mut()
-        .unwrap()
-        .remove(crate::t2::SEAL_FIELD);
+    let Some(o) = descriptor.as_object_mut() else {
+        return Err(GovError::new("USAGE", "descriptor must be an object"));
+    };
+    o.remove("provenance");
+    o.remove(crate::t2::SEAL_FIELD);
     // a gate id in the descriptor is a request naming a candidate approval, never the approval itself
     let cited: Vec<String> = descriptor
         .get("registration_gate")
@@ -720,52 +747,54 @@ pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
     let normalized = binding::normalized_descriptor(&descriptor);
     let (subject_doc, subject) = binding::registration_subject(&descriptor, &imp);
     let previous = registry::entry(p, &id);
-    let mut gate_id = Value::Null;
-    let mut approved_by = Value::Null;
-    if imp.class == ExecutionClass::Executable {
-        match approval_for_subject(p, "plugin-registration", &subject, &cited) {
-            SubjectApproval::Approved(a) => {
-                gate_id = json!(a.gate);
-                approved_by = json!({"gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision});
-            }
-            SubjectApproval::Declined { gate, option } => {
-                return Ok(
-                    json!({"registered": false, "declined": true, "human_gate": gate, "answer": option, "registration_subject_sha256": subject,
-                    "reason": format!("the human declined gate {gate} for exactly this registration; the request ends here. A changed descriptor or implementation is a new request; `gov gate revoke {gate}` withdraws the refusal"),
-                    "execution_class": imp.class.as_str(), "implementation": imp.to_value(), "acquisition": acquisition_verdict}),
-                );
-            }
-            SubjectApproval::Pending { gate } => {
-                return Ok(
-                    json!({"registered": false, "human_gate": gate, "state": "PENDING", "registration_subject_sha256": subject,
-                    "reason": format!("gate {gate} for exactly this registration is raised and not answered yet: `gov gate present {gate}`, then the product owner answers it through the human channel, then register again"),
-                    "execution_class": imp.class.as_str(), "implementation": imp.to_value(), "acquisition": acquisition_verdict}),
-                );
-            }
-            SubjectApproval::None { not_honoured } => {
-                let mut pkg = gate_package(&id, &tmp, &imp, &subject, &required, previous.as_ref());
-                if !declared_elevated.is_empty() {
-                    pkg["impact_radius"] = json!("R4");
-                    pkg["impact"] = json!(format!(
-                        "{} It also DECLARES elevated access {declared_elevated:?}.",
-                        pkg["impact"].as_str().unwrap_or("")
-                    ));
-                }
-                let g = gates::create_system(p, pkg)?;
-                return Ok(
-                    json!({"registered": false, "human_gate": g["id"], "state": "RAISED", "registration_subject_sha256": subject,
-                    "gates_not_honoured": not_honoured,
-                    "reason": "an executable plugin runs only after a presented, owner-answered gate raised for exactly its identity, version, implementation and permission set; present the gate, have the product owner answer it through the human channel, then register again (the gate is found by its subject; citing it as registration_gate is optional)",
-                    "execution_class": imp.class.as_str(), "implementation": imp.to_value(), "acquisition": acquisition_verdict}),
-                );
-            }
-        }
-    }
-    descriptor = normalized;
-    descriptor["pin"] = json!({"sha256": imp.sha256, "files": imp.paths()});
-    descriptor["provenance"] = json!({"registered_by_session": p.session_id, "registered_by_role": p.role, "registered_at": now_iso(), "gate": gate_id, "method": "gov plugins register"});
+    Ok(Prepared {
+        id,
+        dest,
+        tmp,
+        imp,
+        descriptor,
+        acquisition,
+        channel,
+        acquisition_verdict,
+        required,
+        declared_elevated,
+        normalized,
+        subject_doc,
+        subject,
+        previous,
+        cited,
+    })
+}
+
+/// **The one writer of a registration** (the descriptor the OS normalises into `governance/project/plugins/` and the
+/// sealed registry entry), reached only from the execution of the registration's own change transaction
+/// ([`apply_registration`], CIT-E) after the execution approval was re-verified there. `OWNER-DECISION-0006` §6 bullet
+/// 5 is asked here, at the instant of the effect, by the function that performs it (the §6 derivation sees this
+/// function as a capability-registry writer carrying the sink), whatever was asked before.
+fn register_write(
+    p: &Project,
+    prep: &Prepared,
+    gate_id: &Value,
+    change_transaction: &str,
+) -> Result<(Value, Value)> {
+    crate::srr::plugins::guard_acquisition(
+        &prep.id,
+        &prep.descriptor,
+        prep.acquisition,
+        &[],
+        &prep.channel,
+    )?;
+    let dest = p
+        .overlay_dir()
+        .join("plugins")
+        .join(format!("{}.yaml", prep.id));
+    let mut descriptor = prep.normalized.clone();
+    descriptor["pin"] = json!({"sha256": prep.imp.sha256, "files": prep.imp.paths()});
+    descriptor["provenance"] = json!({"registered_by_session": p.session_id, "registered_by_role": p.role, "registered_at": now_iso(), "gate": gate_id, "method": "gov plugins register", "change_transaction": change_transaction});
     descriptor["status"] = json!("active");
-    std::fs::create_dir_all(dest.parent().unwrap())?;
+    if let Some(d) = dest.parent() {
+        std::fs::create_dir_all(d)?;
+    }
     crate::util::write_yaml(&dest, &descriptor)?;
     // The authoritative record lives OUTSIDE the descriptor (verifier V-H1): identity, version, descriptor content
     // hash, implementation, subject, approved roles, permission classes and the approving gate are written — and
@@ -787,18 +816,287 @@ pub fn register(p: &Project, mut descriptor: Value) -> Result<Value> {
         registry::Registration {
             desc: &written,
             descriptor_sha256: &dsha,
-            implementation: &imp,
-            subject_sha256: &subject,
+            implementation: &prep.imp,
+            subject_sha256: &prep.subject,
             approved_roles: &approved_roles,
-            required_permission_classes: &required,
+            required_permission_classes: &prep.required,
             permissions: descriptor.get("permissions").cloned().unwrap_or(json!({})),
             gate: gate_id.clone(),
         },
     )?;
     let _ = crate::tools::generate_registry(p);
-    Ok(
-        json!({"registered": true, "plugin_id": id, "path": format!("governance/project/plugins/{id}.yaml"), "pin": descriptor["pin"], "provenance": descriptor["provenance"], "approved_roles": descriptor["approved_roles"], "registry": registry::REGISTRY_PATH, "registry_entry": entry, "approval": approved_by, "registration_subject": subject_doc, "execution_class": imp.class.as_str(), "acquisition": acquisition_verdict}),
+    Ok((descriptor, entry))
+}
+
+/// The manifest operation of a registration's change transaction: what CIT-P simulates and CIT-E applies
+/// (`cit::apply_op` → [`apply_registration`]). The approval of the transaction binds it (its content digest).
+fn registration_op(prep: &Prepared) -> Value {
+    json!({"op": "register_plugin", "plugin_id": prep.id, "path": prep.dest_rel(), "registry": registry::REGISTRY_PATH,
+        "descriptor": prep.normalized, "subject_sha256": prep.subject, "implementation_sha256": prep.imp.sha256,
+        "execution_class": prep.imp.class.as_str()})
+}
+
+fn registration_proposal(prep: &Prepared) -> String {
+    let approval = if prep.imp.class == ExecutionClass::Executable {
+        "Its execution is approved separately, by the Human Decision Gate raised for exactly this registration subject (Contract v3 F4); this transaction is the registration's change control (Contract v3 K3) and does not approve execution."
+    } else {
+        "It is an OS-provided capability server (non-elevated by construction, D-0005), so no execution approval is asked; this transaction is the registration's change control (Contract v3 K3)."
+    };
+    format!(
+        "Register capability plugin {} v{} ({}): write its OS-normalised descriptor to {} and its sealed entry to {} (registration subject sha256 {}, implementation sha256 {}). {approval}",
+        prep.id,
+        prep.tmp.version,
+        prep.tmp.capability,
+        prep.dest_rel(),
+        registry::REGISTRY_PATH,
+        prep.subject,
+        prep.imp.sha256
     )
+}
+
+/// **CIT-E side of a registration** (the `register_plugin` manifest operation; INT3-O1). The request is derived
+/// again from the bytes as they are now ([`prepare`]: schema, health, binding, the acquisition sink) and must be
+/// exactly the subject the transaction's approval binds; an executable plugin's execution approval (Contract v3 F4:
+/// a presented, owner-answered gate raised for exactly this subject) is re-verified here, so no route into CIT-E —
+/// `gov plugins register`, `gov cit execute` or a hand-proposed transaction carrying this operation — writes a
+/// registration the owner did not approve. Returns the paths it wrote.
+pub fn apply_registration(p: &Project, op: &Value, change_transaction: &str) -> Result<Value> {
+    let prep = prepare(p, op["descriptor"].clone())?;
+    let want = op["subject_sha256"].as_str().unwrap_or("");
+    if prep.subject != want || op["plugin_id"].as_str() != Some(prep.id.as_str()) {
+        return Err(GovError::new("PLUGIN_REGISTRATION_STALE", format!("change transaction {change_transaction} registers plugin {:?} with subject {want}, but its descriptor and the implementation bytes now give plugin '{}' subject {}: the plugin changed after the transaction was proposed and approved; nothing is written — register it again (`gov plugins register`) for a new request", op["plugin_id"], prep.id, prep.subject)).with_details(json!({"cit": change_transaction, "approved_subject": want, "current_subject": prep.subject, "implementation": prep.imp.to_value()})));
+    }
+    let mut gate_id = Value::Null;
+    if prep.imp.class == ExecutionClass::Executable {
+        match approval_for_subject(p, "plugin-registration", &prep.subject, &prep.cited) {
+            SubjectApproval::Approved(a) => gate_id = json!(a.gate),
+            other => {
+                let (gate, state) = match &other {
+                    SubjectApproval::Declined { gate, .. } => (json!(gate), "DECLINED"),
+                    SubjectApproval::Pending { gate } => (json!(gate), "PENDING"),
+                    _ => (Value::Null, "NONE"),
+                };
+                return Err(GovError::new("PLUGIN_NOT_APPROVED", format!("change transaction {change_transaction} would register executable plugin '{}', but no presented, owner-answered gate raised for exactly this registration subject authorises its execution (gate {gate}, {state}); an approved change is not an execution approval (Contract v3 F4) — nothing is written", prep.id)).with_details(json!({"cit": change_transaction, "plugin_id": prep.id, "registration_subject_sha256": prep.subject, "execution_gate": gate, "execution_gate_state": state})));
+            }
+        }
+    }
+    let legacy_before = p.root.join(registry::LEGACY_REGISTRY_PATH).exists();
+    let (descriptor, entry) = register_write(p, &prep, &gate_id, change_transaction)?;
+    let mut touched = vec![prep.dest_rel(), registry::REGISTRY_PATH.to_string()];
+    if legacy_before && !p.root.join(registry::LEGACY_REGISTRY_PATH).exists() {
+        touched.push(registry::LEGACY_REGISTRY_PATH.to_string());
+    }
+    Ok(
+        json!({"plugin_id": prep.id, "touched": touched, "registry_entry": entry, "pin": descriptor["pin"], "provenance": descriptor["provenance"], "execution_gate": gate_id}),
+    )
+}
+
+/// What a host operation reports about its own change transaction (`gov plugins register`, `gov tools install`).
+pub(crate) fn change_view(p: &Project, cit: &str) -> Value {
+    let store = RecordStore::load(&p.root);
+    match store.get(cit) {
+        Some(c) => {
+            json!({"cit": cit, "cit_status": c.get("cit_status"), "human_gate": Some(c.get("human_gate")).filter(|g| !g.is_empty()),
+            "radius": c.data["impact"]["radius"], "effective_triggers": c.data["impact"]["effective_triggers"],
+            "binding_sha256": c.data["impact"]["binding_sha256"], "consequences": c.data["impact"]["consequences"],
+            "decision": Some(c.get("decision")).filter(|d| !d.is_empty())})
+        }
+        None => Value::Null,
+    }
+}
+
+/// Register (or re-register) a plugin descriptor as a governed act: authority, schema, acquisition class, health,
+/// the implementation binding, and — for every executable plugin, whatever it declares — a presented, owner-answered
+/// Human Decision Gate raised for exactly this registration subject.
+///
+/// **A registration is also a material governance and security change** (INT3-O1; Contract v3 K3 "auto-trigger for
+/// material security, governance/policy"; F4 "elevated permissions reference authoritative gate/decision"; framework
+/// §47-48 "the human should not need to type /impact"). So the OS itself proposes the registration's change
+/// transaction (`cit::propose_registration`: CIT-P, simulated automatically, its own gate raised under
+/// CHANGE_POLICY), and the descriptor and registry entry are written **only by that transaction's execution** (CIT-E,
+/// [`apply_registration`]: snapshot, verification, index refresh, commit or rollback, per-path writes recorded and
+/// sealed). Two approvals, each for what it approves, each naming the other: the execution approval (this module's
+/// gate, subject `plugin-registration`, which names the transaction and its gate) and the change approval (the
+/// transaction's gate, whose sealed content names the registration subject). Neither answer stands in for the other,
+/// and the worker never hand-files a transaction: repeating `gov plugins register` once both are answered approves
+/// and executes it. A registration made inside a claimed task therefore closes on the transaction's recorded writes
+/// (task close step 10a), like any other governed change.
+pub fn register(p: &Project, descriptor: Value) -> Result<Value> {
+    crate::orchestration::control::guard_write(p, "plugins register")?;
+    crate::authority::require(p, "register_plugin")?;
+    let install_roles: Vec<String> = p
+        .overlay()
+        .get("TOOL_PERMISSIONS.yaml")
+        .get("install_authority_roles")
+        .and_then(|v| v.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|x| x.as_str().map(|s| s.to_string()))
+                .collect()
+        })
+        .unwrap_or_default();
+    if !install_roles.is_empty() && !install_roles.iter().any(|r| r == &p.role) {
+        return Err(GovError::new(
+            "AUTHORITY_DENIED",
+            format!(
+                "role '{}' is not in TOOL_PERMISSIONS.install_authority_roles {install_roles:?}",
+                p.role
+            ),
+        )
+        .with_details(json!({"operation": "register_plugin", "role": p.role})));
+    }
+    let prep = prepare(p, descriptor)?;
+    let id = prep.id.clone();
+    let subject = prep.subject.clone();
+    let common = |mut v: Value| -> Value {
+        v["registration_subject_sha256"] = json!(subject);
+        v["execution_class"] = json!(prep.imp.class.as_str());
+        v["implementation"] = prep.imp.to_value();
+        v["acquisition"] = prep.acquisition_verdict.clone();
+        v
+    };
+    let mut gate_id = Value::Null;
+    let mut approved_by = Value::Null;
+    if prep.imp.class == ExecutionClass::Executable {
+        match approval_for_subject(p, "plugin-registration", &subject, &prep.cited) {
+            SubjectApproval::Approved(a) => {
+                gate_id = json!(a.gate);
+                approved_by = json!({"gate": a.gate, "option": a.option, "by_kind": a.by_kind, "answered_by": a.answered_by, "decision": a.decision});
+            }
+            SubjectApproval::Declined { gate, option } => {
+                // the request ends here, and so does its change transaction
+                let closed = crate::cit::close_host_requests(
+                    p,
+                    "register_plugin",
+                    "plugin_id",
+                    &id,
+                    Some(&subject),
+                    &format!("the execution approval of this registration was declined (gate {gate}, answer '{option}')"),
+                );
+                return Ok(common(
+                    json!({"registered": false, "declined": true, "human_gate": gate, "answer": option,
+                    "reason": format!("the human declined gate {gate} for exactly this registration; the request ends here. A changed descriptor or implementation is a new request; `gov gate revoke {gate}` withdraws the refusal"),
+                    "change_transactions_closed": closed}),
+                ));
+            }
+            SubjectApproval::Pending { gate } => {
+                let open = crate::cit::host_transactions(p, "register_plugin", &subject)
+                    .into_iter()
+                    .find(|(_, st)| crate::cit::is_open_status(st))
+                    .map(|(c, _)| change_view(p, &c))
+                    .unwrap_or(Value::Null);
+                return Ok(common(
+                    json!({"registered": false, "human_gate": gate, "state": "PENDING", "change_transaction": open,
+                    "reason": format!("gate {gate} for exactly this registration is raised and not answered yet: `gov gate present {gate}`, then the product owner answers it through the human channel{}, then register again", open["human_gate"].as_str().map(|g| format!(" (and gate {g} of the registration's change transaction {})", open["cit"].as_str().unwrap_or("?"))).unwrap_or_default())}),
+                ));
+            }
+            SubjectApproval::None { not_honoured } => {
+                // a new request: first its change transaction (CIT-P, simulated automatically), then the execution
+                // approval gate, which names the transaction and its gate
+                let c = crate::cit::propose_registration(
+                    p,
+                    registration_op(&prep),
+                    &registration_proposal(&prep),
+                    &id,
+                    &subject,
+                )?;
+                let cit = c["id"].as_str().unwrap_or("").to_string();
+                let change = change_view(p, &cit);
+                let mut pkg = gate_package(
+                    &id,
+                    &prep.tmp,
+                    &prep.imp,
+                    &subject,
+                    &prep.required,
+                    prep.previous.as_ref(),
+                    Some(&change),
+                );
+                if !prep.declared_elevated.is_empty() {
+                    pkg["impact_radius"] = json!("R4");
+                    pkg["impact"] = json!(format!(
+                        "{} It also DECLARES elevated access {:?}.",
+                        pkg["impact"].as_str().unwrap_or(""),
+                        prep.declared_elevated
+                    ));
+                }
+                let g = gates::create_system(p, pkg)?;
+                let gid = g["id"].as_str().unwrap_or("").to_string();
+                crate::cit::note_host_gate(
+                    p,
+                    &cit,
+                    &gid,
+                    "the plugin's execution approval (Contract v3 F4) is this gate, raised for exactly the registration subject this transaction carries; this transaction's own gate approves the change",
+                    "plugins register",
+                );
+                return Ok(common(
+                    json!({"registered": false, "human_gate": gid, "state": "RAISED", "gates_not_honoured": not_honoured, "change_transaction": change,
+                    "reason": format!("an executable plugin runs only after a presented, owner-answered gate raised for exactly its identity, version, implementation and permission set; and a registration is a material governance and security change, carried out by change transaction {cit} (proposed and simulated by the OS) with its own gate {}. Present both gates, have the product owner answer them through the human channel, then register again (the gate is found by its subject; citing it as registration_gate is optional)", change["human_gate"].as_str().unwrap_or("(none required)"))}),
+                ));
+            }
+        }
+    }
+    // --- change control: the registration is written only by its change transaction's execution
+    // a registration of exactly this subject, approved by this gate, already in force: nothing changes
+    if let Some(e) = prep.previous.as_ref() {
+        let in_force = registry::binding_of(&id, e).is_verified()
+            && e["registration_subject_sha256"].as_str() == Some(subject.as_str())
+            && e["registration_gate"] == gate_id
+            && std::fs::read(&prep.dest)
+                .ok()
+                .map(|b| crate::util::sha256_hex(&b))
+                .as_deref()
+                == e["descriptor_sha256"].as_str();
+        if in_force {
+            let d = crate::util::read_yaml(&prep.dest).unwrap_or(Value::Null);
+            return Ok(common(
+                json!({"registered": true, "unchanged": true, "plugin_id": id, "path": prep.dest_rel(), "pin": d["pin"], "provenance": d["provenance"], "approved_roles": d["approved_roles"], "registry": registry::REGISTRY_PATH, "registry_entry": e, "approval": approved_by, "registration_subject": prep.subject_doc,
+                "change_transaction": d["provenance"]["change_transaction"].as_str().map(|c| change_view(p, c)).unwrap_or(Value::Null),
+                "reason": "this registration is already in force as written by its change transaction: nothing to change"}),
+            ));
+        }
+    }
+    let linked = crate::cit::host_transactions(p, "register_plugin", &subject);
+    let cit = match linked.iter().find(|(_, st)| crate::cit::is_open_status(st)) {
+        Some((c, _)) => c.clone(),
+        None => {
+            if let Some((c, st)) = linked.first().filter(|(_, st)| st == "REJECTED") {
+                let v = change_view(p, c);
+                return Ok(common(
+                    json!({"registered": false, "declined": true, "human_gate": v["human_gate"], "change_transaction": v, "approval": approved_by,
+                    "reason": format!("the change transaction {c} of exactly this registration is {st} (declined through its gate, or withdrawn with the execution approval): the request ends here. A changed descriptor or implementation is a new request; withdrawing the execution approval (`gov gate revoke <gate>`) and registering again raises a new one")}),
+                ));
+            }
+            let c = crate::cit::propose_registration(
+                p,
+                registration_op(&prep),
+                &registration_proposal(&prep),
+                &id,
+                &subject,
+            )?;
+            c["id"].as_str().unwrap_or("").to_string()
+        }
+    };
+    let change = change_view(p, &cit);
+    match crate::cit::host_gate_state(p, &cit) {
+        crate::cit::GateState::Pending(g) => Ok(common(
+            json!({"registered": false, "human_gate": g, "state": if linked.iter().any(|(c, _)| c == &cit) { "PENDING" } else { "RAISED" }, "change_transaction": change, "approval": approved_by,
+            "reason": format!("the registration's change transaction {cit} (proposed and simulated by the OS: Contract v3 K3) waits on its own gate {g}; present it, have the product owner answer it through the human channel, then register again")}),
+        )),
+        crate::cit::GateState::Declined(g) => Ok(common(
+            json!({"registered": false, "declined": true, "human_gate": g, "change_transaction": change_view(p, &cit), "approval": approved_by,
+            "reason": format!("gate {g} of the registration's change transaction {cit} was declined: the change is refused and the request ends here")}),
+        )),
+        crate::cit::GateState::Ready => {
+            let executed =
+                crate::cit::execute_host_op(p, &cit, "register_plugin", "register_plugin")?;
+            let e = registry::entry(p, &id).unwrap_or(Value::Null);
+            let d = crate::util::read_yaml(&prep.dest).unwrap_or(Value::Null);
+            Ok(common(
+                json!({"registered": true, "plugin_id": id, "path": prep.dest_rel(), "pin": d["pin"], "provenance": d["provenance"], "approved_roles": d["approved_roles"], "registry": registry::REGISTRY_PATH, "registry_entry": e, "approval": approved_by, "registration_subject": prep.subject_doc,
+                "change_transaction": change_view(p, &cit), "execution": executed}),
+            ))
+        }
+    }
 }
 
 /// Remove a plugin's registration (a governed act with the same authority as registering it). The descriptor stays

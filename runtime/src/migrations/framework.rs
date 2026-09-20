@@ -165,6 +165,50 @@ pub fn apply(
             "require_index_rebuild" => {
                 out.index_rebuild = true;
             }
+            // WS-7 IP-W7R3-5 / WS-6 IP-R3-WS06-7 (round 4): the tracked OS-written stores an earlier release kept in
+            // the regenerable views (`governance/generated/`) move to where they belong at upgrade — the plugin
+            // registry and the skill content bindings — so a brownfield project's registrations and bindings survive
+            // deleting the generated views from the moment it is upgraded, not only after its next registry write.
+            // The bytes move as they are (every seal included: nothing becomes honoured by moving, nothing is
+            // re-sealed); a store already at its location with a differing legacy copy keeps the location and the
+            // legacy copy is left and reported (`paths::misplaced_os_state`). Only tracked stores: machine-local
+            // operational stores move on first use by their own writers, under their own locks.
+            "relocate_os_stores" => {
+                let wanted: Vec<String> = match op["stores"].as_array() {
+                    Some(a) => a
+                        .iter()
+                        .filter_map(|x| x.as_str().map(String::from))
+                        .collect(),
+                    None => crate::paths::OS_STORES
+                        .iter()
+                        .filter(|s| s.tracked)
+                        .map(|s| s.id.to_string())
+                        .collect(),
+                };
+                let mut moved = vec![];
+                for id in wanted {
+                    let store = crate::paths::os_store(&id).filter(|s| s.tracked).ok_or_else(|| {
+                        GovError::new(
+                            "MIGRATION_FAILED",
+                            format!("relocate_os_stores: '{id}' is not a tracked OS store (paths::OS_STORES); machine-local stores move on first use by their writers"),
+                        )
+                    })?;
+                    if dry_run {
+                        for (from, to) in store.moves {
+                            if p.root.join(from).exists() {
+                                moved.push(json!({"store": id, "from": from, "to": to, "action": "would move"}));
+                            }
+                        }
+                        continue;
+                    }
+                    moved.extend(match id.as_str() {
+                        "plugin-registry" => crate::capabilities::registry::relocate(p)?,
+                        "skill-bindings" => crate::skills::relocate_bindings(p)?,
+                        other => crate::paths::relocate_legacy(&p.root, other)?,
+                    });
+                }
+                rec["moved"] = json!(moved);
+            }
             "regenerate_adapters" => {
                 out.regenerate_adapters = true;
             }
@@ -1215,6 +1259,65 @@ mod tests {
 
     /// Dry runs (`gov update --check`) report what the convergence would change without writing; a project without
     /// the overlay file is left to `add_overlay_file_from_template`.
+    /// WS-7 IP-W7R3-5 / WS-6 IP-R3-WS06-7 (round 4, P2-AR-0043): `relocate_os_stores` moves the tracked OS stores an
+    /// earlier release kept in the generated views, bytes unchanged; a dry run reports and writes nothing; a second
+    /// run moves nothing; a machine-local store is refused (its writer moves it under its own lock).
+    #[test]
+    fn relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them() {
+        let dir = scratch("relocate");
+        let kdir = scratch("relocate-kernel");
+        let (reg, bind) = (
+            "governance/generated/plugin-registry.json",
+            "governance/generated/skill-bindings.json",
+        );
+        std::fs::create_dir_all(dir.join("governance/generated")).unwrap();
+        std::fs::write(
+            dir.join(reg),
+            "{\"plugins\": {\"x\": {\"os_binding\": \"kept as is\"}}}",
+        )
+        .unwrap();
+        std::fs::write(dir.join(bind), "{\"versions\": {}}").unwrap();
+        let (rb, bb) = (
+            std::fs::read(dir.join(reg)).unwrap(),
+            std::fs::read(dir.join(bind)).unwrap(),
+        );
+        let p = Project::open(&dir);
+        let m = json!({"id": "M-x", "operations": [{"op": "relocate_os_stores"}]});
+        let mut out = MigrationOutcome::default();
+        apply(&p, &m, &kdir, true, &mut out).unwrap();
+        assert_eq!(
+            out.applied[0]["moved"].as_array().unwrap().len(),
+            2,
+            "{:?}",
+            out.applied
+        );
+        assert!(
+            dir.join(reg).exists() && dir.join(bind).exists(),
+            "a dry run moves nothing"
+        );
+        let mut out = MigrationOutcome::default();
+        apply(&p, &m, &kdir, false, &mut out).unwrap();
+        assert!(!dir.join(reg).exists() && !dir.join(bind).exists());
+        assert_eq!(
+            std::fs::read(dir.join(crate::paths::PLUGIN_REGISTRY_PATH)).unwrap(),
+            rb
+        );
+        assert_eq!(
+            std::fs::read(dir.join(crate::paths::SKILL_BINDINGS_PATH)).unwrap(),
+            bb
+        );
+        let mut out = MigrationOutcome::default();
+        apply(&p, &m, &kdir, false, &mut out).unwrap();
+        assert_eq!(out.applied[0]["moved"], json!([]), "idempotent");
+        let local = json!({"id": "M-y", "operations": [{"op": "relocate_os_stores", "stores": ["claims"]}]});
+        let e = apply(&p, &local, &kdir, false, &mut MigrationOutcome::default()).unwrap_err();
+        assert_eq!(e.code, "MIGRATION_FAILED");
+        let _ = (
+            std::fs::remove_dir_all(&dir),
+            std::fs::remove_dir_all(&kdir),
+        );
+    }
+
     #[test]
     fn template_convergence_dry_run_writes_nothing() {
         let base = read_yaml(

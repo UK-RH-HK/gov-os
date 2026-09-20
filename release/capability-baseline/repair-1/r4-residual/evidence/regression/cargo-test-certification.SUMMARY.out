@@ -1,0 +1,14 @@
+# P2-AR-0043 certification summary: union of the nine chunk runs vs the full test list
+cert-c1.3a384d8.out: # chunk: arch brownfield failure_injection greenfield integration_r3 migration multi_machine  HEAD 3a384d84144b1398dc75b2d7a08f9f5aa02879b6  | test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 268.69s
+cert-c2.3a384d8.out: # chunk: r4_residual repair3 section6  HEAD 3a384d84144b1398dc75b2d7a08f9f5aa02879b6  dirty=0  2026-09-19T19:05:23Z | test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 143.74s
+cert-c3.3a384d8.out: # chunk: repair  HEAD 3a384d84144b1398dc75b2d7a08f9f5aa02879b6  dirty=0  2026-09-19T19:08:24Z | test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 178 filtered out; finished in 106.72s
+cert-c4.3a384d8.out: # chunk: repair2 upstream update  HEAD 3a384d84144b1398dc75b2d7a08f9f5aa02879b6  dirty=0  2026-09-19T19:10:30Z | test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 185 filtered out; finished in 194.43s
+cert-c5.3a384d8.out: # chunk: srr srr_material  HEAD 3a384d84144b1398dc75b2d7a08f9f5aa02879b6  dirty=0  2026-09-19T19:14:16Z | test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 28.53s
+cert-c6.34e3725.out: # chunk: ws03 ws03_r3 ws04r2  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:21:02Z | test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 168 filtered out; finished in 212.09s
+cert-c7.34e3725.out: # chunk: ws04r3 ws05 ws05r3  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:25:09Z | test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 172 filtered out; finished in 182.33s
+cert-c8.34e3725.out: # chunk: ws06 ws06r3 ws07  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:28:42Z | test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 177 filtered out; finished in 200.15s
+cert-c9.34e3725.out: # chunk: ws08 ws08_r2 ws08_r3  HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff  dirty=0  2026-09-19T19:32:34Z | test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 175 filtered out; finished in 117.23s
+tests listed: 198; passed across chunks: 198; difference: 0 lines
+chunks c1-c5 ran at 3a384d8; c6-c9 at 34e3725; the two trees differ only in tests/certification/ws04r2.rs (run in c6 at 34e3725): git diff --stat 3a384d8 34e3725:
+ tests/certification/ws04r2.rs | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)

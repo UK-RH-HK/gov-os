@@ -30,3 +30,9 @@ hex = "0.4"
 opt-level = 2
 debug = false
 strip = true
+
+# IP-W7R3-10 (WS-7 round 3, optional; P2-AR-0043): debug builds hash every bound plugin file, T2 seal, manifest and
+# pin with unoptimised sha2, about 20x slower than optimised. Optimising this one dependency in the dev profile changes
+# no behaviour (the release profile is unchanged) and keeps the debug `gov` the certification suite drives usable.
+[profile.dev.package.sha2]
+opt-level = 3

@@ -10,6 +10,7 @@ mod greenfield;
 mod integration_r3;
 mod migration;
 mod multi_machine;
+mod r4_residual;
 mod repair;
 mod repair2;
 mod repair3;

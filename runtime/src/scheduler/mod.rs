@@ -2162,6 +2162,72 @@ mod tests {
             .is_empty());
     }
 
+    /// WS-4 IP-R3-WS04-11 (round 4, P2-AR-0043): the block scope and remedy semantics of `cit.propose` and
+    /// `handoff.create` (catalogue `WORK_REMEDIES`). Under a critical block (a secret in a product file, D011): a
+    /// proposal on the block's subject is its remedy, any other proposal is refused; the handoff of work that declares
+    /// the check among its remedies and reaches the subject is its remedy (the availability rule), an undeclared or
+    /// unrelated handoff is refused. Under an interrupted transaction (D016): no proposal starts (no remedy but
+    /// `gov recover`), and a handoff is not refused.
+    #[test]
+    fn proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy() {
+        let store = empty_store();
+        let mut checks = Map::new();
+        let d011 = catalogue::get("D011").unwrap();
+        checks.insert("D011".into(), json!({"surface": "doctor", "blocking_findings": blocking_findings(d011, &[json!({"severity": "critical", "message": "secret content in src/leak.txt", "subjects": ["src/leak.txt"]})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let r = |op: &str, subj: &[&str], rem: &[&str]| {
+            classify_blocks(
+                &st,
+                &Request::new(op).with_subjects(subj).with_remedies(rem),
+                &store,
+            )
+        };
+        let (refusing, remedial) = r("cit.propose", &["src/leak.txt"], &[]);
+        assert!(
+            refusing.is_empty() && remedial.len() == 1,
+            "{refusing:?} {remedial:?}"
+        );
+        assert_eq!(r("cit.propose", &["docs/a.md"], &[]).0.len(), 1);
+        let remediation = ["spec/tasks/TASK-0002.yaml", "src/leak.txt"];
+        let (refusing, remedial) = r("handoff.create", &remediation, &["D011"]);
+        assert!(
+            refusing.is_empty() && remedial.len() == 1,
+            "{refusing:?} {remedial:?}"
+        );
+        assert_eq!(
+            r("handoff.create", &remediation, &[]).0.len(),
+            1,
+            "undeclared"
+        );
+        assert_eq!(
+            r(
+                "handoff.create",
+                &["spec/tasks/TASK-0003.yaml", "docs/a.md"],
+                &["D011"]
+            )
+            .0
+            .len(),
+            1,
+            "unrelated"
+        );
+        // an interrupted transaction: no proposal starts anywhere; handing off is not refused by it
+        let mut checks = Map::new();
+        let d016 = catalogue::get("D016").unwrap();
+        checks.insert("D016".into(), json!({"surface": "doctor", "blocking_findings": blocking_findings(d016, &[json!({"severity": "high", "message": "CIT-0001 was left EXECUTING", "subjects": ["spec/decisions/CIT-0001.yaml"]})]), "result": "HR-1", "at": "t", "key": "k"}));
+        let st = st_with(&checks);
+        let r = |op: &str, subj: &[&str]| {
+            classify_blocks(&st, &Request::new(op).with_subjects(subj), &store)
+        };
+        assert_eq!(
+            r("cit.propose", &["spec/decisions/CIT-0001.yaml"]).0.len(),
+            1
+        );
+        assert_eq!(r("cit.propose", &["docs/a.md"]).0.len(), 1);
+        assert!(r("handoff.create", &["spec/tasks/TASK-0002.yaml"])
+            .0
+            .is_empty());
+    }
+
     /// Round-3 integration: a record that does not parse is loaded with an empty id; its block (D023, schema) must
     /// still name only its path, so an update — whose subjects are the kernel, lock, overlay and views — is refused by
     /// it, and is never admitted as its "remedy" through an empty alias that matches every path.

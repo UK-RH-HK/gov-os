@@ -101,7 +101,7 @@ authority_levels_required:
   emit_telemetry: L0         # telemetry emit appends observability evidence
   adoption_plan: L3          # adopt baseline / inventory / classify / map / plan / test-design
   adoption_review: L0        # adopt review / verify-migration / verify-memory / audit (independent L0 roles; a role must still be declared)
-  record_skill_binding: L3   # health skills --record binds skill versions to content in governance/generated/skill-bindings.json (the level skills::record already applied as the undeclared-class default)
+  record_skill_binding: L3   # health skills --record binds skill versions to content in governance/registry/skill-bindings.json (the level skills::record already applied as the undeclared-class default)
   record_failure_memory: L1  # memory miss: a declared agent reports a retrieval miss as a memory-quality failure event (framework §18; never indexed, deduplicated by signature)
   reseal_t2_bindings: L4     # trust reseal: re-seal, under the owner's T2 binding authority (trust bind), records this machine sealed with its own key while provisioned (P2-ADJ-0002 continuity; rewrites governed records' seals)
   record_research_evidence: L1 # research record|update|conclude|withdraw|sync, experiment design|update|run|reproduce|conclude|abandon, data register: the research, experiment and test-data lifecycles (lifecycle::RECORD_AUTHORITY), authored by research-agent / data-author (L1) (WS-10 IP-WS10-01, WS-3 IP-R3-WS03-4)

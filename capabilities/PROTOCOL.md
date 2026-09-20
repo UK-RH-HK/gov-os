@@ -57,14 +57,24 @@ entry must be held by the role. `gov capabilities plugins` lists usable / denied
   interpreter's own search path.
 - The registry (`governance/registry/plugin-registry.json`, tracked OS-written state; not among the regenerable views of
   `governance/generated/`, so deleting those never drops a registration) is written only by `gov plugins register` /
-  `unregister`. Its entries are sealed by the registering operation on this machine; a hand-written, edited or foreign
-  entry is never honoured, and a fresh clone re-registers (a new gate whose package states whether the implementation
-  differs from the tracked registration). A registry an earlier release kept at
-  `governance/generated/plugin-registry.json` is read — entry by entry, under the same seal rule — until the next
-  registry write moves it there unchanged; once moved, a file at the old location is ignored and reported.
+  `unregister`. Its entries are sealed (T2) by the registering operation; a hand-written, edited or foreign entry is
+  never honoured. On the owner's provisioned machines bound to the owner's T2 binding authority (`gov trust bind`,
+  P2-ADJ-0002) a registration sealed on one of them is honoured on the others after a clone or pull; a machine the
+  owner did not authorise (unprovisioned, not bound, or another owner's) does not honour it and re-registers (a new
+  gate whose package states whether the implementation differs from the tracked registration). A registry an earlier
+  release kept at `governance/generated/plugin-registry.json` is moved there unchanged by `gov update` (migration op
+  `relocate_os_stores`; `gov update --rollback` restores the earlier layout) or, before that, by the next registry
+  write, and read from the old location — entry by entry, under the same seal rule — until then; once moved, a file at
+  the old location is ignored and reported.
 
-To register: `gov plugins register --descriptor <file>` (as an install-authority role) returns `human_gate`; render it
-with `gov gate present <gate>`; the product owner answers it (owner-signed answer, `gov decide <gate> --option A
---answer-file <doc>`); run the same `gov plugins register` again. A pending gate is returned instead of a new one; a
-declined gate ends the request. `gov plugins health --ping` never executes a plugin the acting role may not run, and
+To register: `gov plugins register --descriptor <file>` (as an install-authority role) returns `human_gate`, the
+plugin's **execution** approval (a gate raised for exactly this registration subject), and `change_transaction`: a
+registration is also a material governance and security change (Contract v3 K3), so the OS proposes its change
+transaction itself (CIT-P simulated automatically) with that transaction's own gate, the **change** approval. Each
+names the other, and neither answer stands in for the other. Render both with `gov gate present <gate>`; the product
+owner answers them (owner-signed answers, `gov decide <gate> --option A --answer-file <doc>`); run the same `gov
+plugins register` again: it approves and executes the transaction (CIT-E), which alone writes the descriptor and the
+registry entry, so a registration made inside a claimed task closes on the transaction's recorded writes. A pending
+gate is returned instead of a new one; a declined gate ends the request. An OS-provided capability server needs no
+execution approval; its registration still goes through its change transaction. `gov plugins health --ping` never executes a plugin the acting role may not run, and
 records health failures in failure memory.

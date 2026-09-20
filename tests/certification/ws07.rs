@@ -103,34 +103,63 @@ fn unrelated_answered_gate(g: &Gov) -> String {
 /// **Register a plugin the governed way**: `gov plugins register` (as `g`'s role) raises a gate for exactly this
 /// registration; the OS renders it and the product owner answers A through the owner-signed channel; the same
 /// registration is run again and succeeds. Returns the final `plugins register` result.
+///
+/// INT3-O1 (round 4): a registration is also a material governance/security change, so the first request also
+/// returns the change transaction the OS proposed for it (`change_transaction`, CIT-P simulated automatically) with
+/// its own gate. The owner answers both — the execution approval (`human_gate`, subject `plugin-registration`) and
+/// the change approval (the transaction's gate) — and the repeated registration executes the transaction (CIT-E).
+/// For an OS-provided plugin there is no execution approval, so the only gate is the transaction's.
 pub fn register_approved(g: &Gov, descriptor: &Path) -> Value {
-    let r = g.ok(&[
+    let mut r = g.ok(&[
         "plugins",
         "register",
         "--descriptor",
         descriptor.to_str().unwrap(),
     ]);
-    if r["registered"] == true {
-        return r;
+    let mut execution_gate: Option<String> = None;
+    let mut answered: Vec<String> = vec![];
+    for _ in 0..3 {
+        if r["registered"] == true {
+            break;
+        }
+        let mut gates: Vec<String> = vec![];
+        if let Some(gid) = r["human_gate"].as_str() {
+            gates.push(gid.to_string());
+        }
+        if let Some(gid) = r["change_transaction"]["human_gate"].as_str() {
+            gates.push(gid.to_string());
+        }
+        gates.retain(|x| !answered.contains(x));
+        assert!(
+            !gates.is_empty(),
+            "registration neither succeeded nor raised a gate: {r}"
+        );
+        for gid in gates {
+            if execution_gate.is_none()
+                && yaml(&g.root, &format!("spec/decisions/{gid}.yaml"))["subject"]["kind"]
+                    == "plugin-registration"
+            {
+                execution_gate = Some(gid.clone());
+            }
+            crate::ws03::human_decide(&g.with_role("orchestrator"), &gid, "A");
+            answered.push(gid);
+        }
+        r = g.ok(&[
+            "plugins",
+            "register",
+            "--descriptor",
+            descriptor.to_str().unwrap(),
+        ]);
     }
-    let gate = r["human_gate"]
-        .as_str()
-        .unwrap_or_else(|| panic!("registration neither succeeded nor raised a gate: {r}"))
-        .to_string();
-    crate::ws03::human_decide(&g.with_role("orchestrator"), &gate, "A");
-    let r2 = g.ok(&[
-        "plugins",
-        "register",
-        "--descriptor",
-        descriptor.to_str().unwrap(),
-    ]);
-    assert_eq!(r2["registered"], true, "{r2}");
-    assert_eq!(
-        r2["registry_entry"]["registration_gate"],
-        json!(gate),
-        "{r2}"
-    );
-    r2
+    assert_eq!(r["registered"], true, "{r}");
+    if let Some(gate) = execution_gate {
+        assert_eq!(r["registry_entry"]["registration_gate"], json!(gate), "{r}");
+    }
+    // the registration was written by its change transaction, which committed
+    if r["unchanged"] != true {
+        assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
+    }
+    r
 }
 
 // ============================================================================================ BC-P2-39
@@ -302,9 +331,22 @@ fn a_registration_is_approved_only_by_a_gate_raised_for_exactly_it() {
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     let g2 = r["human_gate"].as_str().unwrap().to_string();
     assert_ne!(g2, g1);
+    // INT3-O1 (round 4): the registration is also a material governance/security change; the OS proposed its change
+    // transaction (CIT-P simulated automatically) with its own gate, and the execution approval does not stand in
+    // for it — the registration stays unwritten until the change is approved too
+    let ct_gate = r["change_transaction"]["human_gate"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    assert_ne!(ct_gate, g2, "{r}");
     crate::ws03::human_decide(&g, &g2, "A");
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
+    assert_eq!(r["registered"], false, "{r}");
+    assert_eq!(r["human_gate"], json!(ct_gate), "{r}");
+    crate::ws03::human_decide(&g, &ct_gate, "A");
+    let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     assert_eq!(r["registered"], true, "{r}");
+    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
     let e = &json(&root, REGISTRY)["plugins"]["p1"];
     assert_eq!(e["registration_gate"], json!(g2));
     assert_eq!(
@@ -812,34 +854,57 @@ fn a_tool_installation_is_approved_only_for_that_installation() {
     );
     // the failed condition raises a gate for exactly this installation; asking again returns the same gate
     let d = tool_descriptor(&root, "c", json!({}));
-    let r = te.ok(&["tools", "install", "--descriptor", d.to_str().unwrap()]);
+    // `--execute` is part of what the transaction's approval binds, so every request of this installation gives it
+    let install_c = [
+        "tools",
+        "install",
+        "--descriptor",
+        d.to_str().unwrap(),
+        "--execute",
+    ];
+    let r = te.ok(&install_c);
     let gt = r["human_gate"].as_str().unwrap().to_string();
     let gate = yaml(&root, &format!("spec/decisions/{gt}.yaml"));
     assert_eq!(gate["trigger"], "tool_install");
     assert_eq!(gate["subject"]["kind"], "tool-installation");
     assert_eq!(gate["subject"]["sha256"], r["installation_sha256"]);
+    // R4-O1: the installation is also a material governance and security change, carried out by a transaction the
+    // OS proposed and simulated itself. This gate approves the installation; that transaction's own gate approves
+    // the change. Each names the other, and neither answer stands in for the other.
+    let cit = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+    let cgt = r["change_transaction"]["human_gate"]
+        .as_str()
+        .unwrap()
+        .to_string();
+    assert_ne!(cgt, gt);
+    assert_eq!(gate["subject"]["change_transaction"]["cit"], json!(cit));
     let before = gate_count(&root);
-    let r = te.ok(&["tools", "install", "--descriptor", d.to_str().unwrap()]);
+    let r = te.ok(&install_c);
     assert_eq!(
         (r["human_gate"].as_str(), r["state"].as_str()),
         (Some(gt.as_str()), Some("PENDING")),
         "{r}"
     );
     assert_eq!(gate_count(&root), before);
-    // the owner's A on that gate lets the same install proceed (citing it is optional)
+    // the owner's A on the installation gate alone writes nothing: the change is not approved yet
     crate::ws03::human_decide(&g, &gt, "A");
-    let r = te.ok(&[
-        "tools",
-        "install",
-        "--descriptor",
-        d.to_str().unwrap(),
-        "--execute",
-    ]);
+    let r = te.ok(&install_c);
+    assert_eq!(r["installed"], false, "{r}");
+    assert_eq!(r["human_gate"], json!(cgt), "{r}");
+    assert!(
+        !root.join("governance/project/tools/TOOL-W7.yaml").exists(),
+        "the descriptor was written before the change was approved"
+    );
+    // both answered: the same install proceeds, written by the transaction's execution (citing the gate is optional)
+    crate::ws03::human_decide(&g, &cgt, "A");
+    let r = te.ok(&install_c);
     assert_eq!(r["installed"], true, "{r}");
     assert_eq!(r["approval"]["mode"], "human_gate");
     assert_eq!(r["approval"]["gate"], json!(gt));
+    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
     let rec = yaml(&root, "governance/project/tools/TOOL-W7.yaml");
     assert_eq!(rec["approval"]["gate"], json!(gt));
+    assert_eq!(rec["approval"]["change_transaction"], json!(cit));
     assert_eq!(rec["installation_sha256"], r["installation_sha256"]);
     // a changed installation is a new request; declining it ends it
     let d2 = tool_descriptor(&root, "d", json!({"version_pin": "1.0.1"}));
@@ -1095,6 +1160,12 @@ fn declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves() {
         "{impact}"
     );
     crate::ws03::human_decide(&g, &gate, "A");
+    // INT3-O1 (round 4): the change transaction the OS proposed for the registration is approved through its own gate
+    crate::ws03::human_decide(
+        &g,
+        r["change_transaction"]["human_gate"].as_str().unwrap(),
+        "A",
+    );
     let r = te.ok(&["plugins", "register", "--descriptor", df.to_str().unwrap()]);
     assert_eq!(r["registered"], true, "{r}");
     let bound = r["registry_entry"]["implementation"].to_string();
@@ -1307,19 +1378,56 @@ fn a_governed_security_review_by_another_role_lets_the_installation_proceed() {
     let ry = yaml(&root, &rel);
     assert!(ry["os_binding"]["mac"].is_string(), "{ry}");
     assert_eq!(ry["security_review"]["verdict"], "passed");
-    // installing exactly that tool and version, citing the review: it proceeds, and no gate is raised
+    // Installing exactly that tool and version, citing the review: it proceeds, and **no gate is raised at all**.
+    //
+    // R4-O1 (round 4) made the installation a change transaction the OS proposes (Contract v3 K3), and OD-P2-03
+    // (product owner, 2026-09-20; governed record D-0011; the rule is
+    // CHANGE_POLICY.change_classes.tool_installation) settles whether that transaction needs the owner's gate: it
+    // does not, for a tool that is authenticated and pinned, independently governed-reviewed, registered,
+    // reversible and entirely inside the project's already-authorised permission and trust envelope. This tool is
+    // all five — READ_REPO for a role that holds it, no network, and commands that neither raise privilege nor
+    // leave the project — so the installation completes in one request with no gate, and the change transaction
+    // records which branch applied and why.
+    let rvd = tool_descriptor(&root, "rv", json!({"security_review_record": rpt}));
+    let install_rv = ["tools", "install", "--descriptor", rvd.to_str().unwrap()];
     let before = gate_count(&root);
-    let r = te.ok(&[
-        "tools",
-        "install",
-        "--descriptor",
-        tool_descriptor(&root, "rv", json!({"security_review_record": rpt}))
-            .to_str()
-            .unwrap(),
-    ]);
+    let r = te.ok(&install_rv);
     assert_eq!(security_check(&r)["ok"], true, "{r}");
     assert_eq!(r["installed"], true, "{r}");
-    assert_eq!(gate_count(&root), before);
+    assert_eq!(gate_count(&root), before, "a gate was raised: {r}");
+    assert!(r["human_gate"].is_null(), "{r}");
+    assert_eq!(r["approval"]["mode"], "autonomous", "{r}");
+    // the change transaction still happened, and it states the branch and its authority
+    let cit = r["change_transaction"]["cit"].as_str().unwrap().to_string();
+    assert_eq!(r["change_transaction"]["cit_status"], "COMMITTED", "{r}");
+    assert!(
+        r["change_transaction"]["human_gate"].is_null(),
+        "the transaction raised a gate: {r}"
+    );
+    let c = yaml(&root, &format!("spec/decisions/{cit}.yaml"));
+    let cc = &c["impact"]["change_class"];
+    assert_eq!(cc["branch"], "not_gated", "{cc}");
+    assert_eq!(cc["owner_decision"], "OD-P2-03", "{cc}");
+    assert_eq!(cc["decision_record"], "D-0011", "{cc}");
+    assert_eq!(cc["authority_envelope"]["expands_authority"], false, "{cc}");
+    assert_eq!(c["impact"]["human_gate_required"], false, "{c}");
+    assert_eq!(
+        c["impact"]["human_gate_by_radius_or_trigger"], true,
+        "the radius and trigger rules alone would have gated it; the owner's rule is what did not: {c}"
+    );
+    // the bound independent review is what the non-gated branch stands on, and the installed descriptor traces to it
+    assert_eq!(cc["security_review"]["record"], json!(rpt), "{cc}");
+    let d = yaml(&root, "governance/project/tools/TOOL-W7.yaml");
+    assert_eq!(d["approval"]["authorised_by"]["owner_decision"], "OD-P2-03");
+    assert_eq!(d["approval"]["authorised_by"]["branch"], "not_gated");
+    assert_eq!(
+        d["approval"]["authorised_by"]["security_review"]["record"],
+        json!(rpt)
+    );
+    assert_eq!(
+        d["approval"]["authorised_by"]["change_transaction"],
+        json!(cit)
+    );
     // the review does not cover another version
     let r = te.ok(&[
         "tools",

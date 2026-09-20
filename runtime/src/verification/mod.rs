@@ -562,7 +562,26 @@ pub fn run_family(ctx: &FamilyCtx, fam: &str) -> Result<Family> {
                 for m in &oracle_material {
                     f.findings.push(finding("high", &fam, format!("hidden Qualification Oracle material inside the governed repository at {m}: the verifier-owned hidden oracle must stay in verifier custody, separate from the qualification repository (Contract v3:1014, :1062); remove it from the repository and its history, and re-seal the oracle"), Some(m.clone())));
                 }
-                f.detail = json!({"unmatched": unknown, "secret_content_outside_secret_class": secrets_wrong, "hidden_oracle_material": oracle_material});
+                // WS-6 IP-R3-WS06-4 (round 4): a repository-contract rule that never decides a path (a later rule
+                // matches every path it matches and applies something else; WS-6 r2 O-1, detected generally): the
+                // path map states a classification the product never applies. Low: nothing relies on the dead rule —
+                // the rule that decides is applied — but the contract is not what it reads as
+                let shadowed = contract.shadowed_rules();
+                for r in &shadowed {
+                    let mut x = finding(
+                        "low",
+                        &fam,
+                        format!(
+                            "{}; reorder the installed contract ({})",
+                            r["message"].as_str().unwrap_or(""),
+                            crate::paths::REPOSITORY_CONTRACT_REL
+                        ),
+                        Some(crate::paths::REPOSITORY_CONTRACT_REL.to_string()),
+                    );
+                    x["subjects"] = json!([crate::paths::REPOSITORY_CONTRACT_REL]);
+                    f.findings.push(x);
+                }
+                f.detail = json!({"unmatched": unknown, "secret_content_outside_secret_class": secrets_wrong, "hidden_oracle_material": oracle_material, "shadowed_rules": shadowed});
             }
             "context_reproducibility" => {
                 if let Some(db) = &db {

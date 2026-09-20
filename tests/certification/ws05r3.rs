@@ -767,7 +767,9 @@ fn stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence
     r["statement"] = json!("totals are integer cents, rounded half-even");
     write_yaml(&root, rq, &r);
     git_commit_all(&root, "direct change");
-    g.ok(&["rebuild-memory", "--incremental"]);
+    // round 4 (P2-AR-0043, INT3-O2): a host-run index rebuild now propagates a direct change it observes (G1), so to
+    // keep observing the claim-time propagation this test is about, the rebuild moves after the claim below (the DAG,
+    // the list and the claim read the records, not the index)
     let reasons = g.ok(&["task", "dag"]).to_string();
     assert!(
         reasons.contains("changed since this task's work consumed them"),
@@ -780,6 +782,9 @@ fn stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence
     assert_eq!(c.error_code(), "TASK_NOT_RUNNABLE", "{}", c.envelope);
     assert!(c.envelope.to_string().contains("retest"), "{}", c.envelope);
     assert_eq!(g.ok(&["task", "show", &a])["retest_required"], true);
+    // the index catches up after the claim propagated (nothing left for the rebuild to propagate)
+    let rb = g.ok(&["rebuild-memory", "--incremental"]);
+    assert_ne!(rb["upstream_changes"]["propagated"], true, "{rb}");
     // work that never started re-delivers its context at the current inputs, which acknowledges the change
     g.ok(&["context", "compile", &b]);
     g.ok(&["task", "claim", &b]);

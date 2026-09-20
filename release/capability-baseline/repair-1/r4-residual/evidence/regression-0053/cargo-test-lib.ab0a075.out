@@ -1,0 +1,7 @@
+# P2-AR-0053 cargo test --lib at ab0a075
+test capabilities::pincache::tests::a_stored_digest_is_never_returned_for_changed_bytes ... ok
+test qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected ... ok
+test memory::claims::tests::concurrent_processes_claiming_one_task_grant_exactly_one ... ok
+
+test result: ok. 266 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.89s
+

@@ -1,0 +1,235 @@
+# Repair iteration 1, round 4, residual integration points (P2-HO-0042 and its continuation P2-HO-0048).
+#
+# Builder claims only (Contract v3 O3): nothing here says an item is accepted, verified or closed, and no claim
+# grades anyone's work, its author's included. `source` is the run that did the work: P2-AR-0043 (terminated by a
+# weekly model usage limit, its five product commits and its report in the base) or P2-AR-0053 (its continuation).
+# Statuses of P2-AR-0043's items are DERIVED FROM ITS REPORT (`00-REPAIR-REPORT.md`); its evidence is not restated
+# here as P2-AR-0053's. P2-AR-0053 re-ran the whole regression and all four R1 held-out suites on its own final tree
+# (`01-CONTINUATION-REPORT.md` §1).
+#
+# P2-AR-0055 (handoff P2-HO-0050) implements owner decision OD-P2-03, which answers P2-AR-0053's R4-O1. Its claim is
+# the last entry below. It re-ran the whole regression and all four R1 held-out suites on its own final tree
+# (`02-OD-P2-03-REPORT.md` §0) and did not redo, restate or grade P2-AR-0043's or P2-AR-0053's work.
+run_ids: [P2-AR-0043, P2-AR-0053, P2-AR-0055]
+workstream: round-4 residual (cross-workstream)
+handoffs: [P2-HO-0042, P2-HO-0048, P2-HO-0050]
+base_commit: cae2f67                                                  # P2-AR-0043's base (round-3 integrated tree)
+continuation_base_commit: 55af199                                     # P2-AR-0053's base = P2-AR-0043's tip
+od_p2_03_base_commit: d96c8ab                                         # P2-AR-0055's base = P2-AR-0053's tip
+previous_final_commit: ab0a075                                        # P2-AR-0053's final; its unconditional gating is superseded by OD-P2-03
+final_commit: 4bd7468
+product_code_digest: 2fbbbd6c995ab3aa57d0e03f93198535efd27f9612988dd229efe3a6dfab9d82   # at 4bd7468
+governed_state_digest: 4bfc1ae838a6e09d69614dbdc305f5c63e2261873864f2f218e2ee4f4959e336
+
+claims:
+  # ---------------------------------------------------------------- the two round-3 integration observations
+  - item: INT3-O1
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      A plugin registration inside a claimed task is carried out by a change transaction the OS proposes and
+      simulates itself (Contract v3 K3), with the plugin's execution approval kept as its own gate (F4); the two
+      approvals name each other, CIT-E alone writes the registration, and the close accepts it on the transaction's
+      recorded writes.
+    evidence_in: 00-REPAIR-REPORT.md §1; evidence/int3-o1/
+  - item: INT3-O2
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      A direct upstream change observed by a host-run incremental rebuild is propagated there (Contract v3 W6 with
+      O5's G1 tier), deferred and reported rather than forced when a write control refuses it, idempotent, with the
+      claim-time path unchanged.
+    evidence_in: 00-REPAIR-REPORT.md §2; evidence/audit-probes/final/
+
+  # ---------------------------------------------------------------- the remaining builder integration points
+  - item: IP-R3-WS03-6
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: The T2 binding status is in the family detail; machine-scope sealing on a provisioned machine is disclosed.
+    evidence_in: 00-REPAIR-REPORT.md §3.1
+  - item: IP-R3-WS03-7
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`capabilities/PROTOCOL.md` registry-portability text replaced (P2-ADJ-0002)."
+    evidence_in: 00-REPAIR-REPORT.md §3.2
+  - item: IP-R3-WS03-9
+    source: P2-AR-0043
+    status: CONFIRMED
+    what: >-
+      A probe-premise item: the product keeps the emergency-control state at `.governance-state/control.json`
+      (BC-P2-31), so no product change is needed; WS-3's labelled derived copy of alpha-r A5 runs to the end.
+    evidence_in: 00-REPAIR-REPORT.md §3.3; evidence/audit-probes/final/
+  - item: IP-R3-WS08-3
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "D033 / `os_binding_integrity` report the T2 binding status, including a bound machine not sealing with the authority's active key."
+    evidence_in: 00-REPAIR-REPORT.md §3.1
+  - item: IP-R3-WS06-4
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "A repository-contract path-map rule that never decides is reported (low) by `path_map_compliance`."
+    evidence_in: 00-REPAIR-REPORT.md §3.4
+  - item: IP-R3-WS02-10
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      The heading-marker confirmation step is retired now that WS-6's coverage verifier compares headings by text;
+      WS-2's unit test is replaced under its own name with the property that still holds (the one replacement
+      P2-HO-0042 allows).
+    evidence_in: 00-REPAIR-REPORT.md §3.4
+  - item: IP-R3-WS06-7
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`skill-bindings.json` moved to `governance/registry/` and classified in `OS_STORES`, with the legacy file relocated on the next binding write."
+    evidence_in: 00-REPAIR-REPORT.md §3.5
+  - item: IP-R3-WS09-4
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "TOOL_PERMISSIONS lists the adoption protocol's independent roles; the A7 verifier is authorised by the policy, with the designated-duty fallback kept."
+    evidence_in: 00-REPAIR-REPORT.md §3.6
+  - item: IP-W7R3-3
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "The currency class `tools_plugins` lists the registry at its BC-P2-31 location; `project_skills` lists the new bindings location."
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-5
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      A new migration operation relocates the tracked OS stores at upgrade, bytes and seals unchanged, and the update
+      snapshot covers `governance/registry/` so a rollback restores the previous layout — brownfield projects do not
+      lose registrations.
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-6
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      The memory profile hashes with the pin's digest (the size-plus-mtime shortcut is gone) and the declared model
+      and runtime artefacts are part of the retrieval-profile identity.
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-7
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "The `plugins registry` help text names the registry's current location."
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-W7R3-9
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`docs/ARCHITECTURE.md` gives the registry directory, its template rule, the store classification, the move at upgrade and the rollback."
+    evidence_in: 00-REPAIR-REPORT.md §3.7
+  - item: IP-R3-WS04-11
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: >-
+      Block scope for `cit.propose` / `handoff.create`: a remediation handoff is a remedy of the block it repairs and
+      stays available; unrelated handoffs are refused only where the block reaches (availability rule, P2-HO-0031).
+    evidence_in: 00-REPAIR-REPORT.md §3.8
+  - item: IP-R3-WS04-09
+    source: P2-AR-0043
+    status: REPAIRED_CLAIMED
+    what: "`docs/ARCHITECTURE.md` and `docs/COMMANDS.md` document the round-3 and round-4 behaviour listed in the report."
+    evidence_in: 00-REPAIR-REPORT.md §3.8
+
+  # ---------------------------------------------------------------- the optional list (P2-HO-0042 item 4)
+  - item: IP-W7R3-10
+    source: P2-AR-0043
+    status: DONE
+    what: "Dev-profile `sha2` at opt-level 3; the release profile is unchanged."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: IP-R3-WS03-8
+    source: P2-AR-0043
+    status: DONE
+    what: "`gov status` reports the T2 sealing scope."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: INT3-O3
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: >-
+      Routing WS-2's read-only floors digest through an `srr::state` helper would add a function to an R1-listed §6
+      file whose unchanged state WS-8's own invariant script pins; not "cheap and safe". WS-8's `r1-invariants.sh`
+      line "floors_path( outside state.rs = 1" therefore stays at 1 (R4-O3).
+    evidence_in: 00-REPAIR-REPORT.md §5, §7
+  - item: IP-R3-WS04-03
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: "A refactor of the DAG, receipt and `continue` producer-rule filters with no functional gain."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: IP-R3-WS04-06
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: "Removing `current_stale_links` would delete an existing WS-2 unit test, which P2-HO-0042 forbids."
+    evidence_in: 00-REPAIR-REPORT.md §5
+  - item: IP-R3-WS02-11
+    source: P2-AR-0043
+    status: NOT_DONE
+    what: "Refusing a non-remedial CIT-E at entry reaches the same outcome more cheaply but reports less; not needed."
+    evidence_in: 00-REPAIR-REPORT.md §5
+
+  # ---------------------------------------------------------------- P2-HO-0048 item 1 (R4-O1)
+  - item: R4-O1
+    source: P2-AR-0053
+    status: OWNER_DECISION_REQUIRED
+    answered_by: >-
+      OD-P2-03 (product owner, 2026-09-20; owner gate HG-P2-0002). The owner chose neither (a) nor (b) as stated
+      below but a third reading: gate only ELEVATED installs. See the OD-P2-03 claim at the end of this file
+      (source P2-AR-0055). This entry is left as P2-AR-0053 recorded it.
+    what: >-
+      The adjacent path P2-AR-0043 recorded and was checking when it stopped. A probe on the unchanged base confirms
+      the gap: `gov tools install` writes `governance/project/tools/<id>.yaml`, and an installation made inside a
+      claimed task is refused at the close with `MATERIAL_CHANGE_REQUIRES_CIT` (`governance_change`), exactly as the
+      plugin descriptor was in INT3-O1 — refused, never let through unattributed. The INT3-O1 mechanism is extended
+      to it (`install_tool` manifest operation, `cit::propose_installation`, `tools::apply_installation` as the CIT-E
+      side, `tools::install_write` as the one writer asking the §6 sink at its write), and the close then accepts the
+      installation on the transaction's recorded writes.
+    owner_decision_required: >-
+      Adopting it narrows an accepted requirement. Under the shipped CHANGE_POLICY a `governance_change` needs a
+      human gate, so a review-evidenced installation — which IP-W7-1 / BC-P2-41 recorded as completing with "no gate
+      raised" — now completes through its change transaction's own gate. No accepted source resolves K3 ("impact
+      simulation auto-triggers for material governance/security changes") against IP-W7-1 ("a governed security
+      review satisfies the condition without the owner's gate") for this path, so P2-AR-0053 states the choice and
+      does not take it. The two answers are: (a) accept the narrowing — IP-W7-1 means no gate for the INSTALLATION
+      subject, and the change gate stands as for any governance change (what the branch implements); or (b) keep
+      IP-W7-1 literally, which needs a rule no source states — a pre-authorisation of this change class in
+      CHANGE_POLICY, or tool descriptors ceasing to be a material governance change.
+    evidence_in: 01-CONTINUATION-REPORT.md §2; evidence/r4-o1/
+
+  # ---------------------------------------------------------------- P2-HO-0050 (owner decision OD-P2-03)
+  - item: OD-P2-03
+    source: P2-AR-0055
+    answers: R4-O1
+    supersedes: "the unconditional gating of ab0a075 (its change-control machinery is kept)"
+    status: REPAIRED_CLAIMED
+    what: >-
+      A tool installation's change transaction needs a Human Gate only when the installation EXPANDS AUTHORITY, as
+      the product owner decided (OD-P2-03, governed record spec/decisions/D-0011.yaml). The rule is governed data,
+      not code: CHANGE_POLICY.change_classes.tool_installation names the change class, the five non-gated conditions
+      - each mapped to the TOOL_POLICY.auto_install_conditions entry that decides it, so shortening that list can
+      never satisfy the rule - the six authority-expansion triggers, the trusted envelope sources and
+      fail_closed: true; TOOL_POLICY.installation_envelope supplies the authorised envelope, with the approved
+      registries and allowlisted services in the kernel tool registry (tools/registry/TOOLS.yaml network_allowlist)
+      because registry hostnames are ecosystem knowledge that INV-005 keeps out of kernel policy; ENFORCEMENT_MAP
+      names what enforces both policy keys; both are immutable under the unchanged POLICY_PRECEDENCE catch-alls,
+      and the registry is verified kernel payload. The envelope is
+      computed by tools::installation_authority from trusted OS state alone (TOOL_PERMISSIONS, AUTHORITY_POLICY,
+      DATA_SENSITIVITY/SECURITY_POLICY, the path map, the tool policy's lists) and what the installation WOULD hold
+      is derived from the request AND from what the OS can observe of its own commands, so nothing a descriptor
+      declares authorises it (Contract v3 F4, BC-P2-39). Anything that cannot be evaluated is an expansion and
+      gates. cit::simulate_inner records the verdict - which branch applied and why - in the transaction's BOUND
+      impact (binding::impact_of now covers it) and raises the transaction's gate only when it is required;
+      cit::approve_with approves a pre-authorised transaction above auto_approve_max_radius only on that bound
+      verdict and names the rule and the owner decision in the auto-approval decision record; the installed
+      descriptor's approval.authorised_by carries the owner decision, the governed record, the branch, the bound
+      independent review and the transaction; tools::apply_installation derives the verdict again at CIT-E and
+      refuses TOOL_INSTALL_ELEVATED, rolling back, if the installation would now expand authority and no gate
+      approved the transaction. BC-P2-41's own installation gate, TOOL_POLICY's conditions, the plugins block and
+      the policy-precedence rules are unchanged.
+    tests: >-
+      ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed returns to asserting that no
+      gate is raised, with its tool inside the envelope, and now also asserts what the transaction recorded. New:
+      r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority (each of the six triggers, one
+      cause each, plus the non-elevated control),
+      r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does (the owner's own control,
+      in three states), r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write
+      (fail closed at the instant of the write), and lib
+      tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold.
+    evidence_in: 02-OD-P2-03-REPORT.md; evidence/regression-0055/; evidence/r1-heldout-0055/; evidence/identity-and-scope-0055.out

@@ -146,6 +146,9 @@ const SNAPSHOT_STORE: &str = "update-snapshots";
 /// the product classifies derived must not delete the way back. A snapshot an older `gov` left at the legacy
 /// location is moved once, by the store API ([`crate::paths::relocate_legacy`]), before any snapshot is read or
 /// written; a conflicting copy at both places is refused (`STATE_LOCATION_CONFLICT`), never overwritten.
+/// The `governance/` directories an update snapshot covers (and a rollback restores, besides the verified kernel).
+const SNAPSHOT_DIRS: [&str; 4] = ["kernel", "project", "generated", "registry"];
+
 fn snapshot_base(p: &Project) -> Result<std::path::PathBuf> {
     crate::paths::relocate_legacy(&p.root, SNAPSHOT_STORE)?;
     crate::paths::store_path(&p.root, SNAPSHOT_STORE).ok_or_else(|| {
@@ -311,10 +314,12 @@ pub fn apply_update_opts(
     let db = RuntimeDb::open(&p.db_path())?;
     db.init_schema()?;
     let ck = crate::checkpoints::create(p, &db, json!({"trigger": "before_model_switch", "next_action": format!("gov update --apply to {target}"), "last_completed_step": "pre-update checkpoint"})).ok();
-    // snapshot kernel + overlay + lock + generated
+    // snapshot kernel + overlay + lock + generated, and the OS-written registry directory (round 4, IP-W7R3-5: a
+    // migration may move tracked OS stores into `governance/registry/`; a rollback restores the layout the previous
+    // release reads)
     let snap = snapshot_dir(p, &target)?;
     remove_dir_if_exists(&snap)?;
-    for sub in ["kernel", "project", "generated"] {
+    for sub in SNAPSHOT_DIRS {
         let s = p.governance_dir().join(sub);
         if s.exists() {
             copy_dir(&s, &snap.join(sub))?;
@@ -323,7 +328,7 @@ pub fn apply_update_opts(
     std::fs::copy(p.lock_path(), snap.join("framework.lock"))?;
     write_json(
         &snap.join("snapshot.json"),
-        &json!({"from": chk["current"], "to": target, "at": now_iso(), "checkpoint": ck.as_ref().map(|c| c["id"].clone()), "migrations": chk["migration_path"], "by": by, "session": p.session_id, "role": p.role, "source": source_label(src), "release_commit": release_commit_for_source(src)}),
+        &json!({"from": chk["current"], "to": target, "at": now_iso(), "checkpoint": ck.as_ref().map(|c| c["id"].clone()), "migrations": chk["migration_path"], "by": by, "session": p.session_id, "role": p.role, "source": source_label(src), "release_commit": release_commit_for_source(src), "snapshotted": SNAPSHOT_DIRS}),
     )?;
     let (overlay_before, _) = hash_tree(&p.overlay_dir(), &[])?;
     // BC-P2-38: this machine's protected record for the project, as it stands before the transaction; an abort puts
@@ -625,6 +630,22 @@ fn rollback_internal(
         if s.exists() {
             remove_dir_if_exists(&d)?;
             copy_dir(&s, &d)?;
+        }
+    }
+    // the OS-written registry directory (round 4): restored as the snapshot saw it — including its absence, when the
+    // snapshot says it covered the directory (an older snapshot did not, and leaves it as it is)
+    {
+        let s = dir.join("registry");
+        let d = p.governance_dir().join("registry");
+        let covered = meta["snapshotted"]
+            .as_array()
+            .map(|a| a.iter().any(|x| x == "registry"))
+            .unwrap_or(false);
+        if s.exists() {
+            remove_dir_if_exists(&d)?;
+            copy_dir(&s, &d)?;
+        } else if covered {
+            remove_dir_if_exists(&d)?;
         }
     }
     if auth.is_none() {

@@ -131,6 +131,7 @@ pub fn run_for(
                 embed_override: Some(cand.embed.clone()),
                 record_failures: Some(false),
                 observe_boundaries: false,
+                propagate_direct_changes: false,
             },
         ) {
             Ok(r) => r,

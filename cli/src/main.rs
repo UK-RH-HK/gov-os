@@ -794,7 +794,9 @@ enum PluginsCmd {
     Unregister {
         plugin_id: String,
     },
-    /// The authoritative plugin registry (governance/generated/plugin-registry.json)
+    /// The authoritative plugin registry (governance/registry/plugin-registry.json; a registry an earlier release kept
+    /// in governance/generated/ is shown from there until it is moved): entries, their T2 binding, where it is read
+    /// from and any location finding
     Registry,
     List,
     Health {
@@ -1955,7 +1957,7 @@ fn run(cli: &Cli) -> Result<Value> {
         Cmd::CancelAgents { reason } => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "CANCEL_AGENTS", reason.as_deref()) }
         Cmd::Resume => { let p = open_project(cli, true)?; gov_runtime::orchestration::control::set(&p, "RESUME", None) }
         Cmd::Doctor => { let p = open_project(cli, false)?; let r = gov_runtime::doctor::run(&p)?; let v = serde_json::to_value(&r)?; if r.verdict == "UNHEALTHY" { return Err(GovError::new("UNHEALTHY", format!("doctor: UNHEALTHY ({} failed checks)", r.failed)).with_details(v)); } Ok(v) }
-        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
+        Cmd::RebuildMemory { incremental } => { let p = open_project(cli, true)?; let r = gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, propagate_direct_changes: true, ..Default::default() })?; Ok(serde_json::to_value(&r)?) }
         Cmd::Recover { dry_run } => { let p = open_project(cli, true)?; if !*dry_run { gov_runtime::authority::require(&p, "recover")?; } gov_runtime::recovery::recover(&p, *dry_run) }
         Cmd::Adopt { stage } | Cmd::Migrate { stage } => {
             let root = cli.root.clone().unwrap_or(std::env::current_dir()?);
@@ -2162,7 +2164,7 @@ fn run(cli: &Cli) -> Result<Value> {
                 }
                 MemoryCmd::Failures => Ok(json!({"open": gov_runtime::memory::failures::open_failures(&p)})),
                 MemoryCmd::Freshness => Ok(serde_json::to_value(gov_runtime::memory::manifest::freshness(&p))?),
-                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, ..Default::default() })?)?),
+                MemoryCmd::Rebuild { incremental } => Ok(serde_json::to_value(gov_runtime::memory::indexer::rebuild(&p, gov_runtime::memory::indexer::IndexOptions { incremental: *incremental, observe_boundaries: true, propagate_direct_changes: true, ..Default::default() })?)?),
                 MemoryCmd::Graph { node, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::neighbours(&d, node, *depth)?)) }
                 MemoryCmd::Impact { seeds, depth } => { let d = db(&p)?; Ok(json!(gov_runtime::graph::impact_set(&d, &csv(&Some(seeds.clone())), *depth)?)) }
             }

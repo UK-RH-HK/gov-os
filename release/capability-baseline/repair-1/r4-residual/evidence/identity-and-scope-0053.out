@@ -1,0 +1,53 @@
+# P2-AR-0053 identity and scope (2026-09-20T14:28:39Z)
+## continuation base (P2-AR-0043's tip; its product tip is 34e3725)
+commit: 55af19999e22acacc8c201db212e8ff6b47b4c5d
+product_code_digest: 1eb1564c0ec4d4c2bb0d5630a5dc9de896f77d4771b8227a7997e096d28d9a87
+governed_state_digest: a700ee0d5127f3336168733dc84adec8b92c3e0acaf212863b4dc9a1c2f0fc96
+## final product commit
+commit: ab0a0753a02b03468e2432f61c89b46861e14193
+product_code_digest: dcf4c59101a9442ccf56e3c6c02c760b0225c54cb5fd6725a31dc3ad36ab0a13
+governed_state_digest: c88c0bf1a0778af960c4a0f6fb644ffb4385c8152aec9a51b9c5c065d6be5f70
+## release gov
+64ff046e82ebbd5a82fb19bfc3f146998cf01b078a7fdfba68b184046b4c39fa  target/release/gov
+## commits on this branch since the continuation base
+ab0a075 P2-AR-0053 r4-residual: R4-O1 — a tool installation is carried out by a change transaction the OS proposes
+## files changed since the continuation base (product and tests; evidence excluded)
+ docs/ARCHITECTURE.md                   |  12 +-
+ docs/COMMANDS.md                       |   6 +-
+ framework/KERNEL.yaml                  |   2 +-
+ framework/schemas/cit.schema.json      |  26 +-
+ runtime/src/capabilities/governance.rs |  25 +-
+ runtime/src/cit/materiality.rs         |  73 ++++-
+ runtime/src/cit/mod.rs                 | 135 ++++++---
+ runtime/src/tools.rs                   | 507 +++++++++++++++++++++++++++------
+ tests/certification/r4_residual.rs     | 245 ++++++++++++++++
+ tests/certification/ws07.rs            |  85 ++++--
+ 10 files changed, 954 insertions(+), 162 deletions(-)
+## protected paths changed since the base (expect none)
+  (end)
+## other workstreams' repair-1 directories changed (expect none)
+  (end)
+## WS-1 round-4 files (P2-AR-0042 owns them; expect none)
+  (end)
+## Contract v3 source and frozen gate contract (sha256, unchanged)
+4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3  Governance_OS_Capability_Acceptance_Contract_v3.md
+d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e  release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+## existing tests renamed, removed or ignored since the base (expect none): #[test] fn names at base missing at final
+  (end)
+## #[ignore] attributes anywhere in the test tree (expect none)
+  (end)
+## tests added since the base (fn names at final not at base)
+  fn a_tool_installation_descriptor_is_a_governance_and_a_security_change
+  fn a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction
+  fn an_installation_change_approved_without_its_installation_approval_writes_nothing
+  (end)
+## non-test product helpers renamed (cit/mod.rs: the registration helpers generalised to host-proposed transactions)
+  registration_op_of        -> host_op_of(c, op)
+  registration_transactions -> host_transactions(p, op, subject)
+  close_registration_requests -> close_host_requests(p, op, id_field, id, subject, why)
+  note_registration_gate    -> note_host_gate(p, cit, gate, note, operation)
+  registration_gate_state   -> host_gate_state(p, cit)
+  execute_registration      -> execute_host_op(p, id, op, authority)
+  capabilities/governance.rs: change_view is now pub(crate) (shared by both host operations)
+  No test references any of these names (`git grep` over tests/ at the base and at final: no hits).
+  (end)

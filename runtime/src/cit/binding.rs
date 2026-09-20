@@ -99,6 +99,31 @@ pub fn impact_of(impact: &Value) -> Value {
         "features": impact.get("features").cloned().unwrap_or(json!([])),
         "material_classes": impact.get("material_classes").cloned().unwrap_or(json!([])),
         "effective_triggers": impact.get("effective_triggers").cloned().unwrap_or(json!([])),
+        // OD-P2-03: the governed change-class verdict decides who must approve (a pre-authorised class is
+        // approvable without a human gate above the automatic radius), so an approval binds which branch applied
+        // and why, exactly as it binds `human_gate_required`. A re-simulation that lands on the other branch does
+        // not inherit the earlier approval.
+        "change_class": class_of(impact.get("change_class")),
+    })
+}
+
+/// The part of a change-class verdict an approval binds: the class, the branch and why, the conditions and the
+/// authority-expansion triggers. The evidence detail around them (per-finding prose, the sources list) describes how
+/// the verdict was reached, not what it is.
+fn class_of(v: Option<&Value>) -> Value {
+    let Some(c) = v.filter(|c| c.is_object()) else {
+        return Value::Null;
+    };
+    json!({
+        "class": c.get("class").cloned().unwrap_or(Value::Null),
+        "rule": c.get("rule").cloned().unwrap_or(Value::Null),
+        "owner_decision": c.get("owner_decision").cloned().unwrap_or(Value::Null),
+        "decision_record": c.get("decision_record").cloned().unwrap_or(Value::Null),
+        "branch": c.get("branch").cloned().unwrap_or(Value::Null),
+        "gate_required": c.get("gate_required").cloned().unwrap_or(Value::Null),
+        "why": c.get("why").cloned().unwrap_or(Value::Null),
+        "unmet_conditions": c.get("unmet_conditions").cloned().unwrap_or(json!([])),
+        "triggers_fired": c["authority_envelope"]["triggers_fired"].clone(),
     })
 }
 

@@ -3,7 +3,7 @@
 //! **Skill regression (Contract v3:399-402, :774; framework §27; BC-P2-42).**
 //!
 //! * *A version identifies its content.* A skill's content digest is the SHA-256 of its canonical JSON form. The
-//!   first content seen for `id@version` is bound — in the tracked, OS-written `governance/generated/skill-bindings.json`
+//!   first content seen for `id@version` is bound — in the tracked, OS-written `governance/registry/skill-bindings.json`
 //!   (`gov health skills --record`) and, on every machine that evaluates the skill, in the machine-local observation
 //!   ledger. Different content under an already-bound or already-observed version is reported: the method changed
 //!   without a version change.
@@ -159,10 +159,42 @@ pub fn validate_all(p: &Project) -> Vec<String> {
 
 // ------------------------------------------------------------------------------------------ version binding
 
-pub const BINDINGS_REL: &str = "governance/generated/skill-bindings.json";
+/// Where the tracked, OS-written skill content bindings belong (BC-P2-31; WS-6 IP-R3-WS06-7): the kernel's store
+/// declaration `paths::OS_STORES` `skill-bindings`, beside the plugin registry and outside the regenerable views.
+pub const BINDINGS_REL: &str = crate::paths::SKILL_BINDINGS_PATH;
+/// Where writers before round 4 kept them (inside `governance/generated/`, which the product regenerates).
+pub const LEGACY_BINDINGS_REL: &str = "governance/generated/skill-bindings.json";
 
+/// Where bindings are written: the store location (`paths::store_path`).
 pub fn bindings_path(p: &Project) -> PathBuf {
-    p.root.join(BINDINGS_REL)
+    crate::paths::store_path(&p.root, "skill-bindings").unwrap_or_else(|| p.root.join(BINDINGS_REL))
+}
+
+/// Where bindings are read from: the store location, or — only while nothing is there — the legacy location an
+/// earlier release wrote. Reading never moves anything (read-only commands stay read-only); the next binding write
+/// moves the legacy file ([`relocate_bindings`]).
+pub fn bindings_read_path(p: &Project) -> PathBuf {
+    let at = bindings_path(p);
+    let legacy = p.root.join(LEGACY_BINDINGS_REL);
+    if !at.exists() && legacy.exists() {
+        legacy
+    } else {
+        at
+    }
+}
+
+/// Move bindings kept at the legacy location to where they belong, bytes unchanged (`paths::relocate_legacy`). When
+/// the location already holds bindings and the legacy file differs, the location is authoritative and the legacy file
+/// is left in place (never read again, never overwritten or deleted by the OS; `paths::misplaced_os_state` reports
+/// it). Called before every binding write and by the upgrade path. Idempotent.
+pub fn relocate_bindings(p: &Project) -> Result<Vec<Value>> {
+    match crate::paths::relocate_legacy(&p.root, "skill-bindings") {
+        Ok(v) => Ok(v),
+        Err(e) if e.code == "STATE_LOCATION_CONFLICT" => Ok(vec![json!({
+            "store": "skill-bindings", "from": LEGACY_BINDINGS_REL, "to": BINDINGS_REL, "action": "left in place",
+            "reason": "bindings already exist where they belong and the legacy file differs; the location is authoritative and the legacy file is never read"})]),
+        Err(e) => Err(e),
+    }
 }
 pub fn observations_path(p: &Project) -> PathBuf {
     p.runtime_dir().join("health").join("skills-observed.json")
@@ -664,7 +696,7 @@ pub fn regression(p: &Project, opts: &RegressionOptions) -> (Vec<Value>, Value) 
                 .unwrap_or(true)
         })
         .collect();
-    let bindings = load_obj(&bindings_path(p));
+    let bindings = load_obj(&bindings_read_path(p));
     let mut observed = load_obj(&observations_path(p));
     let mut observed_changed = false;
     let kernel_checks = kernel_scenario_checks(p);
@@ -850,7 +882,7 @@ pub fn regression(p: &Project, opts: &RegressionOptions) -> (Vec<Value>, Value) 
         let _ = save_obj(
             &observations_path(p),
             &observed,
-            "machine-local first-seen content per skill version (derived; the tracked binding is governance/generated/skill-bindings.json)",
+            "machine-local first-seen content per skill version (derived; the tracked binding is governance/registry/skill-bindings.json)",
         );
     }
     let detail = json!({"skills": rows, "executed_passed": passed, "executed_failed": failed, "declared_not_executed": declared, "unexecutable": unexecutable, "not_run": not_run, "runner": runner.map(|r| r.to_string_lossy().to_string())});
@@ -877,6 +909,8 @@ pub fn record(p: &Project, only: Option<&str>) -> Result<Value> {
             include_deferred: false,
         },
     );
+    // the bindings move to where they belong before they are written (IP-R3-WS06-7)
+    relocate_bindings(p)?;
     let mut bindings = load_obj(&bindings_path(p));
     let mut bound = vec![];
     let mut refused = vec![];

@@ -1,0 +1,27 @@
+# P2-AR-0043 WS-7 named checks (derived): /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/release/capability-baseline/repair-1/r4-residual/evidence/int3-o1/ws07_r3_named_checks.INT3-O1.P2-AR-0043.py sha256 869ce9e40e4941736fb4e9f0c7acffe20b564eb9c6d5bfcfdecfa1f74c15a1f0
+# worktree HEAD 34e37259648a5c65eb57e536d56b63e2922cd4ff; gov 512913ef3ac53f8d568f48b7cead5f241b2f54ece472a73cdf58decfa3391112
+# date 2026-09-19T19:47:53Z
+# gov: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/release/gov (gov 4.1.6) sha256 512913ef3ac53f8d568f48b7cead5f241b2f54ece472a73cdf58decfa3391112
+# scratch: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/P2-AR-0043/ws07nc-derived-1789847273
+C W7R3-31.setup HOLDS p1 registered the governed way (gate answered A by the owner channel) -- 
+X W7R3-31.a PASS the OS writes the plugin registry outside the regenerable views (governance/registry/plugin-registry.json) -- {"at_location": true, "at_legacy": false}
+X W7R3-31.b PASS deleting the whole governance/generated/ directory keeps the registration: the plugin still runs -- {"ok": true, "code": null, "runs": 1}
+C W7R3-31.c HOLDS a registry kept at the legacy location is honoured as it stands, and reading it (invoke, list, registry, doctor) never moves it -- {"invoke_ok": true, "code": null, "moved": false, "legacy_unchanged": true}
+X W7R3-31.d PASS the next registry write moves the legacy registry unchanged: the sealed entry still runs, the forged entry stays refused, and the OS does not seal the document over it -- {"moved": true, "p1_ok": true, "n1_before": "PLUGIN_REGISTRATION_UNBOUND", "n1_after": "PLUGIN_REGISTRATION_UNBOUND", "document_seal": false}
+X W7R3-31.e PASS after the move, a registry planted at the legacy location (one that would unregister everything) is ignored and reported by D028 -- {"invoke_ok": true, "code": null, "d028": "plugin n1: its entry in governance/registry/plugin-registry.json is not what `gov plugins register` wrote on this machine (T2 binding UNSEALED: no OS seal: the record was not written by a gov operation (hand-written, legacy, or written by a writer that has not adopted the T2 primitive)); a forged, e"}
+C W7R3-31.f HOLDS the forged n1 never ran -- {"n1_runs": 0, "p1_q1_runs": 4}
+X W7R3-13.a PASS the kernel plugin-descriptor schema admits declared model/runtime artefacts -- []
+X W7R3-13.b PASS the registration gate shows the declared model/runtime artefacts and the registration binds their bytes -- {"roles": [["model", "tokenizer.json"], ["model", "weights.bin"], ["runtime", "libinfer.so"]], "gate_impact_names_them": true, "register": ""}
+X W7R3-13.c PASS a changed model byte stops the registered plugin (PLUGIN_PIN_MISMATCH naming the file) -- {"ran_before": true, "code": "PLUGIN_PIN_MISMATCH"}
+X W7R3-13.d PASS a changed runtime byte stops it as well -- {"code": "PLUGIN_PIN_MISMATCH"}
+X W7R3-13.e PASS a declared model artefact that does not exist is refused before any gate is raised -- {"code": "PLUGIN_IMPLEMENTATION_UNRESOLVED", "gates_raised": 0}
+X W7R3-PC.a PASS the digest labelling the running gov binary is kept in the machine's protected state; no bound plugin file's digest leaves the process -- {"runs_ok": [true, true], "store": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/target/P2-AR-0043/ws07nc-derived-1789847273/r3-cache-e87505/home/.local/state/governance-os/machine/plugin-pin-cache/cache.json", "gov_labelled": true, "plugin_files_stored": false}
+C W7R3-PC.b HOLDS no pin cache is ever written inside the repository -- []
+C W7R3-PC.c HOLDS a same-size rewrite with the modification time put back is refused -- {"code": "PLUGIN_PIN_MISMATCH"}
+C W7R3-PC.g HOLDS a forged machine-store entry naming the approved digest for the tampered file does not make it run -- {"code": "PLUGIN_PIN_MISMATCH"}
+X W7R3-PC.d PASS a change to the file a bound symlink points at (outside the repository) is refused -- {"restored_ran": true, "code": "PLUGIN_PIN_MISMATCH"}
+C W7R3-PC.f HOLDS changed bytes never ran (2 approved executions only) -- {"runs": 2}
+C W7R3-41.a HOLDS IP-W7-1 confirmed: the OS-sealed report closing a security task by another session and role is the governed review; the install proceeds with no owner gate -- {"close": "RPT-0001", "report_sealed": true, "installed": true, "gates_raised": 0, "security_check": [{"condition": "licence_and_security_satisfied", "ok": true, "detail": "license MIT (approved); security review: governed review RPT-0001 of TOOL-W7 1.0.0 by security-engineer (spec/reports/RPT-0001.yaml)"}]}
+C W7R3-41.b HOLDS the reviewing role's own review does not approve its own installation -- [{"condition": "licence_and_security_satisfied", "ok": false, "detail": "license MIT (approved); security review: not evidenced: RPT-0001 was written by the installing session S-sec: a security review cannot be self-attested"}]
+# SUMMARY: 11 of 11 discriminating checks PASS
+[exit=0]

@@ -16,6 +16,11 @@ roles:
   security-engineer: [READ_REPO, RUN_TESTS, SECRET_READ]
   release-agent: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
   migration-executor: [READ_REPO, WRITE_REPO_SCOPED, RUN_TESTS]
+  # the adoption protocol's independent roles (repair-1 r3-ws09-11 IP-R3-WS09-4): the A7 verifier runs every approved
+  # migration test (protocol §3 Role D: "independently runs/extends tests"); the reviewer and the memory verifier read
+  migration-verifier: [READ_REPO, RUN_TESTS]
+  migration-reviewer: [READ_REPO]
+  memory-verifier: [READ_REPO]
 install_authority_roles: [tooling-engineer, orchestrator]
 tool_allowlist: {}       # role -> [tool ids]; empty means kernel registry defaults apply
 mcp_servers: {}          # role -> [mcp server ids]
