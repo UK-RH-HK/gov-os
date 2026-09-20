@@ -260,3 +260,14 @@ work `2ed8ab1`, report `d1487e8`; `product_code_digest` `d0c6a0d4…a4c9`). Scop
 baselines. Disclosed gaps for the verifier: 16 capabilities owned only by builder tests, 9 without a G-tier owner, no G6
 owner, 127 checklist items unowned. Remaining IPs IP-R4-WS01-1…6 — at merge, run `gov contract verify` after P2-AR-0043
 merges (IP-R4-WS01-3). P2-AR-0043 still running. Hold unchanged.
+
+## P2-L-0026 — 2026-09-20 — Recovery from the usage-limit interruption; round 4 continues
+
+| Field | Value |
+|---|---|
+| What happened | The weekly model usage limit terminated **P2-AR-0043** (round-4 residual IPs) mid-run on 2026-09-19, after its five product commits but before `claims.yaml`, its run report and one adjacent check. The previous session's safe-hold records (P2-CP-0008, P2-HO-ORCH-0002, `refs/safe-hold/*`) held; the owner lifted the hold on 2026-09-20 and ordered normal continuation. |
+| Reconstruction | From Git and the orchestration evidence only: `check_state.py verify` = STATE_CONSISTENT at `26c5459`, 0 uncommitted entries; branches, worktrees and safe-hold refs inspected; no transcript or task-output store read. P2-AR-0042 was already recorded COMPLETED_AWAITING_INTEGRATION (P2-L-0025). P2-AR-0043's branch carried `e752bed`, `00615f1`, `e5336d9`, `3a384d8`, `34e3725`; its report and evidence survived as untracked files in its worktree. |
+| Recovery | Snapshot `refs/safe-hold/P2-AR-0043-2` (`e62bbcd`), then commit `55af199`: the run's own `00-REPAIR-REPORT.md` and `evidence/` committed unchanged, with provenance — the orchestrator authored none of it and graded nothing. Run recorded `INCOMPLETE_USAGE_LIMIT_RECOVERED` with its self-reported figures (lib 265/0, certification 198/0/0, R1 at baselines, census 123 files/2329 functions, 0 §6 violations) marked as unverified builder claims. |
+| Preserved gap | The check P2-AR-0043 was starting when it stopped: whether `gov tools install` / `tools/<id>.yaml` writes governed files that task close treats as INT3-O1 did (Contract v3 K3 + F4). Routed as item 1 of **P2-HO-0048**. |
+| Continuation | **P2-AR-0053** dispatched on `phase2/repair-1-r4-residual-b` from `55af199` with P2-HO-0048: the preserved gap, `claims.yaml` for the whole run, regression and R1 re-established on its own tree, and a continuation report. It must not redo P2-AR-0043's committed work, edit P2-AR-0042's files, or rename any test (the evidence map names 441 by path). |
+| Owner stop condition | Recorded in `ORCHESTRATOR_STATE.yaml` and P2-CP-0009: if verification of `cap2-candidate-1` does not accept, stop after recording evidence and produce the owner decision package. |

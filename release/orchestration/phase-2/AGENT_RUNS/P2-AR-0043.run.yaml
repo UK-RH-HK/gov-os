@@ -17,7 +17,19 @@ branch: phase2/repair-1-r4-residual
 expected_output_path: release/capability-baseline/repair-1/r4-residual/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: INCOMPLETE_USAGE_LIMIT_RECOVERED
+outcome:
+  verdict: INCOMPLETE (terminated mid-run by a weekly model usage limit on 2026-09-19, before claims.yaml, the run report and one adjacent check)
+  work_recovered: true
+  product_commits: [e752bed, 00615f1, e5336d9, 3a384d8, 34e3725]
+  product_tip_commit: 34e37259648a5c65eb57e536d56b63e2922cd4ff
+  branch_tip_after_recovery: 55af199
+  recovery_commit: 55af199 (orchestrator committed the run's own report and evidence unchanged from its worktree; authored none of it)
+  pre_recovery_snapshots: [refs/safe-hold/P2-AR-0043 b7e1e557ef3ed8c080ecd1bc1ba263930c85bb64, refs/safe-hold/P2-AR-0043-2 e62bbcd5613d738ba2ab37eddcbe4b2f238e6817]
+  self_reported_in_recovered_report: {verdict_claimed: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, product_code_digest: 1eb1564c0ec4d4c2bb0d5630a5dc9de896f77d4771b8227a7997e096d28d9a87, lib: 265/0, certification: 198/0/0 (nine chunks), r1: all four at baseline, census: 123 files/2329 fns 0 violations}
+  outstanding: [claims.yaml, run report, "unfinished adjacent check: whether gov tools install / tools/<id>.yaml writes governed files that task close treats as INT3-O1 did"]
+  continued_by: P2-AR-0053 (handoff P2-HO-0048, branch phase2/repair-1-r4-residual-b)
+  note: recovered work is builder claims, never acceptance; the continuation run re-establishes regression and R1 on its own tree
 at_safe_hold:
   date: '2026-09-19'
   agent: still running when the owner ordered SAFE_HOLD; not stopped by the orchestrator

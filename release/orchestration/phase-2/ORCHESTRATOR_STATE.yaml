@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-19T18:23:07Z'
-state_hash: 69bf407af2f6a656c5282e0b13110db41b39c797ffbf88d9a900612d41c41201
+updated_at: '2026-09-20T13:10:26Z'
+state_hash: 38827e6ec52209857719eba5000cf0c0eb4919e859812b59f7d619c45b01a571
 lifecycle_state: P2_REPAIR_ITERATION_1
-loop_status: SAFE_HOLD_USAGE_LIMIT
+loop_status: P2_REPAIR_1_ROUND_4_RUNNING
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -247,10 +247,11 @@ agent_runs:
   - {run_id: P2-AR-0040, role: capability-repair, workstream: WS-9+WS-11, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0040.run.yaml}
   - {run_id: P2-AR-0041, role: capability-repair (integration builder), iteration: 1, round: 3, status: COMPLETED, branch: phase2/repair-1-r3-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.run.yaml}
   - {run_id: P2-AR-0042, role: capability-repair, workstream: WS-1, iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-ws01, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
-  - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
+  - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: INCOMPLETE_USAGE_LIMIT_RECOVERED, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
+  - {run_id: P2-AR-0053, role: capability-repair, workstream: residual-IPs (continuation of P2-AR-0043), iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-residual-b, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0043, role: capability-repair, status: RUNNING, at_safe_hold: 'branch tip cae2f67 (no commits); uncommitted work in refs/safe-hold/P2-AR-0043 b7e1e55; no report', run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
+  - {run_id: P2-AR-0053, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -300,16 +301,19 @@ completed_stages:
       COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on the
       pinned model under P2-HO-0008 / P2-HO-0009.
 
-continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md
-latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0008.yaml
+continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md  # resume procedure; hold lifted 2026-09-20
+latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0009.yaml
 next_deterministic_action: >-
-  SAFE_HOLD — owner-ordered usage-preservation hold (2026-09-19). Do NOT start any builder, integration, candidate minting,
-  independent verification or repair round, and launch no replacement or follow-on agent, until the owner explicitly says
-  the usage limit has reset. Then RESUME_ROUND_4 per HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md "Resume procedure":
-  P2-AR-0042 is COMPLETED_AWAITING_INTEGRATION (recorded during the hold); determine P2-AR-0043 state from its branch (report present = completed -> record; no report and no live
-  agent = INCOMPLETE -> preserve worktree to refs/safe-hold, re-dispatch fresh from the same handoff on a new branch); when
-  both are complete, merge (or fresh integration builder), reproduce regression and gov contract verify, mint
-  cap2-candidate-1, dispatch verification iteration 1 (P2-HO-0043..0047). Model routing and acceptance criteria unchanged.
+  AWAIT_P2-AR-0053 (round-4 residual continuation, branch phase2/repair-1-r4-residual-b from 55af199, handoff P2-HO-0048).
+  On completion: verify scope, record, and dispatch the round-4 integration builder (P2-AR-0054) to merge
+  phase2/repair-1-r4-ws01 (P2-AR-0042, completed) with the continuation branch — overlapping files cli/src/main.rs and
+  orchestration/control.rs, and IP-R4-WS01-3: after merging, gov contract verify must pass (update owner-spec.yaml,
+  apply_owner_spec.py, gov contract compile if tests moved). Then merge --no-ff into release/4.1.6-rc1, reproduce
+  cargo test --lib / --test certification and gov contract verify, mint cap2-candidate-1 (tag + digests, reopen
+  GATE-P2-R1-PRESERVATION) and dispatch verification iteration 1 (P2-HO-0043..0047; runs P2-AR-0044..0052). Owner stop
+  condition (2026-09-20): if that verification does not issue GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, STOP after
+  recording the verifier evidence, produce the owner decision package and return
+  PHASE_2_POST_ROUND4_VERIFICATION_REJECTED__OWNER_REVIEW_REQUIRED; start no further repair round or build agents.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
@@ -320,7 +324,6 @@ current_prohibitions:
   - {action: amending or superseding D-0007, until: an explicit owner-authorised transition record}
   - {action: reconstructing or paraphrasing Contract v3 content, until: never}
   - {action: starting Phase 3 or selecting a provisional retrieval profile, until: never in this session}
-  - {action: starting any builder, integration, candidate minting, independent verification, repair round, or replacement/follow-on agent, until: the owner explicitly confirms the usage limit has reset (SAFE_HOLD 2026-09-19)}
   - {action: merging to main, publishing, or certifying a release, until: never in Phase 2}
   - {action: any role reading/listing/searching session or agent transcripts, task-output stores or user auto-memory, until: never}
   - {action: writing held-out test content, in-progress verdicts or unreviewed findings into user auto-memory, until: never}
