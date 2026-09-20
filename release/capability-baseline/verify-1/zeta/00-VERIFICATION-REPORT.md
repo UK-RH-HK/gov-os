@@ -58,8 +58,10 @@ produced here, on this candidate.
   shortcut: a test obligation that merely *asserts* `independent_of_implementer: true` is rejected
   as its own claim rather than evidence, and `tests.status: passed` is refused unless a product test
   actually ran. Both refusals are recorded as observations in favour of the product.
-* **Builder evidence is regression evidence only** (O3). `cargo test --lib`: **276 passed, 0 failed**
-  (`evidence/cargo-lib.out`). `cargo test --test certification`: see `evidence/cargo-certification.out`.
+* **Builder evidence is regression evidence only** (O3). `cargo test --lib`: **276 passed, 0 failed**.
+  `cargo test --test certification`: **207 passed, 0 failed** (`evidence/cargo-lib.out`,
+  `evidence/cargo-certification.out`). The certification run completed after the evidence commit and
+  was recorded in a follow-up commit; the note in that file gives the full history.
 * **Counts.** 137 held-out checks across the thirteen probes; 135 PASS, 2 FAIL. Each FAIL is a
   recorded finding (W3-04 → A1-W3-01; W12-G2b → A1-W12-01). The W8.5 gap is recorded as
   A1-W8-01 from the passing W8-05/W8-05b pair, whose recorded detail shows what is and is not covered.
@@ -271,6 +273,9 @@ A0-W9-01, A0-W10-01, A0-W11-01, A0-W12-01, S0-W1-01, S0-W5-01. Per-finding evide
   finding-id scheme through the governance suite.
 * **Cross-machine continuity** (P2-ADJ-0002) — alpha leads it; nothing in W1–W12 required it, and I
   did not exercise it.
+* ~~The certification regression suite.~~ **Resolved after the first evidence commit**: it completed
+  **207 passed, 0 failed**, independently reproducing the regression state. Recorded in
+  `evidence/cargo-certification.out` and in the run report.
 * **Whether a `PARTIAL` metric set can hide a real defect.** Several W11 metrics report
   `applicable: false` in a repository with no live work, so a project could carry a green
   artifact-flow family with almost nothing measured. I demonstrated that each metric becomes
