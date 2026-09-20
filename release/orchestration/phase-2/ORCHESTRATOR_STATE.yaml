@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-20T18:13:03Z'
-state_hash: f852fb7183a401e8c53f5ca770c787b7827deb5e61c1ea14ee82b7b4b01a6fc6
+updated_at: '2026-09-20T20:13:32Z'
+state_hash: 5f07251eb89ad8d2cd0a5d57e87119ed5f01d6c232fa25d8b654e1c03de8d3ce
 lifecycle_state: P2_REPAIR_ITERATION_1
-loop_status: P2_REPAIR_1_ROUND_4_RUNNING
+loop_status: P2_VERIFICATION_ITERATION_1_RUNNING
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -48,7 +48,7 @@ repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
   phase_2_base_commit: 3374db452008628074824faacb030ad841ce4ed9
-  last_recorded_commit: e4cb662b64564b7cd5030d5fc2c0d72e710c6a9e
+  last_recorded_commit: 0bad524d836f179964ffbac31972856ea6434682
   main_branch: main
   main_branch_modified_by_phase_2: false
 
@@ -128,11 +128,20 @@ candidates:
     verdict_run: P2-AR-0007
     verdict_commit: ea6abea28f7605c7799477bda2434e8b970a088b
     accepted: false
+  - id: cap2-candidate-1
+    tag: cap2-candidate-1
+    commit: 0bad524d836f179964ffbac31972856ea6434682
+    product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+    governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+    minted: '2026-09-20'
+    provenance: repair iteration 1, rounds 1-4 integrated (merges b7e6d52, e8e1ff2, e4cb662, 0bad524); round-4 integration P2-AR-0054
+    orchestrator_reproduction: {release_build: ok 0 warnings, gov contract verify: CONTRACT_SOURCE_BOUND, lib: 276/0/0, certification: 207/0/0}
+    status: AWAITING_INDEPENDENT_VERIFICATION (verification iteration 1)
 
 current_candidate:
-  id: cap2-candidate-0
-  tag: cap2-candidate-0
-  commit: 57177a37ea296ece16b185874831462b6a76db18
+  id: cap2-candidate-1
+  tag: cap2-candidate-1
+  commit: 0bad524d836f179964ffbac31972856ea6434682
 
 iteration:
   current: 1
@@ -250,10 +259,25 @@ agent_runs:
   - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: INCOMPLETE_USAGE_LIMIT_RECOVERED, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
   - {run_id: P2-AR-0053, role: capability-repair, workstream: residual-IPs (continuation of P2-AR-0043), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-b, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
   - {run_id: P2-AR-0055, role: capability-repair, workstream: residual-IPs (OD-P2-03), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-c, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.run.yaml}
-  - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
+  - {run_id: P2-AR-0044, role: capability-verifier, scope: r1-preservation, iteration: 1, status: RUNNING, branch: phase2/verify-1-r1-preservation, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml}
+  - {run_id: P2-AR-0045, role: capability-verifier, scope: oracle-format, iteration: 1, status: RUNNING, branch: phase2/verify-1-oracle-format, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0045.run.yaml}
+  - {run_id: P2-AR-0046, role: capability-verifier, scope: alpha, iteration: 1, status: RUNNING, branch: phase2/verify-1-alpha, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0046.run.yaml}
+  - {run_id: P2-AR-0047, role: capability-verifier, scope: beta, iteration: 1, status: RUNNING, branch: phase2/verify-1-beta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml}
+  - {run_id: P2-AR-0048, role: capability-verifier, scope: gamma, iteration: 1, status: RUNNING, branch: phase2/verify-1-gamma, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml}
+  - {run_id: P2-AR-0049, role: capability-verifier, scope: delta, iteration: 1, status: RUNNING, branch: phase2/verify-1-delta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml}
+  - {run_id: P2-AR-0050, role: capability-verifier, scope: epsilon, iteration: 1, status: RUNNING, branch: phase2/verify-1-epsilon, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml}
+  - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: RUNNING, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
+  - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0054, role: capability-repair (integration builder), status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
+  - {run_id: P2-AR-0044, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml}
+  - {run_id: P2-AR-0045, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0045.run.yaml}
+  - {run_id: P2-AR-0046, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0046.run.yaml}
+  - {run_id: P2-AR-0047, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml}
+  - {run_id: P2-AR-0048, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml}
+  - {run_id: P2-AR-0049, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml}
+  - {run_id: P2-AR-0050, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml}
+  - {run_id: P2-AR-0051, role: capability-verifier, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -304,15 +328,19 @@ completed_stages:
       pinned model under P2-HO-0008 / P2-HO-0009.
 
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md  # resume procedure; hold lifted 2026-09-20
-latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0009.yaml
+latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0010.yaml
 next_deterministic_action: >-
-  AWAIT_INTEGRATION_4 — P2-AR-0054 (fresh integration builder, P2-HO-0049) merges phase2/repair-1-r4-ws01 (P2-AR-0042,
-  evidence map) with phase2/repair-1-r4-residual-c (P2-AR-0043 + P2-AR-0053 + P2-AR-0055 OD-P2-03); gov contract verify must
-  pass after the merge (IP-R4-WS01-3). On completion: verify, merge --no-ff into release/4.1.6-rc1, reproduce lib,
-  certification and gov contract verify, mint cap2-candidate-1 (tag + digests; reopen GATE-P2-R1-PRESERVATION), then dispatch
-  verification iteration 1 (P2-HO-0043..0047; runs P2-AR-0044..0052). Owner stop condition (2026-09-20): if verification does
-  not issue GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, STOP after recording the verifier evidence, produce the owner decision
-  package and return PHASE_2_POST_ROUND4_VERIFICATION_REJECTED__OWNER_REVIEW_REQUIRED; start no further repair round.
+  AWAIT_VERIFICATION_ITERATION_1 — eight fresh independent verifiers run on cap2-candidate-1 (0bad524): P2-AR-0044 AC-14 R1
+  preservation, P2-AR-0045 AC-6 oracle format, P2-AR-0046..0051 families alpha/beta/gamma/delta/epsilon/zeta, each on
+  branch phase2/verify-1-*. On each completion: verify its report and scope, record. When all eight are done: merge their
+  evidence into release/4.1.6-rc1 and dispatch the fresh synthesis verifier P2-AR-0052 (P2-HO-0047), the sole issuer of the
+  iteration-1 verdict. Owner stop condition (2026-09-20): if the synthesis verdict is not
+  GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, STOP after recording the verifier evidence — no further repair round, no further
+  build agents — classify every finding (blocker class, severity, normative source, RESIDUAL vs MATERIALLY_NEW), record which
+  of the 52 iteration-0 classes remain, identify whether the failure is implementation / integration / evidence /
+  architecture / orchestration, checkpoint, produce the owner decision package, and return
+  PHASE_2_POST_ROUND4_VERIFICATION_REJECTED__OWNER_REVIEW_REQUIRED. If accepted: finalise and return
+  PHASE_ORCHESTRATION_COMPLETE__GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED. Phase 3 is not started in this session.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}

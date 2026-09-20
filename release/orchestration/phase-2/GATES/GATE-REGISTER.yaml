@@ -49,11 +49,13 @@ gates:
 
   - id: GATE-P2-R1-PRESERVATION
     title: R1 acceptance remains valid for the candidate under verification
-    status: NOT_REQUIRED_FOR_CANDIDATE_0
+    status: REQUIRED_AND_NOT_SATISFIED_FOR_CANDIDATE_1
     satisfier: fresh independent verifier (frozen contract AC-14, section 9.3)
     note: >-
-      cap2-candidate-0 carries product code byte-identical to srr1-r1-accepted (product_code_digest bd4d65d9...), so AC-14
-      is satisfied by the existing AR-0033 evidence. Any later candidate with a different product_code_digest reopens this gate.
+      cap2-candidate-0 carried product code byte-identical to srr1-r1-accepted, so AC-14 was satisfied by the existing
+      AR-0033 evidence. cap2-candidate-1 (product_code_digest e6332fc7...2220) differs, so the gate is reopened: run P2-AR-0044
+      (handoff P2-HO-0045) re-runs every prior R1 held-out suite unedited and re-establishes the twelve frozen R1 items for
+      every changed area.
 
   - id: GATE-P2-CAPABILITY-BASELINE-ACCEPT
     title: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED on one exact frozen candidate
@@ -81,9 +83,9 @@ gates:
 
   - id: GATE-P2-REPAIR-1
     title: Repair iteration 1 — all rounds integrated into a new immutable candidate cap2-candidate-1
-    status: OPEN
+    status: SATISFIED (cap2-candidate-1 minted 2026-09-20 at 0bad524; builder claims only, never an acceptance)
     satisfier: capability-repair builders (claims only) + orchestrator integration; never an acceptance
-    rounds: {round_1: INTEGRATED (P2-AR-0022, merge b7e6d52, product_code_digest b1ab1c8c...fbb1), round_2: INTEGRATED (P2-AR-0032, merge e8e1ff2, product_code_digest 797da37c...1fe1), round_3: INTEGRATED (P2-AR-0041, merge e4cb662, product_code_digest 1d3e9f59...85df7), round_4: RUNNING (P2-AR-0042 evidence map COMPLETED_AWAITING_INTEGRATION; P2-AR-0043 INCOMPLETE_USAGE_LIMIT_RECOVERED, continued by P2-AR-0053)}
+    rounds: {round_1: INTEGRATED (P2-AR-0022, merge b7e6d52, product_code_digest b1ab1c8c...fbb1), round_2: INTEGRATED (P2-AR-0032, merge e8e1ff2, product_code_digest 797da37c...1fe1), round_3: INTEGRATED (P2-AR-0041, merge e4cb662, product_code_digest 1d3e9f59...85df7), round_4: INTEGRATED (P2-AR-0042 + P2-AR-0043/0053/0055; integrator P2-AR-0054, merge 0bad524, product_code_digest e6332fc7...2220)}
 
   - id: GATE-P3-PROVISIONAL-RETRIEVAL
     title: Phase 3 — PROVISIONAL_RETRIEVAL_PROFILE_READY

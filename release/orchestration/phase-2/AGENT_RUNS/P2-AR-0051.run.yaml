@@ -1,0 +1,22 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0051
+role: capability-verifier (verification iteration 1)
+scope: zeta
+objective: "Family zeta (W1-W12): full re-audit with fresh held-out tests; AC-8 artifact flow coverage matrix rebuilt on this candidate. Verification, never repair: no product source is modified."
+agent_model: claude-opus-5 (pinned explicitly at dispatch)
+fresh_context: true
+independent_of: [every builder P2-AR-0014..0055, every integrator, every iteration-0 auditor, the orchestrator, and every other iteration-1 verifier]
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0044-verify-1-family-scopes.md
+common_protocol_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
+active_gate: GATE-P2-CAPABILITY-BASELINE-ACCEPT
+iteration: 1
+candidate: cap2-candidate-1
+candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+candidate_product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+candidate_governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+branch: phase2/verify-1-zeta
+expected_output_path: release/capability-baseline/verify-1/zeta/
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.report.yaml
+required_verdict_vocabulary: [FAMILY_VERIFICATION_COMPLETE, INCOMPLETE]
+status: RUNNING
