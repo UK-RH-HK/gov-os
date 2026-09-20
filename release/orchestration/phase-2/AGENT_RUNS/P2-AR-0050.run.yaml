@@ -19,4 +19,26 @@ branch: phase2/verify-1-epsilon
 expected_output_path: release/capability-baseline/verify-1/epsilon/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.report.yaml
 required_verdict_vocabulary: [FAMILY_VERIFICATION_COMPLETE, INCOMPLETE]
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  work_commit: 55c03328e01cfad659022191140fa75bec4e68a9
+  report_commit: ad71c4b531a5eeb966e798ec7f58a31369e51d86
+  branch_tip_commit: 9371409c49aad31f9dbd4f3d886da5dfd136aba7
+  branch_tip_note: a third commit corrects one probe count (163->167) in the report and capability-audit.yaml; the final evidence state is the tip, output.commit names the work-product commit as the protocol requires
+  agent_model_self_reported: claude-opus-5[1m]
+  identities_verified: {candidate: 0bad524 with digests e6332fc7...2220 / 3d2aeba2...20c0 at both tag and HEAD, contract_v3: 4c2df291...5ed3, frozen_gate_contract: d2f33e89...f25e}
+  ac15_reproduced_by_verifier: {lib: 276/0, certification: 207/0}
+  heldout: 167 tests over 8 files, 163 PASS / 4 FAIL (the four failures are its four findings)
+  capability_statuses: {PRESENT_AND_SUBSTANTIAL: 11, PARTIAL: 5 (O5, P1, P2, Q1, Q2, U — see report), ABSENT: 0, UNCLEAR: 0, N/A: 0, bullets_evaluated: 146}
+  findings:
+    blocking: [E-O5-01 (MEDIUM, RESIDUAL of BC-P2-07, blocks AC-5) — gov health checks declares D001-D035 at G1 and G5 but run_suite iterates only the governance-suite families, so health run/audit/update --apply/release build evaluate 39 of 74 declared checks while reporting complete true and not_evaluated 0; health status can read GREEN with no failing check while the same output reads DEGRADED with currency false and 18 stale checks]
+    non_blocking: [E-P2-01 (LOW), E-Q1-01 (MEDIUM), E-Q2-01 (MEDIUM)]
+    labelling_caveat: the verifier labelled the three non-blocking findings RESIDUAL with inventoried_class null because the iteration-0 inventory holds blocking classes only, naming the iteration-0 finding each restates; it states this family adds nothing to the convergence count (the synthesis verifier checks and may correct these labels)
+  ac5_assessment: NOT MET — met on impacted selection, parallel execution, isolation, cache reuse and invalidation, stale evidence, RGY aggregation, hard-block vs warning, remediation generation, not-whole-suite-serially and tiers G0-G4/G6; NOT met on health-result provenance and the G5 full-suite duty, both from the single cause E-O5-01; RGY aggregate ignores staleness and the repository verdict
+  availability_rule_attacks: 15/15 hold (scoped refusal, listed remedy admitted as remedy, independent work available, no block refuses its own remedy, typed refusals naming scope and subjects, a committing remedy that has not cleared its block does not commit, a block whose inputs changed is re-evaluated before refusing, global stop reserved for critical)
+  gate_u: 15 SLOs tracked with thresholds and owning checks, 14 crossings demonstrated to change health state, the 15th (governance-suite freshness) owned by D021 and reached by E-O5-01; all 13 HEALTHY conditions evaluated with named enforcing checks; O4 — nine input classes each alone staled a legitimately current green record
+  prior_finding_disposition: {in_scope: 38, CLOSED: 25, RESIDUAL: 6, NOT_APPLICABLE: 7; blocking in scope 28 -> 22 closed / 1 residual / 5 not applicable}
+  could_not_establish: [HEALTH_REMEDY_INCOMPLETE on its own path (needs a signed successor release), three O2 families' detection by injected failure, five HEALTHY conditions flipped individually, Q1 closing-report lessons and the FCP->governed-release link, O3 under a hostile single actor holding two declared roles (recorded as residual risk under OD-P2-01, not a finding)]
+  method_note: the verifier wrote its own administrator-domain signer (heldout/srr.py, published constant seeds) to provision a throw-away root and install a signed release, which is what let it reach GREEN and the authenticated human channel; reusable by other verifiers
+  orchestrator_checks: "Scope clean against base 8588813: only its evidence directory and run report. Evidence merged at the branch tip 9371409 so the corrected counts are what the synthesis verifier reads. The AC-5 judgement is the verifier's; the orchestrator neither confirms nor overrules it."
