@@ -1,0 +1,20 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0055
+role: capability-repair
+workstream: residual-IPs (OD-P2-03 implementation)
+objective: "Implement OWNER-DECISION-P2-0003: a tool installation needs the human gate only when it expands authority (privilege escalation, broader filesystem/project access, new secret/credential access, host-level authority, governance/security-policy mutation, new or unrestricted network trust boundary); otherwise an authenticated/pinned, independently reviewed, registered, reversible install inside the project's authorised envelope proceeds ungated. Every installation recorded with security and CIT evidence. Claims only."
+agent_model: claude-opus-5 (pinned explicitly at dispatch)
+fresh_context: true
+independent_of: [all auditors, verifiers, integrators; continues the residual workstream after the owner decision]
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0050-repair-1-r4-tool-install-gate.md
+owner_decision: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md
+active_gate: GATE-P2-REPAIR-1
+iteration: 1
+round: 4
+base_commit: d96c8ab
+branch: phase2/repair-1-r4-residual-c
+expected_output_path: release/capability-baseline/repair-1/r4-residual/
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.report.yaml
+required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
+status: RUNNING

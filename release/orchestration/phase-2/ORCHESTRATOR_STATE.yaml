@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-20T13:10:26Z'
-state_hash: 38827e6ec52209857719eba5000cf0c0eb4919e859812b59f7d619c45b01a571
+updated_at: '2026-09-20T15:43:11Z'
+state_hash: 2b224b2c96c105a1236fe6db79e15438633382abd98fc11f7569d87c85d73972
 lifecycle_state: P2_REPAIR_ITERATION_1
 loop_status: P2_REPAIR_1_ROUND_4_RUNNING
 
@@ -248,10 +248,11 @@ agent_runs:
   - {run_id: P2-AR-0041, role: capability-repair (integration builder), iteration: 1, round: 3, status: COMPLETED, branch: phase2/repair-1-r3-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.run.yaml}
   - {run_id: P2-AR-0042, role: capability-repair, workstream: WS-1, iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-ws01, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
   - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: INCOMPLETE_USAGE_LIMIT_RECOVERED, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
-  - {run_id: P2-AR-0053, role: capability-repair, workstream: residual-IPs (continuation of P2-AR-0043), iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-residual-b, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
+  - {run_id: P2-AR-0053, role: capability-repair, workstream: residual-IPs (continuation of P2-AR-0043), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-b, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
+  - {run_id: P2-AR-0055, role: capability-repair, workstream: residual-IPs (OD-P2-03), iteration: 1, round: 4, status: RUNNING, branch: phase2/repair-1-r4-residual-c, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0053, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
+  - {run_id: P2-AR-0055, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -304,15 +305,13 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0002-safe-hold-continuity.md  # resume procedure; hold lifted 2026-09-20
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0009.yaml
 next_deterministic_action: >-
-  AWAIT_P2-AR-0053 (round-4 residual continuation, branch phase2/repair-1-r4-residual-b from 55af199, handoff P2-HO-0048).
-  On completion: verify scope, record, and dispatch the round-4 integration builder (P2-AR-0054) to merge
-  phase2/repair-1-r4-ws01 (P2-AR-0042, completed) with the continuation branch — overlapping files cli/src/main.rs and
-  orchestration/control.rs, and IP-R4-WS01-3: after merging, gov contract verify must pass (update owner-spec.yaml,
-  apply_owner_spec.py, gov contract compile if tests moved). Then merge --no-ff into release/4.1.6-rc1, reproduce
-  cargo test --lib / --test certification and gov contract verify, mint cap2-candidate-1 (tag + digests, reopen
+  AWAIT_P2-AR-0055 (OD-P2-03 implementation, branch phase2/repair-1-r4-residual-c from d96c8ab, handoff P2-HO-0050). On
+  completion: verify scope, record, then dispatch round-4 integration P2-AR-0054 (P2-HO-0049) to merge
+  phase2/repair-1-r4-ws01 with the final residual branch (gov contract verify must pass, IP-R4-WS01-3). Then merge --no-ff
+  into release/4.1.6-rc1, reproduce lib/certification and gov contract verify, mint cap2-candidate-1 (tag + digests, reopen
   GATE-P2-R1-PRESERVATION) and dispatch verification iteration 1 (P2-HO-0043..0047; runs P2-AR-0044..0052). Owner stop
-  condition (2026-09-20): if that verification does not issue GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, STOP after
-  recording the verifier evidence, produce the owner decision package and return
+  condition (2026-09-20): if verification does not issue GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, STOP after recording the
+  verifier evidence, produce the owner decision package, return
   PHASE_2_POST_ROUND4_VERIFICATION_REJECTED__OWNER_REVIEW_REQUIRED; start no further repair round or build agents.
 
 current_prohibitions:

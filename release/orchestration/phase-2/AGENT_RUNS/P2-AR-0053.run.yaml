@@ -16,4 +16,18 @@ branch: phase2/repair-1-r4-residual-b
 expected_output_path: release/capability-baseline/repair-1/r4-residual/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.report.yaml
 required_verdict_vocabulary: [READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION, OWNER_DECISION_REQUIRED, INCOMPLETE]
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: OWNER_DECISION_REQUIRED (item R4-O1 only; items 2-4 delivered, every P2-HO-0042 item claimed)
+  work_commit: d96c8ab
+  product_commit: ab0a075
+  branch_tip_commit: d96c8ab
+  branch_product_code_digest: dcf4c59101a9442ccf56e3c6c02c760b0225c54cb5fd6725a31dc3ad36ab0a13
+  agent_model_self_reported: claude-opus-5[1m]
+  claims: 24 claims in release/capability-baseline/repair-1/r4-residual/claims.yaml (16 REPAIRED_CLAIMED, 1 CONFIRMED, 2 optional DONE, 4 optional NOT_DONE, 1 OWNER_DECISION_REQUIRED); 23 sourced to P2-AR-0043, 1 to P2-AR-0055's predecessor item
+  regression_self_reported: {lib: 266/0, certification: 200/0/0 (nine chunks at ab0a075, union = full list), python: 4/4, warnings: 0}
+  r1_self_reported: {AR-0027: 26/3, AR-0029: 26/2 (ho_f n/c), AR-0031: 27/7, AR-0033: 30/1 (size pin), census: 123 files/2340 fns, 0 s6 violations, failure messages identical to P2-AR-0043 and transitively integration-3}
+  owner_gate_raised: HG-P2-0002 (R4-O1 tool-install gate) -> answered OD-P2-03 "gate only elevated installs"
+  superseded_by_owner_decision: commit ab0a075 implemented "always gate"; OD-P2-03 requires the elevated-only rule, implemented by P2-AR-0055 (P2-HO-0050)
+  orchestrator_checks: "Scope checked against P2-HO-0048: changed files (tools.rs, cit/mod.rs, cit/materiality.rs, capabilities/governance.rs, cit.schema.json, KERNEL.yaml, docs, tests r4_residual.rs and ws07.rs) are within the residual scope and outside P2-AR-0042's owned files; no test renamed, removed or ignored. Verified the recovered P2-AR-0043 work is carried in this tree and re-run on it. Claims are builder claims, not acceptance."
+  remaining_integration_points: [R4-O1 (now OD-P2-03, to P2-AR-0055), R4-IP-1 probes that install a tool must answer the install gate where it applies, R4-IP-2 evidence-map owners for the new tests, R4-O2 plugins unregister writes the sealed registry directly and no tool de-installation path exists, R4-O3 INT3-O3 not done, R4-O4 cit schema 1.3.0 vocabulary widened - confirm with WS-9]
