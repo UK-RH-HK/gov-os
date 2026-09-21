@@ -1,0 +1,27 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0064
+role: capability-repair (iteration 2, native worker)
+workstream: wsB
+blocker_class: BC-P2-45
+objective: 'Finish BC-P2-45 overlay precedence from preserved state: draw the OC-P2-04 line between a project declaring or narrowing what it has and an increase in effective trusted authority; clear the
+  nine residual full-suite failures without weakening any test'
+worker:
+  execution: native Claude subagent (no API key; same spawn mechanics as Opus roles)
+  model: claude-sonnet-5 (selected per spawn; the outer orchestrator remains Opus 5)
+  effort: high
+  routing_basis: 'owner routing policy 2026-09-21: normal and difficult engineering repair defaults to Sonnet 5; DeepSeek paused as an execution provider until the owner re-enables it'
+  discipline: bounded scope and mutation ownership, authoritative requirement quoted rather than explored, targeted tests during development with one genuine full certification suite before any repair claim,
+    checkpoint in the shared schema, no test renames or weakening
+continues: P2-AR-0056 (provider worker, PARTIAL; its work is preserved on the branch)
+active_gate: GATE-P2-REPAIR-2
+iteration: 2
+branch: phase2/repair-2-wsB
+branch_tip_at_dispatch: 01c5de8
+checkpoint_path: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0064-wsB.checkpoint.json
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING
