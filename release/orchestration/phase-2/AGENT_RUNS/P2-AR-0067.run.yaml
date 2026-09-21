@@ -59,6 +59,7 @@ outcome:
     product_code_digest: f08f991b3a8f403c164c73fa57e8feffd50871ffee8aef7a267a7c778392e2f2
     governed_state_digest: 8c8ebe02da0926151a4bfc1f3a4437c31f2315c10255da3ad4a56ad451b6935d
   unresolved: none; no item stopped, no cross-workstream contradiction, no new repair work opened
-  orchestrator_checks: pending - serialised build, lib, full certification and gov contract verify by the orchestrator, after proving on this exact tree that a failing test propagates a non-zero status
-    through the pipeline used for the authoritative run
+  orchestrator_checks: 'Reproduced serialised by the orchestrator on the untouched integrated tree 61e39b6: build 0 warnings; cargo test --lib 276/0; cargo test --test certification 225/0 (1213 s); gov
+    contract verify CONTRACT_SOURCE_BOUND. Matches the integrator exactly. Pipeline-failure propagation was proven on this exact tree first in a throwaway worktree (deliberate failing test -> exit 101 through
+    the same pipeline), so the green result is trustworthy.'
   status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone

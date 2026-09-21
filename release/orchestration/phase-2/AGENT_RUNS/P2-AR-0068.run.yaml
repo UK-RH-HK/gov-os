@@ -1,0 +1,27 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0068
+role: adversarial pre-mint reviewer (independent; not the formal acceptance verifier)
+objective: 'Attack the repaired tool-install and authority surface on the integrated iteration-2 tree before any candidate is minted: command-shape bypasses (BC-P2-53), review-to-installation binding (BC-P2-41),
+  WS-A''s two disclosed residuals, the negative controls, and real filesystem effects rather than status fields.'
+worker:
+  execution: native Claude subagent
+  model: claude-opus-5
+  effort: high
+  routing_basis: 'owner routing policy: adversarial and formal verification roles are Opus 5; DeepSeek paused, so the different-provider review is a fresh Opus 5 role instead'
+independence: authored none of the iteration-2 repairs, the integration, or the iteration-1 verifications; repairs nothing and writes only its own findings
+target:
+  branch: phase2/repair-2-adversarial
+  base: phase2/repair-2-integration 61e39b6
+  product_code_digest: f08f991b3a8f403c164c73fa57e8feffd50871ffee8aef7a267a7c778392e2f2
+  governed_state_digest: 8c8ebe02da0926151a4bfc1f3a4437c31f2315c10255da3ad4a56ad451b6935d
+  orchestrator_verified: build 0 warnings, lib 276/0, certification 225/0, gov contract verify CONTRACT_SOURCE_BOUND
+active_gate: GATE-P2-REPAIR-2
+iteration: 2
+required_verdict_vocabulary:
+- SURFACE_SOUND
+- RESIDUAL_DEFECTS
+- INCOMPLETE
+consequence: RESIDUAL_DEFECTS in an existing blocker class sends the class back for repair and re-review before minting. A genuinely new material blocker class or a normative ambiguity is escalated to the
+  owner under the Phase-2 rules.
+status: RUNNING
