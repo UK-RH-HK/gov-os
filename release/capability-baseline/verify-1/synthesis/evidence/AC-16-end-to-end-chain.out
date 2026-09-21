@@ -1,0 +1,168 @@
+P2-AR-0052 — AC-16 end-to-end chain across family boundaries, run by the synthesis verifier
+candidate cap2-candidate-1 / e6332fc7…2220; project /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/ac16
+
+== K3/K4 -> W8 : CIT impact simulation reaches the dependent task over a canonical edge
+{
+ "radius": "R2",
+ "seeds": [
+  "REQ-0001"
+ ],
+ "affected": [
+  {
+   "node": "TASK-0001",
+   "hop": 1,
+   "via": "CONSUMES \u2192 REQ-0001"
+  }
+ ],
+ "affected_tasks": [
+  "TASK-0001"
+ ],
+ "material_classes": [
+  "behaviour_change"
+ ]
+}
+
+== W8 : reverse/forward lineage of the changed artefact
+{
+ "id": "REQ-0001",
+ "direction": "forward",
+ "depth": 6,
+ "reach": [
+  {
+   "node": "TASK-0001",
+   "hop": 1,
+   "via": "CONSUMES \u2192 REQ-0001",
+   "from": "REQ-0001"
+  }
+ ],
+ "edges": [
+  {
+   "src": "CIT-0001",
+   "type": "AFFECTS",
+   "dst": "REQ-0001"
+  },
+  {
+   "src": "CIT-0002",
+   "type": "AFFECTS",
+   "dst": "REQ-0001"
+  },
+  {
+   "src": "TASK-0001",
+   "type": "CONSUMES",
+   "dst": "REQ-0001"
+  },
+  {
+   "src": "TASK-0001",
+   "type": "GOVERNED_BY",
+   "dst": "REQ-0001"
+  }
+ ]
+}
+
+== W6 : staleness propagated to the dependent task
+{
+ "task": "TASK-0001",
+ "stale": true,
+ "retest_required": true,
+ "stale_inputs": [
+  {
+   "id": "REQ-0001",
+   "consumed": "f231f5ed2f43f833d41f755c6e6e6680cc01a424051d5603158e37ce1b11b75a",
+   "current": "38ebade5308346831fcf52bd131a1baf909c69147275c804f125d0b852162818",
+   "propagated": true
+  }
+ ],
+ "staleness": {
+  "stale": true,
+  "reason": "direct change (not through a CIT)",
+  "at": "2026-09-20T23:41:41Z",
+  "causes": [
+   {
+    "kind": "direct",
+    "detected_by": "index rebuild",
+    "note": "an authoritative input changed outside change control; the same propagation CIT-E performs was applied when it was detected"
+   }
+  ],
+  "inputs_changed": [
+   {
+    "id": "REQ-0001",
+    "from": "f231f5ed2f43f833d41f755c6e6e6680cc01a424051d5603158e37ce1b11b75a",
+    "to": "38ebade5308346831fcf52bd131a1baf909c69147275c804f125d0b852162818",
+    "cause": "direct change (not through a CIT)"
+   }
+  ],
+  "why": [
+   "consumes REQ-0001 (requirement, declared in task.requirements)"
+  ]
+ }
+}
+
+== W4/W10 : the delivered packet no longer verifies
+{
+ "task": "TASK-0001",
+ "ok": false,
+ "packet_hash": "498320da0de2b802a991a824f34c71e32f3b416851706ed7262ca7108a8afcb8",
+ "deterministic_hash_verified": true,
+ "declared_inputs": 1,
+ "delivery_state_at_compile": "COMPLETE",
+ "delivery_state_now": "COMPLETE",
+ "undelivered_inputs": [],
+ "stale_inputs": [
+  {
+   "id": "REQ-0001",
+   "supplied": "20c68a90184fa531fdf8157c12c1f47788f7952bb379a6699d79d6d7ec9aa831",
+   "current": "c514e5b8cf4400bec33f243f8c49d93bf0a6e04ea56e8e7853e40da440934479",
+   "normative_supplied": "f231f5ed2f43f833d41f755c6e6e6680cc01a424051d5603158e37ce1b11b75a",
+   "normative_current": "38ebade5308346831fcf52bd131a1baf909c69147275c804f125d0b852162818"
+  }
+ ],
+ "invalidated": {
+  "at": "2026-09-20T23:41:41Z",
+  "cause": {
+   "detected_by": "index rebuild",
+   "kind": "direct",
+   "note": "an authoritative input changed outside change control; the same propagation CIT-E performs was applied when it was detected"
+  },
+  "inputs": [
+   {
+    "cause": "direct change (not through a CIT)",
+    "current": "38ebade5308346831fcf52bd131a1baf909c69147275c804f125d0b852162818",
+
+== O4 : governance-suite currency lost, naming the changed input classes
+{
+ "green": "AUD-0001",
+ "current": false,
+ "changed_classes": [
+  {
+   "class": "index_manifest",
+   "contract_class": "relevant index manifest"
+  },
+  {
+   "class": "source",
+   "contract_class": "relevant source files"
+  },
+  {
+   "class": "spec_decisions",
+   "contract_class": "authoritative spec/decision"
+  },
+  {
+   "class": "spec_requirements",
+   "contract_class": "authoritative spec/decision"
+  },
+  {
+   "class": "spec_tasks",
+   "contract_class": "authoritative spec/decision (task manifests, test obligations)"
+  }
+ ],
+ "message": "green record \"AUD-0001\" is obsolete (inputs changed: index_manifest, source, spec_decisions, spec_requirements, spec_tasks)"
+}
+
+== W12/G0 : the guard re-evaluates at the instant of the call
+{
+ "operation": "task.close",
+ "allowed": true,
+ "blocks": [],
+ "observed_tier": null,
+ "changed_classes": null,
+ "health_result": null
+}

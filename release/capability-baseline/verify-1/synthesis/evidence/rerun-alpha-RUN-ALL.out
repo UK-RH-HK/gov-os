@@ -1,0 +1,453 @@
+===== t01_a2_root_of_trust :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/release/capability-baseline/verify-1/alpha/heldout/t01_a2_root_of_trust.py =====
+PASS A2-b1-unprovisioned-external-source-refused-typed :: code=SRR_UNPROVISIONED_EXTERNAL_SOURCE_REFUSED
+PASS A2-b1-refusal-states-nothing-was-staged :: staged_for_installation=False
+PASS A2-b1-no-staged-payload-left-behind-on-refusal :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/alpha/machines/t01-unprov/state/governance-os/machine/staging contents=[]
+PASS A2-b1-no-kernel-installed-on-refusal :: governance/kernel absent
+PASS A2-provision-ok :: gov trust provision
+PASS A2-b1-provisioned-unsigned-source-refused :: code=SRR_RELEASE_UNVERIFIED
+PASS A2-b1-unsigned-nothing-installed
+PASS A2-b5-tampered-payload-file-refused-typed :: code=SRR_PAYLOAD_DIGEST_MISMATCH
+PASS A2-b5-refusal-names-the-offending-file :: staged payload file 'policies/SECURITY_POLICY.yaml' has digest abccfd1c891303aac3edd3ab4fd710ecaeedb2e336753f01741985f9a677fdd9, the signed metadata binds ac273
+PASS A2-b5-nothing-installed
+PASS A2-b5-consistent-source-rewrite-still-refused :: code=SRR_PAYLOAD_DIGEST_MISMATCH
+PASS A2-b6-source-signed-by-its-own-root-refused :: code=SRR_THRESHOLD_NOT_MET
+PASS A2-b6-anchor-from-repository-refused :: code=SRR_ANCHOR_FROM_REPOSITORY_REFUSED
+PASS A2-authentic-install-succeeds
+PASS A2-authentic-install-is-AUTHENTIC-CURRENT-PROVISIONED :: {"authenticity": "AUTHENTIC", "currency": "CURRENT", "posture": "PROVISIONED", "admission": "SIGNED_RELEASE_METADATA"}
+PASS A2-b7-lock-records-authenticity-basis :: lock carries an authenticity basis
+PASS A2-b7-lock-binds-the-verified-release-metadata-digest :: release_metadata_sha256 present in framework.lock
+PASS A2-b7-lock-independent-of-machine-cache-path :: framework.lock identical across XDG_CACHE_HOME values
+PASS A2-b4-tamper-baseline-installed
+PASS A2-b4-naive-post-install-tamper-detected :: ok=True code=
+PASS A2-b4-consistent-post-install-rewrite-detected (BC-P2-35) :: ok=True result={"ok": false, "modified": ["policies/SECURITY_POLICY.yaml"], "missing": [], "added": [], "payload_hash": "2207d0ab3ad607d8a668010e11d853198cd00966e42d3e6f69b8bc6577ffb637", "version": "4.1.6", "trust": {"installed": true, "verified": false, "source": "embedded baseline 4.1.6 substituted for the untr
+PASS A2-b4-kernel-trust-reports-the-rewrite :: {"verified": false, "summary": "installed kernel FAILED verification (kernel payload is not the payload this machine committed into this project (348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5), whatever KERNEL_MANIFEST.json and framework.lock say: modified [\"policies/SECURITY_POL
+PASS A2-b4-doctor-does-not-report-HEALTHY-over-a-rewritten-kernel :: verdict=None
+PASS A2-b2-three-predicates-reported-separately :: {"authentic": "signed release metadata (this module)", "intact": "D-0007 installed-kernel integrity (gov kernel trust) \u2014 a separate control that establishes only that a local copy is unmodified",
+PASS A2-b2-kernel-trust-is-an-integrity-verdict-not-an-authenticity-one :: {"verified": true, "summary": "installed kernel 4.1.6 intact: matches KERNEL_MANIFEST.json, framework.lock and this machine's protected installation record", "trust": {"installed": true, "verified": t
+PASS A2-b8-bootstrap-install-succeeds-unprovisioned
+PASS A2-b8-bootstrap-marked-and-UNKNOWN :: {"authenticity": "UNKNOWN", "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD"}
+PASS A2-b8-command-envelope-does-not-present-bootstrap-as-CURRENT :: presented_as=UNAUTHENTICATED
+PASS A2-b8-status-discloses-bootstrap :: status envelope mentions BOOTSTRAP
+PASS A2-b8-doctor-discloses-bootstrap :: doctor envelope mentions BOOTSTRAP
+PASS A2-b8-audit-discloses-bootstrap :: audit envelope mentions BOOTSTRAP
+PASS A2-b8-unsigned-CERTIFIED-claim-refused :: code=RELEASE_CERTIFICATION_REQUIRES_SIGNED_METADATA
+PASS A2-b9-rotation-machine-provisioned
+PASS A2-b9-root-succession-accepted
+PASS A2-b9-succession-reports-revoked-keys :: ["8f09d198e496128815b9d748279ed93facc1de027b3f8d73a28bc0db4491556c"]
+PASS A2-b9-release-signed-by-revoked-key-refused :: code=SRR_THRESHOLD_NOT_MET
+PASS A2-b9-root-succession-gap-refused :: code=SRR_ROOT_VERSION_NOT_SUCCESSOR
+PASS A2-b9-root-replay-refused :: code=SRR_ROOT_VERSION_NOT_SUCCESSOR
+PASS A2-b9-reprovision-refused :: code=SRR_ALREADY_PROVISIONED
+PASS A2-b9-recovery-machine-provisioned
+PASS A2-b9-recovery-baseline-installed
+PASS A2-b9-below-floor-refused-without-owner-authorisation :: code=HUMAN_GATE_REQUIRED out={
+  "ok": false,
+  "command": "update",
+  "error": {
+    "code": "HUMAN_GATE_REQUIRED",
+    "message": "update requires human approval: gate HDG-0001 created; present it (`gov gate present HDG-0001`), record the answer (`gov decide HDG-0001 --option A --by <human>`), then re-run `gov update --apply 
+PASS A2-b9-break-glass-flag-alone-is-not-authority :: code= applied=False reason=human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record installed_version=4.1.6
+PASS A2-b9-env-GOV_BREAK_GLASS-cannot-create-authority :: code=SRR_ENV_CANNOT_CREATE_AUTHORITY
+PASS A2-b9-env-GOV_TRUST_OVERRIDE-cannot-create-authority :: code=SRR_ENV_CANNOT_CREATE_AUTHORITY
+PASS A2-b9-env-GOV_SKIP_VERIFY-cannot-create-authority :: code=SRR_ENV_CANNOT_CREATE_AUTHORITY
+PASS A2-b9-env-GOV_HUMAN_GATE_APPROVED-cannot-create-authority :: code=SRR_ENV_CANNOT_CREATE_AUTHORITY
+PASS A2-b10-offline-reinstall-from-protected-record-succeeds :: code= msg=
+PASS A2-b10-offline-authenticity-is-PREVIOUSLY_VERIFIED_BY_THIS_MACHINE :: {"reinstalled": true, "version": "4.1.6", "payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5", "release_authenticity": {"ingress": "reinstall", "product": "agentic-engineering-os", "release_version": "4.1.6", "sequence": 100, "channel": "stable", "repository": "", "aut
+PASS A2-b10-offline-unknown-payload-refused :: code=SRR_RELEASE_UNVERIFIED
+PASS A2-b10-offline-refusal-leaves-installation-unchanged :: code=SRR_RELEASE_UNVERIFIED
+PASS A2-b3-ingress-init-refuses-a-tampered-source :: code=SRR_PAYLOAD_DIGEST_MISMATCH out=
+FAIL A2-b3-ingress-update-refuses-a-tampered-source [V1-S5-01: the update ingress reports 'already up to date' instead] :: code= out={
+  "ok": true,
+  "command": "update",
+  "result": {
+    "applied": false,
+    "reason": "already up to date",
+    "check": {
+      "current": "4.1.6",
+      "available": "4.1.6",
+      "source": "/tm
+PASS A2-b3-ingress-reinstall-refuses-a-tampered-source :: code=SRR_PAYLOAD_DIGEST_MISMATCH out=
+PASS A2-b3-ingress-rollback-refuses-when-there-is-nothing-it-verified-to-return-to :: code=SNAPSHOT_MISSING (`update --rollback` takes no --source: it restores the snapshot the previous update wrote, and every rollback consumes its snapshot)
+ingress refusal codes: {"init": "SRR_PAYLOAD_DIGEST_MISMATCH", "update": "", "reinstall": "SRR_PAYLOAD_DIGEST_MISMATCH", "adopt-baseline": "ADOPTION_SESSION_UNDECLARED"}
+
+-- 54/55 checks passed
+===== t02_cross_machine :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/release/capability-baseline/verify-1/alpha/heldout/t02_cross_machine.py =====
+PASS S6-provision-t02-A
+PASS S6-provision-t02-B
+PASS S6-provision-t02-C
+PASS S6-provision-t02-E
+PASS S6-bind-t02-A
+PASS S6-bind-t02-B
+PASS S6-bind-t02-E
+PASS S6-A-bound-C-provisioned-but-not-bound :: A.bound=True C.bound=False
+PASS S6-D-unprovisioned-cannot-be-bound :: T2_BINDING_UNPROVISIONED
+PASS S6-A-authentic-install
+PASS S6-A-gate-record-written :: HDG-0001 
+PASS S6-A-audit-record-written :: AUD-0002 
+PASS S6-A-task-record-written :: TASK-0001 
+PASS S6-A-cit-record-written :: CIT-0001 
+PASS S6-A-records-carry-an-os_binding-seal :: 6: ['spec/audits/AUD-0001.yaml', 'spec/audits/AUD-0002.yaml', 'spec/decisions/CIT-0001.yaml', 'spec/decisions/HDG-0001.yaml', 'spec/decisions/HDG-0002.yaml', 'spec/tasks/TASK-0001.yaml']
+PASS S6-A-seals-are-portable-scope-under-the-owner-authority :: portable=6 of 6
+PASS S6-no-binding-key-material-in-the-repository :: []
+PASS S6-no-root-private-key-in-the-repository :: []
+PASS S6-no-release-private-key-in-the-repository :: []
+PASS S6-no-snapshot-private-key-in-the-repository :: []
+PASS S6-no-timestamp-private-key-in-the-repository :: []
+PASS S6-no-recovery-private-key-in-the-repository :: []
+PASS S6-no-t2-binding-private-key-in-the-repository :: []
+PASS S6-no-human-gate-private-key-in-the-repository :: []
+PASS S6-B-honours-the-facts-machine-A-wrote (P2-ADJ-0002) :: open T2 findings on B: []
+PASS S6-B-gate-binding-verifies-before-anchoring :: binding=VERIFIED {"binding": "VERIFIED", "key_id": "t02-owner-authority/e07acad297f63f03", "scope": "provisioned", "operation": "gate create", "at": "2026-09-20T23:19:58Z"}
+PASS S6-B-status-reconstructs-the-project :: gov status on the second machine
+PASS S6-C-refuses-the-owner-facts-it-was-not-authorised-for :: [{"marker": "T2_UNBOUND"}, {"marker": "FOREIGN"}]
+PASS S6-C-refusal-is-typed :: binding=FOREIGN {"binding": "FOREIGN", "key_id": "t02-owner-authority/e07acad297f63f03", "scope": "provisioned", "reason": "sealed under binding key t02-owner-authority/e07acad297f63f03, which this machine does not hold (a machine of another owner or project, or a m
+PASS S6-D-refusal-is-typed :: binding=FOREIGN {"binding": "FOREIGN", "key_id": "t02-owner-authority/e07acad297f63f03", "scope": "provisioned", "reason": "sealed under binding key t02-owner-authority/e07acad297f63f03, which this machine does not hold (a machine of another owner or project, or a m
+PASS S6-E-foreign-owner-refusal-is-typed :: binding=FOREIGN {"binding": "FOREIGN", "key_id": "t02-owner-authority/e07acad297f63f03", "scope": "provisioned", "reason": "sealed under binding key t02-owner-authority/e07acad297f63f03, which this machine does not hold (a machine of another owner or project, or a m
+PASS S6-D-unprovisioned-machine-refuses-the-owner-facts :: [{"marker": "T2_UNBOUND"}, {"marker": "FOREIGN"}]
+PASS S6-D-unprovisioned-external-ingress-refused (OD-P2-02) :: code=
+PASS S6-E-foreign-owner-refuses-these-facts :: [{"marker": "T2_UNBOUND"}, {"marker": "FOREIGN"}]
+PASS S6-E-cannot-anchor-a-release-signed-by-another-owner :: code=SRR_THRESHOLD_NOT_MET
+PASS S6-E-installs-its-own-owner-signed-release
+PASS S6-E-writes-its-own-T2-fact
+PASS S6-A-refuses-a-record-sealed-by-a-foreign-owner :: binding=FOREIGN {"binding": "FOREIGN", "key_id": "t02-foreign-authority/9b18fe51e8e282b4", "scope": "provisioned", "reason": "sealed under binding key t02-foreign-authority/9b18fe51e8e282b4, which this machine does not hold (a machine of another owner or project, or
+PASS S6-gate-file-found :: HDG-0001
+PASS S6-edited-sealed-record-refused-typed-BROKEN :: binding=BROKEN {"binding": "BROKEN", "reason": "the record was modified after the OS operation 'gate create' sealed it at 2026-09-20T23:19:58Z (machine 71579634ebe4b70b75ec4e1314f78fdb, authority t02-owner-authority, key e07acad297f63f03)"}
+PASS S6-edited-record-is-observable-in-the-governance-suite :: audit ok=False code=UNHEALTHY mentions_record=True
+PASS S6-unsealed-hand-written-record-refused :: binding=UNSEALED {"binding": "UNSEALED", "reason": "no OS seal: the record was not written by a gov operation (hand-written, legacy, or written by a writer that has not adopted the T2 primitive)"}
+PASS S6-restored-record-verifies-again :: binding=VERIFIED
+PASS S6-auth-machine-provisioned
+PASS S6-wrong-signer-authority-refused :: SRR_THRESHOLD_NOT_MET
+PASS S6-unknown-signer-authority-refused :: SRR_THRESHOLD_NOT_MET
+PASS S6-expired-authority-refused :: T2_BINDING_AUTHORITY_EXPIRED
+PASS S6-valid-authority-accepted
+PASS S6-authority-rotation-accepted
+PASS S6-rolled-back-authority-refused :: T2_BINDING_AUTHORITY_ROLLBACK
+PASS S6-unauthorised-binding-key-refused :: T2_BINDING_KEY_NOT_AUTHORISED
+PASS S6-authority-for-another-machine-refused :: T2_BINDING_MACHINE_NOT_AUTHORISED
+PASS S6-revoke-baseline-record
+PASS S6-revoking-authority-accepted
+PASS S6-seals-under-a-revoked-key-stop-being-honoured :: binding=UNAUTHORISED {"binding": "UNAUTHORISED", "key_id": "t02-owner-authority/e07acad297f63f03", "scope": "provisioned", "reason": "sealed under binding key t02-owner-authority/e07acad297f63f03, which this machine holds but its owner's binding authority does not author
+PASS S6-no-signing-subcommand-on-the-trust-surface :: ['Signed Release Root: machine trust anchor, protected floors, break-glass recovery (ARCH-0003)', '  break-glass           Where an owner-signed break-glass authorisation must be placed, and what it must bind', '  human-channel         The authenticated human channel for Human Decision Gate answers: anchor, inbox, what a signed answer binds', '      --role <ROLE>        Acting role, as assigned to this caller (else $GOV_ROLE). With neither, the invocation carries no privileged authority (L0). The `human` role is never conferred by a declaration: human answers are owner-signed']
+PASS S6-binary-carries-no-obvious-signing-entry-point :: hits=0
+PASS S6-b3-release-identity-identical-across-machines :: A=348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5 B=348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5
+PASS S6-b3-no-absolute-machine-path-in-framework.lock :: {}
+PASS S6-b1-governed-records-are-tracked-in-git :: 27 spec, 148 governance files tracked
+PASS S6-b2-derived-runtime-is-not-tracked :: []
+PASS S6-b2-second-machine-has-no-inherited-runtime-state :: clone carries no tracked runtime db
+PASS S6-unanchored-second-machine-refusal-is-typed :: code=KERNEL_UNANCHORED
+PASS S6-unanchored-refusal-names-its-remedy :: ["gov kernel trust", "gov kernel reinstall --source <signed release pinned by framework.lock>", "gov kernel override --reason <why> (L4+, raises a gate)"]
+PASS S6-availability-status-stays-available-while-unanchored :: code=
+PASS S6-availability-doctor-stays-available-while-unanchored :: code=UNHEALTHY
+PASS S6-availability-kernel-trust-stays-available-while-unanchored :: code=
+PASS S6-availability-kernel-verify-stays-available-while-unanchored :: code=
+PASS S6-second-machine-can-verify-the-pinned-release (ARCH-0003 §8) :: code= 
+PASS S6-b2-derived-runtime-rebuilds-locally-after-anchoring
+PASS S6-B-honours-the-gate-A-wrote-after-anchoring :: binding=VERIFIED
+PASS S6-B-can-write-its-own-T2-fact
+PASS S6-A-honours-the-fact-B-wrote (round trip) :: binding=VERIFIED
+PASS S6-b2-second-machine-doctor-runs
+
+-- 74/74 checks passed
+===== t03_gate_a :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/release/capability-baseline/verify-1/alpha/heldout/t03_gate_a.py =====
+PASS A1-b1-constitution-and-invariants-are-machine-readable :: rules=110 layers=7
+PASS A1-b1-hard-invariants-exist-as-parsable-records :: ['HARD_INVARIANTS.yaml', 'constitution']
+PASS A1-b2-weakening-MODEL_ROUTING_OVERRIDES.yaml-is-refused-or-reported :: refused=[{"policy": "MODEL_ROUTING_OVERRIDES", "key": "tier_floors.governance", "value": "T1", "source": "MODEL_ROUTING_OVERRIDES.yaml", "kernel_value": null, "reason": "MODEL_ROUTING_OVERRIDES.tier_floors.go applied=[] audit_ok=False
+PASS A1-b2-weakening-PROJECT_POLICY.yaml-is-refused-or-reported :: refused=[{"policy": "PROJECT_POLICY", "key": "readiness.enforce_pre_implementation_cells", "value": false, "source": "PROJECT_POLICY.yaml", "kernel_value": true, "reason": "PROJECT_POLICY.readiness.enforce_pr applied=[] audit_ok=False
+PASS A1-b2-weakening-DATA_SENSITIVITY.yaml-is-refused-or-reported :: refused=[] applied=[] audit_ok=False
+PASS A1-b2-weakening-TOOL_PERMISSIONS.yaml-is-refused-or-reported :: refused=[] applied=[] audit_ok=False
+PASS A1-b2-lowered-kernel-tier-floor-does-not-take-effect (BC-P2-45) :: before={"task": null, "task_class": "governance", "role": "orchestrator", "minimum_tier": "T3", "reasoning": "high", "candidates": [], "chosen": null, "note" after={"task": null, "task_class": "governance", "role": "orchestrator", "minimum_tier": "T3", "reasoning": "high", "candidates": [], "chosen": null, "note"
+PASS A1-b6-the-weakening-attempt-is-observable :: [{"policy": "MODEL_ROUTING_OVERRIDES", "key": "tier_floors.governance", "value": "T1", "source": "MODEL_ROUTING_OVERRIDES.yaml", "kernel_value": null, "reason": "MODEL_ROUTING_OVERRIDES.tier_floors.governance: constitutional/security key cannot be overridden by a lower-precedence layer (POLICY_PRECE
+PASS A1-b3-strengthening-within-the-allowed-mode-is-accepted :: applied=[{"policy": "SECURITY_POLICY", "key": "never_index_classes", "value": ["secret", "restricted", "probe-extra-restricted-class"], "source": "PROJECT_POLICY.policy_overrides", "mode": "additive"}] refused=[]
+PASS A1-b4-precedence-order-is-deterministic-and-declared :: ["constitution_hard_invariants", "security_and_authority_policy", "framework_kernel_policy", "project_policy_overrides_and_exceptions", "active_decisions_and_specifications", "task_contracts_and_mutation_manifests", "retrieved_or_inferred_context"]
+PASS A1-b5-retrieved-or-inferred-context-is-the-lowest-layer :: ["task_contracts_and_mutation_manifests", "retrieved_or_inferred_context"]
+PASS A1-b5-a-retrieved-document-cannot-raise-its-own-authority :: []
+PASS A3-b1-paths-datasets-tools-namespaces-carry-classification :: {"schema_version": "1.0.0", "default_class": "internal", "identifiers_to_strip": [], "classifications": []}
+PASS A3-b2-seeded-secret-is-not-returned-by-retrieval :: {"ok": true, "command": "memory", "result": {"query": "AWS_SECRET_ACCESS_KEY", "routes": ["symbol", "lexical"], "strategy": "fusion", "hits": [{"artifact_id": "file:governance/kernel/policies/SECURITY
+PASS A3-b2-secret-bearing-content-is-reported :: secrets family present in the suite
+PASS A3-b3-overlay-cannot-declassify-a-secret-bearing-path :: {"ok": true, "command": "memory", "result": {"query": "AWS_SECRET_ACCESS_KEY", "routes": ["symbol", "lexical"], "strategy": "fusion", "hits": [{"artifact_id": "file:governance/kernel/policies/SECURITY
+PASS A3-b4-tool-registry-is-inspectable
+PASS A3-b4-L0-role-cannot-reinstall-the-kernel :: code=AUTHORITY_DENIED
+PASS A3-b4-an-undeclared-role-cannot-reinstall-the-kernel :: code=AUTHORITY_DENIED
+PASS A3-b5-an-L1-role-cannot-issue-an-emergency-control :: code=AUTHORITY_DENIED
+PASS A3-b6-outbound-export-controls-are-declared-default-deny :: {"never_export_classes": ["secret", "restricted", "confidential"], "on_secret_in_export_payload": "fail_closed"}
+PASS A3-b6-export-of-secret-bearing-material-fails-closed :: ok=False code=PACKET_NOT_FOUND leaked=False
+PASS A3-b6-export-path-refuses-an-unapproved-packet :: code=AUTHORITY_DENIED
+PASS A4-b1-model-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b1-api-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b1-cloud-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b1-network-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b1-tool-install-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b1-parallel-agent-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b1-experiment-budget-is-governed :: governed=['api_spend', 'cloud_changes', 'high_cost_experiments', 'model_spend', 'network_calls', 'package_install', 'parallel_agents']
+PASS A4-b4-budget-state-is-observable :: {"budget": {"max_network_calls_per_task": 200, "network_calls_by_task": {}, "over_budget": [], "max_parallel_agents": 4, "active_sessions": []}, "events": 54, "commands": [{"name": "audit", "count": 6, "ok": 6, "avg_ms": 0.0}, {"name": "cli.audit", "count": 6, "ok": 1, "avg_ms": 2158.6666666666665},
+PASS A4-b2-a-tightened-delegated-threshold-takes-effect :: effective max_parallel_agents=1
+PASS A4-b2-a-delegated-spend-threshold-is-executable :: ok=True code= threshold=task cost 999 > BUDGET_POLICY.defaults.max_task_cost_usd 1
+PASS A4-b3-exceeding-a-delegated-limit-creates-a-Human-Decision-Gate :: gate=HDG-0001 record={"model": "probe-model", "provider": "probe", "task_class": "governance", "reasoning_effort": "high", "cost": 999.0, "latency": 10, "pass_fail": "pass", "repair_count": 0, "reviewer_findings": 0, "task": "TASK-BUDGET-PROBE", "ts": "2026-09-20T23:20:4
+PASS A4-b2-a-second-over-budget-record-is-stopped-by-the-daily-spend-threshold :: threshold=daily spend 999.01 > BUDGET_POLICY.defaults.max_daily_spend_usd 200
+PASS A4-b2-spend-inside-the-delegated-budget-raises-no-gate :: ok=True gate=None
+PASS A4-b4-network-spend-to-date-is-observable :: [{"task": "TASK-BUDGET-PROBE", "network_calls": 3, "budget": 1}]
+FAIL A4-b2-network-call-budget-is-enforced-not-only-reported :: a network.call beyond the delegated budget was accepted: ok=True code=
+PASS A5-PAUSE-is-executable
+PASS A5-PAUSE-is-observable-in-status :: {}
+FAIL A5-PAUSE-no-command-changes-tracked-governed-state :: [{"command": "rebuild-memory", "ok": true, "code": "", "tracked_changes": ["M governance/generated/index-manifest.json", " M governance/generated/memory-manifest.json"]}, {"command": "memory rebuild", "ok": true, "code": "", "tracked_changes": ["M governance/generated/index-manifest.json"]}]
+PASS A5-PAUSE-recovery-is-executable
+PASS A5-FREEZE_WRITES-is-executable
+PASS A5-FREEZE_WRITES-is-observable-in-status :: {}
+FAIL A5-FREEZE_WRITES-no-command-changes-tracked-governed-state :: [{"command": "rebuild-memory", "ok": true, "code": "", "tracked_changes": ["M governance/generated/index-manifest.json"]}, {"command": "memory rebuild", "ok": true, "code": "", "tracked_changes": ["M governance/generated/index-manifest.json"]}]
+PASS A5-FREEZE_WRITES-remedy-resume-stays-available
+PASS A5-FREEZE_WRITES-recovery-is-executable
+PASS A5-CANCEL_AGENTS-is-executable
+PASS A5-CANCEL_AGENTS-is-observable-in-status :: {}
+PASS A5-CANCEL_AGENTS-recovery-is-executable
+PASS A5-ROLLBACK_TRANSACTION-cit-opened
+PASS A5-ROLLBACK_TRANSACTION-is-executable :: USAGE
+PASS A5-b5-emergency-commands-are-deterministic :: {"agents_cancelled": false, "mode": "PAUSED", "reason": "determinism probe", "role": "orchestrator", "writes_frozen": false} vs {"agents_cancelled": false, "mode": "PAUSED", "reason": "determinism probe", "role": "orchestrator", "writes_frozen": false}
+PASS A5-b5-emergency-commands-are-authority-gated :: code=AUTHORITY_DENIED
+PASS A5-b6-resume-succeeds
+PASS A5-b6-recovery-is-auditable (telemetry) :: telemetry mentions resume: True
+FAIL A5-b6-the-control-record-retains-the-entry-and-exit-history :: {"agents_cancelled": false, "mode": "RUNNING", "reason": null, "role": "orchestrator", "session": "S-3ec638345ce0", "updated_at": "2026-09-20T23:21:19Z", "writes_frozen": false}
+FAIL A5-b6-recovery-leaves-a-durable-reasoned-record :: records naming the reason: []
+
+-- 53/58 checks passed
+===== t04_adopt_roles :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/release/capability-baseline/verify-1/alpha/heldout/t04_adopt_roles.py =====
+PASS S4-brownfield-kernel-installed :: {
+  "ok": true,
+  "command": "init",
+  "result": {
+    "root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/alpha/proj/t04-a
+PASS S4-A0-safety-baseline-executes
+PASS S4-A0-records-a-safety-baseline (branch/snapshot/clean-tree) :: {"stage": "A0", "evidence": "spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml", "commit": "7155f08d42f970d419e45c2c1050a86581854971", "dirty_files": 22, "interrupted": true, "baseline_tests": "failed", "freeze_advice": "interrupted work detected: review items before A1; broad edits are frozen by pro
+PASS S4-A0-baseline-record-is-sealed (T2) :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/alpha/proj/t04-adopt/spec/audits/GOVERNANCE-ADOPTION/00-BASELINE.yaml
+PASS T2-b1-an-undeclared-session-cannot-author-an-adoption-stage :: code=ADOPTION_SESSION_UNDECLARED
+PASS S4-A1-`gov adopt inventory`-executes
+PASS S4-A2-`gov adopt classify`-executes
+PASS S4-A3-`gov adopt map`-executes
+PASS S4-A4-`gov adopt plan`-executes
+PASS S4-A4t-`gov adopt test-design`-executes
+PASS S4-A1-cold-inventory-catalogues-the-tree :: {"stage": "A1", "summary": {"files": 210, "tracked": 35, "by_kind": {"chat_store": 2, "config": 149, "data": 2, "doc": 18, "entrypoint": 1, "index_store": 2, "old_governance": 2, "package_manifest": 2, "provider_rules": 4, "report": 7, "research": 5, "secret": 4, "source": 10, "spec_doc": 28, "test"
+PASS S4-A2-classification-assigns-classes :: {"stage": "A2", "classified": 210, "by_class": {"DATA_RUNTIME": 1, "DEAD_OR_UNUSED": 2, "DECISION": 5, "GENERATED": 2, "GOVERNANCE_CURRENT": 149, "GOVERNANCE_LEGACY": 3, "HISTORICAL": 6, "PRODUCT_SOURCE": 6, "PRODUCT_TEST": 4, "REPORT_EVIDENCE": 2, "SECRET": 3, "SPEC_AUTHORITATIVE": 22, "SPEC_DERIVE
+PASS S4-A3-target-path-map-is-produced :: {"stage": "A3", "entries": 210, "actions": {"DELETE_FROM_ACTIVE_TREE": 4, "EXTRACT": 4, "KEEP_IN_PLACE": 194, "MOVE": 8}, "unknown_blocking_destructive": 0, "schema_problems": [], "catalogue": {"id": "PMAP-GOVERNANCE-ADOPTION", "version": 1, "content_hash": "dc001a7f1e5f3e1f9c441f308e2fb8f106293f39a
+PASS S4-A4-migration-plan-is-produced :: {"stage": "A4", "plan": {"id": "MPLAN-GOVERNANCE-ADOPTION", "version": 1, "content_hash": "5d8bb41bb8392d131970366c5739d844bc9a410385b5b04dbf2dac0fd6840b64", "regenerated_unchanged": false}, "batches": [{"batch": 0, "entries": 0, "human_gate": false}, {"batch": 1, "entries": 2, "human_gate": false},
+PASS T1-A5-the-planner-cannot-perform-the-independent-review :: code=INDEPENDENCE A5 (review) is performed only by the role designated for it, 'migration-reviewer'; this invocation declared 'orchestrator'
+PASS T2-A5-the-reviewer-may-not-continue-the-planner's-session :: code=INDEPENDENCE cause=SAME_SESSION_AS_BUILDER
+PASS T2-A5-an-approval-on-the-planner-scaffold-alone-is-refused (O3, BC-P2-34) :: code=INDEPENDENT_TESTS_REQUIRED scaffold_tests=42
+PASS S4-A5-independent-review-executes
+PASS T3-A5-approval-binds-digests-of-what-was-reviewed (BC-P2-34) :: {"stage": "A5", "verdict": {"session": "S-reviewer", "role": "migration-reviewer", "session_source": "installed", "role_source": "flag", "verdict": "MIGRATION_PLAN_APPROVED", "at": "2026-09-20T23:21:27Z", "tests": 45, "notes": null, "reviewer_tests": ["RVW-001", "RVW-002", "RVW-003"], "reviewer_test
+FAIL S4-A6-is-not-hard-blocked-on-a-brownfield-tree-A2-already-classified (BC-P2-33) :: A6 refused on a brownfield tree whose secret-bearing files A2 classified SECRET: [{"check": "D011", "subjects": ["memory/chat_history.sql", "src/app/config.py"], "severity": "critical", "remedies": ["cit.propose", "cit.approve", "cit.execute", "task.create", "task.claim", "handoff.create", "update.apply"]}, {"check": "path_map_compliance", "subjects": ["memory/chat_history.sql"], "severity": "critical", "remedies": ["cit.propose", "cit.approve", "cit.execute", "task.create", "task.claim", "handoff.create", "update.apply"]}, {"check": "path_map_compliance", "subjects": ["src/app/config.py"], "severity": "critical", "remedies": ["cit.propose", "cit.approve", "cit.execute", "
+    [S4] out-of-band remedy applied by the verifier: classified ['memory/chat_history.sql', 'src/app/config.py'] as secret in the project overlay (not an adoption stage)
+PASS S4-A6-controlled-migration-executes
+PASS T3-A6-execution-refuses-a-plan-changed-after-approval (BC-P2-34) :: code=APPROVAL_STALE
+PASS T3-A6-execution-refuses-weakened-independent-tests (BC-P2-34) :: code=APPROVAL_STALE
+PASS T3-A6-execution-refuses-a-changed-catalogue (BC-P2-34) :: code=APPROVAL_STALE
+    [S4] batch 2: ok 
+    [S4] batch 3: ok 
+    [S4] batch 4: ok 
+    [S4] batch 5: ok 
+    [S4] batch 6: ok 
+    [S4] batch 7: ok 
+PASS S4-A6-every-planned-batch-executes :: {"2": "ok", "3": "ok", "4": "ok", "5": "ok", "6": "ok", "7": "ok"}
+PASS T2-A7-the-verifier-may-not-continue-the-executor's-session :: code=INDEPENDENCE
+PASS S4-A7-independent-migration-verification-executes
+PASS S4-A8-legacy-extraction-retirement-executes
+PASS S4-A8-retirement-states-a-dependency-proof (BC-P2-33) :: {"stage": "A8", "stores": [{"path": ".chat/sessions.jsonl", "artifact_id": "ART-04f22cc0c94e", "kind": "jsonl", "strings": 3, "extracted": 2, "registered_for_review": 1, "skipped_secret_strings": 0, "duplicates": 0, "by_kind": {"decision": 1, "lesson": 1, "question": 1}, "records": ["spec/decisions/
+PASS S4-A9-new-knowledge-fabric-executes
+PASS T2-A10-the-builder-starter-set-alone-is-refused (O3, BC-P2-34) :: code=INDEPENDENT_HELDOUT_REQUIRED
+PASS T2-A10-the-memory-verifier-may-not-continue-the-builder's-session :: code=INDEPENDENCE
+PASS S4-A10-independent-memory-verification-executes
+PASS T2-A10-accepts-only-held-out-queries-the-verifier-authored (BC-P2-34) :: {"stage": "A10", "verdict": "MEMORY_ACCEPTED_FOR_V4_AUDIT", "heldout": {"recall_at_k": 0.8888888888888888, "mrr": 0.7962962962962963, "pass": true, "queries": 27, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0, "forbidden_violations": 0, "failed": [{"id": "HQ-014", "query": "\"rationale: legacy g
+PASS S4-A11-full-project-audit-executes
+PASS S4-A10-accepts-on-a-tree-whose-memory-meets-the-thresholds :: verdict=MEMORY_ACCEPTED_FOR_V4_AUDIT code=
+PASS S4-A11-full-project-audit-executes-after-A10-accepts :: ok=True code= {"stage": "A11", "verdict": "ADOPTED_HEALTHY", "verdict_reasons": [], "verdict_reason": null, "audit": "AUD-0011", "audit_verdict": "HEALTHY", "tier": "G5", "health_result": "HR-20260920T232344931Z-884b78c2", "doctor": "HEALTHY", "checks": [{"criteri
+PASS T1-authorship-of-independent-auditor-is-recorded :: auditor authorship recorded: True
+PASS T3-the-adoption-evidence-tree-is-traceable-end-to-end :: stages visible in `gov adopt status`: ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11']
+PASS T3-every-stage-leaves-an-artefact-in-the-evidence-tree :: 20 artefacts: ['00-BASELINE.yaml', '01-COLD-INVENTORY.jsonl', '01-COLD-INVENTORY.md', '02-CLASSIFICATION.jsonl', '03-LEGACY-GOVERNANCE-MAP.md', '04-TARGET-PATH-MAP.jsonl', '04-TARGET-PATH-MAP.meta.json', '04-TARGET-PATH-MAP.versions', '05-ADOPTION-MIGRATION-PLAN.md', '05-plan.versions', '05-plan.yaml', '06-INDEPENDENT-MIGRATION-TEST-DESIGN.md', '06-migration-tests.yaml', '07-MIGRATION-EXECUTION-REPORT.md']
+PASS T1-authorship-of-orchestrator-is-recorded :: orchestrator/S-planner present in the baseline authorship log
+PASS T1-authorship-of-migration-executor-is-recorded :: migration-executor/S-executor present in the baseline authorship log
+PASS T1-authorship-of-migration-reviewer-is-recorded :: migration-reviewer/S-reviewer present in the baseline authorship log
+PASS T1-authorship-of-migration-verifier-is-recorded :: migration-verifier/S-verifier present in the baseline authorship log
+PASS T1-authorship-of-memory-engineer-is-recorded :: memory-engineer/S-memory present in the baseline authorship log
+PASS T1-authorship-of-memory-verifier-is-recorded :: memory-verifier/S-memver present in the baseline authorship log
+PASS T1-role-`recovery agent`-is-executable-as-the-recovery-procedure
+PASS T1-recovery-classifies-partial-mutations :: {"ok": true, "command": "recover", "result": {"items": [{"kind": "uncommitted_governance_changes", "files": ["governance/", "spec/architecture/", "spec/audits/", "spec/data/", "spec/experiments/", "spec/features/", "spec/interfaces/", "spec/lessons/", "spec/now/", "spec/performance/", "spec/planning
+PASS T1-recovery-writes-a-checkpoint-or-report :: {"ok": true, "command": "recover", "result": {"items": [{"kind": "uncommitted_governance_changes", "files": ["governance/", "spec/architecture/", "spec/audits/", "spec/data/", "spec/experiments/", "spec/features/", "spec/interfaces/", "spec/lessons/", "spec/now/", "spec/performance/", "spec/planning
+PASS T1-recovery-freezes-broad-governance-memory-work :: {"ok": true, "command": "recover", "result": {"items": [{"kind": "uncommitted_governance_changes", "files": ["governance/", "spec/architecture/", "spec/audits/", "spec/data/", "spec/experiments/", "spec/features/", "spec/interfaces/", "spec/lessons/", "spec/now/", "spec/performance/", "spec/planning
+PASS T1-role-`adoption auditor/planner`-exists-as-a-kernel-role :: 'orchestrator' in ROLES.yaml: True
+PASS T1-role-`independent migration reviewer/test author`-exists-as-a-kernel-role :: 'migration-reviewer' in ROLES.yaml: True
+PASS T1-role-`migration executor`-exists-as-a-kernel-role :: 'migration-executor' in ROLES.yaml: True
+PASS T1-role-`independent migration verifier`-exists-as-a-kernel-role :: 'migration-verifier' in ROLES.yaml: True
+PASS T1-role-`memory engineer`-exists-as-a-kernel-role :: 'memory-engineer' in ROLES.yaml: True
+PASS T1-role-`independent memory verifier/test author`-exists-as-a-kernel-role :: 'memory-verifier' in ROLES.yaml: True
+PASS T1-role-`comprehensive independent auditor`-exists-as-a-kernel-role :: 'independent-auditor' in ROLES.yaml: True
+PASS T1-role-`operator/CTO`-exists-as-a-kernel-role :: 'human' in ROLES.yaml: True
+PASS B2-b3-unknown-material-artefacts-are-counted-as-blocking-destructive-migration :: unknown_blocking=1 map_unknown_blocking_destructive=1
+PASS B2-b3-a-destructive-batch-is-refused-while-an-UNKNOWN-artefact-is-unresolved :: unknown=['src/unknown_blob.bin'] batches={"0": "ok", "1": "ok", "2": "ok", "3": "ok", "4": "ok", "5": "ok", "6": "UNKNOWN_BLOCKS_DESTRUCTIVE", "7": "UNKNOWN_BLOCKS_DESTRUCTIVE"}
+PASS S4-legacy-tree-installed
+PASS BC-P2-31-a-legacy-emergency-control-file-is-still-honoured :: {"ok": true, "command": "status", "result": {"framework": {"name": "agentic-engineering-os", "version": "4.1.6", "release_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5", "cli_version": "4.1.6", "installed_at": "2026-09-20T2
+PASS BC-P2-31-the-control-state-can-be-lifted-on-a-legacy-tree
+PASS BC-P2-31-the-control-store-is-relocated-out-of-the-derived-runtime-dir :: state=True legacy=False
+PASS BC-P2-31-adopt-runs-on-the-legacy-tree-after-relocation
+PASS B3-deleting-the-derived-runtime-directory-does-not-delete-project-truth :: code=
+PASS BC-P2-31-the-non-rebuildable-OS-stores-survive-deleting-the-derived-runtime :: ['.gitignore', 'claims.db', 'control.json']
+PASS BC-P2-31-a-conflicting-legacy-copy-is-honoured-strictly-or-refused :: {"ok": true, "command": "status", "result": {"framework": {"name": "agentic-engineering-os", "version": "4.1.6", "release_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5", "cli_version": "4.1.6", "installed_at": "2026-09-20T23:24:37Z"}
+
+Adoption stage outcomes: {"A0": [true, ""], "A1": [true, ""], "A2": [true, ""], "A3": [true, ""], "A4": [true, ""], "A4t": [true, ""], "A5": [true, ""], "A6": [true, ""], "A7": [true, ""], "A8": [true, ""], "A9": [true, ""], "A10": [true, ""], "A11": [true, ""]}
+
+-- 67/68 checks passed
+===== t05_release_init_update :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/release/capability-baseline/verify-1/alpha/heldout/t05_release_init_update.py =====
+PASS S1-b1-canonical-repo-separates-`framework` :: framework present at the canonical root
+PASS S1-b1-canonical-repo-separates-`runtime` :: runtime present at the canonical root
+PASS S1-b1-canonical-repo-separates-`cli` :: cli present at the canonical root
+PASS S1-b1-canonical-repo-separates-`tools` :: tools present at the canonical root
+PASS S1-b1-canonical-repo-separates-`migrations` :: migrations present at the canonical root
+PASS S1-b1-canonical-repo-separates-`tests` :: tests present at the canonical root
+PASS S1-b1-canonical-repo-separates-`fixtures` :: fixtures present at the canonical root
+PASS S1-b1-canonical-repo-separates-`lessons` :: lessons present at the canonical root
+PASS S1-b1-canonical-repo-separates-`change-proposals` :: change-proposals present at the canonical root
+PASS S1-b1-canonical-repo-separates-`release` :: release present at the canonical root
+PASS S1-b1-canonical-repo-separates-`docs` :: docs present at the canonical root
+PASS S3-b1-certified-kernel-installation-executes
+PASS S1-b2-a-consumer-repo-does-not-rebuild-the-OS :: consumer build inputs present=False
+PASS S2-b1-semantic-versioning :: 4.1.6
+PASS S2-b-release-manifest :: True
+PASS S2-b-file-hashes :: {"KERNEL.yaml": "0de6f4193ca337e8d2bde01d7ba8d492d65593a8d7b501c35a0d8e547ba69cb4", "adapters/api/adapter.yaml": "349dc1b97fc22fe1407dba473485cf2a83d0b5656104bb
+PASS S2-b-supported-migrations :: ["M-4.1.5-4.1.6"]
+PASS S2-b-schema-versions :: {"adapter-manifest": "1.0.0", "adoption-baseline": "1.2.0", "audit": "1.2.0", "capability-profile": "1.0.0", "checkpoint": "1.0.0", "cit": "1.3.0", "command-con
+PASS S2-b-CLI/runtime-versions :: ["4.1.6", "4.1.6"]
+PASS S2-b-adapter/capability-versions :: {"api": "1.0.0", "cli": "1.0.0", "generic": "1.0.0", "ide": "1.0.0", "mcp": "1.0.0"}
+PASS S2-b-release-notes :: "Release 4.1.6 of agentic-engineering-os."
+PASS S2-b-affected-indexes :: ["code", "graph", "lexical", "semantic"]
+PASS S2-b-human-decisions :: []
+PASS S2-b-rollback :: "gov update --rollback restores the previous kernel, overlay snapshot and framework.lock from the update snapshot in .governance-state/update/<version>/ (non-re
+FAIL S2-b-capability-plugin-versions-are-recorded (A0-S2-01) :: adapter_versions={"api": "1.0.0", "cli": "1.0.0", "generic": "1.0.0", "ide": "1.0.0", "mcp": "1.0.0"} capability_versions=None
+PASS S2-releases-are-immutable :: code=RELEASE_IMMUTABLE
+PASS S2-release-hashes-verify :: {"version": "4.1.6", "ok": true, "modified": [], "missing": [], "added": [], "release_hash_matches_kernel": true, "certification": {"effective_status": "UNCERTIFIED", "authenticated": false, "basis": 
+PASS S2-release-verify-detects-a-changed-file :: ok=True code=
+PASS S3-b2-project-overlay-created :: governance/project/*
+PASS S3-b3-repository-contract-created
+PASS S3-b4-initial-memory-state-created :: index manifest / runtime db
+PASS S3-b5-health-checks-run-at-init :: {"doctor": "HEALTHY", "conformance": {"audit": "AUD-0001", "verdict": "HEALTHY"}}
+PASS S3-b6-reference-retrieval-profile-bootstrapped-when-certified :: {"embedder": "hashed-ngram", "identity": "88ad40bc7681d5c994526b9be6a10c9e2d2df0512a5c61863b3e84236895192a", "artifacts": 162}
+PASS S3-b6-the-bootstrapped-profile-answers-queries :: {"queries": 12, "pending_queries": 2, "min_queries": 5, "measured": true, "status": "PASS", "recall_at_k": 1.0, "mrr": 1.0, "precision_at_k": 1.0, "stale_hit_rate": 0.0, "superseded_hit_rate": 0.0, "f
+PASS S3-init-records-the-authenticity-basis-of-what-it-installed :: {"authenticity": "AUTHENTIC", "admission": "SIGNED_RELEASE_METADATA", "sequence": 100}
+PASS S5-b1-check-impact-simulation-executes
+PASS S5-b1-impact-simulation-states-radius-and-consequences :: {"radius": "R3", "overlay_changes": [], "index_rebuild": false, "regenerate_adapters": false, "notes": [], "breaking_changes": [], "human_gates": [], "consequences": ["kernel 4.1.6 \u2192 4.1.7 (1 migration step(s))", "spec/ and product/ are not touched (INV-013)", "no index rebuild required", "targ
+PASS S5-b3-compatibility-and-migration-path-are-computed :: {"compatible": true, "migration_path": ["M-4.1.6-4.1.7"]}
+PASS S5-b2-authenticated-source: certification comes only from signed metadata :: {"authenticated": false, "authenticated_status": null, "release_metadata_sha256": "c8e396fa4abc285b20fc11ab46a0ab6e01615183f703cca61452b2a43e870ffe", "release_version": "4.1.7", "basis": "the signed release metadata binds no certification evidence; treated as uncertified", "unsigned_claim": "READY_F
+PASS S5-b2-an-uncertified-target-requires-the-human-gate :: True
+PASS S5-b2-an-unsigned-update-source-does-not-install :: ok=False code=HUMAN_GATE_REQUIRED applied=None
+PASS S5-b2-a-foreign-signed-update-source-does-not-install :: ok=True code= reason=human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record
+FAIL S5-b2-a-tampered-source-declaring-the-installed-version-is-not-reported-as-up-to-date :: ok=True code= reason=already up to date (the source was never authenticated)
+PASS S5-b2-an-uncertified-update-stops-at-the-human-gate :: ok=True code= reason=human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record
+PASS S5-b2-an-agent-declared-approval-does-not-substitute-for-the-human-gate :: ok=True code= reason=human gate not presented/answered (INV-008): --approve is not a substitute for an answered gate record
+PASS S5-the-gate-package-is-presented-before-it-can-be-answered (INV-008)
+PASS S5-the-owner-signed-human-answer-is-accepted
+PASS S5-an-authentic-approved-update-applies :: ok=True code= 
+PASS S5-b3-migration-is-applied :: ["M-4.1.6-4.1.7"]
+PASS S5-b4-the-project-overlay-is-preserved :: PROJECT_POLICY.yaml unchanged by the update
+PASS S5-b5-adapters-views-are-regenerated :: {"overlay_reconciled": [], "overlay_keys_changed": []}
+PASS S5-b6-affected-indexes-are-rebuilt :: 91311851accff3d7ff84ac16a646cef6f02c0535947966a0cc199f53527055cb
+PASS S5-b7-the-update-verifies-afterwards :: {"doctor": "DEGRADED", "audit": "HEALTHY"}
+PASS S5-b2-the-committed-update-records-an-authentic-source :: {"authenticity": "AUTHENTIC", "version": "4.1.7"}
+PASS S5-b9-ledger-provenance-is-recorded :: {"at":"2026-09-20T23:25:07Z","event":"update","from":"4.1.6","to":"4.1.7","by":"orchestrator","session":"S-dfac1687240a","role":"orchestrator","result":"committed","release_commit":"unverified","sourc
+PASS S5-b8-rollback-below-the-floor-is-refused-by-default :: code=SRR_BELOW_FLOOR
+PASS S5-b8-rollback-with-an-owner-signed-authorisation-restores-the-release (BC-P2-38) :: ok=True code= version=4.1.6 
+PASS S5-b8-the-machine-is-marked-degraded-after-break-glass :: {"marking": "DEGRADED \u2014 RECOVERY ONLY", "entered_at": "2026-09-20T23:25:09Z", "record": {"active": true, "authorisation": {"expires": "2099-01-01T00:00:00Z", "issued": "2026-09-20T00:00:00Z", "no
+PASS S5-health-admission-refuses-an-update-that-remedies-nothing :: code=NOT_INSTALLED no Governance OS installation at /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/alpha/proj/t05-health (run gov init or gov adop
+PASS S5-health-admission-refusal-is-typed-and-names-its-subjects :: {"operation": null, "subjects": null}
+PASS S5-b8-rollback-is-executable-or-typed-when-there-is-nothing-to-roll-back :: ok=False code=SNAPSHOT_MISSING no unconsumed update snapshot under .governance-state/update/ (every rollback consumes its snapshot; see spec/reports/framework-updates.jsonl)
+
+S5 update apply outcome:  
+
+-- 59/61 checks passed
+===== t06_gate_b_contract_freshness :: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/release/capability-baseline/verify-1/alpha/heldout/t06_gate_b_contract_freshness.py =====
+PASS B-baseline-installed
+PASS B1-b1-boundary-`governance`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`framework`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`project`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`generated`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b1-boundary-`runtime`-is-explicit :: named in REPOSITORY_CONTRACT.yaml
+PASS B1-b2-native-product-architecture-is-preserved :: src/ and docs/ untouched by init
+PASS B1-b3-the-contract-maps-the-project's-own-layout-without-refactoring-it :: [{"pattern": "src/**", "class": "source", "owner_role": "backend-engineer", "semantic_index": true, "lexical_index": true, "graph_index": true, "code_index": true, "namespace": "product"}, {"pattern": "governance/kernel/**", "class": "authoritative", "owner_role": "release-agent", "mutation": "prohi
+PASS B1-b4-generated-runtime-state-is-distinguished-from-tracked-authoritative-state :: {}
+PASS B1-b4-the-derived-runtime-directory-is-not-tracked :: []
+PASS B2-adopt-baseline-executes
+PASS B2-adopt-inventory-executes
+PASS B2-adopt-classify-executes
+PASS B2-adopt-map-executes
+PASS B2-b1-every-material-artefact-is-classified :: 181 rows
+PASS B2-b1-each-carries-current-path-class-authority-and-intended-target :: 181/181 complete; sample={"artifact_id": "ART-eaaf287742ff", "type": "migration-catalogue-entry", "current_path": ".gitignore", "current_class": "TOOLING", "authority": "ACTIVE", "target_path": null, "target_class": "TOOLING", "action": "KEEP_IN_PLACE", "reason": "native pro
+PASS B2-b2-target-action-`KEEP`-is-supported :: in_produced_map=True in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`MOVE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`RENAME`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`SPLIT`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`MERGE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`EXTRACT`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`RETIRE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+PASS B2-b2-target-action-`DELETE_FROM_ACTIVE_TREE`-is-supported :: in_produced_map=False in_catalogue_schema_vocabulary=True
+FAIL B2-b2-SPLIT-and-MERGE-are-executable-not-only-declared (A0-B2-01) :: actions with an executor in the migration engine: []
+PASS B2-b4-imports-and-consumers-are-represented :: {"ART-eaaf287742ff": [], "ART-3d1db03b377d": [], "ART-a090e26c869d": []}
+PASS B2-b4-documentation-citations-are-represented (BC-P2-52) :: {"path": "docs/design.md", "citations": ["src/app.py", "src/util.py"], "path_references": [], "consumers": []}
+PASS B2-b4-a-cited-file-records-its-document-consumer (BC-P2-52) :: {"path": "src/util.py", "consumers": ["docs/design.md", "governance/generated/index-manifest.json", "governance/tests/memory/heldout.yaml", "spec/audits/AUD-0001.yaml", "src/app.py"]}
+PASS B2-b5-path-map-compliance-is-machine-checkable :: path_map_compliance family present in the governance suite
+PASS B2-b5-the-compliance-check-reports-a-violation :: audit ok=False code=UNHEALTHY
+PASS B3-b1-git-records-remain-authoritative :: 192 tracked files
+PASS B3-b2-indexes-are-declared-derived :: index manifest + runtime db
+PASS B3-b3-deleting-derived-state-does-not-delete-project-truth :: status code=
+PASS B3-b3-derived-state-rebuilds-from-authoritative-truth
+PASS B3-b3-retrieval-is-restored-after-the-rebuild :: [{"artifact_id": "file:src/util.py", "path": "src/util.py", "chunk_id": "file:src/util.py#1", "section": "helper", "level": "section", "score": 0.03278688524590164, "routes": ["symbol", "lexical"], "s
+PASS B3-b4-derived-records-carry-provenance-sufficient-to-reconstruct-source-hits :: {"artifact_id": "file:src/util.py", "path": "src/util.py", "chunk_id": "file:src/util.py#1", "section": "helper", "record_type": "file"}
+PASS AC13-contract-verify-reports-a-bound-chain :: {"contract_version": "v3", "owner_source": "Governance_OS_Capability_Acceptance_Contract_v3.md", "owner_source_present_in_tree": true, "owner_source_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3", "canonical_import": "fra
+PASS BC-P2-01-compiled-contract-carries-A1's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-A2's-10-bullets-verbatim :: want=10 got=10
+PASS BC-P2-01-compiled-contract-carries-A3's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-A4's-4-bullets-verbatim :: want=4 got=4
+PASS BC-P2-01-compiled-contract-carries-A5's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-B1's-4-bullets-verbatim :: want=4 got=4
+PASS BC-P2-01-compiled-contract-carries-B2's-5-bullets-verbatim :: want=5 got=5
+PASS BC-P2-01-compiled-contract-carries-B3's-4-bullets-verbatim :: want=4 got=4
+PASS BC-P2-01-compiled-contract-carries-S1's-2-bullets-verbatim :: want=2 got=2
+PASS BC-P2-01-compiled-contract-carries-S2's-11-bullets-verbatim :: want=11 got=11
+PASS BC-P2-01-compiled-contract-carries-S3's-6-bullets-verbatim :: want=6 got=6
+PASS BC-P2-01-compiled-contract-carries-S4's-12-bullets-verbatim :: want=12 got=12
+PASS BC-P2-01-compiled-contract-carries-S5's-9-bullets-verbatim :: want=9 got=9
+PASS BC-P2-01-compiled-contract-carries-S6's-3-bullets-verbatim :: want=3 got=3
+PASS BC-P2-01-compiled-contract-carries-T1's-9-bullets-verbatim :: want=9 got=9
+PASS BC-P2-01-compiled-contract-carries-T2's-2-bullets-verbatim :: want=2 got=2
+PASS BC-P2-01-compiled-contract-carries-T3's-1-bullets-verbatim :: want=1 got=1
+PASS BC-P2-01-A2-is-compiled-as-POST_VERIFICATION_HARDENING :: POST_VERIFICATION_HARDENING
+PASS BC-P2-01-Gate-U-is-represented-in-the-compiled-contract :: U present=True bullets=28
+PASS BC-P2-01-the-compiled-contract-covers-every-owner-source-capability :: capability_count=101 checklist_item_count=713
+PASS BC-P2-02-A1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:policy_precedence", "class": "governance health check", "tiers": ["G4", "G5", "G6"], "exercises": "refuse
+PASS BC-P2-02-A2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent held-out test", "migration/rollback evidence",  automated_checks=[{"id": "doctor:D003", "class": "governance health check", "tiers": ["G1", "G5"], "exercises": "kernel payload integrity
+PASS BC-P2-02-A3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["automated invariant/guard", "unit/integration/system test", "governance health check", "human-gate evidence", "indepen automated_checks=[{"id": "check:secrets_sensitivity_indexing", "class": "governance health check", "tiers": ["G1", "G4", "G5", "G6"], "ex
+PASS BC-P2-02-A4-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "human-gate evidence", "independent audit evidence"] automated_checks=[{"id": "test:certification:repair::budget_parallel_agents_threshold_raises_gate", "class": "unit/integration/system tes
+PASS BC-P2-02-A5-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["automated invariant/guard", "unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "g0:pause", "class": "automated invariant/guard", "tiers": ["G0"], "exercises": "PAUSE is an authority-gated (em
+PASS BC-P2-02-B1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:path_map_compliance", "class": "governance health check", "tiers": ["G1", "G4", "G5", "G6"], "exercises":
+PASS BC-P2-02-B2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "migration/rollback evidence", "independent audit evidence"] automated_checks=[{"id": "check:path_map_compliance", "class": "governance health check", "tiers": ["G1", "G4", "G5", "G6"], "exercises":
+PASS BC-P2-02-B3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "clean-clone/release evidence", "independent audit evidence" automated_checks=[{"id": "check:recovery_rebuild", "class": "governance health check", "tiers": ["G4", "G5", "G6"], "exercises": "tracked
+PASS BC-P2-02-S1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "clean-clone/release evidence", "independent audit evidence"] automated_checks=[{"id": "release:release build", "class": "clean-clone/release evidence", "record": "release-manifest", "exercises": "a 
+PASS BC-P2-02-S2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "independent held-out test", "migration/rollback evidence", "clean-clone/release eviden automated_checks=[{"id": "release:release build", "class": "clean-clone/release evidence", "record": "release-manifest", "exercises": "th
+PASS BC-P2-02-S3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent held-out test", "clean-clone/release evidence", automated_checks=[{"id": "release:init", "class": "clean-clone/release evidence", "record": "framework-lock", "exercises": "a clean insta
+PASS BC-P2-02-S4-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "migration/rollback evidence", "human-gate evidence", "independent audit evidence"] automated_checks=[{"id": "human-gate:adopt migrate", "class": "human-gate evidence", "record": "human-gate", "exercises": "a destructive 
+PASS BC-P2-02-S5-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "independent held-out test", "migration/rollback evidence", "clean-clone/release eviden automated_checks=[{"id": "release:update --apply", "class": "clean-clone/release evidence", "record": "framework-lock", "exercises": "an 
+PASS BC-P2-02-S6-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "clean-clone/release evidence", "independent audit evidence" automated_checks=[{"id": "check:recovery_rebuild", "class": "governance health check", "tiers": ["G4", "G5", "G6"], "exercises": "the der
+PASS BC-P2-02-T1-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["automated invariant/guard", "unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:authority_role_limits", "class": "governance health check", "tiers": ["G3", "G4", "G5", "G6"], "exercises
+PASS BC-P2-02-T2-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "independent audit evidence"] automated_checks=[{"id": "test:certification:migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts", "class"
+PASS BC-P2-02-T3-has-an-evidence-owner-and-at-least-one-automated-check :: evidence_class=["unit/integration/system test", "governance health check", "independent audit evidence"] automated_checks=[{"id": "check:os_binding_integrity", "class": "governance health check", "tiers": ["G1", "G2", "G3", "G4", "G5", "G6"],
+PASS AC13-a-semantic-divergence-in-the-compiled-view-is-detected :: ok=False code=CONTRACT_COMPILED_DIVERGED framework/contracts/governance-capability-acceptance.yaml does not faithfully represent the approved source: 2 difference(s) from the owner source Governance_OS_Capability_Acceptance_Contract_v3.md — 
+PASS AC13-a-gutted-evidence-map-is-detected :: ok=False code=CONTRACT_EVIDENCE_OWNER_INVALID
+PASS AC10-a-green-governance-record-can-be-established :: green=True verdict=HEALTHY
+PASS AC10-changing-`an authoritative spec decision`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+PASS AC10-changing-`product source`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+PASS AC10-changing-`the project policy overlay`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+PASS AC10-changing-`the index manifest`-invalidates-prior-green-evidence :: task_create=ok doctor=ok
+
+-- 80/81 checks passed
+
+===== RUN-ALL summary =====
+t01_a2_root_of_trust: 54 passed, 1 failed (exit 1)
+t02_cross_machine: 74 passed, 0 failed (exit 0)
+t03_gate_a: 53 passed, 5 failed (exit 1)
+t04_adopt_roles: 67 passed, 1 failed (exit 1)
+t05_release_init_update: 59 passed, 2 failed (exit 1)
+t06_gate_b_contract_freshness: 80 passed, 1 failed (exit 1)

@@ -1,0 +1,827 @@
+schema: governance-os.phase-2.qualification-coverage-matrix
+schema_version: 1
+run_id: P2-AR-0052
+acceptance_criterion: AC-11
+candidate: cap2-candidate-1
+note: 'assembled from the six iteration-1 family verifications and checked by the synthesis verifier for completeness: every applicable capability names a Repo A challenge, a Repo B challenge and a hidden-oracle
+  fault class, or states why it is not challengeable and names another independent evidence route.'
+summary:
+  capabilities: 101
+  with_repo_a: 101
+  with_repo_b: 101
+  with_hidden_oracle_fault_class: 101
+  with_chaos_scale_soak_or_stated_not_relevant: 101
+  with_retrieval_or_stated_not_relevant: 101
+  not_challengeable_with_alternative_route: 0
+  incomplete_rows: []
+capabilities:
+- capability: A1
+  family: alpha
+  repo_a_challenge: a greenfield overlay that strengthens one additive key and weakens one immutable key in the same file
+  repo_b_challenge: a brownfield tree with contradictory legacy provider rules and a project overlay that lowers a kernel tier floor
+  hidden_oracle_fault_class: a weakening override that is silently applied instead of refused
+  chaos_scale_soak: 'not relevant: precedence is evaluated per command from a small rule set'
+  retrieval_challenge: a retrieved document claiming constitutional authority must never enter the effective policy
+  not_challengeable: null
+- capability: A2
+  family: alpha
+  repo_a_challenge: install a signed release, then rewrite payload+manifest+lock consistently and require detection
+  repo_b_challenge: adopt a brownfield tree from a release whose metadata was replaced by another owner's
+  hidden_oracle_fault_class: a tampered payload admitted, or a bootstrap install presented as current
+  chaos_scale_soak: interrupt the atomic swap mid-commit and require the replay to leave one consistent installation
+  retrieval_challenge: 'not relevant: authenticity never depends on retrieval'
+  not_challengeable: null
+- capability: A3
+  family: alpha
+  repo_a_challenge: seeded credentials in source, config and a test fixture; a project overlay that tries to declassify them
+  repo_b_challenge: a legacy chat store carrying secrets, plus a provider-rules file granting broad tool permissions
+  hidden_oracle_fault_class: a secret reaching the index or an export packet
+  chaos_scale_soak: a large tree where the secret scanner must stay within the index-build budget
+  retrieval_challenge: a query that targets the secret directly must return nothing
+  not_challengeable: null
+- capability: A4
+  family: alpha
+  repo_a_challenge: a workstream whose routing evidence crosses the per-task and then the daily spend thresholds
+  repo_b_challenge: an adopted repository whose legacy tooling would install packages above max_install_cost_usd
+  hidden_oracle_fault_class: a delegated threshold crossed without a gate
+  chaos_scale_soak: many concurrent sessions contending for max_parallel_agents
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: A5
+  family: alpha
+  repo_a_challenge: freeze writes mid-task and require every mutating command to refuse and the remedy to stay available
+  repo_b_challenge: an adopted tree where a legacy control file exists at the pre-relocation path
+  hidden_oracle_fault_class: a governed write that succeeds during a freeze
+  chaos_scale_soak: a freeze issued while several sessions hold claims
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: B1
+  family: alpha
+  repo_a_challenge: a greenfield tree with an unusual but healthy layout that the contract must map in place
+  repo_b_challenge: Repo B's misplaced specs, duplicate authority and generated files in the wrong places
+  hidden_oracle_fault_class: an authoritative store classified derived, or a derived store classified authoritative
+  chaos_scale_soak: 'not relevant: the contract is a small rule set evaluated per path'
+  retrieval_challenge: per-path index flags must decide what is indexed
+  not_challengeable: null
+- capability: B2
+  family: alpha
+  repo_a_challenge: a greenfield tree whose docs cite source files that later move
+  repo_b_challenge: Repo B with no path map, hidden cross-references, dead code and an unclassifiable blob
+  hidden_oracle_fault_class: a destructive migration that runs with an UNKNOWN artefact outstanding, or a citation lost on a move
+  chaos_scale_soak: a tree of tens of thousands of files where the catalogue must stay complete
+  retrieval_challenge: the map must answer "who consumes this?" without semantic retrieval
+  not_challengeable: null
+- capability: B3
+  family: alpha
+  repo_a_challenge: delete the whole derived runtime directory and require a byte-identical rebuild
+  repo_b_challenge: an adopted tree whose legacy index stores sit beside the new ones
+  hidden_oracle_fault_class: an authoritative record that exists only in the derived store
+  chaos_scale_soak: interrupt a rebuild and require the next one to be complete
+  retrieval_challenge: a rebuilt index must answer the held-out queries at the same recall
+  not_challengeable: null
+- capability: C1
+  family: beta
+  repo_a_challenge: a greenfield repository carrying at least one record of each of the seventeen kinds; assert each is read back after a fresh clone
+  repo_b_challenge: a brownfield repository whose legacy material must become records of these kinds through adoption; assert no kind is left unrepresented
+  hidden_oracle_fault_class: a record of one kind silently missing from the structured store while the file exists on disk
+  chaos_scale_soak: 'not relevant: C1 is a representation obligation, not a throughput one'
+  retrieval_challenge: exact-id retrieval of one record of each kind
+  not_challengeable: null
+- capability: C2
+  family: beta
+  repo_a_challenge: a repository with one record of each relation type; assert all twenty read back and impact traversal reaches the expected set
+  repo_b_challenge: a brownfield repository whose imported relations are reversed or ill-typed; assert every one is reported
+  hidden_oracle_fault_class: an edge to a superseded target, a reversed edge and an ill-typed edge planted together
+  chaos_scale_soak: 'a graph of 10^5 edges: traversal and integrity must stay bounded'
+  retrieval_challenge: '`what depends on X` must be answered by the graph route, not by semantic similarity'
+  not_challengeable: null
+- capability: C3
+  family: beta
+  repo_a_challenge: a repository where each semantic class is the only carrier of a distinctive statement; assert each is retrievable by paraphrase
+  repo_b_challenge: a brownfield repository whose superseded material outranks its current material lexically
+  hidden_oracle_fault_class: twenty superseded carriers of the needle and one current carrier
+  chaos_scale_soak: 'not relevant: covered by the D5 benchmark''s latency and resource measures'
+  retrieval_challenge: paraphrase queries for decisions, lessons, research, requirements and code units
+  not_challengeable: null
+- capability: C4
+  family: beta
+  repo_a_challenge: needles in list-valued and nested record fields, in module-level code and inside method bodies
+  repo_b_challenge: a brownfield repository with error strings and config keys only in legacy documents
+  hidden_oracle_fault_class: content that exists only inside a nested record field or outside every structural code unit
+  chaos_scale_soak: not relevant
+  retrieval_challenge: exact term, identifier, filename, error string, config key and literal phrase
+  not_challengeable: null
+- capability: C5
+  family: beta
+  repo_a_challenge: a five-language source tree with routes, ORM models, inheritance and cross-file tests
+  repo_b_challenge: a brownfield tree whose adapters are absent, so every file falls back to the built-in extractor
+  hidden_oracle_fault_class: a renamed method, a route whose handler moved, a model whose table name changed
+  chaos_scale_soak: 'a 10^5-file tree: extraction must stay incremental'
+  retrieval_challenge: qualified-symbol lookup must return the method, not the file header
+  not_challengeable: null
+- capability: C6
+  family: beta
+  repo_a_challenge: a record amended twice and then superseded; assert the OS can say what changed, when, why and by which decision
+  repo_b_challenge: a brownfield repository whose history predates governance
+  hidden_oracle_fault_class: a supersession recorded on one side only
+  chaos_scale_soak: not relevant
+  retrieval_challenge: '`what changed in X and why` must reach the transaction record'
+  not_challengeable: null
+- capability: C7
+  family: beta
+  repo_a_challenge: a task claimed, worked and closed by a designated role in its own session
+  repo_b_challenge: a brownfield repository where the first closes happen during adoption
+  hidden_oracle_fault_class: a close report whose declared files_changed do not match the working tree
+  chaos_scale_soak: many concurrent sessions closing work
+  retrieval_challenge: '`what did session S do` must reach its close report'
+  not_challengeable: null
+- capability: C8
+  family: beta
+  repo_a_challenge: each of the seven failure classes provoked in turn; assert a durable record of that class
+  repo_b_challenge: a brownfield repository whose adoption provokes a migration failure
+  hidden_oracle_fault_class: 'a failure of a class with no writer: it must be recorded, not lost'
+  chaos_scale_soak: a repeated failure must not flood the tree (the signature de-duplication)
+  retrieval_challenge: a tool failure must be recalled by a later session through the fabric; a retrieval miss must never answer its own query
+  not_challengeable: null
+- capability: C9
+  family: beta
+  repo_a_challenge: a task with declared requirements, decisions, interfaces, scenarios and a required research input
+  repo_b_challenge: a brownfield task whose declared input was superseded during adoption
+  hidden_oracle_fault_class: a mandatory input silently missing, and a duplicate carrier of the same text
+  chaos_scale_soak: a packet whose supplementary material would exceed the budget
+  retrieval_challenge: the packet must not need semantic retrieval to find a mandatory input
+  not_challengeable: null
+- capability: C10
+  family: beta
+  repo_a_challenge: a repository declaring MCP servers, plugins and model providers; assert each is resolved per role
+  repo_b_challenge: a brownfield repository whose dependency manifests are the only record of its packages
+  hidden_oracle_fault_class: a tool whose installed version differs from the declared one
+  chaos_scale_soak: not relevant
+  retrieval_challenge: '`which tools may this role use` must be answered from capability memory'
+  not_challengeable: null
+- capability: D1
+  family: beta
+  repo_a_challenge: edits, renames, deletes, a path-map reclassification and an embedder change in sequence
+  repo_b_challenge: a brownfield repository whose adoption reclassifies half the tree
+  hidden_oracle_fault_class: a reclassified-as-archive file that the index still serves as current
+  chaos_scale_soak: 10^4 changed files in one incremental pass
+  retrieval_challenge: after a reclassification the reclassified material must leave default retrieval
+  not_challengeable: null
+- capability: D2
+  family: beta
+  repo_a_challenge: one query per route plus a compound question
+  repo_b_challenge: a brownfield repository where ids and paths differ from the greenfield conventions
+  hidden_oracle_fault_class: a dependency question answered by similarity instead of the graph
+  chaos_scale_soak: query latency under a large index (measured by the D5 benchmark)
+  retrieval_challenge: the six routes and their fusion
+  not_challengeable: null
+- capability: D3
+  family: beta
+  repo_a_challenge: a long document and a class with several methods
+  repo_b_challenge: legacy documents with irregular heading structure
+  hidden_oracle_fault_class: a method whose body carries the answer while the file header does not
+  chaos_scale_soak: 'a very large file: chunking must stay bounded by max_chars'
+  retrieval_challenge: child-first retrieval with selective parent expansion
+  not_challengeable: null
+- capability: D4
+  family: beta
+  repo_a_challenge: a repository whose components are each swapped in turn through the governed path
+  repo_b_challenge: a brownfield repository whose legacy index store must be replaced wholesale
+  hidden_oracle_fault_class: a component swapped under an unchanged pin
+  chaos_scale_soak: not relevant
+  retrieval_challenge: every retrieval must name the components that produced it
+  not_challengeable: null
+- capability: D5
+  family: beta
+  repo_a_challenge: benchmark three candidates, select one through the gate, and roll one back on a failed regression
+  repo_b_challenge: a brownfield repository whose legacy embedder must be replaced during adoption
+  hidden_oracle_fault_class: a pin edited directly, and a candidate that is measurably worse
+  chaos_scale_soak: benchmark cost on a large index (index_ms and vectors are reported)
+  retrieval_challenge: the held-out set is the retrieval challenge
+  not_challengeable: null
+- capability: D6
+  family: beta
+  repo_a_challenge: delete all derived state and rebuild; then rebuild the same tree at another path
+  repo_b_challenge: a brownfield repository rebuilt after adoption
+  hidden_oracle_fault_class: a claim or an emergency-control state that a rebuild silently drops
+  chaos_scale_soak: rebuild under a concurrent claim
+  retrieval_challenge: the rebuilt index must reproduce the manifest hash
+  not_challengeable: null
+- capability: E1
+  family: gamma
+  repo_a_challenge: a greenfield repository driven end to end by an adapter that declares no role, and by one that declares an L1 role, with every privileged operation attempted
+  repo_b_challenge: a brownfield repository adopted while a legacy harness sets GOV_ROLE to a role the kernel does not define
+  hidden_oracle_fault_class: an operation added without an authority::require call; a role id accepted outside the verified kernel ROLES.yaml
+  chaos_scale_soak: concurrent invocations under different declared roles against one repository
+  retrieval_challenge: 'not relevant: authority is deterministic and never retrieved'
+  not_challengeable: null
+- capability: E2
+  family: gamma
+  repo_a_challenge: a greenfield product whose team structure needs a role the kernel does not define
+  repo_b_challenge: a brownfield repository whose legacy CODEOWNERS names roles outside the kernel set
+  hidden_oracle_fault_class: a project role silently granted kernel authority
+  chaos_scale_soak: 'not relevant: role definition is static'
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: E3
+  family: gamma
+  repo_a_challenge: a multi-role greenfield build where each stage hands off and the receiving role must reconstruct from the record alone
+  repo_b_challenge: a brownfield repository where a handoff is returned after a process restart
+  hidden_oracle_fault_class: a return that omits a required element; a return bound to the wrong handoff
+  chaos_scale_soak: many concurrent handoffs across roles
+  retrieval_challenge: 'not relevant: handoffs are deterministic records'
+  not_challengeable: null
+- capability: E4
+  family: gamma
+  repo_a_challenge: many parallel agents in linked git worktrees of one greenfield repository
+  repo_b_challenge: a brownfield repository whose claims store is at the legacy .governance-runtime location
+  hidden_oracle_fault_class: a claims table copied into a sandbox granting the same task twice; a claim whose isolation row is missing
+  chaos_scale_soak: hundreds of concurrent claim/release cycles with killed processes
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: F1
+  family: gamma
+  repo_a_challenge: a greenfield build whose skills are exercised and whose scenarios must all execute
+  repo_b_challenge: a brownfield repository carrying project skills whose content drifted from their declared version
+  hidden_oracle_fault_class: a skill whose validation scenario is declared but silently not executed; a skill edited without a version bump
+  chaos_scale_soak: 'not relevant: skills are static documents'
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: F2
+  family: gamma
+  repo_a_challenge: a greenfield build needing several tools across roles and task classes
+  repo_b_challenge: a brownfield repository with pre-existing, unregistered tooling
+  hidden_oracle_fault_class: a tool exposed to a task class it must not serve; a registry entry whose health status is stale
+  chaos_scale_soak: many tools registered and health-checked concurrently
+  retrieval_challenge: 'not relevant: the registry is deterministic'
+  not_challengeable: null
+- capability: F3
+  family: gamma
+  repo_a_challenge: a greenfield build that needs a tool it does not have, acquired end to end
+  repo_b_challenge: a brownfield repository whose existing tooling must be brought under governance
+  hidden_oracle_fault_class: a descriptor reviewed in one form and installed in another; an install command whose real effects the OS cannot read
+  chaos_scale_soak: repeated install/uninstall cycles with interrupted transactions
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: F4
+  family: gamma
+  repo_a_challenge: a greenfield repository into which a hostile capability plugin and a hostile tool descriptor are introduced
+  repo_b_challenge: a brownfield repository carrying a legacy plugin registry at the old generated location
+  hidden_oracle_fault_class: an install command whose real effect is hidden behind an interpreter; an envelope source edited out of band; a review reused across descriptors
+  chaos_scale_soak: repeated register/unregister/drift cycles
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: F5
+  family: gamma
+  repo_a_challenge: a greenfield repository whose adapter expects an MCP transport that is not shipped
+  repo_b_challenge: a brownfield repository with its own MCP servers already configured
+  hidden_oracle_fault_class: retrieval standing in for a mandatory input; a handoff used as a capability call
+  chaos_scale_soak: not relevant
+  retrieval_challenge: a mandatory input that retrieval could rediscover but the manifest must name (Gate W, zeta)
+  not_challengeable: null
+- capability: G1
+  family: gamma
+  repo_a_challenge: an operator driving a greenfield build entirely in prose, including refusals and negations
+  repo_b_challenge: a brownfield repository where a consequential spec edit is attempted inside an ordinary task
+  hidden_oracle_fault_class: a negated or conditional instruction routed to the affirmative operation; a material change labelled editorial
+  chaos_scale_soak: not relevant
+  retrieval_challenge: 'not relevant: the router is deterministic and does not retrieve'
+  not_challengeable: null
+- capability: G2
+  family: gamma
+  repo_a_challenge: an operator pausing, freezing and resuming a greenfield build mid-flight
+  repo_b_challenge: an emergency freeze during a brownfield adoption
+  hidden_oracle_fault_class: a freeze that also blocks its own remedy; a control that reports success without acting
+  chaos_scale_soak: freeze/resume under concurrent agents
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: H1
+  family: gamma
+  repo_a_challenge: a greenfield product specified from idea to live evidence, traced end to end
+  repo_b_challenge: a brownfield repository whose legacy documents must be classified into the seventeen kinds
+  hidden_oracle_fault_class: a lineage kind silently absent; an edge that exists in a field but not in the graph
+  chaos_scale_soak: a large spec tree traced repeatedly
+  retrieval_challenge: lineage must be graph-derived, never rediscovered by retrieval (Gate W, zeta)
+  not_challengeable: null
+- capability: H2
+  family: gamma
+  repo_a_challenge: a greenfield feature whose 26 cells are filled one at a time
+  repo_b_challenge: a brownfield feature whose legacy documentation partially fills the cells
+  hidden_oracle_fault_class: a cell marked N/A with no reason; a chain cell asserted PRESENT while the records contradict it
+  chaos_scale_soak: hundreds of features evaluated at once
+  retrieval_challenge: 'not relevant: cells are computed, not retrieved'
+  not_challengeable: null
+- capability: H3
+  family: gamma
+  repo_a_challenge: a greenfield feature implemented before its readiness contract is filled
+  repo_b_challenge: a brownfield feature whose project overlay tries to switch off readiness gating
+  hidden_oracle_fault_class: a readiness gap that generates no work; an implementation task promoted READY with unsatisfied pre-implementation cells
+  chaos_scale_soak: many features planned concurrently
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: H4
+  family: gamma
+  repo_a_challenge: a greenfield feature whose scenarios, data and independent tests are built in order
+  repo_b_challenge: a brownfield feature with tests but no declared scenarios or data provenance
+  hidden_oracle_fault_class: test data authored by the implementer; provenance asserted for content that does not exist; a scenario with no failure criteria
+  chaos_scale_soak: large datasets rebound repeatedly
+  retrieval_challenge: the chain must be graph-derived, never rediscovered semantically
+  not_challengeable: null
+- capability: I1
+  family: gamma
+  repo_a_challenge: a greenfield build exercising every class in one DAG
+  repo_b_challenge: a brownfield repository whose legacy backlog maps onto the classes
+  hidden_oracle_fault_class: a class accepted by the schema but unrepresented in the DAG's views
+  chaos_scale_soak: thousands of tasks across every class
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: I2
+  family: gamma
+  repo_a_challenge: a greenfield task contract whose every field is violated in turn
+  repo_b_challenge: a brownfield task inheriting a legacy path scope
+  hidden_oracle_fault_class: a recorded contract field with no enforcing consumer
+  chaos_scale_soak: many tasks with overlapping scopes claimed concurrently
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: I3
+  family: gamma
+  repo_a_challenge: a greenfield build where each of the eleven event kinds is injected once
+  repo_b_challenge: a brownfield repository with a backlog of pre-existing failures
+  hidden_oracle_fault_class: an event that generates no work; the same event generating duplicate work; generated work with no link to its cause
+  chaos_scale_soak: a storm of failures generating work concurrently
+  retrieval_challenge: a retrieval miss must become work without looping on its own generated work
+  not_challengeable: null
+- capability: I4
+  family: gamma
+  repo_a_challenge: a greenfield build with several independent feature branches and one owner gate
+  repo_b_challenge: a brownfield adoption where one stage waits on the owner while others proceed
+  hidden_oracle_fault_class: a blocked task offered as runnable; a gate that stalls unrelated work
+  chaos_scale_soak: many agents running while gates accumulate
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: J1
+  family: delta
+  repo_a_challenge: 'A greenfield repository where a decision cites a research record that was never concluded: the OS must hold it NARRATIVE and refuse it as citable evidence.'
+  repo_b_challenge: 'A brownfield tree with a docs/research directory of prose notes carrying ids: adoption must not promote them to EVIDENCE, and `gov research check` must list each as REFERENCE_ONLY with
+    its missing fields.'
+  hidden_oracle_fault_class: A research record whose measurements do not support its conclusion, cited by a decision — detected only if the oracle scores content, not fields.
+  chaos_scale_soak: '10k research records with dense influence graphs: `gov research sync` must stay linear and must not lose a backlink.'
+  retrieval_challenge: 'A question whose answer is in a concluded research record that is not linked to the asking task: retrieval must surface it as supplementary, never as authority.'
+  not_challengeable: null
+- capability: J2
+  family: delta
+  repo_a_challenge: 'An experiment whose declared outputs are under spec/experiments/**, promoted through a gate: the promotion must require an owner-signed answer.'
+  repo_b_challenge: 'A brownfield tree with an experiments/ directory already merged into production: adoption must flag it and refuse to treat its output as governed.'
+  hidden_oracle_fault_class: An experiment concluded from a single run with reproducibility declared rather than judged.
+  chaos_scale_soak: 'Interleaved reproduce calls from several sessions on one experiment: the judged verdict must be a deterministic function of the recorded runs.'
+  retrieval_challenge: 'not relevant: experiment standing is read from the record, never retrieved semantically.'
+  not_challengeable: null
+- capability: K1
+  family: delta
+  repo_a_challenge: 'A dense requirement/feature/scenario graph: the deterministic traversal must reach every dependent at the stated depth and no further.'
+  repo_b_challenge: 'A legacy tree whose links are implicit in prose: the deterministic set is small and the semantic supplement carries the load — the OS must label which is which.'
+  hidden_oracle_fault_class: A dependency declared only in a path the repository contract does not classify, so it is invisible to traversal.
+  chaos_scale_soak: 'A 50k-artefact graph at R5: traversal must complete inside the Gate U SLO.'
+  retrieval_challenge: Semantic candidates on an intentionally inadequate profile must not be presented as deterministic impact.
+  not_challengeable: null
+- capability: K2
+  family: delta
+  repo_a_challenge: 'A CIT that invalidates a DONE task, its report, its packet and its checkpoint: every one must be marked and a revalidation task generated.'
+  repo_b_challenge: 'A CIT over a legacy tree where the index is stale: execution must refresh it and the verification must not attribute pre-existing damage to the transaction.'
+  hidden_oracle_fault_class: A transaction that commits the manifest but silently skips one propagation target.
+  chaos_scale_soak: 'Kill the process mid-execute: `gov trust recover-transactions` must leave the tree either fully committed or fully rolled back.'
+  retrieval_challenge: 'not relevant: CIT-E''s authoritative updates never depend on retrieval.'
+  not_challengeable: null
+- capability: K3
+  family: delta
+  repo_a_challenge: 'Each of the eight classes proposed with the declared trigger set to ''editorial'': each must be derived, simulated and gated per CHANGE_POLICY.'
+  repo_b_challenge: 'A brownfield tree whose repository contract does not yet classify the product directory: the behaviour class must be absent and adoption must say so, rather than silently reporting
+    ''not material''.'
+  hidden_oracle_fault_class: A security check removed by a rename rather than an edit, so the content heuristic does not see a weakened line.
+  chaos_scale_soak: 'A manifest of 500 operations spanning all eight classes: classification must stay complete and bounded.'
+  retrieval_challenge: 'not relevant: materiality is derived from records, paths and content, never from retrieval.'
+  not_challengeable: null
+- capability: K4
+  family: delta
+  repo_a_challenge: 'One change proposed at each radius: traversal depth, semantic breadth, test set and approval must differ as the policy states.'
+  repo_b_challenge: 'A legacy tree where a single edit reaches three modules: the radius must rise to R3+ from the cross-module threshold, not from the proposer''s label.'
+  hidden_oracle_fault_class: A change whose true blast radius exceeds its computed one because a dependency is undeclared.
+  chaos_scale_soak: 'not relevant: the radius computation is bounded by the traversal it configures.'
+  retrieval_challenge: Semantic breadth at R4/R5 on a weak profile must not inflate the impact set with noise presented as impact.
+  not_challengeable: null
+- capability: L1
+  family: delta
+  repo_a_challenge: 'Two current decisions on one decision_key: the task must be blocked, the gate raised and the resolution must set one aside.'
+  repo_b_challenge: 'A legacy tree with a decision superseded only in prose: precedence must not resolve it, so it must surface as a contradiction.'
+  hidden_oracle_fault_class: Two decisions that contradict only in prose with no shared key, delivered together as authority.
+  chaos_scale_soak: '1k decisions with a dense supersession forest: detection must stay bounded and deterministic.'
+  retrieval_challenge: A contradiction between an authoritative decision and a retrieved supplementary note must never be treated as a contradiction between authorities.
+  not_challengeable: null
+- capability: L2
+  family: delta
+  repo_a_challenge: 'Every gate trigger raised in turn: each package must be complete and substantive with real options and OS-derived next actions.'
+  repo_b_challenge: 'A legacy ''approvals'' file imported at adoption: it must not become an answered gate.'
+  hidden_oracle_fault_class: A package whose impact and reversibility statements are plausible but wrong.
+  chaos_scale_soak: 'not relevant: package validation is per-gate.'
+  retrieval_challenge: 'not relevant: package content is authored, not retrieved.'
+  not_challengeable: null
+- capability: L3
+  family: delta
+  repo_a_challenge: The full fabrication battery (flags, environment, role claims, forged records, another gate's signed answer, a widened manifest) against a provisioned machine.
+  repo_b_challenge: 'A cloned repository on the owner''s second machine and on a foreign owner''s machine: the first honours the answer, the second does not.'
+  hidden_oracle_fault_class: A gate answered, then re-bound to a different subject by an edit the seal does not cover.
+  chaos_scale_soak: 'Concurrent `gov decide` calls with the same signed answer: replay must be refused after the first.'
+  retrieval_challenge: 'not relevant: gate authority never comes from retrieval.'
+  not_challengeable: null
+- capability: L4
+  family: delta
+  repo_a_challenge: 'A plan with one gated branch and three independent ones: the three must run to completion while the gate waits.'
+  repo_b_challenge: 'A legacy tree where two branches share an undeclared file: the OS treats them as independent — the qualification must measure the resulting conflict.'
+  hidden_oracle_fault_class: A block whose declared scope is narrower than what it actually refuses.
+  chaos_scale_soak: 'Many concurrent claims under an active block: the refusal set must stay exactly the protected one.'
+  retrieval_challenge: 'not relevant: blocking is graph- and policy-driven.'
+  not_challengeable: null
+- capability: M1
+  family: delta
+  repo_a_challenge: Route every task class and role and assert the tier floor; then attempt to lower each through the overlay.
+  repo_b_challenge: 'A legacy overlay that already lowers a floor: adoption must refuse the weakening and report it.'
+  hidden_oracle_fault_class: A task routed below its class floor through a path the precedence evaluator does not cover.
+  chaos_scale_soak: 'not relevant: routing is a pure function of policy and the task.'
+  retrieval_challenge: not relevant.
+  not_challengeable: null
+- capability: M2
+  family: delta
+  repo_a_challenge: 'Tasks declaring each reasoning level: the router must honour the maximum of task, role and radius.'
+  repo_b_challenge: 'A legacy task schema without minimum_reasoning: migration must supply the role default rather than ''low''.'
+  hidden_oracle_fault_class: A run recorded at a lower effort than the task declared, accepted without a flag.
+  chaos_scale_soak: not relevant.
+  retrieval_challenge: not relevant.
+  not_challengeable: null
+- capability: M3
+  family: delta
+  repo_a_challenge: Map two providers in the overlay and assert the chosen model and that no provider name enters project state.
+  repo_b_challenge: 'A legacy project that hard-codes model names in spec records: adoption must flag them as project state that should live in the overlay.'
+  hidden_oracle_fault_class: A role whose floor is bypassed because the project declared a same-named role outside the kernel taxonomy.
+  chaos_scale_soak: not relevant.
+  retrieval_challenge: not relevant.
+  not_challengeable: null
+- capability: M4
+  family: delta
+  repo_a_challenge: Record runs that differ only in reasoning effort and only in reviewer findings, then ask the product to compare them.
+  repo_b_challenge: 'A legacy routing evidence file from an earlier schema: the report must not silently mis-aggregate it.'
+  hidden_oracle_fault_class: A routing recommendation drawn from a report that merged two materially different populations.
+  chaos_scale_soak: '100k recorded runs: the report must stay bounded and must not mis-sum.'
+  retrieval_challenge: not relevant.
+  not_challengeable: null
+- capability: N1
+  family: delta
+  repo_a_challenge: 'A checkpoint taken mid-task: every declared field must be populated from OS state, not from the caller.'
+  repo_b_challenge: 'A brownfield tree with prose session summaries: they must not be accepted as checkpoints.'
+  hidden_oracle_fault_class: A checkpoint that records an index reference taken before the change it claims to capture.
+  chaos_scale_soak: 'A very large working tree: files_changed must stay bounded and must not omit untracked work.'
+  retrieval_challenge: 'not relevant: the checkpoint records the index identity, it does not retrieve.'
+  not_challengeable: null
+- capability: N2
+  family: delta
+  repo_a_challenge: Drive all eight triggers in one session and assert a checkpoint for each.
+  repo_b_challenge: 'An adopted tree with no previous checkpoint: the first boundary must establish the baseline rather than fire spuriously.'
+  hidden_oracle_fault_class: A trigger that occurs and is then masked by a later checkpoint before any gov command observes it.
+  chaos_scale_soak: 'A session that runs thousands of commands: the watchdog must fire on schedule, not once.'
+  retrieval_challenge: not relevant.
+  not_challengeable: null
+- capability: N3
+  family: delta
+  repo_a_challenge: Change an input a checkpoint recorded and assert STALE, then assert session close and handoff are degraded and say why.
+  repo_b_challenge: 'A tree with no git history: the file counter degrades, so the command counter must carry the watchdog.'
+  hidden_oracle_fault_class: A checkpoint that stays CURRENT although an input it recorded changed through a path the freshness computation does not cover.
+  chaos_scale_soak: 'Long sessions with no checkpoint: the watchdog must fire from the OS''s own counters.'
+  retrieval_challenge: not relevant.
+  not_challengeable: null
+- capability: N4
+  family: delta
+  repo_a_challenge: 'A subagent returns a schema-valid result and its session ends: a fresh session must reconstruct the work from the record alone.'
+  repo_b_challenge: 'A legacy handoff record from an earlier schema: migration must keep the returned result readable.'
+  hidden_oracle_fault_class: A return whose claims are plausible but false, accepted because the receipt validation was not consulted at close.
+  chaos_scale_soak: 'Concurrent returns on one handoff: exactly one must be recorded as the return.'
+  retrieval_challenge: 'not relevant: the return is read by id.'
+  not_challengeable: null
+- capability: O1
+  family: epsilon
+  repo_a_challenge: Repo A declares all ten families with runnable commands; the harness makes one fail and the run must be refused as covered work.
+  repo_b_challenge: Repo B (brownfield) has an undeclared legacy test runner; adoption must classify it into a family or record a reasoned N/A.
+  hidden_oracle_fault_class: a product defect whose only signal is a failing family the repository does not declare
+  chaos_scale_soak: kill the family process mid-run; the recorded evidence must not read passed
+  retrieval_challenge: 'not relevant: product tests are not retrieved'
+  not_challengeable: null
+- capability: O2
+  family: epsilon
+  repo_a_challenge: each of the 17 families is given one seeded defect of its own class and must raise it
+  repo_b_challenge: the same, over a brownfield tree where the defect predates adoption
+  hidden_oracle_fault_class: a defect visible to exactly one family, to detect families that never detect
+  chaos_scale_soak: interrupt a sandboxed family; the live tree must be unchanged
+  retrieval_challenge: the retrieval-regression family is scored on the hidden memory oracle's queries
+  not_challengeable: null
+- capability: O3
+  family: epsilon
+  repo_a_challenge: the builder authors an acceptance test for its own work; the DAG must refuse it
+  repo_b_challenge: a legacy test of unknown authorship; adoption must not certify it as independent
+  hidden_oracle_fault_class: a fault only a genuinely independent test would catch
+  chaos_scale_soak: 'not relevant: authorship is a record property'
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: O4
+  family: epsilon
+  repo_a_challenge: close governance work, then change each input class and re-close
+  repo_b_challenge: a brownfield tree whose green record predates adoption
+  hidden_oracle_fault_class: a change in an input class the candidate is expected to miss
+  chaos_scale_soak: interrupt the suite between the change and the record
+  retrieval_challenge: 'not relevant: currency is content-keyed, not retrieved'
+  not_challengeable: null
+- capability: O5
+  family: epsilon
+  repo_a_challenge: a trivial mutation must select a small impacted set; a critical mutation must block in scope
+  repo_b_challenge: the same on a brownfield tree with a large unclassified surface
+  hidden_oracle_fault_class: a defect planted in an input class the scheduler must map to a check
+  chaos_scale_soak: kill a worker mid-run; the result must be incomplete rather than falsely complete
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: P1
+  family: epsilon
+  repo_a_challenge: a scored run must produce every P1 field for every worker step
+  repo_b_challenge: the same through an adapter the project already had
+  hidden_oracle_fault_class: a step whose telemetry is expected to show retries and a model change
+  chaos_scale_soak: a worker killed mid-step must leave a failure event
+  retrieval_challenge: retrieval queries and hits per step are scored against the memory oracle
+  not_challengeable: null
+- capability: P2
+  family: epsilon
+  repo_a_challenge: the eight questions are answered from the run's own telemetry
+  repo_b_challenge: the same over a brownfield history
+  hidden_oracle_fault_class: a known rework pattern the answers must surface
+  chaos_scale_soak: not relevant
+  retrieval_challenge: retrieval misses are scored against the memory oracle
+  not_challengeable: null
+- capability: Q1
+  family: epsilon
+  repo_a_challenge: a seeded failure must yield a corroborated, classified, validated lesson
+  repo_b_challenge: a legacy postmortem must enter the lifecycle at the right stage
+  hidden_oracle_fault_class: 'two runs of the same failure mode: corroboration must be established, not asserted'
+  chaos_scale_soak: not relevant
+  retrieval_challenge: lesson retrieval must not outrank authority
+  not_challengeable: null
+- capability: Q2
+  family: epsilon
+  repo_a_challenge: a lesson contradicting a decision must not override it
+  repo_b_challenge: a legacy 'lessons' document must not be admitted as authority
+  hidden_oracle_fault_class: a lesson that asserts the opposite of the hidden authoritative truth
+  chaos_scale_soak: not relevant
+  retrieval_challenge: the lesson must not displace the decision in retrieval
+  not_challengeable: null
+- capability: Q3
+  family: epsilon
+  repo_a_challenge: PROJECT, PRODUCT and FRAMEWORK lessons; only the last is eligible
+  repo_b_challenge: a mis-scoped legacy lesson
+  hidden_oracle_fault_class: a lesson whose true scope differs from its declared scope
+  chaos_scale_soak: not relevant
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: Q4
+  family: epsilon
+  repo_a_challenge: packets seeded with secrets, customer names, paths, raw code and vector rows
+  repo_b_challenge: the same drawn from real brownfield material
+  hidden_oracle_fault_class: a secret the scanner is expected to miss by pattern but catch by content
+  chaos_scale_soak: interrupt a submission; nothing partial may reach the inbox
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: R1
+  family: beta
+  repo_a_challenge: 'not relevant: R1 is a brownfield obligation'
+  repo_b_challenge: 'the brownfield fixture: two old-governance documents, three provider rule files, a duplicate decision, a contradicting pair and planted secrets'
+  hidden_oracle_fault_class: a retirement whose reference is still live, and legacy knowledge with no cue word
+  chaos_scale_soak: a legacy tree of 10^4 files
+  retrieval_challenge: retired material must leave default retrieval while its extracted knowledge stays reachable
+  not_challengeable: null
+- capability: R2
+  family: beta
+  repo_a_challenge: 'not relevant: a greenfield repository has no chat store'
+  repo_b_challenge: the brownfield fixture's .chat/sessions.jsonl and memory/chat_history.sql
+  hidden_oracle_fault_class: a chat store that answers a current question
+  chaos_scale_soak: a chat store of 10^6 lines
+  retrieval_challenge: no default query may be answered from a raw chat store
+  not_challengeable: null
+- capability: R3
+  family: beta
+  repo_a_challenge: an archive directory whose content must never answer a current query
+  repo_b_challenge: a brownfield repository whose archive is created by adoption
+  hidden_oracle_fault_class: archived material indexed as current
+  chaos_scale_soak: not relevant
+  retrieval_challenge: stale-hit and superseded-hit rates must be zero
+  not_challengeable: null
+- capability: S1
+  family: alpha
+  repo_a_challenge: a consumer repository that must never need the OS build inputs
+  repo_b_challenge: a brownfield tree that already vendored a copy of an older framework
+  hidden_oracle_fault_class: a consumer tree that can rebuild or alter the kernel locally
+  chaos_scale_soak: not relevant
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: S2
+  family: alpha
+  repo_a_challenge: build a release, verify it, then modify one payload byte and require detection
+  repo_b_challenge: adopt from a release directory whose manifest claims a certification it cannot prove
+  hidden_oracle_fault_class: a mutable release, or a manifest field an ingress believes without a signature
+  chaos_scale_soak: not relevant
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: S3
+  family: alpha
+  repo_a_challenge: init into an empty tree and require a HEALTHY first audit
+  repo_b_challenge: init into a tree that already carries legacy governance files
+  hidden_oracle_fault_class: an init that installs unauthenticated material or reports HEALTHY over it
+  chaos_scale_soak: init interrupted during the atomic swap
+  retrieval_challenge: the bootstrapped profile must answer the generated held-out queries
+  not_challengeable: null
+- capability: S4
+  family: alpha
+  repo_a_challenge: adopt a healthy greenfield tree end to end and require ADOPTED_HEALTHY
+  repo_b_challenge: adopt Repo B (no path map, provider rules, dead code, a secret-bearing chat store, an unclassifiable blob) end to end
+  hidden_oracle_fault_class: a migration that executes a plan the reviewer did not approve, or an A10 that accepts the builder's own queries
+  chaos_scale_soak: interrupt a destructive batch and require the rollback point to restore it
+  retrieval_challenge: A10's held-out queries must be the verifier's and must pass on their own
+  not_challengeable: null
+- capability: S5
+  family: alpha
+  repo_a_challenge: a clean update across one migration, with the gate answered through the owner-signed channel
+  repo_b_challenge: an update attempted on an adopted tree whose suite is not green (health admission)
+  hidden_oracle_fault_class: an update that installs an unauthenticated source, or reports a tampered source as up to date
+  chaos_scale_soak: interrupt the update between the snapshot and the commit
+  retrieval_challenge: the rebuilt index must still answer the held-out queries after the update
+  not_challengeable: null
+- capability: S6
+  family: alpha
+  repo_a_challenge: two provisioned machines of one owner sharing a repository through a private remote
+  repo_b_challenge: an adopted repository cloned to a second machine that must anchor before privileged work
+  hidden_oracle_fault_class: a forged or foreign T2 record honoured, or an owner fact refused on the owner's own machine
+  chaos_scale_soak: a rotation applied on one machine while the other is offline
+  retrieval_challenge: the second machine must rebuild retrieval locally and answer the same queries
+  not_challengeable: null
+- capability: T1
+  family: alpha
+  repo_a_challenge: an adoption driven by a single session that must be refused at every independent stage
+  repo_b_challenge: an adoption where the executor tries to perform the verification
+  hidden_oracle_fault_class: an independent stage accepted from a builder's role or session
+  chaos_scale_soak: not relevant
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: T2
+  family: alpha
+  repo_a_challenge: a reviewer that adds no test of its own must be refused
+  repo_b_challenge: a memory verifier that reuses the builder's held-out set must be refused
+  hidden_oracle_fault_class: an independent verdict earned on the builder's own evidence
+  chaos_scale_soak: not relevant
+  retrieval_challenge: A10's accept/reject must turn on the verifier's queries
+  not_challengeable: null
+- capability: T3
+  family: alpha
+  repo_a_challenge: a complete adoption whose evidence tree must reconstruct every decision
+  repo_b_challenge: an adoption interrupted mid-chain that must resume without losing traceability
+  hidden_oracle_fault_class: a stage recorded complete with no artefact, or a verdict not bound to what it accepted
+  chaos_scale_soak: not relevant
+  retrieval_challenge: a fresh agent must reconstruct the adoption from the tree alone
+  not_challengeable: null
+- capability: U
+  family: epsilon
+  repo_a_challenge: each SLO driven across its threshold and each condition violated in turn
+  repo_b_challenge: a brownfield tree that starts below several thresholds
+  hidden_oracle_fault_class: a repository the oracle declares UNHEALTHY for exactly one condition
+  chaos_scale_soak: a killed rebuild must fail memory_rebuild_success
+  retrieval_challenge: Recall@K is scored against the hidden memory oracle
+  not_challengeable: null
+- capability: V1
+  family: epsilon
+  repo_a_challenge: the fault manifest of Repo A is validated before any fault is injected
+  repo_b_challenge: the same for Repo B
+  hidden_oracle_fault_class: this capability IS the oracle format
+  chaos_scale_soak: not relevant
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: V2
+  family: epsilon
+  repo_a_challenge: 'not relevant: V2 is the brownfield oracle'
+  repo_b_challenge: the path-map oracle of Repo B
+  hidden_oracle_fault_class: this capability IS the oracle format
+  chaos_scale_soak: not relevant
+  retrieval_challenge: not relevant
+  not_challengeable: null
+- capability: V3
+  family: epsilon
+  repo_a_challenge: the memory oracle of Repo A
+  repo_b_challenge: the memory oracle of Repo B
+  hidden_oracle_fault_class: this capability IS the oracle format
+  chaos_scale_soak: not relevant
+  retrieval_challenge: the expected retrieval results are the retrieval challenge
+  not_challengeable: null
+- capability: V4
+  family: epsilon
+  repo_a_challenge: the score report of Repo A, bound to its oracle
+  repo_b_challenge: the score report of Repo B
+  hidden_oracle_fault_class: this capability IS the scoring format
+  chaos_scale_soak: the chaos pass rate is one of its metrics
+  retrieval_challenge: the retrieval metrics are among its twelve
+  not_challengeable: null
+- capability: W1
+  family: zeta
+  repo_a_challenge: 'Repo A: a governed output of each of the eleven W1 artefact types, with a move that keeps the id.'
+  repo_b_challenge: 'Repo B: legacy artefacts with duplicate ids, records outside their canonical location, and an adoption re-run that must not renumber the catalogue.'
+  hidden_oracle_fault_class: 'hidden oracle: the correct current id/version of an artefact that was moved and re-planned.'
+  chaos_scale_soak: 'not relevant: identity is not a load-bearing concurrency or scale property (re-run stability is covered by the re-plan/re-audit challenge).'
+  retrieval_challenge: 'not relevant: identity is resolved from records, never from retrieval.'
+  not_challengeable: null
+- capability: W2
+  family: zeta
+  repo_a_challenge: 'Repo A: a full typed chain with EVIDENCE_FOR/CONSTRAINS/IMPLEMENTS/TESTS/VALIDATES/SUPERSEDES edges.'
+  repo_b_challenge: 'Repo B: legacy links whose direction is implicit in prose; a lesson and a research note used as policy.'
+  hidden_oracle_fault_class: 'hidden oracle: which record is authority for a slot, and which is evidence only.'
+  chaos_scale_soak: 'not relevant: relation typing is deterministic.'
+  retrieval_challenge: index a lesson with high similarity to a decision query and confirm it never becomes authority.
+  not_challengeable: null
+- capability: W3
+  family: zeta
+  repo_a_challenge: 'Repo A: tasks with complete manifests, and one with a version pin.'
+  repo_b_challenge: 'Repo B: tasks whose declarations are missing or name legacy ids.'
+  hidden_oracle_fault_class: 'hidden oracle: the correct required input set and version per task.'
+  chaos_scale_soak: 'chaos: remove a required record mid-run and confirm READY is withdrawn.'
+  retrieval_challenge: confirm the manifest is identical with the index absent.
+  not_challengeable: null
+- capability: W4
+  family: zeta
+  repo_a_challenge: 'Repo A: packets compiled for every task class.'
+  repo_b_challenge: 'Repo B: brownfield tasks whose inputs live outside the canonical paths.'
+  hidden_oracle_fault_class: 'hidden oracle: the exact content each packet should have carried.'
+  chaos_scale_soak: token pressure at several budgets; index removed mid-compile.
+  retrieval_challenge: confirm the deterministic block is unchanged under every retrieval outcome.
+  not_challengeable: null
+- capability: W5
+  family: zeta
+  repo_a_challenge: 'Repo A: closes with honest receipts.'
+  repo_b_challenge: 'Repo B: closes whose receipts name legacy ids or omit the trace.'
+  hidden_oracle_fault_class: 'hidden oracle: the true implemented requirement set per close.'
+  chaos_scale_soak: 'chaos: interrupt a close between receipt validation and record minting.'
+  retrieval_challenge: 'not relevant: the receipt is validated against the manifest, not retrieval.'
+  not_challengeable: null
+- capability: W6
+  family: zeta
+  repo_a_challenge: 'Repo A: change a spec after implementation and confirm the full propagation.'
+  repo_b_challenge: 'Repo B: a legacy spec changed outside change control.'
+  hidden_oracle_fault_class: 'hidden oracle: the expected downstream propagation set.'
+  chaos_scale_soak: 'soak: many small changes; confirm markers accumulate and do not duplicate work.'
+  retrieval_challenge: confirm an index rebuild alone never clears staleness.
+  not_challengeable: null
+- capability: W7
+  family: zeta
+  repo_a_challenge: 'Repo A: one injected orphan of each of the five W7 classes.'
+  repo_b_challenge: 'Repo B: legacy code and specs with no governed link.'
+  hidden_oracle_fault_class: 'hidden oracle: the true orphan set (this is the only route to recall).'
+  chaos_scale_soak: 'scale: a large repository, to bound false positives.'
+  retrieval_challenge: 'not relevant: orphan detection reads records and version control, not retrieval.'
+  not_challengeable: null
+- capability: W8
+  family: zeta
+  repo_a_challenge: 'Repo A: the full chain to a release record.'
+  repo_b_challenge: 'Repo B: broken and stale links, cross-language consumers.'
+  hidden_oracle_fault_class: 'hidden oracle: the correct impact set of a changed requirement.'
+  chaos_scale_soak: 'scale: deep chains, to bound traversal cost.'
+  retrieval_challenge: 'not relevant: lineage is computed from records and the code graph.'
+  not_challengeable: null
+- capability: W9
+  family: zeta
+  repo_a_challenge: 'Repo A: session end, model switch and fresh-agent resume.'
+  repo_b_challenge: 'Repo B: resume into a brownfield repository with no prior chat.'
+  hidden_oracle_fault_class: 'hidden oracle: the mandatory input set the resumed agent must reconstruct.'
+  chaos_scale_soak: 'chaos: kill the process mid-task and resume.'
+  retrieval_challenge: confirm reconstruction with the index absent.
+  not_challengeable: null
+- capability: W10
+  family: zeta
+  repo_a_challenge: 'Repo A: omit the current spec from the index; index a superseded near-duplicate.'
+  repo_b_challenge: 'Repo B: a legacy index that is stale for most of the repository.'
+  hidden_oracle_fault_class: 'hidden oracle: the correct required input/version.'
+  chaos_scale_soak: index outage, corruption and embedder re-pin during dispatch.
+  retrieval_challenge: the whole capability is the retrieval challenge.
+  not_challengeable: null
+- capability: W11
+  family: zeta
+  repo_a_challenge: 'Repo A: inject one fault per metric and confirm each moves.'
+  repo_b_challenge: 'Repo B: measure the same metrics on an adopted repository.'
+  hidden_oracle_fault_class: 'hidden oracle: the true value of each metric (the only route to orphan recall).'
+  chaos_scale_soak: 'soak: metric stability across many runs.'
+  retrieval_challenge: retrieval leakage rate is measured over the governing inputs, not over retrieval hits.
+  not_challengeable: null
+- capability: W12
+  family: zeta
+  repo_a_challenge: 'Repo A: drive each tier at its trigger event.'
+  repo_b_challenge: 'Repo B: the same, after adoption.'
+  hidden_oracle_fault_class: 'hidden oracle: which tier should have observed an injected fault.'
+  chaos_scale_soak: parallel tier runs, cache reuse and invalidation under load.
+  retrieval_challenge: 'not relevant: tier selection is deterministic.'
+  not_challengeable: null

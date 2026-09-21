@@ -1,0 +1,754 @@
+### cargo test --lib ### 2026-09-21T00:18:53+01:00
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.47
+   Compiling version_check v0.9.5
+   Compiling cfg-if v1.0.4
+   Compiling libc v0.2.189
+   Compiling stable_deref_trait v1.2.1
+   Compiling syn v2.0.119
+   Compiling syn v3.0.5
+   Compiling synstructure v0.13.2
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerofrom v0.1.8
+   Compiling zerovec-derive v0.11.6
+   Compiling yoke v0.8.3
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling zerovec v0.11.8
+   Compiling displaydoc v0.2.7
+   Compiling serde_core v1.0.229
+   Compiling tinystr v0.8.4
+   Compiling generic-array v0.14.7
+   Compiling litemap v0.8.3
+   Compiling serde v1.0.229
+   Compiling smallvec v1.16.1
+   Compiling writeable v0.6.4
+   Compiling memchr v2.8.3
+   Compiling icu_locale_core v2.3.0
+   Compiling zerotrie v0.2.5
+   Compiling potential_utf v0.1.6
+   Compiling serde_derive v1.0.229
+   Compiling icu_properties_data v2.3.0
+   Compiling utf8_iter v1.0.4
+   Compiling icu_normalizer_data v2.3.0
+   Compiling typenum v1.20.1
+   Compiling getrandom v0.3.4
+   Compiling zerocopy v0.8.57
+   Compiling icu_collections v2.3.0
+   Compiling icu_provider v2.3.1
+   Compiling num-integer v0.1.47
+   Compiling ahash v0.8.12
+   Compiling semver v1.0.28
+   Compiling shlex v2.0.1
+   Compiling once_cell v1.21.4
+   Compiling find-msvc-tools v0.1.12
+   Compiling cc v1.4.5
+   Compiling rustc_version v0.4.1
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling num-bigint v0.4.8
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling aho-corasick v1.1.5
+   Compiling pkg-config v0.3.34
+   Compiling hashbrown v0.17.1
+   Compiling zmij v1.0.23
+   Compiling regex-syntax v0.8.11
+   Compiling vcpkg v0.2.15
+   Compiling parking_lot_core v0.9.12
+   Compiling getrandom v0.4.3
+   Compiling equivalent v1.0.2
+   Compiling indexmap v2.14.2
+   Compiling regex-automata v0.4.18
+   Compiling libsqlite3-sys v0.28.0
+   Compiling num-rational v0.4.2
+   Compiling digest v0.10.7
+   Compiling idna_adapter v1.2.2
+   Compiling curve25519-dalek v4.1.3
+   Compiling num-iter v0.1.46
+   Compiling num-complex v0.4.6
+   Compiling scopeguard v1.2.0
+   Compiling cpufeatures v0.2.17
+   Compiling time-core v0.1.9
+   Compiling num-conv v0.2.2
+   Compiling percent-encoding v2.3.2
+   Compiling bit-vec v0.6.3
+   Compiling anyhow v1.0.104
+   Compiling itoa v1.0.18
+   Compiling serde_json v1.0.151
+   Compiling bit-set v0.5.3
+   Compiling form_urlencoded v1.2.2
+   Compiling time-macros v0.2.32
+   Compiling lock_api v0.4.14
+   Compiling num v0.4.3
+   Compiling idna v1.1.0
+   Compiling hashbrown v0.14.5
+   Compiling nom v8.0.0
+   Compiling getrandom v0.2.17
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling powerfmt v0.2.0
+   Compiling thiserror v1.0.69
+   Compiling zeroize v1.9.0
+   Compiling subtle v2.6.1
+   Compiling signature v2.2.0
+   Compiling deranged v0.5.8
+   Compiling lazy_static v1.5.0
+   Compiling fraction v0.15.4
+   Compiling time v0.3.55
+   Compiling ed25519 v2.2.3
+   Compiling rand_core v0.6.4
+   Compiling iso8601 v0.6.6
+   Compiling hashlink v0.9.1
+   Compiling uuid v1.26.1
+   Compiling parking_lot v0.12.5
+   Compiling url v2.5.8
+   Compiling fancy-regex v0.13.0
+   Compiling regex v1.13.1
+   Compiling sha2 v0.10.9
+   Compiling thiserror-impl v1.0.69
+   Compiling same-file v1.0.6
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling num-cmp v0.1.0
+   Compiling iana-time-zone v0.1.65
+   Compiling bitflags v2.13.2
+   Compiling base64 v0.22.1
+   Compiling ryu v1.0.23
+   Compiling unsafe-libyaml v0.2.11
+   Compiling bytecount v0.6.9
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/runtime)
+   Compiling fallible-iterator v0.3.0
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling rusqlite v0.31.0
+   Compiling jsonschema v0.18.3
+   Compiling chrono v0.4.45
+   Compiling walkdir v2.5.0
+   Compiling ed25519-dalek v2.2.0
+   Compiling hex v0.4.3
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 42.75s
+     Running unittests src/lib.rs (target/debug/deps/gov_runtime-c01e7b895fc352c0)
+
+running 276 tests
+test adopt::tests::a_verdict_is_stale_when_a_bound_artefact_changed_or_was_never_bound ... ok
+test adopt::tests::a_relabelled_heldout_query_keeps_its_identity ... ok
+test adopt::tests::plan_digest_ignores_regeneration_stamps_only ... ok
+test adopt::tests::the_approval_digest_ignores_os_bookkeeping_but_not_what_happens_to_an_artefact ... ok
+test adopt::tests::a11_names_the_installation_posture_when_it_is_the_only_reason ... ok
+test authority::tests::resolution_precedence_is_flag_then_environment_then_undeclared ... ok
+test authority::tests::undeclared_is_level_zero_and_never_orchestrator ... ok
+test capabilities::binding::tests::python_names_are_recognised ... ok
+test capabilities::binding::tests::the_os_capability_server_is_recognised_only_with_its_own_flags ... ok
+test adopt::tests::every_designated_independent_role_is_a_read_only_kernel_role ... ok
+test adopt::tests::command_test_permissions_come_from_policy_and_the_designated_duty ... ok
+test capabilities::pincache::tests::a_file_is_quiescent_only_when_it_last_changed_well_before_the_read ... ok
+test capabilities::binding::tests::a_missing_program_or_declared_path_is_refused ... ok
+test capabilities::pincache::tests::only_kernel_maintained_local_filesystems_are_cached ... ok
+test capabilities::pincache::tests::the_stat_key_round_trips_through_the_store_format ... ok
+test capabilities::registry::tests::the_location_and_the_legacy_location_are_the_kernel_store_declaration ... ok
+test checkpoints::tests::transitions_decisions_and_routing_changes_are_triggers ... ok
+test capabilities::binding::tests::a_script_binds_the_program_and_the_script_and_any_edit_changes_the_identity ... ok
+test cit::binding::tests::a_secret_flag_is_bound_into_the_block_only_when_set ... ok
+test capabilities::pincache::tests::a_file_written_just_now_is_hashed_again_on_every_call_so_a_same_tick_rewrite_is_seen ... ok
+test checkpoints::tests::material_decisions_are_gate_derived_human_or_wide ... ok
+test cit::binding::tests::coverage_is_bound_to_the_content_a_committed_cit_wrote ... ok
+test cit::binding::tests::the_os_reseals_only_what_it_verified_and_is_entitled_to_write ... ok
+test capabilities::registry::tests::t2_audit_rows_name_every_entry_the_os_did_not_write ... ok
+test capabilities::registry::tests::relocation_moves_the_bytes_unchanged_and_never_overwrites ... ok
+test capabilities::binding::tests::inline_code_is_executable_and_bound_through_the_descriptor ... ok
+test capabilities::registry::tests::the_legacy_registry_is_read_only_until_one_exists_where_it_belongs ... ok
+test cit::propagation::tests::receipts_name_consumed_hashes ... ok
+test cit::propagation::tests::staleness_accumulates_changes_and_is_idempotent ... ok
+test code_intelligence::generic::tests::blanking_preserves_positions_and_lines ... ok
+test capabilities::binding::tests::python_finder_order_prefers_a_regular_package_then_a_module_then_namespace_portions ... ok
+test capabilities::binding::tests::declared_model_and_runtime_artefacts_are_bound_with_their_roles ... ok
+test capabilities::binding::tests::symlinked_files_and_directories_inside_a_bound_tree_are_bound_by_content ... ok
+test context::contradictions::tests::explicit_keys_questions_forks_and_declared_conflicts ... ok
+test context::contradictions::tests::precedence_resolves_first_and_undecidable_pairs_are_detected ... ok
+test cit::propagation::tests::normative_content_ignores_bookkeeping_and_tracks_content ... ok
+test authority::tests::embedded_kernel_check_refuses_undeclared_and_human_claims ... ok
+test cit::binding::tests::digests_are_stable_across_the_record_writer_and_sensitive_to_content ... ok
+test capabilities::host::tests::bad_json_and_protocol_mismatch_are_reported ... ok
+test context::manifest::tests::a_complete_manifest_is_satisfied_and_names_every_input ... ok
+test context::manifest::tests::absent_wrong_type_superseded_and_non_authoritative_inputs_block ... ok
+test context::manifest::tests::version_constraints ... ok
+test context::receipt::tests::worker_return_and_report_are_one_contract ... ok
+test context::manifest::tests::output_contracts_in_the_schema_are_the_enforced_table ... ok
+test context::manifest::tests::a_specification_producer_is_not_held_to_what_its_feature_still_lacks ... ok
+test context::manifest::tests::relations_notes_and_supplementary_context_are_declarations ... ok
+test context::manifest::tests::state_version_and_hash_constraints_are_enforced ... ok
+test context::receipt::tests::worker_return_maps_to_a_schema_valid_report ... ok
+test checkpoints::tests::files_changed_names_files_and_bounds_large_untracked_trees ... ok
+test contracts::tests::an_edited_import_is_refused_before_anything_else ... ok
+test capabilities::host::tests::large_stdin_request_and_stderr_flood_are_drained ... ok
+test cit::materiality::tests::the_declared_label_is_kept_but_never_lowers_the_derived_classes ... ok
+test cit::materiality::tests::bookkeeping_and_editorial_changes_are_not_material ... ok
+test contracts::tests::labels_are_carried_exactly_as_the_source_states_them ... ok
+test cit::materiality::tests::a_retrieval_profile_change_is_material_for_cit_p ... ok
+test contracts::tests::qualifiers_invariant_and_challenges_are_carried_verbatim ... ok
+test cit::materiality::tests::a_tool_installation_descriptor_is_a_governance_and_a_security_change ... ok
+test cit::materiality::tests::each_material_class_is_derived_from_what_changes_not_from_a_label ... ok
+test capabilities::host::tests::large_response_well_above_pipe_buffer_does_not_deadlock ... ok
+test contracts::tests::a_single_changed_byte_in_the_source_changes_the_binding ... ok
+test code_intelligence::generic::tests::trait_method_declarations_are_single_line_units ... ok
+test cit::materiality::tests::declared_path_targets_are_classified_without_a_manifest ... ok
+test contracts::tests::the_owner_sources_fingerprint_follows_what_owners_resolve_against ... ok
+test contracts::tests::the_owner_universe_is_read_in_full ... ok
+test contracts::tests::the_resolver_reads_items_not_text ... ok
+test contracts::tests::what_the_owners_determine_is_derived_from_the_product ... ok
+test error::tests::blocked_class_codes_exit_4 ... ok
+test exceptions::tests::a_fabricated_decision_reference_is_refused ... ok
+test exceptions::tests::lifecycle_scope_and_authority_are_all_required ... ok
+test graph::identity::tests::a_product_release_is_a_governed_record_in_the_lineage ... ok
+test graph::identity::tests::citation_and_scenario_chain_fields_are_relation_edges ... ok
+test graph::identity::tests::content_derived_ids_are_stable_and_distinct ... ok
+test graph::identity::tests::failure_and_plan_records_have_canonical_locations ... ok
+test graph::identity::tests::misplaced_records_are_reported_and_subdirectories_are_canonical ... ok
+test graph::lineage::tests::a_finished_transactions_links_are_history_not_stale_links ... ok
+test graph::lineage::tests::every_relation_field_reads_in_the_direction_of_its_meaning ... ok
+test graph::lineage::tests::stale_links_and_unconsumed_outputs_are_named ... ok
+test graph::tests::implicit_architecture_consumers_are_reached_by_impact ... ok
+test contracts::tests::the_compiler_accounts_for_every_line_of_the_approved_source ... ok
+test graph::tests::inverse_storage_is_read_back_in_the_direction_of_its_meaning ... ok
+test graph::tests::producer_and_report_edges_point_from_producer_to_product ... ok
+test code_intelligence::generic::tests::no_symbols_from_comments_or_strings ... ok
+test human_channel::tests::the_embedded_kernel_keeps_the_standalone_anchor_off ... ok
+test kernel::tests::the_embedded_payload_digest_is_what_staging_measures ... ok
+test kernel_trust::tests::uninstalled_projects_keep_the_installed_kernel_path_and_never_block ... ok
+test lifecycle::experiment::tests::experimental_output_copied_into_production_is_found_unless_promoted ... ok
+test lifecycle::experiment::tests::reproductions_are_judged_by_the_os_under_the_fixed_rule ... ok
+test lifecycle::experiment::tests::standing_requires_os_written_concluded_reproduced_experiments_on_unchanged_inputs ... ok
+test lifecycle::experiment::tests::the_state_machine_admits_only_its_transitions ... ok
+test lifecycle::research::tests::findings_name_incomplete_evidence_unsupported_decisions_and_missing_backlinks ... ok
+test lifecycle::research::tests::j1_completeness_decides_evidence_standing ... ok
+test lifecycle::scenario::tests::a_complete_chain_has_no_gaps_and_computes_present_cells ... ok
+test code_intelligence::generic::tests::inheritance_routes_and_models_across_languages ... ok
+test lifecycle::scenario::tests::data_author_independence_uses_recorded_authorship_and_honours_only_an_approved_waiver ... ok
+test lifecycle::scenario::tests::every_missing_link_is_a_typed_gap ... ok
+test lifecycle::tests::authorship_prefers_the_os_stamp_then_the_closing_report_then_declarations ... ok
+test lifecycle::tests::every_lifecycle_command_is_g0_classified_with_the_class_its_runtime_requires ... ok
+test lifecycle::tests::ids_are_read_from_lists_objects_and_free_text ... ok
+test lifecycle::scenario::tests::provenance_is_read_real_data_needs_approval_and_changes_are_detected ... ok
+test lock::tests::versions_and_compat ... ok
+test lifecycle::tests::influence_is_derived_through_edges_evidence_refs_and_gates ... ok
+test kernel::tests::a_kernel_cache_is_reused_only_when_it_is_exactly_the_embedded_listing ... ok
+test contracts::tests::the_line_accounting_is_independent_of_the_compiler ... ok
+test memory::chunking::tests::every_heading_is_held_and_headings_compare_the_same_way_on_both_sides ... ok
+test memory::chunking::tests::record_sections_hold_list_and_nested_content ... ok
+test memory::chunking::tests::every_non_empty_code_line_is_held_by_a_chunk ... ok
+test memory::chunking::tests::hierarchical_chunks ... ok
+test memory::chunking::tests::methods_are_child_units_and_long_units_keep_every_line ... ok
+test memory::claims::tests::budget_is_decided_in_the_same_transaction ... ok
+test memory::claims::tests::claims_child_process ... ok
+test memory::claims::tests::a_claim_is_bound_to_its_worktree_and_renewal_keeps_claimed_at ... ok
+test memory::claims::tests::a_copied_store_is_not_the_store_its_claims_are_not_live_there ... ok
+test memory::claims::tests::a_legacy_store_moves_to_its_state_location_with_its_live_claims ... ok
+test memory::claims::tests::linked_worktrees_share_the_main_worktree_store ... ok
+test memory::claims::tests::legacy_store_is_migrated ... ok
+test memory::claims::tests::overlapping_scopes_of_other_sessions_are_refused_and_disjoint_ones_granted ... ok
+test memory::claims::tests::release_and_sweep_only_touch_the_rows_they_decided_on ... ok
+test memory::embeddings::tests::sha1_matches_known_vector ... ok
+test memory::failures::tests::failure_kinds_signatures_and_locations ... ok
+test memory::embeddings::tests::deterministic_unit_vectors ... ok
+test memory::indexer::tests::import_resolution_covers_src_layouts_and_crates ... ok
+test memory::indexer::tests::record_rank_follows_the_record_store_and_changes_count_content_only ... ok
+test memory::indexer::tests::test_paths_by_convention ... ok
+test memory::integrity::tests::signatures_judge_direction_and_type ... ok
+test migrations::executor::tests::a_legacy_snapshot_is_moved_into_the_store_and_still_rolls_back ... ok
+test migrations::executor::tests::a_rollback_restores_only_what_its_batch_recorded ... ok
+test memory::indexer::tests::admission_decides_every_skip_reason_from_the_file ... ok
+test migrations::extraction::tests::bullet_lists_split_but_numbered_procedures_stay_whole ... ok
+test migrations::extraction::tests::sql_dump_literals_are_read ... ok
+test migrations::extraction::tests::units_are_classified_without_requiring_decision_or_lesson_cues ... ok
+test migrations::framework::tests::relocate_os_stores_moves_tracked_stores_bytes_unchanged_and_only_them ... ok
+test migrations::framework::tests::template_convergence_dry_run_writes_nothing ... ok
+test contracts::tests::the_owner_resolver_lists_exactly_the_tests_the_lib_harness_runs ... ok
+test capabilities::host::tests::timeout_kills_child_promptly ... ok
+test kernel::tests::the_payload_declares_the_schema_versions_it_ships_and_carries_no_secret ... ok
+test migrations::identity::tests::a_session_is_declared_only_by_the_caller_and_never_twice ... ok
+test migrations::identity::tests::artefact_ids_depend_only_on_the_path ... ok
+test migrations::identity::tests::extracted_ids_ignore_whitespace_and_case ... ok
+test migrations::identity::tests::finding_ids_survive_an_inserted_finding ... ok
+test migrations::identity::tests::identical_findings_are_disambiguated ... ok
+test migrations::framework::tests::template_convergence_is_a_three_way_merge_that_keeps_customisations ... ok
+test contracts::tests::owner_references_resolve_against_the_product ... ok
+test migrations::executor::tests::batch_snapshots_live_in_the_os_store_and_survive_deleting_the_runtime_directory ... ok
+test migrations::references::tests::citations_links_and_path_references_are_found ... ok
+test migrations::verify::tests::a_command_test_runs_only_a_governed_command_for_a_permitted_role ... ok
+test orchestration::claims::tests::disjoint_directories_do_not_overlap ... ok
+test orchestration::claims::tests::nested_equal_and_wildcard_scopes_overlap ... ok
+test orchestration::claims::tests::unrestricted_scope_is_described_and_contains_everything ... ok
+test migrations::verify::tests::the_runner_executes_only_permitted_command_tests ... ok
+test orchestration::control::tests::governed_work_labels_are_classified_writes_and_remedies_are_never_governed_work ... ok
+test orchestration::control::tests::labels_are_unique_and_allow_lists_name_classified_writes ... ok
+test orchestration::dag::tests::explicit_hold_is_only_a_status_set_by_task_status_and_still_in_force ... ok
+test orchestration::dag::tests::task_state_names_are_stable ... ok
+test orchestration::gates::tests::options_authorise_blocked_work_explicitly_or_by_the_approve_convention ... ok
+test orchestration::gates::tests::radii_are_validated ... ok
+test orchestration::gates::tests::reversibility_is_assessed_explicitly_or_not_at_all ... ok
+test orchestration::control::tests::every_authority_class_exists_in_the_kernel_authority_policy ... ok
+test orchestration::generation::tests::generation_is_idempotent_per_occurrence_and_subject ... ok
+test orchestration::generation::tests::missing_capability_work_is_augmented_not_duplicated ... ok
+test orchestration::generation::tests::a_condition_no_project_role_can_remedy_is_reported_not_generated ... ok
+test orchestration::generation::tests::the_taxonomy_declares_every_source ... ok
+test orchestration::readiness::tests::not_applicable_cells_need_a_reason ... ok
+test orchestration::readiness::tests::every_pre_implementation_chain_gap_belongs_to_a_chain_cell ... ok
+test orchestration::tasks::tests::cited_evidence_and_remedies_are_read_from_the_contract ... ok
+test orchestration::tasks::tests::independent_work_is_recognised_by_class_role_or_readiness_cell ... ok
+test orchestration::tasks::tests::operation_only_statuses_name_their_route ... ok
+test migrations::references::tests::a_dependency_proof_sees_live_code_and_ignores_archive_and_leaving_files ... ok
+test migrations::framework::tests::the_substance_check_simulates_the_update_an_installed_project_receives ... ok
+test paths::tests::secret_classification_can_never_be_downgraded ... ok
+test paths::tests::legacy_stores_relocate_and_are_reported_until_moved ... ok
+test policy_precedence::tests::a_rule_set_silent_on_a_label_does_not_govern_it_and_the_stricter_set_wins ... ok
+test policy_precedence::tests::floors_and_additive_sets ... ok
+test policy_precedence::tests::overlay_documents_may_raise_floors_but_never_lower_them ... ok
+test policy_precedence::tests::pattern_matching ... ok
+test migrations::framework::tests::the_next_migration_converges_every_overlay_template_from_the_4_1_5_templates ... ok
+test orchestration::claims::tests::overlap_is_sound_against_glob_match ... ok
+test paths::tests::every_writer_location_is_classified_as_its_store ... ok
+test qualification_oracle::tests::a_score_report_is_bound_to_its_sealed_oracle ... ok
+test paths::tests::the_shipped_template_states_the_store_classification_under_any_reading ... ok
+test qualification_oracle::tests::the_format_covers_every_v1_v4_element_of_the_owner_source ... ok
+test contracts::tests::every_capability_names_a_running_owner_and_every_owner_resolves ... ok
+test paths::tests::os_stores_are_never_classified_derived_or_generated ... ok
+test qualification_oracle::tests::the_record_the_audit_used_is_rejected ... ok
+test records::tests::parse_yaml_and_markdown_records ... ok
+test release::tests::a_product_release_is_composed_only_inside_its_lineage ... ok
+test qualification_oracle::tests::score_arithmetic_is_checked ... ok
+test scheduler::catalogue::tests::checks_that_write_derived_state_are_isolated ... ok
+test scheduler::catalogue::tests::committing_operations_and_update_subjects_are_known ... ok
+test scheduler::catalogue::tests::every_policy_family_is_declared_and_every_dependency_is_a_known_class ... ok
+test scheduler::catalogue::tests::hard_blocks_are_explicit ... ok
+test scheduler::tests::a_block_about_an_unparseable_record_is_not_reached_by_every_request ... ok
+test scheduler::tests::an_update_is_the_remedy_of_an_overlay_block_but_not_of_a_record_block ... ok
+test scheduler::tests::blocks_are_derived_from_declared_rules_and_scoped ... ok
+test retrieval::tests::bare_file_names_reach_the_path_route ... ok
+test scheduler::tests::proposals_and_handoffs_are_refused_by_what_they_rely_on_and_admitted_when_they_remedy ... ok
+test scheduler::tests::tiers_parse_and_default_selection ... ok
+test scheduler::tests::subject_scoped_blocks_leave_independent_work_available ... ok
+test skills::tests::content_digest_ignores_annotations_and_detects_method_changes ... ok
+test security::secrets::tests::detects_and_redacts ... ok
+test skills::tests::lookup_and_expectations ... ok
+test skills::tests::scenario_plans ... ok
+test srr::binding::tests::key_ids_match_the_t2_primitive_and_commitments_are_domain_separated ... ok
+test srr::breakglass::tests::a_guarded_record_type_is_recognised_however_the_record_was_minted ... ok
+test skills::tests::every_kernel_scenario_has_a_bound_check_or_declared_mode ... ok
+test srr::breakglass::tests::an_undetermined_subject_refuses_and_says_which_it_is ... ok
+test srr::breakglass::tests::below_floor_limits_describe_allow_listed_operations ... ok
+test srr::breakglass::tests::below_floor_refusal_is_structural_not_an_enumeration ... ok
+test srr::breakglass::tests::degraded_marking_is_byte_exact_with_an_em_dash ... ok
+test srr::breakglass::tests::every_permitted_operation_names_a_real_section_5_activity ... ok
+test srr::breakglass::tests::every_section_6_activity_has_exactly_one_declared_sink ... ok
+test srr::breakglass::tests::every_section_6_bullet_has_a_derivation_signature_and_none_claims_an_absence ... ok
+test srr::breakglass::tests::exit_requires_both_floors_under_the_stricter_policy ... ok
+test srr::breakglass::tests::failing_closed_never_blocks_a_section_5_restoration_route ... ok
+test srr::breakglass::tests::refusal_classes_report_a_section_6_bullet_but_decide_nothing ... ok
+test srr::breakglass::tests::reserved_refusal_classes_are_inert_and_disjoint ... ok
+test srr::breakglass::tests::the_marking_record_has_exactly_one_reader ... ok
+test srr::breakglass::tests::a_named_section_6_effect_has_no_allow_list_exception ... ok
+test srr::installation::tests::a_consistent_rewrite_diverges_from_the_protected_record_and_names_the_file ... ok
+test srr::installation::tests::an_unknown_installed_record_vouches_for_nothing ... ok
+test srr::installation::tests::a_provisioned_machine_requires_a_verification_record ... ok
+test srr::installation::tests::an_unprovisioned_divergence_is_enforced_since_owner_decision_p2_0002 ... ok
+test srr::installation::tests::an_unprovisioned_machine_admits_only_a_bootstrap_installation_or_the_embedded_payload ... ok
+test srr::installation::tests::the_doctor_check_is_in_doctor_shape_and_fails_when_authenticity_is_not_established ... ok
+test srr::installation::tests::pending_and_current_are_both_bound_until_the_commit_completes ... ok
+test srr::metadata::tests::canonical_utc_timestamp_accepts_exactly_what_now_iso_emits ... ok
+test srr::metadata::tests::expiry_fails_closed_on_absent_and_non_canonical_forms ... ok
+test srr::plugins::tests::a_matching_delegation_admits_a_privileged_remote_capability_on_its_own_channel ... ok
+test srr::plugins::tests::a_privileged_remote_capability_without_a_delegation_is_refused ... ok
+test srr::plugins::tests::built_in_and_local_capabilities_need_no_delegation ... ok
+test srr::present::tests::a_presentation_always_states_which_way_it_went ... ok
+test srr::present::tests::attach_demotes_a_currency_claim_exactly_when_the_guard_refused ... ok
+test srr::installation::tests::the_ledger_keeps_the_highest_signed_sequence_for_the_same_bytes ... ok
+test t2::tests::a_portable_seal_is_honoured_where_the_key_is_held_and_authorised_and_nowhere_else ... ok
+test t2::tests::hmac_matches_rfc4231_test_cases ... ok
+test t2::tests::new_seals_are_portable_only_under_an_authority_that_verifies_now_with_its_active_key_held ... ok
+test t2::tests::reseal_moves_only_post_provisioning_local_seals_and_keeps_enclosing_seals_valid ... ok
+test t2::tests::a_seal_survives_the_product_writer_and_breaks_on_any_edit ... ok
+test tools::tests::a_governed_review_of_this_tool_and_version_by_another_author_is_evidence ... ok
+test tools::tests::anything_short_of_that_is_not_evidence ... ok
+test tools::tests::the_installation_subject_ignores_requests_and_results_but_nothing_else ... ok
+test update::tests::certification_claims_are_recognised_in_every_spelling ... ok
+test util::tests::deep_helpers ... ok
+test tools::tests::the_os_reads_an_installations_own_commands_for_what_it_would_hold ... ok
+test util::tests::hashing_is_canonical ... ok
+test util::tests::glob_semantics ... ok
+test memory::claims::tests::concurrent_claims_of_one_task_grant_exactly_one ... ok
+test verification::currency::tests::health_outputs_are_recognised_by_content_not_by_name ... ok
+test verification::currency::tests::manifest_normalisation_drops_volatile_fields_only ... ok
+test verification::currency::tests::non_file_classes_are_keyed_and_never_file_classes ... ok
+test qualification_oracle::tests::a_report_is_validated_against_the_oracle_file_it_names ... ok
+test verification::currency::tests::governance_affecting_by_class_and_by_touched_inputs ... ok
+test verification::reporting::tests::a_completed_change_transaction_is_not_a_stale_link_to_what_it_changed ... ok
+test verification::lineage::tests::each_record_level_w7_class_is_named_and_linked_records_are_not ... ok
+test verification::reporting::tests::binding_status_findings_raise_an_unhonoured_authority_and_disclose_machine_scope ... ok
+test verification::reporting::tests::t2_severity_separates_tampering_forged_gates_and_legacy_claims ... ok
+test verification::slo::tests::every_gate_u_slo_and_condition_is_declared_with_an_owner_and_threshold ... ok
+test verification::currency::tests::every_contract_input_class_has_an_owner_class ... ok
+test verification::slo::tests::healthy_only_when_every_condition_holds ... ok
+test verification::reporting::tests::a_coverage_gap_is_confirmed_unless_every_line_is_held_with_its_heading_markers ... ok
+test contracts::tests::the_committed_binding_chain_verifies ... ok
+test contracts::tests::the_lock_and_the_schema_are_part_of_the_binding ... ok
+test qualification_oracle::tests::well_formed_samples_validate ... ok
+test verification::currency::tests::snapshot_attributes_changes_to_classes_and_ignores_its_own_outputs ... ok
+test qualification_oracle::tests::the_hidden_oracle_is_kept_out_of_the_public_suite_and_the_repository ... ok
+test contracts::tests::a_tree_without_the_owners_sources_defers_and_discloses_and_never_compiles ... ok
+test contracts::tests::the_matrix_is_generated_from_the_map_with_the_supplied_run_evidence ... ok
+test contracts::tests::regeneration_is_idempotent_over_the_committed_views ... ok
+test contracts::tests::a_semantic_difference_in_the_compiled_form_is_a_typed_failure ... ok
+test qualification_oracle::tests::semantic_rules_reject_contradictory_or_unanchored_records ... ok
+test contracts::tests::a_semantic_difference_in_the_generated_view_is_a_typed_failure ... ok
+test capabilities::pincache::tests::a_stored_digest_is_never_returned_for_changed_bytes ... ok
+test contracts::tests::a_semantic_difference_in_the_evidence_map_is_a_typed_failure ... ok
+test contracts::tests::governed_evidence_values_survive_regeneration ... ok
+test qualification_oracle::tests::a_record_missing_any_v1_v4_field_is_rejected ... ok
+test memory::claims::tests::concurrent_processes_claiming_one_task_grant_exactly_one ... ok
+test contracts::tests::an_owner_mutation_is_a_typed_failure ... ok
+
+test result: ok. 276 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.30s
+
+### cargo test --test certification ### 2026-09-21T00:19:46+01:00
+   Compiling utf8parse v0.2.2
+   Compiling colorchoice v1.0.5
+   Compiling anstyle-parse v1.0.0
+   Compiling anstyle-query v1.1.5
+   Compiling anstyle v1.0.14
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling strsim v0.11.1
+   Compiling anstream v1.0.0
+   Compiling clap_lex v1.1.0
+   Compiling heck v0.5.0
+   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/runtime)
+   Compiling clap_derive v4.6.4
+   Compiling clap_builder v4.6.6
+   Compiling clap v4.6.6
+   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis/cli)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.84s
+     Running ../tests/certification/main.rs (target/debug/deps/certification-f1bd0746f039ec4b)
+
+running 207 tests
+test arch::core_crates_have_no_python_or_node_bindings ... ok
+test arch::kernel_data_contains_no_language_or_toolchain_assumptions ... ok
+test arch::rust_sources_never_hardcode_external_language_runtimes ... ok
+test arch::builtin_embedder_matches_python_reference_plugin ... ok
+test arch::schemas_policies_and_registries_validate_against_kernel_schemas ... ok
+test arch::ecosystem_resolution_follows_the_governed_project_not_the_os ... ok
+test r4_residual::a_repository_contract_rule_that_never_decides_is_reported ... ok
+test arch::core_runs_without_any_governed_toolchain_on_path has been running for over 60 seconds
+test arch::plugin_protocol_is_language_neutral_bash_embedder has been running for over 60 seconds
+test brownfield::brownfield_adoption_end_to_end has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered has been running for over 60 seconds
+test greenfield::greenfield_end_to_end has been running for over 60 seconds
+test integration_r3::a_cit_invalidating_done_work_leaves_graph_integrity_and_d015_clean has been running for over 60 seconds
+test integration_r3::a_legacy_unsealed_task_rewritten_by_gov_inside_a_claim_window_is_reported_not_refused has been running for over 60 seconds
+test integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2 has been running for over 60 seconds
+test integration_r3::a_task_record_written_outside_gov_inside_a_claim_window_is_refused_at_close has been running for over 60 seconds
+test integration_r3::task_records_are_sealed_and_os_writes_inside_another_claim_window_are_honoured has been running for over 60 seconds
+test migration::adoption_dependency_proof_citations_and_rerun_identity has been running for over 60 seconds
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts has been running for over 60 seconds
+test migration::command_tests_execute_only_governed_commands_for_permitted_roles has been running for over 60 seconds
+test migration::path_migration_with_rollback_and_memory_rebuild has been running for over 60 seconds
+test multi_machine::clone_rebuilds_identical_derived_state has been running for over 60 seconds
+test r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once has been running for over 60 seconds
+test r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction has been running for over 60 seconds
+test r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing has been running for over 60 seconds
+test r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority has been running for over 60 seconds
+test r4_residual::a_direct_upstream_change_observed_at_an_index_rebuild_is_propagated_there_once ... ok
+test multi_machine::clone_rebuilds_identical_derived_state ... ok
+test integration_r3::a_legacy_unsealed_task_rewritten_by_gov_inside_a_claim_window_is_reported_not_refused ... ok
+test r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction has been running for over 60 seconds
+test arch::core_runs_without_any_governed_toolchain_on_path ... ok
+test r4_residual::a_registration_change_approved_without_its_execution_approval_writes_nothing ... ok
+test r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing has been running for over 60 seconds
+test integration_r3::a_task_record_written_outside_gov_inside_a_claim_window_is_refused_at_close ... ok
+test integration_r3::task_records_are_sealed_and_os_writes_inside_another_claim_window_are_honoured ... ok
+test integration_r3::a_readiness_regression_made_through_change_control_is_refused_at_close_by_g2 ... ok
+test r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write has been running for over 60 seconds
+test r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout has been running for over 60 seconds
+test r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity has been running for over 60 seconds
+test arch::plugin_protocol_is_language_neutral_bash_embedder ... ok
+test r4_residual::an_installation_whose_envelope_changed_after_simulation_is_refused_at_the_write ... ok
+test r4_residual::a_plugin_registered_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction ... ok
+test r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does has been running for over 60 seconds
+test r4_residual::skill_bindings_are_written_where_they_belong_and_a_legacy_file_moves_on_the_next_write ... ok
+test r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs has been running for over 60 seconds
+test r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed has been running for over 60 seconds
+test r4_residual::a_tool_installed_inside_a_claimed_task_closes_on_its_os_proposed_change_transaction ... ok
+test repair2::interface_contract_kernel_yaml_and_migration_substance_are_consistent ... ok
+test integration_r3::a_cit_invalidating_done_work_leaves_graph_integrity_and_d015_clean ... ok
+test r4_residual::an_installation_change_approved_without_its_installation_approval_writes_nothing ... ok
+test r4_residual::the_t2_binding_status_is_reported_and_machine_scope_sealing_on_a_provisioned_machine_is_disclosed ... ok
+test repair2::release_build_reproduces_released_versions_from_their_commit ... ok
+test migration::command_tests_execute_only_governed_commands_for_permitted_roles ... ok
+test repair3::current_release_payload_identity_and_hygiene ... ok
+test repair2::cit_approval_derives_only_from_an_answered_gate has been running for over 60 seconds
+test repair2::framework_lock_is_release_identifying_and_portable has been running for over 60 seconds
+test r4_residual::declared_model_and_runtime_artefacts_are_part_of_the_retrieval_profile_identity ... ok
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger has been running for over 60 seconds
+test repair2::framework_lock_is_release_identifying_and_portable ... ok
+test repair2::incremental_rebuild_follows_record_relocation has been running for over 60 seconds
+test repair2::incremental_rebuild_follows_record_relocation ... ok
+test r4_residual::the_remediation_handoff_stays_available_under_the_block_it_repairs ... ok
+test repair2::plugins_are_governed_capabilities_not_arbitrary_commands has been running for over 60 seconds
+test r4_residual::an_update_moves_the_tracked_os_stores_and_a_rollback_restores_the_previous_layout ... ok
+test repair2::project_policy_cannot_weaken_constitutional_floors has been running for over 60 seconds
+test repair2::task_close_uses_observed_mutations_not_self_attestation has been running for over 60 seconds
+test repair3::constitutional_floors_require_a_verified_kernel has been running for over 60 seconds
+test repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts has been running for over 60 seconds
+test migration::adoption_dependency_proof_citations_and_rerun_identity ... ok
+test repair3::plugin_descriptors_can_never_authorise_themselves has been running for over 60 seconds
+test repair3::policy_exceptions_require_a_real_governing_decision has been running for over 60 seconds
+test repair::authority_levels_are_enforced_on_executable_paths has been running for over 60 seconds
+test repair2::task_close_uses_observed_mutations_not_self_attestation ... ok
+test repair::budget_parallel_agents_threshold_raises_gate ... ok
+test repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts ... ok
+test repair::benchmark_records_evidence_and_selection_pins_through_decision has been running for over 60 seconds
+test repair::authority_levels_are_enforced_on_executable_paths ... ok
+test repair::benchmark_records_evidence_and_selection_pins_through_decision ... ok
+test repair3::policy_exceptions_require_a_real_governing_decision ... ok
+test repair::cit_auto_simulation_and_secret_redaction has been running for over 60 seconds
+test repair2::project_policy_cannot_weaken_constitutional_floors ... ok
+test repair::context_packet_layers_and_contradiction_flags ... ok
+test repair::embedded_kernel_installs_without_canonical_root ... ok
+test repair::claims_survive_full_memory_rebuild has been running for over 60 seconds
+test repair::destructive_migration_requires_answered_gate_record has been running for over 60 seconds
+test repair3::constitutional_floors_require_a_verified_kernel ... ok
+test repair::embedder_replaceable_end_to_end_and_no_silent_fallback ... ok
+test repair::claims_survive_full_memory_rebuild ... ok
+test repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index has been running for over 60 seconds
+test repair::cit_auto_simulation_and_secret_redaction ... ok
+test repair::freeze_writes_is_honoured_by_adopt_and_upstream ... ok
+test repair::implementation_prerequisites_and_symbol_route has been running for over 60 seconds
+test repair::plugin_host_large_response_through_cli has been running for over 60 seconds
+test migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts ... ok
+test r4_residual::ordinary_allowlisted_network_use_does_not_gate_but_a_new_boundary_does ... ok
+test repair2::cit_approval_derives_only_from_an_answered_gate ... ok
+test repair::policy_enforcement_coverage_is_complete_and_honest ... ok
+test section6::a_no_primitive_claim_is_refutable_by_this_suite ... ok
+test repair::reranker_hook_invoked_and_never_silently_skipped has been running for over 60 seconds
+test repair::implementation_prerequisites_and_symbol_route ... ok
+test section6::both_capability_acquisition_primitives_ask_section_6_without_consulting_the_descriptor ... ok
+test section6::section_6_coverage_is_derived_from_the_product ... ok
+test repair::sensitivity_classes_and_namespaces_are_enforced has been running for over 60 seconds
+test repair::smaller_findings_regressions has been running for over 60 seconds
+test repair::sensitivity_classes_and_namespaces_are_enforced ... ok
+test section6::the_dropped_held_out_sub_checks_run_here ... ok
+test section6::the_floors_sink_never_lowers_a_floor_however_the_value_was_set ... ok
+test repair::embedder_pin_change_escalates_to_full_rebuild_without_mixed_index ... ok
+test repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger ... ok
+test section6::a_human_gate_record_cannot_be_written_below_floor_however_it_was_minted ... ok
+test section6::an_undetermined_subject_fails_closed_at_both_enforcement_points ... ok
+test repair::task_close_enforces_mutation_scope has been running for over 60 seconds
+test migration::path_migration_with_rollback_and_memory_rebuild ... ok
+test srr::an_unreadable_marking_is_read_the_same_way_by_every_consumer_and_still_exits ... ok
+test srr::an_unsigned_source_is_refused_once_a_trust_anchor_exists ... ok
+test repair::unmeasured_memory_recall_is_not_green ... ok
+test repair::update_approval_requires_presented_answered_gate has been running for over 60 seconds
+test section6::the_below_floor_marking_reaches_every_surface_including_ones_that_know_nothing_about_it ... ok
+test srr::a_signed_release_is_verified_end_to_end_and_the_floors_advance ... ok
+test srr::expired_metadata_fails_closed_against_the_declared_local_clock ... ok
+test srr::a_privileged_capability_acquired_from_outside_needs_a_delegated_signed_target ... ok
+test srr::modified_metadata_payload_and_migration_all_fail_closed ... ok
+test srr::an_interrupted_install_leaves_one_complete_version_and_never_advances_a_floor ... ok
+test section6::the_marking_is_absent_from_every_surface_on_a_healthy_machine ... ok
+test srr::below_floor_refusal_is_default_refuse_across_the_whole_operation_surface ... ok
+test srr::root_succession_requires_both_quorums_no_gaps_and_revokes_by_omission ... ok
+test srr::section_6_refusal_class_tables_are_partitioned_by_what_the_product_actually_enforces ... ok
+test srr::the_capability_contract_source_chain_is_hash_bound_and_fails_closed ... ok
+test srr::an_allow_listed_operation_cannot_create_a_human_gate_below_floor ... ok
+test srr::the_no_bypass_and_no_signing_preservation_census_still_holds ... ok
+test srr::wrong_key_wrong_product_and_wrong_channel_all_fail_closed ... ok
+test srr::break_glass_never_admits_an_inauthentic_release_and_needs_no_network ... ok
+test srr::environment_repository_and_caller_inputs_cannot_create_trust_or_approval ... ok
+test srr::replaying_older_metadata_is_refused_by_the_protected_high_water ... ok
+test repair::plugin_host_large_response_through_cli ... ok
+test srr::installed_integrity_authenticity_and_admissibility_stay_three_separate_predicates ... ok
+test ws01r4::a_tree_without_the_owners_sources_discloses_deferred_owners_and_refuses_to_compile ... ok
+test ws01r4::the_owner_resolver_lists_exactly_the_tests_the_certification_harness_runs ... ok
+test srr::protected_floors_survive_uninstall_and_project_removal ... ok
+test srr::section_6_effects_are_enforced_inside_their_sinks ... ok
+test ws01r4::the_suite_to_contract_matrix_is_generated_from_the_products_own_map ... ok
+test repair::update_approval_requires_presented_answered_gate ... ok
+test ws01r4::gov_contract_verify_enforces_the_evidence_owners ... ok
+test srr::the_floor_binds_every_ingress_and_only_owner_signed_break_glass_admits_a_below_floor_release ... ok
+test update::update_from_previous_release_preserves_project_and_rolls_back has been running for over 60 seconds
+test repair::reranker_hook_invoked_and_never_silently_skipped ... ok
+test ws03::every_cli_command_label_is_classified_by_g0 ... ok
+test upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet has been running for over 60 seconds
+test upstream::export_gate_fails_closed_on_content_whatever_the_name has been running for over 60 seconds
+test ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate ... ok
+test upstream::upstream_export_gate_fails_closed_and_sanitises ... ok
+test ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere ... ok
+test ws03::agent_resolution_needs_an_assessed_and_independent_assessment ... ok
+test upstream::export_gate_fails_closed_on_content_whatever_the_name ... ok
+test ws03::blocked_work_is_released_only_by_an_authorising_answer ... ok
+test repair::smaller_findings_regressions ... ok
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor has been running for over 60 seconds
+test ws03::cit_approval_consumes_only_honoured_gate_answers has been running for over 60 seconds
+test ws03::hand_written_gate_and_decision_records_are_not_honoured ... ok
+test repair::task_close_enforces_mutation_scope ... ok
+test ws03::presentation_is_recorded_only_from_an_owner_signed_receipt ... ok
+test greenfield::greenfield_end_to_end ... ok
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations has been running for over 60 seconds
+test failure_injection::injected_failures_are_detected_and_recovered ... ok
+test ws03::the_decision_package_is_enforced ... ok
+test ws03_r3::a_t2_binding_authority_is_admitted_only_from_the_administrator_domain_under_this_machines_root ... ok
+test upstream::export_approval_comes_only_from_an_owner_signed_answer_bound_to_the_packet ... ok
+test ws03::human_answers_come_only_from_the_owner_signed_channel has been running for over 60 seconds
+test ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations ... ok
+test repair::destructive_migration_requires_answered_gate_record ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them has been running for over 60 seconds
+test ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor ... ok
+test ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals has been running for over 60 seconds
+test ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals ... ok
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers has been running for over 60 seconds
+test ws03::cit_approval_consumes_only_honoured_gate_answers ... ok
+test ws03_r3::emergency_control_state_lives_in_the_operational_store ... ok
+test ws03_r3::gate_operations_keep_os_sealed_task_records_verifiable_and_never_bless_others ... ok
+test ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers ... ok
+test ws03_r3::gates_cite_only_governed_research_and_record_its_influence has been running for over 60 seconds
+test ws03_r3::root_succession_that_drops_the_binding_role_revokes_its_records_and_sealing_falls_back ... ok
+test ws03::project_overlays_may_raise_floors_but_never_lower_them ... ok
+test ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close has been running for over 60 seconds
+test ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else has been running for over 60 seconds
+test ws03_r3::reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_else has been running for over 60 seconds
+test update::update_from_previous_release_preserves_project_and_rolls_back ... ok
+test ws03_r3::gates_cite_only_governed_research_and_record_its_influence ... ok
+test ws04r2::contradictions_are_blocked_and_routed ... ok
+test ws03_r3::the_t2_audit_covers_the_plugin_registry has been running for over 60 seconds
+test ws04r2::materiality_is_derived_not_labelled ... ok
+test ws03_r3::reseal_makes_what_this_machine_sealed_while_provisioned_portable_and_nothing_else ... ok
+test ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only has been running for over 60 seconds
+test ws04r2::checkpoint_and_handoff_continuity has been running for over 60 seconds
+test ws03::human_answers_come_only_from_the_owner_signed_channel ... ok
+test ws03_r3::upstream_export_and_experiment_promotion_gates_are_human_only ... ok
+test ws04r2::cit_approval_binds_content_impact_and_transaction has been running for over 60 seconds
+test ws03_r3::generated_provider_hooks_call_gov_checkpoint_and_session_close ... ok
+test repair3::plugin_descriptors_can_never_authorise_themselves ... ok
+test ws04r2::upstream_change_reaches_completed_work has been running for over 60 seconds
+test ws04r2::cit_approval_binds_content_impact_and_transaction ... ok
+test ws04r3::a_cit_declined_during_another_tasks_claim_does_not_block_its_close has been running for over 60 seconds
+test ws04r3::a_governed_change_reseals_only_what_the_os_may_seal has been running for over 60 seconds
+test ws04r3::the_manifest_applies_the_producer_rule_and_flags_ungoverned_evidence ... ok
+test ws04r3::untraceable_implementation_is_judged_on_what_was_produced ... ok
+test ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences has been running for over 60 seconds
+test ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks has been running for over 60 seconds
+test ws04r3::a_cit_declined_during_another_tasks_claim_does_not_block_its_close ... ok
+test ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken has been running for over 60 seconds
+test ws04r3::experimental_output_reaches_production_only_through_a_promotion has been running for over 60 seconds
+test ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory has been running for over 60 seconds
+test ws05::close_observes_os_written_state_no_os_operation_produced has been running for over 60 seconds
+test ws05::close_requires_and_persists_the_consumption_receipt has been running for over 60 seconds
+test ws03_r3::the_t2_audit_covers_the_plugin_registry ... ok
+test ws05::releasing_a_claim_is_a_guarded_write ... ok
+test ws05::gates_decide_runnability_and_completion has been running for over 60 seconds
+test ws05::status_shows_health_and_this_projects_release_trust ... ok
+test ws05::close_requires_and_persists_the_consumption_receipt ... ok
+test ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag ... ok
+test ws05::independence_is_established_from_recorded_authorship has been running for over 60 seconds
+test ws04r3::rollback_snapshots_survive_deleting_the_derived_runtime_directory ... ok
+test ws04r3::experimental_output_reaches_production_only_through_a_promotion ... ok
+test ws05::gates_decide_runnability_and_completion ... ok
+test ws05r3::a_failing_product_test_family_generates_repair_work ... ok
+test ws05::close_observes_os_written_state_no_os_operation_produced ... ok
+test ws05::independence_is_established_from_recorded_authorship ... ok
+test ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task has been running for over 60 seconds
+test ws05r3::a_red_result_made_stale_by_the_events_own_records_is_reevaluated_not_dropped has been running for over 60 seconds
+test ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block has been running for over 60 seconds
+test ws05r3::an_experiment_task_closes_only_through_its_lifecycle has been running for over 60 seconds
+test ws05r3::an_experiment_task_closes_only_through_its_lifecycle ... ok
+test ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks ... ok
+test ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote has been running for over 60 seconds
+test ws05r3::claims_and_claim_baselines_survive_deleting_the_derived_runtime has been running for over 60 seconds
+test ws05r3::claims_and_claim_baselines_survive_deleting_the_derived_runtime ... ok
+test ws05r3::every_event_source_generates_linked_governed_work_once has been running for over 60 seconds
+test ws05r3::material_changes_inside_a_task_complete_only_through_change_control has been running for over 60 seconds
+test ws05r3::a_red_result_made_stale_by_the_events_own_records_is_reevaluated_not_dropped ... ok
+test ws05r3::every_event_source_generates_linked_governed_work_once ... ok
+test ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence has been running for over 60 seconds
+test ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences ... ok
+test ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression has been running for over 60 seconds
+test ws06::graph_integrity_raises_orphan_stale_reversed_ill_typed_and_cycles ... ok
+test ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block ... ok
+test ws05r3::cit_coverage_is_bound_to_the_content_the_cit_wrote ... ok
+test ws06r3::a_refused_code_intelligence_adapter_is_a_recorded_degradation ... ok
+test ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration has been running for over 60 seconds
+test ws04r2::upstream_change_reaches_completed_work ... ok
+test ws06::embedder_components_are_identified_bound_and_fail_closed_on_change has been running for over 60 seconds
+test ws06::a_profile_change_needs_evidence_the_radius_gate_and_a_recorded_regression ... ok
+test ws04r3::a_governed_change_reseals_only_what_the_os_may_seal ... ok
+test ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips has been running for over 60 seconds
+test repair2::plugins_are_governed_capabilities_not_arbitrary_commands ... ok
+test ws06r3::a_significant_mutation_observed_at_rebuild_is_a_checkpoint_boundary ... ok
+test brownfield::brownfield_adoption_end_to_end ... ok
+test ws06r3::a_change_transaction_commits_while_the_tree_holds_files_the_indexer_skips ... ok
+test ws06r3::markdown_headings_are_held_and_coverage_reports_no_false_gap ... ok
+test ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task ... ok
+test ws06r3::freshness_judges_exactly_what_the_indexer_indexes has been running for over 60 seconds
+test r4_residual::a_tool_installation_is_gated_for_each_way_it_expands_authority ... ok
+test ws06r3::the_benchmark_is_governed_research_and_the_profile_decision_is_recorded_as_its_influence ... ok
+test ws06r3::the_repository_contract_states_where_the_os_keeps_its_state ... ok
+test ws06r3::freshness_judges_exactly_what_the_indexer_indexes ... ok
+test ws06r3::the_index_holds_research_and_experiments_at_their_evidence_standing ... ok
+test ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence ... ok
+test ws07::a_cached_pin_never_approves_changed_bytes has been running for over 60 seconds
+test ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed has been running for over 60 seconds
+test ws08::certification_is_taken_only_from_the_trust_root ... ok
+test ws08::a_machine_that_did_not_install_the_project_verifies_the_pinned_release_first ... ok
+test ws08::framework_lock_records_the_verified_identity_and_its_basis ... ok
+test ws06::deleting_everything_classified_derived_keeps_claims_control_and_registration ... ok
+test ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it has been running for over 60 seconds
+test ws07::a_tool_installation_is_approved_only_for_that_installation has been running for over 60 seconds
+test ws07::an_executable_plugin_never_runs_on_its_own_declarations has been running for over 60 seconds
+test ws07::declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves has been running for over 60 seconds
+test ws07::every_byte_a_plugin_executes_is_bound has been running for over 60 seconds
+test ws08::a_consistent_post_install_rewrite_is_detected_against_the_protected_record ... ok
+test ws07::registry_entries_are_honoured_only_as_the_os_wrote_them has been running for over 60 seconds
+test ws08::an_unauthenticated_installation_is_never_presented_as_current ... ok
+test ws07::an_executable_plugin_never_runs_on_its_own_declarations ... ok
+test ws07::the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written has been running for over 60 seconds
+test ws08_r2::a_release_is_built_only_from_a_contract_bound_tree_and_verified_as_written ... ok
+test ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified has been running for over 60 seconds
+test ws08_r2::a_provisioned_machine_never_installs_in_bootstrap_mode ... ok
+test ws08_r2::a_corrupt_or_racing_embedded_kernel_cache_is_never_installed ... ok
+test ws08_r2::an_unprovisioned_machine_refuses_external_source_kernel_ingress_at_every_ingress ... ok
+test ws08::refused_lifecycle_commands_leave_the_installation_as_they_found_it ... ok
+test ws08_r2::a_consistent_rewrite_of_a_bootstrap_installation_fails_closed ... ok
+test ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else ... ok
+test ws08_r2::an_unprovisioned_machine_does_not_trust_kernel_material_it_never_admitted has been running for over 60 seconds
+test ws08::a_provisioned_machine_rolls_back_to_a_release_it_verified ... ok
+test ws08_r2::an_unprovisioned_machine_does_not_trust_kernel_material_it_never_admitted ... ok
+test ws08_r3::the_health_checks_ship_in_the_payload_exactly_when_the_kernel_scanner_finds_them_clean ... ok
+test ws08_r3::a_t2_binding_authority_installs_only_from_the_owners_provisioned_root ... ok
+test ws08_r3::the_next_kernel_payload_is_version_consistent_and_release_build_refuses_drift ... ok
+test ws07::a_governed_security_review_by_another_role_lets_the_installation_proceed ... ok
+test ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back has been running for over 60 seconds
+test ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite has been running for over 60 seconds
+test ws08_r2::update_applies_only_on_a_verified_authorising_answer ... ok
+test ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current has been running for over 60 seconds
+test ws08_r3::a_binding_authority_is_not_installed_below_floor has been running for over 60 seconds
+test ws05r3::material_changes_inside_a_task_complete_only_through_change_control ... ok
+test ws08_r2::the_bootstrap_installation_is_marked_tied_to_the_binary_and_never_presented_as_current ... ok
+test ws07::a_cached_pin_never_approves_changed_bytes ... ok
+test ws07::declared_model_and_runtime_artefacts_are_part_of_what_the_owner_approves ... ok
+test ws08_r2::an_update_over_a_defect_the_full_suite_detects_is_refused_and_rolled_back ... ok
+test ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken ... ok
+test ws08_r3::a_binding_authority_is_not_installed_below_floor ... ok
+test ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere has been running for over 60 seconds
+test ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion has been running for over 60 seconds
+test ws07::registry_entries_are_honoured_only_as_the_os_wrote_them ... ok
+test ws06::embedder_components_are_identified_bound_and_fail_closed_on_change ... ok
+test ws04r2::checkpoint_and_handoff_continuity ... ok
+test ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite ... ok
+test ws07::a_registration_is_approved_only_by_a_gate_raised_for_exactly_it ... ok
+test ws07::a_tool_installation_is_approved_only_for_that_installation ... ok
+test ws08_r3::t2_facts_written_on_one_owner_machine_are_honoured_on_the_others_and_refused_elsewhere ... ok
+test ws08_r3::update_entry_guard_is_scoped_and_snapshots_survive_derived_state_deletion ... ok
+test ws07::the_plugin_registry_survives_deleting_the_generated_views_and_moves_only_as_written ... ok
+test ws07::every_byte_a_plugin_executes_is_bound ... ok
+
+test result: ok. 207 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1274.60s
+
+### DONE 2026-09-21T00:42:12+01:00
