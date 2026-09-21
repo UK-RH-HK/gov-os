@@ -1,0 +1,20 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0072
+role: capability-repair (iteration 2, post-adversarial)
+workstream: reviewbind-constructions
+blocker_class: BC-P2-41
+adjudication: release/orchestration/phase-2/GATES/P2-ADJ-0005-BOUND-REVIEW-TEST-CONSTRUCTIONS.md
+objective: Update the six review constructions that relied on the retired fallback, preserving every assertion, and re-point the one test whose premise is now moot, so the tree is green end to end.
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: medium-high
+branch: phase2/repair-2-reviewbind2
+base: phase2/repair-2-reviewbind fabb145
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING
