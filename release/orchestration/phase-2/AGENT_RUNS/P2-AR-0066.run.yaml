@@ -1,0 +1,27 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0066
+role: capability-repair (iteration 2, native worker)
+workstream: wsA
+blocker_classes:
+- BC-P2-53
+- BC-P2-41
+objective: 'Repair the tool-installation trust surface on the verified overlay foundation: an installation the OS cannot evaluate is recorded undetermined and gates however the effect is expressed, health_check.command
+  is inside the same boundary, and the governed security review is bound to the exact installation it authorises.'
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+  routing_basis: 'owner routing policy 2026-09-21: difficult cross-cutting implementation defaults to Sonnet 5'
+base: 'phase2/repair-2-wsB tip a9bdab2 (BC-P2-45 repaired and independently verified: certification 211/0)'
+branch: phase2/repair-2-wsA
+active_gate: GATE-P2-REPAIR-2
+iteration: 2
+checkpoint_path: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0066-wsA.checkpoint.json
+followed_by: a strong independent adversarial review by a fresh Opus 5 role before cap2-candidate-2 is minted
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING

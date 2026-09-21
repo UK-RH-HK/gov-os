@@ -46,6 +46,5 @@ outcome:
   disclosed_for_verifiers: DATA_SENSITIVITY.identifiers_to_strip is additive with an empty kernel default and carries the same theoretical whole-list-replace risk, but it is a flat string list with no pattern
     identity and no test exercises it; left on the generic path deliberately and flagged for a future iteration
   checkpoint: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0064-wsB.checkpoint.json
-  orchestrator_checks: 'pending: the orchestrator reproduces build, lib and the full certification suite on this branch itself, serialised after WS-F''s suite completes. Worker figures are claims until
-    then.'
+  orchestrator_checks: 'Reproduced by the orchestrator on the branch, serialised: build 0 warnings, cargo test --lib 276/0, cargo test --test certification 211/0 (1029 s). Matches the worker''s figures.'
   status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone
