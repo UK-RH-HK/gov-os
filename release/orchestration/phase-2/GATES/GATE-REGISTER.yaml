@@ -66,7 +66,7 @@ gates:
 
   - id: GATE-P2-CAPABILITY-BASELINE-ACCEPT
     title: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED on one exact frozen candidate
-    status: NOT_SATISFIED
+    status: 'NOT_SATISFIED (iteration 1: cap2-candidate-1 REJECTED by P2-AR-0052 on 2026-09-21 - AC-3, AC-4 and AC-5 unmet; evidence release/capability-baseline/verify-1/synthesis/)'
     satisfier: fresh independent acceptance verifier/synthesis role only
     preconditions: [GATE-P2-ENTRY, GATE-P2-FROZEN-CONTRACT, GATE-P2-ORACLE-FORMAT, GATE-P2-R1-PRESERVATION]
     token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED

@@ -2,10 +2,16 @@ schema: governance-os.phase-2.agent-run
 schema_version: 1
 run_id: P2-AR-0052
 role: capability-baseline-synthesis (verification iteration 1)
-objective: "Verify, do not adopt, the eight iteration-1 verifications of cap2-candidate-1; assemble the matrices; adjudicate AC-1..AC-16; label every blocking finding RESIDUAL or MATERIALLY_NEW and group materially new ones into classes from BC-P2-53; issue GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED or GOVERNANCE_CAPABILITY_BASELINE_REJECTED. Sole issuer of the iteration-1 verdict."
+objective: Verify, do not adopt, the eight iteration-1 verifications of cap2-candidate-1; assemble the matrices; adjudicate AC-1..AC-16; label every blocking finding RESIDUAL or MATERIALLY_NEW and group
+  materially new ones into classes from BC-P2-53; issue GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED or GOVERNANCE_CAPABILITY_BASELINE_REJECTED. Sole issuer of the iteration-1 verdict.
 agent_model: claude-opus-5 (pinned explicitly at dispatch)
 fresh_context: true
-independent_of: [every builder, every integrator, every iteration-0 auditor, every iteration-1 verifier P2-AR-0044..0051, and the orchestrator]
+independent_of:
+- every builder
+- every integrator
+- every iteration-0 auditor
+- every iteration-1 verifier P2-AR-0044..0051
+- and the orchestrator
 handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0047-verify-1-synthesis.md
 common_protocol_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
 active_gate: GATE-P2-CAPABILITY-BASELINE-ACCEPT
@@ -15,16 +21,108 @@ candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
 candidate_product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
 candidate_governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
 inputs:
-  - {run: P2-AR-0044, scope: AC-14 R1 preservation, verdict: R1_PRESERVED, evidence: release/capability-baseline/verify-1/r1-preservation/}
-  - {run: P2-AR-0045, scope: AC-6 oracle format, verdict: ORACLE_FORMAT_ACCEPTED, evidence: release/capability-baseline/verify-1/oracle-format/}
-  - {run: P2-AR-0046, scope: family alpha, verdict: FAMILY_VERIFICATION_COMPLETE, blocking_findings: 2, evidence: release/capability-baseline/verify-1/alpha/}
-  - {run: P2-AR-0047, scope: family beta, verdict: FAMILY_VERIFICATION_COMPLETE, blocking_findings: 1, evidence: release/capability-baseline/verify-1/beta/}
-  - {run: P2-AR-0048, scope: family gamma, verdict: FAMILY_VERIFICATION_COMPLETE, blocking_findings: 3, evidence: release/capability-baseline/verify-1/gamma/}
-  - {run: P2-AR-0049, scope: family delta, verdict: FAMILY_VERIFICATION_COMPLETE, blocking_findings: 0, evidence: release/capability-baseline/verify-1/delta/}
-  - {run: P2-AR-0050, scope: family epsilon, verdict: FAMILY_VERIFICATION_COMPLETE, blocking_findings: 1, evidence: release/capability-baseline/verify-1/epsilon/}
-  - {run: P2-AR-0051, scope: family zeta, verdict: FAMILY_VERIFICATION_COMPLETE, blocking_findings: 0, evidence: release/capability-baseline/verify-1/zeta/}
+- run: P2-AR-0044
+  scope: AC-14 R1 preservation
+  verdict: R1_PRESERVED
+  evidence: release/capability-baseline/verify-1/r1-preservation/
+- run: P2-AR-0045
+  scope: AC-6 oracle format
+  verdict: ORACLE_FORMAT_ACCEPTED
+  evidence: release/capability-baseline/verify-1/oracle-format/
+- run: P2-AR-0046
+  scope: family alpha
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  blocking_findings: 2
+  evidence: release/capability-baseline/verify-1/alpha/
+- run: P2-AR-0047
+  scope: family beta
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  blocking_findings: 1
+  evidence: release/capability-baseline/verify-1/beta/
+- run: P2-AR-0048
+  scope: family gamma
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  blocking_findings: 3
+  evidence: release/capability-baseline/verify-1/gamma/
+- run: P2-AR-0049
+  scope: family delta
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  blocking_findings: 0
+  evidence: release/capability-baseline/verify-1/delta/
+- run: P2-AR-0050
+  scope: family epsilon
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  blocking_findings: 1
+  evidence: release/capability-baseline/verify-1/epsilon/
+- run: P2-AR-0051
+  scope: family zeta
+  verdict: FAMILY_VERIFICATION_COMPLETE
+  blocking_findings: 0
+  evidence: release/capability-baseline/verify-1/zeta/
 branch: phase2/verify-1-synthesis
 expected_output_path: release/capability-baseline/verify-1/synthesis/
 expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.report.yaml
-required_verdict_vocabulary: [GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED, GOVERNANCE_CAPABILITY_BASELINE_REJECTED]
-status: RUNNING
+required_verdict_vocabulary:
+- GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+- GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+status: COMPLETED
+outcome:
+  verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+  work_commit: 5a7018049fc93304d413029f93264b3bec245c52
+  report_commit: 831a11b015c231edc3557c813aae6efdf61d72c7
+  agent_model_self_reported: claude-opus-5[1m]
+  identities_verified: candidate 0bad524 with digests e6332fc7...2220 / 3d2aeba2...20c0 identical at tag and HEAD; contract_v3 4c2df291...5ed3; frozen gate contract d2f33e89...f25e; frozen SRR boundary
+    70977d11...99c1
+  acceptance_criteria:
+    FAIL:
+    - 'AC-3 (eight PARTIALs argued COULD_UNDERMINE: A1, S4, S5, C8, F3, F4, O5, U)'
+    - AC-4 (A2 fully met and its R1 acceptance valid, but F4 is PARTIAL/COULD_UNDERMINE on three blocking findings)
+    - AC-5 (ten of twelve scheduler behaviours met; health-result provenance and the G5 tier duty are not)
+    HOLD:
+    - 'AC-1 (universe parsed independently: 101 capabilities, 687 bullets)'
+    - AC-2 (73 PRESENT_AND_SUBSTANTIAL, 28 PARTIAL, 0 ABSENT, 0 UNCLEAR, 0 N/A)
+    - AC-6
+    - AC-7
+    - AC-8
+    - AC-9
+    - AC-10 (798 owners, 0 capabilities with zero owners, 0 unresolved, invalidation demonstrated)
+    - AC-11
+    - AC-12
+    - AC-13 (independent line accounting 1026/1026 carried verbatim exactly once)
+    - AC-14
+    - 'AC-15 (run by the synthesis verifier: lib 276/0, certification 207/0)'
+    - AC-16
+  blocking_findings: 8 - V1-F4-01 (HIGH, new class BC-P2-53), V1-F3-01 (HIGH, BC-P2-41), V1-F4-02 (HIGH, BC-P2-45), S1-A1-01 (MEDIUM, the synthesis verifier's own, BC-P2-45), V1-S4-01 (HIGH, BC-P2-33),
+    V1-S5-01 (MEDIUM, BC-P2-37), V1-BETA-01 (MEDIUM, BC-P2-32), E-O5-01 (MEDIUM, BC-P2-07)
+  disposition_of_verifier_findings: 'all 55 CONFIRMED, 0 refuted; two judgements made by the synthesis verifier: V1-S5-01 confirmed blocking (Contract v3:154 makes a tampered source payload A2''s own advanced-qualification
+    challenge and the product answers ok true, already up to date), and delta''s M1 label CORRECTED to CANNOT_UNDERMINE (none of V4''s twelve scored metrics is cost or routing determinism); its own finding
+    S1-A1-01 corrected alpha''s A1 to PARTIAL after reconciling alpha''s A1 evidence with gamma''s demonstrated overlay edit'
+  convergence:
+    iteration_0_classes: 52 - 37 CLOSED, 14 PARTIALLY_CLOSED, 1 RESIDUAL (BC-P2-32)
+    iteration_0_findings: 193 - 142 CLOSED, 43 RESIDUAL, 8 N/A
+    classes_still_leaving_an_AC_unmet:
+    - BC-P2-07
+    - BC-P2-32
+    - BC-P2-33
+    - BC-P2-37
+    - BC-P2-41
+    - BC-P2-45
+    new_classes:
+    - BC-P2-53 - installation_authority scans each argv element literally, so one interpreter argument hides sudo, host authority or absolute paths, and undetermined fires only when no command exists at
+      all
+    introduces_materially_new_blocker_classes: true
+    label_checks: 'both consequential labels checked in the direction that would change the escalation count: BC-P2-53 stays new (installation_authority, authority_expansion_triggers, installation_envelope
+      and CHANGE_POLICY.change_classes.tool_installation have zero occurrences at cap2-candidate-0, and BC-P2-39''s plugin mechanism is closed here); V1-F4-02 stays residual (policy.rs carries the repair''s
+      own BC-P2-45 comment over code evaluating two overlays - BC-P2-45 verbatim, incompletely fixed)'
+    countable_iterations: 1 of 3 - iteration 0 established the inventory rather than introducing into it
+  owner_decisions_required: none, written explicitly. Zeta's candidate A1-W8-01 adjudicated NOT an owner decision at this gate (Contract v3:1152 conditions W8.5 on 'where in scope' and nothing in the accepted
+    sources places cross-language or cross-repository relationships in scope at Phase 2; placing them in scope would be a new product requirement, recorded as later-lifecycle). Alpha's V1-A3-01 likewise
+  repair_delta_shape: 'seven classes across six workstreams with mostly non-overlapping file scopes: WS-A tool-installation trust surface (BC-P2-53 + BC-P2-41), WS-B overlay precedence coverage (BC-P2-45),
+    WS-C adoption on a secret-bearing tree (BC-P2-33), WS-D update ingress (BC-P2-37), WS-E failure memory (BC-P2-32), WS-F health tier coverage (BC-P2-07). WS-B sequences before or with WS-A because WS-A''s
+    trusted OS state is only trustworthy once WS-B closes; the only other overlap is scheduler/catalogue.rs between WS-C and WS-F'
+  re_run_by_synthesis: every family suite re-run and every recorded figure reproduced exactly - alpha 387/10, beta 185/10, gamma 184/17, delta 256/9, epsilon 163/4, zeta 135/2, r1-preservation 40/1 plus
+    AR-0027 26/3, AR-0029 26/2, AR-0031 27/7, AR-0033 30/1
+  disclosed: three protocol deviations weighed and none load-bearing (the synthesis verifier re-ran every suite itself on clean machine state and owns AC-15); one load artefact resolved (beta's C1-transactions
+    failed once under six concurrent suites, 17/0 isolated); what it could not establish is stated in report section 6
+  orchestrator_checks: 'Scope clean against 311eafa: only its evidence directory and run report; no product source. Evidence merged. The verdict, every AC determination and every label are the synthesis
+    verifier''s; the orchestrator records them and neither confirms nor overrules'
