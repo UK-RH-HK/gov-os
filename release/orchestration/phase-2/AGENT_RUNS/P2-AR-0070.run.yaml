@@ -1,0 +1,30 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0070
+role: capability-repair (iteration 2, post-adversarial)
+workstream: toolbind
+blocker_classes:
+- BC-P2-53
+- BC-P2-41
+findings:
+- AR68-F1
+- AR68-F2
+- AR68-F4
+- AR68-F5
+- AR68-F6
+owner_decision: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0005-BIND-THE-BYTES.md (OD-P2-05)
+objective: 'Implement OD-P2-05 on the tool-install surface: every executed file hash-pinned and re-verified at every execution, inline code gates, classification fails closed, and the review is bound to
+  the exact installation by default rather than by exception.'
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+branch: phase2/repair-2-toolbind
+base: phase2/repair-2-integration 61e39b6
+concurrent_with: P2-AR-0069 (AR68-F3, policy files) - disjoint files
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING

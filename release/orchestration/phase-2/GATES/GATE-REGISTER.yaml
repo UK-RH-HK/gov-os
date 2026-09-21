@@ -72,6 +72,12 @@ gates:
     token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
     satisfied_when: every acceptance criterion AC-1..AC-16 of the frozen contract holds for one exact frozen candidate
 
+  - id: HG-P2-0003
+    title: How tool installation discharges OD-P2-03 requirement 3 (unevaluable commands) after two failed enumeration attempts
+    status: ANSWERED
+    satisfier: product owner
+    answer: 'OD-P2-05 bind the bytes not the meaning (release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0005-BIND-THE-BYTES.md)'
+
   - id: HG-P2-0002
     title: Tool-install human gate (R4-O1) — when may a tool installation proceed without the owner's gate
     status: ANSWERED

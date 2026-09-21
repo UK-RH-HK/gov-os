@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-21T18:13:04Z'
-state_hash: 0c1261235838f1b7d106b11f3b457ada76f17003a576c9f9fe8f59affb5e8d9b
+updated_at: '2026-09-21T19:07:55Z'
+state_hash: c8ba221ba2b974f926b2f3d092f8d07ffda784d84be171febe64e9f8275a6e03
 lifecycle_state: P2_REPAIR_ITERATION_2
 loop_status: P2_REPAIR_2_RUNNING
 
@@ -280,10 +280,12 @@ agent_runs:
   - {run_id: P2-AR-0067, role: capability-repair (integration builder), iteration: 2, status: COMPLETED, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0067.run.yaml}
   - {run_id: P2-AR-0068, role: adversarial pre-mint reviewer, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0068.run.yaml}
   - {run_id: P2-AR-0069, role: capability-repair, workstream: f3-path-rule-floor, iteration: 2, status: RUNNING, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-f3, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0069.run.yaml}
+  - {run_id: P2-AR-0070, role: capability-repair, workstream: toolbind, iteration: 2, status: RUNNING, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-toolbind, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0070.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
 running_work:
   - {run_id: P2-AR-0069, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0069.run.yaml}
+  - {run_id: P2-AR-0070, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0070.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
