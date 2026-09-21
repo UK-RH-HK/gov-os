@@ -1,0 +1,168 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0058
+role: capability-repair (iteration 2, provider worker)
+workstream: wsD
+blocker_class: BC-P2-37
+transcription_note: This report is the worker's own structured finish output, transcribed verbatim by the orchestrator from the adapter's result file. Provider workers report through the adapter rather
+  than by writing a report file themselves. The orchestrator authored none of the content and graded nothing.
+worker:
+  execution: DeepSeek API worker via release/orchestration/phase-2/tools/api_worker.py
+  provider: deepseek
+  model: deepseek-v4-pro
+  packet: release/orchestration/phase-2/packets/P2-AR-0058-wsD.json
+  bootstrap_spec: release/orchestration/phase-2/packets/specs/P2-AR-0058-wsD.spec.json
+verdict: REPAIRED_CLAIMED
+summary: BC-P2-37 WS-D repair is claimed. runtime/src/update.rs now authenticates an explicit external source through the single srr::admit policy before drawing any currency conclusion. On admission failure,
+  `gov update --check` returns a non-affirmative result with source_authenticated=false, up_to_date=false, a typed authentication_error, and a recommendation that states plainly that no currency claim is
+  made. `gov update --apply` no longer returns `already up to date` for such a source; it proceeds through the existing Human Gate flow and the final srr::admit returns the typed SRR refusal. A correctly
+  signed at-version source still reports source_authenticated=true, up_to_date=true and apply reason `already up to date`. The frozen five-admit/install census was preserved by introducing one shared `admit_update_source`
+  helper for update check/rollback while keeping the required `let auth = crate::srr::admit` site in apply_update_opts. Tests in tests/certification/r2_wsd.rs observe the three required source shapes from
+  both --check and --apply, plus the authenticated at-version case.
+items:
+- 'runtime/src/update.rs: explicit-source check authenticates before any currency conclusion and returns typed non-affirmative result on refusal'
+- 'runtime/src/update.rs: apply no longer returns a false already-up-to-date clearance for an unauthenticated explicit source'
+- 'runtime/src/update.rs: shared admit_update_source helper keeps the SRR five-admit/install census intact'
+- 'tests/certification/r2_wsd.rs: payload-tampered, foreign-signed and below-floor sources each produce typed non-affirmative check and apply results'
+- 'tests/certification/r2_wsd.rs: correctly signed at-version source still reports up to date'
+- 'tests/certification/main.rs: r2_wsd module remains declared'
+remaining: []
+files_written:
+- runtime/src/update.rs
+- tests/certification/r2_wsd.rs
+checks:
+- name: cert_wsd
+  exit: 0
+  seconds: 47.3
+- name: cert_update
+  exit: 0
+  seconds: 337.0
+- name: build
+  exit: 0
+  seconds: 271.7
+- name: lib_tests
+  exit: 0
+  seconds: 40.9
+- name: update_tests
+  exit: 0
+  seconds: 7.3
+- name: fmt
+  exit: 0
+  seconds: 2.8
+- name: cert_all
+  exit: 0
+  seconds: 1649.1
+- name: fmt
+  exit: 0
+  seconds: 3.0
+- name: update_tests
+  exit: 0
+  seconds: 6.1
+- name: update_tests
+  exit: 0
+  seconds: 9.5
+- name: cert_wsd
+  exit: 0
+  seconds: 61.5
+- name: cert_update
+  exit: 0
+  seconds: 340.3
+- name: build
+  exit: 0
+  seconds: 281.4
+- name: lib_tests
+  exit: 0
+  seconds: 35.2
+- name: fmt
+  exit: 0
+  seconds: 2.1
+- name: cert_all
+  exit: 0
+  seconds: 2109.4
+- name: fmt
+  exit: 0
+  seconds: 1.2
+- name: update_tests
+  exit: 0
+  seconds: 3.3
+- name: cert_wsd
+  exit: 0
+  seconds: 14.2
+- name: fmt
+  exit: 0
+  seconds: 1.1
+- name: cert_wsd
+  exit: 0
+  seconds: 15.0
+- name: cert_wsd
+  exit: 0
+  seconds: 22.9
+- name: cert_wsd
+  exit: 0
+  seconds: 22.3
+- name: cert_wsd
+  exit: 0
+  seconds: 22.6
+- name: cert_wsd
+  exit: 0
+  seconds: 22.7
+- name: fmt
+  exit: 0
+  seconds: 1.1
+- name: cert_wsd
+  exit: 0
+  seconds: 51.2
+- name: cert_update
+  exit: 0
+  seconds: 111.7
+- name: build
+  exit: 0
+  seconds: 87.9
+- name: lib_tests
+  exit: 0
+  seconds: 13.5
+- name: update_tests
+  exit: 0
+  seconds: 2.4
+- name: fmt
+  exit: 0
+  seconds: 1.1
+- name: cert_all
+  exit: 0
+  seconds: 1596.6
+telemetry:
+  tool_calls: 148
+  tool_calls_before_first_write: 122
+  context_renewals: 2
+  nudges: 3
+  checkpoints: 3
+  bootstrap_tokens_estimate: 4880
+  runtime_seconds: 1201.0
+  drift_events:
+  - at_tool_call: 20
+    event: reads_without_mutation
+  - at_tool_call: 40
+    event: reads_without_mutation
+  - at_tool_call: 40
+    event: context_renewal
+    why: exploration without mutation
+  - at_tool_call: 60
+    event: reads_without_mutation
+  - at_tool_call: 60
+    event: context_renewal
+    why: exploration without mutation
+  - at_tool_call: 77
+    event: repeated_identical_call
+    call: list_dir
+  - at_tool_call: 123
+    event: repeated_identical_call
+    call: read_file
+tokens:
+  prompt_total: 6338042
+  cached_prompt: 6121728
+  completion_total: 51776
+  reasoning: 31945
+  context_peak_prompt_tokens: 106173
+  context_budget_tokens: 150000
+orchestrator_verification: build 0 warnings, lib 276/0, no failing certification tests; exact count taken at integration
+status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone
