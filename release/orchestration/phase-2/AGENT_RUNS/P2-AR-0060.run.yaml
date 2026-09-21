@@ -1,0 +1,24 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0060
+role: capability-repair (iteration 2)
+workstream: wsF
+objective: BC-P2-07 health tier coverage
+worker:
+  provider: deepseek
+  model: deepseek-v4-pro
+  adapter: release/orchestration/phase-2/tools/ds_worker.py
+  note: orchestration-layer provider worker for this iteration only; the outer orchestrator remains Opus 5 and the formal acceptance verification remains fresh Opus 5 roles
+packet_path: release/orchestration/phase-2/packets/P2-AR-0060-wsF.json
+handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0051-repair-2-common-protocol.md
+active_gate: GATE-P2-REPAIR-2
+iteration: 2
+base_commit: 01ff11896ac26e325866659ac48259781e95c223
+branch: phase2/repair-2-wsF
+expected_report_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.report.yaml
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING

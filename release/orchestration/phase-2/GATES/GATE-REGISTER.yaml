@@ -94,6 +94,13 @@ gates:
     satisfier: capability-repair builders (claims only) + orchestrator integration; never an acceptance
     rounds: {round_1: INTEGRATED (P2-AR-0022, merge b7e6d52, product_code_digest b1ab1c8c...fbb1), round_2: INTEGRATED (P2-AR-0032, merge e8e1ff2, product_code_digest 797da37c...1fe1), round_3: INTEGRATED (P2-AR-0041, merge e4cb662, product_code_digest 1d3e9f59...85df7), round_4: INTEGRATED (P2-AR-0042 + P2-AR-0043/0053/0055; integrator P2-AR-0054, merge 0bad524, product_code_digest e6332fc7...2220)}
 
+  - id: GATE-P2-REPAIR-2
+    title: Repair iteration 2 — the seven blocking classes of P2-AR-0052 repaired and integrated into cap2-candidate-2
+    status: OPEN
+    satisfier: repair workers (claims only) + orchestrator integration; never an acceptance
+    owner_authorisation: '2026-09-21, option A, with OC-P2-04 (trusted authority state) as a normative source'
+    workstreams: 'WS-B overlay precedence (before WS-A), WS-A tool-install trust surface, WS-C adoption, WS-D update ingress, WS-E failure memory, WS-F health tiers, WS-G non-blocking'
+
   - id: GATE-P3-PROVISIONAL-RETRIEVAL
     title: Phase 3 — PROVISIONAL_RETRIEVAL_PROFILE_READY
     status: NOT_OPEN

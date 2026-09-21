@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-21T00:09:43Z'
-state_hash: 9078eaf7d2c4bda3a184c526018324f0656d46e43b473e72ec3b9230abf4ed71
-lifecycle_state: P2_REPAIR_ITERATION_1
-loop_status: STOPPED_AWAITING_OWNER_REVIEW
+updated_at: '2026-09-21T00:38:54Z'
+state_hash: 35076c8fb3fb27a057d285c05edc192280b399f4117aee901f17115caf84e902
+lifecycle_state: P2_REPAIR_ITERATION_2
+loop_status: P2_REPAIR_2_RUNNING
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -144,7 +144,7 @@ current_candidate:
   commit: 0bad524d836f179964ffbac31972856ea6434682
 
 iteration:
-  current: 1
+  current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
   convergence_rule: >-
     If three consecutive verification iterations each introduce materially new blocker classes (frozen contract section 8)
@@ -268,9 +268,21 @@ agent_runs:
   - {run_id: P2-AR-0050, role: capability-verifier, scope: epsilon, iteration: 1, status: COMPLETED, branch: phase2/verify-1-epsilon, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml}
   - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
   - {run_id: P2-AR-0052, role: capability-baseline-synthesis, iteration: 1, status: COMPLETED, branch: phase2/verify-1-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.run.yaml}
+  - {run_id: P2-AR-0056, role: capability-repair, workstream: wsB, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0056.run.yaml}
+  - {run_id: P2-AR-0057, role: capability-repair, workstream: wsC, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsC, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml}
+  - {run_id: P2-AR-0058, role: capability-repair, workstream: wsD, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsD, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0058.run.yaml}
+  - {run_id: P2-AR-0059, role: capability-repair, workstream: wsE, iteration: 2, status: RUNNING, worker_model: deepseek-flash, branch: phase2/repair-2-wsE, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
+  - {run_id: P2-AR-0060, role: capability-repair, workstream: wsF, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
+  - {run_id: P2-AR-0061, role: capability-repair, workstream: wsG, iteration: 2, status: RUNNING, worker_model: deepseek-flash, branch: phase2/repair-2-wsG, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
-running_work: []
+running_work:
+  - {run_id: P2-AR-0056, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0056.run.yaml}
+  - {run_id: P2-AR-0057, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml}
+  - {run_id: P2-AR-0058, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0058.run.yaml}
+  - {run_id: P2-AR-0059, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
+  - {run_id: P2-AR-0060, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
+  - {run_id: P2-AR-0061, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -323,17 +335,20 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  STOP — OWNER REVIEW REQUIRED. Verification iteration 1 rejected cap2-candidate-1 (P2-AR-0052: AC-3, AC-4 and AC-5 unmet;
-  the other thirteen hold). Under the owner's stop condition of 2026-09-20 the orchestrator has recorded the verifier
-  evidence and stopped: no repair iteration 2, no further build or repair agents, no candidate change. The decision package
-  is PHASE_2_DECISION_PACKAGE.md; the continuity handoff is HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md.
-  Resume only on an explicit owner instruction, which the package frames as options A (authorise repair iteration 2 over the
-  six workstreams of the synthesis repair delta, WS-B before or with WS-A), B (amend the frozen gate contract or the
-  lifecycle placement of one or more classes - an owner act, never the orchestrator's), C (meta-review of the loop itself)
-  or D (stop Phase 2 here). Convergence counter: 1 of 3 iterations with materially new blocker classes.
+  AWAIT_REPAIR_2_WORKSTREAMS — six provider workers repair the seven blocking classes plus the non-blocking list, each in
+  its own worktree under a bounded task packet (release/orchestration/phase-2/packets/): P2-AR-0056 WS-B overlay precedence
+  (deepseek-v4-pro, must land before WS-A), P2-AR-0057 WS-C adoption, P2-AR-0058 WS-D update ingress, P2-AR-0059 WS-E
+  failure memory (deepseek-flash), P2-AR-0060 WS-F health tiers, P2-AR-0061 WS-G non-blocking (deepseek-flash). When WS-B
+  is merged, dispatch P2-AR-0062 WS-A (tool-install trust surface, deepseek-v4-pro) from the WS-B result. Then integrate,
+  reproduce regression locally, run the adversarial pre-verification P2-AR-0063 (deepseek-v4-pro, authored none of the
+  repairs) over the tool-install and authority surface, repair residuals in known classes, mint cap2-candidate-2, and only
+  then dispatch the formal independent acceptance verification on fresh Opus 5 roles. Escalate to the owner on a genuinely
+  new material blocker class, an architecture-boundary decision, a provider-security problem or an owner decision.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
+  - {action: printing, logging, committing, hashing or copying the provider API key into any file, packet, handoff or agent output, until: never}
+  - {action: a provider (DeepSeek) worker grading a candidate or substituting for the formal Opus acceptance verification, until: never}
   - {action: builder or repair role grading its own work, until: never}
   - {action: exposing held-out verifier/test-author tests to a builder or repair role, until: that verifier's verdict is committed}
   - {action: modifying release/verification/**, release/root-of-trust/**, release/releases/**, release/orchestration/phase-1/**, until: never}

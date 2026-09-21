@@ -7,3 +7,8 @@ __pycache__/
 *.egg-info/
 /release/evidence/tmp/
 /target/
+
+# local, never committed: orchestration-layer provider credentials (repair iteration 2 experiment)
+*.env
+.secrets/
+deepseek*.env
