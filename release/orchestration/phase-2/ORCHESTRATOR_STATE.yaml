@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-21T12:50:56Z'
-state_hash: 603d7f6cfd55c4d2d17be197cd6785a85e2fb4b75ea110d0da37271a952fc6bc
+updated_at: '2026-09-21T16:13:48Z'
+state_hash: 53dd2a8fe502f18b6114a40eb5e0518cb33be4bc327d685dc7081cb93e744484
 lifecycle_state: P2_REPAIR_ITERATION_2
 loop_status: P2_REPAIR_2_RUNNING
 
@@ -277,9 +277,11 @@ agent_runs:
   - {run_id: P2-AR-0064, role: capability-repair, workstream: wsB, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0064.run.yaml}
   - {run_id: P2-AR-0065, role: capability-repair, workstream: wsF, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0065.run.yaml}
   - {run_id: P2-AR-0066, role: capability-repair, workstream: wsA, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsA, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0066.run.yaml}
+  - {run_id: P2-AR-0067, role: capability-repair (integration builder), iteration: 2, status: RUNNING, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0067.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
-running_work: []
+running_work:
+  - {run_id: P2-AR-0067, role: capability-repair (integration builder), status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0067.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml

@@ -1,0 +1,30 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0067
+role: capability-repair (iteration 2 integration builder, native worker)
+objective: Integrate the seven repaired iteration-2 workstreams in dependency order (WS-A already sits on WS-B), reconcile the test module list and the evidence map, and leave a tree that builds clean,
+  passes the full suites and passes gov contract verify. This tree becomes cap2-candidate-2 after an independent adversarial review.
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+  routing_basis: 'owner routing policy: integration and engineering default to Sonnet 5'
+branches:
+  phase2/repair-2-wsA: '27dd443 (contains WS-B a9bdab2: BC-P2-53, BC-P2-41, BC-P2-45)'
+  phase2/repair-2-wsC: a945e1d (BC-P2-33)
+  phase2/repair-2-wsD: 8a0eccb (BC-P2-37)
+  phase2/repair-2-wsE: cc85bd4 (BC-P2-32)
+  phase2/repair-2-wsF: 6aa1cf8 (BC-P2-07)
+  phase2/repair-2-wsG: 52816e4 (non-blocking items)
+known_overlaps: tests/certification/main.rs and .gitignore only; all product files are disjoint across branches
+branch: phase2/repair-2-integration
+base: 7d9d241
+active_gate: GATE-P2-REPAIR-2
+iteration: 2
+checkpoint_path: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0067-integration.checkpoint.json
+followed_by: orchestrator serialised regression and gov contract verify, then a fresh Opus 5 adversarial review, then cap2-candidate-2
+required_verdict_vocabulary:
+- READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
+- PARTIAL
+- INCOMPLETE
+status: RUNNING
