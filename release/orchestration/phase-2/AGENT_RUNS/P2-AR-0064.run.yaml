@@ -24,4 +24,28 @@ required_verdict_vocabulary:
 - PARTIAL
 - OWNER_DECISION_REQUIRED
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: REPAIRED_CLAIMED
+  branch_commit: a9bdab2
+  parent: 01c5de8
+  worker: native Claude subagent, claude-sonnet-5, high effort
+  two_defects_found:
+  - 'Stale baseline: the REPOSITORY_CONTRACT path-rule baseline compared the project document against git show HEAD, the PREVIOUS commit. PolicySet::load runs mid-transaction (doctor verification inside
+    gov update --apply, before that transaction commits), so a legitimate kernel-template change looked like a hand edit removing a kernel rule and the update was refused and rolled back. Fixed by comparing
+    against the currently installed verified kernel''s own template, as TOOL_PERMISSIONS and DATA_SENSITIVITY already did; sync_overlay_template''s three-way merge already reconciles the project document
+    first.'
+  - 'Whole-list substitution: evaluate_overlay''s per-leaf repair replaced a refused leaf with the ENTIRE kernel value - right for a scalar, wrong for REPOSITORY_CONTRACT.paths and DATA_SENSITIVITY.classifications,
+    where one widened rule discarded every other rule the project or gov init had declared. New evaluate_path_rules_overlay and evaluate_classifications_overlay repair rule-by-rule keyed on pattern; a project-declared
+    rule with no kernel floor passes through unreported (OC-P2-04).'
+  full_suite_worker_reported: 'cargo test --test certification, no filters, single run: 211 passed, 0 failed, 0 ignored (2104 s)'
+  other_checks_worker_reported: workspace build 0 warnings; cargo test --lib policy 8/8; r2_wsb 4/4; cert_ws07 9/9
+  tests: no new tests; one assertion in its own tests/certification/r2_wsb.rs relocated to match per-rule reporting (the same widening is still required to be refused, reported by doctor D027 and left without
+    effect)
+  no_test_asserts_a_widening_should_take_effect: 'confirmed by the worker: all nine originally failing tests were legitimate declarations, narrowings or migrations'
+  disclosed_for_verifiers: DATA_SENSITIVITY.identifiers_to_strip is additive with an empty kernel default and carries the same theoretical whole-list-replace risk, but it is a flat string list with no pattern
+    identity and no test exercises it; left on the generic path deliberately and flagged for a future iteration
+  checkpoint: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0064-wsB.checkpoint.json
+  orchestrator_checks: 'pending: the orchestrator reproduces build, lib and the full certification suite on this branch itself, serialised after WS-F''s suite completes. Worker figures are claims until
+    then.'
+  status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone

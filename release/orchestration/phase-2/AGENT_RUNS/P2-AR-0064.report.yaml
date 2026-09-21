@@ -1,0 +1,42 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0064
+role: capability-repair (iteration 2, native worker)
+workstream: wsB
+blocker_class: BC-P2-45
+transcription_note: Transcribed by the orchestrator from the worker's own hand-back report. Native subagent workers report through their hand-back rather than by writing a report file. The orchestrator
+  authored none of the content and graded nothing.
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+  telemetry:
+    subagent_tokens: 386142
+    tool_uses: 582
+    duration_seconds: 4857
+    context_peak: NOT_OBSERVABLE for native subagents
+    context_renewals: NOT_OBSERVABLE
+    note: native runs expose total tokens, tool uses and duration; the per-step context detail the API adapter recorded is not observable here
+verdict: REPAIRED_CLAIMED
+branch_commit: a9bdab2
+two_defects_found:
+- 'Stale baseline: the REPOSITORY_CONTRACT path-rule baseline compared the project document against git show HEAD, the PREVIOUS commit. PolicySet::load runs mid-transaction (doctor verification inside gov
+  update --apply, before that transaction commits), so a legitimate kernel-template change looked like a hand edit removing a kernel rule and the update was refused and rolled back. Fixed by comparing against
+  the currently installed verified kernel''s own template, as TOOL_PERMISSIONS and DATA_SENSITIVITY already did; sync_overlay_template''s three-way merge already reconciles the project document first.'
+- 'Whole-list substitution: evaluate_overlay''s per-leaf repair replaced a refused leaf with the ENTIRE kernel value - right for a scalar, wrong for REPOSITORY_CONTRACT.paths and DATA_SENSITIVITY.classifications,
+  where one widened rule discarded every other rule the project or gov init had declared. New evaluate_path_rules_overlay and evaluate_classifications_overlay repair rule-by-rule keyed on pattern; a project-declared
+  rule with no kernel floor passes through unreported (OC-P2-04).'
+full_suite_worker_reported: 'cargo test --test certification, no filters, single run: 211 passed, 0 failed, 0 ignored (2104 s)'
+other_checks_worker_reported: workspace build 0 warnings; cargo test --lib policy 8/8; r2_wsb 4/4; cert_ws07 9/9
+tests: no new tests; one assertion in its own tests/certification/r2_wsb.rs relocated to match per-rule reporting (the same widening is still required to be refused, reported by doctor D027 and left without
+  effect)
+no_test_asserts_a_widening_should_take_effect: 'confirmed by the worker: all nine originally failing tests were legitimate declarations, narrowings or migrations'
+discoveries:
+- repair3::constitutional_floors_require_a_verified_kernel asserted `applied` is empty where the project had already declared a DATA_SENSITIVITY.classifications entry - an ordinary compliant declaration
+  against the kernel's empty default. Before this class brought DATA_SENSITIVITY under policy_precedence that key was never evaluated, so `applied` was trivially empty. The per-entry fix resolves it by
+  honouring a classification with no kernel counterpart without a report, not by suppressing anything.
+- DATA_SENSITIVITY.identifiers_to_strip is additive with an empty kernel default and carries the same theoretical whole-list-replace risk; it is a flat string list with no pattern identity and no test exercises
+  it, so it was deliberately left on the generic path and flagged.
+checkpoint: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0064-wsB.checkpoint.json
+orchestrator_verification: pending - build, lib and the full certification suite are reproduced by the orchestrator on this branch, serialised after WS-F's suite
+status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone

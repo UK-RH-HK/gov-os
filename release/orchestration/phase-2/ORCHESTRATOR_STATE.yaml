@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-21T09:42:17Z'
-state_hash: d283f02647480e9880af528564344db29a115df72d49db49367fac7793e65a99
+updated_at: '2026-09-21T10:56:50Z'
+state_hash: b573df8eb89837a6a7b5b35c5e6d5ef5433e80abb40f81a0e72f1b06395d3f1e
 lifecycle_state: P2_REPAIR_ITERATION_2
 loop_status: P2_REPAIR_2_RUNNING
 
@@ -274,12 +274,11 @@ agent_runs:
   - {run_id: P2-AR-0059, role: capability-repair, workstream: wsE, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: deepseek-flash, branch: phase2/repair-2-wsE, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
   - {run_id: P2-AR-0060, role: capability-repair, workstream: wsF, iteration: 2, status: 'SUPERSEDED_BY_P2-AR-0065 (PARTIAL; work preserved on branch)', worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
   - {run_id: P2-AR-0061, role: capability-repair, workstream: wsG, iteration: 2, status: 'COMPLETED_AWAITING_INTEGRATION (PARTIAL: 2 of 5 non-blocking items landed)', worker_model: deepseek-flash, branch: phase2/repair-2-wsG, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
-  - {run_id: P2-AR-0064, role: capability-repair, workstream: wsB, iteration: 2, status: RUNNING, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0064.run.yaml}
+  - {run_id: P2-AR-0064, role: capability-repair, workstream: wsB, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0064.run.yaml}
   - {run_id: P2-AR-0065, role: capability-repair, workstream: wsF, iteration: 2, status: RUNNING, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0065.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
 running_work:
-  - {run_id: P2-AR-0064, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0064.run.yaml}
   - {run_id: P2-AR-0065, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0065.run.yaml}
 
 unresolved_findings:
