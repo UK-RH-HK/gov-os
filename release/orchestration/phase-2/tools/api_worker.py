@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""DeepSeek worker adapter (non-product orchestration tooling, repair iteration 2 experiment).
+"""Model-neutral API worker adapter (non-product orchestration tooling, repair iteration 2 experiment).
+
+One substrate for every provider: DeepSeek (OpenAI-compatible wire) and Anthropic (messages wire) receive the
+same governed bootstrap, task contract, tool surface, mutation restrictions, checkpoint and context-renewal
+protocol and telemetry schema. A provider entry says only how to speak to the wire, never what the worker must do.
 
 Runs one bounded repair/analysis task on a provider model inside one git worktree, with a small
 whitelisted tool surface, bounded context, summarised command output and per-run telemetry.
 
-  ds_worker.py --packet PACKET.json [--model deepseek-v4-pro] [--max-steps 60] [--context-budget 150000]
+  api_worker.py --packet PACKET.json [--model deepseek-v4-pro] [--max-steps 60] [--context-budget 150000]
 
 The packet (JSON) carries: run_id, role, worktree, model, allow_write (globs), deny_write (globs),
 brief (markdown), checks (named whitelisted commands the worker may run), context_budget_tokens.
@@ -17,18 +21,50 @@ Not product code. Nothing here is evidence: the worker produces claims, which an
 """
 import argparse, fnmatch, json, os, re, subprocess, sys, time, urllib.error, urllib.request
 
-API = "https://api.deepseek.com/chat/completions"
-KEY_FILE = os.path.expanduser("~/.config/governance-os/deepseek.env")
+# ---------------------------------------------------------------------------
+# Providers. One canon, one bootstrap, one task contract, one checkpoint protocol:
+# a provider entry only says how to speak to the wire, never what the worker must do.
+# ---------------------------------------------------------------------------
+PROVIDERS = {
+    "deepseek": {
+        "url": "https://api.deepseek.com/chat/completions",
+        "key_file": os.path.expanduser("~/.config/governance-os/deepseek.env"),
+        "key_var": "DEEPSEEK_API_KEY",
+        "wire": "openai",
+        "models": ("deepseek-v4-pro", "deepseek-flash"),
+    },
+    "anthropic": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "key_file": os.path.expanduser("~/.config/governance-os/anthropic.env"),
+        "key_var": "ANTHROPIC_API_KEY",
+        "wire": "anthropic",
+        "models": ("claude-sonnet-5",),
+        "version": "2023-06-01",
+    },
+}
+
+
+def provider_for(model):
+    for name, p in PROVIDERS.items():
+        if model in p["models"] or model.startswith(name):
+            return name, p
+    if model.startswith("claude"):
+        return "anthropic", PROVIDERS["anthropic"]
+    return "deepseek", PROVIDERS["deepseek"]
 MAX_TOOL_CHARS = 6000          # per tool result injected into context
 MAX_READ_LINES = 400
 
 
-def api_key():
-    with open(KEY_FILE) as fh:
-        for line in fh:
-            if line.startswith("DEEPSEEK_API_KEY="):
-                return line.split("=", 1)[1].strip()
-    sys.exit("provider key not found (expected DEEPSEEK_API_KEY in ~/.config/governance-os/deepseek.env)")
+def api_key(prov):
+    """Read the provider key at call time. Never printed, logged, persisted or placed in any record."""
+    path, var = prov["key_file"], prov["key_var"]
+    if not os.path.isfile(path):
+        sys.exit(f"provider key file missing: {path} (expected {var}=...). "
+                 "Credentials are owner-supplied; this tool never invents or derives one.")
+    for line in open(path):
+        if line.startswith(var + "="):
+            return line.split("=", 1)[1].strip()
+    sys.exit(f"{var} not found in {path}")
 
 
 def clip(text, limit=MAX_TOOL_CHARS):
@@ -62,6 +98,8 @@ class Worker:
         self.p = packet
         self.root = os.path.abspath(packet["worktree"])
         self.model = model
+        self.provider, self.prov = provider_for(model)
+        self.wire, self.url = self.prov["wire"], self.prov["url"]
         self.max_steps = max_steps
         self.budget = budget
         self.telemetry_path = telemetry_path
@@ -189,12 +227,15 @@ class Worker:
         cmd = checks[name]
         env = dict(os.environ, CARGO_BUILD_JOBS="2", PATH=os.path.expanduser("~/.cargo/bin") + ":" + os.environ["PATH"])
         t0 = time.time()
-        r = subprocess.run(cmd, shell=True, cwd=self.root, capture_output=True, text=True, env=env, timeout=7200)
+        # bash + pipefail: a failing cargo run must surface as a non-zero exit even through a pipe
+        r = subprocess.run("set -o pipefail; " + cmd, shell=True, executable="/bin/bash",
+                           cwd=self.root, capture_output=True, text=True, env=env, timeout=7200)
         dt = round(time.time() - t0, 1)
         out = (r.stdout or "") + "\n" + (r.stderr or "")
         self.checks_run.append({"name": name, "exit": r.returncode, "seconds": dt})
         body = summarise_cargo(out) if ("cargo" in cmd or "test" in cmd) else out
-        head = f"[{name}] exit={r.returncode} in {dt}s\n"
+        verdict = "PASS" if r.returncode == 0 else "FAIL"
+        head = f"[{name}] {verdict} (exit={r.returncode}) in {dt}s\n"
         return head + (self.externalise(name, body) if len(body) > MAX_TOOL_CHARS else body)
 
     def t_finish(self, verdict, summary, items=None, remaining=None):
@@ -224,16 +265,69 @@ class Worker:
                                                          "parameters": {"type": "object", "properties": p, "required": req}}})
         return out
 
-    # ---------- provider ----------
+    # ---------- provider wire ----------
+    def anthropic_body(self):
+        """Translate the canonical message list into Anthropic's blocks. No instruction differs by provider."""
+        system = self.messages[0]["content"]
+        msgs, pending_tool_results = [], []
+        for m in self.messages[1:]:
+            if m["role"] == "tool":
+                pending_tool_results.append({"type": "tool_result", "tool_use_id": m["tool_call_id"],
+                                             "content": m["content"]})
+                continue
+            if pending_tool_results:
+                msgs.append({"role": "user", "content": pending_tool_results})
+                pending_tool_results = []
+            if m["role"] == "assistant":
+                blocks = []
+                if m.get("content"):
+                    blocks.append({"type": "text", "text": m["content"]})
+                for c in (m.get("tool_calls") or []):
+                    blocks.append({"type": "tool_use", "id": c["id"], "name": c["function"]["name"],
+                                   "input": json.loads(c["function"]["arguments"] or "{}")})
+                msgs.append({"role": "assistant", "content": blocks or [{"type": "text", "text": "..."}]})
+            else:
+                msgs.append({"role": "user", "content": m["content"]})
+        if pending_tool_results:
+            msgs.append({"role": "user", "content": pending_tool_results})
+        tools = [{"name": f["function"]["name"], "description": f["function"]["description"],
+                  "input_schema": f["function"]["parameters"]} for f in self.tool_schema()]
+        return {"model": self.model, "system": system, "messages": msgs, "tools": tools,
+                "max_tokens": 16000, "temperature": 0.2}
+
+    def anthropic_to_canonical(self, d):
+        """Present an Anthropic reply in the canonical shape the run loop already handles."""
+        text, calls = [], []
+        for b in d.get("content", []):
+            if b["type"] == "text":
+                text.append(b["text"])
+            elif b["type"] == "tool_use":
+                calls.append({"id": b["id"], "type": "function",
+                              "function": {"name": b["name"], "arguments": json.dumps(b["input"])}})
+        u = d.get("usage", {}) or {}
+        return {"choices": [{"message": {"role": "assistant", "content": "\n".join(text) or None,
+                                         "tool_calls": calls or None},
+                             "finish_reason": d.get("stop_reason")}],
+                "usage": {"prompt_tokens": u.get("input_tokens", 0),
+                          "completion_tokens": u.get("output_tokens", 0),
+                          "prompt_cache_hit_tokens": u.get("cache_read_input_tokens", 0),
+                          "completion_tokens_details": {"reasoning_tokens": 0}}}
+
     def call(self, key):
-        body = {"model": self.model, "messages": self.messages, "tools": self.tool_schema(),
-                "tool_choice": "auto", "max_tokens": 16000, "temperature": 0.2}
-        req = urllib.request.Request(API, data=json.dumps(body).encode(),
-                                     headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+        if self.wire == "anthropic":
+            body = self.anthropic_body()
+            headers = {"x-api-key": key, "anthropic-version": self.prov.get("version", "2023-06-01"),
+                       "Content-Type": "application/json"}
+        else:
+            body = {"model": self.model, "messages": self.messages, "tools": self.tool_schema(),
+                    "tool_choice": "auto", "max_tokens": 16000, "temperature": 0.2}
+            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+        req = urllib.request.Request(self.url, data=json.dumps(body).encode(), headers=headers)
         for attempt in range(4):
             try:
                 with urllib.request.urlopen(req, timeout=900) as r:
-                    return json.load(r)
+                    d = json.load(r)
+                return self.anthropic_to_canonical(d) if self.wire == "anthropic" else d
             except urllib.error.HTTPError as e:
                 detail = e.read().decode(errors="replace")[:300]
                 if e.code in (429, 500, 502, 503, 504) and attempt < 3:
@@ -266,7 +360,7 @@ class Worker:
         self.drift_events.append({"at_tool_call": self.tool_calls, "event": "context_renewal", "why": why})
 
     def run(self):
-        key = api_key()
+        key = api_key(self.prov)
         self.messages = [
             {"role": "system", "content": self.p["system"]},
             {"role": "user", "content": self.p["brief"]},
@@ -348,7 +442,7 @@ class Worker:
 
     def telemetry(self):
         rec = {
-            "run_id": self.p["run_id"], "role": self.p.get("role"), "provider": "deepseek", "model": self.model,
+            "run_id": self.p["run_id"], "role": self.p.get("role"), "provider": self.provider, "model": self.model,
             "reasoning_level": "provider default (reasoning_tokens reported)",
             "tokens": {"prompt_total": self.usage["prompt"], "cached_prompt": self.usage["cached"],
                        "completion_total": self.usage["completion"], "reasoning": self.usage["reasoning"],

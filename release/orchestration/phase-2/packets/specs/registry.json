@@ -26,7 +26,8 @@
    "lib_tests": "library suite",
    "cert_wsb": "your new certification module",
    "cert_ws07": "the tool-install family must not regress",
-   "policy_tests": "policy unit tests"
+   "policy_tests": "policy unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0057-wsC": {
@@ -62,7 +63,8 @@
    "lib_tests": "library suite",
    "cert_wsc": "your new certification module",
    "cert_adopt": "existing adoption tests must not regress",
-   "adopt_tests": "adoption unit tests"
+   "adopt_tests": "adoption unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0058-wsD": {
@@ -94,7 +96,8 @@
    "lib_tests": "library suite",
    "cert_wsd": "your new certification module",
    "cert_update": "existing update and kernel tests must not regress",
-   "update_tests": "update unit tests"
+   "update_tests": "update unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0059-wsE": {
@@ -127,7 +130,8 @@
    "lib_tests": "library suite",
    "cert_wse": "your new certification module",
    "cert_ws03": "an existing family that exercises failure memory",
-   "failure_tests": "failure-memory unit tests"
+   "failure_tests": "failure-memory unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0060-wsF": {
@@ -161,7 +165,8 @@
    "cert_wsf": "your new certification module",
    "cert_ws02": "an existing scheduler/health family that must not regress",
    "scheduler_tests": "scheduler unit tests",
-   "doctor_tests": "doctor unit tests"
+   "doctor_tests": "doctor unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0061-wsG": {
@@ -192,7 +197,8 @@
    "lib_tests": "library suite",
    "cert_wsg": "your new certification module",
    "paths_tests": "paths unit tests",
-   "intent_tests": "routing unit tests"
+   "intent_tests": "routing unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0062-wsA": {
@@ -229,7 +235,8 @@
    "cert_wsa": "your new certification module",
    "cert_ws07": "WS-7's tool family",
    "cert_r4": "the round-4 tool-install tests must not regress",
-   "tools_tests": "tools unit tests"
+   "tools_tests": "tools unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  },
  "P2-AR-0063-preverify": {
@@ -268,7 +275,8 @@
    "cert_ws07": "WS-7's tool family",
    "cert_r4": "round-4 tool-install tests",
    "tools_tests": "tools unit tests",
-   "policy_tests": "policy unit tests"
+   "policy_tests": "policy unit tests",
+   "cert_all": "THE FULL certification suite - required before you finish; your change must not break another family"
   }
  }
 }

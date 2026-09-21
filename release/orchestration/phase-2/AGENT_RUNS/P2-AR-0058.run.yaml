@@ -7,7 +7,7 @@ objective: BC-P2-37 update ingress authenticity
 worker:
   provider: deepseek
   model: deepseek-v4-pro
-  adapter: release/orchestration/phase-2/tools/ds_worker.py
+  adapter: release/orchestration/phase-2/tools/api_worker.py
   note: orchestration-layer provider worker for this iteration only; the outer orchestrator remains Opus 5 and the formal acceptance verification remains fresh Opus 5 roles
 packet_path: release/orchestration/phase-2/packets/P2-AR-0058-wsD.json
 handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-0051-repair-2-common-protocol.md
