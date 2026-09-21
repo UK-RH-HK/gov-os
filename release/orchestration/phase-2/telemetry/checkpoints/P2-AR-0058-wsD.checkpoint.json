@@ -1,0 +1,63 @@
+{
+ "run_id": "P2-AR-0058",
+ "at_tool_call": 148,
+ "objective": "BC-P2-37 update ingress authenticity",
+ "completed": [
+  "3 file(s) written",
+  "8 check(s) run"
+ ],
+ "files_changed": [
+  "runtime/src/update.rs",
+  "tests/certification/main.rs",
+  "tests/certification/r2_wsd.rs"
+ ],
+ "checks": [
+  {
+   "name": "fmt",
+   "exit": 0,
+   "seconds": 1.2
+  },
+  {
+   "name": "build",
+   "exit": 0,
+   "seconds": 95.9
+  },
+  {
+   "name": "fmt",
+   "exit": 0,
+   "seconds": 1.2
+  },
+  {
+   "name": "build",
+   "exit": 0,
+   "seconds": 85.0
+  },
+  {
+   "name": "cert_wsd",
+   "exit": 0,
+   "seconds": 109.6
+  },
+  {
+   "name": "update_tests",
+   "exit": 0,
+   "seconds": 27.9
+  },
+  {
+   "name": "lib_tests",
+   "exit": 0,
+   "seconds": 12.7
+  },
+  {
+   "name": "cert_update",
+   "exit": 0,
+   "seconds": 120.1
+  }
+ ],
+ "discoveries": [
+  "auto-checkpoint: run ended without finish"
+ ],
+ "unresolved": [],
+ "decisions": [],
+ "next_action": "continue the task contract from the files already changed",
+ "at": "2026-09-21T01:17:41Z"
+}

@@ -1,0 +1,37 @@
+{
+ "run_id": "P2-AR-0060",
+ "at_tool_call": 34,
+ "objective": "BC-P2-07 health tier coverage repair: make tier runs honest about unevaluated doctor members and keep health status consistent with repository verdict",
+ "completed": [
+  "Read scheduler/mod.rs run_suite and status paths",
+  "Confirmed prior edits include declared doctor members in tier selections and mark Surface::Doctor as NotEvaluated with a reason",
+  "Confirmed status() demotes GREEN to YELLOW when repository.verdict is DEGRADED",
+  "Ran all required checks: build, lib_tests, cert_wsf, cert_ws02, scheduler_tests, doctor_tests, fmt"
+ ],
+ "files_changed": [
+  "runtime/src/scheduler/mod.rs",
+  "tests/certification/main.rs",
+  "tests/certification/r2_wsf.rs"
+ ],
+ "checks": [
+  "build exit=0 warnings=0",
+  "lib_tests 276 passed 0 failed",
+  "cert_wsf 3 passed 0 failed",
+  "cert_ws02 0 passed 0 failed",
+  "scheduler_tests 10 passed 0 failed",
+  "doctor_tests 1 passed 0 failed",
+  "fmt exit=0"
+ ],
+ "discoveries": [
+  "run_suite Selection::All now includes all catalogue checks; Surface::Doctor is recorded NotEvaluated with reason rather than omitted",
+  "SuiteOutcome::complete and summary.complete now reflect the not-evaluated doctor members",
+  "scheduler::status() already contains the BC-P2-07 colour correction",
+  "reevaluate() still routes doctor checks through crate::doctor::run, preserving remedy availability"
+ ],
+ "unresolved": [],
+ "decisions": [
+  "Chose the honest-record side: doctor half remains a gov doctor duty and tier runs name every unevaluated doctor member with a reason"
+ ],
+ "next_action": "Call finish with REPAIRED_CLAIMED, reporting observed check figures and scope",
+ "at": "2026-09-21T01:03:30Z"
+}

@@ -21,4 +21,70 @@ required_verdict_vocabulary:
 - PARTIAL
 - OWNER_DECISION_REQUIRED
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: REPAIRED_CLAIMED
+  branch_commit: cc85bd4
+  worker_model: deepseek-v4-pro
+  summary: 'Implemented governed writers for the four previously unwritable failure classes of Contract v3:276-283.
+
+
+    - Agent-observed classes (`bug`, `failed-approach`, `incorrect-assumption`) now have a governed command `gov memory failure --kind ...` that builds a sealed/provenanced failure event through `memory::failures::record`,
+    exactly like `gov memory miss`. The command is classified in COMMAND_GUARDS and g0_label as `memory failure` (authority class `record_failure_memory`, Write), so G0 admits it.
+
+    - Product-observed migration failures are recorded by the CLI adoption surface itself: an `adopt migrate` that returns `MIGRATION_BATCH_FAILED` (post-batch tests failed and the batch was rolled back)
+    and a successful `adopt rollback` both write a `migration-failure` record with detection `automatic`.
+
+    - The common record path remains the existing `record` function: it validates `KINDS`, deduplicates by signature, passes `guard_write`, seals/provenances the record in the tracked tree (`spec/reports/failures/`),
+    and is linked to generated follow-up work by the existing generator.
+
+    - Added integration test `tests/certification/r2_wse.rs` that drives all four classes through the product surface, verifies the records survive `gov rebuild-memory`, and verifies each record is linked
+    to a generated task (`generation.subject == failure id`).'
+  items:
+  - 'runtime/src/memory/failures.rs: added `reported_failure_event` and `migration_failure_event` constructors'
+  - 'cli/src/main.rs: added `MemoryCmd::Failure`, g0 label `memory failure`, dispatch, and adoption-surface migration-failure recording'
+  - 'runtime/src/orchestration/control.rs: added `memory failure` to COMMAND_GUARDS'
+  - 'tests/certification/main.rs: added `mod r2_wse;`'
+  - 'tests/certification/r2_wse.rs: added behavioural integration test for all four classes'
+  remaining:
+  - 'The evidence map capability-evidence-map.yaml is regenerated at integration and was not edited. Its C8.1, C8.2, C8.3 and C8.6 rows should each name this behavioural owner: tests/certification/r2_wse.rs::every_failure_class_has_a_governed_writer_and_follow_up_after_rebuild.'
+  - Direct observation sites inside runtime/src/adopt.rs were outside this workstream's allow_write list, so migration-failure recording was placed at the CLI adoption surface (owned) instead; this covers
+    rolled-back and batch-failed migrations.
+  files_changed:
+  - cli/src/main.rs
+  - runtime/src/memory/failures.rs
+  - runtime/src/orchestration/control.rs
+  - tests/certification/main.rs
+  - tests/certification/r2_wse.rs
+  checks_run:
+  - name: fmt
+    exit: 0
+  - name: build
+    exit: 0
+  - name: fmt
+    exit: 0
+  - name: build
+    exit: 0
+  - name: fmt
+    exit: 0
+  - name: cert_wse
+    exit: 0
+  - name: cert_ws03
+    exit: 0
+  - name: failure_tests
+    exit: 0
+  - name: lib_tests
+    exit: 0
+  - name: build
+    exit: 0
+  orchestrator_checks: 'cargo build --release reproduced by the orchestrator on the branch: clean. Full suites are reproduced at integration. Worker output is a claim; an independent verifier grades it
+    on a frozen candidate.'
+  telemetry:
+    model: deepseek-v4-pro
+    tool_calls: 84
+    tool_calls_before_first_write: null
+    context_renewals: null
+    nudges: 1
+    checkpoints: null
+    bootstrap_tokens_estimate: null
+    runtime_seconds: 922.4

@@ -269,20 +269,16 @@ agent_runs:
   - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
   - {run_id: P2-AR-0052, role: capability-baseline-synthesis, iteration: 1, status: COMPLETED, branch: phase2/verify-1-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.run.yaml}
   - {run_id: P2-AR-0056, role: capability-repair, workstream: wsB, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0056.run.yaml}
-  - {run_id: P2-AR-0057, role: capability-repair, workstream: wsC, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsC, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml}
+  - {run_id: P2-AR-0057, role: capability-repair, DONE: true, workstream: wsC, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsC, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml}
   - {run_id: P2-AR-0058, role: capability-repair, workstream: wsD, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsD, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0058.run.yaml}
-  - {run_id: P2-AR-0059, role: capability-repair, workstream: wsE, iteration: 2, status: RUNNING, worker_model: deepseek-flash, branch: phase2/repair-2-wsE, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
-  - {run_id: P2-AR-0060, role: capability-repair, workstream: wsF, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
-  - {run_id: P2-AR-0061, role: capability-repair, workstream: wsG, iteration: 2, status: RUNNING, worker_model: deepseek-flash, branch: phase2/repair-2-wsG, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
+  - {run_id: P2-AR-0059, role: capability-repair, DONE: true, workstream: wsE, iteration: 2, status: RUNNING, worker_model: deepseek-flash, branch: phase2/repair-2-wsE, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
+  - {run_id: P2-AR-0060, role: capability-repair, DONE: true, workstream: wsF, iteration: 2, status: RUNNING, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
+  - {run_id: P2-AR-0061, role: capability-repair, DONE: true, workstream: wsG, iteration: 2, status: RUNNING, worker_model: deepseek-flash, branch: phase2/repair-2-wsG, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
 running_work:
   - {run_id: P2-AR-0056, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0056.run.yaml}
-  - {run_id: P2-AR-0057, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml}
   - {run_id: P2-AR-0058, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0058.run.yaml}
-  - {run_id: P2-AR-0059, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
-  - {run_id: P2-AR-0060, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
-  - {run_id: P2-AR-0061, role: capability-repair, status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml

@@ -21,4 +21,82 @@ required_verdict_vocabulary:
 - PARTIAL
 - OWNER_DECISION_REQUIRED
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: PARTIAL
+  branch_commit: 52816e4
+  worker_model: deepseek-flash
+  summary: 'Two of the five WS-G items are now true and observable; three cannot be closed inside this packet''s writable paths and are named precisely below. No existing test was renamed, deleted, ignored
+    or weakened, and no check, schema or policy was relaxed.
+
+
+    LANDED (each with its own test in tests/certification/r2_wsg.rs, registered in tests/certification/main.rs):
+
+
+    1. `V1-R1P-01` — `paths::relocate_legacy` deletes what it could not read. The function in this worktree already establishes identity only from bytes BOTH copies were read as (`f.is_file() && t.is_file()
+    && matches!((read(&f), read(&t)), (Ok(a), Ok(b)) if a == b)`; runtime/src/paths.rs:269-286), so I made the requirement observable instead of changing correct code: `an_unreadable_legacy_store_is_never_removed_without_being_read`
+    builds a legacy/destination pair that `read` cannot read (directories — unreadable for every uid, including root — and, as a second case, mode-0 files) and asserts `STATE_LOCATION_CONFLICT`, that the
+    legacy copy still exists and that the destination was not overwritten; it also asserts that an identical pair that WAS read is still de-duplicated, so the function stays idempotent. This test fails
+    against the pre-repair `read(&f).ok() == read(&t).ok()` shape (that shape returns an incidental EISDIR IO error for the directory case, not the typed conflict).
+
+
+    2. `V1-BETA-08` — a generated held-out query that can never pass. `runtime/src/memory/heldout.rs`: the generated `graph_impact` query now expects w'
+  items:
+  - 'V1-R1P-01: LANDED (observable). runtime/src/paths.rs::relocate_legacy already fails closed on unreadable pairs; tests/certification/r2_wsg.rs::an_unreadable_legacy_store_is_never_removed_without_being_read
+    proves it behaviourally (typed STATE_LOCATION_CONFLICT, legacy copy intact, destination untouc'
+  - 'V1-BETA-08: LANDED. runtime/src/memory/heldout.rs graph_impact queries expect the seed''s dependants (crate::graph::impact_set) or are generated `pending`; tests/certification/r2_wsg.rs::generated_graph_heldout_queries_can_pass_against_the_graph_route
+    passes, and was shown to fail against the old exp'
+  - 'A1-W12-01: BLOCKED (preview/gate disagreement cannot be closed in tasks.rs; needs cli/src/main.rs:721-743 or runtime/src/verification/mod.rs::close_gate or runtime/src/context/receipt.rs; runtime/src/scheduler/**
+    is WS-F''s).'
+  - 'V1-G1-01: BLOCKED (deterministic intent routing lives in runtime/src/orchestration/intents.rs:18-38, not in the writable runtime/src/routing.rs).'
+  - 'V1-A5-01: BLOCKED (control.rs can only refuse, which tests/certification/ws03.rs:420-431 asserts against and which is named in the evidence map; the alternative fix needs runtime/src/memory/indexer.rs:2035
+    / runtime/src/memory/manifest.rs).'
+  remaining:
+  - 'A1-W12-01 — needs a writable seam for the preview: add receipt/`require_receipt` validation to the preview path (cli/src/main.rs:721-743) or publish a `tasks.rs` preview entry point the CLI calls,
+    so `allowed: true` cannot be read as "this close will be admitted".'
+  - 'V1-G1-01 — needs runtime/src/orchestration/intents.rs: gate pattern matching on negation ("do not/never/no ... approve") so a negated phrase never routes to the negated intent; the fix must not break
+    the deterministic T0 pattern contract in the kernel COMMAND_CONTRACT.yaml.'
+  - V1-A5-01 — needs either FROZEN_ALLOW_LIST/PAUSED_ALLOW_LIST entries removed in runtime/src/orchestration/control.rs:517-542 together with tests/certification/ws03.rs:420-431 updated to assert refusal,
+    or the tracked-manifest write at runtime/src/memory/indexer.rs:2035 skipped while a control is in f
+  files_changed:
+  - runtime/src/memory/heldout.rs
+  - tests/certification/main.rs
+  - tests/certification/r2_wsg.rs
+  checks_run:
+  - name: paths_tests
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: build
+    exit: 0
+  - name: lib_tests
+    exit: 0
+  - name: intent_tests
+    exit: 0
+  - name: fmt
+    exit: 0
+  - name: cert_wsg
+    exit: 0
+  - name: fmt
+    exit: 0
+  orchestrator_checks: 'cargo build --release reproduced by the orchestrator on the branch: clean. Full suites are reproduced at integration. Worker output is a claim; an independent verifier grades it
+    on a frozen candidate.'
+  telemetry:
+    model: deepseek-flash
+    tool_calls: 153
+    tool_calls_before_first_write: 31
+    context_renewals: 0
+    nudges: 3
+    checkpoints: 3
+    bootstrap_tokens_estimate: 4011
+    runtime_seconds: 841.9
