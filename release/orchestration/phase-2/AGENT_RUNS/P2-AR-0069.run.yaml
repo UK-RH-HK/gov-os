@@ -1,0 +1,22 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0069
+role: capability-repair (iteration 2, post-adversarial)
+workstream: f3-path-rule-floor
+blocker_class: BC-P2-45 / OC-P2-04
+finding: AR68-F3
+objective: 'An appended project path rule at a pattern with no kernel counterpart must not increase effective trusted authority silently: evaluate_path_rules_overlay honours an unmatched pattern with no
+  restrictiveness check, so one appended rule flips a tool installation from gated to not_gated and nothing reports it.'
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+branch: phase2/repair-2-f3
+base: phase2/repair-2-integration 61e39b6
+independent_of: the tool-install command-shape question, which is with the owner
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING
