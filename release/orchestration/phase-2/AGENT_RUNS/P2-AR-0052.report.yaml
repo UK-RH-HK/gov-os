@@ -1,0 +1,317 @@
+schema: governance-os.phase-2.agent-report
+schema_version: 1
+run_id: P2-AR-0052
+role: capability-baseline-synthesis
+objective: >-
+  Verification iteration 1 synthesis and verdict for cap2-candidate-1, on the whole of AC-1...AC-16,
+  as the sole issuer of the iteration-1 Phase-2 verdict.
+agent_model: claude-opus-5[1m]
+independence_statement: >-
+  I authored none of the Governance OS implementation, none of its tests, none of the iteration-0 audits or
+  re-audits, none of the repairs (P2-AR-0014...0043), none of the integrations, none of the eight iteration-1
+  verifications, and no Phase-1 role. I am not the orchestrator and I never modified product source: everything I
+  wrote is under release/capability-baseline/verify-1/synthesis/ and this report. I read the eight iteration-1
+  verifications as evidence (which my handoff makes my inputs), the iteration-0 synthesis as the inventory I measure
+  against, the owner source, the governing documents, the frozen gate contract, the owner decisions and
+  adjudications in force, and the product's own source, policies and generated views. I did NOT read any session or
+  agent transcript, any task-output store, or user auto-memory; I spawned no sub-agent; I did not contact the
+  product owner. `rm` is denied in this environment and I did not use it; no file was deleted anywhere, and no
+  other verifier's evidence directory was written to (the family RUN-ALL scripts that default to writing there had
+  their output paths redirected, and delta's probes were run individually for that reason).
+input:
+  base_commit: 311eafaf6f123f5c9c4dfe146c4ce8e38f31f154
+  candidate: cap2-candidate-1
+  candidate_commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  contract_v3_sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  frozen_gate_contract_sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  frozen_srr_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0047-verify-1-synthesis.md
+  pinned_inputs_verified: true
+  stop_condition: none
+inspected:
+  - Governance_OS_Capability_Acceptance_Contract_v3.md
+  - release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001-AGENT-ROLE-IDENTITY.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
+  - release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0001-STANDALONE-HUMAN-GATE-ANCHOR.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0002-T2-CROSS-MACHINE-CONTINUITY.md
+  - release/orchestration/phase-2/GATES/P2-ADJ-0003-H4-GAPS-AND-GREEN-PRECONDITIONS.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0000-audit-0-common-protocol.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0007-audit-0-synthesis.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0009-audit-0-reaudit-common.md
+  - release/orchestration/phase-2/HANDOFFS/P2-HO-0043-verify-1-common-protocol.md
+  - release/capability-baseline/audit-0/synthesis/
+  - release/capability-baseline/verify-1/{alpha,beta,gamma,delta,epsilon,zeta,r1-preservation,oracle-format}/
+  - release/orchestration/phase-2/AGENT_RUNS/P2-AR-004{4,5,6,7,8,9},P2-AR-005{0,1}.run.yaml
+  - framework/contracts/, framework/policies/, framework/qualification-oracle/, tests/governance/capability-evidence-map.yaml
+  - runtime/src/{tools.rs,policy.rs,policy_precedence.rs,update.rs,paths.rs,contracts.rs,scheduler/}
+  - cap2-candidate-0 (git show, to establish which mechanisms existed at iteration 0)
+produced:
+  - release/capability-baseline/verify-1/synthesis/00-SYNTHESIS-REPORT.md
+  - release/capability-baseline/verify-1/synthesis/capability-status-matrix.yaml
+  - release/capability-baseline/verify-1/synthesis/suite-to-contract-matrix.yaml
+  - release/capability-baseline/verify-1/synthesis/qualification-coverage-matrix.yaml
+  - release/capability-baseline/verify-1/synthesis/artifact-flow-coverage-matrix.yaml
+  - release/capability-baseline/verify-1/synthesis/blocker-classes.yaml
+  - release/capability-baseline/verify-1/synthesis/convergence.yaml
+  - release/capability-baseline/verify-1/synthesis/findings.yaml
+  - release/capability-baseline/verify-1/synthesis/repair-delta.md
+  - release/capability-baseline/verify-1/synthesis/owner-decisions-required.md
+  - release/capability-baseline/verify-1/synthesis/later-lifecycle-notes.md
+  - release/capability-baseline/verify-1/synthesis/evidence/
+tests_or_attacks:
+  - id: RERUN-alpha
+    description: P2-AR-0046's held-out suite re-run in my worktree (its default set t01-t06)
+    result: PASS
+    detail: 387 PASS / 10 FAIL; per-suite 54/1, 74/0, 53/5, 67/1, 59/2, 80/1 - P2-AR-0046's figures exactly
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-alpha-RUN-ALL.out
+  - id: RERUN-beta
+    description: P2-AR-0047's held-out suite re-run
+    result: PASS
+    detail: >-
+      185 PASS / 10 FAIL; its nine recorded failures exactly. The tenth (C1-transactions) failed once under six
+      concurrent suites plus a certification build and passed 17/0 on an isolated re-run of the same probe, with
+      `cit propose` -> `cit list` reproduced by hand; a load artefact, not product behaviour.
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-beta-RUN-ALL.out
+  - id: RERUN-gamma
+    description: P2-AR-0048's held-out suite re-run, including V1-F4-01-executed-proof.sh
+    result: PASS
+    detail: 184 PASS / 17 FAIL - its totals and every failing check exactly
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-gamma-RUN-ALL.out
+  - id: RERUN-delta
+    description: P2-AR-0049's nine probes run individually (so nothing was written into delta's evidence directory)
+    result: PASS
+    detail: 256 PASS / 9 FAIL - its nine recorded failures exactly
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-delta-RUN-ALL.out
+  - id: RERUN-epsilon
+    description: P2-AR-0050's held-out suite re-run
+    result: PASS
+    detail: 163 PASS / 4 FAIL - exactly its recorded figures
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-epsilon-RUN-ALL.out
+  - id: RERUN-zeta
+    description: P2-AR-0051's held-out suite re-run
+    result: PASS
+    detail: 135 PASS / 2 FAIL - exactly its recorded figures
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-zeta-RUN-ALL.out
+  - id: RERUN-r1-preservation
+    description: P2-AR-0044's suite and its four unedited prior R1 suites re-run (AC-14)
+    result: PASS
+    detail: >-
+      p1 13/0, p2 9/0, p3 10/1 (the deliberate c5 = V1-R1P-01), p6 8/0; AR-0027 26/3, AR-0029 26/2, AR-0031 27/7,
+      AR-0033 30/1 - every per-binary figure exactly; the OWNER-DECISION-0006 section 6 census re-derived at
+      123 files / 2392 functions with zero violations in all three splitter configurations
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-r1-preservation-RUN-ALL.out
+  - id: RERUN-oracle-format
+    description: P2-AR-0045's two load-bearing AC-6 checks re-run
+    result: PASS
+    detail: >-
+      format_sha256 f89a3e2f...16fd recomputed and reported by `gov oracle format`; the crosswalk against the
+      OWNER-SOURCE bytes resolves all 35 Gate V bullets and 5 prose statements to existing, required, typed fields
+      (0 problems); the 93-sample attack matrix is 93 as expected, 0 unexpected
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/rerun-oracle-format.out
+  - id: AC-9
+    description: candidate identity verified at the tag and at HEAD, plus every pinned document digest
+    result: PASS
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/AC-9-AC-13-pinned-inputs-and-contract-verify.out
+  - id: AC-13
+    description: >-
+      the compiled contract view checked against the owner source by my own line accounting, WITHOUT using the
+      product - the mechanism BC-P2-01/S0-AC13-01 called self-referential
+    result: PASS
+    detail: >-
+      1026 of 1026 non-blank non-'---' owner-source lines carried verbatim exactly once; 0 missing, 0 extra,
+      0 without a verbatim carrier; capability_count 101 including Gate U with its 28 items; 713 capability
+      checklist items + 9 acceptance-gate items = the source's own 722 checklist lines; canonical import
+      byte-identical; `gov contract verify` -> CONTRACT_SOURCE_BOUND
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/AC-13-independent-line-accounting.out
+  - id: AC-10
+    description: suite-to-contract matrix regenerated with the product and fed with my own run logs
+    result: PASS
+    detail: >-
+      101 capabilities, 798 evidence owners, 0 capabilities with zero owners, 0 owners that fail to resolve against
+      the product, 0 capabilities without an owner I observed running (127 executed at G5, 34 under gov doctor,
+      477 cargo tests I ran, 110 independent-verification obligations); invalidation demonstrated across 11
+      freshness triggers
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/AC-10-gov-contract-matrix-with-my-runs.yaml
+  - id: AC-5
+    description: the G1/G5 tier coverage re-established from scratch in my own probe project
+    result: FAIL
+    detail: >-
+      `gov health checks` declares 74 checks, 74 at G5 and 49 at G1. `gov health run --tier G5` evaluated 39 and
+      wrote a health result reading `complete: true, executed: 39, not_evaluated: 0`; `--tier G1` evaluated 18 of
+      49 with the same claim; D001-D035 appear in neither and run only under `gov doctor`. Ten of the twelve AC-5
+      behaviours are met and were exercised; health-result provenance and the G5 tier duty are not.
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/AC-5-health-run-G5.json
+  - id: AC-15
+    description: regression run by me on the candidate, one pass each
+    result: PASS
+    detail: "cargo test --lib: 276 passed, 0 failed. cargo test --test certification: 207 passed, 0 failed (1274.6s)"
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/AC-15-regression.out
+  - id: AC-16
+    description: >-
+      my own end-to-end chain across family boundaries - K3/K4 -> W8 -> D1 -> W6 -> W4/W10 -> O4 -> G0/W12 -> L4
+    result: PASS
+    detail: >-
+      CIT impact simulation reached the dependent task at hop 1 `via CONSUMES -> REQ-0001` at radius R2; an index
+      rebuild propagated staleness (`stale: true, retest_required: true, propagated: true`) with the consumed and
+      current normative hashes; the delivered packet stopped verifying; the green record went obsolete naming five
+      input classes; the G0 guard re-evaluated at the instant of the call; and independent work plus the block's
+      own remedy stayed available
+    evidence_path: release/capability-baseline/verify-1/synthesis/evidence/AC-16-end-to-end-chain.out
+  - id: LABEL-CHECK-BC-P2-53
+    description: >-
+      whether V1-F4-01's MATERIALLY_NEW label survives being checked in the direction that would avoid escalation
+    result: CONFIRMED
+    detail: >-
+      `installation_authority`, `authority_expansion_triggers`, `installation_envelope` and
+      CHANGE_POLICY.change_classes.tool_installation have ZERO occurrences at cap2-candidate-0; the whole surface
+      was built during repair iteration 1 under OD-P2-03, so no iteration-0 class can name the mechanism.
+      BC-P2-39's own inventoried mechanism (the PLUGIN authorize/register path) is closed on this candidate.
+    evidence_path: release/capability-baseline/verify-1/synthesis/convergence.yaml
+  - id: LABEL-CHECK-BC-P2-45
+    description: >-
+      whether V1-F4-02's RESIDUAL label survives being checked in the direction that would CREATE a second new class
+    result: CONFIRMED
+    detail: >-
+      runtime/src/policy.rs:285 carries the repair's own comment "BC-P2-45: every project overlay input is subject
+      to POLICY_PRECEDENCE" and the code beneath it evaluates exactly two overlays (:295, :340). That is BC-P2-45's
+      mechanism verbatim, incompletely fixed, and BC-P2-45's capability list already contains A1.
+    evidence_path: release/capability-baseline/verify-1/synthesis/findings.yaml
+capability_status_summary:
+  PRESENT_AND_SUBSTANTIAL: 73
+  PARTIAL: 28
+  ABSENT: 0
+  UNCLEAR: 0
+  N/A_WITH_REASON: 0
+acceptance_criteria:
+  AC-1: HOLDS
+  AC-2: HOLDS
+  AC-3: FAILS
+  AC-4: FAILS
+  AC-5: FAILS
+  AC-6: HOLDS
+  AC-7: HOLDS
+  AC-8: HOLDS
+  AC-9: HOLDS
+  AC-10: HOLDS
+  AC-11: HOLDS
+  AC-12: HOLDS
+  AC-13: HOLDS
+  AC-14: HOLDS
+  AC-15: HOLDS
+  AC-16: HOLDS
+findings:
+  - id: S1-A1-01
+    severity: MEDIUM
+    capability: [A1, F4, F3]
+    blocking: true
+    blocker_class: BC-P2-45
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: >-
+      Project overlay documents that carry authority and sensitivity decisions are never visited by
+      POLICY_PRECEDENCE, so its own deny-by-default never reaches them (corrects A1 to PARTIAL)
+    path: release/capability-baseline/verify-1/synthesis/findings.yaml
+  - id: S1-AC13-01
+    severity: MEDIUM
+    capability: ["(all 101, derived views)"]
+    blocking: false
+    blocker_class: BC-P2-02
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: >-
+      The evidence map leaves the governed per-capability field `severity` null for all 101 capabilities, and 126 of
+      713 checklist items name no automated check
+    path: release/capability-baseline/verify-1/synthesis/findings.yaml
+  - id: S1-AC13-02
+    severity: INFO
+    capability: [V1, V2, V3, V4]
+    blocking: false
+    blocker_class: BC-P2-01
+    new_vs_residual: RESIDUAL
+    owner_decision_required: false
+    title: >-
+      V1-V4 carry a requirement class the owner source's own field definition does not list - because the owner
+      source itself writes that fourth label (faithful carriage of an owner-source inconsistency, not a defect)
+    path: release/capability-baseline/verify-1/synthesis/findings.yaml
+verifier_findings_disposition:
+  total: 55
+  CONFIRMED: 55
+  CORRECTED: 0
+  REFUTED: 0
+  note: >-
+    All 55 findings raised by the eight iteration-1 verifications are confirmed; every check behind each one was
+    re-executed by me and reproduced. One capability-level LABEL was corrected: P2-AR-0049 recorded M1's
+    partial_qualification_impact opening "COULD_UNDERMINE only for a qualification design that scores cost or
+    determinism of routing" while recording its finding blocking:false - an internal contradiction. Corrected to
+    CANNOT_UNDERMINE against V4's twelve scored metrics (Contract v3:1049-1060), none of which is cost or routing
+    determinism. The finding V1-M1-01 and delta's blocking:false both stand.
+blocking_findings_confirmed:
+  - {id: V1-F4-01, class: BC-P2-53, severity: HIGH, ac: [AC-4, AC-3]}
+  - {id: V1-F3-01, class: BC-P2-41, severity: HIGH, ac: [AC-4, AC-3]}
+  - {id: V1-F4-02, class: BC-P2-45, severity: HIGH, ac: [AC-4, AC-3]}
+  - {id: S1-A1-01, class: BC-P2-45, severity: MEDIUM, ac: [AC-3], raised_by: P2-AR-0052}
+  - {id: V1-S4-01, class: BC-P2-33, severity: HIGH, ac: [AC-3]}
+  - {id: V1-S5-01, class: BC-P2-37, severity: MEDIUM, ac: [AC-3]}
+  - {id: V1-BETA-01, class: BC-P2-32, severity: MEDIUM, ac: [AC-3]}
+  - {id: E-O5-01, class: BC-P2-07, severity: MEDIUM, ac: [AC-5]}
+convergence:
+  iteration_0_classes: 52
+  CLOSED: 37
+  PARTIALLY_CLOSED: 14
+  RESIDUAL: 1
+  classes_still_blocking: [BC-P2-07, BC-P2-32, BC-P2-33, BC-P2-37, BC-P2-41, BC-P2-45]
+  new_blocker_classes: [BC-P2-53]
+  introduces_materially_new_blocker_classes: true
+  materially_new_findings_total: 11
+  materially_new_findings_that_block: [V1-F4-01]
+  consecutive_iterations_introducing_materially_new_blocker_classes: 1
+  convergence_rule_note: >-
+    Frozen gate contract section 8 stops the phase if THREE CONSECUTIVE verification iterations each introduce
+    materially new blocker classes. Iteration 0 established the inventory rather than introducing classes into it,
+    so this is the first iteration that can count: one of three. No escalation follows from this verification; the
+    count is the orchestrator's to keep.
+owner_decisions_required: none
+owner_decision_flags_adjudicated:
+  - {finding: A1-W8-01, flagged_by: P2-AR-0051, adjudication: NOT_AN_OWNER_DECISION_AT_THIS_GATE}
+  - {finding: V1-A3-01, flagged_by: P2-AR-0046, adjudication: NOT_AN_OWNER_DECISION_AT_THIS_GATE}
+protocol_deviations_weighed:
+  - >-
+    P2-AR-0044 and P2-AR-0049 each listed the harness task-output directory once, reading no other agent's output
+    (orchestrator-recorded). Neither touches evidence I rely on; I re-ran all of it myself.
+  - >-
+    P2-AR-0048 provisioned a trust anchor in the real machine's shared state before isolating XDG_STATE_HOME and
+    moved both files aside (rm being denied), returning that directory to its prior empty UNPROVISIONED posture;
+    the orchestrator verified it cleared. I re-ran gamma's whole suite on a clean machine state of my own.
+  - >-
+    P2-AR-0048 did not run `cargo test --test certification`. AC-15 is the synthesis verifier's and I ran it:
+    207 passed, 0 failed.
+verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+output:
+  branch: phase2/verify-1-synthesis
+  commit: 5a7018049fc93304d413029f93264b3bec245c52
+  evidence_path: release/capability-baseline/verify-1/synthesis/
+unresolved:
+  - >-
+    The G2 close gate refusing on a stale input was not established in my own AC-16 chain: the chain's
+    implementation task stayed BLOCKED on readiness (correct H3/I1 behaviour) so I could not claim and close it.
+    The property rests on beta's D1-b6-stale-close and zeta's W6-09c and W12-G2, both of which I re-ran.
+  - >-
+    An EFFECTIVE weakening through REPOSITORY_CONTRACT.yaml or DATA_SENSITIVITY.yaml was not demonstrated.
+    S1-A1-01 claims the coverage gap for three documents and the exploit for one (TOOL_PERMISSIONS.yaml).
+  - >-
+    I did not mint a signed release payload and install it end to end; the lifecycle-ingress half of AC-16 rests on
+    alpha's suite and the prior R1 suites, which I re-ran, not on a signed install I performed.
+  - >-
+    50 of the 798 evidence owners (13 held-out, 19 G0, 13 human-gate, 5 release) are not covered by the run logs I
+    fed the matrix; they resolve against the product and the families exercised them. Every capability still has at
+    least one owner I observed running.
+recommended_next_action: >-
+  Open a repair iteration against release/capability-baseline/verify-1/synthesis/repair-delta.md, sequencing WS-B
+  (overlay precedence coverage) before or together with WS-A (the tool-installation trust surface), since three of
+  the seven blocking classes live on the surface OD-P2-03 created and WS-A's "trusted OS state" is only trustworthy
+  once WS-B closes. WS-C, WS-D, WS-E and WS-F are independent and may run in parallel.
+completed_at: 2026-09-21T00:04:57Z
