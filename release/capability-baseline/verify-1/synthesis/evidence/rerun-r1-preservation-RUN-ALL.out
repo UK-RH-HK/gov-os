@@ -1,0 +1,251 @@
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis
+scratch:  /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/r1p
+
+== candidate identity ==
+commit: 311eafaf6f123f5c9c4dfe146c4ce8e38f31f154
+product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+
+== building the candidate ==
+ok
+
+== P2-AR-0044 held-out tests ==
+PASS  ho-p2ar0044::p1_t2_binding::a10_owner_facts_travel_between_bound_machines_and_no_further
+PASS  ho-p2ar0044::p1_t2_binding::a11_gov_has_no_command_that_mints_a_binding_authority
+PASS  ho-p2ar0044::p1_t2_binding::a12_an_expired_or_non_canonical_authority_is_refused
+PASS  ho-p2ar0044::p1_t2_binding::a13_no_binding_secret_is_written_into_the_repository
+PASS  ho-p2ar0044::p1_t2_binding::a1_repository_content_cannot_manufacture_a_verified_t2_fact
+PASS  ho-p2ar0044::p1_t2_binding::a2_a_foreign_machines_seal_is_not_honoured
+PASS  ho-p2ar0044::p1_t2_binding::a3_an_unprovisioned_machine_cannot_be_bound
+PASS  ho-p2ar0044::p1_t2_binding::a4_only_the_root_delegated_role_can_create_a_binding_authority
+PASS  ho-p2ar0044::p1_t2_binding::a5_the_authority_cannot_come_from_the_repository_or_the_environment
+PASS  ho-p2ar0044::p1_t2_binding::a6_authority_rollback_and_conflict_fail_closed
+PASS  ho-p2ar0044::p1_t2_binding::a7_an_unauthorised_or_mismatched_key_is_refused
+PASS  ho-p2ar0044::p1_t2_binding::a8_a_root_without_the_delegation_authorises_nothing
+PASS  ho-p2ar0044::p1_t2_binding::a9_a_machine_the_authority_does_not_list_is_refused
+      [ho-p2ar0044::p1_t2_binding] test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+PASS  ho-p2ar0044::p2_update_and_kernel::b1_external_kernel_material_is_refused_before_staging_until_provisioned
+PASS  ho-p2ar0044::p2_update_and_kernel::b2_the_embedded_payload_bootstrap_stays_available_and_is_marked
+PASS  ho-p2ar0044::p2_update_and_kernel::b3_the_environment_cannot_admit_a_kernel
+PASS  ho-p2ar0044::p2_update_and_kernel::b4_cli_strings_are_requests_not_authority
+PASS  ho-p2ar0044::p2_update_and_kernel::b5_break_glass_cannot_be_claimed_on_the_command_line
+PASS  ho-p2ar0044::p2_update_and_kernel::b6_the_installed_payload_matches_what_kernel_yaml_declares
+PASS  ho-p2ar0044::p2_update_and_kernel::b7_post_install_tampering_is_detected_as_an_integrity_fault
+PASS  ho-p2ar0044::p2_update_and_kernel::b8_rollback_is_one_of_the_named_gate_free_remedies
+PASS  ho-p2ar0044::p2_update_and_kernel::b9_the_protected_high_water_never_goes_backwards
+      [ho-p2ar0044::p2_update_and_kernel] test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.32s
+PASS  ho-p2ar0044::p3_stores_and_tools::c1_every_os_store_resolves_into_the_state_directory
+PASS  ho-p2ar0044::p3_stores_and_tools::c2_a_disaster_recovery_deletion_never_sweeps_an_os_store
+PASS  ho-p2ar0044::p3_stores_and_tools::c3_relocation_never_overwrites_a_conflicting_store
+PASS  ho-p2ar0044::p3_stores_and_tools::c4_repository_resident_authoritative_stores_are_not_writable_by_project_content
+FAIL  ho-p2ar0044::p3_stores_and_tools::c5_an_unreadable_legacy_store_is_not_removed_without_comparison
+PASS  ho-p2ar0044::p3_stores_and_tools::d1_a_quiet_descriptor_that_installs_with_sudo_is_still_an_expansion
+PASS  ho-p2ar0044::p3_stores_and_tools::d2_no_declaration_in_a_descriptor_clears_the_expansion_verdict
+PASS  ho-p2ar0044::p3_stores_and_tools::d3_an_underivable_installation_is_gated_fail_closed
+PASS  ho-p2ar0044::p3_stores_and_tools::d4_an_unauthorised_role_cannot_carry_an_installation
+PASS  ho-p2ar0044::p3_stores_and_tools::d5_project_content_cannot_enlarge_the_network_allowlist
+PASS  ho-p2ar0044::p3_stores_and_tools::d6_an_installation_aimed_elsewhere_is_not_an_installation
+      [ho-p2ar0044::p3_stores_and_tools] test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.72s
+PASS  ho-p2ar0044::p6_structural::f1_the_section_5_allow_list_is_four_entries_and_exact_match
+PASS  ho-p2ar0044::p6_structural::f2_every_install_kernel_site_is_paired_with_an_admit_site
+PASS  ho-p2ar0044::p6_structural::f3_the_admission_token_has_exactly_one_constructor
+PASS  ho-p2ar0044::p6_structural::f4_no_clearance_is_constructed_outside_breakglass
+PASS  ho-p2ar0044::p6_structural::f5_d0007_integrity_never_claims_authenticity_or_admissibility
+PASS  ho-p2ar0044::p6_structural::f6_the_product_cannot_sign
+PASS  ho-p2ar0044::p6_structural::f7_contract_v3_canonical_import_is_byte_identical_and_pinned
+PASS  ho-p2ar0044::p6_structural::f8_no_floor_mutator_lowers_a_floor
+      [ho-p2ar0044::p6_structural] test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+== prior R1 held-out suites, byte-identical (AR-0027 / AR-0029 / AR-0031 / AR-0033) ==
+  IDENTICAL ho27/heldout_srr.rs
+  IDENTICAL ho27/heldout_srr2.rs
+  IDENTICAL ho27/heldout_srr3.rs
+  IDENTICAL ho27/heldout_srr4.rs
+  IDENTICAL ho27/forge.rs
+  IDENTICAL ho27/Cargo.toml.txt
+  IDENTICAL ho29/ho_a_allowlist.rs
+  IDENTICAL ho29/ho_b_coverage.rs
+  IDENTICAL ho29/ho_c_deadlock.rs
+  IDENTICAL ho29/ho_d_expiry.rs
+  IDENTICAL ho29/ho_e_rootexpiry.rs
+  IDENTICAL ho29/ho_f_preservation.rs
+  IDENTICAL ho29/mint.rs
+  IDENTICAL ho29/Cargo.toml.txt
+  IDENTICAL ho31/hx_a_census.rs
+  IDENTICAL ho31/hx_b_failopen.rs
+  IDENTICAL ho31/hx_c_prior_evidence.rs
+  IDENTICAL ho31/hx_d_acquisition_and_preservation.rs
+  IDENTICAL ho31/bench.rs
+  IDENTICAL ho31/Cargo.toml.txt
+  IDENTICAL ho33/hv_a_derivation.rs
+  IDENTICAL ho33/hv_b_bullet7.rs
+  IDENTICAL ho33/hv_c_failclosed.rs
+  IDENTICAL ho33/hv_d_sinks_and_preservation.rs
+  IDENTICAL ho33/Cargo.toml.txt
+PASS  ho27::heldout_srr::a10_malleable_and_small_order_signatures_are_refused_by_verify_strict
+PASS  ho27::heldout_srr::a11_unsupported_key_scheme_is_refused
+PASS  ho27::heldout_srr::a12_spec_version_and_role_type_confusion_are_refused
+PASS  ho27::heldout_srr::a1_signature_lifted_from_a_different_document_is_refused
+PASS  ho27::heldout_srr::a2_keyid_cannot_be_pointed_at_another_keys_material
+PASS  ho27::heldout_srr::a3_role_confusion_a_timestamp_key_cannot_authorise_a_release
+PASS  ho27::heldout_srr::a4_threshold_cannot_be_reached_by_repeating_one_key
+PASS  ho27::heldout_srr::a5_unsatisfiable_threshold_is_refused_at_parse_time
+PASS  ho27::heldout_srr::a6_zero_threshold_is_refused
+PASS  ho27::heldout_srr::a7_trailing_bytes_after_the_envelope_are_refused
+PASS  ho27::heldout_srr::a8_a_duplicate_signed_member_is_refused_rather_than_last_wins
+PASS  ho27::heldout_srr::a9_unsigned_and_empty_signature_lists_are_refused
+      [ho27::heldout_srr] test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+FAIL  ho27::heldout_srr2::b1_expiry_comparison_against_valid_but_non_emitted_rfc3339_forms
+FAIL  ho27::heldout_srr2::b2_no_canonical_form_check_guards_the_lexicographic_expiry_comparison
+PASS  ho27::heldout_srr2::c1_floor_binds_a_non_rollback_ingress_after_a_verified_install
+PASS  ho27::heldout_srr2::c2_identity_and_payload_binding_fail_closed
+PASS  ho27::heldout_srr2::c3_provisioned_machine_refuses_unsigned_input_and_anchor_removal_fails_closed
+PASS  ho27::heldout_srr2::c4_returning_a_machine_to_the_unprovisioned_posture
+PASS  ho27::heldout_srr2::c5_environment_cannot_carry_authority
+PASS  ho27::heldout_srr2::c6_floors_survive_project_deletion
+      [ho27::heldout_srr2] test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.64s
+PASS  ho27::heldout_srr3::d1_break_glass_authority_cannot_be_manufactured
+PASS  ho27::heldout_srr3::d2_valid_break_glass_enters_marks_and_is_single_use
+FAIL  ho27::heldout_srr3::d3_below_floor_refusal_surface_against_owner_decision_0006_section_6
+PASS  ho27::heldout_srr3::d4_exit_policy_is_one_point_at_the_stricter_reading
+PASS  ho27::heldout_srr3::d5_break_glass_is_purely_local
+      [ho27::heldout_srr3] test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.67s
+PASS  ho27::heldout_srr4::e1_an_expired_trust_anchor_still_authorises_a_release_install
+PASS  ho27::heldout_srr4::e2_timestamp_and_snapshot_are_optional_and_their_expiry_does_not_refuse
+PASS  ho27::heldout_srr4::e3_install_transaction_is_atomic_and_replays_after_interruption
+PASS  ho27::heldout_srr4::e4_intact_is_not_authentic_and_the_two_controls_are_independent
+      [ho27::heldout_srr4] test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.75s
+PASS  ho29::ho_a_allowlist::a1_the_decision_function_is_exact_match_under_every_near_miss_i_could_construct
+PASS  ho29::ho_a_allowlist::a2_refusal_is_the_default_for_labels_that_exist_in_neither_table
+PASS  ho29::ho_a_allowlist::a3_the_real_guard_on_a_marked_machine_permits_exactly_the_four
+PASS  ho29::ho_a_allowlist::a4_refusal_classes_are_reporting_only_and_never_load_bearing
+PASS  ho29::ho_a_allowlist::a5_an_unmarked_machine_is_not_refused_anything
+PASS  ho29::ho_a_allowlist::a6_the_exit_policy_point_is_single_and_still_the_stricter_reading
+      [ho29::ho_a_allowlist] test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+PASS  ho29::ho_b_coverage::b1_trust_root_update_mutates_trust_policy_while_the_machine_is_marked_degraded
+PASS  ho29::ho_b_coverage::b2_the_trust_anchor_actually_moves_while_marked
+FAIL  ho29::ho_b_coverage::b3_census_of_section_6_operations_against_their_enforcement_points
+PASS  ho29::ho_b_coverage::b4_provision_cannot_re_anchor_a_provisioned_machine
+PASS  ho29::ho_b_coverage::b5_section_5_inspection_diagnosis_and_restoration_remain_available_below_floor
+FAIL  ho29::ho_b_coverage::b6_a_permitted_operation_reaches_an_unguarded_human_gate_creation_and_then_stalls
+      [ho29::ho_b_coverage] test result: FAILED. 4 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+PASS  ho29::ho_c_deadlock::c1_an_unreadable_marking_refuses_everything_outside_the_allow_list
+PASS  ho29::ho_c_deadlock::c2_the_restore_half_of_the_claim_holds
+PASS  ho29::ho_c_deadlock::c3_an_unreadable_marking_cannot_be_cleared_by_meeting_the_exit_condition
+PASS  ho29::ho_c_deadlock::c4_the_machine_reports_not_degraded_while_refusing_as_degraded
+PASS  ho29::ho_c_deadlock::c5_a_readable_marking_clears_when_the_exit_condition_is_met
+      [ho29::ho_c_deadlock] test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+PASS  ho29::ho_d_expiry::d1_the_canonical_form_gate_accepts_exactly_the_form_the_profile_emits
+PASS  ho29::ho_d_expiry::d2_expiry_is_fail_closed_in_all_four_directions
+PASS  ho29::ho_d_expiry::d3_fail_closed_does_not_brick_an_ordinary_document
+PASS  ho29::ho_d_expiry::d4_the_canonical_gate_is_syntactic_only
+PASS  ho29::ho_d_expiry::d5_every_expiry_consumer_inherits_the_gate
+      [ho29::ho_d_expiry] test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+PASS  ho29::ho_e_rootexpiry::e1_the_profile_is_honest_about_what_an_expired_anchor_does_not_bar
+PASS  ho29::ho_e_rootexpiry::e2_root_rotation_is_possible_under_the_implemented_profile
+PASS  ho29::ho_e_rootexpiry::e3_the_alternative_would_make_rotation_permanently_impossible
+PASS  ho29::ho_e_rootexpiry::e4_the_enforced_half_of_the_profile_is_real
+PASS  ho29::ho_e_rootexpiry::e5_trusted_root_carries_no_vestigial_expiry_branch
+PASS  ho29::ho_e_rootexpiry::e6_an_expired_anchor_does_not_bar_verifying_release_metadata_against_it
+      [ho29::ho_e_rootexpiry] test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+FAIL  ho29::ho_f_preservation  (did not compile — see /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/r1p/logs/ho29-ho_f_preservation.log)
+        error: cannot construct `AuthenticatedRelease` with struct literal syntax due to private fields
+        error: could not compile `srr-heldout-ar0029` (test "ho_f_preservation") due to 1 previous error
+FAIL  ho31::hx_a_census::a1_the_census_is_a_total_function_over_the_section_6_activities
+PASS  ho31::hx_a_census::a2_every_effect_guard_refuses_at_the_instant_of_the_effect
+PASS  ho31::hx_a_census::a3_an_allow_listed_operation_does_not_suspend_bullets_2_to_7
+PASS  ho31::hx_a_census::a4_the_trust_anchor_sink_refuses_and_is_the_only_writer
+FAIL  ho31::hx_a_census::a5_the_clearance_seal_does_not_cover_gate_creation_outside_the_gates_module
+PASS  ho31::hx_a_census::a6_no_second_primitive_realises_a_named_section_6_effect
+PASS  ho31::hx_a_census::a7_bullet_6_has_no_primitive_because_every_floor_mutator_is_a_monotonic_raise
+FAIL  ho31::hx_a_census::a8_bullet_7_claims_every_reporting_surface_carries_the_marking
+      [ho31::hx_a_census] test result: FAILED. 5 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+PASS  ho31::hx_b_failopen::b1_resolve_state_root_errors_only_on_the_hostile_case_never_on_the_unprovisioned_one
+PASS  ho31::hx_b_failopen::b2_an_environment_variable_suppresses_every_effect_level_section_6_check
+PASS  ho31::hx_b_failopen::b3_the_operation_level_guard_fails_open_on_the_same_input
+PASS  ho31::hx_b_failopen::b4_gate_creation_loses_its_only_enforcement_point
+PASS  ho31::hx_b_failopen::b5_the_state_carrying_guard_is_immune_because_it_resolves_nothing
+FAIL  ho31::hx_b_failopen::b6_closing_the_fail_open_does_not_touch_the_owner_closed_resolution
+      [ho31::hx_b_failopen] test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+PASS  ho31::hx_c_prior_evidence::c1_the_migrated_preservation_census_is_compared_assertion_by_assertion
+FAIL  ho31::hx_c_prior_evidence::c2_the_dropped_malleability_check_is_reproduced_and_still_holds
+PASS  ho31::hx_c_prior_evidence::c2b_verify_and_verify_strict_are_one_behaviour_on_a_non_canonical_scalar
+FAIL  ho31::hx_c_prior_evidence::c3_the_dropped_relaxation_switch_census_is_reproduced_and_still_holds
+PASS  ho31::hx_c_prior_evidence::c3b_no_relaxation_switch_exists_in_product_source
+PASS  ho31::hx_c_prior_evidence::c4_the_section_6_enforcement_point_census_re_derived_on_candidate_3
+PASS  ho31::hx_c_prior_evidence::c5_a_guard_now_sits_between_the_allow_list_entry_and_the_gate_creation
+PASS  ho31::hx_c_prior_evidence::c6_provision_keeps_its_diagnosis_and_section_6_is_proved_at_the_sink
+      [ho31::hx_c_prior_evidence] test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+PASS  ho31::hx_d_acquisition_and_preservation::d10_the_exit_policy_point_is_single_and_unchanged
+PASS  ho31::hx_d_acquisition_and_preservation::d11_floors_are_monotonic_and_advance_only_from_verified_facts
+PASS  ho31::hx_d_acquisition_and_preservation::d12_break_glass_is_purely_local
+PASS  ho31::hx_d_acquisition_and_preservation::d1_the_acquisition_sink_refuses_a_privileged_capability_below_floor
+FAIL  ho31::hx_d_acquisition_and_preservation::d2_the_descriptor_decides_whether_section_6_is_consulted_at_all
+PASS  ho31::hx_d_acquisition_and_preservation::d3_tools_install_reaches_the_bullet_5_effect_without_the_sink
+PASS  ho31::hx_d_acquisition_and_preservation::d4_the_clearance_witness_is_not_a_capability_and_its_guarantee_stops_at_the_module_boundary
+PASS  ho31::hx_d_acquisition_and_preservation::d5_the_allow_list_is_four_entries_and_matches_exactly
+PASS  ho31::hx_d_acquisition_and_preservation::d6_five_admit_sites_and_five_install_kernel_sites
+PASS  ho31::hx_d_acquisition_and_preservation::d7_no_signing_capability_in_product_source
+PASS  ho31::hx_d_acquisition_and_preservation::d8_d0007_stays_independent_of_the_srr_verdicts
+PASS  ho31::hx_d_acquisition_and_preservation::d9_contract_v3_canonical_import_is_byte_identical_and_fails_closed
+      [ho31::hx_d_acquisition_and_preservation] test result: FAILED. 11 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+PASS  ho33::hv_a_derivation::a10_the_single_exemption_writes_only_into_the_snapshot_directory
+FAIL  ho33::hv_a_derivation::a1_the_derived_census_reproduces_independently_at_the_claimed_scale
+PASS  ho33::hv_a_derivation::a2_the_same_signatures_flag_the_pre_repair_source
+PASS  ho33::hv_a_derivation::a3_plausible_future_primitives_against_the_signatures
+PASS  ho33::hv_a_derivation::a4_the_bullet_6_primitive_the_census_cannot_see_is_refused_by_the_sink
+PASS  ho33::hv_a_derivation::a5_an_acceptance_marker_accepts_an_unenforced_implementation
+PASS  ho33::hv_a_derivation::a6_the_positive_controls_are_classified_by_what_they_actually_prove
+PASS  ho33::hv_a_derivation::a7_no_sink_entry_claims_an_absence_and_bullet_7_has_real_call_sites
+PASS  ho33::hv_a_derivation::a8_the_rustfmt_assumption_behind_the_splitter_is_untrue_but_costs_nothing_here
+PASS  ho33::hv_a_derivation::a9_the_cfg_test_cut_hides_no_section_6_primitive
+      [ho33::hv_a_derivation] test result: FAILED. 9 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+PASS  ho33::hv_b_bullet7::b1_a_below_floor_machine_does_not_read_as_current
+PASS  ho33::hv_b_bullet7::b2_an_unmarked_machine_is_not_marked_and_a_cleared_marking_lifts
+PASS  ho33::hv_b_bullet7::b3_a_machine_with_no_home_is_not_spuriously_marked
+PASS  ho33::hv_b_bullet7::b4_every_command_result_carries_the_marking_through_the_envelope
+PASS  ho33::hv_b_bullet7::b5_a_stdout_path_bypasses_the_command_result_envelope
+PASS  ho33::hv_b_bullet7::b6_the_non_json_surface_carries_the_marking
+PASS  ho33::hv_b_bullet7::b7_in_process_reporting_surfaces_are_covered_only_where_they_carry_it_themselves
+      [ho33::hv_b_bullet7] test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+PASS  ho33::hv_c_failclosed::c1_both_enforcement_points_fail_closed_on_an_undetermined_subject
+PASS  ho33::hv_c_failclosed::c2_the_section_5_allow_list_is_consulted_before_the_state_read
+PASS  ho33::hv_c_failclosed::c3_break_glass_can_still_be_exited_and_the_exit_policy_is_unchanged
+PASS  ho33::hv_c_failclosed::c4_an_unreadable_marking_is_treated_as_marked_and_can_still_be_cleared
+PASS  ho33::hv_c_failclosed::c5_the_state_carrying_guard_resolves_nothing_and_holds_under_the_same_input
+PASS  ho33::hv_c_failclosed::c6_the_fail_open_is_gone_and_resolution_is_byte_identical
+      [ho33::hv_c_failclosed] test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+PASS  ho33::hv_d_sinks_and_preservation::d1_a_human_gate_record_cannot_be_persisted_below_floor_however_it_was_minted
+PASS  ho33::hv_d_sinks_and_preservation::d2_the_cit_mutation_ops_reach_the_bullet_2_control
+PASS  ho33::hv_d_sinks_and_preservation::d3_gate_present_reaches_no_operation_guard_and_is_now_refused_at_the_sink
+PASS  ho33::hv_d_sinks_and_preservation::d4_both_acquisition_primitives_ask_section_6_unconditionally
+PASS  ho33::hv_d_sinks_and_preservation::d5_the_malleability_and_relaxation_properties_hold_in_held_out_material
+PASS  ho33::hv_d_sinks_and_preservation::d6_the_product_cannot_sign
+PASS  ho33::hv_d_sinks_and_preservation::d7_frozen_r1_preservation_still_holds
+PASS  ho33::hv_d_sinks_and_preservation::d8_break_glass_consults_no_network
+      [ho33::hv_d_sinks_and_preservation] test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+
+== AR-0033 hv_a::a1, size assertions PRINTED rather than asserted (labelled copy) ==
+  warning: function `a1_LABELLED_property_only_violations_must_be_empty` should have a snake case name
+  18 | fn a1_LABELLED_property_only_violations_must_be_empty() {
+     |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: convert the identifier to snake case: `a1_labelled_property_only_violations_must_be_empty`
+  test a1_LABELLED_property_only_violations_must_be_empty ... independent walk: 123 files, 2392 functions
+  SIZE (printed, not asserted): files=123 (AR-0033 pinned 84)
+  SIZE (printed, not asserted): functions=2392 (AR-0033 pinned 740)
+    human_gate_create: derived 50 / writers 45 / exempt 1 / violations 0
+    human_gate_approve: derived 1 / writers 1 / exempt 0 / violations 0
+    release_certification: derived 1 / writers 1 / exempt 0 / violations 0
+    trust_policy_mutation: derived 8 / writers 1 / exempt 0 / violations 0
+    privileged_plugin_acquisition: derived 13 / writers 3 / exempt 0 / violations 0
+    floor_lower_or_reset: derived 4 / writers 1 / exempt 0 / violations 0
+    present_below_floor_release_as_current: derived 1 / writers 1 / exempt 0 / violations 0
+  test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.16s
+
+== AR-0033 derive.py, ROOT retargeted at this candidate ==
+  --- indentation splitter, cfg(test) cut (the product's own): 123 files, 2392 functions
+  --- brace-depth splitter, cfg(test) cut (independent): 123 files, 2392 functions
+  --- indentation splitter, NO cfg(test) cut: 123 files, 2758 functions
+  (zero violations in every configuration => PASS; see /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/r1p/logs/derive-py.log)
+
+== regression (the candidate's own suites) ==
+  cargo test --lib: test result: ok. 276 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.73s

@@ -1,0 +1,682 @@
+{
+  "ok": true,
+  "command": "health",
+  "result": {
+    "audit": "",
+    "verdict": "HEALTHY",
+    "green": true,
+    "families": {
+      "schema_invariants": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "records_checked": 1,
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "graph_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "dangling": 0,
+          "edge_types": {},
+          "integrity": {
+            "checked_edges": 0,
+            "checked_records": 1,
+            "counts": {},
+            "ok": true
+          },
+          "lineage": {
+            "dangling_blocks": 0,
+            "misplaced_records": 0,
+            "stale_links": 0
+          },
+          "orphan_records": [
+            "AUD-0001"
+          ],
+          "orphans": 1,
+          "resolved_investigation_links": [],
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "index_freshness": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "added": [],
+          "checked": 163,
+          "removed": [],
+          "retrieval_profile": {
+            "decision": null,
+            "digest": "8df15571734ac50e6917bba3d1375f91734e2667b758738225a9fecc0bb03bfe",
+            "governed": true,
+            "state": "KERNEL_DEFAULT"
+          },
+          "stale": [],
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "path_map_compliance": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "hidden_oracle_material": [],
+          "secret_content_outside_secret_class": [],
+          "shadowed_rules": [],
+          "unmatched": 0,
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "concurrency_claims": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "claims": 0,
+          "expired": 0
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "secrets_sensitivity_indexing": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "excluded": 0,
+          "leaked_chunks": 0,
+          "secret_artifacts": 0,
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "fresh_agent_reconstruction": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "reads": 4,
+          "budget": 25,
+          "status_chars": 7746,
+          "next_action": "no runnable tasks: run readiness planning or discovery"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "audit_reproducibility": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "compared": [],
+          "mismatches": 0,
+          "note": "every executed DoubleRun check runs twice concurrently; every refreshed check is compared with its cached result under an identical key"
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "os_binding_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "unverified_by_binding": {},
+          "gates_unverified": 0,
+          "binding_key": "c89139f382eb4971",
+          "binding_status": {
+            "bound": false,
+            "provisioned": false,
+            "portable": false,
+            "sealing": {
+              "scope": "machine",
+              "machine_key_id": "c89139f382eb4971",
+              "alg": "hmac-sha256/t2-v1",
+              "honoured_on": "this machine only",
+              "reason": "this machine is unprovisioned (no Signed Release Root): its seals are machine-scope and are not honoured on any other machine (P2-ADJ-0002; OWNER-DECISION-P2-0002)"
+            },
+            "sealing_key_id": "c89139f382eb4971",
+            "sealing_key_is_authority_active_key": false,
+            "authority_id": null,
+            "authority_error": null
+          }
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "installation_authenticity": {
+        "ok": true,
+        "findings": 1,
+        "detail": {
+          "project_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/ac5probe",
+          "installed": true,
+          "machine_posture": "UNPROVISIONED",
+          "authenticity": "UNKNOWN",
+          "authenticity_established": false,
+          "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+          "bootstrap": {
+            "authenticity": "UNKNOWN",
+            "binary": {
+              "cli_version": "4.1.6",
+              "embedded_commit": "311eafaf6f123f5c9c4dfe146c4ce8e38f31f154",
+              "embedded_kernel_version": "4.1.6",
+              "embedded_payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5",
+              "executable_sha256": "fa3b2be2f287ec1d59bdd95e568c967b8c1b927736cbcf94680574ffcb93eb7f",
+              "gov_version": "4.1.6"
+            },
+            "decision": "OWNER-DECISION-P2-0002",
+            "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+            "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+            "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+          },
+          "integrity": {
+            "intact": true,
+            "protected_record": "MATCHED",
+            "basis": "byte-identical to the payload embedded in the running gov binary: the bootstrap baseline a machine with no trust anchor may hold (OWNER-DECISION-P2-0002); its authenticity is UNKNOWN"
+          },
+          "bound_release": {
+            "release_version": "4.1.6",
+            "sequence": 0,
+            "channel": "unspecified",
+            "payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5",
+            "kernel_manifest_hash": "a95e28fbeae9647ce208fad3b397d1f945c565e8c65012ab35ffd2524d5492ed",
+            "authenticity": "UNKNOWN",
+            "posture_at_install": "UNPROVISIONED",
+            "release_metadata_sha256": "",
+            "ingress": "init",
+            "at": "2026-09-20T23:26:50Z",
+            "admission": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+            "bootstrap": {
+              "authenticity": "UNKNOWN",
+              "binary": {
+                "cli_version": "4.1.6",
+                "embedded_commit": "311eafaf6f123f5c9c4dfe146c4ce8e38f31f154",
+                "embedded_kernel_version": "4.1.6",
+                "embedded_payload_hash": "348e1922945fbf91c730cc64e2257c13a73356d14dc9516d792264aaf9667bb5",
+                "executable_sha256": "fa3b2be2f287ec1d59bdd95e568c967b8c1b927736cbcf94680574ffcb93eb7f",
+                "gov_version": "4.1.6"
+              },
+              "decision": "OWNER-DECISION-P2-0002",
+              "mode": "BOOTSTRAP_EMBEDDED_PAYLOAD",
+              "presentation": "never presented as current, verified or certified; disclosed by doctor, audit and every command envelope",
+              "remedy": "provision a trust anchor (gov trust provision) and install a signed release"
+            }
+          },
+          "lock_version": "4.1.6",
+          "disclosure": "this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.6), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "index_content_coverage": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "check": "index_content_coverage",
+          "checked_artifacts": 163,
+          "comparison": "markdown headings by text on both sides (chunker 3)",
+          "complete": true,
+          "gaps": [],
+          "stale_skipped": 0,
+          "uncovered_lines": 0,
+          "unlisted_artefacts": 0,
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "task_contract_integrity": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "production_merge_violations": []
+        },
+        "status": "executed",
+        "cached_from": null
+      },
+      "upstream_change_propagation": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "invalidated_completed_tasks": [],
+          "retest_open_tasks": [],
+          "stale_reports": [],
+          "unpropagated": [],
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "authority_unambiguous": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "contradictions": 0,
+          "detail": [],
+          "unresolved": 0,
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "legacy_authority": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "legacy_mechanisms": 0,
+          "unmarked": [],
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "feature_readiness": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "active_features": 0,
+          "features": [],
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "unresolved_audit_findings": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "unresolved_critical": [],
+          "served_from_cache": "HR-20260920T232710523Z-7d679983"
+        },
+        "status": "reused",
+        "cached_from": "HR-20260920T232710523Z-7d679983"
+      },
+      "health_slos": {
+        "ok": true,
+        "findings": 0,
+        "detail": {
+          "slos": [
+            {
+              "id": "governance_suite_freshness",
+              "value": {
+                "current": true,
+                "green": "AUD-0001",
+                "changed_classes": []
+              },
+              "threshold": {
+                "rule": "the latest honoured green record is current (TEST_POLICY.green_record_currency: inputs_hash)"
+              },
+              "owner": "D021",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "product_test_health",
+              "value": null,
+              "threshold": {
+                "max_failing_families": 0
+              },
+              "owner": "product_test_health",
+              "applicable": false,
+              "crossed": false
+            },
+            {
+              "id": "retrieval_recall_at_k",
+              "value": {
+                "recall_at_k": 1.0,
+                "mrr": 1.0,
+                "queries": 12,
+                "latest_outcome_ok": true
+              },
+              "threshold": {
+                "value": 0.8,
+                "source": "MEMORY_POLICY.regression.min_recall_at_k"
+              },
+              "owner": "memory_retrieval_regression",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "stale_index_count",
+              "value": {
+                "stale_index_count": 0,
+                "manifest_present": true,
+                "age_hours": 0.005555555555555556
+              },
+              "threshold": {
+                "value": 0.0,
+                "source": "MEMORY_POLICY.freshness.max_stale_artifacts_on_task_close"
+              },
+              "owner": "index_freshness",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "orphan_graph_count",
+              "value": {
+                "orphan_graph_nodes": 0
+              },
+              "threshold": {
+                "value": 0.0,
+                "source": "framework/health/HEALTH_SLOS.yaml"
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "unresolved_contradictions",
+              "value": {
+                "unresolved_contradictions": 0,
+                "contradictions": 0,
+                "supersession_conflicts": 0,
+                "duplicate_ids": 0
+              },
+              "threshold": {
+                "max": 0
+              },
+              "owner": "authority_unambiguous",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "unresolved_human_gates",
+              "value": {
+                "open_gates": 0,
+                "oldest_open_hours": 0.0
+              },
+              "threshold": {
+                "max_open": {
+                  "value": 4.0,
+                  "source": "BUDGET_POLICY.defaults.max_parallel_agents"
+                },
+                "max_age_hours": 72.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "task_traceability",
+              "value": {
+                "task_traceability": 1.0,
+                "traced": 0,
+                "tasks": 0
+              },
+              "threshold": {
+                "min": 0.8,
+                "min_population": 3.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "feature_readiness_coverage",
+              "value": {
+                "feature_readiness_coverage": 1.0,
+                "active_features": 0
+              },
+              "threshold": {
+                "min_mean": 0.5,
+                "min_population": 1.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "context_packet_size",
+              "value": {
+                "largest_packet_chars": 0,
+                "packets": 0
+              },
+              "threshold": {
+                "value": 60000.0,
+                "source": "CONTEXT_POLICY.max_packet_chars"
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "tokens_per_completed_task",
+              "value": {
+                "tokens_per_completed_task": null,
+                "done_tasks": 0,
+                "done_tasks_with_token_accounting": 0
+              },
+              "threshold": {
+                "value": 2000000.0,
+                "source": "framework/health/HEALTH_SLOS.yaml"
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "first_pass_completion",
+              "value": {
+                "first_pass_completion_rate": 1.0,
+                "reports": 0,
+                "first_pass": 0
+              },
+              "threshold": {
+                "min": 0.5,
+                "min_population": 1.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "handoff_failure",
+              "value": {
+                "handoff_failure_rate": 0.0,
+                "returned": 0,
+                "failed": 0
+              },
+              "threshold": {
+                "max_rate": 0.5,
+                "min_population": 1.0
+              },
+              "owner": "health_slos",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "memory_rebuild_success",
+              "value": {
+                "latest_outcome_ok": true,
+                "latest_result": "HR-20260920T232710523Z-7d679983",
+                "detail": {
+                  "deep": false,
+                  "isolated_in_sandbox": true,
+                  "live": "62ce017fa19208025e5ea763e8ef839e475bb4ecb62316c250e2b724b6c8d707",
+                  "misplaced_os_state": [],
+                  "tracked": "62ce017fa19208025e5ea763e8ef839e475bb4ecb62316c250e2b724b6c8d707"
+                }
+              },
+              "threshold": {
+                "rule": "reproducible"
+              },
+              "owner": "recovery_rebuild",
+              "applicable": true,
+              "crossed": false
+            },
+            {
+              "id": "fresh_agent_reconstruction_success",
+              "value": {
+                "latest_outcome_ok": true,
+                "latest_result": "HR-20260920T232710523Z-7d679983",
+                "detail": null
+              },
+              "threshold": {
+                "policy": "CONTEXT_POLICY.fresh_agent_read_budget_files"
+              },
+              "owner": "fresh_agent_reconstruction",
+              "applicable": true,
+              "crossed": false
+            }
+          ],
+          "crossed": [],
+          "declarations": "framework/health/HEALTH_SLOS.yaml"
+        },
+        "status": "executed",
+        "cached_from": null
+      }
+    },
+    "findings": [
+      {
+        "severity": "low",
+        "family": "installation_authenticity",
+        "message": "installation authenticity not established (UNPROVISIONED machine; admission BOOTSTRAP_EMBEDDED_PAYLOAD): this installation is a BOOTSTRAP installation of the payload embedded in a gov binary (4.1.6), made on a machine with no provisioned Signed Release Root trust anchor (OWNER-DECISION-P2-0002). Its release authenticity is UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`).",
+        "path": "governance/framework.lock",
+        "id": "GF-e4e8527e36"
+      }
+    ],
+    "inputs_hash": "962e213dd8562d0c883458db2863e3c5316d31637366fc75117d8041507594e6",
+    "inputs": {
+      "adoption_evidence": "822b4f2f824a8cef92d00d93b123285ca02aec37923f713d10736da04fc9b0f7",
+      "archive": "c8b3f94a2e204e2e1db367526c950592fe19c5d031e085a95b6e0c4ba7f22a32",
+      "continuity_records": "0a283da5d4a3dcb101ac187cc7519957f7eee472469a06897f1f655298463d06",
+      "evidence_records": "5cbe895af14e22679cac0f53a23b257d33ae7dcbba836bedee4da84ad360e3c3",
+      "framework_lock": "ec825d8956deebb1822712344ad0a3fff8a93f8dde7a10b009ecba89c1d18b77",
+      "generated_other": "89e7b111b4ca25aefd6150b5e4f524c413ddf9131eb6467f5be4c6946e2114d6",
+      "governance_tests": "a335f97e9d82ccb2219bd59685c24ddde7e9909c5bd0d3184a4abbd905412a0f",
+      "index_manifest": "1b29b3c0bd133a1d966296b2ba73f47d767b9091d6c47e7ef2c8cc684349f8b9",
+      "kernel_migration": "317f172c9ade4146ab42ac94443020d12eceb522e920b632803562e29cbd6da3",
+      "kernel_other": "f35fafa89080a5ea69c95735827a6f1d19483e6648b5e1ccd401efe0a9861eca",
+      "kernel_policy": "fcef19c58c58141b173fa64128314623c38bcda21ed9536bfc12f58245f10f8c",
+      "kernel_schema": "11b23b1ee1f1ed4824599b2bbeaa96bcb4c6e3ce1b9d561ada170b6a87873a85",
+      "kernel_skills": "6e31eccb31d969cc41784e1edffb11f39d125f0330eb5cb58eef6c1b42b158dc",
+      "kernel_tools": "bb5cdf8ae61da2e79faa22c7973380d43c1aba74798535634c01ac09a48c51bf",
+      "machine_trust": "32a5fe6b3870ff330b8120cee37711ab60eed3ccac41cf2e51f14fb643f3111d",
+      "model_profile": "cecbab4a91d1462ae74f17c53bb122e3e4560052c0475686c16e0cc4014e5a21",
+      "overlay_other": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "path_map": "ac70595be890ce52d38ce33e871cc5eb39cb6a5e8f5897cdca6e7fd8d02c3fe3",
+      "project_policy": "4d2ed851e6fe60621e761e1cf85dc359f8ee19f403679f1e242a0bf48638baf9",
+      "project_skills": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "research_experiments": "e3a82313fb651f80fe10959ffda54e6937d14cded5277cba9a0f3284bf31790e",
+      "runtime_identity": "69eb723255c1592797bc49bb78b22fcb102b22617755205f07e56977486ae294",
+      "sensitivity": "bb49a7bf386eb9b893a8502c9cdf8bdeb6365179b8636a20b701209c0ef83445",
+      "source": "7e84e089eef46b0dab23f0957ca73c3ef7e935228e048c6b80e0c869dae82ae6",
+      "spec_architecture": "407c9a9a7c2cb386af840a067443872aaa21c6b0c7b056608080a1c66ec5417e",
+      "spec_decisions": "79bb9e8afb80ef8a7be8b8b929e26fb6d32843cc4fcc69ff4a43a7cecd60a3bf",
+      "spec_other": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "spec_requirements": "53826741b82fe2afe4ccca7b3049000dde1f1ef8f12ce064423da1b64a3b9862",
+      "spec_tasks": "396b721ce4bd79a0dd6163b5225d15385f87a8ce37a3be4b6c7b6713207a7d6b",
+      "t2_bindings": "f815690b32600e14fd6fc794bbefaf5bf5cb98db5e4c5b40608cacbf97fd8cc2",
+      "tools_plugins": "daeecef6ac1018372688707ebd332349b77a15b65b715c2b8c5d20d5df07512a"
+    },
+    "result_hash": "27c45eef9d022cd9b248e0ee6e268ed0b4d7ddbedc55e8aae7a08dc709883981",
+    "reproducible": true,
+    "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    },
+    "complete": true,
+    "suite_verdict": "HEALTHY",
+    "health_result": "HR-20260920T232714526Z-bcd86893",
+    "tier": "G1",
+    "summary": {
+      "executed": 7,
+      "reused": 32,
+      "not_evaluated": 0,
+      "complete": true,
+      "executed_checks": [
+        "concurrency_claims",
+        "fresh_agent_reconstruction",
+        "audit_reproducibility",
+        "os_binding_integrity",
+        "installation_authenticity",
+        "task_contract_integrity",
+        "health_slos"
+      ],
+      "reused_checks": [
+        "schema_invariants",
+        "graph_integrity",
+        "index_freshness",
+        "memory_retrieval_regression",
+        "authority_role_limits",
+        "mutation_scope",
+        "path_map_compliance",
+        "context_reproducibility",
+        "adapter_portability",
+        "skill_regression",
+        "command_contract_consistency",
+        "secrets_sensitivity_indexing",
+        "recovery_rebuild",
+        "product_traceability",
+        "policy_enforcement_coverage",
+        "policy_precedence",
+        "plugin_governance",
+        "product_test_health",
+        "human_gate_integrity",
+        "change_control_integrity",
+        "continuity_checkpoint_handoff",
+        "model_routing_integrity",
+        "lineage_orphans",
+        "contract_binding",
+        "index_content_coverage",
+        "upstream_change_propagation",
+        "authority_unambiguous",
+        "legacy_authority",
+        "feature_readiness",
+        "unresolved_audit_findings",
+        "research_experiment_data_lifecycle",
+        "artifact_flow_health"
+      ],
+      "not_evaluated_checks": []
+    },
+    "parallelism": {
+      "workers": 4,
+      "threads_used": [
+        "gov-health-0",
+        "gov-health-1",
+        "gov-health-2",
+        "gov-health-3"
+      ],
+      "process_id": 593937
+    },
+    "cache_mode": "use",
+    "state": "YELLOW",
+    "blocks": [],
+    "runtime": {
+      "cli_version": "4.1.6",
+      "runtime_version": "4.1.6",
+      "index_version": "4.1.5-idx5",
+      "binary_sha256": "fa3b2be2f287ec1d59bdd95e568c967b8c1b927736cbcf94680574ffcb93eb7f",
+      "binary_name": "gov"
+    },
+    "repository": {
+      "git_commit": "cafe3548a6acb5001f6098287ed0827a80594dc3",
+      "git_dirty_files": 5,
+      "content_key": "962e213dd8562d0c883458db2863e3c5316d31637366fc75117d8041507594e6",
+      "root_name": "ac5probe"
+    },
+    "record_binding": null,
+    "remediation": null,
+    "failure_memory": null,
+    "qualification": null
+  },
+  "session": "syn",
+  "release_trust": {
+    "surface": "health",
+    "below_floor": false,
+    "marking": null,
+    "presented_as": "UNAUTHENTICATED",
+    "section_6_bullet": 7,
+    "authenticity_established": false,
+    "disclosure": [
+      "BOOTSTRAP installation (OWNER-DECISION-P2-0002): the installed kernel is a gov binary's embedded payload, installed on a machine with no provisioned Signed Release Root trust anchor. Release authenticity UNKNOWN: it is not current, not verified and not certified (Contract v3:150). Provision a trust anchor (`gov trust provision --anchor <administrator root>`) and install a signed release (`gov kernel reinstall --source <signed release>`)."
+    ],
+    "detail": "gov kernel trust; gov trust status",
+    "basis": "BC-P2-36 (Contract v3:150; OWNER-DIRECTIVE-0004): an installation whose release authenticity is not established is never presented as current, verified or certified. OWNER-DECISION-0006 §6 bullet 7 was also asked and cleared: this machine carries no `DEGRADED — RECOVERY ONLY` marking."
+  }
+}

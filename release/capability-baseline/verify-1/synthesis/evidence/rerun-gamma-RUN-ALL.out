@@ -1,0 +1,301 @@
+worktree: /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-verify1-synthesis
+lab:      /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/syn/scratch/gamma
+gov 4.1.6
+
+==================== E1-E2-authority.sh ====================
+PASS  E1 b1: the kernel defines every authority level L0-L5 (got L0,L1,L2,L3,L4,L5)
+PASS  E1 b1: an L0 role is refused an L2 operation (create_task) (got AUTHORITY_DENIED)
+PASS  E1 b1: an L2 role performs the L2 operation (got TASK-)
+PASS  E1 b1: an L2 role is refused an L4 operation (resume_control) (got AUTHORITY_DENIED)
+PASS  E1 b2: no command declared above L0 succeeds for an L0 role (got 0)
+PASS  E1 b2: an invocation that declares no role receives no privileged authority (got ROLE_UNDECLARED)
+PASS  E1 b3: --role human manufactures no human authority (got HUMAN_ROLE_CLAIM)
+PASS  E1 b3: GOV_ROLE=human manufactures no human authority (got HUMAN_ROLE_CLAIM)
+PASS  E1 b3: an invented role id is refused, not honoured (got UNKNOWN_ROLE)
+PASS  E1 b3: a hand-edited gate answer is T2-unbound, unverified and not honoured (got BROKEN/UNVERIFIED/False)
+PASS  E1 b4: the independent audit/verification roles sit at read-only authority (got L0,L1,L0,L0,L0)
+PASS  E1 b4: the independent roles hold no repository-write permission class (got none)
+PASS  E2 b1-b6: every representative role class the contract lists exists in the kernel (got none)
+PASS  E2 b7: a project-specific role is refused and no governed role-extension point exists (gap) (got UNKNOWN_ROLE/absent)
+---- E1-E2-authority.sh: 14 passed, 0 failed
+
+==================== E3-E4-handoff-claims.sh ====================
+PASS  E3 b1-b7: every typed return element is REQUIRED by the worker-return contract (got none)
+PASS  E3: a typed handoff is created (HND-0001) (got HND-)
+PASS  E3: a typed return is accepted and recorded (got RETURNED)
+PASS  E3 b5: a lesson in the return becomes a governed PROVISIONAL lesson record (got yes)
+PASS  E3: every returned element persists in the governed record after the session ends (got all)
+PASS  E3/W5: a schema-valid worker return is accepted as the task-close receipt
+PASS  E4 b1: a task is claimed by a session (got yes)
+PASS  E4 b1/b3: a claim records its session, worktree and mutation scope (got branch,git_dir,head,scope,session_id,worktree)
+PASS  E4 b2: a second session's claim of a held task is refused (got TASK_CLAIMED)
+PASS  E4 b2: exactly one of 8 concurrent claimants wins (atomic claim) (got 1)
+PASS  E4 b3: every claim survives a full derived-memory rebuild (2 before, 2 after) (got 2)
+PASS  E4 b4: a governed stale-claim recovery operation exists and runs (claims sweep) (got ok)
+PASS  E4 b4: after governed recovery an expired claim no longer blocks the task (got yes)
+PASS  E4 b5: a task with a disjoint mutation scope is claimable in parallel (got yes)
+PASS  E4 b5: a parallel claim whose mutation scope overlaps a live claim is refused (got CLAIM_SCOPE_CONFLICT)
+PASS  E4 b5: a dependency-blocked task cannot be claimed even when its stored status says READY (got TASK_NOT_RUNNABLE)
+---- E3-E4-handoff-claims.sh: 16 passed, 0 failed
+
+==================== F1-F2-F5-skills-tools-layers.sh ====================
+PASS  F1 b1: every kernel skill carries a semantic version (12/none skills) (got none)
+PASS  F1 b1: no skill document carries or grants authority (got none)
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+    skills resolve as an L0 role -> 
+PASS  F1 b2: every skill defines applicability (roles, task classes), inputs, outputs and evidence scenarios (got none)
+PASS  F1 b3: skill validation scenarios are actually executed (7/14/7 executed/declared/deferred)
+PASS  F1 b3: a scenario the suite does not execute states why (no silent N/A) (got 0)
+PASS  F1 b3: a skill's version is bound to its content (content_sha256 recorded) (got present)
+FAIL  F1 b4: a lesson from ordinary work cannot propose a skill update through governed promotion (upstream prepare -> UPSTREAM_SCOPE; framework-change-proposal -> no-skill-target; no skill-promotion operation exists)
+    F2 registry fields: identity/version=yes;executable/transport=yes;permissions=yes;allowed roles=yes;allowed task classes=NO;sensitivity=yes;network scope=yes;filesystem scope=NO;health status=yes;provenance=yes;hash pin=yes;installation/approval status=yes
+PASS  F2: the registry records identity/version
+PASS  F2: the registry records executable/transport
+PASS  F2: the registry records permissions
+PASS  F2: the registry records allowed roles
+PASS  F2: the registry records health status
+PASS  F2: the registry records provenance
+PASS  F2: the registry records hash pin
+PASS  F2: the registry records installation/approval status
+FAIL  F2 b4: the registry records allowed ROLES but no task-class scoping, although TOOL_POLICY.mcp.scope declares role_and_task
+FAIL  F2 b5: the registry records no filesystem scope for a tool (only a repo_write boolean)
+    tools health rows: 14
+    MCP registry: MCP-REPO-001:planned
+PASS  F5 b1/b4: the deferred MCP transport is registered as 'planned', never silently substituted (D-0004)
+FAIL  F5 b4: doctor reports the deferred MCP layer rather than passing over it (expected 'reported', got 'silent')
+PASS  F5 b2: an A2A handoff always carries an explicit authority envelope (got present)
+PASS  F5 b3/b4: the Knowledge Fabric's retrieved material is kept separate from deterministic authority in a context packet (got separate)
+PASS  OD-P2-03: an installation demanding a class the role does not hold expands authority (True|privilege_escalation|gated) (got True)
+    envelope verdict before=True|privilege_escalation|gated after=False|-|gated
+FAIL  OD-P2-03 req 2: a hand edit of governance/project/TOOL_PERMISSIONS.yaml (no gov command, no change transaction, no gate) enlarged the authorised envelope: the same installation stopped being an authority expansion (True|privilege_escalation|gated -> False|-|gated)
+FAIL  OD-P2-03 req 2: the governance suite reports an out-of-band edit of an envelope source (expected 'detected', got 'silent')
+---- F1-F2-F5-skills-tools-layers.sh: 18 passed, 6 failed
+
+==================== F3-F4-tool-install-gate.sh ====================
+PASS  F3/F4 setup: an independent governed security review exists (RPT-0001)
+PASS  OD-P2-03 req 6: a non-elevated, reviewed, pinned, reversible install is NOT gated (got not_gated/none)
+PASS  F3: the non-gated installation completes (install/configure/register/health/continue) (got True)
+PASS  OD-P2-03 trigger 'privilege_escalation' gates: declares a permission class the role does not hold (triggers privilege_escalation, gate HDG-0002)
+PASS  OD-P2-03 trigger 'host_level_authority' gates: declares a host-authority class (triggers host_level_authority, gate HDG-0004)
+PASS  OD-P2-03 trigger 'new_secret_or_credential_access' gates: declares credential access (triggers new_secret_or_credential_access, gate HDG-0006)
+PASS  OD-P2-03 trigger 'privilege_escalation' gates: installs with sudo (triggers privilege_escalation, gate HDG-0007)
+PASS  OD-P2-03 trigger 'host_level_authority' gates: installs with a host package manager (triggers host_level_authority, gate HDG-0008)
+PASS  OD-P2-03 trigger 'host_level_authority' gates: installs globally (triggers host_level_authority, gate HDG-0009)
+PASS  OD-P2-03 trigger 'broader_filesystem_or_project_access' gates: reaches outside the project (triggers broader_filesystem_or_project_access, gate HDG-0010)
+PASS  OD-P2-03 trigger 'governance_or_security_policy_mutation' gates: declares a policy mutation (triggers governance_or_security_policy_mutation, gate HDG-0011)
+PASS  OD-P2-03 trigger 'new_or_unrestricted_network_trust_boundary' gates: fetches from an unallowlisted host (triggers new_or_unrestricted_network_trust_boundary, gate HDG-0012)
+PASS  OD-P2-03 trigger 'new_secret_or_credential_access' gates: declares a credential scope (triggers new_secret_or_credential_access, gate HDG-0013)
+PASS  OD-P2-03 trigger 'new_secret_or_credential_access' gates: reads a credential in its command (triggers new_secret_or_credential_access, gate HDG-0014)
+PASS  OD-P2-03: ordinary use of the approved registry registry.npmjs.org alone does not gate (got not_gated)
+FAIL  OD-P2-03 req 3: an install command that runs sudo inside 'sh -c' installed with NO human gate (branch=not_gated expands=False triggers=- undetermined=0)
+FAIL  OD-P2-03 req 3: an install command that copies /etc/shadow inside 'bash -lc' installed with NO human gate (branch=not_gated expands=False triggers=- undetermined=0)
+FAIL  OD-P2-03 req 3: an install command that runs os.system(sudo) in python3 -c installed with NO human gate (branch=not_gated expands=False triggers=- undetermined=0)
+FAIL  OD-P2-03 req 3: an install command that is an opaque build target installed with NO human gate (branch=not_gated expands=False triggers=- undetermined=0)
+FAIL  F4:431 / BC-P2-41: the review of TL-JQ 1.7.1 authorised a DIFFERENT installation (command swapped after review; branch=not_gated, executed outside any gate)
+PASS  OD-P2-03 req 4/5: the installed descriptor records decision, rule, branch, why, bound review and change transaction
+---- F3-F4-tool-install-gate.sh: 16 passed, 5 failed
+
+==================== F4-plugin-boundary.sh ====================
+PASS  F4 b1: a hand-declared, self-attested executable plugin does not run (PLUGIN_NOT_APPROVED)
+PASS  F4 b1: the tool-registry view reports the self-declared plugin as unregistered, not active/approved (got unregistered)
+    descriptor claims the OS records as ignored: approved_roles: ["all"] (a descriptor cannot widen role authorisation) | provenance (registration is proven by the OS-written plugin registry, not by the descriptor) | status: active
+PASS  F4 b2: the registry is OS state at governance/registry/plugin-registry.json (not a generated view)
+PASS  F4 b2: a hand-written registry entry is refused (PLUGIN_REGISTRATION_UNBOUND)
+PASS  F4 b5: registering an executable plugin raises a Human Decision Gate (HDG-0002) and a change transaction (CIT-0001)
+    registration gate=HDG-0002 change-transaction gate=HDG-0001
+    second register -> registered=True
+PASS  F4 b5: after the owner answered the gate raised for exactly this registration, the plugin runs (got RAN)
+    task TASK-0001 status after registration: IN_PROGRESS
+PASS  F4 b3: the registration binds descriptor, implementation, subject and gate (979b9934|3ae4421f|eb24caf0|HDG-0002)
+PASS  F4 b3: implementation_sha256 is bound (3ae4421f6c08…)
+PASS  F4 b4: a changed implementation byte fails closed (got PLUGIN_PIN_MISMATCH)
+PASS  F4 b4: an edited descriptor no longer matches its registration (PLUGIN_REGISTRY_MISMATCH)
+PASS  F4 b3 / BC-P2-40: a module-form plugin's implementation is pinned (cfb8b3bdef4e…)
+PASS  F4 b6: the descriptor's own provenance / security-review claim is recorded as ignored (approved_roles: ["all"] (a descriptor cannot widen role authorisation) | provenance (registration is proven by the OS-written plugin registry, not by the descriptor) | status: active)
+---- F4-plugin-boundary.sh: 12 passed, 0 failed
+
+==================== G1-G2-I1-I4-command-work.sh ====================
+PASS  G1 b1: a human expresses intent in words, without internal command syntax (got STATUS)
+    -> gov status
+PASS  G1 b2: the same words map deterministically to the same governed operation (got PAUSE/PAUSE)
+PASS  G1 b2: every routed command is a governed operation the command contract declares (got none)
+FAIL  G1 b2: 'do not approve this change' routes to APPROVE (negation inverted)
+PASS  G1 b2: the router never proposes a command that asserts a human identity on the agent's behalf (got no)
+    classify -> {"paths": ["spec/interfaces/API-7001.yaml"], "base": "HEAD", "materiality": {"declared_trigger": "", "derived_classes": ["interface_change"], "effective_triggers": ["interface_change"], "effective_trigger": "interface_change", "material": true, "label_understates": true, "requires_cit_in_task": [{"c
+PASS  G1 b3: a consequential edit is classified material by the OS, from the change itself (got material)
+    close of a task that made a material interface change -> MATERIAL_CHANGE_REQUIRES_CIT
+PASS  G1 b3: closing a task that made a material change without change control is refused (MATERIAL_CHANGE_REQUIRES_CIT)
+PASS  G2: control 'status' is executable
+PASS  G2: control 'continue' is executable
+PASS  G2: control 'audit' is executable
+PASS  G2: control 'decide' is executable (got 1)
+PASS  G2: emergency control 'pause' is executable
+PASS  G2: emergency control 'freeze-writes' is executable
+PASS  G2: emergency control 'cancel-agents' is executable
+PASS  G2: pause/freeze actually blocks governed writes (FROZEN)
+PASS  G2: the remedy for a freeze (resume) stays available while the freeze is in force (got ok)
+PASS  G2: control 'rollback' is executable
+PASS  I1: every one of the twenty-two task classes is in the governed task contract (got none)
+PASS  I1: all twenty-two classes can actually be created as tasks () (got 22)
+    tasks in the single DAG: 24
+PASS  I2 b3: 'dependencies' are enforced (a dependent task is not runnable) (got TASK_NOT_RUNNABLE)
+PASS  I2 b8: 'allowed/forbidden paths' are enforced at close (MUTATION_SCOPE_VIOLATION)
+PASS  I2 b4/b6: an absent required tool/data blocks the task (TASK_NOT_RUNNABLE)
+    routing for TASK-0027 -> {"tier": null, "reasoning": "high", "minimum_tier": "T3", "minimum_reasoning": null}
+PASS  I2 b7: a minimum model tier / reasoning is resolved for a task
+    declared generation sources: audit-finding,cit-effect,failed-tests,failure,health-failure,human-decision,lesson,memory-health,missing-skill,missing-tool,performance-regression,proposed-decision,research-discovery,retrieval-failure,security-finding,tool-failure
+PASS  I3: 'failed tests' is a declared generation source (failed-tests)
+PASS  I3: 'audit findings' is a declared generation source (audit-finding)
+PASS  I3: 'research discoveries' is a declared generation source (research-discovery)
+PASS  I3: 'human decisions' is a declared generation source (human-decision)
+PASS  I3: 'CIT effects' is a declared generation source (cit-effect)
+PASS  I3: 'lessons' is a declared generation source (lesson)
+PASS  I3: 'missing tools' is a declared generation source (missing-tool)
+PASS  I3: 'missing skills' is a declared generation source (missing-skill)
+PASS  I3: 'retrieval failures' is a declared generation source (retrieval-failure)
+PASS  I3: 'security findings' is a declared generation source (security-finding)
+PASS  I3: 'performance regressions' is a declared generation source (performance-regression)
+    task generate --dry-run -> ERR:TypeError
+    generated on first run: 0; on an immediate second run: 0
+PASS  I3: generation is idempotent (the same events do not generate the work twice) (got 0)
+PASS  I3: every generated task records its source, subject, dedup key and the evidence that caused it (got none)
+PASS  I3: a record-backed source (a lesson) generates work linked to the causing record
+    dag -> {"runnable": 8, "blocked": 24, "waiting_human": 0, "chain": 2, "per_feature": 1, "gatedeps": 0}
+PASS  I4 b1: the DAG reports a runnable set (8)
+PASS  I4 b1: the DAG reports a blocked set (24)
+PASS  I4 b4: the DAG reports a waiting-on-human set (0)
+PASS  I4 b2: the DAG reports a critical path (2 tasks)
+PASS  I4 b3: the DAG reports a per-feature path (1 features)
+PASS  I4 b4: a task whose authorising gate is unanswered is reported as waiting on the human (got waiting)
+PASS  I4 b5: an independent branch continues while another waits for human input (got yes)
+    continue -> {"status": "NEXT_WORK", "task": "TASK-0025", "task_contract": {"id": "TASK-0025", "type": "task", "title": "A", "status": "ACTIVE", "created": "2026-09-20", "objective": "A", "class": "documentation",
+---- G1-G2-I1-I4-command-work.sh: 43 passed, 1 failed
+
+==================== H1-H4-spec-readiness.sh ====================
+    data register (requirement) -> ok
+    data register (dataset)     -> ok
+    H1 node kinds: idea=yes;mission/outcomes=yes;users/actors=yes;journeys=yes;scenarios=yes;features/capabilities=yes;data=yes;requirements/NFRs=yes;research/experiments=yes;decisions=yes;algorithms/processing=yes;architecture=yes;interfaces=yes;security/performance/operations=yes;WBS/task DAG=yes;acceptance/test obligations=yes;live evidence=yes
+PASS  H1: every one of the seventeen lineage kinds is a governed, traceable record kind
+    artefact lineage FEAT-0001 -> ok
+PASS  H2: the readiness contract has exactly 26 dimensions (got 26)
+PASS  H2: exactly the five statuses the contract names (got BLOCKED,MISSING,N/A_WITH_REASON,PRESENT,PROVISIONAL)
+PASS  H2: readiness check evaluates all 26 cells for a feature (got 26)
+PASS  H2: a silent N/A is reported invalid, not honoured (got invalid)
+PASS  H2: an N/A with a reason is honoured as a distinct state (got N/A_WITH_REASON)
+    generated readiness work: {"performance_capacity": "performance", "integrations": "architecture", "recovery_fallback": "architecture", "user_actor": "specification", "representative_test_data": "data", "security_privacy": "security", "scenarios": "specification", "database_state_requirements": "architecture", "ux_interactions": "specification", "documentation_operations": "documentation", "success_criteria": "specification", "non_functional_requirements": "specification", "backend_service_behaviour": "architecture", "journey_workflow": "specification", "interface_api_event_contracts": "architecture", "functional_requirements": "specification", "processing_algorithm": "research", "inputs": "specification", "observability": "devops", "expected_outputs": "specification", "failure_criteria": "specification", "devops_runtime": "devops", "independent_acceptance_tests": "test-design", "data_model_schema": "data"}
+PASS  H3: a missing data_model_schema generates a data task (got data)
+PASS  H3: a missing performance_capacity generates a performance task (got performance)
+PASS  H3: a missing security_privacy generates a security task (got security)
+PASS  H3: a missing independent_acceptance_tests generates a test-design task (got test-design)
+PASS  H3: a generated independent-test gap task carries its designated role (got independent-test-designer)
+PASS  H3: a production implementation task is not runnable while pre-implementation cells are unsatisfied (stored status DRAFT) (got blocked)
+    H4 chain: feature=yes;scenario=yes;data_requirements=yes;test_datasets=yes;success_criteria=yes;failure_criteria=yes;tests=yes
+PASS  H4 b1: the chain carries feature
+PASS  H4 b1: the chain carries data_requirements
+PASS  H4 b1: the chain carries test_datasets
+PASS  H4 b1: the chain carries success_criteria
+PASS  H4 b1: the chain carries failure_criteria
+PASS  H4 b1: the chain carries tests
+    TD-0001 authorship: {"authorship": {"role": "data-author", "session": "main-hspec", "source": "os-recorded", "established": true, "detail": {"stamp": {"role": "data-author", "session": "main-hspec", "at": "2026-09-20T23:28:46Z", "operation": "data register"}, "t2": {"binding": "VERIFIED", "key_id": "4d86705cf99beecb", "scope": "machine", "operation": "data register", "at": "2026-09-20T23:28:46Z"}}}, "author_role": null, "author_session": null, "independent_of_test_author": null}
+PASS  H4 b2: the OS records the test-data author
+PASS  H4 b2: a dataset authored by the scenario's own end-to-end test author is refused (DATA_AUTHOR_NOT_INDEPENDENT)
+    scenario check codes: DATA_AUTHOR_IS_TEST_AUTHOR
+PASS  H4 b3: a test dataset without recorded provenance is refused (got DATA_PROVENANCE_REQUIRED)
+PASS  H4 b3: provenance is bound to content that exists, not merely asserted (got DATA_LOCATION_MISSING)
+    audit verdict with an H4 gap: UNHEALTHY; task.close -> 
+PASS  P2-ADJ-0003: an incomplete scenario chain degrades suite health (UNHEALTHY)
+---- H1-H4-spec-readiness.sh: 23 passed, 0 failed
+
+==================== FRESHNESS-invalidation.sh ====================
+    currency input classes: adoption_evidence,archive,continuity_records,evidence_records,framework_lock,generated_other,governance_tests,index_manifest,kernel_migration,kernel_other,kernel_policy,kernel_schema,kernel_skills,kernel_tools,machine_trust,model_profile,overlay_other,path_map,project_policy,project_skills,research_experiments,runtime_identity,sensitivity,source,spec_architecture,spec_decisions,spec_other,spec_requirements,spec_tasks,t2_bindings,tools_plugins
+PASS  AC-10: the evidence currency key covers the input class 'tools_plugins'
+PASS  AC-10: the evidence currency key covers the input class 'project_skills'
+PASS  AC-10: the evidence currency key covers the input class 'spec_tasks'
+PASS  AC-10: the evidence currency key covers the input class 'spec_requirements'
+PASS  AC-10: the evidence currency key covers the input class 'source'
+PASS  AC-10: the evidence currency key covers the input class 'index_manifest'
+PASS  AC-10: the evidence currency key covers the input class 'machine_trust'
+PASS  AC-10 (F1): adding a project skill changes the project_skills digest
+PASS  AC-10 (F1): and the whole evidence currency key
+PASS  AC-10 (F2/F4): a change to the tool/plugin registry changes its digest
+PASS  AC-10 (I1/I2/I4): a task-DAG change changes the spec_tasks digest
+PASS  AC-10 (H2/H3): feature/readiness state is carried by the spec_requirements class
+    green record AUD-0001 current=False
+    after a tool-registry edit: current=False changed=index_manifest,machine_trust,project_skills,spec_requirements,spec_tasks,tools_plugins
+PASS  AC-10: a green governance record stops being current once a relevant input changes (got False)
+PASS  AC-10: the OS names the changed input class that invalidated it
+    close of governance work on a stale green record -> INDEX_STALE
+PASS  AC-10: governance-affecting work is refused on an obsolete green record (INDEX_STALE)
+---- FRESHNESS-invalidation.sh: 15 passed, 0 failed
+
+==================== OD-P2-01-human-approval.sh ====================
+    gate HDG-0001 (rendered)
+PASS  BC-P2-10: 'gov decide --role human' does not record a human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: 'gov decide --by human' does not record a human approval (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: 'gov decide --by product-owner' does not record a human approval (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: 'gov decide --by 'the owner said yes in chat'' does not record a human approval (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: GOV_ROLE=human produces no human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: GOV_HUMAN_GATE_APPROVED=1 produces no human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: GOV_HUMAN=1 produces no human approval (AUTHORITY_DENIED)
+PASS  BC-P2-10: a forged answer document is refused (HUMAN_ANSWER_UNAUTHENTICATED)
+PASS  BC-P2-10: an agent may not resolve a gate outside HUMAN_GATE_POLICY.agent_resolvable_when (AUTHORITY_DENIED)
+    owner-signed answer -> {"answered_by_kind": "human", "answered_by": "gamma verification owner (test seed)", "option": "A", "decision": "D-0001"}
+PASS  L3: the owner's signed answer is accepted and recorded as a human answer
+PASS  L3: the recorded answer re-verifies against the machine's anchor at use time (got 1)
+PASS  D-0007 rule 2: a hand-written 'human_approved' decision does not authorise a change (USAGE)
+    plugin refusal -> {"code": "PLUGIN_NOT_APPROVED", "remedy": "gov plugins register --descriptor <file> (as an install-authority role); present the gate it raises; the product owner answers it through the human channel; register again"}
+PASS  L4 availability: the plugin refusal is typed and names its remedy
+PASS  L4 availability: the remedy the refusal names stays available while the block is in force (got available)
+PASS  L4 availability: an unapproved plugin blocks only plugin execution, not unrelated governed work (got ok)
+PASS  L4 availability: an unsatisfied readiness contract blocks the implementation task (got blocked)
+    readiness remedy tasks runnable: 26/26
+PASS  L4 availability: the readiness block's own remedy work stays runnable (26/26)
+---- OD-P2-01-human-approval.sh: 17 passed, 0 failed
+
+==================== PRIOR-FINDINGS-recheck.sh ====================
+    evidence map for the 19 gamma capabilities: 0/19 unmapped
+PASS  A0-E1-06: every gamma capability has an evidence class and at least one automated check
+    compiled contract view for E1: bullets
+PASS  A0-E1-06: the compiled contract view carries checklist bullets
+    independent-test gap task: TASK-0025
+    claim by backend-engineer -> ROLE_NOT_DESIGNATED ; by independent-test-designer -> ALLOWED
+PASS  A0-E1-05: a designated role binds who may claim the task it designates
+    second return by a role the handoff did not name -> ACCEPTED ; record now holds: 'SECOND return by a d'
+FAIL  A0-E3-01: a role the handoff did not name returned it, overwriting the earlier return ('SECOND return by a d')
+    continue in session B offered: None (session A holds TASK-0029)
+PASS  A0-E4-04: continue offers other work, not the task another session holds (None)
+    skills resolve (a class kernel skills cover) -> {"task": "TASK-0030", "resolved": [], "missing": [], "candidates_by_class_role": [{"id": "SKL-API-CONTRACT-REVIEW", "version": "1.0.0", "source": "kernel", "content_sha256": "acdca045bbba18e2a68ff495f6534ec7da86ae3f44cc40afc3716f967acb1236"}, {"id": "SKL-TASK-CLOSE", "version": "1.0.0", "source": "kernel", "content_sha256": "73cba03a7f239a12660660695fa7bdd2a7511d4a173aab817e896553d547f98d"}], "capability_gap": false}
+PASS  A0-F1-02 (defined half): every kernel skill defines inputs, outputs and evidence scenarios (got none)
+FAIL  A0-F1-02 (consumed half): skill resolution returns id, version, source and content hash only — a skill's declared inputs/outputs are still not consumed by any caller
+    elevated install raised installation gate=HDG-0002 change gate=HDG-0001
+    after the owner answered: installed=True gate=HDG-0001
+PASS  A0-F3-01: an install gate answered A leads to the installation
+    with PROJECT_POLICY.readiness.enforce_pre_implementation_cells=false the implementation task is blocked
+PASS  A0-H3-01: the project overlay cannot switch off pre-implementation readiness gating (task still blocked)
+    closing a task that wrote outside its scope -> MUTATION_SCOPE_VIOLATION
+PASS  A0-I2-02: a path outside the task's declared scope is refused at close (MUTATION_SCOPE_VIOLATION)
+    per_feature: {"": ["TASK-0027", "TASK-0028", "TASK-0029", "TASK-0030", "TASK-0031", "TASK-0033"], "FEAT-7001": ["TASK-0001", "TASK-0002", "TASK-0003", "TASK-0004", "TASK-0005", "TASK-0006", "TASK-0007", "TASK-0008", "TASK-0009", "TASK-0010", "TASK-0011", "TASK-0012", "TASK-0013", "TASK-0014", "TASK-0015", "TASK-
+PASS  A0-I4-01: the per-feature view respects dependency order (an end-to-end path)
+    handoff authority as recorded: {'allowed': ['**'], 'prohibited': []}
+FAIL  A0-F5-01: a handoff declared authority ('**') broader than its task's allowed paths
+---- PRIOR-FINDINGS-recheck.sh: 9 passed, 3 failed
+
+==================== V1-F4-01-executed-proof.sh ====================
+PASS  setup: an independent governed security review of TL-EXEC 1.0.0 exists (RPT-0001)
+    installed|gate|branch|expands|undetermined = True|none|not_gated|False|0
+FAIL  OD-P2-03: an ungated installation (True|none|not_gated|False|0) executed a command that wrote OUTSIDE the project root — the authority-expansion trigger 'broader_filesystem_or_project_access' was neither fired nor recorded as undetermined
+    (no --execute) installed|gate|branch = True|none|not_gated
+FAIL  OD-P2-03: a shell-wrapped health_check command wrote OUTSIDE the project root on an ungated installation WITHOUT --execute — --execute is not the boundary
+---- V1-F4-01-executed-proof.sh: 1 passed, 2 failed
+
+================================================================
+GAMMA HELD-OUT SUITE: 184 passed, 17 failed
+probes with failures: F1-F2-F5-skills-tools-layers.sh F3-F4-tool-install-gate.sh G1-G2-I1-I4-command-work.sh PRIOR-FINDINGS-recheck.sh V1-F4-01-executed-proof.sh
+A FAIL is a recorded observation of the candidate's behaviour, not a harness error:
+see 00-VERIFICATION-REPORT.md and findings.yaml for what each one falsifies.
