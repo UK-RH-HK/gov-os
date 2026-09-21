@@ -24,4 +24,40 @@ required_verdict_vocabulary:
 - PARTIAL
 - OWNER_DECISION_REQUIRED
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: REPAIRED_CLAIMED (worker said CLAIMED; recorded in the phase vocabulary)
+  branch_commit: 27dd443
+  base: a9bdab2 (WS-B, unmodified)
+  worker: native Claude subagent, claude-sonnet-5, high effort
+  bc_p2_53_design: 'The per-token scan already covered install_command, uninstall_command and health_check.command; the bug was that an effect wrapped inside one string element is invisible to a per-token
+    scan. Fix: unreadable_command_shape, a POSITIVE allowlist of command shapes the OS can read - (1) opaque_recipe_programs (make, rake, ninja, just...) matched on argv[0]''s basename, whose real recipe
+    lives in a file the OS never reads; (2) inline_code_flags (-c, -lc, -e, --eval, --command, /c, -encodedcommand...) matched against ANY argv token regardless of which program carries it. Matching the
+    flag vocabulary rather than the program name is the defensible part: an unlisted interpreter does not evade it, because that branch never looks at argv[0]. Anything unreadable is undetermined and therefore
+    gates.'
+  stated_limits: (a) a single-token payload with no flag and no whitespace (sh -c ./x, or a bare ./install.sh) is not specially detected - equivalent in risk to any opaque script the OS already could not
+    read, not a new hole; (b) no 'only flag it if the value looks shell-like' heuristic was added, deliberately, because that heuristic is itself a bypass (encode the payload without whitespace). Over-gating
+    fails toward a human gate, the direction OD-P2-03 requires.
+  oc_p2_04_reasoning: Both lists are project-editable TOOL_POLICY keys; removing entries only narrows what the OS can SEE and never grants authority, and OD-P2-03 requirement 3's fail-closed default (no
+    envelope in policy -> undetermined) covers a project deleting them outright. Both fall under the existing ENFORCEMENT_MAP wildcard TOOL_POLICY.installation_envelope.*, confirmed by repair::policy_enforcement_coverage_is_complete_and_honest
+    - no map edit needed.
+  eight_wrapper_results: 'sh -c, bash -lc, python3 -c and make install, each in install_command AND health_check.command: all 8 recorded undetermined, expands_authority true, branch gated, descriptor never
+    written - and proved by running with --execute and inspecting the filesystem that the marker each payload would have written outside the project root never appeared.'
+  bc_p2_41_binding: 'security_review_evidence binds after review_verdict succeeds: (1) EXACT when the report''s security_review names subject_sha256, which must equal review_subject(descriptor) - installation_subject
+    with security_review_record stripped, because a reviewer writes it before their own report id exists; (2) a single-use fallback when the review names no subject: once an installed descriptor has consumed
+    a review record, a second differently-shaped descriptor citing the same record is refused, reported honestly as subject_bound false rather than treated as equal strength.'
+  six_descriptor_result: one review bound to the base descriptor; the base installs not_gated; five variants (install command, permissions, pin, health check, combined) all refused with licence_and_security_satisfied.ok
+    false, each detail naming the difference.
+  regression_caught_in_iteration: its first attempt excluded security_review_record from the GLOBAL installation_subject(), which broke ws07::a_tool_installation_is_approved_only_for_that_installation (three
+    descriptors differing only in that field must be three separate gate subjects). Reverted; introduced review_subject() as a local helper used only inside the binding comparison, leaving gate and transaction
+    subject semantics unchanged. ws07 re-confirmed green.
+  negative_controls: 'non-elevated, reviewed, pinned, reversible install: installed true, branch not_gated, zero gates. curl -sS https://pypi.org/...: installed true, not_gated, network_endpoints [pypi.org]
+    - the new flag scan does not mistake curl''s own short flags for inline-code flags.'
+  checks_worker_reported: lib tools 4/4; r2_wsa 5/5 (new); ws07 9/9; r4_residual 14/14; r2_wsb 4/4; policy enforcement coverage pass; FULL certification suite single run 216 passed / 0 failed (1857 s);
+    workspace build 0 warnings before and after; clippy 37 pre-existing warnings, none in files this run touched.
+  honest_residual: the single-use fallback proves at most one installation ever benefits from an unbound-shaped review, but not that the one that wins is the one actually reviewed - whichever descriptor
+    installs first binds it. Closing it fully needs subject_sha256 made schema-required plus coordinated helper changes in r4_residual.rs and ws07.rs, both outside this run's ownership. Flagged, not hidden
+    - and a prime target for the adversarial reviewer.
+  checkpoint: release/orchestration/phase-2/telemetry/checkpoints/P2-AR-0066-wsA.checkpoint.json
+  orchestrator_checks: pending - targeted reproduction of the tool-install surface now, then the integrated tree is the authoritative run
+  status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone
