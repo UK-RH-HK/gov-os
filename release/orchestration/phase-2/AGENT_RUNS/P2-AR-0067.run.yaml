@@ -27,4 +27,38 @@ required_verdict_vocabulary:
 - READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION
 - PARTIAL
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED
+outcome:
+  verdict: READY_FOR_INDEPENDENT_CAPABILITY_VERIFICATION (claim only)
+  final_commit: 61e39b6
+  worker: native Claude subagent, claude-sonnet-5, high effort
+  merges:
+  - 7a544a9 wsA 27dd443 (BC-P2-53 + BC-P2-41, and BC-P2-45 carried in from WS-B a9bdab2, confirmed an ancestor via git merge-base --is-ancestor and so not merged separately)
+  - fb1f6eb wsC a945e1d (BC-P2-33)
+  - 8cbc9c6 wsD 8a0eccb (BC-P2-37)
+  - 9ea065f wsE cc85bd4 (BC-P2-32)
+  - 4994e7c wsF 6aa1cf8 (BC-P2-07 + per-project scheduler-guard rescoping)
+  - d34b1d4 wsG 52816e4 (two non-blocking items)
+  conflicts: only tests/certification/main.rs, four times, each branch adding one mod r2_wsX line at the same spot - resolved by union every time. .gitignore never actually conflicted. Verified pairwise
+    that no other product file overlaps across the six branches, so no behavioural reconciliation was needed.
+  changes_beyond_merges: 'one commit, 4a17740: additive edit to r4-ws01/evidence/mapping/owner-spec.yaml, then apply_owner_spec.py and gov contract compile regenerated the evidence map, the source lock
+    and the generated view. No product or Rust file changed beyond the merges.'
+  evidence_map: 'C8.1/C8.2/C8.3/C8.6 now name r2_wse::every_failure_class_has_a_governed_writer_and_follow_up_after_rebuild instead of the old KINDS-constant unit test, which narrowed to the three classes
+    it still uniquely evidences - WS-E''s own routed item. The other five new test files mapped against their workstream''s iteration-1 finding and the capability''s checklist text: r2_wsa -> F3.2/F3.4,
+    F4.1/F4.5/F4.6; r2_wsb -> E1.3, F4.5; r2_wsc -> S4.3/S4.7; r2_wsd -> S5.1/S5.2; r2_wsf -> O5.2/O5.6/O5.12; r2_wsg -> B3.3, D5.3/D5.4. 18 new test ids checked to name real functions, entered as 22 owner
+    entries across 9 capabilities. Verified structurally rather than textually: the 730-line raw diff is almost all YAML re-serialisation, so old and new were parsed and compared per capability - exactly
+    the 9 intended capabilities changed, every change purely additive, nothing removed, renamed or reassigned. Owner counts confirmed empirically against the pre-edit tree: owners 798 -> 820, test-kind
+    owners 477 -> 499 (+22 exactly); checklist items naming an owner unchanged at 587.'
+  checks_worker_reported:
+    build: PASS, 0 warnings
+    lib: 276 passed / 0 failed (8.5 s)
+    certification: 225 passed / 0 failed / 0 ignored, one genuine full run, no filters (2180 s)
+    contract_verify: CONTRACT_SOURCE_BOUND, run three times; the post-edit and post-suite runs byte-identical
+    count_reconciliation: 225 is 9 above WS-A's 216, accounted for exactly by wsC 1 + wsD 2 + wsE 1 + wsF 3 + wsG 2 = 9 new tests; no drop
+  integrated_identity:
+    product_code_digest: f08f991b3a8f403c164c73fa57e8feffd50871ffee8aef7a267a7c778392e2f2
+    governed_state_digest: 8c8ebe02da0926151a4bfc1f3a4437c31f2315c10255da3ad4a56ad451b6935d
+  unresolved: none; no item stopped, no cross-workstream contradiction, no new repair work opened
+  orchestrator_checks: pending - serialised build, lib, full certification and gov contract verify by the orchestrator, after proving on this exact tree that a failing test propagates a non-zero status
+    through the pipeline used for the authoritative run
+  status_note: builder claims only; acceptance is the formal independent Opus 5 verification's alone
