@@ -1,0 +1,21 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0071
+role: capability-repair (iteration 2, post-adversarial)
+workstream: reviewbind
+blocker_class: BC-P2-41
+finding: AR68-F2 residual
+adjudication: release/orchestration/phase-2/GATES/P2-ADJ-0004-SUBJECTLESS-REVIEW-FALLBACK.md
+objective: Retire the subjectless-review fallback so a review that names no installation subject authorises nothing, and update the two test constructions P2-ADJ-0004 authorises.
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+branch: phase2/repair-2-reviewbind
+base: phase2/repair-2-toolbind 9597d90
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING
