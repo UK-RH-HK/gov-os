@@ -22,4 +22,61 @@ required_verdict_vocabulary:
 - SURFACE_SOUND
 - RESIDUAL_DEFECTS
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: RESIDUAL_DEFECTS (2 HIGH, 1 LOW)
+  commit: 2ca0f77
+  reviewer: native Claude subagent, claude-opus-5, high effort; independent of every repair, the integration and both prior reviews
+  claims_reproduced: build 0 warnings; lib 280/0; certification 244 passed / 0 failed independently reproduced (2742 s); gov contract verify CONTRACT_SOURCE_BOUND with canonical import byte-identical; product_code_digest
+    b6f75daf...2929 and governed_state_digest 8c8ebe02...935d. The last two tests to report in the green run were the 33-shape regression guard and P2-ADJ-0006's own property test over the default; both
+    passed
+  answer_to_the_stopping_rule: 'the reviewer states it precisely: THE INVERSION ITSELF HOLDS - an arbitrary unnamed program gates, an unnamed wrapper in front of a listed program gates, unrecognised flag
+    forms, the chain past the walk''s bound, env -S, attached-flag code and stdin interpreters all gate, ordinary unlisted programs (git, npm, tar) gate, and a project cannot widen, narrow or empty the
+    policy lists (a project-level TOOL_POLICY is not read at all). What breaks is the PREMISE OF THE POSITIVE LIST for two of its six names. It says this is narrower and differently shaped than either prior
+    round and that it would not call it the same failure a fourth time, while still filing it as a residual because calling it new would let BC-P2-53 be marked closed with its property false.'
+  all_twelve_prior_findings: 'CLOSED, each by its own reproduction: AR68-F1..F6 and AR73-F1..F6. AR73-F6''s canonicalisation also covers a symlinked PARENT directory, which that finding never tested'
+  defects:
+  - id: AR75-F1
+    severity: HIGH
+    class: BC-P2-53
+    judgement: residual, new mechanism
+    statement: 'cp and curl are on plain_argument_programs on the stated ground that they have no code, wrapper or file-execution meaning of their own. Both do. Combined with the per-token scan treating
+      a token as a path ONLY if it contains a slash, six shapes install not_gated with expands_authority false, no triggers, nothing undetermined, zero gate records, a written descriptor and a marker in
+      the parent of the project root: cp writing through a symlink named for the parent (in install_command, in health_check.command, and behind an env wrapper), and curl -K reading the rest of its command
+      line from an ordinary project file (in both command fields). Five of the six contain no slash, no .. and no absolute path anywhere in argv. The health-check variants re-fire on every later gov tools
+      health. Controls confirm specificity: sudo make install gates on privilege_escalation, apt-get install gates on host_level_authority, cp with both operands inside the project installs ungated'
+    tension_stated_by_the_reviewer: 'cp and curl are listed BECAUSE the certification suite needs them; striking them gates conforming paths, and modelling their arguments re-opens enumeration. It offers
+      a third option it did not implement: resolve every non-flag token against the project root and refuse what escapes, instead of only reading tokens that contain a slash'
+  - id: AR75-F2
+    severity: HIGH
+    class: BC-P2-45 / OC-P2-04
+    judgement: residual of AR68-F3, new mechanism
+    statement: 'overlap_is_no_less_restrictive deliberately does not compare class, but class is authority-bearing: tasks::contract_generated drops generated and derived paths from the observed-mutation
+      set before the declaration and scope checks. Appending a rule at product/*.yaml with class derived - equal or STRICTER on every compared dimension - makes an undeclared, out-of-scope write close cleanly:
+      gov task close goes from refused MUTATION_SCOPE_VIOLATION to accepted, observed mutations from one to none, and policy overrides, D027, the policy_precedence family and path_map_compliance all stay
+      clean. globprobe confirms the check SAW the overlap and passed the rule, so this is not a pattern miss'
+  - id: AR75-F3
+    severity: LOW
+    class: BC-P2-45 / OC-P2-04
+    judgement: the second pair of eyes P2-AR-0074 asked for
+    statement: 'an attacker can claim class secret freely, and it does widen mutation - archive restricted to allowed, and governance/kernel prohibited to allowed - with nothing reported. THE EXCLUSION''S
+      STATED JUSTIFICATION IS FACTUALLY WRONG: decide applies a later secret rule in full, so the appended rule''s own mutation wins; the latch does not leave mutation to another rule. Not exploitable today
+      because the only consumer of decide().mutation is pre-empted by the secret-sensitivity branch above it (measured: the install still gates, on a different trigger) and the two prohibited checks read
+      the raw rules array. Declaring secret costs the attacker every other dimension, and an explicit export override on the same rule is still refused. LOW, but the code comment''s reasoning must not be
+      carried forward as written'
+  witness_gap_measured: 'globprobe fuzz over 2069 candidates x 38 kernel rules (78622 pairs, 776-path corpus): 272 real overlaps missed across 124 candidates and five kernel rules. Argued inert, but for
+    a DIFFERENT reason than the repair gave: the 87 misses against the secret rule cannot matter because the procedure deliberately skips secret kernel rules anyway, and all 185 non-secret misses have a
+    candidate the procedure does see overlapping .governance-state/**, which by measured decided output dominates all four missed non-secret rules on every compared dimension. The reviewer notes governance/kernel
+    is NOT the saturating rule, so the argument must be made against .governance-state. Bounded search, strong evidence, not a proof'
+  consumers: indexing (all four flags), retrieval, export and the tool-install envelope are all back at the kernel floor for every refused pattern, with per-dimension globprobe evidence; explicit export
+    widening is refused on any candidate including a secret one. The one new consumer this review adds is tasks::contract_generated, reached through class
+  negative_controls: 'all pass, and ordinary acquisition still works. Conforming install ungated with zero gate records; allowlisted network alone ungated; gov init on brownfield succeeds with 42 rules
+    and refuses none; restrictive append honoured; ungoverned-pattern declaration honoured; exact widening refused and repaired in place. Across all 80 command rows every gated row wrote nothing with exactly
+    one gate record and every ungated row had zero - nothing wrote before gating. Nine further pin spellings held. NO defect against OD-P2-03 requirement 6: the only cost is the disclosed one, an unlisted
+    package manager gating'
+  observations_not_filed: the empty-argv branch is the one remaining fail-open answer but is inert; uppercase or .exe spellings of a listed name would run on a case-insensitive mount or Windows, unproven
+    here; a tool hand-added to the kernel registry executes unclassified but the tamper is caught loudly by doctor and audit; gov tools install without --execute still writes the descriptor, a reporting
+    oddity
+  lab_discipline: disposable projects each with their own XDG_STATE_HOME, the machine's shared state never touched; rm denied and nothing deleted - it even patched both prior reviews' probe files so their
+    unlink calls move files aside instead
+  orchestrator_disposition: 'P2-ADJ-0006''s stopping rule triggered: escalated to the owner with a decision package rather than a fourth round'
