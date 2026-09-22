@@ -25,7 +25,7 @@ required_verdict_vocabulary:
 status: COMPLETED_AWAITING_INTEGRATION
 outcome:
   verdict: RESIDUAL_DEFECTS
-  commit: e5438033e1e5ca9400eaadcb6f099e7056c88402
+  commit: 24940407662b4e89636f3593c21fa0a8a9555c00 (supersedes e5438033; two commits, both the reviewer's, nothing outside its own evidence directory and run report)
   reviewer: native Claude subagent, claude-opus-5, high effort; independent of every repair, the integration and the first review
   ar68_disposition: 'ALL SIX CLOSED by their own reproductions, re-run with a bound review: F1 33/33 shapes gate or refuse with no markers (the two that previously gated only incidentally now gate with
     a non-empty undetermined); F2 a subjectless review authorises nothing and the bound form admits exactly the reviewed descriptor, all five variants gated including the pinned_files variant; F3 its reproduction
@@ -85,8 +85,6 @@ outcome:
     appears in the file, and r2_toolbind enumerates the previous reviewer''s 33 shapes verbatim. In both iterations the new tests encode the LAST reviewer''s attack list, so each round closes the previous
     round''s reproductions and leaves the class open.'
   could_not_establish:
-  - the 235/0 certification total (197 ok / 0 failed when it stopped; the two files that matter were complete and green) - it takes the same position the first reviewer did and leaves the total as the orchestrator's
-    claim
   - Windows-only flag spellings on a Linux host; by inspection the attached-value form is the normal PowerShell convention, so AR73-F1's mechanism applies
   - whether export is reachable through any consumer other than upstream.rs, and whether an agent_read enforcement point exists that it missed - if so AR73-F3 rises
   - a deterministic TOCTOU between the last pin check and process spawn - the window exists by construction but needs a concurrent writer, which it declined to manufacture
@@ -95,8 +93,18 @@ outcome:
   - its gate-record helper scanned the wrong directories so its zero-gate counts were vacuous; it re-derived every count by direct filesystem scan and the corrected result is stronger
   - its first hand-edited-review attack changed only a comment and was inconclusive; redone with semantic edits, the property holds, and it records that a pure re-serialisation still verifies because the
     binding is over canonical parsed content rather than raw bytes - defensible, recorded as an observation
+  - 'a third, volunteered correction: mid-run it wrote that r2_toolbind had reported complete and green, inferring this from ten log lines while the file''s flagship 33-shape test had not yet reported -
+    it was the last test in the suite to finish, and it passed, so the conclusion held but the evidence for it at the time did not. The reviewer flagged this itself as the same failure mode it criticised
+    in the repairs: asserting a property from a proxy signal rather than the thing itself'
+  - negative controls re-run after the suite finished and reproduced byte-identically
   new_tooling: globprobe, a read-only external crate over the runtime's public API giving per-path production decisions across every authority dimension and a direct overlap oracle - the 'classify this
     path' observable the first reviewer recorded as missing, and what turned AR73-F3 from a hypothesis into a measurement
   reviewer_suggestion: 'offered as observation, implemented not at all: the classifier is fail-closed in structure and fail-open in default; inverting the default - unreadable unless the effective program
     is on a named list whose whole argv shape the OS can read - makes the bound, the wrapper list and the interpreter list all fail safely, and the conforming path already works'
   orchestrator_disposition: see P2-ADJ-0006
+  independently_confirmed: 'all five of the tree''s claims are now reproduced by the reviewer itself: build 0 warnings, cargo test --lib 280/0, cargo test --test certification 235 passed / 0 failed (1791
+    s, default parallelism), gov contract verify CONTRACT_SOURCE_BOUND, and product_code_digest 86dbdfdb...8a14. The certification total was the one claim the first review left unestablished; it is no longer
+    outstanding.'
+  structural_finding_carried_forward: 'stated plainly by the reviewer now the count is confirmed: 235/0 and three HIGH defects are both true at once. r2_f3''s attack test appends exactly the previous reviewer''s
+    spelling with no /-free pattern anywhere in the file, and r2_toolbind enumerates the previous reviewer''s 33 shapes verbatim. Both are good tests, both reproduce green, and their scope is the last reviewer''s
+    attack list - so a green suite is not evidence that the class is closed. This is the finding P2-ADJ-0006 acts on.'
