@@ -1,0 +1,7 @@
+	User time (seconds): 171.07
+	System time (seconds): 35.91
+	Percent of CPU this job got: 527%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:39.27
+	Maximum resident set size (kbytes): 1760740
+	Voluntary context switches: 68310
+	Involuntary context switches: 17727

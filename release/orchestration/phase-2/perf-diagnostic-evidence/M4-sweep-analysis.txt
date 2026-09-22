@@ -1,0 +1,90 @@
+====================================================================================================
+FAMILIES: 13   TESTS SEEN: 133
+SUM of family wall (serial-within-family):     5925.2 s
+SUM of family CPU  (user+sys, incl. gov/git subprocesses):   11722.7 s
+   of which SYSTEM time (kernel/IO):            382.4 s  = 3.3% of CPU
+   of which USER   time (compute in gov):     11340.3 s  = 96.7% of CPU
+aggregate cpu/wall across sweep:            1.98
+blocks written (512B units):                28,958,816 = 14.8 GB
+NON-ZERO EXIT: none
+====================================================================================================
+
+### PER-FAMILY (serial within family; families run 6-at-a-time) ###
+family               tests    wall_s     cpu_s cpu/wall  sys%  s/test   ld_a
+repair                  20     901.0    1845.1     2.05   3.1    45.1  14.68
+ws04r3                   9     681.2    1169.7     1.72   2.4    75.7  14.50
+repair2                  9     640.5    1251.5     1.95   2.8    71.2  18.33
+migration                4     595.5    1001.7     1.68   1.8   148.9  18.96
+ws05r3                  10     584.0    1107.3     1.90   2.7    58.4  19.66
+ws03_r3                 10     453.1     957.5     2.11   3.6    45.3  14.52
+ws04r2                   5     426.6     705.9     1.66   2.4    85.3  14.50
+ws03                    15     386.1     824.3     2.13   3.9    25.7  11.91
+ws08_r2                 10     298.0     892.0     2.99   7.4    29.8  14.96
+repair3                  5     295.8     558.5     1.89   2.4    59.2  17.29
+ws05                     7     277.6     523.4     1.89   3.1    39.7  13.80
+ws06r3                   8     204.7     450.6     2.20   3.8    25.6  14.96
+srr                     21     181.1     435.2     2.40   4.2     8.6  12.02
+
+### 30 SLOWEST INDIVIDUAL TESTS (per-test timing sound: --test-threads=1) ###
+    dur_s  outcome test
+    305.3  ok      repair2::plugins_are_governed_capabilities_not_arbitrary_commands
+    237.3  ok      ws04r2::checkpoint_and_handoff_continuity
+    223.0  ok      migration::path_migration_with_rollback_and_memory_rebuild
+    208.5  ok      ws04r3::every_cit_write_is_sealed_and_a_hand_edit_stays_broken
+    194.3  ok      ws03_r3::os_written_facts_are_honoured_on_the_owners_other_provisioned_machines_and_nowhere_else
+    166.3  ok      repair3::plugin_descriptors_can_never_authorise_themselves
+    163.9  ok      migration::adoption_independence_is_bound_to_declared_roles_and_approved_artefacts
+    151.3  ok      ws05r3::material_changes_inside_a_task_complete_only_through_change_control
+    141.9  ok      repair::destructive_migration_requires_answered_gate_record
+    138.2  ok      ws04r3::a_governed_change_reseals_only_what_the_os_may_seal
+    130.1  ok      migration::adoption_dependency_proof_citations_and_rerun_identity
+    113.4  ok      ws04r2::upstream_change_reaches_completed_work
+    100.1  ok      repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger
+     99.5  ok      ws04r3::cit_e_rolls_back_relationships_it_introduces_but_not_their_consequences
+     97.6  ok      repair2::cit_approval_derives_only_from_an_answered_gate
+     95.8  ok      repair::task_close_enforces_mutation_scope
+     87.4  ok      ws05r3::stale_inputs_are_seen_propagated_at_claim_and_cleared_only_by_retest_evidence
+     86.4  ok      ws08_r2::below_floor_restoration_by_update_still_completes_with_the_g5_post_install_suite
+     85.3  ok      repair::smaller_findings_regressions
+     83.4  ok      repair::plugin_host_large_response_through_cli
+     82.4  ok      ws05r3::a_cit_effect_on_completed_work_generates_one_linked_revalidation_task
+     78.5  ok      migration::command_tests_execute_only_governed_commands_for_permitted_roles
+     77.9  ok      ws05::close_observes_os_written_state_no_os_operation_produced
+     73.6  ok      repair::reranker_hook_invoked_and_never_silently_skipped
+     70.4  ok      ws04r3::direct_propagation_is_a_sealed_system_transaction_that_covers_its_marks
+     64.0  ok      ws03_r3::the_t2_audit_covers_the_plugin_registry
+     59.0  ok      ws05r3::a_security_finding_generates_remediation_that_stays_available_under_its_block
+     58.9  ok      repair2::project_policy_cannot_weaken_constitutional_floors
+     58.1  ok      repair3::constitutional_floors_require_a_verified_kernel
+     53.5  ok      ws05::gates_decide_runnability_and_completion
+
+### DISTRIBUTION ###
+n=133  sum=5925.1s  mean=44.5s  median=26.7s
+min=0.00s  p90=99.5s  max=305.3s
+  tests >=    1s:  123  ( 92.5% of tests)    5922.5s = 100.0% of total test time
+  tests >=    5s:  119  ( 89.5% of tests)    5915.6s =  99.8% of total test time
+  tests >=   10s:  117  ( 88.0% of tests)    5897.3s =  99.5% of total test time
+  tests >=   30s:   62  ( 46.6% of tests)    4835.8s =  81.6% of total test time
+  tests >=   60s:   26  ( 19.5% of tests)    3355.6s =  56.6% of total test time
+  tests >=  120s:   11  (  8.3% of tests)    2060.1s =  34.8% of total test time
+  >>> the slowest 21 tests (15.8%) hold 50% of all test time
+  >>> the slowest 59 tests (44.4%) hold 80% of all test time
+
+### PER-PROCESS FIXED SETUP (first test in each family absorbs the lazy OnceLock fixtures) ###
+family               first_test_s  median_rest_s   delta_s  first test
+repair                       35.9           30.8       5.1  repair::authority_levels_are_enforced_on_executable_pat
+ws04r3                       35.2           60.2     -24.9  ws04r3::a_cit_declined_during_another_tasks_claim_does_
+repair2                      97.6           29.1      68.4  repair2::cit_approval_derives_only_from_an_answered_gat
+migration                   130.1          163.9     -33.7  migration::adoption_dependency_proof_citations_and_reru
+ws05r3                       82.4           45.6      36.8  ws05r3::a_cit_effect_on_completed_work_generates_one_li
+ws03_r3                       9.8           31.2     -21.4  ws03_r3::a_t2_binding_authority_is_admitted_only_from_t
+ws04r2                      237.3           28.2     209.1  ws04r2::checkpoint_and_handoff_continuity ... ok
+ws03                         19.1           23.5      -4.4  ws03::a_policy_exception_needs_a_decision_recorded_by_a
+ws08_r2                      20.8           26.0      -5.2  ws08_r2::a_consistent_rewrite_of_a_bootstrap_installati
+repair3                      58.1           34.5      23.6  repair3::constitutional_floors_require_a_verified_kerne
+ws05                         77.9           32.8      45.0  ws05::close_observes_os_written_state_no_os_operation_p
+ws06r3                       32.2           25.3       6.8  ws06r3::a_change_transaction_commits_while_the_tree_hol
+srr                          19.1           12.0       7.1  srr::a_privileged_capability_acquired_from_outside_need
+
+median estimated per-process fixed setup cost: 6.8 s
+(paid once per test PROCESS: sharding into N processes pays it N times)

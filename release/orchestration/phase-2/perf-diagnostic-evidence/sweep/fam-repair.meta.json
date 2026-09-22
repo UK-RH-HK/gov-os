@@ -1,0 +1,32 @@
+{
+  "label": "fam-repair",
+  "cmd": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-perf-diag/target/debug/deps/certification-f1bd0746f039ec4b",
+    "--test-threads=1",
+    "repair::"
+  ],
+  "started_at_utc": "2026-09-22T11:38:28Z",
+  "exit_code": 0,
+  "wall_s": 901.017,
+  "cpu_user_s": 1787.867,
+  "cpu_sys_s": 57.186,
+  "cpu_total_s": 1845.053,
+  "cpu_per_wall": 2.048,
+  "max_rss_kb": 232620,
+  "involuntary_ctx_switches": 102222,
+  "voluntary_ctx_switches": 160663,
+  "block_input_ops": 17536,
+  "block_output_ops": 4932488,
+  "load_before": "2.93 2.18 1.52 5/1350 2650602",
+  "load_after": "14.68 15.07 10.22 15/1382 2715278",
+  "declared_tests": 20,
+  "result": {
+    "verdict": "ok",
+    "passed": 20,
+    "failed": 0,
+    "ignored": 0
+  },
+  "per_test_timing_sound": true,
+  "n_test_lines": 20,
+  "sum_test_durations_s": 901.011
+}

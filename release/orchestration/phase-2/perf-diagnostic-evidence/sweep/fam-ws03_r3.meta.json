@@ -1,0 +1,32 @@
+{
+  "label": "fam-ws03_r3",
+  "cmd": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-perf-diag/target/debug/deps/certification-f1bd0746f039ec4b",
+    "--test-threads=1",
+    "ws03_r3::"
+  ],
+  "started_at_utc": "2026-09-22T11:49:02Z",
+  "exit_code": 0,
+  "wall_s": 453.107,
+  "cpu_user_s": 923.05,
+  "cpu_sys_s": 34.5,
+  "cpu_total_s": 957.55,
+  "cpu_per_wall": 2.113,
+  "max_rss_kb": 234304,
+  "involuntary_ctx_switches": 50977,
+  "voluntary_ctx_switches": 71946,
+  "block_input_ops": 10512,
+  "block_output_ops": 2421224,
+  "load_before": "19.66 14.46 8.06 11/1393 2694066",
+  "load_after": "14.52 14.74 10.75 9/1385 2723675",
+  "declared_tests": 10,
+  "result": {
+    "verdict": "ok",
+    "passed": 10,
+    "failed": 0,
+    "ignored": 0
+  },
+  "per_test_timing_sound": true,
+  "n_test_lines": 10,
+  "sum_test_durations_s": 453.101
+}

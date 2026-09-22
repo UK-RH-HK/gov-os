@@ -1,0 +1,23 @@
+LOAD ATTRIBUTION TIMELINE (P2-PERF-0001). 20 logical cores, i7-12700F, 16 GB, WSL2 kernel
+6.6.87.2-microsoft-standard-WSL2, all paths on /dev/sdd ext4 inside the WSL2 VM (NOT 9p /mnt/c).
+
+11:16  load 0.29  -- idle. Machine context recorded.
+11:20-11:21  COLD BUILD (M1). load_before 0.30, load_after 2.90. CLEAN measurement.
+11:21-11:22  warm/incremental builds (M2,M3). load 1.3-1.6. CLEAN.
+11:23-11:29  brownfield ALONE (M4). load_before 0.86, load_after 2.41. CLEAN -- this is the
+             uncontended reference point for the whole report: 318.457 s for 1 test.
+11:38:28  SWEEP START (38 families, pool of 6, --test-threads=1 within each family).
+11:42  srr done at load 12.02   } contended ONLY by my own 6-family pool
+11:46  ws03 done at load 11.91  }
+11:47-11:51  I ran the Q5 cross-worktree build experiment, pushing load to 17-20.
+             repair3 / ws05r3 / migration / repair2 completed at load 17.3-19.7 and are
+             therefore INFLATED BY MY OWN BUILD. Labelled in the results table.
+11:52  ws05 done at load 13.80.
+~11:54  THE CONCURRENT REPAIR WORKER in wt/p2-r3-boundary BECAME ACTIVE (130% CPU, PID 2713213).
+             Every family completing after this point carries its contention as well as the pool's.
+             Recorded because the brief requires it: this orchestration was already burned once by
+             reading contention as defects (a 203/7 result that was really a green tree).
+
+Observed per-family-process CPU while the pool ran: 113-216% (mean ~2.0 cores per family process).
+This is why a pool of 6 produces load ~12-16: the `gov` subprocesses are internally multi-threaded,
+so one "serial" family still occupies ~2 cores.

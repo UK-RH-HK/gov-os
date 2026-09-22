@@ -1,0 +1,16 @@
+duration_s	outcome	test
+50.91	ok	ws03::human_answers_come_only_from_the_owner_signed_channel
+44.312	ok	ws03::a_project_on_a_shipped_older_kernel_keeps_descriptive_overlay_keys_and_every_floor
+39.434	ok	ws03::g0_freeze_and_pause_refuse_every_write_outside_the_listed_recovery_operations
+37.71	ok	ws03::cit_approval_consumes_only_honoured_gate_answers
+33.262	ok	ws03::project_overlays_may_raise_floors_but_never_lower_them
+28.432	ok	ws03::the_standalone_human_gate_anchor_is_off_and_an_unprovisioned_machine_refuses_human_answers
+25.24	ok	ws03::agent_resolution_needs_an_assessed_and_independent_assessment
+21.852	ok	ws03::round_two_call_sites_use_the_declared_role_and_typed_refusals
+21.29	ok	ws03::blocked_work_is_released_only_by_an_authorising_answer
+19.123	ok	ws03::a_policy_exception_needs_a_decision_recorded_by_an_answered_gate
+18.827	ok	ws03::an_undeclared_invocation_carries_no_privileged_authority_anywhere
+15.889	ok	ws03::the_decision_package_is_enforced
+15.278	ok	ws03::presentation_is_recorded_only_from_an_owner_signed_receipt
+14.57	ok	ws03::hand_written_gate_and_decision_records_are_not_honoured
+0.001	ok	ws03::every_cli_command_label_is_classified_by_g0

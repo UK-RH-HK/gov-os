@@ -1,0 +1,43 @@
+M12: hypotheses TESTED AND REJECTED (each with the number that kills it)
+
+1. "gov process spawn of a 190 MB debug binary is expensive"
+   MEASURED: 10 x `gov --help` = 0.0395 s total => 3.9 ms per spawn. Not material.
+
+2. "gov re-hashes its own 190 MB executable on every invocation"
+   MEASURED: sha256 over the 190,754,832-byte debug binary = 0.106 s (3 runs, load 16).
+   It is additionally memoised per process in a OnceLock (currency.rs runtime_identity)
+   AND cached on disk in ~/.cache/gov/runtime-digests.json keyed by exe path + stat identity.
+   Worst case 0.106 s once per gov process. Not material.
+   NOTE the disk cache self-clears above 64 entries (currency.rs: `if o.len() > 64 { o.clear(); }`)
+   and is written read-modify-write + rename, so concurrent writers can LOSE each other's entries.
+   Currently 31 entries / 15 distinct exe paths, so it is NOT thrashing today. Benign either way
+   (a miss costs 0.106 s), but it is unsynchronised machine-global mutable state -- see Q8.
+
+3. "WSL2 / ext4 filesystem performance is the problem"
+   MEASURED (M9): fixture tree copy (34 files, 216 KB) = 4.4 ms on ext4, 1.6 ms on tmpfs.
+   244 tests x 1 copy ~= 1.1 s for the whole suite. /tmp holding 37,808 entries costs 0.03 ms/op.
+   REJECTED.
+
+4. "filesystem I/O / syscall time dominates"
+   MEASURED (brownfield alone): 578.586 s user vs 9.115 s system CPU. System time is 1.5% of CPU,
+   despite 1,609,104 blocks (~824 MB) written -- buffered through page cache. REJECTED.
+   The workload is USER-SPACE CPU.
+
+5. "compilation is the cost"
+   MEASURED: cold build of all test targets 39.27 s wall / 207 s CPU / 186 units.
+   Warm no-op 3.64-3.79 s (3 runs). Incremental after touching one certification file 6.38 s;
+   after touching runtime/src/lib.rs 3.55 s (incremental codegen reuse). REJECTED against a
+   suite that costs 1200-8600 s.
+
+6. "the certification suite shells out to cargo, or runs nested cargo builds"
+   VERIFIED BY INSPECTION: no Command::new("cargo") anywhere in tests/certification.
+   runtime/src/verification/product.rs BUILDS a `cargo test` command vector but has NO
+   execution call site (no Command::new / .output() / .status() / .spawn() in the file), so the
+   rust-cargo ecosystem plan for fixtures/greenfield/project/Cargo.toml is planned, never run.
+   The only subprocesses the suite spawns are `gov` and `git`. REJECTED.
+
+7. "the suite is forced serial by a #[serial] attribute or a static guard"
+   VERIFIED BY INSPECTION: zero `#[serial]`, no serial_test dependency, and zero
+   std::env::set_var / remove_var in tests/certification (count = 0). All environment is set
+   PER Command (common.rs Gov::run: c.env("XDG_STATE_HOME", machine_state_home(&self.root))).
+   The 5 statics in common.rs are idempotent OnceLock caches of test key material. REJECTED.

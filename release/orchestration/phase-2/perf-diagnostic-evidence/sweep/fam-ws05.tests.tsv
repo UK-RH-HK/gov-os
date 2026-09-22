@@ -1,0 +1,8 @@
+duration_s	outcome	test
+77.857	ok	ws05::close_observes_os_written_state_no_os_operation_produced
+53.496	ok	ws05::gates_decide_runnability_and_completion
+48.382	ok	ws05::independence_is_established_from_recorded_authorship
+41.63	ok	ws05::close_requires_and_persists_the_consumption_receipt
+24.055	ok	ws05::runnable_ready_and_claimable_are_derived_from_the_task_dag
+16.127	ok	ws05::status_shows_health_and_this_projects_release_trust
+16.03	ok	ws05::releasing_a_claim_is_a_guarded_write

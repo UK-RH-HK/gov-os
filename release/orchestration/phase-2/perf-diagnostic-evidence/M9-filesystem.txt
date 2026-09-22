@@ -1,0 +1,8 @@
+M9 filesystem probe (taken at load ~12.2, i.e. CONTENDED -> pessimistic)
+location                          mkdir+canon x300  per_op_ms  copy_brownfield x40 per_copy_ms
+/tmp (ext4, ~37.8k entries)                 0.044s      0.146               0.176s         4.4
+fresh ext4 dir (empty)                      0.035s      0.115               0.184s         4.6
+/dev/shm (tmpfs)                            0.007s      0.023               0.062s         1.6
+Conclusion: a fixture tree copy (34 files/216K) costs 4.4 ms on ext4. 244 tests x 1 copy ~= 1.1 s
+total. /tmp having 37,808 entries costs ~0.03 ms/op. Neither is material. tmpfs would save ~3 ms
+per copy. The WSL2 ext4 filesystem is NOT a factor in the suite runtime.

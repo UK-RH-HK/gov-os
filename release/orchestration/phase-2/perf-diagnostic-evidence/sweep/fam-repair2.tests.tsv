@@ -1,0 +1,10 @@
+duration_s	outcome	test
+305.333	ok	repair2::plugins_are_governed_capabilities_not_arbitrary_commands
+100.127	ok	repair2::genuine_412_consumer_updates_through_413_to_414_and_rolls_back_with_ledger
+97.585	ok	repair2::cit_approval_derives_only_from_an_answered_gate
+58.85	ok	repair2::project_policy_cannot_weaken_constitutional_floors
+34.415	ok	repair2::task_close_uses_observed_mutations_not_self_attestation
+23.875	ok	repair2::framework_lock_is_release_identifying_and_portable
+18.15	ok	repair2::incremental_rebuild_follows_record_relocation
+2.088	ok	repair2::release_build_reproduces_released_versions_from_their_commit
+0.024	ok	repair2::interface_contract_kernel_yaml_and_migration_substance_are_consistent

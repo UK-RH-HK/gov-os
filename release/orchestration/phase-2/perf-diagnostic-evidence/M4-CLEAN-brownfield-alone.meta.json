@@ -1,0 +1,32 @@
+{
+  "label": "M4-alone-brownfield",
+  "cmd": [
+    "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-perf-diag/target/debug/deps/certification-f1bd0746f039ec4b",
+    "--test-threads=1",
+    "brownfield::"
+  ],
+  "started_at_utc": "2026-09-22T11:23:58Z",
+  "exit_code": 0,
+  "wall_s": 318.457,
+  "cpu_user_s": 578.586,
+  "cpu_sys_s": 9.115,
+  "cpu_total_s": 587.702,
+  "cpu_per_wall": 1.845,
+  "max_rss_kb": 240224,
+  "involuntary_ctx_switches": 2135,
+  "voluntary_ctx_switches": 87463,
+  "block_input_ops": 9752,
+  "block_output_ops": 1609104,
+  "load_before": "0.86 0.93 0.61 2/1338 2625219",
+  "load_after": "2.41 1.80 1.09 1/1338 2633801",
+  "declared_tests": 1,
+  "result": {
+    "verdict": "ok",
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0
+  },
+  "per_test_timing_sound": true,
+  "n_test_lines": 1,
+  "sum_test_durations_s": 318.453
+}
