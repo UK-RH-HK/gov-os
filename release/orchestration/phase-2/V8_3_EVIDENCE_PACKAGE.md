@@ -504,6 +504,43 @@ execution, or whole-tree formatters must be prohibited in packets; **(ii)** the 
 formatting that no current toolchain reproduces) is itself a defect worth fixing once, deliberately, outside a bounded
 repair, because until it is fixed `cargo fmt --check` cannot be used as a gate at all.
 
+### 6.3b A five-hour stall caused by an orchestrator-invented handshake, masked by notification wording
+
+**The most expensive orchestration defect of the round, and it was purely procedural.**
+
+Correcting a worker's thread count, the orchestrator added: *"Tell me before you start the full suite and I will confirm
+the machine is clear."* The worker complied exactly — finished every targeted run (41/41 green), completed a clean
+release build, wrote its checkpoint recording *"waiting for confirmation the machine is clear before doing so (their
+explicit request)"* — and stopped.
+
+The orchestrator never sent the confirmation. **The worker sat idle for roughly five hours** with all its work complete
+and uncommitted.
+
+Three failures compounded:
+
+1. **A handshake was invented with no obligation on the inviting side.** The orchestrator created a blocking dependency
+   on itself and had no mechanism that would fire if it failed to answer. A protocol that can deadlock on the
+   coordinator's silence is a defect in the protocol, not in the worker.
+2. **The notification wording actively misled.** Each task notification read *"This agent stopped with background work
+   of its own still running … it is waiting on its own background work"* — when in fact there was **no** background
+   work; it was waiting on a **message**. Successive notifications showed a rising `duration_ms` (5.4M → 7.1M → 7.7M)
+   with an identical body, which reads as progress and is actually a stall.
+3. **The orchestrator reported "still running" to the owner twice without verifying.** It inferred from a process
+   listing taken earlier rather than re-checking. A single `uptime` would have shown load 0.30 and no processes. **The
+   owner detected the stall, not the orchestrator** — after 420 minutes.
+
+**Recommendations for V8.3.**
+
+- **Never create a coordinator handshake without a timeout and a default.** Either the worker proceeds after a stated
+  interval, or the coordinator registers a timer when it makes the request. Prefer giving the worker a *precondition it
+  can evaluate itself* ("start when load is below N and no `cargo` process is running") over a message it must wait for.
+- **Distinguish "blocked on compute" from "blocked on a message" in agent status**, and surface the latter loudly to the
+  coordinator — it is the coordinator's queue, not the worker's problem.
+- **A rising elapsed time with an unchanged status body is a stall signature**, and a supervisor should treat it as one.
+- **Never report a worker as "running" from a stale observation.** Liveness claims must come from a check taken at the
+  time of the claim. This is the same discipline §5.3 demands of test evidence, applied to status reporting: a claim
+  without its observation conditions is not evidence.
+
 ### 6.4 Progress and drift detection at the orchestrator level
 
 **OBSERVED.** The orchestrator's own drift signals were: a worker reading without writing, a review finding the same
