@@ -33,3 +33,44 @@ UNAFFECTED by the correction: the --test-threads=1 category error and R1; the us
 split and every hypothesis rejected in section 5; the Pareto shape; "2 units, not 141" and the
 178 GB; the perpetual-rebuild root cause with cargo's own dirty reason; the RECONCILED
 disclosed observation; the 172-of-244 evidence-map gap.
+
+--------------------------------------------------------------------------------
+ADDENDUM: CPU topology, and why the "20 cores" divisor was wrong.
+
+Read from the guest, no load generated:
+  nproc                -> 20
+  lscpu                -> Model name: 12th Gen Intel(R) Core(TM) i7-12700F
+                          CPU(s): 20   Core(s) per socket: 10   Thread(s) per core: 2
+                          Socket(s): 1   L2 cache: 12.5 MiB (10 instances)
+  /proc/cpuinfo        -> uniform 10 x 2; core id 0..9, each with two processors
+  thread_siblings_list -> 0-1, 2-3, 4-5, ... 18-19
+  /sys/.../smt/active  -> 1
+  cpuinfo flags        -> includes `hypervisor` and `avx_vnni`
+
+The guest topology is SYNTHETIC. The `hypervisor` flag is set, and the real i7-12700F is an
+Alder Lake HYBRID part: 8 P-cores (2 threads each) + 4 E-cores (1 thread each) = 12 physical
+cores / 20 threads. WSL2 flattens that heterogeneous package into a fabricated homogeneous
+10 x 2, so the guest's sibling pairs need not correspond to real SMT siblings and the
+vCPU -> host-core mapping is not observable from inside the guest.
+
+Consequences:
+  * The divisor 20 used throughout the first two versions of PERFORMANCE_DIAGNOSTIC.md is
+    wrong. W / 20 = 1,949 s (32.5 min) is a BOUND THAT CANNOT BE REACHED, not a floor.
+  * Measured P = 12.95 is 65% of 20 logical CPUs but ~108% of 12 physical cores. Since Linux
+    fills idle physical cores before doubling onto siblings, essentially EVERY physical core
+    was busy. The machine was near saturation, not "a third idle".
+  * Achievable floor, modelled (SMT gain 1.2-1.3x on P-cores; P-cores ~70-75% of throughput):
+    3,010 / 1.15..1.25 = ~2,400-2,600 s = 40-43 min. NOT MEASURED.
+  * Perfect scheduling is therefore worth ~7-10 min, not 17.5. This strengthens R5 (do not
+    shard: a shard would contend for hyperthreads, not occupy idle silicon) and R3 (reducing
+    W is the only lever that does not stop at the hardware).
+  * SECOND-ORDER: the kernel accounts THREAD-seconds, not work. Under SMT two siblings each
+    accrue CPU at wall rate while together delivering ~1.2-1.3x one thread. So W is NOT purely
+    a property of the tree -- it is inflated by how parallel the run was. The retraction is
+    unaffected (the clean run and P2-AR-0075 ran at the same parallelism, so it cancels); the
+    single-threaded derivation carries more uncertainty, but stands on P2-AR-0069's directly
+    recorded 8,035 s rather than on arithmetic alone.
+
+THE DEFINITIVE EXPERIMENT, needing no model: run the suite at --test-threads = 4, 8, 12, 16, 20
+and plot wall against thread count. The knee is the achievable floor, measured. ~4 hours of
+machine time; post-Phase-2 work.

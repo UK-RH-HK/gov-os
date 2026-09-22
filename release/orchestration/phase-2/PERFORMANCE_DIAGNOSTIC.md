@@ -18,13 +18,13 @@
 >
 > **Total CPU `W` = 38,971 s** — **2.39× the ~15,800 s this report originally inferred.** Three consequences:
 >
-> 1. **The milestone figure is ~50 minutes, not 20–25.** The 20-minute target in the first version of §11.2 was wrong and is retracted. At 100% utilisation of 20 cores the **floor is 1,949 s ≈ 32.5 min**, so **no scheduling change alone can get this suite below about half an hour.**
+> 1. **The milestone figure is ~50 minutes, not 20–25.** The 20-minute target in the first version of §11.2 was wrong and is retracted. The achievable floor is **~40–43 min** (§5.2): the machine has **12 physical cores, not 20** — 20 logical CPUs on an 8P+4E part — so `W ÷ 20 = 1,949 s` is a bound SMT cannot reach. **No scheduling change alone is worth more than about 7–10 minutes here.**
 > 2. **P2-AR-0075's 2,742 s was never an anomaly.** With the true `W` it decodes to `P ≈ 12.2–13.1` effective cores against this run's 12.95 — indistinguishable. The "~3 test streams" conclusion is **retracted in full**; there was nothing to explain. §3.1 says what went wrong and why the two calibrations agreed with each other while both were wrong.
 > 3. **The `--test-threads=1` speedup is ~3×, not 7×** — a correction beyond the one requested, derived in §3.1. The category-error finding itself is **unaffected and is now confirmed directly** rather than by cross-tree scaling.
 >
 > **What still stands, unaffected:** R1 and the `--test-threads=1` category error · the user/system CPU split (this run: **2.88% system**, against 1.55% clean and 3.3% swept — the I/O rejection is reinforced) · the Pareto shape · the "2 units, not 141" shared-target finding and the 178 GB · the perpetual-rebuild root cause with cargo's own dirty reason · the `RECONCILED` disclosed observation · the evidence-map gap (172 of 244 mapped) · every rejected hypothesis in §5.
 >
-> **And it materially strengthens R3.** If the workload is ~97% user-space CPU at `opt-level = 0` and scheduling bottoms out at 32.5 min, then **optimisation is the only remaining lever on the milestone figure**, not merely the largest one.
+> **And it materially strengthens R3.** If the workload is ~97% user-space CPU at `opt-level = 0` and scheduling bottoms out around 40–43 min, then **optimisation is the only remaining lever on the milestone figure**, not merely the largest one — and the 12-physical-core correction makes that sharper still, since it shows the machine is already near saturation.
 
 ---
 
@@ -50,7 +50,7 @@ Two methodological rules I applied, because they change which contaminated numbe
 
 ## 1. The headline
 
-**The ~2.5 hours is the cost of running the suite with `--test-threads=1`. Machine-exclusive at default parallelism the same suite is ~50 minutes — measured. But the suite is also genuinely expensive: 38,971 CPU-seconds, 154.6 s of CPU per test, which puts a hard floor of ~32.5 minutes on any scheduling fix.**
+**The ~2.5 hours is the cost of running the suite with `--test-threads=1`. Machine-exclusive at default parallelism the same suite is ~50 minutes — measured. But the suite is also genuinely expensive: 38,971 CPU-seconds, 154.6 s of CPU per test, which puts a floor of roughly 40–43 minutes on any scheduling fix — the machine has 12 physical cores, not 20.**
 
 *(Corrected. The first version of this report said "about 20 minutes", inferred from records rather than measured. A direct measurement gave 50 min — see the banner above and §3.1. The half of the headline about `--test-threads=1` is confirmed; the half about what it costs otherwise was wrong.)*
 
@@ -69,7 +69,7 @@ The measured anchor, and the only full-suite figure in this report that is a dir
 | CPU | user 37,850.4 s + sys 1,120.7 s = **38,971 s**, system = **2.88%** |
 | Effective cores `P` | **12.95** (65% of 20) |
 | Per test | **154.6 s CPU**, 11.94 s wall |
-| Floor at 100% of 20 cores | **1,949 s ≈ 32.5 min** |
+| Achievable floor | **~2,400–2,600 s ≈ 40–43 min** (modelled, §5.2; `W ÷ 20 = 1,949 s` is an unreachable bound) |
 
 **INFERRED-FROM-RECORD** durations from `release/orchestration/phase-2/AGENT_RUNS/` are tabulated in §3, but **§3.1 shows they cannot be normalised across trees the way the first version of this report did**, because per-test cost changed by more than a factor of two as heavy end-to-end tests were added. The s/test comparisons that produced the retracted "20 minutes" and "7×" are no longer used.
 
@@ -89,9 +89,15 @@ Two consequences:
 
 **MEASURED-CLEAN.** Recorded at 11:16 UTC, load `0.29 0.33 0.35`.
 
+> **Corrected: this machine does not have 20 independent cores, and the guest cannot see how many it has.**
+>
+> `nproc` returns 20 and `lscpu` reports *"Core(s) per socket: 10, Thread(s) per core: 2"*, and `/proc/cpuinfo` shows a perfectly uniform 10 × 2 layout with sibling pairs `0-1, 2-3, … 18-19`. **That topology is synthetic.** The `hypervisor` flag is set, and the real i7-12700F is an Alder Lake *hybrid* part: **8 P-cores (2 threads each) + 4 E-cores (1 thread each) = 12 physical cores, 20 threads**. WSL2 is flattening a heterogeneous 8P+4E package into a fabricated homogeneous 10 × 2, so the guest's sibling pairs need not correspond to real SMT siblings, and the guest has no way to learn the vCPU→host mapping.
+>
+> Three consequences, worked through in §5.2: the "20 cores" divisor used throughout the first version of this report was wrong; **`W ÷ 20` is a bound that certainly cannot be reached**; and the measured `P = 12.95` is far closer to saturation than "65% of 20" suggests, because there are at most 12 physical cores for those threads to run on.
+
 | Property | Value |
 |---|---|
-| CPU | 12th Gen Intel Core i7-12700F, **20 logical cores** |
+| CPU | 12th Gen Intel Core i7-12700F — **20 logical CPUs; 12 physical cores on the real part (8 P + 4 E); guest reports a synthetic 10 × 2** |
 | Memory | 16,288,940 kB total (~15.5 GiB) |
 | Kernel | `6.6.87.2-microsoft-standard-WSL2` — **WSL2**, as stated in the brief |
 | Worktree filesystem | `/dev/sdd`, **ext4**, mounted `/`, inside the WSL2 VM |
@@ -155,6 +161,15 @@ This matters more than the retraction, because §3.2 rests on the same inference
 
 **Error 3, the one worth carrying into V8.3 — the two estimates were not independent, so their agreement was worthless.** I presented "calibrated two independent ways, which agree" as validation. They were not independent: both rest on `cpu/wall` measured from the *same* biased sample (`brownfield` plus the sweep). Two estimates sharing a common biased input will agree with each other and both be wrong, and their agreement carries no information. **A cross-check is only evidence when the inputs are genuinely disjoint** — and the check that would have been disjoint, a direct measurement of the whole suite, is the one I argued was unnecessary.
 
+#### Error 4, found later and second-order: `W` is not schedule-invariant either
+
+The whole model rests on "total CPU work is a property of the tree, not of the schedule". **On an SMT machine that is not exactly true.** The kernel accounts *thread-seconds*, not work: two hyperthread siblings on one physical core each accrue CPU time at wall-clock rate while together delivering only ~1.2–1.3× one thread's throughput. So the same work measured at `P = 12.95` yields **more** CPU-seconds than measured at `P = 4.3`. `W = 38,971 s` is therefore partly an artefact of how parallel that particular run was.
+
+What it does and does not affect:
+- **The retraction is unaffected**, which is the comparison that mattered. The clean run (`P = 12.95`) and P2-AR-0075 (`P ≈ 12.2–13.1`) ran at essentially the same parallelism, so the same SMT inflation is present in both and it cancels.
+- **The single-threaded derivation carries more uncertainty than §1 implies**, because it compares across very different parallelism: `W` at `P ≈ 4.3` would be somewhat *lower* than 38,971, so the true single-threaded wall is somewhat *below* 9,063 s. That conclusion does not depend on the model alone — P2-AR-0069 directly recorded 8,035 s for 229 tests (8,842 s scaled to 252), i.e. 2.3–2.5 h. **The ~2.5 h finding stands on a record, not only on arithmetic.**
+- **It is the same mistake in miniature**: I took a quantity to be invariant because it was invariant in the idealisation, and did not check the assumption against the hardware. That is Error 3 again, one level down.
+
 #### The consequence I was not asked to correct, but which follows
 
 **The "7×" speedup for avoiding `--test-threads=1` is really ~3×.** It came from comparing 35.09 s/test (single-threaded, 229-test tree) against 4.92 s/test (the "serialised band", 189–225-test trees) — **a comparison across trees whose per-test cost differs by more than a factor of two**, which §3.1 has just shown is invalid. The like-for-like figure, on one tree, from the measured `W`: single-threaded is capped at `P ≈ 4.3` by `clamp(2, 4)`, default threads measured `P = 12.95`, so **3.0×**. The category error and its direction are unaffected and are now confirmed directly; only the magnitude was inflated.
@@ -168,6 +183,31 @@ The original claim — that the five-concurrent-suite figures are physically imp
 > Five suites finishing within the longest reported wall of 1,875 s have **1,875 × 20 = 37,500 core-seconds** between them. Each suite may therefore cost at most **7,500 s of CPU — 35.7 s CPU/test** at 210 tests.
 
 The measured figure is **154.6 s CPU/test**. Those trees would have to have been **4.3× cheaper per test** than today's. With the original (2.39× too low) `W` the same argument gave a shortfall factor of 1.8; with the correct `W` it is **4.3**, so the conclusion is substantially stronger, and it was robust to a 2.4× calibration error in the first place. The likeliest benign explanation remains staggered starts, so that five suites were never simultaneously in flight; two of the five also reported spurious failures. **These figures cannot support a quantitative claim** — which is how both `V8_3_EVIDENCE_PACKAGE.md` and this diagnostic's brief already treat them.
+
+### 3.3 An evidence-hygiene finding: at least one durable suite figure cannot be reproduced as recorded
+
+**This is a finding against the orchestration's evidence hygiene, not a performance result.** It is recorded here because §3.1 turned it up and because it bears directly on what a formal verifier may rely on.
+
+`P2-AR-0067.run.yaml:62` reads, verbatim:
+
+> `orchestrator_checks: 'Reproduced serialised by the orchestrator on the untouched integrated tree 61e39b6: build 0 warnings; cargo test --lib 276/0; cargo test --test certification 225/0 (1213 s); gov …`
+
+It is recorded as **a single full-suite run**, not a chunked one — of the Phase-2 run records only `P2-AR-0054` mentions chunking ("14 chunks at `e9a2f9c`"). At the measured 154.6 CPU-s/test, 225 tests hold **34,785 CPU-s**, which in 1,213 s requires **`P = 28.7`** on a machine whose hard ceiling is 20 logical CPUs and ~12 physical cores. **As recorded, it cannot have happened.**
+
+Three candidate explanations, and **the record cannot distinguish them**:
+
+1. **Mis-transcription** — the duration belongs to something else, or a digit is wrong.
+2. **A partial or differently-scoped run** — a filtered subset, a chunk, or a reused earlier figure, recorded as if it were the whole suite.
+3. **A genuinely cheaper tree** — possible only if the 225-test tree cost ≤70.1 CPU-s/test, i.e. 2.2× less than today's, which requires the 27 tests added since to average 859 CPU-s each — above `brownfield`'s 588 s, one of the heaviest tests in the suite. Implausible, not impossible.
+
+The record carries **no thread count, no load average and no command line**, so it is unfalsifiable in precisely the way `V8_3_EVIDENCE_PACKAGE.md` §5.3 says evidence must not be. That is the finding: *the figure is not wrong so much as unusable*, and no amount of re-reading will fix it.
+
+**Consequences, which are the actionable part:**
+
+- **None of the four "serialised band" figures may be used as a baseline by anyone, including the formal verifier.** P2-AR-0067 is the one confirmed; P2-AR-0041, P2-AR-0054 and P2-AR-0064 sit in the same band and are suspect by the same arithmetic. They are the records that produced this report's own retracted 20-minute target.
+- **The only usable full-suite baseline is the clean measurement of §1** — 252 tests, 3,010 s, with its load, thread count and CPU recorded.
+- **This is the strongest possible argument for the V8.3 requirement that §5.3 already states.** A duration recorded without its concurrency conditions cannot be audited even in principle; here it took a CPU measurement taken for an unrelated purpose, months later, to notice that a durable record was arithmetically impossible. **Make thread count and load mandatory fields of any recorded test result.**
+- **Do not spend machine time settling this** by checking out `61e39b6` and re-running — post-Phase-2 work at best, and the tree is no longer the one anyone cares about.
 
 ## 4. Wall-clock breakdown by family and test
 
@@ -288,7 +328,22 @@ The suite's only subprocesses are **`gov`** and **`git`**. There is no nested ca
 - The worker count is **deliberately bounded**: `scheduler/mod.rs:798-802` takes `opts.workers` or else `available_parallelism().clamp(2, 4)` — **at most 4 workers**, not one per core. This is sound design, not a defect: 20 concurrent `gov` processes can reach at most ~80 threads rather than ~400. There is a CLI `workers` option but **no environment override**, so a caller cannot lower it to fit a shared machine.
 - Because contention *reduces* cpu/wall, **1.98 is a lower bound** on a single `gov` invocation's true parallelism.
 
-**The key scheduling fact, now measured rather than modelled.** The clean run gives `W = 38,971 s` CPU in 3,010 s wall = **`P = 12.95` effective cores, 65% of the 20 available**. The suite is **not** CPU-saturated: about a third of the machine sits idle, lost to the long tail (a single 305 s test cannot be subdivided) and to `gov`'s ≤4-worker clamp. **The floor, at a hypothetical 100% utilisation, is 38,971 ÷ 20 = 1,949 s ≈ 32.5 min** — so perfect packing would buy 50 min → 32.5 min and no more. That is the single most important number for R3 and R5.
+**The key scheduling fact, re-derived for 12 physical cores rather than 20 logical.** The clean run gives `W = 38,971 s` CPU in 3,010 s wall = **`P = 12.95`**. What that means depends entirely on the denominator, and the denominator was wrong:
+
+| Denominator | Utilisation | Reading |
+|---|---|---|
+| 20 logical CPUs | 65% | *"a third of the machine is idle"* — the first version of this report. **Misleading.** |
+| **12 physical cores (8P + 4E)** | **108%** | already drawing more scheduled threads than there are physical cores |
+
+Since Linux places threads on idle physical cores before doubling up on siblings, an average of **12.95 runnable threads across 12 physical cores means essentially every physical core was busy**, with a little SMT doubling on top. **The machine was close to saturated, not a third idle.**
+
+**So `38,971 ÷ 20 = 1,949 s (32.5 min)` is a bound that cannot be reached, and it should not be quoted as "the floor".** Reaching it would require all 20 logical CPUs to deliver a full core of throughput each, which SMT does not do: the second thread on a physical core typically adds ~20–30% on CPU-bound integer work, not 100%. Going from the measured state to all 20 logical CPUs busy means doubling up the 8 P-cores and gains only that SMT increment on them — with P-cores contributing the large majority of throughput, roughly **15–25% overall**. That puts the achievable floor at:
+
+> **≈ 3,010 ÷ 1.15…1.25 = 2,400 – 2,600 s ≈ 40 – 43 min**
+
+**NOT MEASURED — a model with stated assumptions** (SMT gain 1.2–1.3× on P-cores; P-cores ~70–75% of throughput; guest vCPUs mostly landing on distinct host physical cores). The vCPU→host mapping is not observable from inside the guest, so I cannot do better than a range from here. **The definitive experiment needs no modelling:** run the suite at `--test-threads` = 4, 8, 12, 16, 20 and plot wall against thread count; the knee is the achievable floor, measured directly. That is ~4 hours of machine time and is clearly post-Phase-2 work.
+
+**The practical upshot is what matters, and it is the opposite of the first version's:** perfect scheduling buys roughly **7–10 minutes**, not 17.5. See R5.
 
 *(Two corrections of record, both instructive. First, an earlier draft asserted the suite was "CPU-saturated" from 20 test threads × ~2 cores ≈ 40 cores of demand; that confused peak demand with achieved throughput and is contradicted by the measured 65%. Second — and this is the cautionary one — the draft that replaced it derived "`P ≈ 13.2`, about 66%", which is within 2% of the measured 12.95/65%. **It was right by luck**: `W` was 2.39× too low and the assumed wall (1,200 s) was 2.5× too low, and the two errors cancelled in the ratio. A derived quantity agreeing with reality does not validate the inputs it was derived from.)*
 
@@ -412,7 +467,7 @@ so `.git/HEAD` and `.git/refs/heads` **do not exist**. A `rerun-if-changed` path
 
 The `.git` misses affect **all 40 linked agent worktrees**. The `manifest.json` miss affects **every tree including the main checkout**, where `.git` *is* a directory — so even the main repository never achieves a no-op build.
 
-**Cost:** ~3.6–3.8 s on every `cargo build` / `cargo test` invocation, plus re-linking the 190 MB `gov` and 164 MB certification binaries. It does not move the 20-minute suite much, but it is a floor on *every* targeted test run during iteration, which is exactly the loop the owner wants to make cheap. A side effect: because the binary is relinked every time, its `stat` identity changes, so the `runtime-digests.json` exe-SHA cache always misses (costing a further 0.106 s, §9).
+**Cost:** ~3.6–3.8 s on every `cargo build` / `cargo test` invocation, plus re-linking the 190 MB `gov` and 164 MB certification binaries. It is negligible against the 50-minute suite, but it is a floor on *every* targeted test run during iteration, which is exactly the loop the owner wants to make cheap. A side effect: because the binary is relinked every time, its `stat` identity changes, so the `runtime-digests.json` exe-SHA cache always misses (costing a further 0.106 s, §9).
 
 **Are dependencies rebuilt across worktrees? Yes today, but needlessly.** Controlled experiment (MEASURED-CONTAMINATED for wall time at load 17.3–19.9; the **unit counts are load-independent and are the finding**). A second tree was materialised with `git archive c34c439` into my scratchpad and both trees built against **one shared** `CARGO_TARGET_DIR`:
 
@@ -574,7 +629,7 @@ Ranked by saving-per-risk. "Touches acceptance evidence" means adopting it chang
 
 ### R3 — Raise `opt-level` for the dev profile. **Do NOT do in Phase 2. Now the single most valuable measurement left, and the only lever that can move the milestone figure.**
 - **Expected saving: NOT DETERMINED — but it is now the *only* candidate that can help.** I did not measure it; the sweep was stopped first. Still a candidate, not a finding.
-- **Why it is now decisive rather than merely promising.** The clean run puts a **32.5-minute floor** on any scheduling fix (`W = 38,971 s` ÷ 20 cores), against 50 min measured. Sharding, thread tuning and better packing all live inside that 17.5-minute gap; impact selection and caching buy time only by *not running tests*. **Reducing `W` is the sole remaining way to move the number**, and `W` is **97% user-space CPU compiled at `opt-level = 0`** (§5.6). The repository already records `sha2` alone as **~20× slower** unoptimised — which is why `[profile.dev.package.sha2] opt-level = 3` exists — while `regex`, `jsonschema`, `serde_json`, `serde_yaml`, `curve25519-dalek` and all 99,655 lines of `gov-runtime` remain unoptimised. A 2× reduction in `W` would put the floor at ~16 min and a realistic run at ~25 min.
+- **Why it is now decisive rather than merely promising.** The clean run, read against the machine's **12 physical cores**, puts the achievable floor at **~40–43 min** (§5.2) against 50 min measured. Sharding, thread tuning and better packing all live inside that **7–10 minute** gap — and the 12-core correction shrank that gap from the 17.5 minutes an earlier draft claimed; impact selection and caching buy time only by *not running tests*. **Reducing `W` is the sole remaining way to move the number**, and `W` is **97% user-space CPU compiled at `opt-level = 0`** (§5.6). The repository already records `sha2` alone as **~20× slower** unoptimised — which is why `[profile.dev.package.sha2] opt-level = 3` exists — while `regex`, `jsonschema`, `serde_json`, `serde_yaml`, `curve25519-dalek` and all 99,655 lines of `gov-runtime` remain unoptimised. A 2× reduction in `W` would halve the work itself, taking a realistic run to ~25 min — more than double what perfect scheduling can deliver, and it is the only lever that does not stop at the hardware.
 - **The exact experiment to run** (≈5 minutes on a quiet machine, no file change — environment only), comparing against the clean 318.457 s baseline:
   ```
   CARGO_PROFILE_DEV_OPT_LEVEL=2 cargo test --test certification brownfield::
@@ -593,7 +648,8 @@ Ranked by saving-per-risk. "Touches acceptance evidence" means adopting it chang
 - **Risk: LOW** for GC; **MEDIUM** for sharing, which is why sharing is not recommended.
 
 ### R5 — Do **not** shard the certification suite. **Decision, not an action.**
-- **Rationale, restated on the measured numbers.** Sharding's purpose is to use idle cores, and the clean run shows **35% of the machine is genuinely idle** (`P = 12.95` of 20). So unlike the first version of this argument — which wrongly claimed the suite was already CPU-saturated — there *is* headroom. It is still not worth taking: **perfect packing caps out at the 32.5-minute floor**, i.e. 50 → 32.5 min at most, and only by paying every isolation obligation in Q8, N× repeated per-process fixture setup, and an evidence-aggregation step that is itself a "reports success while failing" risk. The idle third is mostly long tail — a single 305 s test cannot be subdivided by any scheduler — so real sharding would capture well under that 17.5-minute ceiling.
+- **Rationale, re-derived for 12 physical cores (§5.2) — and the case against sharding is now much stronger than either earlier version.** The "35% idle" reading was an artefact of dividing by 20 logical CPUs. Against the **12 physical cores** the machine actually has, the measured `P = 12.95` is **108% — essentially every physical core busy**, with Linux already doubling slightly onto siblings. **There is very little genuine idle silicon to reclaim.** Perfect packing is worth ~7–10 minutes (50 min → ~40–43 min), not the 17.5 the earlier draft implied, and what remains is mostly SMT increment on already-busy P-cores.
+- **So a shard would contend for hyperthreads rather than occupy idle cores** — it would take its throughput largely *from the other shards*, while still paying every isolation obligation in Q8, N× repeated per-process fixture setup, and an evidence-aggregation step that is itself a "reports success while failing" risk. The residue is also mostly long tail: a single 305 s test cannot be subdivided by any scheduler.
 - **R3 is the better trade for the same engineering effort**: it attacks `W` itself, which is the only quantity that moves the floor.
 - Revisit only if R3 is adopted and the resulting measured figure still misses the §11 target.
 
@@ -639,9 +695,10 @@ The only durable measurements available are **INFERRED-FROM-RECORD** from `P2-AR
 
 The governing arithmetic, and it is unforgiving:
 
-> `W = 38,971 s` CPU · 20 cores · measured `P = 12.95` (65%)
-> **Measured: 3,010 s = 50 min.** **Floor at 100% utilisation: 1,949 s = 32.5 min.**
-> **No scheduling change alone — not sharding, not thread tuning, not better packing — can take this suite below about half an hour.**
+> `W = 38,971 s` CPU · **20 logical CPUs on ~12 physical cores** · measured `P = 12.95`
+> **Measured: 3,010 s = 50 min.**
+> **Achievable floor: ~2,400–2,600 s ≈ 40–43 min** (modelled, §5.2 — `W ÷ 20 = 1,949 s / 32.5 min` is a bound that SMT cannot reach and is **not** quoted as the floor).
+> **No scheduling change alone — not sharding, not thread tuning, not better packing — is worth more than about 7–10 minutes here.**
 
 | Scenario | Target | Derivation |
 |---|---|---|
@@ -649,7 +706,7 @@ The governing arithmetic, and it is unforgiving:
 | **Milestone validation** | **≤ 55 min** | **MEASURED: 50 min** (3,010 s real, 2,966 s harness) machine-exclusive at default threads, 252 tests, exit 0. The 55 min target is that measurement plus headroom for continued growth. **This supersedes both the retracted 20–25 min target and the 2,742 s figure previously quoted** — see §3.1. The only thing R1 buys here is *avoiding a 3× regression* to ~2.5 h; it does not make 50 min faster, because 50 min already is the machine-exclusive default-threads figure. |
 | **Full certification (G5/G6 gate)** | **≤ 65 min** | `cargo build --release` + `gov contract verify` + `cargo test --lib` (280 tests) + the suite. The suite contributes the measured 3,010 s; the other three remain **NOT DETERMINED** (never timed in any record) and are budgeted at ~600 s, still **the weakest number in this report**. Measuring them is §12(b), ~5 minutes. |
 
-**This is what makes R3 decisive rather than merely attractive.** With a 32.5-minute floor from scheduling and a workload that is **97% user-space CPU at `opt-level = 0`**, optimisation is now **the only lever that can move the milestone figure at all**. Every alternative — sharding, thread tuning, impact selection, caching — either cannot cross the floor or buys time by not running tests. If R3 delivered even 2×, `W` would fall to ~19,500 s: floor ~16 min, realistic ~25 min. I am still deliberately **not** putting a number on it, because I have not measured it; §12(a) is now the highest-value measurement left in the brief by a clear margin.
+**This is what makes R3 decisive rather than merely attractive.** With an achievable scheduling floor of ~40–43 min (§5.2 — the machine has 12 physical cores, and `P = 12.95` already means essentially all of them are busy) and a workload that is **97% user-space CPU at `opt-level = 0`**, optimisation is now **the only lever that can move the milestone figure at all**. Every alternative — sharding, thread tuning, impact selection, caching — either cannot cross the floor or buys time by not running tests. If R3 delivered even 2×, `W` would fall to ~19,500 s and a realistic run to ~25 min — more than triple what perfect scheduling can buy. I am still deliberately **not** putting a number on it, because I have not measured it; §12(a) is now the highest-value measurement left in the brief by a clear margin.
 
 ---
 
@@ -679,7 +736,9 @@ The governing arithmetic, and it is unforgiving:
 9. **I was wrong about the most-quoted figure in the package, in the direction that flattered my own model.** I called 2,742 s a 2.3× anomaly needing explanation and produced a confident mechanism for it. It was an ordinary run; the anomaly was in my calibration. What I had actually done was infer a quantity twice from a shared biased input, observe that the two results agreed, and call that validation — while arguing that the direct measurement which would have caught it was unnecessary. **The measurement I declined to take is the one that falsified me.**
 10. **A published set of five durations is physically impossible**, and the correction made it *more* so — the shortfall factor went from 1.8× to 4.3× (§3.2). A conclusion that survives a 2.4× error in its own input was worth stating; those numbers had been sitting in the evidence package unreconciled.
 11. **The "serialised band" I built the original headline on probably isn't what it says it is.** Reconciling it against the measured CPU requires those trees to have been 2.2× cheaper per test, implying the 27 tests added since average 859 s of CPU each — more than `brownfield`, one of the heaviest in the suite. Flagged as a hypothesis, not a finding (§3.1), but it means four durable records in `AGENT_RUNS/` deserve a second look.
-12. **Total CPU was the most useful instrument in the diagnostic, and it indicted me as readily as anything else.** Because CPU work is schedule-invariant while wall time is not, `wait4` survived the contention that invalidated every wall-clock number, rejected three hypotheses at once via the 1.5–2.9% system-time ratio, and then — once someone measured it directly instead of inferring it — overturned my central reconciliation, my 7× headline, and a 66% utilisation figure that had been right only because two errors cancelled. The instrument was sound throughout; what failed was calibrating it from a sample I never checked against the one clean measurement I already held (`brownfield`, 587.7 s CPU for a single test, 6.7× my own sweep's mean).
+12. **I divided by the wrong number for the entire diagnostic, and it was on the first line of §2.** I recorded "20 logical cores" from `nproc` in the opening minutes and used 20 as the denominator throughout — for utilisation, for the floor, for the sharding headroom. The machine has **12 physical cores**; `lscpu`'s "10 cores × 2 threads" is itself a WSL2 fabrication over an 8P+4E hybrid part. Both the number I used and the number the guest reports are wrong, in different ways. It inverted the R5 conclusion from "a third of the machine is idle" to "essentially every physical core is busy" — the same conclusion, reached for the opposite reason.
+13. **A durable record in `AGENT_RUNS/` is arithmetically impossible**, and it took a CPU measurement gathered months later for an unrelated purpose to notice (§3.3). Not wrong so much as **unusable**: no thread count, no load, no command line, so it cannot be audited even in principle. It is also the record that produced this report's own retracted 20-minute target — a bad baseline propagating into a diagnostic meant to fix baselines.
+14. **Total CPU was the most useful instrument in the diagnostic, and it indicted me as readily as anything else.** Because CPU work is schedule-invariant while wall time is not, `wait4` survived the contention that invalidated every wall-clock number, rejected three hypotheses at once via the 1.5–2.9% system-time ratio, and then — once someone measured it directly instead of inferring it — overturned my central reconciliation, my 7× headline, and a 66% utilisation figure that had been right only because two errors cancelled. The instrument was sound throughout; what failed was calibrating it from a sample I never checked against the one clean measurement I already held (`brownfield`, 587.7 s CPU for a single test, 6.7× my own sweep's mean).
 
 ---
 
