@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T06:20:11Z'
-state_hash: 603e807b68bdc76a16748ec89071f148340301e0bd7d289393ff81e9a2664758
-lifecycle_state: P2_REPAIR_ITERATION_2
-loop_status: STOPPED_AWAITING_OWNER_REVIEW_PRE_MINT
+updated_at: '2026-09-22T11:23:21Z'
+state_hash: 868083f4248a68c18e0e63f60153c30bf556744599f0086aa81e10ccef80c800
+lifecycle_state: P2_REPAIR_ROUND_3_BOUNDED
+loop_status: RUNNING
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -96,7 +96,9 @@ active_decisions:
   active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001, ARCH-0003]
   superseded: [D-0001]
   proposed_not_active: [D-0008, ARCH-0002]
-  owner_records_in_force: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002]
+  owner_records_in_force: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002, OWNER-DECISION-P2-0003, OWNER-CLARIFICATION-P2-0004, OWNER-DECISION-P2-0005, OWNER-AUTHORISATION-P2-0006]
+  orchestrator_adjudications: [P2-ADJ-0001, P2-ADJ-0002, P2-ADJ-0003, P2-ADJ-0004, P2-ADJ-0005, P2-ADJ-0006]
+  orchestrator_adjudications_note: 'all six are in GATES/; P2-ADJ-0006''s stopping rule fired on 2026-09-22 and the owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources, never a new owner decision, and the owner may override any of them.'
   owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses the owner Phase-2 directive's three-iteration convergence rule
   d0007: ACTIVE and unchanged; the explicit D-0007 transition record remains open and was not requested
   frozen_srr_boundary_path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
@@ -155,21 +157,17 @@ iteration:
   blocker_class_inventory:
     - {id: BC-P2-01, title: "Compiled contract views lose owner-source semantics and verification is self-referential", findings: 9, max_severity: HIGH}
     - {id: BC-P2-02, title: "Evidence map declares no evidence owner for any capability", findings: 7, max_severity: HIGH}
-    - {id: BC-P2-03, title: "Green governance evidence currency: key omits relevant input classes and enforcement\
-  \ is path-keyed", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-03, title: "Green governance evidence currency: key omits relevant input classes and enforcement is path-keyed", findings: 6, max_severity: HIGH}
     - {id: BC-P2-04, title: "Upstream change does not invalidate completed work, its evidence or compiled packets", findings: 6, max_severity: HIGH}
     - {id: BC-P2-05, title: "Checkpoint and handoff continuity: triggers, staleness and handoff blocking", findings: 3, max_severity: HIGH}
     - {id: BC-P2-06, title: "Health scheduler mechanics absent", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-07, title: "Health tiers G1-G6 do not perform their duties at their trigger events (incl. Gate-W\
-  \ duties)", findings: 6, max_severity: HIGH}
+    - {id: BC-P2-07, title: "Health tiers G1-G6 do not perform their duties at their trigger events (incl. Gate-W duties)", findings: 6, max_severity: HIGH}
     - {id: BC-P2-08, title: "Acting-role resolution and G0 guard coverage on privileged/mutating paths", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-09, title: "OS-written (T2) records honoured without binding to an OS operation; lower-role writes\
-  \ exempt at task close", findings: 3, max_severity: HIGH}
+    - {id: BC-P2-09, title: "OS-written (T2) records honoured without binding to an OS operation; lower-role writes exempt at task close", findings: 3, max_severity: HIGH}
     - {id: BC-P2-10, title: "Human approval and presentation derived from caller-declared metadata", findings: 4, max_severity: HIGH}
     - {id: BC-P2-11, title: "Gate approval not bound to the subject and content it authorises", findings: 2, max_severity: HIGH}
     - {id: BC-P2-12, title: "Task-blocking gate semantics", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-13, title: "Material changes escape change control (materiality self-declared, in-task edits\
-  \ bypass CIT)", findings: 2, max_severity: HIGH}
+    - {id: BC-P2-13, title: "Material changes escape change control (materiality self-declared, in-task edits bypass CIT)", findings: 2, max_severity: HIGH}
     - {id: BC-P2-14, title: "Task-contract fields and path scope not enforced", findings: 2, max_severity: HIGH}
     - {id: BC-P2-15, title: "Claim atomicity and claim scope", findings: 2, max_severity: HIGH}
     - {id: BC-P2-16, title: "Runnable / claimable / READY state not derived from the DAG", findings: 3, max_severity: HIGH}
@@ -187,8 +185,7 @@ iteration:
     - {id: BC-P2-28, title: "Graph integrity detection", findings: 1, max_severity: MEDIUM}
     - {id: BC-P2-29, title: "Incremental index invalidation", findings: 3, max_severity: HIGH}
     - {id: BC-P2-30, title: "Retrieval-profile component identity and change governance", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-31, title: "Non-rebuildable authoritative state stored in, or classified as, derived/generated\
-  \ state", findings: 2, max_severity: MEDIUM}
+    - {id: BC-P2-31, title: "Non-rebuildable authoritative state stored in, or classified as, derived/generated state", findings: 2, max_severity: MEDIUM}
     - {id: BC-P2-32, title: "Failure memory not durable", findings: 1, max_severity: MEDIUM}
     - {id: BC-P2-33, title: "Legacy identification, extraction and retirement", findings: 4, max_severity: HIGH}
     - {id: BC-P2-34, title: "Independence of test, review and verification authorship is self-attested", findings: 4, max_severity: HIGH}
@@ -288,7 +285,9 @@ agent_runs:
   - {run_id: P2-AR-0075, role: adversarial pre-mint reviewer (third pass), iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial-3, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0075.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
-running_work: []
+running_work:
+  - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: RUNNING}
+  - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: RUNNING, blocks_phase_2: false}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -341,16 +340,22 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  AWAIT_P2-AR-0073, the second adversarial pre-mint review, against phase2/repair-2-final (1c6a3a2), which the orchestrator
-  verified serially at build 0 warnings, lib 280/0, certification 235/0 and CONTRACT_SOURCE_BOUND. If it finds defects in
-  existing classes, repair and re-review again before minting. If it reports SURFACE_SOUND: merge the line into
-  release/4.1.6-rc1, reproduce the serialised checks on the release branch, mint cap2-candidate-2, and dispatch the formal
-  independent acceptance verification on fresh Opus 5 roles (the P2-HO-0043..0047 templates updated for the new candidate).
-  Escalate to the owner only on a genuinely new material blocker class, an architecture-boundary decision or an owner
-  decision.
+  AWAIT_P2-AR-0076, the bounded final repair round the owner authorised as Option A, against phase2/repair-3-boundary
+  (base c34c439), scoped to exactly AR75-F1, AR75-F2 and AR75-F3 per P2-HO-0052. On its result, reproduce its checks
+  serially, then dispatch ONE fresh Opus 5 adversarial review (P2-AR-0077) focused on the two fixes and the existing
+  install-trust attack surface. Then branch on that review, per the owner's stop condition -- if it finds another
+  materially new HIGH blocker on the install-trust surface, or leaves AR75-F1 or AR75-F2 materially open, STOP and return
+  an architecture/meta-review package to the owner rather than repairing again. If it finds no blocking defect, merge the
+  line into release/4.1.6-rc1, reproduce the serialised checks there, mint cap2-candidate-2, and dispatch the formal
+  independent acceptance verification on fresh Opus 5 roles (the P2-HO-0043..0047 templates updated for the new
+  candidate). P2-PERF-0001 runs in parallel and does not gate any of this.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
+  - {action: 'minting cap2-candidate-2', until: 'both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)'}
+  - {action: 'a fifth repair round on the install-trust surface', until: 'the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077'}
+  - {action: 'designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it', until: 'Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written'}
+  - {action: 'a major performance optimisation or refactor of the certification suite', until: 'after Phase 2, unless required for correctness -- P2-PERF-0001 measures and recommends only'}
   - {action: printing, logging, committing, hashing or copying the provider API key into any file, packet, handoff or agent output, until: never}
   - {action: a provider worker grading a candidate or substituting for the formal Opus acceptance verification, until: never}
   - {action: launching any DeepSeek/API provider worker, until: the owner explicitly re-enables DeepSeek as an execution provider (paused 2026-09-21; adapter, telemetry and evidence preserved for V8.3)}
