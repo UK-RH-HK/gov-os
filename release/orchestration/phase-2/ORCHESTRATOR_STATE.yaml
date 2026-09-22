@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T12:23:20Z'
-state_hash: 250d6c7ad3baa459e53f3d97cedb80080f3d3e5c36513b5d13eaaa2369ba97b1
+updated_at: '2026-09-22T20:20:10Z'
+state_hash: 72ac4df99e25b18dd4fc9730131f04e3326e91c625188e6e46b72cd957124feb
 lifecycle_state: P2_REPAIR_ROUND_3_BOUNDED
 loop_status: RUNNING
 
@@ -293,7 +293,9 @@ test_execution_policy:
   what_serialised_means_here: 'ONE SUITE AT A TIME ON THE MACHINE, default threads intact -- never tests forced serial within a suite. The historical spurious failures (203/7 on a tree that was really 210/0) were cross-suite machine overload, a different problem with a different fix.'
   where_single_threading_is_genuinely_required: "the independent verifiers' held-out harnesses, which do mutate process-global env (release/verification/.../heldout-tests/mint.rs:138-141 sets XDG_STATE_HOME and HOME). That constraint must not migrate back to the certification suite."
   recording_requirement: 'every run record that reports a suite figure must also state the --test-threads value and the machine load. A test result without its concurrency conditions is unfalsifiable -- P2-AR-0075 omitted both and its 2,742 s needed a CPU-conservation argument to decode.'
-  planning_figure: '~1,460 s (24 min) growth-adjusted for 244 tests; 1,200 s optimistic. Do NOT quote 2,742 s as the suite cost.'
+  planning_figure: 'MEASURED 2026-09-22 on a verified-quiet machine at default threads: 252 tests, 2,966 s wall (49m26s), 38,971 CPU-s, P=12.95 effective cores (65% of 20). The suite costs about 50 minutes on this tree. The earlier ~1,460 s (24 min) estimate was derived from a CPU calibration that the direct measurement falsified by ~2.4x, and is withdrawn.'
+  superseded_reconciliation: "P2-AR-0075's 2,742 s was NOT an outlier and needed no explanation: at the measured W its P is about 12, indistinguishable from this run's 12.95. The earlier '~3 test streams / reduced --test-threads' account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost."
+  floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
 running_work:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: RUNNING}
