@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T20:36:19Z'
-state_hash: b0723c5d31c337149f5ffd8fb3afaa41695f33a36926e93cb226bef4c7d8e81b
+updated_at: '2026-09-22T21:08:32Z'
+state_hash: 361bf594174fe4dc4d56749f5ed97a2d755bcd9039412e0c0eae043654c761f7
 lifecycle_state: P2_REPAIR_ROUND_3_BOUNDED
-loop_status: RUNNING
+loop_status: STOPPED_AWAITING_OWNER_ARCHITECTURE_REVIEW
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -299,7 +299,8 @@ test_execution_policy:
   evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
-running_work:
+running_work: []
+former_running_work:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: RUNNING}
   - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: RUNNING, blocks_phase_2: false}
 
@@ -354,15 +355,10 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  AWAIT_P2-AR-0076, the bounded final repair round the owner authorised as Option A, against phase2/repair-3-boundary
-  (base c34c439), scoped to exactly AR75-F1, AR75-F2 and AR75-F3 per P2-HO-0052. On its result, reproduce its checks
-  serially, then dispatch ONE fresh Opus 5 adversarial review (P2-AR-0077) focused on the two fixes and the existing
-  install-trust attack surface. Then branch on that review, per the owner's stop condition -- if it finds another
-  materially new HIGH blocker on the install-trust surface, or leaves AR75-F1 or AR75-F2 materially open, STOP and return
-  an architecture/meta-review package to the owner rather than repairing again. If it finds no blocking defect, merge the
-  line into release/4.1.6-rc1, reproduce the serialised checks there, mint cap2-candidate-2, and dispatch the formal
-  independent acceptance verification on fresh Opus 5 roles (the P2-HO-0043..0047 templates updated for the new
-  candidate). P2-PERF-0001 runs in parallel and does not gate any of this.
+  NONE WITHOUT AN OWNER DECISION. OA-P2-06's stop condition triggered on BOTH limbs: P2-AR-0077 returned
+  RESIDUAL_DEFECTS with three materially new HIGH findings on the install-trust surface, and left AR75-F1 and AR75-F2
+  materially open as classes. The orchestrator has stopped: no mint, no fifth repair round, no formal verification.
+  PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md is the escalation, with options A-E. Resume only on the owner's choice.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
