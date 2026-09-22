@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T00:58:26Z'
-state_hash: 8e6321fefd28f217a43856ab652880a905498571b36cacc1a56113667a63301a
+updated_at: '2026-09-22T01:33:11Z'
+state_hash: d324dba78f5d0727cb7792d0189fa2a69e742d28c212d5dc70aca1ef5a39b5f7
 lifecycle_state: P2_REPAIR_ITERATION_2
 loop_status: P2_REPAIR_2_RUNNING
 
@@ -283,9 +283,11 @@ agent_runs:
   - {run_id: P2-AR-0070, role: capability-repair, workstream: toolbind, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-toolbind, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0070.run.yaml}
   - {run_id: P2-AR-0071, role: capability-repair, workstream: reviewbind, iteration: 2, status: COMPLETED_PARTIAL, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-reviewbind, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0071.run.yaml}
   - {run_id: P2-AR-0072, role: capability-repair, workstream: reviewbind-constructions, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-reviewbind2, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0072.run.yaml}
+  - {run_id: P2-AR-0073, role: adversarial pre-mint reviewer (second pass), iteration: 2, status: RUNNING, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial-2, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0073.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
-running_work: []
+running_work:
+  - {run_id: P2-AR-0073, role: adversarial pre-mint reviewer (second pass), status: RUNNING, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0073.run.yaml}
 
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
@@ -338,15 +340,13 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  AWAIT_P2-AR-0064 (WS-B overlay precedence) and P2-AR-0065 (WS-F health tiers), fresh native Sonnet 5 workers at high
-  effort continuing from the preserved branches. On each: verify the branch myself (build, lib, full certification), record,
-  and commit. WS-C, WS-D, WS-E and WS-G are already claimed and verified clean by orchestrator runs (WS-D's exact
-  certification count is taken at integration). When WS-B is clean, dispatch WS-A (BC-P2-53 + BC-P2-41, tool-install trust
-  surface) as a fresh native Sonnet 5 worker from the WS-B result, then a strong independent adversarial review by a fresh
-  Opus 5 role before minting. Then integrate all workstreams, reproduce the full regression and gov contract verify myself,
-  mint cap2-candidate-2, and dispatch the formal independent acceptance verification on fresh Opus 5 roles. Escalate to the
-  owner only on a genuinely new material blocker class, an architecture-boundary decision, a provider-security problem or an
-  owner decision; routine model, context, checkpoint, split and worker-mechanism choices are the orchestrator's.
+  AWAIT_P2-AR-0073, the second adversarial pre-mint review, against phase2/repair-2-final (1c6a3a2), which the orchestrator
+  verified serially at build 0 warnings, lib 280/0, certification 235/0 and CONTRACT_SOURCE_BOUND. If it finds defects in
+  existing classes, repair and re-review again before minting. If it reports SURFACE_SOUND: merge the line into
+  release/4.1.6-rc1, reproduce the serialised checks on the release branch, mint cap2-candidate-2, and dispatch the formal
+  independent acceptance verification on fresh Opus 5 roles (the P2-HO-0043..0047 templates updated for the new candidate).
+  Escalate to the owner only on a genuinely new material blocker class, an architecture-boundary decision or an owner
+  decision.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}

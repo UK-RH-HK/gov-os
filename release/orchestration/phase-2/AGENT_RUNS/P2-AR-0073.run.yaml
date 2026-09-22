@@ -1,0 +1,25 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0073
+role: adversarial pre-mint reviewer, second pass (independent; not the formal acceptance verifier)
+objective: 'Attack the three mechanisms built after the first adversarial review: OD-P2-05 byte binding and command classification, bound-only review evidence, and the glob-overlap plus decided-output restrictiveness
+  check. Also probe the consumers the path-rule repair left unaudited beyond the suite.'
+worker:
+  execution: native Claude subagent
+  model: claude-opus-5
+  effort: high
+independence: authored none of the repairs, the integration, the first adversarial review or the iteration-1 verifications
+target:
+  branch: phase2/repair-2-adversarial-2
+  base: phase2/repair-2-final 1c6a3a2
+  product_code_digest: 86dbdfdb5b0cd2e65a13089f3fd3e113fb89d1e882533f0a3073b7100e998a14
+  governed_state_digest: 8c8ebe02da0926151a4bfc1f3a4437c31f2315c10255da3ad4a56ad451b6935d
+  orchestrator_verified: build 0 warnings, lib 280/0, certification 235/0, gov contract verify CONTRACT_SOURCE_BOUND (serialised)
+prior_review: P2-AR-0068 found 3 HIGH and 3 MEDIUM; all six were repaired by P2-AR-0069..0072 under OD-P2-05, P2-ADJ-0004 and P2-ADJ-0005
+active_gate: GATE-P2-REPAIR-2
+iteration: 2
+required_verdict_vocabulary:
+- SURFACE_SOUND
+- RESIDUAL_DEFECTS
+- INCOMPLETE
+status: RUNNING
