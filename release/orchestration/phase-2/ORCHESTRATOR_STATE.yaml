@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T21:08:32Z'
-state_hash: 361bf594174fe4dc4d56749f5ed97a2d755bcd9039412e0c0eae043654c761f7
-lifecycle_state: P2_REPAIR_ROUND_3_BOUNDED
-loop_status: STOPPED_AWAITING_OWNER_ARCHITECTURE_REVIEW
+updated_at: '2026-09-22T22:16:49Z'
+state_hash: 90cfc422ca65243e132e0a36c38c5481c8a4bb6384799866f20d053c0ffea7d6
+lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
+loop_status: RUNNING
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -96,7 +96,7 @@ active_decisions:
   active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001, ARCH-0003]
   superseded: [D-0001]
   proposed_not_active: [D-0008, ARCH-0002]
-  owner_records_in_force: [OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002, OWNER-DECISION-P2-0003, OWNER-CLARIFICATION-P2-0004, OWNER-DECISION-P2-0005, OWNER-AUTHORISATION-P2-0006]
+  owner_records_in_force: [OWNER-DECISION-P2-0007, OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002, OWNER-DECISION-P2-0003, OWNER-CLARIFICATION-P2-0004, OWNER-DECISION-P2-0005, OWNER-AUTHORISATION-P2-0006]
   orchestrator_adjudications: [P2-ADJ-0001, P2-ADJ-0002, P2-ADJ-0003, P2-ADJ-0004, P2-ADJ-0005, P2-ADJ-0006]
   orchestrator_adjudications_note: 'all six are in GATES/; P2-ADJ-0006''s stopping rule fired on 2026-09-22 and the owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources, never a new owner decision, and the owner may override any of them.'
   owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses the owner Phase-2 directive's three-iteration convergence rule
@@ -285,6 +285,23 @@ agent_runs:
   - {run_id: P2-AR-0075, role: adversarial pre-mint reviewer (third pass), iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial-3, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0075.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
 
+worker_stall_protection:
+  status: ACTIVE
+  adopted: '2026-09-22, owner instruction section 1 of the A+C architecture decision (OD-P2-07)'
+  scope: 'procedural/runtime governance for the remainder of Phase 2. Changes nothing in Contract v3, the frozen Phase-2 acceptance criteria, product behaviour or the active V8.2 architecture.'
+  origin: 'the ~420-minute stall recorded in V8_3_EVIDENCE_PACKAGE.md section 6.3b -- a worker finished its targeted work, was told to wait for coordinator confirmation before the full suite, the coordinator never sent it, and the worker sat idle while its notifications read as running.'
+  rules:
+    - '1. No worker may be left indefinitely waiting for an orchestrator/coordinator message.'
+    - '2. A blocking coordinator handshake may be created ONLY with BOTH an explicit timeout AND a deterministic default action on expiry.'
+    - '3. Prefer self-evaluable preconditions over handshakes. BAD: "tell me when ready and wait until I confirm the machine is clear". GOOD: "start when no competing cargo/gov certification process is running and load satisfies the stated condition; otherwise wait, re-check periodically, and proceed automatically once satisfied".'
+    - '4. Worker state must distinguish at least RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, COMPLETE.'
+    - '5. BLOCKED_ON_COORDINATOR must be surfaced immediately and must always carry why it is blocked, what response is awaited, the timeout and the default action. It must never be reported merely as running.'
+    - '6. Rising elapsed time with unchanged status or progress is a stall signature. Investigate rather than assume progress.'
+    - '7. Never report a worker as still running from a stale observation. Check current process/worker state AT THE TIME of any liveness statement to the owner.'
+    - '8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator message.'
+  v8_3_disposition: IMPLEMENTED_DURING_PHASE_2
+  confirmed_active_before: 'the A+C implementation dispatch, as the owner required in section 1 rule 10'
+
 test_execution_policy:
   adopted: '2026-09-22, from P2-PERF-0001 recommendation R1 (release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, commit 651ceb3)'
   rule: 'never pass --test-threads=1 to the certification suite; run it machine-exclusive at libtest default parallelism'
@@ -299,7 +316,8 @@ test_execution_policy:
   evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
-running_work: []
+running_work:
+  - {run_id: P2-AR-0078, role: 'structural architecture remediation (A+C per OD-P2-07)', worker_model: claude-sonnet-5 native, branch: phase2/remediation-ac, base: e25ca70, worktree: scratchpad/wt/p2-ac, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0054-a-plus-c-structural-remediation.md, evidence_class: BUILDER_DEVELOPMENT_EVIDENCE, status: RUNNING}
 former_running_work:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: RUNNING}
   - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: RUNNING, blocks_phase_2: false}
@@ -355,13 +373,24 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  NONE WITHOUT AN OWNER DECISION. OA-P2-06's stop condition triggered on BOTH limbs: P2-AR-0077 returned
-  RESIDUAL_DEFECTS with three materially new HIGH findings on the install-trust surface, and left AR75-F1 and AR75-F2
-  materially open as classes. The orchestrator has stopped: no mint, no fifth repair round, no formal verification.
-  PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md is the escalation, with options A-E. Resume only on the owner's choice.
+  AWAIT_P2-AR-0078, the A+C structural remediation authorised by OD-P2-07, on phase2/remediation-ac off e25ca70 under
+  P2-HO-0054. On its result, reproduce its checks serially, FREEZE the implementation, then dispatch ONE fresh Opus 5
+  independent adversarial/property review that did not implement the change, did not participate in the builder session
+  and did not author the builder's tests. Then branch on the owner's hard stop: if that review finds another materially
+  new HIGH on the install-trust architecture, the raw-command authority boundary, the authority-enumeration pattern or
+  project-editable exemption semantics, OR leaves a known HIGH materially open, STOP and return to the owner - escalating
+  toward Option B or another owner-approved architecture review, never another local repair round. If it finds no
+  blocking defect: integrate and freeze, run the trusted deterministic checks, mint cap2-candidate-2, re-establish
+  evidence per Contract v3 freshness, and dispatch the formal fresh Opus 5 acceptance verification including
+  R1-preservation and held-out suites. No builder grades its own work. Phase 3 does not begin unless
+  GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED is independently earned.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
+  - {action: 'treating any builder-authored test, including a generative property test, as independent or acceptance evidence', until: 'never - OD-P2-07 fixes four classes: BUILDER_REGRESSION, BUILDER_DEVELOPMENT_EVIDENCE, INDEPENDENT_ADVERSARIAL, HELD_OUT_ACCEPTANCE, never collapsed into "tests passed"'}
+  - {action: 'implementing Option B (isolation/sandbox execution) during Phase 2', until: 'A demonstrably cannot satisfy the frozen Phase-2 requirements AND the owner explicitly authorises the additional scope'}
+  - {action: 'another local repair or enumeration round on the install-trust surface after the A+C review', until: 'an owner decision - the hard stop escalates toward Option B or another owner-approved architecture review'}
+  - {action: 'creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default action', until: 'never in Phase 2 - worker_stall_protection is ACTIVE'}
   - {action: 'minting cap2-candidate-2', until: 'both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)'}
   - {action: 'a fifth repair round on the install-trust surface', until: 'the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077'}
   - {action: 'designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it', until: 'Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written'}

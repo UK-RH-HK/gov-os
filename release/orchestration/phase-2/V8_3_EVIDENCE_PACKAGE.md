@@ -248,7 +248,32 @@ model. Budget last, if ever.
 `c34c439` and will write `PERFORMANCE_DIAGNOSTIC.md`. Its brief is measurement and recommendation only: the owner barred
 a major performance refactor during the bounded Phase-2 repair. **Its findings replace this section's placeholders.**
 
-### 5.1a The headline, and it is not what the orchestrator assumed — DELIVERED, P2-PERF-0001 (`PERFORMANCE_DIAGNOSTIC.md`, `651ceb3`)
+### 5.0 CURRENT TRUTH — this table supersedes every figure later in §5
+
+Anything in §5 that disagrees with this block is **historical and retracted**, retained only to show how the numbers
+moved. Established by direct measurement on 2026-09-22 (`M14-CLEAN-FULL-SUITE.txt`), machine-exclusive at default
+`--test-threads` from a verified-quiet machine.
+
+| Quantity | **Current truth** | Status of the earlier figure |
+|---|---|---|
+| Full certification suite (252 tests) | **≈ 50 min** (2,966 s wall; 38,971 CPU-s; P = 12.95) | ~20–24 min **RETRACTED** |
+| `--test-threads=1` | **≈ 2.5 h** | unchanged |
+| Single-threading penalty | **≈ 3×** | 7× **RETRACTED** (invalid cross-tree normalisation) |
+| Scheduling-only floor | **≈ 40–43 min** (modelled, NOT MEASURED) | 32.5 min **RETRACTED** (assumed 20 logical CPUs deliver 20 cores) |
+| Milestone validation SLO | **≤ 55 min** | ≤ 25 min **RETRACTED** |
+| Full certification SLO | **≤ 65 min** | ≤ 35 min **RETRACTED** |
+| Ordinary task/change validation | **≤ 5 min** | ≤ 3 min superseded |
+| Hardware | **8 P-cores + 4 E-cores = 12 physical, 20 threads**; the guest's uniform "10 × 2" is synthetic | both 20 and 10 were wrong divisors |
+| Where the time goes | **user-space CPU inside `gov`** (system time ~3%) | unchanged |
+| Remaining lever | **`W` itself** — dev-profile optimisation. Scheduling is worth ~7–10 min and cannot cross the floor | scheduling **no longer** the main opportunity |
+
+**Operating rules that follow, in force for the rest of Phase 2:** never `--test-threads=1` on the ordinary
+certification suite without a demonstrated isolation requirement; keep acceptance-critical full suites
+machine-exclusive; never run two full suites concurrently for speed; and record **thread count, load/concurrency
+condition, command line and duration** with every acceptance-relevant suite figure. No major performance refactor during
+the A+C remediation.
+
+### 5.1a The headline, and it is not what the orchestrator assumed — DELIVERED, P2-PERF-0001 (`PERFORMANCE_DIAGNOSTIC.md`, `651ceb3`), **with §5.0 superseding its derived figures**
 
 **The ~2.5 hours is not a property of the suite. It is the cost of `--test-threads=1`.** Normalising every recorded
 suite duration by test count:
@@ -364,7 +389,7 @@ operation is a fresh single-project process, so runtime statics cannot cross tes
 
 ### 5.4 The tension V8.3 must resolve
 
-Requiring the full suite per run (§4, correctly, to catch cross-family breakage) multiplied by ~24 min per run is the
+Requiring the full suite per run (§4, correctly, to catch cross-family breakage) multiplied by ~50 min per run (§5.0) is the
 direct cause of the cost the owner is objecting to. These pull against each other and the resolution is almost certainly
 **impact-selected checks for G1–G4 with exhaustive qualification reserved for G5/G6**, plus sound evidence caching — but
 only if isolation and cache-key soundness are *demonstrated*, per the owner:
@@ -377,12 +402,12 @@ only if isolation and cache-key soundness are *demonstrated*, per the owner:
 
 | | Recommendation | Expected saving | Must be proven first | Touches acceptance evidence | Phase 2? |
 |---|---|---|---|---|---|
-| **R1** | **Never pass `--test-threads=1` to the certification suite; keep machine-exclusivity** | **~7×, ~2 h per run** | Effectively already proven: no `#[serial]`, no `env::set_var`, per-`Command` env, unique roots, the one real hazard fixed in `6aa1cf8`, and P2-AR-0072 already ran **231/0 at default parallelism** | **Yes, beneficially** — record `--test-threads` and load in every run record | **ADOPTED** |
+| **R1** | **Never pass `--test-threads=1` to the certification suite; keep machine-exclusivity** | **~3×, ~1.7 h per run** (§5.0; the 7× was an invalid cross-tree normalisation). Better read as *a 3× regression to avoid* than a speed-up available | Effectively already proven: no `#[serial]`, no `env::set_var`, per-`Command` env, unique roots, the one real hazard fixed in `6aa1cf8`, and P2-AR-0072 already ran **231/0 at default parallelism** | **Yes, beneficially** — record `--test-threads` and load in every run record | **ADOPTED** |
 | R2 | Fix the perpetual rebuild in `runtime/build.rs` | 3.6–3.8 s per invocation, every invocation | that `EMBEDDED_COMMIT` still invalidates when HEAD moves — that trigger is *why* `.git/HEAD` is declared | no | defer |
 | R3 | Raise dev-profile `opt-level` | **NOT DETERMINED — likely largest after R1** | identical outcomes **and** a full green suite | **yes** — the binary under test changes | **not in Phase 2** |
 | R4 | GC stale `target/` dirs; do **not** share a target dir between concurrently-active worktrees | 178 GB (118 GB already reclaimed) | — | no | GC safe now |
 | R5 | **Do not shard** — decision, not an omission | — | — | — | — |
-| R6 | Whole-suite evidence cache, advisory G1–G4, never G5/G6 | skips a ~24 min run when `product_code_digest` is unchanged | the full key list, expiry, and a reconciliation run | **yes, centrally** | defer |
+| R6 | Whole-suite evidence cache, advisory G1–G4, never G5/G6 | skips a **~50 min** run when `product_code_digest` is unchanged — worth more than when first written | the full key list, expiry, and a reconciliation run | **yes, centrally** | defer |
 | **R7** | `pipefail` in `collect_evidence.sh`; a missing result line must be **FAIL**, not `NOT_RUN` | none — **correctness** | — | no | **DONE** (see below) |
 | R8 | Reap suite scratch (37,808 roots / 3.7 GB) | negligible time; unbounded growth | — | no | safe now |
 
@@ -392,11 +417,11 @@ only if isolation and cache-key soundness are *demonstrated*, per the owner:
 `curve25519-dalek` and all 99,655 lines of `gov-runtime` are still unoptimised. Use `CARGO_PROFILE_DEV_OPT_LEVEL`,
 **not `--release`**, which would also disable overflow checks and the one `debug_assert`.
 
-**Target runtimes.** Ordinary task/change validation **≤ 3 min** (targeted families at default parallelism plus
+**Target runtimes.** Ordinary task/change validation **≤ 5 min** (targeted families at default parallelism plus
 `cargo test --lib`, with the build tax R2 would remove; the binding constraint is not speed but Q9's lesson that
-targeted runs must still be followed by one full suite before review). Milestone validation **≤ 25 min** (one full
+targeted runs must still be followed by one full suite before review). Milestone validation **≤ 55 min** (§5.0; one full
 suite, machine-exclusive, default threads — **available today with no code change**, and it supersedes 2,742 s). Full
-certification **≤ 35 min**, of which the suite is ~1,460 s and the other three required checks are **NOT DETERMINED**
+certification **≤ 65 min** (§5.0), of which the suite is ~2,966 s and the other three required checks are **NOT DETERMINED**
 and budgeted at ~600 s — the **weakest number in the report**, and about five minutes' work to fix.
 
 ### 5.6 Two findings from the diagnostic that are not about performance
@@ -434,6 +459,76 @@ evidence-map row references the script (only historical reports do), it can only
 leaving a known evidence-masking defect in the collection tooling while a formal acceptance verification is about to
 run would be indefensible. The hard-coded `--test-threads=4` on the same line was **deliberately left alone** — that is
 a performance change, not a correctness one, and the owner barred performance work in this round.
+
+### 6.3e Evidence classes — a property test is not independent merely because it is generative
+
+**This supersedes the weaker rule stated in §6.1** (*"acceptance evidence for a class must be a property"*). That rule was
+right about shape lists and wrong about who may author the property. P2-AR-0077 proved it.
+
+**The four classes, and they must not be collapsed into "tests passed":**
+
+| Class | What it is | What it can close |
+|---|---|---|
+| `BUILDER_REGRESSION` | builder-authored regression tests | development evidence only |
+| `BUILDER_DEVELOPMENT_EVIDENCE` | **builder-authored property/generative tests** | **development evidence only** |
+| `INDEPENDENT_ADVERSARIAL` | probes and generators derived independently by a reviewer who did not implement | a finding, by its own reproduction |
+| `HELD_OUT_ACCEPTANCE` | held-out formal acceptance tests, unseen by any builder until the verdict is committed | acceptance |
+
+**The evidence (P2-AR-0077, verified in source by the orchestrator).** P2-ADJ-0006 required a property over the default.
+The builder complied faithfully, and wrote:
+
+```rust
+for cand_class in ["generated", "derived"]   // repair4.rs:616
+```
+
+inside `a_candidate_conferring_the_generated_exemption_is_refused_for_any_class_value_or_overlapped_kernel_rule`. **The
+name says "for any class value"; the generator quantifies over exactly the two values the fix implements.** The real
+vocabulary is six (`is_production_path`, `tasks.rs:1865–1868`). The companion AR75-F1 property test has the same shape of
+gap: every case it generates is a token that *is* a path — it never produces a URL, a path embedded in a larger token, a
+dangling symlink or any `curl` argv, which is precisely where AR77-F1 and AR77-F2 live.
+
+**The rule, stated generally:** when one worker defines both the implementation and the generator's domain, the two share
+a blind spot, and the property proved is only *"the implementation behaves correctly over the cases its author
+imagined."* Generativity does not confer independence — **the domain does.** The old failure encoded the last reviewer's
+shape list; this one encoded the implementation's own value set. Same structure, one level up.
+
+This extends the frozen gate contract's line 57 (*"builder tests are regression evidence, not independent
+certification"*) to property tests, which this orchestration had implicitly assumed immune.
+
+### 6.3f The enumeration-failure lesson — four rounds, one pattern
+
+| Round | Mechanism | Defeated by |
+|---|---|---|
+| 1 | per-token scan | wrapping |
+| 2 | positive allowlist of readable *shapes* | 25 shapes |
+| 3 | **inverting the default** (P2-ADJ-0006) | the inversion **held**; two list entries' *premises* were false |
+| 4 | fixing those two entries | the premise false twice more for the same program; `class` compared 2 of 6 values and 1 of 2 consumers |
+
+Five distinct enumerations failed: **programs, command shapes, allowlist premises, class values, and the set of
+*consumers* of class.** The transferable lesson:
+
+> **A fail-closed default is weakened by exceptions whose completeness cannot be proven.** Every exception is an
+> enumeration, and every enumeration is a hole. Prefer structural authority sources and enforceable boundaries over
+> repeated exception enumeration.
+
+The inversion itself was correct and still holds — an unrecognised program gates. The defect was never the default; it
+was the exception list guarding it.
+
+### 6.3g Cross-check independence
+
+Recorded at §6.3d and restated here as a rule for measurement evidence generally: **two calculations agreeing is not
+corroboration when they share a biased input.** Future evidence should state whether cross-check inputs are genuinely
+disjoint, and a cross-check whose inputs overlap should be rejected rather than counted.
+
+### 6.3h Derived verdicts and enforced checkpoints — carried forward
+
+Both retained from §1.3 and §2.4 as V8.3 requirements rather than observations:
+
+- **Workers report evidence; the substrate derives the verdict** from required checks, results, unresolved items,
+  mutation scope and evidence completeness. A worker should not be able to type `REPAIRED_CLAIMED` at all. Phase 2 saw
+  the orchestrator re-grade three worker-declared verdicts.
+- **Checkpointing must be substrate-enforced.** Prompt instruction alone did not reliably produce checkpoints — a worker
+  that owes one should not be able to finish without it.
 
 ## 6. Orchestration
 
