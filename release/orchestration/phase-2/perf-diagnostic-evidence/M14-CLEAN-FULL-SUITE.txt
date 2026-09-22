@@ -1,0 +1,35 @@
+M14: the clean machine-exclusive full-suite run that falsified this diagnostic's CPU calibration.
+Measured by the orchestrator, not by P2-PERF-0001. Recorded here because every corrected figure
+in PERFORMANCE_DIAGNOSTIC.md derives from it.
+
+Conditions: machine-exclusive, default --test-threads, verified quiet at start
+  load 0.64 / 0.45 / 0.41, zero other cargo/gov processes, 319 GB free
+  started 2026-09-22T19:23:06Z, ended 20:13:15Z, exit 0
+
+  test result: ok. 252 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2966.26s
+  real  50m9.968s
+  user  630m50.420s
+  sys   18m40.657s
+
+Derived:
+  total CPU W      = 37,850.420 + 1,120.657 = 38,971.077 s
+  system fraction  = 1,120.657 / 38,971.077 = 2.88%   (cf. 1.55% clean brownfield, 3.3% swept)
+  wall             = 2,966.26 s harness / 3,009.968 s real
+  effective cores  P = 38,971.077 / 3,009.968 = 12.95   (64.7% of 20)
+  per test         154.6 s CPU, 11.94 s wall
+  floor at 20 cores, 100% utilisation = 38,971.077 / 20 = 1,948.6 s = 32.5 min
+
+Consequences (see PERFORMANCE_DIAGNOSTIC.md section 3.1):
+  * W is 2.39x the ~15,800 s this diagnostic inferred. The inference is retracted.
+  * P2-AR-0075's 2,742 s decodes to P = 12.2-13.1, indistinguishable from 12.95. It was a
+    normal machine-exclusive run. The "~3 test streams" reconciliation is retracted in full.
+  * single-threaded is capped at P ~= 4.3 by gov's available_parallelism().clamp(2,4), so
+    38,971 / 4.3 = 9,063 s = 2.52 h -- the owner's "~2.5 hours", reproduced from first
+    principles. The like-for-like speedup for avoiding --test-threads=1 is 3.0x, not 7x.
+  * milestone validation is ~50 min measured, NOT the 20-25 min this report first targeted.
+  * no scheduling change alone can go below ~32.5 min; only reducing W (R3) can.
+
+UNAFFECTED by the correction: the --test-threads=1 category error and R1; the user/system CPU
+split and every hypothesis rejected in section 5; the Pareto shape; "2 units, not 141" and the
+178 GB; the perpetual-rebuild root cause with cargo's own dirty reason; the RECONCILED
+disclosed observation; the 172-of-244 evidence-map gap.
