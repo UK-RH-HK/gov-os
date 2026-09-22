@@ -248,11 +248,80 @@ model. Budget last, if ever.
 `c34c439` and will write `PERFORMANCE_DIAGNOSTIC.md`. Its brief is measurement and recommendation only: the owner barred
 a major performance refactor during the bounded Phase-2 repair. **Its findings replace this section's placeholders.**
 
+### 5.1a The headline, and it is not what the orchestrator assumed — INTERIM, from P2-PERF-0001
+
+**The ~2.5 hours is not a property of the suite. It is the cost of `--test-threads=1`.** Normalising every recorded
+suite duration by test count:
+
+| Condition | s/test | Extrapolated to 244 tests |
+|---|---|---|
+| default threads, one suite at a time ("serialised") | 4.30, 4.88, 5.11, 5.39 | **~1,200 s ≈ 20 min** |
+| worker runs sharing the machine | 8.5 – 10.4 | ~35 – 42 min |
+| the load→160 era (five concurrent suites) | 23.7 | ~96 min |
+| **`--test-threads=1`** (P2-AR-0069, the only such run) | **35.09** | **8,561 s ≈ 2.38 h** |
+
+**Proof by contradiction, which is what makes this solid:** if "serialised" had meant `--test-threads=1`, the four runs
+labelled serialised would read ~35 s/test. They read 4.3–5.4 — **7× faster.** Nothing in the entire record is within
+40 minutes of 2.5 h except the single-threaded run.
+
+**And the single-threading was a category error.** `tests/certification` has **no `#[serial]`, no `serial_test`
+dependency, and zero `env::set_var`** — every variable is set per-`Command`. The `--test-threads=1` requirement is real
+but belongs to the **independent verifiers' held-out harnesses**, which *do* call `env::set_var` for `XDG_STATE_HOME`
+and `HOME`. Applying their constraint to the certification suite imported a 7× cost for no isolation benefit.
+
+**Answer to Q6, therefore:** "serialised" in this orchestration has meant **one suite at a time on the machine**, with
+libtest's default parallelism intact — not tests forced serial within a suite. The historical spurious failures were
+**machine overload across concurrent suites**, not intra-suite unsafety. Those are different problems with different
+fixes, and conflating them cost real time (§5.3).
+
 ### 5.2 What is already known, from durable records
 
-- **MEASURED.** A clean independent full certification run of 244 tests took **2,742 s** (~46 min) — `P2-AR-0075.run.yaml`.
-  The "~2.5 hours" the owner is reacting to therefore includes more than one suite execution (build, unit suites, the
-  `gov contract verify` chain, and an orchestrator reproduction), which the diagnostic is decomposing.
+- **MEASURED.** A clean independent full certification run of 244 tests took **2,742 s** (~46 min) —
+  `P2-AR-0075.run.yaml`. At 11.2 s/test this sits **above** the 4.3–5.4 s/test band of the runs classified as
+  serialised and inside the "sharing the machine" band, so it is currently an **unexplained 2.3× outlier**. The
+  orchestrator has asked P2-PERF-0001 to reconcile it rather than leave it standing, because this is the figure that
+  was quoted to a repair worker and in the owner-facing decision package. **An unexplained 2.3× may itself be a
+  finding.**
+- **MEASURED, clean (load 0.30–2.90).** Cold build of all test targets **39.3 s** wall / 207 s CPU (527%, 186 units);
+  warm no-op build **3.6–3.8 s**; incremental after touching one certification file **6.4 s**; `gov` process spawn
+  **3.9 ms**.
+- **MEASURED, clean (load 0.86).** `brownfield::brownfield_adoption_end_to_end` **alone takes 318.5 s** — one test.
+- **MEASURED, load-robust by construction.** System time is **3.3%** of CPU across 13 families (382.4 s system vs
+  11,340.3 s user), corroborated at 1.5% by the clean brownfield run. The workload is **user-space CPU-bound inside
+  `gov`** — not I/O-bound, not spawn-bound, not filesystem-bound. Three hypotheses retired at once.
+- **MEASURED, load-independent.** The slowest **21 of 133** tests hold **50%** of all test time; the slowest 59 hold
+  80%. Optimisation should target the head of that distribution, not the suite.
+- **MEASURED, load-independent (Q5).** Building a second tree into a **shared `CARGO_TARGET_DIR` recompiled 2 units,
+  not 141** — every third-party dependency was reused. Against that, the session held **44 independent worktrees at
+  ~4 GB each** for what is a 2-unit delta.
+
+### 5.2a A methodological lesson from the diagnostic itself
+
+The orchestrator instructed the diagnostician to discard any timing taken above load ~3. **The diagnostician pushed
+back, correctly, and the orchestrator accepted it.** Three classes of measurement are load-robust by construction and
+discarding them would have thrown away the report's central finding:
+
+1. **CPU time** (`os.wait4` user+sys, including reaped subprocesses) — contention stretches wall clock while a process
+   waits; it does not invent user-space instructions. Ratios survive any load.
+2. **Upper bounds that are still negligible** — a fixture copy at 4.4 ms under load 12, or a 190 MB sha256 at 0.106 s
+   under load 16, reject their hypotheses *a fortiori*, since contention could only inflate them.
+3. **Counts and rankings** — "2 units, not 141", and the Pareto shape, are load-independent.
+
+**Recommendation.** V8.3's measurement discipline should distinguish *wall-clock* claims (require a quiet machine) from
+*CPU-ratio, upper-bound and count* claims (do not). A blanket "quiet machine only" rule is simpler but discards sound
+evidence, and the orchestrator's own blunt version of it was wrong. Equally: the pushback only happened because the
+brief invited it. **Ask workers to argue rather than comply when they hold the measurements.**
+
+### 5.2b Storage, found by the diagnostic and remediated during it
+
+**MEASURED.** 44 worktrees held **177 GB** of unshared `target/` directories on a filesystem at **80%** used. All were
+audited: only the active repair worktree had uncommitted content, every other worktree's work being committed on its
+branch. The 23 worktrees of the two completed generations were then reclaimed, all restorable from their (verified
+still-present) branches.
+
+**Outcome: 177 GB → 59 GB; filesystem 80% → 67%; 319 GB free.** The buried hazard was that an in-flight build could
+have hit a full filesystem mid-round. **Recommendation:** a shared `CARGO_TARGET_DIR` (Q5 shows the delta is ~2 units)
+plus worktree lifecycle management once a generation's work is committed and recorded.
 - **MEASURED.** Five concurrent full suites at machine load ~160 reported 1,875 s / 1,062 s / 1,523 s / 1,785 s /
   1,038 s, **two of them with spurious failures** (203/7 and 206/3).
 
@@ -319,6 +388,34 @@ for a candidate merge commit that no human review had noticed.)
 - **OBSERVED failure.** A `worker_bootstrap.py` spec-generation loop aborted silently, leaving two workers launched with
   **stale briefs**. Both runs were killed and relaunched after a standalone generator was written. A partial
   packet-generation failure must be loud and must block dispatch.
+
+### 6.3a Two defects found by the repair worker in the orchestrator's own setup (2026-09-22)
+
+Both were reported by P2-AR-0076 rather than worked around silently, which is the behaviour §1.2 argues for.
+
+**(a) The worktree lineage did not contain the normative records the packet cited. ORCHESTRATOR DEFECT.** The repair
+worktree was branched from the repair tip `c34c439`, but the orchestration records (`OD-P2-05`, `P2-ADJ-0006`, the
+`P2-AR-0075` run record, and the worker's own handoff) live on `release/4.1.6-rc1`, a divergent lineage. The worker
+verified with `git ls-tree` that the paths it had been told to read *did not exist in its own tree*, located them in
+the main checkout, read them read-only and transcribed its quotations — and said so in its checkpoint.
+
+The harm was bounded because those files are read-only inputs. But a worker that trusted the packet less, or
+investigated less, would have proceeded without its governing decisions. **Recommendation:** product branches and
+governance-record branches diverge as a matter of course, so a packet must either resolve every normative path to a
+concrete revision or state which checkout to read it from. Better: have the substrate *verify path existence at
+dispatch* and refuse to launch a packet that cites a path the worker cannot see.
+
+**(b) `cargo fmt` is a scope-violation hazard in this repository.** The committed formatting does not match the
+sandbox's `rustfmt 1.9.0-stable` — even untouched files such as `runtime/src/doctor.rs` fail `rustfmt --check` in a
+pristine checkout. A bare `cargo fmt` walks the whole module tree from the crate root and reformatted **~17 files
+outside `allow_write`**. The worker reverted every one with `git checkout --`, verified with `git diff --stat`, and
+disclosed it.
+
+**Recommendation.** Two things for V8.3: **(i)** the write-scope enforcement that works well for `edit_file`/`write_file`
+does **not** cover a shell command that writes files as a side effect — scope enforcement must extend to command
+execution, or whole-tree formatters must be prohibited in packets; **(ii)** the underlying condition (committed
+formatting that no current toolchain reproduces) is itself a defect worth fixing once, deliberately, outside a bounded
+repair, because until it is fixed `cargo fmt --check` cannot be used as a gate at all.
 
 ### 6.4 Progress and drift detection at the orchestrator level
 
