@@ -1,0 +1,914 @@
+{
+  "rows": [
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command[2] 'escape-link' ('escape-link'): 'escape-link': its deepest existing ancestor '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/escape-link' could not be canonicalised (No such file or directory (os error 2)); a candidate the OS cannot resolve is not classified as staying inside the project (OD-P2-05 clause 3)"
+      ],
+      "human_gate": "HDG-0001",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml"
+      ],
+      "exec_result": null,
+      "shape": "W1-cp-symlink-install",
+      "tool": "TOOL-F1-01",
+      "argv_install": [
+        "cp",
+        "payload.txt",
+        "escape-link"
+      ],
+      "argv_health": null,
+      "note": "AR75-F1 witness: cp through a dangling in-project symlink"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [
+        "broader_filesystem_or_project_access"
+      ],
+      "undetermined": [],
+      "human_gate": "HDG-0002",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": true,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml"
+      ],
+      "exec_result": null,
+      "shape": "W1b-cp-symlink-live",
+      "tool": "TOOL-F1-02",
+      "argv_install": [
+        "cp",
+        "payload.txt",
+        "escape-link"
+      ],
+      "argv_health": null,
+      "note": "same, target already exists (NOT dangling)"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "health_check.command[2] 'escape-link' ('escape-link'): 'escape-link': its deepest existing ancestor '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/escape-link' could not be canonicalised (No such file or directory (os error 2)); a candidate the OS cannot resolve is not classified as staying inside the project (OD-P2-05 clause 3)"
+      ],
+      "human_gate": "HDG-0003",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml"
+      ],
+      "exec_result": null,
+      "shape": "W2-cp-symlink-health",
+      "tool": "TOOL-F1-03",
+      "argv_install": [
+        "true"
+      ],
+      "argv_health": [
+        "cp",
+        "payload.txt",
+        "escape-link"
+      ],
+      "note": "AR75-F1 witness in health_check.command; re-fires on gov tools health",
+      "health_ok": true,
+      "health_detail": "[{\"tool_id\": \"TOOL-FS-001\", \"ok\": true, \"kind\": \"builtin\"}, {\"tool_id\": \"TOOL-GIT-001\", \"ok\": true, \"kind\": \"command\", \"exit\": 0, \"stderr\": \"\"}, {\"tool_id\": \"TOOL-TEST-001\", \"ok\": true, \"kind\": \"command\", \"exit\": 0, \"stderr\": \"\"}, {\"tool_id\": \"TOOL-AST-001\", \"ok\": true, \"kind\": \"builtin\"}, {\"tool_id\": \"TOOL-CARGO-001\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"recorded\", \"id\": \"FAIL-0001\", \"path\": \"spec/reports/failures/FAIL-0001.yaml\", \"kind\": \"tool-failure\", \"signature\": \"302165282ecdaf196cfc3a9d\", \"reason\": null}}, {\"tool_id\": \"TOOL-CARGO-002\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"recorded\", \"id\": \"FAIL-0002\", \"path\": \"spec/reports/failures/FAIL-0002.yaml\", \"kind\": \"tool-failure\", \"signature\": \"5f850e97ddfee4459d6e581f\", \"reason\": null}}, {\"tool_id\": \"TOOL-CARGO-003\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"recorded\", \"id\": \"FAIL-0003\", \"path\": \"spec/reports/failures/FAIL-0003.yaml\", \"kind\": \"tool-failure\", \"signature\": \"82090714eed0d6d6494a7bce\", \"reason\": null}}, {\"tool_id\": \"TOOL-NPM-001\", \"ok\": true, \"kind\": \"command\", \"exit\": 0, \"stderr\": \"\"}, {\"tool_id\": \"TOOL-GO-001\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"recorded\", \"id\": \"FA",
+      "MARKER_AFTER_HEALTH": false
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command[3] 'escape-link' ('escape-link'): 'escape-link': its deepest existing ancestor '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/escape-link' could not be canonicalised (No such file or directory (os error 2)); a candidate the OS cannot resolve is not classified as staying inside the project (OD-P2-05 clause 3)"
+      ],
+      "human_gate": "HDG-0004",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml"
+      ],
+      "exec_result": null,
+      "shape": "W3-cp-symlink-env",
+      "tool": "TOOL-F1-04",
+      "argv_install": [
+        "env",
+        "cp",
+        "payload.txt",
+        "escape-link"
+      ],
+      "argv_health": null,
+      "note": "AR75-F1 witness behind an env wrapper"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl -K curlcfg'): 'curl' is told through '-K' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0005",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml"
+      ],
+      "exec_result": null,
+      "shape": "W4-curl-K-install",
+      "tool": "TOOL-F1-05",
+      "argv_install": [
+        "curl",
+        "-K",
+        "curlcfg"
+      ],
+      "argv_health": null,
+      "note": "AR75-F1 witness: curl -K reads its command line from a project file"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "health_check.command ('curl -K curlcfg'): 'curl' is told through '-K' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0006",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml"
+      ],
+      "exec_result": null,
+      "shape": "W5-curl-K-health",
+      "tool": "TOOL-F1-06",
+      "argv_install": [
+        "true"
+      ],
+      "argv_health": [
+        "curl",
+        "-K",
+        "curlcfg"
+      ],
+      "note": "same, in health_check.command",
+      "health_ok": true,
+      "health_detail": "[{\"tool_id\": \"TOOL-FS-001\", \"ok\": true, \"kind\": \"builtin\"}, {\"tool_id\": \"TOOL-GIT-001\", \"ok\": true, \"kind\": \"command\", \"exit\": 0, \"stderr\": \"\"}, {\"tool_id\": \"TOOL-TEST-001\", \"ok\": true, \"kind\": \"command\", \"exit\": 0, \"stderr\": \"\"}, {\"tool_id\": \"TOOL-AST-001\", \"ok\": true, \"kind\": \"builtin\"}, {\"tool_id\": \"TOOL-CARGO-001\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"existing\", \"id\": \"FAIL-0001\", \"path\": \"spec/reports/failures/FAIL-0001.yaml\", \"kind\": \"tool-failure\", \"signature\": \"302165282ecdaf196cfc3a9d\", \"reason\": null}}, {\"tool_id\": \"TOOL-CARGO-002\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"existing\", \"id\": \"FAIL-0002\", \"path\": \"spec/reports/failures/FAIL-0002.yaml\", \"kind\": \"tool-failure\", \"signature\": \"5f850e97ddfee4459d6e581f\", \"reason\": null}}, {\"tool_id\": \"TOOL-CARGO-003\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"existing\", \"id\": \"FAIL-0003\", \"path\": \"spec/reports/failures/FAIL-0003.yaml\", \"kind\": \"tool-failure\", \"signature\": \"82090714eed0d6d6494a7bce\", \"reason\": null}}, {\"tool_id\": \"TOOL-NPM-001\", \"ok\": true, \"kind\": \"command\", \"exit\": 0, \"stderr\": \"\"}, {\"tool_id\": \"TOOL-GO-001\", \"ok\": false, \"kind\": \"command\", \"exit\": -1, \"stderr\": \"No such file or directory (os error 2)\", \"failure_memory\": {\"status\": \"existing\", \"id\": \"FA",
+      "MARKER_AFTER_HEALTH": false
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command[2] 'brokenmid/marker' ('brokenmid/marker'): 'brokenmid/marker': its deepest existing ancestor '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/brokenmid' could not be canonicalised (No such file or directory (os error 2)); a candidate the OS cannot resolve is not classified as staying inside the project (OD-P2-05 clause 3)"
+      ],
+      "human_gate": "HDG-0007",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G1-dangling-mid",
+      "tool": "TOOL-F1-07",
+      "argv_install": [
+        "cp",
+        "payload.txt",
+        "brokenmid/marker"
+      ],
+      "argv_health": null,
+      "note": "gap 1: BROKEN intermediate component"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [
+        "broader_filesystem_or_project_access"
+      ],
+      "undetermined": [],
+      "human_gate": "HDG-0008",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G1b-live-mid",
+      "tool": "TOOL-F1-08",
+      "argv_install": [
+        "cp",
+        "payload.txt",
+        "livemid/g1b.marker"
+      ],
+      "argv_health": null,
+      "note": "live intermediate symlink out of the project"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl --config curlcfg'): 'curl' is told through '--config' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0009",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G2-config-long",
+      "tool": "TOOL-F1-09",
+      "argv_install": [
+        "curl",
+        "--config",
+        "curlcfg"
+      ],
+      "argv_health": null,
+      "note": "gap 2: --config long form"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl --config=curlcfg'): 'curl' is told through '--config=curlcfg' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0010",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G2b-config-equals",
+      "tool": "TOOL-F1-10",
+      "argv_install": [
+        "curl",
+        "--config=curlcfg"
+      ],
+      "argv_health": null,
+      "note": "gap 2: --config=<file> equals form"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl -sK curlcfg'): 'curl' is told through '-sK' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0011",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G2c-bundle-sK",
+      "tool": "TOOL-F1-11",
+      "argv_install": [
+        "curl",
+        "-sK",
+        "curlcfg"
+      ],
+      "argv_health": null,
+      "note": "gap 2/3: single-dash bundle carrying K"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl -Ks curlcfg'): 'curl' is told through '-Ks' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0012",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G2d-bundle-Ks",
+      "tool": "TOOL-F1-12",
+      "argv_install": [
+        "curl",
+        "-Ks",
+        "curlcfg"
+      ],
+      "argv_health": null,
+      "note": "gap 2/3: bundle, other order"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl --CONFIG curlcfg'): 'curl' is told through '--CONFIG' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0013",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G3-CONFIG-upper",
+      "tool": "TOOL-F1-13",
+      "argv_install": [
+        "curl",
+        "--CONFIG",
+        "curlcfg"
+      ],
+      "argv_health": null,
+      "note": "gap 3: uppercase long spelling"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [],
+      "undetermined": [
+        "install_command ('curl -k -s -o out.txt file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/payload.txt'): 'curl' is told through '-k' to read further arguments from a file or stream this classifier does not parse; a named artefact exists but what it would grant cannot be classified with confidence without reading its own grammar, so the OS reads no further and gates (OD-P2-05 clause 3, AR75-F1)"
+      ],
+      "human_gate": "HDG-0014",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G3b-curl-k-insecure",
+      "tool": "TOOL-F1-14",
+      "argv_install": [
+        "curl",
+        "-k",
+        "-s",
+        "-o",
+        "out.txt",
+        "file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/payload.txt"
+      ],
+      "argv_health": null,
+      "note": "gap 3: the disclosed case-fold collision -- curl -k (--insecure)"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml"
+      ],
+      "exec_result": null,
+      "shape": "G3c-curl-insecure-long",
+      "tool": "TOOL-F1-15",
+      "argv_install": [
+        "curl",
+        "--insecure",
+        "-s",
+        "-o",
+        "out.txt",
+        "file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/payload.txt"
+      ],
+      "argv_health": null,
+      "note": "gap 3: --insecure long form is NOT on the list -- does it gate?"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": true,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml"
+      ],
+      "exec_result": null,
+      "shape": "E1-curl-T-file-url",
+      "tool": "TOOL-F1-16",
+      "argv_install": [
+        "curl",
+        "-s",
+        "-T",
+        "payload.txt",
+        "file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/outside/f1-E1.marker"
+      ],
+      "argv_health": null,
+      "note": "MINE: curl uploads an in-project file to a file:// URL naming an absolute path outside the root. endpoint_host() returns None for the empty authority, and the token is not lexically an escape, so nothing looks at it as a path."
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": true,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml"
+      ],
+      "exec_result": null,
+      "shape": "E2-curl-writeout",
+      "tool": "TOOL-F1-17",
+      "argv_install": [
+        "curl",
+        "-s",
+        "-o",
+        "out2.txt",
+        "-w",
+        "%output{/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/outside/f1-E2.marker}P2AR0077_WRITEOUT\n",
+        "file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1/payload.txt"
+      ],
+      "argv_health": null,
+      "note": "MINE: curl --write-out %output{<abs path>} redirects write-out into an arbitrary absolute file. The path is EMBEDDED in a larger token, which token_values()/resolves_outside_project() never reads as a path."
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml"
+      ],
+      "exec_result": null,
+      "shape": "E3-curl-read-host-file",
+      "tool": "TOOL-F1-18",
+      "argv_install": [
+        "curl",
+        "-s",
+        "-o",
+        "stolen.txt",
+        "file:///etc/hostname"
+      ],
+      "argv_health": null,
+      "note": "MINE: read escape -- an absolute host path carried inside a file:// URL",
+      "STOLEN_IN_PROJECT": "Usain\n"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [
+        "broader_filesystem_or_project_access"
+      ],
+      "undetermined": [],
+      "human_gate": "HDG-0015",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml",
+        "HDG-0015.yaml"
+      ],
+      "exec_result": null,
+      "shape": "E4-cp-target-directory",
+      "tool": "TOOL-F1-19",
+      "argv_install": [
+        "cp",
+        "-t",
+        "tlink",
+        "payload.txt"
+      ],
+      "argv_health": null,
+      "note": "MINE: cp -t <symlinked dir> -- a bare-word target directory"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml",
+        "HDG-0015.yaml"
+      ],
+      "exec_result": null,
+      "shape": "NC1-conforming",
+      "tool": "TOOL-F1-20",
+      "argv_install": [
+        "true"
+      ],
+      "argv_health": null,
+      "note": "OD-P2-03 req 6: a conforming installation proceeds ungated"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml",
+        "HDG-0015.yaml"
+      ],
+      "exec_result": null,
+      "shape": "NC2-curl-sS-https",
+      "tool": "TOOL-F1-21",
+      "argv_install": [
+        "curl",
+        "-sS",
+        "https://pypi.org/simple/"
+      ],
+      "argv_health": null,
+      "note": "ordinary allowlisted network use alone does not gate"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml",
+        "HDG-0015.yaml"
+      ],
+      "exec_result": null,
+      "shape": "NC3-cp-inside",
+      "tool": "TOOL-F1-22",
+      "argv_install": [
+        "cp",
+        "payload.txt",
+        "copy.txt"
+      ],
+      "argv_health": null,
+      "note": "cp with both operands inside the project installs ungated",
+      "COPY_IN_PROJECT": true
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [
+        "privilege_escalation"
+      ],
+      "undetermined": [],
+      "human_gate": "HDG-0016",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml",
+        "HDG-0015.yaml",
+        "HDG-0016.yaml"
+      ],
+      "exec_result": null,
+      "shape": "NC4-sudo-make",
+      "tool": "TOOL-F1-23",
+      "argv_install": [
+        "sudo",
+        "make",
+        "install"
+      ],
+      "argv_health": null,
+      "note": "control: privilege escalation still gates"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": true,
+      "triggers_fired": [
+        "host_level_authority"
+      ],
+      "undetermined": [],
+      "human_gate": "HDG-0017",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": false,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml",
+        "HDG-0003.yaml",
+        "HDG-0004.yaml",
+        "HDG-0005.yaml",
+        "HDG-0006.yaml",
+        "HDG-0007.yaml",
+        "HDG-0008.yaml",
+        "HDG-0009.yaml",
+        "HDG-0010.yaml",
+        "HDG-0011.yaml",
+        "HDG-0012.yaml",
+        "HDG-0013.yaml",
+        "HDG-0014.yaml",
+        "HDG-0015.yaml",
+        "HDG-0016.yaml",
+        "HDG-0017.yaml"
+      ],
+      "exec_result": null,
+      "shape": "NC5-apt-get",
+      "tool": "TOOL-F1-24",
+      "argv_install": [
+        "apt-get",
+        "install",
+        "x"
+      ],
+      "argv_health": null,
+      "note": "control: host-level authority still gates"
+    }
+  ],
+  "outside_dir": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/outside",
+  "project_root": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/f1",
+  "hdg_gates_in_project": [
+    "HDG-0001.yaml",
+    "HDG-0002.yaml",
+    "HDG-0003.yaml",
+    "HDG-0004.yaml",
+    "HDG-0005.yaml",
+    "HDG-0006.yaml",
+    "HDG-0007.yaml",
+    "HDG-0008.yaml",
+    "HDG-0009.yaml",
+    "HDG-0010.yaml",
+    "HDG-0011.yaml",
+    "HDG-0012.yaml",
+    "HDG-0013.yaml",
+    "HDG-0014.yaml",
+    "HDG-0015.yaml",
+    "HDG-0016.yaml",
+    "HDG-0017.yaml"
+  ]
+}

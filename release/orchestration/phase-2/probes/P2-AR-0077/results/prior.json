@@ -1,0 +1,820 @@
+{
+  "classification": [
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-env",
+      "field": "install_command",
+      "argv": [
+        "env",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('env make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-nohup",
+      "field": "install_command",
+      "argv": [
+        "nohup",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('nohup make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-timeout_5",
+      "field": "install_command",
+      "argv": [
+        "timeout",
+        "5",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('timeout 5 make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-nice",
+      "field": "install_command",
+      "argv": [
+        "nice",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('nice make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-setsid",
+      "field": "install_command",
+      "argv": [
+        "setsid",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('setsid make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-stdbuf_-o0",
+      "field": "install_command",
+      "argv": [
+        "stdbuf",
+        "-o0",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('stdbuf -o0 make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-ionice",
+      "field": "install_command",
+      "argv": [
+        "ionice",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('ionice make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-chrt_1",
+      "field": "install_command",
+      "argv": [
+        "chrt",
+        "1",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('chrt 1 make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-env_FOO=1",
+      "field": "install_command",
+      "argv": [
+        "env",
+        "FOO=1",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('env FOO=1 make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "bundle--ce",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-ce",
+        "cd ..; touch m"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -ce cd ..; touch m'): 'sh' is handed inline code through '-ce', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "bundle--cl",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-cl",
+        "cd ..; touch m"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -cl cd ..; touch m'): 'sh' is handed inline code through '-cl', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "bundle--cx",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-cx",
+        "cd ..; touch m"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -cx cd ..; touch m'): 'sh' is handed inline code through '-cx', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "bundle--xc",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-xc",
+        "cd ..; touch m"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -xc cd ..; touch m'): 'sh' is handed inline code through '-xc', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "bundle--cv",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-cv",
+        "cd ..; touch m"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -cv cd ..; touch m'): 'sh' is handed inline code through '-cv', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "bundle--ic",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-ic",
+        "cd ..; touch m"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -ic cd ..; touch m'): 'sh' is handed inline code through '-ic', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "equals--eval",
+      "field": "install_command",
+      "argv": [
+        "node",
+        "--eval=require('fs')"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('node --eval=require('fs')'): 'node' is handed inline code through '--eval=require('fs')', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "equals--command",
+      "field": "install_command",
+      "argv": [
+        "python3",
+        "--command=import os"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('python3 --command=import os'): 'python3' is handed inline code through '--command=import os', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "flagless-awk",
+      "field": "install_command",
+      "argv": [
+        "awk",
+        "BEGIN{system(\"touch ../m\")}"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('awk BEGIN{system(\"touch ../m\")}'): 'awk' takes its program as a bare argument with no flag at all; the OS cannot distinguish that argument from an ordinary one, so it cannot be pinned and the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "flagless-gawk",
+      "field": "install_command",
+      "argv": [
+        "gawk",
+        "BEGIN{system(\"touch ../m\")}"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('gawk BEGIN{system(\"touch ../m\")}'): 'gawk' takes its program as a bare argument with no flag at all; the OS cannot distinguish that argument from an ordinary one, so it cannot be pinned and the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "flagless-mawk",
+      "field": "install_command",
+      "argv": [
+        "mawk",
+        "BEGIN{system(\"touch ../m\")}"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('mawk BEGIN{system(\"touch ../m\")}'): 'mawk' takes its program as a bare argument with no flag at all; the OS cannot distinguish that argument from an ordinary one, so it cannot be pinned and the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "flagless-nawk",
+      "field": "install_command",
+      "argv": [
+        "nawk",
+        "BEGIN{system(\"touch ../m\")}"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('nawk BEGIN{system(\"touch ../m\")}'): 'nawk' takes its program as a bare argument with no flag at all; the OS cannot distinguish that argument from an ordinary one, so it cannot be pinned and the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "script-sh-installer",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "installer.sh"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh installer.sh'): 'installer.sh' is a file this command executes and is not named in descriptor.pinned_files with a sha256: an unpinned file cannot be classified as readable (OD-P2-05), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "script-bare",
+      "field": "install_command",
+      "argv": [
+        "./installer.sh"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('./installer.sh'): './installer.sh' is a file this command executes and is not named in descriptor.pinned_files with a sha256: an unpinned file cannot be classified as readable (OD-P2-05), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "script-python-setup",
+      "field": "install_command",
+      "argv": [
+        "python3",
+        "setup.py",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('python3 setup.py install'): 'setup.py' is a file this command executes and is not named in descriptor.pinned_files with a sha256: an unpinned file cannot be classified as readable (OD-P2-05), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-env-make-health_check",
+      "field": "health_check",
+      "argv": [
+        "env",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "health_check.command ('env make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR68-F1",
+      "shape": "wrap-env-make-uninstall_command",
+      "field": "uninstall_command",
+      "argv": [
+        "env",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "uninstall_command ('env make install'): 'make' drives a build recipe defined outside argv (a Makefile or equivalent); the OS does not read that file and cannot name it to pin, so it cannot determine what the installation would do"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "wrap-flock",
+      "field": "install_command",
+      "argv": [
+        "flock",
+        "-w",
+        "1",
+        "lockfile",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('flock -w 1 lockfile make install'): 'flock' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "wrap-taskset",
+      "field": "install_command",
+      "argv": [
+        "taskset",
+        "-c",
+        "0",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('taskset -c 0 make install'): 'taskset' is handed inline code through '-c', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "wrap-unshare",
+      "field": "install_command",
+      "argv": [
+        "unshare",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('unshare make install'): 'unshare' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "wrap-xargs",
+      "field": "install_command",
+      "argv": [
+        "xargs",
+        "-a",
+        "xargsfile",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('xargs -a xargsfile make install'): 'xargs' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "env-chain-9",
+      "field": "install_command",
+      "argv": [
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('env env env env env env env env env make install'): 'env' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "env-chain-12",
+      "field": "install_command",
+      "argv": [
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "env",
+        "make",
+        "install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('env env env env env env env env env env env env make install'): 'env' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "env-dash-S",
+      "field": "install_command",
+      "argv": [
+        "env",
+        "-S",
+        "make install"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('env -S make install'): 'make install' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "attached-python3-c",
+      "field": "install_command",
+      "argv": [
+        "python3",
+        "-cimport os"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('python3 -cimport os'): 'python3' is handed inline code through '-cimport os', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "attached-perl-e",
+      "field": "install_command",
+      "argv": [
+        "perl",
+        "-esystem('touch ../m')"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('perl -esystem('touch ../m')'): 'perl' is handed inline code through '-esystem('touch ../m')', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "sed-1e",
+      "field": "install_command",
+      "argv": [
+        "sed",
+        "1e touch ../m",
+        "payload.txt"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sed 1e touch ../m payload.txt'): 'sed' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "unnamed-program",
+      "field": "install_command",
+      "argv": [
+        "zzqq-not-a-real-program",
+        "--go"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('zzqq-not-a-real-program --go'): 'zzqq-not-a-real-program' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "git-unlisted",
+      "field": "install_command",
+      "argv": [
+        "git",
+        "clone",
+        "https://example.invalid/x"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('git clone https://example.invalid/x'): 'git' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "npm-unlisted",
+      "field": "install_command",
+      "argv": [
+        "npm",
+        "install",
+        "-g",
+        "x"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('npm install -g x'): 'npm' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F1",
+      "shape": "tar-unlisted",
+      "field": "install_command",
+      "argv": [
+        "tar",
+        "xf",
+        "a.tar"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('tar xf a.tar'): 'tar' is not a program TOOL_POLICY.installation_envelope names anywhere -- not a wrapper, an opaque recipe program, a flagless code interpreter, a script interpreter, or a listed plain-argument program whose whole argv the OS can read; an unrecognised program is not classified as readable by default (OD-P2-05 clause 3, P2-ADJ-0006), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F2",
+      "shape": "backslash-divergence",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "a\\b.sh"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh a\\b.sh'): 'a\\b.sh' is a file this command executes and is not named in descriptor.pinned_files with a sha256: an unpinned file cannot be classified as readable (OD-P2-05), so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F2",
+      "shape": "forward-slash-control",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "a/b.sh"
+      ],
+      "expands_authority": false,
+      "triggers": [],
+      "undetermined": [],
+      "GATES": false
+    },
+    {
+      "family": "AR73-F5",
+      "shape": "uninstall-attached-code",
+      "field": "uninstall_command",
+      "argv": [
+        "python3",
+        "-cimport os"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "uninstall_command ('python3 -cimport os'): 'python3' is handed inline code through '-cimport os', a flag meaning \"the rest is more program, not an argument\"; inline code has no artefact to pin, so the OS reads argv elements as literal arguments, not as a language to parse"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F5",
+      "shape": "sh-dash-s",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "-s"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh -s'): 'sh' names a script interpreter ('sh') with no file operand the OS can see: if it reads its program from standard input (a flag such as '-s' or a bare '-') that program is invisible to this classifier and cannot be pinned, so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F5",
+      "shape": "python3-dash",
+      "field": "install_command",
+      "argv": [
+        "python3",
+        "-"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('python3 -'): 'python3' names a script interpreter ('python3') with no file operand the OS can see: if it reads its program from standard input (a flag such as '-s' or a bare '-') that program is invisible to this classifier and cannot be pinned, so the installation gates"
+      ],
+      "GATES": true
+    },
+    {
+      "family": "AR73-F6",
+      "shape": "pin-symlink-outside",
+      "field": "install_command",
+      "argv": [
+        "sh",
+        "pinned-link.sh"
+      ],
+      "expands_authority": true,
+      "triggers": [],
+      "undetermined": [
+        "install_command ('sh pinned-link.sh'): 'pinned-link.sh' resolves (through a symlink or other indirection) to '/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/outside/outside-pin.sh', outside the project root: it cannot be pinned or re-verified there, so the installation gates"
+      ],
+      "GATES": true
+    }
+  ],
+  "review": [
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": "HDG-0002",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": null,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml"
+      ],
+      "exec_result": null,
+      "family": "AR68-F2/F5/F6",
+      "shape": "AR68-F2-subjectless",
+      "note": "a review naming no subject_sha256 authorises nothing (P2-ADJ-0004)"
+    },
+    {
+      "family": "AR68-F2/F5/F6",
+      "shape": "AR68-F6-numeric-subject",
+      "note": "a wrong-TYPED subject must fail closed, not fall back",
+      "review_could_not_be_written": "gov task close TASK-0001 --report /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/prior-AR68-F6-numeric-subject/.governance-runtime/reports/rev-TOOL-REV.json FAILED: {\"code\": \"SCHEMA_INVALID\", \"message\": \"schema validation failed for report (RPT-0001): /security_review/subject_sha256: 12345 is not of type \\\"string\\\"\", \"deta",
+      "branch": "n/a (review refused)",
+      "installed": false
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": false,
+      "branch": "gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": "HDG-0002",
+      "descriptor_written": false,
+      "MARKER_OUTSIDE_PROJECT": null,
+      "gate_records": [
+        "HDG-0001.yaml",
+        "HDG-0002.yaml"
+      ],
+      "exec_result": null,
+      "family": "AR68-F2/F5/F6",
+      "shape": "AR68-F6-wrong-subject",
+      "note": "a subject that is not this descriptor's digest authorises nothing"
+    },
+    {
+      "ok": true,
+      "error_code": null,
+      "installed": true,
+      "branch": "not_gated",
+      "expands_authority": false,
+      "triggers_fired": [],
+      "undetermined": [],
+      "human_gate": null,
+      "descriptor_written": true,
+      "MARKER_OUTSIDE_PROJECT": null,
+      "gate_records": [],
+      "exec_result": null,
+      "family": "AR68-F2/F5/F6",
+      "shape": "CONTROL-bound",
+      "note": "control: the correctly bound review DOES authorise (no over-gating)",
+      "rearm_branch": "not_gated",
+      "rearm_installed": true
+    }
+  ]
+}

@@ -1,0 +1,286 @@
+[
+  {
+    "case": "C0-no-rule",
+    "rule": null,
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "control: an undeclared production write is refused",
+    "append_index": null,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "W-derived",
+    "rule": "- pattern: product/*.yaml\n  class: derived\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "AR75-F2 witness: class derived over the kernel's product/** source",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": true,
+    "policy_overrides_refused": [
+      {
+        "policy": "REPOSITORY_CONTRACT",
+        "key": "paths",
+        "value": {
+          "pattern": "product/*.yaml",
+          "class": "derived",
+          "owner_role": "backend-engineer"
+        },
+        "source": "REPOSITORY_CONTRACT.yaml",
+        "kernel_value": {
+          "pattern": "product/**",
+          "class": "source",
+          "owner_role": "backend-engineer",
+          "semantic_index": true,
+          "lexical_index": true,
+          "graph_index": true,
+          "code_index": true,
+          "namespace": "product"
+        },
+        "reason": "REPOSITORY_CONTRACT.paths[product/*.yaml]: class would be 'derived', which drops this path out of what orchestration::tasks::contract_generated observes as a mutation at all -- an observed path becoming unobserved is a widening even when every other compared dimension looks equal or stricter (AR75-F2); 'product/*.yaml' overlaps kernel rule 'product/**', and REPOSITORY_CONTRACT.paths is last-match-wins, so appending this pattern would widen authority for the paths the two share (POLICY_PRECEDENCE mode 'path_rules', rule REPOSITORY_CONTRACT.paths)"
+      }
+    ],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "W-generated",
+    "rule": "- pattern: product/*.yaml\n  class: generated\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "the other value contract_generated matches",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": true,
+    "policy_overrides_refused": [
+      {
+        "policy": "REPOSITORY_CONTRACT",
+        "key": "paths",
+        "value": {
+          "pattern": "product/*.yaml",
+          "class": "generated",
+          "owner_role": "backend-engineer"
+        },
+        "source": "REPOSITORY_CONTRACT.yaml",
+        "kernel_value": {
+          "pattern": "product/**",
+          "class": "source",
+          "owner_role": "backend-engineer",
+          "semantic_index": true,
+          "lexical_index": true,
+          "graph_index": true,
+          "code_index": true,
+          "namespace": "product"
+        },
+        "reason": "REPOSITORY_CONTRACT.paths[product/*.yaml]: class would be 'generated', which drops this path out of what orchestration::tasks::contract_generated observes as a mutation at all -- an observed path becoming unobserved is a widening even when every other compared dimension looks equal or stricter (AR75-F2); 'product/*.yaml' overlaps kernel rule 'product/**', and REPOSITORY_CONTRACT.paths is last-match-wins, so appending this pattern would widen authority for the paths the two share (POLICY_PRECEDENCE mode 'path_rules', rule REPOSITORY_CONTRACT.paths)"
+      }
+    ],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-evidence",
+    "rule": "- pattern: product/*.yaml\n  class: evidence\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class evidence confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-narrative",
+    "rule": "- pattern: product/*.yaml\n  class: narrative\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class narrative confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-historical",
+    "rule": "- pattern: product/*.yaml\n  class: historical\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class historical confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-runtime-data",
+    "rule": "- pattern: product/*.yaml\n  class: runtime-data\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class runtime-data confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-operational",
+    "rule": "- pattern: product/*.yaml\n  class: operational\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class operational confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-authoritative",
+    "rule": "- pattern: product/*.yaml\n  class: authoritative\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class authoritative confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  },
+  {
+    "case": "X-test",
+    "rule": "- pattern: product/*.yaml\n  class: test\n  owner_role: backend-engineer\n",
+    "target": "product/undeclared.yaml",
+    "task_class": null,
+    "note": "does class test confer any exemption the check ignores?",
+    "append_index": 285,
+    "policy_overrides_ok": true,
+    "refused_mentions_rule": false,
+    "policy_overrides_refused": [],
+    "effective_has_appended_rule": null,
+    "effective_raw_head": "{}",
+    "close_ok": false,
+    "close_error": "MUTATION_SCOPE_VIOLATION",
+    "observed": [
+      "product/undeclared.yaml"
+    ],
+    "out_of_scope": [],
+    "undeclared": [
+      "product/undeclared.yaml"
+    ],
+    "task_status": "IN_PROGRESS",
+    "ESCAPED": false
+  }
+]

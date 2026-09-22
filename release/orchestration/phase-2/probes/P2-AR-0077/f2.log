@@ -1,0 +1,13 @@
+C0-no-rule                         close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+W-derived                          close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+W-generated                        close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-evidence                         close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-narrative                        close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-historical                       close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-runtime-data                     close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-operational                      close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-authoritative                    close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+X-test                             close_ok=False err=MUTATION_SCOPE_VIOLATION status=IN_PROGRESS ESCAPED=False
+[saved] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-r3-adv/release/orchestration/phase-2/probes/P2-AR-0077/results/f2.json
+
+=== CLOSES THAT SUCCEEDED (an undeclared production write went unobserved) ===

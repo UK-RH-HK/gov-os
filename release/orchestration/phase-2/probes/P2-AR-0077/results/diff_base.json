@@ -1,0 +1,134 @@
+[
+  {
+    "ok": false,
+    "error_code": "INSTALL_FAILED",
+    "installed": null,
+    "branch": null,
+    "expands_authority": null,
+    "triggers_fired": null,
+    "undetermined": null,
+    "human_gate": null,
+    "descriptor_written": false,
+    "MARKER_OUTSIDE_PROJECT": false,
+    "gate_records": [],
+    "exec_result": null,
+    "shape": "W1-cp-symlink",
+    "argv": [
+      "cp",
+      "payload.txt",
+      "escape-link"
+    ],
+    "note": "AR75-F1 witness 1: cp through a bare-word in-project symlink",
+    "build": "base"
+  },
+  {
+    "ok": true,
+    "error_code": null,
+    "installed": true,
+    "branch": "not_gated",
+    "expands_authority": false,
+    "triggers_fired": [],
+    "undetermined": [],
+    "human_gate": null,
+    "descriptor_written": true,
+    "MARKER_OUTSIDE_PROJECT": true,
+    "gate_records": [],
+    "exec_result": null,
+    "shape": "W4-curl-K",
+    "argv": [
+      "curl",
+      "-K",
+      "curlcfg"
+    ],
+    "note": "AR75-F1 witness 2: curl -K reads its command line from a project file",
+    "build": "base"
+  },
+  {
+    "ok": true,
+    "error_code": null,
+    "installed": true,
+    "branch": "not_gated",
+    "expands_authority": false,
+    "triggers_fired": [],
+    "undetermined": [],
+    "human_gate": null,
+    "descriptor_written": true,
+    "MARKER_OUTSIDE_PROJECT": true,
+    "gate_records": [],
+    "exec_result": null,
+    "shape": "E1-curl-T-file-url",
+    "argv": [
+      "curl",
+      "-s",
+      "-T",
+      "payload.txt",
+      "file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/outside/base-E1.marker"
+    ],
+    "note": "P2-AR-0077 E1: is this a regression, or pre-existing?",
+    "build": "base"
+  },
+  {
+    "ok": true,
+    "error_code": null,
+    "installed": true,
+    "branch": "not_gated",
+    "expands_authority": false,
+    "triggers_fired": [],
+    "undetermined": [],
+    "human_gate": null,
+    "descriptor_written": true,
+    "MARKER_OUTSIDE_PROJECT": true,
+    "gate_records": [],
+    "exec_result": null,
+    "shape": "E2-curl-writeout",
+    "argv": [
+      "curl",
+      "-s",
+      "-o",
+      "o.txt",
+      "-w",
+      "%output{/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/outside/base-E2.marker}X\n",
+      "file:///tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/lab/p/diff-base/payload.txt"
+    ],
+    "note": "P2-AR-0077 E2: is this a regression, or pre-existing?",
+    "build": "base"
+  },
+  {
+    "ok": true,
+    "error_code": null,
+    "installed": true,
+    "branch": "not_gated",
+    "expands_authority": false,
+    "triggers_fired": [],
+    "undetermined": [],
+    "human_gate": null,
+    "descriptor_written": true,
+    "MARKER_OUTSIDE_PROJECT": false,
+    "gate_records": [],
+    "exec_result": null,
+    "shape": "NC1-conforming",
+    "argv": [
+      "true"
+    ],
+    "note": "negative control",
+    "build": "base"
+  },
+  {
+    "shape": "PATHRULE-derived",
+    "build": "base",
+    "rule": "- pattern: product/*.yaml\n  class: derived\n  owner_role: backend-engineer\n",
+    "rule_refused": false,
+    "design_ok": true,
+    "design_error": null,
+    "note": "does the appended class rule take a production path out of the production tree?"
+  },
+  {
+    "shape": "PATHRULE-evidence",
+    "build": "base",
+    "rule": "- pattern: product/*.yaml\n  class: evidence\n  owner_role: backend-engineer\n",
+    "rule_refused": false,
+    "design_ok": true,
+    "design_error": null,
+    "note": "does the appended class rule take a production path out of the production tree?"
+  }
+]
