@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T12:06:27Z'
-state_hash: 6f61d03e80e3201b5daff7f0e7d03e871a215921e23b9b2bfb58aa74f4ccbb4a
+updated_at: '2026-09-22T12:23:20Z'
+state_hash: 250d6c7ad3baa459e53f3d97cedb80080f3d3e5c36513b5d13eaaa2369ba97b1
 lifecycle_state: P2_REPAIR_ROUND_3_BOUNDED
 loop_status: RUNNING
 
@@ -284,6 +284,16 @@ agent_runs:
   - {run_id: P2-AR-0074, role: capability-repair (structural), workstream: failclosed, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-failclosed, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0074.run.yaml}
   - {run_id: P2-AR-0075, role: adversarial pre-mint reviewer (third pass), iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial-3, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0075.run.yaml}
   - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
+
+test_execution_policy:
+  adopted: '2026-09-22, from P2-PERF-0001 recommendation R1 (release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, commit 651ceb3)'
+  rule: 'never pass --test-threads=1 to the certification suite; run it machine-exclusive at libtest default parallelism'
+  basis: 'tests/certification has zero #[serial], no serial_test dependency, zero env::set_var/remove_var and zero set_current_dir; every variable is set per-Command; scratch roots are PID+nanosecond unique and XDG_STATE_HOME is per-root-hash. P2-AR-0072 already ran 231/0 at default parallelism.'
+  cost_of_the_old_practice: '35.09 s/test single-threaded versus 4.30-5.39 s/test at default parallelism -- about 7x, roughly 2 hours per full run, for no isolation benefit'
+  what_serialised_means_here: 'ONE SUITE AT A TIME ON THE MACHINE, default threads intact -- never tests forced serial within a suite. The historical spurious failures (203/7 on a tree that was really 210/0) were cross-suite machine overload, a different problem with a different fix.'
+  where_single_threading_is_genuinely_required: "the independent verifiers' held-out harnesses, which do mutate process-global env (release/verification/.../heldout-tests/mint.rs:138-141 sets XDG_STATE_HOME and HOME). That constraint must not migrate back to the certification suite."
+  recording_requirement: 'every run record that reports a suite figure must also state the --test-threads value and the machine load. A test result without its concurrency conditions is unfalsifiable -- P2-AR-0075 omitted both and its 2,742 s needed a CPU-conservation argument to decode.'
+  planning_figure: '~1,460 s (24 min) growth-adjusted for 244 tests; 1,200 s optimistic. Do NOT quote 2,742 s as the suite cost.'
 
 running_work:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: RUNNING}

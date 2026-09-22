@@ -248,7 +248,7 @@ model. Budget last, if ever.
 `c34c439` and will write `PERFORMANCE_DIAGNOSTIC.md`. Its brief is measurement and recommendation only: the owner barred
 a major performance refactor during the bounded Phase-2 repair. **Its findings replace this section's placeholders.**
 
-### 5.1a The headline, and it is not what the orchestrator assumed — INTERIM, from P2-PERF-0001
+### 5.1a The headline, and it is not what the orchestrator assumed — DELIVERED, P2-PERF-0001 (`PERFORMANCE_DIAGNOSTIC.md`, `651ceb3`)
 
 **The ~2.5 hours is not a property of the suite. It is the cost of `--test-threads=1`.** Normalising every recorded
 suite duration by test count:
@@ -276,12 +276,25 @@ fixes, and conflating them cost real time (§5.3).
 
 ### 5.2 What is already known, from durable records
 
-- **MEASURED.** A clean independent full certification run of 244 tests took **2,742 s** (~46 min) —
-  `P2-AR-0075.run.yaml`. At 11.2 s/test this sits **above** the 4.3–5.4 s/test band of the runs classified as
-  serialised and inside the "sharing the machine" band, so it is currently an **unexplained 2.3× outlier**. The
-  orchestrator has asked P2-PERF-0001 to reconcile it rather than leave it standing, because this is the figure that
-  was quoted to a repair worker and in the owner-facing decision package. **An unexplained 2.3× may itself be a
-  finding.**
+- **RECONCILED, and the figure is retired.** A clean independent full certification run of 244 tests took **2,742 s**
+  (`P2-AR-0075.run.yaml`) — 11.2 s/test, an outlier above the 4.3–5.4 s/test serialised band. P2-PERF-0001 decoded it
+  by **conservation of CPU**: total CPU is a property of the tree, wall time is not, so `P = W/wall` gives effective
+  cores. Calibrating `W ≈ 15,800 s` two independent ways that agree, the run achieved **5.76 effective cores ≈ three
+  test streams** (predicting 2,847 s against 2,742 s observed, a 4% miss). The model **validates itself** on the
+  single-threaded run, reproducing an independently measured 1.845–1.98 cpu/wall to within 2%.
+
+  Two mechanisms fit and the record cannot separate them: a reduced `--test-threads` (**`=4` is hard-coded at
+  `scripts/collect_evidence.sh:22`** — the obvious thing a reviewer reproducing checks would copy), or a ~3-way shared
+  machine (P2-AR-0074 ran the full suite twice on this tree in the same window). Suite *growth* explains only ~20% of
+  the gap (a fit on the four serialised points predicts 1,459 s at 244 tests); the remaining 1,283 s is **scheduling,
+  not the tree**.
+
+  **`P2-AR-0075.run.yaml` records no command line, no thread count and no load** — which is itself an instance of the
+  requirement §5.3 states: *a test result without its concurrency conditions is unfalsifiable.* **Do not quote 2,742 s
+  as the suite's cost.** The planning figure is **~1,460 s (24 min)** growth-adjusted, with 1,200 s optimistic.
+- **A published set of five durations is physically impossible.** Applying the same model, five concurrent 210-test
+  suites need 67,992 CPU-seconds while the longest reported wall (1,875 s) supplies only 37,500 core-seconds. The
+  likeliest benign explanation is staggered starts. Recorded so it is not rediscovered as a mystery later.
 - **MEASURED, clean (load 0.30–2.90).** Cold build of all test targets **39.3 s** wall / 207 s CPU (527%, 186 units);
   warm no-op build **3.6–3.8 s**; incremental after touching one certification file **6.4 s**; `gov` process spawn
   **3.9 ms**.
@@ -334,12 +347,24 @@ evidence of anything.
 
 **The generalisable requirement:** an acceptance-critical measurement taken under uncontrolled load is not evidence.
 V8.3 should make load context part of the evidence record — a test result without its concurrency conditions is
-unfalsifiable. The guards were subsequently changed from process-global to per-project; **what remains global is exactly
-question 7 of the diagnostic.**
+unfalsifiable. **This requirement then immediately caught its own author:** `P2-AR-0075.run.yaml` records no thread
+count and no load, which is why its 2,742 s took a CPU-conservation argument to decode (§5.2).
+
+**Answered (Q7).** For the suite *as architected* there is **no runtime global that can interfere** — every governed
+operation is a fresh single-project process, so runtime statics cannot cross tests. What remains is of three kinds:
+- the **disclosed** `RECONCILED` single-project-per-process assumption, plus two further set-once statics
+  (`authority.rs:106 PROCESS_ROLE`, `migrations/identity.rs:191 DECLARED_SESSION`) — these block *in-process
+  multi-project/multi-session* execution, which is a **Phase-8 input, not a Phase-2 defect**;
+- three genuinely **machine-shared** resources: `~/.cache/gov/kernels/` (shared by **239 of 244 tests**; hardened with
+  per-PID staging, atomic rename and verify), `~/.cache/gov/runtime-digests.json` (a lost-update read-modify-write
+  race, benign — a miss costs 0.106 s), and `/tmp/gov-cert-machine/` (collision-free but **37,808 leaked roots /
+  3.7 GB**);
+- and four caches audited and found sound (`kernel_trust`, `pincache` — filtered on a full `StatKey`, so no inode
+  aliasing — `VERIFIED`, `VIEW_CACHE`).
 
 ### 5.4 The tension V8.3 must resolve
 
-Requiring the full suite per run (§4, correctly, to catch cross-family breakage) multiplied by ~46 min per run is the
+Requiring the full suite per run (§4, correctly, to catch cross-family breakage) multiplied by ~24 min per run is the
 direct cause of the cost the owner is objecting to. These pull against each other and the resolution is almost certainly
 **impact-selected checks for G1–G4 with exhaustive qualification reserved for G5/G6**, plus sound evidence caching — but
 only if isolation and cache-key soundness are *demonstrated*, per the owner:
@@ -347,6 +372,68 @@ only if isolation and cache-key soundness are *demonstrated*, per the owner:
 > Do not introduce parallelism merely for speed unless isolation/concurrency safety is demonstrated.
 
 ---
+
+### 5.5 Ranked recommendations and the three target runtimes (P2-PERF-0001; full derivations in `PERFORMANCE_DIAGNOSTIC.md`)
+
+| | Recommendation | Expected saving | Must be proven first | Touches acceptance evidence | Phase 2? |
+|---|---|---|---|---|---|
+| **R1** | **Never pass `--test-threads=1` to the certification suite; keep machine-exclusivity** | **~7×, ~2 h per run** | Effectively already proven: no `#[serial]`, no `env::set_var`, per-`Command` env, unique roots, the one real hazard fixed in `6aa1cf8`, and P2-AR-0072 already ran **231/0 at default parallelism** | **Yes, beneficially** — record `--test-threads` and load in every run record | **ADOPTED** |
+| R2 | Fix the perpetual rebuild in `runtime/build.rs` | 3.6–3.8 s per invocation, every invocation | that `EMBEDDED_COMMIT` still invalidates when HEAD moves — that trigger is *why* `.git/HEAD` is declared | no | defer |
+| R3 | Raise dev-profile `opt-level` | **NOT DETERMINED — likely largest after R1** | identical outcomes **and** a full green suite | **yes** — the binary under test changes | **not in Phase 2** |
+| R4 | GC stale `target/` dirs; do **not** share a target dir between concurrently-active worktrees | 178 GB (118 GB already reclaimed) | — | no | GC safe now |
+| R5 | **Do not shard** — decision, not an omission | — | — | — | — |
+| R6 | Whole-suite evidence cache, advisory G1–G4, never G5/G6 | skips a ~24 min run when `product_code_digest` is unchanged | the full key list, expiry, and a reconciliation run | **yes, centrally** | defer |
+| **R7** | `pipefail` in `collect_evidence.sh`; a missing result line must be **FAIL**, not `NOT_RUN` | none — **correctness** | — | no | **DONE** (see below) |
+| R8 | Reap suite scratch (37,808 roots / 3.7 GB) | negligible time; unbounded growth | — | no | safe now |
+
+**Why R3 leads on expected value while remaining a candidate:** the workload is **96.7% user-space CPU at
+`opt-level = 0`**, and the repository *already records* that `sha2` alone was ~20× slower unoptimised (hence
+`[profile.dev.package.sha2] opt-level = 3`). `regex`, `jsonschema`, `serde_json`, `serde_yaml`,
+`curve25519-dalek` and all 99,655 lines of `gov-runtime` are still unoptimised. Use `CARGO_PROFILE_DEV_OPT_LEVEL`,
+**not `--release`**, which would also disable overflow checks and the one `debug_assert`.
+
+**Target runtimes.** Ordinary task/change validation **≤ 3 min** (targeted families at default parallelism plus
+`cargo test --lib`, with the build tax R2 would remove; the binding constraint is not speed but Q9's lesson that
+targeted runs must still be followed by one full suite before review). Milestone validation **≤ 25 min** (one full
+suite, machine-exclusive, default threads — **available today with no code change**, and it supersedes 2,742 s). Full
+certification **≤ 35 min**, of which the suite is ~1,460 s and the other three required checks are **NOT DETERMINED**
+and budgeted at ~600 s — the **weakest number in the report**, and about five minutes' work to fix.
+
+### 5.6 Two findings from the diagnostic that are not about performance
+
+**(a) The evidence map covers 70% of the suite, not all of it.** The map binds `test:certification:<family>::<test>`
+with 868 references over **172 distinct tests across 33 families — but 244 tests exist, so 72 (30%) are not in the map
+at all.** This corroborates what the orchestrator found independently while adjudicating a worker's question:
+`r4_residual` and `repair3` are heavily registered (75 and 15 references) while `r2_failclosed` and `r2_wsa` have
+**zero**. Registration is therefore **inconsistent across rounds**, not absent. Consequence for Q9: map-derived
+impact selection **cannot be sound for the whole suite** until that gap closes. Recorded as a disclosed observation
+for the formal verifier; it is not a Phase-2 repair item, and it bears on BC-P2-02.
+
+**(b) `tests/certification` executes no nested `cargo`.** `verification/product.rs` *builds* a `cargo test` argv and a
+fixture `Cargo.toml` exists, so a plan is genuinely produced — but the file has **no execution call site at all**.
+Planned, never run. Worth a verifier's eye, since a capability that plans an action it never performs is a different
+thing from one that performs it.
+
+### 5.7 R7, done during Phase 2, and why that was in scope
+
+`scripts/collect_evidence.sh` derived each test row from the summary line alone. A suite that failed to compile, was
+killed, or aborted before libtest printed its summary produced **no** line — and was reported `NOT_RUN`, "present but
+not executed", so a reader scanning for FAIL saw none. This is the **same defect class** as the `cert_all` wrapper that
+reported exit 0 on a red suite (§4), which the owner required be fixed *and proven* before any repair worker launched.
+
+Fixed: `set -o pipefail`, and every test row now derives from the summary line **and** the command's own
+`${PIPESTATUS[0]}`, with anything other than an `ok` line at a zero exit reading FAIL. `NOT_RUN` now means only what
+the file's own header says it means — a deliberate decision not to run.
+
+**Proven with deliberate failures before being relied on**, all four cases plus both pipe directions: green/exit 0 →
+PASS; red/exit 101 → FAIL; **no line + exit 101 → FAIL (previously `NOT_RUN`)**; no line + exit 0 → FAIL; a failing
+command through `tee | grep | tail` → `PIPESTATUS[0]=1` → FAIL; a passing one → PASS.
+
+**Why this was in scope** when the round is otherwise bounded to AR75-F1/F2/F3: it is not product code, no test or
+evidence-map row references the script (only historical reports do), it can only make evidence **stricter**, and
+leaving a known evidence-masking defect in the collection tooling while a formal acceptance verification is about to
+run would be indefensible. The hard-coded `--test-threads=4` on the same line was **deliberately left alone** — that is
+a performance change, not a correctness one, and the owner barred performance work in this round.
 
 ## 6. Orchestration
 

@@ -2,7 +2,15 @@
 # Implementer evidence collection. Every row carries one of PASS | FAIL | NOT_AVAILABLE | NOT_RUN | NOT_APPLICABLE.
 # An unavailable tool is NOT_AVAILABLE (never counted as a pass), a tool present but not executed is NOT_RUN, and a
 # check that does not apply is NOT_APPLICABLE with the reason (verifier M15 / directive §11).
+#
+# P2-PERF-0001 / R7 (2026-09-22): a test command that produced no `test result` line used to report NOT_RUN, so a
+# suite that failed to compile, was killed, or aborted before libtest printed its summary read as "present but not
+# executed" rather than red. A reader scanning for FAIL saw none. Every test row now derives from BOTH the summary
+# line AND the command's own exit status (`${PIPESTATUS[0]}`, which is why `pipefail` is set), and anything other
+# than an `ok` line with a zero exit is FAIL. NOT_RUN now means only what the header says it means: a deliberate
+# decision not to run. Proven with an intentionally failing test before being relied on.
 set -u
+set -o pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PATH="$HOME/.cargo/bin:$PATH"
 EV="$ROOT/release/evidence"; mkdir -p "$EV"
@@ -15,12 +23,20 @@ tool_status() { # name, probe command...
 }
 { tool_status clippy cargo clippy --version; tool_status rustfmt cargo fmt --version; tool_status python3 python3 --version; tool_status pytest python3 -c "import pytest"; } > "$EV/tool-status.txt"
 cargo build --release 2>&1 | tail -3 > "$EV/build.txt"; BUILD_RC=${PIPESTATUS[0]}
-status_of_test_result() { # "test result: ok. N passed; M failed" -> PASS/FAIL with counts
-  local line="$1"; if [ -z "$line" ]; then echo "NOT_RUN (no result line)"; elif echo "$line" | grep -q "^test result: ok"; then echo "PASS ($(echo "$line" | sed -E 's/^test result: ok\. //; s/; 0 ignored.*//'))"; else echo "FAIL ($line)"; fi; }
+status_of_test_result() { # summary line, command exit status -> PASS/FAIL with counts. Fails closed on both.
+  local line="$1"; local rc="${2:-1}"
+  if [ "$rc" -ne 0 ]; then
+    if [ -z "$line" ]; then echo "FAIL (exit $rc, and no 'test result' line: the suite did not run to completion)"
+    else echo "FAIL (exit $rc) ($line)"; fi
+  elif [ -z "$line" ]; then echo "FAIL (exit 0 but no 'test result' line: nothing proves the suite ran)"
+  elif echo "$line" | grep -q "^test result: ok"; then echo "PASS ($(echo "$line" | sed -E 's/^test result: ok\. //; s/; 0 ignored.*//'))"
+  else echo "FAIL ($line)"; fi; }
 cargo test -p gov-runtime 2>&1 | tee "$EV/unit-tests.txt" | grep -E "^test result" | head -1 > "$EV/unit-summary.raw"
-status_of_test_result "$(cat "$EV/unit-summary.raw")" > "$EV/unit-summary.txt"
+UNIT_RC=${PIPESTATUS[0]}
+status_of_test_result "$(cat "$EV/unit-summary.raw")" "$UNIT_RC" > "$EV/unit-summary.txt"
 cargo test -p gov-cli --test certification -- --test-threads=4 2>&1 | tee "$EV/certification-tests.txt" | grep -E "^test result" | tail -1 > "$EV/certification-summary.raw"
-status_of_test_result "$(cat "$EV/certification-summary.raw")" > "$EV/certification-summary.txt"
+CERT_RC=${PIPESTATUS[0]}
+status_of_test_result "$(cat "$EV/certification-summary.raw")" "$CERT_RC" > "$EV/certification-summary.txt"
 if python3 -c "import pytest" >/dev/null 2>&1; then
   ( cd capabilities/python && PYTHONPATH=. python3 -m pytest -q ../tests 2>&1 ) | tee "$EV/python-plugin-tests.txt" | tail -1 > "$EV/python-summary.raw"
   if grep -qE "^[0-9]+ passed" "$EV/python-summary.raw" && ! grep -qE "failed|error" "$EV/python-summary.raw"; then echo "PASS ($(cat "$EV/python-summary.raw"))" > "$EV/python-summary.txt"; else echo "FAIL ($(cat "$EV/python-summary.raw"))" > "$EV/python-summary.txt"; fi
