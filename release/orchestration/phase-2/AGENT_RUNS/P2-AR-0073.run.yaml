@@ -22,4 +22,81 @@ required_verdict_vocabulary:
 - SURFACE_SOUND
 - RESIDUAL_DEFECTS
 - INCOMPLETE
-status: RUNNING
+status: COMPLETED_AWAITING_INTEGRATION
+outcome:
+  verdict: RESIDUAL_DEFECTS
+  commit: e5438033e1e5ca9400eaadcb6f099e7056c88402
+  reviewer: native Claude subagent, claude-opus-5, high effort; independent of every repair, the integration and the first review
+  ar68_disposition: 'ALL SIX CLOSED by their own reproductions, re-run with a bound review: F1 33/33 shapes gate or refuse with no markers (the two that previously gated only incidentally now gate with
+    a non-empty undetermined); F2 a subjectless review authorises nothing and the bound form admits exactly the reviewed descriptor, all five variants gated including the pinned_files variant; F3 its reproduction
+    refused, reported with policy/key/value/kernel_value/reason and D027 critical with a global hard block, floor repaired in place; F4 a drifted pinned file refused TOOL_COMMAND_UNVERIFIED and not executed;
+    F5 a bound review reused after the descriptor is moved aside authorises nothing; F6 seven malformed digest forms all refused SCHEMA_INVALID at the write'
+  harness_note: P2-AR-0068's helper wrote subjectless reviews, so after P2-ADJ-0004 its probes would have refused every row for the wrong reason. This reviewer learned the digest the governed way in a separate
+    oracle project, wrote a bound review under another session and role, then installed - which is what makes its regression comparison non-vacuous
+  defects:
+  - id: AR73-F1
+    severity: HIGH
+    class: BC-P2-53
+    judgement: residual
+    statement: '14 command shapes install ungated and write outside the project root, in install_command and health_check.command alike. Root cause: unreadable_command_shape''s last statement is None -
+      the DEFAULT for an unrecognised program is READABLE, so it fails closed only for what policy enumerates. This directly violates OD-P2-05 clause 3. Shapes: wrappers the list does not name (flock, taskset,
+      unshare, xargs -a), chains past the 0..8 bound (env x9, env x12; env x8 gates, pinning the bound exactly), a wrapper whose own flag carries the payload (env -S), inline code ATTACHED to a listed short
+      flag (python3 -cimport..., perl -esystem...), an unlisted flagless code program (sed 1e), and pin/path divergence'
+  - id: AR73-F2
+    severity: HIGH
+    class: BC-P2-53
+    judgement: materially new mechanism, in this repair's own pinning code
+    statement: 'classify_file_candidate normalises backslashes to forward slashes before reading the file, and leaves_project does the same, but argv keeps the literal backslash. So the OS hashes a/b.sh
+      (benign, reviewed) while sh executes a\b.sh (the payload). Isolated with a control: the same pin and files with a forward slash installs and writes no marker'
+  - id: AR73-F3
+    severity: HIGH
+    class: BC-P2-45 / OC-P2-04
+    judgement: residual of AR68-F3
+    statement: 'glob_match gives any /-free pattern a second chance as **/<pattern>, and the overlap procedure never models that prefix. Proven with the runtime''s own public functions: patterns_may_overlap(''*.txt'',''archive/**'')
+      is false while glob_match(''*.txt'',''archive/a.txt'') is true. Appending *.txt makes decide(''archive/a.txt'') return mutation allowed (was restricted), export allowed, sensitivity public and all
+      four index flags true, and flips a tool install from gated to not_gated. *.json widens governance/registry/** from os-only and export-denied to allowed and all-indexed - the indexing, retrieval and
+      export consumers P2-AR-0069 recorded as unaudited. And nothing reports it: refused [], D027 ok, policy_precedence ok, shadowed_rules [], no hard block'
+  - id: AR73-F4
+    severity: MEDIUM
+    class: BC-P2-53 (lifetime)
+    judgement: residual, new mechanism
+    statement: health_one gates the whole re-verification on installation_sha256 being a string, so with the field absent, null or a number the check is skipped and an unpinned health script executes. The
+      same type-confusion shape as AR68-F6, reintroduced in a guard written in the same commit that fixed it elsewhere. The correct discriminator was two lines away. The reviewer argues both ways and lands
+      on MEDIUM because the precondition is an ungoverned write to a restricted path, and says it would not object to HIGH
+  - id: AR73-F5
+    severity: LOW
+    class: BC-P2-53
+    judgement: latent
+    statement: uninstall_command accepts attached-flag inline code and classifies it readable (no executor exists yet, so it goes live the moment a governed uninstall does); an interpreter with no file
+      operand (sh, sh -s, python3 -) classifies readable although -s and - read the program from stdin
+  - id: AR73-F6
+    severity: LOW
+    class: BC-P2-53
+    judgement: latent
+    statement: a pinned path may be a symlink to a file outside the project root, contradicting the doc comment; integrity still binds (content change and repoint both re-gate), so what is lost is that
+      the reviewed artefact sits outside version control
+  properties_that_held: pin for another path gates unpinned; a pinned directory gates unreadable; a symlinked pin re-gates on both target-content change and repoint; field reorder preserves the digest while
+    whitespace breaks it; NFC/NFD do not collide; a duplicate JSON key resolves last-wins and gates; a semantically edited review record is T2 BROKEN and gated; brace, character-class and wrong-case patterns
+    are inert; a 10-segment ** chain does not defeat the budget; the secret latch holds
+  negative_controls: all eight pass - the conforming bound, pinned, reversible install is not_gated with zero gate records; allowlisted network alone does not gate; gov init on the brownfield fixture succeeds
+    with 42 path rules and refuses none; a restrictive appended rule is honoured and decides more strictly; an ungoverned-pattern declaration is honoured; a widened exact rule is refused and repaired in
+    place; every gated case wrote and ran nothing; the repair's own four shapes gate with reasons
+  why_the_suite_is_green: 'the reviewer''s structural finding, and the most important sentence in the report: r2_f3''s attack test appends exactly the previous reviewer''s spelling and no /-free pattern
+    appears in the file, and r2_toolbind enumerates the previous reviewer''s 33 shapes verbatim. In both iterations the new tests encode the LAST reviewer''s attack list, so each round closes the previous
+    round''s reproductions and leaves the class open.'
+  could_not_establish:
+  - the 235/0 certification total (197 ok / 0 failed when it stopped; the two files that matter were complete and green) - it takes the same position the first reviewer did and leaves the total as the orchestrator's
+    claim
+  - Windows-only flag spellings on a Linux host; by inspection the attached-value form is the normal PowerShell convention, so AR73-F1's mechanism applies
+  - whether export is reachable through any consumer other than upstream.rs, and whether an agent_read enforcement point exists that it missed - if so AR73-F3 rises
+  - a deterministic TOCTOU between the last pin check and process spawn - the window exists by construction but needs a concurrent writer, which it declined to manufacture
+  - the sibling execution surfaces capabilities/host.rs and capabilities/binding.rs (gov capabilities invoke, gov plugins) - another route to execution, outside the envelope it was asked to attack, unprobed
+  own_work_disclosures:
+  - its gate-record helper scanned the wrong directories so its zero-gate counts were vacuous; it re-derived every count by direct filesystem scan and the corrected result is stronger
+  - its first hand-edited-review attack changed only a comment and was inconclusive; redone with semantic edits, the property holds, and it records that a pure re-serialisation still verifies because the
+    binding is over canonical parsed content rather than raw bytes - defensible, recorded as an observation
+  new_tooling: globprobe, a read-only external crate over the runtime's public API giving per-path production decisions across every authority dimension and a direct overlap oracle - the 'classify this
+    path' observable the first reviewer recorded as missing, and what turned AR73-F3 from a hypothesis into a measurement
+  reviewer_suggestion: 'offered as observation, implemented not at all: the classifier is fail-closed in structure and fail-open in default; inverting the default - unreadable unless the effective program
+    is on a named list whose whole argv shape the OS can read - makes the bound, the wrapper list and the interpreter list all fail safely, and the conforming path already works'
+  orchestrator_disposition: see P2-ADJ-0006

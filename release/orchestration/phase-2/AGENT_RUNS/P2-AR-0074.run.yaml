@@ -1,0 +1,29 @@
+schema: governance-os.phase-2.agent-run
+schema_version: 1
+run_id: P2-AR-0074
+role: capability-repair (iteration 2, structural)
+workstream: failclosed
+blocker_classes:
+- BC-P2-53
+- BC-P2-45
+findings:
+- AR73-F1
+- AR73-F2
+- AR73-F3
+- AR73-F4
+adjudication: release/orchestration/phase-2/GATES/P2-ADJ-0006-FAIL-CLOSED-DEFAULT-AND-STOPPING-RULE.md
+objective: Invert the command classifier's default so an unrecognised program fails towards the gate (OD-P2-05 clause 3), bind the path actually executed rather than a normalised twin, model decide's **/-prefix
+  matching rule in the overlap procedure, and fix the type-confused re-verification guard. Acceptance is a property over the default, not the previous reviewers' shape lists.
+worker:
+  execution: native Claude subagent
+  model: claude-sonnet-5
+  effort: high
+branch: phase2/repair-2-failclosed
+base: phase2/repair-2-final 1c6a3a2
+stopping_rule: 'per P2-ADJ-0006: if the next adversarial review still breaks the command classifier after the default is inverted, the orchestrator stops and escalates rather than iterating again'
+required_verdict_vocabulary:
+- REPAIRED_CLAIMED
+- PARTIAL
+- OWNER_DECISION_REQUIRED
+- INCOMPLETE
+status: RUNNING
