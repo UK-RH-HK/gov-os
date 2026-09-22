@@ -541,6 +541,55 @@ Three failures compounded:
   time of the claim. This is the same discipline §5.3 demands of test evidence, applied to status reporting: a claim
   without its observation conditions is not evidence.
 
+### 6.3c At least one durable suite figure in `AGENT_RUNS/` cannot have happened, and the orchestrator wrote it
+
+**MEASURED/DERIVED, 2026-09-22.** `P2-AR-0067.run.yaml` line 62 records, as an **orchestrator check**:
+
+> `Reproduced serialised by the orchestrator on the untouched integrated tree 61e39b6: … cargo test --test certification 225/0 (1213 s)`
+
+At the directly measured cost of **154.6 CPU-s per test**, 225 tests need ~34,785 CPU-seconds. In 1,213 s of wall that
+demands **P = 28.7 effective cores**. The machine is an i7-12700F: **10 physical cores, 20 logical CPUs** — a hard
+ceiling of 20, and realistically well below it. **As recorded, that run cannot have happened.**
+
+It is recorded as a single full-suite run; only `P2-AR-0054` mentions chunked execution ("14 chunks"), so chunking does
+not explain it. Three candidates remain — a mis-transcribed duration, a partial or differently-scoped run, or a tree
+genuinely far cheaper per test — and **the record cannot distinguish them**, because it carries no thread count, no
+load and no command line.
+
+Three things follow, and the third is the uncomfortable one:
+
+1. **Those figures must not be used as baselines** by anyone, including the formal verifier. The retracted 20-minute
+   milestone target came from exactly this band.
+2. **The diagnostic's self-correction was right to go further than asked.** It flagged the band as a hypothesis needing
+   verification rather than a finding; verification confirmed it.
+3. **The orchestrator wrote that record**, in an earlier session, and it fails the evidence standard the orchestrator
+   adopted *today* on the strength of the same diagnostic (§5.3: record `--test-threads` and load with every suite
+   figure). The rule was imposed on workers after being broken by the role imposing it. **A standard that the
+   coordinator does not apply to its own records retroactively is not yet a standard** — V8.3 should validate figures
+   at write time, not trust the writer, exactly as `check_state.py` already refuses an unparseable gate register.
+
+### 6.3d How the diagnostic falsified itself — a reusable lesson about cross-checks
+
+P2-PERF-0001 presented a key figure as *"calibrated two independent ways that agree"*. Both ways rested on a `cpu/wall`
+ratio taken from the **same** biased sample, so their agreement carried no information. Its own words on discovering
+this:
+
+> Two estimates sharing a biased input agree with each other and are both wrong. A cross-check is evidence only when
+> its inputs are disjoint — and the disjoint check was the direct measurement I argued was unnecessary.
+
+Two further self-caught errors are worth carrying:
+
+- It had **already measured** the fact that refuted its sampling (`brownfield` at 587.7 s CPU, 6.7× its sample mean)
+  and never reconciled it. It also documented `gov`'s `clamp(2, 4)` worker cap in its own report, then calibrated as
+  though fewer than two workers ran.
+- Its headline "7× saving" was itself an invalid cross-tree normalisation of the type it had just identified; the
+  honest figure is **~3×**, and R1 is better understood as *a 3× regression to avoid* than a speed-up available.
+  The category error survives and is now supported **without** cross-tree scaling: 38,971 ÷ 4.3 = 9,063 s = 2.52 h
+  reproduces the reported ~2.5 h from first principles.
+
+**Recommendation.** Require cross-checks to declare their inputs and be rejected when those inputs overlap. Treat "two
+methods agree" as a claim needing proof of independence, not as evidence in itself.
+
 ### 6.4 Progress and drift detection at the orchestrator level
 
 **OBSERVED.** The orchestrator's own drift signals were: a worker reading without writing, a review finding the same

@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T20:20:10Z'
-state_hash: 72ac4df99e25b18dd4fc9730131f04e3326e91c625188e6e46b72cd957124feb
+updated_at: '2026-09-22T20:31:36Z'
+state_hash: 950e789957786fcaae007bc4a2f49b77c8ebb17b98f7173c4ad619e9f13adbf4
 lifecycle_state: P2_REPAIR_ROUND_3_BOUNDED
 loop_status: RUNNING
 
@@ -295,6 +295,8 @@ test_execution_policy:
   recording_requirement: 'every run record that reports a suite figure must also state the --test-threads value and the machine load. A test result without its concurrency conditions is unfalsifiable -- P2-AR-0075 omitted both and its 2,742 s needed a CPU-conservation argument to decode.'
   planning_figure: 'MEASURED 2026-09-22 on a verified-quiet machine at default threads: 252 tests, 2,966 s wall (49m26s), 38,971 CPU-s, P=12.95 effective cores (65% of 20). The suite costs about 50 minutes on this tree. The earlier ~1,460 s (24 min) estimate was derived from a CPU calibration that the direct measurement falsified by ~2.4x, and is withdrawn.'
   superseded_reconciliation: "P2-AR-0075's 2,742 s was NOT an outlier and needed no explanation: at the measured W its P is about 12, indistinguishable from this run's 12.95. The earlier '~3 test streams / reduced --test-threads' account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost."
+  hardware: 'i7-12700F -- 10 PHYSICAL cores, 20 logical CPUs (2 threads/core). The 20-core figure in derived floors is logical, not physical, so any floor computed as W/20 is optimistic; and P=12.95 against ten physical cores means the machine is closer to saturated than a 35%-idle reading suggests.'
+  evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
 running_work:
