@@ -44,16 +44,63 @@ that is a package, not an obstacle. Landlock is present in the kernel.
 
 **Does not follow — do not over-read this:**
 
-- **Landlock's ABI level is not established here.** Symbols being present says the feature is compiled in, not which
-  ABI version. Landlock's capabilities differ materially by version (filesystem scope, truncation, and network
-  restrictions arrived in different ABIs), and kernel 6.6 does not have the newest. **The synthesiser must not assume a
-  specific Landlock ABI without checking it**, and no recommendation should depend on an unverified ABI level.
+- ~~**Landlock's ABI level is not established here.**~~ **RESOLVED — see below.** AGENT-4-ISOLATION subsequently ran a
+  live unprivileged syscall probe on this exact kernel and established the ABI empirically.
 - **Namespace creation succeeding is not the same as bubblewrap working.** It is the prerequisite Agent 5 named, and it
   is satisfied; the tool itself is untested here because it is not installed.
 - **This is one machine at one moment.** WSL2 kernels update. A recommendation that depends on this should say so and
   should degrade safely if the capability disappears, rather than assuming it persists.
 - **Nothing here says sandboxing is the right answer.** It says one specific objection to it does not apply. Agent 4
   owns whether it is warranted at all, and was explicitly told that "none of this yet" is a valid finding.
+
+## Landlock, measured live on this kernel (AGENT-4-ISOLATION, empirical)
+
+Agent 4 compiled and ran an unprivileged C probe against this machine's kernel rather than reasoning from
+documentation. Results, which supersede the caveat above:
+
+- **Landlock ABI 3 is supported**, compiled in, and in the kernel's **default-enabled LSM list**. A full
+  `create_ruleset → add_rule → restrict_self` cycle succeeded **with no root and no capabilities**, and enforcement is
+  real: a denied write returned `EACCES`, as did a denied read outside the granted rule.
+- **A genuine trap, found by probing rather than reading**: `LANDLOCK_ACCESS_FS_WRITE_FILE` governs opening an
+  *existing* file for write. **It does not cover creating a new file** — that is `MAKE_REG` and siblings. A ruleset
+  handling only `WRITE_FILE`/`READ_FILE` therefore leaves **file creation unrestricted everywhere**, which the agent
+  confirmed by watching a file get created despite the "denied" write. Any design that reaches implementation must
+  enumerate the `MAKE_*` access rights explicitly. **This is precisely the shape of defect that has beaten this project
+  five times** — a mechanism whose advertised property is not the property needed — so it is recorded prominently.
+- `/dev/kvm` exists but the working user is not in the `kvm` group, so Firecracker and KVM-backed gVisor have an unmet
+  precondition. Docker is installed as a conventional **root-owned daemon**; rootless prerequisites are only partial
+  (`subuid`/`subgid` present, `newuidmap`/`newgidmap` absent). seccomp, unprivileged user namespaces and cgroup v2 all
+  work. **AppArmor is compiled in but runtime-disabled** — consistent with, and explaining, the measurement above.
+- bubblewrap, gVisor, Firecracker, wasmtime/wasmer, Nix and Bazel are **none of them installed**; all would be new
+  dependencies.
+- Still undetermined and flagged rather than guessed: exact kernel versions for Landlock ABI 5+ (sources disagreed);
+  whether nested KVM works reliably under this WSL2 configuration; whether AppArmor's disabled state is WSL2-general or
+  specific to this machine.
+
+**Residue disclosed:** the probe left one inert 0-byte file, `/tmp/landlock_probe_writetest.txt`, which the agent's own
+`rm` restriction prevented it from removing. Harmless, outside the repository, recorded for honesty.
+
+## Verified repository fact — the product already concedes the confinement gap
+
+**AGENT-4-ISOLATION identified `runtime/src/tools.rs` as already admitting the exact gap.** Verified by the
+orchestrator; the doc comment reads, verbatim:
+
+> The token and pattern lists in `TOOL_POLICY.installation_envelope` are a **kernel floor, never a safety proof**: the
+> OS **cannot confine a spawned process**, so what it cannot observe is carried by the independent governed security
+> review the non-gated branch also requires.
+
+**This is the single most important sentence surfaced by the study so far.** The architecture has always known it
+cannot confine execution, and compensated by trying to *observe* more — which is exactly what five rounds of
+enumeration were. Landlock would change the premise rather than extend the observation: confine the process, instead of
+predicting it.
+
+It also means a confinement mechanism would be filling a gap the design *already documents*, not adding an unplanned
+capability — which materially lowers the architectural risk of adopting one.
+
+**One category error to avoid**, also flagged by Agent 4 and worth stating for the synthesiser: the existing
+`Isolation::Sandbox` (`runtime/src/scheduler/sandbox.rs`) is a **disposable filesystem copy for reproducibility between
+concurrent checks — it is not a security boundary.** Nothing prevents a process "inside" it from reading or writing
+outside it. Any recommendation that reuses that name must say which of the two things it means.
 
 ## Verified repository fact — the floor/local axis already exists
 
