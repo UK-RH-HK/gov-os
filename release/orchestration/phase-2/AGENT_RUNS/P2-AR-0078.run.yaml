@@ -13,9 +13,9 @@ target:
   branch: phase2/remediation-ac
   base: e25ca70
   commit: 35461c9
-status: COMPLETED_AWAITING_INTEGRATION
+status: COMPLETED_FROZEN_FOR_INDEPENDENT_REVIEW
 outcome:
-  verdict: PARTIAL
+  verdict: 'PARTIAL (worker) -- the declared gap is now CLOSED by the orchestrator''s own full-suite reproduction: 263/0'
   why_partial: the one required full certification suite was NOT run - the worker was stopped before starting it. It reported this plainly rather than claiming a run it did not perform. The orchestrator
     is reproducing the suite independently.
   property_a:
@@ -67,3 +67,27 @@ outcome:
 orchestrator_disposition: 'scope and commit verified: files changed exactly within allow_write, worktree clean. The orchestrator is reproducing the full certification suite independently, machine-exclusive
   at default threads from a verified-idle machine (load 0.99, zero competing processes), closing the evidence gap the worker declared. The implementation then FREEZES for a fresh independent Opus 5 adversarial
   review per OD-P2-07.'
+orchestrator_full_suite_reproduction:
+  purpose: closes the evidence gap P2-AR-0078 declared - the worker did not run the required full suite and said so rather than claiming it
+  command: cargo test -p gov-cli --test certification   (no filter, DEFAULT --test-threads)
+  commit: 35461c9
+  result: ok. 263 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+  test_count_reconciles: 263 = the previous tree's 252 plus 11 new (10 in remediation_ac.rs, 1 in repair4.rs)
+  suite_time_s: 3084.19
+  wall_time: 53m19s including compile; 51m24s test time
+  cpu: user 671m30s + sys 22m12s = 41,622 CPU-s over 3,199 s wall = P 13.0 effective cores, consistent with the 12.95 measured independently on the previous tree
+  exit_code: 0
+  start_utc: '2026-09-22T23:26:40Z'
+  end_utc: '2026-09-23T00:20:13Z'
+  load_before: 0.90 1.92 2.19
+  load_after: 2.08 3.37 11.68
+  competing_processes: ZERO, verified with pgrep before launch (an earlier count of 3 was this shell's own pipeline, re-checked and corrected in the meta file)
+  machine_exclusive: true
+  thread_setting: default (never --test-threads=1, per the adopted test_execution_policy)
+  pipefail: set -o pipefail in force; output redirected to a file rather than piped
+  log: target/orchlogs/full_suite.log and full_suite.meta in the p2-ac worktree
+freeze:
+  commit: 35461c9
+  frozen_at: 2026-09-23T00:20:13Z, immediately after the orchestrator full-suite reproduction
+  reason: OD-P2-07 section 7 requires the implementation to FREEZE before the independent adversarial review is dispatched
+  rule: the implementation worker must not see or tune against the reviewer's held-out probes before that reviewer commits its verdict

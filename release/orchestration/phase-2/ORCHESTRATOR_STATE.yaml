@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-22T22:16:49Z'
-state_hash: 90cfc422ca65243e132e0a36c38c5481c8a4bb6384799866f20d053c0ffea7d6
+updated_at: '2026-09-23T00:20:48Z'
+state_hash: fc82ccb924a9adb99baa8c0fe58d49edf74afdfa75f81cb19ee9bea899683b38
 lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
 loop_status: RUNNING
 
@@ -317,7 +317,7 @@ test_execution_policy:
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
 running_work:
-  - {run_id: P2-AR-0078, role: 'structural architecture remediation (A+C per OD-P2-07)', worker_model: claude-sonnet-5 native, branch: phase2/remediation-ac, base: e25ca70, worktree: scratchpad/wt/p2-ac, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0054-a-plus-c-structural-remediation.md, evidence_class: BUILDER_DEVELOPMENT_EVIDENCE, status: RUNNING}
+  - {run_id: P2-AR-0079, role: 'independent adversarial/property review of the A+C remediation', worker_model: claude-opus-5 native, branch: phase2/remediation-ac-review, target: 'phase2/remediation-ac 35461c9 (FROZEN)', worktree: scratchpad/wt/p2-ac-rev, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0055-a-plus-c-independent-review.md, evidence_class: INDEPENDENT_ADVERSARIAL, status: RUNNING}
 former_running_work:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: RUNNING}
   - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: RUNNING, blocks_phase_2: false}
