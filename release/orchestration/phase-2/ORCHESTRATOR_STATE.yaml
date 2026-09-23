@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-23T14:23:53Z'
-state_hash: a61c1c2f0a1d26b0122639f4d022bf824a288c5d9b98932a684722bf902b6551
+updated_at: '2026-09-23T15:07:19Z'
+state_hash: 5a05c00faa468362444ce58cf0fca1af1fdce062dcb621056f7a2201fc70a920
 lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
-loop_status: STOPPED_AWAITING_OWNER_DECISION_OPTION_B__READ_ONLY_RESEARCH_IN_PROGRESS
+loop_status: STOPPED_AWAITING_OWNER_ARCHITECTURE_DECISION__RESEARCH_COMPLETE
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -318,13 +318,7 @@ test_execution_policy:
   evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
-running_work:
-  - {run_id: P2-RES-0001, role: 'prior-art research: secure update and release trust (Level 1)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-1-UPDATE-TRUST.md, read_only: true, status: COMPLETED}
-  - {run_id: P2-RES-0002, role: 'prior-art research: governed configuration and policy authority (Level 2A and 2C)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-2-GOVERNED-STATE.md, read_only: true, status: COMPLETED}
-  - {run_id: P2-RES-0003, role: 'prior-art research: exact and hermetic execution (Level 2B)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-3-EXECUTION.md, read_only: true, status: COMPLETED}
-  - {run_id: P2-RES-0004, role: 'prior-art research: sandboxing and isolation (Level 3)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-4-ISOLATION.md, read_only: true, status: COMPLETED}
-  - {run_id: P2-RES-0005, role: 'prior-art research: developer tooling and build systems', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-5-TOOLING.md, read_only: true, status: COMPLETED}
-  - {run_id: P2-RES-0006, role: 'prior-art research: cross-domain challenger', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-6-CHALLENGER.md, read_only: true, status: COMPLETED}
+running_work: []
 completed_work_formerly_running:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: COMPLETED_SUPERSEDED_BY_P2-AR-0078}
   - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: COMPLETED, blocks_phase_2: false}
@@ -380,18 +374,20 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  AWAIT the six read-only prior-art research agents (P2-RES-0001..0006), then dispatch a fresh Opus 5 architecture
-  SYNTHESISER over all six reports plus the R0/R1 accepted architecture, D-0007, the Option B escalation package,
-  P2-AR-0079's evidence, the applicable Contract v3 requirements and the private/local deployment boundary. It must
-  produce an architecture comparison against our exact requirements rather than vote between researchers. Then dispatch
-  one fresh Opus 5 CHALLENGER of that synthesis, which asks whether a mature primitive was overlooked, whether any
-  proposed custom mechanism is unnecessary, whether a recommended dependency solves a stronger or different problem
-  than ours, whether trust assumptions are explicit, whether Level 3 has contaminated Levels 1-2, whether the
-  recommendation would actually have prevented the concrete R0/R1/P79 attacks, and whether it simplifies the system or
-  merely relocates complexity. The synthesiser may correct factual issues the challenger exposes. Then produce
-  TRUST_ARCHITECTURE_EXISTING_SOLUTIONS_REVIEW.md with 2-3 coherent ranked options and STOP, returning to the owner.
-  NOTHING IS IMPLEMENTED. Phase 2 remains stopped; the Option B escalation (PHASE_2_OPTION_B_ESCALATION_PACKAGE.md)
-  remains the open owner decision and this research informs it rather than replacing it.
+  NONE WITHOUT AN OWNER DECISION. The read-only trust-architecture prior-art study is COMPLETE and implemented
+  nothing: six researchers, one synthesis, one independent challenge that defeated the synthesis's own fix by
+  execution, and one amended synthesis. The owner-facing report is
+  release/orchestration/phase-2/TRUST_ARCHITECTURE_EXISTING_SOLUTIONS_REVIEW.md, with RESEARCH/SYNTHESIS.md (rev 2),
+  RESEARCH/SYNTHESIS-CHALLENGE.md and RESEARCH/ORCHESTRATOR-MEASURED-ENVIRONMENT.md beneath it. Two corrections are
+  owed to and recorded for the owner: P79-F10's blocker does not exist (cit::binding already implements the pattern,
+  and t2 sealing is general), and the escalation package's section 6 Property-A recommendation is MEASURED WRONG on
+  two of three limbs. Recommended: Option 1 (resolve once, execute the object; floor the class) -- four changes, no
+  new dependency for the minimum, net TCB reduction, closes all four open HIGHs subject to precondition P1. Option 2
+  (plus Landlock) is its R2 successor; Option 3 (full hermetic execution) needs Option 1 inside it regardless. Before
+  ANY implementation: settle precondition P1 (gov adopt native layouts are unfloored, so floor composition closes zero
+  of P79-F8/F9 there) and run probe P2 (pinned dynamically-linked ELF with project-controlled RUNPATH/$ORIGIN/LD_*,
+  since LOADER_ENV_VARS is stripped on the plugin path only). Phase 2 remains STOPPED and the Option B escalation
+  remains the open decision this research informs.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}

@@ -3,11 +3,45 @@
 | Field | Value |
 |---|---|
 | Run id | **P2-SYN-0001** (architecture synthesiser) |
+| Revision | **2** — amended 2026-09-23 after independent challenge by P2-SYN-0002; see §0a |
 | Date | 2026-09-23 |
-| Nature | **READ-ONLY.** One document written. No product, runtime, kernel, policy, schema or test file touched. Nothing implemented. Nothing decided on the owner's behalf. |
-| Inputs | `COMMON-BRIEF.md`; `ORCHESTRATOR-MEASURED-ENVIRONMENT.md`; `AGENT-1`…`AGENT-6`; `PHASE_2_OPTION_B_ESCALATION_PACKAGE.md`; `AGENT_RUNS/P2-AR-0079.run.yaml`; OD-P2-03, OC-P2-04, OD-P2-05, OD-P2-07; `PHASE-2-FROZEN-GATE-CONTRACT.md`; Contract v3; `docs/DECISIONS.md` (D-0007, D-0009, ARCH-0003) |
+| Nature | **READ-ONLY.** One document written, then amended in place. No product, runtime, kernel, policy, schema or test file touched, in either revision. Nothing implemented. Nothing decided on the owner's behalf. |
+| Inputs | `SYNTHESIS-CHALLENGE.md` (P2-SYN-0002, for revision 2); `COMMON-BRIEF.md`; `ORCHESTRATOR-MEASURED-ENVIRONMENT.md`; `AGENT-1`…`AGENT-6`; `PHASE_2_OPTION_B_ESCALATION_PACKAGE.md`; `AGENT_RUNS/P2-AR-0079.run.yaml`; OD-P2-03, OC-P2-04, OD-P2-05, OD-P2-07; `PHASE-2-FROZEN-GATE-CONTRACT.md`; Contract v3; `docs/DECISIONS.md` (D-0007, D-0009, ARCH-0003) |
 | Trees read | working tree at `4d42c34` (`release/4.1.6-rc1`) **and** the frozen reviewed tree `35461c9` (`phase2/remediation-ac-review`). Where they differ it is stated; the A+C remediation exists **only** on `35461c9` and is not on the release branch. |
-| Evidence added | two probes run on this machine (§1.2, §9.3). Both wrote only into the session scratchpad. |
+| Evidence added | two probes run on this machine (§1.2, §9.3), both writing only into the session scratchpad. Revision 2 additionally **relies on** two probes produced by P2-SYN-0002 and reproduced by the coordinator (§9.0) — not re-run here, and attributed in the Appendix. |
+
+## 0a. AMENDMENT RECORD — revision 2, 2026-09-23, after independent challenge
+
+This document was challenged by **P2-SYN-0002** (`SYNTHESIS-CHALLENGE.md`), which verdicted it *fit for the owner
+after amendment*, and agreed explicitly with its level separation, its dependency declines, the `class`-is-a-label
+finding, the Landlock-at-R2 placement, and its refusal to reopen the frozen RoT-1 lineage. **Both corrections to
+the owner survived independent verification. The ranking survives.**
+
+**What changed, and why the owner should read the change rather than only the result:**
+
+| # | Amendment | Kind |
+|---|---|---|
+| **A1** | **§9.2's reduction was defeated by execution.** A `#!` line inside pinned, reviewed bytes executes an unpinned project file *before any reviewed byte runs*. §9.2 now carries a **fourth obligation** that closes it structurally. §9.1's stated property was false as specified and is restated. | **Blocking — architecture changed** |
+| **A2** | **§11's minimum is four changes, not three.** The headline sentence is re-counted. | Substantive |
+| **A3** | **P79-F8/F9 closure is kernel-layout-only.** For projects onboarded by `gov adopt` with a native layout, floor-composition closes **zero** of that shape. §16 Q3 is restated as a **precondition of the claim**, not a filed question. | **Changes an answer** |
+| **A4** | Arithmetic and attribution corrections (§8, §1.3, §1.1, §15): `LOADER_ENV_VARS` is **30** entries not 32; `CLASS_EXEMPTIONS` is 20 lines not 30; comparison total ≈**447** not 457; net ≈**−250** not −260; `migrations/executor.rs:714` is a test; `run_cmd` has **four** call sites not two; the `t2.rs` quote was truncated one sentence early and is completed. | Corrections |
+| **A5** | Two findings **strengthened** on the challenger's evidence: the single-chokepoint claim is provable **by type construction**, not by enumeration; and the Property-C floor is **authenticated kernel content**, which I asserted without showing. | Strengthening |
+| **A6** | Change 3's size is restated: *one function, one struct field, one retention, one construction site* — not "~40 lines inside an existing function". §15 assumption 3's residual is **not bounded**. | Corrections |
+| **A7** | One further probe of the same shape is **recorded as open and not run**: a pinned dynamically-linked ELF artefact with project-controlled `RUNPATH`/`$ORIGIN`/`LD_*`. | Added, unresolved |
+
+**The lesson I am recording against myself, because it is the study's own thesis and this is its fifth instance.**
+I found that the escalation package reasoned about a representation (`gov`'s environment) while the effect came
+from elsewhere (a program `gov` launched). I then specified a fix that reasoned about a representation (the
+descriptor the OS holds) while the effect came from elsewhere (**the first line of the bytes inside it**). The
+challenger's probes are the same move applied to me, one level further down. That is not a reason to distrust the
+architecture — the remedy is small and in the same idiom — but it *is* a reason to treat "we have now reached the
+bottom" as a claim requiring evidence rather than a feeling, and A7 exists because this pattern's track record in
+this study is five for five.
+
+I counted `LOADER_ENV_VARS` by its **line count** rather than its **contents** and reported 32 where the answer is
+30. In a study whose subject is checks that reason about a representation instead of the thing itself, that is the
+error the study is about, committed in miniature, in the document arguing against it. It is corrected in §8 and
+flagged here rather than quietly fixed.
 
 ## 0. How to read this, and what I did not inherit
 
@@ -56,12 +90,29 @@ mode 0600, or a provisioned owner-authority key). The module says so itself, and
 challenger will look for exactly this and because no researcher surfaced it:
 
 > *"A process running with the **operator's full OS privileges** on a provisioned machine can read the binding key
-> (same account) and could compute a seal. Against that attacker the primitive is **detection-grade, not proof**."*
+> (same account) and could compute a seal. Against that attacker the primitive is detection-grade, not proof —
+> and, because the requirement is that a record written on one provisioned machine is honoured on the others,
+> **what such a process forges on one of the owner's machines is honoured on the others** holding the same key
+> (any mechanism meeting the requirement has that property). … The key is symmetric and shared by the machines
+> that hold it (`gov` never signs, so no per-machine signature is available): **revocation is per key** (a new
+> authority version), **not per machine**."*
+
+**[AMENDED — A4.]** Revision 1 of this document stopped that quote one sentence early, at "detection-grade, not
+proof." The omitted sentences make the exposure **worse**: a seal forged on one machine is **honoured on every
+other provisioned machine**, and revocation is per key, not per machine — so the blast radius of one compromised
+agent is the owner's whole fleet, and the remedy is a new authority version rather than evicting a machine. A
+truncation that flatters the recommendation it supports is the one kind this study cannot afford, and the
+challenger was right to call it.
 
 The lower-trust party in this deployment profile is *an AI agent running on the owner's machine under the owner's
 account*. That is exactly the attacker the module names. **Therefore: sealing the path map, by itself, is
-detection-grade against the actual adversary, not proof.** Anyone who tells the owner that sealing "closes"
-Property C without that sentence has overclaimed.
+detection-grade against the actual adversary, not proof, and a forgery propagates.** Anyone who tells the owner
+that sealing "closes" Property C without those sentences has overclaimed.
+
+Note the second bullet of the same paragraph, which bounds the claim further and which I also did not quote: *"A
+process can always run `gov` under a declared role; what it writes that way is an OS operation performed under
+that role's authority"* — the agent-identity question is OD-P2-01 and explicitly out of scope. So even a
+*correctly* sealed path-map write does not establish *who* asked for it.
 
 Two things rescue it, and they are both already in the product:
 
@@ -131,22 +182,42 @@ The orchestrator verified that `governance/kernel/**` is `owner_role: release-ag
 `governance/project/**` is `change-controller, restricted`. I re-verified that **[verified]** and add two facts
 that change the size of the Property-C fix, neither of which any researcher or the orchestrator established.
 
-**(a) There is exactly one chokepoint, not twelve unknown consumers. [verified]** The review flagged "12 further
-`.class()` consumers … outside the table," and OD-P2-07 demanded "search for ALL consumers." I enumerated every
-`.class()` call site at `35461c9`. In production code — excluding tests and excluding the comparison machinery
-itself — **every single one reads `contract().decide(path).class()`**:
+**(a) There is exactly one chokepoint, not twelve unknown consumers — and it is provable by construction.
+[verified; strengthened per A5]** The review flagged "12 further `.class()` consumers … outside the table," and
+OD-P2-07 demanded "search for ALL consumers."
+
+Revision 1 argued this **by enumeration**: I listed every `.class()` call site at `35461c9` and found they all read
+`contract().decide(path).class()`. That is true — **22 non-test call sites across 10 modules**, excluding
+`policy_precedence.rs:606` (the comparison machinery, which this recommendation deletes):
 
 ```
-cit/materiality.rs:870        context/receipt.rs:462,671     memory/integrity.rs:310
-memory/indexer.rs (6 sites)   memory/manifest.rs:234         migrations/executor.rs:714
-orchestration/tasks.rs:954,1882   paths.rs:346,445           verification/lineage.rs:295,596,981,1077,1082
-verification/reporting.rs:682
+cit/materiality.rs:870          context/receipt.rs:462,671          memory/integrity.rs:310
+memory/indexer.rs:210,1548,1667,1672,1700,1705,1827                 memory/manifest.rs:234
+orchestration/tasks.rs:954,1882 paths.rs:346,445                    verification/reporting.rs:682
+verification/lineage.rs:295,596,981,1077,1082
 ```
 
-`RepositoryContract::decide` is a single function that every class-derived authority effect flows through.
-**Property C is a change to one function, not an enumeration over consumers.** That is the "one derived authority
-source replacing several synchronised enumerations" the brief asks for — and it is already structurally available.
-Agent 2's recommendation (§6) converges on this without having established it; I am recording it as verified fact.
+**[CORRECTED — A4]** Revision 1 said "~19 production consumers" and included `migrations/executor.rs:714`. That
+line is inside `#[cfg(test)] mod tests`, which begins at line 665 **[verified]** — a test, not a consumer. The
+correct figure is 22.
+
+**[STRENGTHENED — A5] But the enumeration is not the argument, and a stronger one is available.** `PathDecision`
+is the only type carrying a `.class()` method, and it is **constructed at exactly one place in the entire
+runtime** — `paths.rs:710`, the tail of `decide()` **[verified: a grep for `PathDecision {` over every `.rs` file
+at `35461c9` returns the struct declaration, the `impl`, `decide`'s return type, that one literal construction,
+and `policy_precedence.rs:550`'s signature, which obtains its value *by calling `decide()`*]**.
+
+So "no consumer enumeration is needed" is a **type-level fact, not a search result**. There cannot be an
+unenumerated consumer, because there is no other way to obtain the value. This matters beyond tidiness: it is
+exactly the move from an **unfalsifiable** proof obligation ("did we find them all?" — the question that defeated
+four rounds) to a **single decidable proposition** ("is there a second construction site?"). OD-P2-07 C's "search
+for ALL consumers" is discharged **by construction**, which is the strongest form of discharge available and the
+one the owner was told could not be reached.
+
+**Property C is therefore a change to one function, and the fix propagates to every consumer by typing.** That is
+the "one derived authority source replacing several synchronised enumerations" the brief asks for. Agent 2's
+recommendation (§6) converges on it without establishing it; the type-level argument is the challenger's, verified
+independently here, and it is better than what revision 1 had.
 
 **(b) The obligation is a positive class match, which no ordering can express. [verified]**
 `runtime/src/cit/materiality.rs:870`:
@@ -161,7 +232,7 @@ if class == "source" {
 Meanwhile the "single authoritative predicate" models exemptions through `paths::Exemption`, which has **exactly
 two variants** — `TaskMutationObservation` and `ProductionTreeMembership` **[verified]**. `source → test` confers
 neither, so `overlap_is_no_less_restrictive` passes it. The predicate is not merely one-directional; it models
-**2 of the ~19 distinct authority effects** reachable from `decide().class()`.
+**2 of the many distinct authority effects** reachable from `decide().class()`.
 
 This kills the "bidirectional predicate" option (the escalation package's option (i)) on evidence rather than on
 principle: you cannot order `source` against `test`. Obligations and exemptions do not share a lattice, and the
@@ -235,6 +306,19 @@ But "one diagnosis" does not imply "one mechanism," and the reason is structural
 > resolves `install.sh` under `--chdir=decoy` — §1.2 measured exactly that. **A manifest that is consumed as a
 > string is one more representation, which is the defect.**
 
+**[STRENGTHENED — A1] This is no longer an argument; it is a measurement.** §9.0's two defeats show the kernel
+performing a *second, independent resolution from bytes inside the artefact* **after** the OS has handed it a
+descriptor. A CXI-style action manifest binding `{interpreter: sh, artefact: install.sh, argv, envp}` describes
+both invocations perfectly and stops **neither**, because nothing consumes the manifest at the instant the kernel
+reads `#!`. The defeat happens *below the level at which descriptions exist*. Revision 1 asserted "a manifest can
+describe both, it can enforce neither"; that sentence is now backed by two executed attacks, which converts the
+adjudication against Agent 6's unification from a contested judgement into an evidenced one.
+
+Agent 6's *framing* contribution stands undiminished and is adopted throughout: Hardy 1988 / Miller 2006 as the
+standing vocabulary, and `cit::binding`'s `os_state` block as an already-shipping instance of the manifest shape.
+Its warning that the research org chart mirrored the repair org chart is fair and is partly upheld by this
+document's own seed-list audit (§7.4). What it does not carry is the conclusion.
+
 **What genuinely does unify, and it is worth having:** one *discipline*, stated once and applied at both sites —
 
 > **Verification emits a resolved object. Use consumes only that object. Nothing between them may re-derive any
@@ -262,7 +346,7 @@ already-proven record shape.** Anything that claims a single mechanism closes 2B
 | **Agent 2** | OPA / Rego as WRAP candidate | **Reject for this profile.** Agent 2 itself could not determine whether a Go/WASM evaluator is a realistic embed in a Rust kernel. The transferable idea (AND-composition of independently sourced layers) is ~40 lines of Rust. Taking a policy engine to get an `AND` is the opposite of the brief's §7. |
 | **Agent 3** | Bazel `--incompatible_strict_action_env` as the model, ADAPT/REQUIRED NOW | **Right pattern, insufficient alone — and its "REQUIRED NOW" label is falsified by §1.2 unless paired with wrapper elimination.** Agent 3's Q1 answer *does* include "resolve the target to an absolute canonicalised path … execute that same resolved target," which is the correct limb; its own classification table then splits that away from the env work as if either could stand alone. They cannot. |
 | **Agent 3** | The Rust `std` fork+exec `environ`-swap is a reason to prefer `Command` | **Correct and well-sourced, and it does not help here.** It makes `Command`'s own `PATH` search honour the child's env. §1.2 shows the child then re-supplies `PATH` itself. Good engineering, wrong layer. |
-| **Agent 4** | Landlock is the one REQUIRED-NOW-defensible candidate | **Accept the measurement, decline the priority.** Agent 4's honesty about P79-F11 is exactly right and I am amplifying it. Landlock closes AR77-F1/F2/F4 — which are `MEDIUM` and already disclosed under OD-P2-05 as "effects OD-P2-05 already declares unbounded." It closes **neither open HIGH**. Adopting a kernel LSM to close two MEDIUMs while two HIGHs stay open is priority inversion. → **USEFUL LATER / R2** (§13). |
+| **Agent 4** | Landlock is the one REQUIRED-NOW-defensible candidate | **Accept the measurement, decline the priority.** Agent 4's honesty about P79-F11 is exactly right and I am amplifying it. Landlock closes AR77-F1/F2/F4 — which are `MEDIUM` and already disclosed under OD-P2-05 as "effects OD-P2-05 already declares unbounded." It closes **no open HIGH's underlying defect** — precision correction per A4: a blanket "no `LANDLOCK_ACCESS_FS_EXECUTE` under the project root" ruleset *would* stop P79-F1's specific shape, as a containment side-effect that must be carved out the moment any build step legitimately executes a project file; the conclusion is unaffected. Adopting a kernel LSM to close two MEDIUMs while two HIGHs stay open is priority inversion. → **USEFUL LATER / R2** (§13). |
 | **Agent 5** | bubblewrap "contingent" on the AppArmor userns restriction | **Inference falsified by the orchestrator's measurement** (this kernel loads no AppArmor). Agent 5's reasoning was sound; record it as corrected, not dropped. Note the correction *raises* bubblewrap's feasibility and does not raise its priority. |
 | **Agent 5** | Commit-identity gate (hash the file, compare to a designated commit) — REQUIRED NOW | **Right instinct, wrong primitive.** It has Agent 2's git-dependency problem *and* a fresh one: it accepts **any** commit as governed ("committed ⇒ governed by definition"). An AI agent with repository write access can commit. That converts an authority check into a **no-op against the actual adversary**. `t2::verify_file` + an owner-signed gate is the same idea with a real authority anchor and no new dependency. |
 | **Agent 6** | Migrate `policy_precedence` merge to a CUE-style lattice meet — "one of the two or three highest-value findings" | **Reject for `class`, accept for the scalar keys.** §1.3(b): `class` is not orderable, so a meet operator has no meaning for the exact field that failed. Agent 6 reached this from the D027 incident (a *scalar* key) and generalised across a field boundary. For scalar overlay keys the lattice framing is genuinely good; it is not the Property-C fix. |
@@ -339,8 +423,9 @@ Held to Agent 4's standard. **R = the recommended architecture (§9 Problem A + 
 | **P79-F12** same shape at `health_check.command` | HIGH | **YES** | Same call site; OD-P2-05 cl.5 re-verification is the same code path. |
 | **P79-F1** `env PATH=. true` | HIGH | **YES — but not for the reason the package gave** | Not because the environment is cleared (measured T1: that fails), but because `env` is not executed and `true` is not a pinned artefact, so the command never reaches the ungated path. **Residual: if a project legitimately pins `/usr/bin/env` as an artefact, R must still refuse to pass through *its* argv — see §15, assumption 3.** |
 | **AR68/AR73 family** (~40 shapes) | — | **YES, as a class** | Wrapper chains, flag bundles, attached-value inline code, flagless interpreters, and slash-spelling divergence all stop being able to change what the kernel executes. They can still change what a *log* reads, which is a reporting concern, not an authority one. |
-| **P79-F8** `{pattern: product/*.py, class: test}` | HIGH | **YES** | `cit::materiality:870` reads `decide(path).class()`. Under floor-composition, `product/app.py` is matched by the kernel rule `product/**`, so its class comes from the kernel rules only. The appended project rule cannot change it. The obligation is never lost. |
-| **P79-F9** same edit escapes lineage W7 | HIGH-adj | **YES** | `lineage.rs:981` filters on `CODE_CLASSES.contains(decide(rel).class())` — same chokepoint, same fix. |
+| **P79-F8** `{pattern: product/*.py, class: test}` | HIGH | **YES for kernel-layout projects. NO for `gov adopt` native layouts** | `cit::materiality:870` reads `decide(path).class()`. Under floor-composition, `product/app.py` is matched by the kernel rule `product/**`, so its class comes from the kernel rules only and the obligation is never lost. **But `adopt.rs:1579/1585` generates unfloored `{d}/**` rules for any non-`product/` layout, so for those projects the same edit against `src/*.py` still works (§10.4).** Closure is conditional on extending the floor to declared project roots — **precondition P1**, not a filed question. |
+| **P79-F9** same edit escapes lineage W7 | HIGH-adj | **YES, same condition** | `lineage.rs:981` filters on `CODE_CLASSES.contains(decide(rel).class())` — same chokepoint, same fix, **same layout qualification**. |
+| **Direct-artefact `#!` re-resolution** (`["install.sh"]` with `#!./w` or `#!/usr/bin/env -S PATH=. sh`) | — | **NO for revision 1's §9; YES with obligation 2** | Measured defeat of revision 1's specification (§9.0). The remedy is §9.2 obligation 2 + §11 change 4. Listed here because it was *created* by the recommendation and must not be invisible in its own scorecard. |
 | **AR77-F3** second consumer of `class` | closed | **YES, and structurally** | The class a consumer sees is floor-owned wherever a kernel rule matches, so a *future* unknown consumer inherits the property without being enumerated. This is the specific thing OD-P2-07 C asked for. |
 | **P79-F10** "no mechanism exists" | MEDIUM | **N/A — the finding is false** (§1.1) | Three mechanisms exist. R uses two of them. |
 | **AR77-F1** empty-authority `file://` | MEDIUM | **NO** | The write is performed by the *spawned process*, correctly executing verified bytes. R establishes identity, not effects. Closed only by §9.4 (Landlock) or by the governed review, which OD-P2-05 cl.4 already assigns. **State this plainly; do not let R be sold as closing it.** |
@@ -349,9 +434,15 @@ Held to Agent 4's standard. **R = the recommended architecture (§9 Problem A + 
 | **P79-F3b** decoupled scan can remove a finding | LOW | **NO** | Untouched. It is a reporting-accuracy defect, correctly graded, and should stay on the register. |
 | **R0/R1 unauthenticated-source attacks** | — | **NO, and R must not claim to** | Level 1. Answered to the accepted extent by SRR-1's verify-then-install transaction and monotonic high-water marks; the residual is the *frozen* RoT-1 question. R touches nothing here. §14. |
 
-**Score, stated without spin: R closes 4 of 4 open HIGHs (P79-F1, F8, F9, F11) plus F12 and the AR68/AR73 class.
-It closes 0 of the 3 open MEDIUMs (AR77-F1/F2/F4) and 0 Level-1 findings.** That is the honest boundary, and it
-matches the partition in §1.4 exactly — which is a consistency check, not a coincidence.
+**Score, restated without spin [AMENDED — A3]: R closes 4 of 4 open HIGHs (P79-F1, F8, F9, F11) plus F12 and the
+AR68/AR73 class — with P79-F8 and P79-F9 closed for kernel-layout projects and conditional on precondition P1
+(§10.4) for `gov adopt` native layouts. It closes 0 of the 3 open MEDIUMs (AR77-F1/F2/F4) and 0 Level-1
+findings.** The execution half (F1, F11, F12, AR68/AR73) carries no layout condition.
+
+That is the honest boundary, and it matches the partition in §1.4 exactly — which is a consistency check, not a
+coincidence. **The one thing the boundary must not be allowed to hide** is that revision 1's own fix *created* a
+new instance of the identity column (the `#!` row above) and had to be amended to close it; a scorecard that
+counts only inherited defects flatters whatever produced it.
 
 ## 6. USE DIRECTLY / WRAP / ADAPT / BUILD CUSTOM
 
@@ -364,7 +455,7 @@ Consolidated across all six researchers, adjudicated, with the brief's burden of
 | `nix` crate (`unistd::{execve,execveat,fexecve}`) | **WRAP** | NOW | MIT, actively released; `std` has no descriptor-exec at all |
 | `std::process::Command` `env_clear`/`current_dir` | **USE DIRECTLY** | NOW | necessary hygiene; **not sufficient** (§1.2) |
 | Bazel fixed-`PATH` + `--action_env` allowlist | **ADAPT** | NOW | hangs off the existing `tool.schema.json` declaration surface |
-| Chen/Wagner/Dean erase-and-allowlist | **ADAPT** | NOW | supersedes the 32-entry `LOADER_ENV_VARS` denylist (§8) |
+| Chen/Wagner/Dean erase-and-allowlist | **ADAPT** | NOW | supersedes the 30-entry `LOADER_ENV_VARS` denylist (§8) |
 | `t2::seal_value` / `verify_file` / `classify_path` | **USE DIRECTLY (in-repo)** | NOW | detection-grade; see §1.1 caveat |
 | `human_channel` owner signature (Ed25519, key off-machine) | **USE DIRECTLY (in-repo)** | NOW | the only *proof*-grade authority anchor available |
 | `cit::binding` `os_state` manifest shape | **ADAPT (in-repo)** | NOW | the already-proven action manifest (§2) |
@@ -372,7 +463,7 @@ Consolidated across all six researchers, adjudicated, with the brief's burden of
 | OPA multi-bundle AND-composition | **ADAPT** | NOW | the operator, not the engine |
 | Object-capability discipline (Hardy '88, Miller '06) | **ADAPT (vocabulary + audit method)** | NOW | free; prevents re-enumeration |
 | Saltzer & Schroeder complete mediation | **ADAPT** | NOW | the oldest correct statement of the defect |
-| Floor-composed `decide()` | **BUILD CUSTOM** | NOW | **Justified**: ~40 lines inside an existing function, reusing the existing kernel-template baseline and the existing `owner_role`/`mutation` axis. No external primitive expresses "this project's path map" |
+| Floor-composed `decide()` | **BUILD CUSTOM** | NOW | **Justified**: one function, one struct field, one retention, one construction site (§10.3), reusing the existing kernel-template baseline and the existing `owner_role`/`mutation` axis. No external primitive expresses "this project's path map" |
 | Landlock (`landlock` crate) | **WRAP** | **LATER / R2** | measured ABI 3; closes AR77-F1/F2/F4; closes no HIGH |
 | `memfd_create` + `F_SEAL_WRITE` | **WRAP** | LATER | only for content the OS stages itself |
 | seccomp-bpf | **WRAP** | LATER | answers "which syscall", not "which path" |
@@ -387,7 +478,7 @@ Consolidated across all six researchers, adjudicated, with the brief's burden of
 | gVisor, Firecracker, rootless containers, WASI, remote execution | **WRAP** | R3 | hostile-multi-tenant tools for a non-multi-tenant profile |
 | Sigstore keyless, TPM sealing, Uptane, `AT_EXECVE_CHECK` | **NOT APPLICABLE** | — | online CA / no guest TPM / no fleet / needs kernel ≥6.14 (this is 6.6.87) |
 
-**Only one `BUILD CUSTOM` survives**, and it is ~40 lines inside a function that already exists. That is the
+**Only one `BUILD CUSTOM` survives**, and it is ~40 lines of logic inside a function that already exists, plus three small touch points (§10.3). That is the
 result the brief's §7 asked for.
 
 ## 7. Where the researchers converged — and whether it was convergence or a shared seed list
@@ -445,11 +536,18 @@ answer a *different* question — would this installation expand authority — a
 kernel floor for the review trigger. I am stating this because it would be easy, and wrong, to claim "106 entries
 deleted."
 
-Also deleted: **`LOADER_ENV_VARS`, 32 entries** (`runtime/src/capabilities/binding.rs`), replaced by
+Also deleted: **`LOADER_ENV_VARS`, 30 entries** (`runtime/src/capabilities/binding.rs`), replaced by
 `env_clear()` + a fixed `PATH` + a declared allowlist. Worth noting why this list is itself evidence: it is the
 product's *best* existing environment defence and **it is a denylist that does not contain `PATH`, `IFS` or
-`GIT_SSH_COMMAND`** **[verified]**. The mechanism BC-P2-40 built to stop code substitution omits the variable that
-P79-F1 uses. Erase-and-allowlist is not a refinement of this; it is its replacement.
+`GIT_SSH_COMMAND`** **[verified — full list re-derived by parsing its string literals]**. The mechanism BC-P2-40
+built to stop code substitution omits the variable that P79-F1 uses. Erase-and-allowlist is not a refinement of
+this; it is its replacement.
+
+> **[CORRECTED — A4] Revision 1 said 32.** I had counted the declaration's *lines* rather than its *entries*. The
+> list holds 30 strings. In a document arguing that checks must reason about the thing rather than its
+> representation, counting a list by its representation is the error the document is about, committed in
+> miniature. It is recorded rather than quietly fixed because the study's own standard requires it — and because
+> it is a reminder that the 45/61 split above was checked entry by entry and this was not.
 
 Plus: `skip_wrappers` and its `is_flag`/`is_env_assignment`/`is_bare_number` token heuristics
 (`tools.rs:981-1000`), and the `-C` vs `--chdir=` asymmetry (P79-F13) that no list can fix.
@@ -463,18 +561,22 @@ of the function spans]**:
 | `path_rule_narrowing` | 90 |
 | `overlap_is_no_less_restrictive` | 83 |
 | `evaluate_path_rules` | 71 |
-| `CLASS_EXEMPTIONS` table | 30 |
+| `CLASS_EXEMPTIONS` table | **20** *(corrected — A4; 22 with its doc comment)* |
 | `rule_effective_attrs` | 16 |
 | `describe_exemptions` | 13 |
 | `Exemption` enum | 10 |
 | `class_exemptions` | 7 |
 | `class_confers`, `patterns_may_overlap` | 6 |
-| **total** | **457** |
+| **total** | **≈447** *(corrected from 457)* |
 
 Floor-composition replaces the **comparison** — roughly 300 of those lines — with a second `decide()` pass over
-the kernel rules and a field-wise AND (~40 lines). The **reporting** (~130 lines of applied/refused records that
-OC-P2-04 §2 and §4 require, feeding `gov policy overrides` and doctor D027) is **retained**, not deleted. Net
-≈ **−260 lines of hand-written security comparison logic**, and the `Exemption` vocabulary disappears entirely.
+the kernel rules and a field-wise AND. The **reporting** (~130 lines of applied/refused records that OC-P2-04 §2
+and §4 require, feeding `gov policy overrides` and doctor D027) is **retained**, not deleted. Net ≈ **−250 lines
+of hand-written security comparison logic** *(corrected from −260)*, and the `Exemption` vocabulary disappears
+entirely. Every other span above was independently re-measured and matches exactly.
+
+**What replaces it is not free either [A6]:** one function, one struct field, one retention, one construction site
+(§10.3). The net is still strongly negative, but "~40 lines" was the code and not the change.
 
 **Reductions in the brief's own terms:**
 
@@ -482,9 +584,9 @@ OC-P2-04 §2 and §4 require, feeding `gov policy overrides` and doctor D027) is
 |---|---|---|
 | Authority sources for `class` | project file, with the kernel template consulted *comparatively* | one: the kernel rules decide any path they match |
 | Enumerations that must be kept complete | 45 exec-semantics entries + 32 loader vars + 2 exemptions + 14 class values × 19 effects | **0** for execution semantics; **0** for class authority |
-| Custom security comparison code | 457 lines | ≈130 (reporting only) |
-| Consumers that must be found and updated | feared 12+; **actually 1** (`decide()`) — §1.3a | 1, and now correct by construction |
-| Proof surface | "did we enumerate every shape / every consumer?" (unbounded, unfalsifiable) | "does `decide()` return the floor where a kernel rule matches?" + "is the exec'd fd the hashed fd?" (two bounded, testable propositions) |
+| Custom security comparison code | ≈447 lines | ≈130 (reporting only) |
+| Consumers that must be found and updated | feared 12+; **actually 1** — and `PathDecision` has exactly one construction site, so there *cannot* be another (§1.3a) | 1, correct by **typing**, not by search |
+| Proof surface | "did we enumerate every shape / every consumer?" (unbounded, **unfalsifiable**) | three bounded, testable propositions: "does `decide()` return the floor where a kernel rule matches?", "is the exec'd fd the hashed fd?", **"is every program the kernel resolves before the first reviewed instruction in the hashed closure?"** (the third added by A1) |
 | TCB | + the classifier's semantic model of every shell/interpreter on earth | + two syscalls already in the kernel |
 
 **The most important deletion is not a line count.** It is that both remaining propositions are **falsifiable by a
@@ -493,12 +595,59 @@ precisely why five rounds each ended with a reviewer finding one more.
 
 ## 9. Recommended architecture — Problem A (execution trust)
 
-### 9.1 The property
+### 9.0 **[AMENDED — A1] The defeat that changed this section, and why it is not a disclosure**
 
-> **The OS executes a kernel object it holds, never a name it was handed.** Verification produces a
-> `ResolvedExecution`; execution consumes only that; nothing in between re-derives any part of it.
+Revision 1 of §9 stated its guarantee as *"the interpreter that runs is the one intended, on the bytes reviewed."*
+**That was false as specified.** The independent challenger implemented §9.2 exactly — `open(O_PATH|O_NOFOLLOW)`,
+OS-constructed `envp`, OS-pinned cwd, `execveat(fd,"",argv,envp,AT_EMPTY_PATH)` — and made a hash-pinned, reviewed
+artefact execute an **unpinned, unreviewed project file**, twice, by two routes. The coordinator reproduced both
+independently. I take them as established and have not re-run them.
 
-### 9.2 The shape, in four obligations
+| attack — artefact's **first line** is the whole payload | observed |
+|---|---|
+| `#!./w` (relative interpreter) | `UNPINNED-W-RAN` |
+| **control:** same artefact, cwd *not* pinned to the project root | fails `ENOENT` |
+| `#!/usr/bin/env -S PATH=. sh` | `UNPINNED-LOCAL-SH-RAN` |
+
+**Read the control row.** The first attack does not merely survive the cwd pin — it **requires** it. §9.2(1)'s
+mitigation supplies the attacker's resolution root. The second defeats §9.2(3) ("construct the environment") with
+four bytes inside the reviewed artefact: the shebang names `/usr/bin/env` *absolutely*, so nothing the OS does to
+`PATH` matters, and `-S` rebuilds the environment inside the child. **That is P79-F1 reconstructed inside a
+conforming, pinned, byte-verified installation under a fully constructed environment.**
+
+**Neither is an instance of §9.4's disclosed limit.** Both act *before a single reviewed byte executes*, and both
+decide *which* interpreter runs. They violate **OD-P2-05 clause 1** directly, and they violate §9.1's own stated
+property: the OS held the object; **the object handed the kernel a name.** Therefore the remedy below is
+**structural — a fourth obligation the reduction must enforce — not a limitation to disclose.** Disclosure is not
+available where a normative clause is breached.
+
+**The cause is this study's own thesis, one level further down than I looked.** `execveat` hands the kernel a
+verified object; the kernel then performs a **second resolution from bytes inside that object**. I applied that
+pattern to the escalation package's recommendation and did not apply it to my own. It is recorded in §0a against
+myself, and it is the reason §16 Q8 exists.
+
+**Two consequences worth stating before the remedy:**
+
+1. **This strengthens the rejection of Agent 6's one-mechanism answer (§2), converting a contested judgement into
+   an evidenced one.** A CXI-style action manifest binding `{interpreter, artefact, argv, envp}` **describes both
+   invocations perfectly and stops neither**, because nothing consumes the manifest at the instant the kernel
+   reads `#!`. *"A manifest can describe both. It can enforce neither"* was an argument in revision 1; it is now a
+   measurement.
+2. **It does not favour Option 2 or Option 3.** `./w` is a *declared input* — it would be bind-mounted into a
+   bubblewrap jail and permitted by a Landlock ruleset scoped to the project root. Both attacks survive inside
+   Option 3 unchanged. The ranking is unaffected.
+
+### 9.1 The property **[restated]**
+
+> **The OS executes a kernel object it holds, never a name it was handed — and nothing inside that object may name
+> a second one.** Verification produces a `ResolvedExecution` whose closure includes *every* program the kernel
+> will resolve on the way to the first reviewed instruction; execution consumes only that; nothing in between
+> re-derives any part of it.
+
+The clause after the dash is the amendment. Revision 1's property stopped at the descriptor, which is precisely
+where the kernel starts resolving again.
+
+### 9.2 The shape, in **five** obligations
 
 1. **Reduce, do not classify.** For each declared command, the OS attempts to reduce it to a
    `ResolvedExecution { interpreter: Option<Fd>, artefact: Fd, argv: Vec<OsString>, envp: Vec<OsString>, cwd:
@@ -506,15 +655,41 @@ precisely why five rounds each ended with a reviewer finding one more.
    descriptor**. **If the reduction fails for any reason, the command is `undetermined` and gates** — OD-P2-05
    clause 3 unchanged. A wrapper program is a reduction failure, not a token to skip. *This is the limb §1.2
    proves is load-bearing.*
-2. **Execute the object.** `execveat(artefact_fd, "", argv, envp, AT_EMPTY_PATH)`, with the interpreter's own
+2. **[NEW — A1] Resolve the artefact's own first line, or refuse.** The reduction reads the artefact's first
+   line and **fails (→ `undetermined` → gate)** unless *either* the artefact has no `#!`, *or* the `#!` names an
+   **absolute** interpreter path which the OS itself resolves, opens and hashes **inside the same
+   `ResolvedExecution`**, and which is **not itself a re-exec vector**. A relative `#!` path, an `env`-fronted
+   `#!`, a `#!` carrying `-S`, or a `#!` naming a program that is not in the resolved closure is a **reduction
+   failure**, not a shape to normalise.
+
+   **The starting point already exists in-repo, and reusing it unchanged would reproduce the defect.**
+   `runtime/src/memory/profile.rs:378` implements `fn shebang(file) -> Option<String>` **[verified]**, and that
+   module's own header states the interpreter so found is *"content-hashed"* (`profile.rs:19`) — so the product
+   already knows, **in one subsystem**, that a shebang decides which executable runs and must be hashed. The
+   installation classifier never reads one. *This is §1.1's move recurring at the execution boundary: the
+   primitive exists and was never pointed at this surface.* But its `env` special case is
+   `parts.find(|a| !a.starts_with('-'))` **[verified]**, which for `#!/usr/bin/env -S PATH=. sh` skips `-S` and
+   returns **`"PATH=."`** as the interpreter. **Reuse it; do not reuse it unchanged.**
+
+3. **Execute the object.** `execveat(artefact_fd, "", argv, envp, AT_EMPTY_PATH)`, with the interpreter's own
    descriptor when the artefact is a script and the descriptor **not** opened `O_CLOEXEC` (§9.3).
-3. **Construct the environment; do not filter it.** `env_clear()`, then a fixed OS-owned
+4. **Construct the environment; do not filter it.** `env_clear()`, then a fixed OS-owned
    `PATH=/usr/bin:/bin` (Bazel's shipped default since 0.21), a disposable OS-owned `HOME`, and an explicit
    per-tool allowlist. The natural home is the existing `tool.schema.json` declaration surface, which already
    carries `permissions`, `required_permission_classes`, `capabilities`, `credential_scope`, `version_pin` and
-   `installation_sha256` — this answers Agent 3's one open obstacle.
-4. **Re-verify at every execution.** Re-open, re-hash, re-exec per invocation — OD-P2-05 clause 5, unchanged in
-   requirement, now cheap because hash and exec share one descriptor.
+   `installation_sha256` — this answers Agent 3's one open obstacle. **Note obligation 2 is what makes this
+   obligation hold**: without it, `#!/usr/bin/env -S …` discards everything constructed here in one exec hop.
+5. **Re-verify at every execution.** Re-open, re-hash, re-exec per invocation — OD-P2-05 clause 5, unchanged in
+   requirement, now cheap because hash and exec share one descriptor. **The closure re-verified must include the
+   interpreter resolved under obligation 2**, not only the artefact.
+
+**[AMENDED — A4] Scope correction.** Revision 1 scoped this property to *"`util::run_cmd`'s two install call
+sites."* `run_cmd` has **four** call sites at `35461c9` **[verified]**: `tools.rs:2151` and `tools.rs:2566` (the
+install path, the two the open HIGHs live on), plus **`adopt.rs:622`** (a detected native test command) and
+**`verification/product.rs:255`** (`pl.command`, a project-declared verification plan). The latter two execute
+**project-influenced** command vectors through the same program-by-string, no-`env_clear` path. Neither is an open
+HIGH, so this qualifies *scope*, not correctness — but the honest statement is **"two call sites for the minimum,
+four for the property,"** and a property applied to half its call sites is the shape this study exists to stop.
 
 ### 9.3 Feasibility — measured on this machine, not cited
 
@@ -535,6 +710,20 @@ advertised property is not the property needed.
 
 ### 9.4 What Problem A does not close, stated before anyone claims otherwise
 
+**[AMENDED — A1] What is no longer on this list.** The `#!` re-resolution was *never* on it and could not have
+been: it breaches OD-P2-05 clause 1, which is normative, so it must be **enforced** (obligation 2) rather than
+disclosed. The boundary between "enforced" and "disclosed" is exactly this: *does a reviewed byte execute first?*
+If the defect acts before the first reviewed instruction, it is a binding failure and belongs in §9.2. If it acts
+after, it is the interpreter's own behaviour and belongs here.
+
+- **The direct-artefact install shape needs the same rule.** The classifier admits not only
+  `["sh", "install.sh"]` (the shape every certification fixture uses) but also `["install.sh"]` directly, via
+  `looks_like_a_file` → `classify_file_candidate`. For that shape there is no declared interpreter at all, so
+  obligation 2 is the *only* thing standing between a pin and an unpinned `#!` target. Either apply the shebang
+  rule to it or refuse the shape (require a declared interpreter). **This is §11's change 4.** Not verified
+  end-to-end by anyone: the challenger derived its admissibility from source and did not run
+  `gov tools install --execute` against it. As an architecture requirement it stands regardless; as an
+  *exploitable finding* it needs that run, which is cheap (§16 Q8).
 - **AR77-F1/F2/F4.** Effects of a correctly-executing verified process. Kernel confinement (§17 Option 2) or the
   governed review (OD-P2-05 clause 4, already the design).
 - **A malicious-but-correctly-pinned artefact.** OD-P2-05 says so explicitly; that is the division of labour.
@@ -566,10 +755,10 @@ over the expanded effective state — and it is Agent 2's "floor AND local, neve
    - the local decision alone where no kernel rule matched.
    **`class` is not AND-composed, because it is not ordered (§1.3b) — it is floor-owned.** This is the single
    design decision the whole of Problem C turns on.
-2. **One chokepoint, therefore no consumer enumeration.** All ~19 production consumers already read
-   `decide().class()` **[verified §1.3a]**. OD-P2-07 C's "search for ALL consumers" is discharged by a
-   *structural* argument rather than a search, which is strictly stronger and is the thing four previous rounds
-   could not achieve.
+2. **One chokepoint, therefore no consumer enumeration.** All 22 non-test consumers read `decide().class()`, and
+   — the stronger form — `PathDecision` has **exactly one construction site** in the runtime **[verified §1.3a]**.
+   OD-P2-07 C's "search for ALL consumers" is discharged **by type construction**, not by a search, which is the
+   thing four previous rounds could not achieve.
 3. **Seal the file; refuse to honour an unsealed or broken one — as an integrity check, not as the authority.**
    Add `"repository-contract"` to `SEALED_RECORD_TYPES`, seal on every governed write, and call the **existing**
    `t2::verify_file`. Top-level `os_binding` is already schema-legal (§1.1). This catches accidental and
@@ -589,42 +778,108 @@ release-agent, mutation: prohibited` for `governance/kernel/**` and `change-cont
 floor baseline. Floor-composition changes *what is done with* that baseline — from comparison to composition —
 and touches no schema, no policy file and no template. Nothing is replaced.
 
-### 10.4 The limit of this fix, which the challenger will find if I do not state it
+**[STRENGTHENED — A5] The floor is authenticated kernel content, and this is the best fact in the Property-C
+story.** Revision 1 asserted that floor-composition "needs no key"; it did not show why that is safe. Verified
+now: `PolicySet::load` takes `kernel_dir = trust.policy_root` from `kernel_trust::trust(root)`
+(`policy.rs:117`) **[verified]**, and that function's own contract is explicit —
+
+> *"Constitutional content is read only from a kernel that has been **authenticated against the installed release
+> identity** (`kernel_trust`); when verification fails the immutable payload **embedded in this binary is
+> substituted explicitly** and the substitution is recorded (verifier V-H2)."* — `policy.rs:112-114`
+
+So the floor is not a project-editable file and not a file at all in the untrusted sense: it is release-identity-
+authenticated kernel content, with an explicit, recorded fail-safe to the binary's embedded payload. **That is why
+floor-composition is stronger than the seal rather than merely cheaper** — the seal is detection-grade under a
+symmetric key an agent can read (§1.1), whereas the floor rests on the accepted Level-1 chain (ARCH-0003) without
+introducing any new dependency on it. It is the one limb of Property C that is structurally sound against the
+actual adversary, and it should be the limb the owner is told about first.
+
+**[CORRECTED — A6] And the size of the change, restated honestly.** Revision 1 called this "~40 lines inside an
+existing function," and §17's reversibility row called it "one function plus one string in a three-member const."
+Both understate it. Verified: `Project::contract()` builds `RepositoryContract::new(overlay().get(…))`
+(`project.rs:176`); `RepositoryContract` carries `data`, `roots`, `rules`, `sensitivity` — **no kernel template**
+(`paths.rs:555-560`); and `repository_contract_baseline` is a **local variable** inside `PolicySet::load`
+(`policy.rs:410`), not retained **[all verified]**. Floor-composition therefore needs **one function, one struct
+field, one retention, and one construction site** — still small, still the right shape, but four touch points, not
+one.
+
+**One rail already exists and reduces the work.** `contract()` reads the **effective** overlay, not the raw file:
+`Overlay::get` returns `set_effective`'s value when present, and `contract()` calls `policies()` (which sets it)
+first **[verified]**. So the precedence layer's refusals already reach every `decide()`; floor-composition rides
+that rail rather than laying it.
+
+### 10.4 **[AMENDED — A3] The limit of this fix. It is a hole, not a footnote, and it changes an answer.**
 
 **The floor's coverage equals the kernel template's coverage.** The template covers `governance/**`, `spec/**`,
-`product/**`, `archive/**`, `**/.env*`, `**/secrets/**`, `.governance-runtime/**`, `.governance-state/**`. A
-project whose product lives at `src/` or `app/` has **no floor for it** — and `adopt.rs` generates native-layout
-rules for exactly such projects. For those paths, class remains project-owned, and P79-F8's *shape* remains
-available even though its *instance* is closed.
+`product/**`, `archive/**`, `**/.env*`, `**/secrets/**`, `.governance-runtime/**`, `.governance-state/**`.
 
-This is structurally the same finding as the RoT-1 review's "64 of 125 leaves unfloored," recurring here. It is
-not a reason to reject floor-composition — it is a reason to state its scope precisely, to make "this path is
-unfloored" **observable** in `gov policy overrides` and doctor, and to put "should the floor be extended to
-declared project roots?" on the owner's list (§16, Q3). Anything that presents floor-composition as total is
-overclaiming.
+Revision 1 stated that accurately and then filed the consequence as an open question. **That placement was wrong,
+and the challenger is right that it is load-bearing.** Verified myself at `35461c9`, `adopt.rs:1579` and `:1585`:
 
-## 11. The smallest thing that closes the two open HIGHs — and how it differs from the architecture
+```rust
+for d in &test_dirs { extra.push(json!({"pattern": format!("{d}/**"), "class": "test",   …})); }
+for d in &src_dirs  { extra.push(json!({"pattern": format!("{d}/**"), "class": "source", …})); }
+```
+
+with `d` excluded only when it is one of `spec|governance|archive|product|docs`. So for any repository whose
+source or tests are not under `product/`, `gov adopt` generates `src/**`, `app/**`, `lib/**`, `cmd/**` as
+**project-declared patterns with no kernel counterpart — hence no floor.**
+
+**The consequence, stated plainly, because it changes a "YES" into a qualified one:**
+
+> For a project onboarded by `gov adopt` with any layout other than the kernel's own, **floor-composition closes
+> zero of P79-F8 and P79-F9's shape.** `{pattern: "src/*.py", class: test}` still cancels
+> `MATERIAL_CHANGE_REQUIRES_CIT` at `cit/materiality.rs:870`, and still drops the file out of
+> `lineage.rs:981`'s `CODE_CLASSES` filter. The *instance* is closed because **this** repository uses `product/`.
+> The *capability* is untouched for the population `gov adopt` exists to serve.
+
+This is structurally the same finding as the RoT-1 review's "64 of 125 leaves unfloored," recurring here — which
+is itself a reason to take it seriously rather than as an edge case.
+
+**What follows for the recommendation.** Not rejection — floor-composition is still right, and it is the only limb
+that is structurally sound (§10.3). But three things change:
+
+1. **§5's verdict and §17's Option 1 row must read "closes P79-F8/F9 for kernel-layout projects."** Amended.
+2. **"Is the floor extended to declared project roots?" is a precondition of the closure claim, not a question to
+   file.** Amended in §16 as **P1**, ahead of the numbered questions.
+3. **"This path is unfloored" must be observable** in `gov policy overrides` and doctor — otherwise the gap is
+   silent, which OC-P2-04 §4 ("silence is failure") independently forbids.
+
+Anything that presents floor-composition as total is overclaiming. Revision 1 came close to doing so in two
+sentences, and they are corrected.
+
+## 11. **[AMENDED — A2]** The smallest thing that closes the two open HIGHs — and how it differs from the architecture
 
 The brief asked for this separation explicitly, and it matters because the owner may want the minimum.
 
-**The minimum, for both open HIGH classes:**
+**The minimum, for both open HIGH classes — four changes, not three:**
 
 | # | Change | Closes | Size |
 |---|---|---|---|
-| 1 | In the installation classifier, treat a **wrapper program as a reduction failure** (`undetermined` ⇒ gate) instead of a prefix to skip. Delete `skip_wrappers` and `wrapper_programs`. | **P79-F11, P79-F12, P79-F1** | one function deleted, one branch changed |
-| 2 | Exec the **resolved absolute artefact** (and resolved absolute interpreter), with `env_clear()` + fixed `PATH`, at `util::run_cmd`'s two install call sites. | hardens 1; closes the residual `PATH` shapes | ~20 lines |
-| 3 | In `RepositoryContract::decide`, take **`class` from the kernel rules** wherever a kernel rule matches. | **P79-F8, P79-F9**, and AR77-F3 structurally | ~40 lines |
+| 1 | In the installation classifier, treat a **wrapper program as a reduction failure** (`undetermined` ⇒ gate) instead of a prefix to skip. Delete `skip_wrappers` and `wrapper_programs`. **No replacement detector is needed** — the classifier's existing inverted default already gates an unrecognised program. | **P79-F11, P79-F12, P79-F1** | one function deleted, one branch changed |
+| 2 | Exec the **resolved absolute artefact** (and resolved absolute interpreter), with `env_clear()` + fixed `PATH`, at `util::run_cmd`'s two **install** call sites (of four — §9.2). | hardens 1; closes the residual `PATH` shapes | ~20 lines |
+| **4** | **[NEW]** **Resolve the artefact's own `#!` line into the hashed closure, or refuse** (§9.2 obligation 2); and for the direct-artefact shape `["install.sh"]`, either apply that rule or require a declared interpreter. | the two measured defeats of §9 (§9.0) — **without it, changes 1–2 still let a pinned artefact run an unpinned file** | one first-line read + one resolution; `memory/profile.rs::shebang` is the starting point, amended for `-S` |
+| 3 | In `RepositoryContract::decide`, take **`class` from the kernel rules** wherever a kernel rule matches. | **P79-F8, P79-F9** (kernel layouts; see P1), and AR77-F3 structurally | one function, one struct field, one retention, one construction site |
 
-**That is it. Three changes, no new dependency, no new crate, no kernel feature, no schema change.** Measured
-T1/T2/T3 say change 1 is the one that actually matters for A, and §1.3(a) says change 3 needs no consumer sweep.
+**That is it. Four changes, no new dependency, no new crate, no kernel feature, no schema change.** Measured
+T1/T2/T3 say change 1 is the one that actually matters for A; §9.0's probes say change 4 is not optional; and
+§1.3(a) says change 3 needs no consumer sweep.
+
+> **Why change 4 is in the *minimum* and not in the architecture.** Changes 1–2 close the two *inherited* HIGHs.
+> But they leave — and change 2 partly *enables*, via its own cwd pin — a route by which a reviewed artefact runs
+> an unpinned file before any reviewed byte executes, breaching OD-P2-05 clause 1. Shipping 1–2 without 4 would
+> close two proven attacks and open one measured one. **Any sequencing that defers change 4 past changes 1–2
+> should be refused.**
 
 **What the minimum is *not*:**
 
 - It is **not** descriptor-based execution. Change 2 closes the *identity-rebinding* attacks that exist today;
   `execveat` closes the *TOCTOU window* between hash and exec, which is a narrower, un-demonstrated residual. Add
   it when implementing the architecture, not to close the HIGHs.
-- It is **not** the T2 seal on the path map. Floor-composition alone makes P79-F8 inert. The seal adds
-  observability (OC-P2-04 §4) and catches shapes outside the floor's coverage (§10.4).
+- It is **not** the T2 seal on the path map. Floor-composition alone makes P79-F8 inert **where the floor
+  reaches** (§10.4). The seal adds observability (OC-P2-04 §4) and is the only thing that speaks at all to the
+  unfloored paths `gov adopt` generates — which raises, rather than lowers, its importance for the adopted-project
+  population, while remaining detection-grade (§1.1).
 - It is **not** the owner-signed route for legitimate class changes. That restores a *capability*; it does not
   close a defect.
 - It is **not** Landlock. Landlock closes no HIGH (§5).
@@ -696,7 +951,7 @@ it.
 | Floor-composed `decide()` | 2A/2C | clean |
 | T2 seal on the path map | 2A | clean — reuses an in-repo primitive |
 | Owner-signed route for class widening | 2A | clean — reuses `human_channel`, already wired to gates |
-| **Landlock** | **3, used as a 2B compensating control** | **Contaminating if placed in REQUIRED NOW.** It is a kernel LSM security boundary. Agent 4 argued both sides honestly and declined to make the call; I am making it: **R2, not now.** It closes no open HIGH (§5), and pulling a Level-3 mechanism into a stopped Phase 2 to close two already-disclosed MEDIUMs is precisely "solving an R3 problem inside Phase 2 because the technology exists." |
+| **Landlock** | **3, used as a 2B compensating control** | **Contaminating if placed in REQUIRED NOW.** It is a kernel LSM security boundary. Agent 4 argued both sides honestly and declined to make the call; I am making it: **R2, not now.** It closes no open HIGH's underlying defect (§5), and pulling a Level-3 mechanism into a stopped Phase 2 to close two already-disclosed MEDIUMs is precisely "solving an R3 problem inside Phase 2 because the technology exists." |
 | bubblewrap / containers / gVisor / Firecracker / WASI | 3 | excluded |
 | `tough` / TUF re-implementation | **1** | **excluded — and this is the direction contamination would most likely come from.** The RoT-1 lineage is frozen; importing it would re-open a loop the owner closed |
 | Sigstore keyless, TPM | 3 | excluded (and TPM unavailable) |
@@ -713,12 +968,28 @@ none.
 2. **The T2 binding key is readable by any process running as the owner's account — including the AI agents that
    are the lower-trust party.** The module says so; §1.1 restates it. **The seal is detection-grade against the
    actual adversary.** Every Property-C claim must be phrased accordingly.
-3. **`argv` handed to a pinned artefact is still attacker-influenced.** §9 binds *which bytes run*. It does not
-   bind what the artefact is told to do. A project that pins `/usr/bin/env` as its artefact reconstructs P79-F1
-   inside a "conforming" install. **The reduction must refuse to admit a program whose documented job is to
-   re-execute another program** — and that boundary is itself a judgement, i.e. a small residual enumeration
-   moved from "what can this command do" to "is this artefact an exec vector." Smaller and bounded, but not zero.
-   I flag it because it is the likeliest place a sixth round would be found.
+3. **`argv` handed to a pinned artefact is still attacker-influenced. [AMENDED — A6: the residual is NOT
+   bounded.]** §9 binds *which bytes run*. It does not bind what the artefact is told to do. Revision 1 predicted
+   in prose that "a project that pins `/usr/bin/env` as its artefact reconstructs P79-F1 inside a conforming
+   install," and proposed refusing to admit programs whose job is to re-execute another — calling that residual
+   *"smaller and bounded."*
+
+   **The challenger executed that prediction and corrected the adjective.** A byte-identical **copy** of
+   `/usr/bin/env` at an arbitrary project path (`cp /usr/bin/env proj/tools/setup`) satisfies the pin exactly,
+   never leaves the project root, and with `["tools/setup", "PATH=.", "true"]` runs a project-local `./true`.
+   **No name-based list reaches a copy.** Only a content denylist would, and that is unbounded.
+
+   **The honest placement, therefore, is not "a small enumeration" but the concession §9.4 already makes.** This
+   residual is **co-extensive with "what the interpreter does next"** and belongs to **OD-P2-05 clause 4's
+   governed review**, which the architecture already relies on and which the owner already accepted as the
+   division of labour. Presenting it as a bounded list would be inventing a sixth enumeration in the document
+   arguing against enumerations.
+
+8. **[NEW — A1] The artefact's own first line does not choose the interpreter.** This assumption was nowhere
+   stated in revision 1 because it was not noticed, and the challenger's probes broke it. It is listed here for
+   completeness, but **listing it is not the remedy**: OD-P2-05 clause 1 is normative, so the architecture must
+   **enforce** it (§9.2 obligation 2), not disclose it. An assumption that a normative clause depends on is a
+   requirement wearing the wrong label.
 4. **The kernel template is trusted and complete for the paths it covers.** Floor-composition inherits the
    template's coverage exactly; §10.4 is the consequence.
 5. **The owner's private signing key is off this machine** (`human_channel`'s stated premise, ARCH-0003 §1). If
@@ -731,6 +1002,33 @@ none.
 
 ## 16. Open questions needing an owner decision
 
+### **P1 — a precondition, not a question [A3]**
+
+**The floor must be extended to declared project roots, or the P79-F8/F9 closure claim must be narrowed to
+kernel-layout projects.** This is not something to file alongside the questions below, because a claim in §5 and
+§17 depends on its answer. `gov adopt` generates unfloored `{d}/**` source/test rules for every non-`product/`
+layout (§10.4, verified at `adopt.rs:1579/1585`), so for the population `gov adopt` exists to serve,
+floor-composition closes none of that shape. Either the kernel template gains a mechanism for flooring
+project-declared roots (for example: a declared root inherits the floor of the kernel role it claims), or the
+owner accepts a closure scoped to this repository's layout — **and the scoping is stated wherever the closure is
+claimed.** Both are defensible; silence is not.
+
+### **P2 — one probe, recorded as open and deliberately not run [A7]**
+
+**A pinned, dynamically-linked ELF artefact with a project-controlled `RUNPATH`/`$ORIGIN`, or `LD_*` reaching
+`run_cmd`.** This is the same shape as the two defeats in §9.0 — a second resolution performed from data inside or
+beside the verified object — at the layer below the shebang: the dynamic loader. It matters because
+**`LOADER_ENV_VARS` is stripped on the *plugin* path only (`apply_plugin_env`), not at `run_cmd`** **[verified]**,
+so the install path has no loader-variable hygiene at all today.
+
+I have **not run it and I do not assume its outcome.** What I will say is that this pattern's record in this study
+is five for five — the escalation package's fix, revision 1's fix, and three of the five repair rounds all failed
+at exactly one level below where they looked — and that a design which reaches implementation without this probe
+would be repeating the one mistake this study has documented most thoroughly. **It is a pre-implementation
+obligation, not an owner decision**, and it is cheap.
+
+### The owner decisions
+
 1. **Is the corrected Property-A recommendation authorised?** §1.2 falsifies what the escalation package proposed.
    The owner has not yet been asked to authorise "do not execute wrapper chains" — which is a *behaviour change*
    for projects whose installers legitimately use `env`, `nohup` or `timeout`. **This is the one question that
@@ -738,9 +1036,8 @@ none.
 2. **Is detection-grade acceptable for the path-map seal?** Given §1.1's key exposure, does the owner accept
    detection-grade integrity for authority-bearing config, with proof-grade reserved for the owner-signed gate
    route? (This is the question Agent 2 correctly declined to answer.)
-3. **Should the floor extend beyond the kernel template's path coverage?** §10.4: projects with a non-standard
-   layout have unfloored authority-bearing paths. Extending the floor to adopted project roots is a product
-   decision about what "project-editable" means.
+3. **~~Should the floor extend beyond the kernel template's path coverage?~~ → promoted to precondition P1
+   above.** It is not an optional extension; a closure claim depends on it.
 4. **What is the legitimate governed route for a class change, and what does it cost in workflow?** OD-P2-07
    preserves the capability. Routing it through a Human Decision Gate makes every path-map edit an owner-signed
    event. Acceptable, or too heavy?
@@ -755,6 +1052,13 @@ none.
    little, but that is the owner's judgement, not mine.
 7. **`pinned_files` schema gap** (§13). Fix now, or record as R2? It is not exploited; it is the same defect class
    as AR73-F4 one field over.
+8. **[NEW — A1] Should the direct-artefact install shape (`["install.sh"]`) be supported at all, or refused in
+   favour of a declared interpreter?** §9.4. Refusing it is strictly simpler and removes the shape the two
+   measured defeats used; supporting it means §9.2 obligation 2 must carry the whole weight for it. **Related and
+   cheap:** nobody has run `gov tools install --execute` end-to-end against that shape — the challenger derived
+   its admissibility from source. That run is what would grade §9.0's defeats as an *exploitable finding* rather
+   than an *architecture defect*. They stand as an architecture defect either way, because they defeat the
+   prescription regardless of which shapes reach it.
 
 ---
 
@@ -768,19 +1072,22 @@ one above it.
 | | |
 |---|---|
 | **Existing technology / pattern used** | `execveat(2)`/`O_PATH` (kernel, **measured working here** for binaries and `#!` scripts); `std::process::Command` `env_clear`; Bazel's fixed-`PATH` + `--action_env` allowlist (shipped default since 0.21); Chen/Wagner/Dean 2002 erase-and-allowlist; SELinux `neverallow` semantic-closure check; OPA multi-bundle AND-composition; **in-repo**: `t2::seal_value`/`verify_file`/`classify_path`, `human_channel` Ed25519 owner signature, and `cit::binding`'s already-proven action-manifest shape. |
-| **What Governance OS still has to build** | A `ResolvedExecution` reduction (wrapper ⇒ `undetermined`) at the two `util::run_cmd` install sites; descriptor acquisition + hash-through-fd + `execveat`; a constructed `envp` hanging off `tool.schema.json`; floor-composition inside `RepositoryContract::decide` (~40 lines); `"repository-contract"` added to `SEALED_RECORD_TYPES`; an owner-gated route for legitimate class widening. **One `BUILD CUSTOM`, ~40 lines, inside an existing function.** |
-| **Assurance achieved** | Closes **all 4 open HIGHs** (P79-F1, F8, F9, F11) + F12 + the AR68/AR73 class. Property A's guarantee is *falsifiable by one test* ("is the exec'd fd the hashed fd?") rather than by an unbounded enumeration. Property C's guarantee is *structural* ("does `decide()` return the floor?"), discharging OD-P2-07 C's "find all consumers" by construction. **Does not close AR77-F1/F2/F4** (effects) or anything at Level 1. |
-| **Complexity** | Low. Two call sites for A, one function for C. No new crate for the §11 minimum; one small crate (`nix`) for the descriptor-exec increment. |
-| **Likely effort** | §11 minimum: small — three changes, no dependency. Full Option 1 with descriptor-exec, the seal and the owner-gated route: moderate, dominated by test/negative-control authoring (including the `O_CLOEXEC` control) and by the workflow design for Q4, not by the code. |
-| **Effect on the TCB** | **Net reduction.** Removes the classifier's semantic model of shells and interpreters (45 policy entries + `skip_wrappers`), the 32-entry loader denylist, and ~260 lines of comparison logic. Adds two syscalls in a kernel already trusted. The `landlock`/bubblewrap/container TCB is *not* added. |
+| **What Governance OS still has to build** | A `ResolvedExecution` reduction (wrapper ⇒ `undetermined`) at the two `util::run_cmd` **install** sites — of four for the full property (§9.2); **shebang resolution into the hashed closure (§9.2 obligation 2)**, starting from `memory/profile.rs::shebang`, amended for `-S`; descriptor acquisition + hash-through-fd + `execveat`; a constructed `envp` hanging off `tool.schema.json`; floor-composition — **one function, one struct field, one retention, one construction site**; `"repository-contract"` added to `SEALED_RECORD_TYPES`; an owner-gated route for legitimate class widening. **One `BUILD CUSTOM`.** |
+| **Assurance achieved** | Closes **all 4 open HIGHs** (P79-F1, F8, F9, F11) + F12 + the AR68/AR73 class — **P79-F8/F9 for kernel-layout projects, conditional on precondition P1 for `gov adopt` native layouts (§10.4)**. Property A's guarantee is falsifiable by **two** tests ("is the exec'd fd the hashed fd?" and "is every program the kernel resolves before the first reviewed instruction in the hashed closure?") rather than by an unbounded enumeration. Property C's guarantee is *structural*, discharging OD-P2-07 C's "find all consumers" **by type construction**. **Does not close AR77-F1/F2/F4** (effects) or anything at Level 1. |
+| **Complexity** | Low. Two call sites for A's minimum (four for the property), one function plus three touch points for C. No new crate for the §11 minimum; one small crate (`nix`) for the descriptor-exec increment. |
+| **Likely effort** | §11 minimum: small — **four** changes, no dependency. Full Option 1 with descriptor-exec, the seal and the owner-gated route: moderate, dominated by test/negative-control authoring (the `O_CLOEXEC` control, **and a `#!` control per §9.0's two shapes**) and by the workflow design for Q4, not by the code. Add probe P2 before implementation. |
+| **Effect on the TCB** | **Net reduction.** Removes the classifier's semantic model of shells and interpreters (45 policy entries + `skip_wrappers`), the **30**-entry loader denylist, and ≈250 lines of comparison logic. Adds two syscalls in a kernel already trusted, plus one first-line read. The `landlock`/bubblewrap/container TCB is *not* added. |
 | **Effect on Phase-2 acceptance** | Directly addresses both OD-P2-07 limbs at the level the owner asked ("remove the pattern, not another enumeration"). Positive for **AC-3** (the remaining PARTIALs get *argued* rather than *enumerated* justifications) and **AC-4**. Neutral to **AC-14** — it changes `product_code_digest`, so R1 re-verification is required either way. Leaves AR77-F1/F2/F4 as disclosed residual, which is where OD-P2-05 clause 4 already placed them. |
 | **R2 path** | Add Landlock for the effects residual; add `memfd_create` sealing for staged content; schema-constrain `pinned_files`; in-toto Statement shape for evidence digests. Each is additive. |
 | **R3 path** | Unchanged and unblocked: bubblewrap → rootless containers → gVisor/microVM, in that order, if the profile ever becomes multi-tenant. Option 1 does not foreclose any of it. |
-| **Reversibility** | **High, and this is its second-strongest property.** A is two call sites and a policy-list deletion; reverting restores the lists from git. C is one function plus one string in a three-member const; reverting restores comparison. The seal is additive (a top-level field the schema already permits). The owner-signed route is a new gate, removable. **No data migration, no format change, no external dependency to unwind, no schema change.** |
+| **Reversibility** | **High, and this is its second-strongest property — with one qualification neither I nor the challenger verified.** A is two call sites and a policy-list deletion; C is one function, one struct field, one retention, one construction site; the seal is additive (a top-level field the schema already permits); the owner-signed route is a removable gate. **No data migration, no format change, no external dependency to unwind, no schema change.** **The qualification:** deleting `wrapper_programs` from `framework/policies/TOOL_POLICY.yaml` changes the kernel payload, hence `KERNEL_MANIFEST.json`, `framework.lock.kernel_manifest_hash`, the binary's embedded payload and this machine's SRR installation record — so "revert the code" is not the same as "revert the release transaction," and `ENFORCEMENT_MAP.yaml` coverage (`policy_coverage.rs` treats "declared but does nothing" as a finding) is a second small edit. **Neither of us attempted it.** "Reversible in an afternoon" is right about the code and is an unverified claim about the release transaction. |
 
 **The case against, stated fairly:** it does not close AR77-F1/F2/F4, so a reviewer who regards those as the real
-remaining risk will find Option 1 incomplete. It also leaves assumption 3 (§15) as a small, bounded residual
-judgement — "is this artefact an exec vector" — which is the one place a sixth round could still be found.
+remaining risk will find Option 1 incomplete. It leaves §15 assumption 3 as a residual that is **not bounded** — a
+byte-identical copy of an exec vector satisfies any pin — properly assigned to OD-P2-05 clause 4's governed review
+rather than to a list. And **its own specification was defeated once already** (§9.0); the remedy is small and in
+the same idiom, but the honest inference is that the *next* level down (probe P2, §16) deserves checking before
+implementation rather than after.
 
 ## OPTION 2 — Option 1 **+ kernel confinement at the spawn site**
 
@@ -824,15 +1131,26 @@ replaces one enumeration (command shapes) with another (path declarations), the 
 
 ## Ranking, and the single sentence
 
-**1 › 2 › 3.** Option 1 closes every open HIGH, deletes more than it adds, needs no new dependency for its
-minimum, and is reversible in an afternoon. Option 2 is its correct R2 successor. Option 3 is a genuine
-architecture whose time is not now and which needs Option 1 inside it regardless.
+**1 › 2 › 3, unchanged after independent challenge.** Option 1 closes every open HIGH, deletes more than it adds,
+needs no new dependency for its minimum, and is reversible at the code level. Option 2 is its correct R2
+successor. Option 3 is a genuine architecture whose time is not now and which — decisively — **needs Option 1
+inside it regardless**: `./w` is a declared input, so §9.0's two defeats survive inside a bubblewrap jail
+unchanged.
 
-If only one sentence reaches the owner, it should be this:
+**[AMENDED — A2] The single sentence, re-counted.** Revision 1 said "the same three changes." It is four, and the
+owner will quote whichever number is printed:
 
 > **The recommended Property-A fix would not have worked — measured, on this machine — and the Property-C
-> prerequisite the owner was told to settle first does not exist; both problems reduce to the same three
-> changes, and none of them needs a new dependency.**
+> prerequisite the owner was told to settle first does not exist; both problems reduce to the same four changes,
+> none of which needs a new dependency.**
+
+Two qualifications the owner should carry with that sentence, neither of which changes it:
+
+- **The fourth change exists because this document's own first fix was defeated the same way** (§9.0). That is
+  evidence the *method* works — specify, attack, amend — and evidence that "we have reached the bottom" is a claim
+  needing a probe, not a feeling. Probe **P2** (§16) is the next one and has not been run.
+- **P79-F8/F9's closure is scoped to kernel-layout projects** until precondition **P1** (§10.4) is settled. For
+  repositories `gov adopt` onboards with a native layout, that shape remains open.
 
 ---
 
@@ -845,6 +1163,23 @@ bytes. GNU coreutils 9.4, kernel 6.6.87.2-microsoft-standard-WSL2.
 **Probe 2, §9.3** (`scratchpad/fdexec.c`): `execveat(fd,"",AT_EMPTY_PATH)` on a binary → success; on a `#!`
 script → success; with `O_CLOEXEC` → `ENOENT`; `/dev/fd` and `/proc/self/fd` present.
 
+**Evidence I did NOT produce, and am relying on (revision 2).** §9.0's two defeats, and §15 assumption 3's
+pinned-copy attack, were produced by **P2-SYN-0002** (`SYNTHESIS-CHALLENGE.md`, probes 1–2) and **independently
+reproduced by the coordinator**. I have not re-run them and I am not claiming them as mine. They are taken as
+established on two independent reproductions; the amendments they drive (§9.0, §9.2 obligation 2, §11 change 4,
+§15 assumption 3 and 8) are mine.
+
+**Source claims re-derived by me for revision 2** (not inherited from the challenge): `LOADER_ENV_VARS` parsed to
+its 30 string literals, confirming no `PATH`/`IFS`/`GIT_SSH_COMMAND`; `CLASS_EXEMPTIONS` span = 20 lines;
+`run_cmd`'s four call sites (`tools.rs:2151`, `tools.rs:2566`, `adopt.rs:622`, `verification/product.rs:255`);
+`migrations/executor.rs:714` inside `#[cfg(test)]` beginning at line 665; all 23 non-test `.class()` sites and the
+22 that remain after excluding the comparison machinery; `PathDecision`'s single literal construction site
+(`paths.rs:710`) by grepping every `.rs` file at `35461c9`; `RepositoryContract`'s four fields;
+`PolicySet::load`'s `kernel_dir = trust.policy_root` and its authentication contract at `policy.rs:112-117`;
+`repository_contract_baseline` as a local at `policy.rs:410`; `adopt.rs:1579/1585`'s unfloored `{d}/**`
+generation; `memory/profile.rs::shebang` in full, including the `parts.find(|a| !a.starts_with('-'))` `env` case
+that returns `"PATH=."` for `-S`; and `profile.rs:19`'s "content-hashed" interpreter claim.
+
 Both probes ran unprivileged and wrote only inside the session scratchpad
 (`/tmp/claude-1000/…/scratchpad/p2syn/`, `…/scratchpad/fdexec*`). **No repository file was created, modified or
 deleted by this synthesis other than this document.** Residue disclosed for honesty: the scratchpad retains
@@ -853,7 +1188,7 @@ repository.
 
 **Source claims re-derived rather than inherited:** `t2.rs` (`SEALED_RECORD_TYPES`, `verify_file`,
 `classify_path`, the symmetric-key limitation); `cit/binding.rs` (the `os_state` manifest); `human_channel.rs`
-(Ed25519, key off-machine, use-time re-verification); `capabilities/binding.rs` (`LOADER_ENV_VARS` = 32 entries,
+(Ed25519, key off-machine, use-time re-verification); `capabilities/binding.rs` (`LOADER_ENV_VARS` = 30 entries,
 no `PATH`); `util.rs::run_cmd` (no `env_clear`, program by string); `tools.rs` (the kernel-floor concession;
 `skip_wrappers` at `35461c9:981-1000`); `policy_precedence.rs` at `35461c9` (`path_rule_narrowing`,
 `overlap_is_no_less_restrictive`, `evaluate_path_rules{,_overlay}`, and the function-span line counts);
