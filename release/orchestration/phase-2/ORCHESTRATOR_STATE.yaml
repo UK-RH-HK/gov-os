@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-23T15:07:19Z'
-state_hash: 5a05c00faa468362444ce58cf0fca1af1fdce062dcb621056f7a2201fc70a920
-lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
-loop_status: STOPPED_AWAITING_OWNER_ARCHITECTURE_DECISION__RESEARCH_COMPLETE
+updated_at: '2026-09-23T18:43:53Z'
+state_hash: ccff4374fa29bddeb20fa81a9d93434eb0d8e473b4f16a52fb11fd86f70e2e3e
+lifecycle_state: P2_COMPLETION_OPTION_1
+loop_status: RUNNING
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -96,7 +96,7 @@ active_decisions:
   active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001, ARCH-0003]
   superseded: [D-0001]
   proposed_not_active: [D-0008, ARCH-0002]
-  owner_records_in_force: [OWNER-DECISION-P2-0007, OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002, OWNER-DECISION-P2-0003, OWNER-CLARIFICATION-P2-0004, OWNER-DECISION-P2-0005, OWNER-AUTHORISATION-P2-0006]
+  owner_records_in_force: [OWNER-DECISION-P2-0008, OWNER-DECISION-P2-0007, OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002, OWNER-DECISION-P2-0003, OWNER-CLARIFICATION-P2-0004, OWNER-DECISION-P2-0005, OWNER-AUTHORISATION-P2-0006]
   orchestrator_adjudications: [P2-ADJ-0001, P2-ADJ-0002, P2-ADJ-0003, P2-ADJ-0004, P2-ADJ-0005, P2-ADJ-0006]
   orchestrator_adjudications_note: 'all six are in GATES/; P2-ADJ-0006''s stopping rule fired on 2026-09-22 and the owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources, never a new owner decision, and the owner may override any of them.'
   owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses the owner Phase-2 directive's three-iteration convergence rule
@@ -301,6 +301,9 @@ worker_stall_protection:
     - '8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator message.'
     - '3a. COROLLARY, added 2026-09-23 after three wait-loops spun for 10 hours: a self-evaluable precondition must not be able to MATCH ITSELF. `until ! pgrep -f <pattern>` inside a shell whose own command line contains <pattern> never exits. Exclude the checking process (grep -v $$, a captured PID, a marker file, or wait on a known child), and give every wait-loop a bounded iteration count with a defined action on exhaustion -- an unbounded until-loop is a handshake with the kernel and earns the same discipline as rule 2.'
     - '7a. COROLLARY: liveness monitoring must cover the TASK REGISTRY, not only the machine. A sleeping waiter is invisible to load average and ps -- it looks exactly like a healthy idle machine. A task producing no output for far longer than its expected runtime is a stall regardless of what the machine shows.'
+    - '9. OD-P2-08: prefer tracked PID/process-group state over process-name regex; where pattern matching is unavoidable, PROVE the waiter cannot match itself.'
+    - '10. OD-P2-08: maintain last_progress_at or equivalent freshness evidence, and reconcile the task registry against live process state, output freshness AND worker report state.'
+    - '11. OD-P2-08: worker states must distinguish RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, STALLED, COMPLETE. A sleeping waiter is not productive work.'
   v8_3_disposition: IMPLEMENTED_DURING_PHASE_2
   confirmed_active_before: 'the A+C implementation dispatch, as the owner required in section 1 rule 10'
 
@@ -374,20 +377,17 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  NONE WITHOUT AN OWNER DECISION. The read-only trust-architecture prior-art study is COMPLETE and implemented
-  nothing: six researchers, one synthesis, one independent challenge that defeated the synthesis's own fix by
-  execution, and one amended synthesis. The owner-facing report is
-  release/orchestration/phase-2/TRUST_ARCHITECTURE_EXISTING_SOLUTIONS_REVIEW.md, with RESEARCH/SYNTHESIS.md (rev 2),
-  RESEARCH/SYNTHESIS-CHALLENGE.md and RESEARCH/ORCHESTRATOR-MEASURED-ENVIRONMENT.md beneath it. Two corrections are
-  owed to and recorded for the owner: P79-F10's blocker does not exist (cit::binding already implements the pattern,
-  and t2 sealing is general), and the escalation package's section 6 Property-A recommendation is MEASURED WRONG on
-  two of three limbs. Recommended: Option 1 (resolve once, execute the object; floor the class) -- four changes, no
-  new dependency for the minimum, net TCB reduction, closes all four open HIGHs subject to precondition P1. Option 2
-  (plus Landlock) is its R2 successor; Option 3 (full hermetic execution) needs Option 1 inside it regardless. Before
-  ANY implementation: settle precondition P1 (gov adopt native layouts are unfloored, so floor composition closes zero
-  of P79-F8/F9 there) and run probe P2 (pinned dynamically-linked ELF with project-controlled RUNPATH/$ORIGIN/LD_*,
-  since LOADER_ENV_VARS is stripped on the plugin path only). Phase 2 remains STOPPED and the Option B escalation
-  remains the open decision this research informs.
+  P2 loader probe is COMPLETE and did NOT falsify the architecture: a pinned dynamically-linked ELF with RUNPATH
+  $ORIGIN ran unverified code before the first reviewed instruction under a fully cleared environment, because RUNPATH
+  lives INSIDE the verified object. Recorded at RESEARCH/P2-LOADER-PROBE.md; incorporated as a closure extension per
+  OD-P2-08 section 3. NEXT: dispatch a fresh Sonnet 5 implementation of Option 1 under OD-P2-08 -- Property A
+  (ResolvedExecution with shebang AND dynamic-dependency closure; wrapper chains do not qualify for the ungated path),
+  Property C (project-specific authenticated adoption floor composed with the kernel floor, no ordered class
+  predicate, one authoritative PathDecision construction point), reuse of cit::binding rather than a new hand-edit
+  detector, and the pinned_files schema gap. Then targeted tests, affected dependency tests, deterministic checks, ONE
+  full certification run, freeze, fresh Opus 5 adversarial review with independently derived held-out probes, mint
+  cap2-candidate-2 only when its prerequisites hold, then fresh Opus 5 formal acceptance verification. Ordinary defects
+  are repaired and re-reviewed AUTOMATICALLY without owner relay; stop only on the OD-P2-08 section 8 conditions.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
@@ -396,7 +396,11 @@ current_prohibitions:
   - {action: 'another local repair or enumeration round on the install-trust surface after the A+C review', until: 'an owner decision - the hard stop escalates toward Option B or another owner-approved architecture review'}
   - {action: 'creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default action', until: 'never in Phase 2 - worker_stall_protection is ACTIVE'}
   - {action: 'minting cap2-candidate-2', until: 'both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)'}
-  - {action: 'implementing, prototyping or adopting ANY architecture discovered during the prior-art research', until: 'the owner reviews the research report and explicitly chooses an architecture -- the study is read-only decision support'}
+  - {action: 'implementing Landlock, hermetic execution, bubblewrap, rootless containers, gVisor or microVMs during Phase 2', until: 'R2 or R3 respectively, unless OD-P2-08 section 8 shows the selected architecture is otherwise impossible'}
+  - {action: 'treating the T2 HMAC seal as proof-grade owner authority', until: 'never -- a process with the owner OS privileges can read the symmetric key; proof-grade authority is the authenticated machine/kernel floor plus the authenticated project adoption floor plus an owner-signed governed transition'}
+  - {action: 'requiring a universal product/** layout, or governing paths outside the adopted repository', until: 'never -- OD-P2-08 section 2 makes the floor PROJECT-SPECIFIC and derived from the governed adoption transition'}
+  - {action: 'building a hand-edit detector as the trust model', until: 'never -- authenticate the authoritative transition instead (OD-P2-08 section 2)'}
+  - {action: 'the outer orchestrator self-awarding GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED', until: 'never -- only a fresh independent Opus 5 formal verifier may issue it'}
   - {action: 'a fifth repair round on the install-trust surface', until: 'the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077'}
   - {action: 'designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it', until: 'Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written'}
   - {action: 'a major performance optimisation or refactor of the certification suite', until: 'after Phase 2, unless required for correctness -- P2-PERF-0001 measures and recommends only'}
