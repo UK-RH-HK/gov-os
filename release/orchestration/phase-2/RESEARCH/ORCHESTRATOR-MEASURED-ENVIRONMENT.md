@@ -224,6 +224,48 @@ something else, why that is worth more than extending a mechanism already carryi
 **And the orchestrator must correct the owner**, since it relayed P79-F10's framing as a blocker. That correction is
 owed regardless of what the synthesis concludes.
 
+## ★★ The orchestrator's own recommendation to the owner was wrong — reproduced by hand
+
+`PHASE_2_OPTION_B_ESCALATION_PACKAGE.md` §6 recommended, and the orchestrator told the owner, that:
+
+> Clearing the environment to a controlled allowlist, pinning the working directory so it cannot be overridden, and
+> executing the verified artefact by resolved absolute path, would close both [P79-F1 and P79-F11].
+
+**P2-SYN-0001 falsified this by measurement. The orchestrator then reproduced it independently.** Run on this machine,
+with a **fully cleared** environment (`env -i PATH=/usr/bin:/bin` — strictly stronger than an allowlist) and the
+working directory pinned to the project root:
+
+| Attack, under a cleared environment and pinned cwd | Result |
+|---|---|
+| `env --chdir=decoy sh install.sh` (P79-F11) | **`DECOY-SCRIPT-RAN`** — still succeeds |
+| `env PATH=. true` (P79-F1) | **`PROJECT-LOCAL-TRUE-RAN`** — still succeeds |
+| *control:* `/bin/sh <abs>/install.sh` | `REAL-VERIFIED-SCRIPT` — correct |
+
+**Two of the three limbs do nothing.** The reason is embarrassing once seen: **`env` is not an environment variable, it
+is a program the OS chooses to execute**, and `PATH=.` and `--chdir=` are *arguments to that program*, applied by it
+inside the child **after `gov` has already lost control**. No environment `gov` constructs survives a program whose
+entire job is to construct a different one. Pinning the cwd is defeated the same way.
+
+**Only the third limb works** — and it is the one the package stated least precisely. The correct property is not
+"control the environment" but:
+
+> **Do not execute the wrapper chain at all. Resolve to the artefact and execute the object.**
+
+### Why this belongs in the permanent record, not just the report
+
+This is **the study's own thesis recurring inside the study**. Six researchers, the escalation package, and the
+orchestrator all inherited the common brief's framing of P79-F1 as an *environment* defect. It is a *wrapper-execution*
+defect. The check — here, a recommendation — reasoned about a representation (the environment) while the effect came
+from somewhere the representation did not cover (an argument to a program).
+
+The orchestrator relayed this to the owner as its own recommendation, with confidence, **without running the two
+commands that disprove it** — a three-line test. That is the same failure this session has now recorded three times in
+others and twice in itself, and it is the strongest available argument for the standing instruction below.
+
+**Consequence for the owner-facing report:** the escalation package's §6 recommendation must be marked **superseded**,
+and the correction must be stated plainly rather than folded silently into a new recommendation. The owner made a
+decision partly on that recommendation's strength.
+
 ## Standing instruction for the synthesis
 
 Where a researcher marked something "could not determine" **about this machine**, prefer measuring it over reasoning
