@@ -685,6 +685,46 @@ Two further self-caught errors are worth carrying:
 **Recommendation.** Require cross-checks to declare their inputs and be rejected when those inputs overlap. Treat "two
 methods agree" as a claim needing proof of independence, not as evidence in itself.
 
+### 6.3i A self-evaluable precondition that matched itself — three wait-loops spun for 10 hours
+
+**Found by the owner, not the orchestrator**, on 2026-09-23 — the second time in this phase the owner detected a stall
+first.
+
+Three background tasks showed `Running` for **10h 47m–10h 51m**. All three were wait-loops of the form:
+
+```bash
+until ! pgrep -f p2_ar_0079- >/dev/null; do sleep 20; done; echo DONE; tail -c 5000 <sweep log>
+```
+
+**`pgrep -f` matches against full command lines — including the waiting shell's own**, whose command line contains the
+literal string `p2_ar_0079-`. So the condition was never satisfiable and the loop could never exit. Demonstrated live
+before stopping them: `pgrep -af p2_ar_0079-` returned the waiting `bash -c` process itself.
+
+**Nothing was lost.** The sweep they waited on had finished at 02:38 with exit 101, and the reviewer had already
+delivered its report through its own channel; the orchestrator acted on it hours earlier. The two "failures" in that
+sweep were the reviewer's own probe assertions firing — `p79_c_f8c` and `p79_c_f8d` — i.e. **confirmed findings, the
+expected outcome**. Cost was three sleeping shells, no compute.
+
+**The uncomfortable part, and the reason this is recorded.** The orchestrator had adopted `worker_stall_protection`
+hours earlier, including *rule 6: rising elapsed time with unchanged status is a stall signature* and *rule 7: never
+report liveness from a stale observation*. These tasks produced **zero bytes of output for ten hours** — the strongest
+possible stall signature — and were missed anyway, because the orchestrator checked **the machine** (`ps`, load average)
+and never checked **its own task registry**. Watching for the previous failure mode is not the same as watching.
+
+**Two corrections for V8.3:**
+
+1. **`worker_stall_protection` rule 3 needs a corollary.** The rule prefers *self-evaluable preconditions* over
+   coordinator handshakes — which remains right, and is what let the review proceed without blocking on the
+   orchestrator. But a self-evaluable precondition has its own failure mode: **the check must not be able to match
+   itself.** A process-existence test must exclude its own process (`pgrep -f … | grep -v $$`, a marker file, a PID
+   captured at launch, or `wait` on a known child) — and every wait-loop needs a **bounded iteration count** with a
+   defined action on exhaustion, exactly as rule 2 requires of handshakes. An unbounded `until` loop is a handshake with
+   the kernel and deserves the same discipline.
+2. **Liveness monitoring must cover the task registry, not only the machine.** A task that has produced no output for an
+   interval far exceeding its expected runtime should be surfaced automatically. Neither load average nor `ps` shows a
+   sleeping waiter as anomalous — it looks exactly like a healthy idle machine, which is precisely why it survived ten
+   hours of the orchestrator confidently reporting that nothing needed attention.
+
 ### 6.4 Progress and drift detection at the orchestrator level
 
 **OBSERVED.** The orchestrator's own drift signals were: a worker reading without writing, a review finding the same

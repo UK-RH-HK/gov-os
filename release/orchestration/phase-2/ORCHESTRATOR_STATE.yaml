@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-23T01:47:56Z'
-state_hash: 3e47e4ee2fa5633f8f2fb65edf93d431e7144255603a7252b036c4770cdc2db7
+updated_at: '2026-09-23T12:28:22Z'
+state_hash: 0e8e96d0394a51f448028899d85569d0d7862817048cd3f877a5554fec95ec64
 lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
 loop_status: STOPPED_AWAITING_OWNER_DECISION_OPTION_B
 
@@ -299,6 +299,8 @@ worker_stall_protection:
     - '6. Rising elapsed time with unchanged status or progress is a stall signature. Investigate rather than assume progress.'
     - '7. Never report a worker as still running from a stale observation. Check current process/worker state AT THE TIME of any liveness statement to the owner.'
     - '8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator message.'
+    - '3a. COROLLARY, added 2026-09-23 after three wait-loops spun for 10 hours: a self-evaluable precondition must not be able to MATCH ITSELF. `until ! pgrep -f <pattern>` inside a shell whose own command line contains <pattern> never exits. Exclude the checking process (grep -v $$, a captured PID, a marker file, or wait on a known child), and give every wait-loop a bounded iteration count with a defined action on exhaustion -- an unbounded until-loop is a handshake with the kernel and earns the same discipline as rule 2.'
+    - '7a. COROLLARY: liveness monitoring must cover the TASK REGISTRY, not only the machine. A sleeping waiter is invisible to load average and ps -- it looks exactly like a healthy idle machine. A task producing no output for far longer than its expected runtime is a stall regardless of what the machine shows.'
   v8_3_disposition: IMPLEMENTED_DURING_PHASE_2
   confirmed_active_before: 'the A+C implementation dispatch, as the owner required in section 1 rule 10'
 
