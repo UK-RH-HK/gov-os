@@ -725,6 +725,35 @@ and never checked **its own task registry**. Watching for the previous failure m
    sleeping waiter as anomalous — it looks exactly like a healthy idle machine, which is precisely why it survived ten
    hours of the orchestrator confidently reporting that nothing needed attention.
 
+### 6.3j Acknowledging a completed agent's re-send *sustains* the loop
+
+**OBSERVED twice, 2026-09-22 and 2026-09-23.** Two different completed subagents each re-sent their full final report
+three to four times. The second stated the cause outright: it was responding to *"a system delivery-enforcement
+prompt"* after its own `SubagentHandback` had returned success.
+
+**The counterintuitive part, and the reason this is recorded:** a completed agent is dormant and only wakes when the
+coordinator messages it. **Each acknowledgement the orchestrator sent — intended to stop the loop — resumed the agent
+and handed it another opportunity to re-send.** The loop was sustained by the acknowledgement, not by the agent. The
+first agent stopped after one ack; the second re-sent *after* being acked, and `TaskStop` then reported it was already
+`completed` — confirming there was nothing running to stop.
+
+**The correct response is to send nothing.** Verify the work from durable artefacts (commit, scope, checkpoint, test
+figures), record it, and let the dormant agent stay dormant. Politeness here is expensive: these were ~500k-token
+sessions re-emitting a multi-thousand-token report.
+
+**Recommendations for V8.3:**
+
+- **A completed agent's duplicate report should be deduplicated by the substrate**, not by the coordinator's social
+  instinct. Hash the report; a byte-identical re-send from an agent already marked complete is a no-op.
+- **Delivery acknowledgement should be a substrate fact, not a message.** The agent asked, reasonably, whether its
+  report arrived; nothing in its interface told it. A handback that returns a durable receipt the agent can observe
+  removes the entire failure mode.
+- **Never resume a completed agent merely to reassure it.** If the coordinator genuinely needs more from it, that is a
+  new task with new scope.
+
+This belongs beside §6.3b and §6.3i: three distinct orchestration defects in this phase, all in the *coordination*
+layer rather than the work, and all costing real tokens or wall-clock while every individual worker behaved correctly.
+
 ### 6.4 Progress and drift detection at the orchestrator level
 
 **OBSERVED.** The orchestrator's own drift signals were: a worker reading without writing, a review finding the same
