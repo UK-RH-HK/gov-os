@@ -7,8 +7,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-23T14:12:07Z'
-state_hash: e9dfc5157f07270ad8af8f814573df6964dd35e8b96d274bf09e39b010f118c1
+updated_at: '2026-09-23T14:23:53Z'
+state_hash: a61c1c2f0a1d26b0122639f4d022bf824a288c5d9b98932a684722bf902b6551
 lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
 loop_status: STOPPED_AWAITING_OWNER_DECISION_OPTION_B__READ_ONLY_RESEARCH_IN_PROGRESS
 
@@ -319,12 +319,12 @@ test_execution_policy:
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
 running_work:
-  - {run_id: P2-RES-0001, role: 'prior-art research: secure update and release trust (Level 1)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-1-UPDATE-TRUST.md, read_only: true, status: RUNNING}
-  - {run_id: P2-RES-0002, role: 'prior-art research: governed configuration and policy authority (Level 2A and 2C)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-2-GOVERNED-STATE.md, read_only: true, status: RUNNING}
-  - {run_id: P2-RES-0003, role: 'prior-art research: exact and hermetic execution (Level 2B)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-3-EXECUTION.md, read_only: true, status: RUNNING}
-  - {run_id: P2-RES-0004, role: 'prior-art research: sandboxing and isolation (Level 3)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-4-ISOLATION.md, read_only: true, status: RUNNING}
-  - {run_id: P2-RES-0005, role: 'prior-art research: developer tooling and build systems', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-5-TOOLING.md, read_only: true, status: RUNNING}
-  - {run_id: P2-RES-0006, role: 'prior-art research: cross-domain challenger', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-6-CHALLENGER.md, read_only: true, status: RUNNING}
+  - {run_id: P2-RES-0001, role: 'prior-art research: secure update and release trust (Level 1)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-1-UPDATE-TRUST.md, read_only: true, status: COMPLETED}
+  - {run_id: P2-RES-0002, role: 'prior-art research: governed configuration and policy authority (Level 2A and 2C)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-2-GOVERNED-STATE.md, read_only: true, status: COMPLETED}
+  - {run_id: P2-RES-0003, role: 'prior-art research: exact and hermetic execution (Level 2B)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-3-EXECUTION.md, read_only: true, status: COMPLETED}
+  - {run_id: P2-RES-0004, role: 'prior-art research: sandboxing and isolation (Level 3)', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-4-ISOLATION.md, read_only: true, status: COMPLETED}
+  - {run_id: P2-RES-0005, role: 'prior-art research: developer tooling and build systems', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-5-TOOLING.md, read_only: true, status: COMPLETED}
+  - {run_id: P2-RES-0006, role: 'prior-art research: cross-domain challenger', worker_model: claude-sonnet-5 native, status_note: COMPLETED, output: release/orchestration/phase-2/RESEARCH/AGENT-6-CHALLENGER.md, read_only: true, status: COMPLETED}
 completed_work_formerly_running:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: COMPLETED_SUPERSEDED_BY_P2-AR-0078}
   - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: COMPLETED, blocks_phase_2: false}

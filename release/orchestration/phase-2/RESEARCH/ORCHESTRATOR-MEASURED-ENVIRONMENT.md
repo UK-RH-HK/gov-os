@@ -134,6 +134,96 @@ extending one the codebase already commits to.
 **The synthesiser should treat this as a load-bearing constraint**, and should say explicitly whether its recommended
 architecture builds on this existing axis or replaces it — and if it replaces it, why that is worth the larger change.
 
+## Answering AGENT-3's open repo question — and a new finding it led to
+
+**AGENT-3-EXECUTION listed as "could not determine"**: whether Governance OS has any existing declared-dependency
+mechanism to hang a Bazel-style environment allowlist off.
+
+**Answer: yes.** The tool descriptor schema (`framework/schemas/tool.schema.json`) already declares
+`permissions`, `required_permission_classes`, `capabilities`, `credential_scope`, `package`, `source`,
+`version_pin` and `installation_sha256`. A declared environment allowlist has a natural home in that existing
+surface — an installation would declare the variables it needs exactly as it already declares permission classes, and
+anything undeclared would be cleared. **This removes AGENT-3's main open obstacle to the Bazel
+`--incompatible_strict_action_env` pattern**, which it recommended as ADAPT / REQUIRED NOW.
+
+### The finding that came out of checking
+
+Verified on the reviewed tree `35461c9`:
+
+| | Result |
+|---|---|
+| `pinned_files` occurrences in `runtime/src/tools.rs` | **7** |
+| `pinned_files` occurrences in `framework/schemas/tool.schema.json` | **0** |
+| Top-level `additionalProperties` in that schema | **absent** (so undeclared fields are permitted) |
+
+**`pinned_files` is the field that carries the entire "bind the bytes" guarantee of OD-P2-05 — and the schema does not
+describe it at all.** Nothing validates its presence, its shape or its types; the schema does not even forbid unknown
+fields.
+
+This is the same defect class one field over from **AR73-F4**, where `installation_sha256` being absent, `null` or a
+*number* each had to be caught by hand-written runtime checks precisely because the schema does not constrain it. It is
+also another instance of the study's central pattern: **the check reasons about a representation that is itself
+unvalidated.**
+
+Recorded as a new observation for the synthesiser and for the formal verifier. It is **not** in scope for this
+read-only study to fix, and it does not by itself constitute a proven exploit — but any recommendation that leans on
+descriptor-declared data (which every Property A option does) should say whether it also requires that data to be
+schema-constrained.
+
+## ★ The most consequential finding — P79-F10 is WRONG, and the mechanism already exists
+
+**AGENT-6-CHALLENGER claimed** that `runtime/src/cit/binding.rs` already implements the exact pattern P79-F10 says the
+product lacks, and that it has simply never been applied to `REPOSITORY_CONTRACT.yaml`. **Verified by the orchestrator
+on the reviewed tree `35461c9`.** This is a direct correction to a finding the escalation package treated as an
+architectural blocker.
+
+**P79-F10 stated** — and the orchestrator repeated it to the owner — that *"the product has no mechanism anywhere to
+distinguish a governed contract change from a hand edit"*, and that Property C therefore could not be completed without
+first building one. The reviewer was careful to say its search was **"targeted, not exhaustive"**. It missed this.
+
+### What already exists, from the module's own documentation
+
+`runtime/src/cit/binding.rs` seals an `os_state` block with the machine binding key, carrying digests rather than
+copies — including `binding_sha256`, described as *"what a Human Decision Gate raised for this CIT carries as
+`subject.sha256`, so the owner signs exactly this transaction and impact."* And then, decisively:
+
+> **Consumers never trust the record's top-level fields for an authority decision**: approve and execute recompute the
+> digests from the record as it stands and compare them with the sealed block; **a hand-edited manifest, impact,
+> approval, gate reference or status is therefore refused, typed**, at approve and at execute.
+
+> [`seal`] also T2-seals the **whole record** … **A hand edit of any field breaks the whole-record seal**, and no CIT
+> operation blesses it.
+
+That is, precisely: *only authenticated state has authority; a hand edit is inert and refused.* It is the pattern
+AGENT-2 independently identified as the mature answer, already implemented, already shipping, already carrying an
+owner signature through a Human Decision Gate.
+
+### And the primitive is general, not CIT-specific
+
+| Fact | Evidence (`35461c9`) |
+|---|---|
+| `t2::seal_value` / `t2::seal_record` / `t2::verify_record` | **public, general-purpose** functions in `runtime/src/t2.rs` |
+| Record types sealed **today** | `SEALED_RECORD_TYPES = ["human-gate", "cit", "task"]` |
+| Is the path map among them? | **No.** |
+
+**So extending this to `REPOSITORY_CONTRACT.yaml` is adding a fourth member to an existing closed list, not inventing a
+mechanism.**
+
+### Why this changes the owner's decision materially
+
+The Option B escalation package put to the owner that Property C faced a prerequisite — build a way to tell a governed
+change from a hand edit — and that everything else about C depended on settling it. **That prerequisite appears already
+satisfied by existing, shipped, owner-signed machinery.** Combined with the separately verified fact that the schema
+already carries the `owner_role`/`mutation` floor/local axis, Property C now looks like **two mechanisms the product
+already has, applied to one more file** — rather than new architecture, a new dependency, or a deferred decision.
+
+**The synthesiser must treat this as load-bearing**, must verify it independently rather than inherit it, and must say
+explicitly whether its Property C recommendation builds on `t2`/`cit::binding` or proposes something else — and if
+something else, why that is worth more than extending a mechanism already carrying owner signatures in production.
+
+**And the orchestrator must correct the owner**, since it relayed P79-F10's framing as a blocker. That correction is
+owed regardless of what the synthesis concludes.
+
 ## Standing instruction for the synthesis
 
 Where a researcher marked something "could not determine" **about this machine**, prefer measuring it over reasoning
