@@ -266,6 +266,54 @@ others and twice in itself, and it is the strongest available argument for the s
 and the correction must be stated plainly rather than folded silently into a new recommendation. The owner made a
 decision partly on that recommendation's strength.
 
+## ★★★ The synthesis's own fix is also defeated — reproduced by the orchestrator
+
+**P2-SYN-0002 (the independent challenger) achieved the outcome the brief valued most: it defeated the proposed fix by
+execution.** The orchestrator reproduced both attacks independently.
+
+The synthesis's §9.2 reduction is: `open(O_PATH|O_NOFOLLOW)` → OS-constructed `envp` → cwd pinned to the project root →
+`execveat(fd,"",AT_EMPTY_PATH)`. Its stated guarantee: *"the interpreter that runs is the one intended, on the bytes
+reviewed."*
+
+**Both attacks put the interpreter's identity under the attacker's control, from inside the pinned bytes, before a
+single reviewed byte executes.**
+
+| Attack — pinned artefact, OS-constructed env, cwd pinned to project root | Result |
+|---|---|
+| `#!./w` as the shebang of the pinned artefact | **`UNPINNED-W-RAN`** — the kernel resolved `./w` against **the cwd the OS itself pinned** |
+| *control*: identical artefact, cwd **not** the project root | **fails `No such file or directory`** |
+| `#!/usr/bin/env -S PATH=. sh` | **`UNPINNED-LOCAL-SH-RAN`** — the OS-constructed `PATH` was discarded one exec hop later |
+
+**Read the control row carefully. The attack does not merely survive the cwd pin — it *requires* it.** The mitigation
+supplies the attacker's resolution root.
+
+### The cause is the study's own thesis, one level further down
+
+`execveat` hands the kernel a verified *object*. The kernel then performs a **second resolution, from bytes inside that
+object** — the `#!` line. The synthesis identified exactly this pattern, applied it to the escalation package's
+recommendation, and **did not apply it to its own**. Neither attack is an instance of its disclosed §9.4 limit ("what
+the interpreter does next"), because both act before any reviewed byte runs. **OD-P2-05 clause 1 is violated directly:
+the program that runs is not hash-pinned.**
+
+It also **strengthens** the synthesis's rejection of the one-mechanism answer: a CXI-style action manifest describes the
+invocation perfectly and stops neither attack.
+
+Verified in support: `runtime/src/tools.rs` never reads a shebang. A shebang parser already exists at
+`runtime/src/memory/profile.rs:378` — and is itself defeated by `env -S`, returning `"PATH=."` as the interpreter.
+
+### Required amendment
+
+The reduction must read the artefact's first line: a `#!` must name an **absolute** interpreter that the OS resolves,
+opens and hashes within the *same* resolved execution, and that is not itself a re-exec vector. **Disclosure is not
+sufficient — clause 1 is normative.**
+
+### Still to probe before any implementation
+
+The challenger names one more, of the same shape and not yet run: **a pinned, dynamically-linked ELF artefact with
+project-controlled `RUNPATH`/`$ORIGIN`/`LD_*`.** `LOADER_ENV_VARS` is stripped on the plugin path only, **not** at
+`run_cmd`. Three lines of test; unresolved at the time of writing, and the pattern's track record in this study is that
+it succeeds.
+
 ## Standing instruction for the synthesis
 
 Where a researcher marked something "could not determine" **about this machine**, prefer measuring it over reasoning
