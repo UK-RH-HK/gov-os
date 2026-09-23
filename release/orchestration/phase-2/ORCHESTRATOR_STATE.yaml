@@ -7,10 +7,10 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-23T12:28:22Z'
-state_hash: 0e8e96d0394a51f448028899d85569d0d7862817048cd3f877a5554fec95ec64
+updated_at: '2026-09-23T14:12:07Z'
+state_hash: e9dfc5157f07270ad8af8f814573df6964dd35e8b96d274bf09e39b010f118c1
 lifecycle_state: P2_STRUCTURAL_REMEDIATION_A_PLUS_C
-loop_status: STOPPED_AWAITING_OWNER_DECISION_OPTION_B
+loop_status: STOPPED_AWAITING_OWNER_DECISION_OPTION_B__READ_ONLY_RESEARCH_IN_PROGRESS
 
 protocol:
   source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
@@ -318,7 +318,13 @@ test_execution_policy:
   evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
   floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
 
-running_work: []
+running_work:
+  - {run_id: P2-RES-0001, role: 'prior-art research: secure update and release trust (Level 1)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-1-UPDATE-TRUST.md, read_only: true, status: RUNNING}
+  - {run_id: P2-RES-0002, role: 'prior-art research: governed configuration and policy authority (Level 2A and 2C)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-2-GOVERNED-STATE.md, read_only: true, status: RUNNING}
+  - {run_id: P2-RES-0003, role: 'prior-art research: exact and hermetic execution (Level 2B)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-3-EXECUTION.md, read_only: true, status: RUNNING}
+  - {run_id: P2-RES-0004, role: 'prior-art research: sandboxing and isolation (Level 3)', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-4-ISOLATION.md, read_only: true, status: RUNNING}
+  - {run_id: P2-RES-0005, role: 'prior-art research: developer tooling and build systems', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-5-TOOLING.md, read_only: true, status: RUNNING}
+  - {run_id: P2-RES-0006, role: 'prior-art research: cross-domain challenger', worker_model: claude-sonnet-5 native, output: release/orchestration/phase-2/RESEARCH/AGENT-6-CHALLENGER.md, read_only: true, status: RUNNING}
 completed_work_formerly_running:
   - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: COMPLETED_SUPERSEDED_BY_P2-AR-0078}
   - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: COMPLETED, blocks_phase_2: false}
@@ -374,15 +380,18 @@ completed_stages:
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
 next_deterministic_action: >-
-  NONE WITHOUT AN OWNER DECISION. OD-P2-07 section 8 triggered on BOTH limbs: P2-AR-0079 returned RESIDUAL_DEFECTS with
-  three materially new HIGH findings on the surfaces that section names, and left AR77-F1/F2/F4 narrowed but not
-  closed. Both properties fail. The orchestrator has stopped: no mint, no sixth round, no formal verification.
-  PHASE_2_OPTION_B_ESCALATION_PACKAGE.md is the escalation. Its recommendation: authorise the MINIMAL
-  execution-boundary work for Property A (controlled environment, pinned cwd, execute the verified artefact by resolved
-  absolute path rather than by the argv string), which closes P79-F1 and P79-F11 at the root rather than by
-  enumeration; and for Property C decide the PREREQUISITE first - whether the OS is to gain a way to distinguish a
-  governed contract change from a hand edit, since P79-F10 found no such mechanism exists and everything else about C
-  depends on it. Re-scoping to R2 is also on the table and is the owner's alone. Resume only on the owner's choice.
+  AWAIT the six read-only prior-art research agents (P2-RES-0001..0006), then dispatch a fresh Opus 5 architecture
+  SYNTHESISER over all six reports plus the R0/R1 accepted architecture, D-0007, the Option B escalation package,
+  P2-AR-0079's evidence, the applicable Contract v3 requirements and the private/local deployment boundary. It must
+  produce an architecture comparison against our exact requirements rather than vote between researchers. Then dispatch
+  one fresh Opus 5 CHALLENGER of that synthesis, which asks whether a mature primitive was overlooked, whether any
+  proposed custom mechanism is unnecessary, whether a recommended dependency solves a stronger or different problem
+  than ours, whether trust assumptions are explicit, whether Level 3 has contaminated Levels 1-2, whether the
+  recommendation would actually have prevented the concrete R0/R1/P79 attacks, and whether it simplifies the system or
+  merely relocates complexity. The synthesiser may correct factual issues the challenger exposes. Then produce
+  TRUST_ARCHITECTURE_EXISTING_SOLUTIONS_REVIEW.md with 2-3 coherent ranked options and STOP, returning to the owner.
+  NOTHING IS IMPLEMENTED. Phase 2 remains stopped; the Option B escalation (PHASE_2_OPTION_B_ESCALATION_PACKAGE.md)
+  remains the open owner decision and this research informs it rather than replacing it.
 
 current_prohibitions:
   - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
@@ -391,6 +400,7 @@ current_prohibitions:
   - {action: 'another local repair or enumeration round on the install-trust surface after the A+C review', until: 'an owner decision - the hard stop escalates toward Option B or another owner-approved architecture review'}
   - {action: 'creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default action', until: 'never in Phase 2 - worker_stall_protection is ACTIVE'}
   - {action: 'minting cap2-candidate-2', until: 'both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)'}
+  - {action: 'implementing, prototyping or adopting ANY architecture discovered during the prior-art research', until: 'the owner reviews the research report and explicitly chooses an architecture -- the study is read-only decision support'}
   - {action: 'a fifth repair round on the install-trust surface', until: 'the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077'}
   - {action: 'designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it', until: 'Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written'}
   - {action: 'a major performance optimisation or refactor of the certification suite', until: 'after Phase 2, unless required for correctness -- P2-PERF-0001 measures and recommends only'}
