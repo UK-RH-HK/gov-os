@@ -71,7 +71,21 @@ to**, through an environment and working directory that the same `argv` controls
 ## 3. The research frame — three trust levels
 
 - **Level 1 — trusting Governance OS itself.** Is the runtime being installed and executed the authentic authorised
-  version? (Existing direction: a compact TUF-style release root, accepted at R0/R1.)
+  version? (Existing direction: a compact TUF-style release root — **see the correction immediately below**.)
+
+  > **CORRECTION, added 2026-09-23 after AGENT-2 flagged it.** An earlier draft of this brief said the Level-1 signed
+  > release root was simply "accepted at R0/R1". That is true but incomplete, and the omission is material. Two
+  > separate things are both true:
+  >
+  > 1. **SRR-1 / ARCH-0003 was accepted** at R0 and R1 (`ROT_ARCHITECTURE_ACCEPTED_R0`,
+  >    `ROT_PHASE1_CANDIDATE_ACCEPTED_R1`, tag `srr1-r1-accepted`), and ARCH-0003 is owner-adopted.
+  > 2. A **subsequent hardening lineage, RoT-1, was rejected in all seven of its revisions** and is **frozen by the
+  >    owner pending a meta-architecture review**. `D-0008` and `ARCH-0002` are `PROPOSED`, **not active**.
+  >
+  > **Consequence for your research:** treat as settled ground only the accepted, meta-review-endorsed core — a
+  > versioned and hashed release, independent verification, and no self-authorisation. **Do not build on, or assume the
+  > correctness of, the contested RoT-1 extension**, and do not import that unresolved Level-1 dispute into a Level-2
+  > recommendation. AGENT-2 scoped its recommendation this way unprompted, which was the right call.
 - **Level 2 — trusting its decisions, state and execution.** **This is the current Phase-2 problem.** 2A governed
   state/authority provenance; 2B execution binding; 2C policy/configuration integrity.
 - **Level 3 — higher-assurance / hostile execution.** Isolation architectures, *if and when* stronger guarantees than a
