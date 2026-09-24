@@ -447,3 +447,34 @@ if fail-closed relocation cannot be given a working exit without inventing a new
 Both repairs are deletions and substitutions, and both are smaller than any predecessor's. Seventh enumeration
 failure recorded: programs → shapes → list premises → class values → consumers → obligations → **a liveness predicate
 on an attacker-chosen string.**
+
+## P2-L-0040 — P2-AR-0093 lands all four non-deferrable obligations (363/0); seventh review dispatched (2026-09-24)
+
+`a376cc4` on `phase2/remediation-ar92`, base `4686e8d`, full suite **363/0** in 3,486 s at default threads. Product
+diff confined to five files; `exec_resolve.rs` untouched, so Property A is carried forward unmodified.
+
+**All four §1 obligations landed.** The `&& Path::new(minted_for).exists()` conjunct is deleted (`paths.rs:765`), so
+`other_live_claim` now refuses on any store entry at a different path, live or stale. `is_health_sandbox_root`
+requires an OS-written marker under the protected state root in addition to the four-component shape. `gov
+floor-reanchor` exists, gated at the **same `install_kernel` tier as `init`** — the §1.3 escalation trigger did
+**not** fire, because no new trusted authority was invented — and is demonstrated end-to-end. A genuine foreign
+clone's bootstrap adoption is now disclosed through a channel deliberately separate from D027.
+
+**Orchestrator verification.** Each of the four mechanisms read and confirmed at the commit. One suspected G0 bypass
+chased and **ruled out**: `command_name` spells the command `"floor-reanchor"` while `COMMAND_GUARDS` holds `"floor
+reanchor"`, but `g0_label` — the authority-bearing mapping — matches, and `command_name` feeds display only. The two
+parallel hand-maintained label tables are handed to review 7 as the AR90-C6 / AR92-D2 defect class.
+
+**The builder's disclosures were good and are the reason this round is reviewable.** It declined to claim AR92-C3
+closed, stating plainly that re-anchoring is an identity **transfer** that removes the prior entry, so running it
+from a second live checkout steals the identity from the first. It named the missing positive control for a
+legitimate sandbox, the `health-sandboxes/` marker leak, unprobed concurrency, and that re-anchor never reads
+`bound_cit`.
+
+**Dispatched `P2-AR-0094`** on `P2-HO-0058` at `a376cc4`, branch `phase2/review-7`, with two primary targets — both
+the mechanisms this round introduced, per the standing prediction that each repair's new mechanism is the next
+round's defect. The orchestrator derived and handed over one attack chain: `Sandbox::create` bases sandboxes at
+`p.runtime_dir()`, **inside the project**, so the random sandbox path is observable by an ordinary project-scoped
+actor; if the marker leaks because `Drop` never ran, recreating a directory at that observed path may reconstitute
+the exemption. The builder classified that leak as storage hygiene; this round made the marker authority-bearing,
+which is why it is now a capability question and not a hygiene one.

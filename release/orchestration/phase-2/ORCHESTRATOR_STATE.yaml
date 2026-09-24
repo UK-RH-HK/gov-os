@@ -1428,20 +1428,33 @@ review_history:
   owner_stop_conditions: all seven evaluated, all NO; orchestrator independently re-verified portability, uuid identity
     derivation, and the sandbox predicate
   disposition: automatic repair per OD-P2-08 section 8
-current_round:
-  id: P2-AR-0093
+- round: P2-AR-0093
   kind: repair
-  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0057-ar92-repair.md
-  base_commit: 4686e8d
-  branch: phase2/remediation-ar92
-  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
-  non_deferrable:
-  - 1.1 drop the exists() liveness conjunct (AR92-C1/C1B/C1C)
-  - 1.2 sandbox exemption from an OS record, not a path spelling (AR92-C2)
-  - 1.3 demonstrate the re-anchor remedy end-to-end (covers AR92-C3)
-  - 1.4 a relocation must not be silent (AR92-C4)
-  escalation_trigger: if the re-anchor remedy cannot be built without inventing a new trusted authority, STOP --
-    OD-P2-08 section 8
+  verdict_claimed: REPAIRED_CLAIMED (builder development evidence only)
+  commit: a376cc4
+  suite: 363/0, 3486s, default threads
+  obligations_landed: all four non-deferrable (1.1 conjunct deleted, 1.2 sandbox record, 1.3 re-anchor demonstrated,
+    1.4 disclosure)
+  escalation_trigger_result: NOT triggered -- the re-anchor remedy was built without inventing a new trusted authority
+    (reuses the install_kernel tier)
+  builder_disclosed_residuals:
+  - 'AR92-C3 not closed: re-anchor is an identity TRANSFER, not a copy; a second live checkout still loses its floor'
+  - no positive control that a legitimate sandbox still receives the exemption
+  - health-sandboxes/ markers leak if Drop never runs
+  - concurrent floor-reanchor unprobed; reanchor never reads bound_cit
+  - 2.2 rollback residual and 2.4 manifest_paths not taken, named only
+current_round:
+  id: P2-AR-0094
+  kind: independent_adversarial_review
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0058-review-7.md
+  subject_commit: a376cc4
+  branch: phase2/review-7
+  evidence_class: INDEPENDENT_ADVERSARIAL
+  primary_targets:
+  - the sandbox marker is now authority-bearing and the builder says it leaks; the sandbox path is inside the project
+    and therefore observable
+  - gov floor-reanchor is an identity transfer that removes the prior store entry
+  - adjudicate the builder's changes to two AR92 held-out probes
 orchestrator_verified_independently:
 - paths.rs:651 -- the exists() conjunct is present exactly as reported
 - paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
@@ -1451,4 +1464,12 @@ orchestrator_verified_independently:
   the conjunct does not touch P2-ADJ-0002 portability
 - review commit 4686e8d touches no product source (git diff --stat over runtime cli framework spec capabilities
   migrations tools bin scripts docs is empty)
+- 'a376cc4: paths.rs:765 -- the exists() conjunct is deleted; guard returns on path inequality alone'
+- 'a376cc4: is_health_sandbox_root now requires shaped AND sandbox_record_path().is_file()'
+- 'a376cc4: COMMAND_GUARDS:288 registers floor reanchor at the install_kernel tier -- no new authority invented'
+- 'a376cc4: suspected G0 bypass from the hyphen/space label divergence RULED OUT -- g0_label matches the guard table;
+  command_name is display/telemetry only. The two parallel label tables remain a named defect class for review 7.'
+- 'a376cc4: exec_resolve.rs untouched (empty diff); product diff confined to 5 files'
+- 'a376cc4: Sandbox::create bases sandboxes at p.runtime_dir(), i.e. INSIDE the project, so the random sandbox path
+  is observable by an ordinary project-scoped actor -- orchestrator-derived attack chain handed to review 7'
 last_updated: '2026-09-24'
