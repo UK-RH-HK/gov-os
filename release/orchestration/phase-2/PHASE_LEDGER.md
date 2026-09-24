@@ -549,3 +549,40 @@ re-running the adoption decision). **Deleting `floor-reanchor` is therefore not 
 identity-transfer surface but leaves same-machine relocation with no in-product remedy unless a re-onboarding path is
 also provided. Mitigating half, also verified: `PolicySet::load` reconstructs from native layout plus AR86-C6
 `last_known_rules`, so a refused floor leaves the checkout DEGRADED/UNHEALTHY rather than unprotected.
+
+## P2-L-0043 — P2-AR-0095 lands all five items (373/0); the sweep answers 5B and 5C from evidence (2026-09-24)
+
+`92982ff` on `phase2/remediation-ar94`, base `f2a9ab9`, full suite **373/0** in 3,617 s (60m17s). Scope confined to
+`paths.rs`, `cli/src/main.rs`, two test files and a checkpoint; **`exec_resolve.rs` untouched**, so Property A is
+carried forward unmodified for the fourth round.
+
+**All five non-deferrable items landed.** `gov floor-reanchor` now requires `--from <previous path>` and compares the
+document's `bound_project_identity` against the entry at that **operator-named** key (`paths.rs:1555`) — AR94-C2
+closed by narrowing, with the whole-store identity scan deleted rather than guarded.
+
+**The builder declared one deviation rather than burying it**, which is the reason this round is adjudicable. It did
+**not** delete the durable sandbox marker as §1.2 prescribed; it re-keyed the marker to the OS-created object's own
+`(device, inode)` and added GC. Its stated reason: `ar94_nc2` — the AR94 reviewer's own positive control — requires
+**post-mortem** recognition, and a process-local registry cannot satisfy that by construction.
+
+**Orchestrator verification settled two of the owner's three sweep questions from evidence.**
+
+**5B — the concurrent re-anchor race is CONFIRMED real.** OD-P2-09 §5B asserted this; the orchestrator flagged it as
+unverifiable from durable state at the time and that caution is now **withdrawn**. AR95 reproduced two store entries
+for one identity in one run and observed serialisation in another — stronger evidence than AR94's `ar94_c5`, which
+constructed the interleaving but saw it serialise. `reanchor_project_identity`'s lookup→write→remove holds no lock.
+Left unfixed, correctly, as outside the round's five items.
+
+**5C — production never needs post-mortem sandbox recognition.** `skills.rs:528 execute_check` holds its `Sandbox`
+alive across every child `gov` call (`run_gov`), so the creating process is alive for **every** production read;
+`ar94_nc2` (`ar94_floor.rs:490`) uses `spawn_and_kill_when` to SIGKILL the creator **deliberately**. The requirement
+that forced the builder's deviation therefore comes from a **test**, not from any product path — which makes the
+owner's proposed simpler semantic (creator dies → exemption no longer authoritative → fail closed) available, and
+would allow deleting the inode binding and the GC outright.
+
+**5A — restated crux.** `init.rs:303` and `adopt.rs:1840` gate the floor write on `!already_installed`, so no
+onboarding path re-establishes a floor at a relocated path. Deleting `floor-reanchor` outright removes the
+identity-transfer surface but leaves relocation with no in-product remedy.
+
+**Sweep presented to the owner in one consolidated message. Review 8 is blocked** until it is answered and any
+resulting delta implemented (OD-P2-09 §4, OD-P2-10 §1).

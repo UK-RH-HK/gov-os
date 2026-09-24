@@ -1329,21 +1329,22 @@ review_history:
     probe; ar92_c3's original contradicted its own author's measurement, prose, severity and repair direction. But
     the docstring's claim that a working remedy answers the cost is false (AR94-C4).
   disposition: automatic repair per OD-P2-08 section 8
-current_round:
-  id: P2-AR-0095
+- round: P2-AR-0095
   kind: repair
-  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0059-ar94-repair.md
-  base_commit: f2a9ab9
-  branch: phase2/remediation-ar94
-  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
-  non_deferrable:
-  - 1.1 AR94-C2 take the identity from the store via --from, never from the document
-  - 1.2 AR94-C1 delete the durable sandbox marker for a process-local registry
-  - 1.3 AR94-C3 refuse when the anchor path is None; write_full must not report success for work it did not do
-  - 1.4 AR94-C4 the printed advice must name the second-checkout case with the re-onboarding remedy
-  - 1.5 AR94-D1 disclose the transfer and widen the disclosure channel's reach
-  named_risk: the reviewer's child-process suggestion uses an environment variable, which is ambient authority;
-    the brief forbids quietly trusting it
+  commit: 92982ff
+  verdict_claimed: PARTIAL (honest) -- builder development evidence only
+  suite: 373/0, 3617s (60m17s), default threads
+  items_landed: all five non-deferrable
+  declared_deviation: 1.2 -- the durable sandbox marker was NOT deleted; it was re-keyed to (device,inode) plus
+    GC, because ar94_nc2 requires post-mortem recognition and a process-local registry cannot satisfy it
+  open_residual: AR94-C5 concurrency race -- now CONFIRMED real and nondeterministic (2 store entries for 1 identity
+    in one run, serialised in another); left unfixed as out of scope
+  env_var_authority: none -- builder traced SANDBOX_ENV and confirmed it is not referenced in the exemption decision
+current_round:
+  id: PRE_FINAL_OWNER_QUESTION_SWEEP
+  status: PRESENTED_TO_OWNER
+  blocking: Review 8 may not be dispatched until the sweep is answered and any delta implemented (OD-P2-09 section
+    4, OD-P2-10 section 1)
 orchestrator_verified_independently:
 - paths.rs:651 -- the exists() conjunct is present exactly as reported
 - paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
@@ -1367,6 +1368,18 @@ orchestrator_verified_independently:
 - a376cc4 paths.rs:788 -- write_full returns Ok(()) without writing when path(root) is None, and reanchor then removes
   the old dir unconditionally. AR94-C3 confirmed.
 - f2a9ab9 touches no product source
+- '92982ff: scope is paths.rs + main.rs + two test files + checkpoint; exec_resolve.rs untouched (empty diff)'
+- 92982ff paths.rs:1555 -- reanchor compares the document's identity against the entry at the OPERATOR-NAMED --from
+  key; AR94-C2 closed by narrowing, not by a new mechanism
+- 92982ff paths.rs:626 -- is_health_sandbox_root requires shape AND a record AND sandbox_record_still_matches (device,inode)
+- '5C ANSWERED BY CODE: production NEVER needs post-mortem sandbox recognition. skills.rs:528 execute_check holds
+  `sb` alive across every child `gov` call (run_gov), so the creator is alive for every production read. ar94_nc2
+  (ar94_floor.rs:490) uses spawn_and_kill_when to SIGKILL the creator deliberately -- the post-mortem requirement
+  is a TEST artifact, not a product requirement.'
+- '5B ANSWERED BY EVIDENCE: the concurrent re-anchor race is CONFIRMED real. The owner''s premise was correct and
+  the orchestrator''s earlier caution is now resolved -- AR95 reproduced two store entries for one identity.'
+- '5A CRUX (restated): init.rs:303 and adopt.rs:1840 gate the floor write on !already_installed, so no onboarding
+  path re-establishes a floor at a relocated path.'
 last_updated: '2026-09-24'
 owner_directions_in_force:
 - OD-P2-07
