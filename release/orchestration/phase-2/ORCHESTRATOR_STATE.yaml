@@ -44,8 +44,9 @@ self_location:
     final_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-FINAL-PHASE-1-COMPLETE.yaml
     transition_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-0034-PHASE-2-TRANSITION.yaml
     phase_1_state_check: STATE_CONSISTENT
-    verified_note: R1 was verified at worktree HEAD 84b9ee8, which differs from the candidate c7d3fef only in three Phase-1 orchestration files. HEAD 3374db4 differs from c7d3fef only in README.md, docs/DECISIONS.md,
-      ARCH-0003 adoption metadata and orchestration records; product_code_digest is identical at c7d3fef and 3374db4.
+    verified_note: R1 was verified at worktree HEAD 84b9ee8, which differs from the candidate c7d3fef only in three
+      Phase-1 orchestration files. HEAD 3374db4 differs from c7d3fef only in README.md, docs/DECISIONS.md, ARCH-0003
+      adoption metadata and orchestration records; product_code_digest is identical at c7d3fef and 3374db4.
   arch_0003_adoption:
     record: OWNER-DECISION-0009
     record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md
@@ -76,7 +77,8 @@ contract_v3:
   compiled_file_sha256: 3bc27e106dd8bab08b9772696efe449bd8f6eabd36bc18579f4a635a00250f9c
   lock_path: framework/contracts/contract-source.lock
   lock_compiled_sha256: 30cec97cb03ad481680c5a721a99d442d0acac942e857f3a8f331e1cca8f64f3
-  lock_hash_note: the lock's compiled_sha256 is runtime::util::hash_value (canonical JSON of the parsed YAML), not a file-byte digest; the two values above are therefore expected to differ
+  lock_hash_note: the lock's compiled_sha256 is runtime::util::hash_value (canonical JSON of the parsed YAML), not
+    a file-byte digest; the two values above are therefore expected to differ
   gov_contract_verify_at_phase_2_entry: CONTRACT_SOURCE_BOUND
   compiled_capability_count: 100
   evidence_map_path: tests/governance/capability-evidence-map.yaml
@@ -91,9 +93,11 @@ operator_ui:
   phase_2_card: section id="capability-baseline" — CAP-1 role prompt; acceptance rule; Gate W baseline audit
   logged_conflicts:
   - id: P2-CONFLICT-1
-    v8_text: CAP-1 "Any source/kernel/runtime repair after rejection creates a new candidate and requires R1 verification again before this audit is rerun."
+    v8_text: CAP-1 "Any source/kernel/runtime repair after rejection creates a new candidate and requires R1 verification
+      again before this audit is rerun."
     higher_source: Contract v3 evidence freshness (lines 95-111) governs what evidence a change invalidates
-    resolution: frozen contract AC-14 and section 9.3 — independent R1-preservation verification of every candidate whose product code differs from srr1-r1-accepted
+    resolution: frozen contract AC-14 and section 9.3 — independent R1-preservation verification of every candidate
+      whose product code differs from srr1-r1-accepted
   - id: P2-CONFLICT-2
     v8_text: Phase 3 card places provisional retrieval after GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
     higher_source: Contract v3 pre-advanced-qualification item 7 and its own PROPOSED ORDER
@@ -159,17 +163,21 @@ active_decisions:
   - P2-ADJ-0004
   - P2-ADJ-0005
   - P2-ADJ-0006
-  orchestrator_adjudications_note: all six are in GATES/; P2-ADJ-0006's stopping rule fired on 2026-09-22 and the owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources,
-    never a new owner decision, and the owner may override any of them.
-  owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses the owner Phase-2 directive's three-iteration convergence rule
+  orchestrator_adjudications_note: all six are in GATES/; P2-ADJ-0006's stopping rule fired on 2026-09-22 and the
+    owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources, never a new owner
+    decision, and the owner may override any of them.
+  owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses
+    the owner Phase-2 directive's three-iteration convergence rule
   d0007: ACTIVE and unchanged; the explicit D-0007 transition record remains open and was not requested
   frozen_srr_boundary_path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
   frozen_srr_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
 inherited_inputs:
   residual_risk_register_path: release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
   residual_risk_register_sha256: b08678b0cbb9afe1a1ea23b0da89bac8ba4a935d27891d4cb10f835481d66b9e
-  residual_risk_disposition: 'Inherited as input, not as Phase-2 obligations: the register''s items are R1-LOW or R2 lifecycle and none is a Phase-2 requirement (register section 6). AR27-N7 (evidence-map
-    rows NOT_YET_MAPPED) is independently a Phase-2 matter under frozen contract AC-10 and is expected to surface through the audit, not by inheritance.'
+  residual_risk_disposition: 'Inherited as input, not as Phase-2 obligations: the register''s items are R1-LOW or
+    R2 lifecycle and none is a Phase-2 requirement (register section 6). AR27-N7 (evidence-map rows NOT_YET_MAPPED)
+    is independently a Phase-2 matter under frozen contract AC-10 and is expected to surface through the audit,
+    not by inheritance.'
 baseline_regression:
   commit: 3374db452008628074824faacb030ad841ce4ed9
   lib: 42 passed, 0 failed
@@ -196,100 +204,157 @@ candidates:
   product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
   governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
   minted: '2026-09-20'
-  provenance: repair iteration 1, rounds 1-4 integrated (merges b7e6d52, e8e1ff2, e4cb662, 0bad524); round-4 integration P2-AR-0054
+  provenance: repair iteration 1, rounds 1-4 integrated (merges b7e6d52, e8e1ff2, e4cb662, 0bad524); round-4 integration
+    P2-AR-0054
   orchestrator_reproduction:
     release_build: ok 0 warnings
     gov contract verify: CONTRACT_SOURCE_BOUND
     lib: 276/0/0
     certification: 207/0/0
-  status: GOVERNANCE_CAPABILITY_BASELINE_REJECTED (P2-AR-0052, verification iteration 1, 2026-09-21; AC-3, AC-4, AC-5 unmet)
+  status: GOVERNANCE_CAPABILITY_BASELINE_REJECTED (P2-AR-0052, verification iteration 1, 2026-09-21; AC-3, AC-4,
+    AC-5 unmet)
 current_candidate:
   id: cap2-candidate-1
   tag: cap2-candidate-1
   commit: 0bad524d836f179964ffbac31972856ea6434682
 convergence_watch:
-  note: Rounds 7 and 8 each closed their assigned findings AND introduced new HIGHs (P2-AR-0083 introduced AR84-F4 and AR84-C2; P2-AR-0081 introduced nothing but P2-AR-0080 left P1 open). The defects are
-    genuinely DIFFERENT each round rather than the same enumeration recurring, and each fix path has been measured rather than theorised, so OD-P2-08 section 8 continues to apply. But the orchestrator is
-    watching whether repair introduces defects faster than review closes them, and will escalate if the pattern becomes convergent failure rather than progressive repair.
-  round_9_result: 'P2-AR-0085 closed ALL SIX AR84 findings and introduced ZERO new HIGHs -- the first round on this surface to do so. It also caught two of its own regressions before the suite: the resurfaced
-    AR82-F2 (ld.so --list computes $ORIGIN from the path AS GIVEN, not the realpath the kernel uses), found by re-running a prior reviewer own probe rather than trusting carried-forward evidence; and a
-    design flaw where binding identity to the canonical filesystem path made every legitimate git clone read as an attack, caught by an unrelated existing multi_machine test. Convergence is improving, not
-    degrading.'
-  orchestrator_record_hygiene: The orchestrator broke this file a third time while editing it, with an unescaped apostrophe inside a single-quoted scalar. Caught by parse validation before sealing, as the
-    owner section 14 requires, then repaired by loading, editing the structure and dumping with yaml.safe_dump -- which is what should have been done every time. String surgery on quoted YAML scalars is
-    the recurring defect; see V8_3_EVIDENCE_PACKAGE section 6.2.
-  round_10_result: 'P2-AR-0086 found 2 Property-A and 4 Property-C HIGHs, but ALSO re-proved that four of the previous six were closed AS A CLASS rather than carried forward, and closed one prior open question
-    with a negative result (ld.so --list runs no .preinit_array or DT_INIT_ARRAY constructor, so the static parse is complete for the verification path). Its own words: the architecture is not the problem
-    and eight rounds of findings did not make a ninth inevitable.'
-  orchestrator_direction_failure: 'THREE consecutive rounds have blocked on the same omission: OD-P2-08 section 5 NAMED cit::binding as the primitive to reuse, and two rounds deferred it as a considered
-    scope decision and substituted something cheaper -- a path, then a git lineage. Both substitutes were defeated. This is the orchestrator''s failure of direction, not the workers'': the briefs listed
-    it among several items, so workers under budget pressure deferred it. The AR86 brief makes it THE deliverable and explicitly non-deferrable, and instructs the worker to stop and report with evidence
-    rather than substitute a third time.'
-  why_not_escalated: No OD-P2-08 section 8 condition fires and all three reviewers checked them explicitly. The architecture keeps being confirmed sound independently; the defects are different each round
-    rather than one enumeration recurring; each fix path is measured before dispatch; and rounds are now closing more than they open. The correct orchestrator action was to fix its own brief, which costs
-    the owner nothing, rather than to escalate a problem of its own making.
-  round_11_result: 'P2-AR-0087 closed all seven AR86 findings; full suite 319/0. It did NOT wire cit::binding literally, building instead a FloorIdentity (random per-checkout UUID plus a monotonic sequence)
-    at <root>/.governance-state/adoption-floor-identity.json -- which the AR86 reviewer''s own repair path had offered as an equivalent option (high-water in the machine''s protected state). Orchestrator-verified
-    concern passed to the next reviewer as its priority target: that location carries class operational, mutation os-only, the SAME declared protection as the floor document it authenticates, and sits INSIDE
-    the project root where the defined lower-trust party can write. The open question is whether it is genuinely a different trust domain or a second copy of the same problem, raising attacker effort from
+  note: Rounds 7 and 8 each closed their assigned findings AND introduced new HIGHs (P2-AR-0083 introduced AR84-F4
+    and AR84-C2; P2-AR-0081 introduced nothing but P2-AR-0080 left P1 open). The defects are genuinely DIFFERENT
+    each round rather than the same enumeration recurring, and each fix path has been measured rather than theorised,
+    so OD-P2-08 section 8 continues to apply. But the orchestrator is watching whether repair introduces defects
+    faster than review closes them, and will escalate if the pattern becomes convergent failure rather than progressive
+    repair.
+  round_9_result: 'P2-AR-0085 closed ALL SIX AR84 findings and introduced ZERO new HIGHs -- the first round on this
+    surface to do so. It also caught two of its own regressions before the suite: the resurfaced AR82-F2 (ld.so
+    --list computes $ORIGIN from the path AS GIVEN, not the realpath the kernel uses), found by re-running a prior
+    reviewer own probe rather than trusting carried-forward evidence; and a design flaw where binding identity to
+    the canonical filesystem path made every legitimate git clone read as an attack, caught by an unrelated existing
+    multi_machine test. Convergence is improving, not degrading.'
+  orchestrator_record_hygiene: The orchestrator broke this file a third time while editing it, with an unescaped
+    apostrophe inside a single-quoted scalar. Caught by parse validation before sealing, as the owner section 14
+    requires, then repaired by loading, editing the structure and dumping with yaml.safe_dump -- which is what should
+    have been done every time. String surgery on quoted YAML scalars is the recurring defect; see V8_3_EVIDENCE_PACKAGE
+    section 6.2.
+  round_10_result: 'P2-AR-0086 found 2 Property-A and 4 Property-C HIGHs, but ALSO re-proved that four of the previous
+    six were closed AS A CLASS rather than carried forward, and closed one prior open question with a negative result
+    (ld.so --list runs no .preinit_array or DT_INIT_ARRAY constructor, so the static parse is complete for the verification
+    path). Its own words: the architecture is not the problem and eight rounds of findings did not make a ninth
+    inevitable.'
+  orchestrator_direction_failure: 'THREE consecutive rounds have blocked on the same omission: OD-P2-08 section
+    5 NAMED cit::binding as the primitive to reuse, and two rounds deferred it as a considered scope decision and
+    substituted something cheaper -- a path, then a git lineage. Both substitutes were defeated. This is the orchestrator''s
+    failure of direction, not the workers'': the briefs listed it among several items, so workers under budget pressure
+    deferred it. The AR86 brief makes it THE deliverable and explicitly non-deferrable, and instructs the worker
+    to stop and report with evidence rather than substitute a third time.'
+  why_not_escalated: No OD-P2-08 section 8 condition fires and all three reviewers checked them explicitly. The
+    architecture keeps being confirmed sound independently; the defects are different each round rather than one
+    enumeration recurring; each fix path is measured before dispatch; and rounds are now closing more than they
+    open. The correct orchestrator action was to fix its own brief, which costs the owner nothing, rather than to
+    escalate a problem of its own making.
+  round_11_result: 'P2-AR-0087 closed all seven AR86 findings; full suite 319/0. It did NOT wire cit::binding literally,
+    building instead a FloorIdentity (random per-checkout UUID plus a monotonic sequence) at <root>/.governance-state/adoption-floor-identity.json
+    -- which the AR86 reviewer''s own repair path had offered as an equivalent option (high-water in the machine''s
+    protected state). Orchestrator-verified concern passed to the next reviewer as its priority target: that location
+    carries class operational, mutation os-only, the SAME declared protection as the floor document it authenticates,
+    and sits INSIDE the project root where the defined lower-trust party can write. The open question is whether
+    it is genuinely a different trust domain or a second copy of the same problem, raising attacker effort from
     one cp to two.'
-  unexplained_coupling: P2-AR-0087 reports 8/8 reproducible trials that ANY early return in repository_lineage_id -- including a pure filesystem variant with no subprocess -- deterministically breaks brownfield_adoption_end_to_end's
-    held-out memory-retrieval currency check, while no check at all passes 3/3. It ruled out wrong-answer and latency, did not root-cause it, and dropped the lineage-side check rather than ship an unexplained
-    interaction into a security-relevant function. The instinct was right; the coupling is passed to P2-AR-0088 to investigate, since a deterministic link between a security function's control flow and
-    a currency subsystem may indicate a defect elsewhere that this round merely stepped around.
-  round_12_result: 'P2-AR-0088 answered the priority question by execution: FloorIdentity in .governance-state is a SECOND COPY OF THE SAME PROBLEM, not an authentication boundary. Copying both files works;
-    merely MOVING THE ANCHOR ASIDE works, because the bootstrap branch honours any sealed floor; and mutation os-only CLASSIFIES BUT DOES NOT PREVENT -- measured, an ordinary write took effect with no finding
-    and D027 healthy. It also found two materially new HIGHs: lexically_normalise disagrees with the kernel, which expands a symlink BEFORE applying the following .., so one string reads as a system loader
-    and opens as an unpinned project file; and gov init --force rewrites the authoritative floor with the checkout''s own identity, a forward sequence and a fresh valid seal but NO CIT, NO GATE, NO OWNER
-    -- an authenticated ordered transition that is not an AUTHORISED one. It independently re-verified all seven AR86 findings closed against their own reproductions, and judged FloorIdentity the right
-    SHAPE in the wrong PLACE.'
-  coupling_root_caused: 'The mystery P2-AR-0087 could only correlate is now explained: 1304 calls, 44 firing, and every firing root is an OS HEALTH SANDBOX under .governance-runtime/health/sandboxes/. Sandboxes
-    byte-copy the repository with NO .git, so they authenticate their copied floor only because git rev-list walks up -- AR86-C2 relied upon as a feature. The bootstrap branch is therefore load-bearing
-    on every health run, not a concession to fresh clones, which is why two successive lineage-side fixes broke brownfield. ORCHESTRATOR ADDITION the reviewer did not have: ALWAYS_EXCLUDED_DIRS excludes
-    .git, .governance-runtime and .governance-state but NOT governance/, so a sandbox DOES copy the records store. That removes the obstacle to binding the floor to the authorising CIT/gate evidence --
-    the OD-P2-08 section 5 primitive deferred three times -- because a sandbox carries those records while a donor floor from another project references a CIT id this project''s store does not hold.'
-  round_13_result: 'P2-AR-0089 closed all eleven AR88 findings; full suite 337/0, and brownfield_adoption_end_to_end green at 318.88s -- the exact health-sandbox constraint that broke the two previous attempts.
-    The anchor moved OUT of the project to <state_root>/adoption-floors/<key>/identity.json, the same protected root t2 draws its own binding key from, keyed by sha256(canonical_path + lineage) with the
-    path load-bearing. The sandbox question resolved with NO special-casing: a sandbox''s path has never been seen so it bootstraps and authenticates, while a donor floor copied into an already-onboarded
-    project meets that project''s existing anchor and mismatches. PT_INTERP now refuses any ParentDir component, closing the class rather than the symlink case. gov init --force no longer writes an already-onboarded
-    project''s floor.'
-  second_consecutive_clean_round: 'Rounds 12 and 13 each closed everything assigned. The one gap is disclosed with a STRUCTURAL reason rather than a budget one: bound_cit is recorded in the sealed document
-    but not gated on read, because a reclassify_adoption_floor execution re-reads its own not-yet-COMMITTED floor during propagation, so gating would refuse a transaction''s own legitimate write. The AR90
-    reviewer is asked to trace execute_with and judge whether that reason is real and resolvable, and -- more important -- what distinguishes an AUTHORISED transition from an AUTHENTICATED one while bound_cit
-    stays unverified.'
-  orchestrator_priority_for_ar90: 'The property now rests on a canonical PATH being unreachable by an attacker''s operations. The obvious attack, named in the brief: an attacker inside the repository may
-    be able to CHANGE that path. Move the project, plant a donor floor, run gov at the new path -- never-seen key, bootstrap branch, adopts the document''s own claim -- then move back. That is the same
-    fresh-directory shape that defeated the previous anchor, one layer up. Also named: is_health_sandbox_root is a pure path-shape check an attacker may be able to imitate for a permanent bootstrap.'
-  property_a_holds: 'MILESTONE, round 14: P2-AR-0090 attacked Property A and could construct NO divergence after the ParentDir refusal. AR88-F1/F2/F3/F4 independently re-proved closed; non-UTF-8 and NUL
-    PT_INTERP shown structurally unreachable by source reasoning; the AR88-F1-CONTROL re-assertion judged disclosed over-caution on a contrived shape rather than a legitimate shape broken. The exact-object
-    property took six rounds and is now confirmed sound by an adversary who tried to break it and failed. Only one MEDIUM over-gating regression remains on that surface (AR90-F2).'
-  round_14_result: 'Property C fails on ONE idea: the anchor key sha256(canonical_path + lineage) is a CONJUNCTION, and a key miss falls to the bootstrap branch which adopts the document''s own claim --
-    so A KEY MISS MEANS CONSENT. Lineage is a value the attacker fully controls from inside the repository: one git checkout --orphan plus a commit changes half the key while leaving the working tree byte-identical
-    and git working. The orchestrator''s own named attack also landed: one mv of the project directory, with the same bytes refused in place, honoured after the move, and refused again when moved back.
-    Damning disclosure evidence: doctor goes DEGRADED to UNHEALTHY while protection works, then back to DEGRADED after the attack -- the attack REMOVES the warning that was already there. Separately AR90-C6
-    needs no attacker at all: cit execute fails, the store records ROLLED_BACK, restore_snapshot restores 0 files, and the floor write SURVIVES, because manifest_paths never names the floor''s path so take_snapshot
+  unexplained_coupling: P2-AR-0087 reports 8/8 reproducible trials that ANY early return in repository_lineage_id
+    -- including a pure filesystem variant with no subprocess -- deterministically breaks brownfield_adoption_end_to_end's
+    held-out memory-retrieval currency check, while no check at all passes 3/3. It ruled out wrong-answer and latency,
+    did not root-cause it, and dropped the lineage-side check rather than ship an unexplained interaction into a
+    security-relevant function. The instinct was right; the coupling is passed to P2-AR-0088 to investigate, since
+    a deterministic link between a security function's control flow and a currency subsystem may indicate a defect
+    elsewhere that this round merely stepped around.
+  round_12_result: 'P2-AR-0088 answered the priority question by execution: FloorIdentity in .governance-state is
+    a SECOND COPY OF THE SAME PROBLEM, not an authentication boundary. Copying both files works; merely MOVING THE
+    ANCHOR ASIDE works, because the bootstrap branch honours any sealed floor; and mutation os-only CLASSIFIES BUT
+    DOES NOT PREVENT -- measured, an ordinary write took effect with no finding and D027 healthy. It also found
+    two materially new HIGHs: lexically_normalise disagrees with the kernel, which expands a symlink BEFORE applying
+    the following .., so one string reads as a system loader and opens as an unpinned project file; and gov init
+    --force rewrites the authoritative floor with the checkout''s own identity, a forward sequence and a fresh valid
+    seal but NO CIT, NO GATE, NO OWNER -- an authenticated ordered transition that is not an AUTHORISED one. It
+    independently re-verified all seven AR86 findings closed against their own reproductions, and judged FloorIdentity
+    the right SHAPE in the wrong PLACE.'
+  coupling_root_caused: 'The mystery P2-AR-0087 could only correlate is now explained: 1304 calls, 44 firing, and
+    every firing root is an OS HEALTH SANDBOX under .governance-runtime/health/sandboxes/. Sandboxes byte-copy the
+    repository with NO .git, so they authenticate their copied floor only because git rev-list walks up -- AR86-C2
+    relied upon as a feature. The bootstrap branch is therefore load-bearing on every health run, not a concession
+    to fresh clones, which is why two successive lineage-side fixes broke brownfield. ORCHESTRATOR ADDITION the
+    reviewer did not have: ALWAYS_EXCLUDED_DIRS excludes .git, .governance-runtime and .governance-state but NOT
+    governance/, so a sandbox DOES copy the records store. That removes the obstacle to binding the floor to the
+    authorising CIT/gate evidence -- the OD-P2-08 section 5 primitive deferred three times -- because a sandbox
+    carries those records while a donor floor from another project references a CIT id this project''s store does
+    not hold.'
+  round_13_result: 'P2-AR-0089 closed all eleven AR88 findings; full suite 337/0, and brownfield_adoption_end_to_end
+    green at 318.88s -- the exact health-sandbox constraint that broke the two previous attempts. The anchor moved
+    OUT of the project to <state_root>/adoption-floors/<key>/identity.json, the same protected root t2 draws its
+    own binding key from, keyed by sha256(canonical_path + lineage) with the path load-bearing. The sandbox question
+    resolved with NO special-casing: a sandbox''s path has never been seen so it bootstraps and authenticates, while
+    a donor floor copied into an already-onboarded project meets that project''s existing anchor and mismatches.
+    PT_INTERP now refuses any ParentDir component, closing the class rather than the symlink case. gov init --force
+    no longer writes an already-onboarded project''s floor.'
+  second_consecutive_clean_round: 'Rounds 12 and 13 each closed everything assigned. The one gap is disclosed with
+    a STRUCTURAL reason rather than a budget one: bound_cit is recorded in the sealed document but not gated on
+    read, because a reclassify_adoption_floor execution re-reads its own not-yet-COMMITTED floor during propagation,
+    so gating would refuse a transaction''s own legitimate write. The AR90 reviewer is asked to trace execute_with
+    and judge whether that reason is real and resolvable, and -- more important -- what distinguishes an AUTHORISED
+    transition from an AUTHENTICATED one while bound_cit stays unverified.'
+  orchestrator_priority_for_ar90: 'The property now rests on a canonical PATH being unreachable by an attacker''s
+    operations. The obvious attack, named in the brief: an attacker inside the repository may be able to CHANGE
+    that path. Move the project, plant a donor floor, run gov at the new path -- never-seen key, bootstrap branch,
+    adopts the document''s own claim -- then move back. That is the same fresh-directory shape that defeated the
+    previous anchor, one layer up. Also named: is_health_sandbox_root is a pure path-shape check an attacker may
+    be able to imitate for a permanent bootstrap.'
+  property_a_holds: 'MILESTONE, round 14: P2-AR-0090 attacked Property A and could construct NO divergence after
+    the ParentDir refusal. AR88-F1/F2/F3/F4 independently re-proved closed; non-UTF-8 and NUL PT_INTERP shown structurally
+    unreachable by source reasoning; the AR88-F1-CONTROL re-assertion judged disclosed over-caution on a contrived
+    shape rather than a legitimate shape broken. The exact-object property took six rounds and is now confirmed
+    sound by an adversary who tried to break it and failed. Only one MEDIUM over-gating regression remains on that
+    surface (AR90-F2).'
+  round_14_result: 'Property C fails on ONE idea: the anchor key sha256(canonical_path + lineage) is a CONJUNCTION,
+    and a key miss falls to the bootstrap branch which adopts the document''s own claim -- so A KEY MISS MEANS CONSENT.
+    Lineage is a value the attacker fully controls from inside the repository: one git checkout --orphan plus a
+    commit changes half the key while leaving the working tree byte-identical and git working. The orchestrator''s
+    own named attack also landed: one mv of the project directory, with the same bytes refused in place, honoured
+    after the move, and refused again when moved back. Damning disclosure evidence: doctor goes DEGRADED to UNHEALTHY
+    while protection works, then back to DEGRADED after the attack -- the attack REMOVES the warning that was already
+    there. Separately AR90-C6 needs no attacker at all: cit execute fails, the store records ROLLED_BACK, restore_snapshot
+    restores 0 files, and the floor write SURVIVES, because manifest_paths never names the floor''s path so take_snapshot
     never covers it (orchestrator-verified).'
-  bound_cit_adjudicated: 'The reviewer traced execute_with rather than accepting the previous round''s account: the self-reference is REAL -- propagation::apply, generate_registry, adapters::generate and
-    indexer::rebuild all re-read the floor while the CIT is still EXECUTING -- but it is RESOLVABLE by accepting EXECUTING|COMMITTED or using cit::binding''s writes_sha256, so ''structural, not budgetary''
-    overstated it. Gating would NOT close C1/C2, since onboarding floors legitimately carry no bound_cit and every donor in those attacks is one, but it WOULD have caught C6. As shipped it is inert: one
-    writer, zero readers. The repair round is told to gate it.'
-  round_15_result: P2-AR-0091 closed all six AR90 findings; full suite 350/0. The key is now sha256(canonical_path) alone -- lineage dropped, so an orphan commit or a .git move-aside no longer moves it
-    and those attacks never reach the bootstrap branch at all. For the remaining half, a new minted_for_path field plus other_live_claim refuses a bootstrap that would adopt an identity THIS MACHINE minted
-    for a different path that still exists. manifest_paths now names the floor so a rolled-back CIT genuinely restores it -- measured 0 files restored before, 1 after. bound_cit is gated, accepting EXECUTING
-    or COMMITTED, which also closed AR90-C5 as a side effect. The Property-A over-gating regression is fixed per the reviewer's own three-line prescription.
-  round_15_disclosure_quality: 'Worth recording as the standard: the worker distinguished the ATTACK variant of AR90-C2 (relocate then plant a foreign donor -- now refused) from the AVAILABILITY half (a
-    bare mv with no donor still bootstraps silently, no finding), and said plainly that only the attack is closed rather than claiming the finding. It also disclosed that because the anchor sequence lives
-    outside any snapshot''s reach, a legitimately rolled-back floor reads as stale until one more reclassification -- fail-closed but degraded. Both are passed to the reviewer as judgements rather than
-    buried.'
-  orchestrator_priority_for_ar92: 'The whole new mechanism turns on one line, orchestrator-verified: if minted_for != current_canon && Path::new(minted_for).exists(). So a planted donor is refused only
-    WHILE THE DONOR''S DIRECTORY STILL EXISTS. The named first attack: mint in a scratch project, plant it, then move or delete the scratch project -- exists() is false, no live claim, bootstrap adopts.
-    One extra mv, entirely inside the attacker''s control. Also named: the sandbox exemption is now the only unconditional bypass of that check, and .governance-runtime/health/sandboxes/<purpose>-<uuid>
-    is an ordinary mkdir -p, so whether canonicalisation in Project::open is the only thing standing between an attacker and a permanent bootstrap must be re-verified.'
+  bound_cit_adjudicated: 'The reviewer traced execute_with rather than accepting the previous round''s account:
+    the self-reference is REAL -- propagation::apply, generate_registry, adapters::generate and indexer::rebuild
+    all re-read the floor while the CIT is still EXECUTING -- but it is RESOLVABLE by accepting EXECUTING|COMMITTED
+    or using cit::binding''s writes_sha256, so ''structural, not budgetary'' overstated it. Gating would NOT close
+    C1/C2, since onboarding floors legitimately carry no bound_cit and every donor in those attacks is one, but
+    it WOULD have caught C6. As shipped it is inert: one writer, zero readers. The repair round is told to gate
+    it.'
+  round_15_result: P2-AR-0091 closed all six AR90 findings; full suite 350/0. The key is now sha256(canonical_path)
+    alone -- lineage dropped, so an orphan commit or a .git move-aside no longer moves it and those attacks never
+    reach the bootstrap branch at all. For the remaining half, a new minted_for_path field plus other_live_claim
+    refuses a bootstrap that would adopt an identity THIS MACHINE minted for a different path that still exists.
+    manifest_paths now names the floor so a rolled-back CIT genuinely restores it -- measured 0 files restored before,
+    1 after. bound_cit is gated, accepting EXECUTING or COMMITTED, which also closed AR90-C5 as a side effect. The
+    Property-A over-gating regression is fixed per the reviewer's own three-line prescription.
+  round_15_disclosure_quality: 'Worth recording as the standard: the worker distinguished the ATTACK variant of
+    AR90-C2 (relocate then plant a foreign donor -- now refused) from the AVAILABILITY half (a bare mv with no donor
+    still bootstraps silently, no finding), and said plainly that only the attack is closed rather than claiming
+    the finding. It also disclosed that because the anchor sequence lives outside any snapshot''s reach, a legitimately
+    rolled-back floor reads as stale until one more reclassification -- fail-closed but degraded. Both are passed
+    to the reviewer as judgements rather than buried.'
+  orchestrator_priority_for_ar92: 'The whole new mechanism turns on one line, orchestrator-verified: if minted_for
+    != current_canon && Path::new(minted_for).exists(). So a planted donor is refused only WHILE THE DONOR''S DIRECTORY
+    STILL EXISTS. The named first attack: mint in a scratch project, plant it, then move or delete the scratch project
+    -- exists() is false, no live claim, bootstrap adopts. One extra mv, entirely inside the attacker''s control.
+    Also named: the sandbox exemption is now the only unconditional bypass of that check, and .governance-runtime/health/sandboxes/<purpose>-<uuid>
+    is an ordinary mkdir -p, so whether canonicalisation in Project::open is the only thing standing between an
+    attacker and a permanent bootstrap must be re-verified.'
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
-  convergence_rule: If three consecutive verification iterations each introduce materially new blocker classes (frozen contract section 8) instead of closing known ones, STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED
-    and produce a root-cause/meta-review package.
+  convergence_rule: If three consecutive verification iterations each introduce materially new blocker classes (frozen
+    contract section 8) instead of closing known ones, STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED and produce
+    a root-cause/meta-review package.
   consecutive_new_class_iterations: 1
   blocker_class_inventory_path: release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
   blocker_class_inventory_established_by: P2-AR-0007 (iteration 0)
@@ -327,7 +392,8 @@ iteration:
     findings: 6
     max_severity: HIGH
   - id: BC-P2-09
-    title: OS-written (T2) records honoured without binding to an OS operation; lower-role writes exempt at task close
+    title: OS-written (T2) records honoured without binding to an OS operation; lower-role writes exempt at task
+      close
     findings: 3
     max_severity: HIGH
   - id: BC-P2-10
@@ -1079,56 +1145,88 @@ agent_runs:
 worker_stall_protection:
   status: ACTIVE
   adopted: 2026-09-22, owner instruction section 1 of the A+C architecture decision (OD-P2-07)
-  scope: procedural/runtime governance for the remainder of Phase 2. Changes nothing in Contract v3, the frozen Phase-2 acceptance criteria, product behaviour or the active V8.2 architecture.
-  origin: the ~420-minute stall recorded in V8_3_EVIDENCE_PACKAGE.md section 6.3b -- a worker finished its targeted work, was told to wait for coordinator confirmation before the full suite, the coordinator
-    never sent it, and the worker sat idle while its notifications read as running.
+  scope: procedural/runtime governance for the remainder of Phase 2. Changes nothing in Contract v3, the frozen
+    Phase-2 acceptance criteria, product behaviour or the active V8.2 architecture.
+  origin: the ~420-minute stall recorded in V8_3_EVIDENCE_PACKAGE.md section 6.3b -- a worker finished its targeted
+    work, was told to wait for coordinator confirmation before the full suite, the coordinator never sent it, and
+    the worker sat idle while its notifications read as running.
   rules:
   - 1. No worker may be left indefinitely waiting for an orchestrator/coordinator message.
-  - 2. A blocking coordinator handshake may be created ONLY with BOTH an explicit timeout AND a deterministic default action on expiry.
-  - '3. Prefer self-evaluable preconditions over handshakes. BAD: "tell me when ready and wait until I confirm the machine is clear". GOOD: "start when no competing cargo/gov certification process is running
-    and load satisfies the stated condition; otherwise wait, re-check periodically, and proceed automatically once satisfied".'
-  - 4. Worker state must distinguish at least RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, COMPLETE.
-  - 5. BLOCKED_ON_COORDINATOR must be surfaced immediately and must always carry why it is blocked, what response is awaited, the timeout and the default action. It must never be reported merely as running.
-  - 6. Rising elapsed time with unchanged status or progress is a stall signature. Investigate rather than assume progress.
-  - 7. Never report a worker as still running from a stale observation. Check current process/worker state AT THE TIME of any liveness statement to the owner.
-  - 8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator message.
-  - '3a. COROLLARY, added 2026-09-23 after three wait-loops spun for 10 hours: a self-evaluable precondition must not be able to MATCH ITSELF. `until ! pgrep -f <pattern>` inside a shell whose own command
-    line contains <pattern> never exits. Exclude the checking process (grep -v $$, a captured PID, a marker file, or wait on a known child), and give every wait-loop a bounded iteration count with a defined
-    action on exhaustion -- an unbounded until-loop is a handshake with the kernel and earns the same discipline as rule 2.'
-  - '7a. COROLLARY: liveness monitoring must cover the TASK REGISTRY, not only the machine. A sleeping waiter is invisible to load average and ps -- it looks exactly like a healthy idle machine. A task
-    producing no output for far longer than its expected runtime is a stall regardless of what the machine shows.'
-  - '9. OD-P2-08: prefer tracked PID/process-group state over process-name regex; where pattern matching is unavoidable, PROVE the waiter cannot match itself.'
-  - '10. OD-P2-08: maintain last_progress_at or equivalent freshness evidence, and reconcile the task registry against live process state, output freshness AND worker report state.'
-  - '11. OD-P2-08: worker states must distinguish RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, STALLED, COMPLETE. A sleeping waiter is not productive work.'
+  - 2. A blocking coordinator handshake may be created ONLY with BOTH an explicit timeout AND a deterministic default
+    action on expiry.
+  - '3. Prefer self-evaluable preconditions over handshakes. BAD: "tell me when ready and wait until I confirm the
+    machine is clear". GOOD: "start when no competing cargo/gov certification process is running and load satisfies
+    the stated condition; otherwise wait, re-check periodically, and proceed automatically once satisfied".'
+  - 4. Worker state must distinguish at least RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR,
+    BLOCKED_ON_OWNER, COMPLETE.
+  - 5. BLOCKED_ON_COORDINATOR must be surfaced immediately and must always carry why it is blocked, what response
+    is awaited, the timeout and the default action. It must never be reported merely as running.
+  - 6. Rising elapsed time with unchanged status or progress is a stall signature. Investigate rather than assume
+    progress.
+  - 7. Never report a worker as still running from a stale observation. Check current process/worker state AT THE
+    TIME of any liveness statement to the owner.
+  - 8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator
+    message.
+  - '3a. COROLLARY, added 2026-09-23 after three wait-loops spun for 10 hours: a self-evaluable precondition must
+    not be able to MATCH ITSELF. `until ! pgrep -f <pattern>` inside a shell whose own command line contains <pattern>
+    never exits. Exclude the checking process (grep -v $$, a captured PID, a marker file, or wait on a known child),
+    and give every wait-loop a bounded iteration count with a defined action on exhaustion -- an unbounded until-loop
+    is a handshake with the kernel and earns the same discipline as rule 2.'
+  - '7a. COROLLARY: liveness monitoring must cover the TASK REGISTRY, not only the machine. A sleeping waiter is
+    invisible to load average and ps -- it looks exactly like a healthy idle machine. A task producing no output
+    for far longer than its expected runtime is a stall regardless of what the machine shows.'
+  - '9. OD-P2-08: prefer tracked PID/process-group state over process-name regex; where pattern matching is unavoidable,
+    PROVE the waiter cannot match itself.'
+  - '10. OD-P2-08: maintain last_progress_at or equivalent freshness evidence, and reconcile the task registry against
+    live process state, output freshness AND worker report state.'
+  - '11. OD-P2-08: worker states must distinguish RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR,
+    BLOCKED_ON_OWNER, STALLED, COMPLETE. A sleeping waiter is not productive work.'
   v8_3_disposition: IMPLEMENTED_DURING_PHASE_2
   confirmed_active_before: the A+C implementation dispatch, as the owner required in section 1 rule 10
 test_execution_policy:
-  adopted: 2026-09-22, from P2-PERF-0001 recommendation R1 (release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, commit 651ceb3)
+  adopted: 2026-09-22, from P2-PERF-0001 recommendation R1 (release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md,
+    commit 651ceb3)
   rule: never pass --test-threads=1 to the certification suite; run it machine-exclusive at libtest default parallelism
-  basis: 'tests/certification has zero #[serial], no serial_test dependency, zero env::set_var/remove_var and zero set_current_dir; every variable is set per-Command; scratch roots are PID+nanosecond unique
-    and XDG_STATE_HOME is per-root-hash. P2-AR-0072 already ran 231/0 at default parallelism.'
-  cost_of_the_old_practice: 35.09 s/test single-threaded versus 4.30-5.39 s/test at default parallelism -- about 7x, roughly 2 hours per full run, for no isolation benefit
-  what_serialised_means_here: ONE SUITE AT A TIME ON THE MACHINE, default threads intact -- never tests forced serial within a suite. The historical spurious failures (203/7 on a tree that was really 210/0)
-    were cross-suite machine overload, a different problem with a different fix.
-  where_single_threading_is_genuinely_required: the independent verifiers' held-out harnesses, which do mutate process-global env (release/verification/.../heldout-tests/mint.rs:138-141 sets XDG_STATE_HOME
-    and HOME). That constraint must not migrate back to the certification suite.
-  recording_requirement: every run record that reports a suite figure must also state the --test-threads value and the machine load. A test result without its concurrency conditions is unfalsifiable --
-    P2-AR-0075 omitted both and its 2,742 s needed a CPU-conservation argument to decode.
-  planning_figure: 'MEASURED 2026-09-22 on a verified-quiet machine at default threads: 252 tests, 2,966 s wall (49m26s), 38,971 CPU-s, P=12.95 effective cores (65% of 20). The suite costs about 50 minutes
-    on this tree. The earlier ~1,460 s (24 min) estimate was derived from a CPU calibration that the direct measurement falsified by ~2.4x, and is withdrawn.'
-  superseded_reconciliation: 'P2-AR-0075''s 2,742 s was NOT an outlier and needed no explanation: at the measured W its P is about 12, indistinguishable from this run''s 12.95. The earlier ''~3 test streams
-    / reduced --test-threads'' account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost.'
-  hardware: 'the guest topology is SYNTHETIC and neither published number is right. /proc/cpuinfo carries the hypervisor flag and shows a perfectly uniform 10 cores x 2 threads (siblings 0-1, 2-3 .. 18-19),
-    but the real i7-12700F is a hybrid Alder Lake part: 8 P-cores (2 threads each) + 4 E-cores (1 thread each) = 12 PHYSICAL cores, 20 threads. A genuine 12700F could never show uniform SMT across all cores
-    because the E-cores have none, so WSL2 is flattening a heterogeneous package, and the vCPU-to-host mapping is not observable from inside the guest. Consequences: W/20 = 1,949 s (32.5 min) is a bound
-    SMT cannot reach, not a floor; measured P=12.95 is 65% of 20 logical but ~108% of 12 physical, and since Linux fills idle physical cores before doubling onto siblings, essentially every physical core
-    was busy -- the machine was near saturation, NOT a third idle. Modelled achievable floor ~2,400-2,600 s (40-43 min), NOT MEASURED. Perfect scheduling is therefore worth ~7-10 minutes, not 17.5.'
-  evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires
-    P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped
-    run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines.
-    The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
-  floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
-    the only remaining lever on this figure, not merely the largest.
+  basis: 'tests/certification has zero #[serial], no serial_test dependency, zero env::set_var/remove_var and zero
+    set_current_dir; every variable is set per-Command; scratch roots are PID+nanosecond unique and XDG_STATE_HOME
+    is per-root-hash. P2-AR-0072 already ran 231/0 at default parallelism.'
+  cost_of_the_old_practice: 35.09 s/test single-threaded versus 4.30-5.39 s/test at default parallelism -- about
+    7x, roughly 2 hours per full run, for no isolation benefit
+  what_serialised_means_here: ONE SUITE AT A TIME ON THE MACHINE, default threads intact -- never tests forced serial
+    within a suite. The historical spurious failures (203/7 on a tree that was really 210/0) were cross-suite machine
+    overload, a different problem with a different fix.
+  where_single_threading_is_genuinely_required: the independent verifiers' held-out harnesses, which do mutate process-global
+    env (release/verification/.../heldout-tests/mint.rs:138-141 sets XDG_STATE_HOME and HOME). That constraint must
+    not migrate back to the certification suite.
+  recording_requirement: every run record that reports a suite figure must also state the --test-threads value and
+    the machine load. A test result without its concurrency conditions is unfalsifiable -- P2-AR-0075 omitted both
+    and its 2,742 s needed a CPU-conservation argument to decode.
+  planning_figure: 'MEASURED 2026-09-22 on a verified-quiet machine at default threads: 252 tests, 2,966 s wall
+    (49m26s), 38,971 CPU-s, P=12.95 effective cores (65% of 20). The suite costs about 50 minutes on this tree.
+    The earlier ~1,460 s (24 min) estimate was derived from a CPU calibration that the direct measurement falsified
+    by ~2.4x, and is withdrawn.'
+  superseded_reconciliation: 'P2-AR-0075''s 2,742 s was NOT an outlier and needed no explanation: at the measured
+    W its P is about 12, indistinguishable from this run''s 12.95. The earlier ''~3 test streams / reduced --test-threads''
+    account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost.'
+  hardware: 'the guest topology is SYNTHETIC and neither published number is right. /proc/cpuinfo carries the hypervisor
+    flag and shows a perfectly uniform 10 cores x 2 threads (siblings 0-1, 2-3 .. 18-19), but the real i7-12700F
+    is a hybrid Alder Lake part: 8 P-cores (2 threads each) + 4 E-cores (1 thread each) = 12 PHYSICAL cores, 20
+    threads. A genuine 12700F could never show uniform SMT across all cores because the E-cores have none, so WSL2
+    is flattening a heterogeneous package, and the vCPU-to-host mapping is not observable from inside the guest.
+    Consequences: W/20 = 1,949 s (32.5 min) is a bound SMT cannot reach, not a floor; measured P=12.95 is 65% of
+    20 logical but ~108% of 12 physical, and since Linux fills idle physical cores before doubling onto siblings,
+    essentially every physical core was busy -- the machine was near saturation, NOT a third idle. Modelled achievable
+    floor ~2,400-2,600 s (40-43 min), NOT MEASURED. Perfect scheduling is therefore worth ~7-10 minutes, not 17.5.'
+  evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification
+    225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective
+    cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records
+    chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree --
+    the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL
+    VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the
+    standard the orchestrator adopted today.'
+  floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the
+    full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining
+    lever on this figure, not merely the largest.
 running_work:
 - run_id: P2-AR-0092
   role: sixth independent adversarial review -- fitness to mint
@@ -1163,7 +1261,8 @@ unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
   blocking_total: 134
   classes: 52
-  note: per-finding severity, provenance, lifecycle and class are in the synthesis findings file; not duplicated here
+  note: per-finding severity, provenance, lifecycle and class are in the synthesis findings file; not duplicated
+    here
 downstream_evidence_invalidated: []
 owner_gates:
   pending: []
@@ -1184,8 +1283,9 @@ owner_gates:
       record: OWNER-DECISION-P2-0002
       record_path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
       record_sha256: 5d73bbe3619a54b7f8f5da1fa9c556ed5cdca2f86a4babdf47d8e828a20c16c4
-      effect: refuse external-source ingress until provisioned; embedded payload only as marked bootstrap mode; harness/docs provision a throw-away root; Phase-4 and release evidence on provisioned machines;
-        BC-P2-36 admission part now determined -> round 2 WS-8
+      effect: refuse external-source ingress until provisioned; embedded payload only as marked bootstrap mode;
+        harness/docs provision a throw-away root; Phase-4 and release evidence on provisioned machines; BC-P2-36
+        admission part now determined -> round 2 WS-8
 immutable_evidence:
 - path: release/orchestration/phase-1
   commit: 3374db452008628074824faacb030ad841ce4ed9
@@ -1196,7 +1296,8 @@ immutable_evidence:
 completed_stages:
 - stage: P2_SELF_LOCATED
   commit: 3374db452008628074824faacb030ad841ce4ed9
-  note: Phase-1 tokens verified from committed evidence; ARCH-0003 adoption verified; Contract v3 and V8.2 identities verified; located to Phase 2
+  note: Phase-1 tokens verified from committed evidence; ARCH-0003 adoption verified; Contract v3 and V8.2 identities
+    verified; located to Phase 2
 - stage: P2_INITIALISED
   commit: 57177a37ea296ece16b185874831462b6a76db18
   note: durable state, frozen gate contract, gate register, audit-0 handoffs created; tagged cap2-candidate-0
@@ -1205,38 +1306,52 @@ completed_stages:
   note: six family auditors dispatched in isolated worktrees
 - stage: P2_AUDIT_0_SYNTHESIS_REJECTED
   commit: 395df8d27ca3312948f727de1ff0111ed101c2c2
-  note: P2-AR-0007 GOVERNANCE_CAPABILITY_BASELINE_REJECTED on cap2-candidate-0; 134 blocking findings in 52 classes; OD-P2-01/02 confirmed
+  note: P2-AR-0007 GOVERNANCE_CAPABILITY_BASELINE_REJECTED on cap2-candidate-0; 134 blocking findings in 52 classes;
+    OD-P2-01/02 confirmed
 - stage: P2_AUDIT_0_FIRST_PASS_RULED_NONCONFORMING
   commit: ab964d70e9b598b38e07fd1ffcdd63735af1c355
-  note: All six first-pass family audits returned; all self-reported claude-opus-4-6 against the recorded claude-opus-5; five were ruled COMPLETED_NONCONFORMING (status/finding contradictions, aggregate-output
-    evidence) and gamma COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on the pinned model under P2-HO-0008 / P2-HO-0009.
+  note: All six first-pass family audits returned; all self-reported claude-opus-4-6 against the recorded claude-opus-5;
+    five were ruled COMPLETED_NONCONFORMING (status/finding contradictions, aggregate-output evidence) and gamma
+    COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on
+    the pinned model under P2-HO-0008 / P2-HO-0009.
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
-next_deterministic_action: 'P2 loader probe is COMPLETE and did NOT falsify the architecture: a pinned dynamically-linked ELF with RUNPATH $ORIGIN ran unverified code before the first reviewed instruction
-  under a fully cleared environment, because RUNPATH lives INSIDE the verified object. Recorded at RESEARCH/P2-LOADER-PROBE.md; incorporated as a closure extension per OD-P2-08 section 3. NEXT: dispatch
-  a fresh Sonnet 5 implementation of Option 1 under OD-P2-08 -- Property A (ResolvedExecution with shebang AND dynamic-dependency closure; wrapper chains do not qualify for the ungated path), Property C
-  (project-specific authenticated adoption floor composed with the kernel floor, no ordered class predicate, one authoritative PathDecision construction point), reuse of cit::binding rather than a new hand-edit
-  detector, and the pinned_files schema gap. Then targeted tests, affected dependency tests, deterministic checks, ONE full certification run, freeze, fresh Opus 5 adversarial review with independently
-  derived held-out probes, mint cap2-candidate-2 only when its prerequisites hold, then fresh Opus 5 formal acceptance verification. Ordinary defects are repaired and re-reviewed AUTOMATICALLY without owner
-  relay; stop only on the OD-P2-08 section 8 conditions.'
+next_deterministic_action: 'P2 loader probe is COMPLETE and did NOT falsify the architecture: a pinned dynamically-linked
+  ELF with RUNPATH $ORIGIN ran unverified code before the first reviewed instruction under a fully cleared environment,
+  because RUNPATH lives INSIDE the verified object. Recorded at RESEARCH/P2-LOADER-PROBE.md; incorporated as a closure
+  extension per OD-P2-08 section 3. NEXT: dispatch a fresh Sonnet 5 implementation of Option 1 under OD-P2-08 --
+  Property A (ResolvedExecution with shebang AND dynamic-dependency closure; wrapper chains do not qualify for the
+  ungated path), Property C (project-specific authenticated adoption floor composed with the kernel floor, no ordered
+  class predicate, one authoritative PathDecision construction point), reuse of cit::binding rather than a new hand-edit
+  detector, and the pinned_files schema gap. Then targeted tests, affected dependency tests, deterministic checks,
+  ONE full certification run, freeze, fresh Opus 5 adversarial review with independently derived held-out probes,
+  mint cap2-candidate-2 only when its prerequisites hold, then fresh Opus 5 formal acceptance verification. Ordinary
+  defects are repaired and re-reviewed AUTOMATICALLY without owner relay; stop only on the OD-P2-08 section 8 conditions.'
 current_prohibitions:
 - action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status
   until: never
-- action: treating any builder-authored test, including a generative property test, as independent or acceptance evidence
-  until: 'never - OD-P2-07 fixes four classes: BUILDER_REGRESSION, BUILDER_DEVELOPMENT_EVIDENCE, INDEPENDENT_ADVERSARIAL, HELD_OUT_ACCEPTANCE, never collapsed into "tests passed"'
+- action: treating any builder-authored test, including a generative property test, as independent or acceptance
+    evidence
+  until: 'never - OD-P2-07 fixes four classes: BUILDER_REGRESSION, BUILDER_DEVELOPMENT_EVIDENCE, INDEPENDENT_ADVERSARIAL,
+    HELD_OUT_ACCEPTANCE, never collapsed into "tests passed"'
 - action: implementing Option B (isolation/sandbox execution) during Phase 2
-  until: A demonstrably cannot satisfy the frozen Phase-2 requirements AND the owner explicitly authorises the additional scope
+  until: A demonstrably cannot satisfy the frozen Phase-2 requirements AND the owner explicitly authorises the additional
+    scope
 - action: another local repair or enumeration round on the install-trust surface after the A+C review
   until: an owner decision - the hard stop escalates toward Option B or another owner-approved architecture review
-- action: creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default action
+- action: creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default
+    action
   until: never in Phase 2 - worker_stall_protection is ACTIVE
 - action: minting cap2-candidate-2
-  until: both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)
-- action: implementing Landlock, hermetic execution, bubblewrap, rootless containers, gVisor or microVMs during Phase 2
+  until: both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner
+    instruction 2026-09-22)
+- action: implementing Landlock, hermetic execution, bubblewrap, rootless containers, gVisor or microVMs during
+    Phase 2
   until: R2 or R3 respectively, unless OD-P2-08 section 8 shows the selected architecture is otherwise impossible
 - action: treating the T2 HMAC seal as proof-grade owner authority
-  until: never -- a process with the owner OS privileges can read the symmetric key; proof-grade authority is the authenticated machine/kernel floor plus the authenticated project adoption floor plus an
-    owner-signed governed transition
+  until: never -- a process with the owner OS privileges can read the symmetric key; proof-grade authority is the
+    authenticated machine/kernel floor plus the authenticated project adoption floor plus an owner-signed governed
+    transition
 - action: requiring a universal product/** layout, or governing paths outside the adopted repository
   until: never -- OD-P2-08 section 2 makes the floor PROJECT-SPECIFIC and derived from the governed adoption transition
 - action: building a hand-edit detector as the trust model
@@ -1244,9 +1359,11 @@ current_prohibitions:
 - action: the outer orchestrator self-awarding GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
   until: never -- only a fresh independent Opus 5 formal verifier may issue it
 - action: a fifth repair round on the install-trust surface
-  until: the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077
+  until: the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly
+    for P2-AR-0077
 - action: designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it
-  until: Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written
+  until: Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3
+    evidence package is written
 - action: a major performance optimisation or refactor of the certification suite
   until: after Phase 2, unless required for correctness -- P2-PERF-0001 measures and recommends only
 - action: printing
@@ -1290,3 +1407,48 @@ current_prohibitions:
 - action: writing held-out test content
   in-progress verdicts or unreviewed findings into user auto-memory: null
   until: never
+review_history:
+- review: P2-AR-0092
+  commit_reviewed: a01f0c9
+  review_commit: 4686e8d
+  verdict: RESIDUAL_DEFECTS
+  property_a: HOLDS (second consecutive round; AR88-F4 not reopened)
+  property_c: FAILS -- AR90-C2 narrowed, not closed
+  highs:
+  - AR92-C1
+  - AR92-C1B
+  - AR92-C1C
+  - AR92-C2
+  mediums:
+  - AR92-C3
+  - AR92-C4
+  lows:
+  - AR92-D1
+  - AR92-D2
+  owner_stop_conditions: all seven evaluated, all NO; orchestrator independently re-verified portability, uuid identity
+    derivation, and the sandbox predicate
+  disposition: automatic repair per OD-P2-08 section 8
+current_round:
+  id: P2-AR-0093
+  kind: repair
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0057-ar92-repair.md
+  base_commit: 4686e8d
+  branch: phase2/remediation-ar92
+  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
+  non_deferrable:
+  - 1.1 drop the exists() liveness conjunct (AR92-C1/C1B/C1C)
+  - 1.2 sandbox exemption from an OS record, not a path spelling (AR92-C2)
+  - 1.3 demonstrate the re-anchor remedy end-to-end (covers AR92-C3)
+  - 1.4 a relocation must not be silent (AR92-C4)
+  escalation_trigger: if the re-anchor remedy cannot be built without inventing a new trusted authority, STOP --
+    OD-P2-08 section 8
+orchestrator_verified_independently:
+- paths.rs:651 -- the exists() conjunct is present exactly as reported
+- paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
+- paths.rs:730 -- project_identity is uuid::Uuid::new_v4(), never derived from repository content, so the proposed
+  'any entry, live or stale' rule opens no pre-poisoning denial channel
+- srr/state.rs:95 -- resolve_state_root is per-machine and refuses env relocation once provisioned, so dropping
+  the conjunct does not touch P2-ADJ-0002 portability
+- review commit 4686e8d touches no product source (git diff --stat over runtime cli framework spec capabilities
+  migrations tools bin scripts docs is empty)
+last_updated: '2026-09-24'

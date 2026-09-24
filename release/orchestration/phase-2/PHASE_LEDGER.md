@@ -416,3 +416,34 @@ merges (IP-R4-WS01-3). P2-AR-0043 still running. Hold unchanged.
 | What the study established | The defect class is the **confused deputy** (Hardy 1988), with Miller 2006's *No Ambient Authority* as its formal statement — five rounds rediscovered it in a private vocabulary. The product's own `tools.rs` already concedes *"the OS cannot confine a spawned process"*. `PathDecision` is constructed at **exactly one site**, so OD-P2-07 C's "find all consumers" is dischargeable **by typing**, not search. `class` is a **label, not a level**, so the bidirectional predicate the escalation package offered is impossible. Landlock is real here (ABI 3, unprivileged, measured) but closes **no open HIGH**. |
 | Recommendation | **Option 1 — resolve once, execute the object; floor the class.** Four changes, no new dependency for the minimum, deletes 45 of 106 envelope entries + a 30-entry loader denylist + ≈250 lines, net TCB reduction, reversible at code level. Option 2 (+ Landlock) is the R2 successor. Option 3 (full hermetic execution) **needs Option 1 inside it regardless** — `./w` is a declared input, so both defeats survive a bubblewrap jail. |
 | Carried forward, unresolved | **P1** (precondition): `gov adopt` native layouts are unfloored, so floor composition closes **zero** of P79-F8/F9 there. **P2** (obligation, not run): pinned dynamically-linked ELF with project-controlled `RUNPATH`/`$ORIGIN`/`LD_*` — `LOADER_ENV_VARS` is stripped on the plugin path only. Plus: the T2 seal is HMAC under a symmetric key readable by an agent on the owner's account — *"detection-grade, not proof"*, and a forgery is honoured on the owner's other machines. And `pinned_files` appears 7 times in `tools.rs` and 0 times in its schema. |
+
+## P2-L-0039 — P2-AR-0092 returns RESIDUAL_DEFECTS; AR92 repair dispatched (2026-09-24)
+
+The sixth independent adversarial review of `a01f0c9` returns **`RESIDUAL_DEFECTS`**, committed at `4686e8d` on
+`phase2/review-6` with product source untouched (verified by the orchestrator).
+
+**Property A HOLDS for the second consecutive round.** The AR90-F2 over-gate repair is correct in both directions and
+AR88-F4 is not re-opened (both proved by the reviewer's own probes). No divergence constructible.
+
+**Property C FAILS.** `other_live_claim` — the first mechanism in six rounds to ask a question the attacker cannot
+answer for the OS — conditions its answer on `Path::exists()` of an attacker-chosen string. Four HIGH: the donor can
+be moved aside (C1, measured **permanent**), made unreadable so `exists()` fails open on `EACCES` (C1B), or minted
+*inside the victim* so that **the owner's own rename** completes the attack with no attacker move at all (C1C); and
+the sandbox exemption is a four-component path-shape match reachable by `mkdir -p` outside any governed project
+(C2). Two MEDIUM: a second same-machine checkout permanently loses its floor (C3, pre-existing); a bare relocation is
+silent (C4) — and that silence is the enabling condition for every HIGH.
+
+All seven OD-P2-08 §8 stop conditions were evaluated and answered NO. The orchestrator independently re-verified the
+three that decide it: portability survives dropping the conjunct (`resolve_state_root` is per-machine and env-locked
+once provisioned); `project_identity` is a v4 uuid never derived from repository content, so "any entry, live or
+stale" opens no pre-poisoning denial channel; and `is_health_sandbox_root` consults no OS record.
+
+**Disposition: automatic repair per §8.** `P2-AR-0093` dispatched on `P2-HO-0057` from `4686e8d`, with four
+non-deferrable obligations — delete the liveness conjunct; grant the sandbox exemption from the OS's own record;
+**demonstrate a working re-anchor remedy end-to-end**; disclose the relocation. The third is the escalation trigger:
+if fail-closed relocation cannot be given a working exit without inventing a new trusted authority, that is a genuine
+§8 stop and returns to the owner.
+
+Both repairs are deletions and substitutions, and both are smaller than any predecessor's. Seventh enumeration
+failure recorded: programs → shapes → list premises → class values → consumers → obligations → **a liveness predicate
+on an attacker-chosen string.**
