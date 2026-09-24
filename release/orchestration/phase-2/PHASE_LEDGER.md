@@ -586,3 +586,32 @@ identity-transfer surface but leaves relocation with no in-product remedy.
 
 **Sweep presented to the owner in one consolidated message. Review 8 is blocked** until it is answered and any
 resulting delta implemented (OD-P2-09 §4, OD-P2-10 §1).
+
+## P2-L-0044 — the owner-approved delta: a round that mostly deletes (2026-09-24)
+
+The owner accepted the Option-C probe, approved fresh-identity re-onboarding, and **corrected an orchestrator
+error**: the proposed never-weaker mitigation would have inherited rules from the T2-verified floor document, but
+OD-P2-08 §2 makes the T2 seal **detection, never proof-grade**, because its symmetric key is readable inside the
+local OS trust domain. The proposal re-admitted the document as an authority source through the back door — the exact
+shape this phase exists to remove. Withdrawn; the document is not consulted for rules at all.
+
+**`HISTORICAL_RULE_SOURCE_REUSES_EXISTING_PROOF_GRADE_PRIMITIVE`** (`RESEARCH/P2-HISTORICAL-RULE-SOURCE.md`). The
+source is `FloorIdentity::last_known_rules` under the protected machine state root — outside every project and
+unreachable by an ordinary actor (AR88). The association problem, which is what would have forced trusting a
+project-editable identity claim, is **dissolved by the owner's own conservative-union suggestion**: `policy.rs`'s
+existing AR86-C6 union is pattern-additive (`if !fresh_patterns.contains(p)`), so unioning across every store entry
+can only **add** patterns the fresh derivation missed, with the fresh derivation always winning on conflict. No
+historical identity has to be declared the owner of the new checkout. Every failure direction — missing, wrong,
+conflicting — resolves toward *more* obligation, never less. No new authority mechanism.
+
+**Dispatched `P2-AR-0096`** on `P2-HO-0060` from `92982ff`. The delta is mostly deletion: `gov floor-reanchor` goes
+entirely, taking AR94-C2/C3/C4/D1/D5 and the confirmed C5 race with it; relocation recovery becomes ordinary governed
+re-onboarding minting a **fresh** identity, which falls out of existing code (`FloorIdentity::advance` already mints
+a uuid when a checkout has no entry) and fixes AR92-C3 as a side effect; the sandbox exemption becomes creator
+liveness, deleting the inode-binding and GC. Net: one command, one race and five findings removed; one condition and
+one read added.
+
+**The detail most likely to be got wrong, named in the brief:** the union must be applied in the derivation
+`init`/`adopt` hand to `write_project_adoption_floor`, **not only** in `PolicySet::load`'s reconstruction fallback —
+because once a floor is written reconstruction never fires, so a weak derived floor would be promoted to
+*authenticated*, strictly worse than the case it replaces.

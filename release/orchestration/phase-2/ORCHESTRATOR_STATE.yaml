@@ -1341,10 +1341,18 @@ review_history:
     in one run, serialised in another); left unfixed as out of scope
   env_var_authority: none -- builder traced SANDBOX_ENV and confirmed it is not referenced in the exemption decision
 current_round:
-  id: PRE_FINAL_OWNER_QUESTION_SWEEP
-  status: AWAITING_OWNER_APPROVAL_OF_MINIMAL_5A_DESIGN
-  blocking: Review 8 not to be dispatched until the owner approves the minimal 5A design (OD-P2-09 section 4, owner
-    sweep response)
+  id: P2-AR-0096
+  kind: approved_delta_implementation
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0060-approved-delta.md
+  base_commit: 92982ff
+  branch: phase2/approved-delta
+  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
+  non_deferrable:
+  - delete gov floor-reanchor entirely
+  - fresh-identity re-onboarding when no anchor exists for the current path
+  - never-weaker union from protected machine state, applied at re-onboarding derivation
+  - sandbox exemption = creator liveness (owner-approved 5C Option B); delete inode-binding and GC; revise ar94_nc2
+  then: targeted -> affected regression -> full certification -> Review-8 whole-system context pack -> Review 8
 orchestrator_verified_independently:
 - paths.rs:651 -- the exists() conjunct is present exactly as reported
 - paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
@@ -1457,3 +1465,21 @@ option_c_probe:
   named_risk: re-derivation at a new path has no last_known_rules, so AR86-C6's never-weaker protection does not
     apply; mitigate by taking the union with the T2-verified lineage-bound document's RULES while minting a FRESH
     identity
+historical_rule_source:
+  verdict: HISTORICAL_RULE_SOURCE_REUSES_EXISTING_PROOF_GRADE_PRIMITIVE
+  record: release/orchestration/phase-2/RESEARCH/P2-HISTORICAL-RULE-SOURCE.md
+  orchestrator_error_corrected_by_owner: the orchestrator proposed inheriting rules from the T2-verified document;
+    OD-P2-08 section 2 makes the T2 seal detection, never proof-grade. Proposal withdrawn; the document is not consulted
+    for rules at all.
+  source: FloorIdentity::last_known_rules under srr::state::resolve_state_root()/adoption-floors/ -- protected machine
+    state, outside every project, unreachable by an ordinary actor (AR88)
+  association: NONE NEEDED -- the owner's conservative-union suggestion dissolves it. policy.rs's existing AR86-C6
+    union is pattern-additive (if !fresh_patterns.contains(p)), so a union across all store entries can only ADD
+    patterns the fresh derivation missed; no historical identity has to be declared owner of the new checkout.
+  fail_closed: missing -> fresh derivation only (today's behaviour); wrong -> can only add patterns, i.e. restrict;
+    conflicting -> fresh derivation wins, own classifications never displaced
+  new_authority: none -- same store, same read helper, same native_layout_rules, same additive-union shape; one
+    new enumeration, which is a read not an authority
+  load_bearing_detail: the union must be applied in the derivation init/adopt hand to write_project_adoption_floor,
+    not only in PolicySet::load's reconstruction, because once a floor is written reconstruction never fires and
+    a weak derived floor would be promoted to authenticated
