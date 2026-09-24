@@ -1,49 +1,65 @@
-# Governance OS — Phase 2 orchestrator state (machine-readable, resumable).
-# Durable facts, decisions, evidence references, verdicts and next actions only.
-# Verify / seal / show: python3 release/orchestration/phase-2/tools/check_state.py {verify|seal|show}
 schema: governance-os.phase-2.orchestrator-state
 schema_version: 1
 phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-24T03:55:18Z'
-state_hash: 7d408038aace3e7eb3d5b790f86bca880ce0e2e723443bcf07b5279468d86213
+updated_at: '2026-09-24T05:59:29Z'
+state_hash: 5214d90b465d0269de88c557bd88b53e966c132da2d302f6e234f603471c34dd
 lifecycle_state: P2_COMPLETION_OPTION_1
 loop_status: RUNNING
-
 protocol:
-  source: 'owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)'
+  source: owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)
   launcher: V8.2 — Self-locating durable autonomous Phase Orchestrator (NON_NORMATIVE_OPERATOR_UI)
   completion_signal: PHASE_ORCHESTRATION_COMPLETE__GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
-  out_of_scope: [phase-3, provisional-retrieval-profile-selection, advanced-qualification-execution, r2-certification, r3, publication, merge-to-main]
+  out_of_scope:
+  - phase-3
+  - provisional-retrieval-profile-selection
+  - advanced-qualification-execution
+  - r2-certification
+  - r3
+  - publication
+  - merge-to-main
   agent_model: claude-opus-5
   role_templates: V8.2 Phase 2 card, CAP-1 Independent Governance Capability Baseline Auditor (non-normative template)
-
 self_location:
   performed_at: '2026-09-18'
   method: committed Git state and evidence only; no conversational memory
   phase_1:
-    r0: {token: ROT_ARCHITECTURE_ACCEPTED_R0, run: AR-0025, work_commit: 5635955f0b7c1fafa964afc8e94f2c8bab80a0a9, report_commit: 57294b93f1f5de25b4c4d31a6507b3b7cb37de1a, evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/, independently_earned: true}
-    r1: {token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1, run: AR-0033, work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100, report_commit: 6dc1b0a8fdfc2031c3413f669646fc618f18516d, evidence_path: release/verification/4.1.6-r1-4/, blocking_findings: 0, independently_earned: true}
+    r0:
+      token: ROT_ARCHITECTURE_ACCEPTED_R0
+      run: AR-0025
+      work_commit: 5635955f0b7c1fafa964afc8e94f2c8bab80a0a9
+      report_commit: 57294b93f1f5de25b4c4d31a6507b3b7cb37de1a
+      evidence_path: release/root-of-trust/signed-release-root-v1-review-r0-2/
+      independently_earned: true
+    r1:
+      token: ROT_PHASE1_CANDIDATE_ACCEPTED_R1
+      run: AR-0033
+      work_commit: 5c4a4eb50e5b34a424f104ee651e3dfa45dd0100
+      report_commit: 6dc1b0a8fdfc2031c3413f669646fc618f18516d
+      evidence_path: release/verification/4.1.6-r1-4/
+      blocking_findings: 0
+      independently_earned: true
     final_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-FINAL-PHASE-1-COMPLETE.yaml
     transition_checkpoint_path: release/orchestration/phase-1/CHECKPOINTS/CP-0034-PHASE-2-TRANSITION.yaml
     phase_1_state_check: STATE_CONSISTENT
-    verified_note: >-
-      R1 was verified at worktree HEAD 84b9ee8, which differs from the candidate c7d3fef only in three Phase-1
-      orchestration files. HEAD 3374db4 differs from c7d3fef only in README.md, docs/DECISIONS.md, ARCH-0003 adoption
-      metadata and orchestration records; product_code_digest is identical at c7d3fef and 3374db4.
+    verified_note: R1 was verified at worktree HEAD 84b9ee8, which differs from the candidate c7d3fef only in three Phase-1 orchestration files. HEAD 3374db4 differs from c7d3fef only in README.md, docs/DECISIONS.md,
+      ARCH-0003 adoption metadata and orchestration records; product_code_digest is identical at c7d3fef and 3374db4.
   arch_0003_adoption:
     record: OWNER-DECISION-0009
     record_path: release/orchestration/phase-1/GATES/OWNER-DECISION-0009-ADOPT-ARCH-0003.md
     record_sha256: a0d3325fa8618f1af5089b47370e362cee37ba76516c1bd1ad77acf53ca1fd39
-    state_at_head: {status: ACTIVE, in_effect: true, human_approved: true, approval_state: OWNER_ADOPTED}
+    state_at_head:
+      status: ACTIVE
+      in_effect: true
+      human_approved: true
+      approval_state: OWNER_ADOPTED
     body_sha256_at_r0_candidate_r1_candidate_and_head: 093cb78ef097413665bd34f468b2e7e0f5d9f20b0e9b532dcef517fd8f71536a
     adoption_commit: 3374db452008628074824faacb030ad841ce4ed9
   earliest_unearned_target: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
   result: PHASE 2 — GOVERNANCE CAPABILITY BASELINE
   phase_state_conflict: false
-
 repository:
   path: /home/usain/Dynamic-Agentic-Engineering-OS
   integration_branch: release/4.1.6-rc1
@@ -51,7 +67,6 @@ repository:
   last_recorded_commit: 0bad524d836f179964ffbac31972856ea6434682
   main_branch: main
   main_branch_modified_by_phase_2: false
-
 contract_v3:
   path: Governance_OS_Capability_Acceptance_Contract_v3.md
   sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
@@ -66,7 +81,6 @@ contract_v3:
   compiled_capability_count: 100
   evidence_map_path: tests/governance/capability-evidence-map.yaml
   evidence_map_state_at_entry: every row evidence_class NOT_YET_MAPPED (carried as AR27-N7 from Phase 1)
-
 operator_ui:
   path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html
   sha256: 6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c
@@ -74,351 +88,1138 @@ operator_ui:
   classification: NON_NORMATIVE_OPERATOR_UI
   hash_matches_owner_expected_value: true
   duplicate_canonical_copies: none (V8.1 is labelled historical Phase-1 evidence)
-  phase_2_card: 'section id="capability-baseline" — CAP-1 role prompt; acceptance rule; Gate W baseline audit'
+  phase_2_card: section id="capability-baseline" — CAP-1 role prompt; acceptance rule; Gate W baseline audit
   logged_conflicts:
-    - id: P2-CONFLICT-1
-      v8_text: CAP-1 "Any source/kernel/runtime repair after rejection creates a new candidate and requires R1 verification again before this audit is rerun."
-      higher_source: Contract v3 evidence freshness (lines 95-111) governs what evidence a change invalidates
-      resolution: frozen contract AC-14 and section 9.3 — independent R1-preservation verification of every candidate whose product code differs from srr1-r1-accepted
-    - id: P2-CONFLICT-2
-      v8_text: Phase 3 card places provisional retrieval after GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
-      higher_source: Contract v3 pre-advanced-qualification item 7 and its own PROPOSED ORDER
-      resolution: frozen contract AC-7 and section 9.1 (orchestrator interpretation, owner may override)
-
+  - id: P2-CONFLICT-1
+    v8_text: CAP-1 "Any source/kernel/runtime repair after rejection creates a new candidate and requires R1 verification again before this audit is rerun."
+    higher_source: Contract v3 evidence freshness (lines 95-111) governs what evidence a change invalidates
+    resolution: frozen contract AC-14 and section 9.3 — independent R1-preservation verification of every candidate whose product code differs from srr1-r1-accepted
+  - id: P2-CONFLICT-2
+    v8_text: Phase 3 card places provisional retrieval after GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+    higher_source: Contract v3 pre-advanced-qualification item 7 and its own PROPOSED ORDER
+    resolution: frozen contract AC-7 and section 9.1 (orchestrator interpretation, owner may override)
 frozen_gate_contract:
   path: release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
   sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
   revision: 1
   frozen_before_first_dispatch: true
-  acceptance_criteria: [AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9, AC-10, AC-11, AC-12, AC-13, AC-14, AC-15, AC-16]
-
+  acceptance_criteria:
+  - AC-1
+  - AC-2
+  - AC-3
+  - AC-4
+  - AC-5
+  - AC-6
+  - AC-7
+  - AC-8
+  - AC-9
+  - AC-10
+  - AC-11
+  - AC-12
+  - AC-13
+  - AC-14
+  - AC-15
+  - AC-16
 active_decisions:
-  active: [D-0002, D-0003, D-0004, D-0005, D-0006, D-0007, D-0009, CIT-0001, ARCH-0001, ARCH-0003]
-  superseded: [D-0001]
-  proposed_not_active: [D-0008, ARCH-0002]
-  owner_records_in_force: [OWNER-DECISION-P2-0008, OWNER-DECISION-P2-0007, OWNER-DIRECTIVE-0004, OWNER-DECISION-0005, OWNER-DECISION-0006, OWNER-DECISION-0007, OWNER-DECISION-0008, OWNER-DECISION-0009, OWNER-DECISION-P2-0001, OWNER-DECISION-P2-0002, OWNER-DECISION-P2-0003, OWNER-CLARIFICATION-P2-0004, OWNER-DECISION-P2-0005, OWNER-AUTHORISATION-P2-0006]
-  orchestrator_adjudications: [P2-ADJ-0001, P2-ADJ-0002, P2-ADJ-0003, P2-ADJ-0004, P2-ADJ-0005, P2-ADJ-0006]
-  orchestrator_adjudications_note: 'all six are in GATES/; P2-ADJ-0006''s stopping rule fired on 2026-09-22 and the owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources, never a new owner decision, and the owner may override any of them.'
+  active:
+  - D-0002
+  - D-0003
+  - D-0004
+  - D-0005
+  - D-0006
+  - D-0007
+  - D-0009
+  - CIT-0001
+  - ARCH-0001
+  - ARCH-0003
+  superseded:
+  - D-0001
+  proposed_not_active:
+  - D-0008
+  - ARCH-0002
+  owner_records_in_force:
+  - OWNER-DECISION-P2-0008
+  - OWNER-DECISION-P2-0007
+  - OWNER-DIRECTIVE-0004
+  - OWNER-DECISION-0005
+  - OWNER-DECISION-0006
+  - OWNER-DECISION-0007
+  - OWNER-DECISION-0008
+  - OWNER-DECISION-0009
+  - OWNER-DECISION-P2-0001
+  - OWNER-DECISION-P2-0002
+  - OWNER-DECISION-P2-0003
+  - OWNER-CLARIFICATION-P2-0004
+  - OWNER-DECISION-P2-0005
+  - OWNER-AUTHORISATION-P2-0006
+  orchestrator_adjudications:
+  - P2-ADJ-0001
+  - P2-ADJ-0002
+  - P2-ADJ-0003
+  - P2-ADJ-0004
+  - P2-ADJ-0005
+  - P2-ADJ-0006
+  orchestrator_adjudications_note: all six are in GATES/; P2-ADJ-0006's stopping rule fired on 2026-09-22 and the owner answered it with OA-P2-06. An adjudication is the orchestrator reading the sources,
+    never a new owner decision, and the owner may override any of them.
   owner_decision_0008_scope_note: its immediate-escalation rule was scoped to "the remainder of R1"; Phase 2 uses the owner Phase-2 directive's three-iteration convergence rule
   d0007: ACTIVE and unchanged; the explicit D-0007 transition record remains open and was not requested
   frozen_srr_boundary_path: release/root-of-trust/signed-release-root-v1/01-FROZEN-R0-R1-R2-R3-ACCEPTANCE-BOUNDARY.md
   frozen_srr_boundary_sha256: 70977d11b778c4a8391a65cb3e0f53103bcc1e565de595c1e83150797f1699c1
-
 inherited_inputs:
   residual_risk_register_path: release/orchestration/phase-1/PHASE-1-RESIDUAL-RISKS.md
   residual_risk_register_sha256: b08678b0cbb9afe1a1ea23b0da89bac8ba4a935d27891d4cb10f835481d66b9e
-  residual_risk_disposition: >-
-    Inherited as input, not as Phase-2 obligations: the register's items are R1-LOW or R2 lifecycle and none is a Phase-2
-    requirement (register section 6). AR27-N7 (evidence-map rows NOT_YET_MAPPED) is independently a Phase-2 matter under
-    frozen contract AC-10 and is expected to surface through the audit, not by inheritance.
-
+  residual_risk_disposition: 'Inherited as input, not as Phase-2 obligations: the register''s items are R1-LOW or R2 lifecycle and none is a Phase-2 requirement (register section 6). AR27-N7 (evidence-map
+    rows NOT_YET_MAPPED) is independently a Phase-2 matter under frozen contract AC-10 and is expected to surface through the audit, not by inheritance.'
 baseline_regression:
   commit: 3374db452008628074824faacb030ad841ce4ed9
   lib: 42 passed, 0 failed
   certification: 79 passed, 0 failed
   reproduced_by: phase-2 orchestrator (regression reproduction only; not a verdict)
-  toolchain: {cargo: 1.98.1, rustc: 1.98.1, python: 3.12.3}
-
+  toolchain:
+    cargo: 1.98.1
+    rustc: 1.98.1
+    python: 3.12.3
 candidates:
-  - id: cap2-candidate-0
-    tag: cap2-candidate-0
-    commit: 57177a37ea296ece16b185874831462b6a76db18
-    product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
-    product_code_equal_to: srr1-r1-accepted (c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112)
-    r1_preservation_required: false
-    status: REJECTED_BY_P2_AR_0007
-    verdict_run: P2-AR-0007
-    verdict_commit: ea6abea28f7605c7799477bda2434e8b970a088b
-    accepted: false
-  - id: cap2-candidate-1
-    tag: cap2-candidate-1
-    commit: 0bad524d836f179964ffbac31972856ea6434682
-    product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
-    governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
-    minted: '2026-09-20'
-    provenance: repair iteration 1, rounds 1-4 integrated (merges b7e6d52, e8e1ff2, e4cb662, 0bad524); round-4 integration P2-AR-0054
-    orchestrator_reproduction: {release_build: ok 0 warnings, gov contract verify: CONTRACT_SOURCE_BOUND, lib: 276/0/0, certification: 207/0/0}
-    status: GOVERNANCE_CAPABILITY_BASELINE_REJECTED (P2-AR-0052, verification iteration 1, 2026-09-21; AC-3, AC-4, AC-5 unmet)
-
+- id: cap2-candidate-0
+  tag: cap2-candidate-0
+  commit: 57177a37ea296ece16b185874831462b6a76db18
+  product_code_digest: bd4d65d9d5ffd6aedbd9435e2091a664dfc3e62f80614a76197cfaf87efd0547
+  product_code_equal_to: srr1-r1-accepted (c7d3fefa12f7e5813d3c3d9d9d229b5993b7c112)
+  r1_preservation_required: false
+  status: REJECTED_BY_P2_AR_0007
+  verdict_run: P2-AR-0007
+  verdict_commit: ea6abea28f7605c7799477bda2434e8b970a088b
+  accepted: false
+- id: cap2-candidate-1
+  tag: cap2-candidate-1
+  commit: 0bad524d836f179964ffbac31972856ea6434682
+  product_code_digest: e6332fc7d5af5c73adbe0f200003db30fe5a6fd0b7f24d047d3e340e6f972220
+  governed_state_digest: 3d2aeba2fc3b52a95c369c49a854bb9d443b0b03da1180db5339f01d892620c0
+  minted: '2026-09-20'
+  provenance: repair iteration 1, rounds 1-4 integrated (merges b7e6d52, e8e1ff2, e4cb662, 0bad524); round-4 integration P2-AR-0054
+  orchestrator_reproduction:
+    release_build: ok 0 warnings
+    gov contract verify: CONTRACT_SOURCE_BOUND
+    lib: 276/0/0
+    certification: 207/0/0
+  status: GOVERNANCE_CAPABILITY_BASELINE_REJECTED (P2-AR-0052, verification iteration 1, 2026-09-21; AC-3, AC-4, AC-5 unmet)
 current_candidate:
   id: cap2-candidate-1
   tag: cap2-candidate-1
   commit: 0bad524d836f179964ffbac31972856ea6434682
-
 convergence_watch:
-  note: 'Rounds 7 and 8 each closed their assigned findings AND introduced new HIGHs (P2-AR-0083 introduced AR84-F4 and AR84-C2; P2-AR-0081 introduced nothing but P2-AR-0080 left P1 open). The defects are genuinely DIFFERENT each round rather than the same enumeration recurring, and each fix path has been measured rather than theorised, so OD-P2-08 section 8 continues to apply. But the orchestrator is watching whether repair introduces defects faster than review closes them, and will escalate if the pattern becomes convergent failure rather than progressive repair.'
-
+  note: Rounds 7 and 8 each closed their assigned findings AND introduced new HIGHs (P2-AR-0083 introduced AR84-F4 and AR84-C2; P2-AR-0081 introduced nothing but P2-AR-0080 left P1 open). The defects are
+    genuinely DIFFERENT each round rather than the same enumeration recurring, and each fix path has been measured rather than theorised, so OD-P2-08 section 8 continues to apply. But the orchestrator is
+    watching whether repair introduces defects faster than review closes them, and will escalate if the pattern becomes convergent failure rather than progressive repair.
+  round_9_result: 'P2-AR-0085 closed ALL SIX AR84 findings and introduced ZERO new HIGHs -- the first round on this surface to do so. It also caught two of its own regressions before the suite: the resurfaced
+    AR82-F2 (ld.so --list computes $ORIGIN from the path AS GIVEN, not the realpath the kernel uses), found by re-running a prior reviewer own probe rather than trusting carried-forward evidence; and a
+    design flaw where binding identity to the canonical filesystem path made every legitimate git clone read as an attack, caught by an unrelated existing multi_machine test. Convergence is improving, not
+    degrading.'
+  orchestrator_record_hygiene: The orchestrator broke this file a third time while editing it, with an unescaped apostrophe inside a single-quoted scalar. Caught by parse validation before sealing, as the
+    owner section 14 requires, then repaired by loading, editing the structure and dumping with yaml.safe_dump -- which is what should have been done every time. String surgery on quoted YAML scalars is
+    the recurring defect; see V8_3_EVIDENCE_PACKAGE section 6.2.
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
-  convergence_rule: >-
-    If three consecutive verification iterations each introduce materially new blocker classes (frozen contract section 8)
-    instead of closing known ones, STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED and produce a root-cause/meta-review package.
-  consecutive_new_class_iterations: 1  # iteration 1 introduced BC-P2-53; escalation at 3 consecutive
+  convergence_rule: If three consecutive verification iterations each introduce materially new blocker classes (frozen contract section 8) instead of closing known ones, STOP with PHASE_CONVERGENCE_ESCALATION_REQUIRED
+    and produce a root-cause/meta-review package.
+  consecutive_new_class_iterations: 1
   blocker_class_inventory_path: release/capability-baseline/audit-0/synthesis/blocker-classes.yaml
   blocker_class_inventory_established_by: P2-AR-0007 (iteration 0)
   blocker_class_inventory:
-    - {id: BC-P2-01, title: "Compiled contract views lose owner-source semantics and verification is self-referential", findings: 9, max_severity: HIGH}
-    - {id: BC-P2-02, title: "Evidence map declares no evidence owner for any capability", findings: 7, max_severity: HIGH}
-    - {id: BC-P2-03, title: "Green governance evidence currency: key omits relevant input classes and enforcement is path-keyed", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-04, title: "Upstream change does not invalidate completed work, its evidence or compiled packets", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-05, title: "Checkpoint and handoff continuity: triggers, staleness and handoff blocking", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-06, title: "Health scheduler mechanics absent", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-07, title: "Health tiers G1-G6 do not perform their duties at their trigger events (incl. Gate-W duties)", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-08, title: "Acting-role resolution and G0 guard coverage on privileged/mutating paths", findings: 6, max_severity: HIGH}
-    - {id: BC-P2-09, title: "OS-written (T2) records honoured without binding to an OS operation; lower-role writes exempt at task close", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-10, title: "Human approval and presentation derived from caller-declared metadata", findings: 4, max_severity: HIGH}
-    - {id: BC-P2-11, title: "Gate approval not bound to the subject and content it authorises", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-12, title: "Task-blocking gate semantics", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-13, title: "Material changes escape change control (materiality self-declared, in-task edits bypass CIT)", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-14, title: "Task-contract fields and path scope not enforced", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-15, title: "Claim atomicity and claim scope", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-16, title: "Runnable / claimable / READY state not derived from the DAG", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-17, title: "Mandatory task-input manifest semantics", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-18, title: "Contradiction detection and resolution", findings: 3, max_severity: MEDIUM}
-    - {id: BC-P2-19, title: "Context-packet delivery, provenance and outage behaviour", findings: 4, max_severity: HIGH}
-    - {id: BC-P2-20, title: "Consumption receipt and implementation traceability", findings: 4, max_severity: HIGH}
-    - {id: BC-P2-21, title: "Artefact identity and relation-edge semantics", findings: 3, max_severity: MEDIUM}
-    - {id: BC-P2-22, title: "Orphan / unexplained output detection", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-23, title: "Artifact-flow quantitative health absent", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-24, title: "Governed work not generated from events", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-25, title: "Index content coverage and chunk granularity", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-26, title: "Retrieval pipeline ordering, routing and de-duplication", findings: 4, max_severity: HIGH}
-    - {id: BC-P2-27, title: "Code-structural extraction", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-28, title: "Graph integrity detection", findings: 1, max_severity: MEDIUM}
-    - {id: BC-P2-29, title: "Incremental index invalidation", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-30, title: "Retrieval-profile component identity and change governance", findings: 3, max_severity: HIGH}
-    - {id: BC-P2-31, title: "Non-rebuildable authoritative state stored in, or classified as, derived/generated state", findings: 2, max_severity: MEDIUM}
-    - {id: BC-P2-32, title: "Failure memory not durable", findings: 1, max_severity: MEDIUM}
-    - {id: BC-P2-33, title: "Legacy identification, extraction and retirement", findings: 4, max_severity: HIGH}
-    - {id: BC-P2-34, title: "Independence of test, review and verification authorship is self-attested", findings: 4, max_severity: HIGH}
-    - {id: BC-P2-35, title: "Post-install kernel integrity anchored only in repository-controlled records", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-36, title: "Unauthenticated installation presented as current/verified (default posture)", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-37, title: "Trust decisions and identity records taken from unauthenticated release fields", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-38, title: "Provisioned-machine rollback/reinstall", findings: 1, max_severity: MEDIUM}
-    - {id: BC-P2-39, title: "Plugin elevation decided by descriptor self-declaration", findings: 1, max_severity: MEDIUM}
-    - {id: BC-P2-40, title: "Plugin implementation bytes not bound", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-41, title: "Tool acquisition: review evidence and approval not bound to the tool installation", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-42, title: "Skill regression never executed", findings: 2, max_severity: MEDIUM}
-    - {id: BC-P2-43, title: "Product-test results not governed", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-44, title: "Health SLO thresholds and the HEALTHY conjunction", findings: 2, max_severity: HIGH}
-    - {id: BC-P2-45, title: "Project overlay files bypass POLICY_PRECEDENCE", findings: 2, max_severity: MEDIUM}
-    - {id: BC-P2-46, title: "Scenario -> data -> test-data lineage and provenance", findings: 2, max_severity: MEDIUM}
-    - {id: BC-P2-47, title: "Research output completeness", findings: 1, max_severity: MEDIUM}
-    - {id: BC-P2-48, title: "Experiment lifecycle absent", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-49, title: "Human Decision Gate package not enforced", findings: 1, max_severity: MEDIUM}
-    - {id: BC-P2-50, title: "Upstream export gate fails open on content", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-51, title: "Qualification Oracle format absent", findings: 1, max_severity: HIGH}
-    - {id: BC-P2-52, title: "Path map does not represent documentation citations", findings: 1, max_severity: MEDIUM}
+  - id: BC-P2-01
+    title: Compiled contract views lose owner-source semantics and verification is self-referential
+    findings: 9
+    max_severity: HIGH
+  - id: BC-P2-02
+    title: Evidence map declares no evidence owner for any capability
+    findings: 7
+    max_severity: HIGH
+  - id: BC-P2-03
+    title: 'Green governance evidence currency: key omits relevant input classes and enforcement is path-keyed'
+    findings: 6
+    max_severity: HIGH
+  - id: BC-P2-04
+    title: Upstream change does not invalidate completed work, its evidence or compiled packets
+    findings: 6
+    max_severity: HIGH
+  - id: BC-P2-05
+    title: 'Checkpoint and handoff continuity: triggers, staleness and handoff blocking'
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-06
+    title: Health scheduler mechanics absent
+    findings: 6
+    max_severity: HIGH
+  - id: BC-P2-07
+    title: Health tiers G1-G6 do not perform their duties at their trigger events (incl. Gate-W duties)
+    findings: 6
+    max_severity: HIGH
+  - id: BC-P2-08
+    title: Acting-role resolution and G0 guard coverage on privileged/mutating paths
+    findings: 6
+    max_severity: HIGH
+  - id: BC-P2-09
+    title: OS-written (T2) records honoured without binding to an OS operation; lower-role writes exempt at task close
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-10
+    title: Human approval and presentation derived from caller-declared metadata
+    findings: 4
+    max_severity: HIGH
+  - id: BC-P2-11
+    title: Gate approval not bound to the subject and content it authorises
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-12
+    title: Task-blocking gate semantics
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-13
+    title: Material changes escape change control (materiality self-declared, in-task edits bypass CIT)
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-14
+    title: Task-contract fields and path scope not enforced
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-15
+    title: Claim atomicity and claim scope
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-16
+    title: Runnable / claimable / READY state not derived from the DAG
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-17
+    title: Mandatory task-input manifest semantics
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-18
+    title: Contradiction detection and resolution
+    findings: 3
+    max_severity: MEDIUM
+  - id: BC-P2-19
+    title: Context-packet delivery, provenance and outage behaviour
+    findings: 4
+    max_severity: HIGH
+  - id: BC-P2-20
+    title: Consumption receipt and implementation traceability
+    findings: 4
+    max_severity: HIGH
+  - id: BC-P2-21
+    title: Artefact identity and relation-edge semantics
+    findings: 3
+    max_severity: MEDIUM
+  - id: BC-P2-22
+    title: Orphan / unexplained output detection
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-23
+    title: Artifact-flow quantitative health absent
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-24
+    title: Governed work not generated from events
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-25
+    title: Index content coverage and chunk granularity
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-26
+    title: Retrieval pipeline ordering, routing and de-duplication
+    findings: 4
+    max_severity: HIGH
+  - id: BC-P2-27
+    title: Code-structural extraction
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-28
+    title: Graph integrity detection
+    findings: 1
+    max_severity: MEDIUM
+  - id: BC-P2-29
+    title: Incremental index invalidation
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-30
+    title: Retrieval-profile component identity and change governance
+    findings: 3
+    max_severity: HIGH
+  - id: BC-P2-31
+    title: Non-rebuildable authoritative state stored in, or classified as, derived/generated state
+    findings: 2
+    max_severity: MEDIUM
+  - id: BC-P2-32
+    title: Failure memory not durable
+    findings: 1
+    max_severity: MEDIUM
+  - id: BC-P2-33
+    title: Legacy identification, extraction and retirement
+    findings: 4
+    max_severity: HIGH
+  - id: BC-P2-34
+    title: Independence of test, review and verification authorship is self-attested
+    findings: 4
+    max_severity: HIGH
+  - id: BC-P2-35
+    title: Post-install kernel integrity anchored only in repository-controlled records
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-36
+    title: Unauthenticated installation presented as current/verified (default posture)
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-37
+    title: Trust decisions and identity records taken from unauthenticated release fields
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-38
+    title: Provisioned-machine rollback/reinstall
+    findings: 1
+    max_severity: MEDIUM
+  - id: BC-P2-39
+    title: Plugin elevation decided by descriptor self-declaration
+    findings: 1
+    max_severity: MEDIUM
+  - id: BC-P2-40
+    title: Plugin implementation bytes not bound
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-41
+    title: 'Tool acquisition: review evidence and approval not bound to the tool installation'
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-42
+    title: Skill regression never executed
+    findings: 2
+    max_severity: MEDIUM
+  - id: BC-P2-43
+    title: Product-test results not governed
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-44
+    title: Health SLO thresholds and the HEALTHY conjunction
+    findings: 2
+    max_severity: HIGH
+  - id: BC-P2-45
+    title: Project overlay files bypass POLICY_PRECEDENCE
+    findings: 2
+    max_severity: MEDIUM
+  - id: BC-P2-46
+    title: Scenario -> data -> test-data lineage and provenance
+    findings: 2
+    max_severity: MEDIUM
+  - id: BC-P2-47
+    title: Research output completeness
+    findings: 1
+    max_severity: MEDIUM
+  - id: BC-P2-48
+    title: Experiment lifecycle absent
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-49
+    title: Human Decision Gate package not enforced
+    findings: 1
+    max_severity: MEDIUM
+  - id: BC-P2-50
+    title: Upstream export gate fails open on content
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-51
+    title: Qualification Oracle format absent
+    findings: 1
+    max_severity: HIGH
+  - id: BC-P2-52
+    title: Path map does not represent documentation citations
+    findings: 1
+    max_severity: MEDIUM
   history:
-    - {iteration: 0, candidate: cap2-candidate-0, verdict_run: P2-AR-0007, verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED, classes: 52, blocking_findings: 134, materially_new: baseline-inventory, closed: []}
-
+  - iteration: 0
+    candidate: cap2-candidate-0
+    verdict_run: P2-AR-0007
+    verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+    classes: 52
+    blocking_findings: 134
+    materially_new: baseline-inventory
+    closed: []
 agent_runs:
-  - {run_id: P2-AR-0001, role: capability-family-auditor, family: alpha, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0013, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml}
-  - {run_id: P2-AR-0002, role: capability-family-auditor, family: beta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0009, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.run.yaml}
-  - {run_id: P2-AR-0003, role: capability-family-auditor, family: gamma, iteration: 0, status: COMPLETED_MODEL_DEVIATION, superseded_by: P2-AR-0010, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.run.yaml}
-  - {run_id: P2-AR-0004, role: capability-family-auditor, family: delta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0011, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.run.yaml}
-  - {run_id: P2-AR-0005, role: capability-family-auditor, family: epsilon, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0008, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml}
-  - {run_id: P2-AR-0006, role: capability-family-auditor, family: zeta, iteration: 0, status: COMPLETED_NONCONFORMING, superseded_by: P2-AR-0012, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml}
-  - {run_id: P2-AR-0008, role: capability-family-auditor, family: epsilon-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-epsilon-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.run.yaml}
-  - {run_id: P2-AR-0009, role: capability-family-auditor, family: beta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-beta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml}
-  - {run_id: P2-AR-0010, role: capability-family-auditor, family: gamma-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-gamma-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.run.yaml}
-  - {run_id: P2-AR-0011, role: capability-family-auditor, family: delta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-delta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml}
-  - {run_id: P2-AR-0012, role: capability-family-auditor, family: zeta-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-zeta-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml}
-  - {run_id: P2-AR-0013, role: capability-family-auditor, family: alpha-r, iteration: 0, status: COMPLETED, audit_of_record: true, branch: phase2/cap-audit-0-alpha-r, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml}
-  - {run_id: P2-AR-0007, role: capability-baseline-synthesis, iteration: 0, status: COMPLETED, verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED, branch: phase2/cap-audit-0-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.run.yaml}
-  - {run_id: P2-AR-0014, role: capability-repair, workstream: WS-1(part)+WS-12, iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws01-12, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0014.run.yaml}
-  - {run_id: P2-AR-0015, role: capability-repair, workstream: WS-2(part), iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0015.run.yaml}
-  - {run_id: P2-AR-0016, role: capability-repair, workstream: WS-3, iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws03, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0016.run.yaml}
-  - {run_id: P2-AR-0017, role: capability-repair, workstream: WS-4(part), iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws04, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0017.run.yaml}
-  - {run_id: P2-AR-0018, role: capability-repair, workstream: WS-5(part), iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0018.run.yaml}
-  - {run_id: P2-AR-0019, role: capability-repair, workstream: WS-6(part), iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws06, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0019.run.yaml}
-  - {run_id: P2-AR-0020, role: capability-repair, workstream: WS-8(part), iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.run.yaml}
-  - {run_id: P2-AR-0021, role: capability-repair, workstream: WS-9(part)+WS-11, iteration: 1, round: 1, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0021.run.yaml}
-  - {run_id: P2-AR-0022, role: capability-repair (integration), iteration: 1, round: 1, status: COMPLETED, merge_commit: b7e6d52, branch: phase2/repair-1-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0022.run.yaml}
-  - {run_id: P2-AR-0023, role: capability-repair, workstream: WS-2, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0023.run.yaml}
-  - {run_id: P2-AR-0024, role: capability-repair, workstream: WS-3 (+docs), iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws03, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0024.run.yaml}
-  - {run_id: P2-AR-0025, role: capability-repair, workstream: WS-4, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws04, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0025.run.yaml}
-  - {run_id: P2-AR-0026, role: capability-repair, workstream: WS-5, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0026.run.yaml}
-  - {run_id: P2-AR-0027, role: capability-repair, workstream: WS-6, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws06, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0027.run.yaml}
-  - {run_id: P2-AR-0028, role: capability-repair, workstream: WS-7, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws07, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0028.run.yaml}
-  - {run_id: P2-AR-0029, role: capability-repair, workstream: WS-8, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.run.yaml}
-  - {run_id: P2-AR-0030, role: capability-repair, workstream: WS-9+WS-11, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0030.run.yaml}
-  - {run_id: P2-AR-0031, role: capability-repair, workstream: WS-10, iteration: 1, round: 2, status: COMPLETED_INTEGRATED, branch: phase2/repair-1-r2-ws10, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0031.run.yaml}
-  - {run_id: P2-AR-0032, role: capability-repair (integration), iteration: 1, round: 2, status: COMPLETED, merge_commit: e8e1ff2, branch: phase2/repair-1-r2-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0032.run.yaml}
-  - {run_id: P2-AR-0033, role: capability-repair, workstream: WS-2, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws02, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0033.run.yaml}
-  - {run_id: P2-AR-0034, role: capability-repair, workstream: WS-3 (+docs/spec/adapters), iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws03, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0034.run.yaml}
-  - {run_id: P2-AR-0035, role: capability-repair, workstream: WS-4, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws04, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0035.run.yaml}
-  - {run_id: P2-AR-0036, role: capability-repair, workstream: WS-5, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws05, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0036.run.yaml}
-  - {run_id: P2-AR-0037, role: capability-repair, workstream: WS-6, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws06, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0037.run.yaml}
-  - {run_id: P2-AR-0038, role: capability-repair, workstream: WS-7, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws07, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0038.run.yaml}
-  - {run_id: P2-AR-0039, role: capability-repair, workstream: WS-8, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws08, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0039.run.yaml}
-  - {run_id: P2-AR-0040, role: capability-repair, workstream: WS-9+WS-11, iteration: 1, round: 3, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r3-ws09-11, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0040.run.yaml}
-  - {run_id: P2-AR-0041, role: capability-repair (integration builder), iteration: 1, round: 3, status: COMPLETED, branch: phase2/repair-1-r3-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.run.yaml}
-  - {run_id: P2-AR-0042, role: capability-repair, workstream: WS-1, iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-ws01, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml}
-  - {run_id: P2-AR-0043, role: capability-repair, workstream: residual-IPs, iteration: 1, round: 4, status: INCOMPLETE_USAGE_LIMIT_RECOVERED, branch: phase2/repair-1-r4-residual, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml}
-  - {run_id: P2-AR-0053, role: capability-repair, workstream: residual-IPs (continuation of P2-AR-0043), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-b, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml}
-  - {run_id: P2-AR-0055, role: capability-repair, workstream: residual-IPs (OD-P2-03), iteration: 1, round: 4, status: COMPLETED_AWAITING_INTEGRATION, branch: phase2/repair-1-r4-residual-c, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.run.yaml}
-  - {run_id: P2-AR-0044, role: capability-verifier, scope: r1-preservation, iteration: 1, status: COMPLETED, branch: phase2/verify-1-r1-preservation, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml}
-  - {run_id: P2-AR-0045, role: capability-verifier, scope: oracle-format, iteration: 1, status: COMPLETED, branch: phase2/verify-1-oracle-format, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0045.run.yaml}
-  - {run_id: P2-AR-0046, role: capability-verifier, scope: alpha, iteration: 1, status: COMPLETED, branch: phase2/verify-1-alpha, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0046.run.yaml}
-  - {run_id: P2-AR-0047, role: capability-verifier, scope: beta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-beta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml}
-  - {run_id: P2-AR-0048, role: capability-verifier, scope: gamma, iteration: 1, status: COMPLETED, branch: phase2/verify-1-gamma, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml}
-  - {run_id: P2-AR-0049, role: capability-verifier, scope: delta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-delta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml}
-  - {run_id: P2-AR-0050, role: capability-verifier, scope: epsilon, iteration: 1, status: COMPLETED, branch: phase2/verify-1-epsilon, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml}
-  - {run_id: P2-AR-0051, role: capability-verifier, scope: zeta, iteration: 1, status: COMPLETED, branch: phase2/verify-1-zeta, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml}
-  - {run_id: P2-AR-0052, role: capability-baseline-synthesis, iteration: 1, status: COMPLETED, branch: phase2/verify-1-synthesis, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.run.yaml}
-  - {run_id: P2-AR-0056, role: capability-repair, workstream: wsB, iteration: 2, status: 'SUPERSEDED_BY_P2-AR-0064 (PARTIAL; work preserved on branch)', worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0056.run.yaml}
-  - {run_id: P2-AR-0057, role: capability-repair, workstream: wsC, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsC, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml}
-  - {run_id: P2-AR-0058, role: capability-repair, workstream: wsD, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsD, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0058.run.yaml}
-  - {run_id: P2-AR-0059, role: capability-repair, workstream: wsE, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: deepseek-flash, branch: phase2/repair-2-wsE, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml}
-  - {run_id: P2-AR-0060, role: capability-repair, workstream: wsF, iteration: 2, status: 'SUPERSEDED_BY_P2-AR-0065 (PARTIAL; work preserved on branch)', worker_model: deepseek-v4-pro, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml}
-  - {run_id: P2-AR-0061, role: capability-repair, workstream: wsG, iteration: 2, status: 'COMPLETED_AWAITING_INTEGRATION (PARTIAL: 2 of 5 non-blocking items landed)', worker_model: deepseek-flash, branch: phase2/repair-2-wsG, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml}
-  - {run_id: P2-AR-0064, role: capability-repair, workstream: wsB, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsB, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0064.run.yaml}
-  - {run_id: P2-AR-0065, role: capability-repair, workstream: wsF, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsF, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0065.run.yaml}
-  - {run_id: P2-AR-0066, role: capability-repair, workstream: wsA, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, effort: high, branch: phase2/repair-2-wsA, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0066.run.yaml}
-  - {run_id: P2-AR-0067, role: capability-repair (integration builder), iteration: 2, status: COMPLETED, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0067.run.yaml}
-  - {run_id: P2-AR-0068, role: adversarial pre-mint reviewer, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0068.run.yaml}
-  - {run_id: P2-AR-0069, role: capability-repair, workstream: f3-path-rule-floor, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-f3, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0069.run.yaml}
-  - {run_id: P2-AR-0070, role: capability-repair, workstream: toolbind, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-toolbind, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0070.run.yaml}
-  - {run_id: P2-AR-0071, role: capability-repair, workstream: reviewbind, iteration: 2, status: COMPLETED_PARTIAL, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-reviewbind, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0071.run.yaml}
-  - {run_id: P2-AR-0072, role: capability-repair, workstream: reviewbind-constructions, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-reviewbind2, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0072.run.yaml}
-  - {run_id: P2-AR-0073, role: adversarial pre-mint reviewer (second pass), iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial-2, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0073.run.yaml}
-  - {run_id: P2-AR-0074, role: capability-repair (structural), workstream: failclosed, iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-sonnet-5 native, branch: phase2/repair-2-failclosed, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0074.run.yaml}
-  - {run_id: P2-AR-0075, role: adversarial pre-mint reviewer (third pass), iteration: 2, status: COMPLETED_AWAITING_INTEGRATION, worker_model: claude-opus-5 native, branch: phase2/repair-2-adversarial-3, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0075.run.yaml}
-  - {run_id: P2-AR-0054, role: capability-repair (integration builder), iteration: 1, round: 4, status: COMPLETED, branch: phase2/repair-1-r4-integration, run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml}
-
+- run_id: P2-AR-0001
+  role: capability-family-auditor
+  family: alpha
+  iteration: 0
+  status: COMPLETED_NONCONFORMING
+  superseded_by: P2-AR-0013
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0001.run.yaml
+- run_id: P2-AR-0002
+  role: capability-family-auditor
+  family: beta
+  iteration: 0
+  status: COMPLETED_NONCONFORMING
+  superseded_by: P2-AR-0009
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0002.run.yaml
+- run_id: P2-AR-0003
+  role: capability-family-auditor
+  family: gamma
+  iteration: 0
+  status: COMPLETED_MODEL_DEVIATION
+  superseded_by: P2-AR-0010
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0003.run.yaml
+- run_id: P2-AR-0004
+  role: capability-family-auditor
+  family: delta
+  iteration: 0
+  status: COMPLETED_NONCONFORMING
+  superseded_by: P2-AR-0011
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0004.run.yaml
+- run_id: P2-AR-0005
+  role: capability-family-auditor
+  family: epsilon
+  iteration: 0
+  status: COMPLETED_NONCONFORMING
+  superseded_by: P2-AR-0008
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0005.run.yaml
+- run_id: P2-AR-0006
+  role: capability-family-auditor
+  family: zeta
+  iteration: 0
+  status: COMPLETED_NONCONFORMING
+  superseded_by: P2-AR-0012
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0006.run.yaml
+- run_id: P2-AR-0008
+  role: capability-family-auditor
+  family: epsilon-r
+  iteration: 0
+  status: COMPLETED
+  audit_of_record: true
+  branch: phase2/cap-audit-0-epsilon-r
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0008.run.yaml
+- run_id: P2-AR-0009
+  role: capability-family-auditor
+  family: beta-r
+  iteration: 0
+  status: COMPLETED
+  audit_of_record: true
+  branch: phase2/cap-audit-0-beta-r
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0009.run.yaml
+- run_id: P2-AR-0010
+  role: capability-family-auditor
+  family: gamma-r
+  iteration: 0
+  status: COMPLETED
+  audit_of_record: true
+  branch: phase2/cap-audit-0-gamma-r
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0010.run.yaml
+- run_id: P2-AR-0011
+  role: capability-family-auditor
+  family: delta-r
+  iteration: 0
+  status: COMPLETED
+  audit_of_record: true
+  branch: phase2/cap-audit-0-delta-r
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0011.run.yaml
+- run_id: P2-AR-0012
+  role: capability-family-auditor
+  family: zeta-r
+  iteration: 0
+  status: COMPLETED
+  audit_of_record: true
+  branch: phase2/cap-audit-0-zeta-r
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0012.run.yaml
+- run_id: P2-AR-0013
+  role: capability-family-auditor
+  family: alpha-r
+  iteration: 0
+  status: COMPLETED
+  audit_of_record: true
+  branch: phase2/cap-audit-0-alpha-r
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0013.run.yaml
+- run_id: P2-AR-0007
+  role: capability-baseline-synthesis
+  iteration: 0
+  status: COMPLETED
+  verdict: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
+  branch: phase2/cap-audit-0-synthesis
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0007.run.yaml
+- run_id: P2-AR-0014
+  role: capability-repair
+  workstream: WS-1(part)+WS-12
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws01-12
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0014.run.yaml
+- run_id: P2-AR-0015
+  role: capability-repair
+  workstream: WS-2(part)
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws02
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0015.run.yaml
+- run_id: P2-AR-0016
+  role: capability-repair
+  workstream: WS-3
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws03
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0016.run.yaml
+- run_id: P2-AR-0017
+  role: capability-repair
+  workstream: WS-4(part)
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws04
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0017.run.yaml
+- run_id: P2-AR-0018
+  role: capability-repair
+  workstream: WS-5(part)
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws05
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0018.run.yaml
+- run_id: P2-AR-0019
+  role: capability-repair
+  workstream: WS-6(part)
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws06
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0019.run.yaml
+- run_id: P2-AR-0020
+  role: capability-repair
+  workstream: WS-8(part)
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws08
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0020.run.yaml
+- run_id: P2-AR-0021
+  role: capability-repair
+  workstream: WS-9(part)+WS-11
+  iteration: 1
+  round: 1
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-ws09-11
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0021.run.yaml
+- run_id: P2-AR-0022
+  role: capability-repair (integration)
+  iteration: 1
+  round: 1
+  status: COMPLETED
+  merge_commit: b7e6d52
+  branch: phase2/repair-1-integration
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0022.run.yaml
+- run_id: P2-AR-0023
+  role: capability-repair
+  workstream: WS-2
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws02
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0023.run.yaml
+- run_id: P2-AR-0024
+  role: capability-repair
+  workstream: WS-3 (+docs)
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws03
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0024.run.yaml
+- run_id: P2-AR-0025
+  role: capability-repair
+  workstream: WS-4
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws04
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0025.run.yaml
+- run_id: P2-AR-0026
+  role: capability-repair
+  workstream: WS-5
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws05
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0026.run.yaml
+- run_id: P2-AR-0027
+  role: capability-repair
+  workstream: WS-6
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws06
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0027.run.yaml
+- run_id: P2-AR-0028
+  role: capability-repair
+  workstream: WS-7
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws07
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0028.run.yaml
+- run_id: P2-AR-0029
+  role: capability-repair
+  workstream: WS-8
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws08
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0029.run.yaml
+- run_id: P2-AR-0030
+  role: capability-repair
+  workstream: WS-9+WS-11
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws09-11
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0030.run.yaml
+- run_id: P2-AR-0031
+  role: capability-repair
+  workstream: WS-10
+  iteration: 1
+  round: 2
+  status: COMPLETED_INTEGRATED
+  branch: phase2/repair-1-r2-ws10
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0031.run.yaml
+- run_id: P2-AR-0032
+  role: capability-repair (integration)
+  iteration: 1
+  round: 2
+  status: COMPLETED
+  merge_commit: e8e1ff2
+  branch: phase2/repair-1-r2-integration
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0032.run.yaml
+- run_id: P2-AR-0033
+  role: capability-repair
+  workstream: WS-2
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws02
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0033.run.yaml
+- run_id: P2-AR-0034
+  role: capability-repair
+  workstream: WS-3 (+docs/spec/adapters)
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws03
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0034.run.yaml
+- run_id: P2-AR-0035
+  role: capability-repair
+  workstream: WS-4
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws04
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0035.run.yaml
+- run_id: P2-AR-0036
+  role: capability-repair
+  workstream: WS-5
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws05
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0036.run.yaml
+- run_id: P2-AR-0037
+  role: capability-repair
+  workstream: WS-6
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws06
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0037.run.yaml
+- run_id: P2-AR-0038
+  role: capability-repair
+  workstream: WS-7
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws07
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0038.run.yaml
+- run_id: P2-AR-0039
+  role: capability-repair
+  workstream: WS-8
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws08
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0039.run.yaml
+- run_id: P2-AR-0040
+  role: capability-repair
+  workstream: WS-9+WS-11
+  iteration: 1
+  round: 3
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r3-ws09-11
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0040.run.yaml
+- run_id: P2-AR-0041
+  role: capability-repair (integration builder)
+  iteration: 1
+  round: 3
+  status: COMPLETED
+  branch: phase2/repair-1-r3-integration
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0041.run.yaml
+- run_id: P2-AR-0042
+  role: capability-repair
+  workstream: WS-1
+  iteration: 1
+  round: 4
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r4-ws01
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.run.yaml
+- run_id: P2-AR-0043
+  role: capability-repair
+  workstream: residual-IPs
+  iteration: 1
+  round: 4
+  status: INCOMPLETE_USAGE_LIMIT_RECOVERED
+  branch: phase2/repair-1-r4-residual
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0043.run.yaml
+- run_id: P2-AR-0053
+  role: capability-repair
+  workstream: residual-IPs (continuation of P2-AR-0043)
+  iteration: 1
+  round: 4
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r4-residual-b
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0053.run.yaml
+- run_id: P2-AR-0055
+  role: capability-repair
+  workstream: residual-IPs (OD-P2-03)
+  iteration: 1
+  round: 4
+  status: COMPLETED_AWAITING_INTEGRATION
+  branch: phase2/repair-1-r4-residual-c
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0055.run.yaml
+- run_id: P2-AR-0044
+  role: capability-verifier
+  scope: r1-preservation
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-r1-preservation
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0044.run.yaml
+- run_id: P2-AR-0045
+  role: capability-verifier
+  scope: oracle-format
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-oracle-format
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0045.run.yaml
+- run_id: P2-AR-0046
+  role: capability-verifier
+  scope: alpha
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-alpha
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0046.run.yaml
+- run_id: P2-AR-0047
+  role: capability-verifier
+  scope: beta
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-beta
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0047.run.yaml
+- run_id: P2-AR-0048
+  role: capability-verifier
+  scope: gamma
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-gamma
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0048.run.yaml
+- run_id: P2-AR-0049
+  role: capability-verifier
+  scope: delta
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-delta
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0049.run.yaml
+- run_id: P2-AR-0050
+  role: capability-verifier
+  scope: epsilon
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-epsilon
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0050.run.yaml
+- run_id: P2-AR-0051
+  role: capability-verifier
+  scope: zeta
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-zeta
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0051.run.yaml
+- run_id: P2-AR-0052
+  role: capability-baseline-synthesis
+  iteration: 1
+  status: COMPLETED
+  branch: phase2/verify-1-synthesis
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0052.run.yaml
+- run_id: P2-AR-0056
+  role: capability-repair
+  workstream: wsB
+  iteration: 2
+  status: SUPERSEDED_BY_P2-AR-0064 (PARTIAL; work preserved on branch)
+  worker_model: deepseek-v4-pro
+  branch: phase2/repair-2-wsB
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0056.run.yaml
+- run_id: P2-AR-0057
+  role: capability-repair
+  workstream: wsC
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: deepseek-v4-pro
+  branch: phase2/repair-2-wsC
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0057.run.yaml
+- run_id: P2-AR-0058
+  role: capability-repair
+  workstream: wsD
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: deepseek-v4-pro
+  branch: phase2/repair-2-wsD
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0058.run.yaml
+- run_id: P2-AR-0059
+  role: capability-repair
+  workstream: wsE
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: deepseek-flash
+  branch: phase2/repair-2-wsE
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0059.run.yaml
+- run_id: P2-AR-0060
+  role: capability-repair
+  workstream: wsF
+  iteration: 2
+  status: SUPERSEDED_BY_P2-AR-0065 (PARTIAL; work preserved on branch)
+  worker_model: deepseek-v4-pro
+  branch: phase2/repair-2-wsF
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0060.run.yaml
+- run_id: P2-AR-0061
+  role: capability-repair
+  workstream: wsG
+  iteration: 2
+  status: 'COMPLETED_AWAITING_INTEGRATION (PARTIAL: 2 of 5 non-blocking items landed)'
+  worker_model: deepseek-flash
+  branch: phase2/repair-2-wsG
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0061.run.yaml
+- run_id: P2-AR-0064
+  role: capability-repair
+  workstream: wsB
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  effort: high
+  branch: phase2/repair-2-wsB
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0064.run.yaml
+- run_id: P2-AR-0065
+  role: capability-repair
+  workstream: wsF
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  effort: high
+  branch: phase2/repair-2-wsF
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0065.run.yaml
+- run_id: P2-AR-0066
+  role: capability-repair
+  workstream: wsA
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  effort: high
+  branch: phase2/repair-2-wsA
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0066.run.yaml
+- run_id: P2-AR-0067
+  role: capability-repair (integration builder)
+  iteration: 2
+  status: COMPLETED
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-2-integration
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0067.run.yaml
+- run_id: P2-AR-0068
+  role: adversarial pre-mint reviewer
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-opus-5 native
+  branch: phase2/repair-2-adversarial
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0068.run.yaml
+- run_id: P2-AR-0069
+  role: capability-repair
+  workstream: f3-path-rule-floor
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-2-f3
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0069.run.yaml
+- run_id: P2-AR-0070
+  role: capability-repair
+  workstream: toolbind
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-2-toolbind
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0070.run.yaml
+- run_id: P2-AR-0071
+  role: capability-repair
+  workstream: reviewbind
+  iteration: 2
+  status: COMPLETED_PARTIAL
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-2-reviewbind
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0071.run.yaml
+- run_id: P2-AR-0072
+  role: capability-repair
+  workstream: reviewbind-constructions
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-2-reviewbind2
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0072.run.yaml
+- run_id: P2-AR-0073
+  role: adversarial pre-mint reviewer (second pass)
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-opus-5 native
+  branch: phase2/repair-2-adversarial-2
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0073.run.yaml
+- run_id: P2-AR-0074
+  role: capability-repair (structural)
+  workstream: failclosed
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-2-failclosed
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0074.run.yaml
+- run_id: P2-AR-0075
+  role: adversarial pre-mint reviewer (third pass)
+  iteration: 2
+  status: COMPLETED_AWAITING_INTEGRATION
+  worker_model: claude-opus-5 native
+  branch: phase2/repair-2-adversarial-3
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0075.run.yaml
+- run_id: P2-AR-0054
+  role: capability-repair (integration builder)
+  iteration: 1
+  round: 4
+  status: COMPLETED
+  branch: phase2/repair-1-r4-integration
+  run_record_path: release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.run.yaml
 worker_stall_protection:
   status: ACTIVE
-  adopted: '2026-09-22, owner instruction section 1 of the A+C architecture decision (OD-P2-07)'
-  scope: 'procedural/runtime governance for the remainder of Phase 2. Changes nothing in Contract v3, the frozen Phase-2 acceptance criteria, product behaviour or the active V8.2 architecture.'
-  origin: 'the ~420-minute stall recorded in V8_3_EVIDENCE_PACKAGE.md section 6.3b -- a worker finished its targeted work, was told to wait for coordinator confirmation before the full suite, the coordinator never sent it, and the worker sat idle while its notifications read as running.'
+  adopted: 2026-09-22, owner instruction section 1 of the A+C architecture decision (OD-P2-07)
+  scope: procedural/runtime governance for the remainder of Phase 2. Changes nothing in Contract v3, the frozen Phase-2 acceptance criteria, product behaviour or the active V8.2 architecture.
+  origin: the ~420-minute stall recorded in V8_3_EVIDENCE_PACKAGE.md section 6.3b -- a worker finished its targeted work, was told to wait for coordinator confirmation before the full suite, the coordinator
+    never sent it, and the worker sat idle while its notifications read as running.
   rules:
-    - '1. No worker may be left indefinitely waiting for an orchestrator/coordinator message.'
-    - '2. A blocking coordinator handshake may be created ONLY with BOTH an explicit timeout AND a deterministic default action on expiry.'
-    - '3. Prefer self-evaluable preconditions over handshakes. BAD: "tell me when ready and wait until I confirm the machine is clear". GOOD: "start when no competing cargo/gov certification process is running and load satisfies the stated condition; otherwise wait, re-check periodically, and proceed automatically once satisfied".'
-    - '4. Worker state must distinguish at least RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, COMPLETE.'
-    - '5. BLOCKED_ON_COORDINATOR must be surfaced immediately and must always carry why it is blocked, what response is awaited, the timeout and the default action. It must never be reported merely as running.'
-    - '6. Rising elapsed time with unchanged status or progress is a stall signature. Investigate rather than assume progress.'
-    - '7. Never report a worker as still running from a stale observation. Check current process/worker state AT THE TIME of any liveness statement to the owner.'
-    - '8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator message.'
-    - '3a. COROLLARY, added 2026-09-23 after three wait-loops spun for 10 hours: a self-evaluable precondition must not be able to MATCH ITSELF. `until ! pgrep -f <pattern>` inside a shell whose own command line contains <pattern> never exits. Exclude the checking process (grep -v $$, a captured PID, a marker file, or wait on a known child), and give every wait-loop a bounded iteration count with a defined action on exhaustion -- an unbounded until-loop is a handshake with the kernel and earns the same discipline as rule 2.'
-    - '7a. COROLLARY: liveness monitoring must cover the TASK REGISTRY, not only the machine. A sleeping waiter is invisible to load average and ps -- it looks exactly like a healthy idle machine. A task producing no output for far longer than its expected runtime is a stall regardless of what the machine shows.'
-    - '9. OD-P2-08: prefer tracked PID/process-group state over process-name regex; where pattern matching is unavoidable, PROVE the waiter cannot match itself.'
-    - '10. OD-P2-08: maintain last_progress_at or equivalent freshness evidence, and reconcile the task registry against live process state, output freshness AND worker report state.'
-    - '11. OD-P2-08: worker states must distinguish RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, STALLED, COMPLETE. A sleeping waiter is not productive work.'
+  - 1. No worker may be left indefinitely waiting for an orchestrator/coordinator message.
+  - 2. A blocking coordinator handshake may be created ONLY with BOTH an explicit timeout AND a deterministic default action on expiry.
+  - '3. Prefer self-evaluable preconditions over handshakes. BAD: "tell me when ready and wait until I confirm the machine is clear". GOOD: "start when no competing cargo/gov certification process is running
+    and load satisfies the stated condition; otherwise wait, re-check periodically, and proceed automatically once satisfied".'
+  - 4. Worker state must distinguish at least RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, COMPLETE.
+  - 5. BLOCKED_ON_COORDINATOR must be surfaced immediately and must always carry why it is blocked, what response is awaited, the timeout and the default action. It must never be reported merely as running.
+  - 6. Rising elapsed time with unchanged status or progress is a stall signature. Investigate rather than assume progress.
+  - 7. Never report a worker as still running from a stale observation. Check current process/worker state AT THE TIME of any liveness statement to the owner.
+  - 8. For machine-resource waits, workers normally evaluate the condition themselves rather than wait for a coordinator message.
+  - '3a. COROLLARY, added 2026-09-23 after three wait-loops spun for 10 hours: a self-evaluable precondition must not be able to MATCH ITSELF. `until ! pgrep -f <pattern>` inside a shell whose own command
+    line contains <pattern> never exits. Exclude the checking process (grep -v $$, a captured PID, a marker file, or wait on a known child), and give every wait-loop a bounded iteration count with a defined
+    action on exhaustion -- an unbounded until-loop is a handshake with the kernel and earns the same discipline as rule 2.'
+  - '7a. COROLLARY: liveness monitoring must cover the TASK REGISTRY, not only the machine. A sleeping waiter is invisible to load average and ps -- it looks exactly like a healthy idle machine. A task
+    producing no output for far longer than its expected runtime is a stall regardless of what the machine shows.'
+  - '9. OD-P2-08: prefer tracked PID/process-group state over process-name regex; where pattern matching is unavoidable, PROVE the waiter cannot match itself.'
+  - '10. OD-P2-08: maintain last_progress_at or equivalent freshness evidence, and reconcile the task registry against live process state, output freshness AND worker report state.'
+  - '11. OD-P2-08: worker states must distinguish RUNNING_COMPUTE, RUNNING_TOOL, BLOCKED_RESOURCE, BLOCKED_ON_COORDINATOR, BLOCKED_ON_OWNER, STALLED, COMPLETE. A sleeping waiter is not productive work.'
   v8_3_disposition: IMPLEMENTED_DURING_PHASE_2
-  confirmed_active_before: 'the A+C implementation dispatch, as the owner required in section 1 rule 10'
-
+  confirmed_active_before: the A+C implementation dispatch, as the owner required in section 1 rule 10
 test_execution_policy:
-  adopted: '2026-09-22, from P2-PERF-0001 recommendation R1 (release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, commit 651ceb3)'
-  rule: 'never pass --test-threads=1 to the certification suite; run it machine-exclusive at libtest default parallelism'
-  basis: 'tests/certification has zero #[serial], no serial_test dependency, zero env::set_var/remove_var and zero set_current_dir; every variable is set per-Command; scratch roots are PID+nanosecond unique and XDG_STATE_HOME is per-root-hash. P2-AR-0072 already ran 231/0 at default parallelism.'
-  cost_of_the_old_practice: '35.09 s/test single-threaded versus 4.30-5.39 s/test at default parallelism -- about 7x, roughly 2 hours per full run, for no isolation benefit'
-  what_serialised_means_here: 'ONE SUITE AT A TIME ON THE MACHINE, default threads intact -- never tests forced serial within a suite. The historical spurious failures (203/7 on a tree that was really 210/0) were cross-suite machine overload, a different problem with a different fix.'
-  where_single_threading_is_genuinely_required: "the independent verifiers' held-out harnesses, which do mutate process-global env (release/verification/.../heldout-tests/mint.rs:138-141 sets XDG_STATE_HOME and HOME). That constraint must not migrate back to the certification suite."
-  recording_requirement: 'every run record that reports a suite figure must also state the --test-threads value and the machine load. A test result without its concurrency conditions is unfalsifiable -- P2-AR-0075 omitted both and its 2,742 s needed a CPU-conservation argument to decode.'
-  planning_figure: 'MEASURED 2026-09-22 on a verified-quiet machine at default threads: 252 tests, 2,966 s wall (49m26s), 38,971 CPU-s, P=12.95 effective cores (65% of 20). The suite costs about 50 minutes on this tree. The earlier ~1,460 s (24 min) estimate was derived from a CPU calibration that the direct measurement falsified by ~2.4x, and is withdrawn.'
-  superseded_reconciliation: "P2-AR-0075's 2,742 s was NOT an outlier and needed no explanation: at the measured W its P is about 12, indistinguishable from this run's 12.95. The earlier '~3 test streams / reduced --test-threads' account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost."
-  hardware: 'the guest topology is SYNTHETIC and neither published number is right. /proc/cpuinfo carries the hypervisor flag and shows a perfectly uniform 10 cores x 2 threads (siblings 0-1, 2-3 .. 18-19), but the real i7-12700F is a hybrid Alder Lake part: 8 P-cores (2 threads each) + 4 E-cores (1 thread each) = 12 PHYSICAL cores, 20 threads. A genuine 12700F could never show uniform SMT across all cores because the E-cores have none, so WSL2 is flattening a heterogeneous package, and the vCPU-to-host mapping is not observable from inside the guest. Consequences: W/20 = 1,949 s (32.5 min) is a bound SMT cannot reach, not a floor; measured P=12.95 is 65% of 20 logical but ~108% of 12 physical, and since Linux fills idle physical cores before doubling onto siblings, essentially every physical core was busy -- the machine was near saturation, NOT a third idle. Modelled achievable floor ~2,400-2,600 s (40-43 min), NOT MEASURED. Perfect scheduling is therefore worth ~7-10 minutes, not 17.5.'
-  evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines. The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
-  floor: 'at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore the only remaining lever on this figure, not merely the largest.'
-
+  adopted: 2026-09-22, from P2-PERF-0001 recommendation R1 (release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, commit 651ceb3)
+  rule: never pass --test-threads=1 to the certification suite; run it machine-exclusive at libtest default parallelism
+  basis: 'tests/certification has zero #[serial], no serial_test dependency, zero env::set_var/remove_var and zero set_current_dir; every variable is set per-Command; scratch roots are PID+nanosecond unique
+    and XDG_STATE_HOME is per-root-hash. P2-AR-0072 already ran 231/0 at default parallelism.'
+  cost_of_the_old_practice: 35.09 s/test single-threaded versus 4.30-5.39 s/test at default parallelism -- about 7x, roughly 2 hours per full run, for no isolation benefit
+  what_serialised_means_here: ONE SUITE AT A TIME ON THE MACHINE, default threads intact -- never tests forced serial within a suite. The historical spurious failures (203/7 on a tree that was really 210/0)
+    were cross-suite machine overload, a different problem with a different fix.
+  where_single_threading_is_genuinely_required: the independent verifiers' held-out harnesses, which do mutate process-global env (release/verification/.../heldout-tests/mint.rs:138-141 sets XDG_STATE_HOME
+    and HOME). That constraint must not migrate back to the certification suite.
+  recording_requirement: every run record that reports a suite figure must also state the --test-threads value and the machine load. A test result without its concurrency conditions is unfalsifiable --
+    P2-AR-0075 omitted both and its 2,742 s needed a CPU-conservation argument to decode.
+  planning_figure: 'MEASURED 2026-09-22 on a verified-quiet machine at default threads: 252 tests, 2,966 s wall (49m26s), 38,971 CPU-s, P=12.95 effective cores (65% of 20). The suite costs about 50 minutes
+    on this tree. The earlier ~1,460 s (24 min) estimate was derived from a CPU calibration that the direct measurement falsified by ~2.4x, and is withdrawn.'
+  superseded_reconciliation: 'P2-AR-0075''s 2,742 s was NOT an outlier and needed no explanation: at the measured W its P is about 12, indistinguishable from this run''s 12.95. The earlier ''~3 test streams
+    / reduced --test-threads'' account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost.'
+  hardware: 'the guest topology is SYNTHETIC and neither published number is right. /proc/cpuinfo carries the hypervisor flag and shows a perfectly uniform 10 cores x 2 threads (siblings 0-1, 2-3 .. 18-19),
+    but the real i7-12700F is a hybrid Alder Lake part: 8 P-cores (2 threads each) + 4 E-cores (1 thread each) = 12 PHYSICAL cores, 20 threads. A genuine 12700F could never show uniform SMT across all cores
+    because the E-cores have none, so WSL2 is flattening a heterogeneous package, and the vCPU-to-host mapping is not observable from inside the guest. Consequences: W/20 = 1,949 s (32.5 min) is a bound
+    SMT cannot reach, not a floor; measured P=12.95 is 65% of 20 logical but ~108% of 12 physical, and since Linux fills idle physical cores before doubling onto siblings, essentially every physical core
+    was busy -- the machine was near saturation, NOT a third idle. Modelled achievable floor ~2,400-2,600 s (40-43 min), NOT MEASURED. Perfect scheduling is therefore worth ~7-10 minutes, not 17.5.'
+  evidence_hygiene_finding: 'P2-AR-0067.run.yaml records an orchestrator check of "cargo test --test certification 225/0 (1213 s)" as a single full-suite run. At the measured 154.6 CPU-s/test that requires
+    P=28.7 effective cores against a hard ceiling of 20, so as recorded it cannot have happened. Not chunked (only P2-AR-0054 records chunking). Candidates: mis-transcription, a partial or differently-scoped
+    run, or a genuinely cheaper tree -- the record carries no thread count, load or command line and cannot distinguish them. DISCLOSED TO THE FORMAL VERIFIER. Those figures must not be used as baselines.
+    The orchestrator wrote that record, and it fails the standard the orchestrator adopted today.'
+  floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
+    the only remaining lever on this figure, not merely the largest.
 running_work:
-  - {run_id: P2-AR-0085, role: 'repair the AR84 findings -- OS-held loader instead of the artefact-chosen one, static DT_AUDIT refusal, explicit trace failure, identity bound INSIDE the floor document, kernel-validated governed widening with a disclosing gate package', worker_model: claude-sonnet-5 native, branch: phase2/ar84-repair, base: e74e409, worktree: scratchpad/wt/p2-ar84-fix, evidence_class: BUILDER_DEVELOPMENT_EVIDENCE, status: RUNNING, last_progress_at: '2026-09-24'}
+- run_id: P2-AR-0086
+  role: third independent adversarial review -- fitness to mint
+  worker_model: claude-opus-5 native
+  branch: phase2/review-3
+  target: phase2/ar84-repair 46f0a4b (FROZEN)
+  worktree: scratchpad/wt/p2-rev3
+  evidence_class: INDEPENDENT_ADVERSARIAL
+  status: RUNNING
+  last_progress_at: '2026-09-24'
 completed_work_formerly_running:
-  - {run_id: P2-AR-0076, role: 'capability-repair (bounded, final round on the install-trust surface)', scope: 'exactly AR75-F1, AR75-F2 and AR75-F3', worker_model: claude-sonnet-5 native, branch: phase2/repair-3-boundary, base: c34c439, worktree: scratchpad/wt/p2-r3-boundary, handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md, status: COMPLETED_SUPERSEDED_BY_P2-AR-0078}
-  - {run_id: P2-PERF-0001, role: 'performance diagnostician (measurement only; no product change)', scope: 'the eleven owner questions about the ~2.5 h certification run', worker_model: claude-opus-5 native, branch: phase2/perf-diag, base: c34c439, worktree: scratchpad/wt/p2-perf-diag, output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, status: COMPLETED, blocks_phase_2: false}
-
+- run_id: P2-AR-0076
+  role: capability-repair (bounded, final round on the install-trust surface)
+  scope: exactly AR75-F1, AR75-F2 and AR75-F3
+  worker_model: claude-sonnet-5 native
+  branch: phase2/repair-3-boundary
+  base: c34c439
+  worktree: scratchpad/wt/p2-r3-boundary
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md
+  status: COMPLETED_SUPERSEDED_BY_P2-AR-0078
+- run_id: P2-PERF-0001
+  role: performance diagnostician (measurement only; no product change)
+  scope: the eleven owner questions about the ~2.5 h certification run
+  worker_model: claude-opus-5 native
+  branch: phase2/perf-diag
+  base: c34c439
+  worktree: scratchpad/wt/p2-perf-diag
+  output: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md
+  status: COMPLETED
+  blocks_phase_2: false
 unresolved_findings:
   source: release/capability-baseline/audit-0/synthesis/findings.yaml
   blocking_total: 134
   classes: 52
   note: per-finding severity, provenance, lifecycle and class are in the synthesis findings file; not duplicated here
-
 downstream_evidence_invalidated: []
-
 owner_gates:
   pending: []
   answered:
-    - id: HG-P2-0001
-      record_path: release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md
-      answered_at: '2026-09-19'
-      channel: active chat (AskUserQuestion), product owner
-      answers:
-        - {decision: OD-P2-01, option: A, record: OWNER-DECISION-P2-0001, record_path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001-AGENT-ROLE-IDENTITY.md, record_sha256: 612849ba65c310c5ff41999e72e3382048842f526048a3fe49ab1a5b5a88b0ce, effect: agent roles stay adapter-declared (D-0007 consequence 5); no new class; residual risk recorded}
-        - {decision: OD-P2-02, option: A, record: OWNER-DECISION-P2-0002, record_path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md, record_sha256: 5d73bbe3619a54b7f8f5da1fa9c556ed5cdca2f86a4babdf47d8e828a20c16c4, effect: refuse external-source ingress until provisioned; embedded payload only as marked bootstrap mode; harness/docs provision a throw-away root; Phase-4 and release evidence on provisioned machines; BC-P2-36 admission part now determined -> round 2 WS-8}
-
+  - id: HG-P2-0001
+    record_path: release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md
+    answered_at: '2026-09-19'
+    channel: active chat (AskUserQuestion), product owner
+    answers:
+    - decision: OD-P2-01
+      option: A
+      record: OWNER-DECISION-P2-0001
+      record_path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0001-AGENT-ROLE-IDENTITY.md
+      record_sha256: 612849ba65c310c5ff41999e72e3382048842f526048a3fe49ab1a5b5a88b0ce
+      effect: agent roles stay adapter-declared (D-0007 consequence 5); no new class; residual risk recorded
+    - decision: OD-P2-02
+      option: A
+      record: OWNER-DECISION-P2-0002
+      record_path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0002-UNPROVISIONED-MACHINES.md
+      record_sha256: 5d73bbe3619a54b7f8f5da1fa9c556ed5cdca2f86a4babdf47d8e828a20c16c4
+      effect: refuse external-source ingress until provisioned; embedded payload only as marked bootstrap mode; harness/docs provision a throw-away root; Phase-4 and release evidence on provisioned machines;
+        BC-P2-36 admission part now determined -> round 2 WS-8
 immutable_evidence:
-  - path: release/orchestration/phase-1
-    commit: 3374db452008628074824faacb030ad841ce4ed9
-  - path: release/verification
-    commit: 3374db452008628074824faacb030ad841ce4ed9
-  - path: release/root-of-trust
-    commit: 3374db452008628074824faacb030ad841ce4ed9
-
+- path: release/orchestration/phase-1
+  commit: 3374db452008628074824faacb030ad841ce4ed9
+- path: release/verification
+  commit: 3374db452008628074824faacb030ad841ce4ed9
+- path: release/root-of-trust
+  commit: 3374db452008628074824faacb030ad841ce4ed9
 completed_stages:
-  - stage: P2_SELF_LOCATED
-    commit: 3374db452008628074824faacb030ad841ce4ed9
-    note: Phase-1 tokens verified from committed evidence; ARCH-0003 adoption verified; Contract v3 and V8.2 identities verified; located to Phase 2
-  - stage: P2_INITIALISED
-    commit: 57177a37ea296ece16b185874831462b6a76db18
-    note: durable state, frozen gate contract, gate register, audit-0 handoffs created; tagged cap2-candidate-0
-  - stage: P2_AUDIT_0_DISPATCHED
-    commit: 990f85832ccc1cb14e9182ff1bb9a81b11fd8bbd
-    note: six family auditors dispatched in isolated worktrees
-  - stage: P2_AUDIT_0_SYNTHESIS_REJECTED
-    commit: 395df8d27ca3312948f727de1ff0111ed101c2c2
-    note: P2-AR-0007 GOVERNANCE_CAPABILITY_BASELINE_REJECTED on cap2-candidate-0; 134 blocking findings in 52 classes; OD-P2-01/02 confirmed
-  - stage: P2_AUDIT_0_FIRST_PASS_RULED_NONCONFORMING
-    commit: ab964d70e9b598b38e07fd1ffcdd63735af1c355
-    note: >-
-      All six first-pass family audits returned; all self-reported claude-opus-4-6 against the recorded claude-opus-5;
-      five were ruled COMPLETED_NONCONFORMING (status/finding contradictions, aggregate-output evidence) and gamma
-      COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on the
-      pinned model under P2-HO-0008 / P2-HO-0009.
-
+- stage: P2_SELF_LOCATED
+  commit: 3374db452008628074824faacb030ad841ce4ed9
+  note: Phase-1 tokens verified from committed evidence; ARCH-0003 adoption verified; Contract v3 and V8.2 identities verified; located to Phase 2
+- stage: P2_INITIALISED
+  commit: 57177a37ea296ece16b185874831462b6a76db18
+  note: durable state, frozen gate contract, gate register, audit-0 handoffs created; tagged cap2-candidate-0
+- stage: P2_AUDIT_0_DISPATCHED
+  commit: 990f85832ccc1cb14e9182ff1bb9a81b11fd8bbd
+  note: six family auditors dispatched in isolated worktrees
+- stage: P2_AUDIT_0_SYNTHESIS_REJECTED
+  commit: 395df8d27ca3312948f727de1ff0111ed101c2c2
+  note: P2-AR-0007 GOVERNANCE_CAPABILITY_BASELINE_REJECTED on cap2-candidate-0; 134 blocking findings in 52 classes; OD-P2-01/02 confirmed
+- stage: P2_AUDIT_0_FIRST_PASS_RULED_NONCONFORMING
+  commit: ab964d70e9b598b38e07fd1ffcdd63735af1c355
+  note: All six first-pass family audits returned; all self-reported claude-opus-4-6 against the recorded claude-opus-5; five were ruled COMPLETED_NONCONFORMING (status/finding contradictions, aggregate-output
+    evidence) and gamma COMPLETED_MODEL_DEVIATION. Evidence retained unchanged and merged as records. All six families re-audited on the pinned model under P2-HO-0008 / P2-HO-0009.
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
-next_deterministic_action: >-
-  P2 loader probe is COMPLETE and did NOT falsify the architecture: a pinned dynamically-linked ELF with RUNPATH
-  $ORIGIN ran unverified code before the first reviewed instruction under a fully cleared environment, because RUNPATH
-  lives INSIDE the verified object. Recorded at RESEARCH/P2-LOADER-PROBE.md; incorporated as a closure extension per
-  OD-P2-08 section 3. NEXT: dispatch a fresh Sonnet 5 implementation of Option 1 under OD-P2-08 -- Property A
-  (ResolvedExecution with shebang AND dynamic-dependency closure; wrapper chains do not qualify for the ungated path),
-  Property C (project-specific authenticated adoption floor composed with the kernel floor, no ordered class
-  predicate, one authoritative PathDecision construction point), reuse of cit::binding rather than a new hand-edit
-  detector, and the pinned_files schema gap. Then targeted tests, affected dependency tests, deterministic checks, ONE
-  full certification run, freeze, fresh Opus 5 adversarial review with independently derived held-out probes, mint
-  cap2-candidate-2 only when its prerequisites hold, then fresh Opus 5 formal acceptance verification. Ordinary defects
-  are repaired and re-reviewed AUTOMATICALLY without owner relay; stop only on the OD-P2-08 section 8 conditions.
-
+next_deterministic_action: 'P2 loader probe is COMPLETE and did NOT falsify the architecture: a pinned dynamically-linked ELF with RUNPATH $ORIGIN ran unverified code before the first reviewed instruction
+  under a fully cleared environment, because RUNPATH lives INSIDE the verified object. Recorded at RESEARCH/P2-LOADER-PROBE.md; incorporated as a closure extension per OD-P2-08 section 3. NEXT: dispatch
+  a fresh Sonnet 5 implementation of Option 1 under OD-P2-08 -- Property A (ResolvedExecution with shebang AND dynamic-dependency closure; wrapper chains do not qualify for the ungated path), Property C
+  (project-specific authenticated adoption floor composed with the kernel floor, no ordered class predicate, one authoritative PathDecision construction point), reuse of cit::binding rather than a new hand-edit
+  detector, and the pinned_files schema gap. Then targeted tests, affected dependency tests, deterministic checks, ONE full certification run, freeze, fresh Opus 5 adversarial review with independently
+  derived held-out probes, mint cap2-candidate-2 only when its prerequisites hold, then fresh Opus 5 formal acceptance verification. Ordinary defects are repaired and re-reviewed AUTOMATICALLY without owner
+  relay; stop only on the OD-P2-08 section 8 conditions.'
 current_prohibitions:
-  - {action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status, until: never}
-  - {action: 'treating any builder-authored test, including a generative property test, as independent or acceptance evidence', until: 'never - OD-P2-07 fixes four classes: BUILDER_REGRESSION, BUILDER_DEVELOPMENT_EVIDENCE, INDEPENDENT_ADVERSARIAL, HELD_OUT_ACCEPTANCE, never collapsed into "tests passed"'}
-  - {action: 'implementing Option B (isolation/sandbox execution) during Phase 2', until: 'A demonstrably cannot satisfy the frozen Phase-2 requirements AND the owner explicitly authorises the additional scope'}
-  - {action: 'another local repair or enumeration round on the install-trust surface after the A+C review', until: 'an owner decision - the hard stop escalates toward Option B or another owner-approved architecture review'}
-  - {action: 'creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default action', until: 'never in Phase 2 - worker_stall_protection is ACTIVE'}
-  - {action: 'minting cap2-candidate-2', until: 'both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)'}
-  - {action: 'implementing Landlock, hermetic execution, bubblewrap, rootless containers, gVisor or microVMs during Phase 2', until: 'R2 or R3 respectively, unless OD-P2-08 section 8 shows the selected architecture is otherwise impossible'}
-  - {action: 'treating the T2 HMAC seal as proof-grade owner authority', until: 'never -- a process with the owner OS privileges can read the symmetric key; proof-grade authority is the authenticated machine/kernel floor plus the authenticated project adoption floor plus an owner-signed governed transition'}
-  - {action: 'requiring a universal product/** layout, or governing paths outside the adopted repository', until: 'never -- OD-P2-08 section 2 makes the floor PROJECT-SPECIFIC and derived from the governed adoption transition'}
-  - {action: 'building a hand-edit detector as the trust model', until: 'never -- authenticate the authoritative transition instead (OD-P2-08 section 2)'}
-  - {action: 'the outer orchestrator self-awarding GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED', until: 'never -- only a fresh independent Opus 5 formal verifier may issue it'}
-  - {action: 'a fifth repair round on the install-trust surface', until: 'the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077'}
-  - {action: 'designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it', until: 'Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written'}
-  - {action: 'a major performance optimisation or refactor of the certification suite', until: 'after Phase 2, unless required for correctness -- P2-PERF-0001 measures and recommends only'}
-  - {action: printing, logging, committing, hashing or copying the provider API key into any file, packet, handoff or agent output, until: never}
-  - {action: a provider worker grading a candidate or substituting for the formal Opus acceptance verification, until: never}
-  - {action: launching any DeepSeek/API provider worker, until: the owner explicitly re-enables DeepSeek as an execution provider (paused 2026-09-21; adapter, telemetry and evidence preserved for V8.3)}
-  - {action: changing a global model setting that would alter the outer orchestrator, until: never - model selection is per role and per spawn}
-  - {action: builder or repair role grading its own work, until: never}
-  - {action: exposing held-out verifier/test-author tests to a builder or repair role, until: that verifier's verdict is committed}
-  - {action: modifying release/verification/**, release/root-of-trust/**, release/releases/**, release/orchestration/phase-1/**, until: never}
-  - {action: moving or recreating tags srr1-r1-accepted or srr1-r1-candidate-*, until: never}
-  - {action: amending or superseding D-0007, until: an explicit owner-authorised transition record}
-  - {action: reconstructing or paraphrasing Contract v3 content, until: never}
-  - {action: starting Phase 3 or selecting a provisional retrieval profile, until: never in this session}
-  - {action: merging to main, publishing, or certifying a release, until: never in Phase 2}
-  - {action: any role reading/listing/searching session or agent transcripts, task-output stores or user auto-memory, until: never}
-  - {action: writing held-out test content, in-progress verdicts or unreviewed findings into user auto-memory, until: never}
+- action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status
+  until: never
+- action: treating any builder-authored test, including a generative property test, as independent or acceptance evidence
+  until: 'never - OD-P2-07 fixes four classes: BUILDER_REGRESSION, BUILDER_DEVELOPMENT_EVIDENCE, INDEPENDENT_ADVERSARIAL, HELD_OUT_ACCEPTANCE, never collapsed into "tests passed"'
+- action: implementing Option B (isolation/sandbox execution) during Phase 2
+  until: A demonstrably cannot satisfy the frozen Phase-2 requirements AND the owner explicitly authorises the additional scope
+- action: another local repair or enumeration round on the install-trust surface after the A+C review
+  until: an owner decision - the hard stop escalates toward Option B or another owner-approved architecture review
+- action: creating a blocking coordinator handshake without BOTH an explicit timeout and a deterministic default action
+  until: never in Phase 2 - worker_stall_protection is ACTIVE
+- action: minting cap2-candidate-2
+  until: both AR75-F1 and AR75-F2 are closed and a fresh Opus 5 adversarial review finds no blocking defect (owner instruction 2026-09-22)
+- action: implementing Landlock, hermetic execution, bubblewrap, rootless containers, gVisor or microVMs during Phase 2
+  until: R2 or R3 respectively, unless OD-P2-08 section 8 shows the selected architecture is otherwise impossible
+- action: treating the T2 HMAC seal as proof-grade owner authority
+  until: never -- a process with the owner OS privileges can read the symmetric key; proof-grade authority is the authenticated machine/kernel floor plus the authenticated project adoption floor plus an
+    owner-signed governed transition
+- action: requiring a universal product/** layout, or governing paths outside the adopted repository
+  until: never -- OD-P2-08 section 2 makes the floor PROJECT-SPECIFIC and derived from the governed adoption transition
+- action: building a hand-edit detector as the trust model
+  until: never -- authenticate the authoritative transition instead (OD-P2-08 section 2)
+- action: the outer orchestrator self-awarding GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+  until: never -- only a fresh independent Opus 5 formal verifier may issue it
+- action: a fifth repair round on the install-trust surface
+  until: the owner rules after an architecture/meta-review package -- the owner set this stop condition explicitly for P2-AR-0077
+- action: designing, installing or activating V8.3, or switching the active Phase-2 orchestrator to it
+  until: Phase 2 independently earns GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED; until then only a non-normative V8.3 evidence package is written
+- action: a major performance optimisation or refactor of the certification suite
+  until: after Phase 2, unless required for correctness -- P2-PERF-0001 measures and recommends only
+- action: printing
+  logging: null
+  committing: null
+  hashing or copying the provider API key into any file: null
+  packet: null
+  handoff or agent output: null
+  until: never
+- action: a provider worker grading a candidate or substituting for the formal Opus acceptance verification
+  until: never
+- action: launching any DeepSeek/API provider worker
+  until: the owner explicitly re-enables DeepSeek as an execution provider (paused 2026-09-21; adapter
+  telemetry and evidence preserved for V8.3): null
+- action: changing a global model setting that would alter the outer orchestrator
+  until: never - model selection is per role and per spawn
+- action: builder or repair role grading its own work
+  until: never
+- action: exposing held-out verifier/test-author tests to a builder or repair role
+  until: that verifier's verdict is committed
+- action: modifying release/verification/**
+  release/root-of-trust/**: null
+  release/releases/**: null
+  release/orchestration/phase-1/**: null
+  until: never
+- action: moving or recreating tags srr1-r1-accepted or srr1-r1-candidate-*
+  until: never
+- action: amending or superseding D-0007
+  until: an explicit owner-authorised transition record
+- action: reconstructing or paraphrasing Contract v3 content
+  until: never
+- action: starting Phase 3 or selecting a provisional retrieval profile
+  until: never in this session
+- action: merging to main
+  publishing: null
+  or certifying a release: null
+  until: never in Phase 2
+- action: any role reading/listing/searching session or agent transcripts
+  task-output stores or user auto-memory: null
+  until: never
+- action: writing held-out test content
+  in-progress verdicts or unreviewed findings into user auto-memory: null
+  until: never
