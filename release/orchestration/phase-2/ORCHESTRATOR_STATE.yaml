@@ -4,8 +4,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-24T14:03:10Z'
-state_hash: da55bbf4716ecd86d4126098eea84f02d608e46dc68f9e8d6eb8d9b804875df0
+updated_at: '2026-09-24T16:17:10Z'
+state_hash: 5a3aa839585b179107d390240aa590bdc85c3374f16cc94539382dbbe8b81e70
 lifecycle_state: P2_COMPLETION_OPTION_1
 loop_status: RUNNING
 protocol:
@@ -273,6 +273,18 @@ convergence_watch:
     indexer::rebuild all re-read the floor while the CIT is still EXECUTING -- but it is RESOLVABLE by accepting EXECUTING|COMMITTED or using cit::binding''s writes_sha256, so ''structural, not budgetary''
     overstated it. Gating would NOT close C1/C2, since onboarding floors legitimately carry no bound_cit and every donor in those attacks is one, but it WOULD have caught C6. As shipped it is inert: one
     writer, zero readers. The repair round is told to gate it.'
+  round_15_result: P2-AR-0091 closed all six AR90 findings; full suite 350/0. The key is now sha256(canonical_path) alone -- lineage dropped, so an orphan commit or a .git move-aside no longer moves it
+    and those attacks never reach the bootstrap branch at all. For the remaining half, a new minted_for_path field plus other_live_claim refuses a bootstrap that would adopt an identity THIS MACHINE minted
+    for a different path that still exists. manifest_paths now names the floor so a rolled-back CIT genuinely restores it -- measured 0 files restored before, 1 after. bound_cit is gated, accepting EXECUTING
+    or COMMITTED, which also closed AR90-C5 as a side effect. The Property-A over-gating regression is fixed per the reviewer's own three-line prescription.
+  round_15_disclosure_quality: 'Worth recording as the standard: the worker distinguished the ATTACK variant of AR90-C2 (relocate then plant a foreign donor -- now refused) from the AVAILABILITY half (a
+    bare mv with no donor still bootstraps silently, no finding), and said plainly that only the attack is closed rather than claiming the finding. It also disclosed that because the anchor sequence lives
+    outside any snapshot''s reach, a legitimately rolled-back floor reads as stale until one more reclassification -- fail-closed but degraded. Both are passed to the reviewer as judgements rather than
+    buried.'
+  orchestrator_priority_for_ar92: 'The whole new mechanism turns on one line, orchestrator-verified: if minted_for != current_canon && Path::new(minted_for).exists(). So a planted donor is refused only
+    WHILE THE DONOR''S DIRECTORY STILL EXISTS. The named first attack: mint in a scratch project, plant it, then move or delete the scratch project -- exists() is false, no live claim, bootstrap adopts.
+    One extra mv, entirely inside the attacker''s control. Also named: the sandbox exemption is now the only unconditional bypass of that check, and .governance-runtime/health/sandboxes/<purpose>-<uuid>
+    is an ordinary mkdir -p, so whether canonicalisation in Project::open is the only thing standing between an attacker and a permanent bootstrap must be re-verified.'
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
@@ -1118,13 +1130,13 @@ test_execution_policy:
   floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
     the only remaining lever on this figure, not merely the largest.
 running_work:
-- run_id: P2-AR-0091
-  role: repair the AR90 findings -- make a key miss NOT mean consent, cover the floor in the CIT snapshot, gate bound_cit, and stop over-gating a real conventional loader path
-  worker_model: claude-sonnet-5 native
-  branch: phase2/ar90-repair
-  base: 9af14f6
-  worktree: scratchpad/wt/p2-ar90-fix
-  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
+- run_id: P2-AR-0092
+  role: sixth independent adversarial review -- fitness to mint
+  worker_model: claude-opus-5 native
+  branch: phase2/review-6
+  target: phase2/ar90-repair a01f0c9 (FROZEN)
+  worktree: scratchpad/wt/p2-rev6
+  evidence_class: INDEPENDENT_ADVERSARIAL
   status: RUNNING
   last_progress_at: '2026-09-24'
 completed_work_formerly_running:
