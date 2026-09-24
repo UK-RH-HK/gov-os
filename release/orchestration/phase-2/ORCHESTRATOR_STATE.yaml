@@ -1342,9 +1342,9 @@ review_history:
   env_var_authority: none -- builder traced SANDBOX_ENV and confirmed it is not referenced in the exemption decision
 current_round:
   id: PRE_FINAL_OWNER_QUESTION_SWEEP
-  status: PRESENTED_TO_OWNER
-  blocking: Review 8 may not be dispatched until the sweep is answered and any delta implemented (OD-P2-09 section
-    4, OD-P2-10 section 1)
+  status: AWAITING_OWNER_APPROVAL_OF_MINIMAL_5A_DESIGN
+  blocking: Review 8 not to be dispatched until the owner approves the minimal 5A design (OD-P2-09 section 4, owner
+    sweep response)
 orchestrator_verified_independently:
 - paths.rs:651 -- the exists() conjunct is present exactly as reported
 - paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
@@ -1429,3 +1429,31 @@ od_p2_10:
     result must never outrank a current authoritative decision
   phase_3: qualifies the already-built retrieval profile rather than re-engineering it; the Phase-3 gate is not
     skipped
+sweep_answers:
+  5C: OWNER APPROVED Option B -- exemption valid only while the creating process lives; remove the post-mortem requirement
+    from the held-out control; delete inode-binding/GC if no production path needs them. Revised control must still
+    prove cross-process recognition WHILE the creator is alive, and refuse an unrecorded/substituted sandbox.
+  5A: 'OWNER PROVISIONALLY ALIGNED with Option C, conditional on an end-to-end proof. Proof run: OPTION_C_REQUIRES_ONBOARDING_CHANGE.'
+  5B: no separate decision needed if the invariant eliminates transfer and its race
+option_c_probe:
+  verdict: OPTION_C_REQUIRES_ONBOARDING_CHANGE
+  evidence: release/orchestration/phase-2/RESEARCH/P2-PROBE-OPTION-C.md (+ .rs)
+  decisive_measurement: after deleting the stale entry the repo is healthy again, but the SAME identity is minted
+    for the NEW path (identity_unchanged_from_document=true); the system's own disclosure says it was established
+    'by adopting the document's own claim ... never by this checkout's own onboarding'
+  invariant_check: relocation-never-transfers-identity VIOLATED; authority-only-through-onboarding VIOLATED; stale-binding-may-be-deleted
+    satisfied
+  second_checkout: 'deleting an entry does NOT silently invalidate a second live checkout (measured: second unchanged,
+    still refused)'
+  simpler_option_found: no forget operation and no recovery subsystem are needed. FloorIdentity::advance mints a
+    fresh uuid when this checkout has no entry, which is exactly the relocated state; a fresh identity makes other_live_claim
+    never match, leaves the stale entry inert, holds the invariant by construction, and fixes AR92-C3 as a side
+    effect.
+  minimum_change:
+  - delete gov floor-reanchor entirely (takes AR94-C2/C3/C4/D1/D5 and the confirmed C5 race with it)
+  - relax the floor-write gate at init.rs:303 and adopt.rs:1840 to also fire when this checkout holds no anchor
+    for its current path, under the existing install_kernel authority
+  - no floor-forget command
+  named_risk: re-derivation at a new path has no last_known_rules, so AR86-C6's never-weaker protection does not
+    apply; mitigate by taking the union with the T2-verified lineage-bound document's RULES while minting a FRESH
+    identity
