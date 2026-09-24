@@ -4,8 +4,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-24T05:59:29Z'
-state_hash: 5214d90b465d0269de88c557bd88b53e966c132da2d302f6e234f603471c34dd
+updated_at: '2026-09-24T06:47:08Z'
+state_hash: 92860c5506965421234beef90f45b5024ebb73f52ca77f5a3b33ef4069c186a7
 lifecycle_state: P2_COMPLETION_OPTION_1
 loop_status: RUNNING
 protocol:
@@ -218,6 +218,16 @@ convergence_watch:
   orchestrator_record_hygiene: The orchestrator broke this file a third time while editing it, with an unescaped apostrophe inside a single-quoted scalar. Caught by parse validation before sealing, as the
     owner section 14 requires, then repaired by loading, editing the structure and dumping with yaml.safe_dump -- which is what should have been done every time. String surgery on quoted YAML scalars is
     the recurring defect; see V8_3_EVIDENCE_PACKAGE section 6.2.
+  round_10_result: 'P2-AR-0086 found 2 Property-A and 4 Property-C HIGHs, but ALSO re-proved that four of the previous six were closed AS A CLASS rather than carried forward, and closed one prior open question
+    with a negative result (ld.so --list runs no .preinit_array or DT_INIT_ARRAY constructor, so the static parse is complete for the verification path). Its own words: the architecture is not the problem
+    and eight rounds of findings did not make a ninth inevitable.'
+  orchestrator_direction_failure: 'THREE consecutive rounds have blocked on the same omission: OD-P2-08 section 5 NAMED cit::binding as the primitive to reuse, and two rounds deferred it as a considered
+    scope decision and substituted something cheaper -- a path, then a git lineage. Both substitutes were defeated. This is the orchestrator''s failure of direction, not the workers'': the briefs listed
+    it among several items, so workers under budget pressure deferred it. The AR86 brief makes it THE deliverable and explicitly non-deferrable, and instructs the worker to stop and report with evidence
+    rather than substitute a third time.'
+  why_not_escalated: No OD-P2-08 section 8 condition fires and all three reviewers checked them explicitly. The architecture keeps being confirmed sound independently; the defects are different each round
+    rather than one enumeration recurring; each fix path is measured before dispatch; and rounds are now closing more than they open. The correct orchestrator action was to fix its own brief, which costs
+    the owner nothing, rather than to escalate a problem of its own making.
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
@@ -1063,13 +1073,13 @@ test_execution_policy:
   floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
     the only remaining lever on this figure, not merely the largest.
 running_work:
-- run_id: P2-AR-0086
-  role: third independent adversarial review -- fitness to mint
-  worker_model: claude-opus-5 native
-  branch: phase2/review-3
-  target: phase2/ar84-repair 46f0a4b (FROZEN)
-  worktree: scratchpad/wt/p2-rev3
-  evidence_class: INDEPENDENT_ADVERSARIAL
+- run_id: P2-AR-0087
+  role: repair the AR86 findings -- wire the floor to an authenticated ORDERED transition per OD-P2-08 section 5 (non-deferrable, THE deliverable), and stop resolving PT_INTERP in the wrong process
+  worker_model: claude-sonnet-5 native
+  branch: phase2/ar86-repair
+  base: d2f981a
+  worktree: scratchpad/wt/p2-ar86-fix
+  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
   status: RUNNING
   last_progress_at: '2026-09-24'
 completed_work_formerly_running:
