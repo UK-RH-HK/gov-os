@@ -218,137 +218,12 @@ current_candidate:
   tag: cap2-candidate-1
   commit: 0bad524d836f179964ffbac31972856ea6434682
 convergence_watch:
-  note: Rounds 7 and 8 each closed their assigned findings AND introduced new HIGHs (P2-AR-0083 introduced AR84-F4
-    and AR84-C2; P2-AR-0081 introduced nothing but P2-AR-0080 left P1 open). The defects are genuinely DIFFERENT
-    each round rather than the same enumeration recurring, and each fix path has been measured rather than theorised,
-    so OD-P2-08 section 8 continues to apply. But the orchestrator is watching whether repair introduces defects
-    faster than review closes them, and will escalate if the pattern becomes convergent failure rather than progressive
-    repair.
-  round_9_result: 'P2-AR-0085 closed ALL SIX AR84 findings and introduced ZERO new HIGHs -- the first round on this
-    surface to do so. It also caught two of its own regressions before the suite: the resurfaced AR82-F2 (ld.so
-    --list computes $ORIGIN from the path AS GIVEN, not the realpath the kernel uses), found by re-running a prior
-    reviewer own probe rather than trusting carried-forward evidence; and a design flaw where binding identity to
-    the canonical filesystem path made every legitimate git clone read as an attack, caught by an unrelated existing
-    multi_machine test. Convergence is improving, not degrading.'
-  orchestrator_record_hygiene: The orchestrator broke this file a third time while editing it, with an unescaped
-    apostrophe inside a single-quoted scalar. Caught by parse validation before sealing, as the owner section 14
-    requires, then repaired by loading, editing the structure and dumping with yaml.safe_dump -- which is what should
-    have been done every time. String surgery on quoted YAML scalars is the recurring defect; see V8_3_EVIDENCE_PACKAGE
-    section 6.2.
-  round_10_result: 'P2-AR-0086 found 2 Property-A and 4 Property-C HIGHs, but ALSO re-proved that four of the previous
-    six were closed AS A CLASS rather than carried forward, and closed one prior open question with a negative result
-    (ld.so --list runs no .preinit_array or DT_INIT_ARRAY constructor, so the static parse is complete for the verification
-    path). Its own words: the architecture is not the problem and eight rounds of findings did not make a ninth
-    inevitable.'
-  orchestrator_direction_failure: 'THREE consecutive rounds have blocked on the same omission: OD-P2-08 section
-    5 NAMED cit::binding as the primitive to reuse, and two rounds deferred it as a considered scope decision and
-    substituted something cheaper -- a path, then a git lineage. Both substitutes were defeated. This is the orchestrator''s
-    failure of direction, not the workers'': the briefs listed it among several items, so workers under budget pressure
-    deferred it. The AR86 brief makes it THE deliverable and explicitly non-deferrable, and instructs the worker
-    to stop and report with evidence rather than substitute a third time.'
-  why_not_escalated: No OD-P2-08 section 8 condition fires and all three reviewers checked them explicitly. The
-    architecture keeps being confirmed sound independently; the defects are different each round rather than one
-    enumeration recurring; each fix path is measured before dispatch; and rounds are now closing more than they
-    open. The correct orchestrator action was to fix its own brief, which costs the owner nothing, rather than to
-    escalate a problem of its own making.
-  round_11_result: 'P2-AR-0087 closed all seven AR86 findings; full suite 319/0. It did NOT wire cit::binding literally,
-    building instead a FloorIdentity (random per-checkout UUID plus a monotonic sequence) at <root>/.governance-state/adoption-floor-identity.json
-    -- which the AR86 reviewer''s own repair path had offered as an equivalent option (high-water in the machine''s
-    protected state). Orchestrator-verified concern passed to the next reviewer as its priority target: that location
-    carries class operational, mutation os-only, the SAME declared protection as the floor document it authenticates,
-    and sits INSIDE the project root where the defined lower-trust party can write. The open question is whether
-    it is genuinely a different trust domain or a second copy of the same problem, raising attacker effort from
-    one cp to two.'
-  unexplained_coupling: P2-AR-0087 reports 8/8 reproducible trials that ANY early return in repository_lineage_id
-    -- including a pure filesystem variant with no subprocess -- deterministically breaks brownfield_adoption_end_to_end's
-    held-out memory-retrieval currency check, while no check at all passes 3/3. It ruled out wrong-answer and latency,
-    did not root-cause it, and dropped the lineage-side check rather than ship an unexplained interaction into a
-    security-relevant function. The instinct was right; the coupling is passed to P2-AR-0088 to investigate, since
-    a deterministic link between a security function's control flow and a currency subsystem may indicate a defect
-    elsewhere that this round merely stepped around.
-  round_12_result: 'P2-AR-0088 answered the priority question by execution: FloorIdentity in .governance-state is
-    a SECOND COPY OF THE SAME PROBLEM, not an authentication boundary. Copying both files works; merely MOVING THE
-    ANCHOR ASIDE works, because the bootstrap branch honours any sealed floor; and mutation os-only CLASSIFIES BUT
-    DOES NOT PREVENT -- measured, an ordinary write took effect with no finding and D027 healthy. It also found
-    two materially new HIGHs: lexically_normalise disagrees with the kernel, which expands a symlink BEFORE applying
-    the following .., so one string reads as a system loader and opens as an unpinned project file; and gov init
-    --force rewrites the authoritative floor with the checkout''s own identity, a forward sequence and a fresh valid
-    seal but NO CIT, NO GATE, NO OWNER -- an authenticated ordered transition that is not an AUTHORISED one. It
-    independently re-verified all seven AR86 findings closed against their own reproductions, and judged FloorIdentity
-    the right SHAPE in the wrong PLACE.'
-  coupling_root_caused: 'The mystery P2-AR-0087 could only correlate is now explained: 1304 calls, 44 firing, and
-    every firing root is an OS HEALTH SANDBOX under .governance-runtime/health/sandboxes/. Sandboxes byte-copy the
-    repository with NO .git, so they authenticate their copied floor only because git rev-list walks up -- AR86-C2
-    relied upon as a feature. The bootstrap branch is therefore load-bearing on every health run, not a concession
-    to fresh clones, which is why two successive lineage-side fixes broke brownfield. ORCHESTRATOR ADDITION the
-    reviewer did not have: ALWAYS_EXCLUDED_DIRS excludes .git, .governance-runtime and .governance-state but NOT
-    governance/, so a sandbox DOES copy the records store. That removes the obstacle to binding the floor to the
-    authorising CIT/gate evidence -- the OD-P2-08 section 5 primitive deferred three times -- because a sandbox
-    carries those records while a donor floor from another project references a CIT id this project''s store does
-    not hold.'
-  round_13_result: 'P2-AR-0089 closed all eleven AR88 findings; full suite 337/0, and brownfield_adoption_end_to_end
-    green at 318.88s -- the exact health-sandbox constraint that broke the two previous attempts. The anchor moved
-    OUT of the project to <state_root>/adoption-floors/<key>/identity.json, the same protected root t2 draws its
-    own binding key from, keyed by sha256(canonical_path + lineage) with the path load-bearing. The sandbox question
-    resolved with NO special-casing: a sandbox''s path has never been seen so it bootstraps and authenticates, while
-    a donor floor copied into an already-onboarded project meets that project''s existing anchor and mismatches.
-    PT_INTERP now refuses any ParentDir component, closing the class rather than the symlink case. gov init --force
-    no longer writes an already-onboarded project''s floor.'
-  second_consecutive_clean_round: 'Rounds 12 and 13 each closed everything assigned. The one gap is disclosed with
-    a STRUCTURAL reason rather than a budget one: bound_cit is recorded in the sealed document but not gated on
-    read, because a reclassify_adoption_floor execution re-reads its own not-yet-COMMITTED floor during propagation,
-    so gating would refuse a transaction''s own legitimate write. The AR90 reviewer is asked to trace execute_with
-    and judge whether that reason is real and resolvable, and -- more important -- what distinguishes an AUTHORISED
-    transition from an AUTHENTICATED one while bound_cit stays unverified.'
-  orchestrator_priority_for_ar90: 'The property now rests on a canonical PATH being unreachable by an attacker''s
-    operations. The obvious attack, named in the brief: an attacker inside the repository may be able to CHANGE
-    that path. Move the project, plant a donor floor, run gov at the new path -- never-seen key, bootstrap branch,
-    adopts the document''s own claim -- then move back. That is the same fresh-directory shape that defeated the
-    previous anchor, one layer up. Also named: is_health_sandbox_root is a pure path-shape check an attacker may
-    be able to imitate for a permanent bootstrap.'
-  property_a_holds: 'MILESTONE, round 14: P2-AR-0090 attacked Property A and could construct NO divergence after
-    the ParentDir refusal. AR88-F1/F2/F3/F4 independently re-proved closed; non-UTF-8 and NUL PT_INTERP shown structurally
-    unreachable by source reasoning; the AR88-F1-CONTROL re-assertion judged disclosed over-caution on a contrived
-    shape rather than a legitimate shape broken. The exact-object property took six rounds and is now confirmed
-    sound by an adversary who tried to break it and failed. Only one MEDIUM over-gating regression remains on that
-    surface (AR90-F2).'
-  round_14_result: 'Property C fails on ONE idea: the anchor key sha256(canonical_path + lineage) is a CONJUNCTION,
-    and a key miss falls to the bootstrap branch which adopts the document''s own claim -- so A KEY MISS MEANS CONSENT.
-    Lineage is a value the attacker fully controls from inside the repository: one git checkout --orphan plus a
-    commit changes half the key while leaving the working tree byte-identical and git working. The orchestrator''s
-    own named attack also landed: one mv of the project directory, with the same bytes refused in place, honoured
-    after the move, and refused again when moved back. Damning disclosure evidence: doctor goes DEGRADED to UNHEALTHY
-    while protection works, then back to DEGRADED after the attack -- the attack REMOVES the warning that was already
-    there. Separately AR90-C6 needs no attacker at all: cit execute fails, the store records ROLLED_BACK, restore_snapshot
-    restores 0 files, and the floor write SURVIVES, because manifest_paths never names the floor''s path so take_snapshot
-    never covers it (orchestrator-verified).'
-  bound_cit_adjudicated: 'The reviewer traced execute_with rather than accepting the previous round''s account:
-    the self-reference is REAL -- propagation::apply, generate_registry, adapters::generate and indexer::rebuild
-    all re-read the floor while the CIT is still EXECUTING -- but it is RESOLVABLE by accepting EXECUTING|COMMITTED
-    or using cit::binding''s writes_sha256, so ''structural, not budgetary'' overstated it. Gating would NOT close
-    C1/C2, since onboarding floors legitimately carry no bound_cit and every donor in those attacks is one, but
-    it WOULD have caught C6. As shipped it is inert: one writer, zero readers. The repair round is told to gate
-    it.'
-  round_15_result: P2-AR-0091 closed all six AR90 findings; full suite 350/0. The key is now sha256(canonical_path)
-    alone -- lineage dropped, so an orphan commit or a .git move-aside no longer moves it and those attacks never
-    reach the bootstrap branch at all. For the remaining half, a new minted_for_path field plus other_live_claim
-    refuses a bootstrap that would adopt an identity THIS MACHINE minted for a different path that still exists.
-    manifest_paths now names the floor so a rolled-back CIT genuinely restores it -- measured 0 files restored before,
-    1 after. bound_cit is gated, accepting EXECUTING or COMMITTED, which also closed AR90-C5 as a side effect. The
-    Property-A over-gating regression is fixed per the reviewer's own three-line prescription.
-  round_15_disclosure_quality: 'Worth recording as the standard: the worker distinguished the ATTACK variant of
-    AR90-C2 (relocate then plant a foreign donor -- now refused) from the AVAILABILITY half (a bare mv with no donor
-    still bootstraps silently, no finding), and said plainly that only the attack is closed rather than claiming
-    the finding. It also disclosed that because the anchor sequence lives outside any snapshot''s reach, a legitimately
-    rolled-back floor reads as stale until one more reclassification -- fail-closed but degraded. Both are passed
-    to the reviewer as judgements rather than buried.'
-  orchestrator_priority_for_ar92: 'The whole new mechanism turns on one line, orchestrator-verified: if minted_for
-    != current_canon && Path::new(minted_for).exists(). So a planted donor is refused only WHILE THE DONOR''S DIRECTORY
-    STILL EXISTS. The named first attack: mint in a scratch project, plant it, then move or delete the scratch project
-    -- exists() is false, no live claim, bootstrap adopts. One extra mv, entirely inside the attacker''s control.
-    Also named: the sandbox exemption is now the only unconditional bypass of that check, and .governance-runtime/health/sandboxes/<purpose>-<uuid>
-    is an ordinary mkdir -p, so whether canonicalisation in Project::open is the only thing standing between an
-    attacker and a permanent bootstrap must be re-verified.'
+  rounds_reviewed_under_option_1: 7
+  pattern: each repair's new mechanism becomes the next round's defect; confirmed seven times
+  property_a: converged -- held three consecutive independent attacks
+  property_c: 'root-cause count per round: systemic, 6, 6, 11, 1, 2, 2'
+  owner_surfaced: 2026-09-24 -- no round budget exists in OD-P2-08 section 8; raised for the owner while the repair
+    runs
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
@@ -1443,18 +1318,40 @@ review_history:
   - health-sandboxes/ markers leak if Drop never runs
   - concurrent floor-reanchor unprobed; reanchor never reads bound_cit
   - 2.2 rollback residual and 2.4 manifest_paths not taken, named only
+- review: P2-AR-0094
+  commit_reviewed: a376cc4
+  review_commit: f2a9ab9
+  verdict: RESIDUAL_DEFECTS
+  property_a: HOLDS (third consecutive round; closure re-run 22/0)
+  property_c: FAILS on both mechanisms this round introduced
+  highs:
+  - AR94-C1 sandbox marker is a capability and minting one is free
+  - AR94-C2 floor-reanchor reads the identity it transfers from the floor document
+  mediums:
+  - AR94-C3
+  - AR94-C4
+  - AR94-D1
+  owner_stop_conditions: all seven evaluated, all NO; orchestrator independently confirmed C1, C2 and C3 by reading
+    the code at a376cc4
+  adjudication_of_builder_probe_changes: both rulings LEGITIMATE -- ar92_c4 was a strengthening of a still-passing
+    probe; ar92_c3's original contradicted its own author's measurement, prose, severity and repair direction. But
+    the docstring's claim that a working remedy answers the cost is false (AR94-C4).
+  disposition: automatic repair per OD-P2-08 section 8
 current_round:
-  id: P2-AR-0094
-  kind: independent_adversarial_review
-  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0058-review-7.md
-  subject_commit: a376cc4
-  branch: phase2/review-7
-  evidence_class: INDEPENDENT_ADVERSARIAL
-  primary_targets:
-  - the sandbox marker is now authority-bearing and the builder says it leaks; the sandbox path is inside the project
-    and therefore observable
-  - gov floor-reanchor is an identity transfer that removes the prior store entry
-  - adjudicate the builder's changes to two AR92 held-out probes
+  id: P2-AR-0095
+  kind: repair
+  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0059-ar94-repair.md
+  base_commit: f2a9ab9
+  branch: phase2/remediation-ar94
+  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
+  non_deferrable:
+  - 1.1 AR94-C2 take the identity from the store via --from, never from the document
+  - 1.2 AR94-C1 delete the durable sandbox marker for a process-local registry
+  - 1.3 AR94-C3 refuse when the anchor path is None; write_full must not report success for work it did not do
+  - 1.4 AR94-C4 the printed advice must name the second-checkout case with the re-onboarding remedy
+  - 1.5 AR94-D1 disclose the transfer and widen the disclosure channel's reach
+  named_risk: the reviewer's child-process suggestion uses an environment variable, which is ambient authority;
+    the brief forbids quietly trusting it
 orchestrator_verified_independently:
 - paths.rs:651 -- the exists() conjunct is present exactly as reported
 - paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
@@ -1472,4 +1369,10 @@ orchestrator_verified_independently:
 - 'a376cc4: exec_resolve.rs untouched (empty diff); product diff confined to 5 files'
 - 'a376cc4: Sandbox::create bases sandboxes at p.runtime_dir(), i.e. INSIDE the project, so the random sandbox path
   is observable by an ordinary project-scoped actor -- orchestrator-derived attack chain handed to review 7'
+- a376cc4 paths.rs:1349 -- reanchor_project_identity reads bound_project_identity FROM THE DOCUMENT, then scans
+  the store for that identity and moves it; it never asks whether this checkout is entitled to it. AR94-C2 confirmed.
+- a376cc4 -- remove_sandbox_record has exactly one caller (sandbox.rs:144, in Drop); no GC anywhere. AR94-C1 confirmed.
+- a376cc4 paths.rs:788 -- write_full returns Ok(()) without writing when path(root) is None, and reanchor then removes
+  the old dir unconditionally. AR94-C3 confirmed.
+- f2a9ab9 touches no product source
 last_updated: '2026-09-24'

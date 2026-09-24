@@ -478,3 +478,38 @@ round's defect. The orchestrator derived and handed over one attack chain: `Sand
 actor; if the marker leaks because `Drop` never ran, recreating a directory at that observed path may reconstitute
 the exemption. The builder classified that leak as storage hygiene; this round made the marker authority-bearing,
 which is why it is now a capability question and not a hygiene one.
+
+## P2-L-0041 — P2-AR-0094 returns RESIDUAL_DEFECTS; AR94 repair dispatched; convergence question raised with the owner (2026-09-24)
+
+The seventh independent review of `a376cc4` returns **`RESIDUAL_DEFECTS`**, committed at `f2a9ab9` with product
+source untouched.
+
+**Property A holds for the third consecutive round** — `exec_resolve.rs` unchanged, closure re-run 22/0, the
+predecessor's held-out probes unmodified and green.
+
+**Property C fails on both mechanisms this round introduced**, exactly as the standing prediction says.
+**AR94-C2 (HIGH)** is the sharpest finding in the phase so far: `reanchor_project_identity` reads
+`bound_project_identity` **from the floor document**, then scans the store for that identity and moves it — it never
+asks whether this checkout is entitled to it. The T2 seal carries no path or identity (AR84-C3) and git lineage is
+public (AR86-C1), so the attacker's whole contribution is **one project-scoped file copy**; the owner completes it by
+relocating their own checkout and following the advice the OS itself prints. **AR94-C1 (HIGH)**: the sandbox marker
+is a capability and minting one is free — the adversary kills their **own** `gov` process, since `remove_sandbox_record`
+has exactly one caller, in `Drop`, and there is no GC. Three MEDIUMs compose with these.
+
+**Orchestrator verification.** C1, C2 and C3 each confirmed by reading the code at `a376cc4`. The reviewer's
+adjudication of the previous builder's changes to two held-out probes was checked against AR92's own text and is
+sound: `ar92_c4` was a strengthening of a probe that still passed; `ar92_c3`'s original contradicted its own author's
+measurement, prose, severity and repair direction. The docstring's claim that a working remedy answers the cost is
+false, and that is AR94-C4.
+
+**Dispatched `P2-AR-0095`** on `P2-HO-0059` from `f2a9ab9` with five non-deferrable items. Both HIGH repairs are a
+**deletion** (the durable marker, replaced by a process-local registry that cannot leak) and a **narrowing** (`--from`,
+taking the identity from the store and making the operator name it). The brief forbids adding a third mechanism to
+guard the second, and explicitly warns that the reviewer's child-process suggestion rests on an environment variable —
+ambient authority, the class this phase exists to refuse.
+
+**Raised with the owner, not decided here.** Seven reviews under Option 1, every one finding something, with the
+defect each time in the mechanism the previous repair introduced. OD-P2-08 §8's seven stop conditions are all NO and
+none of them is a round budget, so the loop has no terminating condition other than a reviewer finding nothing. The
+repair proceeds meanwhile — both findings are HIGH, and §10 requires every HIGH closed before minting under any
+policy the owner might choose — so nothing is blocked while they consider it.
