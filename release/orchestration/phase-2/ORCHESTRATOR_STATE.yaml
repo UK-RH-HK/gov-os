@@ -4,8 +4,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-24T06:47:08Z'
-state_hash: 92860c5506965421234beef90f45b5024ebb73f52ca77f5a3b33ef4069c186a7
+updated_at: '2026-09-24T10:47:22Z'
+state_hash: 14720b26840e3295fa4b171283abd14e265b445cd6dd6e006b00f014f21f4558
 lifecycle_state: P2_COMPLETION_OPTION_1
 loop_status: RUNNING
 protocol:
@@ -228,6 +228,15 @@ convergence_watch:
   why_not_escalated: No OD-P2-08 section 8 condition fires and all three reviewers checked them explicitly. The architecture keeps being confirmed sound independently; the defects are different each round
     rather than one enumeration recurring; each fix path is measured before dispatch; and rounds are now closing more than they open. The correct orchestrator action was to fix its own brief, which costs
     the owner nothing, rather than to escalate a problem of its own making.
+  round_11_result: 'P2-AR-0087 closed all seven AR86 findings; full suite 319/0. It did NOT wire cit::binding literally, building instead a FloorIdentity (random per-checkout UUID plus a monotonic sequence)
+    at <root>/.governance-state/adoption-floor-identity.json -- which the AR86 reviewer''s own repair path had offered as an equivalent option (high-water in the machine''s protected state). Orchestrator-verified
+    concern passed to the next reviewer as its priority target: that location carries class operational, mutation os-only, the SAME declared protection as the floor document it authenticates, and sits INSIDE
+    the project root where the defined lower-trust party can write. The open question is whether it is genuinely a different trust domain or a second copy of the same problem, raising attacker effort from
+    one cp to two.'
+  unexplained_coupling: P2-AR-0087 reports 8/8 reproducible trials that ANY early return in repository_lineage_id -- including a pure filesystem variant with no subprocess -- deterministically breaks brownfield_adoption_end_to_end's
+    held-out memory-retrieval currency check, while no check at all passes 3/3. It ruled out wrong-answer and latency, did not root-cause it, and dropped the lineage-side check rather than ship an unexplained
+    interaction into a security-relevant function. The instinct was right; the coupling is passed to P2-AR-0088 to investigate, since a deterministic link between a security function's control flow and
+    a currency subsystem may indicate a defect elsewhere that this round merely stepped around.
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
@@ -1073,13 +1082,13 @@ test_execution_policy:
   floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
     the only remaining lever on this figure, not merely the largest.
 running_work:
-- run_id: P2-AR-0087
-  role: repair the AR86 findings -- wire the floor to an authenticated ORDERED transition per OD-P2-08 section 5 (non-deferrable, THE deliverable), and stop resolving PT_INTERP in the wrong process
-  worker_model: claude-sonnet-5 native
-  branch: phase2/ar86-repair
-  base: d2f981a
-  worktree: scratchpad/wt/p2-ar86-fix
-  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
+- run_id: P2-AR-0088
+  role: fourth independent adversarial review -- fitness to mint
+  worker_model: claude-opus-5 native
+  branch: phase2/review-4
+  target: phase2/ar86-repair 52f1448 (FROZEN)
+  worktree: scratchpad/wt/p2-rev4
+  evidence_class: INDEPENDENT_ADVERSARIAL
   status: RUNNING
   last_progress_at: '2026-09-24'
 completed_work_formerly_running:
