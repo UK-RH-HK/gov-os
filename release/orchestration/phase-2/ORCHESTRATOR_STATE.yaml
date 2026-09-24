@@ -4,8 +4,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-24T10:47:22Z'
-state_hash: 14720b26840e3295fa4b171283abd14e265b445cd6dd6e006b00f014f21f4558
+updated_at: '2026-09-24T11:22:33Z'
+state_hash: f7895c3a9d540c6e7c3b8bb31dfe7aaaa8ed19b54fadb38967a86553dff1eb3c
 lifecycle_state: P2_COMPLETION_OPTION_1
 loop_status: RUNNING
 protocol:
@@ -237,6 +237,17 @@ convergence_watch:
     held-out memory-retrieval currency check, while no check at all passes 3/3. It ruled out wrong-answer and latency, did not root-cause it, and dropped the lineage-side check rather than ship an unexplained
     interaction into a security-relevant function. The instinct was right; the coupling is passed to P2-AR-0088 to investigate, since a deterministic link between a security function's control flow and
     a currency subsystem may indicate a defect elsewhere that this round merely stepped around.
+  round_12_result: 'P2-AR-0088 answered the priority question by execution: FloorIdentity in .governance-state is a SECOND COPY OF THE SAME PROBLEM, not an authentication boundary. Copying both files works;
+    merely MOVING THE ANCHOR ASIDE works, because the bootstrap branch honours any sealed floor; and mutation os-only CLASSIFIES BUT DOES NOT PREVENT -- measured, an ordinary write took effect with no finding
+    and D027 healthy. It also found two materially new HIGHs: lexically_normalise disagrees with the kernel, which expands a symlink BEFORE applying the following .., so one string reads as a system loader
+    and opens as an unpinned project file; and gov init --force rewrites the authoritative floor with the checkout''s own identity, a forward sequence and a fresh valid seal but NO CIT, NO GATE, NO OWNER
+    -- an authenticated ordered transition that is not an AUTHORISED one. It independently re-verified all seven AR86 findings closed against their own reproductions, and judged FloorIdentity the right
+    SHAPE in the wrong PLACE.'
+  coupling_root_caused: 'The mystery P2-AR-0087 could only correlate is now explained: 1304 calls, 44 firing, and every firing root is an OS HEALTH SANDBOX under .governance-runtime/health/sandboxes/. Sandboxes
+    byte-copy the repository with NO .git, so they authenticate their copied floor only because git rev-list walks up -- AR86-C2 relied upon as a feature. The bootstrap branch is therefore load-bearing
+    on every health run, not a concession to fresh clones, which is why two successive lineage-side fixes broke brownfield. ORCHESTRATOR ADDITION the reviewer did not have: ALWAYS_EXCLUDED_DIRS excludes
+    .git, .governance-runtime and .governance-state but NOT governance/, so a sandbox DOES copy the records store. That removes the obstacle to binding the floor to the authorising CIT/gate evidence --
+    the OD-P2-08 section 5 primitive deferred three times -- because a sandbox carries those records while a donor floor from another project references a CIT id this project''s store does not hold.'
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
@@ -1082,13 +1093,14 @@ test_execution_policy:
   floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
     the only remaining lever on this figure, not merely the largest.
 running_work:
-- run_id: P2-AR-0088
-  role: fourth independent adversarial review -- fitness to mint
-  worker_model: claude-opus-5 native
-  branch: phase2/review-4
-  target: phase2/ar86-repair 52f1448 (FROZEN)
-  worktree: scratchpad/wt/p2-rev4
-  evidence_class: INDEPENDENT_ADVERSARIAL
+- run_id: P2-AR-0089
+  role: repair the AR88 findings -- refuse ParentDir in PT_INTERP, bind the floor to the authorising CIT/gate evidence (the OD-P2-08 section 5 primitive, deferred three times), and stop gov init --force
+    writing the authoritative floor
+  worker_model: claude-sonnet-5 native
+  branch: phase2/ar88-repair
+  base: 4b677bc
+  worktree: scratchpad/wt/p2-ar88-fix
+  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
   status: RUNNING
   last_progress_at: '2026-09-24'
 completed_work_formerly_running:
