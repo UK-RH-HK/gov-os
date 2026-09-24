@@ -4,8 +4,8 @@ phase: 2
 phase_name: GOVERNANCE CAPABILITY BASELINE
 target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
-updated_at: '2026-09-24T11:22:33Z'
-state_hash: f7895c3a9d540c6e7c3b8bb31dfe7aaaa8ed19b54fadb38967a86553dff1eb3c
+updated_at: '2026-09-24T13:26:46Z'
+state_hash: ca71e56c349439851553ef08539b1af1190388226e5373972b96dcb19216b555
 lifecycle_state: P2_COMPLETION_OPTION_1
 loop_status: RUNNING
 protocol:
@@ -248,6 +248,18 @@ convergence_watch:
     on every health run, not a concession to fresh clones, which is why two successive lineage-side fixes broke brownfield. ORCHESTRATOR ADDITION the reviewer did not have: ALWAYS_EXCLUDED_DIRS excludes
     .git, .governance-runtime and .governance-state but NOT governance/, so a sandbox DOES copy the records store. That removes the obstacle to binding the floor to the authorising CIT/gate evidence --
     the OD-P2-08 section 5 primitive deferred three times -- because a sandbox carries those records while a donor floor from another project references a CIT id this project''s store does not hold.'
+  round_13_result: 'P2-AR-0089 closed all eleven AR88 findings; full suite 337/0, and brownfield_adoption_end_to_end green at 318.88s -- the exact health-sandbox constraint that broke the two previous attempts.
+    The anchor moved OUT of the project to <state_root>/adoption-floors/<key>/identity.json, the same protected root t2 draws its own binding key from, keyed by sha256(canonical_path + lineage) with the
+    path load-bearing. The sandbox question resolved with NO special-casing: a sandbox''s path has never been seen so it bootstraps and authenticates, while a donor floor copied into an already-onboarded
+    project meets that project''s existing anchor and mismatches. PT_INTERP now refuses any ParentDir component, closing the class rather than the symlink case. gov init --force no longer writes an already-onboarded
+    project''s floor.'
+  second_consecutive_clean_round: 'Rounds 12 and 13 each closed everything assigned. The one gap is disclosed with a STRUCTURAL reason rather than a budget one: bound_cit is recorded in the sealed document
+    but not gated on read, because a reclassify_adoption_floor execution re-reads its own not-yet-COMMITTED floor during propagation, so gating would refuse a transaction''s own legitimate write. The AR90
+    reviewer is asked to trace execute_with and judge whether that reason is real and resolvable, and -- more important -- what distinguishes an AUTHORISED transition from an AUTHENTICATED one while bound_cit
+    stays unverified.'
+  orchestrator_priority_for_ar90: 'The property now rests on a canonical PATH being unreachable by an attacker''s operations. The obvious attack, named in the brief: an attacker inside the repository may
+    be able to CHANGE that path. Move the project, plant a donor floor, run gov at the new path -- never-seen key, bootstrap branch, adopts the document''s own claim -- then move back. That is the same
+    fresh-directory shape that defeated the previous anchor, one layer up. Also named: is_health_sandbox_root is a pure path-shape check an attacker may be able to imitate for a permanent bootstrap.'
 iteration:
   current: 2
   kind: repair iteration 1 (rounds per repair-delta section 2), then independent verification of cap2-candidate-1
@@ -1093,14 +1105,13 @@ test_execution_policy:
   floor: at 100% utilisation of 20 cores the floor is ~1,950 s (32 min), so no scheduling change alone gets the full suite below about half an hour. Optimisation (dev-profile opt-level, R3) is therefore
     the only remaining lever on this figure, not merely the largest.
 running_work:
-- run_id: P2-AR-0089
-  role: repair the AR88 findings -- refuse ParentDir in PT_INTERP, bind the floor to the authorising CIT/gate evidence (the OD-P2-08 section 5 primitive, deferred three times), and stop gov init --force
-    writing the authoritative floor
-  worker_model: claude-sonnet-5 native
-  branch: phase2/ar88-repair
-  base: 4b677bc
-  worktree: scratchpad/wt/p2-ar88-fix
-  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
+- run_id: P2-AR-0090
+  role: fifth independent adversarial review -- fitness to mint
+  worker_model: claude-opus-5 native
+  branch: phase2/review-5
+  target: phase2/ar88-repair 526f789 (FROZEN)
+  worktree: scratchpad/wt/p2-rev5
+  evidence_class: INDEPENDENT_ADVERSARIAL
   status: RUNNING
   last_progress_at: '2026-09-24'
 completed_work_formerly_running:
