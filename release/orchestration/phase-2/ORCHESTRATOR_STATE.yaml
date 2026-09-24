@@ -1191,8 +1191,9 @@ completed_stages:
     the pinned model under P2-HO-0008 / P2-HO-0009.
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
-next_deterministic_action: await P2-AR-0095 hand-back (full suite live, verified); then verify its commit/scope/tests,
-  then perform the mandatory pre-final owner-question sweep before dispatching Review 8
+next_deterministic_action: await P2-AR-0095 hand-back (suite live, verified); then verify commit/scope/tests; then
+  the mandatory pre-final owner-question sweep; then build the whole-system/impact context pack; then dispatch Review
+  8
 current_prohibitions:
 - action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status
   until: never
@@ -1371,6 +1372,7 @@ owner_directions_in_force:
 - OD-P2-07
 - OD-P2-08
 - OD-P2-09
+- OD-P2-10
 od_p2_09:
   recorded: release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md
   round_budget: Review 8 is the convergence decision point; no automatic Review 9+ on the same mechanism-hardening
@@ -1392,3 +1394,25 @@ sweep_findings_so_far:
   no in-product remedy unless a re-onboarding path is also provided.'
 - '5A MITIGATION, verified: a refused floor is not fatal. PolicySet::load reconstructs from native layout plus AR86-C6
   last_known_rules, so src/** stays protected; the checkout is DEGRADED/UNHEALTHY (AR94-D4), not bricked.'
+od_p2_10:
+  recorded: release/orchestration/phase-2/GATES/OWNER-AMENDMENT-P2-0010-CONTEXT-RETRIEVAL-BRIDGE.md
+  pre_review_8_sequence:
+  - AR95 completion
+  - pre-final owner-question sweep
+  - whole-system/impact CONTEXT PACK (new, mandatory)
+  - fresh independent Review 8
+  conditional: 'ONLY if Review 8 fails with another blocking HIGH: freeze Phase-2 product, and build the V8.3 CONTEXT/RETRIEVAL
+    BRIDGE in a SEPARATE fresh session BEFORE any further Phase-2 product repair'
+  bridge_is_not:
+  - the accepted product
+  - the Phase-2 candidate
+  - a normative authority source
+  - proof Phase 3 is accepted
+  - a replacement for Contract v3 or deterministic mandatory-input resolution
+  anti_snowball_rule: after the bridge, every finding runs finding -> whole-system context pack -> fresh root-cause
+    synthesis classifying the response as REPAIR/REUSE/DELETE/NARROW/DEFER/OWNER DECISION, before any product code
+    changes
+  authority_model: retrieval must never silently replace an authoritative mandatory input; a high-scoring historical
+    result must never outrank a current authoritative decision
+  phase_3: qualifies the already-built retrieval profile rather than re-engineering it; the Phase-3 gate is not
+    skipped

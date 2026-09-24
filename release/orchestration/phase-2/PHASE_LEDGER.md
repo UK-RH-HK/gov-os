@@ -513,3 +513,39 @@ defect each time in the mechanism the previous repair introduced. OD-P2-08 §8's
 none of them is a round budget, so the loop has no terminating condition other than a reviewer finding nothing. The
 repair proceeds meanwhile — both findings are HIGH, and §10 requires every HIGH closed before minting under any
 policy the owner might choose — so nothing is blocked while they consider it.
+
+## P2-L-0042 — OD-P2-09 and OD-P2-10 recorded; the loop gains a budget and a conditional exit (2026-09-24)
+
+Two owner records land while `P2-AR-0095`'s certification suite runs (left untouched per OD-P2-09 §3; liveness
+verified from process state, not assumed).
+
+**OD-P2-09** closes the round-budget gap the orchestrator raised after review 7. **Review 8 is the convergence
+decision point**; there is no automatic Review 9 on the same mechanism-hardening loop. The simplification principle
+becomes binding: an optional recovery feature that repeatedly produces HIGH findings is **deleted or simplified, not
+wrapped**. A mandatory pre-final owner-question sweep precedes Review 8, and three questions must be checked
+explicitly — whether `floor-reanchor` is required at all, concurrent re-anchor semantics, and sandbox exemption
+lifetime. The acceptance standard is stated finitely and explicitly is **not** "no conceivable defect can ever be
+found".
+
+**OD-P2-10** adds one mandatory step before Review 8 — a **whole-system / impact context pack** — and one conditional
+branch after it. If Review 8 fails with another blocking HIGH, the Phase-2 product **freezes** and a separate fresh
+session builds a **V8.3 Context/Retrieval Bridge** before any further product repair. The owner's reasoning is
+recorded because it diagnoses this phase's own failure mode: *independence must mean independent reasoning plus
+complete relevant context, not independent reasoning plus architectural ignorance.* After the bridge, every finding
+must run `finding → whole-system context pack → fresh root-cause synthesis` classifying the answer as
+REPAIR/REUSE/DELETE/NARROW/DEFER/OWNER DECISION **before** product code changes — aimed squarely at the loop this
+phase has been in.
+
+**Orchestrator correction to a premise.** OD-P2-09 §5B states AR95 has already produced evidence of a genuine
+nondeterministic concurrent re-anchor race. That is not confirmable from durable state: AR95 has committed nothing
+and has not reported. The race evidence on record is P2-AR-0094's `ar94_c5`, which **constructed** the interleaving
+but observed the invocations serialise — explicitly *not ruled out* rather than proven. Flagged to the owner so the
+sweep does not inherit an unverified premise.
+
+**First sweep finding, verified at `f2a9ab9`.** `init.rs:303` and `adopt.rs:1840` both gate
+`write_project_adoption_floor` on `!already_installed`, and a relocated checkout carries `framework.lock` — so
+neither onboarding path re-establishes a floor at a new path (`--force` explicitly reinstalls the kernel without
+re-running the adoption decision). **Deleting `floor-reanchor` is therefore not a pure deletion**: it removes the
+identity-transfer surface but leaves same-machine relocation with no in-product remedy unless a re-onboarding path is
+also provided. Mitigating half, also verified: `PolicySet::load` reconstructs from native layout plus AR86-C6
+`last_known_rules`, so a refused floor leaves the checkout DEGRADED/UNHEALTHY rather than unprotected.
