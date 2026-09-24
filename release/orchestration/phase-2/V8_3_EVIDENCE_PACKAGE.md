@@ -870,6 +870,74 @@ risk**, and the lab discipline the reviewers adopted — a disposable project pe
 
 ---
 
+## 10. Routine governance overhead objective (owner requirement, OD-P2-09 §16)
+
+**Non-normative for Phase 2. Not a Phase-2 blocker.** Recorded here as a binding objective for the V8.3 architect.
+
+After successful project adoption, once Governance OS is operating normally, incremental Governance OS overhead for
+ordinary engineering work should normally remain at approximately **10–20% or less** of representative:
+
+* wall-clock engineering effort; and
+* model/token consumption,
+
+**measured over a meaningful task window rather than one isolated task.**
+
+The objective **excludes** exceptional work: release certification, advanced qualification, major migration, security
+incident, architecture redesign, initial project adoption, and major Governance OS upgrade.
+
+The overhead is repaid through: correct bounded context; durable memory; retrieval rather than repeated repository
+reading; deterministic task/impact mapping; reduced model drift; reduced context explosion; targeted tests instead of
+unnecessary full suites; safe session/model continuation; less rework; reusable lessons; reusable capabilities; and
+explicit decisions with provenance.
+
+> If Product A/B evidence later shows routine overhead is **materially and persistently above ~20%** without
+> equivalent productivity or safety benefit, that is a **PRODUCT/ARCHITECTURE EFFICIENCY DEFECT**. The required
+> response is **simplification and optimisation, not rationalisation**.
+
+> **Governance OS succeeds only if it is an accelerator with governance, not governance that consumes the
+> productivity it was built to protect.**
+
+### The cost tiering this objective implies (OD-P2-09 §15)
+
+Phase-2 exhaustive/adversarial cost is **not** the intended cost model for normal governed development:
+
+| Gate | Cost tier |
+|---|---|
+| G1 mutation | targeted cheap checks |
+| G2 task close | affected/dependency checks |
+| G3 checkpoint/handoff | bounded broader checks |
+| G4 milestone | broader integration checks |
+| G5 candidate | full certification |
+| G6 qualification/release | exhaustive/adversarial qualification |
+
+The hour-scale full certification suite measured throughout this phase (263→374 tests, ~50–62 min idle, longer under
+load) belongs at **candidate and qualification boundaries only** — never on each ordinary feature. This phase ran it
+per round because every round produced a minting candidate, which is exactly the G5/G6 case; that is not evidence
+about normal use.
+
+## 11. Deterministic-first cross-project learning (owner requirement, OD-P2-09 §17)
+
+**Shared learning does NOT mean shared project memory.** One machine may have one authenticated Governance OS runtime
+and **many isolated project governance domains**.
+
+Cross-project transfer occurs **only** through explicit governed artefacts: `LESSON_CHANNEL`, `CAPABILITY_CHANNEL`,
+`FRAMEWORK_UPSTREAM_CHANNEL`.
+
+Routine operations are **deterministic-first**: hashes, manifests, stable IDs, schema validation, change detection,
+dependency impact, compatibility, provenance.
+
+**Cost rules, binding on the V8.3 design:**
+
+> No LLM call solely to discover that nothing changed.
+
+> No cross-project model invocation unless an explicit candidate artefact, dependency impact, conflict, or requested
+> semantic retrieval exists.
+
+**Do not build:** one global private-memory GraphRAG across projects; continuous LLM scanning of every repository;
+automatic copying of project memory; a Governance OS release for every lesson; automatic mass migrations.
+
+Future V8.3 / Phase-8 design input only.
+
 ## Unresolved optimisation questions for the V8.3 architect
 
 1. How should acceptance evidence be **cached** so an unchanged check can be skipped soundly? Exactly which inputs must

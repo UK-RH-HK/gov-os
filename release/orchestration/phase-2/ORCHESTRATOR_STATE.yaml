@@ -1191,17 +1191,8 @@ completed_stages:
     the pinned model under P2-HO-0008 / P2-HO-0009.
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
-next_deterministic_action: 'P2 loader probe is COMPLETE and did NOT falsify the architecture: a pinned dynamically-linked
-  ELF with RUNPATH $ORIGIN ran unverified code before the first reviewed instruction under a fully cleared environment,
-  because RUNPATH lives INSIDE the verified object. Recorded at RESEARCH/P2-LOADER-PROBE.md; incorporated as a closure
-  extension per OD-P2-08 section 3. NEXT: dispatch a fresh Sonnet 5 implementation of Option 1 under OD-P2-08 --
-  Property A (ResolvedExecution with shebang AND dynamic-dependency closure; wrapper chains do not qualify for the
-  ungated path), Property C (project-specific authenticated adoption floor composed with the kernel floor, no ordered
-  class predicate, one authoritative PathDecision construction point), reuse of cit::binding rather than a new hand-edit
-  detector, and the pinned_files schema gap. Then targeted tests, affected dependency tests, deterministic checks,
-  ONE full certification run, freeze, fresh Opus 5 adversarial review with independently derived held-out probes,
-  mint cap2-candidate-2 only when its prerequisites hold, then fresh Opus 5 formal acceptance verification. Ordinary
-  defects are repaired and re-reviewed AUTOMATICALLY without owner relay; stop only on the OD-P2-08 section 8 conditions.'
+next_deterministic_action: await P2-AR-0095 hand-back (full suite live, verified); then verify its commit/scope/tests,
+  then perform the mandatory pre-final owner-question sweep before dispatching Review 8
 current_prohibitions:
 - action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status
   until: never
@@ -1376,3 +1367,28 @@ orchestrator_verified_independently:
   the old dir unconditionally. AR94-C3 confirmed.
 - f2a9ab9 touches no product source
 last_updated: '2026-09-24'
+owner_directions_in_force:
+- OD-P2-07
+- OD-P2-08
+- OD-P2-09
+od_p2_09:
+  recorded: release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md
+  round_budget: Review 8 is the convergence decision point; no automatic Review 9+ on the same mechanism-hardening
+    loop
+  simplification_principle: BINDING -- an optional/recovery feature that repeatedly creates HIGH findings is deleted
+    or simplified, not wrapped
+  mandatory_next_step: PRE_FINAL_OWNER_QUESTION_SWEEP after AR95 completes, before Review 8; one consolidated message
+  must_check:
+  - 5A floor-reanchor required at all?
+  - 5B concurrent re-anchor semantics
+  - 5C sandbox exemption lifetime
+  post_review_8: no HIGH -> mint automatically; HIGH in floor-reanchor -> DELETE it; HIGH in another optional mechanism
+    -> delete/narrow; HIGH in old untouched core -> STOP to owner; only MEDIUM/LOW -> do not keep the phase open
+sweep_findings_so_far:
+- '5A CRUX, verified at f2a9ab9: BOTH init.rs:303 and adopt.rs:1840 gate write_project_adoption_floor on !already_installed.
+  A relocated checkout carries framework.lock, so already_installed is TRUE at the new path -- neither gov init
+  (even --force, which explicitly does not re-run the adoption decision) nor gov adopt re-establishes a floor there.
+  Deleting floor-reanchor therefore does NOT merely remove a convenience; it leaves same-machine relocation with
+  no in-product remedy unless a re-onboarding path is also provided.'
+- '5A MITIGATION, verified: a refused floor is not fatal. PolicySet::load reconstructs from native layout plus AR86-C6
+  last_known_rules, so src/** stays protected; the checkout is DEGRADED/UNHEALTHY (AR94-D4), not bricked.'
