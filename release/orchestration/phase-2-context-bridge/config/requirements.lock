@@ -1,0 +1,71 @@
+# govbridge pinned dependencies (ARCHITECTURE.md section 13; orchestrator amendment BR-DAG-AMEND-1).
+# Installed with `pip install --require-hashes --no-deps -r requirements.lock` (bootstrap/bootstrap.sh). Every
+# wheel every layer needs (B1-B6, I1) is pinned here, hash-verified, so the shared venv is never touched again
+# after B1's bootstrap runs. Versions and hashes for the 22 packages below are the architect's own resolved,
+# working spike environment (SO-07, SO-18: ARCHITECTURE/spike-outputs); pytest and its two runtime dependencies
+# (iniconfig, pluggy) were resolved and hash-captured by this run (BR-AR-0003) the same way, for the same
+# platform (manylinux2014_x86_64 / cp312).
+#
+# Platform: Python 3.12, Linux x86_64 (manylinux2014/manylinux_2_17/manylinux_2_28 wheels).
+
+# -- direct requirements of govbridge itself --------------------------------------------------------------------
+numpy==2.5.3 \
+    --hash=sha256:b7e18c623bb5c95acb3b3328861272816ba199fb531921c5d6d0b675f1fde9e3
+PyYAML==6.0.3 \
+    --hash=sha256:ba1cc08a7ccde2d2ec775841541641e4548226580ab850948cbfda66a1befcdc
+onnxruntime==1.30.0 \
+    --hash=sha256:fa688e7891a6aa206636fe7372e27ee75fd17713289f6b4fc7b190e0a7de9328
+tokenizers==0.23.2 \
+    --hash=sha256:41c2f84d172449b4dadb9cdc508e3e364076613c35b16e76ecfe47a60d1e3305
+tree-sitter==0.25.2 \
+    --hash=sha256:b43a9e4c89d4d0839de27cd4d6902d33396de700e9ff4c5ab7631f277a85ead9
+tree-sitter-rust==0.24.0 \
+    --hash=sha256:bf2c1f4b87df568352a9e523600af7cb32c5748dc75275f4794d6f811ab13dfe
+
+# -- tokenizers' / onnxruntime's own runtime dependencies (installed explicitly: --no-deps means nothing pulls
+#    these in automatically) --------------------------------------------------------------------------------
+huggingface_hub==1.33.0 \
+    --hash=sha256:04e434b06e100eddbce9a6e817d72693a7884b10a79bd67ab48080d5c07eb899
+hf-xet==1.6.0 \
+    --hash=sha256:d62671bb130879cef0ee4c9ebe47a14af6c66ec53e6d84dc15936e5ffdfac82f
+filelock==4.0.3 \
+    --hash=sha256:30cd166e2aee2c7534ce2c33c6367c4cd051b8368e20e2c4eb0c34f699bacfab
+fsspec==2026.9.0 \
+    --hash=sha256:8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f
+packaging==26.3 \
+    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+typing_extensions==4.16.0 \
+    --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
+tqdm==4.70.1 \
+    --hash=sha256:c293e525e6fef9c20e8728fd4612df02a0aa31bb5fe91ecd93e123b1b7bffa73
+protobuf==7.36.2 \
+    --hash=sha256:89f23aa53c24553a2416fd4fd1ec06f74fa42b14b546d8883128813f775bbfd2
+flatbuffers==25.12.19 \
+    --hash=sha256:7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4
+click==8.5.0 \
+    --hash=sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360
+certifi==2026.7.22 \
+    --hash=sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775
+idna==3.20 \
+    --hash=sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c
+anyio==4.15.1 \
+    --hash=sha256:6152fdbbf9a77fdec97731721bebf7c4c44f7c29b424b0065826173efc7ed101
+h11==0.16.0 \
+    --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
+httpcore==1.0.9 \
+    --hash=sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55
+httpx==0.28.1 \
+    --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
+
+# -- tests (SEMANTIC_ROUTE.md section 5.1 / IMPLEMENTATION_DAG.yaml conventions.python: "plus pytest") ----------
+# pytest 9.0.3's own Requires-Dist (verified against its wheel METADATA): iniconfig>=1.0.1, packaging>=22,
+# pluggy<2,>=1.5, pygments>=2.7.2 (colorama/exceptiongroup/tomli are platform/version-guarded and not needed on
+# Python 3.12 Linux). --no-deps means every one of these must be listed explicitly, or pytest fails to import.
+pytest==9.0.3 \
+    --hash=sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9
+iniconfig==2.3.0 \
+    --hash=sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12
+pluggy==1.6.0 \
+    --hash=sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746
+pygments==2.21.0 \
+    --hash=sha256:2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9

@@ -1,0 +1,44 @@
+schema: govbridge-corpus-rules/1
+description: a small rule set exercising every match type, for tests/core -- not the real config/corpus-rules.yaml
+rules:
+  - id: X-SEC-PATH
+    effect: EXCLUDE
+    match:
+      globs: ["**/.env", "**/*.pem", "secrets/**"]
+    source_cite: fixture
+
+  - id: X-BUILD
+    effect: EXCLUDE
+    match:
+      globs: ["**/__pycache__/**"]
+    source_cite: fixture
+
+  - id: M-LARGE
+    effect: METADATA_ONLY
+    match:
+      size_gt: 1048576
+    source_cite: fixture
+
+  - id: X-BINARY
+    effect: EXCLUDE
+    match:
+      binary: true
+    source_cite: fixture
+
+  - id: X-SEC-CONTENT
+    effect: EXCLUDE
+    match:
+      content_regex:
+        aws-secret-key: "(?i)aws_secret_access_key\\s*=\\s*'[A-Za-z0-9/+=]{40}'"
+    source_cite: fixture
+
+  - id: L-MACHINE-OUTPUT
+    effect: LEXICAL_ONLY
+    match:
+      kinds: [out, log]
+    source_cite: fixture
+
+  - id: INCLUDED
+    effect: INCLUDE
+    match: {}
+    source_cite: fixture

@@ -1,0 +1,51 @@
+schema: govbridge-model-pin/1
+description: >
+  The one provisional semantic-route model, pinned (SEMANTIC_ROUTE.md section 2). This is not a final selection --
+  it is the launcher's permitted single provisional model, replaceable behind the gov-capability/1 embed adapter
+  (govbridge/semantic/adapters/onnx_embed.py, node B4) with no redesign (SEMANTIC_ROUTE.md section 5). B1's bootstrap
+  downloads and verifies these artefacts; B1 does not run the model itself (that is node B4).
+model:
+  id: BAAI/bge-small-en-v1.5
+  revision: 5c38ec7c405ec4b44b94cc5a9bb96e735b38267a
+  licence: MIT
+  artefacts:
+    - path: onnx/model.onnx
+      sha256: 828e1496d7fabb79cfa4dcd84fa38625c0d3d21da474a00f08db0f559940cf35
+    - path: tokenizer.json
+      sha256: d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66
+    - path: config.json
+      sha256: 094f8e891b932f2000c92cfc663bac4c62069f5d8af5b5278c4306aef3084750
+    - path: tokenizer_config.json
+      sha256: 9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3
+    - path: special_tokens_map.json
+      sha256: b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3
+    - path: 1_Pooling/config.json
+      sha256: d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c
+      local_name: pooling_config.json
+  dimensions: 384
+  pooling: cls
+  normalize: l2
+  max_tokens: 512
+  query_prefix: "Represent this sentence for searching relevant passages: "
+
+runtime:
+  onnxruntime: 1.30.0
+  tokenizers: 0.23.2
+  numpy: 2.5.3
+  python: "3.12"
+  provider: CPUExecutionProvider
+  session:
+    inter_op_num_threads: 1
+    execution_mode: ORT_SEQUENTIAL
+    use_deterministic_compute: true
+
+download:
+  url_template: "https://huggingface.co/{model_id}/resolve/{revision}/{path}"
+  dest_template: "models/{model_slug}/{revision}/{local_name}"
+
+evidence: "SO-08, SO-09, SO-10, SO-18 (ARCHITECTURE/spike-outputs); SEMANTIC_ROUTE.md section 2"
+
+# sha256(model_id || revision || sorted artefact sha256s || runtime versions || session options || pooling ||
+# query_prefix), as SEMANTIC_ROUTE.md section 2 defines it. Recomputed by bootstrap.sh and by node B4; recorded here
+# so every reader of this file sees the same identity node B4's adapter will assert.
+pin_id_formula: "sha256(model.id || model.revision || sorted(a.sha256 for a in model.artefacts) || runtime.onnxruntime || runtime.tokenizers || runtime.session || model.pooling || model.query_prefix)"
