@@ -1,0 +1,17 @@
+{
+ "acceptance_check": 2,
+ "build2": {
+  "manifest_sha256": "3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c",
+  "records_ref": "natural tip resolution (post-freeze)",
+  "store": "store-BR-AR-0009-b2",
+  "wall_seconds": 2317.194
+ },
+ "build3": {
+  "manifest_sha256": "3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c",
+  "records_ref": "explicitly pinned via --records-ref 6b766656042557c56d8f4a7a9e49077b74e72dea",
+  "store": "store-BR-AR-0009-b3-repro",
+  "wall_seconds": 2308.068
+ },
+ "description": "two from-clean builds at the current (frozen) records view, compared by manifest_sha256",
+ "equal": true
+}

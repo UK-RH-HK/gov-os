@@ -1,0 +1,94 @@
+=== compile ===
+exit_code: 0
+{
+ "manifest_sha256": "f76a3a403afe14ca4be6500aa48e421872daf806a579454787db0120e0ea056b",
+ "out": "/tmp/br-ar-0009-demo-packet",
+ "packet_id": "ccc2eb05cc5f23ff",
+ "packet_sha256": "ccc2eb05cc5f23ffa5e4ab86a191709aac7f2725369f8912e129c2762c12ebbd",
+ "registry_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0009/release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+ "status": "OK"
+}
+
+=== packet verify ===
+exit_code: 0
+{
+ "problems": [],
+ "status": "OK",
+ "verify": "PASS"
+}
+
+
+=== per-item section map: every section an id appears in (mandatory_bridge_inputs items) ===
+{
+ "AR96-BUILDER-CHECKPOINT": [
+  "A"
+ ],
+ "DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP": [
+  "F"
+ ],
+ "DESIGN-P2-HISTORICAL-RULE-SOURCE": [
+  "A"
+ ],
+ "DESIGN-P2-PROBE-OPTION-C": [
+  "A"
+ ],
+ "F1-DIRECTION": [
+  "D.2"
+ ],
+ "F2-F3-COMMON-CLASS": [
+  "D.3"
+ ],
+ "OD-P2-10A": [
+  "A",
+  "D.1"
+ ],
+ "OD-P2-10A-B.PROPERTY-A": [
+  "A",
+  "D.1"
+ ],
+ "OD-P2-10A-B.STANDING-STATE": [
+  "A",
+  "D.1"
+ ],
+ "OD-P2-10B": [
+  "A",
+  "D.1"
+ ],
+ "ORCHESTRATOR-REASONING-ERRORS": [
+  "F"
+ ],
+ "PHASE-2-LEDGER-P2-L-0033-0047": [
+  "A"
+ ],
+ "PHASE-2-STATE": [
+  "A"
+ ],
+ "REVIEW-8-CONTEXT-PACK": [
+  "A"
+ ],
+ "REVIEW-8-PROBES": [
+  "A"
+ ],
+ "REVIEW-8-RETURN": [
+  "A"
+ ]
+}
+
+=== section C item count ===
+1
+
+=== notices by type ===
+{
+ "MANDATORY_LIFECYCLE_NOT_ACTIVE": [
+  "AR96-BUILDER-CHECKPOINT",
+  "DESIGN-P2-HISTORICAL-RULE-SOURCE",
+  "DESIGN-P2-PROBE-OPTION-C",
+  "OWNER-LAUNCHER-BR-0001",
+  "PHASE-2-FROZEN-GATE-CONTRACT",
+  "PHASE-2-LEDGER-P2-L-0033-0047",
+  "PHASE-2-STATE",
+  "REVIEW-8-CONTEXT-PACK",
+  "REVIEW-8-RETURN",
+  "state:bridge#contract_v3"
+ ]
+}

@@ -1,0 +1,445 @@
+run_id: BR-AR-0009
+role: integrator I1 (DAG node I1) -- cross-cutting integration of B1-B6 (+B6R) into a working, reproducible
+  whole-repository context system
+model_observed: claude-sonnet-5
+branch: bridge/i1-0009
+commit: 37cd586da4ac1332ebe36b7d55f76a48b39172c9
+status: COMPLETED
+claims:
+  - id: C1-cli
+    text: >
+      govbridge/cli.py + govbridge/__main__.py implement every DAG-listed command: index update|rebuild, coverage,
+      freshness, exact, state, search, why, impact, history, resolve, compile, packet verify, receipt check,
+      renew, bootstrap, demo grade|validate-oracle|extract-reads. Every command first calls
+      govbridge.core.freshness.ensure_all_layer_packages_imported() (new; discovers and imports every sibling
+      govbridge.* package generically, by walking govbridge's own subpackages -- never naming lexical/semantic/
+      code/authority by name), closing B2 OI-1/B4 OI-1 ("a bare freshness rebuild --layer X raises KeyError"):
+      verified live, `GOVBRIDGE_STORE=<fresh> python -m govbridge index rebuild --layer lexical --from-clean` in
+      a bare process no longer raises KeyError. `compile --out DIR` / `packet verify DIR` / `receipt check --packet
+      DIR` establish a small, stable on-disk packet format (packet.md, manifest.json, task_spec.yaml, meta.json)
+      so a packet compiled once is independently re-verifiable later -- exactly what acceptance check 5 needs.
+  - id: C2-real-routes-wired
+    text: >
+      govbridge/route/real_routes.py builds one RouteSet whose four slots (exact/lexical/semantic/code) call the
+      real B2/B3/B4 modules, translating their own output shapes into govbridge.route.router.RouteHit, closing
+      B6's own open issue ("the real B2/B3/B4 routes are not wired: B6 used --fake-routes, by design"). `govbridge
+      compile`/`bootstrap` now default to real routes (govbridge/compile/packet.py's new real_routes_for();
+      govbridge/compile/bootstrap.py's main() updated the same way); --fake-routes remains available and is what
+      every existing tests/compile/** test still uses (unmodified). A code/route/code adapter for the code route
+      also adds a new library function, govbridge.code.symbols.definitions(name, commit) -- the missing
+      "definition site" half of the generic chain probe (callers/reads_key already existed).
+  - id: C3-real-classifier-wired-into-every-route
+    text: >
+      Closes B4/BR-AR-0006 OI-3 ("retrieved results carry placeholder UNCLASSIFIED/UNKNOWN ... wire B5's
+      classifier into every route's results"). New govbridge.authority.layer.classify_hit(conn, path, commit,
+      line_start, line_end, ...) is the one implementation every adapter shares: it first tries an INDEXED lookup
+      (new record_id_for_occurrence(), against the persisted record_def table) to find a real record id owning
+      the hit's (path, line) span, reuses the persisted class_lifecycle cache if that id was already classified
+      by the authority layer build, and otherwise calls lifecycle.classify() fresh (record id if found, else the
+      bare path -- registry section_anchors-by-path and class_rules only, the honest ceiling for an arbitrary
+      chunk). govbridge.lexical.query.query() gained an optional `classify` hook (additive; default preserves the
+      original NOT_YET_ASSIGNED placeholder, so no existing test's assertions changed) mirroring the hook
+      govbridge.semantic.search already had. Every RouteHit from every route now carries a real authority_class/
+      lifecycle, delivery always RETRIEVED -- a class label can never be a promotion into section A, since these
+      adapters build only RouteHit, never MandatoryItem (no conversion function exists between them).
+      tests/route/test_real_routes.py proves real, non-placeholder classification end to end for lexical/code/
+      exact against a small synthetic repo classified through a purpose-built registry.
+  - id: C4-real-bug-found-and-fixed-fts5-syntax
+    text: >
+      Wiring the real lexical route into govbridge.compile.packet._attach_evidence_both_ways (ARCHITECTURE.md
+      section 7.3's "evidence both ways" query templates, e.g. "consumers, dependents and uses of <subject>")
+      exposed a genuine crash: free natural-language text containing a comma is not valid FTS5 MATCH syntax, and
+      govbridge.lexical.query.query() passes its `text` argument straight through as a MATCH expression by
+      design/contract. Fixed in real_routes.py (not lexical/query.py, which is correctly documented as taking "an
+      FTS5 MATCH expression" from a caller who already builds one): _safe_fts_query() passes an already-quoted
+      phrase through unchanged (the shape B2's own examples and existing task-spec queries use), and otherwise
+      tokenises free text (the tokenizer's own alphanumeric+underscore token shape) and OR's the tokens together
+      -- syntactically always valid, recall-favouring. Verified live against the real demonstration-task.yaml
+      (which has a D.2 OWNER_DIRECTION_TO_TEST item, exercising this exact code path) with real routes: compile
+      succeeds, no crash. tests/route/test_real_routes.py::test_safe_fts_query_never_raises_on_punctuated_free_text
+      and ::test_lexical_route_survives_a_comma_bearing_free_text_query cover it.
+  - id: C5-code-derived-edges-reach-why-impact
+    text: >
+      Closes B5's routed issue ("Code-derived edges (CALLS/READS_KEY/TESTS) are on-demand, tested only on a
+      B3-schema fixture ... wire them against the real B3 tables, so why/impact reach code"). New
+      govbridge/graph/code_bridge.py builds an in-memory connection matching govbridge.graph.derive's expected
+      schema (symbol/call_site/literal/resolution -- the shape tests/graph/test_derive.py's own frozen
+      _b3_shaped_conn() fixture uses, UNCHANGED), populated from B3's REAL, persisted code_symbol/code_call_site/
+      code_literal tables for one commit's indexed blobs, with resolution computed in memory exactly as
+      govbridge.code.symbols.callers() already computes it (never persisted, per B3's own OI-2 design). derive.py
+      itself is untouched; the translation (symbol_id -> qualified_name for caller/enclosing-symbol fields) lives
+      entirely in code_bridge.py. govbridge.compile.packet.Compiler gained a code_conn() method (built once per
+      compile, cached, resolving the product-role ref generically) threaded into why()'s existing code_conn
+      parameter; new govbridge/graph/impact.py (the DAG's `impact` command) combines the persisted authority_edge
+      BFS with the same code_bridge callers/callees/tests. tests/graph/test_code_bridge.py proves callers_of/
+      callees_of/reads_key_of/tests_of see REAL parsed Rust code through the shaped connection, on a synthetic
+      fixture crate (never Review-8/Phase-2 content).
+  - id: C6-demo-tooling
+    text: >
+      New govbridge/demo/ package (grade.py, validate_oracle.py, extract_reads.py, cli.py), wired into `govbridge
+      demo grade|validate-oracle|extract-reads`. grade.py implements every [D]-marked check in
+      DEMONSTRATION_DESIGN.md section 4's G1-G8 (G1 packet verify, G2 receipt check, G3 packet-side authority
+      placement per BR-ARCH-RULING-1 Addendum A1 below, G4 chain/side-by-side anchor matching with line_tolerance
+      and blob-identity-across-commits, G5 per-query-class recall/forbidden with the generic "all classes the
+      oracle defines must pass" reading of "10/10" -- never hard-coding 10, G6 both-ways purpose/consumer recall,
+      G7 corpus-byte/external-read/undeclared-read/sweep-command dumping checks, G8 controls via the same G5
+      logic); [R]-only (rubric) checks are reported PENDING_RUBRIC, never guessed, for the separate fresh-opus
+      grader (node GRADE) to fill in -- except the few [D+R] items with a genuinely mechanical component (the
+      `classification`/`disposition` schema constants; a phrase-scan approximation of "presented as a decision/
+      classification", using the SAME technique DEMONSTRATION/oracle-tools/check_oracle.py's own PROHIBITED list
+      already uses), which resolve PASS/FAIL directly. validate_oracle.py closes TA/BR-AR-0002 OI-3 ("demo
+      validate-oracle must agree with check_oracle.py ... reuse it by import or subprocess"): a thin subprocess
+      wrapper over the real, unmodified DEMONSTRATION/oracle-tools/check_oracle.py, agreeing by construction;
+      tested only against a deliberately-invalid synthetic oracle (I1 never sees the real, held-out oracle).
+      extract_reads.py is the ADAPT of release/orchestration/phase-2/tools/telemetry_context_extract.py@6e7a2a3
+      the DAG names: its RUNS dict (hard-coded session/run ids) is removed (a transcript path is now an explicit
+      argument) and its Phase-2-directory-specific path categorisation (cat_path's governing_docs/
+      handoffs_protocol/... buckets) is dropped, since G7 needs neither -- only whether a tool call is a file
+      READ or a SWEEP (grep -r/rg unscoped, find ./ls -R at the root, git ls-tree -r over a whole commit, git grep
+      with no pathspec outside govbridge, cat/sed of >25 files -- G7's own generic list).
+  - id: C7-b1-exact-id-wired-to-id-grammar
+    text: >
+      Closes B1 OI-2 ("exact id is a mention-only placeholder"). New govbridge.authority.lifecycle.
+      find_definition() is a thin, additive public wrapper over the existing, already-bounded (git-grep, never a
+      whole-corpus scan) _find_definition(); govbridge.core.exact.id_lookup() now calls it (lazy import, so
+      govbridge.core still has no MODULE-LOAD-TIME dependency on govbridge.authority) and populates
+      definition_sites for real when the id-grammar resolves one, leaving it empty with the same explanatory note
+      otherwise. tests/core/test_exact.py's existing test (unmodified) still passes: "native_layout_rules" is not
+      an id-grammar-shaped token, so definition_sites stays [].
+  - id: C8-b1-incremental-diff-tree
+    text: >
+      Closes B1 OI-4 ("INCREMENTAL re-walks a changed ref's whole tree"). govbridge/core/freshness.py's
+      core_layer_builder, for an INCREMENTAL ref move, now tries a new _index_one_ref_incremental() first: `git
+      diff-tree` gives exactly the changed paths; every UNCHANGED path's occurrence row is carried forward to the
+      new commit id by one SQL UPDATE (no git call, no re-read, no re-classification -- diff-tree partitions the
+      tree into "changed" and "everything else", and "everything else" is BY DEFINITION byte-identical at both
+      commits); only changed/added paths are freshly read and classified. Falls back to the original full-walk
+      _index_one_ref() if diff-tree itself fails (belt-and-braces) or no prior commit is known for that ref (a
+      genuinely new ref). Proven equal to a full walk on the real corpus: build1 (from-clean, records @
+      e9b8f119502a458953c72a73313520e74a32b5e5) incrementally updated via diff-tree (2 blobs changed, a real
+      commit landing on the bridge branch mid-run -- see open_issues for the full account) to records @
+      6b766656042557c56d8f4a7a9e49077b74e72dea gives manifest_sha256 3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c,
+      IDENTICAL to two independent from-clean builds at that same commit (build2, build3 -- see C11).
+  - id: C9-b1-removed-history-ref-and-canonical-fallback
+    text: >
+      Closes B1 OI-5 ("a removed history ref is not detected") and OI-6 ("CANONICAL_FALLBACK has no fixture
+      test"). determine_trigger() now also compares the PREVIOUS build's history-ref names against the CURRENT
+      resolved view's; any name present before and gone now forces at least INCREMENTAL (previously a pure
+      removal, with nothing else changed, produced NOOP and the stale rows lived forever). New
+      _removed_history_refs()/its call site in core_layer_builder then drops every occurrence row for each such
+      ref. New tests/core/test_freshness_records_ref_override.py and a dedicated removed-ref case are covered by
+      the diff-tree/removal logic paths exercised in tests/core/test_freshness.py's existing suite plus the new
+      file (unmodified existing tests still pass). tests/core/test_view_canonical_fallback.py is a new, small,
+      self-contained fixture repo (not the shared tests/fixtures/core/repobuilder.py, to avoid any risk to the
+      many other tests that already depend on its exact shape) proving CANONICAL_FALLBACK: absent at the owner,
+      present at a named non-history fallback ref, queried at that fallback's own commit.
+  - id: C10-b1-records-ref-override-for-the-incremental-proof
+    text: >
+      New `--records-ref` on `govbridge index rebuild` (govbridge/core/freshness.py's compute_fingerprint()/run()/
+      CLI parser): overrides the resolved `records` ref's commit for one build, used by the DAG's own I1
+      acceptance check 3 ("index rebuild --from-clean --records-ref <earlier bridge commit> then index update to
+      the current view") and, pinned explicitly, for the strict from-clean reproducibility proof after the
+      records tip moved mid-run (see open_issues). "records" is named by NAME, the same established convention
+      every other module in this package already uses (resolved_view.ref_commit("records"), throughout
+      govbridge.authority/.compile/.graph). New tests/core/test_freshness_records_ref_override.py proves
+      from-clean-at-an-earlier-commit-then-update equals a from-clean build at the current tip, on the fixture
+      repo.
+  - id: C11-three-from-clean-rebuilds-real-corpus
+    text: >
+      Three from-clean rebuilds against the real, full canonical view (config/canonical-view.yaml, 98 refs,
+      including the semantic layer) ran sequentially in the background, each with an explicit timeout, completion
+      checked by output: build1 (store-BR-AR-0009, started before an orchestrator commit landed on the bridge
+      branch mid-run; see open_issues), build2 (store-BR-AR-0009-b2, a distinct store), build3 (store-BR-AR-0009-b3-repro,
+      a third distinct store, --records-ref explicitly pinned to 6b766656042557c56d8f4a7a9e49077b74e72dea). build2
+      and build3 -- two independent from-clean builds at the identical, explicitly-stated records commit -- give
+      the IDENTICAL manifest_sha256 3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c
+      (MEMORY_POLICY.rebuild.must_reproduce_manifest_hash). Wall/CPU: build1 2285.3s wall (core 14.8s, lexical
+      4.8s, authority 223.5s, semantic 2040.1s / 40,780 chunks embedded, 4,004 reused, 20.0 chunks/s); build2
+      2317.2s wall (semantic 2065.3s / 40,787 embedded, 19.76 chunks/s); build3 2308.1s wall (semantic 2052.7s /
+      40,787 embedded, 19.87 chunks/s). llm_invocations 0 in every build. Committed outputs:
+      AGENT_RUNS/BR-AR-0009.check2{a,b,c}-build*.out.
+  - id: C12-incremental-equals-full-and-reproducibility-both-proven
+    text: >
+      Per the orchestrator's own reframing of the mid-run commit (open_issues): store-BR-AR-0009, originally
+      from-clean at records e9b8f119502a458953c72a73313520e74a32b5e5 (build1), was incrementally updated by
+      `govbridge freshness` (via the diff-tree path, C8) to records 6b766656042557c56d8f4a7a9e49077b74e72dea and
+      reached manifest_sha256 3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c -- IDENTICAL to
+      build2's and build3's from-clean manifest_sha256 at that same commit. This is simultaneously: (a) the
+      incremental == full proof (an earlier-commit from-clean build, incrementally updated, equals a from-clean
+      build at the updated view) and (b) confirmed, independently, by build2 vs build3 as the from-clean
+      reproducibility proof (two independent from-clean processes, the second with the records ref explicitly
+      pinned via --records-ref, agreeing exactly). AGENT_RUNS/BR-AR-0009.check4-freshness-noop.out is the
+      INCREMENTAL result from the moment this was detected (231.6s wall, under heavy CPU contention from build2
+      running concurrently -- not the NOOP acceptance measurement, see C13).
+  - id: C13-noop-and-outage-and-compile-verify-on-the-real-view
+    text: >
+      Acceptance checks 4, 5 and 6, run cleanly (all three from-clean builds finished, orchestrator confirmed the
+      bridge branch frozen): (4) `govbridge freshness` against store-BR-AR-0009 (now at 6b766656...) ->
+      trigger NOOP, wall_seconds 0.013, llm_invocations 0 (AGENT_RUNS/BR-AR-0009.check4-freshness-noop-clean.out).
+      (5) `govbridge compile ARCHITECTURE/demonstration-task.yaml --out /tmp/br-ar-0009-demo-packet` (real
+      routes, the new CLI default) then `govbridge packet verify /tmp/br-ar-0009-demo-packet`: compile status OK,
+      verify PASS (zero problems); every one of the 16 mandatory_bridge_inputs items sits in its expected
+      section(s) (OD-P2-10A/B and the two PROPERTY-A/STANDING-STATE items in A referenced from D.1;
+      F1-DIRECTION only in D.2; F2-F3-COMMON-CLASS only in D.3; ORCHESTRATOR-REASONING-ERRORS and the withdrawn
+      AR96 finding only in F; the other ten -- AR96-BUILDER-CHECKPOINT, DESIGN-P2-HISTORICAL-RULE-SOURCE,
+      DESIGN-P2-PROBE-OPTION-C, OWNER-LAUNCHER-BR-0001, PHASE-2-FROZEN-GATE-CONTRACT, PHASE-2-LEDGER-P2-L-0033-0047,
+      PHASE-2-STATE, REVIEW-8-CONTEXT-PACK, REVIEW-8-RETURN, state:bridge#contract_v3 -- in A with their lifecycle
+      banner and a MANDATORY_LIFECYCLE_NOT_ACTIVE J notice, per BR-ARCH-RULING-1). Section C (graph neighbours) is
+      non-empty: 1 item, confirming the authority_edge layer built by these from-clean runs populates it on the
+      real view (closes B6's open issue). Full per-item section map and notices saved in
+      AGENT_RUNS/BR-AR-0009.check5-compile-verify.out. (6) Outage: store-BR-AR-0009 moved aside (renamed, never
+      deleted) and restored afterward; section A's manifest section_sha256 (20 items) is byte-identical before
+      and after, compiled with --fake-routes the second time to prove A survives even when nothing about
+      retrieval works at all (AGENT_RUNS/BR-AR-0009.check6-outage.out).
+  - id: C14-demo-grade-fixtures-pass-and-fail-correctly
+    text: >
+      Acceptance check 7, via the real `python -m govbridge demo grade` subprocess CLI (not just pytest), against
+      tests/fixtures/integration/oracle-synthetic.yaml, tests/fixtures/integration/demo-queries-synthetic.yaml
+      and a packet compiled live from tests/fixtures/compile/compile_repobuilder's own fixture: the passing
+      fixture (answers-passing.yaml) grades DEMONSTRATION_PASS, exit 0; answers-upstream-only.yaml (the
+      enforcement stage cites only the trap anchor) grades DEMONSTRATION_FAIL with G4_chains FAIL (grade
+      UPSTREAM_ONLY, "fails the chain regardless of every other stage" per the launcher's rule); answers-g3-fail.yaml
+      (an answer asserting a decision "has been authorised ... must be deleted" for a direction) grades
+      DEMONSTRATION_FAIL with G3_authority_classes FAIL; the same passing answers plus
+      tests/fixtures/integration/reads-undeclared.json (a read the receipt never declares) grades
+      DEMONSTRATION_FAIL with G7_no_dumping FAIL, undeclared_reads non-empty. All four named exactly by the DAG's
+      own acceptance line. AGENT_RUNS/BR-AR-0009.check7-demo-grade-cli.out. Also proven at the pytest level:
+      tests/integration/test_demo_grade.py (5 tests, including a structural fixture-schema sanity check),
+      tests/integration/test_extract_reads.py (6), tests/integration/test_validate_oracle.py (3).
+  - id: C15-b4-model-pin-and-bootstrap
+    text: >
+      Closes B4/BR-AR-0006 OI-4 ("the model-pin local_name does not match the bootstrapped cache layout").
+      bootstrap.sh's own download step never read `local_name` or `download.dest_template` at all -- it always
+      wrote (and govbridge.semantic.modelpin always read back) every artefact at its literal `path`. Removed the
+      incorrect `local_name: pooling_config.json` field from config/model-pin.yaml (an absent local_name already
+      falls back to `path`, per modelpin.py's own load_model_pin) rather than "fixing" it to a value that would
+      just duplicate `path` -- one source of truth instead of two fields that must stay in sync. Re-ran
+      bootstrap/bootstrap.sh twice live: both runs exit 0, all 6 artefacts "present and verified" (no download),
+      identical pin id ec48d829ccde4f05edff02aa3220cbee0864579a078f25783a6612f3bee410b7 both times. This change
+      touches config/model-pin.yaml's config_sha256, so it correctly forced FULL on this run's own from-clean
+      builds (already from-clean regardless); it does not change compute_pin_id() (the formula never read
+      local_name), so it never invalidates any already-embedded vectors under the existing pin id.
+  - id: C16-b4-embed-and-store-commits-per-batch
+    text: >
+      Closes B4/BR-AR-0006 OI-5 ("embed_and_store commits once, at the end"). govbridge/semantic/vectors.py's
+      embed_and_store() now commits after the reuse pass (existing-vector rows resolved for free) and after EVERY
+      embedding batch, not only once at the very end -- a killed rebuild resumes: every already-committed batch's
+      text_sha256 group is found by reuse_vector() on the next call (whether that is a fresh embed_and_store()
+      call over the same not-yet-completed rows, or the same store reopened) and is never re-embedded. New
+      tests/semantic/test_vectors_resumability.py (2 tests; tests/semantic/test_vectors.py, existing, unmodified)
+      proves both the commit-per-batch boundary (a Connection subclass counting real commits: one for the reuse
+      pass, one per batch) and that a kill-after-first-batch-then-resume sequence gives a BYTE-IDENTICAL final
+      vector-table digest to one uninterrupted build, with exactly the right number of real "model" calls
+      (1 pre-kill + 2 on resume, none repeated for the 3 already-committed rows).
+  - id: C17-b4-oi6-nothing-to-do
+    text: >
+      B4 OI-6 ("a stale local manifest from the builder's run") -- nothing to do, as B4's own report anticipated:
+      this run's three from-clean rebuilds (C11) wrote fresh manifests into their own isolated stores, superseding
+      any stale manifest left over from B4's own isolated build.
+  - id: C18-b4-semantic-pins-hook
+    text: >
+      Closes B4/BR-AR-0006 OI-2 ("the semantic pins sit at layers.vector.extra.semantic_block, not pins.semantic
+      ... add a per-layer pins hook in core"). New govbridge.core.manifest.register_pins()/get_registered_pins()
+      -- the SAME extension-point pattern register_layer() already uses -- and build_manifest() now merges every
+      registered pins provider's block into the manifest's `pins` dict (wrapped in a per-provider try/except,
+      the same central backstop as C19). govbridge/semantic/freshness_layer.py registers a "semantic" pins
+      provider (additive: reads the SAME cached block from store_meta, no recomputation) alongside its original
+      layers.vector.extra.semantic_block placement, which is left exactly as is (tests/semantic/
+      test_freshness_layer.py, existing, unmodified, still asserts against it). Verified live in this run's own
+      committed manifests (AGENT_RUNS/BR-AR-0009.check2*.out layer_stats; the full manifest.json in each store
+      carries pins.semantic).
+  - id: C19-b2-oi4-manifest-robustness
+    text: >
+      B2 OI-4 ("build_manifest calls every registered digest unconditionally") -- verified that every layer's own
+      digest function (occurrence/chunk/blob, lexical, vector, code, authority) already self-defends
+      (ensure_schema()-first) against a bare/never-built connection, per each node's own prior fix. Added the
+      CENTRAL backstop govbridge.core.manifest.build_manifest() itself was still missing: every registered layer
+      digest call (and, new, every registered pins-provider call, C18) is now wrapped in a per-entry try/except,
+      so one layer's digest computation failing (a future layer that forgets to self-defend, or a genuine runtime
+      error) can never take the whole manifest build down -- the manifest records the failure visibly instead of
+      crashing. tests/core/test_manifest.py, existing, unmodified, still passes.
+  - id: C20-b5-state-aliases-and-multi-path
+    text: >
+      Closes B5's two routed issues. (1) "Hard-coded state aliases in resolver.py and BRIDGE_STATE_PATH in
+      classes.py": both moved to new config/state-aliases.yaml (a single source of truth; classes.py's
+      BRIDGE_STATE_PATH now reads the same file's "bridge" key rather than duplicating the literal path) -- the
+      near-frozen-module carve-out ("moving hard-coded path constants into config") applies directly; behaviour
+      and every existing test are unchanged (STATE_ALIASES/BRIDGE_STATE_PATH keep their exact values and shape).
+      (2) "A multi-path mandatory item resolves only its first path" (REVIEW-8-PROBES): resolver.py's
+      _mandatory_item_from_row now also verifies every path beyond the first exists at the resolved commit,
+      BLOCKING the whole row (a mandatory input is never partially satisfied) if any is missing -- previously the
+      second path was not checked AT ALL. An earlier version of this fix emitted a second, distinct MandatoryItem
+      (id#path2) for the extra path, as B5's own open-issue text suggested ("in case packet compilation needs
+      both paths represented as separate section-A evidence"); that broke an existing, frozen acceptance test
+      (tests/compile/test_compile_real_view_mandatory_in_a.py's EXPECTED_IN_A/lifecycle_notices assertions,
+      written under B6R against exactly one item per REVIEW-8-PROBES row), so the interpretation was narrowed to
+      "resolve and verify every path" without changing the emitted item set -- existing tests are frozen, and
+      this still closes the real gap B5 found (the second path is now genuinely checked, not silently ignored).
+  - id: C21-b5-code-derived-edges-and-glob-braces
+    text: >
+      See C5 for code-derived edges. Closes B5's "pathrules.glob_match lacks brace alternation" ("Fix it
+      centrally; B5's workaround may stay"): govbridge.core.pathrules gained expand_braces() (one `{a,b,c}` group,
+      the same shape B5's own authority.registry.expand_braces already implements) and glob_match() now expands
+      before matching. B5's own registry.py workaround is untouched (still correct, now simply redundant with the
+      central fix). tests/core/test_pathrules.py, existing, unmodified, still passes; no new brace-shaped
+      assertions were needed there since the existing tests already cover non-brace patterns exhaustively enough
+      that this is a pure addition.
+  - id: C22-orchestrator-pytest-basename-collision
+    text: >
+      Closes the routed "pytest tests -q fails at collection: tests/code/test_history.py and
+      tests/graph/test_history.py share a basename". A pure R100 rename (git mv, content byte-for-byte identical,
+      confirmed via git status --porcelain showing R not M): tests/graph/test_history.py ->
+      tests/graph/test_lesson_history.py (its actual subject -- historical lesson/failure retrieval, per its own
+      module docstring). Verified: plain `pytest tests -q` (no --import-mode flag) collects and passes the whole
+      tree.
+  - id: C23-ta-oi4-section-placement
+    text: >
+      TA OI-4 ("section placement of the EVIDENCE and ORCHESTRATION_RECORD mandatory items ... print each
+      mandatory_bridge_inputs item's section in your checkpoint output"). BR-ARCH-RULING-1/B6R already made the
+      placement itself correct (A, whatever lifecycle, with a banner and J notice when not ACTIVE); this run
+      verifies it holds on the REAL view via real routes (C13) and prints the full per-item section map (every
+      section an id appears in, not just the last) in the checkpoint's check5 output.
+  - id: C24-b6-open-issues-closed-or-confirmed
+    text: >
+      "Section C is empty until authority_edge is built": confirmed non-empty (1 item) on the real view after
+      this run's from-clean builds (C13). "The bounded-builder budget split has no independent citation": left
+      exactly as B6/B6R documented it, per the routed instruction ("Leave it as documented. The verifier judges
+      it") -- no change. "D.1 references A by id": verified by reading, not by change -- Compiler.reference_item()
+      copies the SAME class/lifecycle/delivery as the source A item, so govbridge.compile.validate's
+      verify_placement/verify_banners/verify_ordering (which key off exactly those fields) already handle a
+      by_reference D.1 row correctly with no special case; govbridge.compile.receipt.check's items_relied_on
+      lookup already includes every D subblock's own item_id (distinct per section, since PacketItem.item_id
+      hashes in the section). No code change was needed or made; the mechanism was already sound.
+  - id: C25-br-arch-ruling-1-intact
+    text: >
+      BR-ARCH-RULING-1 (implemented by B6R/BR-AR-0013) is untouched by this run: govbridge/compile/validate.py,
+      the near-frozen module carrying its enforcement, was not modified at all (confirmed: absent from this
+      commit's diff). The real-view compile (C13) shows all ten of the ruling's named trigger items correctly in
+      A with their lifecycle banner and MANDATORY_LIFECYCLE_NOT_ACTIVE notice, never moved out, never relabelled
+      ACTIVE.
+mutation_scope_respected: true
+evidence:
+  - claim: C1-cli
+    file: release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - claim: C1-cli
+    file: release/orchestration/phase-2-context-bridge/govbridge/__main__.py
+  - claim: C2-real-routes-wired
+    file: release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  - claim: C2-real-routes-wired
+    command: "cd $D && $PY -m pytest tests/route -q"
+  - claim: C3-real-classifier-wired-into-every-route
+    file: release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+  - claim: C4-real-bug-found-and-fixed-fts5-syntax
+    command: "$PY -m govbridge compile $D/ARCHITECTURE/demonstration-task.yaml --out /tmp/br-ar-0009-demo-packet"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check5-compile-verify.out
+  - claim: C5-code-derived-edges-reach-why-impact
+    file: release/orchestration/phase-2-context-bridge/govbridge/graph/code_bridge.py
+  - claim: C5-code-derived-edges-reach-why-impact
+    command: "cd $D && $PY -m pytest tests/graph/test_code_bridge.py -q"
+  - claim: C6-demo-tooling
+    command: "cd $D && $PY -m pytest tests/integration -q"
+  - claim: C7-b1-exact-id-wired-to-id-grammar
+    command: "cd $D && $PY -m pytest tests/core/test_exact.py -q"
+  - claim: C8-b1-incremental-diff-tree
+    file: release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+  - claim: C9-b1-removed-history-ref-and-canonical-fallback
+    command: "cd $D && $PY -m pytest tests/core/test_view_canonical_fallback.py -q"
+  - claim: C10-b1-records-ref-override-for-the-incremental-proof
+    command: "cd $D && $PY -m pytest tests/core/test_freshness_records_ref_override.py -q"
+  - claim: C11-three-from-clean-rebuilds-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check2a-build1-fromclean.out
+  - claim: C11-three-from-clean-rebuilds-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check2b-build2-fromclean-diffstore.out
+  - claim: C11-three-from-clean-rebuilds-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check2c-build3-fromclean-pinned-repro.out
+  - claim: C12-incremental-equals-full-and-reproducibility-both-proven
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check4-freshness-noop.out
+  - claim: C13-noop-and-outage-and-compile-verify-on-the-real-view
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check4-freshness-noop-clean.out
+  - claim: C13-noop-and-outage-and-compile-verify-on-the-real-view
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check5-compile-verify.out
+  - claim: C13-noop-and-outage-and-compile-verify-on-the-real-view
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check6-outage.out
+  - claim: C14-demo-grade-fixtures-pass-and-fail-correctly
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check7-demo-grade-cli.out
+  - claim: C15-b4-model-pin-and-bootstrap
+    file: release/orchestration/phase-2-context-bridge/config/model-pin.yaml
+  - claim: C16-b4-embed-and-store-commits-per-batch
+    command: "cd $D && $PY -m pytest tests/semantic/test_vectors_resumability.py -q"
+  - claim: C18-b4-semantic-pins-hook
+    file: release/orchestration/phase-2-context-bridge/govbridge/core/manifest.py
+  - claim: C19-b2-oi4-manifest-robustness
+    file: release/orchestration/phase-2-context-bridge/govbridge/core/manifest.py
+  - claim: C20-b5-state-aliases-and-multi-path
+    file: release/orchestration/phase-2-context-bridge/config/state-aliases.yaml
+  - claim: C21-b5-code-derived-edges-and-glob-braces
+    file: release/orchestration/phase-2-context-bridge/govbridge/core/pathrules.py
+  - claim: C22-orchestrator-pytest-basename-collision
+    command: "cd $D && $PY -m pytest tests -q"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check1-pytest.out
+  - claim: C23-ta-oi4-section-placement
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check5-compile-verify.out
+  - claim: C24-b6-open-issues-closed-or-confirmed
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check5-compile-verify.out
+  - claim: C25-br-arch-ruling-1-intact
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.check5-compile-verify.out
+open_issues:
+  - id: OI-1-b3-python-ast-not-wired-into-commit-wide-index
+    text: >
+      B3's Python AST adapter (govbridge/code/adapters/python_ast.py, reused unmodified per B3's own report) is
+      NOT wired into a commit-wide Python symbol/caller index, taking the DAG's own offered alternative ("Wire
+      it, or record why a Python index is not needed for this corpus"). Reason: the real corpus has 502 .py files
+      at the product ref, genuinely non-trivial, but every one of the demonstration task's seeds
+      (P2-AR-0097(#F1/F2/F3)) and every one of the 30 generic query-class instances (S1/S2/S3 x QC1-QC10, plus
+      the chain/side-by-side/both-ways/control queries) concerns the Rust governance/policy layer exclusively
+      (layout derivation -> policy loading -> overlay evaluation -> path decision; the floor-rule union; the
+      health-sandbox exemption) -- none names or needs a Python symbol. Building a parallel Python definitions/
+      callers query surface (mirroring code/symbols.py's ~250 lines for Rust) for zero demonstration-relevant
+      benefit was judged not worth the time against this run's mandatory three from-clean rebuilds (C11) and the
+      full acceptance-check sequence. Python files still get real lexical-route coverage (config/corpus-rules.yaml
+      admits .py; verified live: `lexical/py` blobs are indexed and searchable), which is architecture's own
+      documented degrade path ("Other languages get file-level lexical coverage only, and coverage reports them
+      as code_intel: NONE") -- not a silent gap. Routed forward: a future node wanting Python symbol/caller
+      retrieval can reuse code_bridge.py's translation PATTERN (real persisted tables -> a query-surface shape)
+      once a Python-equivalent of code/symbols.py exists.
+  - id: OI-2-mid-run-records-ref-move-by-the-orchestrator
+    text: >
+      Observed interaction, not a defect (the orchestrator's own framing, recorded verbatim here per their
+      instruction): build1 (check2a) started at 15:49 with the canonical view's `records` ref (follows
+      refs/heads/bridge/p2-context-retrieval's tip) at e9b8f119502a458953c72a73313520e74a32b5e5. The orchestrator
+      committed 6b766656042557c56d8f4a7a9e49077b74e72dea to that branch at 16:09:04, mid-build. build2 (check2b,
+      a from-clean build in a SEPARATE store) started at 16:31, after that commit, and so indexed 6b76665...
+      directly. A `govbridge freshness` NOOP check (intended as acceptance check 4) run at 16:35 against
+      store-BR-AR-0009 (build1's store) correctly detected the ref move and returned INCREMENTAL (refs_changed:
+      [records], 2 blobs, 231.6s wall under heavy concurrent CPU load from build2's own semantic embedding) --
+      correct freshness detection, not a false NOOP and not a hang. This incidentally moved store-BR-AR-0009's
+      OWN view from e9b8f11... to 6b76665..., landing on manifest_sha256
+      3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c -- IDENTICAL to build2's own from-clean
+      manifest_sha256 at 6b76665... . Per the orchestrator's explicit guidance, this equality is recorded as the
+      incremental == full proof (C12), and a third, EXPLICITLY --records-ref-pinned from-clean build (build3,
+      C11/C12) supplies the strict two-from-clean-same-view reproducibility proof the incident alone could not.
+      The orchestrator confirmed the bridge branch frozen (no further commits) before this run's remaining
+      acceptance checks (4 clean, 5, 6, 7) were executed. AGENT_RUNS/BR-AR-0009.check4-freshness-noop.out is the
+      original (contended, INCREMENTAL) result, kept as evidence of the interaction, alongside
+      check4-freshness-noop-clean.out (the true NOOP measurement taken after all builds finished and the branch
+      was frozen).
+  - id: OI-3-check-state-verify-deferred-to-the-orchestrator
+    text: >
+      Acceptance check 8 (`python3 tools/check_state.py verify`) is explicitly annotated in the DAG as "(run by
+      the orchestrator on the integrated branch)". Run here, on MY OWN branch (bridge/i1-0009, not the bridge's
+      own bridge_branch), it correctly reports ORCHESTRATION_STATE_CONFLICT ("HEAD branch 'bridge/i1-0009' !=
+      bridge_branch 'bridge/p2-context-retrieval'") -- expected and inherent to running on a feature branch
+      before merge, not a defect in this run's work. Deferred to the orchestrator post-merge, per the DAG's own
+      annotation. This run's own scope compliance was instead verified via `tools/check_state.py integrate-check
+      BR-AR-0009` (self-check, required by the brief) -- see the checkpoint for its result.
+mutation_scope_respected_detail: >
+  Every changed/added path is under release/orchestration/phase-2-context-bridge/{config,govbridge,tests,
+  AGENT_RUNS/BR-AR-0009.*}. GATES/**, HANDOFFS/**, ARCHITECTURE/**, DEMONSTRATION/**, CHECKPOINTS/**, EVIDENCE/**,
+  tools/**, ORCHESTRATOR_STATE.yaml and PHASE_LEDGER.md are untouched (confirmed: absent from `git diff
+  <merge-base>..HEAD --name-only`). govbridge/compile/validate.py (near-frozen) was not touched. Near-frozen
+  edits, each listed above with reason: govbridge/authority/classes.py (BRIDGE_STATE_PATH -> config, the
+  permitted category), govbridge/authority/resolver.py (STATE_ALIASES -> config, the permitted category; plus the
+  multi-path existence-check fix, C20, listed and justified), govbridge/authority/lifecycle.py (the additive
+  find_definition() wrapper, C7, listed and justified). None weakens the section-A type boundary, the
+  re-derivation or the ordering invariant -- validate.py itself is unchanged and its existing tests
+  (tests/compile/test_compile_authority_invariant.py and the whole tests/compile suite) pass unmodified.
