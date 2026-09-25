@@ -1,0 +1,185 @@
+run_id: BR-AR-0005
+role: builder B3 (DAG node B3, code route)
+model_observed: claude-sonnet-5
+branch: bridge/b3-0005
+commit: 7338caf36dde6441661f4be36aa369f833292ba5
+status: COMPLETED
+claims:
+  - id: C1-rust-treesitter-adapter
+    text: >
+      govbridge/code/adapters/rust_treesitter.py parses Git blobs directly with pinned tree-sitter 0.25.2 +
+      tree-sitter-rust 0.24.0 -- no working tree, no cargo check. parse_module() returns symbols, call sites,
+      string literals and ERROR-node spans. Verified against the real repository at 3c880d8: rs_files 217 (equals
+      `git ls-tree -r --name-only 3c880d8 | grep -c '\.rs$'`), definitions 5363, fn_definitions 4126, test_fns 919
+      -- matching the architect's own SO-12 spike figures (5,363 definitions; 919 test fns) -- and exactly the same
+      10 ERROR-node files SO-13 lists, at the same lines (cli/src/main.rs:2285;
+      runtime/src/exec_resolve.rs:370,681; ...). An ERROR span falls back to a line-regex definition scan
+      (derivation HEURISTIC_REGEX_FALLBACK); on the real corpus this fallback never fired (every code_symbol row
+      is EXACT_PARSE), so it is exercised only by tests/code/test_rust_adapter.py's deliberately malformed
+      fixture -- see open_issues OI-3.
+  - id: C2-python-ast-plugin-reused-unmodified
+    text: >
+      govbridge/code/adapters/python_ast.py never edits or copies
+      capabilities/python/govos_capabilities/code_intel_python_ast.py. It reads that file's bytes (plus its small
+      plugin.py/__init__.py package dependencies) straight out of Git at the canonical view's records ref
+      (config/canonical-view.yaml's primary role), materialises them read-only under this run's own isolated
+      store (GOVBRIDGE_STORE, BR-DAG-AMEND-1), and runs the plugin as an ordinary gov-capability/1 subprocess --
+      the invocation ARCHITECTURE.md section 9 specifies ("The bridge invokes plugins directly, as subprocesses
+      speaking gov-capability/1"). Every response carries the plugin's own blob id
+      (tests/code/test_python_ast_adapter.py::test_plugin_blob_id_matches_git_directly asserts it equals
+      `git rev-parse <records-commit>:capabilities/python/govos_capabilities/code_intel_python_ast.py` byte for
+      byte) and the commit it ran from.
+  - id: C3-labelled-resolution-never-collapses-ambiguity
+    text: >
+      govbridge/code/resolve.py implements all eight labels ARCHITECTURE.md section 4.6 names (EXACT_PATH,
+      HEURISTIC_TYPE_PATH, HEURISTIC_SAME_FILE, HEURISTIC_UNIQUE_NAME, HEURISTIC_AMBIGUOUS, UNRESOLVED_EXTERNAL,
+      MACRO, HEURISTIC_MACRO_TOKEN) as one pure function, resolve_call(). By construction the only branch that can
+      return more than one target is the HEURISTIC_AMBIGUOUS branch; every single-target branch is reached only
+      through an explicit len(...)==1 check first. tests/code/test_resolve.py exercises each label directly on
+      synthetic Definition/CallSite objects (including one fixture that reaches all eight in a single index) and
+      tests/code/test_symbols_integration.py reaches the same eight labels through real tree-sitter parsing of a
+      synthetic Rust crate, asserting explicitly that every HEURISTIC_AMBIGUOUS row carries n_candidates >= 2 and
+      len(targets) >= 2 (BR-HO-0005: "An ambiguous call must never yield a single chosen target").
+  - id: C4-symbol-call-literal-tables-lazy-per-blob-cache
+    text: >
+      govbridge/code/store.py adds code_blob/code_symbol/code_call_site/code_literal/code_parse_error to the
+      shared store.db (govbridge.core.store.open_db()); govbridge.code.symbols.ensure_indexed() parses and
+      persists a blob only the first time it is seen at the current adapter/grammar pin (cached by blob id, per
+      ARCHITECTURE.md section 4.6's "Symbol history" paragraph). tests/code/test_symbols_integration.py::
+      test_lazy_caching_reparses_nothing_on_second_call monkeypatches parse_module to prove a second stats() call
+      against an already-indexed commit calls it zero times. Measured on the real 217-file corpus: first
+      `symbols stats --commit 3c880d8` ~5s (cold), second call (same store) ~0.17s.
+  - id: C5-resolution-not-persisted-by-design
+    text: >
+      ARCHITECTURE.md section 4.6 names a `resolution(call_site, target_symbol, label, n_candidates)` table, but
+      this build deliberately does not persist it: a call site's label is a function of every OTHER definition
+      visible in the commit being queried (a name unique in one commit's tree can become ambiguous in another once
+      a colliding file is added or removed), so a resolution row cached only by call_site would silently go stale
+      across commits. govbridge.code.resolve/store.py's module docstrings record this; resolution is recomputed
+      in memory every query from the persisted per-blob symbol/call rows for exactly the blobs reachable at that
+      commit (SO-12 measured this step at ~0.1s for the whole corpus; this build's own `callers`/`reads-key`
+      calls complete in well under that against an already-indexed commit).
+  - id: C6-symbol-history-exact-set-difference
+    text: >
+      govbridge/code/history.py's deleted()/introduced() take the set difference of (kind, qualified_name) pairs
+      between two commits' parsed definitions (each indexed lazily through the same ensure_indexed cache), every
+      row carrying derivation EXACT_PARSE. Verified on the real repository:
+      `history deleted --from 92982ff --to 3c880d8` includes reanchor_project_identity (kind fn, path
+      runtime/src/paths.rs, DELETED_IN 3c880d80f81..., derivation EXACT_PARSE) -- independently confirmed absent
+      from 3c880d8 and present at runtime/src/paths.rs:1459 at 92982ff via `git grep`.
+      tests/code/test_history.py additionally proves a symbol that only moves file is correctly invisible to this
+      diff (not reported as deleted+introduced) -- a documented limitation, not an oversight.
+  - id: C7-acceptance-checks-verified-on-the-real-repository
+    text: >
+      All 7 of node B3's acceptance checks were run against the real repository (not a fixture) and their exact
+      outputs are committed under AGENT_RUNS/BR-AR-0005.check*.out, hashed in checkpoint.yaml: (2) symbols stats
+      --commit 3c880d8 -> rs_files 217, definitions 5363, 10 files_with_parse_errors; (3) callers
+      partition_floor_rules_against_kernel -> exactly one call site, runtime/src/cit/mod.rs:1623, EXACT_PATH; (4)
+      callers union_last_known_rules_across_store -> exactly runtime/src/init.rs:329 and
+      runtime/src/adopt.rs:1806, both EXACT_PATH; (5) reads-key mutation -> includes runtime/src/tools.rs:1817
+      inside installation_authority (this literal sits inside a matches!() macro, so it is found only through the
+      HEURISTIC_MACRO_TOKEN scan, not a parsed method call -- see open_issues OI-1); (6) callers
+      resolve_state_root -> 30 call sites, every one labelled, none unlabelled (the control on an unrelated
+      subsystem); (7) history deleted 92982ff..3c880d8 -> includes reanchor_project_identity as above.
+  - id: C8-generic-not-bespoke
+    text: >
+      `grep -rniE "review.?8|F[1-6]\b|phase.?2" govbridge/code tests/code` finds exactly one hit, and it is not
+      logic: a source comment in tests/code/test_symbols_integration.py spelling out the domain directory's own
+      fixed name ("release/orchestration/phase-2-context-bridge", the path govbridge/__init__.py's
+      GOV_BRIDGE_DOMAIN already resolves to under B1) next to a Path().parents[2] computation -- no code branches
+      on it. The only place any of the acceptance-check names (partition_floor_rules_against_kernel,
+      union_last_known_rules_across_store, mutation, resolve_state_root, reanchor_project_identity) appear
+      anywhere under govbridge/code/** or tests/code/** is as CLI/test *arguments* -- data passed to a fully
+      generic stats/callers/reads-key/history operation, never a branch condition.
+      tests/code/test_symbols_integration.py's fixture crate independently proves every resolution label using
+      names that appear nowhere else in this build (exact_target, method_x, helper, unique_target,
+      ambiguous_target, ...).
+  - id: C9-manifest-layer-registration
+    text: >
+      govbridge/code/__init__.py registers a "code" layer digest with govbridge.core.manifest.register_layer at
+      import time, following B1's documented pattern exactly (no edit to govbridge/core/**); the digest is a
+      rows-count + sha256 over code_symbol, plus blobs_parsed, and is explicitly documented as reporting only
+      what has been lazily indexed so far, not a whole-view coverage claim (the code route is lazy by design,
+      unlike the occurrence/chunk layers).
+mutation_scope_respected: true
+evidence:
+  - claim: C1-rust-treesitter-adapter
+    command: "cd release/orchestration/phase-2-context-bridge && PYTHONPATH=$PWD $HOME/.cache/gov-bridge/venv/bin/python -m govbridge.code.symbols stats --commit 3c880d8 --json"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check2-symbols-stats.out
+  - claim: C2-python-ast-plugin-reused-unmodified
+    file: release/orchestration/phase-2-context-bridge/tests/code/test_python_ast_adapter.py
+  - claim: C3-labelled-resolution-never-collapses-ambiguity
+    file: release/orchestration/phase-2-context-bridge/tests/code/test_resolve.py
+  - claim: C3-labelled-resolution-never-collapses-ambiguity
+    file: release/orchestration/phase-2-context-bridge/tests/code/test_symbols_integration.py
+  - claim: C4-symbol-call-literal-tables-lazy-per-blob-cache
+    file: release/orchestration/phase-2-context-bridge/tests/code/test_symbols_integration.py
+  - claim: C6-symbol-history-exact-set-difference
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check7-history-deleted.out
+  - claim: C7-acceptance-checks-verified-on-the-real-repository
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check3-callers-partition_floor_rules_against_kernel.out
+  - claim: C7-acceptance-checks-verified-on-the-real-repository
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check4-callers-union_last_known_rules_across_store.out
+  - claim: C7-acceptance-checks-verified-on-the-real-repository
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check5-reads-key-mutation.out
+  - claim: C7-acceptance-checks-verified-on-the-real-repository
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check6-callers-resolve_state_root.out
+  - claim: C1-through-C9 (full suite)
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.check1-pytest.out
+open_issues:
+  - id: OI-1-macro-token-scan-was-needed-for-the-real-mutation-check
+    text: >
+      The real acceptance check (reads-key mutation -> tools.rs:1817) initially failed: that call is
+      `d.str("mutation")` inside `matches!(d.str("mutation").as_str(), "allowed" | "")`, and tree-sitter-rust does
+      not expand a macro's argument tokens into call_expression/field_expression nodes (confirmed directly against
+      the grammar), so the literal was captured but the accessor call was not, until the macro-token scan
+      (HEURISTIC_MACRO_TOKEN) was added and wired into reads_key()'s same-line accessor check alongside normal
+      "method" calls. ADAPTER_VERSION was bumped (1.0.0 -> 1.0.1) when this was fixed, so a stale per-blob cache
+      from before the fix is never reused silently (ARCHITECTURE.md section 3's invalidation contract). Recorded
+      here because it is exactly the kind of edge case a fresh grader should be able to re-derive independently.
+  - id: OI-2-resolution-table-not-persisted
+    text: >
+      See claim C5: ARCHITECTURE.md section 4.6 names a `resolution` table; this build recomputes resolution in
+      memory per query instead of persisting it, because a persisted-by-call-site cache would go stale across
+      commits (resolution depends on the whole commit's definition set, not on one call site in isolation). If a
+      future consumer needs resolution rows queryable directly in SQL (e.g. joined against other layers), that
+      would need a commit-scoped cache key (not call_site_id alone) -- not built here, as no B3 acceptance check
+      needs it and the in-memory recomputation is well within the measured latency budget (SO-12: ~0.1s).
+  - id: OI-3-regex-fallback-definitions-untested-on-the-real-corpus
+    text: >
+      HEURISTIC_REGEX_FALLBACK (recovering a definition from inside an ERROR-node span via a line regex) is
+      implemented and unit-tested (tests/code/test_rust_adapter.py::
+      test_error_node_is_recorded_and_fallback_definition_recovered) on a deliberately malformed synthetic
+      snippet, but never actually fires on the real repository at 3c880d8: all 5363 code_symbol rows are
+      derivation EXACT_PARSE (verified: `SELECT COUNT(*) FROM code_symbol WHERE derivation != 'EXACT_PARSE'` = 0),
+      because tree-sitter's own error recovery already keeps every real definition outside the 10 files' localized
+      ERROR spans parseable. The fallback is therefore a safety net proven correct in isolation, not (yet)
+      exercised by the real-repository acceptance checks themselves.
+  - id: OI-4-python-route-not-wired-into-the-commit-wide-index
+    text: >
+      govbridge/code/adapters/python_ast.py (REUSE, C2) is implemented, tested end to end (blob id, subprocess
+      invocation, error handling) and available for a future caller, but govbridge.code.symbols' stats/callers/
+      reads-key/history commands index and query Rust (.rs) blobs only. ARCHITECTURE.md section 4.6's "Tables"
+      paragraph and every B3 acceptance check are Rust-specific; nothing specifies how Python symbols would share
+      the same qualified-name/module-path scheme or the same resolution-label vocabulary, and inventing one
+      unrequested felt like scope creep past this brief rather than diligence. Python files still get file-level
+      lexical coverage through B2's route per ARCHITECTURE.md section 4.6 ("Other languages get file-level lexical
+      coverage only").
+  - id: OI-5-blob-identity-collapses-byte-identical-files
+    text: >
+      Because code_blob/code_symbol are keyed by Git blob id alone (ARCHITECTURE.md section 3's own invalidation
+      table: "keyed by (blob, adapter id+version, grammar version)"), two source files with byte-identical content
+      parse and cache as a single blob; a name defined only in such a pair resolves as HEURISTIC_UNIQUE_NAME, not
+      HEURISTIC_AMBIGUOUS. This is a direct, intentional consequence of the architecture's own caching key, not an
+      implementation gap; tests/code/test_symbols_integration.py::
+      test_byte_identical_files_share_one_cached_blob_by_design pins the behaviour so it is never silently
+      "fixed" into something the cache key cannot actually support (that would need keying by (blob, path)
+      instead, changing what "cached by blob" means). Not observed on the real repository's 217 files (no two
+      share content), and not implicated in any B3 acceptance check.
+  - id: OI-6-module-path-is-a-heuristic-not-mod-resolution
+    text: >
+      module_path() derives a crate::... guess from a file's path alone (runtime/src/x.rs -> crate::x); it is not
+      true Rust `mod`-declaration resolution, which would need a working tree. This is the documented source of
+      HEURISTIC_TYPE_PATH's imprecision (ARCHITECTURE.md section 4.6 already labels that path HEURISTIC, not
+      EXACT) and is unchanged from the architect's own spike (ARCHITECTURE/spike-scripts/code_spike.py's
+      module_path()), copied by logic per BR-HO-0005 ("copy their logic, do not import them"), not by import.
