@@ -45,3 +45,25 @@ never decides it.**
 
 The implementation is BR-AR-0013 (B6R, a fresh builder). Its scope is `govbridge/compile/**`, `tests/compile/**` and
 `tests/fixtures/compile/**`. Handoff: `HANDOFFS/BR-HO-0013-b6r-mandatory-in-a.md`.
+
+## Addendum A1: the grading consequence (2026-09-25, recorded before any demonstration run and without reading the oracle)
+
+`ARCHITECTURE/DEMONSTRATION_DESIGN.md` §4 G3 contains the **[D]** clause *"section A or D.1 contains a non-ladder class
+or a non-`ACTIVE` lifecycle"*. That clause predates this ruling. Read literally, it would fail every packet that
+obeys the ruling. **It is read as follows, and I1's `demo grade` must implement this reading:**
+
+* **Section A** fails G3 in any of these cases:
+  * it contains a **non-ladder class**;
+  * it contains **any item not returned by the resolver** (delivery other than `MANDATORY`);
+  * it contains a **non-`ACTIVE` item that lacks its lifecycle banner**;
+  * a non-`ACTIVE` item has no matching `MANDATORY_LIFECYCLE_NOT_ACTIVE` J notice.
+* **Section D.1** fails G3 if it contains a non-ladder class or any non-`ACTIVE` lifecycle. This part is unchanged.
+* **Oracle rows.** Any held-out oracle `authority_expectations` row that expects an **A-admissible** mandatory item
+  somewhere other than A is **read as expecting A**. This concerns the test-author's OI-4: the sections for
+  `EVIDENCE` and `ORCHESTRATION_RECORD` items were derived from the admissibility rules before this ruling existed.
+  Every other oracle expectation stands **unchanged**. That covers the class, the banner, and the D.2/D.3/F/E/H
+  placements of non-ladder items. The oracle's bytes, and its committed sha256, are untouched.
+
+The grader must record, in the grading report, every oracle row that this reading affected. The orchestrator has
+**not read the oracle**. This addendum follows only from the ruling and the public design text, so it cannot have been
+tuned to the oracle's content.

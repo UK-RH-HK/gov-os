@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T13:29:51Z'
-state_hash: 844cb485b29d838fbb4981dce9e3aeaa3ae37c4771c4334d433997f10df7f0b2
+updated_at: '2026-09-25T13:30:40Z'
+state_hash: 90caae025a81538c0e68f2d611d9f2b797d6cceb24388e724e20e5bfd40833e1
 lifecycle_state: BR_BUILD_PG3_INTEGRATION
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -632,11 +632,15 @@ unresolved_questions: []
 rulings:
 - id: BR-ARCH-RULING-1
   path: release/orchestration/phase-2-context-bridge/GATES/BR-ARCH-RULING-1-MANDATORY-INPUTS-ALWAYS-IN-A.md
-  sha256: 7c2dd1980987b9afb5a5bde7e90002c92917825fa908588c51a2d4f3839e12e1
+  sha256: 6b7f1cc80b518c1cda5261656d22264e8b152097f388fe9bca8b41067c7622dc
   kind: orchestrator ruling (NOT an owner decision); resolves an architecture-internal rule against owner text
   rule: section A membership is decided by the resolver plus class admissibility, never by lifecycle; non-ACTIVE
     lifecycles stay labelled and are listed in J; lifecycle still gates D.1 and ordering; nothing is raised to ACTIVE
   authority: launcher BR-0001 hard invariant; OD-P2-10 section 6; ARCHITECTURE.md section 5.3 item 6 (W10)
+  addendum_A1: DEMONSTRATION_DESIGN G3's 'non-ACTIVE lifecycle in A' clause is read per the ruling (A fails on non-ladder
+    class, non-resolver item, or a non-ACTIVE item without banner/J notice; D.1 unchanged); oracle authority_expectations
+    rows expecting an A-admissible mandatory item outside A are read as A and every affected row is reported; recorded
+    before any demonstration run without the orchestrator reading the oracle; delivered live to I1
 observations:
 - id: OBS-BR-01
   text: 'the orchestrator''s auto-memory claims OD-P2-08 superseded OA-P2-06''s hard stops and AR75 framing entirely; no
