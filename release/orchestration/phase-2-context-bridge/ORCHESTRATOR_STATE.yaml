@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T10:18:52Z'
-state_hash: 782dade4ef644d3bada46146acf31989bf2562c098dd359082242edbe6e3e303
-lifecycle_state: BR_BUILD_PG0
+updated_at: '2026-09-25T10:20:30Z'
+state_hash: b9105a33838cbe9f46df4ee19dfaee644a747781676475001d916a956ee84112
+lifecycle_state: BR_BUILD_PG1
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -309,10 +309,22 @@ agent_runs:
   branch: bridge/b1-0003
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0003
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-a6ee18e5256969db1.jsonl)
+  model_observed: claude-sonnet-5 (all 269 assistant turns, transcript agent-a6ee18e5256969db1.jsonl)
   agent_name: br-builder-b1-0003
   dispatched_at: '2026-09-25T09:47Z'
-  status: RUNNING
+  duration_ms: 2144015
+  status: COMPLETED_INTEGRATED
+  final_commit: 787d3d2b3c01de81ef8c1c25540a4fff228ad28a
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - pytest tests/core 68 passed (re-run in the B1 worktree)
+  - from-clean freshness update with a separate store (store-orch-verify-b1) -- FULL, 503,331 occurrences, 16.0 s,
+    llm_invocations 0, manifest c14e17e9...; immediate re-run NOOP in 0.013 s
+  - exact show 3c880d8:runtime/src/init.rs:146 -- blob eaf1532e, canonical_ref product, INCLUDE
+  - L-MACHINE-OUTPUT (2,850 files at 3c880d8) is LEXICAL_ONLY -- indexed by exact+lexical, only not embedded, per
+    ARCHITECTURE.md section 1.1; the whole-repository corpus holds
+  open_issues: seven, in AGENT_RUNS/BR-AR-0003.report.yaml; none blocks a B1 acceptance check; carried to I1 and the
+    verifier
   store: $HOME/.cache/gov-bridge/store-BR-AR-0003
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/__init__.py
@@ -325,9 +337,77 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/core/**
   - release/orchestration/phase-2-context-bridge/tests/fixtures/core/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.*
+- run_id: BR-AR-0004
+  role: builder B2 (lexical route (SQLite FTS5))
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0004-b2-0004.md
+  branch: bridge/b2-0004
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0004
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-builder-b2-0004
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0004
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/lexical/**
+  - release/orchestration/phase-2-context-bridge/tests/lexical/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.*
+- run_id: BR-AR-0005
+  role: builder B3 (code route)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0005-b3-0005.md
+  branch: bridge/b3-0005
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0005
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-builder-b3-0005
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0005
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/code/**
+  - release/orchestration/phase-2-context-bridge/tests/code/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0005.*
+- run_id: BR-AR-0006
+  role: builder B4 (semantic route)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0006-b4-0006.md
+  branch: bridge/b4-0006
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0006
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-builder-b4-0006
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0006
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/**
+  - release/orchestration/phase-2-context-bridge/config/embed-profile.yaml
+  - release/orchestration/phase-2-context-bridge/tests/semantic/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.*
+- run_id: BR-AR-0007
+  role: builder B5 (authority and graph)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0007-b5-0007.md
+  branch: bridge/b5-0007
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0007
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-builder-b5-0007
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0007
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/**
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/**
+  - release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+  - release/orchestration/phase-2-context-bridge/config/authority-registry.yaml
+  - release/orchestration/phase-2-context-bridge/tests/authority/**
+  - release/orchestration/phase-2-context-bridge/tests/graph/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/authority/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.*
 running_work:
-- run_id: BR-AR-0003
-  liveness_check: subagent transcript mtime + commits on bridge/b1-0003; never inferred from elapsed time
+- run_id: BR-AR-0004
+  liveness_check: subagent transcript mtime + commits on bridge/b2-0004; never inferred from elapsed time
+- run_id: BR-AR-0005
+  liveness_check: subagent transcript mtime + commits on bridge/b3-0005; never inferred from elapsed time
+- run_id: BR-AR-0006
+  liveness_check: subagent transcript mtime + commits on bridge/b4-0006; never inferred from elapsed time
+- run_id: BR-AR-0007
+  liveness_check: subagent transcript mtime + commits on bridge/b5-0007; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -408,7 +488,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0002 (TA) and BR-AR-0003 (B1); for each -- read its observed model from its
-  transcript, run tools/check_state.py integrate-check, merge; after B1 merges, dispatch PG1 (B2 BR-AR-0004, B3 BR-AR-0005,
-  B4 BR-AR-0006, B5 BR-AR-0007; model sonnet; each with GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-<RUN_ID>) in isolated
-  worktrees from the integrated tip
+next_deterministic_action: await PG1 (BR-AR-0004 B2, BR-AR-0005 B3, BR-AR-0006 B4, BR-AR-0007 B5); for each -- read the
+  observed model from its transcript, run integrate-check, run its tests in its worktree, merge; after B5 merges, dispatch
+  B6 (BR-AR-0008, sonnet); after B2/B3/B4/B6 merge, dispatch I1 (BR-AR-0009) with TA open issues OI-3/OI-4

@@ -156,3 +156,29 @@ does not dispose of F1.
 * OI-1 goes to GRADE, which copies only `oracle.yaml`.
 * OI-2 goes to the post-bridge synthesis. The TA found places where the code at `3c880d8` is more precise than, or
   differs from, the Review-8 return and the Phase-2 records. Those details stay sealed until grading.
+
+## BR-L-0007: B1 (core) lands, and PG1 is dispatched in parallel (2026-09-25)
+
+**BR-AR-0003 returned COMPLETED.** The model was `claude-sonnet-5` on all 269 turns. `integrate-check` was
+PERMITTED, run by the orchestrator. The orchestrator re-ran part of the work itself instead of taking the report's
+word:
+
+* `tests/core`: 68 passed;
+* a from-clean build into a **separate** store: FULL, 503,331 occurrences across 98 refs, 16 s, zero LLM calls;
+* an immediate re-run: NOOP in 0.013 s;
+* `exact show` on a product line: the right blob, labelled canonical.
+
+**The coverage figure differs from the architect's, and this is correct.** B1 reports INCLUDED 3,639 against the
+architect's 6,489. The difference is not a lost corpus. B1 implemented the architecture's `L-MACHINE-OUTPUT` rule,
+under which 2,850 logs and outputs are indexed lexically and exactly but not embedded, and 3,639 + 2,850 = 6,489.
+Unclassified is 0 on all 98 refs. B1 documented this rather than tuning a rule to hit the number.
+
+**PG1 is dispatched in parallel** (model sonnet), each in its own worktree and with its own store
+(BR-DAG-AMEND-1):
+
+* B2 lexical: BR-AR-0004;
+* B3 code: BR-AR-0005;
+* B4 semantic: BR-AR-0006;
+* B5 authority and graph: BR-AR-0007.
+
+Their mutation scopes are copied from the DAG into the state, where `integrate-check` enforces them.
