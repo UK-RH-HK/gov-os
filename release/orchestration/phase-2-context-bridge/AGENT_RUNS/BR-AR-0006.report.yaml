@@ -1,0 +1,234 @@
+run_id: BR-AR-0006
+role: builder B4 semantic route (DAG node B4)
+model_observed: claude-sonnet-5
+branch: bridge/b4-0006
+commit: 617c3cae4f69e6f8402c07a84784090208dd16ab
+status: COMPLETED
+claims:
+  - id: C1-onnx-adapter-is-an-adapt-of-a-copy
+    text: >
+      govbridge/semantic/adapters/onnx_embed.py is an ADAPT of a COPY of
+      capabilities/python/govos_capabilities/embed_sentence_transformers.py at commit 6e7a2a3 (blob
+      7b1411bf97b22aacb318ef907436c0d7c93592c8, confirmed unchanged at this branch's HEAD via `git hash-object`);
+      the original file was never edited (git diff 6e7a2a3 -- that path is empty on this branch). The header
+      records path/commit/blob provenance and exactly what changed (sentence-transformers/PyTorch replaced by
+      ONNX Runtime CPU; CAPABILITY_MISMATCH and PIN_MISMATCH added; mode query|passage added; full-precision
+      vector output instead of 6-decimal rounding). Uses the gov-capability/1 request/response shape and the
+      fail-closed codes PROTOCOL_MISMATCH, CAPABILITY_MISMATCH, MODEL_UNAVAILABLE, DIMENSION_MISMATCH,
+      PIN_MISMATCH, BAD_REQUEST -- every one exercised by a real subprocess call in tests/semantic/
+      test_adapter_protocol.py, including MODEL_UNAVAILABLE with the model directory pointed at a path that does
+      not exist (functionally "moved aside" without ever touching the shared, read-only model cache another
+      parallel builder may be using) and PIN_MISMATCH from a tampered artefact copy. The hashed-ngram plugin
+      (capabilities/python/govos_capabilities/embedder_hashed_ngram.py) is used only as a read-only test double
+      (test_dimension_mismatch_via_hashed_ngram_test_double, test_hashed_ngram_double_itself_is_protocol_conformant),
+      never substituted for the real route.
+  - id: C2-embed-profile-matches-the-architecture-spec
+    text: >
+      config/embed-profile.yaml's embed_kinds/embed_kinds_size_le/lexical_only_kinds/lexical_only_kinds_size_gt/
+      history_role_embedded fields match ARCHITECTURE/REUSE_VS_BUILD.yaml's embed-profile.yaml row verbatim (md,
+      txt, html, yaml, yml, toml, rs, py, sh, json<=64KiB embedded; out, log, shimlog, stderr, diff, patch, tsv,
+      jsonl, summary, json>64KiB lexical-only; history_role_embedded false), and its lexical_only_kinds is
+      identical to the already-committed config/corpus-rules.yaml's L-MACHINE-OUTPUT rule (the two files are
+      designed as companions; corpus-rules.yaml's own source_cite already points at this file). Kind admission is
+      a positive allowlist strictly narrower than corpus INCLUDE (a kind absent from both lists, e.g. .csv, is
+      corpus-included but never embedded -- tests/semantic/test_profile.py::
+      test_kind_admitted_positive_list_narrower_than_include). Ref eligibility
+      (govbridge.semantic.profile.eligible_ref_names) reads the ALREADY-PARSED, generic
+      ResolvedView/RefSpec.layers field config/canonical-view.yaml carries for exactly this purpose (every named
+      ref there lists "semantic" in layers; the history ref_glob entry does not) -- it never hard-codes a role
+      name; tested against a view with no layers field at all (falls back to the profile's own
+      history_role_embedded default) and against one that mirrors the real config exactly.
+  - id: C3-vector-store-matches-the-schema
+    text: >
+      govbridge/semantic/vectors.py's `vector` table is exactly
+      vector(chunk_id TEXT PRIMARY KEY, text_sha256 TEXT, pin_id TEXT, dim INT, vec BLOB), float32 LE, matching
+      ARCHITECTURE.md section 4 and schemas/build-manifest.yaml's vector layer field. digest_for_pin computes
+      sha256 over sorted (chunk_id, sha256(vec)) using the same FIELD_SEP/ROW_SEP convention
+      govbridge.core.manifest's own layer digests use. search() is brute-force cosine (vectors are pre-normalised,
+      so dot product suffices), scoped by pin_id. embed_and_store groups chunk rows by text_sha256 first, so a
+      duplicate text is embedded at most once per build and reused (byte-identical vector, credited
+      chunks_reused, never a second model call) both within one build and across a previous run's stored vectors
+      under the same pin_id (SEMANTIC_ROUTE.md section 5.3) -- proven with a monkeypatched embed() double
+      (tests/semantic/test_vectors.py::test_embed_and_store_dedupes_identical_text_without_a_second_model_call,
+      ::test_embed_and_store_reuses_across_calls_via_existing_vector_rows) and with real numbers on the full
+      corpus (see C5: 44,191 chunks seen, 40,187 embedded, 4,004 reused).
+  - id: C4-determinism-measured-on-the-real-corpus
+    text: >
+      `govbridge.semantic.vectors determinism --sample 50`, run against 50 real chunks from this run's own store
+      (GOVBRIDGE_STORE=store-BR-AR-0006), gives the IDENTICAL vectors digest
+      (c2ecf1643b83bce0846c3af0dc4ce45bc0d6db83c99be38d196831a99f6d7be7) across four separate process invocations
+      (two at --threads 4, two at --threads 16) and batch1_eq_batch32 true in every one of those four runs --
+      matching SEMANTIC_ROUTE.md section 2's own claim (bitwise-identical at 4 and 16 threads, batch 1 == batch
+      32) with independently measured evidence on this branch's own build.
+  - id: C5-full-real-corpus-rebuild
+    text: >
+      `python -m govbridge.core.freshness rebuild --from-clean --timings` (govbridge.semantic imported first --
+      see open_issues OI-1 for why), run once against the real, full canonical-view.yaml/corpus-rules.yaml in
+      the isolated store-BR-AR-0006, built BOTH layers in one pass: core in 14.8s (6,773 blobs, 503,411
+      occurrences, 135,983 chunks), semantic in 2,145.8s / ~35.8 min (44,191 eligible chunks seen -- kind-admitted
+      AND in a semantic-eligible ref -- 40,187 embedded, 4,004 reused via text_sha256 dedup, throughput 18.7
+      chunks/s under this machine's concurrent load from sibling builders). manifest.json's layers.vector block
+      records status BUILT, rows 44,191, a digest, and the full semantic manifest block (adapter/model/runtime/
+      encoding/embed_profile_sha256/pin_id) SEMANTIC_ROUTE.md section 4 describes -- see open_issues OI-2 for
+      where that block actually lives in the manifest and why. Verified directly against the built store: 0 of
+      41,916 L-MACHINE-OUTPUT-kind chunks were embedded, and 0 chunks whose blob exists ONLY in a phase2/*
+      (history-role) ref were embedded -- both zero on the real, full corpus, not just the pytest fixture. A
+      telemetry "builds" row with layer=semantic carries wall_seconds and throughput_chunks_per_s (llm_invocations
+      0, since embedding calls a pinned local model, never an LLM).
+  - id: C6-search-returns-the-required-fields
+    text: >
+      `govbridge.semantic.search 'how is a checkpoint made mandatory for a worker' --json` against the real,
+      now-built store returns 10 ranked (best-first) results; every one carries authority_class ("UNCLASSIFIED"),
+      lifecycle ("UNKNOWN"), version_status (computed for real via govbridge.core.view.classify_occurrence, e.g.
+      SAME_AS_CANONICAL/CANONICAL/HISTORICAL_VERSION), and delivery "RETRIEVED". Rank 1 is
+      fixtures/update/previous-release/4.1.1/policies/CHECKPOINT_POLICY.yaml; rank 7 is the current
+      framework/policies/CHECKPOINT_POLICY.yaml -- topically on point for the query, matching the smoke-check
+      SEMANTIC_ROUTE.md section 2 reports for the same query. authority_class/lifecycle are the two non-ladder
+      placeholder values ARCHITECTURE.md section 5.2 rule 5 already defines for "otherwise unclassified" (never
+      fabricated authority; the semantic route can only ever land in sections B-H with delivery RETRIEVED, never
+      A/D.1) via a `classify` hook a caller can override once govbridge.authority (node B5) exists --
+      tests/semantic/test_search.py::test_a_custom_classify_hook_overrides_the_placeholder proves the override
+      point works without editing this file.
+  - id: C7-generic-not-bespoke
+    text: >
+      `grep -rin "review.\?8\|F1-F6\|phase.\?2" govbridge/semantic tests/semantic` matches exactly two lines,
+      both comments, neither logic: profile.py's own module docstring disclaiming "Nothing here names Review 8,
+      a phase or a specific file" (quoting the rule to satisfy it, not naming a case to special-case), and a
+      `# release/orchestration/phase-2-context-bridge` path comment in onnx_embed.py's sys.path.insert line,
+      which is this bridge's own domain directory name (unavoidable in a path comment; "phase-2-context-bridge"
+      is the lifecycle's location, not a conditional on the product's Phase 2). No conditional branches on
+      Review 8, F1-F6 or Phase 2 anywhere; every rule (kind admission, ref eligibility, corpus-effect exclusion)
+      reads versioned config (config/embed-profile.yaml, config/corpus-rules.yaml, config/canonical-view.yaml)
+      generically. Review-8 material appears nowhere in this node's code, fixtures or tests.
+  - id: C8-orchestrator-advisory-addressed
+    text: >
+      govbridge.semantic.freshness_layer.vector_layer_digest() now calls vectors.create_table(conn) before any
+      read (the same ensure-schema-first pattern the orchestrator reported for B2's lexical_layer_digest()), so a
+      bare connection that never ran this node's own layer builder (another node's manifest-assembly test, or
+      build_manifest() invoked before any semantic build) does not raise on a missing `vector` table.
+      tests/core and tests/semantic were run together in BOTH collection orders after the fix
+      (pytest tests/core tests/semantic -q and pytest tests/semantic tests/core -q); 106/106 pass both ways
+      (AGENT_RUNS/BR-AR-0006.check6/7).
+mutation_scope_respected: true
+evidence:
+  - claim: C1-onnx-adapter-is-an-adapt-of-a-copy
+    command: cd $D && $PY -m pytest tests/semantic/test_adapter_protocol.py -q
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check1-pytest-semantic.out
+  - claim: C2-embed-profile-matches-the-architecture-spec
+    command: cd $D && $PY -m pytest tests/semantic/test_profile.py -q
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check1-pytest-semantic.out
+  - claim: C3-vector-store-matches-the-schema
+    command: cd $D && $PY -m pytest tests/semantic/test_vectors.py -q
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check1-pytest-semantic.out
+  - claim: C4-determinism-measured-on-the-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2a-determinism-threads4-run1.out
+  - claim: C4-determinism-measured-on-the-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2b-determinism-defaultthreads-run2.out
+  - claim: C4-determinism-measured-on-the-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2c-determinism-threads16-runA.out
+  - claim: C4-determinism-measured-on-the-real-corpus
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2d-determinism-threads16-runB.out
+  - claim: C5-full-real-corpus-rebuild
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check3-freshness-rebuild-semantic.out
+  - claim: C5-full-real-corpus-rebuild
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check3a-manifest-vector-layer.out
+  - claim: C5-full-real-corpus-rebuild
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check3b-no-machine-output-no-history-verify.out
+  - claim: C6-search-returns-the-required-fields
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check4-search.out
+  - claim: C7-generic-not-bespoke
+    command: cd $D && grep -rin "review.\?8\|F1-F6\|phase.\?2" govbridge/semantic tests/semantic
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check5-generic-grep.out
+  - claim: C8-orchestrator-advisory-addressed
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check6-pytest-core-then-semantic.out
+  - claim: C8-orchestrator-advisory-addressed
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check7-pytest-semantic-then-core.out
+  - claim: mutation_scope_respected
+    command: cd .. && git status --porcelain=v1 (run from the worktree root; only config/embed-profile.yaml, govbridge/semantic/**, tests/semantic/** and AGENT_RUNS/BR-AR-0006.* are untracked/changed)
+open_issues:
+  - id: OI-1-freshness-cli-has-no-layer-package-auto-discovery
+    text: >
+      `python -m govbridge.core.freshness rebuild --layer semantic` (the acceptance check's literal command) does
+      not, by itself, know the "semantic" layer exists: govbridge.core.freshness self-registers only its own
+      "core" builder at import time; a sibling layer's register_layer_builder() call runs only when that layer's
+      OWN package is imported first, and nothing in govbridge.core imports sibling layer packages generically
+      (manifest.py's own docstring documents the register_layer/register_layer_builder extension points for
+      B2-B5 but does not provide a discovery mechanism). This node's mutation_scope excludes govbridge/core/**,
+      so it cannot add one. Worked around, in-scope, for every command in this run's checkpoint that needs the
+      "semantic" layer registered: `import govbridge.semantic` is added ahead of the call (either naturally, via
+      `python -m govbridge.semantic.<module>`, which imports the govbridge.semantic package first and registers
+      as a side effect; or explicitly, via
+      `python -c "import govbridge.semantic, govbridge.core.freshness as f, sys; sys.exit(f.main(sys.argv[1:]))"
+      rebuild --from-clean --timings` for the freshness CLI itself, recorded verbatim in the checkpoint). A
+      second, related consequence: because this registration is process-global (Python module state), importing
+      govbridge.semantic anywhere in a pytest session that ALSO collects tests/core means a bare freshness.run()
+      call inside tests/core now also runs the "semantic" builder. Verified this does not break any tests/core
+      assertion in either collection order (see C8/check6/check7); the underlying gap is generic to every B2-B5
+      package, not specific to this node, and belongs to I1 (which wires the whole govbridge package together)
+      or a future govbridge.core change to resolve properly (e.g. a real plugin-discovery hook, or per-run layer
+      registry scoping).
+  - id: OI-2-semantic-manifest-block-lives-under-layers-vector-not-pins-semantic
+    text: >
+      schemas/build-manifest.yaml describes the semantic manifest block (SEMANTIC_ROUTE.md section 4) as living
+      at the top-level `pins.semantic`. govbridge.core.freshness.run() builds its `pins` dict inline
+      (`pins = {"chunker_version": CHUNKER_VERSION}`) with no hook for a layer to contribute its own pins entry --
+      unlike `layers`, which DOES have a public register_layer() extension point. Outside this node's
+      mutation_scope (govbridge/core/freshness.py), so this run instead attaches the full block (adapter, model,
+      runtime, encoding, embed_profile_sha256, pin_id) as `layers.vector.extra["semantic_block"]`, which
+      LayerDigest.to_dict() already merges into the manifest through the existing, sanctioned register_layer("vector",
+      ...) path. All the same information is present in the manifest and byte-verifiable (see
+      AGENT_RUNS/BR-AR-0006.check3a-manifest-vector-layer.out), just reachable at
+      manifest.layers.vector.{status,pin_id,semantic_block} rather than manifest.pins.semantic. Flagged for B1/I1
+      to reconcile (e.g. generalising the pins dict construction the same way layers already is) -- this affects
+      B2 (fts_tokenizer) and B3 (code_adapters) identically, not just this node.
+  - id: OI-3-authority-class-and-lifecycle-are-placeholders-pending-b5
+    text: >
+      govbridge.semantic.search assigns every result authority_class "UNCLASSIFIED" and lifecycle "UNKNOWN" (the
+      exact non-ladder placeholder values ARCHITECTURE.md section 5.1/5.2 define for "otherwise unclassified"),
+      because real classification is govbridge.authority's job (node B5), which is not in this node's depends_on
+      and is not merged into this branch's base. A `classify` callable parameter lets a caller (B6/I1, once B5 is
+      merged) supply the real classifier without editing this file; version_status is NOT a placeholder -- it is
+      computed for real via the already-built govbridge.core.view canonical model, exactly as the exact route
+      does. Because the semantic route can only ever land in packet sections B-H with delivery RETRIEVED (never
+      A/D.1, ARCHITECTURE.md section 5.3), this placeholder can never be mistaken for authority.
+  - id: OI-4-model-pin-yaml-local-name-does-not-match-the-real-bootstrapped-cache
+    text: >
+      config/model-pin.yaml declares `local_name: pooling_config.json` for the `1_Pooling/config.json` artefact
+      (presumably to avoid a filename collision with the top-level config.json once flattened). The real, shared
+      model cache B1's bootstrap already populated (verified on disk at
+      $HOME/.cache/gov-bridge/models/BAAI-bge-small-en-v1.5/<revision>/) preserves the original nested path
+      instead -- there is a `1_Pooling/config.json`, never a `pooling_config.json`. govbridge.semantic.modelpin
+      resolves every artefact by its declared `path` verbatim (subdirectories preserved), matching the REAL
+      layout rather than the aspirational `local_name` field, which avoids a spurious MODEL_UNAVAILABLE; `local_name`
+      is still parsed and kept on the Artefact dataclass for visibility but is not used for filesystem resolution.
+      Flagged for B1/bootstrap.sh reconciliation (either bootstrap.sh should honour local_name, or model-pin.yaml's
+      local_name field should be dropped/corrected).
+  - id: OI-5-embed-and-store-commits-once-at-the-end-not-per-batch
+    text: >
+      vectors.embed_and_store() calls conn.commit() once, after every batch has been embedded, not after each
+      individual batch. A from-clean full rebuild that is killed or crashes partway through therefore loses ALL
+      of this run's vector progress (the already-committed core layer -- occurrence/blob/chunk -- survives, since
+      core_layer_builder commits its own work first and separately), and because
+      govbridge.core.freshness.determine_trigger() always forces a full store.move_store_aside() whenever no
+      manifest was successfully saved yet (which is exactly the case after an interrupted run), a retry cannot
+      resume from the partial vector table either way under the current CLI -- it always restarts from clean.
+      This run's own full rebuild completed successfully in one pass (~36 minutes, see C5), so this was not hit
+      in practice, but is worth reconsidering (periodic commits, or a resumable invocation that bypasses
+      freshness.run()'s move-aside via a direct embed_and_store() call against an already-populated store) if a
+      future full corpus grows enough that a single embed pass becomes failure-prone.
+  - id: OI-6-plugin-blob-fixed-mid-run
+    text: >
+      An earlier version of freshness_layer.py computed `semantic_block.adapter.plugin_blob` via
+      manifest.bridge_code_tree(), which returns the TREE id of the whole govbridge/ directory -- the wrong git
+      object kind for a single plugin file, and (since this node's files were not yet committed when the one
+      real, full corpus rebuild ran) a stale value from before this branch's own commit besides. Fixed in code
+      (a new _adapter_blob() helper resolves govbridge/semantic/adapters/onnx_embed.py's own blob id at HEAD via
+      gitobj.rev_parse, mirroring bridge_code_tree()'s "None until committed" convention) and covered by the
+      existing test_vector_status_built_and_rows_recorded_in_manifest test (which checks the block's other
+      fields; plugin_blob is exercised structurally but its concrete value is not asserted since it depends on
+      commit state). The already-persisted manifest.json in $HOME/.cache/gov-bridge/store-BR-AR-0006/ (this run's
+      real-corpus evidence, check3/check3a) still carries the OLD, incorrect value, since re-running the ~36-minute
+      full embed solely to refresh one provenance field was judged not worth the CPU cost this run's isolation
+      rules ask other parallel builders to share; the next FULL rebuild of this store (which a future commit to
+      govbridge/ triggers unconditionally, via the code_tree fingerprint) will record the corrected value with no
+      further action needed.

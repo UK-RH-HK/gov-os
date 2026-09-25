@@ -1,0 +1,198 @@
+{
+ "k": 10,
+ "pin_id": "83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50",
+ "query": "how is a checkpoint made mandatory for a worker",
+ "results": [
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "canonical_ref": "product",
+   "delivery": "RETRIEVED",
+   "id": "981a146240592b3be90aeec8",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 9,
+    "line_start": 1,
+    "path": "fixtures/update/previous-release/4.1.1/policies/CHECKPOINT_POLICY.yaml",
+    "ref": "records"
+   },
+   "rank": 1,
+   "route": "semantic",
+   "score": 0.7457687854766846,
+   "version_status": "SAME_AS_CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "canonical_ref": "product",
+   "delivery": "RETRIEVED",
+   "id": "6e9b5b7d3082780c2e4ee892",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 399,
+    "line_start": 367,
+    "path": "runtime/src/checkpoints.rs",
+    "ref": "records"
+   },
+   "rank": 2,
+   "route": "semantic",
+   "score": 0.7404578328132629,
+   "version_status": "SAME_AS_CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+   "canonical_ref": "records",
+   "delivery": "RETRIEVED",
+   "id": "d0b8b168492639316973d3d0",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 136,
+    "line_start": 123,
+    "path": "release/releases/4.1.5/kernel/policies/ENFORCEMENT_MAP.yaml",
+    "ref": "records"
+   },
+   "rank": 3,
+   "route": "semantic",
+   "score": 0.7391235828399658,
+   "version_status": "CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+   "canonical_ref": "records",
+   "delivery": "RETRIEVED",
+   "id": "2c03eed2471a30d30f60b6dd",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 111,
+    "line_start": 108,
+    "path": "release/capability-baseline/audit-0/delta/00-AUDIT-REPORT.md",
+    "ref": "records"
+   },
+   "rank": 4,
+   "route": "semantic",
+   "score": 0.7368320226669312,
+   "version_status": "CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "canonical_ref": "product",
+   "delivery": "RETRIEVED",
+   "id": "d4dad83a1acb1df63fdfa67e",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 577,
+    "line_start": 558,
+    "path": "runtime/src/checkpoints.rs",
+    "ref": "records"
+   },
+   "rank": 5,
+   "route": "semantic",
+   "score": 0.7293061017990112,
+   "version_status": "SAME_AS_CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+   "canonical_ref": "records",
+   "delivery": "RETRIEVED",
+   "id": "93289129b6715585c83b9568",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 1144,
+    "line_start": 1132,
+    "path": "release/capability-baseline/audit-0/zeta-r/capability-audit.yaml",
+    "ref": "records"
+   },
+   "rank": 6,
+   "route": "semantic",
+   "score": 0.7282947301864624,
+   "version_status": "CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "canonical_ref": "product",
+   "delivery": "RETRIEVED",
+   "id": "3b234054bdc672a564d4f753",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 13,
+    "line_start": 1,
+    "path": "framework/policies/CHECKPOINT_POLICY.yaml",
+    "ref": "records"
+   },
+   "rank": 7,
+   "route": "semantic",
+   "score": 0.7255586981773376,
+   "version_status": "SAME_AS_CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "canonical_ref": "product",
+   "delivery": "RETRIEVED",
+   "id": "cfd5c7e3d790f3dd56bc0858",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 808,
+    "line_start": 789,
+    "path": "runtime/src/orchestration/tasks.rs",
+    "ref": "records"
+   },
+   "rank": 8,
+   "route": "semantic",
+   "score": 0.7244260311126709,
+   "version_status": "HISTORICAL_VERSION"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "canonical_ref": "product",
+   "delivery": "RETRIEVED",
+   "id": "5cbf73cbb37138e4a76f5f1e",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+    "line_end": 808,
+    "line_start": 789,
+    "path": "runtime/src/orchestration/tasks.rs",
+    "ref": "evidence"
+   },
+   "rank": 9,
+   "route": "semantic",
+   "score": 0.7244260311126709,
+   "version_status": "SAME_AS_CANONICAL"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "canonical_commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+   "canonical_ref": "records",
+   "delivery": "RETRIEVED",
+   "id": "71126bc70a8dcbc51d402822",
+   "lifecycle": "UNKNOWN",
+   "occurrence": {
+    "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+    "line_end": 109,
+    "line_start": 106,
+    "path": "release/capability-baseline/audit-0/delta/00-AUDIT-REPORT.md",
+    "ref": "records"
+   },
+   "rank": 10,
+   "route": "semantic",
+   "score": 0.7235931158065796,
+   "version_status": "CANONICAL"
+  }
+ ],
+ "route": "semantic"
+}
