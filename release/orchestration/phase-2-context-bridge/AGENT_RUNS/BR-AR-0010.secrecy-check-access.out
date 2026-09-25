@@ -1,0 +1,19 @@
+br-architect-0001: tool_calls=151 calls_touching_sealed_or_oracle=5
+    ('Write', '{"file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001/release/orchestration/phase-2-context-bridge/ARCHITECTURE/DEMONSTRATION_DESIGN.md", "content": "# Review-8 demonstration: query set, ')
+    ('Bash', '{"command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001/release/orchestration/phase-2-context-bridge/ARCHITECTURE && python3 - <<\'EOF\'\\np=\'DEMONSTRATION_DESIGN.md\'\\ns=open(p).read()\\na=\\"*')
+    ('Bash', '{"command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001/release/orchestration/phase-2-context-bridge/ARCHITECTURE/schemas && cat > oracle.yaml <<\'EOF\'\\nschema: govbridge-schema/1\\ndescribe')
+    ('Write', '{"file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001/release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml", "content": "schema: govbridge-implementation-dag/')
+    ('Bash', '{"command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001 && python3 - <<\'EOF\'\\nimport yaml\\nA=\'release/orchestration/phase-2-context-bridge/ARCHITECTURE\'\\nS=A+\'/spike-outputs\'\\nrep = {\\n\\"r')
+br-builder-b1-0003: tool_calls=146 calls_touching_sealed_or_oracle=0
+br-builder-b2-0004: tool_calls=120 calls_touching_sealed_or_oracle=0
+br-builder-b3-0005: tool_calls=122 calls_touching_sealed_or_oracle=0
+br-builder-b4-0006: tool_calls=209 calls_touching_sealed_or_oracle=0
+br-builder-b5-0007: tool_calls=306 calls_touching_sealed_or_oracle=0
+br-builder-b6-0008: tool_calls=224 calls_touching_sealed_or_oracle=0
+br-integrator-i1-0009: tool_calls=426 calls_touching_sealed_or_oracle=4
+    ('Bash', '{"command": "cd /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0009/release/orchestration/phase-2-context-bridge && cat ARCHITECTURE/schemas/oracle.yaml ARCHITECTURE/schemas/answers.yaml ARCHITECTURE/')
+    ('Write', '{"file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0009/release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade.py", "content": "\\"\\"\\"``govbridge.demo.grade`` (I1/BR')
+    ('Write', '{"file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0009/release/orchestration/phase-2-context-bridge/tests/integration/test_validate_oracle.py", "content": "\\"\\"\\"``govbridge.demo.validate_')
+    ('Edit', '{"replace_all": false, "file_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0009/release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade.py", "old_string": "def _base_or')
+br-repair-b6r-0013: tool_calls=111 calls_touching_sealed_or_oracle=0
+TOTAL access-shaped tool calls by non-TA roles: 9

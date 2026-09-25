@@ -1,0 +1,52 @@
+{
+ "blobs_processed": 13692,
+ "chunks_processed": 316408,
+ "layer": "core",
+ "layer_seconds": {
+  "authority": 229.922,
+  "core": 16.948,
+  "lexical": 4.922,
+  "semantic": 2046.946
+ },
+ "layer_stats": {
+  "authority": {
+   "class_lifecycle_rows": 2937,
+   "edges": 2941,
+   "edges_by_label": {
+    "DEFINES": 2937,
+    "SUPERSEDES": 4
+   },
+   "record_defs": 2937
+  },
+  "core": {
+   "blobs": 6926,
+   "chunks": 137707,
+   "occurrences": 503573
+  },
+  "lexical": {
+   "blobs": 6766,
+   "chunks": 137707,
+   "occurrences": 0
+  },
+  "semantic": {
+   "blobs": 0,
+   "chunks": 40994,
+   "chunks_embedded": 40994,
+   "chunks_reused": 4004,
+   "chunks_seen": 44998,
+   "eligible_chunks": 44998,
+   "occurrences": 0,
+   "status": "BUILT",
+   "throughput_chunks_per_s": 20.04,
+   "wall_seconds": 2045.904
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "fb413f63115bc68427fceabc5c07f40af58ff39af7c054de22e0e0396ecff7ec",
+ "occurrences_processed": 503573,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 2302.269
+}
+exit=0
+2026-09-25T18:50:25+01:00
