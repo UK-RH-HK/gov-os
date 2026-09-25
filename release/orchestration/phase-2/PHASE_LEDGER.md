@@ -615,3 +615,47 @@ one read added.
 `init`/`adopt` hand to `write_project_adoption_floor`, **not only** in `PolicySet::load`'s reconstruction fallback —
 because once a floor is written reconstruction never fires, so a weak derived floor would be promoted to
 *authenticated*, strictly worse than the case it replaces.
+
+## P2-L-0045 — the approved delta lands (368/368); Review 8 dispatched as the convergence decision point (2026-09-25)
+
+`3c880d8` on `phase2/approved-delta`, base `92982ff`, **full suite 368/368, 0 filtered, 3,631 s (60m31s)**.
+Arithmetic: 373 base − 8 deleted + 3 new. `exec_resolve.rs` untouched, so Property A carries forward for a fourth
+round.
+
+**The first round in this phase that mostly deletes.** `gov floor-reanchor` is gone whole — command,
+`reanchor_project_identity`, error codes, guard row, `g0_label`/`command_name` arms — taking **AR94-C2, C3, C4, D1,
+D5 and the confirmed C5 concurrency race** with it. C5 is *moot, not fixed*: the function it was a property of no
+longer exists. The `(device,inode)` marker binding and its GC are also deleted, replaced by creator liveness — and
+deleting the GC is sound, because a liveness marker decays to inert the instant its creator dies, which is precisely
+what the P2-AR-0095 sweep existed to bound.
+
+Relocation is now ordinary governed re-onboarding under unchanged `install_kernel` authority, minting a **fresh**
+identity out of unchanged code (`FloorIdentity::advance`). A second working copy gets its own identity **without
+disturbing the first** — AR92-C3's and AR94-C4's measured costs both vanish structurally rather than being
+documented.
+
+**Orchestrator verification** confirmed: the deletion is real (every surviving grep hit is documentation of it;
+`cli/src/main.rs` is 20 deletions, 0 additions); the four new functions exist; `process_start_time` reads
+`/proc/<pid>/stat` field 22 correctly past the comm field, with PID reuse defeated by start-time comparison and
+non-Linux failing closed.
+
+**The orchestrator raised a finding against the revised positive control and then WITHDREW it, wrongly raised.**
+`execute_check`'s sandbox is `git: true`, which runs a fresh `git init`, so its lineage can never match the copied
+floor — and `read_project_adoption_floor` returns early on lineage mismatch at `paths.rs:1200`, **before**
+`reconcile`. The exemption is therefore never consulted for that sandbox, the builder's in-process probe matches the
+only production shape, and the proposed "correction" would have tested a path where the mechanism never decides. This
+is the **second** load-bearing claim the orchestrator got wrong this phase by verifying that a path *exists* without
+verifying that it *reaches the decision* — the same authority-versus-representation confusion the product keeps
+failing on, appearing in the orchestrator's own reasoning. Recorded, not erased.
+
+The verification did surface a real adjacent fact, handed to Review 8 rather than rediscovered: **inside a
+`skills::execute_check` scenario sandbox the project floor is always refused on lineage**, so scenario checks run
+with no floor applied at all. AR84-C3-shaped, unrelated to the exemption, correctly out of scope for a bounded delta.
+
+**`REVIEW_8_CONTEXT_PACK.md` built and completed** (OD-P2-10 §1) — the trust model stated explicitly, the eight-round
+failure pattern, what is settled, and six inherited residuals including the builder's own named creator-liveness
+residual.
+
+**Dispatched `P2-AR-0097`** on `P2-HO-0061` at `3c880d8`. Because this round deleted rather than added, the brief
+inverts the standing question: **did the deletions remove protection?** — above all, whether a planted floor document
+can gain authority through the new re-onboarding path, which is where the deleted command's worst finding lived.
