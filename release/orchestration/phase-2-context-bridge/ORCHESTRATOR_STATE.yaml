@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T17:54:15Z'
-state_hash: eabcb64b0ad491e54ad13568d60097ffe4067a3e7e077b545c67bbcff6024a3e
+updated_at: '2026-09-25T18:44:56Z'
+state_hash: 293a651d81d0471ce74d20dcb932e49a69678c60fff9c6401931500d05dda7c8
 lifecycle_state: BR_REPAIR_CODE_LAYER
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -610,10 +610,23 @@ agent_runs:
   branch: bridge/b3r-0014
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0014
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-abf4e461cbf145547.jsonl)
+  model_observed: claude-sonnet-5 (all 210 assistant turns of pass 1, transcript agent-abf4e461cbf145547.jsonl)
   agent_name: br-repair-b3r-0014
   dispatched_at: '2026-09-25T18:10Z'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
+  pass_1:
+    final_commit: bc4c390c1fe65a82c0a2a7c3154566e3e0594444
+    integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+    claims: eager builder over non-history refs; digest over symbol+call_site+literal restricted to the eager set; 317
+      tests; two from-clean code-layer builds identical (digest a280d1e5..., 210,609 rows, blobs_parsed 244 = independent
+      ls-tree count); query-invariant on a real history tip
+  orchestrator_found_before_merge:
+  - 'SECURITY-POLICY BYPASS: 11 X-SEC-CONTENT (EXCLUDE) .rs blobs at the eager refs (incl. runtime/src/security/secrets.rs,
+    tests/certification/brownfield.rs) are parsed into code tables -- 7,551 code_literal rows; pre-existing in B3''s lazy
+    path, now eager and digest-covered'
+  - no in-place schema migration -- the demonstration store's code_blob lacks the new eager column
+  follow_up_delivered: SendMessage 2026-09-25 -- honour corpus-rule exclusions on eager and lazy paths (recorded, disclosed
+    exclusion), idempotent ALTER TABLE migration, re-run checks in fresh stores with blobs_parsed == independent INCLUDE-verdict count
   store: $HOME/.cache/gov-bridge/store-BR-AR-0014
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/code/**
