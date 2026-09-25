@@ -1,0 +1,64 @@
+=== build 1: store-BR-AR-0014 ===
+{
+ "blobs_processed": 244,
+ "chunks_processed": 0,
+ "layer": "code",
+ "layer_seconds": {
+  "code": 3.338
+ },
+ "layer_stats": {
+  "code": {
+   "blobs": 244,
+   "chunks": 0,
+   "eager_blobs": 244,
+   "eager_refs": [
+    "evidence",
+    "product",
+    "records"
+   ],
+   "occurrences": 0,
+   "rs_occurrences": 623
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "268318d8d7abc1aef93e3e9acf6218f7330bcbde81d8b921fb83f3a40d3e8887",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 3.808
+}
+=== build 2: store-BR-AR-0014b ===
+{
+ "blobs_processed": 244,
+ "chunks_processed": 0,
+ "layer": "code",
+ "layer_seconds": {
+  "code": 3.422
+ },
+ "layer_stats": {
+  "code": {
+   "blobs": 244,
+   "chunks": 0,
+   "eager_blobs": 244,
+   "eager_refs": [
+    "evidence",
+    "product",
+    "records"
+   ],
+   "occurrences": 0,
+   "rs_occurrences": 623
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "268318d8d7abc1aef93e3e9acf6218f7330bcbde81d8b921fb83f3a40d3e8887",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 3.894
+}
+=== manifest layers.code, both stores ===
+store-BR-AR-0014 {"blobs_parsed": 244, "call_site_rows": 117145, "digest": "a280d1e5d06f3bc27ee82358c6db674487c6faf53d03ec4c4542a106cdea5761", "literal_rows": 87069, "rows": 210609, "symbol_rows": 6395}
+store-BR-AR-0014b {"blobs_parsed": 244, "call_site_rows": 117145, "digest": "a280d1e5d06f3bc27ee82358c6db674487c6faf53d03ec4c4542a106cdea5761", "literal_rows": 87069, "rows": 210609, "symbol_rows": 6395}
+=== independent git ls-tree -r --full-tree count of distinct .rs blobs across the eager refs (records/product/evidence) ===
+records=9dcaa3fd640638d25aa8aa7a380d135e9f332172 product=3c880d80f81475f5306bdd5f680f2e004df49391 evidence=58219d5628683d6f462aa67bf25dbc2641933bce
+independent distinct .rs blob count: 244

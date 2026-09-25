@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/usain/.cache/gov-bridge/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0014/release/orchestration/phase-2-context-bridge
+plugins: anyio-4.15.1
+collecting ... collected 9 items / 2 deselected / 7 selected
+
+tests/code/test_eager_build.py::test_eager_ref_names_uses_explicit_layers_list PASSED [ 14%]
+tests/code/test_eager_build.py::test_eager_ref_names_falls_back_to_role_when_layers_is_omitted PASSED [ 28%]
+tests/code/test_eager_build.py::test_eager_ref_names_never_includes_history_glob_refs PASSED [ 42%]
+tests/code/test_eager_build.py::test_incremental_equals_full_on_a_fixture_repo PASSED [ 57%]
+tests/code/test_eager_build.py::test_digest_is_query_invariant_against_a_non_eager_commit PASSED [ 71%]
+tests/code/test_eager_build.py::test_eager_build_parses_only_new_blobs_on_a_second_call PASSED [ 85%]
+tests/code/test_eager_build.py::test_eager_build_is_a_noop_stats_shape_with_no_eager_refs PASSED [100%]
+
+======================= 7 passed, 2 deselected in 0.28s ========================
+EXIT=0

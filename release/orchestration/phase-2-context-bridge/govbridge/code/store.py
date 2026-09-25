@@ -10,6 +10,13 @@ call site's label depends on which *other* blobs are present in the commit being
 commit's tree can become ambiguous in another), so caching it keyed only by call site would silently go stale
 across commits. ``govbridge.code.resolve`` recomputes it, cheaply, in memory, from the rows below, every query
 (SO-12 measured this at ~0.1 s for the whole corpus) -- see resolve.py's module docstring.
+
+``code_blob.eager`` (BR-AR-0014/BR-HO-0014): 0 by default -- set only by ``govbridge.code.build.code_layer_builder``,
+for exactly the blobs reachable, right now, at the canonical view's eager (non-``history``) refs. A blob a query
+lazily parses through ``govbridge.code.symbols.ensure_indexed`` (``stats``/``callers``/``reads-key``/
+``history diff``, or a ``callers --commit <history commit>``) is inserted with ``eager`` at its schema default and
+is never flipped by anything other than the eager builder -- see ``govbridge.code.build``'s module docstring for
+why this makes the build-manifest ``code`` digest query-invariant.
 """
 from __future__ import annotations
 
@@ -25,8 +32,10 @@ CREATE TABLE IF NOT EXISTS code_blob (
     adapter_version TEXT NOT NULL,
     grammar_version TEXT NOT NULL,
     ok_parse INTEGER NOT NULL,
-    error_count INTEGER NOT NULL
+    error_count INTEGER NOT NULL,
+    eager INTEGER NOT NULL DEFAULT 0
 );
+CREATE INDEX IF NOT EXISTS code_blob_by_eager ON code_blob(eager);
 
 CREATE TABLE IF NOT EXISTS code_symbol (
     symbol_id TEXT PRIMARY KEY,
@@ -158,6 +167,23 @@ def clear_blob(conn: sqlite3.Connection, blob_id: str) -> None:
     conn.execute("DELETE FROM code_call_site WHERE blob_id=?", (blob_id,))
     conn.execute("DELETE FROM code_literal WHERE blob_id=?", (blob_id,))
     conn.execute("DELETE FROM code_parse_error WHERE blob_id=?", (blob_id,))
+
+
+def set_eager_blobs(conn: sqlite3.Connection, blob_ids: set[str]) -> None:
+    """Recompute ``code_blob.eager`` from scratch: every row is cleared, then set for exactly ``blob_ids`` (every
+    id MUST already be present in ``code_blob`` -- the caller parses/caches them first, via ``ensure_indexed``).
+    Always a full reset-then-set, never an incremental patch, so an eager ref that stops reaching a blob (content
+    changed, or the ref moved away from it) is reflected exactly as a from-clean build would see it -- this is what
+    keeps BR-HO-0014 acceptance check 4 ("incremental == full") exact regardless of history."""
+    conn.execute("UPDATE code_blob SET eager=0")
+    if blob_ids:
+        ids = sorted(blob_ids)
+        conn.execute(f"UPDATE code_blob SET eager=1 WHERE blob_id IN ({_in_clause(len(ids))})", ids)
+    conn.commit()
+
+
+def eager_blob_ids(conn: sqlite3.Connection) -> list[str]:
+    return [r[0] for r in conn.execute("SELECT blob_id FROM code_blob WHERE eager=1 ORDER BY blob_id").fetchall()]
 
 
 def _in_clause(n: int) -> str:
