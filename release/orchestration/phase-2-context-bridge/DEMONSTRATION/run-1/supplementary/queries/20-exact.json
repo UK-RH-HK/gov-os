@@ -1,0 +1,38 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 3119,
+   "path": "runtime/src/adopt.rs",
+   "text": "pub fn glob_helper(pat: &str, path: &str) -> bool {"
+  },
+  {
+   "line": 111,
+   "path": "runtime/src/exec_resolve.rs",
+   "text": "    fn glob_in_dir(dir: &Path, name_pattern: &str) -> Vec<PathBuf> {"
+  },
+  {
+   "line": 408,
+   "path": "runtime/src/policy_precedence.rs",
+   "text": "fn glob_segments(pattern: &str) -> Vec<String> {"
+  },
+  {
+   "line": 134,
+   "path": "runtime/src/util.rs",
+   "text": "pub fn glob_to_regex(pattern: &str) -> Regex {"
+  },
+  {
+   "line": 179,
+   "path": "runtime/src/util.rs",
+   "text": "pub fn glob_match(pattern: &str, path: &str) -> bool {"
+  },
+  {
+   "line": 380,
+   "path": "runtime/src/util.rs",
+   "text": "    fn glob_semantics() {"
+  }
+ ],
+ "query": "fn glob_",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

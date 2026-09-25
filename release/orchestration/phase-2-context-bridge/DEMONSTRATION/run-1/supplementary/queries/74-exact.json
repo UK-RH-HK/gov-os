@@ -1,0 +1,23 @@
+{
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 133,
+   "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md",
+   "text": "  scheduling floor). The ~20\u201324 min estimate is retracted. No major performance refactor during this remediation."
+  },
+  {
+   "line": 1085,
+   "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "text": "    account is retracted. What survives unaffected is the --test-threads=1 category error and its ~7x cost.'"
+  },
+  {
+   "line": 372,
+   "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+   "text": "| V8.3 reconciled | \u00a76.3e evidence classes; \u00a76.3f the five failed enumerations (programs, shapes, list premises, class values, **consumers**) with the transferable rule that *a fail-closed default is weakened by exceptions whose completeness cannot be proven*; \u00a76.3g cross-check independence; \u00a76.3h derived verdicts and substrate-enforced checkpoints; and **\u00a75.0 CURRENT TRUTH**, which supersedes every later figure in \u00a75 \u2014 full suite **\u224850 min**, single-threaded \u22482.5 h, penalty **\u22483\u00d7** (not 7\u00d7), scheduling floor **\u224840\u201343 min**, milestone SLO **\u226455 min**, all retracted figures labelled as such. |"
+  }
+ ],
+ "query": "retract",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592"
+}

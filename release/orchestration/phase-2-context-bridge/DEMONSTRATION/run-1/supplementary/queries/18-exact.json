@@ -1,0 +1,17 @@
+{
+ "blob": "51c8c16cefa3e411068e777af9c0cf8eb1f1d4ba",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 1680,
+ "line_start": 1600,
+ "path": "runtime/src/paths.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 139834,
+ "text": "\n/// **The single predicate OD-P2-07 requires: does `class` confer ANY exemption from ANY governed control?** The\n/// project-overlay widening refusal ([`crate::policy_precedence::overlap_is_no_less_restrictive`]) calls this to\n/// decide whether a candidate pattern's class must be no less exempting than the kernel rule it overlaps \u2014 it does\n/// not enumerate individual exemptions, so a class newly added to [`CLASS_EXEMPTIONS`] for a brand-new control is\n/// automatically protected there without that function changing at all.\npub fn confers_any_exemption(class: &str) -> bool {\n    !class_exemptions(class).is_empty()\n}\n\n#[derive(Debug, Clone)]\npub struct PathDecision {\n    pub path: String,\n    pub rule_pattern: Option<String>,\n    pub attrs: Map<String, Value>,\n}\n\nimpl PathDecision {\n    pub fn class(&self) -> String {\n        self.attrs\n            .get(\"class\")\n            .and_then(|v| v.as_str())\n            .unwrap_or(\"unknown\")\n            .to_string()\n    }\n    pub fn is_secret(&self) -> bool {\n        self.class() == SECRET_CLASS\n            || self.attrs.get(\"sensitivity\").and_then(|v| v.as_str()) == Some(\"secret\")\n    }\n    /// Never read/indexed: secret-class or a sensitivity class in SECURITY_POLICY.never_index_classes.\n    pub fn is_never_index(&self) -> bool {\n        self.is_secret()\n            || self\n                .attrs\n                .get(\"never_index\")\n                .and_then(|v| v.as_bool())\n                .unwrap_or(false)\n    }\n    pub fn sensitivity(&self) -> String {\n        self.str(\"sensitivity\")\n    }\n    pub fn export_allowed(&self) -> bool {\n        self.attrs.get(\"export\").and_then(|v| v.as_str()) == Some(\"allowed\")\n    }\n    pub fn flag(&self, key: &str) -> bool {\n        if self.is_secret() && key.ends_with(\"_index\") {\n            return false;\n        }\n        self.attrs\n            .get(key)\n            .and_then(|v| v.as_bool())\n            .unwrap_or(false)\n    }\n    pub fn str(&self, key: &str) -> String {\n        self.attrs\n            .get(key)\n            .and_then(|v| v.as_str())\n            .unwrap_or(\"\")\n            .to_string()\n    }\n    pub fn namespace(&self) -> String {\n        self.str(\"namespace\")\n    }\n    pub fn default_retrieval(&self) -> bool {\n        self.attrs\n            .get(\"default_retrieval\")\n            .and_then(|v| v.as_bool())\n            .unwrap_or(true)\n            && !self.is_secret()\n    }\n}\n\nfn class_defaults(cls: &str) -> Value {\n    match cls {\n        \"source\" => {\n            json!({\"semantic_index\": true, \"lexical_index\": true, \"graph_index\": true, \"code_index\": true})\n        }\n        \"test\" => {\n            json!({\"semantic_index\": true, \"lexical_index\": true, \"graph_index\": true, \"code_index\": true})\n        }\n        \"authoritative\" => {\n",
+ "text_sha256": "e1c80814547cc39ee818d10aaba25a4cab4142f3666c7ac2626e1bdd37806f3b",
+ "version_status": "CANONICAL"
+}

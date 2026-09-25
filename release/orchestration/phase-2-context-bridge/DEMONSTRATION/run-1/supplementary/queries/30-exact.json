@@ -1,0 +1,23 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 1623,
+   "path": "runtime/src/cit/mod.rs",
+   "text": "                crate::policy_precedence::partition_floor_rules_against_kernel(&kernel_paths, &rules);"
+  },
+  {
+   "line": 940,
+   "path": "runtime/src/policy_precedence.rs",
+   "text": "pub fn partition_floor_rules_against_kernel("
+  },
+  {
+   "line": 527,
+   "path": "tests/certification/ar86_floor.rs",
+   "text": "// through `partition_floor_rules_against_kernel`? Two shapes in one transaction:"
+  }
+ ],
+ "query": "partition_floor_rules_against_kernel",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

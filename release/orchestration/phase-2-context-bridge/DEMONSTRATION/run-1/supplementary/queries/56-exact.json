@@ -1,0 +1,18 @@
+{
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 103,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- tool/plugin;"
+  },
+  {
+   "line": 164,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "**Advanced qualification challenge:** seeded secrets, restricted research, confidential project files, malicious plugin descriptors, weakened project policy."
+  }
+ ],
+ "query": "plugin",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592"
+}

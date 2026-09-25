@@ -1,0 +1,13 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 407,
+   "path": "runtime/src/capabilities/governance.rs",
+   "text": "    let registered = reg.is_some();"
+  }
+ ],
+ "query": "let registered",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

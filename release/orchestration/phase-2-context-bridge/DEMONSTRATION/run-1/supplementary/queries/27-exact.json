@@ -1,0 +1,38 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 2101,
+   "path": "runtime/src/paths.rs",
+   "text": "                            && d.str(\"mutation\") == \"os-only\","
+  },
+  {
+   "line": 1680,
+   "path": "runtime/src/policy_precedence.rs",
+   "text": "        assert_eq!(d.str(\"mutation\"), \"restricted\", \"kernel floor still decides\");"
+  },
+  {
+   "line": 1682,
+   "path": "runtime/src/policy_precedence.rs",
+   "text": "        assert_eq!(d2.str(\"mutation\"), \"restricted\");"
+  },
+  {
+   "line": 1722,
+   "path": "runtime/src/policy_precedence.rs",
+   "text": "        assert_eq!(contract.decide(\"archive/a.txt\").str(\"mutation\"), \"prohibited\");"
+  },
+  {
+   "line": 1817,
+   "path": "runtime/src/tools.rs",
+   "text": "                } else if !matches!(d.str(\"mutation\").as_str(), \"allowed\" | \"\") {"
+  },
+  {
+   "line": 1820,
+   "path": "runtime/src/tools.rs",
+   "text": "                        format!(\"the installation reaches '{c}', whose mutation the path map records as '{}'\", d.str(\"mutation\")),"
+  }
+ ],
+ "query": "str(\"mutation\")",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

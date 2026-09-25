@@ -1,0 +1,17 @@
+{
+ "blob": "445bd61a05ca03285f71046d9678fdd6860e6480",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 1965,
+ "line_start": 1905,
+ "path": "runtime/src/tools.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 161507,
+ "text": "        if role_net.is_empty() {\n            findings.push(finding(\n                \"new_or_unrestricted_network_trust_boundary\",\n                \"network access\".into(),\n                if declared_net.is_empty() {\n                    \"the installation's own commands\".into()\n                } else {\n                    \"descriptor.required_permission_classes\".to_string()\n                },\n                format!(\"TOOL_PERMISSIONS.roles.{role} holds no network class ({net_classes:?})\"),\n            ));\n        }\n        if endpoints.is_empty() {\n            findings.push(finding(\n                \"new_or_unrestricted_network_trust_boundary\",\n                \"network access to an endpoint the OS cannot determine\".into(),\n                \"descriptor.required_permission_classes / descriptor.permissions.network\".into(),\n                format!(\"the kernel tool registry's approved registries and allowlisted services {authorised_hosts:?}: an unbounded boundary is not one of them\"),\n            ));\n        }\n        for (h, at) in &endpoints {\n            if !authorised_hosts.iter().any(|a| a.eq_ignore_ascii_case(h)) {\n                findings.push(finding(\n                    \"new_or_unrestricted_network_trust_boundary\",\n                    format!(\"network access to '{h}'\"),\n                    at.clone(),\n                    format!(\"the kernel tool registry's approved registries and allowlisted services {authorised_hosts:?}\"),\n                ));\n            }\n        }\n    }\n\n    // a finding under a trigger the governed rule does not declare is still an expansion, but it is named as such\n    let mut fired: Vec<String> = findings\n        .iter()\n        .filter_map(|f| f[\"trigger\"].as_str().map(|s| s.to_string()))\n        .collect();\n    fired.sort();\n    fired.dedup();\n    let undeclared: Vec<String> = fired\n        .iter()\n        .filter(|t| !triggers.is_empty() && !triggers.contains(t))\n        .cloned()\n        .collect();\n    let expands = !findings.is_empty() || !undetermined.is_empty();\n    json!({\n        \"expands_authority\": expands,\n        \"triggers_fired\": fired,\n        \"triggers_declared\": triggers,\n        \"triggers_not_declared_by_policy\": undeclared,\n        \"findings\": findings,\n        \"undetermined\": undetermined,\n        \"authorised_sources\": ENVELOPE_SOURCES,\n        \"role\": role,\n        \"role_permission_classes\": role_classes,\n        \"network_endpoints\": endpoints.iter().map(|(h, _)| h.clone()).collect::<Vec<_>>(),\n        \"authorised_network_hosts\": authorised_hosts,\n    })\n}\n\n/// **Which branch of `CHANGE_POLICY.change_classes.tool_installation` applies to this installation, and why**\n",
+ "text_sha256": "864ed92520b77048cd9a8daae8ea548feb1604dacae90bae8a1819763d24f0f4",
+ "version_status": "CANONICAL"
+}

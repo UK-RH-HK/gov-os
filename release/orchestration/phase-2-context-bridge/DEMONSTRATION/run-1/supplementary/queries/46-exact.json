@@ -1,0 +1,208 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 1051,
+   "path": "runtime/src/srr/breakglass.rs",
+   "text": "            \"protected_release_high_water\": floors.release_high_water_version,"
+  },
+  {
+   "line": 1052,
+   "path": "runtime/src/srr/breakglass.rs",
+   "text": "            \"protected_release_high_water_sequence\": floors.release_high_water_sequence,"
+  },
+  {
+   "line": 1053,
+   "path": "runtime/src/srr/breakglass.rs",
+   "text": "            \"metadata_high_water\": floors.metadata_high_water,"
+  },
+  {
+   "line": 1122,
+   "path": "runtime/src/srr/breakglass.rs",
+   "text": "            \"protected_release_high_water_sequence\": floors.release_high_water_sequence,"
+  },
+  {
+   "line": 374,
+   "path": "runtime/src/srr/state.rs",
+   "text": "/// * `metadata_high_water` \u2014 highest accepted version per metadata role. Pure replay protection."
+  },
+  {
+   "line": 375,
+   "path": "runtime/src/srr/state.rs",
+   "text": "/// * `release_high_water`  \u2014 the highest release this machine has itself verified **and installed**."
+  },
+  {
+   "line": 381,
+   "path": "runtime/src/srr/state.rs",
+   "text": "    pub metadata_high_water: std::collections::BTreeMap<String, u64>,"
+  },
+  {
+   "line": 382,
+   "path": "runtime/src/srr/state.rs",
+   "text": "    pub release_high_water_version: String,"
+  },
+  {
+   "line": 383,
+   "path": "runtime/src/srr/state.rs",
+   "text": "    pub release_high_water_sequence: u64,"
+  },
+  {
+   "line": 397,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        if let Some(m) = v.get(\"metadata_high_water\").and_then(|x| x.as_object()) {"
+  },
+  {
+   "line": 399,
+   "path": "runtime/src/srr/state.rs",
+   "text": "                f.metadata_high_water"
+  },
+  {
+   "line": 403,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        f.release_high_water_version = v"
+  },
+  {
+   "line": 404,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            .get(\"release_high_water\")"
+  },
+  {
+   "line": 409,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        f.release_high_water_sequence = v"
+  },
+  {
+   "line": 410,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            .get(\"release_high_water\")"
+  },
+  {
+   "line": 442,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            \"metadata_high_water\": self.metadata_high_water,"
+  },
+  {
+   "line": 443,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            \"release_high_water\": {\"version\": self.release_high_water_version, \"sequence\": self.release_high_water_sequence},"
+  },
+  {
+   "line": 459,
+   "path": "runtime/src/srr/state.rs",
+   "text": "    /// of [`Floors`] is `pub` and `save` is `pub`, so `f.release_high_water_sequence = 0; f.save(&ms)` is a"
+  },
+  {
+   "line": 472,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            .metadata_high_water"
+  },
+  {
+   "line": 480,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            &persisted.release_high_water_version,"
+  },
+  {
+   "line": 481,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            persisted.release_high_water_sequence,"
+  },
+  {
+   "line": 494,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        *self.metadata_high_water.get(role).unwrap_or(&0)"
+  },
+  {
+   "line": 501,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            self.metadata_high_water.insert(role.to_string(), version);"
+  },
+  {
+   "line": 508,
+   "path": "runtime/src/srr/state.rs",
+   "text": "    /// * `release_high_water_version` \u2014 semantic version ordering, for the human-readable floor and for releases"
+  },
+  {
+   "line": 510,
+   "path": "runtime/src/srr/state.rs",
+   "text": "    /// * `release_high_water_sequence` \u2014 the signed monotonic sequence."
+  },
+  {
+   "line": 523,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            && (self.release_high_water_version.is_empty()"
+  },
+  {
+   "line": 524,
+   "path": "runtime/src/srr/state.rs",
+   "text": "                || crate::lock::compare_versions(version, &self.release_high_water_version)"
+  },
+  {
+   "line": 527,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            self.release_high_water_version = version.to_string();"
+  },
+  {
+   "line": 529,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        if sequence > self.release_high_water_sequence {"
+  },
+  {
+   "line": 530,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            self.release_high_water_sequence = sequence;"
+  },
+  {
+   "line": 537,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        self.release_high_water_version.is_empty() && self.release_high_water_sequence == 0"
+  },
+  {
+   "line": 553,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        self.release_high_water_sequence"
+  },
+  {
+   "line": 560,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            return self.release_high_water_version.clone();"
+  },
+  {
+   "line": 562,
+   "path": "runtime/src/srr/state.rs",
+   "text": "        if self.release_high_water_version.is_empty() {"
+  },
+  {
+   "line": 567,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            &self.release_high_water_version,"
+  },
+  {
+   "line": 572,
+   "path": "runtime/src/srr/state.rs",
+   "text": "            self.release_high_water_version.clone()"
+  },
+  {
+   "line": 791,
+   "path": "runtime/src/srr/verifier.rs",
+   "text": "            \"protected_release_high_water\": floors.release_high_water_version,"
+  },
+  {
+   "line": 792,
+   "path": "runtime/src/srr/verifier.rs",
+   "text": "            \"protected_release_high_water_sequence\": floors.release_high_water_sequence,"
+  },
+  {
+   "line": 1077,
+   "path": "runtime/src/srr/verifier.rs",
+   "text": "    .with_details(json!({\"role\": role, \"presented_version\": found, \"protected_high_water\": floor}))"
+  },
+  {
+   "line": 1259,
+   "path": "runtime/src/srr/verifier.rs",
+   "text": "    for (role, v) in &auth.floors.metadata_high_water {"
+  }
+ ],
+ "query": "high_water",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

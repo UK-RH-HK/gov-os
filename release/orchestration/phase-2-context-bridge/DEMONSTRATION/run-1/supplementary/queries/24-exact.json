@@ -1,0 +1,28 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 193,
+   "path": "framework/policies/TOOL_POLICY.yaml",
+   "text": "  policy_paths: [\"framework/**\", \"governance/**\", \"spec/decisions/**\", \".governance-state/**\"]"
+  },
+  {
+   "line": 1627,
+   "path": "runtime/src/tools.rs",
+   "text": "    let policy_paths = envelope_list(p, \"policy_paths\");"
+  },
+  {
+   "line": 1799,
+   "path": "runtime/src/tools.rs",
+   "text": "                if policy_paths.iter().any(|g| crate::util::glob_match(g, &c)) {"
+  },
+  {
+   "line": 1804,
+   "path": "runtime/src/tools.rs",
+   "text": "                        \"TOOL_POLICY.installation_envelope.policy_paths; an installation writes only its own descriptor and the generated tool registry\".into(),"
+  }
+ ],
+ "query": "policy_paths",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

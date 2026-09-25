@@ -1,0 +1,17 @@
+{
+ "blob": "46e05870a7f7db2986fd578d88b51f61c5e25686",
+ "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "canonical_ref": "records",
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 100,
+ "line_start": 76,
+ "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0060-approved-delta.md",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "size": 8855,
+ "text": "## 4. Sandbox exemption = creator liveness \u2014 non-deferrable (owner-approved 5C Option B)\n\nApproved semantics:\n\n```\nlive OS-created sandbox              \u2192 exemption may be valid\ncreating/owning process dies         \u2192 exemption is no longer authoritative \u2192 fail closed \u2192 cleanup/rebuild\n```\n\n**Delete the inode-binding and the GC** added in P2-AR-0095 if no production path still needs them. The orchestrator\nverified none does: `skills.rs:528 execute_check` holds its `Sandbox` alive across every child `gov` call\n(`run_gov`), so the creator is alive for **every** production read. Cross-process, yes; post-mortem, never.\n\n**`ar94_nc2` must be revised**, on the owner's explicit instruction \u2014 it currently uses `spawn_and_kill_when` to\nSIGKILL the creator, which encodes the old implementation rather than a product requirement. The revised control must\nstill prove **both**: a genuine OS-created sandbox works **cross-process while its creator is alive**, and an\nunrecorded or substituted sandbox does **not**.\n\n**No environment variable may carry authority.** P2-AR-0095 confirmed `SANDBOX_ENV` is not referenced in the\nexemption decision; keep it that way. If creator liveness needs a cross-process signal, use pid plus process start\ntime \u2014 never a value a child can be handed.\n\n## 5. Do not do\n\nNo new command. No new subsystem. No `floor-forget`. No hand-edit detector. No treating T2 as proof-grade. No\n",
+ "text_sha256": "568ff2b316af942ca9e1c70540faee32a3f4fe6133a92d3e73a9833d76790f85",
+ "version_status": "CANONICAL"
+}

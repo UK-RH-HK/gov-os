@@ -1,0 +1,17 @@
+{
+ "blob": "3fbc43a0cad312b5fa5f601ca26ba14573a1ef6d",
+ "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "canonical_ref": "records",
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 573,
+ "line_start": 566,
+ "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "size": 120188,
+ "text": "**post-mortem** recognition, and a process-local registry cannot satisfy that by construction.\n\n**Orchestrator verification settled two of the owner's three sweep questions from evidence.**\n\n**5B \u2014 the concurrent re-anchor race is CONFIRMED real.** OD-P2-09 \u00a75B asserted this; the orchestrator flagged it as\nunverifiable from durable state at the time and that caution is now **withdrawn**. AR95 reproduced two store entries\nfor one identity in one run and observed serialisation in another \u2014 stronger evidence than AR94's `ar94_c5`, which\nconstructed the interleaving but saw it serialise. `reanchor_project_identity`'s lookup\u2192write\u2192remove holds no lock.\n",
+ "text_sha256": "c7ef1a54f680ed8a93e9f4dcdcdd4f962f86000eaed0615c1814a212f9fbad41",
+ "version_status": "CANONICAL"
+}

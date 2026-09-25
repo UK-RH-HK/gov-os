@@ -1,0 +1,337 @@
+{
+ "seed": "P2-AR-0097#F3",
+ "stages": {
+  "architecture": {
+   "hops": [
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 26,
+     "evidence_occurrence": "spec/decisions/D-0011.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "spec/decisions/D-0011.yaml@94d02116e770e0c4e99fe62367f89cd915692592:26",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 50,
+     "evidence_occurrence": "spec/decisions/D-0011.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "spec/decisions/D-0011.yaml@94d02116e770e0c4e99fe62367f89cd915692592:50",
+     "type": "MENTIONS"
+    }
+   ],
+   "status": "PRESENT"
+  },
+  "current_status": {
+   "hops": [
+    {
+     "derivation": "UNCLASSIFIED",
+     "dst": "UNKNOWN",
+     "evidence_line": null,
+     "evidence_occurrence": null,
+     "note": "class=UNCLASSIFIED",
+     "src": "P2-AR-0097#F3",
+     "type": "CURRENT_STATUS"
+    }
+   ],
+   "status": "PRESENT"
+  },
+  "dependency": {
+   "hops": [],
+   "status": "MISSING: dependency"
+  },
+  "findings": {
+   "hops": [],
+   "status": "MISSING: findings"
+  },
+  "implementation": {
+   "hops": [],
+   "status": "MISSING: implementation"
+  },
+  "lessons": {
+   "hops": [],
+   "status": "MISSING: lessons"
+  },
+  "owner_decision": {
+   "hops": [
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 18,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592:18",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 40,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592:40",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 53,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592:53",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 72,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md@94d02116e770e0c4e99fe62367f89cd915692592:72",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 52,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592:52",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 56,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592:56",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 58,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592:58",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 220,
+     "evidence_occurrence": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md@94d02116e770e0c4e99fe62367f89cd915692592:220",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 14,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-AUTHORISATION-P2-0006-OPTION-A-BOUNDED-ROUND.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-AUTHORISATION-P2-0006-OPTION-A-BOUNDED-ROUND.md@94d02116e770e0c4e99fe62367f89cd915692592:14",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 26,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-AUTHORISATION-P2-0006-OPTION-A-BOUNDED-ROUND.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-AUTHORISATION-P2-0006-OPTION-A-BOUNDED-ROUND.md@94d02116e770e0c4e99fe62367f89cd915692592:26",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 22,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0003-TOOL-INSTALL-GATE.md@94d02116e770e0c4e99fe62367f89cd915692592:22",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 66,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md@94d02116e770e0c4e99fe62367f89cd915692592:66",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 87,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md@94d02116e770e0c4e99fe62367f89cd915692592:87",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 59,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@94d02116e770e0c4e99fe62367f89cd915692592:59",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 61,
+     "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@94d02116e770e0c4e99fe62367f89cd915692592:61",
+     "type": "MENTIONS"
+    }
+   ],
+   "status": "PRESENT"
+  },
+  "purpose": {
+   "hops": [],
+   "status": "MISSING: purpose"
+  },
+  "requirement": {
+   "hops": [
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 414,
+     "evidence_occurrence": "Governance_OS_Capability_Acceptance_Contract_v3.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "Governance_OS_Capability_Acceptance_Contract_v3.md@94d02116e770e0c4e99fe62367f89cd915692592:414",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 510,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:510",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2371,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2371",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2375,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2375",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2389,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2389",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2392,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2392",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2395,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2395",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2398,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2398",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2401,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2401",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2404,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2404",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2407,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2407",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2410,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2410",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 2413,
+     "evidence_occurrence": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/governance-capability-acceptance.yaml@94d02116e770e0c4e99fe62367f89cd915692592:2413",
+     "type": "MENTIONS"
+    },
+    {
+     "derivation": "HEURISTIC_LOCAL_ID",
+     "dst": "P2-AR-0097#F3",
+     "evidence_line": 414,
+     "evidence_occurrence": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md@94d02116e770e0c4e99fe62367f89cd915692592",
+     "note": null,
+     "src": "framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md@94d02116e770e0c4e99fe62367f89cd915692592:414",
+     "type": "MENTIONS"
+    }
+   ],
+   "status": "PRESENT"
+  },
+  "tests": {
+   "hops": [],
+   "status": "MISSING: tests"
+  }
+ }
+}

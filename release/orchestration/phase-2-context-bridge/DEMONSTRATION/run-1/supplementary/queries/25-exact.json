@@ -1,0 +1,17 @@
+{
+ "blob": "445bd61a05ca03285f71046d9678fdd6860e6480",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 1630,
+ "line_start": 1599,
+ "path": "runtime/src/tools.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 161507,
+ "text": "pub fn installation_authority(\n    p: &Project,\n    descriptor: &Value,\n    role: &str,\n    dest_rel: &str,\n    op: Option<&Value>,\n) -> Value {\n    let triggers = p.policies().get_list(\n        \"CHANGE_POLICY\",\n        \"change_classes.tool_installation.authority_expansion_triggers\",\n    );\n    let mut findings: Vec<Value> = vec![];\n    let mut undetermined: Vec<String> = vec![];\n    let env = p.policies().get(\"TOOL_POLICY\", \"installation_envelope\");\n    if env.as_ref().and_then(|v| v.as_object()).is_none() {\n        undetermined.push(\"TOOL_POLICY.installation_envelope is absent: the authorised envelope cannot be determined, so the installation is treated as an expansion (fail closed)\".into());\n    }\n    let role_classes = role_permissions(p, role);\n    if role_classes.is_empty() {\n        undetermined.push(format!(\"TOOL_PERMISSIONS.yaml authorises no permission class for role '{role}': nothing the installation asks for is inside the envelope\"));\n    }\n    let host_classes = envelope_list(p, \"host_authority_classes\");\n    let cred_classes = envelope_list(p, \"credential_classes\");\n    let net_classes = envelope_list(p, \"network_classes\");\n    let priv_tokens = envelope_list(p, \"privilege_tokens\");\n    let host_tokens = envelope_list(p, \"host_authority_tokens\");\n    let scope_flags = envelope_list(p, \"host_scope_flags\");\n    let cred_patterns = envelope_list(p, \"credential_patterns\");\n    let policy_paths = envelope_list(p, \"policy_paths\");\n    let inline_flags = envelope_list(p, \"inline_code_flags\");\n    let indirection_flags = envelope_list(p, \"argument_indirection_flags\");\n    let recipe_programs = envelope_list(p, \"opaque_recipe_programs\");\n",
+ "text_sha256": "72f46205572a097fda2d706f5cd164c23ce0c15b055c1dda20c1bc52115e0fa8",
+ "version_status": "CANONICAL"
+}

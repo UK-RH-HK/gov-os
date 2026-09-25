@@ -1,0 +1,930 @@
+{
+ "deleted_in": [],
+ "entries": [
+  {
+   "commit_time": "2026-09-25T03:41:51+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1400,
+    "evidence_occurrence": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:1400",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T03:43:24+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1,
+    "evidence_occurrence": "release/orchestration/phase-2/HANDOFFS/P2-HO-0061-review-8.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/HANDOFFS/P2-HO-0061-review-8.md@94d02116e770e0c4e99fe62367f89cd915692592:1",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T03:43:24+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 659,
+    "evidence_occurrence": "release/orchestration/phase-2/PHASE_LEDGER.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/PHASE_LEDGER.md@94d02116e770e0c4e99fe62367f89cd915692592:659",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T04:33:42+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1367,
+    "evidence_occurrence": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:1367",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T04:33:42+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 665,
+    "evidence_occurrence": "release/orchestration/phase-2/PHASE_LEDGER.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/PHASE_LEDGER.md@94d02116e770e0c4e99fe62367f89cd915692592:665",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:31:04+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 8,
+    "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@94d02116e770e0c4e99fe62367f89cd915692592:8",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "OWNER_DECISION"
+  },
+  {
+   "commit_time": "2026-09-25T09:31:04+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1608,
+    "evidence_occurrence": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:1608",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:31:04+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1612,
+    "evidence_occurrence": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:1612",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 4,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592:4",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 12,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592:12",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 22,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592:22",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 172,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@94d02116e770e0c4e99fe62367f89cd915692592:172",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592:1",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 8,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592:8",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 10,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592:10",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 12,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md@94d02116e770e0c4e99fe62367f89cd915692592:12",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 47,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:47",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 54,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:54",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 55,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:55",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 56,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:56",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 57,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:57",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 58,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:58",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 838,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:838",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:37:49+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 9,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@94d02116e770e0c4e99fe62367f89cd915692592:9",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:41:12+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 23,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md@94d02116e770e0c4e99fe62367f89cd915692592:23",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:41:12+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 184,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:184",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T09:41:12+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 188,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@94d02116e770e0c4e99fe62367f89cd915692592:188",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 194,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md@94d02116e770e0c4e99fe62367f89cd915692592:194",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 54,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/DEMONSTRATION_DESIGN.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/DEMONSTRATION_DESIGN.md@94d02116e770e0c4e99fe62367f89cd915692592:54",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 44,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592:44",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 45,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592:45",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 52,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592:52",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 53,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592:53",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 65,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml@94d02116e770e0c4e99fe62367f89cd915692592:65",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 17,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592:17",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 18,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592:18",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 19,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592:19",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 20,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-task.yaml@94d02116e770e0c4e99fe62367f89cd915692592:20",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T10:37:30+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 74,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/spike-outputs/17-id-census.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/ARCHITECTURE/spike-outputs/17-id-census.out@94d02116e770e0c4e99fe62367f89cd915692592:74",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T11:46:28+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 65,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/query-partition_floor_rules_against_kernel.json@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/query-partition_floor_rules_against_kernel.json@94d02116e770e0c4e99fe62367f89cd915692592:65",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 103,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check2-resolver.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check2-resolver.out@94d02116e770e0c4e99fe62367f89cd915692592:103",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 116,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check2-resolver.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check2-resolver.out@94d02116e770e0c4e99fe62367f89cd915692592:116",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1220,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592:1220",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1226,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592:1226",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1232,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592:1232",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1238,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592:1238",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 1244,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out@94d02116e770e0c4e99fe62367f89cd915692592:1244",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 25,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/config/id-grammar.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/config/id-grammar.yaml@94d02116e770e0c4e99fe62367f89cd915692592:25",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T12:43:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 160,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py@94d02116e770e0c4e99fe62367f89cd915692592:160",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T14:21:29+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 29,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592:29",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T14:21:29+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 30,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592:30",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T14:21:29+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 31,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592:31",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T14:21:29+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 32,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out@94d02116e770e0c4e99fe62367f89cd915692592:32",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T18:01:11+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 393,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592:393",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T20:58:06+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 25,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0015-b6r2-section-g.md@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0015-b6r2-section-g.md@94d02116e770e0c4e99fe62367f89cd915692592:25",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T22:11:42+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 5,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/govbridge/compile/codeseeds.py@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/govbridge/compile/codeseeds.py@94d02116e770e0c4e99fe62367f89cd915692592:5",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T22:11:42+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 113,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/govbridge/compile/codeseeds.py@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/govbridge/compile/codeseeds.py@94d02116e770e0c4e99fe62367f89cd915692592:113",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "UNCLASSIFIED"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:27+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 44,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592:44",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:27+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 46,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592:46",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:27+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 103,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592:103",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:27+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 105,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592:105",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:27+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 107,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out@94d02116e770e0c4e99fe62367f89cd915692592:107",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:44+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 41,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.checkpoint.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.checkpoint.yaml@94d02116e770e0c4e99fe62367f89cd915692592:41",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:44+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 191,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592:191",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:44+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 192,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592:192",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  },
+  {
+   "commit_time": "2026-09-25T23:30:44+01:00",
+   "edge": {
+    "derivation": "EXACT_ID",
+    "dst": "P2-AR-0097",
+    "evidence_line": 196,
+    "evidence_occurrence": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592",
+    "note": null,
+    "src": "release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.report.yaml@94d02116e770e0c4e99fe62367f89cd915692592:196",
+    "type": "MENTIONS"
+   },
+   "kind": "mention",
+   "path_class": "ORCHESTRATION_RECORD"
+  }
+ ],
+ "seed": "P2-AR-0097"
+}

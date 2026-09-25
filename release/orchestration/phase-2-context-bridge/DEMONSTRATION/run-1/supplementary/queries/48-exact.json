@@ -1,0 +1,17 @@
+{
+ "blob": "a00b9f8cf1e7ec0c6a7faf4edc5c13185378e181",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 1080,
+ "line_start": 1060,
+ "path": "runtime/src/srr/verifier.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 64101,
+ "text": "    // Advance the metadata high-water only after every check above has passed, and only upward.\n    floors.raise_metadata(ROLE_RELEASE, release.version);\n    if let Some(s) = snapshot.as_ref() {\n        floors.raise_metadata(ROLE_SNAPSHOT, s.version);\n    }\n    if let Some(t) = timestamp.as_ref() {\n        floors.raise_metadata(ROLE_TIMESTAMP, t.version);\n    }\n    floors.raise_metadata(ROLE_ROOT, root.version);\n    Ok((release, currency))\n}\n\nfn rollback_err(role: &str, found: u64, floor: u64) -> GovError {\n    GovError::new(\n        \"SRR_METADATA_ROLLBACK\",\n        format!(\"{role} metadata version {found} is below this machine's protected high-water {floor}; replaying older metadata is refused\"),\n    )\n    .with_details(json!({\"role\": role, \"presented_version\": found, \"protected_high_water\": floor}))\n}\n\n/// Every migration file in the staged payload must be named by the signed release metadata, and match its digest.\n",
+ "text_sha256": "ff55bc4af42bc67d4a1e077595a53997c85adadfb83b46aa4806b86f858f4a6f",
+ "version_status": "CANONICAL"
+}

@@ -1,0 +1,43 @@
+{
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 1082,
+   "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "text": "    by ~2.4x, and is withdrawn.'"
+  },
+  {
+   "line": 1542,
+   "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "text": "    OD-P2-08 section 2 makes the T2 seal detection, never proof-grade. Proposal withdrawn; the document is not consulted"
+  },
+  {
+   "line": 1577,
+   "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "text": "    the decision. First: proposing the T2-verified document as a rules authority. Second: the withdrawn positive-control"
+  },
+  {
+   "line": 1618,
+   "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "text": "  - RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md (withdrawn finding, retained as evidence)"
+  },
+  {
+   "line": 571,
+   "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+   "text": "unverifiable from durable state at the time and that caution is now **withdrawn**. AR95 reproduced two store entries"
+  },
+  {
+   "line": 702,
+   "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+   "text": "as the withdrawn positive-control finding. The first two were caught before they shipped; this one shipped into an"
+  },
+  {
+   "line": 742,
+   "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+   "text": "decision** (the T2 document as a rules authority; the withdrawn positive-control finding; and the additive-union"
+  }
+ ],
+ "query": "withdrawn",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592"
+}

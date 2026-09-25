@@ -1,0 +1,28 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 1431,
+   "path": "runtime/src/paths.rs",
+   "text": "/// own [`last_known_adoption_floor_rules`], generalised here to EVERY entry the store holds, because a"
+  },
+  {
+   "line": 1492,
+   "path": "runtime/src/paths.rs",
+   "text": "pub fn last_known_adoption_floor_rules(root: &Path) -> Vec<Value> {"
+  },
+  {
+   "line": 497,
+   "path": "runtime/src/policy.rs",
+   "text": "            // CHECKOUT's own last-known-authenticated rule set (`crate::paths::last_known_adoption_floor_rules`,"
+  },
+  {
+   "line": 502,
+   "path": "runtime/src/policy.rs",
+   "text": "            for r in crate::paths::last_known_adoption_floor_rules(root) {"
+  }
+ ],
+ "query": "last_known_adoption_floor_rules",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

@@ -1,0 +1,17 @@
+{
+ "blob": "4cf3bcd0b439fd56045c8de7b90cc9436164bd5a",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 186,
+ "line_start": 176,
+ "path": "runtime/src/project.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 10984,
+ "text": "            RepositoryContract::new(self.overlay().get(\"REPOSITORY_CONTRACT.yaml\"))\n                .with_sensitivity(rules)\n        })\n    }\n    /// Runtime directory from MEMORY_POLICY.runtime_dir (default .governance-runtime).\n    pub fn runtime_dir_name(&self) -> String {\n        if self.is_installed() {\n            self.policies()\n                .get_str(\"MEMORY_POLICY\", \"runtime_dir\", RUNTIME_DIR)\n        } else {\n            RUNTIME_DIR.into()\n",
+ "text_sha256": "e6f1d1b231aec06d615422de79ca64d959263081e675c8a730698f0ce82cbd42",
+ "version_status": "CANONICAL"
+}
