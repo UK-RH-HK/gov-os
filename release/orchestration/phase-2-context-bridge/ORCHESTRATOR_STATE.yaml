@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T10:49:15Z'
-state_hash: aaf70dcbbc28ad6b577cb2d381b483ac38d2c34c0d1c8cb2507268fc4779e421
+updated_at: '2026-09-25T10:50:17Z'
+state_hash: 20348e603c8119f847aa9bee50cf1194119c3aca0738151f1ac960f94ffa7954
 lifecycle_state: BR_BUILD_PG1
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -456,6 +456,14 @@ dag:
       mandatory items)
     reason: changing core under the four PG1 builders running in parallel would destabilise their base; I1 is the first
       node after them that owns cross-cutting integration
+  - id: BR-DAG-AMEND-3
+    by: orchestrator (DAG-vs-architecture gap; clarification delivered live to BR-AR-0007)
+    rule: B5 persists record_def / edge (with labels) / class-lifecycle rows as a registered store layer with a digest
+      (ARCHITECTURE.md sections 8.1-8.3), using one assignment function shared with call-time classification; the
+      mandatory-input resolver stays store-independent (Git objects at call time) so section A survives an index outage
+      (section 5.3 item 6)
+    reason: node B5's DAG entry omitted the layer while section 8.1 requires the manifest to digest those rows; without
+      it I1's reproducibility and incremental==full proofs would silently exclude authority classification and the graph
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
