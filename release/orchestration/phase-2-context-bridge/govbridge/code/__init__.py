@@ -2,37 +2,30 @@
 adapter (BUILD) plus the existing Python AST plugin (REUSE, run from its blob, unmodified), symbol/call/literal
 tables, labelled resolution and lazy per-commit symbol history.
 
-Importing this package registers the code layer's digest with the shared build manifest (govbridge.core.manifest),
-the same pattern govbridge.core itself uses for its own two layers -- see manifest.py's module docstring. The code
-layer is *lazy*: unlike the occurrence/chunk layers, it does not walk every ref in the canonical view up front; it
-parses and caches Rust blobs the first time a query needs them (ARCHITECTURE.md section 4.6, "Symbol history"). The
-manifest digest therefore reports whatever has been indexed so far, not a claim of whole-view coverage -- callers
-that need guaranteed coverage of one commit call ``govbridge.code.symbols.ensure_indexed`` first, exactly as the
-CLI commands below do.
+Importing this package registers the code layer with ``govbridge.core`` at IMPORT TIME -- the same extension point
+``govbridge.core.manifest``/``govbridge.core.freshness`` document and test for every layer node
+(``register_layer``/``register_layer_builder``, "called at import time of the layer's own package", per both
+modules' own docstrings and ``tests/core/test_manifest.py::test_a_new_layer_can_register_without_editing_core``).
+Nothing in ``govbridge.core`` is ever edited to learn this package's name.
+
+Two registrations, both implemented in ``govbridge.code.build`` (its module docstring has the full design,
+including BR-AR-0014/BR-HO-0014's fix for the code layer's original lazy, query-order-dependent build manifest):
+
+* ``register_layer_builder("code", build.code_layer_builder)`` -- an EAGER build, during ``index rebuild``/
+  ``update``, of every ``.rs`` blob reachable at each canonical-view ref whose role is not ``history``.
+* ``register_layer("code", build.code_layer_digest)`` -- the build-manifest digest over the sorted
+  ``code_symbol``/``code_call_site``/``code_literal`` rows for exactly that eager set, query-invariant against
+  anything a lazy query (``stats``/``callers``/``reads-key``/``history diff``, including on a ``history`` commit)
+  parses on top.
+
+The route's QUERY surface (``govbridge.code.symbols``: ``stats``/``callers``/``reads-key``, and
+``govbridge.code.history``) is unchanged by either registration -- both keep parsing and caching a commit's blobs
+lazily, the first time any caller (a query, or now also the eager builder) asks for that commit
+(``govbridge.code.symbols.ensure_indexed``, its own module docstring).
 """
-from __future__ import annotations
+from govbridge.code import build as build  # noqa: F401  (import triggers the two register_* calls below)
+from govbridge.core.freshness import register_layer_builder
+from govbridge.core.manifest import register_layer
 
-import sqlite3
-
-from govbridge.core.manifest import LayerDigest, register_layer
-
-
-def _code_layer_digest(conn: sqlite3.Connection) -> LayerDigest:
-    from govbridge.code import store as codestore
-
-    codestore.ensure_schema(conn)
-    rows = conn.execute(
-        "SELECT symbol_id, blob_id, kind, name, qualified_name, module_path, start_line, end_line, is_test, "
-        "derivation FROM code_symbol ORDER BY symbol_id"
-    ).fetchall()
-    import hashlib
-
-    h = hashlib.sha256()
-    for row in rows:
-        h.update("\x1f".join("" if v is None else str(v) for v in row).encode("utf-8"))
-        h.update(b"\x1e")
-    blobs_parsed = conn.execute("SELECT COUNT(*) FROM code_blob").fetchone()[0]
-    return LayerDigest(rows=len(rows), digest=h.hexdigest(), extra={"blobs_parsed": blobs_parsed})
-
-
-register_layer("code", _code_layer_digest)
+register_layer_builder("code", build.code_layer_builder)
+register_layer("code", build.code_layer_digest)

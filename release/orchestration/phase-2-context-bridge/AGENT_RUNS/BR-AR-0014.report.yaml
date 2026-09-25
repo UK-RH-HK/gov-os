@@ -1,0 +1,217 @@
+run_id: BR-AR-0014
+role: bounded repair B3R (eager, deterministic, query-invariant code layer; digest over symbol+call_site+literal rows; reopened for corpus-rule exclusion and a store migration)
+model_observed: claude-sonnet-5
+branch: bridge/b3r-0014
+commit: 1581d01a2620f7e81bcae13743cd6799fba8e788
+status: COMPLETED
+claims:
+  - id: C1-eager-ref-set-derived-generically
+    text: >
+      govbridge/code/build.py:eager_ref_names() computes the eager ref set from config/canonical-view.yaml's
+      already-parsed RefSpec.role/RefSpec.layers fields only -- never a ref name, symbol or file (OC-BR-02). A
+      ref whose spec lists an explicit `layers:` names "code" to be admitted; a ref whose spec omits `layers`
+      altogether falls back to "every role except the architectural `history` category", mirroring
+      govbridge.semantic.profile.eligible_ref_names's own admission rule for its own layer name (restated, not
+      imported, so govbridge.code never crosses the B3/B4 boundary). On the real config/canonical-view.yaml this
+      evaluates to {records, product, evidence} (verified live, check2) -- history's ref_glob entry is never even
+      reachable through this function (it is only ever in resolved.history, never resolved.named). On the
+      tests/fixtures/core view (no `layers` field on any ref) it falls back correctly to every non-history role.
+      Unit-proven for both branches, plus the "a NAMED ref with role history" edge case and "history-glob refs are
+      never eager", by tests/code/test_eager_build.py::test_eager_ref_names_uses_explicit_layers_list,
+      test_eager_ref_names_falls_back_to_role_when_layers_is_omitted,
+      test_eager_ref_names_never_includes_history_glob_refs.
+  - id: C2-eager-builder-registered-and-reuses-the-existing-lazy-cache
+    text: >
+      govbridge/code/build.py:code_layer_builder is registered with govbridge.core.freshness.
+      register_layer_builder("code", ...) in govbridge/code/__init__.py (the same extension point every sibling
+      layer uses -- govbridge/semantic/freshness_layer.py, govbridge/lexical/fts.py -- so govbridge/core/** is
+      never edited). It calls govbridge.code.symbols.ensure_indexed for every eager ref's CURRENT commit;
+      ensure_indexed's own per-blob cache (keyed by blob id, adapter/grammar version, and now also by exclusion
+      status -- C7 below) means an eager ref that has not moved costs one cheap `git ls-tree` and reparses nothing
+      (test_eager_build_parses_only_new_blobs_on_a_second_call monkeypatches rust_treesitter.parse_module to
+      assert zero calls on a second, unchanged build). Before the FIRST commit on this branch, "code" was not even
+      registered as a builder at all: `GOVBRIDGE_STORE=<fresh> python -m govbridge index rebuild --layer code
+      --from-clean` raised `KeyError: 'code'` (reproduced live before starting).
+  - id: C3-eager-membership-persisted-and-recomputed-whole-every-build
+    text: >
+      govbridge/code/store.py's `code_blob.eager` (an INTEGER NOT NULL DEFAULT 0 column) plus
+      set_eager_blobs()/eager_blob_ids(). code_layer_builder calls set_eager_blobs with exactly the blob ids
+      reached by ensure_indexed across the CURRENT eager ref set on every call (from_clean or incremental) -- a
+      full "UPDATE ... SET eager=0" then set-for-exactly-these-ids, never an incremental patch -- so an eager ref
+      that drops a blob (content changed, or the ref moved away from it) is reflected exactly as a from-clean
+      build would see it. A blob a lazy query parses (stats/callers/reads-key/history diff, including
+      `callers --commit <a history commit>`) is inserted at the schema default, 0, and stays there until an eager
+      builder run actually reaches it. Proven by test_incremental_equals_full_on_a_fixture_repo (check 4) and
+      test_digest_is_query_invariant_against_a_non_eager_commit (check 3's fixture-repo counterpart), both
+      re-verified unaffected by C7/C8 below (checks 4/5 rerun, same pass/fail shape).
+  - id: C4-digest-covers-symbol-call_site-and-literal-restricted-to-eager-blobs
+    text: >
+      govbridge/code/build.py:code_layer_digest (registered via govbridge.core.manifest.register_layer("code",
+      ...)) reads `code_blob.eager=1` blob ids, then hashes the sorted code_symbol rows, then the sorted
+      code_call_site rows, then the sorted code_literal rows for exactly those blobs -- each row tagged with its
+      table name before hashing, so rows from one table can never collide with a different combination of the
+      other two. `LayerDigest.rows` is the sum across all three tables; `extra` carries
+      blobs_parsed/symbol_rows/call_site_rows/literal_rows/excluded_blobs individually. Sensitivity to call_site
+      rows and to literal rows independently (while holding the OTHER two tables' row counts fixed) is proven by
+      test_digest_changes_when_a_single_call_site_row_differs and test_digest_changes_when_a_single_literal_row_differs
+      (check 5) -- the original defect (item 3 of the handoff) is that call_site/literal were never in the digest
+      at all.
+  - id: C5-real-repository-acceptance-checks-1-3-rerun-after-both-follow-ups
+    text: >
+      Numbers below reflect BOTH follow-ups (C7 exclusion, C8 migration); see C9 for the FRESH-store rerun the
+      orchestrator specifically asked for. Check 1: `cd $D && $PY -m pytest tests -q` -- 325 passed (308
+      original + 9 in test_eager_build.py + 8 in test_corpus_exclusion.py), no import-mode flag, whole tree. Check
+      2: two from-clean `index rebuild --layer code --from-clean` builds, into store-BR-AR-0014 and
+      store-BR-AR-0014b, give an IDENTICAL manifest_sha256 (7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f
+      760e064785) and layers.code (rows=197348, digest 8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca306
+      1036, blobs_parsed=233, symbol_rows=6233, call_site_rows=111597, literal_rows=79518, excluded_blobs=11).
+      blobs_parsed is now the INCLUDE-verdict count, not the raw reachable count: independently, classifying every
+      distinct `.rs` blob across records/product/evidence through govbridge.core.corpus.classify_entry gives 244
+      total, 233 INCLUDE, 11 excluded -- an exact match (C7). Check 3: recorded the code digest, ran
+      `python -m govbridge.code.symbols callers resolve_state_root --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d`
+      (refs/heads/phase2/ar84-repair's tip), which resolved real callers and so genuinely parsed+persisted new
+      code_symbol/code_call_site/code_literal rows -- the digest recomputed afterward is byte-identical.
+  - id: C6-no-existing-test-encoded-the-old-lazy-digest-behaviour
+    text: >
+      Before writing any code (first pass), grepped tests/code/**, tests/graph/test_code_bridge.py and
+      tests/authority/test_import_boundary.py for digest/_code_layer_digest/register_layer/blobs_parsed/
+      LayerDigest/"e3b0c4...b855" and for any assertion on govbridge.core.manifest layers["code"]: none matched.
+      Unaffected by this reopen.
+  - id: C7-corpus-rule-exclusion-honoured-by-both-the-eager-and-lazy-paths
+    text: >
+      govbridge/code/symbols.py:ensure_indexed is the ONE place the code route ever parses a blob (both
+      code_layer_builder and every lazy caller -- stats/callers/reads-key/history.diff/govbridge.graph.code_bridge,
+      none of which pass `rules` and so all get the SAME default-loaded real config/corpus-rules.yaml
+      automatically). Every `.rs` blob not already classified is now run through the existing, UNMODIFIED
+      govbridge.core.corpus.classify_entry (with a govbridge.core.corpus.ContentSniffer over the SAME
+      gitobj.CatFileBatch already open for reading) BEFORE `rust_treesitter.parse_module` is ever called. A
+      non-INCLUDE verdict (checked generically, `verdict.effect != "INCLUDE"` -- never `== "EXCLUDE"` specifically,
+      so METADATA_ONLY/LEXICAL_ONLY/NO_DEFAULT_RETRIEVAL are equally "not code-indexable") is recorded, with its
+      rule id and effect, in the new govbridge/code/store.py table `code_excluded_blob` (sticky: `is_excluded()`
+      short-circuits reclassification on every later call) instead of ever reaching code_symbol/code_call_site/
+      code_literal. `eager`/set_eager_blobs now mark BOTH code_blob.eager and code_excluded_blob.eager (the same
+      full reset-then-set discipline as C3), so code_layer_digest's `blobs_parsed` is exactly the INCLUDE-verdict
+      count and `excluded_blobs` is reported alongside it, both in the digest extra and in code_layer_builder's own
+      stats. `stats()` gained `files_excluded` ([{path, rule_id, effect}]) so a query discloses the gap explicitly.
+
+      Real-repository measurement (check6), matching the orchestrator's own numbers exactly: 11 distinct `.rs`
+      blobs at the eager refs (records/product/evidence) classified X-SEC-CONTENT/EXCLUDE --
+      runtime/src/security/secrets.rs; tests/certification/{brownfield,failure_injection,repair,upstream,ws04r3,
+      ws05r3,r4_residual (two distinct blobs)}.rs; two evidence builder-probe files under
+      release/capability-baseline/repair-1/**. literal_rows dropped from 87069 (pre-follow-up) to 79518, a drop of
+      exactly 7551 -- the orchestrator's own reported literal-row count. Zero code_symbol/code_call_site/
+      code_literal rows for any of these 11 blob ids, confirmed by direct query (check6's saved output).
+
+      Lazy path (check7): tests/code/test_corpus_exclusion.py::test_lazy_ensure_indexed_never_parses_an_excluded_blob
+      monkeypatches rust_treesitter.parse_module and asserts it is called for the non-excluded fixture file ONLY,
+      never the excluded one -- fixture repo, synthetic rules, never coupled to the real corpus-rules.yaml content.
+      Real-repo check: `stats --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d` (a phase2/* history tip, never
+      part of the eager set) on a COLD store (nothing pre-cached) -- 10 of that commit's `.rs` blobs were excluded
+      on the spot by the lazy path (one fewer than the eager refs' 11: r4_residual.rs has only one blob at this
+      commit, not two), all ten with zero rows in code_symbol/code_call_site/code_literal, and disclosed by
+      `stats()`'s new `files_excluded` field.
+
+      Any non-INCLUDE effect, not only EXCLUDE, is handled generically:
+      test_any_non_include_effect_is_not_code_indexable_generically uses a synthetic rule with effect
+      LEXICAL_ONLY (BR-HO-0014 follow-up 1's own instruction: "LEXICAL_ONLY does not apply to .rs files, but
+      handle it generically") and proves the same exclusion path.
+  - id: C8-code_blob-eager-migrated-in-place-for-a-pre-existing-store
+    text: >
+      govbridge/code/store.py:ensure_schema now runs a small, idempotent, data-driven migration
+      (`_MIGRATIONS`/`_add_column_if_missing`: PRAGMA table_info + ALTER TABLE ADD COLUMN, only when the column is
+      actually missing) immediately after the schema script, and only THEN creates the `code_blob_by_eager` index
+      (moved out of the inline schema script, because CREATE INDEX on `code_blob(eager)` would itself fail with
+      "no such column" against an unmigrated table). `code_excluded_blob` (C7) is a wholly NEW table, so it needs
+      no migration -- its own `eager` column is part of its CREATE TABLE from the start.
+
+      Proven against a fixture store.db built with the LITERAL pre-BR-AR-0014 code_blob DDL (no `eager` column,
+      one pre-existing row) -- never against store-BR-AR-0010 itself, which this repair never opened, read or
+      wrote (check8, and grep of this run's own tool history confirms no command ever named store-BR-AR-0010):
+      test_migration_adds_eager_column_to_an_old_style_store (the column appears, the pre-existing row survives
+      with `eager` at its column default, and the migrated store is immediately usable via
+      set_eager_blobs/eager_blob_ids); test_migration_is_a_noop_the_second_time (three consecutive ensure_schema()
+      calls leave the table byte-for-byte identical after the first); test_migrated_store_builds_correctly_end_to_end
+      (a real eager build on top of the migrated table reaches the identical digest a from-clean build in a
+      brand-new store reaches, and the pre-existing dummy row is untouched).
+  - id: C9-fresh-store-rerun-of-checks-1-3-per-the-orchestrators-own-instruction
+    text: >
+      store-BR-AR-0014c and store-BR-AR-0014d (both newly built, never used before this reopen) -- (a) `pytest
+      tests/code tests/graph -q`: 88 passed (the full-tree rerun is C5/check1, 325 passed); (b) two from-clean
+      `index rebuild --layer code --from-clean` builds give an IDENTICAL manifest_sha256
+      (7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785) and code digest
+      (8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036); (c) blobs_parsed (233) equals an
+      independently computed INCLUDE-verdict count (233) across the SAME three eager refs' current commits, printed
+      side by side with the excluded count (11, also independently matching); (d) query-invariance still holds:
+      the code digest recorded before `callers resolve_state_root --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d`
+      is byte-identical to the digest recomputed after.
+evidence:
+  - claim: C1-eager-ref-set-derived-generically
+    file: release/orchestration/phase-2-context-bridge/govbridge/code/build.py:87-104
+  - claim: C2-eager-builder-registered-and-reuses-the-existing-lazy-cache
+    file: release/orchestration/phase-2-context-bridge/govbridge/code/build.py:106-149
+  - claim: C3-eager-membership-persisted-and-recomputed-whole-every-build
+    command: "cd $D && $PY -m pytest tests/code/test_eager_build.py -k 'incremental_equals_full or query_invariant' -v"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check4-incremental-equals-full.out
+  - claim: C4-digest-covers-symbol-call_site-and-literal-restricted-to-eager-blobs
+    command: "cd $D && $PY -m pytest tests/code/test_eager_build.py -k 'call_site_row_differs or literal_row_differs' -v"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check5-call-site-and-literal-coverage.out
+  - claim: C5-real-repository-acceptance-checks-1-3-rerun-after-both-follow-ups
+    command: "cd $D && $PY -m pytest tests -q"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check1-pytest.out
+  - claim: C5-real-repository-acceptance-checks-1-3-rerun-after-both-follow-ups
+    command: "GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014{,b} $PY -m govbridge index rebuild --layer code --from-clean --timings"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check2-eager-fromclean-x2.out
+  - claim: C5-real-repository-acceptance-checks-1-3-rerun-after-both-follow-ups
+    command: "GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014 $PY -m govbridge.code.symbols callers resolve_state_root --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d --json"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check3-query-invariance.out
+  - claim: C6-no-existing-test-encoded-the-old-lazy-digest-behaviour
+    file: release/orchestration/phase-2-context-bridge/tests/code/test_eager_build.py
+  - claim: C7-corpus-rule-exclusion-honoured-by-both-the-eager-and-lazy-paths
+    file: release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py:47-130
+  - claim: C7-corpus-rule-exclusion-honoured-by-both-the-eager-and-lazy-paths
+    command: "independent classify_entry pass over records/product/evidence's .rs blobs, plus code_excluded_blob dump and code_symbol/code_call_site/code_literal leak check"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check6-excluded-blob-independent-count.out
+  - claim: C7-corpus-rule-exclusion-honoured-by-both-the-eager-and-lazy-paths
+    command: "cd $D && $PY -m pytest tests/code/test_corpus_exclusion.py -k 'lazy_ensure_indexed or discloses_the_exclusion' -v; GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014-check7 $PY -m govbridge.code.symbols stats --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d --json"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check7-lazy-path-never-parses-excluded.out
+  - claim: C8-code_blob-eager-migrated-in-place-for-a-pre-existing-store
+    file: release/orchestration/phase-2-context-bridge/govbridge/code/store.py:122-143
+  - claim: C8-code_blob-eager-migrated-in-place-for-a-pre-existing-store
+    command: "cd $D && $PY -m pytest tests/code/test_corpus_exclusion.py -k migrat -v"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check8-migration.out
+  - claim: C9-fresh-store-rerun-of-checks-1-3-per-the-orchestrators-own-instruction
+    command: "GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014{c,d} $PY -m govbridge index rebuild --layer code --from-clean --timings; independent INCLUDE/excluded count; query-invariance re-check"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check9-fresh-stores-recheck-1-3.out
+mutation_scope_respected: true
+open_issues:
+  - id: OI-1-RESOLVED-code_blob-migration
+    text: >
+      The first COMPLETED return's OI-1 ("no migration for a pre-existing store's code_blob table") is resolved by
+      C8/follow-up 2.
+  - id: OI-2-RESOLVED-rules-parameter-now-used
+    text: >
+      The first COMPLETED return's OI-2 ("code_layer_builder accepts `rules` but never consults it") is resolved
+      by C7/follow-up 1: `rules` is now threaded through to `ensure_indexed` and drives corpus-rule classification.
+  - id: OI-3-store-BR-AR-0014b-only-used-for-check-2
+    text: >
+      Unchanged from the first return: store-BR-AR-0014b holds only the second from-clean code-layer build for
+      check 2's reproducibility comparison.
+  - id: OI-4-rs_files-in-stats-counts-every-rs-path-including-excluded-ones
+    text: >
+      `stats()`'s `rs_files` (and the underlying `_rs_paths`) deliberately still counts every `.rs` path at a
+      commit regardless of corpus-rule verdict -- unchanged, to keep matching the pre-existing, frozen acceptance
+      line ("exactly what `git ls-tree -r --name-only <commit> | grep -c '\.rs$'` counts",
+      test_stats_counts_rs_files_and_definitions). `files_excluded` (new) and `definitions` (which naturally
+      shrinks, since an excluded blob contributes zero code_symbol rows) are how an excluded file's absence is
+      actually visible; `rs_files` answers a different, narrower question ("how many .rs paths exist") on purpose.
+  - id: OI-5-content-regex-classification-reads-every-new-blobs-content-once-more-than-before
+    text: >
+      Classifying a blob through corpus.classify_entry's content_regex/binary rules requires reading its content
+      via ContentSniffer; a NEWLY-seen INCLUDE-verdict blob is therefore read from Git twice on first sight (once
+      by the sniffer for classification, once more via cat.read for tree-sitter parsing) -- previously it was read
+      once. Already-cached blobs (the overwhelming majority on any but a from-clean build) are unaffected; a
+      from-clean eager build across the three real refs still completes in ~3.3-3.8 s (measured, check2/check9),
+      comfortably under ARCHITECTURE.md section 12's ~1.5 s/commit estimate for three commits. Not fixed: avoiding
+      the double read would mean reaching into ContentSniffer's decoded text and re-encoding it, which risks a
+      subtle non-byte-identical round-trip for content tree-sitter must parse byte-exactly; simplicity and
+      correctness were preferred over this micro-optimisation.

@@ -11,6 +11,23 @@ store and only ever redone for a blob this run has not seen before (or whose ada
 Resolution (the ~0.1 s step, SO-12) is never cached -- it is recomputed in memory, every query, from exactly the
 blobs reachable at the commit being asked about, because it depends on that commit's whole symbol set, not on any
 one call site alone (govbridge.code.resolve's module docstring).
+
+Corpus-rule exclusion (BR-AR-0014 follow-up 1): ``ensure_indexed`` classifies every ``.rs`` blob through
+``govbridge.core.corpus.classify_entry`` -- the SAME function/config (``config/corpus-rules.yaml``) every other
+route already honours -- BEFORE ever parsing it. A blob whose verdict is anything other than ``INCLUDE`` (EXCLUDE,
+METADATA_ONLY, LEXICAL_ONLY, NO_DEFAULT_RETRIEVAL -- generic, never only "EXCLUDE" by name) is never handed to
+``rust_treesitter.parse_module`` and never gets a ``code_symbol``/``code_call_site``/``code_literal`` row; it is
+recorded instead, with its rule id, in ``govbridge.code.store.code_excluded_blob`` (``put_excluded_blob``), so
+``stats()`` can disclose it explicitly rather than the blob simply looking unindexed. This is the ONE place in the
+code route that classification happens -- both the eager builder (``govbridge.code.build.code_layer_builder``,
+which passes its already-loaded ``rules``) and every lazy caller (``stats``/``callers``/``reads-key``/
+``history diff``, or a query at a ``history`` commit) go through this SAME function, so neither path can diverge
+from the other or from what the exact/lexical/semantic routes already exclude. ``rules``, if not given, defaults to
+loading the real ``config/corpus-rules.yaml`` (``_default_rules``) -- the same "resolve from GOV_BRIDGE_DOMAIN when
+the caller does not say otherwise" convention ``govbridge.code.adapters.python_ast._default_view_path`` already
+uses, so every EXISTING caller of ``ensure_indexed`` (the CLI below, ``govbridge.code.history``,
+``govbridge.graph.code_bridge`` -- none of which pass ``rules``) gets real corpus-rule enforcement automatically,
+with no signature change visible to them.
 """
 from __future__ import annotations
 
@@ -18,13 +35,18 @@ import argparse
 import collections
 import json
 import sys
+from pathlib import Path
 from typing import Optional
 
-from govbridge.core import gitobj, store as corestore
+from govbridge import GOV_BRIDGE_DOMAIN
+from govbridge.core import corpus, gitobj, store as corestore
 from govbridge.code import resolve, store as codestore
 from govbridge.code.adapters import rust_treesitter
 
 LANGUAGE = "rust"
+INCLUDE_EFFECT = "INCLUDE"  # config/corpus-rules.yaml's own vocabulary (govbridge.core.corpus.Rule.effect); every
+                            # other effect (EXCLUDE, METADATA_ONLY, LEXICAL_ONLY, NO_DEFAULT_RETRIEVAL) means "not
+                            # code-indexable" here, generically -- see this module's own docstring.
 
 
 def _open_conn():
@@ -33,50 +55,79 @@ def _open_conn():
     return conn
 
 
+def _default_rules_path() -> str:
+    return str(Path(GOV_BRIDGE_DOMAIN) / "config" / "corpus-rules.yaml")
+
+
+def _default_rules() -> list:
+    return corpus.load_rules(_default_rules_path())
+
+
 def _rs_paths(commit: str, repo: Optional[str] = None) -> list[str]:
     """Every path at ``commit`` whose name ends ``.rs`` -- exactly what ``git ls-tree -r --name-only <commit> |
     grep -c '\\.rs$'`` counts, regardless of the entry's Git mode (the code-route ``stats`` acceptance check
-    compares against that literal shell pipeline)."""
+    compares against that literal shell pipeline). Deliberately independent of corpus-rule classification: this is
+    "how many .rs paths exist", not "how many are code-indexable" (``files_excluded`` in ``stats()`` answers that)."""
     return [p for p in gitobj.ls_tree_paths(commit, repo=repo) if p.endswith(".rs")]
 
 
-def _rs_blob_entries(commit: str, repo: Optional[str] = None) -> list[tuple[str, str]]:
-    """[(path, blob_id)] for every real, readable ``.rs`` blob at ``commit`` (skips symlinks/submodules, which
-    ``git ls-tree`` can in principle name with a ``.rs``-looking path but which carry no parseable text)."""
+def _rs_tree_entries(commit: str, repo: Optional[str] = None) -> list["gitobj.TreeEntry"]:
+    """Every real, readable ``.rs`` blob's full tree entry at ``commit`` (skips symlinks/submodules, which
+    ``git ls-tree`` can in principle name with a ``.rs``-looking path but which carry no parseable text). The full
+    ``TreeEntry`` (not just ``(path, blob_id)``) is what ``govbridge.core.corpus.classify_entry`` needs -- mode,
+    type and size, exactly the same object ``govbridge.core.corpus.coverage_for_ref``/``freshness.core_layer_builder``
+    already classify against."""
     out = []
     for entry in gitobj.ls_tree(commit, repo=repo):
         if entry.type == "blob" and entry.mode != "120000" and entry.path.endswith(".rs"):
-            out.append((entry.path, entry.oid))
+            out.append(entry)
     return out
 
 
-def ensure_indexed(conn, commit: str, repo: Optional[str] = None) -> list[tuple[str, str]]:
-    """Parse and persist every ``.rs`` blob reachable at ``commit`` that is not already cached under the current
-    adapter/grammar pin; return [(path, blob_id)] for the whole commit view (cached or freshly parsed alike)."""
-    entries = _rs_blob_entries(commit, repo=repo)
-    to_parse = []
-    for path, blob_id in entries:
+def ensure_indexed(conn, commit: str, repo: Optional[str] = None, rules: Optional[list] = None) \
+        -> list[tuple[str, str]]:
+    """Classify (``govbridge.core.corpus.classify_entry``) and, for every INCLUDE-verdict blob, parse and persist
+    it -- both only for a blob not already cached (classified-excluded, or parsed under the current adapter/
+    grammar pin) -- for every ``.rs`` blob reachable at ``commit``. Returns [(path, blob_id)] for the WHOLE commit
+    view, included and excluded blobs alike (unchanged contract: every existing caller uses this to enumerate the
+    commit's ``.rs`` paths, and an excluded blob_id simply never matches any code_symbol/code_call_site/
+    code_literal row downstream). ``rules`` defaults to the real ``config/corpus-rules.yaml`` when not given (this
+    module's own docstring); the eager builder passes its own already-loaded list instead of reloading it once per
+    eager ref."""
+    entries = _rs_tree_entries(commit, repo=repo)
+    if rules is None:
+        rules = _default_rules()
+
+    to_classify = []
+    for entry in entries:
+        if codestore.is_excluded(conn, entry.oid):
+            continue  # already classified excluded -- sticky, never reclassified (module docstring)
         row = conn.execute(
-            "SELECT adapter_version, grammar_version FROM code_blob WHERE blob_id=?", (blob_id,)
+            "SELECT adapter_version, grammar_version FROM code_blob WHERE blob_id=?", (entry.oid,)
         ).fetchone()
         stale = row is not None and (
             row[0] != rust_treesitter.ADAPTER_VERSION or row[1] != rust_treesitter.GRAMMAR_VERSION
         )
         if row is None or stale:
             if stale:
-                codestore.clear_blob(conn, blob_id)
-            to_parse.append((path, blob_id))
+                codestore.clear_blob(conn, entry.oid)
+            to_classify.append(entry)
 
-    with gitobj.CatFileBatch(repo=repo) as cat:
-        for path, blob_id in to_parse:
-            data = cat.read(blob_id)
-            if data is None:
-                continue
-            parsed = rust_treesitter.parse_module(data, path)
-            _persist(conn, blob_id, path, parsed)
-    if to_parse:
+    if to_classify:
+        with gitobj.CatFileBatch(repo=repo) as cat:
+            sniffer = corpus.ContentSniffer(cat)
+            for entry in to_classify:
+                verdict = corpus.classify_entry(entry, rules, sniffer)
+                if verdict.effect != INCLUDE_EFFECT:
+                    codestore.put_excluded_blob(conn, entry.oid, entry.path, verdict.rule_id, verdict.effect)
+                    continue
+                data = cat.read(entry.oid)
+                if data is None:
+                    continue
+                parsed = rust_treesitter.parse_module(data, entry.path)
+                _persist(conn, entry.oid, entry.path, parsed)
         conn.commit()
-    return entries
+    return [(e.path, e.oid) for e in entries]
 
 
 def _persist(conn, blob_id: str, path: str, parsed) -> None:
@@ -140,6 +191,7 @@ def stats(commit: str, repo: Optional[str] = None) -> dict:
     blob_ids = [b for _, b in entries]
     symbol_rows = codestore.symbols_for_blobs(conn, blob_ids)
     error_rows = codestore.parse_errors_for_blobs(conn, blob_ids)
+    excluded_rows = codestore.excluded_for_blobs(conn, blob_ids)
     by_path: dict[str, list[dict]] = collections.defaultdict(list)
     for r in error_rows:
         by_path[r["path"]].append(
@@ -148,6 +200,11 @@ def stats(commit: str, repo: Optional[str] = None) -> dict:
         )
     files_with_parse_errors = [{"path": p, "spans": sorted(spans, key=lambda s: s["start_line"])}
                                 for p, spans in sorted(by_path.items())]
+    # BR-AR-0014 follow-up 1: an explicit, disclosed exclusion (rule id + effect) rather than a blob that simply
+    # looks unindexed -- every entry here has ZERO code_symbol/code_call_site/code_literal rows, by construction
+    # (ensure_indexed never parses an excluded blob).
+    files_excluded = [{"path": r["path"], "rule_id": r["rule_id"], "effect": r["effect"]}
+                       for r in sorted(excluded_rows, key=lambda r: r["path"])]
     return {
         "commit": commit_full,
         "rs_files": len(_rs_paths(commit_full, repo=repo)),
@@ -155,6 +212,7 @@ def stats(commit: str, repo: Optional[str] = None) -> dict:
         "fn_definitions": sum(1 for r in symbol_rows if r["kind"] in ("fn", "fn_sig")),
         "test_fns": sum(1 for r in symbol_rows if r["is_test"]),
         "files_with_parse_errors": files_with_parse_errors,
+        "files_excluded": files_excluded,
         "adapter": {"id": rust_treesitter.ADAPTER_ID, "version": rust_treesitter.ADAPTER_VERSION,
                     "grammar_version": rust_treesitter.GRAMMAR_VERSION},
     }

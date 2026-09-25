@@ -1,0 +1,79 @@
+=== build 1: store-BR-AR-0014 (rebuilt after follow-up 1/2) ===
+{
+ "blobs_processed": 233,
+ "chunks_processed": 0,
+ "layer": "code",
+ "layer_seconds": {
+  "code": 3.394
+ },
+ "layer_stats": {
+  "code": {
+   "blobs": 233,
+   "chunks": 0,
+   "eager_blobs": 233,
+   "eager_refs": [
+    "evidence",
+    "product",
+    "records"
+   ],
+   "excluded_blobs": 11,
+   "occurrences": 0,
+   "rs_occurrences": 623
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 3.817
+}
+=== build 2: store-BR-AR-0014b (rebuilt after follow-up 1/2) ===
+{
+ "blobs_processed": 233,
+ "chunks_processed": 0,
+ "layer": "code",
+ "layer_seconds": {
+  "code": 3.507
+ },
+ "layer_stats": {
+  "code": {
+   "blobs": 233,
+   "chunks": 0,
+   "eager_blobs": 233,
+   "eager_refs": [
+    "evidence",
+    "product",
+    "records"
+   ],
+   "excluded_blobs": 11,
+   "occurrences": 0,
+   "rs_occurrences": 623
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 3.944
+}
+=== manifest layers.code, both stores ===
+store-BR-AR-0014 {"blobs_parsed": 233, "call_site_rows": 111597, "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036", "excluded_blobs": 11, "literal_rows": 79518, "rows": 197348, "symbol_rows": 6233}
+store-BR-AR-0014b {"blobs_parsed": 233, "call_site_rows": 111597, "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036", "excluded_blobs": 11, "literal_rows": 79518, "rows": 197348, "symbol_rows": 6233}
+=== independent git ls-tree -r --full-tree count of distinct .rs blobs across the eager refs (records/product/evidence), classified INCLUDE vs not, via govbridge.core.corpus.classify_entry ===
+records=4678124bfd5d2818a1cfc0b90428b94da3d04abe product=3c880d80f81475f5306bdd5f680f2e004df49391 evidence=58219d5628683d6f462aa67bf25dbc2641933bce
+total distinct .rs blobs: 244
+INCLUDE-verdict blobs: 233
+excluded (non-INCLUDE) blobs: 11
+  EXCLUDED X-SEC-CONTENT release/capability-baseline/repair-1/integration-3/evidence/builder-probes/derived/ws04r3_observe.claim-time.P2-AR-0041.rs
+  EXCLUDED X-SEC-CONTENT release/capability-baseline/repair-1/r3-ws04/evidence/probes/ws04r3_observe.rs
+  EXCLUDED X-SEC-CONTENT runtime/src/security/secrets.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/brownfield.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/failure_injection.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/r4_residual.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/r4_residual.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/repair.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/upstream.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/ws04r3.rs
+  EXCLUDED X-SEC-CONTENT tests/certification/ws05r3.rs

@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T17:06:44Z'
-state_hash: 0268f987f1c790605f0b1afed6ff9dc5612bb47ca0b4bc3ac46a38bafc72d0d5
+updated_at: '2026-09-25T19:10:14Z'
+state_hash: 77ba7df4df8aca5f51e243fbe722284a1bedd984d3ab39555b62156a41190fff
 lifecycle_state: BR_DEMONSTRATION_FROZEN_VIEW
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -581,13 +581,74 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/INDEX/**
   - release/orchestration/phase-2-context-bridge/telemetry/index/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.*
+- run_id: BR-AR-0010
+  role: D1 whole-repository coverage and index-cost measurement (deterministic, orchestrator-run)
+  branch: bridge/d1-0010
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0010
+  model_requested: none (deterministic tooling)
+  model_observed: none -- commands run by the orchestrator (claude-opus-5-5)
+  status: PASS_1_COMMITTED_ON_BRANCH
+  pass_1_commit: ced0319
+  pass_1_results:
+  - coverage over all 98 view refs -- every ref's per-rule file counts sum to `git ls-tree -r --full-tree`; unclassified 0;
+    every exclusion carries a rule id
+  - timed from-clean build at cf7efe7 -- manifest fb413f63...f7ec; wall 2,302 s; CPU user 9,253 s; peak RSS 530 MB; store 838 MB
+    (uncommitted); llm_invocations 0; per layer core 17 s, lexical 5 s, authority 230 s, semantic 2,047 s
+  - freshness NOOP in 0.02 s against that build
+  - 'secrecy check over every non-TA subagent transcript: 0 tool calls touching .local/share, govbridge-sealed or .authoring;
+    the sealed PATH STRING was seen passively by B1, B4, B6R and I1 when they read ORCHESTRATOR_STATE.yaml (OBS-BR-04)'
+  - 'DEFECT: layers.code rows 0, blobs_parsed 0, digest e3b0c442... (empty) -- repaired by BR-AR-0014'
+  - 'GAP CLOSED: I1 committed neither INDEX/manifests nor telemetry/index rows (DAG deliverables); D1 commits them'
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/COVERAGE/**
+  - release/orchestration/phase-2-context-bridge/INDEX/**
+  - release/orchestration/phase-2-context-bridge/telemetry/index/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.*
+- run_id: BR-AR-0014
+  role: bounded repair B3R (eager, deterministic, query-invariant code layer; digest over symbol+call_site+literal rows)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0014-b3r-eager-code-layer.md
+  branch: bridge/b3r-0014
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0014
+  model_requested: sonnet
+  model_observed: claude-sonnet-5 (all 210 assistant turns of pass 1, transcript agent-abf4e461cbf145547.jsonl)
+  agent_name: br-repair-b3r-0014
+  dispatched_at: '2026-09-25T18:10Z'
+  status: COMPLETED_INTEGRATED
+  final_commit: f9a97337eed39c11aa0ced37be0f6c451199e523
+  merged_at: 1a4506d
+  follow_up_result:
+  - orchestrator-verified in B3R's fresh store store-BR-AR-0014c -- 11 independently classified excluded .rs blobs, 0 rows
+    in code_symbol / code_call_site / code_literal, all 11 recorded in code_excluded_blob with their rule id
+  - blobs_parsed 233 = independent INCLUDE-verdict count; two fresh from-clean code-layer builds identical; query-invariant
+  - idempotent in-place migration of code_blob (ALTER TABLE ADD COLUMN eager) proven on an old-DDL fixture store
+  - tests -- 2 files added, none modified; plain `pytest tests -q` on the merged tree 325 passed (orchestrator-run)
+  - model claude-sonnet-5, 366 assistant turns across both passes
+  pass_1:
+    final_commit: bc4c390c1fe65a82c0a2a7c3154566e3e0594444
+    integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+    claims: eager builder over non-history refs; digest over symbol+call_site+literal restricted to the eager set; 317
+      tests; two from-clean code-layer builds identical (digest a280d1e5..., 210,609 rows, blobs_parsed 244 = independent
+      ls-tree count); query-invariant on a real history tip
+  orchestrator_found_before_merge:
+  - 'SECURITY-POLICY BYPASS: 11 X-SEC-CONTENT (EXCLUDE) .rs blobs at the eager refs (incl. runtime/src/security/secrets.rs,
+    tests/certification/brownfield.rs) are parsed into code tables -- 7,551 code_literal rows; pre-existing in B3''s lazy
+    path, now eager and digest-covered'
+  - no in-place schema migration -- the demonstration store's code_blob lacks the new eager column
+  follow_up_delivered: SendMessage 2026-09-25 -- honour corpus-rule exclusions on eager and lazy paths (recorded, disclosed
+    exclusion), idempotent ALTER TABLE migration, re-run checks in fresh stores with blobs_parsed == independent INCLUDE-verdict count
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0014
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/code/**
+  - release/orchestration/phase-2-context-bridge/tests/code/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/code/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.*
 running_work:
 - run_id: BR-AR-0010
-  liveness_check: orchestrator-run deterministic D1 in worktree br-ar-0010 (branch bridge/d1-0010); /proc scan
+  liveness_check: orchestrator-run D1 finalisation (incremental update of store-BR-AR-0010 to the frozen tip) on bridge/d1-0010
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
-    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012, B6R: BR-AR-0013}
+    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012, B6R: BR-AR-0013, B3R: BR-AR-0014}
   amendments:
   - id: BR-DAG-AMEND-1
     by: orchestrator (deterministic isolation of parallel work; no design change)
@@ -664,7 +725,10 @@ rulings:
     rows expecting an A-admissible mandatory item outside A are read as A and every affected row is reported; recorded
     before any demonstration run without the orchestrator reading the oracle; delivered live to I1
 demonstration_freeze:
-  frozen_bridge_tip: PENDING_THIS_COMMIT
+  status: IN FORCE again from THIS commit (the commit that sets this line) -- re-established after B3R merged; the first
+    freeze (cf7efe7) was lifted before any demonstration run when D1 pass 1 found the lazy code layer
+  frozen_bridge_tip: the commit introducing this line (resolve with `git log -1 --format=%H -S'IN FORCE again from THIS commit' -- ORCHESTRATOR_STATE.yaml`)
+  previous_frozen_tip: cf7efe7 (pass-1 view, lifted)
   rule: NO commits to bridge/p2-context-retrieval from this commit until GRADE (BR-AR-0012) returns -- the canonical view's
     records ref follows this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here
     would move the demonstration's view mid-run (OBS-BR-03)
@@ -684,6 +748,12 @@ observations:
     moves the view -- observed during I1 (commit 6b76665 landed between from-clean builds 1 and 2); freshness correctly reported
     INCREMENTAL and the incremental store reached the identical manifest as a from-clean build, turning the incident into an
     incremental==full proof. Handling -- freeze the bridge branch across view-sensitive runs (see demonstration_freeze)
+- id: OBS-BR-04
+  text: the orchestrator recorded the sealed oracle directory's path in ORCHESTRATOR_STATE.yaml, which builders were told
+    to read; four roles (B1, B4, B6R, I1) saw the path string passively in tool results. A transcript audit of every
+    non-TA role found ZERO tool calls touching .local/share, govbridge-sealed or .authoring, so exposure of the name,
+    no access. Secrecy was always procedural-and-detective; the detective check worked. The DEMO agent is subject to
+    the same access audit, and a verifier should know the path is not secret
 - id: OBS-BR-02
   text: SECURITY_POLICY secret-content exclusion hides 8 product files (fake test keys, incl. brownfield.rs) from content
     indexes; they stay reachable by path/blob through the exact route and the exclusion is disclosed in every packet
@@ -711,6 +781,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: 'FROZEN VIEW: run D1 (BR-AR-0010, orchestrator, deterministic) in worktree br-ar-0010 on branch
-  bridge/d1-0010 -- coverage across every view ref + a timed from-clean rebuild into store-BR-AR-0010; then DEMO per HANDOFFS/BR-HO-0011
-  on bridge/demo-0011; then GRADE per HANDOFFS/BR-HO-0012 on bridge/grade-0012; then merge all three and lift the freeze'
+next_deterministic_action: 'FROZEN VIEW: on bridge/d1-0010 merge this tip, `index update` store-BR-AR-0010 to it (code layer
+  eager + migration), freshness NOOP, re-run coverage, commit INDEX manifest + telemetry + D1 report/checkpoint on the D1 branch;
+  then DEMO per HANDOFFS/BR-HO-0011 on bridge/demo-0011; then GRADE; then merge D1 -> DEMO -> GRADE and lift the freeze'

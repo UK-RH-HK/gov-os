@@ -1,0 +1,105 @@
+run_id: BR-AR-0014
+commit: 1581d01a2620f7e81bcae13743cd6799fba8e788
+commands:
+  - cmd: "cd $D && $PY -m pytest tests -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check1-pytest.out
+    output_sha256: ebbe7fa943e092844acb149196c8b8c0b8e5cd99a170f2c23931cf8b39b5c597
+    # acceptance check 1, RERUN after both follow-ups. 325 passed (308 original + 9 in test_eager_build.py + 8 new
+    # in tests/code/test_corpus_exclusion.py), plain `pytest tests -q`, no --import-mode flag, whole tree.
+
+  - cmd: |
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014 $PY -m govbridge index rebuild --layer code --from-clean --timings
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014b $PY -m govbridge index rebuild --layer code --from-clean --timings
+      # then, for each store, print manifest.json's layers.code block, and independently classify every distinct
+      # .rs blob across the three eager refs (records/product/evidence) through govbridge.core.corpus.
+      # classify_entry, reporting the INCLUDE count and the excluded (non-INCLUDE) count separately.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check2-eager-fromclean-x2.out
+    output_sha256: 7a524df91778b0dd0f0276c7ef5b55e5cd845160947f98accf1970f3b3166ef7
+    # acceptance check 2, RERUN after both follow-ups. Both from-clean builds: identical manifest_sha256
+    # (7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785) and identical layers.code (digest
+    # 8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036, rows=197348 > 0, blobs_parsed=233,
+    # excluded_blobs=11). Independent classify_entry pass: 244 total distinct .rs blobs, 233 INCLUDE, 11 excluded
+    # (all X-SEC-CONTENT) -- blobs_parsed now matches the INCLUDE-verdict count exactly, not the raw reachable
+    # count (the follow-up 1 defect).
+
+  - cmd: |
+      # digest before the lazy query (read back from store-BR-AR-0014's manifest.json)
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014 $PY -m govbridge.code.symbols callers resolve_state_root --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d --json
+      # then recompute govbridge.code.build.code_layer_digest(conn) directly against the SAME store and compare
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check3-query-invariance.out
+    output_sha256: fc6ca56390b6724ef1558d9927fcd7836c6474e08597d22a3dec274b67665be9
+    # acceptance check 3, RERUN after both follow-ups. 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d is
+    # refs/heads/phase2/ar84-repair's tip, a phase2/* history-glob member. The `callers` query resolved real
+    # targets (EXACT_PATH/HEURISTIC_MACRO_TOKEN rows), so it genuinely parsed+persisted new rows for that
+    # commit's non-excluded blobs (and classified its excluded ones too, via the lazy path) -- the manifest's
+    # code digest recomputed afterward is byte-identical (8b1405e9...61036, rows 197348, excluded_blobs 11) to
+    # the value recorded before the query, in the SAME output file.
+
+  - cmd: "cd $D && $PY -m pytest tests/code/test_eager_build.py -v -k \"incremental_equals_full or query_invariant or eager_ref_names or parses_only_new_blobs or noop_stats\""
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check4-incremental-equals-full.out
+    output_sha256: d418e2a1c82c8dbdb2e85fc9b5714647c34a5a4f673deca73cc6e2bed646fcde
+    # acceptance check 4, RERUN (unaffected by either follow-up: this fixture's files are ordinary INCLUDE-verdict
+    # Rust with no secret-shaped content). 7 passed.
+
+  - cmd: "cd $D && $PY -m pytest tests/code/test_eager_build.py -v -k \"call_site_row_differs or literal_row_differs\""
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check5-call-site-and-literal-coverage.out
+    output_sha256: ba4c2ce4a8a3325a500b2ea9db5622dc8da314d41c98da425d8960f369714418
+    # acceptance check 5, RERUN (unaffected by either follow-up). 2 passed.
+
+  - cmd: |
+      $PY -c "from govbridge.core import corpus, gitobj; ..." # classify_entry over every distinct .rs blob at
+      # records/product/evidence's current commits (config/corpus-rules.yaml), printing the excluded ones with
+      # their rule id and blob id (full script in this run's tool history; logic identical to check2's)
+      $PY -c "import sqlite3; conn = sqlite3.connect('.../store-BR-AR-0014/store.db'); ..." # dump
+      # code_excluded_blob and assert zero matching rows in code_symbol/code_call_site/code_literal
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check6-excluded-blob-independent-count.out
+    output_sha256: ff6d5f1bdd82fcb4a34ff17b7189fad2dee08df8df5538bba784b999ca69431a
+    # follow-up 1 acceptance check 6. Independent count: 11, listed by rule id/path/blob id -- matches the
+    # orchestrator's own measurement exactly (runtime/src/security/secrets.rs, tests/certification/{brownfield,
+    # failure_injection,repair,upstream,ws04r3,ws05r3,r4_residual(x2)}.rs, two evidence probe files). The store's
+    # own code_excluded_blob table: 11 rows, byte-identical set. Leak count (rows in code_symbol/code_call_site/
+    # code_literal for any excluded blob id): 0.
+
+  - cmd: |
+      cd $D && $PY -m pytest tests/code/test_corpus_exclusion.py::test_lazy_ensure_indexed_never_parses_an_excluded_blob tests/code/test_corpus_exclusion.py::test_callers_at_a_commit_discloses_the_exclusion_via_stats -v
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014-check7 $PY -m govbridge.code.symbols stats --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d --json
+      # then assert zero code_symbol/code_call_site/code_literal rows for every blob code_excluded_blob now holds
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check7-lazy-path-never-parses-excluded.out
+    output_sha256: 3c5f51d630ec99a14503c1a07c0195e5133d1cf312cfcfa74d5e28ae531b6b82
+    # follow-up 1 acceptance check 7. Fixture test: 2 passed (rust_treesitter.parse_module monkeypatched and
+    # recorded -- called for the kept file only, never the excluded one). Real-repo check: a COLD store (nothing
+    # pre-cached) queried at a phase2/* history tip via `stats`; 10 excluded blobs recorded on the spot by the
+    # lazy path (disclosed in `files_excluded`), zero leaked rows in code_symbol/code_call_site/code_literal.
+
+  - cmd: "cd $D && $PY -m pytest tests/code/test_corpus_exclusion.py -v -k migrat"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check8-migration.out
+    output_sha256: fa439e994cdc22ac3ad937b6c109de4c6d5636338ac55c092a40e4889fe57533
+    # follow-up 2 acceptance check 8. 3 passed: the migration adds `eager` to a fixture store.db built with the
+    # LITERAL pre-BR-AR-0014 code_blob DDL (no such column) and preserves its pre-existing row; running
+    # ensure_schema() a second (and third) time is a no-op; a real eager build on the migrated store reaches the
+    # identical digest a from-clean build in a brand-new store reaches. store-BR-AR-0010 itself was never opened.
+
+  - cmd: |
+      cd $D && $PY -m pytest tests/code tests/graph -q
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014c $PY -m govbridge index rebuild --layer code --from-clean --timings
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014d $PY -m govbridge index rebuild --layer code --from-clean --timings
+      # then print both stores' manifest.json layers.code, an independent INCLUDE-vs-excluded count across the
+      # eager refs, and a before/after query-invariance check on store-BR-AR-0014c
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check9-fresh-stores-recheck-1-3.out
+    output_sha256: 8e6964c93e769213f450cb10578a4b3ab86ffe5ff66f2135bff4aa66753e6ff2
+    # acceptance check 9 (the orchestrator's own "re-run checks 1-3 in FRESH stores" instruction). (a) 88 passed
+    # (tests/code + tests/graph; the full-tree rerun is check1's own 325). (b) store-BR-AR-0014c and -0014d:
+    # identical manifest_sha256 (7db8a0ae...064785) and code digest (8b1405e9...61036). (c) blobs_parsed=233
+    # equals the independently computed INCLUDE count (233); excluded_blobs=11 equals the independently computed
+    # excluded count (11); independent total 244. (d) query-invariance: the digest recorded before
+    # `callers resolve_state_root --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d` on store-BR-AR-0014c is
+    # byte-identical to the digest recomputed after.
