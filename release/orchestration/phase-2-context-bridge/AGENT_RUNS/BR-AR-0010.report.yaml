@@ -2,7 +2,7 @@ run_id: BR-AR-0010
 role: D1 whole-repository coverage and index-cost measurement (deterministic tooling, run by the orchestrator)
 model_observed: none -- deterministic commands executed by the outer orchestrator session (claude-opus-5-5)
 branch: bridge/d1-0010
-commit: PENDING
+commit: 484142712d10e06e16eb1478b73520b1f39ecd9f
 status: COMPLETED
 claims:
 - 'coverage spans the WHOLE canonical repository: for all 98 view refs (records, product 3c880d8, evidence 58219d5, 95 phase2/* history tips)

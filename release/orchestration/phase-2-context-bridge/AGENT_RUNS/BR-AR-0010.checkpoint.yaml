@@ -1,5 +1,5 @@
 run_id: BR-AR-0010
-commit: PENDING
+commit: 484142712d10e06e16eb1478b73520b1f39ecd9f
 commands:
 - cmd: govbridge coverage --view config/canonical-view.yaml --json COVERAGE/p2x-fail-1-bridge.json  (pass 1, view cf7efe7)
   exit_code: 0
