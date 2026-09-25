@@ -289,3 +289,31 @@ owner decision**, so the verifier may challenge it.
 
 A **fresh** builder implements it (B6R, BR-AR-0013). Its tests must include a validator negative control and the
 real-view section map. I1 waits for B6R.
+
+## BR-L-0012: B6R lands; every mandatory input is now delivered as mandatory; I1 is dispatched (2026-09-25)
+
+**BR-AR-0013 returned COMPLETED** on `claude-sonnet-5` (224 turns). `integrate-check` was PERMITTED. The orchestrator
+read the invariant-module diff itself. It changes three things and nothing else:
+
+* the one conjunct in `place_item` is removed;
+* a lifecycle banner and a J notice are added;
+* the validator's `!= ACTIVE` refusal is replaced with a *stricter* banner check.
+
+Section A is still re-derived through a single function.
+
+**Re-run by the orchestrator:** the integrated tree passes **280** tests. The orchestrator also compiled the real
+demonstration task itself. All 20 A-admissible mandatory items are now in A, including Contract v3, the frozen gate
+contract and the owner launcher, each carrying an honest `UNKNOWN` lifecycle banner and a J notice. The other items
+are placed as follows:
+
+* **F1-DIRECTION** is only in D.2, with "NOT YET AUTHORITY".
+* **F2-F3-COMMON-CLASS** is only in D.3, with "NO CLASSIFICATORY FORCE".
+* The reasoning-errors observation and the withdrawn finding are in F, each with its banner.
+* The whole-file reference is in H as `UNCLASSIFIED`.
+
+**Dispatched I1** (BR-AR-0009, sonnet, the cross-cutting integrator). It carries every routed open issue from B1–B6,
+the TA and the ruling. The orchestrator will check its merge rules by `git diff`:
+
+* existing test files are frozen, apart from pure renames;
+* the invariant modules are near-frozen;
+* plain `pytest tests -q` must pass.
