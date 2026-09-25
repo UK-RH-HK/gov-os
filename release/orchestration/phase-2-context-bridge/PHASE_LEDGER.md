@@ -375,3 +375,28 @@ was not accessed.
 **Action.** The freeze is lifted *before any demonstration run*. A fresh bounded repair, **B3R (BR-AR-0014)**, makes
 the code layer eager for the non-history refs, with a digest over all three row kinds that is query-invariant.
 Afterwards the demonstration store is updated incrementally, the freeze is re-established, and D1 is finalised.
+
+## BR-L-0015: B3R lands; the code layer is eager, deterministic, query-invariant and honours exclusions; the view is frozen again (2026-09-25)
+
+**Pass 1** of BR-AR-0014 closed D1's finding. The code layer now builds eagerly for the non-history refs; the ref set
+is derived from the view's roles, never from names. Its digest covers symbol, call-site and literal rows, is
+reproducible across two fresh stores, and does not change when a history query parses more blobs.
+
+**The orchestrator found one more defect before merging:** a **security-policy bypass**. Eleven `.rs` blobs that
+the corpus rules exclude as `X-SEC-CONTENT` had been parsed into the code tables, contributing 7,551 literal rows.
+They include `runtime/src/security/secrets.rs` and `tests/certification/brownfield.rs`. The flaw was already
+present in B3's lazy route; making the layer eager would have put it into every build and into the digest. B3R was
+reopened.
+
+**Pass 2** fixed this, and the orchestrator re-measured it in B3R's fresh store. The code route now classifies every
+blob through the existing corpus API, on both the eager and the lazy path. The measured result:
+
+* the 11 excluded blobs leave **0** rows in any code table;
+* all 11 are recorded as disclosed exclusions, each with its rule id;
+* `blobs_parsed` = **233**, equal to the independent count of INCLUDE-verdict blobs;
+* an idempotent in-place migration lets the existing demonstration store take the new schema.
+
+Plain `pytest tests -q` passes **325** tests on the merged tree.
+
+**This commit re-establishes the freeze.** Next, D1 is finalised against it by an incremental update of the
+demonstration store, followed by the demonstration itself.

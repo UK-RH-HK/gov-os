@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T18:44:56Z'
-state_hash: 293a651d81d0471ce74d20dcb932e49a69678c60fff9c6401931500d05dda7c8
-lifecycle_state: BR_REPAIR_CODE_LAYER
+updated_at: '2026-09-25T19:10:14Z'
+state_hash: 77ba7df4df8aca5f51e243fbe722284a1bedd984d3ab39555b62156a41190fff
+lifecycle_state: BR_DEMONSTRATION_FROZEN_VIEW
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -613,7 +613,16 @@ agent_runs:
   model_observed: claude-sonnet-5 (all 210 assistant turns of pass 1, transcript agent-abf4e461cbf145547.jsonl)
   agent_name: br-repair-b3r-0014
   dispatched_at: '2026-09-25T18:10Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
+  final_commit: f9a97337eed39c11aa0ced37be0f6c451199e523
+  merged_at: 1a4506d
+  follow_up_result:
+  - orchestrator-verified in B3R's fresh store store-BR-AR-0014c -- 11 independently classified excluded .rs blobs, 0 rows
+    in code_symbol / code_call_site / code_literal, all 11 recorded in code_excluded_blob with their rule id
+  - blobs_parsed 233 = independent INCLUDE-verdict count; two fresh from-clean code-layer builds identical; query-invariant
+  - idempotent in-place migration of code_blob (ALTER TABLE ADD COLUMN eager) proven on an old-DDL fixture store
+  - tests -- 2 files added, none modified; plain `pytest tests -q` on the merged tree 325 passed (orchestrator-run)
+  - model claude-sonnet-5, 366 assistant turns across both passes
   pass_1:
     final_commit: bc4c390c1fe65a82c0a2a7c3154566e3e0594444
     integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
@@ -634,8 +643,8 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/code/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.*
 running_work:
-- run_id: BR-AR-0014
-  liveness_check: subagent transcript mtime + commits on bridge/b3r-0014; never inferred from elapsed time
+- run_id: BR-AR-0010
+  liveness_check: orchestrator-run D1 finalisation (incremental update of store-BR-AR-0010 to the frozen tip) on bridge/d1-0010
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -716,10 +725,10 @@ rulings:
     rows expecting an A-admissible mandatory item outside A are read as A and every affected row is reported; recorded
     before any demonstration run without the orchestrator reading the oracle; delivered live to I1
 demonstration_freeze:
-  status: LIFTED (2026-09-25) before any demonstration run -- D1 pass 1 (bridge/d1-0010 at ced0319) found the code layer
-    lazy (manifest code digest = sha256 of empty string); B3R repairs it; the freeze is re-established after B3R merges
-    and the demonstration store is incrementally updated
-  frozen_bridge_tip: cf7efe7 (the pass-1 view)
+  status: IN FORCE again from THIS commit (the commit that sets this line) -- re-established after B3R merged; the first
+    freeze (cf7efe7) was lifted before any demonstration run when D1 pass 1 found the lazy code layer
+  frozen_bridge_tip: the commit introducing this line (resolve with `git log -1 --format=%H -S'IN FORCE again from THIS commit' -- ORCHESTRATOR_STATE.yaml`)
+  previous_frozen_tip: cf7efe7 (pass-1 view, lifted)
   rule: NO commits to bridge/p2-context-retrieval from this commit until GRADE (BR-AR-0012) returns -- the canonical view's
     records ref follows this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here
     would move the demonstration's view mid-run (OBS-BR-03)
@@ -772,7 +781,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0014 (B3R); verify (integrate-check, model, plain pytest, two-store code digest
-  identity with blobs_parsed == independently counted .rs blobs, query-invariance); merge; `index update` store-BR-AR-0010 to
-  the new tip; freshness NOOP; re-establish the freeze; finalise D1 (commit INDEX manifest + telemetry + report/checkpoint);
-  then DEMO per BR-HO-0011
+next_deterministic_action: 'FROZEN VIEW: on bridge/d1-0010 merge this tip, `index update` store-BR-AR-0010 to it (code layer
+  eager + migration), freshness NOOP, re-run coverage, commit INDEX manifest + telemetry + D1 report/checkpoint on the D1 branch;
+  then DEMO per HANDOFFS/BR-HO-0011 on bridge/demo-0011; then GRADE; then merge D1 -> DEMO -> GRADE and lift the freeze'
