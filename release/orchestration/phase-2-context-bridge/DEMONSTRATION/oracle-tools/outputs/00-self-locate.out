@@ -1,0 +1,9 @@
+$ git branch --show-current; git rev-parse HEAD; git rev-parse 3c880d8 6e7a2a3 58219d5 a7b4dbe 5d7bab9 aef8f1c
+bridge/ta-0002
+a7b4dbea4c03bacff7df1d1590dcc568bcc8a761
+3c880d80f81475f5306bdd5f680f2e004df49391
+6e7a2a3495a8d3619759a95b7ed055da9c848618
+58219d5628683d6f462aa67bf25dbc2641933bce
+a7b4dbea4c03bacff7df1d1590dcc568bcc8a761
+5d7bab9b398c2a144f2b725c9f6ba91e3c2b6d91
+aef8f1cdcede2a084eeb94f97cebcf99982c9ce1

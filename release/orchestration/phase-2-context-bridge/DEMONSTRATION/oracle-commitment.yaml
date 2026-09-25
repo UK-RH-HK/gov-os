@@ -1,0 +1,5 @@
+oracle_sha256: 3d80a5fda0724e380821f55e3e4e3980b0b53032a14d2ed188e83169888c7e4b
+author_run: BR-AR-0002
+author_model: 'claude-opus-5-5 (Opus 5.5; spawned with model: opus; self-reported from the session system identity)'
+written_at: '2026-09-25T10:13:28Z'
+schema: govbridge-oracle/1

@@ -1,0 +1,17 @@
+$ python3 release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/selftest_check_oracle.py <SEALED>/oracle.yaml
+unmodified: expected=VALID got=VALID PASS
+stage removed: expected=INVALID got=INVALID PASS
+stages out of order: expected=INVALID got=INVALID PASS
+second enforcement point: expected=INVALID got=INVALID PASS
+no enforcement point: expected=INVALID got=INVALID PASS
+authority row missing: expected=INVALID got=INVALID PASS
+authority row duplicated: expected=INVALID got=INVALID PASS
+authority class not verbatim: expected=INVALID got=INVALID PASS
+anchor lacks commit: expected=INVALID got=INVALID PASS
+anchor lacks path: expected=INVALID got=INVALID PASS
+anchor commit abbreviated: expected=INVALID got=INVALID PASS
+trap without why: expected=INVALID got=INVALID PASS
+control query uncovered: expected=INVALID got=INVALID PASS
+classification asserted: expected=INVALID got=INVALID PASS
+disposition asserted: expected=INVALID got=INVALID PASS
+RESULT: ALL PASS
