@@ -714,3 +714,36 @@ explicit **STOP and return to the owner**. Review 8 argued F2 is *not* scope exp
 overrule it — a judgement that belongs to the owner, not to the orchestrator or the reviewer.
 
 **Action: product frozen at `3c880d8`. No repair dispatched. Returned to the owner.**
+
+## P2-L-0047 — owner disposition of Review 8: F2 is a blocker but not scope expansion; the bridge starts (2026-09-25)
+
+**OD-P2-10A.** The owner overrules the OD-P2-09 §5 table for F2 and agrees with Review 8's own argument: F2 is a
+**newly discovered implementation defect within the already-existing Phase-2 authority / Property-C requirements**,
+not scope expansion, because correcting it introduces no new capability. It **remains a legitimate Phase-2 blocker**
+and is **not to be repaired yet**.
+
+**OD-P2-10B.** The Context/Retrieval Bridge is authorised and starts now, in a **separate fresh outer session /
+worktree / domain** under the `P2X-FAIL-1` process — orchestration support only, forbidden from touching the frozen
+product, Contract v3, the frozen acceptance contract, or authority/trust semantics. Its token is
+`P2_CONTEXT_RETRIEVAL_BRIDGE_READY`, independently earned; only then does fresh whole-system root-cause synthesis
+run, and only after that may any Phase-2 product repair occur.
+
+**F1 and the F2/F3 hypothesis are explicitly NOT final decisions.** F1 is recorded as a strong deletion candidate —
+the sandbox exemption has failed under three successive mechanisms, and Review 8 verified both call sites itself and
+found no production consumer needing the cross-process signal — but the synthesis must reconstruct its purpose,
+consumers, dependencies and consequences and choose among DELETE / SIMPLIFY / REPAIR / NARROW / RETAIN, preferring
+deletion if nothing required depends on it. The F2/F3 single-class hypothesis (*syntactic rule/property reasoning
+that fails to trace through composition, precedence and matching to the actual enforced semantic effect*) must be
+**tested, not assumed** — the owner was explicit that it must not be pre-classified merely because the owner
+proposed it.
+
+**Offered to the synthesis as hypothesis-relevant observation, not as confirmation:** the orchestrator made three
+errors this phase of a strikingly parallel shape — verifying that a property holds without verifying it **reaches the
+decision** (the T2 document as a rules authority; the withdrawn positive-control finding; and the additive-union
+claim that shipped into the approved design as F3). These are errors in the orchestrator's *reasoning*, while the
+owner's hypothesis concerns the *implementation*; they are different objects and the parallel must be tested rather
+than treated as evidence for itself.
+
+**Property A's fourth-consecutive-round evidence is preserved** and not to be reopened without direct falsification.
+
+**This session is now stopped. The product is frozen at `3c880d8`. No repair agent dispatched, none to be.**

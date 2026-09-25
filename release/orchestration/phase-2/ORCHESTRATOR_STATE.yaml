@@ -6,8 +6,8 @@ target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
 updated_at: '2026-09-24T16:17:10Z'
 state_hash: 5a3aa839585b179107d390240aa590bdc85c3374f16cc94539382dbbe8b81e70
-lifecycle_state: PHASE_2_PRODUCT_FROZEN_AWAITING_OWNER
-loop_status: STOPPED_FOR_OWNER_DECISION
+lifecycle_state: PHASE_2_PRODUCT_FROZEN_AWAITING_BRIDGE
+loop_status: STOPPED_BY_OWNER
 protocol:
   source: owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)
   launcher: V8.2 — Self-locating durable autonomous Phase Orchestrator (NON_NORMATIVE_OPERATOR_UI)
@@ -1191,9 +1191,9 @@ completed_stages:
     the pinned model under P2-HO-0008 / P2-HO-0009.
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
-next_deterministic_action: 'AWAIT OWNER: (1) rule on F2''s classification -- old-core HIGH per OD-P2-09 section
-  5''s bright line, or an ordinary in-architecture defect as Review 8 argues; (2) confirm whether to start the V8.3
-  Context/Retrieval Bridge session now per OD-P2-10 section 3'
+next_deterministic_action: NONE in this session. Remain stopped with the product frozen at 3c880d8. The bridge runs
+  in a separate session under P2X-FAIL-1; the next Phase-2 product action occurs only after P2_CONTEXT_RETRIEVAL_BRIDGE_READY
+  and the whole-system synthesis.
 current_prohibitions:
 - action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status
   until: never
@@ -1462,6 +1462,8 @@ owner_directions_in_force:
 - OD-P2-08
 - OD-P2-09
 - OD-P2-10
+- OD-P2-10A
+- OD-P2-10B
 od_p2_09:
   recorded: release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md
   round_budget: Review 8 is the convergence decision point; no automatic Review 9+ on the same mechanism-hardening
@@ -1582,3 +1584,40 @@ triggered_rules:
     do not autonomously launch another broad repair cycle
   action_taken: product frozen at 3c880d8; no repair dispatched; returned to the owner for the F2 classification
     and for confirmation to start the bridge
+od_p2_10a_b:
+  record: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+  OD-P2-10A: F2 is NOT scope expansion -- a newly discovered implementation defect within existing Phase-2 authority/Property-C
+    requirements. Remains a legitimate Phase-2 blocker. NOT to be repaired yet.
+  OD-P2-10B: 'the Context/Retrieval Bridge is authorised and starts NOW, in a SEPARATE fresh outer session/worktree/domain
+    under the P2X-FAIL-1 process. Orchestration support only; must not modify the frozen product, Contract v3, the
+    frozen acceptance contract, or authority/trust semantics. Token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY.'
+  f1_direction_not_authority: strong DELETE/SIMPLIFY candidate (the exemption has failed under three successive
+    mechanisms; Review 8 verified no production consumer needs the cross-process signal) -- but NOT yet authority
+    to delete. Synthesis must reconstruct purpose/consumers/dependencies/consequences and choose DELETE/SIMPLIFY/REPAIR/NARROW/RETAIN,
+    preferring deletion if no required production capability depends on it.
+  f2_f3_hypothesis_not_decision: investigate whether F2 and F3 are one deeper class -- syntactic rule/property reasoning
+    that fails to trace through composition/precedence/matching to the actual enforced semantic effect. MUST NOT
+    be pre-classified as the same class merely because the owner suggested it; the independent synthesis tests it
+    against implementation and historical evidence.
+  property_a: Review-8 evidence preserved (fourth consecutive round); not to be reopened without evidence that directly
+    falsifies it
+frozen_product:
+  commit: 3c880d8
+  branch: phase2/approved-delta (also phase2/review-8)
+  suite: 368/368
+  review: P2-AR-0097 at 58219d5
+  rule: do not modify; no repair agent; next product action only after P2_CONTEXT_RETRIEVAL_BRIDGE_READY and the
+    whole-system synthesis
+evidence_for_the_synthesis:
+  review_8: probes/P2-AR-0097/ + tests/certification/ar97_probe.rs on 58219d5 (6 probes; 3 fail by design, asserting
+    the secure outcome)
+  context_pack: release/orchestration/phase-2/REVIEW_8_CONTEXT_PACK.md
+  design_records:
+  - RESEARCH/P2-PROBE-OPTION-C.md
+  - RESEARCH/P2-HISTORICAL-RULE-SOURCE.md
+  - RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md (withdrawn finding, retained as evidence)
+  ledger: release/orchestration/phase-2/PHASE_LEDGER.md entries P2-L-0033..0046
+  orchestrator_reasoning_errors: 'ORCHESTRATOR_STATE.yaml orchestrator_error_f3 -- three instances this phase of
+    one shape, offered to the synthesis as HYPOTHESIS-RELEVANT OBSERVATION ONLY, not as confirmation: these were
+    errors in the orchestrator''s REASONING, whereas the owner''s F2/F3 hypothesis concerns the IMPLEMENTATION.
+    The parallel is striking and must be tested, not assumed.'
