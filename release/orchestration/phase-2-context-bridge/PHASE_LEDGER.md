@@ -72,3 +72,22 @@ is not committed.
 
 The test surfaced one defect, and it has been fixed. Empty domain directories were not tracked, so role worktrees
 had no `AGENT_RUNS/`. `.gitkeep` files now keep them.
+
+## BR-L-0004: the owner clarifies the corpus and purpose (OC-BR-02), and the running architect is redirected (2026-09-25)
+
+The owner clarified the bridge's scope while BR-AR-0001 was running. The bridge is **not** a retrieval system for
+Review 8. Its corpus is the **whole canonical Governance OS repository**, with principled exclusions. Its purpose is a
+**generic, provider/model-replaceable Governance OS self-memory/context foundation** that can later be promoted into
+V8.3, rather than thrown away. Review 8 stays as the **first mandatory benchmark**, a difficult known case, and must
+not bias the design.
+
+The clarification is recorded verbatim, hash-bound, as `GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md`.
+The orchestrator's reading of it is in `HANDOFFS/BR-HO-0001-A1`, which now governs over BR-HO-0001 where they
+differ. The addendum names the ten items the architecture must define, one heading each. It adds a design test:
+*if every Review-8 reference were deleted, would the architecture change?* Only the demonstration and oracle should.
+It also adds a corpus-coverage node to the DAG.
+
+**Liveness was checked, not assumed.** The architect's transcript was written seconds before the redirect. Its branch
+had no commits and no `ARCHITECTURE.md`, only spike outputs, so the clarification reached it before any design was
+frozen, and nothing is restarted. The write boundary is unchanged: the bridge reads the whole repository and still
+writes only its own domain.

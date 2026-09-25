@@ -4,10 +4,12 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T08:41:39Z'
-state_hash: aa5339b0fd497dd81bf89b03473d1cdacb9fc7d935bd604586b27806d5570532
+updated_at: '2026-09-25T08:45:28Z'
+state_hash: 48f07b7d1e8a9349cc72b496ec280d95690e489c99c83f08fc643dc7e5246505
 lifecycle_state: BR_ARCHITECTURE
 loop_status: RUNNING
+purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
+  Review 8 is its first mandatory benchmark, not its corpus boundary'
 authority_status: ORCHESTRATION_SUPPORT_ONLY -- the bridge is not product, not a candidate, not an authority source,
   not Phase 3, not V8.3 CURRENT (OD-P2-10 section 3, OD-P2-10B, launcher)
 protocol:
@@ -117,6 +119,14 @@ owner_records:
 - id: OWNER-LAUNCHER-BR-0001
   path: release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md
   applies: this lifecycle's procedure, routing, required capabilities and the Review-8 demonstration
+- id: OC-BR-02
+  path: release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md
+  sha256: 44a206eda6d7c8228059115aef4f4bbaef2f8d6cb43eff8b4d4b30deb4154e16
+  received: 2026-09-25, mid-session, while BR-AR-0001 was running (before its architecture was frozen)
+  applies: the corpus is the WHOLE canonical repository (with exclusions for secrets, generated/binary/build artefacts
+    and policy-marked non-indexable material); the bridge is a GENERIC provider/model-replaceable Governance OS self-memory
+    foundation, NOT a bespoke Phase-2/Review-8 mechanism; Review 8 is the first mandatory benchmark, not the corpus
+    boundary; ten explicit architecture items including the V8.3 promotion path; the write boundary is unchanged
 mandatory_bridge_inputs:
   source: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml od_p2_10a_b + evidence_for_the_synthesis, at 6e7a2a3
   refreshed: 2026-09-25 -- release/4.1.6-rc1 tip re-read and still 6e7a2a3; no Phase-2 record newer than the bridge base
@@ -268,6 +278,13 @@ handoffs:
 - id: BR-HO-0001
   path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md
   to: BR-AR-0001
+- id: BR-HO-0001-A1
+  path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-A1-corpus-and-purpose-addendum.md
+  sha256: 82ed7175d1b96f4b08cd88569b4d9069a5e157e6c00727fd6b0912e177f7a3d5
+  to: BR-AR-0001
+  delivery: SendMessage to the running architect (br-architect-0001), which was live when the message was sent;
+    its branch had no commits and no ARCHITECTURE.md yet
+  governs_over: BR-HO-0001 where they differ
 unresolved_questions: []
 evidence_status:
   builder_evidence: NONE_YET
