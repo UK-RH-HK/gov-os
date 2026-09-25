@@ -26,3 +26,15 @@ profiles:
   synthesis:
     total_kb: 360
     section_caps_kb: {A: null, B: 16, C: 40, D: 40, E: 24, F: 40, G: 120, H: 40, I: 12, J: 12}
+
+# BR-HO-0015 (G row, defect 3): "Placement looks at (class, lifecycle, delivery) only... A retrieved hit whose
+# canonical occurrence is product code or a test lands in H". A RETRIEVED/DERIVED item whose occurrence path
+# matches one of these (source-kind or test-path) rules is placed in G instead of H --
+# govbridge.compile.codesurfaces.is_code_or_test_surface, applied only on packet.py's section == "H" fallback, so
+# A/D.1/D.2/D.3/E/F placements are never touched. source_dirs reuses the SAME generic code-directory vocabulary
+# govbridge.graph.derive.CODE_DIRS already uses for CODE_CITES scanning -- one list, never duplicated with a
+# different membership. Generic (OC-BR-02): a versioned config list, never a hand-picked file/path.
+code_test_surfaces:
+  source_extensions: [".rs", ".py"]
+  source_dirs: ["runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/"]
+  test_path_globs: ["**/tests/**", "tests/**", "**/test_*.py", "**/*_test.py", "**/*_tests.rs"]

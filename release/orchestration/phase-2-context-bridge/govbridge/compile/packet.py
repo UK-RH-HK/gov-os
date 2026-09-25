@@ -27,6 +27,8 @@ from govbridge.authority import records as recordsmod
 from govbridge.authority import registry as registrymod
 from govbridge.authority import resolver as resolvermod
 from govbridge.compile import budgets as budgetsmod
+from govbridge.compile import codeseeds as codeseedsmod
+from govbridge.compile import codesurfaces as codesurfacesmod
 from govbridge.compile import render as rendermod
 from govbridge.core import gitobj, store as storemod, view as viewmod
 from govbridge.core.manifest import bridge_code_tree
@@ -192,6 +194,17 @@ def place_item(cls: Optional[str], lifecycle: str, delivery: str, unit_id: str, 
     return "H", False
 
 
+def g_admissible(cls: Optional[str]) -> bool:
+    """Whether a RETRIEVED/DERIVED item of ``cls`` may be redirected from H into G (BR-HO-0015 defect 3). Every
+    NON-LADDER class carries a FIXED ``allowed_sections`` (ARCHITECTURE.md section 5.1) that never names G --
+    ``UNCLASSIFIED``/``FIXTURE`` are H-only by construction -- so redirecting one into G would be an admissibility
+    violation ``validate.py``'s independent re-derivation correctly refuses (``verify_placement``'s non-ladder
+    branch). A LADDER class (e.g. ``EVIDENCE``, product code/tests' usual class) carries no such restriction
+    (``ClassSpec.allowed_sections == ()`` means "any admissible section"), so the redirect applies only there."""
+    spec = classesmod.ALL_CLASSES.get(cls)
+    return spec is not None and spec.ladder
+
+
 def _abs_path(maybe_rel: str) -> str:
     if os.path.isabs(maybe_rel):
         return maybe_rel
@@ -252,7 +265,7 @@ class Compiler:
     short, testable method instead of a closure threading five arguments through."""
 
     def __init__(self, task_spec: dict, routes: RouteSet, repo: Optional[str], view_path: str,
-                 registry_path: Optional[str], rrf_k: int, graph_depth: int):
+                 registry_path: Optional[str], rrf_k: int, graph_depth: int, budgets_path: Optional[str] = None):
         self.task_spec = task_spec
         self.routes = routes or FAKE_ROUTES
         self.repo = repo
@@ -267,29 +280,74 @@ class Compiler:
         self._seen: dict = {}  # section -> set(unit_id) -- prevents literal duplicate placement
         self._code_conn_cache = None
         self._code_conn_attempted = False
+        self._product_commit_cache = None
+        self._product_commit_attempted = False
+        # BR-HO-0015 defect 3 (G row): the small, versioned config list that decides whether a RETRIEVED/DERIVED
+        # item whose occurrence is product code or a test lands in G instead of H -- loaded once, from the SAME
+        # budgets.yaml the profile itself comes from (falls back to the default path when the caller used the
+        # default profile loader too).
+        try:
+            self.code_surface_rules = codesurfacesmod.load_rules(budgets_path)
+        except Exception:
+            self.code_surface_rules = codesurfacesmod.EMPTY_RULES
+
+    def product_commit(self) -> Optional[str]:
+        """The canonical PRODUCT ref's commit (``role: product`` in config/canonical-view.yaml, resolved by ROLE,
+        never a hard-coded ref name -- OC-BR-02), cached for the whole compile. None (honest MISSING) if this view
+        names no product-role ref."""
+        if self._product_commit_attempted:
+            return self._product_commit_cache
+        self._product_commit_attempted = True
+        for r in self.resolved_view.config.refs:
+            if r.role == "product" and r.name in self.resolved_view.named:
+                self._product_commit_cache = self.resolved_view.named[r.name].commit
+                break
+        return self._product_commit_cache
 
     def code_conn(self):
         """The shaped code-route connection (``govbridge.graph.code_bridge``) for the canonical PRODUCT ref
         (ARCHITECTURE.md section 4/7.2: "the code route at the canonical product ref"), built once per compile
         and reused for every seed -- routed issue B5/BR-AR-0007 ("wire [CALLS/READS_KEY/TESTS] against the real
-        B3 tables, so why/impact reach code"). Resolves the ref by ROLE (``role: product`` in
-        config/canonical-view.yaml), never by a hard-coded ref name (OC-BR-02). Returns None (honest MISSING,
-        never an error) if there is no product-role ref in this view, or the code route itself is unavailable."""
+        B3 tables, so why/impact reach code"). Returns None (honest MISSING, never an error) if there is no
+        product-role ref in this view, or the code route itself is unavailable."""
         if self._code_conn_attempted:
             return self._code_conn_cache
         self._code_conn_attempted = True
         try:
             from govbridge.graph import code_bridge
-            product_commit = None
-            for r in self.resolved_view.config.refs:
-                if r.role == "product" and r.name in self.resolved_view.named:
-                    product_commit = self.resolved_view.named[r.name].commit
-                    break
+            product_commit = self.product_commit()
             if product_commit:
                 self._code_conn_cache = code_bridge.build_shaped_code_connection(product_commit, repo=self.repo)
         except Exception:
             self._code_conn_cache = None
         return self._code_conn_cache
+
+    def code_seeds_for(self, seed: str) -> tuple:
+        """Derives extra code-route symbol names and bare (no-enclosing-symbol) occurrences from ``seed`` when it
+        names a RECORD rather than a code symbol directly (BR-HO-0015 defect 1: "nothing derives seed symbols from
+        record seeds"). Returns ``(seed_names, seed_labels, bare_occurrences)`` -- ``seed_names`` always starts
+        with ``seed`` itself (so a seed that already IS a symbol name keeps working exactly as before);
+        ``seed_labels`` maps a derived name to how its citation was resolved; ``bare_occurrences`` is the
+        ``code_route`` ``RouteFn``'s own dict shape. Honest MISSING (``([seed], {}, [])``) on any failure -- a
+        record-citation scan must never break the seed pass's existing why/history/traverse/code hops."""
+        seed_names = [seed]
+        seed_labels: dict = {}
+        bare_occurrences: list = []
+        try:
+            records_commit = self.resolved_view.ref_commit("records")
+            product_commit = self.product_commit()
+            if records_commit and product_commit:
+                symbols_cited, occs_cited = codeseedsmod.cited_code_units(
+                    seed, product_commit, records_commit, self.grammar, repo=self.repo)
+                for sym in symbols_cited:
+                    if sym.name not in seed_names:
+                        seed_names.append(sym.name)
+                    seed_labels[sym.name] = sym.label
+                for occ in occs_cited:
+                    bare_occurrences.append({"path": occ.path, "line": occ.line, "label": occ.label})
+        except Exception:
+            return [seed], {}, []
+        return seed_names, seed_labels, bare_occurrences
 
     # -- construction from a MandatoryItem (delivery MANDATORY, or PINNED when its class is non-ladder) ----------
 
@@ -417,7 +475,8 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     resolve_result = resolvermod.resolve(task_spec, repo=repo, registry_path=registry_path)
     status = STATUS_OK if resolve_result.status == resolvermod.STATUS_OK else STATUS_BLOCKED
 
-    c = Compiler(task_spec, routes, repo, view_path, registry_path, profile.rrf_k, profile.graph_neighbour_depth)
+    c = Compiler(task_spec, routes, repo, view_path, registry_path, profile.rrf_k, profile.graph_neighbour_depth,
+                 budgets_path=budgets_path)
 
     sections: dict = {k: [] for k in ("A", "B", "C", "D.1", "D.2", "D.3", "E", "F", "G", "H")}
     queries_log: dict = {}
@@ -484,9 +543,20 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
                 continue
             c.add(sections, "C", c.item_from_edge_hop("NEIGHBOUR", edge_list[0].to_dict(), "C"))
 
-        for hit in c.routes.run("code", seeds=[seed]):
+        # BR-HO-0015 (G row): a record seed (e.g. a review finding id) carries no symbol name of its own, so the
+        # code route above would resolve nothing for it. code_seeds_for derives every symbol/occurrence the seed
+        # RECORD's own text cites -- path:line, a path-qualified symbol, or a bare backticked symbol -- resolved at
+        # the canonical product ref, and hands them to the SAME code route as extra names/occurrences so definitions,
+        # callers, callees, TESTS edges and READS_KEY consumers are all expanded uniformly (defect 1 + defect 2). A
+        # seed that is already a code symbol keeps working exactly as before (seed_names always starts with seed).
+        seed_names, seed_labels, bare_occurrences = c.code_seeds_for(seed)
+        for hit in c.routes.run("code", seeds=seed_names, seed_labels=seed_labels,
+                                 bare_occurrences=bare_occurrences):
             cls_section, _ = place_item(hit.authority_class, hit.lifecycle, hit.delivery, hit.unit_id, c.grammar)
-            target = "G" if cls_section == "H" else cls_section
+            # BR-HO-0015 defect 3: only a LADDER class may be redirected H -> G (g_admissible); a non-ladder class
+            # (UNCLASSIFIED, FIXTURE) has a FIXED allowed_sections that never names G, and redirecting one there
+            # would fail validate.py's independent placement re-derivation.
+            target = "G" if (cls_section == "H" and g_admissible(hit.authority_class)) else cls_section
             fused = routermod.FusedHit(hit=hit, fused_score=0.0, routes=(hit.route,))
             c.add(sections, target, c.item_from_hit(fused, target))
 
@@ -504,8 +574,19 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         for f in fused:
             section, also_d1 = place_item(f.hit.authority_class, f.hit.lifecycle, f.hit.delivery, f.hit.unit_id,
                                            c.grammar)
-            if section == "H" and target_section:
-                section = target_section
+            if section == "H":
+                # BR-HO-0015 defect 3 (G row): a RETRIEVED/DERIVED item (here, a lexical/semantic query hit -- the
+                # code route's own hits are already redirected in the seed loop above) whose canonical occurrence
+                # is a code or test surface goes to G, never H; D.1/D.2/D.3/E/F placements above are unaffected
+                # (this branch only ever runs on the section == "H" fallback). Only a LADDER class may move to G
+                # (g_admissible) -- a non-ladder class (UNCLASSIFIED, FIXTURE) is H-only by its fixed
+                # allowed_sections, whatever its occurrence path looks like.
+                occ_path = f.hit.occurrences[0].path if f.hit.occurrences else None
+                if (occ_path and g_admissible(f.hit.authority_class)
+                        and codesurfacesmod.is_code_or_test_surface(occ_path, c.code_surface_rules)):
+                    section = "G"
+                elif target_section:
+                    section = target_section
             item = c.item_from_hit(f, section)
             c.add(sections, section, item)
             touched_sections.add(section)

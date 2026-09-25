@@ -1,0 +1,29 @@
+schema: govbridge-task-spec/1
+task_id: BR-HO-0015-D0006-CONTROL
+role: >-
+  BR-AR-0015 acceptance check 4 (OC-BR-02 generic control) -- D-0006, the capability-plugin decision, is
+  deliberately UNRELATED to Review 8/Phase 2; this task spec exists only to show section G populates for ANY
+  seed/query pair whose subject has real code surfaces, never because of a Review-8-specific code path.
+objective: compile a packet whose seed is D-0006 (the capability-plugin/embedding-benchmark decision) and confirm
+  section G is populated with labelled code surfaces from that decision's own subsystem.
+view: config/canonical-view.yaml
+required_inputs: []
+seeds:
+- D-0006
+queries:
+- id: q-embed-plugin
+  text: sentence_transformers embedding plugin fails closed MODEL_UNAVAILABLE respond outputs vectors
+  routes: [lexical]
+  k: 8
+retrieval_exclusions:
+- release/orchestration/phase-2-context-bridge/ARCHITECTURE/**
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/**
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/**
+mutation_scope:
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.*
+prohibitions:
+- read any path matched by retrieval_exclusions
+required_checks:
+- govbridge packet verify
+completion_vocabulary: [ANSWERED, PARTIAL, BLOCKED]
+budget_profile: synthesis

@@ -28,6 +28,7 @@ from govbridge.core import exact as exactmod
 from govbridge.core import pathrules
 from govbridge.core import store as storemod
 from govbridge.core import view as viewmod
+from govbridge.graph import derive as derivemod
 from govbridge.lexical import query as lexicalquery
 from govbridge.route import router as routermod
 from govbridge.route.router import RouteHit, RouteOccurrence, RouteSet
@@ -162,13 +163,40 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     # --- code ------------------------------------------------------------------------------------------------
 
-    def _code_hit_from_definition(d: dict, rank: int) -> RouteHit:
+    # The shaped code_conn (govbridge.graph.code_bridge) wires CALLEES/TESTS/READS_KEY against the real B3 tables,
+    # exactly the way govbridge.compile.packet.Compiler.code_conn already does for why/impact (routed issue
+    # B5/BR-AR-0007). Built at most once per RouteSet and reused by every code_route call -- the same "shared state
+    # built ONCE" discipline this function's own docstring already applies to the view/registry/mandatory-items.
+    _code_conn_state = {"attempted": False, "conn": None, "blob_to_path": {}}
+
+    def _shaped_code_conn() -> tuple:
+        if not _code_conn_state["attempted"]:
+            _code_conn_state["attempted"] = True
+            if product_commit:
+                try:
+                    from govbridge.graph import code_bridge
+                    _code_conn_state["conn"] = code_bridge.build_shaped_code_connection(product_commit, repo=repo)
+                    raw_conn = codesymbols._open_conn()
+                    entries = codesymbols.ensure_indexed(raw_conn, product_commit, repo=repo)
+                    _code_conn_state["blob_to_path"] = {blob_id: p for p, blob_id in entries}
+                except Exception:
+                    _code_conn_state["conn"] = None
+                    _code_conn_state["blob_to_path"] = {}
+        return _code_conn_state["conn"], _code_conn_state["blob_to_path"]
+
+    def _code_hit_from_definition(d: dict, rank: int, citation_label: Optional[str] = None) -> RouteHit:
         cls, lifecycle = classify_occ(d["path"], product_commit, d["start_line"], d["end_line"])
         vstatus = resolved_view.classify_occurrence(d["path"], product_commit).status
         occs = (RouteOccurrence(ref="product", commit=product_commit, path=d["path"], version_status=vstatus,
                                  line_start=d["start_line"], line_end=d["end_line"]),)
+        text = f"{d['kind']} {d['qualified_name']}"
+        if citation_label:
+            # how the SEED citation itself was matched (BR-HO-0015: "label every resolution... never report a
+            # heuristic resolution as exact") -- distinct from, and never confused with, a CALLS/TESTS/READS_KEY
+            # edge's own resolution label below.
+            text += f" [citation:{citation_label}]"
         return RouteHit(unit_id=d["symbol_id"], unit_kind="symbol", route="code", rank=rank, occurrences=occs,
-                         text=f"{d['kind']} {d['qualified_name']}", authority_class=cls, lifecycle=lifecycle)
+                         text=text, authority_class=cls, lifecycle=lifecycle)
 
     def _code_hit_from_caller(row: dict, rank: int) -> RouteHit:
         path, _, line = row["at"].partition(":")
@@ -181,11 +209,66 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                          occurrences=occs, text=f"{row['callee_text']} [{row['label']}]", authority_class=cls,
                          lifecycle=lifecycle)
 
-    def code_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, **_kw) -> list:
+    def _code_hit_from_edge(edge, blob_to_path: dict, rank: int) -> Optional[RouteHit]:
+        """A CALLEES/TESTS/READS_KEY edge from ``govbridge.graph.derive`` (its ``evidence_occurrence`` is
+        ``blob_id:line`` against the SHAPED connection's own schema -- never a path, so it is mapped back through
+        ``blob_to_path`` here, the one place code_route does that translation)."""
+        blob_id, _, line_s = (edge.evidence_occurrence or "").partition(":")
+        path = blob_to_path.get(blob_id)
+        if path is None:
+            return None
+        line_i = int(line_s) if line_s.isdigit() else edge.evidence_line
+        cls, lifecycle = classify_occ(path, product_commit, line_i, line_i)
+        vstatus = resolved_view.classify_occurrence(path, product_commit).status
+        occs = (RouteOccurrence(ref="product", commit=product_commit, path=path, version_status=vstatus,
+                                 line_start=line_i, line_end=line_i),)
+        return RouteHit(unit_id=f"{edge.type}:{path}:{line_i}:{edge.dst}", unit_kind="occurrence", route="code",
+                         rank=rank, occurrences=occs, text=f"{edge.type} {edge.src} -> {edge.dst} [{edge.derivation}]",
+                         authority_class=cls, lifecycle=lifecycle)
+
+    def _expand_symbol(qname: str, conn, blob_to_path: dict, hits: list, exclude) -> None:
+        """Callers and callees; the READS_KEY consumers of any literal key read AT this symbol; TESTS edges
+        (ARCHITECTURE.md section 4.6/7.2's G row, BR-HO-0015 defect 2). Callers are already covered by
+        ``codesymbols.callers`` in the caller loop below; this adds the rest via the shaped connection."""
+        if conn is None:
+            return
+        for edge in (derivemod.callees_of(conn, qname) + derivemod.tests_of(conn, qname)):
+            h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1)
+            if h is not None and not (exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude)):
+                hits.append(h)
+        try:
+            key_rows = conn.execute("SELECT DISTINCT value FROM literal WHERE enclosing_symbol=?", (qname,)).fetchall()
+        except Exception:
+            key_rows = []
+        for (key_value,) in key_rows:
+            for edge in derivemod.reads_key_of(conn, key_value):
+                h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1)
+                if h is not None and not (exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude)):
+                    hits.append(h)
+
+    def _code_hit_from_bare_occurrence(occ: dict, rank: int) -> Optional[RouteHit]:
+        """A cited ``path:line`` at the product ref with no enclosing symbol (BR-HO-0015: "keep an occurrence-level
+        G item for that line") -- this is also how a cited evidence probe surfaces, generically."""
+        path, line_i, label = occ.get("path"), occ.get("line"), occ.get("label")
+        if not path:
+            return None
+        cls, lifecycle = classify_occ(path, product_commit, line_i, line_i)
+        vstatus = resolved_view.classify_occurrence(path, product_commit).status
+        occs = (RouteOccurrence(ref="product", commit=product_commit, path=path, version_status=vstatus,
+                                 line_start=line_i, line_end=line_i),)
+        return RouteHit(unit_id=f"CITED:{path}:{line_i}", unit_kind="occurrence", route="code", rank=rank,
+                         occurrences=occs, text=f"[cited, no enclosing symbol] [{label}]", authority_class=cls,
+                         lifecycle=lifecycle)
+
+    def code_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, seed_labels=None,
+                   bare_occurrences=None, **_kw) -> list:
         if not product_commit:
             return []
         names = list(seeds or []) or _extract_symbol_names(text)
+        seed_labels = seed_labels or {}
+        conn, blob_to_path = _shaped_code_conn()
         hits: list = []
+        expanded: set = set()
         for name in names:
             try:
                 defs_out = codesymbols.definitions(name, product_commit, repo=repo)
@@ -194,7 +277,11 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             for d in defs_out.get("definitions", []):
                 if exclude and pathrules.any_glob_match(d["path"], exclude) is not None:
                     continue
-                hits.append(_code_hit_from_definition(d, len(hits) + 1))
+                hits.append(_code_hit_from_definition(d, len(hits) + 1, citation_label=seed_labels.get(name)))
+                qname = d["qualified_name"]
+                if qname not in expanded:
+                    expanded.add(qname)
+                    _expand_symbol(qname, conn, blob_to_path, hits, exclude)
             try:
                 callers_out = codesymbols.callers(name, product_commit, repo=repo)
             except Exception:
@@ -204,7 +291,13 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 if exclude and pathrules.any_glob_match(path, exclude) is not None:
                     continue
                 hits.append(_code_hit_from_caller(row, len(hits) + 1))
-        return hits[:k] if (text and not seeds) else hits
+        for occ in (bare_occurrences or []):
+            if exclude and occ.get("path") and pathrules.any_glob_match(occ["path"], exclude) is not None:
+                continue
+            h = _code_hit_from_bare_occurrence(occ, len(hits) + 1)
+            if h is not None:
+                hits.append(h)
+        return hits[:k] if (text and not seeds and not bare_occurrences) else hits
 
     # --- exact -----------------------------------------------------------------------------------------------
 

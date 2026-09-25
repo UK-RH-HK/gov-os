@@ -1,0 +1,15 @@
+status: OK
+G item count: 9
+baseline verify_packet problems (expect []): []
+
+hand-moved G item into A -- verify_packet problems (expect non-empty):
+ - section A does not equal the freshly recomputed resolver output: expected 0 item(s), packet has 1; expected=[] actual=[('20842723634da6a722ae914a', 'EVIDENCE', 'UNKNOWN', '7408b41dd1037def5ae1591e13b9536f7878e94c', 'src/x.rs', None, 1, 17, 'cf312db0e5c6024df9d001dc37870a3e49fed9c051dc481adc209a9d498d90eb')]
+ - A/bfcbd21d12ed808685e582df: delivery 'RETRIEVED' != MANDATORY
+FAILS as required: True
+
+hand-moved RETRIEVED G item into D.1 -- verify_packet problems (expect non-empty):
+ - D.1/bfcbd21d12ed808685e582df: lifecycle 'UNKNOWN' != ACTIVE
+ - D.1/bfcbd21d12ed808685e582df: class 'EVIDENCE' is not D.1-admissible
+FAILS as required: True
+
+ALL INVARIANT CHECKS PASSED
