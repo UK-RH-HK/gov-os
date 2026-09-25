@@ -257,3 +257,35 @@ suite passes: **240 tests**. The fix, plus B5's five open issues, goes to I1. Th
 state-file aliases in code, which break the letter of OC-BR-02.
 
 **Dispatched B6** (route and compile, BR-AR-0008, sonnet), based on `e49b8a4`.
+
+## BR-L-0011: B6 (route and compile) lands; the orchestrator finds mandatory inputs demoted to "supplementary" and rules on it (2026-09-25)
+
+**BR-AR-0008 returned COMPLETED** on `claude-sonnet-5` (377 turns), and its `integrate-check` was PERMITTED. Its code
+enforces the hard invariant as B6 was briefed:
+
+* the only path into A is an isinstance-checked `MandatoryItem`;
+* the validator re-derives A;
+* ordering is by stratum;
+* the directions and hypotheses land in D.2 and D.3 with their banners.
+
+It merged at `a935c76`, and the integrated tree passes **274** tests.
+
+**What the orchestrator found by compiling the real demonstration task itself.** Ten mandatory inputs were placed
+in **section H, "supplementary retrieved context"**, among them **Contract v3**, the frozen gate contract and the
+owner's own launcher. The builder had reported this as "correctly excluded". The cause lies in the design, not in
+the builder:
+
+* `packet.py:178` admits a mandatory item to A only when its lifecycle is `ACTIVE`;
+* files without a machine-readable status map to `UNKNOWN`;
+* the registry may never raise a lifecycle.
+
+Together these mean a contract without a status line can never be delivered as a mandatory input. That is exactly
+the substitution the owner forbade.
+
+**BR-ARCH-RULING-1** resolves the conflict in favour of the owner text (launcher; OD-P2-10 §6; W10). Section A
+membership is decided by the resolver and the class, **never by lifecycle**. Lifecycle stays visible, is flagged in
+J, and still gates D.1 and ordering. Nothing is raised to ACTIVE. It is recorded as an **orchestrator ruling, not an
+owner decision**, so the verifier may challenge it.
+
+A **fresh** builder implements it (B6R, BR-AR-0013). Its tests must include a validator negative control and the
+real-view section map. I1 waits for B6R.

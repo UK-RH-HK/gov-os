@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T11:47:59Z'
-state_hash: 43c14a52e1492e06607fae9531a0c463a28d957549a65b13f8bd7d8f50762192
-lifecycle_state: BR_BUILD_PG2
+updated_at: '2026-09-25T12:54:15Z'
+state_hash: 79eeb50588f5fa869185147b1d64540a468aa617aa7e5361429c61fe7ab6466f
+lifecycle_state: BR_BUILD_PG2_REPAIR
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -478,10 +478,25 @@ agent_runs:
   branch: bridge/b6-0008
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0008
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-a5c7e30784b318534.jsonl)
+  model_observed: claude-sonnet-5 (all 377 assistant turns, transcript agent-a5c7e30784b318534.jsonl)
   agent_name: br-builder-b6-0008
   dispatched_at: '2026-09-25T12:20Z'
-  status: RUNNING
+  duration_ms: 3724856
+  status: COMPLETED_INTEGRATED
+  final_commit: 92deb0ca93bdb512d65bfe97c7977ab3d5420e90
+  merged_at: a935c76
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - tests/compile 34 passed; integrated tree 274 passed (--import-mode=importlib)
+  - 'DEFECT FOUND BY THE ORCHESTRATOR on the real demonstration task: 10 mandatory items (Contract v3, frozen gate contract,
+    owner launcher, Review-8 return, AR96 checkpoint, context pack, two design records, Phase-2 ledger, Phase-2 state)
+    placed in section H with notice MANDATORY_ITEM_NOT_IN_A, because packet.py:178 admits a mandatory item to A only when
+    lifecycle == ACTIVE and those files carry no machine-readable status -- ruled on in BR-ARCH-RULING-1, repaired by BR-AR-0013'
+  open_issues_routed_to_I1:
+  - real B2/B3/B4 route adapters into RouteHit (by design)
+  - section C empty until the authority_edge layer is built on the real view
+  - bounded-builder budget split lacks an independent citation (documented scale-down)
+  - D.1 references A by id rather than duplicating content
   store: $HOME/.cache/gov-bridge/store-BR-AR-0008
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/route/**
@@ -490,13 +505,28 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/compile/**
   - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.*
+- run_id: BR-AR-0013
+  role: bounded repair B6R (mandatory inputs always in section A; BR-ARCH-RULING-1)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0013-b6r-mandatory-in-a.md
+  branch: bridge/b6r-0013
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0013
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-repair-b6r-0013
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0013
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/**
+  - release/orchestration/phase-2-context-bridge/tests/compile/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.*
 running_work:
-- run_id: BR-AR-0008
-  liveness_check: subagent transcript mtime + commits on bridge/b6-0008; never inferred from elapsed time
+- run_id: BR-AR-0013
+  liveness_check: subagent transcript mtime + commits on bridge/b6r-0013; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
-    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012}
+    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012, B6R: BR-AR-0013}
   amendments:
   - id: BR-DAG-AMEND-1
     by: orchestrator (deterministic isolation of parallel work; no design change)
@@ -560,6 +590,14 @@ handoffs:
   path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0003-b1-core.md
   to: BR-AR-0003
 unresolved_questions: []
+rulings:
+- id: BR-ARCH-RULING-1
+  path: release/orchestration/phase-2-context-bridge/GATES/BR-ARCH-RULING-1-MANDATORY-INPUTS-ALWAYS-IN-A.md
+  sha256: 7c2dd1980987b9afb5a5bde7e90002c92917825fa908588c51a2d4f3839e12e1
+  kind: orchestrator ruling (NOT an owner decision); resolves an architecture-internal rule against owner text
+  rule: section A membership is decided by the resolver plus class admissibility, never by lifecycle; non-ACTIVE
+    lifecycles stay labelled and are listed in J; lifecycle still gates D.1 and ordering; nothing is raised to ACTIVE
+  authority: launcher BR-0001 hard invariant; OD-P2-10 section 6; ARCHITECTURE.md section 5.3 item 6 (W10)
 observations:
 - id: OBS-BR-01
   text: 'the orchestrator''s auto-memory claims OD-P2-08 superseded OA-P2-06''s hard stops and AR75 framing entirely; no
@@ -575,7 +613,7 @@ evidence_status:
     6,567 files / 6,489 included / 75.4 MB; provisional model BAAI/bge-small-en-v1.5 (MIT, 384-d, ONNX Runtime 1.30.0
     CPU, bitwise-deterministic in spike); product memory engine NOT used (running it would mutate the adoption-floor
     store F3 reads)'
-  builder_evidence: 'integrated tree after B1-B5: 240 tests pass together with --import-mode=importlib (plain collection
+  builder_evidence: 'integrated tree after B1-B6: 274 tests pass together with --import-mode=importlib (plain collection
     blocked by one basename collision, routed to I1); run by the orchestrator'
   review_8_demonstration: NOT_RUN
 immutable_evidence:
@@ -592,5 +630,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0008 (B6); then verify (integrate-check, model, tests incl. the named invariant
-  tests, a packet compile twice), merge, then dispatch I1 (BR-AR-0009, sonnet) with every routed open issue and BR-DAG-AMEND-2
+next_deterministic_action: await BR-AR-0013 (B6R); verify (integrate-check, model, tests, the real-view section map with
+  Contract v3 / frozen gate contract / launcher in A, the validator negative control), merge; append B6's routed issues
+  and the ruling to BR-HO-0009; dispatch I1 (BR-AR-0009, sonnet)
