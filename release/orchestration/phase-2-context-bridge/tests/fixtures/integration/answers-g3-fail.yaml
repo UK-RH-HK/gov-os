@@ -1,0 +1,30 @@
+# Same as answers-passing.yaml except T-CHAIN-1's answer_text asserts a decision has been made for a direction
+# ("has been authorised ... must be deleted") -- G3's mechanical phrase scan fails on this (DEMONSTRATION_DESIGN.md
+# section 4 G3: "the F1 direction is presented as a decision").
+run_id: T-RUN-1
+packets_used: [main]
+answers:
+  - query_id: T-CHAIN-1
+    status: ANSWERED
+    answer_text: The direction has been authorised and must be deleted immediately.
+    citations: []
+    stages:
+      - {stage: s1, claim: the decision, citations: [CX-0010A], is_enforcement_point: true}
+  - query_id: T-SIDE-BY-SIDE
+    status: ANSWERED
+    answer_text: compared
+    shared_points: []
+    differing_points: []
+    classification: NOT_DETERMINED_BY_BRIDGE
+  - query_id: T-BOTH-WAYS
+    status: ANSWERED
+    answer_text: both ways
+    evidence_for:
+      - {claim: purpose, citations: [CX-0010A]}
+    evidence_against:
+      - {claim: consumer, citations: [CX-0010B]}
+    disposition: NONE_STATED
+  - {query_id: T-QC1-S1, status: ANSWERED, answer_text: answer s1, citations: [CX-0010A]}
+  - {query_id: T-QC1-S2, status: ANSWERED, answer_text: answer s2, citations: [CX-0010A]}
+  - {query_id: T-QC1-S3, status: ANSWERED, answer_text: answer s3, citations: [CX-0010A]}
+  - {query_id: T-CTRL-1, status: ANSWERED, answer_text: control answer, citations: [CX-0010A]}

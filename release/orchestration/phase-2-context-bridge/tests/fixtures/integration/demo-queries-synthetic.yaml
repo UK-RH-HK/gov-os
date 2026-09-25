@@ -1,0 +1,17 @@
+schema: govbridge-demonstration-queries/1
+note: >-
+  A GENERIC, synthetic query-set fixture for tests/integration/test_demo_grade.py (I1/BR-AR-0009). Every id is
+  T-* (never Review-8/Phase-2 content -- OC-BR-02); it exercises the SAME generic grading mechanism
+  govbridge.demo.grade implements for the real demonstration-queries.yaml, at a scale small enough to hand-build
+  and verify in a unit test.
+case: synthetic-fixture
+chain_stages: [s1]
+queries:
+- {id: T-CHAIN-1, kind: chain}
+- {id: T-SIDE-BY-SIDE, kind: side_by_side}
+- {id: T-BOTH-WAYS, kind: both_ways}
+- {id: T-QC1-S1, kind: query_class, subject: S1, class: QC1}
+- {id: T-QC1-S2, kind: query_class, subject: S2, class: QC1}
+- {id: T-QC1-S3, kind: query_class, subject: S3, class: QC1}
+controls:
+- {id: T-CTRL-1, kind: control}

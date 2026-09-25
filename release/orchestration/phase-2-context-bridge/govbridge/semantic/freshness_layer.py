@@ -18,7 +18,7 @@ from typing import Optional
 from govbridge import GOV_BRIDGE_DOMAIN
 from govbridge.core import gitobj, manifest as manifestmod, store, telemetry
 from govbridge.core.freshness import register_layer_builder
-from govbridge.core.manifest import LayerDigest, register_layer
+from govbridge.core.manifest import LayerDigest, register_layer, register_pins
 from govbridge.core.view import ResolvedView
 from govbridge.core.yamlutil import canonical_json, sha256_text
 from govbridge.semantic import modelpin, profile as profilemod, vectors
@@ -195,5 +195,22 @@ def vector_layer_digest(conn: sqlite3.Connection) -> LayerDigest:
     return LayerDigest(rows=rows, digest=digest, extra=extra)
 
 
+def semantic_pins(conn: sqlite3.Connection) -> dict:
+    """``pins.semantic`` (schemas/build-manifest.yaml: "semantic: SEMANTIC_ROUTE.md section 4 block"), via the
+    generic ``govbridge.core.manifest.register_pins`` hook (routed issue B4/BR-AR-0006 OI-2, closed by
+    I1/BR-AR-0009: "add a per-layer pins hook in core, and conform to the schema"). Reads the SAME block the
+    layer builder already computed and cached in ``store_meta`` -- no recomputation, no second model call -- so
+    this is additive: ``layers.vector.extra.semantic_block`` (B4's own original placement) is left exactly as is
+    for anything already reading it (tests/semantic/test_freshness_layer.py), and the schema-conformant location
+    is now populated alongside it."""
+    block_json = _get_meta(conn, _META_BLOCK)
+    if not block_json:
+        return {"status": STATUS_UNAVAILABLE}
+    block = json.loads(block_json)
+    block["status"] = _get_meta(conn, _META_STATUS) or STATUS_UNAVAILABLE
+    return block
+
+
 register_layer_builder("semantic", semantic_layer_builder)
 register_layer("vector", vector_layer_digest)
+register_pins("semantic", semantic_pins)

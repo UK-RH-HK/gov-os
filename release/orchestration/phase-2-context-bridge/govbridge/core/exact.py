@@ -163,14 +163,28 @@ def path_resolve(suffix: str, ref: Optional[str] = None, view_path: Optional[str
 
 def id_lookup(token: str, ref: Optional[str] = None, view_path: Optional[str] = None,
                repo: Optional[str] = None) -> dict:
-    """A bounded placeholder for id resolution: every literal mention of ``token``, found generically via Git.
-    Definition-site classification (which mention is THE definition) needs the id-grammar rules that node B5 owns;
-    until B5 lands, every hit is reported as a mention, none as a definition, and the result says so explicitly so
-    nothing downstream mistakes an unclassified mention for authority."""
+    """Every literal mention of ``token`` (found generically via Git), plus its definition site if one resolves
+    through the id grammar (B1 OI-2, closed by I1/BR-AR-0009: node B5's ``config/id-grammar.yaml`` interpreter,
+    reused here via ``govbridge.authority.lifecycle.find_definition`` -- a bounded, git-grep-based lookup, never a
+    whole-corpus scan). ``definition_sites`` is empty, with an explanatory note, when the token is not an
+    id-grammar-shaped record id (e.g. a bare code symbol) or the lookup is unavailable in this environment: a
+    mention is never mistaken for a definition either way."""
     r = grep(token, ref=ref, view_path=view_path, repo=repo)
-    r["definition_sites"] = []
     r["mention_sites"] = r.pop("hits")
-    r["note"] = "definition-site resolution requires config/id-grammar.yaml (node B5); not yet available"
+    definition_sites: list = []
+    try:
+        from govbridge.authority import lifecycle as lifecyclemod
+        found = lifecyclemod.find_definition(token, repo=repo, view_path=view_path)
+        if found is not None:
+            def_path, def_commit, line_start, line_end = found
+            definition_sites.append({
+                "path": def_path, "commit": def_commit, "line_start": line_start, "line_end": line_end,
+            })
+    except Exception:
+        pass  # id-grammar config/registry unavailable in this environment; mentions are still returned honestly
+    r["definition_sites"] = definition_sites
+    r["note"] = ("definition site resolved via config/id-grammar.yaml (govbridge.authority)" if definition_sites
+                 else "no definition site resolved via config/id-grammar.yaml for this token")
     return r
 
 

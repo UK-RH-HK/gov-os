@@ -1,0 +1,12 @@
+schema: govbridge-state-aliases/1
+# A small, closed table of the repository's own orchestrator-state files, each named by domain (ARCHITECTURE.md
+# section 4.1: "a YAML state file (ORCHESTRATOR_STATE.yaml, GATE-REGISTER.yaml, CHECKPOINTS/*.yaml)"). Every alias
+# resolves through the SAME canonical-view partition logic as any other path (govbridge.core.view); this table only
+# says WHICH file a short alias names -- it names no review, finding or phase-specific content, and no code branches
+# on any one of these names (OC-BR-02). Moved out of govbridge/authority/{resolver,lifecycle,classes}.py (routed
+# issue B5/BR-AR-0007, closed by I1/BR-AR-0009) so the alias table is data, not a code constant, and a fourth
+# domain's state can be added here without touching a near-frozen module.
+aliases:
+  bridge: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  phase-2: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+  phase-1: release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml

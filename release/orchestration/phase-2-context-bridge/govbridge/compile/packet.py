@@ -265,6 +265,31 @@ class Compiler:
         self.graph_depth = graph_depth
         self.notices: list = []
         self._seen: dict = {}  # section -> set(unit_id) -- prevents literal duplicate placement
+        self._code_conn_cache = None
+        self._code_conn_attempted = False
+
+    def code_conn(self):
+        """The shaped code-route connection (``govbridge.graph.code_bridge``) for the canonical PRODUCT ref
+        (ARCHITECTURE.md section 4/7.2: "the code route at the canonical product ref"), built once per compile
+        and reused for every seed -- routed issue B5/BR-AR-0007 ("wire [CALLS/READS_KEY/TESTS] against the real
+        B3 tables, so why/impact reach code"). Resolves the ref by ROLE (``role: product`` in
+        config/canonical-view.yaml), never by a hard-coded ref name (OC-BR-02). Returns None (honest MISSING,
+        never an error) if there is no product-role ref in this view, or the code route itself is unavailable."""
+        if self._code_conn_attempted:
+            return self._code_conn_cache
+        self._code_conn_attempted = True
+        try:
+            from govbridge.graph import code_bridge
+            product_commit = None
+            for r in self.resolved_view.config.refs:
+                if r.role == "product" and r.name in self.resolved_view.named:
+                    product_commit = self.resolved_view.named[r.name].commit
+                    break
+            if product_commit:
+                self._code_conn_cache = code_bridge.build_shaped_code_connection(product_commit, repo=self.repo)
+        except Exception:
+            self._code_conn_cache = None
+        return self._code_conn_cache
 
     # -- construction from a MandatoryItem (delivery MANDATORY, or PINNED when its class is non-ladder) ----------
 
@@ -431,7 +456,8 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     # --- B (why) and F (history), from seeds -- real B5 graph modules, git-backed, outage-proof.
     for seed in task_spec.get("seeds", []) or []:
         try:
-            why_result = whymod.why(seed, repo=repo, view_path=view_path, registry_path=c.registry_path)
+            why_result = whymod.why(seed, repo=repo, view_path=view_path, registry_path=c.registry_path,
+                                     code_conn=c.code_conn())
         except Exception:
             why_result = {"stages": {}}
         for stage, info in why_result.get("stages", {}).items():
@@ -634,24 +660,31 @@ def _attach_evidence_both_ways(c: Compiler, sections: dict, queries_log: dict, d
 # CLI
 # --------------------------------------------------------------------------------------------------------------
 
+def real_routes_for(task_spec: dict, registry_path: Optional[str] = None, repo: Optional[str] = None) -> RouteSet:
+    """The default RouteSet for a real compile: the real B2 (lexical)/B3 (code)/B4 (semantic) adapters
+    (``govbridge.route.real_routes``, node I1 -- B6's own open issue "the real B2/B3/B4 routes are not wired").
+    Imported lazily so ``govbridge.compile.packet`` itself still never imports ``.lexical``/``.semantic``/``.code``
+    at module load time (only when an actual compile asks for real routes)."""
+    from govbridge.route import real_routes as real_routesmod
+    return real_routesmod.build_real_routes(view_path=_abs_path(task_spec["view"]), repo=repo,
+                                             registry_path=registry_path)
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="govbridge.compile.packet")
     p.add_argument("task_spec")
     p.add_argument("--fake-routes", action="store_true",
-                    help="required in this branch: govbridge.lexical/.semantic/.code are not a B6 dependency "
-                         "(the real adapters are wired in I1), so lexical/semantic/code are always the all-empty "
-                         "RouteSet here. Graph routes (why/history/traverse) are real. The flag is explicit rather "
-                         "than implicit so a caller never mistakes an empty-route compile for a real-corpus one.")
+                    help="use the all-empty RouteSet (lexical/semantic/code return nothing; graph routes -- "
+                         "why/history/traverse -- are always real). The DEFAULT is the real B2/B3/B4 routes "
+                         "(govbridge.route.real_routes); this flag exists for tests and a corpus-less smoke check.")
     p.add_argument("--registry")
     p.add_argument("--budgets")
     p.add_argument("--json", action="store_true", help="print the manifest instead of the rendered packet")
     args = p.parse_args(argv)
 
-    if not args.fake_routes:
-        print("govbridge.compile.packet: --fake-routes is required in this branch (real B2/B3/B4 routes arrive in "
-              "I1); compiling with the all-empty RouteSet anyway.", file=sys.stderr)
     task_spec = load_yaml_file(args.task_spec)
-    result = compile_packet(task_spec, routes=FAKE_ROUTES, registry_path=args.registry, budgets_path=args.budgets)
+    routes = FAKE_ROUTES if args.fake_routes else real_routes_for(task_spec, registry_path=args.registry)
+    result = compile_packet(task_spec, routes=routes, registry_path=args.registry, budgets_path=args.budgets)
     if args.json:
         print(json.dumps(result["manifest"], indent=1, sort_keys=True))
     else:

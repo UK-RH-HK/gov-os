@@ -1,0 +1,13 @@
+{
+ "blobs_processed": 2,
+ "chunks_processed": 21,
+ "layer": "core",
+ "llm_invocations": 0,
+ "manifest_sha256": "3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c",
+ "occurrences_processed": 1,
+ "refs_changed": [
+  "records"
+ ],
+ "trigger": "INCREMENTAL",
+ "wall_seconds": 231.607
+}

@@ -148,6 +148,10 @@ def embed_and_store(conn: sqlite3.Connection, chunk_rows, pin: "modelpin.ModelPi
             reused += len(g["chunk_ids"])
         else:
             need_embed.append((text_sha256, g["text"]))
+    # B4 OI-5 ("embed_and_store commits once, at the end"): commit the reuse pass now, before any embedding call,
+    # so a kill during the (much longer) embedding loop below never loses rows this pass already resolved for
+    # free from a previous run's stored vectors.
+    conn.commit()
 
     for i in range(0, len(need_embed), batch_texts):
         batch = need_embed[i:i + batch_texts]
@@ -162,8 +166,14 @@ def embed_and_store(conn: sqlite3.Connection, chunk_rows, pin: "modelpin.ModelPi
             for cid in chunk_ids[1:]:
                 put_vector(conn, cid, text_sha256, pin_id, dim, vb)
                 reused += 1
-
-    conn.commit()
+        # B4 OI-5: commit PER BATCH, not once at the end. A killed rebuild resumes: every already-committed batch's
+        # text_sha256 group is found by `reuse_vector` above on the next call (whether that next call is a fresh
+        # `embed_and_store` over the SAME uncompleted chunk_rows, or the same store simply reopened), so it is
+        # never re-embedded -- only the remaining, not-yet-committed batches call the model again. This is proven
+        # equal to an uninterrupted build by digest (tests/semantic/test_vectors_resumability.py::
+        # test_resumed_build_equals_uninterrupted_build, a NEW test file -- this function's existing tests are
+        # unmodified).
+        conn.commit()
     wall = time.monotonic() - t0
     return {
         "chunks_seen": seen, "chunks_embedded": embedded, "chunks_reused": reused,

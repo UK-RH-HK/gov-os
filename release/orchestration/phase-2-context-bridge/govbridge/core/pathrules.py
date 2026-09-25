@@ -4,16 +4,37 @@
 from __future__ import annotations
 
 import fnmatch
+import re
 from typing import Iterable
+
+_BRACE_RE = re.compile(r"^(?P<pre>[^{}]*)\{(?P<alts>[^{}]+)\}(?P<post>[^{}]*)$")
+
+
+def expand_braces(pattern: str) -> list[str]:
+    """Expand one shell-style ``{a,b,c}`` alternation group in ``pattern`` into a list of plain glob patterns, one
+    per alternative. A pattern with no ``{...}`` group is returned unchanged as a single-element list. Handles at
+    most one group (nested/multiple groups are not a seeded need anywhere in this domain's config); a pattern with
+    more than one group is returned unchanged (its first group is left literal) rather than mis-expanded. This is
+    the central fix for the gap B5 (BR-AR-0007) found and worked around locally in
+    ``govbridge.authority.registry.expand_braces``: any glob consumer -- corpus rules, canonical-view partitions,
+    the authority registry -- gets brace alternation through this one function now."""
+    m = _BRACE_RE.match(pattern)
+    if not m:
+        return [pattern]
+    pre, alts, post = m.group("pre"), m.group("alts"), m.group("post")
+    return [f"{pre}{alt}{post}" for alt in alts.split(",")]
 
 
 def glob_match(path: str, pattern: str) -> bool:
     """True if ``path`` matches ``pattern``. A leading ``**/`` also matches at the top level (so ``**/target/**``
-    matches ``target/foo`` as well as ``a/target/foo``), the same convention the architect's spike used."""
-    if fnmatch.fnmatchcase(path, pattern):
-        return True
-    if pattern.startswith("**/") and fnmatch.fnmatchcase(path, pattern[3:]):
-        return True
+    matches ``target/foo`` as well as ``a/target/foo``), the same convention the architect's spike used. ``pattern``
+    may contain one shell-style ``{a,b,c}`` alternation group (expanded via ``expand_braces``); any match among the
+    alternatives matches."""
+    for alt in expand_braces(pattern):
+        if fnmatch.fnmatchcase(path, alt):
+            return True
+        if alt.startswith("**/") and fnmatch.fnmatchcase(path, alt[3:]):
+            return True
     return False
 
 

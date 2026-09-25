@@ -1,0 +1,15 @@
+=== 1) passing fixture -> expect DEMONSTRATION_PASS, exit 0 ===
+exit_code: 0
+verdict: DEMONSTRATION_PASS
+
+=== 2) UPSTREAM_ONLY fixture -> expect DEMONSTRATION_FAIL, G4_chains FAIL ===
+exit_code: 1
+verdict: DEMONSTRATION_FAIL G4: FAIL
+
+=== 3) G3 hard fail fixture -> expect DEMONSTRATION_FAIL, G3_authority_classes FAIL ===
+exit_code: 1
+verdict: DEMONSTRATION_FAIL G3: FAIL
+
+=== 4) G7 undeclared read -> expect DEMONSTRATION_FAIL, G7_no_dumping FAIL ===
+exit_code: 1
+verdict: DEMONSTRATION_FAIL G7: FAIL
