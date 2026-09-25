@@ -6585,3 +6585,8 @@
  "union_included_blobs": 6941,
  "view_id": "p2x-fail-1-bridge"
 }
+
+real	0m11.859s
+user	0m8.301s
+sys	0m1.132s
+exit=0
