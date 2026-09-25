@@ -1,0 +1,45 @@
+schema: govbridge-canonical-view/1
+description: >
+  The canonical multi-ref model (ARCHITECTURE.md section 1.2): what "the canonical repository" means for this
+  lifecycle. In ordinary V8.3 operation (a single adopted repository) this collapses to {primary: HEAD} with one
+  catch-all partition; nothing in govbridge.core assumes more than one ref.
+view_id: p2x-fail-1-bridge
+
+refs:
+  - name: records
+    ref: refs/heads/bridge/p2-context-retrieval
+    follow: tip
+    role: primary
+    layers: [exact, lexical, records, graph, semantic, code]
+
+  - name: product
+    ref: refs/heads/phase2/approved-delta
+    follow: pinned
+    pinned_commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+    role: product
+    layers: [exact, lexical, records, graph, semantic, code]
+
+  - name: evidence
+    ref: refs/heads/phase2/review-8
+    follow: pinned
+    pinned_commit: 58219d5628683d6f462aa67bf25dbc2641933bce
+    role: evidence
+    layers: [exact, lexical, records, graph, semantic, code]
+
+  - name: history
+    ref_glob: refs/heads/phase2/*
+    follow: tip
+    role: history
+    layers: [exact, lexical, records, graph]
+
+partitions:
+  - name: product
+    paths_from: "release/orchestration/phase-2/tools/product_identity.py#PRODUCT_CODE"
+    extra: ["probes/**", "telemetry/**"]
+    owner: product
+    fallback: [evidence, history]
+
+  - name: records
+    paths: ["**"]
+    owner: records
+    fallback: [product, evidence, history]

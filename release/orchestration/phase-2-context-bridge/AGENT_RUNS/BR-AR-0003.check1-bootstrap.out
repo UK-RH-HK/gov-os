@@ -1,0 +1,16 @@
+[bootstrap] venv at /home/usain/.cache/gov-bridge/venv already matches requirements.lock (896aaed6e3f594f9469d3b403dc38a1b25c40803561f5961930dfd5e3e7bf8ef); skipping install
+[bootstrap] model artefact present and verified: onnx/model.onnx
+[bootstrap] model artefact present and verified: tokenizer.json
+[bootstrap] model artefact present and verified: config.json
+[bootstrap] model artefact present and verified: tokenizer_config.json
+[bootstrap] model artefact present and verified: special_tokens_map.json
+[bootstrap] model artefact present and verified: 1_Pooling/config.json
+python 3.12.3, onnxruntime 1.30.0, tokenizers 0.23.2, tree-sitter 0.25.2 and the pin id ec48d829ccde4f05edff02aa3220cbee0864579a078f25783a6612f3bee410b7
+[bootstrap] venv at /home/usain/.cache/gov-bridge/venv already matches requirements.lock (896aaed6e3f594f9469d3b403dc38a1b25c40803561f5961930dfd5e3e7bf8ef); skipping install
+[bootstrap] model artefact present and verified: onnx/model.onnx
+[bootstrap] model artefact present and verified: tokenizer.json
+[bootstrap] model artefact present and verified: config.json
+[bootstrap] model artefact present and verified: tokenizer_config.json
+[bootstrap] model artefact present and verified: special_tokens_map.json
+[bootstrap] model artefact present and verified: 1_Pooling/config.json
+python 3.12.3, onnxruntime 1.30.0, tokenizers 0.23.2, tree-sitter 0.25.2 and the pin id ec48d829ccde4f05edff02aa3220cbee0864579a078f25783a6612f3bee410b7

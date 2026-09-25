@@ -1,0 +1,17 @@
+{
+ "blob": "eaf1532ec9db8f5c2c8680bf8204ef5b081bc671",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 146,
+ "line_start": 146,
+ "path": "runtime/src/init.rs",
+ "ref": "3c880d8",
+ "size": 24051,
+ "text": "        rules.push(json!({\"pattern\": format!(\"{d}/**\"), \"class\": if is_test { \"test\" } else { \"source\" }, \"owner_role\": if is_test { \"independent-test-designer\" } else { \"backend-engineer\" }, \"semantic_index\": true, \"lexical_index\": true, \"graph_index\": true, \"code_index\": true, \"namespace\": \"product\"}));\n",
+ "text_sha256": "aaf39d7667c9efe066fa208833145b421235deadc8bb53767d133b4d87241d2c",
+ "version_status": "CANONICAL"
+}

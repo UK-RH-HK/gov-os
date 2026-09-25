@@ -1,0 +1,22 @@
+{
+ "blobs_processed": 6683,
+ "chunks_processed": 135296,
+ "layer": "core",
+ "llm_invocations": 0,
+ "manifest_sha256": "d83407ef6522c65ae6112f15be89f3abaecb2c497b4e794987031913e518eafc",
+ "occurrences_processed": 503320,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 17.38
+}
+{
+ "blobs_processed": 0,
+ "chunks_processed": 0,
+ "layer": "core",
+ "llm_invocations": 0,
+ "manifest_sha256": "d83407ef6522c65ae6112f15be89f3abaecb2c497b4e794987031913e518eafc",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "NOOP",
+ "wall_seconds": 0.015
+}

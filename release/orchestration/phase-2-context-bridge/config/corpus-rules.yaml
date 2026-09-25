@@ -1,0 +1,111 @@
+schema: govbridge-corpus-rules/1
+description: >
+  Whole-repository corpus inclusion/exclusion rules (ARCHITECTURE.md section 1.1, OC-BR-02). Evaluation is monotone
+  and in file order: the first matching rule decides a file's outcome; a file matching none of these falls to the
+  trailing catch-all (INCLUDED). Repository path names are subjects only, never interpolated into a pattern
+  (govbridge.core.pathrules). Nothing here names Review 8, a phase or any particular file -- every path below is a
+  class of file (secrets, build output, the bridge's own derived output, machine logs), never one file.
+rules:
+  - id: X-SEC-PATH
+    effect: EXCLUDE
+    match:
+      globs:
+        - "**/.env"
+        - "**/.env.*"
+        - "**/*.pem"
+        - "**/*.key"
+        - "**/id_rsa*"
+        - "**/secrets/**"
+        - "**/*secret*.yaml"
+        - "**/*secret*.yml"
+        - "**/*secret*.json"
+        - "**/*credentials*"
+        - "**/*.env"
+        - "**/.secrets/**"
+        - "**/deepseek*.env"
+    source_cite: "framework/policies/SECURITY_POLICY.yaml:6-15 (secret_path_patterns); .gitignore:11-13"
+
+  - id: X-BUILD
+    effect: EXCLUDE
+    match:
+      globs:
+        - "target/**"
+        - "**/target/**"
+        - ".claude/worktrees/**"
+        - "**/__pycache__/**"
+        - "**/*.pyc"
+        - "**/.pytest_cache/**"
+        - "**/.governance-runtime/**"
+        - "build/**"
+        - "dist/**"
+        - "**/*.egg-info/**"
+        - "release/evidence/tmp/**"
+    source_cite: ".gitignore:1-9,15; framework/policies/MEMORY_POLICY.yaml:3 (runtime_dir)"
+
+  - id: X-SELF
+    effect: EXCLUDE
+    match:
+      globs:
+        - "release/orchestration/phase-2-context-bridge/INDEX/**"
+        - "release/orchestration/phase-2-context-bridge/COVERAGE/**"
+        - "release/orchestration/phase-2-context-bridge/DEMONSTRATION/**"
+        - "release/orchestration/phase-2-context-bridge/telemetry/**"
+        - "release/orchestration/phase-2-context-bridge/ARCHITECTURE/spike-outputs/**"
+        - "release/orchestration/phase-2-context-bridge/ARCHITECTURE/spike-scripts/**"
+        - "release/orchestration/phase-2-context-bridge/tests/fixtures/**"
+    source_cite: >
+      ARCHITECTURE.md section 1.1 X-SELF: a memory system must not index its own packets, manifests and answers, or
+      packets start retrieving old packets (a feedback loop). The bridge's design and orchestration records
+      (ARCHITECTURE/, HANDOFFS/, AGENT_RUNS/, ORCHESTRATOR_STATE.yaml, PHASE_LEDGER.md, GATES/, tools/, govbridge/,
+      config/, bootstrap/, tests/core, tests/lexical, ... -- everything except the derived-output and fixture
+      directories above) stay indexed.
+
+  - id: M-LARGE
+    effect: METADATA_ONLY
+    match:
+      size_gt: 1048576
+    source_cite: "OD-P2-10 section 11 (cost rule); ARCHITECTURE.md section 1.1 (the 6 blobs caught total 26.3 MB, SO-04)"
+
+  - id: X-BINARY
+    effect: EXCLUDE
+    match:
+      binary: true
+    source_cite: "generic text test, the same shape as the product's util::is_text_file"
+
+  - id: X-SEC-CONTENT
+    effect: EXCLUDE
+    match:
+      content_regex:
+        aws-access-key: "AKIA[0-9A-Z]{16}"
+        aws-secret-key: "(?i)aws_secret_access_key\\s*[=:]\\s*['\"]?[A-Za-z0-9/+=]{40}"
+        private-key-block: "-----BEGIN (RSA |EC |OPENSSH |DSA |)PRIVATE KEY-----"
+        github-token: "gh[pousr]_[A-Za-z0-9]{36,}"
+        generic-api-key: "(?i)(api[_-]?key|secret[_-]?key|access[_-]?token|auth[_-]?token)\\s*[=:]\\s*['\"]?[A-Za-z0-9_\\-]{20,}"
+        password-assignment: "(?i)password\\s*[=:]\\s*['\"][^'\"\\s]{8,}['\"]"
+        slack-token: "xox[baprs]-[A-Za-z0-9-]{10,}"
+        stripe-like-key: "\\bsk_(live|test)_[A-Za-z0-9_]{16,}"
+        jwt: "eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]{10,}"
+    source_cite: "framework/policies/SECURITY_POLICY.yaml:17-26; :27 (on_secret_outside_secret_class: block_index_and_report)"
+
+  - id: M-ARCHIVE
+    effect: NO_DEFAULT_RETRIEVAL
+    match:
+      globs:
+        - "archive/**"
+    source_cite: "framework/policies/ARCHIVE_POLICY.yaml:3,8 (archive_root, default_retrieval_for_archive: false); framework/policies/MEMORY_POLICY.yaml (retrieval.default_retrieval for archive-class units)"
+
+  - id: L-MACHINE-OUTPUT
+    effect: LEXICAL_ONLY
+    match:
+      kinds: [out, log, shimlog, stderr, diff, patch, tsv, jsonl, summary]
+      kinds_size_gt:
+        json: 65536
+    source_cite: >
+      cost rule: paraphrase recall over machine logs has little value, while the exact tokens in them (test names,
+      error codes) are fully served by the lexical route; release/orchestration/phase-2-context-bridge/config/embed-profile.yaml
+      (node B4) carries the matching embed_kinds/lexical_only_kinds split.
+
+  - id: INCLUDED
+    effect: INCLUDE
+    match: {}
+    source_cite: "everything not caught by a rule above"
