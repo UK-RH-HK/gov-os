@@ -1,0 +1,84 @@
+run_id: BR-AR-0015
+commit: c99ffac02ce421d632a5e886efcd97dd35e7d545
+commands:
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests -q"
+    # acceptance check 9 (plain collection): everything passes, including the six named ARCHITECTURE.md section
+    # 5.3 invariant tests, the import-boundary test and the class-table test, all unmodified -- 329 passed
+    # (328 pre-reopening + 1 new: the tiny-G-budget/large-fan-out fixture test, check 6 below).
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check1-pytest.out
+    output_sha256: 7647385a0f0712ab7ac0678565b471fd27ca07e44596d6fcb4ab852c7421fa74
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests/compile/test_compile_code_route_seeds.py -v"
+    # the original fixture test (BR-AR-0015 first pass, 3 tests): G contains the enclosing symbol (labelled), a
+    # caller, a TESTS edge target and the cited evidence probe; the same code hit via lexical retrieval lands in
+    # G not H, a non-code hit stays in H; hand-moving a G item into A/D.1 fails packet verify. Re-verified against
+    # the reopening's tiering (the enclosing symbol/caller/TESTS/probe are now T1/T2 respectively).
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check2-fixture-test.out
+    output_sha256: a3d72afa14b0fc039fb8a9abcf1e973d65514e6ee3d7b3843359a1583a365a11
+  - cmd: |
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile \
+        ARCHITECTURE/demonstration-task.yaml --out AGENT_RUNS/.scratch/demo-run-1
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile \
+        ARCHITECTURE/demonstration-task.yaml --out AGENT_RUNS/.scratch/demo-run-2
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge packet verify AGENT_RUNS/.scratch/demo-run-1
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge packet verify AGENT_RUNS/.scratch/demo-run-2
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge coverage --view config/canonical-view.yaml
+      # + inline scripts: sha256 of packet.md/manifest.json across both runs; section A's unit.id sequence vs
+      # DEMONSTRATION/run-0-predispatch-g-empty/packet/manifest.json on bridge/demo-0011 (fetched via `git show`,
+      # never an oracle/govbridge-sealed-* path); packet.md vs 1% of the three named refs' INCLUDED corpus bytes
+      # and vs the synthesis profile's 360 KB total; manifest.json vs 1 MB; G's post-budget item/drop summary;
+      # and govbridge.compile.codeseeds.cited_code_units run directly per seed (the SAME function the compiler
+      # itself calls) to print every citation the seed records make and cross-check it against G.
+    # acceptance check 7 (real view, the demonstration task, re-verified under the reopening): compiled TWICE with
+    # real routes against the read-only demonstration store -- byte-identical (packet.md AND manifest.json sha256
+    # match); packet verify PASSES on both (zero problems, after fixing the PINNED-non-ladder-in-H banner/budget
+    # bug this reopening's own re-verification surfaced); section A's 20-item sequence is byte-identical to
+    # run-0's; packet.md is 274,572 bytes (268 KB) -- well under 1% of the 116.4 MB three-named-ref corpus
+    # (1,163,649 bytes) AND under the synthesis profile's 360 KB total (was 889,764 bytes, over both, before this
+    # reopening's fix); manifest.json is 417,036 bytes (407 KB) -- under the 1 MB target AND the 5 MB commit limit
+    # (was 6,149,721 bytes / 5.9 MB before). All 55 computed citations (12 cited lines + 43 resolved symbols, from
+    # the bare P2-AR-0097 seed -- the #F1/#F2/#F3 local headings are themselves unreachable in that specific
+    # committed file, see the report's OI-2) land in G as T1 (PINNED), including the exact anchors this reopening
+    # named: runtime/src/tools.rs:1817, runtime/src/policy_precedence.rs:911/:940/:786, runtime/src/init.rs:146.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out
+    output_sha256: 10bb52286198e1e7fe276fafc415ecc65c932c40f5020a276cdc9103306521b8
+  - cmd: |
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile \
+        tests/fixtures/compile/task-spec-d0006-control.yaml --out AGENT_RUNS/.scratch/d0006-control
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge packet verify AGENT_RUNS/.scratch/d0006-control
+      # + the same citation cross-check script (govbridge.compile.codeseeds.cited_code_units per seed).
+    # acceptance check 8 (real view, the control -- OC-BR-02, re-verified): D-0006 (the capability-plugin
+    # decision, deliberately unrelated to Review 8/Phase 2) -- packet.md 17,042 bytes, manifest.json 20,128 bytes
+    # (both trivially within every size bound); G is non-empty (3 items, class EVIDENCE, labelled) with
+    # occurrences at capabilities/python/govos_capabilities/embed_sentence_transformers.py; packet verify PASSES
+    # (zero problems). D-0006's own text cites its subsystem in prose with no path:line, so
+    # cited_code_units finds zero citations for it -- "0 citations checked, all present" is the correct, honest
+    # report for this seed; G's population here comes entirely from the query (T3), proving G's derivation is
+    # generic and not solely dependent on citation-scanning.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check4-d0006-control.out
+    output_sha256: 5fd801acbfc474684bebe132de59b98d4772eccc6360da5d2968ca08f0082741
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests/compile/test_compile_code_route_seeds.py::test_hand_moved_g_item_fails_packet_verify -v"
+    # + a standalone script re-running the same scenario outside pytest's captured-output mode, to show the
+    # actual verify_packet problem messages inline.
+    # acceptance check 5 (invariants, re-verified): hand-moving a G item into A fails packet verify (section A
+    # does not equal the freshly recomputed resolver output, AND delivery PINNED/RETRIEVED != MANDATORY);
+    # hand-moving a RETRIEVED G item into D.1 fails packet verify (lifecycle UNKNOWN != ACTIVE, AND class EVIDENCE
+    # is not D.1-admissible). The picked G item is now whichever sorts first under the new tier order (a T1/PINNED
+    # citation, in this run) -- the invariant holds regardless of tier/delivery.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check5-invariants.out
+    output_sha256: 94357a18cf3eb118b81126bc6ab3fc14041d6351088cbcb388c119e27eeef6c7
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests/compile/test_compile_code_route_seeds.py::test_tiny_g_budget_keeps_all_t1_anchors_and_drops_expansion_first -v"
+    # acceptance check 6 (NEW fixture: tiny G budget under a large fan-out graph): a seed record cites three
+    # anchors (path:line); each anchor has 8 callers (24 T2 candidates total, fan-out caps left generous so
+    # BUDGET dropping -- never fan-out capping -- is what this test exercises), under a 2 KB G cap. Proves: all
+    # three T1 anchors, WITH their enclosing definitions (6 items), are in G; expansion (T2) is dropped first
+    # (some/all of the 24 candidates are recorded as dropped, tier T2, never T1); rendered G bytes stay within
+    # cap + the fixed per-section header allowance (govbridge.compile.render._render_section_body, the exact
+    # function packet.md itself is built from).
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check6-tiny-budget-fanout.out
+    output_sha256: 2b7b61b44e3c356c60b0d1bdc9cf27c113f128c356ce4828dd83961cc055bab7

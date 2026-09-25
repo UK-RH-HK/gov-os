@@ -1,0 +1,28 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/usain/.cache/gov-bridge/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0015/release/orchestration/phase-2-context-bridge
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/compile/test_compile_code_route_seeds.py::test_hand_moved_g_item_fails_packet_verify PASSED [100%]
+
+============================== 1 passed in 0.57s ===============================
+exit=0
+
+=== standalone script (same scenario), showing the actual verify_packet problem messages ===
+status: OK
+G item count: 10
+baseline verify_packet problems (expect []): []
+
+hand-moved G item into A -- verify_packet problems (expect non-empty):
+ - section A does not equal the freshly recomputed resolver output: expected 0 item(s), packet has 1; expected=[] actual=[('CITED:probes/CX-PROBE-0001.md:1', 'EVIDENCE', 'UNKNOWN', '35542a9950e76ca0db690e21c0f05faf730fc898', 'probes/CX-PROBE-0001.md', None, 1, 1, 'dd459097b3c2dce01c4a55df613b13a4d6840878a9a2e4616083790d45d241e7')]
+ - A/a77c8e3fa0e453d420cb020b: delivery 'PINNED' != MANDATORY
+FAILS as required: True
+
+hand-moved RETRIEVED G item into D.1 -- verify_packet problems (expect non-empty):
+ - D.1/03d5a90c2caf50ec11df0974: lifecycle 'UNKNOWN' != ACTIVE
+ - D.1/03d5a90c2caf50ec11df0974: class 'EVIDENCE' is not D.1-admissible
+FAILS as required: True
+
+ALL INVARIANT CHECKS PASSED
