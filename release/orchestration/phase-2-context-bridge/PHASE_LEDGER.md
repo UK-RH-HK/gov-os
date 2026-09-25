@@ -182,3 +182,22 @@ Unclassified is 0 on all 98 refs. B1 documented this rather than tuning a rule t
 * B5 authority and graph: BR-AR-0007.
 
 Their mutation scopes are copied from the DAG into the state, where `integrate-check` enforces them.
+
+## BR-L-0008: B2 (lexical) and B3 (code) land; B2 exposes a cross-module hazard (2026-09-25)
+
+Both returned COMPLETED on `claude-sonnet-5`, B2 with 210 turns and B3 with 230. Both `integrate-check`s were
+PERMITTED, run by the orchestrator. The orchestrator re-ran the following itself, in separate stores:
+
+* **B3.** 108 tests pass. The caller of the kernel-partition function at `3c880d8` is exactly `cit/mod.rs:1623`,
+  labelled EXACT_PATH, with one target. `reads-key mutation` reaches `tools.rs`. The control on an unrelated
+  subsystem (`resolve_state_root`) has 30 call sites, none unlabelled.
+* **B2.** 83 tests pass. A from-clean build with the lexical layer takes 22 s, with 0 LLM calls. The query returns
+  the frozen product's occurrence as CANONICAL, the review commit's as SAME_AS_CANONICAL and older `phase2/*` tips as
+  HISTORICAL_VERSION, in 0.35 ms. This is the multi-ref model working.
+
+After merging, the integrated tree passes **123 tests together**.
+
+**The hazard B2 found.** The core manifest calls every registered layer's digest even where that layer's tables do
+not exist, and layers register only on import. B2 fixed its own digest. B4 and B5 were confirmed live and got a
+one-line advisory within their scopes. The central fix, and the CLI importing every layer, go to I1 under
+BR-DAG-AMEND-2, together with B3's unwired Python-AST index. B4 (semantic) and B5 (authority/graph) are still running.

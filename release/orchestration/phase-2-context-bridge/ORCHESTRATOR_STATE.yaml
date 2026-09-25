@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T10:22:03Z'
-state_hash: 3e16cd7479c007f8e9771cb6fdbe79dd0e9e5d77ad61993497bc5711fb405a70
+updated_at: '2026-09-25T10:49:15Z'
+state_hash: aaf70dcbbc28ad6b577cb2d381b483ac38d2c34c0d1c8cb2507268fc4779e421
 lifecycle_state: BR_BUILD_PG1
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -343,10 +343,24 @@ agent_runs:
   branch: bridge/b2-0004
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0004
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-aa11e9bbda10e31c1.jsonl)
+  model_observed: claude-sonnet-5 (all 210 assistant turns, transcript agent-aa11e9bbda10e31c1.jsonl)
   agent_name: br-builder-b2-0004
   dispatched_at: '2026-09-25T10:27Z'
-  status: RUNNING
+  duration_ms: 1593388
+  status: COMPLETED_INTEGRATED
+  final_commit: f64154bd40452e6f568465afd14f50706b747d51
+  merged_at: 49a56ff
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - tests/core + tests/lexical 83 passed in the B2 worktree
+  - from-clean build with the lexical layer in a separate store -- FULL, 22.0 s, llm_invocations 0
+  - query partition_floor_rules_against_kernel -- 3c880d8 cit/mod.rs CANONICAL, 58219d5 SAME_AS_CANONICAL, older
+    phase2 tips HISTORICAL_VERSION; latency 0.35 ms
+  open_issues_routed_to_I1:
+  - OI-1 layers register only on import, so a bare `freshness rebuild --layer lexical` raises KeyError -- I1's CLI must
+    import every layer package before dispatch
+  - OI-4 build_manifest calls every registered digest unconditionally -- central fix in core (I1, BR-DAG-AMEND-2);
+    B4/B5 advised live to self-ensure schema
   store: $HOME/.cache/gov-bridge/store-BR-AR-0004
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/lexical/**
@@ -358,10 +372,24 @@ agent_runs:
   branch: bridge/b3-0005
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0005
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-a32e9db373ab4fc8a.jsonl)
+  model_observed: claude-sonnet-5 (all 230 assistant turns, transcript agent-a32e9db373ab4fc8a.jsonl)
   agent_name: br-builder-b3-0005
   dispatched_at: '2026-09-25T10:27Z'
-  status: RUNNING
+  duration_ms: 1545721
+  status: COMPLETED_INTEGRATED
+  final_commit: cebeb5166e224147a34ec06c43362e60e17f7ea7
+  merged_at: d193477
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - tests/core + tests/code 108 passed in the B3 worktree
+  - callers partition_floor_rules_against_kernel @3c880d8 -- exactly runtime/src/cit/mod.rs:1623, EXACT_PATH, one target
+  - reads-key mutation @3c880d8 -- includes tools.rs
+  - control callers resolve_state_root -- 30 rows, 0 unlabelled
+  open_issues_routed_to_I1:
+  - the reused Python AST adapter is tested standalone but not wired into the commit-wide symbol index -- I1 wires it
+    or records why not
+  - HEURISTIC_REGEX_FALLBACK never fires on the real corpus (unit-tested only); module_path is a path heuristic --
+    bounded, disclosed labels
   store: $HOME/.cache/gov-bridge/store-BR-AR-0005
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/code/**
@@ -404,10 +432,6 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/authority/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.*
 running_work:
-- run_id: BR-AR-0004
-  liveness_check: subagent transcript mtime + commits on bridge/b2-0004; never inferred from elapsed time
-- run_id: BR-AR-0005
-  liveness_check: subagent transcript mtime + commits on bridge/b3-0005; never inferred from elapsed time
 - run_id: BR-AR-0006
   liveness_check: subagent transcript mtime + commits on bridge/b4-0006; never inferred from elapsed time
 - run_id: BR-AR-0007
@@ -485,7 +509,8 @@ evidence_status:
     6,567 files / 6,489 included / 75.4 MB; provisional model BAAI/bge-small-en-v1.5 (MIT, 384-d, ONNX Runtime 1.30.0
     CPU, bitwise-deterministic in spike); product memory engine NOT used (running it would mutate the adoption-floor
     store F3 reads)'
-  builder_evidence: NONE_YET
+  builder_evidence: 'integrated tree after B1+B2+B3: 123 tests pass together (core 68, lexical 15, code 40), run by the
+    orchestrator'
   review_8_demonstration: NOT_RUN
 immutable_evidence:
 - path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
