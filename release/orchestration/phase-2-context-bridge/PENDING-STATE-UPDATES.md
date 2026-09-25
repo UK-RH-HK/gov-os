@@ -23,3 +23,18 @@ reads this file, `bridge/d1-0010` and `bridge/demo-0011`.**
 ## Owner direction received
 * **OD-BR-03** (verifier challenge items), in `GATES/OWNER-DIRECTION-BR-0003-VERIFIER-CHALLENGE-ITEMS.md` on this
   branch.
+
+## DEMO returned; audited by the orchestrator
+* BR-AR-0011 run-1 returned ANSWERED, at `bridge/demo-0011` `a9fc27b`. The agent answered all 41 queries: 39
+  ANSWERED and 2 PARTIAL. The receipt check PASSES, re-run by the orchestrator. `integrate-check` BR-AR-0011:
+  PERMITTED.
+* Consumption: peak context 503,981 tokens over 210 turns. The packet plus the saved query outputs come to 1,338,001
+  bytes. Detail in `run-1/CONSUMPTION-AND-SECRECY.orchestrator.md`.
+* Secrecy: 0 accesses to the sealed directory or the oracle; 0 excluded-path reads; 0 overlaps of oracle substance.
+* **OBS-BR-07:** the packet lacks the public query set and the answers/receipt schemas.
+* **OBS-BR-08:** the query commands do not apply the task's `retrieval_exclusions` automatically. The agent's first
+  search returned one snippet of public `ARCHITECTURE/demonstration-queries.yaml` text.
+
+## GRADE dispatched
+* BR-AR-0012 was dispatched at about 01:00 BST on 2026-09-26: agent `br-grade-0012`, spawned `model: opus`, on
+  branch `bridge/grade-0012`, cut from `bridge/demo-0011` at `a9fc27b`.
