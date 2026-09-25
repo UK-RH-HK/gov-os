@@ -344,3 +344,34 @@ A full from-clean build of all 98 refs, including embeddings, takes about 38 min
 **The records ref follows the bridge tip,** so the demonstration needs a fixed view. This commit therefore opens a
 **freeze**: no commits to the bridge branch until grading returns. D1, DEMO and GRADE record their progress on their
 own branches, which the state names, so a resumed orchestrator can pick them up without this conversation.
+
+## BR-L-0014: D1 measures the whole repository, and finds that the code layer was never in the reproducibility proof (2026-09-25)
+
+The orchestrator ran D1 itself on `bridge/d1-0010`, at the frozen view `cf7efe7`.
+
+**Coverage holds across the whole repository.** For every one of the **98** view refs, the per-rule file counts sum
+exactly to `git ls-tree -r --full-tree`. Nothing is unclassified, and every exclusion names its rule. `X-SELF` excludes
+only the bridge's own generated outputs, one of which is `DEMONSTRATION/**`. That keeps the oracle out of every index
+once it is unsealed.
+
+**Cost, measured.** A from-clean build takes **2,302 s** wall and **9,253 CPU-seconds**, peaks at 530 MB RSS, occupies
+838 MB of local store, and makes **0 LLM calls**. Semantic embedding is 89% of the time (2,047 s); the authority and
+graph layer takes 230 s, core 17 s and lexical 5 s. The no-change check is a NOOP in **0.02 s**.
+
+**Two gaps D1 found.**
+
+1. **I1 never committed** the build manifest or the telemetry rows that the DAG assigned it. `integrate-check`
+   verifies format and scope, not a node's deliverable list. D1 closes this.
+2. **The code layer was empty in the manifest**: 0 rows, with the digest of the empty string. B3 built the code
+   route **lazily**, parsing only on a query, so both of I1's reproducibility proofs, and the incremental ≡ full
+   proof, **never covered code symbols, calls or literals**, although §8.1 requires them. The digest also omits
+   call sites and literals altogether, and the layer's contents drift with whichever queries have run.
+
+**Secrecy audit, and a flaw of the orchestrator's own.** The orchestrator recorded the sealed path in the state,
+which builders read, so four roles saw the path string passively. Across every non-TA transcript there were **zero**
+tool calls touching `.local/share`, `govbridge-sealed` or `.authoring` (OBS-BR-04). The name was exposed; the oracle
+was not accessed.
+
+**Action.** The freeze is lifted *before any demonstration run*. A fresh bounded repair, **B3R (BR-AR-0014)**, makes
+the code layer eager for the non-history refs, with a digest over all three row kinds that is query-invariant.
+Afterwards the demonstration store is updated incrementally, the freeze is re-established, and D1 is finalised.
