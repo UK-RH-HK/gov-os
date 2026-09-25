@@ -1,0 +1,74 @@
+run_id: BR-AR-0002
+role: held-out oracle test-author (fresh; DAG node TA) -- not a builder, the architect, the demonstration agent or the grader
+model_observed: 'claude-opus-5-5 (Opus 5.5; spawned with model: opus; self-reported from the session system identity)'
+branch: bridge/ta-0002
+commit: 2affe69ef8f820d1fc021ac07dbf64f12fdb1e5f
+status: COMPLETED
+claims:
+- 'C1 The held-out oracle (schema govbridge-oracle/1, oracle_id R8-ORACLE-1) is written ONLY to the orchestrator-created sealed
+  directory, as oracle.yaml, 141,394 bytes, sha256 3d80a5fda0724e380821f55e3e4e3980b0b53032a14d2ed188e83169888c7e4b. It is
+  not committed, not copied into any worktree, and its path appears in no committed file (grep of DEMONSTRATION/ for the
+  directory name: no match). DEMONSTRATION/oracle-commitment.yaml carries that sha256, author_run BR-AR-0002, author_model,
+  written_at (the file''s mtime, 2026-09-25T10:13:28Z) and schema govbridge-oracle/1, and is committed at `commit` above,
+  before any demonstration run.'
+- 'C2 Coverage of the public query set (demonstration-queries.yaml): both chains (R8-CHAIN-F2, R8-CHAIN-F3) with exactly the
+  11 chain stages in order and exactly one is_enforcement_point each, with traps, wrong entries, acceptable alternative
+  enforcement points and an effective_behaviour block per chain; R8-SIDE-BY-SIDE (shared and differing points);
+  R8-F1-BOTHWAYS (purpose anchors, and consumer anchors each flagged in/cross-process and production/test); all 30 S1..S3 x
+  QC1..QC10 queries plus AUTH-1..AUTH-4 (34 query rows); CTRL-1..CTRL-3 (unrelated subsystems, OC-BR-02); 16
+  authority_expectations rows, one per mandatory_bridge_inputs item, with the class verbatim from ORCHESTRATOR_STATE.yaml.'
+- 'C3 Every anchor (458) carries kind, a full 40-hex commit, path and a line range, and was verified against its Git blob by
+  verify_anchors.py (blob exists; range inside the blob; non-empty slice; symbol, record_id or section present where given):
+  458 OK, 0 FAIL. Code anchors are at the frozen product 3c880d8 (at 58219d5 for Review-8 evidence, and at earlier
+  product commits only where a mechanism''s history requires it); records at 6e7a2a3; the Review-8 return copy, bridge
+  state and OC-BR-02 at the bridge commit a7b4dbe.'
+- 'C4 Ground truth was established from primary sources: every chain stage, the side-by-side, both-ways and query entry cites
+  code/records/evidence read by the test-author at the named commit; the Review-8 return is cited only for what was
+  reported and for current status. Line numbers from the architect''s and the reviewer''s texts were treated as leads and
+  re-derived by reading the code to the point whose evaluated result decides the behaviour; where the author''s reading
+  differs from a secondary text, the oracle records the primary-source fact.'
+- 'C5 The oracle asserts facts and anchors only. It classifies neither F2 nor F3 as one class or as different classes, and it
+  states no disposition of F1; the expected answers remain classification NOT_DETERMINED_BY_BRIDGE and disposition
+  NONE_STATED. check_oracle.py lints every must_state string for classification/disposition assertions (0 hits), and the
+  self-test proves the lint rejects injected ones.'
+- 'C6 check_oracle.py (stdlib + PyYAML) reads its field list, anchor kinds and packet sections from
+  ARCHITECTURE/schemas/oracle.yaml, the chain stages and query ids from demonstration-queries.yaml, and the mandatory items
+  from ORCHESTRATOR_STATE.yaml; it enforces the four node-TA acceptance checks plus key/type checks, why-fields, consumer
+  flags, query coverage and the prohibited-content lint. Result on the sealed oracle: RESULT VALID, exit 0.
+  selftest_check_oracle.py applies 14 structural mutations in memory and the checker rejects all 14 and accepts the
+  unmodified oracle (ALL PASS).'
+- 'C7 No bridge/b*, bridge/i* or bridge/demo* branch and no govbridge/ code was looked at. No product file, Phase-2 record,
+  Contract v3 or frozen gate contract was modified; F1-F6 were neither repaired nor classified; no token was issued.'
+evidence:
+- 'release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment.yaml (sha256 fa894bb46470fb21643b14e620782daa7d860184b240d11aa7203f4875e99482)'
+- 'release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/check_oracle.py (sha256 0b0c93b63c08294c22feb1379a6dd43c6eb7d74b30b472758ebfacc6ac1e56d5)'
+- 'release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/verify_anchors.py (sha256 104e7443d7e114576097e869b2101bf0f7ede1f977c2ec2b6e04f631a1318fd2)'
+- 'release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/selftest_check_oracle.py (sha256 3cb07255b482b008abc77dea63bcee0eb6e35071be3a5a49ccff0056725a45ce)'
+- 'outputs/00-self-locate.out: branch bridge/ta-0002, HEAD a7b4dbe at run time, full ids of every commit the oracle cites'
+- 'outputs/01-check_oracle.out: RESULT VALID; 2 chains x 11 stages; 1 enforcement point per chain; 34 queries; 3 controls;
+  16 authority rows for 16 items; 458 anchors'
+- 'outputs/02-verify_anchors.out: one `<anchor_id> OK|FAIL` line per anchor (anchor_id = key path inside the oracle); 458
+  OK, 0 FAIL. The script runs git show <commit>:<path> and slices <start>,<end> for every anchor.'
+- 'outputs/03-selftest_check_oracle.out: 15 cases (1 valid, 14 mutations), ALL PASS'
+- 'outputs/04-oracle-sha256.out: 3d80a5fda0724e380821f55e3e4e3980b0b53032a14d2ed188e83169888c7e4b  <SEALED>/oracle.yaml
+  (equals oracle-commitment.yaml oracle_sha256)'
+- AGENT_RUNS/BR-AR-0002.checkpoint.yaml lists the five commands with exit codes, output paths and output sha256s; the sealed
+  path is redacted as <SEALED> throughout.
+mutation_scope_respected: true
+open_issues:
+- 'OI-1 The sealed directory also holds the author''s generator script in a 0700 subdirectory `.authoring/` (it contains oracle
+  content, so it was kept inside the sealed directory rather than anywhere else). The grader should copy only oracle.yaml;
+  the commitment covers oracle.yaml alone.'
+- 'OI-2 In several places the facts established from primary sources at 3c880d8 are more precise than, or differ from,
+  statements in the Review-8 return and in Phase-2 orchestration records. They are recorded only in the sealed oracle, so
+  they stay held out; they become visible at GRADE. The later whole-system synthesis should read the unsealed oracle
+  together with the grading report rather than rely on the secondary texts alone.'
+- 'OI-3 For I1''s `govbridge demo validate-oracle`, which must agree with check_oracle.py: check_oracle.py is stricter than
+  the schema prose in three places. It requires lines on every code/test anchor. It requires a record/contract/evidence
+  anchor without lines to name a record_id or section. It requires a full 40-hex commit. It accepts two extra anchor keys,
+  process and production, on f1_both_ways consumer anchors only. queries[].required and forbidden mix plain ids and
+  anchors, as the schema allows.'
+- 'OI-4 The authority_expectations rows for ladder-class mandatory items (EVIDENCE, ORCHESTRATION_RECORD) are derived from
+  ARCHITECTURE.md §5.1/§7.2 admissibility and the design''s example rows. The architecture''s explicit test list names the
+  sections only for the owner-decision, direction, hypothesis, observation and withdrawn items. If the integrated resolver
+  intends a different placement for the ladder-class items, reconcile that before grading, not after.'
