@@ -1,0 +1,36 @@
+run_id: BR-AR-0011
+role: 'fresh-agent Review-8 demonstration (run-1): packet compiled/verified by the orchestrator, answered by a fresh opus agent, audited by the
+  orchestrator'
+model_observed: demonstration agent br-demo-0011 -- claude-opus-5-5 (210/210 turns); orchestrator steps -- claude-opus-5-5
+branch: bridge/demo-0011
+commit: PENDING
+status: COMPLETED
+claims:
+- 'run-1 packet compiled at frozen tip 94d0211 against store-BR-AR-0010: packet_sha256 b5126140...2019, packet verify PASS, packet.md 274,798
+  bytes'
+- 'the fresh agent answered all 41 public queries (39 ANSWERED, 2 PARTIAL), citing 83 packet items; receipt check PASS (agent and orchestrator
+  re-run): 20/20 section-A items acknowledged, 25 declared external-read files, 2,015,491 external-read bytes'
+- 'consumption: peak context 503,981 tokens, 210 turns, 159,564 output tokens; packet.md read in six line windows (lines 2029-3225 not read via
+  Read); 104 saved query outputs, 1,063,203 bytes'
+- 'secrecy: 0 tool calls accessing the sealed directory or oracle; 0 reads of ARCHITECTURE/AGENT_RUNS/HANDOFFS/other DEMONSTRATION runs; 0 oracle-substance
+  overlaps (73 overlaps, all path: locators); sealed name absent from all outputs'
+- grading is NOT claimed here -- it is BR-AR-0012 (GRADE)
+evidence:
+- claim: govbridge packet verify DEMONSTRATION/run-1/packet (orchestrator, before dispatch)
+  command: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/packet-verify.out
+- claim: govbridge receipt check --packet run-1/packet --receipt run-1/receipt.yaml (orchestrator re-run after return)
+  command: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/receipt-check.orchestrator.out
+- claim: govbridge demo extract-reads <demo transcript> --out run-1/reads.json
+  command: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/reads.json
+- claim: oracle-overlap categorisation by YAML key (orchestrator; no oracle values printed)
+  command: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/oracle-overlap-audit.orchestrator.out
+- claim: consumption + secrecy audit over the demo transcript (orchestrator)
+  command: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/CONSUMPTION-AND-SECRECY.orchestrator.md
+mutation_scope_respected: true
+open_issues:
+- 'OBS-BR-07: the packet does not carry the public query set or the answers/receipt schemas (orchestrator copied them verbatim into run-1/task-inputs/)'
+- 'OBS-BR-08: the query commands do not apply the task spec retrieval_exclusions automatically -- the agent''s first search returned a snippet
+  of ARCHITECTURE/demonstration-queries.yaml (public query text) before it added --exclude; bears on OD-BR-03 item 1'
+- the agent wrote temporary helper files into the shared session scratchpad (outside RUN, not committed)
+- external_read_bytes counts whole declared files (2.0 MB) although the agent reports no direct reads (content came through govbridge queries);
+  G7 interpretation is for GRADE
