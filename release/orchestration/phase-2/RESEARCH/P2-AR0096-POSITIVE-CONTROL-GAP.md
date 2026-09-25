@@ -1,61 +1,52 @@
-# P2-AR-0096 — orchestrator finding: the revised 5C positive control no longer exercises the production cross-process path
+# P2-AR-0096 — orchestrator finding: **WITHDRAWN**
 
 | Field | Value |
 |---|---|
-| Found by | the Phase-2 outer orchestrator, 2026-09-25, while AR96's third full suite was running |
-| Status | **to be corrected before the tree is frozen for Review 8** — it is a gap against an explicit owner instruction, not a reviewer's judgement call |
-| Not | a product defect. `runtime/` is unchanged by either of AR96's two flake fixes. |
+| Raised by | the Phase-2 outer orchestrator, 2026-09-25, while AR96's third full suite was running |
+| **Status** | **WITHDRAWN 2026-09-25 — the finding was wrong.** Retained, not deleted: failed iterations are historical evidence (OD-P2-08 §10). |
+| Withdrawn on | code read at `3c880d8`, below |
 
-## The owner's instruction (5C, approved Option B)
+## What I claimed
 
-> The revised positive control must still prove that a genuine OS-created sandbox works **cross-process WHILE its
-> creator remains alive**, while an unrecorded/substituted sandbox does not.
+That AR96's second flake fix — making `ar94_nc2` case A probe in-process instead of spawning `gov` — left the
+owner's 5C positive control no longer exercising the production cross-process path, because `skills.rs:528
+execute_check` spawns the real `gov` binary rooted in a live sandbox (`skills.rs:489`). I proposed "correcting" the
+control to probe an `execute_check`-shaped sandbox instead.
 
-## What AR96 did, and why
+## Why it was wrong
 
-`ar94_nc2` case A failed once in full-suite run 1 and again in run 2 — same test, same `NOT_INSTALLED` symptom,
-different sandbox instance. The builder's second diagnosis is **correct as far as it goes**: the sandbox it was
-probing is a `scheduler/mod.rs` per-family sandbox, whose `create` → checks → `Drop` all happen synchronously inside
-one `gov verify governance` invocation. Probing that from outside races a lifecycle with **no lower bound on
-survival**, and under 368-test contention a fork+exec+full-CLI round trip sometimes lost.
+`execute_check` creates its sandbox with `SandboxOptions { runtime: true, git: true }`, and `git: true` runs a
+**fresh `git init`** (`scheduler/sandbox.rs:113`). So the sandbox's `repository_lineage_id` never matches the
+`bound_repository_lineage` in the floor document it copied.
 
-Its fix: case A stops spawning a `gov` subprocess and instead calls `gov_runtime::paths::adoption_floor_anchor_path_at`
-**in-process from the test binary**.
+And `read_project_adoption_floor` checks lineage **before** the identity path: at `paths.rs:1200` a mismatch
+**returns early** with `rules: vec![]` and a finding — `FloorIdentity::reconcile`, and therefore
+`is_health_sandbox_root`, are never reached.
 
-## Why that is not sufficient
+**Consequence:** the sandbox exemption is never consulted for an `execute_check` sandbox. Its only live consumer is
+`scheduler/mod.rs`'s `git: false` per-family sandbox, which is created, used and dropped **entirely in-process**.
+The production shape for this mechanism therefore *is* in-process, the builder's fix matches it, and my proposed
+correction would have tested a path where the exemption never decides anything.
 
-The builder's supporting claim is:
+The builder's disclosure (1) had already recorded the `git:true`/`git:false` distinction and its reason for
+filtering. I read that disclosure and still argued past it from a partially-verified inference.
 
-> *"Nothing in the product ever reads such a sandbox from a SEPARATE subprocess."*
+## What this cost, and the lesson for my own record
 
-That is **true for `scheduler/mod.rs`'s per-family sandboxes and false for the product as a whole.**
-`skills.rs:528 execute_check` creates a sandbox and then calls `run_gov`, which is
-(`skills.rs:489`, verified by the orchestrator at `92982ff`):
+Nothing, because the check came before the freeze. But this is the **second** load-bearing claim I got wrong in this
+phase by reasoning from a partial trace instead of reading to the decision point — the first was proposing the
+T2-verified document as a rules authority, which the owner caught. Both times the error had the same shape: I
+verified that a path *exists* and did not verify that the path *reaches the decision*. That is precisely the
+enumeration-vs-authority confusion this phase keeps finding in the product, appearing in my own reasoning.
 
-```rust
-let mut child = std::process::Command::new(gov)
-    .args(["--json", "--root"]).arg(root)          // root = sb.root, the sandbox
-    .current_dir(root)
-    .env(crate::scheduler::sandbox::SANDBOX_ENV, "1")
-```
+## The adjacent observation that IS real, and goes to Review 8
 
-— the **real `gov` binary**, spawned as a child, rooted in the live sandbox. So production *does* read a sandbox
-cross-process, and it is the one path where creator-liveness has to hold through a full CLI invocation.
+The verification above establishes something worth deciding rather than discarding:
 
-After the fix, the CLI cross-process path is exercised **only by the negative cases** (B1/B2, on an
-already-dead-creator sandbox). The positive side of the property is now proved in-process only. That is precisely the
-asymmetry the Review-8 context pack warns about: *a guard that refuses everything passes every negative test.*
+> Inside a `skills::execute_check` scenario sandbox, the project adoption floor is **always** refused — on lineage,
+> unconditionally, because `git: true` mints a fresh lineage by construction.
 
-## The correction, which needs no product change
-
-Probe a sandbox of the **`execute_check` shape** rather than a `scheduler` family sandbox. Its lifetime is bounded
-below **by design** — `execute_check` holds `sb` in scope across its whole step loop, precisely so child `gov`
-processes can run against it — so a full-CLI round trip is not racing an unbounded lifecycle. That restores the real
-production shape and removes the flake's cause at the same time, instead of trading one for the other.
-
-## Why this is being recorded rather than left for Review 8 to find
-
-Review 8 is the convergence decision point (OD-P2-09 §5). Freezing a tree whose positive control does not prove what
-the owner's own instruction required would either waste that review or, worse, pass it on evidence that does not
-cover the production path. Verifying the builder's load-bearing claims is the orchestrator's job, and this one did
-not hold.
+So scenario checks run with **no floor applied at all**. The builder correctly identified this as an AR84-C3-shaped
+issue unrelated to the exemption, and correctly declined to fix it in a bounded delta. Whether "a scenario sandbox
+never has a floor" is intended, harmless, or a gap is a judgement for Review 8 — it is stated here so the reviewer
+inherits the fact rather than rediscovering it.

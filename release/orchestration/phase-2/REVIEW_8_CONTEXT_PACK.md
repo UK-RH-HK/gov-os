@@ -162,9 +162,97 @@ marker; AR94 broke exactly those. **This is why the current round mostly deletes
   reach*, and one builder's declared deviation from its brief. Hold that standard in reverse: an unfounded green
   ships a defect, a manufactured objection costs a phase. Only the evidence is acceptable.
 
-## 9. Current implementation state — **PENDING P2-AR-0096**
+## 9. Current implementation state — P2-AR-0096, commit `3c880d8`
 
-*(Filled in from the builder's report and the orchestrator's own verification before dispatch.)*
+**Full certification suite 368/368, 0 filtered, 3631 s (60m31s), default threads.** Arithmetic: 373 base − 8 deleted
++ 3 new. Scope: `paths.rs`, `init.rs`, `adopt.rs`, `control.rs`, `cli/src/main.rs`, three test files, one checkpoint.
+**`exec_resolve.rs` untouched.**
+
+### This round mostly deleted, and that is the point
+
+| Deleted | Consequence |
+|---|---|
+| **`gov floor-reanchor`, whole** — command, `reanchor_project_identity`, its error codes, guard row, `g0_label`/`command_name` arms | **AR94-C2, C3, C4, D1, D5 and the confirmed C5 concurrency race go with the transfer primitive that produced them.** C5 is *moot, not fixed* — the function it was a property of no longer exists |
+| The `(device, inode)` sandbox-marker binding and its opportunistic GC | replaced by creator liveness |
+| 8 tests whose subject no longer exists | 3 `ar92_reanchor_*`, 5 `ar94_*` reanchor-specific |
+
+**Orchestrator-verified:** every surviving grep hit for `floor-reanchor` is documentation of the deletion;
+`cli/src/main.rs` is 20 deletions and 0 additions.
+
+### Relocation is now ordinary governed re-onboarding
+
+`has_local_adoption_anchor(root)` is true when this checkout's anchor exists for its **current canonical path**, or
+when anchoring does not apply at all (inside an OS-created sandbox, or an unresolvable state root) — so the gate
+never mistakes "no anchor possible" for "needs re-onboarding". `init`/`adopt`'s old `if !already_installed` became
+`if !already_installed || (already_installed && !has_local_adoption_anchor(root))`.
+
+`FloorIdentity::advance` is **unchanged** and already mints `uuid::Uuid::new_v4()` when a checkout has no entry, so a
+**fresh identity falls out of existing code** — no new identity-minting path. A relocated checkout re-onboards
+through the ordinary `gov init --force` / `gov adopt` route under the same `install_kernel` authority. A second
+working copy gets its own fresh identity **without disturbing the first** — the property a transfer structurally
+could not offer, and AR92-C3's and AR94-C4's measured costs both disappear.
+
+### Never-weaker union, from protected machine state only
+
+`union_last_known_rules_across_store(fresh)` — AR86-C6's own additive shape, generalised from one checkout's record
+to every entry the machine's `adoption-floors/` store holds, because a re-onboarding checkout has none of its own.
+**Sourced from protected machine state, never the project document** (the orchestrator first proposed the
+T2-verified document and the owner rejected it: OD-P2-08 §2 makes the seal detection, never proof-grade). Applied
+**only** in the `reonboarding` branch.
+
+**Placement was measured, not assumed.** An early version unioned into the floor argument alone and produced a
+self-inflicted D027 finding, because `PolicySet::load` unions the floor into the kernel template before comparing
+against `REPOSITORY_CONTRACT.yaml`'s `paths` — so a pattern the floor gained but the overlay never declared read as
+"the overlay removed a mandated pattern." The same restored rule objects are now spliced into `contract["paths"]`
+too. **This touches the governed array and deserves your scrutiny.**
+
+Disclosed as `PROJECT_ADOPTION_FLOOR_REONBOARDED` with `restored_from_protected_machine_state: [...]` on every
+re-onboarding, `null` on a first install.
+
+### Sandbox exemption = creator liveness (owner-approved, 5C Option B)
+
+`SandboxRecord{dev,ino}` → `{creator_pid, creator_start_time}`. `creator_is_alive` compares
+`process_start_time(pid)` against the recorded value; `process_start_time` reads `/proc/<pid>/stat` field 22 via
+`rsplit_once(')')` — **orchestrator-verified** as correctly past the comm field, with PID reuse defeated by the
+start-time comparison and non-Linux returning `None` (fails closed). No environment variable carries authority;
+`SANDBOX_ENV` remains unreferenced by the exemption decision.
+
+**The GC was deleted and that is sound**: a liveness marker decays to inert the instant its creator dies, which is
+exactly what the P2-AR-0095 sweep existed to bound.
+
+## 9a. Open residuals and observations — inherited, so you need not rediscover them
+
+1. **The creator-liveness residual (builder-named, HIGH-adjacent — judge it).** Creator liveness authenticates the
+   *creator*, not the directory object. An attacker who creates their own sandbox controls their own process's
+   lifetime, so while that process stays genuinely alive its marker is valid. This is narrower than the deleted
+   object-identity guarantee, and far narrower than AR94-C1 (which needed no race at all — kill once, substitute at
+   leisure, unboundedly). The builder declined to add a process-state check (e.g. refusing a `SIGSTOP`'d creator),
+   citing the add-a-mechanism-to-guard-a-mechanism pattern seven rounds were rejected for. **Whether that is the
+   right call is yours.**
+2. **Scenario sandboxes have no floor at all (orchestrator-found).** `execute_check` creates `git: true` sandboxes,
+   and `git: true` runs a fresh `git init` (`scheduler/sandbox.rs:113`), so lineage can never match the copied
+   floor — and `read_project_adoption_floor` returns early on lineage mismatch at `paths.rs:1200`, before
+   `reconcile`. So inside a skills scenario sandbox the project floor is **always** refused. AR84-C3-shaped,
+   unrelated to the exemption, correctly out of scope for a bounded delta. **Is that intended?**
+3. **`ar94_nc2` was rewritten** — the owner required it, because the original SIGKILLed the creator before its own
+   positive measurement and would now prove the wrong thing. It now has three parts: A (genuine sandbox, creator
+   confirmed alive, probed in-process from the test binary), B2 (creator killed the instant a populated sandbox is
+   observed — must refuse), B1 (unrecorded byte-identical copy — must refuse). **A builder revising its own positive
+   control needs independent eyes.** Note the orchestrator raised and then **withdrew** an objection here; the
+   withdrawal and its reasoning are in `RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md`, and you should reach your own
+   conclusion rather than inherit either position.
+4. **Two full-suite-only flakes** in the new `ar94_nc2` (runs 1 and 2), both diagnosed as test-harness raciness
+   against a sandbox lifecycle with no lower bound, both fixed **test-only with `runtime/` untouched**. Full
+   diagnosis in `telemetry/checkpoints/P2-AR-0096.checkpoint.md`. Satisfy yourself that neither masked a product
+   defect.
+5. **Not probed this round:** `write_project_adoption_floor` under two racing re-onboardings of the same relocated
+   checkout. Plus everything on the AR94 reviewer's own unprobed list (glibc+musl, malformed-ELF fuzzing, the
+   `verify`→`Command` TOCTOU window, bind mounts, hand-edited `cit_status`).
+6. **Accepted LOW, unchanged:** the machine store now holds two entries after a re-onboarding (the old one
+   byte-identical and untouched) — AR90-C7 growth, deliberately left inert rather than swept.
+   `capability_roots.native_source`/`native_tests` is not updated with a union-restored pattern while
+   `contract["paths"]` is — informational metadata only (`POLICY_PRECEDENCE.yaml` marks it `overridable`, and
+   nothing in `runtime/src` reads it back).
 
 ## 10. What you are entitled to assume, and what you must derive yourself
 

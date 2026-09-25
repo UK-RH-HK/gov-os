@@ -1340,19 +1340,37 @@ review_history:
   open_residual: AR94-C5 concurrency race -- now CONFIRMED real and nondeterministic (2 store entries for 1 identity
     in one run, serialised in another); left unfixed as out of scope
   env_var_authority: none -- builder traced SANDBOX_ENV and confirmed it is not referenced in the exemption decision
-current_round:
-  id: P2-AR-0096
+- round: P2-AR-0096
   kind: approved_delta_implementation
-  handoff: release/orchestration/phase-2/HANDOFFS/P2-HO-0060-approved-delta.md
-  base_commit: 92982ff
-  branch: phase2/approved-delta
-  evidence_class: BUILDER_DEVELOPMENT_EVIDENCE
-  non_deferrable:
-  - delete gov floor-reanchor entirely
-  - fresh-identity re-onboarding when no anchor exists for the current path
-  - never-weaker union from protected machine state, applied at re-onboarding derivation
-  - sandbox exemption = creator liveness (owner-approved 5C Option B); delete inode-binding and GC; revise ar94_nc2
-  then: targeted -> affected regression -> full certification -> Review-8 whole-system context pack -> Review 8
+  commit: 3c880d8
+  suite: 368/368, 3631s (60m31s), default threads, 0 filtered; runs 1 and 2 each hit one instance of the same test-harness
+    race in the new ar94_nc2, both fixed test-only with runtime untouched
+  test_arithmetic: 373 base - 8 deleted (3 ar92_reanchor_*, 5 ar94_* reanchor-specific) + 3 new = 368
+  deleted:
+  - gov floor-reanchor whole (command, reanchor_project_identity, error codes, guard row, g0_label/command_name
+    arms)
+  - the (device,inode) sandbox marker binding and its GC
+  - 8 tests whose subject no longer exists
+  findings_removed_with_it:
+  - AR94-C2
+  - AR94-C3
+  - AR94-C4
+  - AR94-D1
+  - AR94-D5
+  - AR94-C5 (the confirmed race -- moot, not fixed)
+  named_residual: 'creator liveness authenticates the CREATOR, not the directory object: an attacker who creates
+    their own sandbox holds a valid marker while their process stays genuinely alive. Narrower than the deleted
+    object-identity guarantee and far narrower than AR94-C1 (which needed no race at all), but not nothing. Builder
+    declined to add a process-state check, correctly citing the add-a-mechanism-to-guard-a-mechanism pattern.'
+  named_cosmetic: capability_roots.native_source/native_tests not updated with a union-restored pattern; contract[paths]
+    (the governed array) is. LOW, informational metadata only.
+current_round:
+  id: P2-AR-0097
+  kind: independent_adversarial_review
+  status: DISPATCHING
+  subject_commit: 3c880d8
+  branch: phase2/review-8
+  note: Review 8 is the convergence decision point (OD-P2-09 section 5); OD-P2-10's context pack is a required input
 orchestrator_verified_independently:
 - paths.rs:651 -- the exists() conjunct is present exactly as reported
 - paths.rs:556 -- is_health_sandbox_root matches four trailing path components and consults no OS record
@@ -1388,6 +1406,14 @@ orchestrator_verified_independently:
   the orchestrator''s earlier caution is now resolved -- AR95 reproduced two store entries for one identity.'
 - '5A CRUX (restated): init.rs:303 and adopt.rs:1840 gate the floor write on !already_installed, so no onboarding
   path re-establishes a floor at a relocated path.'
+- '3c880d8: floor-reanchor is genuinely gone -- every remaining grep hit is documentation of the deletion; cli/src/main.rs
+  is 20 deletions and 0 additions'
+- '3c880d8: has_local_adoption_anchor, union_last_known_rules_across_store, creator_is_alive, process_start_time
+  all present in paths.rs'
+- 3c880d8 paths.rs:682 -- process_start_time reads /proc/<pid>/stat field 22 via rsplit_once(')'), correctly past
+  the comm field; PID reuse is defeated by comparing start time; non-Linux returns None, failing closed
+- '3c880d8: deleting the GC is sound -- a creator-liveness marker decays to inert the instant its creator dies,
+  which is why the P2-AR-0095 sweep it replaces is no longer needed'
 last_updated: '2026-09-25'
 owner_directions_in_force:
 - OD-P2-07
@@ -1484,13 +1510,15 @@ historical_rule_source:
     not only in PolicySet::load's reconstruction, because once a floor is written reconstruction never fires and
     a weak derived floor would be promoted to authenticated
 ar96_orchestrator_finding:
+  status: WITHDRAWN -- the finding was wrong
   record: release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md
-  summary: AR96's second flake fix made ar94_nc2 case A probe in-process, so the revised 5C positive control no
-    longer exercises the production cross-process path through the real CLI
-  builder_claim_that_does_not_hold: '''Nothing in the product ever reads such a sandbox from a SEPARATE subprocess''
-    -- true for scheduler/mod.rs per-family sandboxes, false for skills.rs:528 execute_check, which spawns the real
-    gov binary rooted in the live sandbox (skills.rs:489, verified at 92982ff)'
-  correction: probe an execute_check-shaped sandbox, whose lifetime is bounded below by design, instead of a scheduler
-    family sandbox with no lower bound -- restores the production shape AND removes the flake cause; no product
-    change
-  disposition: correct before freezing for Review 8
+  why_wrong: execute_check's sandbox is git:true, which runs a fresh git init (sandbox.rs:113), so its lineage never
+    matches the copied floor; read_project_adoption_floor returns early on lineage mismatch at paths.rs:1200, BEFORE
+    reconcile and therefore before is_health_sandbox_root. The exemption is never consulted for an execute_check
+    sandbox, so the builder's in-process probe matches the only production shape.
+  self_lesson: second load-bearing claim this phase I got wrong by verifying that a path EXISTS without verifying
+    that it REACHES the decision -- the same authority-vs-representation confusion the product keeps failing on.
+    First was proposing the T2-verified document as a rules authority.
+  real_adjacent_observation_for_review_8: inside a skills::execute_check scenario sandbox the project floor is ALWAYS
+    refused on lineage, so scenario checks run with no floor applied at all -- AR84-C3-shaped, unrelated to the
+    exemption, correctly out of scope for a bounded delta, but a judgement for Review 8
