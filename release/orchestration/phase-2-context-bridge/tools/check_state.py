@@ -161,6 +161,7 @@ def verify(text, state):
     anchors = [state["contract_v3"], state["operator_ui"]] + list(state.get("owner_records", []))
     anchors += [{"path": r8["full_return_copy_path"], "sha256": r8["full_return_copy_sha256"]}]
     anchors += list(state.get("immutable_evidence", []))
+    anchors += [i for i in (state.get("mandatory_bridge_inputs") or {}).get("items", []) if i.get("path") and i.get("sha256")]
     for a in anchors:
         p = os.path.join(ROOT, a["path"])
         if not os.path.isfile(p):

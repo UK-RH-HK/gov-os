@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T08:37:39Z'
-state_hash: d26d96c60462fa43de5a05f60bc4da71fbf3611d2052178ce96aa2e2d8f6f2b2
-lifecycle_state: BR_DOMAIN_ESTABLISHED
+updated_at: '2026-09-25T08:41:12Z'
+state_hash: 1a87aaaed12850ea2559290d4d8e3987a4c23bb67f42960e743a81041abdf2cb
+lifecycle_state: BR_ARCHITECTURE
 loop_status: RUNNING
 authority_status: ORCHESTRATION_SUPPORT_ONLY -- the bridge is not product, not a candidate, not an authority source,
   not Phase 3, not V8.3 CURRENT (OD-P2-10 section 3, OD-P2-10B, launcher)
@@ -117,6 +117,102 @@ owner_records:
 - id: OWNER-LAUNCHER-BR-0001
   path: release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md
   applies: this lifecycle's procedure, routing, required capabilities and the Review-8 demonstration
+mandatory_bridge_inputs:
+  source: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml od_p2_10a_b + evidence_for_the_synthesis, at 6e7a2a3
+  refreshed: 2026-09-25 -- release/4.1.6-rc1 tip re-read and still 6e7a2a3; no Phase-2 record newer than the bridge base
+  reconciliation: owner message 2026-09-25 (mid-session) -- incorporate OD-P2-10A/B and its evidence_for_the_synthesis
+    as MANDATORY bridge inputs, preserving the authority distinctions exactly; no validly completed work restarted
+  authority_classes:
+    OWNER_DECISION: binding; the bridge and every role obey it
+    OWNER_DIRECTION_TO_TEST: a direction the owner recorded as NOT YET AUTHORITY; the synthesis must test it and may
+      reject it; the bridge must surface the evidence both for and against
+    HYPOTHESIS_TO_TEST: a hypothesis with NO classificatory force; must not be pre-classified because the owner or
+      anyone else proposed it; the bridge makes it testable and never answers it
+    HYPOTHESIS_RELEVANT_OBSERVATION: offered to the synthesis as observation only, not as evidence for the hypothesis
+    EVIDENCE: measured/committed facts; the commit governs over any transcription
+    EVIDENCE_WITHDRAWN: retained as evidence of a withdrawn claim; never cited as a finding
+    ORCHESTRATION_RECORD: the Phase-2 orchestrator's records -- current state, not authority over owner records
+  items:
+  - id: OD-P2-10A
+    class: OWNER_DECISION
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    sha256: 847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff
+    content: F2 is NOT scope expansion; a newly discovered implementation defect within existing Phase-2 authority/Property-C
+      requirements; remains a legitimate Phase-2 blocker; NOT to be repaired yet
+  - id: OD-P2-10B
+    class: OWNER_DECISION
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    content: bridge authorised in a separate session/worktree/domain under P2X-FAIL-1; orchestration support only; acceptance
+      token P2_CONTEXT_RETRIEVAL_BRIDGE_READY, independently earned; then fresh whole-system synthesis before any product
+      repair
+  - id: OD-P2-10A-B.PROPERTY-A
+    class: OWNER_DECISION
+    content: Property A's fourth-round evidence preserved; not reopened without evidence that directly falsifies it
+  - id: OD-P2-10A-B.STANDING-STATE
+    class: OWNER_DECISION
+    content: remain stopped; product frozen; no repair agent dispatched until BRIDGE_READY and the synthesis completes
+  - id: F1-DIRECTION
+    class: OWNER_DIRECTION_TO_TEST
+    content: F1 is a strong DELETE/SIMPLIFY candidate -- NOT yet authority to delete. Synthesis reconstructs purpose,
+      consumers, dependencies, consequences and chooses DELETE/SIMPLIFY/REPAIR/NARROW/RETAIN, preferring deletion if
+      no required production capability depends on it
+  - id: F2-F3-COMMON-CLASS
+    class: HYPOTHESIS_TO_TEST
+    content: 'F2 and F3 may be one deeper class: syntactic rule/property reasoning that fails to trace through composition/precedence/matching
+      to the actual enforced semantic effect. MUST NOT be pre-classified as the same class merely because the owner
+      suggested it'
+  - id: ORCHESTRATOR-REASONING-ERRORS
+    class: HYPOTHESIS_RELEVANT_OBSERVATION
+    path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+    key: orchestrator_error_f3 (and ledger P2-L-0046, P2-L-0047)
+    content: three orchestrator reasoning errors of a parallel shape (verifying a property without verifying it reaches
+      the decision). They concern the orchestrator's REASONING; the hypothesis concerns the IMPLEMENTATION -- different
+      objects; the parallel is to be tested, never treated as evidence for itself
+  - id: REVIEW-8-PROBES
+    class: EVIDENCE
+    commit: 58219d5628683d6f462aa67bf25dbc2641933bce
+    paths: [probes/P2-AR-0097/, tests/certification/ar97_probe.rs]
+    note: 6 probes; 3 fail by design, asserting the secure outcome
+  - id: REVIEW-8-RETURN
+    class: EVIDENCE
+    path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
+    note: byte copy; the review commit governs on measured facts
+  - id: REVIEW-8-CONTEXT-PACK
+    class: ORCHESTRATION_RECORD
+    path: release/orchestration/phase-2/REVIEW_8_CONTEXT_PACK.md
+    sha256: d69c2f8cec12b0790c0f310f54d4865ce06f003abd1feb70986102630d514684
+  - id: DESIGN-P2-PROBE-OPTION-C
+    class: ORCHESTRATION_RECORD
+    path: release/orchestration/phase-2/RESEARCH/P2-PROBE-OPTION-C.md
+    sha256: 6cfb3af478f2aef244cfffb93b98c44e2f86139306d5037f772506ba5728afe4
+  - id: DESIGN-P2-HISTORICAL-RULE-SOURCE
+    class: ORCHESTRATION_RECORD
+    path: release/orchestration/phase-2/RESEARCH/P2-HISTORICAL-RULE-SOURCE.md
+    sha256: c586d6387fcf8a7676aa06e1eada910030ef36a52b2e173b4f825e8e51a78e67
+  - id: DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP
+    class: EVIDENCE_WITHDRAWN
+    path: release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md
+    sha256: 620cd698b98ac534e617c5f357a3fb14a11e92549fae9387c35523dc6a2105c2
+    note: a WITHDRAWN orchestrator finding, retained as evidence only
+  - id: AR96-BUILDER-CHECKPOINT
+    class: EVIDENCE
+    commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+    paths: [telemetry/checkpoints/P2-AR-0096.checkpoint.md]
+    note: lives in the frozen product tree (top-level telemetry/), not under release/orchestration/phase-2/
+  - id: PHASE-2-LEDGER-P2-L-0033-0047
+    class: ORCHESTRATION_RECORD
+    path: release/orchestration/phase-2/PHASE_LEDGER.md
+    sha256: f7b643a38955571cf493a2f6dadd67949b352377f43026d6e50979c683c0ebc4
+    entries: P2-L-0033..P2-L-0047 (P2-L-0047 records OD-P2-10A/B)
+  - id: PHASE-2-STATE
+    class: ORCHESTRATION_RECORD
+    path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+    sha256: dc864a92616bc80657f952675244a9eb247e3db74d42e697b39fa5e581cf07f4
+    keys: [review_history, orchestrator_verified_independently, orchestrator_error_f3, triggered_rules, od_p2_10a_b,
+      frozen_product, evidence_for_the_synthesis]
+  rule_for_every_role: these items are MANDATORY inputs for any bridge role that designs, tests or demonstrates the
+    Review-8 chain, and the bridge's own resolver must classify them with exactly these authority classes -- a direction
+    or hypothesis must never be emitted into packet section A as if it were an owner decision
 phase_2_records_read_only:
   state: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
   ledger: release/orchestration/phase-2/PHASE_LEDGER.md
@@ -144,13 +240,33 @@ environment_observed_2026_09_25:
   network: huggingface.co reachable (HTTP 200)
   existing_semantic_primitive_hint: capabilities/python/govos_capabilities/embed_sentence_transformers.py (the architect
     must establish whether it is operational)
-spawned_roles: []
-agent_runs: []
-running_work: []
+spawned_roles:
+- role: Context/Retrieval Architect
+  run_id: BR-AR-0001
+agent_runs:
+- run_id: BR-AR-0001
+  role: Context/Retrieval Architect (fresh)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md
+  branch: bridge/arch-0001
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001
+  model_requested: opus
+  model_observed: null
+  agent_name: br-architect-0001
+  status: DISPATCHED
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/ARCHITECTURE/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0001.*
+running_work:
+- run_id: BR-AR-0001
+  liveness_check: subagent transcript mtime under ~/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/034abd76-0719-4661-bb46-b56141b90a16/subagents/
+    plus commits on bridge/arch-0001; never inferred from elapsed time
 checkpoints:
 - id: BR-CP-0001
   path: release/orchestration/phase-2-context-bridge/CHECKPOINTS/BR-CP-0001.yaml
-handoffs: []
+handoffs:
+- id: BR-HO-0001
+  path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md
+  to: BR-AR-0001
 unresolved_questions: []
 evidence_status:
   builder_evidence: NONE_YET
@@ -169,5 +285,7 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: seal state, commit the domain and BR-CP-0001, then dispatch BR-AR-0001 (fresh Context/Retrieval
-  Architect, model opus) on BR-HO-0001
+next_deterministic_action: await BR-AR-0001's return (typed report + checkpoint on bridge/arch-0001); run
+  tools/check_state.py integrate-check BR-AR-0001; read the model it actually ran from its transcript; review the DAG
+  for scope/authority conformance; merge; open GATE-BR-ARCH-DAG; then dispatch the test-author oracle role and the
+  first parallel group of DAG build nodes (model sonnet) in isolated worktrees

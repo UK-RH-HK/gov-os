@@ -30,3 +30,30 @@ spawn therefore passes its model explicitly, and each run's observed model is re
 
 **Next:** dispatch `BR-AR-0001`, a fresh Context/Retrieval Architect on model `opus`. It must return the architecture,
 an implementation DAG and explicit reuse-vs-build decisions before any builder touches bridge code.
+
+## BR-L-0002: the owner's Review-8 disposition is reconciled as mandatory input, with its authority classes kept exact (2026-09-25)
+
+The owner sent a message during the session: refresh the Phase-2 durable records, then take OD-P2-10A/B and its
+`evidence_for_the_synthesis` references in as mandatory bridge inputs, with the authority distinctions preserved.
+The bridge had already been based on `6e7a2a3`, which records OD-P2-10A/B, and the architect had not yet been
+dispatched. Nothing validly completed was therefore restarted.
+
+**Refreshed.** The `release/4.1.6-rc1` tip was re-read. It is still `6e7a2a3`; no Phase-2 record is newer than the
+bridge base, and the main checkout is clean. `P2-AR-0096.checkpoint.md` is not under `release/orchestration/phase-2/`
+where the Review-8 brief implied it would be. It lives in the frozen product tree at
+`3c880d8:telemetry/checkpoints/`, and is recorded there.
+
+**Reconciled.** The state now carries `mandatory_bridge_inputs`, in which each item is hash-bound where it is a file
+and carries an explicit class:
+
+* `OWNER_DECISION`: OD-P2-10A, OD-P2-10B, Property-A preservation, the standing state;
+* `OWNER_DIRECTION_TO_TEST`: F1 deletion/simplification, which is **not yet authority**;
+* `HYPOTHESIS_TO_TEST`: F2/F3 as one class, which has **no classificatory force**;
+* `HYPOTHESIS_RELEVANT_OBSERVATION`: the Phase-2 orchestrator's three reasoning errors, which concern its reasoning
+  rather than the implementation;
+* `EVIDENCE`, and `EVIDENCE_WITHDRAWN` for the withdrawn AR96 positive-control finding;
+* `ORCHESTRATION_RECORD`: the context pack, the design records, ledger entries P2-L-0033..0047 and the Phase-2 state.
+
+`check_state.py verify` now re-hashes these items. BR-HO-0001 makes them mandatory reading. It requires the
+architect's authority model to represent these exact classes, and a direction or hypothesis must be structurally
+incapable of entering packet section A. The demonstration's grading now fails any packet that blurs the classes.
