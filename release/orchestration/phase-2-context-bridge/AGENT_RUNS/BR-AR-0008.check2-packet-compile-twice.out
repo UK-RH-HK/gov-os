@@ -1,0 +1,13 @@
+run1_status OK
+run2_status OK
+rendered_identical True
+packet_sha256_run1 f1f2c41107f406d6dc912cb1f6301223bc83615b22366d191e1c3c8dc12a8de7
+packet_sha256_run2 f1f2c41107f406d6dc912cb1f6301223bc83615b22366d191e1c3c8dc12a8de7
+packet_sha256_equal True
+validate_problems []
+A_item_count 10
+D2_count 1 D2_all_have_banner True
+D3_count 1 D3_all_have_banner True
+D2_class {'OWNER_DIRECTION_TO_TEST'}
+D3_class {'HYPOTHESIS_TO_TEST'}
+every_section_has_queries_items_dropped True

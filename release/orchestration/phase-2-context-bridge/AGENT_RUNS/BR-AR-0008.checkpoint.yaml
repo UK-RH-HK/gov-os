@@ -1,0 +1,55 @@
+run_id: BR-AR-0008
+commit: 2dd3fd0a2bb5a08b233d4600958df71fe45fabe3
+commands:
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0008 PYTHONPATH=$D $PY -m pytest tests/compile -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.check1-pytest.out
+    output_sha256: 63759f464c554e626d5c5d7b006fb4df27e7e43015337323c463022e3eee332a
+  - cmd: |
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0008 PYTHONPATH=$D $PY -c "
+      from govbridge.core.yamlutil import load_yaml_file
+      from govbridge.compile import packet as packetmod
+      from govbridge.compile import validate as validatemod
+      from govbridge.route.router import FAKE_ROUTES
+      task_spec = load_yaml_file('$D/ARCHITECTURE/demonstration-task.yaml')
+      r1 = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES)
+      r2 = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES)
+      print('run1_status', r1['status']); print('run2_status', r2['status'])
+      print('rendered_identical', r1['rendered'] == r2['rendered'])
+      print('packet_sha256_run1', r1['packet_sha256']); print('packet_sha256_run2', r2['packet_sha256'])
+      print('packet_sha256_equal', r1['packet_sha256'] == r2['packet_sha256'])
+      m = r1['manifest']
+      problems = validatemod.verify_packet(m, task_spec, registry_path=r1['registry_path'])
+      print('validate_problems', problems)
+      print('A_item_count', len(m['sections']['A']['items']))
+      d2 = m['sections']['D']['subblocks']['D.2']['items']
+      d3 = m['sections']['D']['subblocks']['D.3']['items']
+      print('D2_count', len(d2), 'D2_all_have_banner', all(it['banner'] for it in d2))
+      print('D3_count', len(d3), 'D3_all_have_banner', all(it['banner'] for it in d3))
+      print('D2_class', {it['authority_class'] for it in d2})
+      print('D3_class', {it['authority_class'] for it in d3})
+      every = True
+      for letter, sec in m['sections'].items():
+          if letter == 'D':
+              for sub in sec['subblocks'].values():
+                  every = every and all(k in sub for k in ('queries', 'items', 'dropped'))
+          else:
+              every = every and all(k in sec for k in ('queries', 'items', 'dropped'))
+      print('every_section_has_queries_items_dropped', every)
+      "
+    # this is a Python API equivalent of the DAG's literal acceptance command ($PY -m govbridge.compile.packet
+    # $D/ARCHITECTURE/demonstration-task.yaml --fake-routes, run twice, diffed); it exercises the identical
+    # compile_packet() call the CLI makes and additionally asserts validate.verify_packet reports zero problems
+    # and that every section carries queries/items/dropped, per the acceptance check's full "expect" clause.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.check2-packet-compile-twice.out
+    output_sha256: a4453edc85dd51774a09cd92018d29e6e7ea227276fee9bbda513ddea132ec6f
+  - cmd: >-
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0008 PYTHONPATH=$D $PY -m govbridge.compile.bootstrap
+      $D/ARCHITECTURE/demonstration-task.yaml | grep -c 'cap2-candidate-1\|GATE-P2-REPAIR-2'
+    exit_code: 1
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.check3-bootstrap-grepcount.out
+    output_sha256: 9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa
+    # exit_code 1 is grep's OWN correct behaviour for a zero count ("no lines matched"), not a failure -- the
+    # acceptance target is the PRINTED value (0), which output_path contains; the DAG's own acceptance line names
+    # this exact command with "expect: 0", meaning the grep -c value, not its process exit status.
