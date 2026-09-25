@@ -1,0 +1,76 @@
+=== bullet 1: plain pytest passes (full tree; see also AGENT_RUNS/BR-AR-0014.check1-pytest.out) ===
+........................................................................ [ 81%]
+................                                                         [100%]
+88 passed in 3.80s
+
+=== bullet 2+3: two from-clean code-layer builds in FRESH stores store-BR-AR-0014c / store-BR-AR-0014d ===
+{
+ "blobs_processed": 233,
+ "chunks_processed": 0,
+ "layer": "code",
+ "layer_seconds": {
+  "code": 3.388
+ },
+ "layer_stats": {
+  "code": {
+   "blobs": 233,
+   "chunks": 0,
+   "eager_blobs": 233,
+   "eager_refs": [
+    "evidence",
+    "product",
+    "records"
+   ],
+   "excluded_blobs": 11,
+   "occurrences": 0,
+   "rs_occurrences": 623
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 3.8
+}
+{
+ "blobs_processed": 233,
+ "chunks_processed": 0,
+ "layer": "code",
+ "layer_seconds": {
+  "code": 3.41
+ },
+ "layer_stats": {
+  "code": {
+   "blobs": 233,
+   "chunks": 0,
+   "eager_blobs": 233,
+   "eager_refs": [
+    "evidence",
+    "product",
+    "records"
+   ],
+   "excluded_blobs": 11,
+   "occurrences": 0,
+   "rs_occurrences": 623
+  }
+ },
+ "llm_invocations": 0,
+ "manifest_sha256": "7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 3.829
+}
+store-BR-AR-0014c {"blobs_parsed": 233, "call_site_rows": 111597, "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036", "excluded_blobs": 11, "literal_rows": 79518, "rows": 197348, "symbol_rows": 6233}
+store-BR-AR-0014d {"blobs_parsed": 233, "call_site_rows": 111597, "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036", "excluded_blobs": 11, "literal_rows": 79518, "rows": 197348, "symbol_rows": 6233}
+
+=== bullet 3: independent count -- INCLUDE-verdict .rs blobs vs excluded, across the eager refs' current commits ===
+records=4678124bfd5d2818a1cfc0b90428b94da3d04abe product=3c880d80f81475f5306bdd5f680f2e004df49391 evidence=58219d5628683d6f462aa67bf25dbc2641933bce
+independent INCLUDE-verdict .rs blob count: 233
+independent excluded (non-INCLUDE) .rs blob count: 11
+independent total distinct .rs blobs: 244
+
+=== bullet 4: query-invariance still holds (store-BR-AR-0014c) ===
+before: {"blobs_parsed": 233, "call_site_rows": 111597, "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036", "excluded_blobs": 11, "literal_rows": 79518, "rows": 197348, "symbol_rows": 6233}
+after: {"blobs_parsed": 233, "call_site_rows": 111597, "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036", "excluded_blobs": 11, "literal_rows": 79518, "rows": 197348, "symbol_rows": 6233}

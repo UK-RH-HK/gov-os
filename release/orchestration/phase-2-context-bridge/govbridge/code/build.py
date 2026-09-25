@@ -53,6 +53,20 @@ marker is a single boolean fact about an already-identified ``code_blob`` row, a
 changes when a single call_site row, and separately a single literal row, differs") then reduces to an ordinary
 join predicate over the SAME tables ``ensure_indexed`` already writes -- no second write path to keep in sync, and
 no risk of the two tables' blob sets silently drifting apart.
+
+**Follow-up 1 (corpus-rule exclusion, reopened after the first COMPLETED return):** the orchestrator measured 11
+``.rs`` blobs at the eager refs classified ``X-SEC-CONTENT``/EXCLUDE by ``config/corpus-rules.yaml``, all still
+parsed into ``code_symbol``/``code_call_site``/``code_literal`` -- a SECURITY_POLICY content-exclusion bypass
+(ARCHITECTURE.md sections 1.1/14 item 2: these files are meant to be reachable only through the exact route, by
+path/blob, never through lexical/semantic/code). Fixed entirely inside ``govbridge.code.symbols.ensure_indexed``
+(its own module docstring): every blob is classified through the existing, UNCHANGED
+``govbridge.core.corpus.classify_entry``/``ContentSniffer`` before it is ever handed to ``rust_treesitter.
+parse_module``, and a non-``INCLUDE`` verdict is recorded in ``govbridge.code.store.code_excluded_blob`` instead of
+being parsed -- generically (any effect other than INCLUDE, never only EXCLUDE by name). ``code_layer_builder``
+passes its own already-loaded ``rules`` through to ``ensure_indexed`` (previously accepted but ignored -- this
+run's own OI-2). ``eager``/``set_eager_blobs`` now mark BOTH ``code_blob`` and its excluded counterpart, so
+``blobs_parsed`` in ``code_layer_digest``'s extra is exactly the INCLUDE-verdict count (the excluded blobs are
+counted separately, in ``extra.excluded_blobs``) -- see ``govbridge.code.store``'s own module docstring.
 """
 from __future__ import annotations
 
@@ -110,16 +124,26 @@ def code_layer_builder(conn: sqlite3.Connection, resolved: ResolvedView, rules, 
     rs_files = 0
     for ref_name in sorted(eager_refs):
         commit = resolved.named[ref_name].commit
-        entries = symbolsmod.ensure_indexed(conn, commit, repo=repo)
+        # `rules` is the SAME corpus.Rule list govbridge.core.freshness.run() already loaded once for this whole
+        # build (BR-AR-0014 follow-up 1) -- passed through so classification never reloads corpus-rules.yaml per
+        # eager ref, and so the eager build classifies through the identical rules object the lazy path would
+        # fall back to loading fresh (govbridge.code.symbols.ensure_indexed's own module docstring).
+        entries = symbolsmod.ensure_indexed(conn, commit, repo=repo, rules=rules)
         rs_files += len(entries)
         reachable.update(blob_id for _, blob_id in entries)
     after = conn.execute("SELECT COUNT(*) FROM code_blob").fetchone()[0]
 
     codestore.set_eager_blobs(conn, reachable)
+    # set_eager_blobs marks `eager=1` on whichever of the two tables actually has a row for each id in
+    # `reachable` -- code_blob for an INCLUDE verdict, code_excluded_blob for anything else (BR-AR-0014 follow-up
+    # 1's own acceptance check 9: "blobs_parsed equals the independent count of INCLUDE-verdict .rs blobs").
+    eager_now = codestore.eager_blob_ids(conn)
+    excluded_now = codestore.eager_excluded_blob_ids(conn)
 
     return {
         "blobs": max(0, after - before), "occurrences": 0, "chunks": 0,
-        "eager_refs": sorted(eager_refs), "eager_blobs": len(reachable), "rs_occurrences": rs_files,
+        "eager_refs": sorted(eager_refs), "eager_blobs": len(eager_now), "excluded_blobs": len(excluded_now),
+        "rs_occurrences": rs_files,
     }
 
 
@@ -149,9 +173,10 @@ def code_layer_digest(conn: sqlite3.Connection) -> LayerDigest:
 
     codestore.ensure_schema(conn)
     blob_ids = codestore.eager_blob_ids(conn)
+    excluded_blobs = len(codestore.eager_excluded_blob_ids(conn))
     h = hashlib.sha256()
     if not blob_ids:
-        return LayerDigest(rows=0, digest=h.hexdigest(), extra={"blobs_parsed": 0})
+        return LayerDigest(rows=0, digest=h.hexdigest(), extra={"blobs_parsed": 0, "excluded_blobs": excluded_blobs})
 
     placeholders = ",".join("?" * len(blob_ids))
     symbol_rows = conn.execute(
@@ -173,5 +198,5 @@ def code_layer_digest(conn: sqlite3.Connection) -> LayerDigest:
 
     return LayerDigest(rows=n_symbol + n_call + n_literal, digest=h.hexdigest(), extra={
         "blobs_parsed": len(blob_ids), "symbol_rows": n_symbol, "call_site_rows": n_call,
-        "literal_rows": n_literal,
+        "literal_rows": n_literal, "excluded_blobs": excluded_blobs,
     })
