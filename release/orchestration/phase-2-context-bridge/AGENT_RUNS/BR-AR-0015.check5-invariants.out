@@ -1,9 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/usain/.cache/gov-bridge/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0015/release/orchestration/phase-2-context-bridge
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+tests/compile/test_compile_code_route_seeds.py::test_hand_moved_g_item_fails_packet_verify PASSED [100%]
+
+============================== 1 passed in 0.50s ===============================
+exit=0
+
+=== standalone script (same scenario), showing the actual verify_packet problem messages ===
 status: OK
 G item count: 9
 baseline verify_packet problems (expect []): []
 
 hand-moved G item into A -- verify_packet problems (expect non-empty):
- - section A does not equal the freshly recomputed resolver output: expected 0 item(s), packet has 1; expected=[] actual=[('20842723634da6a722ae914a', 'EVIDENCE', 'UNKNOWN', '7408b41dd1037def5ae1591e13b9536f7878e94c', 'src/x.rs', None, 1, 17, 'cf312db0e5c6024df9d001dc37870a3e49fed9c051dc481adc209a9d498d90eb')]
+ - section A does not equal the freshly recomputed resolver output: expected 0 item(s), packet has 1; expected=[] actual=[('20842723634da6a722ae914a', 'EVIDENCE', 'UNKNOWN', '4d886f938e85173be561531379f032d284f3c10e', 'src/x.rs', None, 1, 17, 'cf312db0e5c6024df9d001dc37870a3e49fed9c051dc481adc209a9d498d90eb')]
  - A/bfcbd21d12ed808685e582df: delivery 'RETRIEVED' != MANDATORY
 FAILS as required: True
 

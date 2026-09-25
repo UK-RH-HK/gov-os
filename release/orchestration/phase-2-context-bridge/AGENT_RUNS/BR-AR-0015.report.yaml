@@ -1,0 +1,197 @@
+run_id: BR-AR-0015
+role: bounded repair B6R2 (populates section G, ARCHITECTURE.md section 7.2's G row; BR-HO-0015)
+model_observed: claude-sonnet-5
+branch: bridge/b6r2-0015
+commit: 57523cbc2e6206ca1504a9b9e5233792baec98a5
+status: COMPLETED
+claims:
+  - id: C1-record-seed-symbols-derived-and-resolved-at-product-ref
+    text: >
+      New module govbridge/compile/codeseeds.py (defect 1: "nothing derives seed symbols from record seeds").
+      record_span() resolves a task seed to its own heading-delimited section -- a bare record id via a git-grep +
+      id-grammar-extraction walk (govbridge/compile/codeseeds.py:81-106, mirroring govbridge.graph.derive.
+      defines_edges_for_id's own walk, kept separate only because that frozen function discards line_end), or
+      RECORD#LOCAL (e.g. P2-AR-0097#F2) by finding the record's own file first, then re-scanning that SAME file's
+      text for the local heading (codeseeds.py:109-128). cited_code_units() (codeseeds.py:202-259) then scans the
+      section's own text for the four citation shapes BR-HO-0015 names: path:N / path:N-M (via govbridge.graph.
+      derive.cites_edges_in_text, called with citing_commit=PRODUCT commit -- never the record's own ref, because
+      G's job, ARCHITECTURE.md section 7.2, is "the code route at the canonical product ref"), a path-qualified
+      symbol ("module::fn"/"Type::fn"), and a bare backticked symbol. Every citation is resolved at the product ref
+      using only govbridge.code.symbols's public entry points (ensure_indexed) plus a precomputed whole-commit
+      (name, qualified_name) index built from govbridge.code.store.symbols_for_blobs (codeseeds.py:136-172) --
+      never a new resolution heuristic. Labels are never blurred: EXACT_PATH/HEURISTIC_SUFFIX for path:line
+      citations (carried straight from cites_edges_in_text's own derivation), EXACT_QUALIFIED only for a
+      "::"-qualified token that resolves to exactly one definition, HEURISTIC_NAME always for a bare backtick
+      token (never promoted to exact, whatever the match count), HEURISTIC_AMBIGUOUS (all candidates, none chosen)
+      for an ambiguous qualified token. A cited line with no enclosing symbol becomes an occurrence-level G item
+      (CitedOccurrence) instead of being dropped -- this is also how a cited evidence probe (a non-.rs path, e.g.
+      under probes/) surfaces, generically, with no special-casing of that directory.
+  - id: C2-seed-expansion-callers-callees-tests-reads-key
+    text: >
+      govbridge/route/real_routes.py's code_route (defect 2: "expand from those seed symbols... callers and
+      callees; the READS_KEY consumers of any literal key read at a seed symbol; TESTS edges") now builds a shaped
+      code_conn (govbridge.graph.code_bridge, the same connection why()/impact() already use) once per RouteSet
+      (real_routes.py:172-185) and, for every resolved definition, calls govbridge.graph.derive.callees_of/
+      tests_of (real_routes.py:229-247) plus a READS_KEY expansion: the literal keys read AT that symbol (queried
+      directly from the shaped connection's own literal table, the same query shape derive.reads_key_of itself
+      uses) followed by derive.reads_key_of for each key, surfacing every peer consumer. Existing definitions/
+      callers resolution (codesymbols.definitions/callers) is untouched. code_route gained two new optional
+      kwargs, seed_labels (citation-confidence label, embedded as "[citation:LABEL]" in the definition hit's text,
+      never conflated with a CALLS/TESTS/READS_KEY edge's own resolution label) and bare_occurrences (occurrence-
+      level G items for citations with no enclosing symbol) -- both additive, so an existing caller passing neither
+      is unaffected (confirmed by tests/route/test_real_routes.py's own 6 pre-existing tests, unmodified, still
+      passing).
+  - id: C3-packet-py-wires-derivation-into-the-seed-pass
+    text: >
+      govbridge/compile/packet.py's Compiler.code_seeds_for (packet.py:325-357) calls codeseeds.cited_code_units
+      per seed and returns (seed_names, seed_labels, bare_occurrences) -- seed_names always starts with the
+      original seed, so a seed that is already a code symbol keeps working exactly as before. The seed pass
+      (packet.py:545-560) now calls c.routes.run("code", seeds=seed_names, seed_labels=seed_labels,
+      bare_occurrences=bare_occurrences) instead of seeds=[seed], so every derived symbol/occurrence flows through
+      the SAME code-route -> RouteHit -> item_from_hit pipeline as a direct symbol seed, picking up dedup, budget
+      and ordering uniformly. Compiler gained product_commit() (packet.py:294-304), a cached, role-resolved lookup
+      (role: product in config/canonical-view.yaml, never a hard-coded ref name -- OC-BR-02) reused by both
+      code_conn() and code_seeds_for().
+  - id: C4-placement-code-or-test-surface-to-g-not-h
+    text: >
+      Defect 3 ("Placement looks at (class, lifecycle, delivery) only... A retrieved hit whose canonical occurrence
+      is product code or a test lands in H"). New module govbridge/compile/codesurfaces.py: is_code_or_test_surface
+      checks an occurrence's path against a small, versioned config list (config/budgets.yaml's new
+      code_test_surfaces key: source_extensions [.rs, .py], source_dirs [the SAME generic list
+      govbridge.graph.derive.CODE_DIRS already uses], test_path_globs). packet.py's query-fusion loop
+      (packet.py:568-590) now redirects a RETRIEVED/DERIVED item from H to G when its occurrence path is a code/
+      test surface, applied ONLY on the section == "H" fallback branch, so A/D.1/D.2/D.3/E/F placements are
+      provably unaffected (the branch is unreachable from any of those return paths in place_item). D.1/D.2/D.3/E/F
+      placement logic itself (place_item, d1_eligible, NON_LADDER_*_SECTION) is untouched -- verified by grep and
+      by the six named ARCHITECTURE.md section 5.3 invariant tests passing unmodified (check1).
+  - id: C5-admissibility-bug-found-and-fixed-during-real-view-verification
+    text: >
+      The FIRST real-view compile (before this fix) surfaced a genuine admissibility bug: both the seed-pass
+      redirect (pre-existing code, `target = "G" if cls_section == "H" else cls_section`, never touched by this
+      repair's first draft) and my new query-loop redirect would move a NON-LADDER class (UNCLASSIFIED, whose
+      ARCHITECTURE.md section 5.1 allowed_sections is fixed to H only) into G, which validate.py's independent
+      verify_placement correctly refused ("class 'UNCLASSIFIED' not allowed in G"). Fixed by a new helper,
+      g_admissible(cls) (packet.py:197-205): true only for a LADDER class (ClassSpec.allowed_sections == () means
+      "any admissible section"; a non-ladder class's allowed_sections never names G). Both redirect sites
+      (packet.py:559, packet.py:580-584) now gate on cls_section == "H" and g_admissible(...) together. This is
+      the one place this repair touches PRE-EXISTING seed-pass code (previously
+      `target = "G" if cls_section == "H" else cls_section"; the bug could never manifest before this repair,
+      because before it G never received any code-route hit at all for a record seed (defect 1) -- no test
+      asserted the old, latent-buggy behaviour). Re-verified clean on a second full real-view compile (packet
+      verify: zero problems, both runs -- check3).
+  - id: C6-fixture-test-proves-the-five-required-scenarios
+    text: >
+      tests/compile/test_compile_code_route_seeds.py (new, 3 tests, self-contained fixture repo, never Review-8/
+      Phase-2 content -- OC-BR-02): a record cites src/x.rs:3 (target_fn's body -- resolves to the enclosing
+      symbol, labelled EXACT_PATH since the path is cited exactly), the backticked symbol `helper_fn` (resolves,
+      labelled HEURISTIC_NAME), and probes/CX-PROBE-0001.md:1 (a non-code path -- surfaces as an occurrence-level
+      G item, no special-casing). Section G is proven to contain: the enclosing symbol (labelled), a caller
+      (caller_of_target), a TESTS edge target (test_target_fn), and the cited evidence probe.
+      test_lexical_code_hit_lands_in_g_not_h_and_noncode_hit_stays_in_h proves the SAME code file, reached via
+      lexical retrieval (not the code route), lands in G not H, while an unrelated non-code record stays in H.
+      test_hand_moved_g_item_fails_packet_verify proves both invariants (checkpoint entry 5) directly against this
+      fixture: hand-moving a G item into A, and a RETRIEVED G item into D.1, each fails packet verify.
+  - id: C7-real-view-acceptance-g-nonempty-a-unchanged-byte-identical
+    text: >
+      Compiling the REAL ARCHITECTURE/demonstration-task.yaml with real routes (govbridge.route.real_routes),
+      twice, against GOVBRIDGE_STORE=store-BR-AR-0010 (read-only; never index update/rebuild run against it):
+      packets are byte-identical (packet.md and manifest.json sha256 match across both runs); packet verify passes
+      with zero problems on BOTH; section G is non-empty -- 1960 items after budget enforcement (of 19870 raw
+      candidates; 17910 correctly dropped with reason BUDGET, none silently, matching ARCHITECTURE.md section 7.3's
+      "truncation is never silent" -- G's own byte total sits at 122872/122880 bytes, the synthesis profile's 120 KB
+      cap); section A's unit.id sequence (20 items) is byte-for-byte identical, in order, to
+      DEMONSTRATION/run-0-predispatch-g-empty/packet/manifest.json on bridge/demo-0011 -- BR-ARCH-RULING-1's own
+      work (A membership/ordering) is completely undisturbed. G items are populated from all three routes: lexical,
+      semantic and code (CALLS/TESTS occurrences at runtime/src/policy.rs, policy_precedence.rs, tools.rs, adopt.rs,
+      init.rs and elsewhere -- the exact files ARCHITECTURE.md section 4.6's own verified chain-probe table names).
+      Full G listing (path, line, symbol, label/route) saved at AGENT_RUNS/BR-AR-0015.check3-realview-demo.out.
+  - id: C8-oc-br-02-control-d0006
+    text: >
+      A task spec I wrote (tests/fixtures/compile/task-spec-d0006-control.yaml), seeded with D-0006 (the
+      capability-plugin/embedding-benchmark decision -- deliberately unrelated to Review 8/Phase 2) plus one query
+      over its own cited subsystem's real content, compiles OK against the real corpus: section G is non-empty (3
+      items, labelled class EVIDENCE) with occurrences at capabilities/python/govos_capabilities/
+      embed_sentence_transformers.py -- the exact file D-0006's own rationale names -- and packet verify passes
+      with zero problems. Proves G's derivation is generic (no Review-8/Phase-2/file-name special-casing anywhere
+      in govbridge/compile/codeseeds.py, govbridge/compile/codesurfaces.py or the real_routes.py/packet.py changes
+      -- grepped for "P2-AR", "Review 8", "F1"-"F6" and "phase-2": zero hits outside this task spec's own English
+      description of the check).
+  - id: C9-whole-tree-and-compile-suite-coexistence
+    text: >
+      `pytest tests -q` (plain collection) passes 328/328, including the 3 new tests in
+      tests/compile/test_compile_code_route_seeds.py, with zero modifications to any existing test file. The six
+      named ARCHITECTURE.md section 5.3 invariant tests (test_semantic_trap, test_retrieved_cannot_enter_a,
+      test_outage_a_identical, test_budget_pressure, test_mandatory_bridge_inputs_classes, test_section_scoping),
+      the import-boundary test and the class-table test all pass unmodified (part of the same 328).
+evidence:
+  - claim: C1-record-seed-symbols-derived-and-resolved-at-product-ref
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/codeseeds.py:81-259
+  - claim: C2-seed-expansion-callers-callees-tests-reads-key
+    file: release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py:172-300
+  - claim: C3-packet-py-wires-derivation-into-the-seed-pass
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:294-357
+  - claim: C3-packet-py-wires-derivation-into-the-seed-pass
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:545-560
+  - claim: C4-placement-code-or-test-surface-to-g-not-h
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/codesurfaces.py
+  - claim: C4-placement-code-or-test-surface-to-g-not-h
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:568-590
+  - claim: C4-placement-code-or-test-surface-to-g-not-h
+    file: release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  - claim: C5-admissibility-bug-found-and-fixed-during-real-view-verification
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:197-205
+  - claim: C6-fixture-test-proves-the-five-required-scenarios
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_code_route_seeds.py -v"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check2-fixture-test.out
+  - claim: C7-real-view-acceptance-g-nonempty-a-unchanged-byte-identical
+    command: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile ARCHITECTURE/demonstration-task.yaml --out AGENT_RUNS/.scratch/demo-run-1 (twice) && $PY -m govbridge packet verify AGENT_RUNS/.scratch/demo-run-1"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out
+  - claim: C8-oc-br-02-control-d0006
+    command: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile tests/fixtures/compile/task-spec-d0006-control.yaml --out AGENT_RUNS/.scratch/d0006-control && $PY -m govbridge packet verify AGENT_RUNS/.scratch/d0006-control"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check4-d0006-control.out
+  - claim: C9-whole-tree-and-compile-suite-coexistence
+    command: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests -q"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check1-pytest.out
+mutation_scope_respected: true
+open_issues:
+  - id: OI-1-real-view-compile-is-slow
+    text: >
+      Compiling the real demonstration task with real routes takes about 8 minutes per run (up from effectively
+      instantaneous when G was empty), because the seed pass now proposes ~20000 candidate G items (43+ resolved
+      symbols per seed x callers/callees/TESTS/READS_KEY expansion x 4 seeds, mostly discarded by budget
+      enforcement afterward -- check3's own drop list). A first draft resolved each derived symbol name a SECOND
+      time via a fresh govbridge.code.symbols.definitions()/callers() call per name (each re-walking the whole
+      .rs tree via ensure_indexed); this was fixed for the CITATION-SCANNING half (codeseeds.py's
+      _symbol_name_index builds one whole-commit (name, qualified_name) index per seed instead of one
+      ensure_indexed call per token -- cut cited_code_units from several seconds to ~0.35s per seed, confirmed by
+      direct timing). The remaining cost is in real_routes.py's code_route, which still calls
+      codesymbols.definitions()/callers() once per derived NAME (by design -- this is the existing, pre-repair
+      code path, now simply given many more names). A further optimisation (batch-resolving every seed's names in
+      one pass, reusing codeseeds.py's own whole-commit index instead of re-deriving it inside real_routes.py)
+      is possible but out of this bounded repair's scope: correctness (five acceptance checks, all green,
+      byte-identical across two independent runs) was prioritised over compile latency, and nothing in
+      BR-HO-0015 or ARCHITECTURE.md sets a time budget for compilation itself (only for the PACKET's own byte
+      budget, which is enforced and respected).
+  - id: OI-2-local-heading-citations-can-be-unreachable-in-indented-corpus-content
+    text: >
+      For the real demonstration task's three record-local seeds (P2-AR-0097#F1/#F2/#F3), record_span's
+      LOCAL-heading lookup finds nothing: EVIDENCE/review-8/P2-AR-0097-return.verbatim.md's actual committed text
+      has every line indented (it was captured from a subagent hand-back frame, "the harness indents every line of
+      the report"), so the record's "### F2" headings never start at column 0 and
+      govbridge.authority.records.extract_definitions_markdown's DR-MD-HEADING-LOCAL regex (anchored `^#{1,6}`)
+      never matches them. This is honest MISSING (cited_code_units returns ((), ()) for those three local-id
+      seeds, never a guess or a crash) -- G is still populated for the real task because the FOURTH seed,
+      P2-AR-0097 (the bare, non-local id), resolves via DR-FILE-STEM to the WHOLE file and its citation scan covers
+      the same F1/F2/F3 body text anyway (43 symbols found from that one seed alone, verified directly). This is a
+      pre-existing content/indentation property of that specific committed file, not a defect in this repair's
+      logic, and EVIDENCE/review-8/** is explicitly out of scope to edit or repair (per this run's brief:
+      "Do not repair, pre-judge or classify Review-8 findings F1-F6"). Flagged for whoever owns that file's
+      provenance, not fixed here.
+  - id: OI-3-code-route-retrieval-exclusions-not-applied-to-seed-derived-names
+    text: >
+      task_spec['retrieval_exclusions'] is applied to the QUERY-fusion loop's route calls (unchanged,
+      packet.py:564) but, as in the code BEFORE this repair, is NOT passed to the seed loop's
+      c.routes.run("code", seeds=...) call (packet.py:553-554 -- the original code
+      `for hit in c.routes.run("code", seeds=[seed])` never passed exclude either). This repair does not change
+      that pre-existing asymmetry; noted here in case a future node wants seed-derived G items to honour
+      retrieval_exclusions too.
