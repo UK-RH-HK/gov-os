@@ -1,5 +1,5 @@
 run_id: BR-AR-0004
-commit: PENDING-FILLED-IN-SECOND-COMMIT
+commit: d48d6eb55528b216ce20df3f674dc597a9d46789
 commands:
   - cmd: "cd $D && $PY -m pytest tests/lexical -q"
     exit_code: 0

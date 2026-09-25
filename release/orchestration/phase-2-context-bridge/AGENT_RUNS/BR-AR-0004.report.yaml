@@ -2,7 +2,7 @@ run_id: BR-AR-0004
 role: builder B2 lexical route, SQLite FTS5 (DAG node B2)
 model_observed: claude-sonnet-5
 branch: bridge/b2-0004
-commit: PENDING-FILLED-IN-SECOND-COMMIT
+commit: d48d6eb55528b216ce20df3f674dc597a9d46789
 status: COMPLETED
 claims:
   - id: C1-layer-registration-without-editing-core
