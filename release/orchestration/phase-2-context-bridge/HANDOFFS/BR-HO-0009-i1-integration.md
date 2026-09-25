@@ -71,7 +71,11 @@ rules by `git diff` at merge, and violating any one refuses the merge:**
 | Orchestrator | `pytest tests -q` fails at collection: `tests/code/test_history.py` and `tests/graph/test_history.py` share a basename | Fix it **by an R100 rename** of one of them, or by config that makes plain `pytest tests -q` collect everything. **The acceptance command is plain `pytest tests -q`.** |
 | TA OI-3 | `demo validate-oracle` must agree with `DEMONSTRATION/oracle-tools/check_oracle.py` | Match its stricter rules: lines on every code/test anchor; a record_id or section on line-less record/contract/evidence anchors; 40-hex commits; `process`/`production` keys only on both-ways consumer anchors. **Reuse `check_oracle.py` by import or subprocess rather than re-implementing it.** You never see the oracle itself; test against the synthetic fixture oracle only. |
 | TA OI-4 | Section placement of the `EVIDENCE` and `ORCHESTRATION_RECORD` mandatory items | Make the compiled packet's placement follow `ARCHITECTURE.md` §5.1/§7.2 admissibility exactly. Print each `mandatory_bridge_inputs` item's section in your checkpoint output. |
-| B6 | *(the orchestrator will append B6's routed issues here before dispatch)* | |
+| B6 | The real B2/B3/B4 routes are not wired: B6 used `--fake-routes`, by design | Translate the lexical, semantic and code outputs, and the exact route, into B6's `RouteHit`/`RouteSet` (§9 interfaces). The `compile` CLI then uses the real routes by default, and `--fake-routes` remains available only for tests. |
+| B6 | Section C is empty until the `authority_edge` layer is built on the real view | After your from-clean build, C must be populated on the demonstration task. Report its item count. |
+| B6 | The `bounded-builder` budget split has no independent citation | Leave it as documented. The verifier judges it. |
+| B6 | D.1 references A by id, rather than duplicating content | Keep it, and make sure `packet verify` and the receipt checker handle references. |
+| **BR-ARCH-RULING-1** (implemented by B6R, BR-AR-0013, before you start) | A mandatory input is never moved out of A by its lifecycle | **Keep it intact.** On the real view, with real routes, print the per-item section map for every `mandatory_bridge_inputs` item and owner record in your checkpoint. Contract v3, the frozen gate contract and the launcher must be in A. F1-DIRECTION must be in D.2 only, and F2-F3-COMMON-CLASS in D.3 only. |
 
 ## 4. The long runs
 
