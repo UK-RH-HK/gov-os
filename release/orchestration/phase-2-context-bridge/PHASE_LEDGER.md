@@ -233,3 +233,27 @@ I1's scope therefore also gains `config/model-pin.yaml` and `bootstrap/**`.
 
 **B5 (authority and graph) is the only PG1 node still running.** It received the BR-DAG-AMEND-3 clarification while
 live.
+
+## BR-L-0010: B5 (authority and graph) lands; the authority classes are verified by the orchestrator; B6 is dispatched (2026-09-25)
+
+**BR-AR-0007 returned COMPLETED** on `claude-sonnet-5` (544 turns). `integrate-check` was PERMITTED. This node holds
+the foundations of the hard authority invariant, so the orchestrator checked the resolver's real output itself, item
+by item:
+
+* OD-P2-10A is `OWNER_DECISION`, scoped to its own section;
+* **F1-DIRECTION is `OWNER_DIRECTION_TO_TEST`**;
+* **F2-F3-COMMON-CLASS is `HYPOTHESIS_TO_TEST`**;
+* the reasoning-errors item is `HYPOTHESIS_RELEVANT_OBSERVATION`;
+* the AR96 gap is `EVIDENCE_WITHDRAWN`;
+* the whole-file OD-P2-10A/B reference **fails closed to `UNCLASSIFIED`**, so a file's class never flows into its
+  sections.
+
+`resolver.py` and `lifecycle.py` import no retrieval route. BR-DAG-AMEND-3 is implemented: the records, edges and
+class rows are persisted and digested, and the resolver stays store-independent.
+
+**The first real integration defect.** Plain `pytest tests -q` fails at collection. B3's and B5's
+`test_history.py` share a basename, which no single builder could see. With `--import-mode=importlib` the integrated
+suite passes: **240 tests**. The fix, plus B5's five open issues, goes to I1. Those issues include the hard-coded
+state-file aliases in code, which break the letter of OC-BR-02.
+
+**Dispatched B6** (route and compile, BR-AR-0008, sonnet), based on `e49b8a4`.

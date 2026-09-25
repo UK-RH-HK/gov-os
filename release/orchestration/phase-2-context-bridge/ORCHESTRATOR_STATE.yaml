@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T11:41:22Z'
-state_hash: 4acfbfb940273d20e429730071ff41d7b8e9d0cccb9a64fd0b005e57ab2d562b
-lifecycle_state: BR_BUILD_PG1
+updated_at: '2026-09-25T11:47:37Z'
+state_hash: c60450e2cbf1603f8dbfa393434d785ae5393e0b434f03ec4c478025eacf17dc
+lifecycle_state: BR_BUILD_PG2
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -435,10 +435,33 @@ agent_runs:
   branch: bridge/b5-0007
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0007
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-a443a1dd706f259ed.jsonl)
+  model_observed: claude-sonnet-5 (all 544 assistant turns, transcript agent-a443a1dd706f259ed.jsonl)
   agent_name: br-builder-b5-0007
   dispatched_at: '2026-09-25T10:27Z'
-  status: RUNNING
+  duration_ms: 5055611
+  status: COMPLETED_INTEGRATED
+  final_commit: b174f6a3ce4d5af279e1db7546941ef7ec5fc98f
+  merged_at: e49b8a4
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - resolver on demonstration-task.yaml -- status OK, 25 items; OD-P2-10A OWNER_DECISION lines 11-24; F1-DIRECTION
+    OWNER_DIRECTION_TO_TEST lines 38-58; F2-F3-COMMON-CLASS HYPOTHESIS_TO_TEST lines 59-68; ORCHESTRATOR-REASONING-ERRORS
+    HYPOTHESIS_RELEVANT_OBSERVATION; AR96 gap EVIDENCE_WITHDRAWN/WITHDRAWN; the whole-file OD-P2-10A/B reference UNCLASSIFIED
+    (file class never flows into sections)
+  - resolver.py and lifecycle.py import only authority modules and core gitobj/view -- no lexical/semantic/code/graph/route
+  - BR-DAG-AMEND-3 implemented -- record_def/authority_edge/class_lifecycle persisted via core's layer API; resolver
+    store-independent
+  - integrated suite 240 passed with --import-mode=importlib; plain `pytest tests -q` fails collection on a basename
+    collision (tests/code/test_history.py vs tests/graph/test_history.py) -- routed to I1
+  open_issues_routed_to_I1:
+  - 'hard-coded state-file aliases (bridge/phase-2/phase-1) in resolver.py and BRIDGE_STATE_PATH in classes.py -- move to
+    config (OC-BR-02 forbids particular file names in code)'
+  - from-clean authority layer ~4 min on a contended machine (target ~30 s) -- measure uncontended in D1
+  - only DEFINES and registry SUPERSEDES edges persisted; MENTIONS/CITES/CODE_CITES/EVIDENCE_MAP and B3-dependent
+    CALLS/READS_KEY/TESTS are on-demand -- I1 wires the code-derived edges against the real B3 tables
+  - multi-path mandatory item (REVIEW-8-PROBES) resolves only its first path
+  - core pathrules.glob_match lacks brace alternation (worked around in B5 scope) -- I1 may fix centrally
+  - pytest basename collision above
   store: $HOME/.cache/gov-bridge/store-BR-AR-0007
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/authority/**
@@ -449,9 +472,26 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/graph/**
   - release/orchestration/phase-2-context-bridge/tests/fixtures/authority/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.*
+- run_id: BR-AR-0008
+  role: builder B6 (route and compile)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0008-b6-0008.md
+  branch: bridge/b6-0008
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0008
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-builder-b6-0008
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0008
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/route/**
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/**
+  - release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  - release/orchestration/phase-2-context-bridge/tests/compile/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.*
 running_work:
-- run_id: BR-AR-0007
-  liveness_check: subagent transcript mtime + commits on bridge/b5-0007; never inferred from elapsed time
+- run_id: BR-AR-0008
+  liveness_check: subagent transcript mtime + commits on bridge/b6-0008; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -534,8 +574,8 @@ evidence_status:
     6,567 files / 6,489 included / 75.4 MB; provisional model BAAI/bge-small-en-v1.5 (MIT, 384-d, ONNX Runtime 1.30.0
     CPU, bitwise-deterministic in spike); product memory engine NOT used (running it would mutate the adoption-floor
     store F3 reads)'
-  builder_evidence: 'integrated tree after B1+B2+B3+B4: full bridge suite passes together, run by the orchestrator
-    (see BR-L-0009)'
+  builder_evidence: 'integrated tree after B1-B5: 240 tests pass together with --import-mode=importlib (plain collection
+    blocked by one basename collision, routed to I1); run by the orchestrator'
   review_8_demonstration: NOT_RUN
 immutable_evidence:
 - path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
@@ -551,6 +591,5 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await PG1 (BR-AR-0004 B2, BR-AR-0005 B3, BR-AR-0006 B4, BR-AR-0007 B5); for each -- read the
-  observed model from its transcript, run integrate-check, run its tests in its worktree, merge; after B5 merges, dispatch
-  B6 (BR-AR-0008, sonnet); after B2/B3/B4/B6 merge, dispatch I1 (BR-AR-0009) with TA open issues OI-3/OI-4
+next_deterministic_action: await BR-AR-0008 (B6); then verify (integrate-check, model, tests incl. the named invariant
+  tests, a packet compile twice), merge, then dispatch I1 (BR-AR-0009, sonnet) with every routed open issue and BR-DAG-AMEND-2
