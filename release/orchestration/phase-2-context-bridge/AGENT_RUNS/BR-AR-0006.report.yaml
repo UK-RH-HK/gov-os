@@ -2,7 +2,7 @@ run_id: BR-AR-0006
 role: builder B4 semantic route (DAG node B4)
 model_observed: claude-sonnet-5
 branch: bridge/b4-0006
-commit: PLACEHOLDER_FILLED_AFTER_COMMIT
+commit: 617c3cae4f69e6f8402c07a84784090208dd16ab
 status: COMPLETED
 claims:
   - id: C1-onnx-adapter-is-an-adapt-of-a-copy

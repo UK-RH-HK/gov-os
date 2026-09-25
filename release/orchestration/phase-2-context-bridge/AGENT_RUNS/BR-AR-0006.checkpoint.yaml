@@ -1,5 +1,5 @@
 run_id: BR-AR-0006
-commit: PLACEHOLDER_FILLED_AFTER_COMMIT
+commit: 617c3cae4f69e6f8402c07a84784090208dd16ab
 commands:
   # Acceptance check 1: cd $D && $PY -m pytest tests/semantic -q
   - cmd: "cd $D && PYTHONPATH=$D $PY -m pytest tests/semantic -q"
