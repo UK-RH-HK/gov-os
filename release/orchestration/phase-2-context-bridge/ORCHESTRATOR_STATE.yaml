@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T10:21:24Z'
-state_hash: b8b3e5e661222965bb39bcf63417cc2b2a26b38a49b2db9ac8128a0a3e4a5c86
+updated_at: '2026-09-25T10:22:03Z'
+state_hash: 3e16cd7479c007f8e9771cb6fdbe79dd0e9e5d77ad61993497bc5711fb405a70
 lifecycle_state: BR_BUILD_PG1
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -423,6 +423,15 @@ dag:
       uses its own store $HOME/.cache/gov-bridge/store-<RUN_ID>; venv and model cache shared and read-only after B1's
       bootstrap, so requirements.lock must carry every wheel B2-B6/I1 need
     reason: the architecture fixes the store under $HOME/.cache/gov-bridge/ with no override, and B2-B5 run in parallel
+  - id: BR-DAG-AMEND-2
+    by: orchestrator (routing of builder open issues; no design change)
+    rule: I1's mutation_scope is extended with govbridge/core/** and tests/core/** (B1 is complete and no other node
+      touches core) so I1 closes B1's OI-2 (wire `exact id` to B5's id grammar), OI-4 (INCREMENTAL via diff-tree of changed
+      paths), OI-5 (detect a removed history ref and drop its stale occurrences) and OI-6 (a CANONICAL_FALLBACK fixture
+      test); I1 also carries TA OI-3 (validator strictness) and OI-4 (section placement of EVIDENCE/ORCHESTRATION_RECORD
+      mandatory items)
+    reason: changing core under the four PG1 builders running in parallel would destabilise their base; I1 is the first
+      node after them that owns cross-cutting integration
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
