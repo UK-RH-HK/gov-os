@@ -1,0 +1,156 @@
+schema: govbridge-authority-registry/1
+purpose: >-
+  Explicit, cited authority/lifecycle assignments for what records do not carry machine-readably (ARCHITECTURE.md
+  section 5.2 rule 2), plus path/type class rules (rule 4). Entries may only RESTRICT (add supersession, withdrawal,
+  section scoping, a lower class); govbridge.authority.registry never raises a class from what a rule states. Every
+  entry's quote is verified against the cited blob at build/load time (govbridge.authority.registry.load); a
+  mismatch fails loudly. The class vocabulary is the one in ORCHESTRATOR_STATE.yaml mandatory_bridge_inputs.authority_classes
+  plus the ladder classes of ARCHITECTURE.md section 5.1 (govbridge.authority.classes).
+seeded_from: ARCHITECTURE/schemas/authority-registry.yaml seed_entries_verified_by_BR-AR-0001 (verified at 6e7a2a3 by
+  BR-AR-0001's direct reads, checkpoint command 17); every quote below was independently re-read and re-verified by
+  BR-AR-0007 (node B5) at the same commit before this file was committed, and is re-verified again on every load by
+  govbridge.authority.registry.load (never trust-on-read).
+verified_at_commit: 6e7a2a3495a8d3619759a95b7ed055da9c848618
+
+# -----------------------------------------------------------------------------------------------------------------
+# section_anchors: scopes a class to one heading-delimited section of a file that also holds other, differently
+# classed material. The file-level class (from class_rules below) never flows into an anchored file's sections or
+# into its unanchored lines (ARCHITECTURE.md section 5.2 rule 1); unanchored_lines_rule below states this per file.
+# -----------------------------------------------------------------------------------------------------------------
+section_anchors:
+  - item_id: OD-P2-10A
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    heading: '## OD-P2-10A — F2 is NOT scope expansion'
+    lines: [11, 24]
+    class: OWNER_DECISION
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 11,
+           quote: 'OD-P2-10A — F2 is NOT scope expansion'}
+  - item_id: OD-P2-10B
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    heading: '## OD-P2-10B — the Review-8 failure bridge is authorised and starts now'
+    lines: [25, 37]
+    class: OWNER_DECISION
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 25,
+           quote: 'OD-P2-10B — the Review-8 failure bridge is authorised and starts now'}
+  - item_id: F1-DIRECTION
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    heading: '## F1 — owner direction recorded, NOT yet authority to act'
+    lines: [38, 58]
+    class: OWNER_DIRECTION_TO_TEST
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 38,
+           quote: 'F1 — owner direction recorded, NOT yet authority to act'}
+  - item_id: F2-F3-COMMON-CLASS
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    heading: '## F2 / F3 — classification hypothesis, NOT yet a final owner decision'
+    lines: [59, 68]
+    class: HYPOTHESIS_TO_TEST
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 59,
+           quote: 'F2 / F3 — classification hypothesis, NOT yet a final owner decision'}
+  - item_id: OD-P2-10A-B.PROPERTY-A
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    heading: '## Property A'
+    lines: [69, 73]
+    class: OWNER_DECISION
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 69,
+           quote: 'Property A'}
+  - item_id: OD-P2-10A-B.STANDING-STATE
+    path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    heading: '## Standing state after this record'
+    lines: [74, 78]
+    class: OWNER_DECISION
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 74,
+           quote: 'Standing state after this record'}
+  - item_id: ORCHESTRATOR-REASONING-ERRORS
+    path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+    key: orchestrator_error_f3
+    lines: [1569, 1578]
+    class: HYPOTHESIS_RELEVANT_OBSERVATION
+    note: the ledger passages P2-L-0046/P2-L-0047 that describe the same errors are also HYPOTHESIS_RELEVANT_OBSERVATION
+      where they describe the reasoning errors; the rest of those entries stays ORCHESTRATION_RECORD
+    cite: {path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml, line: 1569, quote: 'orchestrator_error_f3'}
+
+unanchored_lines_rule:
+  - path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+    note: >-
+      every line outside the six anchored sections above (lines 1-10, the header table before the first heading)
+      is UNCLASSIFIED, scoped to that section -- the file-level OWNER_DECISION class (from the class_rules OWNER-*.md
+      rule below) never flows into a section, and a request for the file as ONE occurrence (no item_id, no line
+      range inside a single anchor) is likewise UNCLASSIFIED, because the file is not uniformly one class.
+
+# -----------------------------------------------------------------------------------------------------------------
+# supersessions: derivation REGISTRY_CITED. scope: WHOLE flips `to`'s lifecycle via the same status-vocabulary
+# mapping applied to the cited quote (ARCHITECTURE.md section 5.1's fixed table); any other scope leaves `to`'s
+# lifecycle unchanged and adds a "partially superseded: <scope>" note only (govbridge.authority.lifecycle).
+# -----------------------------------------------------------------------------------------------------------------
+supersessions:
+  - from: OD-P2-07
+    to: OA-P2-06
+    scope: stop condition
+    note: >-
+      OA-P2-06 otherwise stays ACTIVE, annotated "partially superseded: stop condition"; OD-P2-08 section 8's
+      stop conditions are the current ones
+    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md,
+           line: 9, quote: "continuation **beyond** OA-P2-06's previous stop condition"}
+  - from: V8.2
+    to: V8.1
+    scope: WHOLE
+    cite: {path: release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml, line: 70,
+           quote: "HISTORICAL_PHASE_1_OPERATOR_EVIDENCE"}
+  - from: OWNER-DIRECTIVE-0004
+    to: CP-1
+    scope: WHOLE
+    note: retired as the Phase-1 target
+    cite: {path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md, line: 43,
+           quote: "CP-1 is retired as the Phase-1 target"}
+  - from: 'V8_3_EVIDENCE_PACKAGE.md#5.0'
+    to: 'V8_3_EVIDENCE_PACKAGE.md#5.3(only serialised runs are authoritative)'
+    scope: section
+    note: the sentence "only serialised runs are authoritative" (and the earlier seven-defect figure) is retracted by
+      section 5.0's current-truth block and corroborated by PERFORMANCE_DIAGNOSTIC.md's independent arithmetic
+    cite: {path: release/orchestration/phase-2/V8_3_EVIDENCE_PACKAGE.md, line: 253,
+           quote: "Anything in §5 that disagrees with this block is"}
+    corroboration: {path: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, line: 177,
+           quote: 'the "serialised band" itself does not survive scrutiny'}
+
+# -----------------------------------------------------------------------------------------------------------------
+# lifecycle_overrides: derivation REGISTRY_CITED. Sets both class and lifecycle directly for `unit` (a record id or
+# `path#heading`); only ever used to RESTRICT (here: to WITHDRAWN/EVIDENCE_WITHDRAWN, never to raise a class).
+# -----------------------------------------------------------------------------------------------------------------
+lifecycle_overrides:
+  - unit: DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP
+    lifecycle: WITHDRAWN
+    class: EVIDENCE_WITHDRAWN
+    cite: {path: release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md, line: 6,
+           quote: "WITHDRAWN 2026-09-25"}
+
+# -----------------------------------------------------------------------------------------------------------------
+# class_rules: glob -> class, data only, FIRST match wins, gives a class, NEVER an ACTIVE lifecycle (ARCHITECTURE.md
+# section 5.2 rule 4). Applied only when nothing above (mandatory_bridge_inputs item, section_anchors, structured
+# YAML/header-table metadata) already assigned a class. The ladder rows come from BR-HO-0001 section 2.2 item 2.
+# -----------------------------------------------------------------------------------------------------------------
+class_rules:
+  - {glob: 'release/orchestration/*/GATES/OWNER-*.md', class: OWNER_DECISION,
+     note: 'section-scoped when section_anchors above anchors items inside the file -- see unanchored_lines_rule'}
+  - {glob: 'release/orchestration/phase-2-context-bridge/GATES/OWNER-*.md', class: OWNER_DECISION}
+  - {glob: 'Governance_OS_Capability_Acceptance_Contract_v3.md', class: CONTRACT}
+  - {glob: 'framework/contracts/source/*.md', class: CONTRACT}
+  - {glob: 'framework/contracts/*.yaml', class: CONTRACT, type: compiled-derived}
+  - {glob: 'release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md', class: FROZEN_GATE_CONTRACT}
+  - {glob: 'spec/decisions/*.yaml', class: ARCHITECTURE_DECISION}
+  - {glob: 'spec/architecture/*.yaml', class: ARCHITECTURE_DECISION}
+  - {glob: '{DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md,GOVERNANCE_OS_ADOPTION_MIGRATION_AND_INDEPENDENT_AUDIT_PROTOCOL_v3.0.md,GOVERNANCE_OS_RELEASE_DISTRIBUTION_ADOPTION_AND_UPSTREAM_LEARNING_PROTOCOL_v1.2.md}',
+     class: ARCHITECTURE_DECISION, type: governing-document}
+  - {glob: 'release/orchestration/*/GATES/P2-ADJ-*.md', class: ORCHESTRATION_RECORD, type: adjudication,
+     note: 'D.1-admissible, labelled rank 5 ("never a new owner decision")'}
+  - {glob: 'release/orchestration/**/{ORCHESTRATOR_STATE.yaml,GATE-REGISTER.yaml,PHASE_LEDGER.md,PHASE_1_LEDGER.md}',
+     class: ORCHESTRATION_RECORD}
+  - {glob: 'release/orchestration/**/{HANDOFFS,AGENT_RUNS,CHECKPOINTS,RESEARCH}/**', class: ORCHESTRATION_RECORD}
+  - {glob: 'release/orchestration/**/*.md', class: ORCHESTRATION_RECORD}
+  - {glob: 'fixtures/**', class: FIXTURE}
+  - {glob: '{probes,telemetry}/**', class: EVIDENCE}
+  - {glob: 'release/**/evidence/**', class: EVIDENCE}
+  - {glob: '{runtime,cli,tests,framework,capabilities,migrations,tools,bin,scripts}/**', class: EVIDENCE,
+     type: implementation-fact}
+  - {glob: '{spec/research,spec/reports,lessons}/**', class: EVIDENCE, type: research-or-lesson,
+     note: 'W2: research/lessons cannot silently become decisions or policy'}
+  - {glob: '**', class: UNCLASSIFIED}

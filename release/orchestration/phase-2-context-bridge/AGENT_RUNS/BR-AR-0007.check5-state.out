@@ -1,0 +1,27 @@
+{
+ "alias": "phase-2",
+ "blob": "314605ba5ae0e0881bc4b7ac6c5f38c3ac4786b1",
+ "commit": "95c05fbd12ec0dc5350cbed6c88060c0905f41e4",
+ "computed_state_hash": "43891420935dc9271abd3ac0a9a5124c30a6286ca8b2a039dc0ee3a7237b8c7d",
+ "key_path": "running_work",
+ "last_changed_commit": "7f78238813a0cd8439196280efb8bcb345c9b608",
+ "last_changed_date": "2026-09-24T17:17:10+01:00",
+ "line_end": 1113,
+ "line_start": 1106,
+ "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+ "recorded_state_hash": "5a3aa839585b179107d390240aa590bdc85c3374f16cc94539382dbbe8b81e70",
+ "seal_status": "SEAL_MISMATCH",
+ "value": [
+  {
+   "branch": "phase2/review-6",
+   "evidence_class": "INDEPENDENT_ADVERSARIAL",
+   "last_progress_at": "2026-09-24",
+   "role": "sixth independent adversarial review -- fitness to mint",
+   "run_id": "P2-AR-0092",
+   "status": "RUNNING",
+   "target": "phase2/ar90-repair a01f0c9 (FROZEN)",
+   "worker_model": "claude-opus-5 native",
+   "worktree": "scratchpad/wt/p2-rev6"
+  }
+ ]
+}
