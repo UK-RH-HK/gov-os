@@ -166,7 +166,14 @@ def place_item(cls: Optional[str], lifecycle: str, delivery: str, unit_id: str, 
     """Where a (class, lifecycle, delivery) combination belongs, purely from the class table (ARCHITECTURE.md
     section 5.1/5.3) -- NEVER from route, rank or score. Returns ``(section, also_d1)``; ``also_d1`` is True only
     for a MANDATORY, D.1-eligible item already placed in A (its D.1 appearance is a reference, not a duplicate --
-    see ``_reference_item``)."""
+    see ``_reference_item``).
+
+    BR-ARCH-RULING-1: section A membership is decided by the resolver together with the class's admissibility in
+    A -- lifecycle never decides it. A resolver-returned (``delivery == "MANDATORY"``) item whose class is
+    A-admissible goes to A **whatever its lifecycle**; a non-ACTIVE lifecycle stays visible via the item's banner
+    (``Compiler.item_from_mandatory``) and a J notice (``compile_packet``), never by being moved out of A or
+    relabelled ACTIVE. Lifecycle still gates D.1 (``d1_eligible`` below requires ACTIVE) and the E fallback, which
+    applies only to RETRIEVED/DERIVED items now that MANDATORY no longer reaches it for an A-admissible class."""
     spec = classesmod.ALL_CLASSES.get(cls)
     if spec is None:
         return "H", False
@@ -175,7 +182,7 @@ def place_item(cls: Optional[str], lifecycle: str, delivery: str, unit_id: str, 
         section = table.get(cls) or (spec.allowed_sections[0] if spec.allowed_sections else "H")
         return section, False
 
-    if delivery == "MANDATORY" and spec.admissible_in_a and lifecycle == classesmod.LIFECYCLE_ACTIVE:
+    if delivery == "MANDATORY" and spec.admissible_in_a:
         return "A", d1_eligible(cls, lifecycle, unit_id, grammar)
     if d1_eligible(cls, lifecycle, unit_id, grammar):
         return "D.1", False
@@ -266,6 +273,12 @@ class Compiler:
         spec = classesmod.ALL_CLASSES.get(mi.cls)
         delivery = delivery_for_mandatory(mi.cls)
         banner = spec.banner if spec is not None else None
+        if section == "A" and mi.lifecycle != classesmod.LIFECYCLE_ACTIVE:
+            # BR-ARCH-RULING-1 rule 2: "lifecycle stays visible and honest" -- a mandatory A item whose lifecycle
+            # is not ACTIVE carries the same lifecycle banner a RETRIEVED item would (LIFECYCLE_BANNERS, used by
+            # item_from_hit below). A ladder class never has its own class banner (spec.banner is None for every
+            # LADDER row), so this never overwrites one -- it only ever replaces None.
+            banner = LIFECYCLE_BANNERS.get(mi.lifecycle, banner)
         text = None
         if mi.path is not None and mi.commit is not None:
             text = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo)
@@ -399,10 +412,17 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         if also_d1:
             c.add(sections, "D.1", c.reference_item(item, "D.1"))
         ladder_spec = classesmod.ALL_CLASSES.get(mi.cls)
-        if ladder_spec is not None and ladder_spec.ladder and section != "A":
-            # a required input whose CLASS is ladder-admissible in A but whose LIFECYCLE kept it out (never
-            # fabricated as ACTIVE -- ARCHITECTURE.md section 5.1: "UNKNOWN... never treated as ACTIVE"). Made
-            # visible in J rather than silently parked wherever place_item's generic fallback put it.
+        if section == "A" and mi.lifecycle != classesmod.LIFECYCLE_ACTIVE:
+            # BR-ARCH-RULING-1 rule 2: the item stays in A (never moved out, never relabelled ACTIVE), but the
+            # gap is made visible in J -- "so the orchestrator sees the classification gap or the stale task
+            # spec". Replaces MANDATORY_ITEM_NOT_IN_A for this case, which is no longer reachable here: an
+            # A-admissible mandatory item is never placed anywhere but A now, whatever its lifecycle.
+            c.notices.append({"type": "MANDATORY_LIFECYCLE_NOT_ACTIVE", "id": mi.id, "class": mi.cls,
+                               "lifecycle": mi.lifecycle})
+        elif ladder_spec is not None and ladder_spec.ladder and section != "A":
+            # a required input whose CLASS is not admissible in A at all (e.g. DERIVED) -- never fabricated as
+            # admissible, and never moved there. Made visible in J rather than silently parked wherever
+            # place_item's generic fallback put it.
             c.notices.append({"type": "MANDATORY_ITEM_NOT_IN_A", "id": mi.id, "class": mi.cls,
                                "lifecycle": mi.lifecycle, "placed_in": section})
         if section == "D.2":

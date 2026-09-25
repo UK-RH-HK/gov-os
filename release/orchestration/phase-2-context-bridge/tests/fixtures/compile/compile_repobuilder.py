@@ -178,6 +178,20 @@ mandatory_bridge_inputs:
   - id: CX-WITHDRAWN-FINDING
     class: EVIDENCE_WITHDRAWN
     path: """ + WITHDRAWN_PATH + """
+  lifecycle_probe_items:
+  # a second, isolated mandatory-items list (never referenced by mandatory_bridge_inputs.items[*], so no existing
+  # test's resolution changes) -- BR-ARCH-RULING-1's own tests read it via its own state_ref. LEDGER_PATH carries
+  # no machine-readable status (no YAML `status`, no markdown `| Status |` row), so every item below resolves to
+  # lifecycle UNKNOWN (ARCHITECTURE.md section 5.1: "anything else maps to UNKNOWN").
+  - id: CX-CONTRACT-NO-STATUS
+    class: CONTRACT
+    path: """ + LEDGER_PATH + """
+  - id: CX-ORCH-RECORD-NO-STATUS
+    class: ORCHESTRATION_RECORD
+    path: """ + LEDGER_PATH + """
+  - id: CX-DIRECTION-NO-STATUS
+    class: OWNER_DIRECTION_TO_TEST
+    path: """ + LEDGER_PATH + """
 owner_records:
 - id: OA-CX-06
   path: """ + OWNER_AUTH_PATH + """

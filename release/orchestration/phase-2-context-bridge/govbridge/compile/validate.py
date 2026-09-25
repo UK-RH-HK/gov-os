@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """The independent validator (ARCHITECTURE.md section 5.3 rule 4): recomputes ``govbridge.authority.resolver``
 **from scratch** and refuses a packet whose section A differs, in order and in every field. It also checks the
-placement admissibility of every item in every section, that every mandatory class banner is present, and the
-ordering invariant of rule 5 (no item with a worse ``(rank, lifecycle)`` precedes a better one).
+placement admissibility of every item in every section, that every mandatory class banner is present (and, per
+BR-ARCH-RULING-1, that every non-ACTIVE A item carries its lifecycle banner), and the ordering invariant of rule 5
+(no item with a worse ``(rank, lifecycle)`` precedes a better one).
+
+BR-ARCH-RULING-1: section A membership is decided by the resolver together with the class's admissibility in A --
+never by lifecycle. ``verify_section_a``'s re-derivation already enforces this (it re-derives A through
+``packet.place_item``, the single fixed function), so a resolver-returned, A-admissible item placed anywhere other
+than A now fails re-derivation; ``verify_placement`` no longer refuses a non-ACTIVE lifecycle inside A.
 
 This is a SEPARATE module from ``packet.py``: the compiler, ``packet verify``, the receipt checker
 (``receipt.py``) and any grader all call INTO this module; nothing here imports ``packet.py`` at module load time
-(only lazily, inside one function, to read ``place_item``/``sort_key`` without a circular import at import time).
+(only lazily, inside two functions, to read ``place_item``/``sort_key``/``LIFECYCLE_BANNERS`` without a circular
+import at import time).
 """
 from __future__ import annotations
 
@@ -97,8 +104,9 @@ def verify_placement(manifest: dict) -> list:
                 problems.append(f"A/{row['item_id']}: delivery {delivery!r} != MANDATORY")
             if spec is None or not spec.ladder or not spec.admissible_in_a:
                 problems.append(f"A/{row['item_id']}: class {cls!r} is not admissible in A")
-            if lifecycle != classesmod.LIFECYCLE_ACTIVE:
-                problems.append(f"A/{row['item_id']}: lifecycle {lifecycle!r} != ACTIVE")
+            # BR-ARCH-RULING-1: lifecycle no longer decides A membership -- a mandatory, A-admissible item stays
+            # in A whatever its lifecycle (was: "lifecycle != ACTIVE" refused here). Its lifecycle must still be
+            # honest: verify_banners checks that a non-ACTIVE A item carries its lifecycle banner.
             continue
 
         if section == "D.1":
@@ -122,9 +130,18 @@ def verify_placement(manifest: dict) -> list:
 
 
 def verify_banners(manifest: dict) -> list:
-    """Every PINNED non-ladder item carries its mandatory class banner verbatim (ARCHITECTURE.md section 5.1)."""
+    """Every PINNED non-ladder item carries its mandatory class banner verbatim (ARCHITECTURE.md section 5.1).
+    Every A item whose lifecycle is not ACTIVE carries its lifecycle banner verbatim (BR-ARCH-RULING-1 rule 2:
+    "lifecycle stays visible and honest... carries a lifecycle banner")."""
+    from govbridge.compile import packet as packetmod  # lazy: avoid a module-load-time circular import
+
     problems = []
     for section, row in _rows_of(manifest):
+        if section == "A" and row["lifecycle"] != classesmod.LIFECYCLE_ACTIVE:
+            expected = packetmod.LIFECYCLE_BANNERS.get(row["lifecycle"])
+            if expected is not None and row.get("banner") != expected:
+                problems.append(f"A/{row['item_id']}: lifecycle banner {row.get('banner')!r} != {expected!r}")
+
         if row["delivery"] != "PINNED":
             continue
         spec = classesmod.ALL_CLASSES.get(row["authority_class"])
