@@ -1,0 +1,173 @@
+schema: bridge-orchestrator-state/1
+lifecycle_id: P2X-FAIL-1-BRIDGE
+lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
+build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
+acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
+acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
+updated_at: '2026-09-25T08:37:39Z'
+state_hash: d26d96c60462fa43de5a05f60bc4da71fbf3611d2052178ce96aa2e2d8f6f2b2
+lifecycle_state: BR_DOMAIN_ESTABLISHED
+loop_status: RUNNING
+authority_status: ORCHESTRATION_SUPPORT_ONLY -- the bridge is not product, not a candidate, not an authority source,
+  not Phase 3, not V8.3 CURRENT (OD-P2-10 section 3, OD-P2-10B, launcher)
+protocol:
+  launcher: release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md
+  normative_control_plane: V8.2 (unchanged; V8.3 is not CURRENT)
+  p2x_fail_1_resolution: OD-P2-10 sections 3-12 + OD-P2-10A/B + launcher BR-0001 (no other definition exists in the
+    repository; see the launcher record)
+  naming: runs BR-AR-NNNN, handoffs BR-HO-NNNN, checkpoints BR-CP-NNNN, ledger BR-L-NNNN, role branches bridge/*
+repository:
+  path: /home/usain/Dynamic-Agentic-Engineering-OS
+  bridge_branch: bridge/p2-context-retrieval
+  bridge_worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/bridge-p2-orchestrator
+  bridge_domain: release/orchestration/phase-2-context-bridge
+  bridge_base_commit: 6e7a2a3495a8d3619759a95b7ed055da9c848618
+  bridge_base_note: tip of release/4.1.6-rc1 when the bridge started; it records OD-P2-10A/B. The Phase-2 integration
+    branch is NOT written by the bridge.
+  last_recorded_commit: 6e7a2a3495a8d3619759a95b7ed055da9c848618
+  phase_2_integration_branch: release/4.1.6-rc1
+  main_branch_modified: false
+  mutation_boundary: every bridge commit changes paths ONLY under release/orchestration/phase-2-context-bridge/ --
+    enforced by tools/check_state.py verify (diff against bridge_base_commit)
+frozen_phase_2_product:
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  branch: phase2/approved-delta
+  also_at: phase2/review-8 (parent of the review commit)
+  product_code_digest: f6b1b8867d3b929d2cfde187e6ac9eb6933c2deecb5575125ec12bb9c293d8ef
+  governed_state_digest: 8c8ebe02da0926151a4bfc1f3a4437c31f2315c10255da3ad4a56ad451b6935d
+  digest_tool: release/orchestration/phase-2/tools/product_identity.py
+  suite_claimed: 368/368 (builder P2-AR-0096; Review 8 verified the count against the tree)
+  rule: never modified by any bridge role; F1/F2/F3 are NOT repaired in this lifecycle
+  readonly_worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-frozen-3c880d8
+  readonly_worktree_note: detached at 3c880d8 and chmod -R a-w (write refused, verified); for roles to read and grep
+    the frozen product. Never build or write there.
+review_8:
+  run_id: P2-AR-0097
+  verdict: RESIDUAL_DEFECTS
+  review_commit: 58219d5628683d6f462aa67bf25dbc2641933bce
+  review_branch: phase2/review-8
+  reviewer_model_observed: claude-opus-5 (spawned model opus; transcript agent-a1cdda64064514620)
+  evidence_objects_at_review_commit:
+    tests/certification/ar97_probe.rs: cce4c99da500a22de72759a1eff8ff160ac2844b
+    probes/P2-AR-0097/ar97-probe-run.out: b27791846cae2716d1e91dc1fcb6517ed992141c
+    probes/P2-AR-0097/ar97-required-regression-64-0.out: bf3d17432a3fe524237ab9eb0caf2dd8e7b3aa3a
+    probes/P2-AR-0097/ar97-zombie-starttime-measurement.out: 6889e66d0e76c65afd16d6d1f9406956aafa1674
+    probes/P2-AR-0097/ar97-zombie-starttime-measurement.py: 50a22efed90a98d7cd94fcdf2ff3d9de5a47c494
+  full_return_copy_path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
+  full_return_copy_sha256: 726f3f40f574f14b4e8cc334cba7785542b93b0aa5fc756bf571824e7578c067
+  provenance_path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/PROVENANCE.md
+  verified_by_bridge_orchestrator:
+  - probe run at 58219d5 -- 3 passed (a1, c1, c2), 3 failed by design (a2, b1, b2; each asserts the secure outcome)
+  - required regression subset 64 passed / 0 failed, 610.64s
+  - zombie measurement -- starttime unchanged in state Z; absent once reaped
+  - phase2/approved-delta tip == 3c880d8; phase2/review-8 tip == 58219d5
+  findings:
+    F1: {severity: HIGH, class: mechanism this round introduced, status: OPEN_FROZEN, note: reopens AR94-C1; owner
+        direction -- strong DELETE/SIMPLIFY candidate, NOT yet authority to delete}
+    F2: {severity: HIGH, class: 'newly discovered implementation defect within existing Phase-2 requirements (OD-P2-10A;
+        NOT scope expansion)', status: OPEN_FROZEN}
+    F3: {severity: HIGH, class: mechanism this round introduced, status: OPEN_FROZEN}
+    F4: {severity: MEDIUM, status: OPEN_FROZEN}
+    F5: {severity: LOW, status: OPEN_FROZEN}
+    F6: {severity: LOW, kind: boundary observation, status: OPEN_FROZEN}
+  property_a: HOLDS (fourth consecutive independent round) -- not to be reopened without directly falsifying evidence
+  property_c: FAILS
+  f2_f3_hypothesis: 'one deeper class? syntactic rule/property reasoning that fails to trace through composition/precedence/matching
+    to the enforced effect -- a HYPOTHESIS for the later synthesis, NOT a classification; the bridge must make it
+    testable, never assume it'
+contract_v3:
+  path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  sha256: 4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+  canonical_import_path: framework/contracts/source/GOVERNANCE_CAPABILITY_ACCEPTANCE_CONTRACT_v3.md
+  compiled_path: framework/contracts/governance-capability-acceptance.yaml
+  note: hash equals the value recorded in release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml contract_v3.sha256
+operator_ui:
+  path: release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html
+  sha256: 6fecfb6b2be86031137433a1cf7e960eeb9ca0c23b4890b2eb54c0546158269c
+  status: NORMATIVE Phase-2 control plane (V8.2)
+non_normative_known_inputs:
+- path: /mnt/c/Users/usain/Downloads/Governance_OS_Interactive_Stage_Control_Panel_v8_3_DRAFT.html
+  sha256: 570aa32999704b5c700b66dc689f75cbe81927e30460740e1b05d8a39484709e
+  status: DRAFT, outside the repository, NOT CURRENT, not an input to any bridge role
+owner_records:
+- id: OD-P2-10
+  path: release/orchestration/phase-2/GATES/OWNER-AMENDMENT-P2-0010-CONTEXT-RETRIEVAL-BRIDGE.md
+  sha256: 8cc0f3bbf74238f5d0c8b28f00b581c2878154faa69895af35a7f35447c3c7b3
+  applies: sections 3-12 define the bridge's scope (the eighteen), authority model, anti-snowball rule, cost rule
+- id: OD-P2-10A/B
+  path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md
+  sha256: 847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff
+  applies: F2 not scope expansion; bridge authorised; acceptance token; F1 direction; F2/F3 hypothesis; Property A
+- id: OD-P2-09
+  path: release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md
+  sha256: 3f0cd498cd7a7927e3175529ec3d4b14d9f953a89fb45ce4ae287948226b3999
+  applies: binding simplification principle; ~10-20% routine-overhead objective (section 16)
+- id: OD-P2-08
+  path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0008-COMPLETE-PHASE-2.md
+  sha256: c7bb4cbae6a8595c3bba9608d7d31bd7911abf876825e3427a39ad5a10a90af8
+  applies: detection is not authority (section 2); stop conditions (section 8)
+- id: OC-P2-04
+  path: release/orchestration/phase-2/GATES/OWNER-CLARIFICATION-P2-0004-TRUSTED-AUTHORITY-STATE.md
+  sha256: e295af0b7300eae826cfc6e93cbc75f61362078b45320a1cbf5b8a4af950e658
+  applies: project-editable files may request authority, never manufacture it
+- id: PHASE-2-FROZEN-GATE-CONTRACT
+  path: release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md
+  sha256: d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+  applies: frozen acceptance criteria AC-1..AC-16 -- the bridge must not change them
+- id: OWNER-LAUNCHER-BR-0001
+  path: release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md
+  applies: this lifecycle's procedure, routing, required capabilities and the Review-8 demonstration
+phase_2_records_read_only:
+  state: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+  ledger: release/orchestration/phase-2/PHASE_LEDGER.md
+  context_pack: release/orchestration/phase-2/REVIEW_8_CONTEXT_PACK.md
+  context_pack_sha256: d69c2f8cec12b0790c0f310f54d4865ce06f003abd1feb70986102630d514684
+  v8_3_evidence_package: release/orchestration/phase-2/V8_3_EVIDENCE_PACKAGE.md
+  phase_2_lifecycle_at_bridge_start: PHASE_2_PRODUCT_FROZEN_AWAITING_BRIDGE / STOPPED_BY_OWNER
+routing:
+  outer_orchestrator: {requested: Opus 5, observed: claude-opus-5-5, session: 034abd76-0719-4661-bb46-b56141b90a16,
+    note: Opus-5-family; the newest Opus available to this session}
+  architect: {model_param: opus, expect: Opus 5 family}
+  builders_integrator: {model_param: sonnet, expect: Sonnet 5}
+  mechanical: {model_param: haiku, only_where_demonstrably_suitable: true}
+  independent_verifier: {model_param: opus, dispatched_by: next control-panel stage, not this lifecycle stage}
+  deepseek: PAUSED
+  hazard: ~/.claude/settings.json sets CLAUDE_CODE_SUBAGENT_MODEL=claude-opus-4-6 -- EVERY spawn must pass model
+    explicitly and its observed model is read back from the subagent transcript
+environment_observed_2026_09_25:
+  python: 3.12.3 (system; numpy 2.4.4, PyYAML 6.0.1; no torch/onnxruntime/sentence-transformers/fastembed)
+  sqlite: 3.45.1 with FTS5
+  gpu: NVIDIA GeForce RTX 5070 Ti
+  cpu_threads: 20
+  ram_gb: 15
+  disk_free: 185G
+  network: huggingface.co reachable (HTTP 200)
+  existing_semantic_primitive_hint: capabilities/python/govos_capabilities/embed_sentence_transformers.py (the architect
+    must establish whether it is operational)
+spawned_roles: []
+agent_runs: []
+running_work: []
+checkpoints:
+- id: BR-CP-0001
+  path: release/orchestration/phase-2-context-bridge/CHECKPOINTS/BR-CP-0001.yaml
+handoffs: []
+unresolved_questions: []
+evidence_status:
+  builder_evidence: NONE_YET
+  review_8_demonstration: NOT_RUN
+immutable_evidence:
+- path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
+  sha256: 726f3f40f574f14b4e8cc334cba7785542b93b0aa5fc756bf571824e7578c067
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md
+  sha256: 6bbd4141478fd944937deaae82e14cfce6aa2a9372a287c93f32c8e8181446f2
+current_prohibitions:
+- mutate the frozen Phase-2 product (3c880d8) or any phase2/* branch
+- write release/orchestration/phase-2/ or the release/4.1.6-rc1 branch
+- change Contract v3, the frozen gate contract AC-1..AC-16, kernel/runtime trust semantics
+- repair F1/F2/F3/F4/F5/F6
+- issue P2_CONTEXT_RETRIEVAL_BRIDGE_READY or any Phase-2/Phase-3 token
+- claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
+- promote any retrieved/derived content to authority
+- dispatch DeepSeek
+next_deterministic_action: seal state, commit the domain and BR-CP-0001, then dispatch BR-AR-0001 (fresh Context/Retrieval
+  Architect, model opus) on BR-HO-0001
