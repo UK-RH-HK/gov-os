@@ -659,3 +659,58 @@ residual.
 **Dispatched `P2-AR-0097`** on `P2-HO-0061` at `3c880d8`. Because this round deleted rather than added, the brief
 inverts the standing question: **did the deletions remove protection?** — above all, whether a planted floor document
 can gain authority through the new re-onboarding path, which is where the deleted command's worst finding lived.
+
+## P2-L-0046 — Review 8 returns RESIDUAL_DEFECTS; the Phase-2 product is FROZEN; two owner rules trigger (2026-09-25)
+
+`P2-AR-0097` reviewed `3c880d8` and committed at `58219d5`. **Three HIGH**, all independently confirmed by the
+orchestrator before any routing decision. **Property A HOLDS for a fourth consecutive round** — `exec_resolve.rs`
+byte-identical to `a01f0c9`, `t2.rs` byte-identical to `92982ff`. **Property C FAILS.**
+
+**F1 (HIGH, mechanism this round introduced — reopens AR94-C1).** `creator_is_alive` accepts a dead-but-**unreaped**
+creator. A zombie keeps `/proc/<pid>/stat` with `starttime` unchanged; `process_start_time` reads field 22 and never
+reads field 3, so the state `Z` is invisible to it. Reaping is the *parent's* job and the attacker is the parent of
+the `gov` process, so the attacker simply never calls `wait()`. The reviewer's reproduction is `ar94_c1`'s own, with
+exactly one line removed — the reap — and the exemption is reconstituted, `reconcile` and therefore
+`other_live_claim` are skipped, and a planted donor floor is adopted **with no finding at all**. Every existing test
+reaps, so none could see it. **The orchestrator confirmed this end to end**: an unreaped child retains `starttime`
+with state `Z`; once reaped the file disappears. (The first attempt at that measurement was invalid — bash job
+control auto-reaps — and was redone with an explicit fork that never waits, rather than reported as a refutation.)
+
+**The sandbox exemption has now produced a HIGH in three consecutive rounds under three different mechanisms**: path
+shape (AR92-C2) → OS marker plus `(device,inode)` (AR94-C1) → creator liveness (F1). OD-P2-09's binding
+simplification principle addresses exactly this, and Review 8 verified independently that the exemption can be
+**deleted** rather than given a fourth mechanism, because no production consumer needs a cross-process signal.
+
+**F2 (HIGH, OLD UNTOUCHED CORE — new).** `native_layout_rules` builds `format!("{d}/**")` with **no glob escaping or
+validation** (`init.rs:146`, confirmed). So `mkdir '*'` plus deleting the floor — two ordinary project-scoped writes —
+mints `*/**`, which matches every path containing a slash, is restored **last** by `evaluate_path_rules_overlay`, and
+under last-match-wins displaces `governance/project/**`'s `mutation: restricted` with `mutation: allowed`. That
+attribute is **enforced**, not merely reported (`tools.rs:1817`). Disclosed (D027 red), but *applied* rather than
+refused — and OD-P2-08 §2 is explicit that detection is not a substitute for authority.
+
+**F3 (HIGH, mechanism this round introduced — new).** `union_last_known_rules_across_store` writes an unvalidated
+**foreign** pattern into this project's authenticated floor. `partition_floor_rules_against_kernel` exists precisely
+because the floor unions onto the kernel template, and it has exactly **one** call site — the CIT route
+(`cit/mod.rs:1623`, confirmed) — so restored rules bypass it entirely.
+
+**This is the orchestrator's own design error, and the third instance of one shape.** The approved design rested on
+the orchestrator's claim that the union is *additive only, so it can only add patterns and never displace a class*.
+The flaw: conflict is decided by **exact pattern-string equality**, so a *broader* foreign pattern is never detected
+as conflicting, "fresh wins on conflict" never fires for it, and last-match-wins does the rest. Ties break by sorted
+`sha256(path)` — not by strength. The orchestrator verified that the union was additive without verifying that
+additivity **reached the decision** — the same error as proposing the T2-verified document as a rules authority, and
+as the withdrawn positive-control finding. The first two were caught before they shipped; this one shipped into an
+owner-approved design.
+
+**What the deletion did NOT break, verified:** `ar97_c2` passes — a planted floor document **cannot** steer the
+re-onboarding it triggers, which was the key question after `gov floor-reanchor` was removed, and where AR94-C2 had
+lived. `ar97_c1` passes — AR88-C10B is not reopened. Required regression subset 64/0; R1's hard constraints green;
+all five OC-P2-04 cases reachable and reportable.
+
+**Two owner rules trigger together, and both point the same way.** OD-P2-10 §3: Review 8 failed with blocking HIGHs,
+so the Phase-2 product **freezes** and no narrow repair cycle may start; a separate fresh session builds the V8.3
+Context/Retrieval Bridge first. OD-P2-09 §5: F2 is a material HIGH in an old, untouched core subsystem, which is an
+explicit **STOP and return to the owner**. Review 8 argued F2 is *not* scope expansion and invited the owner to
+overrule it — a judgement that belongs to the owner, not to the orchestrator or the reviewer.
+
+**Action: product frozen at `3c880d8`. No repair dispatched. Returned to the owner.**

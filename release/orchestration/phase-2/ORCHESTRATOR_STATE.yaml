@@ -6,8 +6,8 @@ target_token: GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
 rejection_token: GOVERNANCE_CAPABILITY_BASELINE_REJECTED
 updated_at: '2026-09-24T16:17:10Z'
 state_hash: 5a3aa839585b179107d390240aa590bdc85c3374f16cc94539382dbbe8b81e70
-lifecycle_state: P2_COMPLETION_OPTION_1
-loop_status: RUNNING
+lifecycle_state: PHASE_2_PRODUCT_FROZEN_AWAITING_OWNER
+loop_status: STOPPED_FOR_OWNER_DECISION
 protocol:
   source: owner prompt "GOVERNANCE OS — V8.2 DURABLE AUTONOMOUS PHASE ORCHESTRATOR" (received 2026-09-18)
   launcher: V8.2 — Self-locating durable autonomous Phase Orchestrator (NON_NORMATIVE_OPERATOR_UI)
@@ -1191,9 +1191,9 @@ completed_stages:
     the pinned model under P2-HO-0008 / P2-HO-0009.
 continuity_handoff_path: release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md
 latest_checkpoint_path: release/orchestration/phase-2/CHECKPOINTS/P2-CP-0011.yaml
-next_deterministic_action: await P2-AR-0095 hand-back (suite live, verified); then verify commit/scope/tests; then
-  the mandatory pre-final owner-question sweep; then build the whole-system/impact context pack; then dispatch Review
-  8
+next_deterministic_action: 'AWAIT OWNER: (1) rule on F2''s classification -- old-core HIGH per OD-P2-09 section
+  5''s bright line, or an ordinary in-architecture defect as Review 8 argues; (2) confirm whether to start the V8.3
+  Context/Retrieval Bridge session now per OD-P2-10 section 3'
 current_prohibitions:
 - action: orchestrator issuing GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED/REJECTED or any capability status
   until: never
@@ -1364,6 +1364,38 @@ review_history:
     declined to add a process-state check, correctly citing the add-a-mechanism-to-guard-a-mechanism pattern.'
   named_cosmetic: capability_roots.native_source/native_tests not updated with a union-restored pattern; contract[paths]
     (the governed array) is. LOW, informational metadata only.
+- review: P2-AR-0097 (Review 8, convergence decision point)
+  commit_reviewed: 3c880d8
+  review_commit: 58219d5
+  verdict: RESIDUAL_DEFECTS
+  property_a: HOLDS / PRESERVED, fourth consecutive round -- exec_resolve.rs byte-identical to a01f0c9, t2.rs byte-identical
+    to 92982ff
+  property_c: FAILS
+  highs:
+    F1: 'creator_is_alive accepts a dead-but-UNREAPED creator; /proc/<pid>/stat survives with starttime intact and
+      state Z, and the code reads past state. REOPENS AR94-C1. Class: mechanism this round introduced.'
+    F2: 'an unescaped glob metacharacter in a directory name (mkdir ''*'') mints pattern */** which matches everything
+      with a slash, is restored LAST by evaluate_path_rules_overlay, and under last-match-wins displaces governance/project/**''s
+      mutation:restricted with mutation:allowed -- an ENFORCED attribute (tools.rs:1817). Class: HIGH in OLD UNTOUCHED
+      CORE.'
+    F3: 'union_last_known_rules_across_store writes an unvalidated FOREIGN pattern into this project''s authenticated
+      floor; partition_floor_rules_against_kernel exists for exactly this union but gates only the CIT route. Class:
+      mechanism this round introduced.'
+  mediums:
+    F4: the contract splice is a no-op on the adopt re-onboarding route (force:false makes write_overlay skip existing
+      files), leaving the project D027-red
+  lows:
+    F5: scenario sandboxes never have a floor -- not intended, LOW, not a widening
+    F6: the stated threat boundary constrains WRITES to protected machine state but is silent on READS; reviewer
+      recommends one sentence in the trust model, not a defect
+  verified_sound_by_reviewer:
+  - ar97_c2 PASSES -- a planted floor document cannot steer the re-onboarding it triggers; the floor-reanchor deletion
+    did NOT remove that protection (this was the key question)
+  - ar97_c1 PASSES -- AR88-C10B not reopened by the relaxed gate
+  - the floor-reanchor deletion is clean; no live code remains
+  - required regression subset 64/0, 610.64s; R1 hard constraints green; all five OC-P2-04 cases reachable
+  stop_conditions: all seven OD-P2-08 section 8 answered NO by the reviewer; it explicitly argued F2 is NOT scope
+    expansion and invited the owner to overrule
 current_round:
   id: P2-AR-0097
   kind: independent_adversarial_review
@@ -1414,6 +1446,16 @@ orchestrator_verified_independently:
   the comm field; PID reuse is defeated by comparing start time; non-Linux returns None, failing closed
 - '3c880d8: deleting the GC is sound -- a creator-liveness marker decays to inert the instant its creator dies,
   which is why the P2-AR-0095 sweep it replaces is no longer needed'
+- 'F1 CONFIRMED end-to-end by the orchestrator''s own measurement: an unreaped child keeps /proc/<pid>/stat with
+  starttime UNCHANGED and state=Z; once reaped the file disappears. process_start_time reads index 19 after rsplit_once('')'')
+  = field 22 (starttime) and never reads index 0 (state). Reaping is the parent''s job, and the attacker is the
+  parent of the gov process. (First attempt at this measurement was invalid -- bash job control auto-reaps -- and
+  was redone with an explicit fork that never waits.)'
+- F2 CONFIRMED structurally at 3c880d8 init.rs:146 -- format!("{d}/**") with no escaping and no validation of the
+  directory name
+- F3 CONFIRMED structurally at 3c880d8 -- partition_floor_rules_against_kernel has exactly ONE call site (cit/mod.rs:1623,
+  the CIT route); union_last_known_rules_across_store does not call it, and paths.sort() confirms the tie-break
+  is by sorted path hash rather than by strength
 last_updated: '2026-09-25'
 owner_directions_in_force:
 - OD-P2-07
@@ -1522,3 +1564,21 @@ ar96_orchestrator_finding:
   real_adjacent_observation_for_review_8: inside a skills::execute_check scenario sandbox the project floor is ALWAYS
     refused on lineage, so scenario checks run with no floor applied at all -- AR84-C3-shaped, unrelated to the
     exemption, correctly out of scope for a bounded delta, but a judgement for Review 8
+orchestrator_error_f3:
+  what_i_claimed: the union is additive only, so it can only ADD patterns the fresh derivation missed and can never
+    displace a class
+  why_wrong: conflict is decided by exact pattern-string equality, so a BROADER foreign pattern (*/**) is never
+    detected as conflicting with src/**; 'fresh wins on conflict' therefore never fires for it, and last-match-wins
+    does the rest. I also did not check that the union bypasses partition_floor_rules_against_kernel, which exists
+    for precisely this union.
+  pattern: 'THIRD instance this phase of the same error shape: verifying a property holds without verifying it reaches
+    the decision. First: proposing the T2-verified document as a rules authority. Second: the withdrawn positive-control
+    finding. This one shipped into an owner-approved design.'
+triggered_rules:
+  OD-P2-10_section_3: Review 8 failed with blocking HIGHs -> freeze the Phase-2 product implementation; do NOT enter
+    another narrow repair/review cycle; a SEPARATE fresh session builds the V8.3 Context/Retrieval Bridge before
+    further product repair
+  OD-P2-09_section_5: F2 is a material HIGH in an old, untouched core subsystem -> STOP and return to the owner;
+    do not autonomously launch another broad repair cycle
+  action_taken: product frozen at 3c880d8; no repair dispatched; returned to the owner for the F2 classification
+    and for confirmation to start the bridge
