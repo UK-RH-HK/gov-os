@@ -1,0 +1,63 @@
+run_id: BR-AR-0014
+commit: fa226385e465458d265e819f43724ced47eede62
+commands:
+  - cmd: "cd $D && $PY -m pytest tests -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check1-pytest.out
+    output_sha256: cbfd148ac85eb708383e35aca62629e997c4d5a2c2d06433de471502ff32de80
+    # acceptance check 1. 317 passed (308 pre-existing + 9 new in tests/code/test_eager_build.py), plain
+    # `pytest tests -q`, no --import-mode flag, the whole integrated tree.
+
+  - cmd: |
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014 $PY -m govbridge index rebuild --layer code --from-clean --timings
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014b $PY -m govbridge index rebuild --layer code --from-clean --timings
+      # then, for each store, print manifest.json's layers.code block, and independently count distinct .rs
+      # blobs across the three eager refs (records/product/evidence) via `git ls-tree -r --full-tree <commit> |
+      # awk '$4 ~ /\.rs$/ {print $3}'`, unioned and deduplicated by blob id across all three refs' trees.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check2-eager-fromclean-x2.out
+    output_sha256: f77dc0d48207a5dbc24838e1ca51138bdef00e5ad9e33e759c3a169898b386d6
+    # acceptance check 2. Both from-clean builds: identical manifest_sha256
+    # (268318d8d7abc1aef93e3e9acf6218f7330bcbde81d8b921fb83f3a40d3e8887) and identical layers.code
+    # (digest a280d1e5d06f3bc27ee82358c6db674487c6faf53d03ec4c4542a106cdea5761, rows=210609 > 0,
+    # blobs_parsed=244). Independent `git ls-tree` count of distinct .rs blobs across records/product/evidence:
+    # 244 -- an exact match, both numbers printed side by side in the saved output.
+
+  - cmd: |
+      # digest before the lazy query (read back from store-BR-AR-0014's manifest.json)
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0014 $PY -m govbridge.code.symbols callers resolve_state_root --commit 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d --json
+      # then recompute govbridge.code.build.code_layer_digest(conn) directly against the SAME store and compare
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check3-query-invariance.out
+    output_sha256: 6fb16259089242ff82ad0115359f8b1f385707c38fd41aadd4501671e7d8eba8
+    # acceptance check 3. 46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d is refs/heads/phase2/ar84-repair's tip, a
+    # phase2/* history-glob member whose .rs blob set has 10 blobs absent from the union of the three eager
+    # refs' .rs trees (confirmed by the same ls-tree comparison as check 2). The `callers` query resolved real
+    # targets (EXACT/HEURISTIC_TYPE_PATH/HEURISTIC_MACRO_TOKEN rows, not an empty result), so it genuinely
+    # parsed and persisted new code_symbol/code_call_site/code_literal rows for those 10 blobs via
+    # ensure_indexed -- yet the manifest's code digest recomputed afterward is byte-identical
+    # (a280d1e5d06f3bc27ee82358c6db674487c6faf53d03ec4c4542a106cdea5761, rows 210609) to the value recorded
+    # before the query, in the SAME output file.
+
+  - cmd: "cd $D && $PY -m pytest tests/code/test_eager_build.py -v -k \"incremental_equals_full or query_invariant or eager_ref_names or parses_only_new_blobs or noop_stats\""
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check4-incremental-equals-full.out
+    output_sha256: 5790666c9bad1de59e5a9d60b2fded80523d98cab4c649ff572887e5c50e5cd1
+    # acceptance check 4 (plus supporting unit tests for C1/C2/C3). 7 passed.
+    # test_incremental_equals_full_on_a_fixture_repo: builds a throwaway repo at C1 (from_clean), then advances
+    # ONE ref to C2 (one .rs file changes -- an extra call site AND a changed literal) and runs
+    # code_layer_builder incrementally on the SAME store; the resulting digest equals a SEPARATE from-clean
+    # build run directly at C2 into an independent store root (digest, rows, and blobs_parsed all compared
+    # equal), and differs from the digest at C1 (proving the change is actually visible, not a false-pass from
+    # an under-specified comparison).
+
+  - cmd: "cd $D && $PY -m pytest tests/code/test_eager_build.py -v -k \"call_site_row_differs or literal_row_differs\""
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0014.check5-call-site-and-literal-coverage.out
+    output_sha256: 3731bc239e0593fbb9e0831d4f8cb931b0d1435c288bf5654e9ba8ab4bc22ad2
+    # acceptance check 5. 2 passed. test_digest_changes_when_a_single_call_site_row_differs: two fixture
+    # commits with identical symbol/literal rows (literal_rows == 0 in both) but one extra call to the same
+    # function -- call_site_rows differs, digest differs. test_digest_changes_when_a_single_literal_row_differs:
+    # two fixture commits with identical symbol_rows AND call_site_rows (same call shape, same line) but a
+    # different string literal argument -- digest differs. Both assert the OTHER two tables' row counts are
+    # unchanged, isolating which table's change the digest is reacting to.
