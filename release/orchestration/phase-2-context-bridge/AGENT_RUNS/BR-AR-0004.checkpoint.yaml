@@ -1,0 +1,40 @@
+run_id: BR-AR-0004
+commit: PENDING-FILLED-IN-SECOND-COMMIT
+commands:
+  - cmd: "cd $D && $PY -m pytest tests/lexical -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/pytest-lexical.txt
+    output_sha256: 9c32d4458e2bcdfb1ffb88513e896a12d349611cd7cbc3769709b97aa9b417fa
+  - cmd: "cd $D && $PY -m pytest tests -q   # regression: tests/core (B1) + tests/lexical (B2) together, both collection orders checked interactively"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/pytest-all.txt
+    output_sha256: 5bd7a30529d4e587dd356612fc712c0ace51a653bc05045eb0f23d7a72ff8b3f
+  - cmd: >-
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0004 $PY -m govbridge.lexical.query
+      '"partition_floor_rules_against_kernel"' --json   # against the real 4-ref canonical view, built from-clean
+      by this run
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/query-partition_floor_rules_against_kernel.json
+    output_sha256: da78a497868bcb619aa7a7569665bde677e059f24b42ebc831853e15287dd5de
+  - cmd: >-
+      GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0004 $PY -m govbridge.lexical.query
+      '"secret_content_patterns"' --exclude 'framework/**' --json
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/query-secret_content_patterns-exclude-framework.json
+    output_sha256: d5ff59866203632428626992fb8b09f7c9de987b5f6dbadbbeac0cd09d8799df
+  - cmd: >-
+      $PY -m govbridge.core.freshness rebuild --layer lexical --from-clean   (run twice, verbatim, each a fresh
+      process, against a throwaway scratch GOVBRIDGE_STORE -- the literal DAG acceptance-check text; see
+      open_issues OI-1 for why this fails standalone: govbridge.lexical is never imported within a bare
+      `python -m govbridge.core.freshness` process, so "lexical" is not in _LAYER_BUILDERS)
+    exit_code: 1
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/freshness-rebuild-layer-lexical-fromclean-LITERAL-transcript.txt
+    output_sha256: e1d86bb5df235d343fd337025789305a5062690e363361849e5c6c7677a7ae86
+  - cmd: >-
+      $PY -c "import govbridge.lexical; from govbridge.core import freshness; freshness.run(from_clean=True)"
+      against the real view, run twice in separate processes, comparing manifest.json's layers.lexical block
+      between the two runs -- the working reproduction of the acceptance check's stated intent ("identical lexical
+      layer digest"), given OI-1
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/lexical-digest-determinism-from-clean-twice.json
+    output_sha256: 69721e2b64420faf9ccefe2202c9ca8547bfca4c5cae19f617586c00c766bf94

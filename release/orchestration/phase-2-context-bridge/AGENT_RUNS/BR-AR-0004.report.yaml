@@ -1,0 +1,135 @@
+run_id: BR-AR-0004
+role: builder B2 lexical route, SQLite FTS5 (DAG node B2)
+model_observed: claude-sonnet-5
+branch: bridge/b2-0004
+commit: PENDING-FILLED-IN-SECOND-COMMIT
+status: COMPLETED
+claims:
+  - id: C1-layer-registration-without-editing-core
+    text: >
+      govbridge/lexical/__init__.py imports govbridge/lexical/fts.py at package import time, and fts.py calls
+      govbridge.core.freshness.register_layer_builder("lexical", ...) and govbridge.core.manifest.register_layer(
+      "lexical", ...) at module import time -- exactly the extension point both core modules document ("call this
+      once, at import time of the layer's own package") and the one tests/core/test_manifest.py::
+      test_a_new_layer_can_register_without_editing_core proves. No file under govbridge/core/** or govbridge/__init__.py
+      was touched.
+  - id: C2-fts5-schema-and-tokenizer
+    text: >
+      govbridge/lexical/fts.py owns two new tables: lexical_fts (an FTS5 virtual table, tokenize = "porter
+      unicode61 tokenchars '_'" -- MEMORY_POLICY.yaml:15's base tokenizer plus ARCHITECTURE.md section 4.3's one
+      deliberate tokenchars '_' addition, so snake_case identifiers stay one token) and lexical_indexed_blob (a
+      bookkeeping table of which blobs are already folded in, giving per-blob incremental invalidation --
+      ARCHITECTURE.md section 3: "chunks + FTS rows ... keyed by (blob, ...) ... invalidated by ... a new blob").
+      build()/lexical_layer_builder() only ever read govbridge.core.store's existing `chunk` table; nothing here
+      shells out to Git or re-implements chunk identity.
+  - id: C3-query-route-and-retrieved-item-shape
+    text: >
+      govbridge/lexical/query.py turns an FTS5 MATCH into RetrievedItem-shaped hits: item_id is the chunk_id
+      (ARCHITECTURE.md section 2 identity), occurrences come from B1's `occurrence` table joined by blob_id with
+      version_status from govbridge.core.view.classify_occurrence (never re-implemented), ranking is BM25 ascending
+      (SQLite's bm25() is a cost). retrieval_exclusions (a list of globs) drop a matching occurrence, and drop a
+      hit entirely once it has no surviving occurrence, never a hit with an empty occurrence list.
+      authority_class/lifecycle are left None with an explicit classification_note rather than guessed, since node
+      B5 (govbridge.authority) is not a B2 dependency and does not exist in this worktree -- ARCHITECTURE.md
+      section 4 states a route's items carry a class "already assigned by section 5" (upstream of the route), and
+      this mirrors govbridge.core.exact.id_lookup's identical precedent ahead of the id-grammar landing.
+  - id: C4-tests-lexical
+    text: >
+      tests/lexical/{test_fts.py,test_query.py} (15 tests, hermetic, against B1's synthetic fixture repo reused
+      read-only from tests/fixtures/core/repobuilder.py) cover: self-registration at import time; a full build
+      indexes every core chunk exactly once; two from-clean builds give an identical lexical layer digest;
+      incremental rebuild adds only the new blob's chunk and leaves every previously-indexed chunk untouched;
+      idempotent rebuild adds no duplicate rows; retrieval_exclusions both drops a fully-excluded hit and leaves an
+      unaffected hit untouched; the tokenizer keeps a snake_case identifier whole; BM25 orders best-first; k bounds
+      the result count; and the CLI's --json output (run as a real subprocess, `python -m govbridge.lexical.query`)
+      matches the library call. All 15 pass; the full suite (tests/core + tests/lexical, 83 tests) passes together
+      in both collection orders.
+  - id: C5-real-view-acceptance-queries
+    text: >
+      Built the real 4-ref canonical view into GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0004 (records,
+      product@3c880d8, evidence@58219d5, history=phase2/* -- 95+ tips): 6,735 core blobs, 135,787 chunks, all
+      135,787 folded into lexical_fts (every chunkable blob indexed, 0 skipped). `govbridge.lexical.query
+      '"partition_floor_rules_against_kernel"' --json` returns, among its default k=8 hits, a chunk (lines
+      1611-1630) whose occurrences include (3c880d8, runtime/src/cit/mod.rs), covering line 1623; latency_ms 0.33
+      (< 100 ms). `govbridge.lexical.query '"secret_content_patterns"' --exclude 'framework/**' --json` returns 8
+      hits with zero framework/ occurrences; re-running the SAME query at k=250 (no exclude) shows 16 real hits
+      under framework/ exist in the corpus and are the ones the exclusion removed (not a vacuous pass).
+  - id: C6-manifest-reproducibility
+    text: >
+      Ran freshness.run(from_clean=True) against the real view four separate times during this run (each a fresh
+      process, govbridge.lexical imported first so core+lexical build together in one pass, matching how node I1
+      will invoke it): manifest_sha256 was identical every time
+      (8821f3a1bba84119c40dd088a454f5a0c181b57e7233be7b7302bf8d382d9e5b), and the lexical layer's own digest block
+      was byte-identical across all of them ({digest: 16589beae33b86c5df2c94b55d31147a674288768f77f46490fdc25a0e0eefaf,
+      rows: 135787, tokenize: "porter unicode61 tokenchars '_'"}).
+  - id: C7-scope-and-size
+    text: >
+      git status shows only new paths under govbridge/lexical/**, tests/lexical/** and
+      AGENT_RUNS/BR-AR-0004.{report,checkpoint,evidence}* -- nothing under govbridge/core/**, no other node's
+      mutation_scope, and no existing file modified. No committed file exceeds 5 MB (the largest evidence file,
+      the unfiltered secret_content_patterns query dump, is ~300 KB).
+mutation_scope_respected: true
+evidence:
+  - claim: C1-layer-registration-without-editing-core
+    command: cd release/orchestration/phase-2-context-bridge && PYTHONPATH=$PWD $HOME/.cache/gov-bridge/venv/bin/python -m pytest tests/lexical/test_fts.py::test_lexical_registers_itself_at_import_time -q
+  - claim: C4-tests-lexical
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/pytest-lexical.txt
+  - claim: C4-tests-lexical
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/pytest-all.txt
+  - claim: C5-real-view-acceptance-queries
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/query-partition_floor_rules_against_kernel.json
+  - claim: C5-real-view-acceptance-queries
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/query-secret_content_patterns-exclude-framework.json
+  - claim: C6-manifest-reproducibility
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0004.evidence/lexical-digest-determinism-from-clean-twice.json
+open_issues:
+  - id: OI-1-freshness-single-layer-cli-cannot-self-register
+    text: >
+      The DAG's literal acceptance-check text -- `$PY -m govbridge.core.freshness rebuild --layer lexical
+      --from-clean`, run twice -- cannot succeed as a bare, single-process command: govbridge.core.freshness.run()
+      restricts a call to EXACTLY the named layer for the WHOLE call
+      (`builders = get_layer_builders() if layer is None else {layer: _LAYER_BUILDERS[layer]}`, freshness.py:214),
+      and nothing under govbridge/core (govbridge/__init__.py, govbridge/core/__init__.py) imports any sibling
+      layer package, so "lexical" is never in _LAYER_BUILDERS in a process that has not itself imported
+      govbridge.lexical -- reproduced twice, verbatim: KeyError: 'lexical' both times (see
+      AGENT_RUNS/BR-AR-0004.evidence/freshness-rebuild-layer-lexical-fromclean-LITERAL-transcript.txt). This is not
+      a B2 defect: govbridge/core/** and govbridge/__init__.py are outside B2's mutation_scope, and both
+      freshness.py's and manifest.py's own docstrings describe the intended trigger for registration as "import
+      time of the layer's own package" -- i.e. node I1's future govbridge/cli.py is expected to import every layer
+      package before dispatching any freshness/compile command; B2 has no dependency on I1 or on any sibling PG1
+      node. I reproduced the acceptance check's stated INTENT instead ("identical lexical layer digest" across two
+      from-clean rebuilds) by importing govbridge.lexical then calling freshness.run(from_clean=True) (layer=None,
+      so core+lexical build together in one pass -- the same sequence I1 will use) twice against the real view;
+      see C6 above and AGENT_RUNS/BR-AR-0004.evidence/lexical-digest-determinism-from-clean-twice.json for the
+      side-by-side comparison. Secondary, unrelated observation made while investigating this: two --from-clean
+      calls within the same wall-clock second can collide on store.move_store_aside()'s
+      `<root>.trashed-<int(time.time())>` naming (ENOTEMPTY on rename) -- observed once, not fixed (store.py is
+      core, out of B2's mutation_scope), noted here for B1's owner / the orchestrator.
+  - id: OI-2-authority-class-lifecycle-not-yet-assigned
+    text: >
+      Every RetrievedItem's authority_class/lifecycle are None with classification_note
+      "NOT_YET_ASSIGNED: authority class/lifecycle are assigned by govbridge.authority (node B5, not a B2
+      dependency)". This is deliberate (see C3), not an omission: B2 depends only on B1, node B5 does not exist in
+      this worktree, and ARCHITECTURE.md section 4 says a route's items carry a class "already assigned by section
+      5" -- i.e. by an upstream classifier, never fabricated by the route itself. Node B6/I1 is expected to merge
+      lexical RetrievedItems with B5's resolver output before section placement.
+  - id: OI-3-per-ref-layers-field-not-consumed-by-core
+    text: >
+      config/canonical-view.yaml's per-ref `layers: [...]` list (e.g. records lists "lexical") is not consumed by
+      govbridge.core's own occurrence/chunk builder -- core indexes every ref uniformly regardless of that field.
+      All four refs in the real view currently list "lexical", so this is moot today, and the lexical layer builder
+      itself does not filter by it either (it indexes whatever govbridge.core already put in the `chunk` table).
+      Flagging so a future per-ref layer-scoping requirement is recognised as a core-level property, not something
+      B2 silently opted out of.
+  - id: OI-4-manifest-digest-functions-must-tolerate-an-unbuilt-layer
+    text: >
+      govbridge.core.manifest.build_manifest() calls every REGISTERED layer's digest function unconditionally,
+      including on a connection where that layer's own tables were never created (store.open_db() only creates
+      core's schema; each layer creates its own lazily). Once govbridge.lexical is imported anywhere in a process
+      (e.g. pytest collecting tests/lexical alongside tests/core), any OTHER test that builds a manifest over a
+      bare/manually-seeded connection would hit "no such table: lexical_fts" unless lexical_layer_digest() is
+      defensive. Fixed by having lexical_layer_digest() call ensure_schema() first (returns a deterministic
+      zero-row digest for a connection this layer has never touched, the same shape occurrence_layer_digest gives
+      for an empty-but-present core table); verified by running tests/core + tests/lexical together, in both
+      collection orders (83 tests, both orders green). Flagging as a pattern nodes B3/B4/B5 should also apply to
+      their own digest functions, since node I1 will be the first process to import every layer package together.
