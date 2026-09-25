@@ -2,7 +2,7 @@ run_id: BR-AR-0010
 role: D1 whole-repository coverage and index-cost measurement (deterministic tooling, run by the orchestrator)
 model_observed: none -- deterministic commands executed by the outer orchestrator session (claude-opus-5-5)
 branch: bridge/d1-0010
-commit: 484142712d10e06e16eb1478b73520b1f39ecd9f
+commit: PENDING
 status: COMPLETED
 claims:
 - 'coverage spans the WHOLE canonical repository: for all 98 view refs (records, product 3c880d8, evidence 58219d5, 95 phase2/* history tips)
@@ -19,6 +19,9 @@ claims:
   committed'
 - 'secrecy audit over every non-TA subagent transcript: 0 tool calls touching .local/share, govbridge-sealed or .authoring; 4 roles saw the sealed
   path string passively via ORCHESTRATOR_STATE.yaml (OBS-BR-04)'
+- 'addendum (third freeze): store-BR-AR-0010 brought to 94d0211 after BR-AR-0015 -- FULL 2530 s wall, 9329 CPU-s, 0 LLM calls; manifest 11372e02...d5b0
+  (code 233 blobs / 11 disclosed exclusions, vectors 45193); freshness NOOP 0.03 s; coverage 98 refs == git ls-tree --full-tree, 0 unclassified;
+  this is the DEMONSTRATION view and store'
 evidence:
 - claim: govbridge coverage --view config/canonical-view.yaml --json COVERAGE/p2x-fail-1-bridge.json  (pass 1, view cf7efe7)
   command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check1-coverage.out
@@ -40,6 +43,14 @@ evidence:
   command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check6-coverage-frozen.out
 - claim: 'independent cross-check at the frozen tip: per-ref sums == git ls-tree -r --full-tree'
   command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check6b-coverage-vs-ls-tree-frozen.out
+- claim: /usr/bin/time -v govbridge index update  (to third frozen tip 94d0211; FULL -- bridge code changed)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check7-update-to-third-tip.out
+- claim: govbridge freshness  (third frozen tip, NOOP expected)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check8-freshness-noop-third.out
+- claim: govbridge coverage  (third frozen tip)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check9-coverage-third.out
+- claim: 'independent cross-check at the third frozen tip: per-ref sums == git ls-tree -r --full-tree'
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check9b-coverage-vs-ls-tree-third.out
 mutation_scope_respected: true
 open_issues:
 - any bridge-code change makes the next index update run FULL (~37 min, dominated by CPU embedding) because the bridge code tree is part of the

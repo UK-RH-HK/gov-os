@@ -1,0 +1,12 @@
+{
+ "blobs_processed": 13979,
+ "chunks_processed": 317071,
+ "layer": "core",
+ "llm_invocations": 0,
+ "manifest_sha256": "11372e028e7999d3dace87969638735a9e479f9772e38d1f324855e9f3f0d5b0",
+ "occurrences_processed": 503601,
+ "refs_changed": [],
+ "trigger": "FULL",
+ "wall_seconds": 2530.309
+}
+exit=0
