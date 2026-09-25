@@ -3,7 +3,7 @@ role: integrator I1 (DAG node I1) -- cross-cutting integration of B1-B6 (+B6R) i
   whole-repository context system
 model_observed: claude-sonnet-5
 branch: bridge/i1-0009
-commit: 37cd586da4ac1332ebe36b7d55f76a48b39172c9
+commit: 37cd5864748aaf91301c555e1e441064bf9de75d
 status: COMPLETED
 claims:
   - id: C1-cli

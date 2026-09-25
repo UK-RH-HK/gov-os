@@ -1,5 +1,5 @@
 run_id: BR-AR-0009
-commit: 37cd586da4ac1332ebe36b7d55f76a48b39172c9
+commit: 37cd5864748aaf91301c555e1e441064bf9de75d
 commands:
   - cmd: "cd $D && $PY -m pytest tests -q"
     exit_code: 0
