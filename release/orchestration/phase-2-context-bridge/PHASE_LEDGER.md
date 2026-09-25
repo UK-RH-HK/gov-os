@@ -201,3 +201,35 @@ After merging, the integrated tree passes **123 tests together**.
 not exist, and layers register only on import. B2 fixed its own digest. B4 and B5 were confirmed live and got a
 one-line advisory within their scopes. The central fix, and the CLI importing every layer, go to I1 under
 BR-DAG-AMEND-2, together with B3's unwired Python-AST index. B4 (semantic) and B5 (authority/graph) are still running.
+
+## BR-L-0009: B4 (semantic) lands; the four routes are integrated (2026-09-25)
+
+**BR-AR-0006 returned COMPLETED** on `claude-sonnet-5` (376 turns). `integrate-check` was PERMITTED, run by the
+orchestrator. The orchestrator re-ran the following itself:
+
+* 106 tests (core plus semantic);
+* the determinism check in **two separate processes**, with an identical vectors digest each time and batch-1 equal
+  to batch-32;
+* a query against B4's built store. The results carry full provenance (path, commit, lines, canonical ref and
+  version status) and are labelled `RETRIEVED`. The authority fields are the fail-closed placeholders
+  `UNCLASSIFIED`/`UNKNOWN`, because B5's classifier is not in B4's base. This is the correct default.
+
+The 36-minute full rebuild was not repeated, because I1 must rebuild from clean twice anyway. The builder's store
+recorded 40,187 embedded chunks, with **no** machine-output or history-only chunk embedded.
+
+**After merging**, the full bridge suite passes together: **161 tests**. The exact, lexical, code and semantic routes
+are now all on the bridge branch.
+
+B4's six open issues go to I1:
+
+* layer auto-discovery;
+* where the semantic pins sit in the manifest;
+* wiring B5's classifier into every route's results;
+* a model-pin path mismatch;
+* per-batch commits for resumable rebuilds;
+* a stale local manifest.
+
+I1's scope therefore also gains `config/model-pin.yaml` and `bootstrap/**`.
+
+**B5 (authority and graph) is the only PG1 node still running.** It received the BR-DAG-AMEND-3 clarification while
+live.
