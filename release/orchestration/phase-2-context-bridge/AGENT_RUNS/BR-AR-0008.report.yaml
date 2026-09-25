@@ -1,0 +1,195 @@
+run_id: BR-AR-0008
+role: builder B6 (route and compile)
+model_observed: claude-sonnet-5
+branch: bridge/b6-0008
+commit: 2dd3fd0a2bb5a08b233d4600958df71fe45fabe3
+status: COMPLETED
+claims:
+  - id: C1-section-a-type-invariant-is-enforced-not-emergent
+    text: >
+      Packet.section_a is filled by exactly one code path: govbridge.compile.packet.Compiler.add_to_a, which
+      isinstance-checks its argument against govbridge.authority.resolver.MandatoryItem and raises
+      SectionAViolation (a TypeError subclass) if it is anything else. Compiler.add -- the general append used for
+      every other section -- refuses section "A" outright, also raising SectionAViolation, so a route hit can never
+      reach A even by an incorrect call site. No function anywhere in govbridge/compile or govbridge/route converts
+      a RouteHit or a graph Edge into a MandatoryItem. tests/compile/test_compile_authority_invariant.py::
+      test_retrieved_cannot_enter_a exercises both refusal paths directly (Compiler.add with a RETRIEVED PacketItem;
+      Compiler.add_to_a with a PacketItem instead of a MandatoryItem) and asserts SectionAViolation in both cases.
+  - id: C2-independent-validator-recomputes-and-catches-tampering
+    text: >
+      govbridge/compile/validate.py is a separate module (packet.py, receipt.py and any grader call INTO it, never
+      the reverse at module-load time) that recomputes govbridge.authority.resolver.resolve() from scratch, applies
+      the SAME class/lifecycle placement rule packet.py uses (place_item), sorts by the SAME sort_key, and asserts
+      the result equals section A of the packet field-for-field
+      (id, class, lifecycle, commit, path, blob, line_start, line_end, content_sha256), in order. It also checks
+      placement admissibility for every item in every section (including D.1's ACTIVE-only rule and every
+      non-ladder class's allowed_sections), that every PINNED non-ladder item carries its exact class banner, and
+      that no item with a worse (tier, rank, lifecycle) precedes a better one in any section.
+      test_hand_edited_packet_with_extra_a_item_fails_verify proves a freshly-compiled packet passes verify_packet
+      with zero problems, and the SAME packet with one hand-added A row fails it, naming the mismatch.
+  - id: C3-semantic-trap-holds-generically-fixture-and-real-corpus
+    text: >
+      A superseded record ranked #1 by BOTH a fake lexical AND a fake semantic route is placed purely by
+      (authority_class, lifecycle) -- SUPERSEDED disqualifies it from A/D.1 regardless of rank/score, and it lands
+      in E with its lifecycle banner. Proven on the hermetic fixture (CX-0001 SUPERSEDED / CX-0002 ACTIVE, a
+      decision pair with real supersession metadata) via test_semantic_trap, and independently by
+      test_mandatory_bridge_inputs_classes/test_section_scoping over the same generic mechanism. No bridge code
+      names Review-8, F1-F6, Phase 2 or a particular file to make this hold (OC-BR-02): place_item() is a pure
+      function of the class table (govbridge.authority.classes.ALL_CLASSES) and the lifecycle order, identical for
+      any corpus.
+  - id: C4-outage-and-budget-pressure-never-touch-a
+    text: >
+      Section A depends only on govbridge.authority.resolver, which reads Git objects directly and never imports
+      govbridge.core.store; test_outage_a_identical moves the SQLite store aside (never deletes -- store.
+      move_store_aside renames it) and asserts both the manifest rows AND the literal rendered "## A." text block
+      are byte-identical before and after. Under budget pressure (test_budget_pressure), A is left untouched while
+      H's RETRIEVED items are dropped lowest-sort-key-first with every drop recorded in the manifest and named in
+      the rendered "[N items / K bytes omitted: see manifest]" trailer; test_blocked_budget_when_a_cannot_fit_even_
+      by_reference proves BLOCKED_BUDGET is emitted, with A's mandatory items still present and UNCHANGED (never
+      dropped), only when even by-reference delivery cannot fit the total budget.
+  - id: C5-mandatory-bridge-inputs-classes-fixture-view
+    text: >
+      tests/fixtures/compile/compile_repobuilder.py's mandatory_bridge_inputs.items covers ALL SIX classes the
+      hard invariant distinguishes as direct items (OWNER_DECISION x2 section-anchored, OWNER_DIRECTION_TO_TEST,
+      HYPOTHESIS_TO_TEST, HYPOTHESIS_RELEVANT_OBSERVATION, EVIDENCE_WITHDRAWN -- the last two NOT only via a
+      registry lifecycle_override, unlike node B5's own authority fixture). test_mandatory_bridge_inputs_classes
+      asserts each lands in exactly its architecture-specified section with its exact banner: the two
+      OWNER_DECISION items in A and referenced in D.1; OWNER_DIRECTION_TO_TEST only in D.2;
+      HYPOTHESIS_TO_TEST only in D.3; HYPOTHESIS_RELEVANT_OBSERVATION only in F and never in D.3;
+      EVIDENCE_WITHDRAWN (PINNED delivery) only in F, lifecycle WITHDRAWN. This test uses no Review-8 id
+      (OC-BR-02) -- the DAG's own acceptance line marks it "(fixture view)" for exactly this reason.
+  - id: C6-section-scoping-holds-through-the-full-compiler
+    text: >
+      test_section_scoping asserts, through the FULL compiled packet (not just the resolver in isolation, which
+      node B5 already proved), that CX-0010A/CX-0010B resolve to two distinct, non-overlapping line spans inside
+      the shared disposition fixture, and that neither span reaches back into the unanchored header (lines 1-6).
+  - id: C7-receipt-checker-and-renewal-per-schema
+    text: >
+      govbridge/compile/receipt.py's check() runs validate.verify_packet, then checks the packet hash, every
+      read token (recomputed from manifest_sha256, never trusted from the receipt), every section-A item's
+      inputs_consumed acknowledgement, every items_relied_on id against the union of every section's rows
+      (including D's three sub-blocks), and every external_read against a real Git blob -- reporting
+      external_read_files/external_read_bytes. 7 pass/fail fixtures cover each failure mode independently.
+      govbridge/compile/renewal.py's renew() gives RENEW_NOOP when manifest_sha256 is unchanged (no recompile
+      needed beyond the check itself), RENEW_DELTA with an old_manifest-based diff (added_or_changed / removed /
+      unchanged_a_by_reference) otherwise, and RENEW_BLOCKED when the recompile itself is BLOCKED or
+      BLOCKED_BUDGET.
+  - id: C8-bootstrap-adapt-no-hardcoded-phase2-text
+    text: >
+      govbridge/compile/bootstrap.py is an ADAPT of
+      release/orchestration/phase-2/tools/worker_bootstrap.py@6e7a2a3495a8d3619759a95b7ed055da9c848618 (provenance
+      recorded in its header). Its CONVENTIONS dict and CHECKPOINT_PROTOCOL text are copied verbatim; its two
+      REQUIRED changes are made: phase_state()'s hard-coded `cap2-candidate-1`/`GATE-P2-REPAIR-2` strings become
+      where_you_are(), which calls govbridge.authority.state.get("bridge", key) for a fixed, generic set of
+      top-level field names and renders each value WITH provenance (path@commit:lines, seal status) -- never a
+      literal; the fixed DECISIONS dict becomes the compiled packet's own section A, embedded verbatim in the
+      output. Run against the REAL ARCHITECTURE/demonstration-task.yaml, the bootstrap output contains neither
+      "cap2-candidate-1" nor "GATE-P2-REPAIR-2" (grep -c: 0).
+  - id: C9-real-demonstration-task-compiles-byte-identically
+    text: >
+      $PY -m govbridge.compile.packet ARCHITECTURE/demonstration-task.yaml --fake-routes, run twice, produces
+      byte-identical rendered output and an equal packet_sha256 (both runs:
+      f1f2c41107f406d6dc912cb1f6301223bc83615b22366d191e1c3c8dc12a8de7). validate.verify_packet reports zero
+      problems against the real corpus. Section A resolves 10 items (all 9 real ACTIVE OWNER_DECISION records plus
+      REVIEW-8-PROBES, an ACTIVE EVIDENCE directory entry); D.2/D.3 each carry exactly one item with their exact
+      architecture-quoted banner (OWNER_DIRECTION_TO_TEST / HYPOTHESIS_TO_TEST); every one of the ten sections'
+      manifest rows carries queries/items/dropped, even where empty. A genuinely-empty-index run (no
+      govbridge.authority.layer.build having populated authority_edge) leaves section C legitimately empty --
+      honest MISSING, not fabricated, per ARCHITECTURE.md's own discipline for an absent index.
+  - id: C10-router-generic-and-real-routes-untouched
+    text: >
+      govbridge/route/router.py never imports govbridge.lexical, govbridge.semantic or govbridge.code (verified by
+      inspection; the only govbridge imports are govbridge.authority.classes). Route selection is generic over a
+      query's TEXT SHAPE (id-grammar mention patterns, path-like tokens, symbol-like tokens, word count) never over
+      its content. RRF fusion (rrf_k=60, config/budgets.yaml, cited to the frozen product's own MEMORY_POLICY.yaml)
+      combines RANKS only, never raw scores (whose direction/scale differ by route), strictly within one
+      (authority rank, lifecycle) stratum computed by stratum_key -- the same two components place_item's own
+      ordering rule uses, so fusion can never let a strongly-ranked hit cross a stratum boundary.
+evidence:
+  - claim: C1-section-a-type-invariant-is-enforced-not-emergent
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:337-362
+  - claim: C1-section-a-type-invariant-is-enforced-not-emergent
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_authority_invariant.py::test_retrieved_cannot_enter_a -q"
+  - claim: C2-independent-validator-recomputes-and-catches-tampering
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py:27-73
+  - claim: C2-independent-validator-recomputes-and-catches-tampering
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_authority_invariant.py::test_hand_edited_packet_with_extra_a_item_fails_verify -q"
+  - claim: C3-semantic-trap-holds-generically-fixture-and-real-corpus
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:165-185
+  - claim: C3-semantic-trap-holds-generically-fixture-and-real-corpus
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_authority_invariant.py::test_semantic_trap -q"
+  - claim: C4-outage-and-budget-pressure-never-touch-a
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/budgets.py:81-97
+  - claim: C4-outage-and-budget-pressure-never-touch-a
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_outage.py tests/compile/test_compile_budget_pressure.py -q"
+  - claim: C5-mandatory-bridge-inputs-classes-fixture-view
+    file: release/orchestration/phase-2-context-bridge/tests/compile/test_compile_mandatory_classes.py
+  - claim: C5-mandatory-bridge-inputs-classes-fixture-view
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_mandatory_classes.py -q"
+  - claim: C6-section-scoping-holds-through-the-full-compiler
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_authority_invariant.py::test_section_scoping -q"
+  - claim: C7-receipt-checker-and-renewal-per-schema
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py:31-84
+  - claim: C7-receipt-checker-and-renewal-per-schema
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_receipt.py tests/compile/test_compile_renewal.py -q"
+  - claim: C8-bootstrap-adapt-no-hardcoded-phase2-text
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.check3-bootstrap-grepcount.out
+  - claim: C8-bootstrap-adapt-no-hardcoded-phase2-text
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_bootstrap.py -q"
+  - claim: C9-real-demonstration-task-compiles-byte-identically
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0008.check2-packet-compile-twice.out
+  - claim: C10-router-generic-and-real-routes-untouched
+    file: release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+  - claim: C10-router-generic-and-real-routes-untouched
+    command: "cd $D && $PY -m pytest tests/compile/test_compile_router.py -q"
+mutation_scope_respected: true
+open_issues:
+  - id: OI-1-real-b2-b3-b4-adapters-not-wired
+    text: >
+      govbridge.route.router.RouteSet's lexical/semantic/code slots are exercised only through in-test fakes and
+      the all-empty FAKE_ROUTES (--fake-routes is required by this branch's own CLI, since B2/B3/B4 are not a B6
+      dependency). I1 must write the adapter functions that translate govbridge.lexical.query.RetrievedItem /
+      govbridge.semantic.search's dict results / the real code route's rows into RouteHit, and wire them into a
+      RouteSet passed to compile_packet -- without changing anything in govbridge/route or govbridge/compile.
+  - id: OI-2-c-section-depends-on-a-built-authority-edge-layer
+    text: >
+      Section C (graph neighbours) reads govbridge.graph.traverse.bfs over the PERSISTED authority_edge table
+      (govbridge.authority.layer), which is empty until govbridge.authority.layer.build() has run against a given
+      store. On a fresh/empty store this is honestly empty (MISSING), matching the outage discipline, but I1 (or
+      whichever node builds the real index) should confirm C is populated on a built store before the demonstration
+      run leans on it.
+  - id: OI-3-several-real-mandatory-items-classify-unknown-lifecycle
+    text: >
+      Compiling the REAL demonstration-task.yaml surfaces 10 MANDATORY_ITEM_NOT_IN_A notices in section J,
+      including PHASE-2-FROZEN-GATE-CONTRACT, OWNER-LAUNCHER-BR-0001 and state:bridge#contract_v3 -- all
+      ladder-admissible classes whose LIFECYCLE classified as UNKNOWN rather than ACTIVE, so they correctly land in
+      H (never fabricated into A per "UNKNOWN is never treated as ACTIVE"), but are visibly parked there rather
+      than in a more prominent section. This is a B5 lifecycle-classification question over real records (their
+      files may lack a recognisable Status/in_effect marker in the vocabulary govbridge.authority.lifecycle
+      matches), not a B6 placement defect -- flagging for I1/whoever reviews real-corpus classification coverage.
+      Reproduce with `$PY -m govbridge.compile.packet ARCHITECTURE/demonstration-task.yaml --fake-routes --json |
+      python3 -c "import json,sys; print(json.load(sys.stdin)['notices'])"`.
+  - id: OI-4-bounded-builder-budget-split-has-no-independent-citation
+    text: >
+      ARCHITECTURE.md section 7.3 cites an exact per-section KB split for the "synthesis" profile only
+      ("A no cap, B 16, C 40, D 40, E 24, F 40, G 120, H 40, I 12, J 12") and gives "bounded-builder totals 100 KB"
+      with no independent per-section breakdown. config/budgets.yaml's bounded-builder section_caps_kb are scaled
+      proportionally (100/360) from synthesis's cited split and documented as such in the file's own comment --
+      a reasonable, generic default, not an architecture citation. Worth an owner/architect confirmation if
+      bounded-builder's section shape ever needs to differ from a straight scale-down.
+  - id: OI-5-d1-references-rather-than-duplicates-mandatory-content
+    text: >
+      D.1 entries sourced from a MANDATORY item already in A are rendered as a short reference ("[see A: <item_id>
+      (<unit_id>)]", by_reference=true) rather than a second full excerpt. ARCHITECTURE.md section 7.2 states this
+      economy explicitly only for section B ("if a record is already in A, B references it by item id rather than
+      duplicating it"); I applied the same principle to D.1 by analogy, since nothing forbids it and it avoids
+      needlessly doubling A's bytes inside the same packet. If a future reviewer wants D.1 to carry the full
+      excerpt again (matching a literal reading of "RELEVANT ACTIVE DECISIONS" as a self-contained section), that
+      is a one-line change in Compiler.add_to_a's caller (govbridge/compile/packet.py's main resolver loop).
+  - id: OI-6-config-sha256-and-build-manifest-sha256-are-partial
+    text: >
+      The packet manifest's config_sha256 covers the four config files THIS compile actually reads
+      (canonical-view, authority-registry, id-grammar, budgets); it does not include corpus-rules.yaml or
+      model-pin.yaml, which B6 never reads. build_manifest_sha256 is always null in this branch, since no index
+      build (govbridge.core.freshness) is invoked by compile_packet itself -- I1, which wires the real routes, is
+      the natural place to thread through the ACTUAL build manifest hash of whatever store the routes read.
