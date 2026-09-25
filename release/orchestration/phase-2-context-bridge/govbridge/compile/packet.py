@@ -78,6 +78,14 @@ LIFECYCLE_BANNERS = {
 
 DELIVERY_TIER = {"MANDATORY": 0, "PINNED": 0, "RETRIEVED": 1, "DERIVED": 1}
 
+# BR-AR-0015 reopening, defect 2: section G's own deterministic tier order, never overridden by rank or volume --
+# T1 (pinned) < T2 (direct callers/callees/TESTS/READS_KEY of T1) < T3 (lexical/semantic/code retrieval hits) <
+# T4 (reserved for a wider expansion no current pipeline stage produces). A non-G item's ``tier`` is always None,
+# which this maps to ONE shared constant below every real tier -- it never perturbs a non-G item's relative order
+# against another non-G item (every non-G item shares the exact same tier_rank), only ever adds a new, low-order
+# tie-breaker AFTER class rank/lifecycle/delivery, which is where the ordering invariant already lived.
+_G_TIER_ORDER = ("T1", "T2", "T3", "T4")
+
 
 # ---------------------------------------------------------------------------------------------------------------
 # PacketItem: the one internal shape every section's rendered/manifest row is built from -- constructed from a
@@ -111,6 +119,13 @@ class PacketItem:
     edge_path: tuple
     reason: Optional[str]
     banner: Optional[str]
+    # BR-AR-0015 reopening, defect 2: section G's own deterministic tier ("T1".."T4") and, defect 3, the
+    # resolution label for HOW this item's own identity was matched (never inferred from route/rank/text --
+    # ARCHITECTURE.md section 5.3 rule 5 still decides ordering by class/lifecycle first; tier/resolution only
+    # ever refine the order WITHIN an already-equal (rank, lifecycle, delivery-tier) group, and bound G's own
+    # budget dropping). None outside G.
+    tier: Optional[str] = None
+    resolution: Optional[str] = None
     item_id: str = dataclasses.field(init=False)
 
     def __post_init__(self):
@@ -126,7 +141,14 @@ class PacketItem:
 def sort_key(item: PacketItem) -> tuple:
     """ARCHITECTURE.md section 5.3 rule 5: "(pinned first, authority rank ascending, lifecycle order ACTIVE <
     PROPOSED < HISTORICAL/SUPERSEDED < WITHDRAWN < UNKNOWN, then fused score)". Ascending on this tuple is
-    "most important first"; fused score is negated so a HIGHER score sorts earlier."""
+    "most important first"; fused score is negated so a HIGHER score sorts earlier.
+
+    BR-AR-0015 reopening, defect 2: TWO more tie-breakers are inserted AFTER delivery-tier/rank/lifecycle and
+    BEFORE fused score -- section G's own tier (g_tier_rank: T1 < T2 < T3 < T4) and, within a tier, EXACT
+    resolutions before HEURISTIC ones (exact_rank). Both are constant (and equal) across every NON-G item, so
+    they never move a B/C/D/E/F/H item relative to another one; they only ever refine G's own internal order,
+    which is the one section ARCHITECTURE.md section 5.3 rule 5 never spoke to (G did not exist as a tiered
+    section before this reopening)."""
     spec = classesmod.ALL_CLASSES.get(item.cls)
     rank = spec.rank if (spec is not None and spec.ladder) else len(classesmod.LADDER) + 1
     try:
@@ -134,7 +156,13 @@ def sort_key(item: PacketItem) -> tuple:
     except ValueError:
         lc_idx = len(classesmod.LIFECYCLE_ORDER) - 1
     tier = DELIVERY_TIER.get(item.delivery, 1)
-    return (tier, rank, lc_idx, -(item.fused_score or 0.0), item.unit_kind, item.unit_id)
+    try:
+        g_tier_rank = _G_TIER_ORDER.index(item.tier)
+    except ValueError:
+        g_tier_rank = len(_G_TIER_ORDER)  # None (every non-G item) or an unrecognised tier -- one shared constant
+    resolution = item.resolution or ""
+    exact_rank = 0 if resolution.startswith("EXACT") or resolution == "DIRECT_SEED" else (1 if resolution else 2)
+    return (tier, rank, lc_idx, g_tier_rank, exact_rank, -(item.fused_score or 0.0), item.unit_kind, item.unit_id)
 
 
 def _is_adjudication(unit_id: str, grammar) -> bool:
@@ -265,7 +293,8 @@ class Compiler:
     short, testable method instead of a closure threading five arguments through."""
 
     def __init__(self, task_spec: dict, routes: RouteSet, repo: Optional[str], view_path: str,
-                 registry_path: Optional[str], rrf_k: int, graph_depth: int, budgets_path: Optional[str] = None):
+                 registry_path: Optional[str], rrf_k: int, graph_depth: int, budgets_path: Optional[str] = None,
+                 fanout: Optional[dict] = None):
         self.task_spec = task_spec
         self.routes = routes or FAKE_ROUTES
         self.repo = repo
@@ -276,6 +305,11 @@ class Compiler:
         self.grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
         self.rrf_k = rrf_k
         self.graph_depth = graph_depth
+        # BR-AR-0015 reopening, defect 2: per-symbol fan-out caps for G's T2 expansion (callers/callees/TESTS/
+        # READS_KEY), read from the budget profile ("fan-out caps from the profile") -- defaults to the real
+        # code_route adapter's own generous fallback when the caller gives none (e.g. an existing test that
+        # predates this reopening).
+        self.fanout = fanout or {}
         self.notices: list = []
         self._seen: dict = {}  # section -> set(unit_id) -- prevents literal duplicate placement
         self._code_conn_cache = None
@@ -409,7 +443,8 @@ class Compiler:
                            line_start=occ.line_start if occ else None, line_end=occ.line_end if occ else None,
                            text=text, content_sha256=(sha256_text(text) if text else None), by_reference=False,
                            route=h.route, raw_score=None, rank=h.rank, fused_score=fused.fused_score,
-                           edge_path=tuple(h.edge_path), reason=None, banner=banner)
+                           edge_path=tuple(h.edge_path), reason=None, banner=banner,
+                           tier=getattr(h, "tier", None), resolution=getattr(h, "resolution", None))
 
     # -- construction from a graph.why/history Edge hop (delivery DERIVED) --------------------------------------
 
@@ -476,7 +511,7 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     status = STATUS_OK if resolve_result.status == resolvermod.STATUS_OK else STATUS_BLOCKED
 
     c = Compiler(task_spec, routes, repo, view_path, registry_path, profile.rrf_k, profile.graph_neighbour_depth,
-                 budgets_path=budgets_path)
+                 budgets_path=budgets_path, fanout=profile.g_fanout)
 
     sections: dict = {k: [] for k in ("A", "B", "C", "D.1", "D.2", "D.3", "E", "F", "G", "H")}
     queries_log: dict = {}
@@ -551,14 +586,24 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         # seed that is already a code symbol keeps working exactly as before (seed_names always starts with seed).
         seed_names, seed_labels, bare_occurrences = c.code_seeds_for(seed)
         for hit in c.routes.run("code", seeds=seed_names, seed_labels=seed_labels,
-                                 bare_occurrences=bare_occurrences):
+                                 bare_occurrences=bare_occurrences, fanout=c.fanout):
             cls_section, _ = place_item(hit.authority_class, hit.lifecycle, hit.delivery, hit.unit_id, c.grammar)
             # BR-HO-0015 defect 3: only a LADDER class may be redirected H -> G (g_admissible); a non-ladder class
             # (UNCLASSIFIED, FIXTURE) has a FIXED allowed_sections that never names G, and redirecting one there
             # would fail validate.py's independent placement re-derivation.
             target = "G" if (cls_section == "H" and g_admissible(hit.authority_class)) else cls_section
             fused = routermod.FusedHit(hit=hit, fused_score=0.0, routes=(hit.route,))
-            c.add(sections, target, c.item_from_hit(fused, target))
+            item = c.item_from_hit(fused, target)
+            if item.tier is not None and target != "G":
+                # T1/T2 pinning (BR-AR-0015 reopening) only ever means anything INSIDE G. A citation-derived hit
+                # whose class is non-ladder (e.g. UNCLASSIFIED -- its own allowed_sections never names G, so
+                # g_admissible refused the redirect above) lands in H or E like any other item of that class: it
+                # must not carry PINNED there, which would wrongly exempt it from THAT section's own budget and
+                # (since item_from_hit's banner is lifecycle-only) fail verify_banners' PINNED-non-ladder check,
+                # which expects the class's own mandatory banner, not a lifecycle one.
+                item = dataclasses.replace(
+                    item, delivery=("RETRIEVED" if item.delivery == "PINNED" else item.delivery), tier=None)
+            c.add(sections, target, item)
 
     # --- queries: exact/lexical/semantic/code routes, fused, placed by (class, lifecycle) alone.
     for q in _load_queries(task_spec, repo=repo):
@@ -588,6 +633,12 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
                 elif target_section:
                     section = target_section
             item = c.item_from_hit(f, section)
+            if section == "G" and item.tier is None:
+                # a lexical/semantic hit redirected into G carries no tier of its own (only the code route's hits
+                # set one) -- it is T3 ("code or test hits from lexical, semantic or code retrieval") by
+                # construction, since this whole branch only runs for a query hit whose occurrence is a code/test
+                # surface (defect 2's tier order).
+                item = dataclasses.replace(item, tier="T3")
             c.add(sections, section, item)
             touched_sections.add(section)
             if also_d1:
@@ -605,12 +656,15 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     c.add(sections, "J", j_item)
 
     # --- budgets, then final deterministic ordering.
-    sections, drops_list, blocked_budget = budgetsmod.apply_budgets(sections, profile)
+    sections, drops_list, blocked_budget, budget_notices = budgetsmod.apply_budgets(sections, profile)
     if blocked_budget:
         status = STATUS_BLOCKED_BUDGET
+    c.notices.extend(budget_notices)  # e.g. G_T1_OVER_BUDGET (BR-AR-0015 reopening defect 2)
     for key in sections:
         sections[key] = sorted(sections[key], key=sort_key)
-    drops_by_section = _group_drops(drops_list)
+    # BR-AR-0015 reopening, defect 4: compact, per (section, tier) -- a count, a sha256 over the sorted dropped
+    # unit ids, and the first 50 of those ids -- never the raw per-item drop list the manifest used to carry.
+    drops_by_section = budgetsmod.compact_drops(drops_list)
 
     # --- assemble manifest + render.
     task_spec_sha256 = sha256_text(canonical_json(task_spec))
@@ -656,16 +710,6 @@ def _config_shas(view_path: str, registry_path: str, budgets_path: Optional[str]
                 out[label] = hashlib.sha256(fh.read()).hexdigest()
         except OSError:
             out[label] = None
-    return out
-
-
-def _group_drops(drops_list: list) -> dict:
-    """``budgets.apply_budgets`` tags each drop dict with the internal ``_section``/``_subblock`` key it was
-    measured against (``enforce_section``/``enforce_combined``); re-key the flat list by that so the manifest can
-    attach each section's own drops."""
-    out: dict = {}
-    for d in drops_list:
-        out.setdefault(d.get("_section", "?"), []).append({k: v for k, v in d.items() if k != "_section"})
     return out
 
 

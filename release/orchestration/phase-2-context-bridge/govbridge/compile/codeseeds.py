@@ -202,10 +202,11 @@ def _resolve_symbol_name(name: str, by_name: dict, by_qualname: dict, qualified:
 def cited_code_units(seed_id: str, product_commit: str, records_commit: str, grammar: "recordsmod.Grammar",
                       repo: Optional[str] = None) -> tuple:
     """Every code/test unit ``seed_id``'s own record text cites, resolved at the canonical product ref:
-    ``(symbols, bare_occurrences)`` -- ``symbols``: ``tuple[CitedSymbol]`` (an enclosing symbol was found, or a
-    ``::``-qualified/backticked token resolved directly to a definition); ``bare_occurrences``:
-    ``tuple[CitedOccurrence]`` (a ``path:line`` citation resolves to a real product-ref line, but no symbol
-    encloses it -- this is also how a cited evidence probe surfaces, generically). Returns ``((), ())`` when
+    ``(symbols, occurrences)`` -- ``symbols``: ``tuple[CitedSymbol]`` (an enclosing definition was found for a
+    ``path:line`` citation, or a ``::``-qualified/backticked token resolved directly to a definition);
+    ``occurrences``: ``tuple[CitedOccurrence]`` (the CITED LINE ITSELF, for every ``path:line``/``path:line-line``
+    citation -- ALWAYS emitted, whether or not an enclosing symbol was also found; this is also how a cited
+    evidence probe surfaces, generically, since it never resolves to a symbol). Returns ``((), ())`` when
     ``seed_id`` is not itself a record (nothing to derive; the seed is presumably already a code symbol or path)."""
     span = record_span(seed_id, records_commit, grammar, repo=repo)
     if span is None:
@@ -234,19 +235,22 @@ def cited_code_units(seed_id: str, product_commit: str, records_commit: str, gra
         # no blob_id here (ensure_indexed only enumerates .rs blobs), which correctly falls through to the
         # occurrence-level branch below, exactly like a .rs line no symbol happens to enclose. Neither case is a
         # reason to drop the citation.
+        # BR-AR-0015 reopening, defect 3: a path:line citation yields BOTH (a) the cited line's own occurrence and
+        # (b) its enclosing definition, when one is found -- never either/or. A CALLS/TESTS/READS_KEY edge that
+        # happens to land on this same line (T2 expansion, below) is never the citation's own resolution.
+        occ_key = (target_path, line)
+        if occ_key not in seen_occs:
+            seen_occs.add(occ_key)
+            occ_out.append(CitedOccurrence(path=target_path, line=line, label=edge.derivation,
+                                            cite_path=cite_path, cite_line=edge.evidence_line))
         blob_id = path_to_blob.get(target_path)
         sym = _enclosing_symbol(conn, blob_id, line) if blob_id is not None else None
         if sym is None:
-            key = (target_path, line)
-            if key not in seen_occs:
-                seen_occs.add(key)
-                occ_out.append(CitedOccurrence(path=target_path, line=line, label=edge.derivation,
-                                                cite_path=cite_path, cite_line=edge.evidence_line))
             continue
-        key = sym["qualified_name"]
-        if key not in seen_syms:
-            seen_syms.add(key)
-            symbols_out.append(CitedSymbol(name=key, kind=sym["kind"], label=edge.derivation, path=target_path,
+        sym_key = sym["qualified_name"]
+        if sym_key not in seen_syms:
+            seen_syms.add(sym_key)
+            symbols_out.append(CitedSymbol(name=sym_key, kind=sym["kind"], label=edge.derivation, path=target_path,
                                             start_line=sym["start_line"], end_line=sym["end_line"],
                                             cite_path=cite_path, cite_line=edge.evidence_line))
 

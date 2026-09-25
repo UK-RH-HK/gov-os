@@ -250,3 +250,178 @@ def test_hand_moved_g_item_fails_packet_verify(tmp_path):
     )
     problems2 = validatemod.verify_packet(into_d1, task_spec, repo=repo_root, registry_path=registry_path)
     assert problems2, "a hand-moved RETRIEVED G item in D.1 must fail packet verify"
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# BR-AR-0015 reopening, acceptance check 6: a seed record cites three anchors, inside a large fan-out graph, under
+# a tiny G budget. All three T1 anchors, with their enclosing definitions, must be in G; expansion (T2) is
+# dropped first; rendered G bytes stay within budget + the fixed header allowance.
+# ---------------------------------------------------------------------------------------------------------------
+
+TIER_RECORD_PATH = "spec/reports/CX-TIER-0001.md"
+TIER_CODE_PATH = "src/anchors.rs"
+CALLERS_PER_ANCHOR = 8  # a "large fan-out graph": 3 anchors x 8 callers = 24 T2 candidates for a 6-item T1 set.
+
+TIER_RECORD_TEXT = """# CX-TIER-0001 -- a fixture finding record (BR-AR-0015 reopening acceptance check 6)
+
+| Field | Value |
+|---|---|
+
+## F1
+
+This finding cites three anchors: `src/anchors.rs:1`, `src/anchors.rs:2` and `src/anchors.rs:3`.
+"""
+
+
+def _tier_code_text() -> str:
+    lines = ["pub fn anchor_one() -> bool { true }",
+             "pub fn anchor_two() -> bool { true }",
+             "pub fn anchor_three() -> bool { true }"]
+    for anchor in ("anchor_one", "anchor_two", "anchor_three"):
+        for i in range(CALLERS_PER_ANCHOR):
+            lines.append(f"pub fn caller_{anchor}_{i}() -> bool {{ {anchor}() }}")
+    return "\n".join(lines) + "\n"
+
+
+def _build_tier_repo(tmp_path: Path) -> Path:
+    root = tmp_path / "repo"
+    root.mkdir()
+    _git(root, "init", "-q", "-b", "main")
+    _git(root, "config", "user.email", "t@example.com")
+    _git(root, "config", "user.name", "t")
+
+    (root / TIER_RECORD_PATH).parent.mkdir(parents=True, exist_ok=True)
+    (root / TIER_RECORD_PATH).write_text(TIER_RECORD_TEXT, encoding="utf-8")
+    (root / TIER_CODE_PATH).parent.mkdir(parents=True, exist_ok=True)
+    (root / TIER_CODE_PATH).write_text(_tier_code_text(), encoding="utf-8")
+
+    state_path = root / BRIDGE_STATE_PATH
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(
+        "schema: bridge-orchestrator-state/1\n"
+        "mandatory_bridge_inputs:\n  authority_classes: {}\n  items: []\n",
+        encoding="utf-8",
+    )
+    (root / "config" / "corpus-rules.yaml").parent.mkdir(parents=True, exist_ok=True)
+    (root / "config" / "corpus-rules.yaml").write_text(
+        "schema: govbridge-corpus-rules/1\nrules:\n- {id: INCLUDED, effect: INCLUDE, match: {}}\n",
+        encoding="utf-8",
+    )
+
+    _git(root, "add", "-A")
+    _git(root, "commit", "-q", "-m", "c1")
+    _git(root, "branch", "-f", "product", "HEAD")
+    return root
+
+
+def _write_tier_configs(tmp_path: Path) -> tuple:
+    view_path = tmp_path / "tier-canonical-view.yaml"
+    view_path.write_text(
+        "schema: govbridge-canonical-view/1\n"
+        "view_id: cx-tier-test-view\n"
+        "refs:\n"
+        "  - {name: records, ref: refs/heads/main, follow: tip, role: primary}\n"
+        "  - {name: product, ref: refs/heads/product, follow: tip, role: product}\n"
+        "partitions:\n"
+        "  - {name: catchall, paths: ['**'], owner: records, fallback: [product]}\n",
+        encoding="utf-8",
+    )
+    registry_path = tmp_path / "tier-authority-registry.yaml"
+    registry_path.write_text(
+        "schema: govbridge-authority-registry/1\n"
+        "class_rules:\n"
+        f"  - {{glob: '{TIER_CODE_PATH}', class: EVIDENCE}}\n"
+        "  - {glob: 'spec/reports/**', class: EVIDENCE}\n"
+        "  - {glob: '**', class: UNCLASSIFIED}\n",
+        encoding="utf-8",
+    )
+    return str(view_path), str(registry_path)
+
+
+def _write_tier_budgets(tmp_path: Path) -> str:
+    """A tiny-G-budget profile, same schema as config/budgets.yaml -- fan-out caps generous (so budget dropping,
+    never fan-out capping, is what this test exercises) but G's own section cap far too small to hold the 24 T2
+    candidates fan-out proposes, while still comfortably holding the 6 T1 items (3 cited lines + 3 enclosing
+    definitions)."""
+    path = tmp_path / "tiny-budgets.yaml"
+    path.write_text(
+        "schema: govbridge-budgets/1\n"
+        "rrf_k: 60\n"
+        "graph_neighbour_depth: 1\n"
+        "parent_expansion_top_n: 3\n"
+        "max_slice_chars: 1600\n"
+        "per_item_cap_kb: 24\n"
+        "section_header_bytes: 4096\n"
+        "profiles:\n"
+        "  tiny:\n"
+        "    total_kb: 64\n"
+        "    section_caps_kb: {A: null, B: 4, C: 4, D: 4, E: 4, F: 4, G: 2, H: 4, I: 3, J: 3}\n"
+        "    g_fanout: {max_callers: 20, max_callees: 20, max_tests: 20, max_reads_key_values: 20, "
+        "max_reads_key_consumers: 20}\n",
+        encoding="utf-8",
+    )
+    return str(path)
+
+
+def _tier_task_spec(view_path: str) -> dict:
+    return {
+        "schema": "govbridge-task-spec/1", "task_id": "T-TIER-1", "role": "test",
+        "objective": "a tiny G budget, under a large fan-out graph -- T1 anchors must survive; T2 is dropped first",
+        "view": view_path,
+        "required_inputs": [],
+        "seeds": ["CX-TIER-0001#F1"],
+        "queries": [],
+        "mutation_scope": ["tests/compile/**"],
+        "prohibitions": ["do not touch anything outside mutation_scope"],
+        "required_checks": ["pytest tests/compile -q"],
+        "completion_vocabulary": ["ANSWERED", "PARTIAL", "BLOCKED"],
+        "budget_profile": "tiny",
+    }
+
+
+def test_tiny_g_budget_keeps_all_t1_anchors_and_drops_expansion_first(tmp_path):
+    from govbridge.compile import budgets as budgetsmod
+    from govbridge.compile import render as rendermod
+
+    repo_root = _build_tier_repo(tmp_path)
+    view_path, registry_path = _write_tier_configs(tmp_path)
+    budgets_path = _write_tier_budgets(tmp_path)
+    from govbridge.core import freshness
+    freshness.run(view_path=view_path, rules_path=str(repo_root / "config" / "corpus-rules.yaml"),
+                  repo=str(repo_root), from_clean=True)
+
+    task_spec = _tier_task_spec(view_path)
+    routes = real_routes.build_real_routes(view_path=view_path, repo=str(repo_root), registry_path=registry_path)
+    result = packetmod.compile_packet(task_spec, routes=routes, repo=str(repo_root), registry_path=registry_path,
+                                       budgets_path=budgets_path)
+    assert result["status"] == packetmod.STATUS_OK
+
+    g_items = result["sections"]["G"]
+    t1_items = [it for it in g_items if it.tier == "T1"]
+    t2_items = [it for it in g_items if it.tier == "T2"]
+
+    # all three T1 anchors, WITH their enclosing definitions -- 3 cited-line occurrences + 3 symbol definitions.
+    t1_occ_paths_lines = {(it.path, it.line_start) for it in t1_items if it.unit_kind == "occurrence"}
+    assert t1_occ_paths_lines == {(TIER_CODE_PATH, 1), (TIER_CODE_PATH, 2), (TIER_CODE_PATH, 3)}, t1_occ_paths_lines
+    t1_symbol_names = {it.unit_id for it in t1_items if it.unit_kind == "symbol"}
+    assert any("anchor_one" in n for n in t1_symbol_names) or any(
+        "anchor_one" in (it.text or "") for it in t1_items), [it.text for it in t1_items]
+    for anchor in ("anchor_one", "anchor_two", "anchor_three"):
+        assert any(anchor in (it.text or "") for it in t1_items if it.unit_kind == "symbol"), \
+            (anchor, [it.text for it in t1_items])
+
+    # expansion (T2 callers) is dropped FIRST -- with only 24 candidates proposed and a 2 KB cap that just fits
+    # the 6 T1 items, only a handful of T2 items (if any) survive, and the drop list accounts for the rest.
+    assert len(t2_items) < CALLERS_PER_ANCHOR * 3, (len(t2_items), CALLERS_PER_ANCHOR * 3)
+    g_drops = result["drops"].get("G", [])
+    assert g_drops, "expansion must be recorded as dropped, never silently"
+    dropped_t2_count = sum(g["count"] for g in g_drops if g["tier"] == "T2")
+    assert dropped_t2_count > 0, g_drops
+
+    # rendered G bytes stay within budget + the fixed header allowance (defect 1).
+    profile = budgetsmod.load_profile("tiny", path=budgets_path)
+    g_body = rendermod._render_section_body("G", {"G": g_items}, result["queries_log"], result["drops"])
+    g_rendered_bytes = len(g_body.encode("utf-8"))
+    cap = profile.section_caps_bytes["G"]
+    assert g_rendered_bytes <= cap + profile.section_header_bytes, (g_rendered_bytes, cap,
+                                                                       profile.section_header_bytes)
