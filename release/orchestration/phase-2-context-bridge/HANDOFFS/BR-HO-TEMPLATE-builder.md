@@ -31,6 +31,10 @@ Context/Retrieval Bridge (lifecycle `P2X-FAIL-1-BRIDGE`). You do not grade your 
 - **The hard authority invariant is code, not prose.** Nothing retrieved (lexical, semantic, graph or code) may
   enter packet section A, displace an A item, or be relabelled as authority. Keep the authority classes exactly as
   they are, including `OWNER_DIRECTION_TO_TEST`, `HYPOTHESIS_TO_TEST` and `EVIDENCE_WITHDRAWN`.
+- **Generic, not bespoke (OC-BR-02).** The bridge is a whole-repository, provider/model-replaceable Governance OS
+  self-memory foundation. No bridge code may special-case Review 8, F1–F6, Phase 2 or particular file names.
+  Review-8 material may appear **only** in demonstration queries, oracle fixtures and their tests. Corpus scope
+  comes from the versioned inclusion/exclusion rules, never from a hand-picked list.
 - **Do not repair, pre-judge or classify Review-8 findings F1–F6.**
 - **Dependencies** must be exactly the pinned set the architecture names, installed only by the domain's pinned
   bootstrap into `$HOME/.cache/gov-bridge/`. Never commit installed packages, model weights, or a file over 5 MB.
