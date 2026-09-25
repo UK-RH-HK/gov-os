@@ -1,0 +1,27 @@
+schema: govbridge-embed-profile/1
+description: >
+  Which chunks the semantic route embeds (ARCHITECTURE.md section 4.5; SEMANTIC_ROUTE.md section 3; node B4).
+  This is a POSITIVE admission list over corpus-INCLUDED text, generic by extension only -- it never names a
+  review, a phase or a particular file (OC-BR-02). It is deliberately narrower than the corpus rules: a kind not
+  listed here is never embedded even when config/corpus-rules.yaml classifies its blob INCLUDE (for example
+  ``.csv``), and a kind the corpus rules already route LEXICAL_ONLY (config/corpus-rules.yaml rule
+  L-MACHINE-OUTPUT) is never embedded regardless of anything below -- the two files are companions and must name
+  the same machine-output kinds (config/corpus-rules.yaml:97-106 cites this file back).
+  Only refs whose config/canonical-view.yaml ``layers:`` list contains ``semantic`` are embedded at all; a ref
+  whose layers list omits it (the ``history`` role, in this lifecycle's view) contributes no chunks to this layer
+  even when a blob it carries is also reachable through an eligible ref (govbridge/semantic/profile.py reads the
+  resolved view's per-ref layers list -- it does not hard-code a role name).
+embed_kinds: [md, txt, html, yaml, yml, toml, rs, py, sh, json]
+embed_kinds_size_le:
+  json: 65536
+lexical_only_kinds: [out, log, shimlog, stderr, diff, patch, tsv, jsonl, summary]
+lexical_only_kinds_size_gt:
+  json: 65536
+history_role_embedded: false
+layer_name: semantic
+chunking:
+  reuse: govbridge.core.chunking (CHUNKER_VERSION, DEFAULT_MAX_CHARS 1200, DEFAULT_OVERLAP_CHARS 120) -- the
+    semantic layer embeds the SAME chunk rows the core layer already produced; it never re-chunks.
+source_cite: >
+  ARCHITECTURE/REUSE_VS_BUILD.yaml embed-profile.yaml row (owner_node B4); SEMANTIC_ROUTE.md section 3 table;
+  ARCHITECTURE.md section 1.1 L-MACHINE-OUTPUT; ARCHITECTURE.md section 4.5 ("History refs -- not embedded").

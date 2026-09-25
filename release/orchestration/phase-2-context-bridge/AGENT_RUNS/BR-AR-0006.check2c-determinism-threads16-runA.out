@@ -1,0 +1,10 @@
+{
+ "batch1_digest": "c2ecf1643b83bce0846c3af0dc4ce45bc0d6db83c99be38d196831a99f6d7be7",
+ "batch1_eq_batch32": true,
+ "batch1_seconds": 5.589,
+ "batch32_digest": "c2ecf1643b83bce0846c3af0dc4ce45bc0d6db83c99be38d196831a99f6d7be7",
+ "batch32_seconds": 7.608,
+ "pin_id": "83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50",
+ "sample": 50,
+ "threads": 16
+}

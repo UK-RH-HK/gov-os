@@ -1,0 +1,77 @@
+run_id: BR-AR-0006
+commit: PLACEHOLDER_FILLED_AFTER_COMMIT
+commands:
+  # Acceptance check 1: cd $D && $PY -m pytest tests/semantic -q
+  - cmd: "cd $D && PYTHONPATH=$D $PY -m pytest tests/semantic -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check1-pytest-semantic.out
+    output_sha256: f13411fb161ed5f8db418311b1432bb066639fef779b30b7c31d54ff46a04cc3
+
+  # Acceptance check 2: $PY -m govbridge.semantic.vectors determinism --sample 50, run twice in separate
+  # processes, and once with --threads 4. Run against this run's own real-corpus store (store-BR-AR-0006), so
+  # the sample is 50 real chunks, not a synthetic fixture. Four separate-process invocations total: two at
+  # --threads 4 (explicit and default-4), two at --threads 16 -- all four give the identical vectors digest
+  # (c2ecf1643b83bce0846c3af0dc4ce45bc0d6db83c99be38d196831a99f6d7be7), and batch1_eq_batch32 is true in every one.
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -m govbridge.semantic.vectors determinism --sample 50 --threads 4"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2a-determinism-threads4-run1.out
+    output_sha256: 66ceb395556358d54c29f321695b3cf64aa9b430af27a1ef8316ba9fe9de68de
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -m govbridge.semantic.vectors determinism --sample 50"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2b-determinism-defaultthreads-run2.out
+    output_sha256: 9aa2b945d3c0bf5b4279f4d45bd8f9bbff004accb30fe5caea92d1620a1e6f0f
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -m govbridge.semantic.vectors determinism --sample 50 --threads 16"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2c-determinism-threads16-runA.out
+    output_sha256: ac777463b1613079d7a95fecd6f7639ba06082bef6fed83c56ccf80a44cdaa34
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -m govbridge.semantic.vectors determinism --sample 50 --threads 16"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check2d-determinism-threads16-runB.out
+    output_sha256: 230e7bd28004ec27dec2bfc07fe41462bde61df3c2174d18a0ea3b65a5ab4d30
+
+  # Acceptance check 3: $PY -m govbridge.core.freshness rebuild --layer semantic. Run as a combined
+  # `rebuild --from-clean` (both "core" and "semantic" registered, via the govbridge.semantic import-first
+  # workaround open_issues OI-1 explains -- a bare `--layer semantic` alone would have nothing to embed, since
+  # nothing else populates chunk/blob data in the same pass, and a plain `--layer semantic` re-invocation after a
+  # separate core-only build hits freshness's NOOP short-circuit instead of running the semantic builder at all).
+  # This is the ONE full real-corpus semantic rebuild this run performs (~36 minutes CPU), run once, at the end,
+  # in the background with a bounded shell-level timeout (3600s), per the isolation rules.
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 timeout 3600 $PY -c \"import govbridge.semantic, govbridge.core.freshness as f, sys; sys.exit(f.main(sys.argv[1:]))\" rebuild --from-clean --timings"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check3-freshness-rebuild-semantic.out
+    output_sha256: f5af0954a1e117dace05033f3598554746435f4948ea267a5c52d47e51ee1a86
+  # Supplementary: the persisted manifest's layers.vector block (status BUILT, rows 44191, digest, and the
+  # semantic manifest block -- see open_issues OI-2 for why it is here rather than at pins.semantic).
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -c \"import json; m=json.load(open('$HOME/.cache/gov-bridge/store-BR-AR-0006/manifest.json')); print(json.dumps(m['manifest']['layers']['vector'], indent=1, sort_keys=True))\""
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check3a-manifest-vector-layer.out
+    output_sha256: 6039980903f90e42d2495f9098e9dbf6269b1e4e539be4d06b0edf16e7d4e9cf
+  # Supplementary: "no chunk of an L-MACHINE-OUTPUT kind embedded" and "no history-only-blob chunk embedded",
+  # verified directly against the real, full corpus store (not just the pytest fixture).
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -c \"import sqlite3, json; conn=sqlite3.connect('$HOME/.cache/gov-bridge/store-BR-AR-0006/store.db'); n=conn.execute('SELECT COUNT(*) FROM chunk c JOIN blob b ON b.blob_id=c.blob_id WHERE b.corpus_rule=\\\"L-MACHINE-OUTPUT\\\" AND c.chunk_id IN (SELECT chunk_id FROM vector)').fetchone()[0]; total=conn.execute('SELECT COUNT(*) FROM chunk c JOIN blob b ON b.blob_id=c.blob_id WHERE b.corpus_rule=\\\"L-MACHINE-OUTPUT\\\"').fetchone()[0]; n2=conn.execute('SELECT COUNT(*) FROM chunk c WHERE c.blob_id IN (SELECT DISTINCT blob_id FROM occurrence WHERE ref_name LIKE \\\"refs/heads/phase2/%\\\" AND blob_id NOT IN (SELECT blob_id FROM occurrence WHERE ref_name NOT LIKE \\\"refs/heads/phase2/%\\\")) AND c.chunk_id IN (SELECT chunk_id FROM vector)').fetchone()[0]; vcount=conn.execute('SELECT COUNT(*) FROM vector').fetchone()[0]; print(json.dumps({'l_machine_output_chunks_embedded_must_be_0': n, 'l_machine_output_chunks_total_in_corpus': total, 'history_only_chunks_embedded_must_be_0': n2, 'total_vector_rows': vcount}, indent=1, sort_keys=True))\""
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check3b-no-machine-output-no-history-verify.out
+    output_sha256: 6ced1ffaaa59f218d41902c7c8a0d95cfafb73636ea26e67e5f6a44541ca4b00
+
+  # Acceptance check 4: $PY -m govbridge.semantic.search 'how is a checkpoint made mandatory for a worker' --json
+  - cmd: "cd $D && PYTHONPATH=$D GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0006 $PY -m govbridge.semantic.search 'how is a checkpoint made mandatory for a worker' --json"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check4-search.out
+    output_sha256: 57627e4421a44ed5d8400dc76b9c893de8a23df8392d7c3b2fac49c5da695405
+
+  # Supplementary: OC-BR-02 generic-not-bespoke grep (claim C7).
+  - cmd: "cd $D && grep -rin \"review.?8\\|F1-F6\\|phase.?2\" govbridge/semantic tests/semantic"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check5-generic-grep.out
+    output_sha256: cfa043d8de96cfac0a46bf108ab23d7da1be95ffd35b30cae8b378d6d0f45b13
+
+  # Supplementary: orchestrator advisory (vector_layer_digest ensure-schema-first) verified by running tests/core
+  # and tests/semantic together, in both collection orders.
+  - cmd: "cd $D && PYTHONPATH=$D $PY -m pytest tests/core tests/semantic -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check6-pytest-core-then-semantic.out
+    output_sha256: a7423bc578c305efd8f9a65361af374c527d24eb504e86c5e8d30b3689ac7f4d
+  - cmd: "cd $D && PYTHONPATH=$D $PY -m pytest tests/semantic tests/core -q"
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0006.check7-pytest-semantic-then-core.out
+    output_sha256: a04e27ff69051e6432d95772d4530524690d1e0db2e61c998fccf5ee75432e22
