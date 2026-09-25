@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T13:30:40Z'
-state_hash: 90caae025a81538c0e68f2d611d9f2b797d6cceb24388e724e20e5bfd40833e1
-lifecycle_state: BR_BUILD_PG3_INTEGRATION
+updated_at: '2026-09-25T17:06:44Z'
+state_hash: 0268f987f1c790605f0b1afed6ff9dc5612bb47ca0b4bc3ac46a38bafc72d0d5
+lifecycle_state: BR_DEMONSTRATION_FROZEN_VIEW
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -542,10 +542,33 @@ agent_runs:
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0009
   base_commit: c8839c0915d25b508562883a1e1e81de28f7ce8d
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-a3d449278924cc8d1.jsonl)
+  model_observed: claude-sonnet-5 (all 777 assistant turns, transcript agent-a3d449278924cc8d1.jsonl)
   agent_name: br-integrator-i1-0009
   dispatched_at: '2026-09-25T14:36Z'
-  status: RUNNING
+  duration_ms: 12759893
+  status: COMPLETED_INTEGRATED
+  final_commit: 83efe3085bce1cbfa1574276028b0584170195db
+  merged_at: 53eb687
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - 'merge rules by git diff from a1fc62a: tests/** 15 added + 1 R100 rename, no existing test modified or deleted; compile/validate.py
+    untouched; authority/classes.py + resolver.py changed only to read state-file paths from config/state-aliases.yaml (sanctioned
+    constant move); resolver multi-path rows now verify EVERY listed path (stricter); lifecycle.py adds an additive find_definition
+    wrapper; resolver still imports no route and never reads the index store'
+  - plain `pytest tests -q` (no import-mode flag) on the merged tree -- 308 passed
+  - 'reproducibility -- build 2 (from-clean, records 6b76665) and build 3 (from-clean, records pinned 6b76665) both manifest_sha256
+    3b68840c...1b2c'
+  - 'incremental == full -- build 1 (from-clean at e9b8f11) incrementally updated to 6b76665 by the freshness run reaches the same
+    3b68840c...1b2c'
+  - check_state.py verify on the merged branch -- STATE_CONSISTENT
+  reported_by_integrator:
+  - real-routes compile + packet verify PASS on the real demonstration task; all 16 mandatory_bridge_inputs items in their
+    expected sections; section C non-empty (1 item)
+  - outage -- section A byte-identical with the store moved aside
+  - demo grade CLI -- pass fixture PASS; UPSTREAM_ONLY, G3 and G7 undeclared-read fixtures FAIL at the named gate
+  - full from-clean build ~2,285 s wall (semantic 2,039 s, 40,780 chunks embedded); llm_invocations 0
+  open_issue: B3's Python-AST adapter not wired into a commit-wide symbol index (Python has full lexical coverage; the
+    benchmark case is Rust) -- a bounded, disclosed limitation for the verifier
   store: $HOME/.cache/gov-bridge/store-BR-AR-0009
   merge_rules_checked_by_orchestrator: existing tests/** test_*.py files only added or R100-renamed (never modified or
     deleted); authority/{resolver,lifecycle,classes}.py and compile/validate.py changed only as listed in the report;
@@ -559,9 +582,8 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/telemetry/index/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0009.*
 running_work:
-- run_id: BR-AR-0009
-  liveness_check: subagent transcript mtime + commits on bridge/i1-0009 + /proc cwd scan of the worktree (its long
-    rebuilds run in the background); never inferred from elapsed time
+- run_id: BR-AR-0010
+  liveness_check: orchestrator-run deterministic D1 in worktree br-ar-0010 (branch bridge/d1-0010); /proc scan
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -641,12 +663,27 @@ rulings:
     class, non-resolver item, or a non-ACTIVE item without banner/J notice; D.1 unchanged); oracle authority_expectations
     rows expecting an A-admissible mandatory item outside A are read as A and every affected row is reported; recorded
     before any demonstration run without the orchestrator reading the oracle; delivered live to I1
+demonstration_freeze:
+  frozen_bridge_tip: PENDING_THIS_COMMIT
+  rule: NO commits to bridge/p2-context-retrieval from this commit until GRADE (BR-AR-0012) returns -- the canonical view's
+    records ref follows this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here
+    would move the demonstration's view mid-run (OBS-BR-03)
+  progress_is_recorded_on: [bridge/d1-0010 (BR-AR-0010 coverage/cost, orchestrator-run), bridge/demo-0011 (bootstrap, packet,
+      answers, receipt, reads), bridge/grade-0012 (unsealed oracle copy, grading report)]
+  demonstration_store: $HOME/.cache/gov-bridge/store-BR-AR-0010 (built from clean by D1 at the frozen tip)
+  resume_rule: a resumed orchestrator reads those branches' commits as the durable progress record, then merges them in
+    order D1 -> DEMO -> GRADE and lifts the freeze
 observations:
 - id: OBS-BR-01
   text: 'the orchestrator''s auto-memory claims OD-P2-08 superseded OA-P2-06''s hard stops and AR75 framing entirely; no
     committed record says so -- OD-P2-07 line 9 authorises continuation beyond OA-P2-06''s stop condition and OD-P2-08
     line 7 supersedes only two escalation packages. The architecture''s cited, scoped representation is grounded in
     the records and stands; memory is not a source.'
+- id: OBS-BR-03
+  text: the records ref follows the bridge branch tip, so an orchestrator commit during a long build or a demonstration
+    moves the view -- observed during I1 (commit 6b76665 landed between from-clean builds 1 and 2); freshness correctly reported
+    INCREMENTAL and the incremental store reached the identical manifest as a from-clean build, turning the incident into an
+    incremental==full proof. Handling -- freeze the bridge branch across view-sensitive runs (see demonstration_freeze)
 - id: OBS-BR-02
   text: SECURITY_POLICY secret-content exclusion hides 8 product files (fake test keys, incl. brownfield.rs) from content
     indexes; they stay reachable by path/blob through the exact route and the exclusion is disclosed in every packet
@@ -674,7 +711,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0009 (I1; long from-clean rebuilds, check liveness by /proc and commits);
-  verify (integrate-check, model, the frozen-test merge rules by git diff, plain `pytest tests -q`, reproducibility and
-  incremental==full evidence, the real-routes section map), merge; then run D1 (BR-AR-0010, deterministic, by the
-  orchestrator); then DEMO preconditions and dispatch DEMO (BR-AR-0011, opus)
+next_deterministic_action: 'FROZEN VIEW: run D1 (BR-AR-0010, orchestrator, deterministic) in worktree br-ar-0010 on branch
+  bridge/d1-0010 -- coverage across every view ref + a timed from-clean rebuild into store-BR-AR-0010; then DEMO per HANDOFFS/BR-HO-0011
+  on bridge/demo-0011; then GRADE per HANDOFFS/BR-HO-0012 on bridge/grade-0012; then merge all three and lift the freeze'

@@ -317,3 +317,30 @@ the TA and the ruling. The orchestrator will check its merge rules by `git diff`
 * existing test files are frozen, apart from pure renames;
 * the invariant modules are near-frozen;
 * plain `pytest tests -q` must pass.
+
+## BR-L-0013: I1 lands; the integrated bridge is reproducible; the view is frozen for the demonstration (2026-09-25)
+
+**BR-AR-0009 returned COMPLETED** on `claude-sonnet-5` (777 turns, about 3.5 h). `integrate-check` was PERMITTED.
+The orchestrator enforced I1's merge rules by `git diff` rather than on trust:
+
+* no existing test was modified; there are 15 additions and one pure rename, which fixes the basename clash;
+* `validate.py` is untouched;
+* the three authority-module edits are the sanctioned move of path constants into config, plus a **stricter**
+  multi-path check;
+* the resolver still imports no route.
+
+Plain `pytest tests -q` passes **308** tests.
+
+**The proofs hold, and one was earned by accident.**
+
+* **Reproducibility.** Two from-clean builds at the same records commit give an identical `manifest_sha256`
+  (`3b68840c…1b2c`).
+* **Incremental ≡ full.** The orchestrator's own commit landed between I1's first two builds (OBS-BR-03).
+  Freshness correctly reported INCREMENTAL, and the incrementally updated first store then reached **the same hash**
+  as the from-clean build at the new tip.
+
+A full from-clean build of all 98 refs, including embeddings, takes about 38 minutes and makes **zero LLM calls**.
+
+**The records ref follows the bridge tip,** so the demonstration needs a fixed view. This commit therefore opens a
+**freeze**: no commits to the bridge branch until grading returns. D1, DEMO and GRADE record their progress on their
+own branches, which the state names, so a resumed orchestrator can pick them up without this conversation.
