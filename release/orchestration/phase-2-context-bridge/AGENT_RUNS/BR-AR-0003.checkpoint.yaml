@@ -1,5 +1,5 @@
 run_id: BR-AR-0003
-commit: PENDING-FILLED-IN-SECOND-COMMIT
+commit: 39be5e1c96565dde0228322cc15918900728ba04
 commands:
   - cmd: "bash $D/bootstrap/bootstrap.sh && bash $D/bootstrap/bootstrap.sh"
     exit_code: 0
@@ -25,3 +25,7 @@ commands:
     exit_code: 0
     output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.check6-exact-show-state.out
     output_sha256: f2d84e513e67b084dfb5616f638b7de1e8d9b3dea0c1cf3d0f7d9044824c5df2
+  - cmd: 'BASE=$(git merge-base bridge/p2-context-retrieval HEAD) && git diff --name-only "$BASE" HEAD | xargs -r du -b | awk ''$1>5242880'''
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.check7-size.out
+    output_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855

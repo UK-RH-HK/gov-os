@@ -2,7 +2,7 @@ run_id: BR-AR-0003
 role: builder B1 core (DAG node B1)
 model_observed: claude-sonnet-5
 branch: bridge/b1-0003
-commit: PENDING-FILLED-IN-SECOND-COMMIT
+commit: 39be5e1c96565dde0228322cc15918900728ba04
 status: COMPLETED
 claims:
   - id: C1-store-isolation
@@ -99,6 +99,8 @@ evidence:
     file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.check1-bootstrap.out
   - claim: C2-git-object-access through C10-generic-not-bespoke (full suite)
     file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.check2-pytest.out
+  - claim: mutation_scope_respected / no committed file over 5 MB
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.check7-size.out
 open_issues:
   - id: OI-1-corpus-l-machine-output-difference
     text: >
