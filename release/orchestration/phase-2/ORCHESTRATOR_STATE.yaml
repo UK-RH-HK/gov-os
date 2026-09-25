@@ -1388,7 +1388,7 @@ orchestrator_verified_independently:
   the orchestrator''s earlier caution is now resolved -- AR95 reproduced two store entries for one identity.'
 - '5A CRUX (restated): init.rs:303 and adopt.rs:1840 gate the floor write on !already_installed, so no onboarding
   path re-establishes a floor at a relocated path.'
-last_updated: '2026-09-24'
+last_updated: '2026-09-25'
 owner_directions_in_force:
 - OD-P2-07
 - OD-P2-08
@@ -1483,3 +1483,14 @@ historical_rule_source:
   load_bearing_detail: the union must be applied in the derivation init/adopt hand to write_project_adoption_floor,
     not only in PolicySet::load's reconstruction, because once a floor is written reconstruction never fires and
     a weak derived floor would be promoted to authenticated
+ar96_orchestrator_finding:
+  record: release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md
+  summary: AR96's second flake fix made ar94_nc2 case A probe in-process, so the revised 5C positive control no
+    longer exercises the production cross-process path through the real CLI
+  builder_claim_that_does_not_hold: '''Nothing in the product ever reads such a sandbox from a SEPARATE subprocess''
+    -- true for scheduler/mod.rs per-family sandboxes, false for skills.rs:528 execute_check, which spawns the real
+    gov binary rooted in the live sandbox (skills.rs:489, verified at 92982ff)'
+  correction: probe an execute_check-shaped sandbox, whose lifetime is bounded below by design, instead of a scheduler
+    family sandbox with no lower bound -- restores the production shape AND removes the flake cause; no product
+    change
+  disposition: correct before freezing for Review 8
