@@ -1,0 +1,5078 @@
+{
+ "bridge_code_tree": "c96e2e922e0befdbaced2e5f3f7d2e130036fd50",
+ "budget_profile": "synthesis",
+ "build_manifest_sha256": null,
+ "config_sha256": {
+  "authority_registry": "6af2e627661239f834dcd26225866e165efd8812962a1e777d58f63596a31416",
+  "budgets": "0d171acb0cd2475cc364e5608fd46b07a8216251f555f0a9ded6a81950142ed8",
+  "canonical_view": "3184499a276cd93c81025dbae7c8633d9e6c97a9908f646b276db0232a760b03",
+  "id_grammar": "009ce18d5cb8f082431dcd9516060c1c919e6188f040e43404676f4901441f6d"
+ },
+ "manifest_sha256": "c1fa17f0cd0ce4e152608ab0a50dcc91e61ac14e7129ece20c374867525c63f0",
+ "notices": [
+  {
+   "class": "EVIDENCE",
+   "id": "REVIEW-8-RETURN",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "ORCHESTRATION_RECORD",
+   "id": "REVIEW-8-CONTEXT-PACK",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "ORCHESTRATION_RECORD",
+   "id": "DESIGN-P2-PROBE-OPTION-C",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "ORCHESTRATION_RECORD",
+   "id": "DESIGN-P2-HISTORICAL-RULE-SOURCE",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "EVIDENCE",
+   "id": "AR96-BUILDER-CHECKPOINT",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "ORCHESTRATION_RECORD",
+   "id": "PHASE-2-LEDGER-P2-L-0033-0047",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "ORCHESTRATION_RECORD",
+   "id": "PHASE-2-STATE",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "FROZEN_GATE_CONTRACT",
+   "id": "PHASE-2-FROZEN-GATE-CONTRACT",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "OWNER_DECISION",
+   "id": "OWNER-LAUNCHER-BR-0001",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "class": "CONTRACT",
+   "id": "state:bridge#contract_v3",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  }
+ ],
+ "packet_schema": "govbridge-packet-manifest/1",
+ "packet_sha256": "18be7e6f1f1bffa091a8a07fc1ebdae812fbfa043ab159b6ea0250d1e7d42025",
+ "retrieval_exclusions": [
+  "release/orchestration/phase-2-context-bridge/ARCHITECTURE/**",
+  "release/orchestration/phase-2-context-bridge/AGENT_RUNS/**",
+  "release/orchestration/phase-2-context-bridge/DEMONSTRATION/**",
+  "release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0*"
+ ],
+ "sections": {
+  "A": {
+   "dropped": [],
+   "items": [
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 4010,
+     "content_sha256": "44a206eda6d7c8228059115aef4f4bbaef2f8d6cb43eff8b4d4b30deb4154e16",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "7f4cd37ea8cf146dc7f02dce",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "b9d47c0dd2c188585197a38e1e93c976b5947f92",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OC-BR-02",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 2863,
+     "content_sha256": "e295af0b7300eae826cfc6e93cbc75f61362078b45320a1cbf5b8a4af950e658",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "ad8d17f03838816b4bbe86f5",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "55d07c5f048d5a0453e9d2ff4d087bf195f0e56a",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/GATES/OWNER-CLARIFICATION-P2-0004-TRUSTED-AUTHORITY-STATE.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OC-P2-04",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 4031,
+     "content_sha256": "c7bb4cbae6a8595c3bba9608d7d31bd7911abf876825e3427a39ad5a10a90af8",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "cd637653bc7a90d5df308b3b",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "f9b2e66befe81c34c6b012e6ae870fa8ebbb5be1",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0008-COMPLETE-PHASE-2.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-08",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 4025,
+     "content_sha256": "3f0cd498cd7a7927e3175529ec3d4b14d9f953a89fb45ce4ae287948226b3999",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "110b2b4d36d63d5fa604a34b",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "050cb967e711d80a5bacc8937240a6ac16b6a1e3",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-09",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 4064,
+     "content_sha256": "8cc0f3bbf74238f5d0c8b28f00b581c2878154faa69895af35a7f35447c3c7b3",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "e2b0ec0fac1ee579045d373c",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "6cc1f495b01e699cd2189219b918fc0501da2e7d",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/GATES/OWNER-AMENDMENT-P2-0010-CONTEXT-RETRIEVAL-BRIDGE.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-10",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 703,
+     "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "c258a21c05cf9959f575c6b2",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 24,
+      "line_start": 11,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-10A",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 214,
+     "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "07298e8ae35a1e5d9b82b37a",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 73,
+      "line_start": 69,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-10A-B.PROPERTY-A",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 289,
+     "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "34f6a93dfc7efef2648742ad",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 78,
+      "line_start": 74,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-10A-B.STANDING-STATE",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 582,
+     "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "52f4379725a56da0735fa574",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 37,
+      "line_start": 25,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-10B",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4012,
+     "content_sha256": "6bbd4141478fd944937deaae82e14cfce6aa2a9372a287c93f32c8e8181446f2",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "5e39184716b10e7d4917941d",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "5e7e5c6013a5880cfeacc2b84817329d38fa27dc",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OWNER-LAUNCHER-BR-0001",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "CONTRACT",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4006,
+     "content_sha256": "4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "668a53a835f5da2b5f8c3653",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "9ccde661b67529a8846546ac77e37334b5e82f2f",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "state:bridge#contract_v3",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "FROZEN_GATE_CONTRACT",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4019,
+     "content_sha256": "d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "f6a29442035024f22e1b1c51",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "bd3aa2fc4a8c8db353b814132eade3e1b63af3fb",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "PHASE-2-FROZEN-GATE-CONTRACT",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4022,
+     "content_sha256": "c586d6387fcf8a7676aa06e1eada910030ef36a52b2e173b4f825e8e51a78e67",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "b3f5e55bbf58d2552950d940",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "9f3ac9e4ed286b49db5c45a77e9036b157d66553",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/RESEARCH/P2-HISTORICAL-RULE-SOURCE.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "DESIGN-P2-HISTORICAL-RULE-SOURCE",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4044,
+     "content_sha256": "6cfb3af478f2aef244cfffb93b98c44e2f86139306d5037f772506ba5728afe4",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "e13bfeeb7e0fb3dd0397f51d",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "0b52766d905baf4bbf99541f09d497e52db0a571",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/RESEARCH/P2-PROBE-OPTION-C.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "DESIGN-P2-PROBE-OPTION-C",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4051,
+     "content_sha256": "f7b643a38955571cf493a2f6dadd67949b352377f43026d6e50979c683c0ebc4",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "476a7df6ea0da5e92e48d0ff",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "3fbc43a0cad312b5fa5f601ca26ba14573a1ef6d",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "PHASE-2-LEDGER-P2-L-0033-0047",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4006,
+     "content_sha256": "dc864a92616bc80657f952675244a9eb247e3db74d42e697b39fa5e581cf07f4",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "a24846c7fab3382e863ef093",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "314605ba5ae0e0881bc4b7ac6c5f38c3ac4786b1",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": null
+     },
+     "unit": {
+      "id": "PHASE-2-STATE",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4026,
+     "content_sha256": "d69c2f8cec12b0790c0f310f54d4865ce06f003abd1feb70986102630d514684",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "3fa08416d7a5ef5942b05580",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "939bb4f098919fee9a33091b92c5b3e6a9534dac",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/REVIEW_8_CONTEXT_PACK.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "REVIEW-8-CONTEXT-PACK",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": null,
+     "by_reference": false,
+     "bytes": 77,
+     "content_sha256": null,
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "284189a52ecc899a9a14c262",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "749fc1d77daed20d8d0b049e3a5fa8965c4604c9",
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": null,
+      "line_start": null,
+      "path": "probes/P2-AR-0097/",
+      "ref": null
+     },
+     "unit": {
+      "id": "REVIEW-8-PROBES",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4039,
+     "content_sha256": "4cea3b8c341c0e481937eaba1d4895563a6b3fa02365d8716b7313a377f200bc",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "c5f604ca2b9cbd0ff85bfacc",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "1406e178869b0d03c7031119f94205d17accdbdc",
+      "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+      "line_end": null,
+      "line_start": null,
+      "path": "telemetry/checkpoints/P2-AR-0096.checkpoint.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "AR96-BUILDER-CHECKPOINT",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 4024,
+     "content_sha256": "726f3f40f574f14b4e8cc334cba7785542b93b0aa5fc756bf571824e7578c067",
+     "delivery": "MANDATORY",
+     "edge_path": [],
+     "item_id": "1c969abaa170663d7847f9a6",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "1f896d30c43b78b114f87293cdd22d86c2bc0c58",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "REVIEW-8-RETURN",
+      "kind": "record"
+     },
+     "version_status": null
+    }
+   ],
+   "queries": [],
+   "section_sha256": "1090d4ff14955978332918c507cbc70b7d741a16105088da819c3ddaf42eff81",
+   "title": "MANDATORY AUTHORITATIVE INPUTS"
+  },
+  "B": {
+   "dropped": [],
+   "items": [
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 2012,
+     "content_sha256": "a581e616d1ce013c97eb9c3ba290a81f9fdc1df9965cd23fd329a89c30f70bb7",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "CLASS_RULE",
+       "dst": "UNKNOWN",
+       "evidence_line": null,
+       "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": "class=ORCHESTRATION_RECORD",
+       "src": "P2-AR-0097",
+       "type": "CURRENT_STATUS"
+      }
+     ],
+     "item_id": "e5ecc5998b0b49072a37108f",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "CURRENT_STATUS:UNKNOWN",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 98,
+     "content_sha256": "424435c0b840c42b167a449102674692b34f5d133de2a5a6b153071cdb7f670d",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "EXACT_ID",
+       "dst": "P2-AR-0097",
+       "evidence_line": 8,
+       "evidence_occurrence": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md@fa25492a9961f205dfca618f4846b3533626a6ae:8",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "524a66867d9505048b8c01e8",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 8,
+      "line_start": 8,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 23,
+     "content_sha256": "00ef04c7cb841c695efd2bf8a6b02a43e1bb4df6e0b34c15461d2e71e1cc260c",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "HEURISTIC_LOCAL_ID",
+       "dst": "P2-AR-0097#F1",
+       "evidence_line": 398,
+       "evidence_occurrence": "Governance_OS_Capability_Acceptance_Contract_v3.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "Governance_OS_Capability_Acceptance_Contract_v3.md@fa25492a9961f205dfca618f4846b3533626a6ae:398",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "824f6a37d82468cbc000e45e",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 398,
+      "line_start": 398,
+      "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097#F1",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 32,
+     "content_sha256": "5149e65395890be4aa2ccb1b24f1e59e99321b572549b0157cfd7e4c4301919b",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "HEURISTIC_LOCAL_ID",
+       "dst": "P2-AR-0097#F2",
+       "evidence_line": 404,
+       "evidence_occurrence": "Governance_OS_Capability_Acceptance_Contract_v3.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "Governance_OS_Capability_Acceptance_Contract_v3.md@fa25492a9961f205dfca618f4846b3533626a6ae:404",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "0f70064fe8dcaccf358de349",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 404,
+      "line_start": 404,
+      "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097#F2",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 32,
+     "content_sha256": "69ed6f82c51d423151f87887f114ba9853455fc89e263532035b5fd19450edf8",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "HEURISTIC_LOCAL_ID",
+       "dst": "P2-AR-0097#F3",
+       "evidence_line": 414,
+       "evidence_occurrence": "Governance_OS_Capability_Acceptance_Contract_v3.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "Governance_OS_Capability_Acceptance_Contract_v3.md@fa25492a9961f205dfca618f4846b3533626a6ae:414",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "91734f728b5a9d89da18c8ce",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 414,
+      "line_start": 414,
+      "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097#F3",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    }
+   ],
+   "queries": [],
+   "section_sha256": "236a39c7ac1af6284060493429ce5682eaf1e774348562ae426d795ac9b003fd",
+   "title": "SYSTEM PURPOSE / WHY"
+  },
+  "C": {
+   "dropped": [],
+   "items": [
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 39,
+     "content_sha256": "175c160f7750b0d6af1a569b23a6822b33e6d7bb6e5d27bc355c7a5edbf889bc",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "EXACT_DEFINITION",
+       "dst": "P2-AR-0097",
+       "evidence_line": 1,
+       "evidence_occurrence": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md@fa25492a9961f205dfca618f4846b3533626a6ae:1",
+       "type": "DEFINES"
+      }
+     ],
+     "item_id": "acdf2db949bfa84895d812a4",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "DEFINES:P2-AR-0097",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    }
+   ],
+   "queries": [],
+   "section_sha256": "8b0e7b6d992524b5f8645de5dc264f325317f5bc3b4aa9b71078754d27f2d386",
+   "title": "DIRECT DEPENDENCY / IMPACT CONTEXT"
+  },
+  "D": {
+   "dropped": [],
+   "items": [],
+   "queries": [],
+   "section_sha256": "e9b1e8df553e293caf7fa57a9464d6aed46f454924b24e1cdd32722d091b269b",
+   "subblocks": {
+    "D.1": {
+     "dropped": [],
+     "items": [
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 44,
+       "content_sha256": "44a206eda6d7c8228059115aef4f4bbaef2f8d6cb43eff8b4d4b30deb4154e16",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "4e9fc4f45f1edb94eb9b18da",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "b9d47c0dd2c188585197a38e1e93c976b5947f92",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": null,
+        "line_start": null,
+        "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OC-BR-02",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 44,
+       "content_sha256": "e295af0b7300eae826cfc6e93cbc75f61362078b45320a1cbf5b8a4af950e658",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "bd9c1ef6f81d6d2e02ade11d",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "55d07c5f048d5a0453e9d2ff4d087bf195f0e56a",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": null,
+        "line_start": null,
+        "path": "release/orchestration/phase-2/GATES/OWNER-CLARIFICATION-P2-0004-TRUSTED-AUTHORITY-STATE.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OC-P2-04",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 44,
+       "content_sha256": "c7bb4cbae6a8595c3bba9608d7d31bd7911abf876825e3427a39ad5a10a90af8",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "3086fb299f0e9a6cf7b9b2cb",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "f9b2e66befe81c34c6b012e6ae870fa8ebbb5be1",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": null,
+        "line_start": null,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0008-COMPLETE-PHASE-2.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-08",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 44,
+       "content_sha256": "3f0cd498cd7a7927e3175529ec3d4b14d9f953a89fb45ce4ae287948226b3999",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "b9aad71d9b1054dcfea69c82",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "050cb967e711d80a5bacc8937240a6ac16b6a1e3",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": null,
+        "line_start": null,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-09",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 44,
+       "content_sha256": "8cc0f3bbf74238f5d0c8b28f00b581c2878154faa69895af35a7f35447c3c7b3",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "687eb3e72ba26e680bf80266",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "6cc1f495b01e699cd2189219b918fc0501da2e7d",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": null,
+        "line_start": null,
+        "path": "release/orchestration/phase-2/GATES/OWNER-AMENDMENT-P2-0010-CONTEXT-RETRIEVAL-BRIDGE.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-10",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 45,
+       "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "400d870bf3b1cb68d19fdae8",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 24,
+        "line_start": 11,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-10A",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 58,
+       "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "0a9ad25b8430934592de879e",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 73,
+        "line_start": 69,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-10A-B.PROPERTY-A",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 62,
+       "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "62c4a426df9f1a0e14d5e8e0",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 78,
+        "line_start": 74,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-10A-B.STANDING-STATE",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": true,
+       "bytes": 45,
+       "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+       "delivery": "MANDATORY",
+       "edge_path": [],
+       "item_id": "34ec4021fee3b563d7d1acb3",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 37,
+        "line_start": 25,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "OD-P2-10B",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1202,
+       "content_sha256": "a0da95c34ca8a2ab70949614d12e8f7e84b92d447fe34633b49ab653bff27a4a",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "ead9c82adc58828ee99911ff",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.01639344262295082,
+        "rank": 1,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 24,
+        "line_start": 1,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "13e4a7e6626eb17872041fee",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1201,
+       "content_sha256": "fd78f9c6c5211d7a7204b537b447aebed7ebc28aca91f02ba12d0323504f6873",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "674abf8bf2e8b5adc7e642d5",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.01639344262295082,
+        "rank": 1,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 68,
+        "line_start": 43,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "eac566ca750a8759b806f32b",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 0,
+       "content_sha256": null,
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "db9054bfc26abb2150bc4f1f",
+       "lifecycle": "ACTIVE",
+       "route": "semantic",
+       "score": {
+        "fused": 0.015625,
+        "rank": 4,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 108,
+        "line_start": 100,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "2117471631b1a368533ac616",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1204,
+       "content_sha256": "d7547b2ab400e73551716552e6a07e1d0993b3db536929611fbca7add3466a52",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "ac9049a48623ec57220e1e01",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.015625,
+        "rank": 4,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 24,
+        "line_start": 1,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "5b3b37a8a73105e05451293a",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1157,
+       "content_sha256": "33bc08a196abb2c66ff867cb6706faa8643d2320e01c434f3784c25d23c0fad1",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "ae2377052c687944eca322e2",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.015151515151515152,
+        "rank": 6,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 37,
+        "line_start": 17,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0008-COMPLETE-PHASE-2.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "f26e2f74eb944dc2b5c6d29c",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1156,
+       "content_sha256": "06460c084d0cf86e75b6d929ac374daa0c5882959dc5fb272ffb7dbb41dd1239",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "65f60c7b9f218c7aa9996f16",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.014925373134328358,
+        "rank": 7,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 65,
+        "line_start": 45,
+        "path": "release/orchestration/phase-2/GATES/OWNER-AMENDMENT-P2-0010-CONTEXT-RETRIEVAL-BRIDGE.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "298be7a9150af279be2932f5",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1171,
+       "content_sha256": "484f09dd60ba966cf8c43b4e52ef4eb430d59e60a3296fc0c4b676a595bf1f8b",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "67042e74d70e5f6f69e98cbe",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.014925373134328358,
+        "rank": 7,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 67,
+        "line_start": 51,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "89d54bf2a602cc68e4509ca9",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DECISION",
+       "banner": null,
+       "by_reference": false,
+       "bytes": 1198,
+       "content_sha256": "52394aa2f44cdcec0afd83f54f3be8543bc869056f905d6c1cb3e35f3f63845b",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "96b6685357bf30b408c921d8",
+       "lifecycle": "ACTIVE",
+       "route": "lexical",
+       "score": {
+        "fused": 0.014705882352941176,
+        "rank": 8,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 22,
+        "line_start": 1,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "740a3d7f347f31630781b249",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      }
+     ],
+     "queries": [
+      {
+       "id": "R8-CHAIN-F2",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "Starting from the finding as reported in the Review-8 return (P2-AR-0097, F2), reconstruct its full decision/effect chain at the frozen product 3c880d8, stage by stage (chain_stages). For each stage cite the code or record anchor and state what it does, verified at 3c880d8 rather than quoted from the review. Identify the actual decision/enforcement point, meaning the code whose evaluated result decides the concrete behaviour. If a stage does not exist for this finding, say so and cite why."
+      },
+      {
+       "id": "R8-CHAIN-F3",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "Starting from the finding as reported in the Review-8 return (P2-AR-0097, F3), reconstruct its full decision/effect chain at the frozen product 3c880d8, stage by stage (chain_stages). For each stage cite the code or record anchor and state what it does, verified at 3c880d8 rather than quoted from the review. Identify the actual decision/enforcement point, meaning the code whose evaluated result decides the concrete behaviour. If a stage does not exist for this finding, say so and cite why."
+      },
+      {
+       "id": "R8-SIDE-BY-SIDE",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "Place the F2 path and the F3 path side by side, each down to its real enforcement point. List the code locations they share and the ones where they differ. Record the evidence that bears on whether they are one deeper class and the evidence that bears against it. Do not classify them. Set the answer field classification to NOT_DETERMINED_BY_BRIDGE."
+      },
+      {
+       "id": "R8-F1-BOTHWAYS",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "For the health-sandbox exemption that F1 concerns, reconstruct why it was created (purpose, origin record, and the requirement or owner decision it served), every consumer (production and test, and whether each is in-process or cross-process), what it depends on and what depends on it. Record the evidence relevant to the owner's direction (DELETE / SIMPLIFY / REPAIR / NARROW / RETAIN), both for and against. State no decision."
+      },
+      {
+       "id": "AUTH-4",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "semantic"
+       ],
+       "text": "Which Phase-2 stop conditions are current, and which are superseded?"
+      },
+      {
+       "id": "CTRL-1",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "semantic"
+       ],
+       "text": "Which decision adopted the signed release root, what requirement does rollback/high-water protection serve, where is the high-water check enforced in code, and which tests prove it?"
+      }
+     ],
+     "title": "D.1 -- RELEVANT ACTIVE DECISIONS"
+    },
+    "D.2": {
+     "dropped": [],
+     "items": [
+      {
+       "authority_class": "OWNER_DIRECTION_TO_TEST",
+       "banner": "OWNER DIRECTION TO TEST: NOT YET AUTHORITY. The synthesis tests it and may reject it.",
+       "by_reference": false,
+       "bytes": 1958,
+       "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+       "delivery": "PINNED",
+       "edge_path": [],
+       "item_id": "bf724c8e060a2a0c6e8fca46",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 58,
+        "line_start": 38,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "F1-DIRECTION",
+        "kind": "record"
+       },
+       "version_status": null
+      },
+      {
+       "authority_class": "OWNER_DIRECTION_TO_TEST",
+       "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+       "by_reference": false,
+       "bytes": 0,
+       "content_sha256": null,
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "e77fec045f8928a22542fd18",
+       "lifecycle": "UNKNOWN",
+       "route": "semantic",
+       "score": {
+        "fused": 0.01639344262295082,
+        "rank": 1,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 150,
+        "line_start": 137,
+        "path": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "5a2ccfc78d6e1e4ea5a87592",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DIRECTION_TO_TEST",
+       "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+       "by_reference": false,
+       "bytes": 1192,
+       "content_sha256": "69b03b99cbb3e94c463714999f31bc93174b9c6934cc2dc8d30fd85d3268ec23",
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "f4bc3c8fba89bb220d3f303b",
+       "lifecycle": "UNKNOWN",
+       "route": "lexical",
+       "score": {
+        "fused": 0.016129032258064516,
+        "rank": 2,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 180,
+        "line_start": 165,
+        "path": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "4d20d596687de8e752c056c5",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      },
+      {
+       "authority_class": "OWNER_DIRECTION_TO_TEST",
+       "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+       "by_reference": false,
+       "bytes": 0,
+       "content_sha256": null,
+       "delivery": "RETRIEVED",
+       "edge_path": [],
+       "item_id": "3a124aa22de39ca5c79eb51f",
+       "lifecycle": "UNKNOWN",
+       "route": "semantic",
+       "score": {
+        "fused": 0.015873015873015872,
+        "rank": 3,
+        "raw": null
+       },
+       "source": {
+        "blob": null,
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 86,
+        "line_start": 71,
+        "path": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
+        "ref": "records"
+       },
+       "unit": {
+        "id": "275c6015cd181c1be000903b",
+        "kind": "chunk"
+       },
+       "version_status": "CANONICAL"
+      }
+     ],
+     "queries": [
+      {
+       "id": "F1-DIRECTION#consumers_and_uses",
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "consumers, dependents and uses of F1-DIRECTION"
+      },
+      {
+       "id": "F1-DIRECTION#purpose_and_origin",
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "purpose, origin and the requirements F1-DIRECTION was created for"
+      },
+      {
+       "id": "R8-SIDE-BY-SIDE",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "Place the F2 path and the F3 path side by side, each down to its real enforcement point. List the code locations they share and the ones where they differ. Record the evidence that bears on whether they are one deeper class and the evidence that bears against it. Do not classify them. Set the answer field classification to NOT_DETERMINED_BY_BRIDGE."
+      },
+      {
+       "id": "R8-F1-BOTHWAYS",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "exact",
+        "semantic"
+       ],
+       "text": "For the health-sandbox exemption that F1 concerns, reconstruct why it was created (purpose, origin record, and the requirement or owner decision it served), every consumer (production and test, and whether each is in-process or cross-process), what it depends on and what depends on it. Record the evidence relevant to the owner's direction (DELETE / SIMPLIFY / REPAIR / NARROW / RETAIN), both for and against. State no decision."
+      },
+      {
+       "id": "AUTH-2",
+       "k": 8,
+       "routes": [
+        "lexical",
+        "semantic"
+       ],
+       "text": "Which items are owner decisions in force, and which are owner directions or hypotheses to test?"
+      }
+     ],
+     "title": "D.2 -- OWNER DIRECTION TO TEST (not yet authority)"
+    },
+    "D.3": {
+     "dropped": [],
+     "items": [
+      {
+       "authority_class": "HYPOTHESIS_TO_TEST",
+       "banner": "HYPOTHESIS TO TEST: NO CLASSIFICATORY FORCE. The bridge makes it testable and does not answer it.",
+       "by_reference": false,
+       "bytes": 551,
+       "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+       "delivery": "PINNED",
+       "edge_path": [],
+       "item_id": "d30d1465f4d853fe2430f5f2",
+       "lifecycle": "ACTIVE",
+       "route": "resolver",
+       "score": {
+        "fused": null,
+        "rank": null,
+        "raw": null
+       },
+       "source": {
+        "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+        "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+        "line_end": 68,
+        "line_start": 59,
+        "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+        "ref": null
+       },
+       "unit": {
+        "id": "F2-F3-COMMON-CLASS",
+        "kind": "record"
+       },
+       "version_status": null
+      }
+     ],
+     "queries": [],
+     "title": "D.3 -- HYPOTHESIS TO TEST (no classificatory force)"
+    }
+   },
+   "title": "RELEVANT ACTIVE DECISIONS"
+  },
+  "E": {
+   "dropped": [],
+   "items": [],
+   "queries": [],
+   "section_sha256": "3a7c99603c8bc6bcc62a7ce458679230af6b74c14d96a2e15e16cb9afa35ff68",
+   "title": "RELEVANT HISTORICAL / SUPERSEDED DECISIONS"
+  },
+  "F": {
+   "dropped": [],
+   "items": [
+    {
+     "authority_class": "EVIDENCE_WITHDRAWN",
+     "banner": "WITHDRAWN: retained as evidence of a withdrawn claim; never cited as a finding.",
+     "by_reference": false,
+     "bytes": 3340,
+     "content_sha256": "620cd698b98ac534e617c5f357a3fb14a11e92549fae9387c35523dc6a2105c2",
+     "delivery": "PINNED",
+     "edge_path": [],
+     "item_id": "ba8a63b26fbae8734d6778c4",
+     "lifecycle": "WITHDRAWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "0979411ca9ddf4de4583424e6d6b5bb704f74f12",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "HYPOTHESIS_RELEVANT_OBSERVATION",
+     "banner": "OBSERVATION ABOUT ORCHESTRATOR REASONING. It concerns reasoning, not implementation, and is not evidence for any hypothesis.",
+     "by_reference": false,
+     "bytes": 835,
+     "content_sha256": "dc864a92616bc80657f952675244a9eb247e3db74d42e697b39fa5e581cf07f4",
+     "delivery": "PINNED",
+     "edge_path": [],
+     "item_id": "01adb32eb048068410221814",
+     "lifecycle": "UNKNOWN",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "314605ba5ae0e0881bc4b7ac6c5f38c3ac4786b1",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1578,
+      "line_start": 1569,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": null
+     },
+     "unit": {
+      "id": "ORCHESTRATOR-REASONING-ERRORS",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 17,
+     "content_sha256": "9fd1fe5046751b5e4b3c8aa326b22f50173a4564a1cedc6717673d1499888c43",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "EXACT_ID",
+       "dst": "P2-AR-0097",
+       "evidence_line": 1400,
+       "evidence_occurrence": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@fa25492a9961f205dfca618f4846b3533626a6ae:1400",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "436e9f4e8ed9de9cc4b0e89d",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1400,
+      "line_start": 1400,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 70,
+     "content_sha256": "d85a1917f7ef7656e0a28e50ea8b5bcb41490f77dbdd25c2719aa920e7a7a40f",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "HEURISTIC_LOCAL_ID",
+       "dst": "P2-AR-0097#F1",
+       "evidence_line": 130,
+       "evidence_occurrence": "runtime/src/memory/embeddings.rs@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "runtime/src/memory/embeddings.rs@fa25492a9961f205dfca618f4846b3533626a6ae:130",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "a156dc9628e185b1e62e296a",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 130,
+      "line_start": 130,
+      "path": "runtime/src/memory/embeddings.rs",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097#F1",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 5,
+     "content_sha256": "e14a7c639f16b397da0eaf210120d761f7b1f07027158e190acdc733077ad0d3",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "HEURISTIC_LOCAL_ID",
+       "dst": "P2-AR-0097#F2",
+       "evidence_line": 1389,
+       "evidence_occurrence": "DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md@fa25492a9961f205dfca618f4846b3533626a6ae:1389",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "ace77b5fd7f278d56b7b8ee3",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1389,
+      "line_start": 1389,
+      "path": "DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097#F2",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 164,
+     "content_sha256": "d56106e0c6fe494ff115ebec230e7fec39875aa440299e8b51959ebe73fa5b6d",
+     "delivery": "DERIVED",
+     "edge_path": [
+      {
+       "derivation": "HEURISTIC_LOCAL_ID",
+       "dst": "P2-AR-0097#F3",
+       "evidence_line": 81,
+       "evidence_occurrence": "release/root-of-trust/4.1.6-review/05-TOCTOU-TRANSACTION-REVIEW.md@fa25492a9961f205dfca618f4846b3533626a6ae",
+       "note": null,
+       "src": "release/root-of-trust/4.1.6-review/05-TOCTOU-TRANSACTION-REVIEW.md@fa25492a9961f205dfca618f4846b3533626a6ae:81",
+       "type": "MENTIONS"
+      }
+     ],
+     "item_id": "c0217de9e153fa8eaa5d12c2",
+     "lifecycle": "UNKNOWN",
+     "route": "graph",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 81,
+      "line_start": 81,
+      "path": "release/root-of-trust/4.1.6-review/05-TOCTOU-TRANSACTION-REVIEW.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "MENTIONS:P2-AR-0097#F3",
+      "kind": "occurrence"
+     },
+     "version_status": null
+    }
+   ],
+   "queries": [],
+   "section_sha256": "3895bad8bd3029f6c993b1d334d714d720907d3c40ef03af4b77084fa368971d",
+   "title": "FAILED APPROACHES / LESSONS"
+  },
+  "G": {
+   "dropped": [],
+   "items": [],
+   "queries": [],
+   "section_sha256": "119835a95ea4cb86f6e391091812d74b5bf851c6a2081f19a5439dee37810d81",
+   "title": "CODE / TEST / ENFORCEMENT SURFACES"
+  },
+  "H": {
+   "dropped": [
+    {
+     "bytes": 1186,
+     "item_id": "5027ebffe9521386517073da",
+     "reason": "BUDGET",
+     "score": 0.014705882352941176,
+     "unit": {
+      "id": "1369851568e4e64c5266617c",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1141,
+     "item_id": "d7b42db1ae45ead39716b5d7",
+     "reason": "BUDGET",
+     "score": 0.014705882352941176,
+     "unit": {
+      "id": "73735b05218e6cc5b160e86d",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1159,
+     "item_id": "c4701bd0e8f731f6d63d6a92",
+     "reason": "BUDGET",
+     "score": 0.03278688524590164,
+     "unit": {
+      "id": "6cc4993c02f79d19a4ed43af",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1197,
+     "item_id": "504a38453f003205452fa267",
+     "reason": "BUDGET",
+     "score": 0.030536130536130537,
+     "unit": {
+      "id": "ad2e8ee47283fc6a93137068",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1142,
+     "item_id": "e071c368614ca81f84018e77",
+     "reason": "BUDGET",
+     "score": 0.01639344262295082,
+     "unit": {
+      "id": "bc585e5843d3401953f5f5ca",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1165,
+     "item_id": "040ce094f3e3da665528bcac",
+     "reason": "BUDGET",
+     "score": 0.01639344262295082,
+     "unit": {
+      "id": "e9e98b9c6cd59740faafe1ba",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1134,
+     "item_id": "6254cd8ab9f758b757ee803e",
+     "reason": "BUDGET",
+     "score": 0.01639344262295082,
+     "unit": {
+      "id": "ec7c4670e09613a2f00b4149",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1154,
+     "item_id": "9df09403cca8a6bd26a522e8",
+     "reason": "BUDGET",
+     "score": 0.016129032258064516,
+     "unit": {
+      "id": "a7fab040c0891bb4cf466291",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1123,
+     "item_id": "6bfeedc581df739ea3b984a0",
+     "reason": "BUDGET",
+     "score": 0.016129032258064516,
+     "unit": {
+      "id": "cd369afe0e63b3166259af6d",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1154,
+     "item_id": "ba98b9ca2c93c340ece0f142",
+     "reason": "BUDGET",
+     "score": 0.016129032258064516,
+     "unit": {
+      "id": "d3dce56d97fadcf8bd6ca418",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 959,
+     "item_id": "494360d6790fb8480e216476",
+     "reason": "BUDGET",
+     "score": 0.015873015873015872,
+     "unit": {
+      "id": "277517d50986f798dc7cd513",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1195,
+     "item_id": "77aa03a22e4fc341b1be1615",
+     "reason": "BUDGET",
+     "score": 0.015873015873015872,
+     "unit": {
+      "id": "7f87cff8ab6f238cb10b1916",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1134,
+     "item_id": "3b9cde81bb2f1d3bdf4c14bc",
+     "reason": "BUDGET",
+     "score": 0.015873015873015872,
+     "unit": {
+      "id": "8181ac614bde0723d399633b",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1142,
+     "item_id": "d528759d39765db94984eeea",
+     "reason": "BUDGET",
+     "score": 0.015873015873015872,
+     "unit": {
+      "id": "ea40f73890088707396fbf6f",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1185,
+     "item_id": "2ebd6d99b11f904af28eea84",
+     "reason": "BUDGET",
+     "score": 0.015625,
+     "unit": {
+      "id": "aba313296b755142acce999d",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1189,
+     "item_id": "9f51c6cc79daeff0fad8d74e",
+     "reason": "BUDGET",
+     "score": 0.015625,
+     "unit": {
+      "id": "d4b855bc8ebce3a365266640",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 641,
+     "item_id": "a2976d56bbe59bc0ebd25982",
+     "reason": "BUDGET",
+     "score": 0.015625,
+     "unit": {
+      "id": "ea83ac774dc7d316256614c0",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1105,
+     "item_id": "2138e020a2a42eb4cd480fb9",
+     "reason": "BUDGET",
+     "score": 0.015384615384615385,
+     "unit": {
+      "id": "1f2a0ca6f9c184eace16ba4e",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1102,
+     "item_id": "ad962aef6de3e269fb43e3d2",
+     "reason": "BUDGET",
+     "score": 0.015384615384615385,
+     "unit": {
+      "id": "464dd694fb351b05b963e995",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1194,
+     "item_id": "d2e474ef59f98a6905533a82",
+     "reason": "BUDGET",
+     "score": 0.015384615384615385,
+     "unit": {
+      "id": "63f99b9ab1e40836f54d8c03",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 827,
+     "item_id": "39ee22cbb8c0dcd756894b65",
+     "reason": "BUDGET",
+     "score": 0.015384615384615385,
+     "unit": {
+      "id": "bb60abc6f62ddba98e0b1e09",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1159,
+     "item_id": "f4bfadc07d31dec527de6eae",
+     "reason": "BUDGET",
+     "score": 0.015151515151515152,
+     "unit": {
+      "id": "58b4d88774592e83a6ced135",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1186,
+     "item_id": "3d5200d66634462afbac583b",
+     "reason": "BUDGET",
+     "score": 0.015151515151515152,
+     "unit": {
+      "id": "bf05941b2f8a8019cd9c9810",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1154,
+     "item_id": "d490edfab41a7adc5b273d4a",
+     "reason": "BUDGET",
+     "score": 0.015151515151515152,
+     "unit": {
+      "id": "e00cfb127c619bcaf2fb5198",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1172,
+     "item_id": "25e3980fb70e28baf7c154af",
+     "reason": "BUDGET",
+     "score": 0.014925373134328358,
+     "unit": {
+      "id": "2f70070a24812a82eda8c3e6",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1156,
+     "item_id": "1a07ccbd502417cf6456615c",
+     "reason": "BUDGET",
+     "score": 0.014705882352941176,
+     "unit": {
+      "id": "70517793654c433f05906e38",
+      "kind": "chunk"
+     }
+    },
+    {
+     "bytes": 1092,
+     "item_id": "a82d0ccb06707c9ffac28377",
+     "reason": "BUDGET",
+     "score": 0.014705882352941176,
+     "unit": {
+      "id": "8b7811dda42e7c1987792c4f",
+      "kind": "chunk"
+     }
+    }
+   ],
+   "items": [
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "AUTHORITY UNKNOWN",
+     "by_reference": false,
+     "bytes": 3718,
+     "content_sha256": "847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff",
+     "delivery": "PINNED",
+     "edge_path": [],
+     "item_id": "208f330afa6498564027d19f",
+     "lifecycle": "ACTIVE",
+     "route": "resolver",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": "ed12fc925e0a491da09cab80039f739612ac0369",
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": null,
+      "line_start": null,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+      "ref": null
+     },
+     "unit": {
+      "id": "OD-P2-10A/B",
+      "kind": "record"
+     },
+     "version_status": null
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1183,
+     "content_sha256": "4cbf0ed8edb8975f1e0a43b21d63b37b67010d3c3cbe0570617e56af8de80cf0",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "0ae70cc729ceba0726c98259",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 224,
+      "line_start": 197,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "35c85c07366257e130521baa",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1187,
+     "content_sha256": "d3c58b38467c3ab9baf770cbdaa862c134fda09273a46e4d20dbb0f371d10763",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "3608649b01f69fa64644484e",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 201,
+      "line_start": 170,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "15952b34a41d8ac43fa2fe5e",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1169,
+     "content_sha256": "e29b7a368601b198eb43a50f56b24e4ac9c3efdf95946345f706f7b59ab4a358",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "ab021117cc03b06849973178",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 73,
+      "line_start": 52,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "7e9f5a1c9474fcfd2662438f",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "OWNER_DECISION",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1160,
+     "content_sha256": "6852bf1d098245642e726a74af6ade5323782b00e3877e2550d39fa33397dd09",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "1dba6d6246d3f14d48bec15b",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 53,
+      "line_start": 34,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "bc3ca92cee12a3a8b8790d5d",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "464eef86ccb7394e472b24c5",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.032018442622950824,
+      "rank": 1,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 33,
+      "line_start": 18,
+      "path": "release/orchestration/phase-1/README.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "4e026b34e1eff54a628cf016",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "12570f93140b2687adff487c",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.03149801587301587,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 319,
+      "line_start": 314,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "da3fefbe300937e0d4a76ded",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1122,
+     "content_sha256": "a8955439de8bd3a397bb993ba7db5a5ede2d943be6cfa9913ae1925ffb4aaf28",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "299a8c02a4d00d534fa673a6",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 734,
+      "line_start": 722,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "0ced918d8a9ae020b48fec9c",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "35067fcb78b7071a0c7cf99a",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 32,
+      "line_start": 14,
+      "path": "release/orchestration/phase-2/PHASE_2_PROGRESS_AND_MODEL_TELEMETRY.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "3e0958c3346f61eb74b06b85",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1124,
+     "content_sha256": "b28ec17c31b5d44d9c5e4a56fb363548953bdba50271687785a2fc7bf8b785e2",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "7bba4a6e84721326cf6b6241",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-1/ESCALATION/PHASE-CONVERGENCE-ESCALATION-R1.md",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "6d45863022a218449c4addff",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "577792a6697b88b7984ff549",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 50,
+      "line_start": 32,
+      "path": "release/orchestration/phase-1/README.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "d41dc3a930083140687981a1",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1118,
+     "content_sha256": "424b4207fbedf8a51767b59faf331c6519adce61987a800072ce5764a91805f6",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "6c34f6e5bd4faadb5ee8d946",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 711,
+      "line_start": 699,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "eb781f64acab5500da0c4020",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1198,
+     "content_sha256": "52d1de5df274e725acca13d7228a4c679cb3a3151ca5753fdb2a0c8dbecd641e",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "da7fcfdd78f6fbeed4c443f7",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 21,
+      "line_start": 8,
+      "path": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "008ba1d3f8f5289fa2c78eb5",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1196,
+     "content_sha256": "010f22f44907a6240b7ce4695ae4810e7574da9bb84bbfb431148e007bec21d2",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "a809030438cfa555c795703e",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 54,
+      "line_start": 38,
+      "path": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "30749100213c4661f758e06a",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1160,
+     "content_sha256": "9224b5e1871a6590e2ba4dfaf8e018a89e67ebfd58448c9e81b5606215bc439f",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "4ee364ae2670d5193933115d",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 23,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "3571321b58fa4a4b7afff335",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "d47112d83114669c4e827c59",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 157,
+      "line_start": 137,
+      "path": "release/orchestration/phase-1/AGENT_RUNS/AR-0023.report.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "919d1bf5f93816984fe4458b",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "6938c9d3b6dc28a028a56392",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "ad4babb5862f6414fd3b3a9b",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "548fb591bc0e18b1ef0f62ec",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 50,
+      "line_start": 34,
+      "path": "release/orchestration/phase-1/AGENT_RUNS/AR-0026.run.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "23cd38597b26ff7fb9f321d7",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1197,
+     "content_sha256": "8c48c80d45498ebe6cb705a9d9116ecfb68b36255596871833f4b9a655428eb7",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "09f87b9a46e8670902885059",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 746,
+      "line_start": 733,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "2493cadd8a7c993dcab9f80d",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1178,
+     "content_sha256": "c967b7ee42df64d12a06d3647a7ba741e981d2acb305bf2b0ce9d364de47ea9a",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "fba286990a99ce9c7028cc2f",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 16,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "4c8e522f268d49b15ae3846d",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1116,
+     "content_sha256": "1882d00b2c5ecf588298766bc875aac1c280a3b888002e9c8d0686ce5da45bcc",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "c61b0f703287b8b64ddc7c77",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fe614e3bbf765ba5064e67852d5333d80e12be3c",
+      "line_end": 106,
+      "line_start": 89,
+      "path": "release/orchestration/phase-2/AGENT_RUNS/P2-AR-0068.report.yaml",
+      "ref": "refs/heads/phase2/repair-2-adversarial"
+     },
+     "unit": {
+      "id": "6470f284ed06a6145ee8fbcb",
+      "kind": "chunk"
+     },
+     "version_status": "HISTORY_ONLY"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "fdd2aade211200af202cb550",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 23,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/PHASE_2_PRE_MINT_DECISION_PACKAGE.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "052b775ee1ebf5b43678178c",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "51cce41f5d2fefbc65a60734",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 90,
+      "line_start": 68,
+      "path": "release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "3b3ec3f15b0f35df3c8954af",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1133,
+     "content_sha256": "6e0ac1222ec3c1010b7d058eb69ae97adfe736846ba60057fead4f041d5d3022",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "7a3229177e03f5e9334e3c58",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 27,
+      "line_start": 15,
+      "path": "release/orchestration/phase-2/GATES/HG-P2-0001-OWNER-DECISIONS.md",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "57810683020aa06e951a7b65",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "7e9c695cab00a028fdd8ed05",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 135,
+      "line_start": 134,
+      "path": "release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "0a2d09e91713204449062d04",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "261c8165ae108e603f9b519b",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 73,
+      "line_start": 65,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0050-repair-1-r4-tool-install-gate.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "3bff8f2e4ea73772768c2f5a",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1128,
+     "content_sha256": "be5830801a148d14c38ac3c808dd582f853bcf7c9deb0768fa982c9743f81d16",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "df1a98e1c8980766ab3cc11b",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 272,
+      "line_start": 252,
+      "path": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "5cde3b5674a35e3e78022218",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1137,
+     "content_sha256": "8e7456392225b4a52ef8f745d3c8fc60b27e349aab856d5d010131ad3852f429",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "60166c9584c6395818715d97",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 671,
+      "line_start": 659,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "01b38564a572108f0ee94836",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "3c7a34d74b77320883a186d5",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 67,
+      "line_start": 52,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0041-repair-1-r4-ws01-evidence-map.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "3fcb99484cc42183b43a69f4",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "b09658053a087943812c979f",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 145,
+      "line_start": 134,
+      "path": "release/orchestration/phase-1/GATES/GATE-REGISTER.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "5af037b302b8866fdc262a61",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1200,
+     "content_sha256": "22ceba0adaee11908c0682498b9d46c1565314aaf2d5f2cf47778d8334191e33",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "8af076ee4ad87e028a0f659f",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 1154,
+      "line_start": 1149,
+      "path": "release/orchestration/phase-1/PHASE_1_LEDGER.md",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "9fe8aa0b44b92748ae242322",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "e894f7141b5a82c3df5632a9",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 25,
+      "line_start": 16,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0001-orchestrator-continuity.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "ce6f48c778dbbbb9f90cbfa1",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "1a2fad1c053f236fe81be936",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 544,
+      "line_start": 531,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "fccb3b729aea40e3004ebd62",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 355,
+     "content_sha256": "47793fc349fe3416bca3e607ff6b79f05f6cbf66762150a05af21fc20a884f08",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "22fa7c4fa555e949f71536d5",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 122,
+      "line_start": 119,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0055-a-plus-c-independent-review.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "25b7d0ae2ab13afdcd7d8589",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "90eab0fef52354c5c57907a8",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 26,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/PHASE_2_OPTION_B_ESCALATION_PACKAGE.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "4f0ff70f3f28dc4f2cea043b",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1193,
+     "content_sha256": "66621126044af5250c8bc6e561d11c7fcf1cadad3a2758374361bd53a61c93a0",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "f9b75024c4a03e5ea4da0456",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 125,
+      "line_start": 110,
+      "path": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "a4e7330028a5f2c749278695",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1161,
+     "content_sha256": "77e0ee554401b1928a435a7cb484d93ea3d104836957154e73ed3e7d231813dd",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "098c3711cd6618b792e91b4a",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 350,
+      "line_start": 348,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "aa9eab720143a19701e864ac",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1146,
+     "content_sha256": "71d2314ae3b2402006b3be838b7a2d63a71ed2ece49e7c69fcae8fe5ff6524a3",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "5c98437e66cf6f74644d6952",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 45,
+      "line_start": 26,
+      "path": "release/orchestration/phase-2-context-bridge/GATES/BR-ARCH-RULING-1-MANDATORY-INPUTS-ALWAYS-IN-A.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "cb4518c4cb1b2dbe80f788e7",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "ORCHESTRATION_RECORD",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "a1948d7186a828df8a1c4ddb",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 83,
+      "line_start": 74,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "dbd55ba818a9181f09cda786",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1155,
+     "content_sha256": "7114ee78d0ad8e0dceb438b809716f8ae6afb2492a0910b13699e510e1a85618",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "dfecaafe8cea7caeedc01731",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.030536130536130537,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "14c7f68b77a14791bb768eeb7cedb8f63196781a",
+      "line_end": 28,
+      "line_start": 12,
+      "path": "runtime/src/context/mod.rs",
+      "ref": "refs/heads/phase2/repair-1-ws04"
+     },
+     "unit": {
+      "id": "18b8ef5bd51c3b52e3113a02",
+      "kind": "chunk"
+     },
+     "version_status": "HISTORICAL_VERSION"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1173,
+     "content_sha256": "0638260978b57e85e7b6e1612bf7c546811da2381fa6e54863248ec605f1ebc9",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "22598465312bdb61dabbc6f1",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.029631255487269532,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "6094199768b52b339b8bc0d5923848ec6d88e659",
+      "line_end": 231,
+      "line_start": 213,
+      "path": "runtime/src/cit/binding.rs",
+      "ref": "refs/heads/phase2/repair-1-r3-ws04"
+     },
+     "unit": {
+      "id": "4c17259248b79ac61d253783",
+      "kind": "chunk"
+     },
+     "version_status": "HISTORICAL_VERSION"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "bc191380272e965455110696",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.029631255487269532,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 929,
+      "line_start": 890,
+      "path": "runtime/src/cit/materiality.rs",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "bf6dd84a752f632411d126e9",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "bc4b1c72ba4c177eb64bf2d9",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.01639344262295082,
+      "rank": 1,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 250,
+      "line_start": 223,
+      "path": "runtime/src/capabilities/registry.rs",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "93f285cc2840e0bd8e7c85fc",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "2142e270aec2d029ce37b185",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 35,
+      "line_start": 24,
+      "path": "capabilities/PROTOCOL.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "0e6c3103b382f72e66f1bdf3",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1038,
+     "content_sha256": "0739811baef9c4659b0f17cc0fd54afec02a0d73f3aec34ab95b93d829f9e276",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "fdc38ee271dfe0a4b795600d",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 15,
+      "line_start": 9,
+      "path": "release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived-runs/derived_ws07_named_checks.root-channel.P2-AR-0032.py.out",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "50fead30f768d5ddc7d4f65b",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "17efb2f69d1a3c1dd62906bf",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 13,
+      "line_start": 1,
+      "path": "runtime/src/capabilities/registry.rs",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "21976541d06a59a628b59ca1",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1190,
+     "content_sha256": "1cd4cf1e4621721a5a8639227148bcc45608a9af49262884176e6a76dc751253",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "29afd8b1fa34bf5b9960b5bd",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 563,
+      "line_start": 538,
+      "path": "framework/schemas/context-packet.schema.json",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "61ff51b353220be6bbf59e46",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 931,
+     "content_sha256": "28fd14876b8c0851266ab5e4eb4809d01677e82a21a21d9fd077c1523f6b881e",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "207c4f3b7f10ef52f001a27b",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 11,
+      "line_start": 6,
+      "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/r2-ws07-named-checks.derived.final-0393bca.out",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "655b57e168086c43848c2bc0",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "fcca1c6b1f2a54939fe2971c",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015873015873015872,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 789,
+      "line_start": 768,
+      "path": "runtime/src/context/manifest.rs",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "98c2d1722ff44aed13187d30",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1169,
+     "content_sha256": "5577d0b2273f59a809222cfb64db8960c38de5ef56c2e9b5cef0e52f5a88bbac",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "e5fd18058873209e7c8d1fbd",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 15,
+      "line_start": 1,
+      "path": "release/capability-baseline/repair-1/r2-ws07/evidence/ws07_named_checks.py",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "21faa04c8e38595cf85d7da9",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1179,
+     "content_sha256": "644d937ea4618edd7d5380f1b2691ca2bc014ba538067a3042e0ab27fe84b5f1",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "b082e528c726640a9851337b",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 8,
+      "line_start": 1,
+      "path": "release/capability-baseline/repair-1/r2-ws07/evidence/probes/ws07-named-checks.final-371794a.out",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "803972664667823e15b5358f",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1161,
+     "content_sha256": "6099fb00487225ab4b1d4ba316f46321aecc73571e1880591db7ebebde03d72d",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "cb20ea7865d3e47e804123e0",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 1870,
+      "line_start": 1859,
+      "path": "runtime/src/orchestration/tasks.rs",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "1c0aa129d4f342250ce8f753",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "e66c4d32f4af0802e71f4427",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 151,
+      "line_start": 119,
+      "path": "runtime/src/context/manifest.rs",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "c0bcbce6ef00c2f5f6fb94f3",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "c1ba3683ee9ef136e3ad36c1",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 235,
+      "line_start": 226,
+      "path": "framework/schemas/plugin-descriptor.schema.json",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "d9423cbc8f83fa72fdf5c594",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1207,
+     "content_sha256": "f7aef2535c927002ee3f258e54fb474d266add4b6d7d5184979e779d75470d75",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "67ddcbf8a978ac4e17a0ca73",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 326,
+      "line_start": 310,
+      "path": "release/root-of-trust/signed-release-root-v1-review-r0-2/evidence/PROBES.md",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "071cef649feb2c7aebfa0b19",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "2e04aef428aea65ee5224283",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 298,
+      "line_start": 297,
+      "path": "probes/P2-AR-0092/P2-AR-0092-REVIEW.md",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "1b099105558182676e51483a",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1179,
+     "content_sha256": "ab0a32931841514dc4055c6947c0b42e69eebf93d1ee5129136ba81fa1412ae2",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "70b15a97e48a2edc41a8a82f",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 29,
+      "line_start": 12,
+      "path": "runtime/src/context/mod.rs",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "71bc99266625390970c96c95",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "7e896f341d2a40fd74c60818",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 30,
+      "line_start": 28,
+      "path": "framework/policies/ENFORCEMENT_MAP.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "7eec3707385fc389db596188",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 1170,
+     "content_sha256": "1e179de7885a7e7bb1fb60849dd0fccf5469f9a652508b6d40b058ba78a50cfd",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "25c3a1330384925037857629",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 9,
+      "line_start": 1,
+      "path": "release/capability-baseline/repair-1/r2-ws07/evidence/probes/ws07-named-checks.base-843d79c.out",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "f01b2c30f7f2005e6f6cf945",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "246461082764b0ef08021440",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 1640,
+      "line_start": 1621,
+      "path": "runtime/src/tools.rs",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "8a106e2eebe03b1159eea2c3",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "EVIDENCE",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "746586d745c59895f62ba8cc",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 523,
+      "line_start": 508,
+      "path": "runtime/src/srr/state.rs",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "915e0ef07ff69902cea9c690",
+      "kind": "chunk"
+     },
+     "version_status": "SAME_AS_CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "2e404a4b3ce895f73a93f59b",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.06426850662704708,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 39,
+      "line_start": 26,
+      "path": "README.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "bb64454b9c42886b1951eccf",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "a1c4cf9987cedb89b676c437",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.031099324975891997,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 251,
+      "line_start": 235,
+      "path": "release/capability-baseline/verify-1/gamma/prior-findings-disposition.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "a5cb35bc564c59f8424e44b2",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "2b15bdc0b3104eebd2971d77",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.030798389007344232,
+      "rank": 3,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 16,
+      "line_start": 1,
+      "path": "release/capability-baseline/audit-0/synthesis/owner-decisions-required.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "d3785b3ef60895bee75022e1",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "e294d0b50909ead3851183d6",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.01639344262295082,
+      "rank": 1,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 19,
+      "line_start": 19,
+      "path": "release/root-of-trust/4.1.6-review-r3/B-trust-security/04-CARRIED-REQUIREMENTS.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "083796045227dc32be8e70b4",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 876,
+     "content_sha256": "f0b909c14e77b640331a29b6396384ca56db1a27aa8235a7a6be1a2a888c6eeb",
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "2c60f3e619f6bb2ce729496c",
+     "lifecycle": "UNKNOWN",
+     "route": "lexical",
+     "score": {
+      "fused": 0.01639344262295082,
+      "rank": 1,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1623,
+      "line_start": 1612,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "1b7082df36d65bd565752b6f",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "4cf7c4b4de78c6ad0741aac1",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.01639344262295082,
+      "rank": 1,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 318,
+      "line_start": 300,
+      "path": "release/capability-baseline/audit-0/zeta/capability-audit.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "a99e49c03c912ce3e9d655f0",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "4206d6915fcb1beade9adc84",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.01639344262295082,
+      "rank": 1,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1159,
+      "line_start": 1132,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "f88636d9ded4a5859ce648fe",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "57381a59084509b028f00e00",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 97,
+      "line_start": 89,
+      "path": "release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "055a37e78580b2b9ce131014",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "3cb56013baa44241e8787180",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.016129032258064516,
+      "rank": 2,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 24,
+      "line_start": 1,
+      "path": "release/capability-baseline/verify-1/epsilon/prior-findings-disposition.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "e68a40cb3ad3af0ca7d56088",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "ab40f818c86307bcc772639c",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 168,
+      "line_start": 154,
+      "path": "release/capability-baseline/repair-1/integration-2/00-INTEGRATION-REPORT.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "05e9b0faeaea90f4ed6d9e3d",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "d612db15d9dcb72154467966",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 619,
+      "line_start": 606,
+      "path": "release/capability-baseline/audit-0/gamma-r/capability-audit.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "294bed42cc45ee9def695e56",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "847c67e8d298818d1f5b9af6",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015625,
+      "rank": 4,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 61,
+      "line_start": 42,
+      "path": "release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "d3a7979c793f86fa25cbfaae",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "c3c253b1ce2a3663424f38cd",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 238,
+      "line_start": 219,
+      "path": "release/capability-baseline/verify-1/gamma/prior-findings-disposition.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "44bed350e10484153d66c9b4",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "a1c76631e9da978be6136367",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 331,
+      "line_start": 303,
+      "path": "release/capability-baseline/verify-1/r1-preservation/heldout/p2_update_and_kernel.rs",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "5311eb121c3e393598994ace",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "5fe7dcb8346c896b4038fd98",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 28,
+      "line_start": 1,
+      "path": "release/capability-baseline/verify-1/zeta/prior-findings-disposition.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "693acdc873d0e49025905d47",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "73481f7d7771816dbe58deeb",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015384615384615385,
+      "rank": 5,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1694,
+      "line_start": 1657,
+      "path": "release/capability-baseline/verify-1/synthesis/suite-to-contract-matrix.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "7b10e200858de8abb76ce4d2",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "f77be7961382d5ec8ac5742c",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 113,
+      "line_start": 82,
+      "path": "release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "1bc9ec9bdd5af1967e3d946d",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "19ade31e7e6b14c528fa23d1",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 49,
+      "line_start": 30,
+      "path": "release/root-of-trust/signed-release-root-v1/04-R0-CORRECTION-1.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "9c2b7ee06c7eca17e53a7c4b",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "d208ed5f8b1abab05904f0ff",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 3640,
+      "line_start": 3629,
+      "path": "release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_1.html",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "b739882c1958b7183e2f48cb",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "e90c0234723be0bdb1330aae",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 180,
+      "line_start": 172,
+      "path": "release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "f0de1d97e63d0611758624fc",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "386590154a2c7cafb54dd905",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.015151515151515152,
+      "rank": 6,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 23,
+      "line_start": 1,
+      "path": "release/capability-baseline/verify-1/gamma/prior-findings-disposition.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "fb9a7c8dea14b3361fcd31dc",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "693ede41204de6c56cdaef92",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 848,
+      "line_start": 838,
+      "path": "release/capability-baseline/verify-1/epsilon/capability-audit.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "2951b16a30a53bf9f50df713",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "77c105ff720d1541db8981a4",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 3211,
+      "line_start": 3182,
+      "path": "release/capability-baseline/verify-1/synthesis/suite-to-contract-matrix.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "458fa73f0b94616c63274bdc",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "5699fdedd8678edba6931965",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014925373134328358,
+      "rank": 7,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 3746,
+      "line_start": 3735,
+      "path": "release/orchestration/control-panel/Governance_OS_Interactive_Stage_Control_Panel_FINAL_AUDITED_v8_2.html",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "dffee8ee83032f4702b7bb1e",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "8266623f221e76c738aabde6",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 329,
+      "line_start": 314,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": "evidence"
+     },
+     "unit": {
+      "id": "0338004ed762d48b794727e6",
+      "kind": "chunk"
+     },
+     "version_status": "HISTORICAL_VERSION"
+    },
+    {
+     "authority_class": "UNCLASSIFIED",
+     "banner": "UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.",
+     "by_reference": false,
+     "bytes": 0,
+     "content_sha256": null,
+     "delivery": "RETRIEVED",
+     "edge_path": [],
+     "item_id": "faf6bf1658b7ec8fc6ba4b2e",
+     "lifecycle": "UNKNOWN",
+     "route": "semantic",
+     "score": {
+      "fused": 0.014705882352941176,
+      "rank": 8,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+      "line_end": 1518,
+      "line_start": 1504,
+      "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+      "ref": "records"
+     },
+     "unit": {
+      "id": "f35e0886c7983cadd3988063",
+      "kind": "chunk"
+     },
+     "version_status": "CANONICAL"
+    }
+   ],
+   "queries": [
+    {
+     "id": "R8-CHAIN-F2",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "exact",
+      "semantic"
+     ],
+     "text": "Starting from the finding as reported in the Review-8 return (P2-AR-0097, F2), reconstruct its full decision/effect chain at the frozen product 3c880d8, stage by stage (chain_stages). For each stage cite the code or record anchor and state what it does, verified at 3c880d8 rather than quoted from the review. Identify the actual decision/enforcement point, meaning the code whose evaluated result decides the concrete behaviour. If a stage does not exist for this finding, say so and cite why."
+    },
+    {
+     "id": "R8-CHAIN-F3",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "exact",
+      "semantic"
+     ],
+     "text": "Starting from the finding as reported in the Review-8 return (P2-AR-0097, F3), reconstruct its full decision/effect chain at the frozen product 3c880d8, stage by stage (chain_stages). For each stage cite the code or record anchor and state what it does, verified at 3c880d8 rather than quoted from the review. Identify the actual decision/enforcement point, meaning the code whose evaluated result decides the concrete behaviour. If a stage does not exist for this finding, say so and cite why."
+    },
+    {
+     "id": "R8-SIDE-BY-SIDE",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "exact",
+      "semantic"
+     ],
+     "text": "Place the F2 path and the F3 path side by side, each down to its real enforcement point. List the code locations they share and the ones where they differ. Record the evidence that bears on whether they are one deeper class and the evidence that bears against it. Do not classify them. Set the answer field classification to NOT_DETERMINED_BY_BRIDGE."
+    },
+    {
+     "id": "R8-F1-BOTHWAYS",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "exact",
+      "semantic"
+     ],
+     "text": "For the health-sandbox exemption that F1 concerns, reconstruct why it was created (purpose, origin record, and the requirement or owner decision it served), every consumer (production and test, and whether each is in-process or cross-process), what it depends on and what depends on it. Record the evidence relevant to the owner's direction (DELETE / SIMPLIFY / REPAIR / NARROW / RETAIN), both for and against. State no decision."
+    },
+    {
+     "id": "AUTH-1",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "List every mandatory input with its authority class, exactly as the packet presents it."
+    },
+    {
+     "id": "AUTH-2",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "Which items are owner decisions in force, and which are owner directions or hypotheses to test?"
+    },
+    {
+     "id": "AUTH-3",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "Which Phase-2 findings were withdrawn, and by whom?"
+    },
+    {
+     "id": "AUTH-4",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "Which Phase-2 stop conditions are current, and which are superseded?"
+    },
+    {
+     "id": "CTRL-1",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "Which decision adopted the signed release root, what requirement does rollback/high-water protection serve, where is the high-water check enforced in code, and which tests prove it?"
+    },
+    {
+     "id": "CTRL-2",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "Why does an executable capability plugin need a registration, which decisions constrain that, and where does the product refuse an unregistered plugin?"
+    },
+    {
+     "id": "CTRL-3",
+     "k": 8,
+     "routes": [
+      "lexical",
+      "semantic"
+     ],
+     "text": "What is current and what is superseded for the operator control panel version, the Phase-1 target architecture, and the Phase-2 stop conditions?"
+    }
+   ],
+   "section_sha256": "54a12e62b24c7b2ae1c3502a788264eabcbfc717cc8d6ad4223a6d1711c3bee3",
+   "title": "SUPPLEMENTARY RETRIEVED CONTEXT"
+  },
+  "I": {
+   "dropped": [],
+   "items": [
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 829,
+     "content_sha256": "62cf29e608c71a963ebd55efda0ffc463b07ed368abea67a6c9c35951b7bf657",
+     "delivery": "PINNED",
+     "edge_path": [],
+     "item_id": "dc934751ef65a90d0ab031f4",
+     "lifecycle": "ACTIVE",
+     "route": "task_spec",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": null,
+      "line_end": null,
+      "line_start": null,
+      "path": null,
+      "ref": null
+     },
+     "unit": {
+      "id": "I",
+      "kind": "section"
+     },
+     "version_status": null
+    }
+   ],
+   "queries": [],
+   "section_sha256": "ea02c769d669bd0b7a774a496e7537c9176293fff3bd89d296498ac1a4ec1404",
+   "title": "TASK CONTRACT / MUTATION SCOPE"
+  },
+  "J": {
+   "dropped": [],
+   "items": [
+    {
+     "authority_class": null,
+     "banner": null,
+     "by_reference": false,
+     "bytes": 1704,
+     "content_sha256": "91e6f5b53bbef31d8b4ba1de76c9ab0be7114c2585fc10bdfa404187bed66fcd",
+     "delivery": "PINNED",
+     "edge_path": [],
+     "item_id": "82a5fe03f308b2e3b62d2fc1",
+     "lifecycle": "ACTIVE",
+     "route": "task_spec",
+     "score": {
+      "fused": null,
+      "rank": null,
+      "raw": null
+     },
+     "source": {
+      "blob": null,
+      "commit": null,
+      "line_end": null,
+      "line_start": null,
+      "path": null,
+      "ref": null
+     },
+     "unit": {
+      "id": "J",
+      "kind": "section"
+     },
+     "version_status": null
+    }
+   ],
+   "queries": [],
+   "section_sha256": "a3c3500fc70b52aaba81ba18b9a301c32ffa58bbecff57956afae2a52dc0dab6",
+   "title": "COMPLETION / EVIDENCE OBLIGATIONS"
+  }
+ },
+ "status": "OK",
+ "task_spec_sha256": "a6656c927b7053ebf9f1bd33db107636bb1e453d25a179a8751c9f360c2341d9",
+ "view": [
+  {
+   "commit": "fa25492a9961f205dfca618f4846b3533626a6ae",
+   "name": "records",
+   "ref": "refs/heads/bridge/p2-context-retrieval",
+   "role": "primary"
+  },
+  {
+   "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "name": "product",
+   "ref": "refs/heads/phase2/approved-delta",
+   "role": "product"
+  },
+  {
+   "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+   "name": "evidence",
+   "ref": "refs/heads/phase2/review-8",
+   "role": "evidence"
+  }
+ ]
+}
