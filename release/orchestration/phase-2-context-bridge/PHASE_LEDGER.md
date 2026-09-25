@@ -91,3 +91,43 @@ It also adds a corpus-coverage node to the DAG.
 had no commits and no `ARCHITECTURE.md`, only spike outputs, so the clarification reached it before any design was
 frozen, and nothing is restarted. The write boundary is unchanged: the bridge reads the whole repository and still
 writes only its own domain.
+
+## BR-L-0005: the architecture lands, the first wave is dispatched (2026-09-25)
+
+**BR-AR-0001 returned COMPLETED.** The orchestrator ran `integrate-check` itself rather than taking the architect's
+word: the result was PERMITTED. It read the model from the transcript: `claude-opus-5-5` on all 256 turns. The branch
+fast-forwarded into the bridge at `ae656ef`. GATE-BR-ARCH-DAG is SATISFIED.
+
+**What the design is.** The design is generic, whole-repository and multi-ref. The inputs are a records ref (following
+the tip), the frozen product and Review-8 evidence (both pinned, reporting `REF_MOVED` rather than drifting), and the
+`phase2/*` tips as history. Current-ness is decided per path by partition ownership, reusing `product_identity.py`'s
+PRODUCT_CODE line. It is never decided by score or by date. The routes are:
+
+* exact;
+* FTS5 lexical;
+* tree-sitter Rust plus the existing Python AST plugin, with every call edge labelled exact or heuristic;
+* a provisional `BAAI/bge-small-en-v1.5` over ONNX Runtime (CPU, bitwise-deterministic in the spike) behind the
+  existing `gov-capability/1` protocol.
+
+The hard authority invariant is enforced four ways: by type (only the resolver constructs a section-A item), by an
+import boundary, by an independent validator that re-derives section A, and by an ordering invariant that no score
+can invert. The `mandatory_bridge_inputs` classes are verbatim. OD-P2-10A/B are section-scoped, so the F1 direction
+cannot inherit OWNER_DECISION from its file. D is split into D.1 decisions, D.2 directions and D.3 hypotheses.
+
+**Why the product's own memory engine is not used.** Running it would call `gov init`, which writes the machine
+adoption-floor store that F3's union reads. The bridge reuses the engine's designs instead.
+
+**Three things the orchestrator checked or changed before dispatch:**
+
+1. **OA-P2-06.** The architect models OA-P2-06 as ACTIVE, with only its stop condition superseded. The orchestrator's
+   own memory said more had been superseded. The committed records support the architect, and no record supports
+   the memory, so the memory claim is noted as unsupported (OBS-BR-01).
+2. **Store isolation (BR-DAG-AMEND-1).** The store path had no override, and B2–B5 will run in parallel. B1 must
+   therefore make the store root configurable through `GOVBRIDGE_STORE`, and each builder gets its own store.
+3. **The sealed oracle.** Its directory is created outside every worktree, mode 0700, with an unguessable name. Its
+   secrecy is procedural, because every role is the same OS user, so it is made **detective**: before grading, every
+   non-TA transcript is grepped for the sealed name. Its integrity is cryptographic: the commitment is merged before
+   any demonstration run.
+
+**Dispatched in parallel (PG0):** BR-AR-0002, the fresh test-author on opus, which writes the held-out oracle; and
+BR-AR-0003, builder B1 (core) on sonnet.

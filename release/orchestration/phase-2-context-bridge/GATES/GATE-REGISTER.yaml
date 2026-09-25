@@ -2,27 +2,29 @@ schema: bridge-gate-register/1
 gates:
 - id: GATE-BR-ENTRY
   status: SATISFIED
-  evidence: BR-CP-0001 -- self-located from Git and the Phase-2 records; frozen product 3c880d8 resolves with its
-    recorded product_code_digest; Review-8 verdict and probe objects verified at 58219d5; Contract v3 and owner
-    records hash-bound
+  evidence: BR-CP-0001 -- self-located from Git and the Phase-2 records; frozen product 3c880d8 resolves with its recorded
+    product_code_digest; Review-8 verdict and probe objects verified at 58219d5; Contract v3 and owner records hash-bound
 - id: GATE-BR-ARCH-DAG
-  status: OPEN
+  status: SATISFIED
   opens_when: BR-AR-0001 (fresh architect) returns ARCHITECTURE.md + IMPLEMENTATION_DAG.yaml + REUSE_VS_BUILD.yaml
-  enforcement: no builder is dispatched until all three exist on the bridge branch, parse, and every DAG node names
-    its mutation_scope inside the domain and its acceptance checks
+  enforcement: no builder is dispatched until all three exist on the bridge branch, parse, and every DAG node names its mutation_scope
+    inside the domain and its acceptance checks
+  evidence: BR-AR-0001 merged at ae656ef; ARCHITECTURE.md + IMPLEMENTATION_DAG.yaml + REUSE_VS_BUILD.yaml present and parse;
+    every node mutation_scope inside the domain, disjoint within parallel groups; every acceptance check a command with an
+    expected result; integrate-check PERMITTED (orchestrator-run)
 - id: GATE-BR-BUILD
-  status: NOT_OPEN
-  enforcement: each builder run must pass `tools/check_state.py integrate-check <run>` (typed report + checkpoint with
-    command/exit-code/output-hash records + mutation scope) before its branch is merged
+  status: OPEN
+  enforcement: each builder run must pass `tools/check_state.py integrate-check <run>` (typed report + checkpoint with command/exit-code/output-hash
+    records + mutation scope) before its branch is merged
 - id: GATE-BR-INTEGRATION
   status: NOT_OPEN
-  enforcement: integrated tree passes the bridge's own test suite and index rebuild from clean; check_state verify
-    reports STATE_CONSISTENT (mutation boundary intact)
+  enforcement: integrated tree passes the bridge's own test suite and index rebuild from clean; check_state verify reports
+    STATE_CONSISTENT (mutation boundary intact)
 - id: GATE-BR-R8-DEMONSTRATION
   status: NOT_OPEN
-  enforcement: a FRESH agent that is not a builder, given only the canonical bootstrap + a compiled context packet,
-    reconstructs the Review-8 rule-composition chain to the actual enforcement point and answers the ten query classes;
-    its consumption receipt must match the packet manifest hash
+  enforcement: a FRESH agent that is not a builder, given only the canonical bootstrap + a compiled context packet, reconstructs
+    the Review-8 rule-composition chain to the actual enforcement point and answers the ten query classes; its consumption
+    receipt must match the packet manifest hash
 - id: GATE-BR-BUILT
   status: NOT_OPEN
   token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT

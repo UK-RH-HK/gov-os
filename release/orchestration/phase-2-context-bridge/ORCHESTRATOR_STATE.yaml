@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T08:45:28Z'
-state_hash: 48f07b7d1e8a9349cc72b496ec280d95690e489c99c83f08fc643dc7e5246505
-lifecycle_state: BR_ARCHITECTURE
+updated_at: '2026-09-25T09:42:53Z'
+state_hash: 32336548cd47b8d5aa5d6796e7325206d6bfd82aa244c16b9923352235cb9dd5
+lifecycle_state: BR_BUILD_PG0
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -257,23 +257,87 @@ agent_runs:
 - run_id: BR-AR-0001
   role: Context/Retrieval Architect (fresh)
   handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md
+  addendum_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-A1-corpus-and-purpose-addendum.md
   branch: bridge/arch-0001
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0001
   model_requested: opus
-  model_observed: claude-opus-5-5 (read from subagent transcript agent-a4d1ee656875af81a.jsonl, session 034abd76)
+  model_observed: claude-opus-5-5 (all 256 assistant turns, transcript agent-a4d1ee656875af81a.jsonl)
   agent_name: br-architect-0001
   dispatched_at: '2026-09-25T08:41Z'
-  status: RUNNING
+  duration_ms: 3490729
+  status: COMPLETED_INTEGRATED
+  final_commit: ae656ef42074ca12c5763c0d1224e4aa7572ff84
+  integrate_check: INTEGRATION_PERMITTED (run by the orchestrator, not only the architect)
+  merged_into_bridge_branch_at: ae656ef42074ca12c5763c0d1224e4aa7572ff84 (fast-forward)
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/ARCHITECTURE/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0001.*
+- run_id: BR-AR-0002
+  role: held-out oracle test-author (fresh; DAG node TA)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0002-test-author-oracle.md
+  branch: bridge/ta-0002
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0002
+  model_requested: opus
+  model_observed: null
+  agent_name: br-test-author-0002
+  status: DISPATCHED
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment.yaml
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0002.*
+- run_id: BR-AR-0003
+  role: builder B1 core (DAG node B1)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0003-b1-core.md
+  branch: bridge/b1-0003
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0003
+  model_requested: sonnet
+  model_observed: null
+  agent_name: br-builder-b1-0003
+  status: DISPATCHED
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0003
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/__init__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/**
+  - release/orchestration/phase-2-context-bridge/config/corpus-rules.yaml
+  - release/orchestration/phase-2-context-bridge/config/canonical-view.yaml
+  - release/orchestration/phase-2-context-bridge/config/model-pin.yaml
+  - release/orchestration/phase-2-context-bridge/config/requirements.lock
+  - release/orchestration/phase-2-context-bridge/bootstrap/**
+  - release/orchestration/phase-2-context-bridge/tests/core/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/core/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.*
 running_work:
-- run_id: BR-AR-0001
-  liveness_check: subagent transcript mtime under ~/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/034abd76-0719-4661-bb46-b56141b90a16/subagents/
-    plus commits on bridge/arch-0001; never inferred from elapsed time
+- run_id: BR-AR-0002
+  liveness_check: subagent transcript mtime + commits on bridge/ta-0002; never inferred from elapsed time
+- run_id: BR-AR-0003
+  liveness_check: subagent transcript mtime + commits on bridge/b1-0003; never inferred from elapsed time
+dag:
+  source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
+  run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
+    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012}
+  amendments:
+  - id: BR-DAG-AMEND-1
+    by: orchestrator (deterministic isolation of parallel work; no design change)
+    rule: the index store root is configurable via GOVBRIDGE_STORE (B1 implements store_root()); every parallel builder
+      uses its own store $HOME/.cache/gov-bridge/store-<RUN_ID>; venv and model cache shared and read-only after B1's
+      bootstrap, so requirements.lock must carry every wheel B2-B6/I1 need
+    reason: the architecture fixes the store under $HOME/.cache/gov-bridge/ with no override, and B2-B5 run in parallel
+sealed_oracle:
+  directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
+  mode: '0700'
+  created: '2026-09-25T09:41Z'
+  rule: ONLY the test-author (BR-AR-0002) writes here and ONLY the grader (BR-AR-0012) reads here. Builders and the
+    demonstration agent must never read it; the path is never placed in their briefs.
+  secrecy_is: PROCEDURAL (every role runs as the same OS user), made DETECTIVE -- before grading the orchestrator greps
+    every builder/integrator/DEMO subagent transcript for 'govbridge-sealed' and records the result in the GRADE gate;
+    any hit invalidates the demonstration run
+  integrity_is: CRYPTOGRAPHIC -- DEMONSTRATION/oracle-commitment.yaml (sha256) is merged before any DEMO run; the grader
+    refuses an oracle whose sha256 differs
 checkpoints:
 - id: BR-CP-0001
   path: release/orchestration/phase-2-context-bridge/CHECKPOINTS/BR-CP-0001.yaml
+- id: BR-CP-0002
+  path: release/orchestration/phase-2-context-bridge/CHECKPOINTS/BR-CP-0002.yaml
 handoffs:
 - id: BR-HO-0001
   path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0001-context-retrieval-architect.md
@@ -285,8 +349,30 @@ handoffs:
   delivery: SendMessage to the running architect (br-architect-0001), which was live when the message was sent;
     its branch had no commits and no ARCHITECTURE.md yet
   governs_over: BR-HO-0001 where they differ
+- id: BR-HO-TEMPLATE
+  path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+- id: BR-HO-0002
+  path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0002-test-author-oracle.md
+  to: BR-AR-0002
+- id: BR-HO-0003
+  path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0003-b1-core.md
+  to: BR-AR-0003
 unresolved_questions: []
+observations:
+- id: OBS-BR-01
+  text: 'the orchestrator''s auto-memory claims OD-P2-08 superseded OA-P2-06''s hard stops and AR75 framing entirely; no
+    committed record says so -- OD-P2-07 line 9 authorises continuation beyond OA-P2-06''s stop condition and OD-P2-08
+    line 7 supersedes only two escalation packages. The architecture''s cited, scoped representation is grounded in
+    the records and stands; memory is not a source.'
+- id: OBS-BR-02
+  text: SECURITY_POLICY secret-content exclusion hides 8 product files (fake test keys, incl. brownfield.rs) from content
+    indexes; they stay reachable by path/blob through the exact route and the exclusion is disclosed in every packet
+    that would have used them -- a bounded limitation for the verifier, not an owner question
 evidence_status:
+  architecture: 'ARCHITECTURE/ (BR-AR-0001): 7 build nodes + TA/D1/DEMO/GRADE; whole-repo corpus measured at 3c880d8
+    6,567 files / 6,489 included / 75.4 MB; provisional model BAAI/bge-small-en-v1.5 (MIT, 384-d, ONNX Runtime 1.30.0
+    CPU, bitwise-deterministic in spike); product memory engine NOT used (running it would mutate the adoption-floor
+    store F3 reads)'
   builder_evidence: NONE_YET
   review_8_demonstration: NOT_RUN
 immutable_evidence:
@@ -303,7 +389,7 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0001's return (typed report + checkpoint on bridge/arch-0001); run
-  tools/check_state.py integrate-check BR-AR-0001; read the model it actually ran from its transcript; review the DAG
-  for scope/authority conformance; merge; open GATE-BR-ARCH-DAG; then dispatch the test-author oracle role and the
-  first parallel group of DAG build nodes (model sonnet) in isolated worktrees
+next_deterministic_action: await BR-AR-0002 (TA) and BR-AR-0003 (B1); for each -- read its observed model from its
+  transcript, run tools/check_state.py integrate-check, merge; after B1 merges, dispatch PG1 (B2 BR-AR-0004, B3 BR-AR-0005,
+  B4 BR-AR-0006, B5 BR-AR-0007; model sonnet; each with GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-<RUN_ID>) in isolated
+  worktrees from the integrated tip

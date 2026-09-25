@@ -1,0 +1,11 @@
+id: BR-CP-0002
+at: '2026-09-25'
+lifecycle_state: BR_BUILD_PG0
+bridge_branch_tip_before_dispatch: ae656ef42074ca12c5763c0d1224e4aa7572ff84 (+ this checkpoint's commit)
+gates: {GATE-BR-ENTRY: SATISFIED, GATE-BR-ARCH-DAG: SATISFIED, GATE-BR-BUILD: OPEN}
+completed: [BR-AR-0001 COMPLETED_INTEGRATED]
+dispatching: [BR-AR-0002 TA (opus), BR-AR-0003 B1 (sonnet)]
+dag_amendments: [BR-DAG-AMEND-1 store isolation]
+sealed_oracle_dir_created: true
+resume: tools/check_state.py show / verify; for each run in running_work check liveness from its transcript and branch;
+  integrate-check each COMPLETED run before merge
