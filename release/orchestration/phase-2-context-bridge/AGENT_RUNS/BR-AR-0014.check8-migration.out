@@ -1,0 +1,13 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/usain/.cache/gov-bridge/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0014/release/orchestration/phase-2-context-bridge
+plugins: anyio-4.15.1
+collecting ... collected 8 items / 5 deselected / 3 selected
+
+tests/code/test_corpus_exclusion.py::test_migration_adds_eager_column_to_an_old_style_store PASSED [ 33%]
+tests/code/test_corpus_exclusion.py::test_migration_is_a_noop_the_second_time PASSED [ 66%]
+tests/code/test_corpus_exclusion.py::test_migrated_store_builds_correctly_end_to_end PASSED [100%]
+
+======================= 3 passed, 5 deselected in 0.17s ========================
+EXIT=0
