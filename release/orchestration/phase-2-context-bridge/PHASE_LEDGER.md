@@ -400,3 +400,29 @@ Plain `pytest tests -q` passes **325** tests on the merged tree.
 
 **This commit re-establishes the freeze.** Next, D1 is finalised against it by an incremental update of the
 demonstration store, followed by the demonstration itself.
+
+## BR-L-0016: the demonstration packet is compiled and not dispatched, because section G is empty; B6R2 is dispatched (2026-09-25)
+
+D1 was finalised on its own branch at the frozen view `fa25492`:
+
+* coverage across all 98 refs matches `git ls-tree --full-tree`, with 0 unclassified;
+* the demonstration store was brought to the tip. The update ran **FULL** (2,215 s), because the bridge's own code
+  tree changed;
+* the manifest now carries a real code layer: 233 blobs, 197,348 rows and 11 disclosed exclusions;
+* freshness is a NOOP (0.012 s);
+* the build manifest and telemetry are committed, which closes I1's gap.
+
+**The orchestrator then compiled the real demonstration packet itself.** `packet verify` PASSES, and every authority
+class is placed exactly. **Section G, code/test/enforcement surfaces, is empty.** §7.2 fills G from *seed symbols*,
+but the task seeds are records and nothing derives symbols from them. The query pass also calls the code route only
+for symbol-shaped tokens, and code-file hits are placed by class, which puts them in H. This is a generic compiler
+gap, and it sits exactly where the demonstration's code chains need context. So **the packet was not given to an
+agent**. It is preserved as `run-0-predispatch-g-empty` evidence, and a fresh bounded repair was dispatched: **B6R2,
+BR-AR-0015**. Its acceptance includes an **unrelated D-0006 control**, so the fix cannot be shaped around Review 8.
+
+**Two further gaps are recorded for the verifier rather than repaired:**
+
+* **OBS-BR-05:** the grader's G7 "≤ 1% of corpus" check is silently disabled. The rubric grader will compute it.
+* **OBS-BR-06:** queries write no supplementary packets. The agent saves its query outputs instead.
+
+**The freeze is lifted again.** It is re-established after B6R2.
