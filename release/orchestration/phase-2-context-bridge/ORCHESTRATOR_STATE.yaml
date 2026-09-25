@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T09:43:39Z'
-state_hash: 67f96f2ef18d682bc2544ce89d13d2134683ba0c660c32013116d9117b4516ab
+updated_at: '2026-09-25T10:18:52Z'
+state_hash: 782dade4ef644d3bada46146acf31989bf2562c098dd359082242edbe6e3e303
 lifecycle_state: BR_BUILD_PG0
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -278,10 +278,27 @@ agent_runs:
   branch: bridge/ta-0002
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0002
   model_requested: opus
-  model_observed: claude-opus-5-5 (transcript agent-a9df6619314f4a5ea.jsonl)
+  model_observed: claude-opus-5-5 (all 308 assistant turns, transcript agent-a9df6619314f4a5ea.jsonl)
   agent_name: br-test-author-0002
   dispatched_at: '2026-09-25T09:47Z'
-  status: RUNNING
+  duration_ms: 2096695
+  status: COMPLETED_INTEGRATED
+  final_commit: 53392945082053d4fefce51ed92412c10ac07bdd
+  integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+  orchestrator_verified:
+  - sealed oracle.yaml sha256 == DEMONSTRATION/oracle-commitment.yaml oracle_sha256 (3d80a5fd...7e4b)
+  - the sealed directory name appears nowhere in the branch diff
+  - of 695 oracle lines >= 50 chars, the only one found verbatim in the diff is the author-model metadata line
+  open_issues_routed:
+    OI-1: the sealed dir also holds .authoring/ (generator, contains oracle content); GRADE copies ONLY oracle.yaml
+    OI-2: the TA found places where code at 3c880d8 is more precise than or differs from the Review-8 return and
+      Phase-2 records; held in the sealed oracle; routed to the post-bridge synthesis (read the unsealed oracle with
+      the grading report)
+    OI-3: I1's `demo validate-oracle` must agree with check_oracle.py's stricter rules (lines on every code/test anchor;
+      record_id or section on line-less record/contract/evidence anchors; 40-hex commits; process/production keys
+      accepted only on both-ways consumer anchors) -- routed to the I1 brief
+    OI-4: expected sections for EVIDENCE and ORCHESTRATION_RECORD mandatory items were derived from ARCHITECTURE.md
+      sections 5.1/7.2 admissibility; reconcile resolver placement with that before grading -- routed to the I1 brief
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment.yaml
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/**
@@ -309,8 +326,6 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/core/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0003.*
 running_work:
-- run_id: BR-AR-0002
-  liveness_check: subagent transcript mtime + commits on bridge/ta-0002; never inferred from elapsed time
 - run_id: BR-AR-0003
   liveness_check: subagent transcript mtime + commits on bridge/b1-0003; never inferred from elapsed time
 dag:
@@ -333,6 +348,8 @@ sealed_oracle:
   secrecy_is: PROCEDURAL (every role runs as the same OS user), made DETECTIVE -- before grading the orchestrator greps
     every builder/integrator/DEMO subagent transcript for 'govbridge-sealed' and records the result in the GRADE gate;
     any hit invalidates the demonstration run
+  commitment_sha256: 3d80a5fda0724e380821f55e3e4e3980b0b53032a14d2ed188e83169888c7e4b
+  commitment_path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment.yaml
   integrity_is: CRYPTOGRAPHIC -- DEMONSTRATION/oracle-commitment.yaml (sha256) is merged before any DEMO run; the grader
     refuses an oracle whose sha256 differs
 checkpoints:

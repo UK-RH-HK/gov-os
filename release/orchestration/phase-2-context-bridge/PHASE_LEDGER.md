@@ -131,3 +131,28 @@ adoption-floor store that F3's union reads. The bridge reuses the engine's desig
 
 **Dispatched in parallel (PG0):** BR-AR-0002, the fresh test-author on opus, which writes the held-out oracle; and
 BR-AR-0003, builder B1 (core) on sonnet.
+
+## BR-L-0006: the held-out oracle is written and committed by hash (2026-09-25)
+
+**BR-AR-0002 returned COMPLETED.** The model was `claude-opus-5-5` on all 308 turns. The orchestrator ran
+`integrate-check` itself, and it was PERMITTED. It merged with a merge commit, because the bridge branch had moved.
+
+**What is sealed.** A 141 KB oracle sits in the sealed directory. It holds two 11-stage chains, each with exactly one
+enforcement point. It also holds the side-by-side, the F1 evidence both ways, the 30 query-class answers, the
+authority rows, the three generic controls, and 16 authority rows, one per `mandatory_bridge_inputs` item. The TA
+verified 458 anchors against their Git blobs: 458 OK. The oracle asserts facts only. It does not classify F2/F3 and
+does not dispose of F1.
+
+**What the orchestrator checked, rather than accepted:**
+
+* the sealed file's sha256 equals the committed commitment;
+* the sealed directory's name appears nowhere in the branch diff;
+* of 695 substantive oracle lines, the only one found verbatim in Git is the author-model metadata line.
+
+**Routed:**
+
+* OI-3 goes to I1. The grader's oracle validator must agree with the TA's stricter checker.
+* OI-4 goes to I1. Section placement for EVIDENCE and ORCHESTRATION_RECORD items must be reconciled before grading.
+* OI-1 goes to GRADE, which copies only `oracle.yaml`.
+* OI-2 goes to the post-bridge synthesis. The TA found places where the code at `3c880d8` is more precise than, or
+  differs from, the Review-8 return and the Phase-2 records. Those details stay sealed until grading.
