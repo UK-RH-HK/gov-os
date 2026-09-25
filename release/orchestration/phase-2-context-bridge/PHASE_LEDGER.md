@@ -57,3 +57,18 @@ and carries an explicit class:
 `check_state.py verify` now re-hashes these items. BR-HO-0001 makes them mandatory reading. It requires the
 architect's authority model to represent these exact classes, and a direction or hypothesis must be structurally
 incapable of entering packet section A. The demonstration's grading now fails any packet that blurs the classes.
+
+## BR-L-0003: the enforced pre-merge checkpoint is proven on synthetic branches (2026-09-25)
+
+`integrate-check` was run against four synthetic cases before any real run depended on it:
+
+* a conforming branch: **PERMITTED**;
+* a branch with a stray `runtime/` file and a tampered output: **REFUSED** on both counts;
+* a branch without its typed report: **REFUSED**;
+* a run whose declared scope lies outside the domain: **REFUSED**.
+
+The throwaway branches and worktree were removed. The script is `selftest_integrate.sh` in the session scratchpad; it
+is not committed.
+
+The test surfaced one defect, and it has been fixed. Empty domain directories were not tracked, so role worktrees
+had no `AGENT_RUNS/`. `.gitkeep` files now keep them.
