@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T09:42:53Z'
-state_hash: 32336548cd47b8d5aa5d6796e7325206d6bfd82aa244c16b9923352235cb9dd5
+updated_at: '2026-09-25T09:43:39Z'
+state_hash: 67f96f2ef18d682bc2544ce89d13d2134683ba0c660c32013116d9117b4516ab
 lifecycle_state: BR_BUILD_PG0
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -278,9 +278,10 @@ agent_runs:
   branch: bridge/ta-0002
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0002
   model_requested: opus
-  model_observed: null
+  model_observed: claude-opus-5-5 (transcript agent-a9df6619314f4a5ea.jsonl)
   agent_name: br-test-author-0002
-  status: DISPATCHED
+  dispatched_at: '2026-09-25T09:47Z'
+  status: RUNNING
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment.yaml
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/**
@@ -291,9 +292,10 @@ agent_runs:
   branch: bridge/b1-0003
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0003
   model_requested: sonnet
-  model_observed: null
+  model_observed: claude-sonnet-5 (transcript agent-a6ee18e5256969db1.jsonl)
   agent_name: br-builder-b1-0003
-  status: DISPATCHED
+  dispatched_at: '2026-09-25T09:47Z'
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0003
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/__init__.py
