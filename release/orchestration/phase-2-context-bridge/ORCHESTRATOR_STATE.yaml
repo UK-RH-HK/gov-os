@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T21:26:17Z'
-state_hash: 8889c7112e9d28fe53cd72094cde58028202bbb28910b34d3102b2e8acbccc29
-lifecycle_state: BR_REPAIR_SECTION_G
+updated_at: '2026-09-25T22:36:52Z'
+state_hash: 5cf8c15c17df32c2a3a64b4e242bb0e6f16b39a8f77b3013c67cb42f04322993
+lifecycle_state: BR_DEMONSTRATION_FROZEN_VIEW
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -668,7 +668,16 @@ agent_runs:
   model_observed: claude-sonnet-5 (530 assistant turns in pass 1, transcript agent-ac67f7b5f16f1151c.jsonl)
   agent_name: br-repair-b6r2-0015
   dispatched_at: '2026-09-25T20:12Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
+  final_commit: e15a955134374f231d789aff119f07478305ff8e
+  merged_at: 7d9563c
+  reopening_verified_by_orchestrator:
+  - integrate-check PERMITTED; validate.py zero diff across both passes; the only modified test is B6R2's own pass-1 test
+  - plain pytest on the merged tree -- 329 passed
+  - 'own real-view compile (store-BR-AR-0010, 88 s): packet.md 274,572 bytes (< 1% of corpus), manifest.json 417,036 bytes
+    (< 1 MB), packet verify PASS, section A unchanged, G 325 items; every Review-8-cited anchor present as the cited occurrence
+    plus its enclosing definition (init.rs:146, tools.rs:1817, policy_precedence.rs:911/940/786, cit/mod.rs:1623, paths.rs:1453)'
+  - model claude-sonnet-5, 795 assistant turns across both passes
   pass_1:
     final_commit: 109151bd36daacfd8cb2a21a94f477cecc28324c
     merged_into_bridge: yes (an intermediate, known-deficient state; nothing was dispatched from it)
@@ -691,8 +700,8 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.*
 running_work:
-- run_id: BR-AR-0015
-  liveness_check: subagent transcript mtime + commits on bridge/b6r2-0015; never inferred from elapsed time
+- run_id: BR-AR-0010
+  liveness_check: orchestrator-run D1 addendum -- store-BR-AR-0010 brought to the third frozen tip (FULL, ~37 min) on bridge/d1-0010
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -773,10 +782,9 @@ rulings:
     rows expecting an A-admissible mandatory item outside A are read as A and every affected row is reported; recorded
     before any demonstration run without the orchestrator reading the oracle; delivered live to I1
 demonstration_freeze:
-  status: LIFTED again (2026-09-25) before any demonstration agent was dispatched -- the run-0 packet compiled at fa25492
-    verified but had an EMPTY section G (seed symbols never derived from record seeds); BR-AR-0015 repairs it; the freeze
-    is re-established after it merges and store-BR-AR-0010 is brought to the new tip
-  frozen_bridge_tip: none (lifted)
+  status: IN FORCE from THIS commit (third freeze) -- re-established after BR-AR-0015 (section G) merged; no commits to
+    bridge/p2-context-retrieval until GRADE returns
+  frozen_bridge_tip: the commit introducing this line (resolve with `git log -1 --format=%H -S'IN FORCE from THIS commit (third freeze)' -- ORCHESTRATOR_STATE.yaml`)
   previous_frozen_tips: [cf7efe7 (pass-1 view, lifted -- lazy code layer), fa25492 (lifted -- empty section G)]
   rule: NO commits to bridge/p2-context-retrieval from this commit until GRADE (BR-AR-0012) returns -- the canonical view's
     records ref follows this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here
@@ -840,6 +848,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0015 (B6R2); verify (integrate-check, model, plain pytest, G non-empty on the real
-  demonstration task and on the D-0006 control, section A identical to run-0, invariant negative controls); merge; bring
-  store-BR-AR-0010 to the new tip; freshness NOOP; re-freeze; compile run-1 and dispatch DEMO
+next_deterministic_action: 'THIRD FROZEN VIEW: on bridge/d1-0010 merge this tip, `index update` store-BR-AR-0010 (FULL, bridge
+  code changed), freshness NOOP, coverage, commit INDEX manifest + telemetry + D1 addendum; on bridge/demo-0011 merge this tip,
+  compile run-1 (real routes), packet verify, commit, dispatch the fresh opus DEMO agent per HANDOFFS/BR-HO-0011; then GRADE'

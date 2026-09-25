@@ -426,3 +426,30 @@ BR-AR-0015**. Its acceptance includes an **unrelated D-0006 control**, so the fi
 * **OBS-BR-06:** queries write no supplementary packets. The agent saves its query outputs instead.
 
 **The freeze is lifted again.** It is re-established after B6R2.
+
+## BR-L-0017: B6R2 needed two passes; the demonstration packet now carries the enforcement points; third freeze (2026-09-25)
+
+**Pass 1** populated section G, and it passed its own checks. The orchestrator then compiled the real packet itself
+and found it unusable, for four reasons:
+
+* `packet.md` was **890 KB**, over 1% of the corpus. The G budget counted item content, not the ~300 bytes of
+  metadata per rendered item.
+* `manifest.json` was **6.1 MB**, above the 5 MB committed-file limit, because of drop records.
+* G held 1,947 fan-out items from unrelated files, while **the anchors that the seed record itself cites**
+  (`tools.rs:1817`, `policy_precedence.rs:911/940/786`) had been dropped by the budget.
+* A cited line was resolved to a heuristic call target instead of its own enclosing definition.
+
+That is the recurring failure in this programme: upstream noise crowding out the real decision point. B6R2 was
+reopened.
+
+**Pass 2** fixed all four, and one more defect it found itself. The orchestrator re-measured the real compile:
+
+* `packet.md` is **274,572 bytes** and `manifest.json` 417 KB;
+* `packet verify` PASSES and section A is unchanged;
+* G has 325 items, tiered with seed citations pinned first, so **every Review-8-cited anchor is present as the
+  cited line plus its enclosing definition**;
+* the compile takes 88 s, down from 8 minutes;
+* 329 tests pass, and `validate.py` was never touched.
+
+**The third freeze begins at this commit.** Next, the demonstration store is updated to this tip, and D1 records an
+addendum. Then `run-1` is compiled and a fresh demonstration agent is dispatched.
