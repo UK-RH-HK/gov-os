@@ -3,12 +3,9 @@ platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /home/usain/.cach
 cachedir: .pytest_cache
 rootdir: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0015/release/orchestration/phase-2-context-bridge
 plugins: anyio-4.15.1
-collecting ... collected 4 items
+collecting ... collected 1 item
 
-tests/compile/test_compile_code_route_seeds.py::test_record_seed_populates_g_with_enclosing_symbol_caller_tests_and_probe PASSED [ 25%]
-tests/compile/test_compile_code_route_seeds.py::test_lexical_code_hit_lands_in_g_not_h_and_noncode_hit_stays_in_h PASSED [ 50%]
-tests/compile/test_compile_code_route_seeds.py::test_hand_moved_g_item_fails_packet_verify PASSED [ 75%]
 tests/compile/test_compile_code_route_seeds.py::test_tiny_g_budget_keeps_all_t1_anchors_and_drops_expansion_first PASSED [100%]
 
-============================== 4 passed in 2.06s ===============================
+============================== 1 passed in 0.58s ===============================
 exit=0
