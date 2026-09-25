@@ -1,0 +1,21 @@
+schema: govbridge-schema/1
+describes: govbridge-receipt/1
+purpose: the worker's consumption receipt (Contract v3 W5); field names follow runtime/src/context/receipt.rs:7-17 at 3c880d8
+fields:
+  context_packet_hash: {type: sha256, required: true, desc: packet_sha256 of every packet used (list allowed)}
+  manifest_sha256: {type: sha256 or list, required: true}
+  read_tokens: {type: 'map section->token (per packet)', required: true}
+  inputs_consumed: {type: 'list of ID@content_sha256', required: true, desc: EVERY section-A item}
+  items_relied_on: {type: list of item_id, required: true}
+  external_reads: {type: 'list of {path, commit, lines, blob, why}', required: true, desc: empty list if none}
+  outputs_produced: {type: list, required: true}
+  decisions_applied: {type: list of record ids, required: false}
+  acceptance_evidence: {type: 'list of {test|check, result, evidence}', required: false}
+  deviations: {type: list, required: true}
+  unresolved: {type: list, required: true}
+checks (govbridge receipt check):
+- packet verify (ARCHITECTURE.md section 5.3 point 4) passes for every named packet
+- packet hash and every read token match
+- every section-A item acknowledged with its exact content_sha256
+- every cited item_id exists in a named packet
+- every external read resolves to a blob in the view; reports external_read_files and external_read_bytes

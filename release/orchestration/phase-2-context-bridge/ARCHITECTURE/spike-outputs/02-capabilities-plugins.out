@@ -1,0 +1,25 @@
+## capabilities/ tree identical at bridge base and frozen product?
+bfac295408771f18a3ab165561975aec4b21bdec
+bfac295408771f18a3ab165561975aec4b21bdec
+## hashed-ngram embed plugin (gov-capability/1)
+{"protocol": "gov-capability/1", "ok": true, "provider": {"id": "hashed-ngram-python", "version": "1"}, "request_id": null, "outputs": {"vectors": [[0.0, 0.0, 0.910579, 0.118771, 0.0, 0.0, 0.0, -0.395904], [0.0, 0.0, 0.76752, 0.0, 0.0, -0.333704, 0.333704, 0.433816]], "dim": 8}}
+## sentence-transformers embed plugin
+{"protocol": "gov-capability/1", "ok": false, "provider": {"id": "st-embed", "version": "1"}, "error": {"code": "MODEL_UNAVAILABLE", "message": "sentence-transformers not installed: No module named 'sentence_transformers'"}}
+## python AST code_intel plugin on a rust file? (capability check)
+205:# gov-capability/1 plugin entry point (capability: code_intel, language: python)
+210:    if inputs.get("language", "python") != "python":
+211:        raise ValueError("python-ast plugin handles language=python only")
+## importable ML runtimes
+torch: no
+onnxruntime: no
+sentence_transformers: no
+fastembed: no
+tokenizers: no
+model2vec: no
+transformers: no
+## venv/pip/uv
+venv module: yes
+pip 24.0
+pip 24.0 from /usr/lib/python3/dist-packages/pip (python 3.12)
+uv: absent
+/usr/bin/pipx

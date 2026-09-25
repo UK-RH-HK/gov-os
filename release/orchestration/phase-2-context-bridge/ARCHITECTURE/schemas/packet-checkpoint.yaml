@@ -1,0 +1,18 @@
+schema: govbridge-schema/1
+describes: govbridge-packet-checkpoint/1
+purpose: renewal without re-reading (Contract v3 W9); consumed by govbridge renew
+fields:
+  run_id: {type: string, required: true}
+  packet_id: {type: string, required: true}
+  manifest_sha256: {type: sha256, required: true}
+  view_commits: {type: 'map name->commit', required: true}
+  build_manifest_sha256: {type: sha256, required: true}
+  read_tokens: {type: map, required: true}
+  items_relied_on: {type: list, required: true}
+  done: {type: list, required: true}
+  open_questions: {type: list, required: true}
+  next_action: {type: string, required: true}
+renew_outcomes:
+  RENEW_NOOP: view, build and task spec unchanged -> same packet id; no model call, no re-read
+  RENEW_DELTA: 'delta packet = added/changed items + removed ids; changed A items re-delivered in full; unchanged A items by reference (id + sha256)'
+  RENEW_BLOCKED: a mandatory input is now missing or mismatched

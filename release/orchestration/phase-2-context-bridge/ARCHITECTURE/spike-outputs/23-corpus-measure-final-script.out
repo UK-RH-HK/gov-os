@@ -1,0 +1,97 @@
+{
+ "refs": {
+  "3c880d8": {
+   "by_rule_files": {
+    "INCLUDED": 6489,
+    "M-LARGE(metadata-only)": 6,
+    "X-BINARY": 5,
+    "X-SEC-CONTENT": 65,
+    "X-SEC-PATH": 2
+   },
+   "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "files_total": 6567,
+   "included_bytes": 75388702,
+   "included_files": 6489
+  },
+  "58219d5": {
+   "by_rule_files": {
+    "INCLUDED": 6494,
+    "M-LARGE(metadata-only)": 6,
+    "X-BINARY": 5,
+    "X-SEC-CONTENT": 65,
+    "X-SEC-PATH": 2
+   },
+   "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+   "files_total": 6572,
+   "included_bytes": 75436594,
+   "included_files": 6494
+  },
+  "6e7a2a3": {
+   "by_rule_files": {
+    "INCLUDED": 6507,
+    "M-LARGE(metadata-only)": 6,
+    "X-BINARY": 5,
+    "X-SEC-CONTENT": 65,
+    "X-SEC-PATH": 2
+   },
+   "commit": "6e7a2a3495a8d3619759a95b7ed055da9c848618",
+   "files_total": 6585,
+   "included_bytes": 74339472,
+   "included_files": 6507
+  }
+ },
+ "rules": {
+  "build": [
+   "target/**",
+   "**/target/**",
+   ".claude/worktrees/**",
+   "**/__pycache__/**",
+   "**/*.pyc",
+   "**/.pytest_cache/**",
+   "**/.governance-runtime/**",
+   "build/**",
+   "dist/**",
+   "**/*.egg-info/**",
+   "release/evidence/tmp/**"
+  ],
+  "max_text_bytes": 1048576,
+  "secret_content": [
+   "aws-access-key",
+   "aws-secret-key",
+   "generic-api-key",
+   "github-token",
+   "jwt",
+   "password-assignment",
+   "private-key-block",
+   "slack-token",
+   "stripe-like-key"
+  ],
+  "secret_path": [
+   "**/.env",
+   "**/.env.*",
+   "**/*.pem",
+   "**/*.key",
+   "**/id_rsa*",
+   "**/secrets/**",
+   "**/*secret*.yaml",
+   "**/*secret*.yml",
+   "**/*secret*.json",
+   "**/*credentials*",
+   "**/*.env",
+   "**/.secrets/**",
+   "**/deepseek*.env"
+  ]
+ },
+ "tips": {
+  "glob": "refs/heads/phase2/*",
+  "new_blobs_vs_measured_refs": 825,
+  "new_bytes_vs_measured_refs": 53267855,
+  "refs": 95,
+  "unique_blobs_all_paths": 6548,
+  "unique_bytes_all_paths": 129348524
+ },
+ "union_of_included_unique_blobs": {
+  "blobs": 5787,
+  "bytes": 77275503
+ }
+}

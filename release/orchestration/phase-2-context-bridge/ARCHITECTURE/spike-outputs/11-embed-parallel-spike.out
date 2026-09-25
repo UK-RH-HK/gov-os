@@ -1,0 +1,9 @@
+nproc=20
+ 10:05:42 up 7 days, 12:03,  0 user,  load average: 10.06, 9.04, 6.60
+{"shard": 2, "of": 5, "threads": 4, "chunks": 200, "embed_s": 31.58, "sha256": "92e3372617a31b6b667edc884f5741b1f43cb85c5eaccf54836ce4afeb6b33ca"}
+{"shard": 1, "of": 5, "threads": 4, "chunks": 200, "embed_s": 32.02, "sha256": "d1225452069d66ff98ef932d865412fb7841193081eaf39f18a0069fa33f6988"}
+{"shard": 0, "of": 5, "threads": 4, "chunks": 200, "embed_s": 32.57, "sha256": "1c475aa21461bc2e02218727fb329a315dc15c1b9ce7b4a710342cedc152f116"}
+{"shard": 3, "of": 5, "threads": 4, "chunks": 200, "embed_s": 34.4, "sha256": "7edbb5ec02ae5fb1571eb9127d20636c32c85d974a2b28e8bb732dd8566c9f5e"}
+{"shard": 4, "of": 5, "threads": 4, "chunks": 200, "embed_s": 35.16, "sha256": "8b10b285808bf76aaea7c88b65b0c5593720e54d2bfaca105579659325b0cb06"}
+wall_s 36.12 chunks_per_s_total 27.7
+ 10:06:18 up 7 days, 12:03,  0 user,  load average: 14.83, 10.39, 7.15

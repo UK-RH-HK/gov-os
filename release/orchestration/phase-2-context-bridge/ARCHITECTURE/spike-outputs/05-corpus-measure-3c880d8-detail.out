@@ -1,0 +1,358 @@
+{
+ "refs": {
+  "3c880d8": {
+   "by_rule_bytes": {
+    "INCLUDED": 75388702,
+    "M-LARGE(metadata-only)": 26301434,
+    "X-BINARY": 2492317,
+    "X-SEC-CONTENT": 1245538,
+    "X-SEC-PATH": 270
+   },
+   "by_rule_files": {
+    "INCLUDED": 6489,
+    "M-LARGE(metadata-only)": 6,
+    "X-BINARY": 5,
+    "X-SEC-CONTENT": 65,
+    "X-SEC-PATH": 2
+   },
+   "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+   "est_chunks_at_1080_stride": 69805,
+   "excluded_examples": {
+    "M-LARGE(metadata-only)": [
+     "release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/matrix-rows.jsonl",
+     "release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-writing-rows-rot1-layouts.json",
+     "release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-rows.jsonl.gz",
+     "release/root-of-trust/4.1.6/evidence/P3r3-pre-rot-register-matrix.json",
+     "release/root-of-trust/4.1.6/evidence/r6/CS6-derivation-calculator.json",
+     "release/root-of-trust/4.1.6/evidence/r7/CS7-derivation-calculator.json"
+    ],
+    "X-BINARY": [
+     "release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-writing-rows.json.gz",
+     "release/root-of-trust/4.1.6-review-r7/C-compat-transaction/evidence/outputs/matrix7-writing-rows.json.gz",
+     "release/root-of-trust/4.1.6/evidence/r6/CS6-results.json.gz",
+     "release/root-of-trust/4.1.6/evidence/r6/LAY6/matrix6-writing-rows-rot1-layouts.json.gz",
+     "release/root-of-trust/4.1.6/evidence/r7/CS7-results.json.gz"
+    ],
+    "X-SEC-CONTENT": [
+     "fixtures/brownfield/project/memory/chat_history.sql  [stripe-like-key]",
+     "fixtures/brownfield/project/src/app/config.py  [generic-api-key]",
+     "fixtures/upstream-learning/lessons/L-0003.yaml  [aws-access-key]",
+     "release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.py  [private-key-block]",
+     "release/capability-baseline/audit-0/epsilon-r/evidence/O2-governance-families.sh  [aws-access-key]"
+    ],
+    "X-SEC-PATH": [
+     "fixtures/brownfield/project/.env  [**/.env]",
+     "fixtures/brownfield/project/config/secrets.yaml  [**/*secret*.yaml]"
+    ]
+   },
+   "excluded_paths": {
+    "M-LARGE(metadata-only)": [
+     "release/root-of-trust/4.1.6-review-r4/C-compat-transaction/evidence/matrix-rows.jsonl",
+     "release/root-of-trust/4.1.6-review-r5/C-compat-transaction/evidence/outputs/matrix5-writing-rows-rot1-layouts.json",
+     "release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-rows.jsonl.gz",
+     "release/root-of-trust/4.1.6/evidence/P3r3-pre-rot-register-matrix.json",
+     "release/root-of-trust/4.1.6/evidence/r6/CS6-derivation-calculator.json",
+     "release/root-of-trust/4.1.6/evidence/r7/CS7-derivation-calculator.json"
+    ],
+    "X-BINARY": [
+     "release/root-of-trust/4.1.6-review-r6/C-compat-transaction/evidence/outputs/matrix6-writing-rows.json.gz",
+     "release/root-of-trust/4.1.6-review-r7/C-compat-transaction/evidence/outputs/matrix7-writing-rows.json.gz",
+     "release/root-of-trust/4.1.6/evidence/r6/CS6-results.json.gz",
+     "release/root-of-trust/4.1.6/evidence/r6/LAY6/matrix6-writing-rows-rot1-layouts.json.gz",
+     "release/root-of-trust/4.1.6/evidence/r7/CS7-results.json.gz"
+    ],
+    "X-SEC-CONTENT": [
+     "fixtures/brownfield/project/memory/chat_history.sql  [stripe-like-key]",
+     "fixtures/brownfield/project/src/app/config.py  [generic-api-key]",
+     "fixtures/upstream-learning/lessons/L-0003.yaml  [aws-access-key]",
+     "release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/audit-0/alpha-r/evidence/A3-security-sensitivity.py  [private-key-block]",
+     "release/capability-baseline/audit-0/epsilon-r/evidence/O2-governance-families.sh  [aws-access-key]",
+     "release/capability-baseline/audit-0/epsilon-r/evidence/O5-scheduler-requirements.sh  [aws-access-key]",
+     "release/capability-baseline/audit-0/epsilon-r/evidence/O5-tiers-G1-G6.sh  [aws-access-key]",
+     "release/capability-baseline/audit-0/epsilon-r/evidence/U-slos-and-healthy.sh  [aws-access-key]",
+     "release/capability-baseline/audit-0/gamma-r/evidence/I3-generation.sh  [aws-access-key]",
+     "release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/R2-ws0911-named-checks.root-channel.P2-AR-0032.py  [aws-access-key]",
+     "release/capability-baseline/repair-1/integration-2/evidence/builder-probes/derived/WS02-r2-supplementary.fixtures.P2-AR-0032.py  [aws-access-key]",
+     "release/capability-baseline/repair-1/integration-2/evidence/secret-literal/check-secret-literal.sh  [aws-access-key]",
+     "release/capability-baseline/repair-1/integration-3/evidence/builder-probes/derived/ws04r3_observe.claim-time.P2-AR-0041.rs  [aws-access-key]",
+     "release/capability-baseline/repair-1/integration/evidence/derived-B-ws0911-regression-probes.owner-channel.P2-AR-0022.py.txt  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws02/evidence/WS02-r2-supplementary.py  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws04/evidence/after/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws04/evidence/after/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws04/evidence/before/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws04/evidence/before/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/base-843d79c-shim/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/base-843d79c-shim/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/final-371794a-prereg/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/final-371794a-prereg/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/final-371794a-shim/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws07/evidence/cross-family/final-371794a-shim/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws08/00-REPAIR-REPORT.md  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws09-11/evidence/probes/R2-ws0911-named-checks.py  [aws-access-key]",
+     "release/capability-baseline/repair-1/r2-ws09-11/evidence/probes/derived/derived-B-ws0911-regression-probes.owner-channel.reviewer-tests.P2-AR-0030.py.txt  [aws-access-key]",
+     "release/capability-baseline/repair-1/r3-ws02/evidence/after-shim/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r3-ws02/evidence/after-shim/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r3-ws02/evidence/before-shim/alpha-r.A3-security-sensitivity.out  [aws-access-key]",
+     "release/capability-baseline/repair-1/r3-ws02/evidence/before-shim/alpha-r.A3-security-sensitivity.out.shimlog  [aws-access-key]",
+     "release/capability-baseline/repair-1/r3-ws04/evidence/probes/ws04r3_observe.rs  [aws-access-key]",
+     "release/capability-baseline/repair-1/r4-ws01/evidence/owner-faults/planted-faults.py  [aws-access-key]",
+     "release/capability-baseline/repair-1/ws02/evidence/supplementary/WS02-supplementary.py  [aws-access-key]",
+     "release/capability-baseline/repair-1/ws09-11/evidence/B-ws0911-regression-probes.py  [aws-access-key]",
+     "release/capability-baseline/verify-1/alpha/heldout/t03_gate_a.py  [aws-access-key]",
+     "release/capability-baseline/verify-1/alpha/heldout/t06_gate_b_contract_freshness.py  [github-token]",
+     "release/capability-baseline/verify-1/epsilon/heldout/t06_gate_q.py  [aws-access-key]",
+     "release/capability-baseline/verify-1/epsilon/heldout/t08_o2_detection.py  [aws-access-key]",
+     "release/root-of-trust/4.1.6-review-r2/evidence/P1-floor-coverage.py  [aws-access-key]",
+     "release/root-of-trust/4.1.6-review-r3/B-trust-security/evidence/r2rerun-P1-floor-coverage.py  [aws-access-key]",
+     "release/root-of-trust/4.1.6-review-r5/B-trust-security/evidence/probes/RV5-B-A09-floor-class-kernels.py  [aws-access-key]",
+     "release/root-of-trust/4.1.6/evidence/P1r3-floor-coverage.py  [aws-access-key]",
+     "release/verification/4.1.2/heldout/harness.py  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new-rerun-4.1.4/results.json  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new-rerun-4.1.4/run-full.log  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new-rerun-4.1.5/results.json  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new-rerun-4.1.5/run-full.log  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new/harness_v2.py  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new/results.json  [aws-access-key]",
+     "release/verification/4.1.3/heldout-new/run-full.log  [aws-access-key]",
+     "release/verification/4.1.4/heldout-v3/harness_v3.py  [aws-access-key]",
+     "release/verification/4.1.4/prev-harness-reruns/second-4.1.3/results.json  [aws-access-key]",
+     "release/verification/4.1.4/prev-harness-reruns/second-4.1.3/run-full.log  [aws-access-key]",
+     "release/verification/4.1.5/evidence/harness-v2-run.log  [aws-access-key]",
+     "runtime/src/security/secrets.rs  [aws-access-key]",
+     "tests/certification/brownfield.rs  [aws-access-key]",
+     "tests/certification/failure_injection.rs  [aws-access-key]",
+     "tests/certification/r4_residual.rs  [aws-access-key]",
+     "tests/certification/repair.rs  [aws-access-key]",
+     "tests/certification/upstream.rs  [aws-access-key]",
+     "tests/certification/ws04r3.rs  [aws-access-key]",
+     "tests/certification/ws05r3.rs  [aws-access-key]"
+    ],
+    "X-SEC-PATH": [
+     "fixtures/brownfield/project/.env  [**/.env]",
+     "fixtures/brownfield/project/config/secrets.yaml  [**/*secret*.yaml]"
+    ]
+   },
+   "files_total": 6567,
+   "included_by_top_dir": {
+    "(root)": [
+     8,
+     181842
+    ],
+    "bin": [
+     1,
+     413
+    ],
+    "capabilities": [
+     9,
+     31650
+    ],
+    "change-proposals": [
+     1,
+     478
+    ],
+    "cli": [
+     2,
+     121147
+    ],
+    "docs": [
+     7,
+     639080
+    ],
+    "fixtures": [
+     168,
+     218189
+    ],
+    "framework": [
+     123,
+     680904
+    ],
+    "lessons": [
+     1,
+     572
+    ],
+    "migrations": [
+     6,
+     20758
+    ],
+    "probes": [
+     27,
+     658547
+    ],
+    "release": [
+     5908,
+     66001388
+    ],
+    "runtime": [
+     124,
+     4655657
+    ],
+    "scripts": [
+     1,
+     6472
+    ],
+    "spec": [
+     43,
+     154879
+    ],
+    "telemetry": [
+     3,
+     38075
+    ],
+    "tests": [
+     54,
+     1968796
+    ],
+    "tools": [
+     3,
+     9855
+    ]
+   },
+   "included_bytes": 75388702,
+   "included_bytes_by_extension": {
+    "(none)": 22305,
+    "c": 3535,
+    "cursorrules": 251,
+    "diff": 958275,
+    "gitignore": 321,
+    "html": 406483,
+    "json": 12672852,
+    "jsonl": 23313,
+    "lock": 44383,
+    "log": 373529,
+    "md": 8084782,
+    "out": 27638374,
+    "patch": 1809,
+    "py": 5569853,
+    "rs": 6608294,
+    "sh": 1389485,
+    "shimlog": 1143953,
+    "stderr": 191,
+    "summary": 10418,
+    "toml": 3822,
+    "ts": 580,
+    "tsv": 52293,
+    "txt": 2096743,
+    "yaml": 8282858
+   },
+   "included_files": 6489,
+   "included_lines": 1288847,
+   "included_top_extensions": [
+    [
+     "out",
+     2177
+    ],
+    [
+     "json",
+     952
+    ],
+    [
+     "shimlog",
+     733
+    ],
+    [
+     "yaml",
+     690
+    ],
+    [
+     "md",
+     548
+    ],
+    [
+     "py",
+     482
+    ],
+    [
+     "sh",
+     257
+    ],
+    [
+     "rs",
+     207
+    ],
+    [
+     "txt",
+     196
+    ],
+    [
+     "diff",
+     81
+    ],
+    [
+     "log",
+     60
+    ],
+    [
+     "stderr",
+     41
+    ],
+    [
+     "tsv",
+     18
+    ],
+    [
+     "(none)",
+     8
+    ],
+    [
+     "c",
+     8
+    ]
+   ],
+   "secret_content_hits": {
+    "aws-access-key": 61,
+    "generic-api-key": 1,
+    "github-token": 1,
+    "private-key-block": 1,
+    "stripe-like-key": 1
+   }
+  }
+ },
+ "rules": {
+  "build": [
+   "target/**",
+   "**/target/**",
+   ".claude/worktrees/**",
+   "**/__pycache__/**",
+   "**/*.pyc",
+   "**/.pytest_cache/**",
+   "**/.governance-runtime/**",
+   "build/**",
+   "dist/**",
+   "**/*.egg-info/**",
+   "release/evidence/tmp/**"
+  ],
+  "max_text_bytes": 1048576,
+  "secret_content": [
+   "aws-access-key",
+   "aws-secret-key",
+   "generic-api-key",
+   "github-token",
+   "jwt",
+   "password-assignment",
+   "private-key-block",
+   "slack-token",
+   "stripe-like-key"
+  ],
+  "secret_path": [
+   "**/.env",
+   "**/.env.*",
+   "**/*.pem",
+   "**/*.key",
+   "**/id_rsa*",
+   "**/secrets/**",
+   "**/*secret*.yaml",
+   "**/*secret*.yml",
+   "**/*secret*.json",
+   "**/*credentials*",
+   "**/*.env",
+   "**/.secrets/**",
+   "**/deepseek*.env"
+  ]
+ },
+ "union_of_included_unique_blobs": {
+  "blobs": 5602,
+  "bytes": 73247517
+ }
+}

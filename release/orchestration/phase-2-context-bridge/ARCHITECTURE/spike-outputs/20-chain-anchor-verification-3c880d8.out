@@ -1,0 +1,79 @@
+== runtime/src/init.rs:90,90
+pub fn native_layout_rules(root: &Path) -> Vec<Value> {
+== runtime/src/init.rs:146,146
+        rules.push(json!({"pattern": format!("{d}/**"), "class": if is_test { "test" } else { "source" }, "owner_role": if is_test { "independent-test-designer" } else { "backend-engineer" }, "semanti
+== runtime/src/init.rs:162,162
+    let native = native_layout_rules(root);
+== runtime/src/init.rs:329,329
+            let unioned = crate::paths::union_last_known_rules_across_store(&adoption_floor);
+== runtime/src/policy.rs:117,121
+impl PolicySet {
+    /// Load the effective policy for a repository. Constitutional content is read only from a kernel that has been
+    /// authenticated against the installed release identity (`kernel_trust`); when verification fails the immutable
+    /// payload embedded in this binary is substituted explicitly and the substitution is recorded (verifier V-H2).
+    pub fn load(root: &Path, overlay: &Overlay, schemas: &SchemaRegistry) -> Self {
+== runtime/src/policy.rs:486,488
+        let mut floor_rules = adoption_floor.rules.clone();
+        if floor_rules.is_empty() {
+            let mut reconstructed = crate::init::native_layout_rules(root);
+== runtime/src/policy.rs:540,546
+        }
+        let paths_kernel = {
+            let mut arr = repository_contract_kernel("paths")
+                .and_then(|v| v.as_array().cloned())
+                .unwrap_or_default();
+            arr.extend(floor_rules.clone());
+            (!arr.is_empty()).then(|| json!(arr))
+== runtime/src/policy.rs:549,549
+            Some(_) => crate::policy_precedence::evaluate_path_rules_overlay(
+== runtime/src/paths.rs:1453,1453
+pub fn union_last_known_rules_across_store(fresh: &[Value]) -> Vec<Value> {
+== runtime/src/paths.rs:1467,1467
+    paths.sort();
+== runtime/src/adopt.rs:1806,1806
+                let unioned = crate::paths::union_last_known_rules_across_store(&adoption_floor);
+== runtime/src/policy_precedence.rs:786,786
+pub fn evaluate_path_rules_overlay(
+== runtime/src/policy_precedence.rs:911,911
+            effective.push(krule.clone()); // restored last, so it wins any pattern match over what precedes it
+== runtime/src/policy_precedence.rs:940,940
+pub fn partition_floor_rules_against_kernel(
+== runtime/src/cit/mod.rs:1623,1623
+                crate::policy_precedence::partition_floor_rules_against_kernel(&kernel_paths, &rules);
+== runtime/src/paths.rs:1786,1789
+    /// Ordered rules; later rules override earlier ones. A `secret` classification can never be downgraded. The
+    /// kernel's classification of the OS's own non-rebuildable stores ([`OS_STORES`]) is applied after the
+    /// overlay's rules, so the overlay cannot classify them derived or generated (BC-P2-31).
+    pub fn decide(&self, path: &str) -> PathDecision {
+== runtime/src/tools.rs:1599,1599
+pub fn installation_authority(
+== runtime/src/tools.rs:1808,1808
+                let d = p.contract().decide(&c);
+== runtime/src/tools.rs:1817,1822
+                } else if !matches!(d.str("mutation").as_str(), "allowed" | "") {
+                    findings.push(finding(
+                        "broader_filesystem_or_project_access",
+                        format!("the installation reaches '{c}', whose mutation the path map records as '{}'", d.str("mutation")),
+                        at.clone(),
+                        "REPOSITORY_CONTRACT.yaml (the path map)".into(),
+== runtime/src/tools.rs:1972,1975
+fn change_decision(p: &Project, prep: &PreparedInstall, op: Option<&Value>) -> Value {
+    let pol = p.policies();
+    let rule = pol.get("CHANGE_POLICY", "change_classes.tool_installation");
+    let envelope = installation_authority(p, &prep.descriptor, &prep.role, &prep.dest_rel(), op);
+== runtime/src/project.rs:145,147
+            .get_or_init(|| PolicySet::load(&self.root, self.overlay(), self.schemas()))
+    }
+    pub fn contract(&self) -> &RepositoryContract {
+== runtime/src/paths.rs:657,657
+fn is_health_sandbox_root(state_root: &Path, root: &Path) -> bool {
+== runtime/src/paths.rs:672,672
+    creator_is_alive(&rec)
+== runtime/src/paths.rs:682,682
+fn process_start_time(pid: u32) -> Option<u64> {
+== runtime/src/paths.rs:733,735
+fn creator_is_alive(rec: &SandboxRecord) -> bool {
+    process_start_time(rec.creator_pid) == Some(rec.creator_start_time)
+}
+== only caller of partition_floor_rules_against_kernel (non-definition hits)
+3c880d8:runtime/src/cit/mod.rs:1623:                crate::policy_precedence::partition_floor_rules_against_kernel(&kernel_paths, &rules);

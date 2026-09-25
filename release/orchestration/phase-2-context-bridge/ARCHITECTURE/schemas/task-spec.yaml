@@ -1,0 +1,26 @@
+schema: govbridge-schema/1
+describes: govbridge-task-spec/1
+purpose: the input to resolve/compile/bootstrap; field names follow the product's W3 manifest (runtime/src/context/manifest.rs:7-24 at 3c880d8)
+fields:
+  schema: {type: const, value: govbridge-task-spec/1, required: true}
+  task_id: {type: string, required: true}
+  role: {type: string, required: true}
+  objective: {type: string, required: true}
+  view: {type: path, required: true, desc: canonical-view file (ARCHITECTURE.md section 1.2)}
+  required_inputs:
+    type: list
+    required: true
+    item_one_of:
+      id_form: {id: record id, reason: string, required_status: 'lifecycle, default ACTIVE', content_hash: 'sha256, optional'}
+      state_form: {state_ref: 'state:<alias>#<yaml key path>[*]', reason: string}
+      path_form: {path: 'path@ref[:L1-L2]', reason: string, content_hash: 'sha256, optional'}
+    rule: resolved ONLY by govbridge.authority.resolver; missing, or hash mismatch => BLOCKED (W3/W4)
+  seeds: {type: list, required: false, desc: 'record ids, record-local ids (ID#local), symbols or paths the graph starts from'}
+  queries: {type: 'path | list', required: false, desc: '[{id, text, routes?, target_section?}] or a queries file'}
+  supplementary_context: {type: list, required: false, desc: 'ids or paths delivered to H as RETRIEVED, never authority'}
+  retrieval_exclusions: {type: list of globs, required: false, desc: 'applied to every route (not to the resolver); recorded in the manifest'}
+  mutation_scope: {type: list of globs, required: true, desc: rendered verbatim in section I}
+  prohibitions: {type: list, required: true}
+  required_checks: {type: list, required: true, desc: rendered in section J}
+  completion_vocabulary: {type: list, required: true}
+  budget_profile: {type: 'enum: bounded-builder | synthesis | <name in config/budgets.yaml>', required: true}

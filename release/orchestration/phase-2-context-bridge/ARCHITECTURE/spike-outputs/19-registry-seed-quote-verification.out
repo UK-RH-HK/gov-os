@@ -1,0 +1,16 @@
+VERIFIED release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md:9
+VERIFIED release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml:70
+VERIFIED release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md:43
+VERIFIED release/orchestration/phase-2/V8_3_EVIDENCE_PACKAGE.md:253
+VERIFIED release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md:177
+VERIFIED release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md:6
+## OD-P2-10A/B section headings (anchors)
+11:## OD-P2-10A — F2 is NOT scope expansion
+25:## OD-P2-10B — the Review-8 failure bridge is authorised and starts now
+38:## F1 — owner direction recorded, NOT yet authority to act
+59:## F2 / F3 — classification hypothesis, NOT yet a final owner decision
+69:## Property A
+74:## Standing state after this record
+## phase-2 state key lines
+1569:orchestrator_error_f3:
+1579:triggered_rules:

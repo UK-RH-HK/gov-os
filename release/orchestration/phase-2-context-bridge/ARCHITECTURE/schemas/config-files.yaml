@@ -1,0 +1,33 @@
+schema: govbridge-schema/1
+describes: the versioned configuration files under release/orchestration/phase-2-context-bridge/config/
+rule: every file's sha256 is recorded in each build manifest; changing one triggers the invalidation in ARCHITECTURE.md section 3
+files:
+  corpus-rules.yaml:
+    owner_node: B1
+    content: 'rules [{id, effect: EXCLUDE|METADATA_ONLY|NO_DEFAULT_RETRIEVAL|LEXICAL_ONLY, match: {globs | content_regex | binary | size_gt | kinds}, source_cite}]'
+    semantics: monotone -- any matching EXCLUDE excludes; order never changes the outcome; repository paths are subjects,
+      never interpolated into a pattern
+    seed: ARCHITECTURE.md section 1.1 table (X-SEC-PATH, X-SEC-CONTENT, X-BUILD, X-SELF, X-BINARY, M-LARGE, M-ARCHIVE, L-MACHINE-OUTPUT)
+  canonical-view.yaml:
+    owner_node: B1
+    content: ARCHITECTURE.md section 1.2 (refs with name/ref|ref_glob/follow/pinned_commit/role/layers; partitions with
+      paths|paths_from, owner, fallback)
+  id-grammar.yaml:
+    owner_node: B5
+    content: 'patterns [{name, regex, local: bool}], definition_rules [{kind: yaml_id|yaml_list_id|md_table_id|md_heading_id|md_heading_names_id_with_severity|ledger_heading|file_stem, pattern}]'
+    seed: ARCHITECTURE/spike-scripts/id_census.py GRAMMAR (SO-17), extended with the finding-heading and register-list rules
+  authority-registry.yaml:
+    owner_node: B5
+    content: schemas/authority-registry.yaml
+  embed-profile.yaml:
+    owner_node: B4
+    content: 'embed_kinds [md, txt, html, yaml, yml, toml, rs, py, sh, json<=64KiB]; lexical_only_kinds [out, log, shimlog, stderr, diff, patch, tsv, jsonl, summary, json>64KiB]; history_role_embedded: false'
+  budgets.yaml:
+    owner_node: B6
+    content: 'profiles {bounded-builder: {total_kb: 100, ...}, synthesis: {total_kb: 360, B: 16, C: 40, D: 40, E: 24, F: 40, G: 120, H: 40, I: 12, J: 12, item_cap_kb: 24}}; A is never capped (ARCHITECTURE.md section 5.3 point 6)'
+  model-pin.yaml:
+    owner_node: B1
+    content: SEMANTIC_ROUTE.md section 2 table (model id, revision, artefact paths + sha256, runtime versions, session options, pooling, query prefix)
+  requirements.lock:
+    owner_node: B1
+    content: 'pip requirements with --hash=sha256:... for every wheel in SO-07 plus pytest; installed with --require-hashes --no-deps'

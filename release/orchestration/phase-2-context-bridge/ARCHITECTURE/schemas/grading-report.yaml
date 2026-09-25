@@ -1,0 +1,19 @@
+schema: govbridge-schema/1
+describes: govbridge-grading-report/1
+purpose: the typed result of grading one demonstration run (DEMONSTRATION_DESIGN.md section 4)
+fields:
+  run_id: string
+  oracle: '{path, sha256, commitment_sha256, match: bool}'
+  deterministic_grader: '{command, exit_code, output_sha256}'
+  rubric_grader: '{run_id, model_observed}'
+  gates:
+    G1_packet_validity: '{result: PASS|FAIL, packets: [{packet_id, verify: PASS|FAIL, reasons}]}'
+    G2_receipt: '{result, reasons}'
+    G3_authority_classes: '{result, packet_side: [..], answer_side: [{rule, quote, verdict}]}'
+    G4_chains: '{result, chains: [{query_id, result, stages: [{stage, grade: REACHED|UPSTREAM_ONLY|MISSING|WRONG, matched_anchor, must_state: [{fact, present: bool, quote}]}]}], side_by_side: {..}}'
+    G5_query_classes: '{result, per_query: [{query_id, recall, forbidden_hits, must_state_ok}], per_class: {QC1..QC10: PASS|FAIL}}'
+    G6_f1_both_ways: '{result, purpose_hit: bool, consumer_recall, decision_stated: bool}'
+    G7_no_dumping: '{result, corpus_bytes, packet_bytes, external_read_files, external_read_bytes, undeclared_reads, sweep_commands, context_efficiency}'
+    G8_controls: '{result, per_query: [..]}'
+  verdict: 'DEMONSTRATION_PASS | DEMONSTRATION_FAIL'
+  note: builder-level evidence toward P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT; never the acceptance token

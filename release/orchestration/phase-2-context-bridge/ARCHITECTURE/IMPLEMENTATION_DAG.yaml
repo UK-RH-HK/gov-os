@@ -1,0 +1,369 @@
+schema: govbridge-implementation-dag/1
+run_id: BR-AR-0001
+reads_with: ARCHITECTURE.md (sections cited per node), REUSE_VS_BUILD.yaml, SEMANTIC_ROUTE.md, DEMONSTRATION_DESIGN.md, schemas/*.yaml
+conventions:
+  domain: release/orchestration/phase-2-context-bridge
+  paths: every mutation_scope glob below is relative to the repository root and lies inside the domain
+  run_records: the orchestrator appends release/orchestration/phase-2-context-bridge/AGENT_RUNS/<RUN_ID>.* to each node's
+    mutation_scope at dispatch (typed report + checkpoint, BR-HO-TEMPLATE-builder.md)
+  python: PY=$HOME/.cache/gov-bridge/venv/bin/python (created by B1's bootstrap); D=release/orchestration/phase-2-context-bridge;
+    every command runs from the repository root of the node's worktree with PYTHONPATH=$D
+  generic_rule: no bridge code may special-case Review 8, F1-F6, Phase 2 or particular file names (OC-BR-02); Review-8
+    names appear only in acceptance data, demonstration queries, oracle fixtures and their tests
+  tests: never --test-threads=1; never pipe without set -o pipefail; every wait bounded with a timeout action
+  size_limit: no committed file over 5 MB; indexes, venvs and models live under $HOME/.cache/gov-bridge/
+build_node_count: 7
+build_node_count_rationale: B1-B6 + I1. The split follows the component boundaries of ARCHITECTURE.md sections 1-9 so that
+  B2/B3/B4/B5 run in parallel with disjoint scopes against B1's store; B6 needs B5's resolver/classes; I1 wires and
+  proves the whole. Fewer nodes would put two L-sized components in one builder; more would split a component.
+parallel_groups:
+  PG0: [TA, B1]
+  PG1: [B2, B3, B4, B5]
+  PG2: [B6]
+  PG3: [I1]
+  PG4: [D1]
+  PG5: [DEMO]
+  PG6: [GRADE]
+nodes:
+- id: TA
+  title: held-out oracle author (fresh test-author)
+  capabilities: [demonstration oracle]
+  depends_on: []
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment.yaml
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/**
+  deliverables:
+  - the oracle file, written OUTSIDE every worktree in the orchestrator-created 0700 directory (never committed before grading)
+  - DEMONSTRATION/oracle-commitment.yaml {oracle_sha256, author_run, author_model, written_at, schema govbridge-oracle/1}
+  - DEMONSTRATION/oracle-tools/check_oracle.py (structural check against ARCHITECTURE/schemas/oracle.yaml)
+  acceptance_checks:
+  - cmd: python3 $D/DEMONSTRATION/oracle-tools/check_oracle.py <sealed oracle path>
+    expect: exit 0; every chain has the 11 stages in order and exactly one is_enforcement_point; one
+      authority_expectations row per mandatory_bridge_inputs item; every anchor has kind/commit/path
+  - cmd: sha256sum <sealed oracle path>
+    expect: equals oracle-commitment.yaml oracle_sha256
+  - cmd: for every code anchor, git show <commit>:<path> | sed -n <lines>p (logged in the checkpoint)
+    expect: non-empty and matching the anchor's symbol where given
+  routing: opus
+  size: M
+  parallel_group: PG0
+  notes: never sees builder branches or demonstration answers; asserts facts and anchors only, never a classification of
+    F2/F3 or a disposition of F1 (DEMONSTRATION_DESIGN.md section 5)
+- id: B1
+  title: core -- Git object access, canonical view, corpus rules and coverage, content-addressed store, chunking, exact
+    route, freshness, build manifest, telemetry writer, pinned bootstrap
+  capabilities:
+  - exact retrieval
+  - provenance (occurrence/blob/chunk identity)
+  - rebuild/freshness telemetry (change detection, build manifest, telemetry rows)
+  - whole-repository corpus rules + coverage
+  - canonical ref model (version status)
+  depends_on: []
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/__init__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/**
+  - release/orchestration/phase-2-context-bridge/config/corpus-rules.yaml
+  - release/orchestration/phase-2-context-bridge/config/canonical-view.yaml
+  - release/orchestration/phase-2-context-bridge/config/model-pin.yaml
+  - release/orchestration/phase-2-context-bridge/config/requirements.lock
+  - release/orchestration/phase-2-context-bridge/bootstrap/**
+  - release/orchestration/phase-2-context-bridge/tests/core/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/core/**
+  deliverables:
+  - govbridge/core/{gitobj,view,corpus,store,chunking,exact,freshness,manifest,telemetry}.py (ARCHITECTURE.md sections 1, 2, 3, 4.2, 8)
+  - a layer-registration API so B2/B3/B4/B5 add their tables and digests to the build manifest without editing core
+  - config/corpus-rules.yaml (section 1.1, every rule citing its source), config/canonical-view.yaml (section 1.2)
+  - config/model-pin.yaml and config/requirements.lock (SEMANTIC_ROUTE.md section 2 values; every wheel of SO-07 plus pytest, hash-pinned)
+  - bootstrap/bootstrap.sh (SEMANTIC_ROUTE.md section 5.1)
+  acceptance_checks:
+  - cmd: bash $D/bootstrap/bootstrap.sh && bash $D/bootstrap/bootstrap.sh
+    expect: both exit 0; the second run downloads nothing; the final line prints python 3.12.x, onnxruntime 1.30.0,
+      tokenizers 0.23.2, tree-sitter 0.25.2 and the pin id; a tampered model byte makes it exit non-zero
+  - cmd: cd $D && $PY -m pytest tests/core -q
+    expect: exit 0
+  - cmd: $PY -m govbridge.core.corpus coverage --view $D/config/canonical-view.yaml --json /tmp/cov.json
+    expect: for every view ref, files_total equals `git ls-tree -r <commit> | wc -l`; unclassified == 0; at 3c880d8 the
+      outcome counts equal SO-05 (INCLUDED 6489, X-SEC-CONTENT 65, X-SEC-PATH 2, X-BINARY 5, M-LARGE 6) unless a
+      difference is documented with its cited source rule
+  - cmd: $PY -m govbridge.core.freshness update && $PY -m govbridge.core.freshness update
+    expect: the second run reports trigger NOOP, blobs_processed 0, llm_invocations 0, wall < 2 s
+  - cmd: $PY -m govbridge.core.exact show 3c880d8:runtime/src/init.rs:146
+    expect: the line's bytes, and blob == `git rev-parse 3c880d8:runtime/src/init.rs`; version_status CANONICAL (product partition)
+  - cmd: $PY -m govbridge.core.exact show 3c880d8:release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
+    expect: version_status HISTORICAL_VERSION (the records partition owns that path and its blob differs)
+  - cmd: git diff --name-only <base> HEAD | xargs -r du -b | awk '$1>5242880'
+    expect: empty
+  routing: sonnet
+  size: L
+  parallel_group: PG0
+- id: B2
+  title: lexical route (SQLite FTS5)
+  capabilities: [lexical retrieval]
+  depends_on: [B1]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/lexical/**
+  - release/orchestration/phase-2-context-bridge/tests/lexical/**
+  deliverables:
+  - govbridge/lexical/{fts,query}.py -- FTS5 over B1 chunks, tokenize "porter unicode61 tokenchars '_'", BM25,
+    retrieval_exclusions, results as RetrievedItem with occurrence(s) + version status (ARCHITECTURE.md section 4.3)
+  - the lexical layer digest registered in the build manifest
+  acceptance_checks:
+  - cmd: cd $D && $PY -m pytest tests/lexical -q
+    expect: exit 0
+  - cmd: $PY -m govbridge.lexical.query '"partition_floor_rules_against_kernel"' --json
+    expect: a hit whose occurrences include (3c880d8, runtime/src/cit/mod.rs) with line range covering 1623; latency < 100 ms
+  - cmd: $PY -m govbridge.lexical.query '"secret_content_patterns"' --exclude 'framework/**' --json
+    expect: no result under framework/ (retrieval_exclusions honoured)
+  - cmd: $PY -m govbridge.core.freshness rebuild --layer lexical --from-clean (twice)
+    expect: identical lexical layer digest
+  routing: sonnet
+  size: S
+  parallel_group: PG1
+- id: B3
+  title: code route -- tree-sitter Rust code_intel adapter, reused Python AST plugin, symbol/call/literal tables, labelled
+    resolution, lazy per-commit symbol history
+  capabilities: [code/symbol/reference retrieval]
+  depends_on: [B1]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/code/**
+  - release/orchestration/phase-2-context-bridge/tests/code/**
+  deliverables:
+  - govbridge/code/adapters/rust_treesitter.py (gov-capability/1 code_intel; symbols, calls, literals, parse_errors)
+  - govbridge/code/adapters/python_ast.py (runs capabilities/python/govos_capabilities/code_intel_python_ast.py from its
+    blob at the records commit, unmodified; records that blob id)
+  - govbridge/code/{symbols,resolve,history}.py with the resolution labels of ARCHITECTURE.md section 4.6 and READS_KEY facts
+  acceptance_checks:
+  - cmd: cd $D && $PY -m pytest tests/code -q
+    expect: exit 0, including a synthetic fixture crate proving each label (EXACT_PATH, HEURISTIC_*, MACRO, UNRESOLVED_EXTERNAL)
+      and that an ambiguous call never yields a single chosen target
+  - cmd: $PY -m govbridge.code.symbols stats --commit 3c880d8 --json
+    expect: rs_files == `git ls-tree -r --name-only 3c880d8 | grep -c '\.rs$'`; definitions >= 5000; every file with
+      ERROR nodes listed with spans (SO-13 lists 10)
+  - cmd: $PY -m govbridge.code.symbols callers partition_floor_rules_against_kernel --commit 3c880d8 --json
+    expect: exactly one call site, runtime/src/cit/mod.rs:1623, label EXACT_PATH
+  - cmd: $PY -m govbridge.code.symbols callers union_last_known_rules_across_store --commit 3c880d8 --json
+    expect: exactly runtime/src/init.rs:329 and runtime/src/adopt.rs:1806
+  - cmd: $PY -m govbridge.code.symbols reads-key mutation --commit 3c880d8 --json
+    expect: includes runtime/src/tools.rs:1817 inside installation_authority
+  - cmd: $PY -m govbridge.code.symbols callers resolve_state_root --commit 3c880d8 --json
+    expect: non-empty; every row labelled; none unlabelled (control on an unrelated subsystem)
+  - cmd: $PY -m govbridge.code.history deleted --from 92982ff --to 3c880d8 --json
+    expect: includes reanchor_project_identity (DELETED_IN 3c880d8, derivation EXACT_PARSE)
+  routing: sonnet
+  size: M
+  parallel_group: PG1
+- id: B4
+  title: semantic route -- gov-capability/1 ONNX embed adapter (ADAPT), vector store, embed profile
+  capabilities: [semantic/vector retrieval on the existing replaceable architecture]
+  depends_on: [B1]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/**
+  - release/orchestration/phase-2-context-bridge/config/embed-profile.yaml
+  - release/orchestration/phase-2-context-bridge/tests/semantic/**
+  deliverables:
+  - govbridge/semantic/adapters/onnx_embed.py -- ADAPT of capabilities/python/govos_capabilities/embed_sentence_transformers.py@6e7a2a3
+    (provenance recorded in its header), request/response per plugin.py, fail-closed codes, mode query|passage
+  - govbridge/semantic/{vectors,search,profile}.py; config/embed-profile.yaml (SEMANTIC_ROUTE.md section 3)
+  - the semantic manifest block of SEMANTIC_ROUTE.md section 4
+  acceptance_checks:
+  - cmd: cd $D && $PY -m pytest tests/semantic -q
+    expect: exit 0, including protocol conformance (PROTOCOL_MISMATCH, CAPABILITY_MISMATCH, MODEL_UNAVAILABLE with the
+      model dir moved aside, DIMENSION_MISMATCH, PIN_MISMATCH) and the hashed-ngram plugin used only as a test double
+  - cmd: $PY -m govbridge.semantic.vectors determinism --sample 50 (run twice in separate processes, and once with --threads 4)
+    expect: identical vectors digest in all runs; batch-1 digest == batch-32 digest
+  - cmd: $PY -m govbridge.core.freshness rebuild --layer semantic
+    expect: vector status BUILT; no chunk of an L-MACHINE-OUTPUT kind embedded; throughput and seconds recorded in the
+      build telemetry row
+  - cmd: $PY -m govbridge.semantic.search 'how is a checkpoint made mandatory for a worker' --json
+    expect: results carry authority_class, lifecycle and version_status; delivery RETRIEVED
+  routing: sonnet
+  size: M
+  parallel_group: PG1
+- id: B5
+  title: authority and graph -- record extraction, id grammar, authority/lifecycle classifier, cited registry,
+    mandatory-input resolver, structured state lookup, graph derivation/traversal, WHY chain, history profile
+  capabilities:
+  - deterministic mandatory-authoritative-input resolver
+  - structured current-state lookup
+  - authority filtering (classes, registry)
+  - lifecycle current-vs-superseded filtering
+  - provenance (record identity, W1)
+  - dependency/impact graph traversal
+  - system-purpose chain
+  - historical lesson/failure retrieval
+  depends_on: [B1]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/**
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/**
+  - release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+  - release/orchestration/phase-2-context-bridge/config/authority-registry.yaml
+  - release/orchestration/phase-2-context-bridge/tests/authority/**
+  - release/orchestration/phase-2-context-bridge/tests/graph/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/authority/**
+  deliverables:
+  - govbridge/authority/{classes,records,registry,lifecycle,resolver,state}.py (ARCHITECTURE.md sections 2, 4.1, 5)
+  - govbridge/graph/{edges,derive,traverse,why,history}.py (ARCHITECTURE.md section 6); code-derived edges built against
+    B3's table schema (section 4.6) and tested on fixtures here, on real data in I1
+  - config/id-grammar.yaml; config/authority-registry.yaml seeded from schemas/authority-registry.yaml (re-verified)
+  acceptance_checks:
+  - cmd: cd $D && $PY -m pytest tests/authority tests/graph -q
+    expect: exit 0, including -- the class table equals ORCHESTRATOR_STATE.yaml mandatory_bridge_inputs.authority_classes
+      plus the ladder; a registry entry whose quote does not match fails the build; resolver.py and lifecycle.py import
+      nothing from lexical/semantic/code/graph/route (ast check)
+  - cmd: $PY -m govbridge.authority.resolver $D/ARCHITECTURE/demonstration-task.yaml --json
+    expect: status OK; every mandatory_bridge_inputs item, owner record and the contract resolved with sha256 equal to
+      the state's recorded sha256; the six OD-P2-10A/B items resolve to six distinct heading sections; lines 1-10 of that
+      file are UNCLASSIFIED (section-scoped); a fixture with a wrong sha256 gives BLOCKED
+  - cmd: $PY -m govbridge.authority.lifecycle show D-0001 D-0008 OA-P2-06 V8.1 CP-1 DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP --json
+    expect: D-0001 SUPERSEDED (by D-0002, EXACT_METADATA); D-0008 PROPOSED; OA-P2-06 ACTIVE with a scoped SUPERSEDES note
+      (stop condition, REGISTRY_CITED); V8.1 HISTORICAL; CP-1 HISTORICAL; the withdrawn item EVIDENCE_WITHDRAWN/WITHDRAWN
+  - cmd: $PY -m govbridge.authority.records census --json
+    expect: definitions resolve for >= 95% of mentioned run/handoff/ledger/owner-record IDs (SO-17 baseline); finding
+      IDs defined by severity headings (for example AR94-C1 in probes/P2-AR-0094/P2-AR-0094-REVIEW.md at 3c880d8);
+      fixtures never supply a definition; dangling IDs listed
+  - cmd: $PY -m govbridge.authority.state get phase-2 running_work --json
+    expect: value plus (path, commit, blob, lines), seal status, and the last commit that changed those lines
+  - cmd: $PY -m govbridge.graph.why D-0006 --json
+    expect: stages in the owner's order, every hop with its edge label and citation, MISSING printed for absent stages
+      (a subject unrelated to Review 8)
+  routing: sonnet
+  size: L
+  parallel_group: PG1
+- id: B6
+  title: route and compile -- router/fusion, context compiler A-J, budgets, manifest, packet hash, independent
+    validator, receipt checker, checkpoint/renewal, canonical worker bootstrap (ADAPT)
+  capabilities:
+  - bounded context compiler (A-J)
+  - exact context manifest with IDs/versions/hashes
+  - context-packet provenance/hash
+  - worker consumption receipt
+  - checkpoint/renewal support
+  - canonical worker bootstrap
+  - authority filtering (validator, ordering invariant)
+  depends_on: [B1, B5]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/route/**
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/**
+  - release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  - release/orchestration/phase-2-context-bridge/tests/compile/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/**
+  deliverables:
+  - govbridge/route/router.py (deterministic route selection, RRF k=60 within (section, authority stratum), dedupe)
+  - govbridge/compile/{packet,budgets,render,manifest,validate,receipt,renewal,bootstrap}.py (ARCHITECTURE.md sections 5.3, 7)
+  - compile/bootstrap.py as an ADAPT of release/orchestration/phase-2/tools/worker_bootstrap.py@6e7a2a3 (provenance in its header)
+  - routes consumed through the interfaces of ARCHITECTURE.md section 9, with in-test fakes (the real routes arrive in I1)
+  acceptance_checks:
+  - cmd: cd $D && $PY -m pytest tests/compile -q
+    expect: exit 0, including test_semantic_trap, test_retrieved_cannot_enter_a, test_outage_a_identical,
+      test_budget_pressure, test_mandatory_bridge_inputs_classes (fixture view), test_section_scoping, receipt pass/fail
+      fixtures, RENEW_NOOP and RENEW_DELTA fixtures
+  - cmd: $PY -m govbridge.compile.packet $D/ARCHITECTURE/demonstration-task.yaml --fake-routes (run twice)
+    expect: byte-identical packet and equal packet_sha256; A equals the resolver output; D has D.1/D.2/D.3 with the
+      exact banners; every section records its queries, items and drops
+  - cmd: $PY -m govbridge.compile.bootstrap $D/ARCHITECTURE/demonstration-task.yaml | grep -c 'cap2-candidate-1\|GATE-P2-REPAIR-2'
+    expect: 0 (no hard-coded state); the "where you are" block cites a state lookup with provenance
+  routing: sonnet
+  size: L
+  parallel_group: PG2
+- id: I1
+  title: integration -- CLI, real routes wired into the compiler, demo tooling (grader, oracle validator, transcript read
+    extraction ADAPT), reproducibility and equivalence proofs, committed manifest and telemetry
+  capabilities:
+  - rebuild/freshness telemetry (committed rows)
+  - integration of every capability above on the real view
+  depends_on: [B2, B3, B4, B6]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - release/orchestration/phase-2-context-bridge/govbridge/__main__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/demo/**
+  - release/orchestration/phase-2-context-bridge/tests/integration/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/integration/**
+  - release/orchestration/phase-2-context-bridge/INDEX/**
+  - release/orchestration/phase-2-context-bridge/telemetry/index/builds.jsonl
+  - release/orchestration/phase-2-context-bridge/telemetry/index/packets.jsonl
+  - release/orchestration/phase-2-context-bridge/telemetry/index/receipts.jsonl
+  deliverables:
+  - python -m govbridge {index update|rebuild, coverage, freshness, exact, state, search, why, impact, history, resolve,
+    compile, packet verify, receipt check, renew, bootstrap, demo grade|validate-oracle|extract-reads}
+  - govbridge/demo/extract_reads.py -- ADAPT of release/orchestration/phase-2/tools/telemetry_context_extract.py@6e7a2a3
+    categorisation (hard-coded session/run ids removed)
+  - INDEX/manifests/<view_id>.json; telemetry/index/{builds,packets,receipts}.jsonl rows from the integration runs
+  acceptance_checks:
+  - cmd: cd $D && $PY -m pytest tests -q
+    expect: exit 0 (every node's tests plus integration)
+  - cmd: $PY -m govbridge index rebuild --from-clean && $PY -m govbridge index rebuild --from-clean
+    expect: identical manifest_sha256 (MEMORY_POLICY.rebuild.must_reproduce_manifest_hash)
+  - cmd: $PY -m govbridge index rebuild --from-clean --records-ref <earlier bridge commit> then index update to the current view
+    expect: manifest_sha256 equals a from-clean build at the current view (incremental == full)
+  - cmd: $PY -m govbridge freshness
+    expect: NOOP, wall < 2 s, llm_invocations 0
+  - cmd: $PY -m govbridge compile $D/ARCHITECTURE/demonstration-task.yaml --out /tmp/p && $PY -m govbridge packet verify /tmp/p
+    expect: status OK; verify PASS; on the REAL view every mandatory_bridge_inputs item sits in its expected section with
+      its exact class and banner (ARCHITECTURE.md section 5.3 test list)
+  - cmd: move the index store aside, compile again, compare section A
+    expect: section A byte-identical (W10 outage)
+  - cmd: $PY -m govbridge demo grade --oracle tests/fixtures/integration/oracle-synthetic.yaml --answers <fixtures>
+    expect: a passing fixture grades DEMONSTRATION_PASS; fixtures for UPSTREAM_ONLY, each G3 hard fail and G7 undeclared
+      reads each grade DEMONSTRATION_FAIL with the right gate named
+  - cmd: python3 $D/tools/check_state.py verify (run by the orchestrator on the integrated branch)
+    expect: STATE_CONSISTENT (mutation boundary intact)
+  routing: sonnet
+  size: L
+  parallel_group: PG3
+- id: D1
+  title: corpus coverage and index-cost measurement (whole repository)
+  capabilities: [whole-repository corpus rules + coverage (measurement), rebuild/freshness telemetry (cost)]
+  depends_on: [I1]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/COVERAGE/**
+  - release/orchestration/phase-2-context-bridge/telemetry/index/coverage.jsonl
+  deliverables:
+  - COVERAGE/<view_id>.json -- per view ref, files included, files excluded by rule (with paths), unclassified; bytes,
+    chunks, symbols, vectors; per-layer build seconds; store bytes
+  acceptance_checks:
+  - cmd: $PY -m govbridge coverage --view $D/config/canonical-view.yaml --json $D/COVERAGE/<view_id>.json
+    expect: unclassified == 0; for every ref, included + excluded == `git ls-tree -r <commit> | wc -l` (the whole
+      repository, never a subset); every excluded path carries a rule id; file < 5 MB
+  - cmd: $PY -m govbridge index rebuild --from-clean --timings
+    expect: per-layer seconds and bytes recorded in telemetry/index/coverage.jsonl; llm_invocations 0
+  routing: deterministic
+  size: S
+  parallel_group: PG4
+- id: DEMO
+  title: fresh-agent Review-8 demonstration run
+  capabilities: [demonstration]
+  depends_on: [I1, D1, TA]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-*/**
+  deliverables:
+  - DEMONSTRATION/run-<n>/{bootstrap.md, packet/*, supplementary/*, answers.yaml, receipt.yaml, reads.json}
+  acceptance_checks:
+  - cmd: $PY -m govbridge receipt check --packet DEMONSTRATION/run-<n>/packet --receipt DEMONSTRATION/run-<n>/receipt.yaml
+    expect: PASS (the agent's own obligation; grading is GRADE's)
+  - cmd: schema check of answers.yaml against ARCHITECTURE/schemas/answers.yaml
+    expect: valid; side-by-side classification == NOT_DETERMINED_BY_BRIDGE; both-ways disposition == NONE_STATED
+  routing: opus
+  size: M
+  parallel_group: PG5
+  notes: preconditions and protocol in DEMONSTRATION_DESIGN.md section 2; the agent is not a builder, not the test-author,
+    and has no prior chat
+- id: GRADE
+  title: grading of the demonstration against the held-out oracle
+  capabilities: [demonstration grading]
+  depends_on: [DEMO, TA]
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle/**
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/grading/**
+  deliverables:
+  - DEMONSTRATION/oracle/oracle.yaml (copied in only now) and DEMONSTRATION/grading/<run>.yaml (schemas/grading-report.yaml)
+  acceptance_checks:
+  - cmd: sha256sum DEMONSTRATION/oracle/oracle.yaml
+    expect: equals DEMONSTRATION/oracle-commitment.yaml oracle_sha256
+  - cmd: $PY -m govbridge demo validate-oracle DEMONSTRATION/oracle/oracle.yaml && $PY -m govbridge demo grade --oracle
+      DEMONSTRATION/oracle/oracle.yaml --run DEMONSTRATION/run-<n>
+    expect: exit 0; a grading report with G1-G8 and a verdict; rubric items judged by a fresh opus grader and quoted
+  routing: opus
+  size: S
+  parallel_group: PG6
+  notes: the deterministic part runs as a script; the rubric part is a fresh opus role that did not build, author the
+    oracle or answer the demonstration

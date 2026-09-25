@@ -1,0 +1,20 @@
+## runtime tree per ref (6e7a2a3 == cap2-candidate-1 0bad524; 3c880d8 differs)
+0bad524 runtime=974ea126228ca6b7f6dffacfc781cf2202bbcb6a
+6e7a2a3 runtime=974ea126228ca6b7f6dffacfc781cf2202bbcb6a
+3c880d8 runtime=cda71d7c8862a7811ecb9ac06d56fb9c050f66e2
+58219d5 runtime=cda71d7c8862a7811ecb9ac06d56fb9c050f66e2
+## top-level dirs present only at product/evidence refs
+6e7a2a3:probes absent
+3c880d8:probes present
+58219d5:probes present
+6e7a2a3:telemetry absent
+3c880d8:telemetry present
+58219d5:telemetry present
+## stale copy of phase-2 records inside the product ref
+6e7a2a3 release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml=314605ba5ae0e0881bc4b7ac6c5f38c3ac4786b1
+3c880d8 release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml=136e825a81c7f0c83eaf718bba8a63f8f1442632
+## Review-8 probes only at 58219d5
+3c880d8 ar97_probe.rs absent
+58219d5 ar97_probe.rs present
+## phase2/* tips
+95

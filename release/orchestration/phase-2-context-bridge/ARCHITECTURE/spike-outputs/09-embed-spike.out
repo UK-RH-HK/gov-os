@@ -1,0 +1,19 @@
+## 1_Pooling/config.json
+{
+  "word_embedding_dimension": 384,
+  "pooling_mode_cls_token": true,
+  "pooling_mode_mean_tokens": false,
+  "pooling_mode_max_tokens": false,
+  "pooling_mode_mean_sqrt_len_tokens": false
+}
+## run A: 3000 chunks @3c880d8, 16 threads, with 3-query smoke check
+{"onnxruntime": "1.30.0", "threads": 16, "chunks": 3000, "chars": 3392238, "dim": 384, "load_chunks_s": 0.37, "load_model_s": 0.24, "embed_s": 203.68, "chunks_per_s": 14.7, "vectors_sha256_float32": "4c138e5a6790d0a63e41bdc6db05af1ca38fd76fdfb331cc2102258ada1c7f6c", "vectors_sha256_rounded6": "74f025a28cbba2472fa3c81da042b35d085a4b029dc17f141f2b14de12807e30"}
+{"query": "why does the sandbox exemption exist and who consumes it", "top3": [["probes/P2-AR-0094/P2-AR-0094-REVIEW.md", 29160, 0.6572], ["probes/P2-AR-0092/P2-AR-0092-REVIEW.md", 28080, 0.6531], ["probes/P2-AR-0092/P2-AR-0092-REVIEW.md", 29160, 0.6412]]}
+{"query": "which rule wins when two path rules match the same file", "top3": [["release/capability-baseline/audit-0/beta-r/findings.yaml", 28080, 0.7236], ["probes/P2-AR-0090/P2-AR-0090-REVIEW.md", 21600, 0.7201], ["framework/policies/POLICY_PRECEDENCE.yaml", 11880, 0.7186]]}
+{"query": "how is a checkpoint made mandatory for a worker", "top3": [["fixtures/update/previous-release/4.1.1/policies/CHECKPOINT_POLICY.yaml", 0, 0.7458], ["framework/policies/CHECKPOINT_POLICY.yaml", 0, 0.7256], ["release/capability-baseline/audit-0/delta-r/findings.yaml", 50760, 0.7251]]}
+## run B: same inputs, fresh process, 16 threads
+{"onnxruntime": "1.30.0", "threads": 16, "chunks": 3000, "chars": 3392238, "dim": 384, "load_chunks_s": 0.35, "load_model_s": 0.22, "embed_s": 205.56, "chunks_per_s": 14.6, "vectors_sha256_float32": "4c138e5a6790d0a63e41bdc6db05af1ca38fd76fdfb331cc2102258ada1c7f6c", "vectors_sha256_rounded6": "74f025a28cbba2472fa3c81da042b35d085a4b029dc17f141f2b14de12807e30"}
+## run C: same inputs, 4 threads
+{"onnxruntime": "1.30.0", "threads": 4, "chunks": 3000, "chars": 3392238, "dim": 384, "load_chunks_s": 0.38, "load_model_s": 0.2, "embed_s": 273.44, "chunks_per_s": 11.0, "vectors_sha256_float32": "4c138e5a6790d0a63e41bdc6db05af1ca38fd76fdfb331cc2102258ada1c7f6c", "vectors_sha256_rounded6": "74f025a28cbba2472fa3c81da042b35d085a4b029dc17f141f2b14de12807e30"}
+## max abs diff A-C
+0.0 True

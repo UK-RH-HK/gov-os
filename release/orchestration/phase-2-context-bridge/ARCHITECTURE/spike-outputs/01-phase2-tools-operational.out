@@ -1,0 +1,27 @@
+## worker_bootstrap.py on a recorded spec (writes only to scratch)
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/034abd76-0719-4661-bb46-b56141b90a16/scratchpad/wb-test.md: 22515 chars (~5628 tokens)
+5:## Where you are
+8:Current candidate `cap2-candidate-1` (0bad524) — **rejected** by the iteration-1 independent verification; this repair iteration exists to close what it found.
+9:Active gate: `GATE-P2-REPAIR-2`. Acceptance is decided later by fresh independent verifiers against the frozen gate contract — never by a repair worker, and never by this orchestration tooling.
+## product_identity.py 3c880d8
+commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+product_code_digest: f6b1b8867d3b929d2cfde187e6ac9eb6933c2deecb5575125ec12bb9c293d8ef
+governed_state_digest: 8c8ebe02da0926151a4bfc1f3a4437c31f2315c10255da3ad4a56ad451b6935d
+## phase-2 check_state.py show (read-only)
+phase 2 (GOVERNANCE CAPABILITY BASELINE)  target GOVERNANCE_CAPABILITY_BASELINE_ACCEPTED
+lifecycle PHASE_2_PRODUCT_FROZEN_AWAITING_BRIDGE  loop STOPPED_BY_OWNER  updated 2026-09-24T16:17:10Z
+branch release/4.1.6-rc1  last_recorded 0bad524d836f179964ffbac31972856ea6434682
+candidate cap2-candidate-1 0bad524d836f179964ffbac31972856ea6434682 tag cap2-candidate-1
+iteration 2  consecutive_new_class_iterations 1
+owner gates pending []
+running P2-AR-0092 sixth independent adversarial review -- fitness to mint RUNNING -> None
+gate GATE-P2-ENTRY                        SATISFIED
+gate GATE-P2-FROZEN-CONTRACT              SATISFIED
+gate GATE-P2-BASELINE-AUDIT-0             SATISFIED
+gate GATE-P2-ORACLE-FORMAT                SATISFIED
+gate GATE-P2-R1-PRESERVATION              SATISFIED_FOR_CANDIDATE_1 (P2-AR-0044, verification iteration 1: R1_PRESERVED; evidence release/capability-baseline/verify-1/r1-preservation/)
+## telemetry_context_extract.py input dir exists?
+/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/tasks
+## prep_packet.py writes into release/orchestration/phase-2/packets (not run; code read)
+58:    json.dump(spec, open(sp, "w"), indent=1)
+93:    json.dump(pkt, open(os.path.join(PK, f"{a.key}.json"), "w"), indent=1)
