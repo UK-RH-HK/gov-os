@@ -1,5 +1,5 @@
 run_id: BR-AR-0011
-commit: PENDING
+commit: 813fa8afd1cca19e2ba3d3b46cb4dd18d860735a
 commands:
 - cmd: govbridge packet verify DEMONSTRATION/run-1/packet (orchestrator, before dispatch)
   exit_code: 0

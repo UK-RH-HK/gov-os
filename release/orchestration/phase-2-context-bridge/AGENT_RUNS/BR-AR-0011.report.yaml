@@ -3,7 +3,7 @@ role: 'fresh-agent Review-8 demonstration (run-1): packet compiled/verified by t
   orchestrator'
 model_observed: demonstration agent br-demo-0011 -- claude-opus-5-5 (210/210 turns); orchestrator steps -- claude-opus-5-5
 branch: bridge/demo-0011
-commit: PENDING
+commit: 813fa8afd1cca19e2ba3d3b46cb4dd18d860735a
 status: COMPLETED
 claims:
 - 'run-1 packet compiled at frozen tip 94d0211 against store-BR-AR-0010: packet_sha256 b5126140...2019, packet verify PASS, packet.md 274,798
