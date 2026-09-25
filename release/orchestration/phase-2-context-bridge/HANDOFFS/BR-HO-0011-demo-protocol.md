@@ -36,7 +36,9 @@ test-author, not a grader, and you have no prior conversation.
 Your inputs are ONLY: the bootstrap text above; the compiled context packet at <PACKET_DIR> (read its manifest first);
 and these `python -m govbridge` query commands, run from <WORKTREE>/release/orchestration/phase-2-context-bridge with
 PYTHONPATH=. and GOVBRIDGE_STORE=<STORE>: search, why, impact, history, exact, state. Every query command writes a
-supplementary packet; keep them under <RUN_DIR>/supplementary/.
+supplementary output: save EACH command's full stdout to
+<RUN_DIR>/supplementary/queries/NN-<command>.json and append the exact command line to
+<RUN_DIR>/supplementary/queries/INDEX.md (these outputs count toward your context size, OBS-BR-06).
 
 You MAY read files directly, but you MUST declare every such read in receipt.yaml `external_reads` (path, commit,
 blob). Undeclared reads fail the run. Keep direct reads few and targeted.
@@ -61,3 +63,10 @@ receipt until it passes. Commit both files on your branch. End with your commit 
 ```
 
 ## 4. Grading (GRADE, run BR-AR-0012) follows this file's §2.6 and HANDOFFS/BR-HO-0012-grade.md
+
+## 5. Adaptations recorded before any run (OBS-BR-06, run-0)
+* The query commands write no supplementary *packets*. Their outputs are saved under `supplementary/queries/`, the
+  receipt names only the main packet, and G7 counts the saved outputs' bytes as packet bytes. That count is done by
+  the rubric grader, because of OBS-BR-05.
+* `run-0-predispatch-g-empty` was compiled and **never dispatched**. The demonstration run is `run-1`, compiled after
+  BR-AR-0015.

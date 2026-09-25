@@ -28,9 +28,15 @@
 3. **Rubric grading.** Apply every **[R]** item yourself: `must_state` facts; no decision stated for F1; no F2/F3
    classification; no withdrawn finding cited as a finding; no reasoning-error passage offered as evidence. **Each
    rubric item is binary, and you must quote the answer text you judged.**
-4. **The orchestrator's secrecy-check result** is in your dispatch message. If it reports a hit, the verdict is
+4. **G7 packet-size check, computed by you (OBS-BR-05).** `govbridge demo grade` never applies the "packet bytes ≤ 1% of
+   corpus" condition: `grade_g7` requires `budget_bytes`, which `grade()` always passes as `None`. Compute it yourself:
+   take `main packet.md` plus every file under `run-<n>/supplementary/queries/`, and compare the total with 1% of
+   corpus bytes. Corpus bytes come from the committed build manifest's coverage for the three named refs; report the
+   figure you used and where it came from. Report this condition's result separately from the deterministic G7
+   result. Name OBS-BR-05 in the grading report.
+5. **The orchestrator's secrecy-check result** is in your dispatch message. If it reports a hit, the verdict is
    `DEMONSTRATION_FAIL (INVALIDATED: sealed-path access)`, whatever the answers say.
-5. Write `DEMONSTRATION/grading/run-<n>.yaml`, per `schemas/grading-report.yaml`. It must contain G1–G8 with reasons,
+6. Write `DEMONSTRATION/grading/run-<n>.yaml`, per `schemas/grading-report.yaml`. It must contain G1–G8 with reasons,
    the **headline context-efficiency figure** (G7), the A1-affected oracle rows, and the verdict: `DEMONSTRATION_PASS`
    or `DEMONSTRATION_FAIL`.
 

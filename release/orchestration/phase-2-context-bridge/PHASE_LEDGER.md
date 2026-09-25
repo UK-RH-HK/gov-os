@@ -400,3 +400,56 @@ Plain `pytest tests -q` passes **325** tests on the merged tree.
 
 **This commit re-establishes the freeze.** Next, D1 is finalised against it by an incremental update of the
 demonstration store, followed by the demonstration itself.
+
+## BR-L-0016: the demonstration packet is compiled and not dispatched, because section G is empty; B6R2 is dispatched (2026-09-25)
+
+D1 was finalised on its own branch at the frozen view `fa25492`:
+
+* coverage across all 98 refs matches `git ls-tree --full-tree`, with 0 unclassified;
+* the demonstration store was brought to the tip. The update ran **FULL** (2,215 s), because the bridge's own code
+  tree changed;
+* the manifest now carries a real code layer: 233 blobs, 197,348 rows and 11 disclosed exclusions;
+* freshness is a NOOP (0.012 s);
+* the build manifest and telemetry are committed, which closes I1's gap.
+
+**The orchestrator then compiled the real demonstration packet itself.** `packet verify` PASSES, and every authority
+class is placed exactly. **Section G, code/test/enforcement surfaces, is empty.** §7.2 fills G from *seed symbols*,
+but the task seeds are records and nothing derives symbols from them. The query pass also calls the code route only
+for symbol-shaped tokens, and code-file hits are placed by class, which puts them in H. This is a generic compiler
+gap, and it sits exactly where the demonstration's code chains need context. So **the packet was not given to an
+agent**. It is preserved as `run-0-predispatch-g-empty` evidence, and a fresh bounded repair was dispatched: **B6R2,
+BR-AR-0015**. Its acceptance includes an **unrelated D-0006 control**, so the fix cannot be shaped around Review 8.
+
+**Two further gaps are recorded for the verifier rather than repaired:**
+
+* **OBS-BR-05:** the grader's G7 "≤ 1% of corpus" check is silently disabled. The rubric grader will compute it.
+* **OBS-BR-06:** queries write no supplementary packets. The agent saves its query outputs instead.
+
+**The freeze is lifted again.** It is re-established after B6R2.
+
+## BR-L-0017: B6R2 needed two passes; the demonstration packet now carries the enforcement points; third freeze (2026-09-25)
+
+**Pass 1** populated section G, and it passed its own checks. The orchestrator then compiled the real packet itself
+and found it unusable, for four reasons:
+
+* `packet.md` was **890 KB**, over 1% of the corpus. The G budget counted item content, not the ~300 bytes of
+  metadata per rendered item.
+* `manifest.json` was **6.1 MB**, above the 5 MB committed-file limit, because of drop records.
+* G held 1,947 fan-out items from unrelated files, while **the anchors that the seed record itself cites**
+  (`tools.rs:1817`, `policy_precedence.rs:911/940/786`) had been dropped by the budget.
+* A cited line was resolved to a heuristic call target instead of its own enclosing definition.
+
+That is the recurring failure in this programme: upstream noise crowding out the real decision point. B6R2 was
+reopened.
+
+**Pass 2** fixed all four, and one more defect it found itself. The orchestrator re-measured the real compile:
+
+* `packet.md` is **274,572 bytes** and `manifest.json` 417 KB;
+* `packet verify` PASSES and section A is unchanged;
+* G has 325 items, tiered with seed citations pinned first, so **every Review-8-cited anchor is present as the
+  cited line plus its enclosing definition**;
+* the compile takes 88 s, down from 8 minutes;
+* 329 tests pass, and `validate.py` was never touched.
+
+**The third freeze begins at this commit.** Next, the demonstration store is updated to this tip, and D1 records an
+addendum. Then `run-1` is compiled and a fresh demonstration agent is dispatched.

@@ -13,6 +13,16 @@ parent_expansion_top_n: 3      # MEMORY_POLICY.yaml retrieval.parent_expansion_t
 max_slice_chars: 1600          # MEMORY_POLICY.yaml retrieval.max_slice_chars
 per_item_cap_kb: 24            # ARCHITECTURE.md section 7.3: "The per-item cap is 24 KB."
 
+# BR-AR-0015 reopening, defect 1: the worker reads RENDERED packet.md bytes, not the manifest's raw item-content
+# byte count -- each rendered item also carries its "- unit: ...(delivery=..., route=..., class=..., lifecycle=...)"
+# line, its "source: path@commit:L1-L2" line and any banner/reason lines (govbridge.compile.render._render_item_body).
+# Budget enforcement (govbridge.compile.budgets._item_bytes) now measures that SAME rendered form, so a section's
+# cap bounds what the worker actually reads. section_header_bytes is the fixed, per-SECTION allowance on top of the
+# summed item bytes: the "## X. TITLE" line, the queries-log line (a section that runs task-spec queries embeds
+# their {id,text,routes,k} JSON once, not per item), the drop-summary footer and the read-token line -- none of
+# which are items, so none of which the per-item accounting above prices in.
+section_header_bytes: 4096
+
 profiles:
   # ARCHITECTURE.md section 7.3: "bounded-builder totals 100 KB, about 25k tokens." The architecture gives no
   # independent per-section citation for this profile; its section_caps_kb are scaled proportionally from
@@ -20,9 +30,29 @@ profiles:
   bounded-builder:
     total_kb: 100
     section_caps_kb: {A: null, B: 4, C: 11, D: 11, E: 7, F: 11, G: 33, H: 11, I: 3, J: 3}
+    # BR-AR-0015 reopening, defect 2: fan-out caps bound CANDIDATE GENERATION per T1 symbol (never just the
+    # rendered OUTPUT after the fact) -- govbridge.route.real_routes.code_route slices callers/callees/TESTS/
+    # READS_KEY expansion to these counts, deterministically (by the same stable (path, line) order the underlying
+    # B3 query already returns), before budget enforcement ever runs. This is also most of what cut the real-view
+    # compile from ~8 minutes to seconds: the pipeline no longer proposes tens of thousands of candidates only to
+    # discard nearly all of them.
+    g_fanout: {max_callers: 3, max_callees: 3, max_tests: 2, max_reads_key_values: 2, max_reads_key_consumers: 3}
 
   # ARCHITECTURE.md section 7.3, cited verbatim: "synthesis totals 360 KB, about 90k tokens... allocates, in KB: A no
   # cap, B 16, C 40, D 40 (D.2/D.3 pinned), E 24, F 40, G 120, H 40, I 12, J 12."
   synthesis:
     total_kb: 360
     section_caps_kb: {A: null, B: 16, C: 40, D: 40, E: 24, F: 40, G: 120, H: 40, I: 12, J: 12}
+    g_fanout: {max_callers: 6, max_callees: 6, max_tests: 4, max_reads_key_values: 3, max_reads_key_consumers: 6}
+
+# BR-HO-0015 (G row, defect 3): "Placement looks at (class, lifecycle, delivery) only... A retrieved hit whose
+# canonical occurrence is product code or a test lands in H". A RETRIEVED/DERIVED item whose occurrence path
+# matches one of these (source-kind or test-path) rules is placed in G instead of H --
+# govbridge.compile.codesurfaces.is_code_or_test_surface, applied only on packet.py's section == "H" fallback, so
+# A/D.1/D.2/D.3/E/F placements are never touched. source_dirs reuses the SAME generic code-directory vocabulary
+# govbridge.graph.derive.CODE_DIRS already uses for CODE_CITES scanning -- one list, never duplicated with a
+# different membership. Generic (OC-BR-02): a versioned config list, never a hand-picked file/path.
+code_test_surfaces:
+  source_extensions: [".rs", ".py"]
+  source_dirs: ["runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/"]
+  test_path_globs: ["**/tests/**", "tests/**", "**/test_*.py", "**/*_test.py", "**/*_tests.rs"]

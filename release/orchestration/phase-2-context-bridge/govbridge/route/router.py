@@ -61,12 +61,19 @@ class RouteHit:
     unit_kind: str  # "chunk" | "record" | "symbol" | "occurrence" | "commit" | "finding"
     route: str  # "exact" | "lexical" | "semantic" | "graph" | "code"
     rank: int  # 1-based rank WITHIN this route's own result list for this one query
-    delivery: str = "RETRIEVED"  # "RETRIEVED" | "DERIVED"
+    delivery: str = "RETRIEVED"  # "RETRIEVED" | "DERIVED" | "PINNED" (a G section T1 citation -- never dropped)
     occurrences: tuple = ()  # (RouteOccurrence, ...)
     text: Optional[str] = None
     authority_class: Optional[str] = None
     lifecycle: Optional[str] = None
     edge_path: tuple = ()  # (dict, ...): graph hop labels, when route == "graph"
+    # BR-AR-0015 reopening, defect 2: section G's own deterministic tier ("T1".."T4", ARCHITECTURE.md section 7.2's
+    # G row) -- None outside G. Never used to decide PLACEMENT (that stays class/lifecycle-only, section 5.3 rule
+    # 5); used only to ORDER and to bound BUDGET dropping once an item is already known to belong to G.
+    tier: Optional[str] = None
+    # how THIS hit's own identity was resolved (EXACT_PATH/HEURISTIC_SUFFIX/EXACT_QUALIFIED/HEURISTIC_NAME/
+    # HEURISTIC_AMBIGUOUS/a code-route CALLS label/...) -- never blurred, never inferred from delivery or rank.
+    resolution: Optional[str] = None
 
     def to_dict(self) -> dict:
         d = dataclasses.asdict(self)

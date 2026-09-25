@@ -81,6 +81,20 @@ def _render_item_body(item) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _drop_footer(d: list) -> Optional[str]:
+    """``d``: either G's COMPACT drop-GROUP list (``govbridge.compile.budgets.compact_drops`` --
+    ``[{tier, count, bytes, dropped_ids_sha256, sample_ids}, ...]``, BR-AR-0015 reopening defect 4) or any other
+    section's unchanged raw per-ITEM drop list (``[{item_id, unit, reason, score, bytes, tier}, ...]``, one entry
+    per dropped item -- the shape node B6's own test_budget_pressure, one of the six named ARCHITECTURE.md
+    section 5.3 invariant tests, asserts for H). A compact group carries its own "count"; a raw item does not, so
+    it counts as exactly one. Either way this aggregates to one summary line. None when nothing was dropped."""
+    if not d:
+        return None
+    total_count = sum(g.get("count", 1) for g in d)
+    total_bytes = sum(g["bytes"] for g in d)
+    return f"[{total_count} items / {total_bytes} bytes omitted: see manifest]"
+
+
 def _render_section_body(letter: str, sub_items: dict, queries_log: dict, drops: dict) -> str:
     """``sub_items``: for D, ``{"D.1": [...], "D.2": [...], "D.3": [...]}``; for every other letter,
     ``{letter: [...]}`` (one entry). Returns the section body text WITHOUT its read-token line."""
@@ -97,10 +111,9 @@ def _render_section_body(letter: str, sub_items: dict, queries_log: dict, drops:
                 out.append("(none)")
             for item in items:
                 out.append(_render_item_body(item))
-            d = drops.get(sub, [])
-            if d:
-                total_bytes = sum(x["bytes"] for x in d)
-                out.append(f"[{len(d)} items / {total_bytes} bytes omitted: see manifest]")
+            footer = _drop_footer(drops.get(sub, []))
+            if footer:
+                out.append(footer)
             out.append("")
     else:
         items = sub_items.get(letter, [])
@@ -111,10 +124,9 @@ def _render_section_body(letter: str, sub_items: dict, queries_log: dict, drops:
             out.append("(none)")
         for item in items:
             out.append(_render_item_body(item))
-        d = drops.get(letter, [])
-        if d:
-            total_bytes = sum(x["bytes"] for x in d)
-            out.append(f"[{len(d)} items / {total_bytes} bytes omitted: see manifest]")
+        footer = _drop_footer(drops.get(letter, []))
+        if footer:
+            out.append(footer)
     return "\n".join(out).rstrip() + "\n"
 
 
