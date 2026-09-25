@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T19:58:29Z'
-state_hash: 0a5863b82d4047d6129dc7a7ac71f5472559c30a9e9da19b7c18516b3d5d0ddb
+updated_at: '2026-09-25T21:26:17Z'
+state_hash: 8889c7112e9d28fe53cd72094cde58028202bbb28910b34d3102b2e8acbccc29
 lifecycle_state: BR_REPAIR_SECTION_G
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -665,10 +665,24 @@ agent_runs:
   branch: bridge/b6r2-0015
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0015
   model_requested: sonnet
-  model_observed: claude-sonnet-5 (transcript agent-ac67f7b5f16f1151c.jsonl)
+  model_observed: claude-sonnet-5 (530 assistant turns in pass 1, transcript agent-ac67f7b5f16f1151c.jsonl)
   agent_name: br-repair-b6r2-0015
   dispatched_at: '2026-09-25T20:12Z'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
+  pass_1:
+    final_commit: 109151bd36daacfd8cb2a21a94f477cecc28324c
+    merged_into_bridge: yes (an intermediate, known-deficient state; nothing was dispatched from it)
+    orchestrator_verified: integrate-check PERMITTED; validate.py zero diff; tests 2 added, none modified; 328 passed
+  orchestrator_found_on_real_compile:
+  - 'packet.md 889,764 bytes (> 1% of corpus, G7 would fail) -- G renders 715,438 bytes although its content budget reads
+    122,872/122,880: budgets count content, not rendered bytes'
+  - 'manifest.json 6.1 MB (> 5 MB committed-file limit) -- 3.27 MB of G drop records'
+  - 'G = 1,947 code-route expansion items led by unrelated files; anchors the seed record itself cites (tools.rs:1817,
+    policy_precedence.rs:911/940/786) dropped by the budget -- no tier priority for seed-cited anchors'
+  - init.rs:146 appears only as a heuristic call target, not as the cited line plus its enclosing definition
+  follow_up_delivered: SendMessage -- rendered-byte budgets; T1 (seed-cited anchors + enclosing definitions, pinned) > T2
+    (callers/callees, READS_KEY, TESTS) > T3 (retrieved code/test) > T4 (wider); bounded candidate generation; compact
+    drop records (count + sha256 + first 50); manifest <= 1 MB; checks computed generically from seed citations
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/compile/**
   - release/orchestration/phase-2-context-bridge/govbridge/route/**
