@@ -1,0 +1,140 @@
+run_id: BR-AR-0013
+role: bounded repair B6R (mandatory inputs always in section A; BR-ARCH-RULING-1)
+model_observed: claude-sonnet-5
+branch: bridge/b6r-0013
+commit: 7a11de13a317e37f2217e392d8cbbe05b136f6ca
+status: COMPLETED
+claims:
+  - id: C1-place-item-no-longer-lets-lifecycle-decide-a-membership
+    text: >
+      govbridge/compile/packet.py:185 (place_item) is the ONE function that decides section membership. Before:
+      `if delivery == "MANDATORY" and spec.admissible_in_a and lifecycle == classesmod.LIFECYCLE_ACTIVE: return "A",
+      ...`. After: `if delivery == "MANDATORY" and spec.admissible_in_a: return "A", ...` -- the `lifecycle ==
+      LIFECYCLE_ACTIVE` conjunct is removed. A resolver-returned (delivery MANDATORY) item whose class is
+      ladder-admissible in A (ranks 1-6: OWNER_DECISION, CONTRACT, FROZEN_GATE_CONTRACT, ARCHITECTURE_DECISION,
+      ORCHESTRATION_RECORD, EVIDENCE) now reaches A whatever its lifecycle (BR-ARCH-RULING-1 rule 1). D.1 eligibility
+      is untouched: d1_eligible() (unchanged) still requires lifecycle == ACTIVE internally, so a non-ACTIVE A item
+      never also appears in D.1 (rule 3). The E fallback (lifecycle in SUPERSEDED/HISTORICAL/WITHDRAWN/PROPOSED) is
+      now reachable only for RETRIEVED/DERIVED delivery, since MANDATORY no longer falls through to it for an
+      A-admissible class.
+  - id: C2-lifecycle-banner-and-j-notice-replace-silent-exclusion
+    text: >
+      Compiler.item_from_mandatory (govbridge/compile/packet.py:271-281) now attaches the same LIFECYCLE_BANNERS
+      entry a RETRIEVED item would carry (item_from_hit's own mechanism) whenever section == "A" and
+      mi.lifecycle != ACTIVE; ladder classes never carry their own class banner (ClassSpec.banner is None for every
+      LADDER row), so this only ever fills an empty banner, never overwrites one. compile_packet's resolver loop
+      (govbridge/compile/packet.py:412-425) emits a J notice `MANDATORY_LIFECYCLE_NOT_ACTIVE` ({id, class,
+      lifecycle}) whenever an item lands in A with a non-ACTIVE lifecycle, and keeps `MANDATORY_ITEM_NOT_IN_A`
+      ({id, class, lifecycle, placed_in}) only for the case it can still legitimately occur: a ladder class that is
+      NOT admissible in A at all (rank 7, DERIVED) -- never reachable for the ten items BR-ARCH-RULING-1's trigger
+      names, all of which ARE A-admissible. Nothing is relabelled ACTIVE anywhere in this change; UNKNOWN stays
+      UNKNOWN (the classifier, govbridge/authority/**, was not touched -- out of mutation scope).
+  - id: C3-non-ladder-classes-and-d1-ordering-unchanged
+    text: >
+      NON_LADDER_PINNED_SECTION/NON_LADDER_RETRIEVED_SECTION, d1_eligible(), and the sort_key ordering rule are
+      byte-for-byte unchanged. OWNER_DIRECTION_TO_TEST still goes only to D.2, HYPOTHESIS_TO_TEST only to D.3,
+      HYPOTHESIS_RELEVANT_OBSERVATION only to F, EVIDENCE_WITHDRAWN to E/F, UNCLASSIFIED to H with a notice --
+      BR-ARCH-RULING-1 rule 4. Proven by test_compile_mandatory_lifecycle_in_a.py::
+      test_mandatory_unknown_lifecycle_lands_in_a_with_banner_and_notice (CX-DIRECTION-NO-STATUS lands only in D.2)
+      and by the untouched test_compile_mandatory_classes.py (all 34 pre-existing compile tests still pass
+      unmodified).
+  - id: C4-validator-re-derivation-catches-a-admissible-items-placed-elsewhere
+    text: >
+      govbridge/compile/validate.py's verify_section_a (unchanged) recomputes A fresh through packet.place_item --
+      the SAME fixed function -- so once place_item is repaired, a compiled packet whose compiler wrongly excluded
+      an A-admissible mandatory item from A (or a hand-tampered packet with the same defect) now fails re-derivation
+      by count/tuple mismatch. verify_placement's section=="A" branch (validate.py:99-109) no longer refuses a
+      non-ACTIVE lifecycle -- the two lines `if lifecycle != classesmod.LIFECYCLE_ACTIVE: problems.append(f"A/
+      {row['item_id']}: lifecycle {lifecycle!r} != ACTIVE")` were removed (this is the one enforcement-code change
+      that encoded the old, now-superseded rule; no existing TEST asserted this -- grep across tests/** for
+      MANDATORY_ITEM_NOT_IN_A and for a lifecycle-excludes-from-A assertion found none, so no test's own assertion
+      needed to change). verify_banners gained a new check (validate.py:132-145): every A row whose lifecycle is
+      not ACTIVE must carry packet.LIFECYCLE_BANNERS[lifecycle] verbatim. Every other existing check (admissibility
+      per class, PINNED class banners, ordering) is untouched.
+  - id: C5-fixture-test-proves-the-four-required-scenarios
+    text: >
+      tests/compile/test_compile_mandatory_lifecycle_in_a.py (new; 4 tests) proves, on the generic fixture corpus
+      (no Review-8/Phase-2 ids -- OC-BR-02): (1) a mandatory CONTRACT item with lifecycle UNKNOWN
+      (CX-CONTRACT-NO-STATUS) lands in A with its UNKNOWN banner and a MANDATORY_LIFECYCLE_NOT_ACTIVE notice; (2) a
+      mandatory ORCHESTRATION_RECORD item with lifecycle UNKNOWN (CX-ORCH-RECORD-NO-STATUS) lands in A the same way;
+      (3) a mandatory OWNER_DIRECTION_TO_TEST item (CX-DIRECTION-NO-STATUS) lands in D.2 and never in A; (4) a
+      RETRIEVED item is never placed in A, checked two ways -- directly against place_item for every A-admissible
+      ladder class at ACTIVE/UNKNOWN/SUPERSEDED lifecycle and both RETRIEVED/DERIVED delivery
+      (test_retrieved_item_never_lands_in_a_whatever_its_class_or_lifecycle), and through a full compile with a
+      faked lexical hit claiming ARCHITECTURE_DECISION/ACTIVE (test_retrieved_hit_never_lands_in_a_through_a_full_compile).
+      The new fixture data is an isolated `mandatory_bridge_inputs.lifecycle_probe_items` list in
+      tests/fixtures/compile/compile_repobuilder.py, read only via its own state_ref -- the pre-existing
+      `mandatory_bridge_inputs.items[*]` list every other compile test resolves against is byte-for-byte unchanged,
+      so no other test's resolution set was affected (all 34 pre-existing tests pass unmodified, confirmed by
+      check1).
+  - id: C6-validator-negative-control
+    text: >
+      test_compile_mandatory_lifecycle_in_a.py::test_hand_moved_a_admissible_item_out_of_a_fails_verify takes a
+      freshly-compiled, verify-clean packet, moves CX-CONTRACT-NO-STATUS by hand from A into H, and asserts
+      validate.verify_packet reports a non-empty problem list naming "section A does not equal the freshly
+      recomputed resolver output" -- the re-derivation in C4 catches it.
+  - id: C7-real-view-acceptance
+    text: >
+      Compiling the REAL ARCHITECTURE/demonstration-task.yaml with --fake-routes (tests/compile/
+      test_compile_real_view_mandatory_in_a.py, 2 new tests; also run directly via check2) now places all 20
+      A-admissible mandatory items in A, including the ten BR-ARCH-RULING-1's trigger names by id
+      (state:bridge#contract_v3 [CONTRACT], PHASE-2-FROZEN-GATE-CONTRACT [FROZEN_GATE_CONTRACT],
+      OWNER-LAUNCHER-BR-0001 [OWNER_DECISION], REVIEW-8-RETURN [EVIDENCE], AR96-BUILDER-CHECKPOINT [EVIDENCE],
+      REVIEW-8-CONTEXT-PACK/DESIGN-P2-PROBE-OPTION-C/DESIGN-P2-HISTORICAL-RULE-SOURCE/
+      PHASE-2-LEDGER-P2-L-0033-0047/PHASE-2-STATE [ORCHESTRATION_RECORD]) -- each with lifecycle UNKNOWN, its
+      banner, and a MANDATORY_LIFECYCLE_NOT_ACTIVE notice; zero MANDATORY_ITEM_NOT_IN_A notices remain.
+      F1-DIRECTION is only in D.2, F2-F3-COMMON-CLASS only in D.3, ORCHESTRATOR-REASONING-ERRORS only in F. Two
+      independent compiles produce byte-identical rendered text and packet_sha256
+      (b06ebc8f39486e218fa2349326f62aa25779dba48ba4bf747fbfe55278832f5b, both runs). validate.verify_packet reports
+      zero problems. The full per-item section map (both runs) is saved at
+      release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out.
+  - id: C8-whole-tree-coexistence
+    text: >
+      `pytest tests -q --import-mode=importlib` from the domain root passes 280 tests (274 pre-existing +
+      6 new: 4 in test_compile_mandatory_lifecycle_in_a.py, 2 in test_compile_real_view_mandatory_in_a.py), with
+      unique basenames across tests/** (checked by directory listing before creating the files) and no
+      cross-package import clash.
+evidence:
+  - claim: C1-place-item-no-longer-lets-lifecycle-decide-a-membership
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:165-190
+  - claim: C2-lifecycle-banner-and-j-notice-replace-silent-exclusion
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:271-281
+  - claim: C2-lifecycle-banner-and-j-notice-replace-silent-exclusion
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py:412-425
+  - claim: C3-non-ladder-classes-and-d1-ordering-unchanged
+    command: "cd $D && GOVBRIDGE_STORE=$STORE PYTHONPATH=$D $PY -m pytest tests/compile -q"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check1-pytest-compile.out
+  - claim: C4-validator-re-derivation-catches-a-admissible-items-placed-elsewhere
+    file: release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py:99-145
+  - claim: C5-fixture-test-proves-the-four-required-scenarios
+    command: "cd $D && GOVBRIDGE_STORE=$STORE PYTHONPATH=$D $PY -m pytest tests/compile/test_compile_mandatory_lifecycle_in_a.py -q"
+    file: release/orchestration/phase-2-context-bridge/tests/compile/test_compile_mandatory_lifecycle_in_a.py
+  - claim: C6-validator-negative-control
+    command: "cd $D && GOVBRIDGE_STORE=$STORE PYTHONPATH=$D $PY -m pytest tests/compile/test_compile_mandatory_lifecycle_in_a.py::test_hand_moved_a_admissible_item_out_of_a_fails_verify -q"
+  - claim: C7-real-view-acceptance
+    command: "cd $D && GOVBRIDGE_STORE=$STORE PYTHONPATH=$D $PY -m pytest tests/compile/test_compile_real_view_mandatory_in_a.py -q"
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check2-realview-compile-twice.out
+  - claim: C8-whole-tree-coexistence
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0013.check3-pytest-whole-tree.out
+mutation_scope_respected: true
+open_issues:
+  - id: OI-1-no-existing-test-locked-in-the-old-behaviour
+    text: >
+      Grepping tests/** before this repair found no test asserting the old "a mandatory item with a non-ACTIVE
+      lifecycle is excluded from A" behaviour, and no test referencing MANDATORY_ITEM_NOT_IN_A -- the defect (OI-3
+      in AGENT_RUNS/BR-AR-0008.report.yaml) was found only on the real corpus, never on the hermetic fixture, since
+      the fixture's only ladder-admissible mandatory items (CX-0010A/CX-0010B) happen to carry "Status | IN FORCE"
+      and were always ACTIVE. Per BR-HO-0013's instruction to quote before/after if a test needed changing: none
+      did. The one literal encoding of the old rule outside packet.py was in validate.py's verify_placement (not a
+      test) -- before: `if lifecycle != classesmod.LIFECYCLE_ACTIVE: problems.append(f"A/{row['item_id']}:
+      lifecycle {lifecycle!r} != ACTIVE")` inside the `section == "A"` branch; after: removed (see C4).
+  - id: OI-2-real-corpus-still-has-no-machine-readable-lifecycle-for-these-ten-records
+    text: >
+      The underlying B5/authority-layer question OI-3 partly raised (that Contract v3, the frozen gate contract,
+      the launcher and several orchestration records carry no recognisable Status/in_effect marker, so
+      govbridge.authority.lifecycle.classify legitimately returns UNKNOWN for them) is UNCHANGED by this repair and
+      out of its scope (govbridge/authority/** was not touched, per the handoff's explicit prohibition). This
+      repair only fixes WHERE a non-ACTIVE mandatory item is placed (always A, never silently moved) and makes the
+      gap visible (lifecycle banner + J notice) -- it does not and must not make these records ACTIVE. Whether any
+      of the ten should eventually get a machine-readable status line is a question for whoever owns those source
+      records, not for the bridge.
