@@ -1,0 +1,22 @@
+=== compile ===
+{
+ "manifest_sha256": "451271fda89ff043e465163c6677b5c74bf21d2937280871e9639d18cb59be19",
+ "out": "AGENT_RUNS/.scratch/d0006-control",
+ "packet_id": "6b5dd568804ca307",
+ "packet_sha256": "6b5dd568804ca3074a3dfd328d389c12a3a90e6f76beb7bf76371dc6dd7ff6fe",
+ "registry_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0015/release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+ "status": "OK"
+}
+
+=== G items (path line_start line_end route authority_class) ===
+G count: 3
+capabilities/python/govos_capabilities/embed_sentence_transformers.py 22 48 lexical EVIDENCE
+capabilities/python/govos_capabilities/embed_sentence_transformers.py 47 60 lexical EVIDENCE
+capabilities/python/govos_capabilities/embed_sentence_transformers.py 1 27 lexical EVIDENCE
+
+=== packet verify ===
+{
+ "problems": [],
+ "status": "OK",
+ "verify": "PASS"
+}

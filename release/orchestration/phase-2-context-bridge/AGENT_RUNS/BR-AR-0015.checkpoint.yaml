@@ -1,0 +1,63 @@
+run_id: BR-AR-0015
+commit: 57523cbc2e6206ca1504a9b9e5233792baec98a5
+commands:
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests -q"
+    # acceptance check 1: plain collection, everything must pass, including the six named ARCHITECTURE.md section
+    # 5.3 invariant tests, the import-boundary test and the class-table test, all unmodified.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check1-pytest.out
+    output_sha256: 4a9b7a291e72c002082d6b0bfc8faabf0431d93547e77b210d850314942ce044
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests/compile/test_compile_code_route_seeds.py -v"
+    # acceptance check 2 (fixture test): a self-contained fixture repo whose seed record cites src/x.rs:3 and a
+    # backticked symbol -- G contains the enclosing symbol (labelled EXACT_PATH), a caller, a TESTS edge target
+    # and the cited evidence probe; the same code hit via lexical retrieval lands in G not H; a retrieved non-code
+    # hit stays in H; nothing retrieved is in A or D.1.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check2-fixture-test.out
+    output_sha256: b8fd7ea24ee0c53d932fb5a065e68d6e7af67e18d1e5fa4484050f7b2397e390
+  - cmd: |
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile \
+        ARCHITECTURE/demonstration-task.yaml --out AGENT_RUNS/.scratch/demo-run-1
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile \
+        ARCHITECTURE/demonstration-task.yaml --out AGENT_RUNS/.scratch/demo-run-2
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge packet verify \
+        AGENT_RUNS/.scratch/demo-run-1
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge packet verify \
+        AGENT_RUNS/.scratch/demo-run-2
+      # + a small inline script (sha256 of packet.md/manifest.json across both runs; G items printed as
+      # path/line_start/line_end/symbol(unit.id)/route/banner; section A's unit.id sequence compared against
+      # DEMONSTRATION/run-0-predispatch-g-empty/packet/manifest.json on bridge/demo-0011, fetched via
+      # `git show bridge/demo-0011:...manifest.json` and never any oracle/govbridge-sealed-* path).
+    # acceptance check 3 (real view, the demonstration task): compiled TWICE with real routes against the
+    # read-only demonstration store (never index update/rebuild run against it) -- packets byte-identical
+    # (packet.md sha256 and manifest.json sha256 match across both runs); packet verify PASSES on both (zero
+    # problems); G is non-empty (1960 items); section A's item set and order are byte-identical to run-0's.
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check3-realview-demo.out
+    output_sha256: d408b8bbd9a58d4e3bdd1cbbda2178653c97209ac7cdc5c01a74d7ef19c0f236
+  - cmd: |
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge compile \
+        tests/fixtures/compile/task-spec-d0006-control.yaml --out AGENT_RUNS/.scratch/d0006-control
+      cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010 $PY -m govbridge packet verify \
+        AGENT_RUNS/.scratch/d0006-control
+      # + a small inline script printing G's items (path/line_start/line_end/route/authority_class).
+    # acceptance check 4 (real view, the control -- OC-BR-02): a task spec I wrote in tests/fixtures/compile/,
+    # seeded with D-0006 (the capability-plugin decision, deliberately unrelated to Review 8/Phase 2), plus one
+    # query over its own cited subsystem -- G is non-empty (3 items) with labelled code surfaces (class EVIDENCE)
+    # from that subsystem (capabilities/python/govos_capabilities/embed_sentence_transformers.py), and packet
+    # verify passes (zero problems).
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check4-d0006-control.out
+    output_sha256: 820d9f2f53a5ff8663aa3ead00ff17c0b0ffe6868b7663851539f5f40c4b9a79
+  - cmd: "cd $D && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0015 $PY -m pytest tests/compile/test_compile_code_route_seeds.py::test_hand_moved_g_item_fails_packet_verify -v"
+      # this single test IS the standalone invariant check: it recompiles the fixture repo, asserts a clean
+      # packet verifies with zero problems, then (a) hand-moves a G item into section A and asserts packet
+      # verify FAILS, (b) hand-moves a RETRIEVED G item into D.1 and asserts packet verify FAILS. Full
+      # problem-list detail (the specific verify_packet messages) is captured in the saved output below, via
+      # the same scenario run as a standalone script rather than under pytest's captured-output mode.
+    # acceptance check 5 (invariants): hand-moving a G item into A fails packet verify (section A does not equal
+    # the freshly recomputed resolver output, AND delivery RETRIEVED != MANDATORY); hand-moving a RETRIEVED G item
+    # into D.1 fails packet verify (lifecycle UNKNOWN != ACTIVE, AND class EVIDENCE is not D.1-admissible).
+    exit_code: 0
+    output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.check5-invariants.out
+    output_sha256: 35fa63f2d1af2a9312e74bf32f85dbb342e09d432b7b4cd3ab03b9563fe60019
