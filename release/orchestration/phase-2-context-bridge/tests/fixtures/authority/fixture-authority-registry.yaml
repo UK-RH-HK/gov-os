@@ -1,0 +1,65 @@
+schema: govbridge-authority-registry/1
+purpose: a small fixture registry, mirroring config/authority-registry.yaml's shape, verified against
+  tests/fixtures/authority/repobuilder.py's synthetic repo (paths FX-*/X-L-*/OA-FX-*, never Review-8/Phase-2 content).
+
+section_anchors:
+  - item_id: FX-0010A
+    path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md
+    heading: '## FX-0010A -- first anchored section'
+    lines: [9, 12]
+    class: OWNER_DECISION
+    cite: {path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md, line: 9,
+           quote: 'FX-0010A -- first anchored section'}
+  - item_id: FX-0010B
+    path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md
+    heading: '## FX-0010B -- second anchored section'
+    lines: [13, 16]
+    class: OWNER_DECISION
+    cite: {path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md, line: 13,
+           quote: 'FX-0010B -- second anchored section'}
+  - item_id: FX-DIRECTION
+    path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md
+    heading: '## FX-DIRECTION -- a direction, not yet authority'
+    lines: [17, 20]
+    class: OWNER_DIRECTION_TO_TEST
+    cite: {path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md, line: 17,
+           quote: 'FX-DIRECTION -- a direction, not yet authority'}
+  - item_id: FX-HYPOTHESIS
+    path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md
+    heading: '## FX-HYPOTHESIS -- a hypothesis, not yet classified'
+    lines: [21, 23]
+    class: HYPOTHESIS_TO_TEST
+    cite: {path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md, line: 21,
+           quote: 'FX-HYPOTHESIS -- a hypothesis, not yet classified'}
+
+unanchored_lines_rule:
+  - path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0010A-B-DISPOSITION.md
+    note: >-
+      every line outside the four anchored sections above (lines 1-6, the header table before the first heading) is
+      UNCLASSIFIED, scoped to that section; a whole-file request is likewise UNCLASSIFIED.
+
+supersessions:
+  - from: OD-FX-07
+    to: OA-FX-06
+    scope: stop condition
+    cite: {path: release/orchestration/fx/GATES/OWNER-DECISION-FX-0007-STOP-CONDITION.md, line: 8,
+           quote: "continuation **beyond** OA-FX-06's previous stop condition"}
+  - from: FX-GEN-2
+    to: FX-GEN-1
+    scope: WHOLE
+    cite: {path: release/orchestration/fx/PHASE_LEDGER.md, line: 9, quote: "reopens FX-0002"}
+
+lifecycle_overrides:
+  - unit: FX-WITHDRAWN-0001
+    lifecycle: WITHDRAWN
+    class: EVIDENCE_WITHDRAWN
+    cite: {path: release/orchestration/fx/RESEARCH/FX-WITHDRAWN-0001.md, line: 5, quote: "WITHDRAWN 2026-01-02"}
+
+class_rules:
+  - {glob: 'release/orchestration/*/GATES/OWNER-*.md', class: OWNER_DECISION}
+  - {glob: 'spec/decisions/*.yaml', class: ARCHITECTURE_DECISION}
+  - {glob: 'release/orchestration/**/*.md', class: ORCHESTRATION_RECORD}
+  - {glob: 'fixtures/**', class: FIXTURE}
+  - {glob: 'runtime/**', class: EVIDENCE, type: implementation-fact}
+  - {glob: '{spec/research,spec/reports,lessons}/**', class: EVIDENCE, type: research-or-lesson}
+  - {glob: '**', class: UNCLASSIFIED}

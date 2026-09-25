@@ -1,0 +1,87 @@
+{
+ "CP-1": {
+  "cls": "UNCLASSIFIED",
+  "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+  "conflict": null,
+  "derivation": "REGISTRY_CITED",
+  "lifecycle": "HISTORICAL",
+  "line_end": 63,
+  "line_start": 56,
+  "notes": [
+   "superseded by OWNER-DIRECTIVE-0004 (scope: WHOLE, REGISTRY_CITED)"
+  ],
+  "path": "release/root-of-trust/signed-release-root-v1/03-TRANSITION-MAP.md",
+  "unit": "CP-1"
+ },
+ "D-0001": {
+  "cls": "ARCHITECTURE_DECISION",
+  "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+  "conflict": null,
+  "derivation": "EXACT_METADATA",
+  "lifecycle": "SUPERSEDED",
+  "line_end": 25,
+  "line_start": 1,
+  "notes": [
+   "status: 'SUPERSEDED' (superseded_by D-0002)"
+  ],
+  "path": "spec/decisions/D-0001.yaml",
+  "unit": "D-0001"
+ },
+ "D-0008": {
+  "cls": "ARCHITECTURE_DECISION",
+  "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+  "conflict": null,
+  "derivation": "EXACT_METADATA",
+  "lifecycle": "PROPOSED",
+  "line_end": 258,
+  "line_start": 1,
+  "notes": [
+   "status: 'PROVISIONAL'"
+  ],
+  "path": "spec/decisions/D-0008.yaml",
+  "unit": "D-0008"
+ },
+ "DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP": {
+  "cls": "EVIDENCE_WITHDRAWN",
+  "commit": null,
+  "conflict": null,
+  "derivation": "REGISTRY_CITED",
+  "lifecycle": "WITHDRAWN",
+  "line_end": null,
+  "line_start": null,
+  "notes": [
+   "lifecycle_override: release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md:6 'WITHDRAWN 2026-09-25'"
+  ],
+  "path": null,
+  "unit": "DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP"
+ },
+ "OA-P2-06": {
+  "cls": "OWNER_DECISION",
+  "commit": "6a3b0e5c40def5cfef06c645893ff36227574f02",
+  "conflict": null,
+  "derivation": "EXACT_METADATA",
+  "lifecycle": "ACTIVE",
+  "line_end": 66,
+  "line_start": 1,
+  "notes": [
+   "Status: 'IN FORCE for the remainder of Phase 2'",
+   "partially superseded by OD-P2-07 (scope: stop condition, REGISTRY_CITED)"
+  ],
+  "path": "release/orchestration/phase-2/GATES/OWNER-AUTHORISATION-P2-0006-OPTION-A-BOUNDED-ROUND.md",
+  "unit": "OA-P2-06"
+ },
+ "V8.1": {
+  "cls": "UNCLASSIFIED",
+  "commit": null,
+  "conflict": null,
+  "derivation": "REGISTRY_CITED",
+  "lifecycle": "HISTORICAL",
+  "line_end": null,
+  "line_start": null,
+  "notes": [
+   "superseded by V8.2 (scope: WHOLE, REGISTRY_CITED)"
+  ],
+  "path": null,
+  "unit": "V8.1"
+ }
+}

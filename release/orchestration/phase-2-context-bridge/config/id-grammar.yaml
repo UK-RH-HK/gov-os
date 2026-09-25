@@ -1,0 +1,130 @@
+schema: govbridge-id-grammar/1
+purpose: >-
+  ARCHITECTURE.md section 2: an ordered set of DEFINITION rules (which occurrence is the definition site of an ID)
+  and MENTION patterns (every literal occurrence of an ID token), plus the id-family taxonomy used by
+  govbridge.authority.records for census reporting and by govbridge.graph for MENTIONS/DEFINES edges. This file is
+  DATA: it names no specific record, review or phase. The families below are the repository-wide naming
+  conventions the orchestrator's own protocol.naming block documents (runs, handoffs, checkpoints, ledgers,
+  decisions, gate answers) -- not a Review-8- or Phase-2-specific list (OC-BR-02).
+version: 1
+
+# -----------------------------------------------------------------------------------------------------------------
+# Mention patterns: every way an ID token can appear in prose/YAML. Tried in order; a token already matched by an
+# earlier pattern at the same span is not re-matched by a later, broader one.
+# -----------------------------------------------------------------------------------------------------------------
+mention_patterns:
+  - id: MP-VERSION
+    description: a product/operator-UI version token such as V8.1, V8.2, V8.3
+    regex: '\bV\d+\.\d+\b'
+  - id: MP-DOTTED-CODE
+    description: a dotted structured code such as CIT-0001 kept intact (never split on the dot); covers ids that
+      embed a dot outside the version shape
+    regex: '\b[A-Z]{2,6}-\d{4}\.\d+\b'
+  - id: MP-HYPHEN-TOKEN
+    description: the general hyphen-segmented uppercase token shape covering decisions (D-0006), runs (BR-AR-0007,
+      P2-AR-0097), handoffs (BR-HO-0007), checkpoints (BR-CP-0001), ledger entries (P2-L-0046), owner records
+      (OD-P2-10, OA-P2-06, OC-P2-04, OC-BR-02), adjudications (P2-ADJ-0006), gates (GATE-P2-REPAIR-1), certified
+      profiles (CP-1), architecture/API/task ids (ARCH-0002, API-0001, TASK-0011, RES-0001, RPT-0011, PRJ-0001) and
+      record-local findings qualified by record (AR94-C1, AR96-C1)
+    regex: '\b[A-Z][A-Z0-9]{0,7}(?:-[A-Z0-9]{1,10}){1,6}\b'
+  - id: MP-BARE-LOCAL
+    description: a bare short token (F1, F2, C1, A2, B1) that is a RECORD-LOCAL id -- only unique inside the record
+      that defines it; never resolved as a global definition on its own, only as RECORD#LOCAL
+    regex: '\b[A-Z]{1,2}\d{1,2}\b'
+    local: true
+
+# -----------------------------------------------------------------------------------------------------------------
+# Definition rules: which occurrence of a mentioned token counts as ITS definition. Evaluated in order for every
+# candidate occurrence; the first rule whose shape matches decides. A record-local id (from MP-BARE-LOCAL, or the
+# local part of RECORD#LOCAL) is defined by DR-MD-HEADING-SEVERITY or DR-MD-HEADING-LOCAL only, always qualified by
+# its enclosing record.
+# -----------------------------------------------------------------------------------------------------------------
+definition_rules:
+  - id: DR-YAML-TOP-ID
+    kind: yaml_top_id
+    description: >-
+      a YAML document whose top-level mapping has an `id:` scalar key defines that id at the whole occurrence
+      (spec/decisions/*.yaml, spec/product/*.yaml, spec/tasks/*.yaml, spec/research/*.yaml, spec/reports/*.yaml, ...)
+  - id: DR-YAML-LIST-ID
+    kind: yaml_list_id
+    description: >-
+      a YAML list item that is itself a mapping with an `id:` key, anywhere in the document (a "register": gate
+      registers, mandatory_bridge_inputs.items, owner_records, agent_runs, review findings) defines that id at the
+      list item's node span
+  - id: DR-MD-TABLE-ID
+    kind: md_table_id
+    description: >-
+      a markdown two-column header-table row whose first cell is (case-insensitively) "Id" or "Ids" defines the id
+      token(s) in the second cell (markdown emphasis `**...**` and inline code `` `...` `` around the token are
+      stripped before matching); "Ids" may hold several comma-separated ids, each a separate definition of the
+      whole table's occurrence
+  - id: DR-MD-HEADING-SEVERITY
+    kind: md_heading_severity
+    description: a markdown heading that NAMES an id followed by a parenthesised severity word defines that id at
+      the heading-delimited section (from the heading line to the line before the next heading of equal-or-higher
+      level, or EOF)
+    regex: '^#{1,6}\s+(?:\d+(?:\.\d+)*\s+)?(?P<id>[A-Z][A-Z0-9]{0,7}(?:-[A-Z0-9]{1,10}){1,4})\s*\((?P<severity>CRITICAL|HIGH|MEDIUM|LOW|INFO)\)\s*$'
+  - id: DR-MD-HEADING-LOCAL
+    kind: md_heading_local
+    description: >-
+      a markdown heading whose text is exactly a bare local token (for example a level-2 heading reading only "F1"
+      or "F2", as used by owner-decision disposition records) defines that token, LOCAL to the enclosing record
+      occurrence, at the heading-delimited section
+    regex: '^#{1,6}\s+(?P<id>[A-Z]{1,2}\d{1,2})\b'
+  - id: DR-MD-LEDGER-HEADING
+    kind: md_ledger_heading
+    description: >-
+      a level-2 ledger heading naming an id that matches the hyphen-token shape (for example "## P2-L-0046") defines
+      that id at the heading-delimited section
+    regex: '^##\s+(?P<id>[A-Z][A-Z0-9]{0,7}(?:-[A-Z0-9]{1,10}){1,4})\b'
+  - id: DR-FILE-STEM
+    kind: file_stem
+    description: >-
+      the leading id-shaped token of a file's basename (before the first `.` extension) defines that id at the
+      whole-file occurrence, when no stronger rule above already defined it in the same file (spec/decisions/D-0006.yaml
+      is already covered by DR-YAML-TOP-ID; this rule catches filename-only ids such as run/handoff/checkpoint files
+      whose body has no `id:` key). Matching stops at the first segment that is neither a short uppercase marker
+      (ADJ, HO, AR, CP, L, ...) nor a digit run, so a filename's trailing free-text description (SUBJECTLESS-REVIEW-FALLBACK,
+      a lowercase node-run suffix such as -b5-0007) is never absorbed into the id.
+    regex: '^(?P<id>[A-Z][A-Z0-9]{0,3}(?:-(?:[A-Z]{1,4}|\d{2,6})){1,4})'
+
+# -----------------------------------------------------------------------------------------------------------------
+# Id families: a taxonomy over MP-HYPHEN-TOKEN/MP-DOTTED-CODE/MP-VERSION mentions, used by `records census` to
+# report resolution separately for "run/handoff/ledger/owner-record" ids (SO-17 baseline) versus everything else.
+# Matched in order, first match wins; a mention matching no family is still censused, just unlabelled.
+# -----------------------------------------------------------------------------------------------------------------
+id_families:
+  - name: run
+    regex: '^[A-Z][A-Z0-9]{0,3}-AR-\d{3,5}$'
+  - name: handoff
+    regex: '^[A-Z][A-Z0-9]{0,3}-HO-\d{3,5}$'
+  - name: checkpoint
+    regex: '^[A-Z][A-Z0-9]{0,3}-CP-\d{3,5}$'
+  - name: ledger
+    description: a phase/domain-prefixed ledger entry (P2-L-0046, BR-L-0001); a bare "L-NNNN" is a lessons/ id, a
+      different convention, and is deliberately excluded here
+    regex: '^[A-Z][A-Z0-9]{0,3}-L-\d{3,5}$'
+  - name: adjudication
+    regex: '^[A-Z][A-Z0-9]{0,3}-ADJ-\d{3,5}$'
+  - name: owner_record
+    regex: '^O[ACD]-[A-Z0-9-]+$'
+  - name: gate
+    regex: '^GATE-[A-Z0-9-]+$'
+  - name: decision
+    regex: '^D-\d{3,5}$'
+  - name: architecture_task_api
+    regex: '^(?:ARCH|API|TASK|RES|RPT|PRJ|CIT)-\d{3,5}$'
+  - name: certified_profile
+    regex: '^CP-\d+$'
+  - name: version
+    regex: '^V\d+\.\d+$'
+  - name: finding_local
+    regex: '^[A-Z]{1,6}\d{2,3}-[A-Z]\d+$'
+
+fixtures_never_define:
+  glob: 'fixtures/**'
+  note: >-
+    ARCHITECTURE.md section 2: several ids are defined more than once because fixtures/ carries copies of records.
+    Fixtures are class FIXTURE, never a definition of authority (section 5.2); govbridge.authority.records excludes
+    every occurrence under this glob from definition-site selection, and reports it separately if it would otherwise
+    have been a candidate definition.

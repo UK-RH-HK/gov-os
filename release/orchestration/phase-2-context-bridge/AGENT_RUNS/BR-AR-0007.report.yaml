@@ -1,0 +1,207 @@
+run_id: BR-AR-0007
+role: builder B5 (authority and graph)
+model_observed: claude-sonnet-5
+branch: bridge/b5-0007
+commit: 571dde68077c0ccb4145c9596823bb5a4bed1e7b
+status: COMPLETED
+claims:
+  - id: C1-class-table-is-a-code-constant-checked-against-state
+    text: >
+      govbridge/authority/classes.py defines LADDER (7 ranked classes) and NON_LADDER (6 non-ladder classes) as
+      frozen ClassSpec tuples, with admissible_in_a/admissible_in_d1 exactly per ARCHITECTURE.md section 5.1
+      (ORCHESTRATION_RECORD's D.1 admissibility is the literal string ADJUDICATIONS_ONLY, not a plain bool).
+      load_state_authority_classes() reads the live mandatory_bridge_inputs.authority_classes dict from the
+      bridge's own ORCHESTRATOR_STATE.yaml at its canonical (records-ref) occurrence, never the working tree;
+      diff_against_state() implements both of section 5.2's build-failure conditions (a state class missing from
+      the table; a state class with different admissibility than section 5.1). tests/authority/test_classes.py
+      asserts diff_against_state(load_state_authority_classes()) == [] against the real, live state file, and
+      asserts the state dict's key set is exactly the seven names the architecture predicts.
+  - id: C2-registry-only-restricts-and-quotes-are-build-verified
+    text: >
+      govbridge/authority/registry.py's load() verifies every section_anchors/supersessions/lifecycle_overrides
+      cite against the actual blob at (path, commit, line) and raises QuoteVerificationError on any mismatch --
+      re-verified myself at 6e7a2a3/the current records tip for every entry in config/authority-registry.yaml
+      (registry check --json: 7 section_anchors, 4 supersessions, 1 lifecycle_override, 19 class_rules all
+      verify). class_rules only ever assigns a class (never an ACTIVE lifecycle); supersessions/lifecycle_overrides
+      only ever restrict (WHOLE-scope supersession maps the cited quote through the same lifecycle vocabulary as
+      structured metadata, defaulting to SUPERSEDED; any other scope adds a note only, never changing lifecycle).
+      A real bug found and fixed during this work: govbridge.core.pathrules.glob_match is a plain fnmatch wrapper
+      with NO brace-alternation support, so the architect's own seed class_rules ("{probes,telemetry}/**" etc.)
+      silently matched nothing; registry.expand_braces() expands one "{a,b,c}" group per glob at load time
+      (tests/authority/test_registry.py, tests/authority/test_lifecycle.py::test_class_rule_fallback).
+  - id: C3-section-scoping-invariant-holds-generically
+    text: >
+      The OD-P2-10A/B section-scoping rule (ARCHITECTURE.md section 5.2 rule 1: a file-level class never flows
+      into a section, and unanchored lines are UNCLASSIFIED) is implemented in govbridge.authority.lifecycle.classify
+      generically, keyed off registry.SectionAnchor spans, not any id or filename. Proven on the REAL demonstration
+      task: resolving ARCHITECTURE/demonstration-task.yaml's state:bridge#mandatory_bridge_inputs.items[*] gives
+      the six OD-P2-10A/B items six DISTINCT, non-overlapping (line_start, line_end) spans, OD-P2-10A/B as a
+      whole-file owner_records reference resolves UNCLASSIFIED (the file mixes OWNER_DECISION/OWNER_DIRECTION_TO_TEST/
+      HYPOTHESIS_TO_TEST sections, so no single class is honest for the whole file), and status is OK with zero
+      blocked_reasons. The identical mechanism is fixture-tested generically with FX-0010A/B/DIRECTION/HYPOTHESIS
+      in tests/authority/test_lifecycle.py and test_resolver.py (four distinct spans, not six -- Review-8/Phase-2
+      names appear nowhere in govbridge/authority/** or govbridge/graph/**, only in acceptance data).
+  - id: C4-mandatory-input-resolver
+    text: >
+      govbridge/authority/resolver.py's MandatoryItem is a frozen dataclass constructed only in resolver.py;
+      resolve() expands state_ref "[*]" lists, id_form and path_form required_inputs, verifies a row's own sha256
+      (or content_hash) against the actual blob when one is recorded, and returns status BLOCKED with a reason
+      the moment any row fails -- never a partial success. tests/authority/test_resolver.py directly exercises
+      _mandatory_item_from_row with a deliberately wrong sha256 and asserts BLOCKED. Real-data run: resolving
+      demonstration-task.yaml's three required_inputs (mandatory_bridge_inputs.items[*], owner_records[*],
+      contract_v3) gives status OK, 25 items, every item whose state row carries a sha256 (7 mandatory_bridge_inputs
+      items, 6 owner_records, the contract) verified equal to the state's recorded value.
+  - id: C5-import-boundary-and-hard-invariant-code-paths
+    text: >
+      tests/authority/test_import_boundary.py parses resolver.py and lifecycle.py with ast and asserts neither
+      imports govbridge.lexical/.semantic/.code/.graph/.route (or any submodule of them) -- a static check that
+      does not depend on what else happens to be importable at runtime. Both modules import only govbridge.core
+      and govbridge.authority.{classes,records,registry}. No conversion path from RetrievedItem/DerivedItem to
+      MandatoryItem exists anywhere in this scope.
+  - id: C6-records-census-and-id-grammar
+    text: >
+      govbridge/authority/records.py interprets config/id-grammar.yaml's definition_rules (yaml_top_id, yaml_list_id,
+      md_table_id, md_heading_severity, md_heading_local, md_ledger_heading, file_stem) and mention_patterns
+      generically -- no rule names a specific id, file or review. Real-corpus census() at the records ref
+      (~18.9k id-shaped mentions scanned): resolution_rate 0.85 overall, but the SO-17-baseline metric the
+      acceptance check names (run/handoff/ledger/owner_record families specifically) is 0.985 (>= the 0.95 bar),
+      with dangling ids reported (never guessed) and fixtures/** excluded from ever supplying a definition
+      (fixture_definitions_excluded: 38, verified by direct assertion in test_records.py::test_fixtures_never_define).
+      Two real bugs found and fixed while getting there: (1) the markdown "Id"/"Ids" header-table rule originally
+      required the FIELD NAME to be the literal header cell, when the real convention is "| Field | Value |" with
+      a DATA row "| Id | **X** |" (or "| Decision id |", "| Run id |", ...) -- fixed to match any "<word> id(s)"
+      field name; (2) a YAML list item carrying BOTH id and a path pointing elsewhere (ORCHESTRATOR_STATE.yaml's
+      owner_records/mandatory_bridge_inputs.items rows) is a REFERENCE to a record defined elsewhere, not that
+      record's own definition -- yaml_list_id now skips such rows.
+  - id: C7-lifecycle-precedence-and-real-id-fixtures
+    text: >
+      govbridge.authority.lifecycle.classify() implements the five-rule precedence of ARCHITECTURE.md section 5.2
+      in order, failing closed (a conflict prefers the less authoritative outcome by construction: mandatory-item/
+      section-anchor/registry sources are consulted before, and can only restrict, structured metadata and
+      class_rules). govbridge.authority.lifecycle.show D-0001 D-0008 OA-P2-06 V8.1 CP-1
+      DESIGN-P2-AR0096-POSITIVE-CONTROL-GAP --json on the real repo gives exactly the acceptance check's six
+      expected (class, lifecycle, derivation) tuples: D-0001 SUPERSEDED/EXACT_METADATA (superseded_by D-0002);
+      D-0008 PROPOSED/EXACT_METADATA (status PROVISIONAL); OA-P2-06 OWNER_DECISION/ACTIVE with a "partially
+      superseded by OD-P2-07 (scope: stop condition, REGISTRY_CITED)" note; V8.1 and CP-1 both HISTORICAL/
+      REGISTRY_CITED (scope-WHOLE supersessions, the cited quotes mapped through the lifecycle vocabulary); the
+      withdrawn AR96 finding EVIDENCE_WITHDRAWN/WITHDRAWN.
+  - id: C8-structured-state-lookup
+    text: >
+      govbridge/authority/state.py composes YAML with PyYAML node marks (not just yaml.load) to give an exact
+      (line_start, line_end) span for any dotted key.path (with optional "[N]" list indices), alongside
+      (path, commit, blob), seal status computed with check_state.py's OWN canonical_hash rule (reimplemented
+      independently here, the same pattern govbridge.core.yamlutil already uses for UniqueKeyLoader, so this
+      package never imports a script that is not meant to be imported), and the last commit/date that changed
+      those exact lines via git blame -L. govbridge.authority.state get phase-2 running_work --json on the real
+      repo returns the value plus full provenance and SEAL_MISMATCH (the phase-2 state file's own recorded hash
+      is, honestly, stale relative to its current content -- not something this lookup can or should paper over).
+  - id: C9-graph-derivation-and-why-chain
+    text: >
+      govbridge/graph/{edges,derive,traverse,why,history}.py implement DEFINES/MENTIONS/CITES_PATH/CITES_LINE/
+      CITES_COMMIT/SUPERSEDES/AMENDS/CODE_CITES/EVIDENCE_MAP/RELATION_CUE as bounded, per-seed derivations (a
+      targeted git grep, never a whole-corpus sweep) with EXACT_*/HEURISTIC_* labels never hidden from the
+      caller; CALLS/READS_KEY/TESTS read a connection matching B3's exact table schema (symbol, call_site,
+      literal, resolution -- ARCHITECTURE.md section 4.6) and are simply absent (MISSING) with conn=None, proven
+      correct against a synthetic B3-shaped sqlite fixture (tests/graph/test_derive.py) since B3 is not in this
+      node's base. govbridge.graph.why D-0006 --json on the real repo (D-0006 is ARCHITECTURE.md section 6.2's
+      named acceptance subject specifically because it has nothing to do with Review 8) gives all ten stages in
+      the owner's order; architecture/implementation/lessons/current_status are PRESENT with real citations
+      (D-0006's own YAML definition; a CODE_CITES hit at capabilities/python/govos_capabilities/
+      embed_sentence_transformers.py:1's docstring "(D-0006, candidate class 1)"; a MENTIONS hit from
+      spec/research/RES-0001.yaml; the record's own current ACTIVE/ARCHITECTURE_DECISION status), and
+      dependency/findings/owner_decision/purpose/requirement/tests are honestly MISSING (no code-route data is
+      wired yet; nothing manufactures a hop that was not found).
+  - id: C10-persisted-authority-graph-layer
+    text: >
+      Per the orchestrator's mid-task clarification (ARCHITECTURE.md section 8.1), govbridge/authority/layer.py
+      persists record_def, authority_edge and class_lifecycle rows through govbridge.core.manifest.register_layer
+      and govbridge.core.freshness.register_layer_builder ("authority"), registered from govbridge/authority/__init__.py
+      at import time (never editing govbridge/core/**). digest() calls ensure_schema() first, so a bare connection
+      that never built this layer returns an empty digest rather than crashing (tests/authority/test_layer.py::
+      test_bare_connection_digest_never_crashes, also proven live against a fresh in-memory store). class_lifecycle
+      rows are produced by calling lifecycle.classify() -- the SAME function used live -- so a persisted row equals
+      a fresh call by construction (test_persisted_class_lifecycle_row_equals_live_classify). Two from-clean builds
+      of the fixture repo give an identical digest (test_two_from_clean_builds_give_identical_digest); on the REAL
+      repo, two independent from-clean builds (before and after a further correctness fix) gave the SAME
+      manifest_sha256 (6586ae8160f996c2ea8ae9e9383a3898f33f4f3f8ac3ab522327ee98b6be5c2f) both times, 2,910
+      record_defs / 2,914 edges / 2,910 class_lifecycle rows. resolver.py/lifecycle.py's public API still takes
+      no sqlite3.Connection anywhere (W10 outage property; test_resolver_module_has_no_store_dependency) --
+      resolver.py always reads Git directly, this layer is a cache the resolver never consults.
+  - id: C11-cross-node-safety-verified
+    text: >
+      Ran tests/core together with tests/authority tests/graph in BOTH collection orders (tests/core first, and
+      tests/authority tests/graph tests/core) -- 147 passed both times. Two real cross-node hazards were found and
+      fixed while getting there: (1) my fixture module was named "repobuilder", identical to tests/fixtures/core's
+      own module name, so whichever conftest.py's sys.path.insert ran first won the sys.modules cache and the
+      other node's tests read the WRONG fixture repo -- renamed mine to authority_repobuilder.py; (2) the
+      "authority" layer builder, once registered, is reachable by ANY caller's freshness.run() with no --layer
+      filter, including govbridge.core's own fixture-repo tests -- this domain's real authority-registry.yaml
+      cites this domain's real repo content, which is meaningless on a foreign fixture tree, so a
+      QuoteVerificationError there now makes the builder contribute nothing (empty tables, stats["skipped_reason"]
+      recorded) instead of aborting an unrelated caller's build.
+evidence:
+  - claim: C1-class-table-is-a-code-constant-checked-against-state
+    command: "cd $D && $PY -m pytest tests/authority/test_classes.py -q"
+  - claim: C2-registry-only-restricts-and-quotes-are-build-verified
+    command: "GOVBRIDGE_STORE=... $PY -m govbridge.authority.registry check"
+  - claim: C3-section-scoping-invariant-holds-generically
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check2-resolver.out
+  - claim: C4-mandatory-input-resolver
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check2-resolver.out
+  - claim: C5-import-boundary-and-hard-invariant-code-paths
+    file: release/orchestration/phase-2-context-bridge/tests/authority/test_import_boundary.py
+  - claim: C6-records-census-and-id-grammar
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check4-census.out
+  - claim: C7-lifecycle-precedence-and-real-id-fixtures
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check3-lifecycle.out
+  - claim: C8-structured-state-lookup
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check5-state.out
+  - claim: C9-graph-derivation-and-why-chain
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check6-why.out
+  - claim: C10-persisted-authority-graph-layer
+    file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0007.check7-layer-build.out
+  - claim: C11-cross-node-safety-verified
+    command: "cd $D && $PY -m pytest tests/core tests/authority tests/graph -q (and the reverse order)"
+mutation_scope_respected: true
+open_issues:
+  - id: OI-1-authority-layer-full-rebuild-is-slow-under-contention
+    text: >
+      A from-clean `freshness rebuild --layer authority` on the real repo took ~240-280s across three independent
+      runs on this machine (ARCHITECTURE.md section 12's cost table targets ~30s), even after two optimisations
+      (scan_ref(keep_text=True) reuse via classify()'s new pre_text parameter, and a call-scoped lru_cache around
+      gitobj.blob_at/read_blob for the remaining fallback reads). Isolated profiling early in this run showed the
+      classify() loop itself is fast once caching engages (~1500 items in ~17s); the dominant remaining cost
+      appears to be git-subprocess-spawn latency under this machine's contention from concurrently running
+      sibling builders (B2-B4, confirmed via `ps`/`uptime` mid-run), not an algorithmic issue in this scope.
+      Result is still fully DETERMINISTIC (three runs, two after further correctness fixes, all gave manifest_sha256
+      6586ae8160f996c2ea8ae9e9383a3898f33f4f3f8ac3ab522327ee98b6be5c2f the two times it mattered) and completes
+      well inside any reasonable timeout; routed to I1/the verifier as a performance note, not a correctness gap.
+  - id: OI-2-mentions-cites-code-route-edges-not-persisted-globally
+    text: >
+      Only DEFINES (one per record definition) and registry-derived SUPERSEDES edges are persisted in the
+      authority_edge table; MENTIONS/CITES_PATH/CITES_LINE/CITES_COMMIT/CODE_CITES/EVIDENCE_MAP and the
+      B3-dependent CALLS/READS_KEY/TESTS remain on-demand, bounded, per-seed lookups in govbridge/graph/derive.py
+      (used directly by why.py/history.py), not globally pre-computed rows. A whole-corpus MENTIONS/CITES scan for
+      every one of ~2,900 record ids is a materially larger, separate operation from this layer's ~4 minute
+      DEFINES-only pass; I1 may promote them into this same schema later without changing its shape. Routed to I1.
+  - id: OI-3-review-8-probes-multi-path-item-uses-its-first-path-only
+    text: >
+      REVIEW-8-PROBES (a mandatory_bridge_inputs item) lists two paths (a directory and a file); resolver.py's
+      _mandatory_item_from_row treats required_inputs rows as single-occurrence and resolves only paths[0] (the
+      directory) as the MandatoryItem's own occurrence -- both paths still verify to exist, but only one is
+      recorded as the item's primary (path, blob). Every other mandatory_bridge_inputs item has exactly one path.
+      Routed to B6/I1 in case packet compilation needs both paths represented as separate section-A evidence.
+  - id: OI-4-state-aliases-are-a-small-hardcoded-table
+    text: >
+      config/id-grammar.yaml and config/authority-registry.yaml are B5's only permitted new config files (per the
+      DAG node's mutation_scope), so the "bridge"/"phase-2"/"phase-1" state-alias -> ORCHESTRATOR_STATE.yaml path
+      table used by resolver.py's state_ref parsing and by state.py's CLI lives as a small constant
+      (resolver.STATE_ALIASES) rather than its own config file. It is generic in shape (any repository domain that
+      has its own ORCHESTRATOR_STATE.yaml could be added as a fourth entry) but is currently a closed, hand-written
+      set of three. Routed to I1/B6 in case a fourth domain's state needs to be addressable later.
+  - id: OI-5-b1-reused-as-is
+    text: >
+      No changes were needed or made to govbridge/core/**; B1's gitobj/view/corpus/yamlutil/manifest/freshness APIs
+      were sufficient as given. The one real defect found in a B1-owned function (pathrules.glob_match has no
+      brace-alternation support) was worked around entirely within this node's own scope (registry.expand_braces),
+      per the working rules never editing govbridge/core/**.
