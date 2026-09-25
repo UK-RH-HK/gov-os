@@ -193,12 +193,17 @@ def compile_brief(task_spec: dict, routes=None, repo: Optional[str] = None, regi
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="govbridge.compile.bootstrap")
     p.add_argument("task_spec")
+    p.add_argument("--fake-routes", action="store_true",
+                    help="use the all-empty RouteSet; the DEFAULT is the real B2/B3/B4 routes, matching "
+                         "govbridge.compile.packet's own CLI default.")
     p.add_argument("--registry")
     p.add_argument("--budgets")
     args = p.parse_args(argv)
 
     task_spec = load_yaml_file(args.task_spec)
-    brief, result = compile_brief(task_spec, routes=packetmod.FAKE_ROUTES, registry_path=args.registry,
+    routes = packetmod.FAKE_ROUTES if args.fake_routes else packetmod.real_routes_for(
+        task_spec, registry_path=args.registry)
+    brief, result = compile_brief(task_spec, routes=routes, registry_path=args.registry,
                                    budgets_path=args.budgets)
     sys.stdout.write(brief)
     return 0 if result["status"] == packetmod.STATUS_OK else 1

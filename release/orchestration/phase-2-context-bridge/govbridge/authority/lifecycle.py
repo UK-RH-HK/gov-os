@@ -315,6 +315,15 @@ def _find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[
     return path, commit, line_start, line_end
 
 
+def find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[str] = None) -> Optional[tuple]:
+    """Public wrapper over ``_find_definition`` (unchanged): a bounded (git-grep, never whole-corpus) id-grammar
+    definition-site lookup for one token. Added so ``govbridge.core.exact.id_lookup`` (B1 OI-2: "exact id is a
+    mention-only placeholder... resolve definition sites through B5's id grammar") can reuse the SAME bounded
+    lookup ``classify()`` already uses internally, rather than re-implementing it. Additive only: no existing
+    behaviour of ``_find_definition``/``classify`` changes."""
+    return _find_definition(unit, repo=repo, view_path=view_path)
+
+
 def show_many(unit_ids: list, repo: Optional[str] = None, view_path: Optional[str] = None) -> dict:
     reg = registrymod.load(registrymod._default_registry_path(), verify_commit="records", view_path=view_path,
                             repo=repo)

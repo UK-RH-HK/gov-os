@@ -213,6 +213,64 @@ def build(conn: sqlite3.Connection, resolved_view, rules, repo: Optional[str], f
     return stats
 
 
+def record_id_for_occurrence(conn: sqlite3.Connection, path: str, line_start: Optional[int],
+                              line_end: Optional[int]) -> Optional[str]:
+    """The record id (if any) whose persisted ``record_def`` span at ``path`` contains/overlaps
+    ``[line_start, line_end]`` -- an INDEXED lookup (no git-grep, no whole-corpus scan) used to give a retrieval
+    hit its real classification unit instead of a bare path. Among several candidates the narrowest (smallest)
+    span wins (the most specific enclosing section); a non-local definition is preferred over a local one
+    (RECORD#LOCAL) when both cover the same lines. ``line_start``/``line_end`` absent means "the whole occurrence"
+    (line 1)."""
+    ensure_schema(conn)
+    ls = line_start if line_start is not None else 1
+    le = line_end if line_end is not None else ls
+    rows = conn.execute(
+        "SELECT id FROM record_def WHERE path=? AND line_start<=? AND line_end>=? "
+        "ORDER BY local ASC, (line_end - line_start) ASC LIMIT 1",
+        (path, le, ls),
+    ).fetchone()
+    return rows[0] if rows else None
+
+
+def classify_hit(conn: sqlite3.Connection, path: Optional[str], commit: Optional[str],
+                  line_start: Optional[int] = None, line_end: Optional[int] = None,
+                  reg: Optional[registrymod.Registry] = None, mandatory_items: Optional[dict] = None,
+                  repo: Optional[str] = None, view_path: Optional[str] = None) -> "lifecyclemod.Classification":
+    """Real authority classification for a RETRIEVED route hit -- never a MandatoryItem; section A stays
+    resolver-only (ARCHITECTURE.md section 5.3 rule 1), so a class computed here can never be mistaken for
+    authority, whatever it says. Routed issue B4/BR-AR-0006 OI-3 ("retrieved results carry placeholder
+    UNCLASSIFIED/UNKNOWN ... wire B5's classifier into every route's results"), closed by I1/BR-AR-0009 here so
+    every route (lexical/semantic/code/graph) shares one implementation.
+
+    Tries an INDEXED lookup first: if ``record_id_for_occurrence`` identifies a real record id owning this
+    (path, line) span, and this store's authority layer already classified that id (the persisted
+    ``class_lifecycle`` cache, the SAME ``lifecycle.classify()`` call ``authority.layer.build()`` made), that row
+    is returned directly -- no recomputation, no extra Git reads. Otherwise ``lifecycle.classify()`` is called
+    fresh, with the found id (full rule 1-4 classification) or the bare path (registry section_anchors-by-path and
+    class_rules only -- the honest ceiling for an arbitrary chunk of text that is not itself one whole record)."""
+    ensure_schema(conn)
+    unit = None
+    if path:
+        try:
+            unit = record_id_for_occurrence(conn, path, line_start, line_end)
+        except sqlite3.Error:
+            unit = None
+    if unit is not None:
+        cached = conn.execute(
+            "SELECT unit, cls, lifecycle, derivation, path, commit_id, line_start, line_end "
+            "FROM class_lifecycle WHERE unit=?", (unit,)
+        ).fetchone()
+        if cached is not None:
+            return lifecyclemod.Classification(
+                unit=cached[0], cls=cached[1], lifecycle=cached[2], derivation=cached[3],
+                notes=["classify_hit: from the persisted class_lifecycle cache"],
+                path=cached[4], commit=cached[5], line_start=cached[6], line_end=cached[7],
+            )
+    return lifecyclemod.classify(unit or (path or ""), path=path, commit=commit, line_start=line_start,
+                                  line_end=line_end, reg=reg, mandatory_items=mandatory_items, repo=repo,
+                                  view_path=view_path)
+
+
 def digest(conn: sqlite3.Connection) -> LayerDigest:
     """Ensures its own schema FIRST (the same fix B2 applied to its lexical layer digest): govbridge.core.manifest.
     build_manifest() calls every registered layer digest unconditionally, including on a bare connection from a

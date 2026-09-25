@@ -1,0 +1,55 @@
+schema: govbridge-oracle/1
+oracle_id: T-ORACLE-1
+line_tolerance: 3
+# A GENERIC, synthetic oracle fixture for `govbridge demo grade` (I1/BR-AR-0009, DAG node I1 acceptance check 7).
+# Every id is CX-* / T-* (never Review-8/Phase-2 content -- OC-BR-02), matching tests/fixtures/compile/
+# compile_repobuilder.py's own synthetic repository (CX-0010A/CX-0010B: ACTIVE OWNER_DECISION mandatory items;
+# CX-DIRECTION: OWNER_DIRECTION_TO_TEST; CX-HYPOTHESIS: HYPOTHESIS_TO_TEST). Record-id anchors only (no code
+# lines), so this oracle is commit-independent -- it exercises the SAME generic grading mechanism
+# govbridge.demo.grade implements for a real, held-out oracle, at a scale small enough to read in one sitting.
+# See tests/integration/test_demo_grade.py for the matching answers.yaml/receipt fixtures and the exact
+# `govbridge compile` invocation (against compile_repobuilder's fixture repo) that produces a packet these
+# anchors resolve against.
+chains:
+  - query_id: T-CHAIN-1
+    stages:
+      - stage: s1
+        required: true
+        is_enforcement_point: true
+        anchors:
+          any_of:
+            - {kind: record, commit: "0000000000000000000000000000000000000000", path: x, record_id: CX-0010A}
+        must_state: ["a fixture fact"]
+        traps:
+          - {kind: record, commit: "0000000000000000000000000000000000000000", path: x, record_id: CX-DIRECTION,
+             why: "an upstream direction, not the enforcement point"}
+        wrong: []
+    acceptable_alternative_enforcement_points: []
+    effective_behaviour:
+      subject: s
+      attribute: a
+      before: b
+      after: c
+      evidence: {kind: record, commit: "0000000000000000000000000000000000000000", path: x, record_id: CX-0010A}
+side_by_side:
+  query_id: T-SIDE-BY-SIDE
+  shared_points: []
+  differing_points: []
+f1_both_ways:
+  query_id: T-BOTH-WAYS
+  purpose_anchors:
+    - {kind: record, commit: "0000000000000000000000000000000000000000", path: x, record_id: CX-0010A}
+  consumer_anchors:
+    - {kind: record, commit: "0000000000000000000000000000000000000000", path: x, record_id: CX-0010B,
+       process: in, production: true}
+queries:
+  - {query_id: T-QC1-S1, required: [CX-0010A], forbidden: [], must_state: ["a fact"]}
+  - {query_id: T-QC1-S2, required: [CX-0010A], forbidden: [], must_state: ["a fact"]}
+  - {query_id: T-QC1-S3, required: [CX-0010A], forbidden: [], must_state: ["a fact"]}
+controls:
+  - {query_id: T-CTRL-1, required: [CX-0010A], forbidden: [], must_state: ["a fact"]}
+authority_expectations:
+  - {item: CX-0010A, sections: [A, D.1], class: OWNER_DECISION}
+  - {item: CX-0010B, sections: [A, D.1], class: OWNER_DECISION}
+  - {item: CX-DIRECTION, sections: [D.2], class: OWNER_DIRECTION_TO_TEST}
+  - {item: CX-HYPOTHESIS, sections: [D.3], class: HYPOTHESIS_TO_TEST}

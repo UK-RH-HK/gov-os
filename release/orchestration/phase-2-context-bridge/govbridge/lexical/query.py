@@ -31,7 +31,7 @@ import dataclasses
 import json
 import sys
 import time
-from typing import Optional
+from typing import Callable, Optional
 
 from govbridge.core import pathrules, store, telemetry, view as viewmod
 from govbridge.core.yamlutil import canonical_json, sha256_text
@@ -105,13 +105,19 @@ def _occurrences_for_blob(conn, blob_id: str, resolved: "viewmod.ResolvedView") 
 
 
 def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, view_path: Optional[str] = None,
-          repo: Optional[str] = None, record_telemetry: bool = True) -> dict:
+          repo: Optional[str] = None, record_telemetry: bool = True,
+          classify: Optional["Callable[[RetrievedItem], tuple]"] = None) -> dict:
     """Run ``text`` (an FTS5 MATCH expression -- a phrase, NEAR(), a bareword query, ...) against the lexical
     index and return up to ``k`` RetrievedItems, ranked by BM25 (ascending: SQLite's bm25() is a cost, lower is
     better -- ORDER BY score ASC is the correct direction, matching fts_spike.py). ``exclude`` is a list of globs
     (retrieval_exclusions): an occurrence whose path matches any of them is dropped; a hit left with no surviving
     occurrence is dropped entirely.
-    """
+
+    ``classify``, an optional hook, ``RetrievedItem -> (authority_class, lifecycle)`` -- the SAME extension point
+    ``govbridge.semantic.search`` already has (its ``Classifier`` callable), added here for symmetry so a caller
+    (I1's real-route wiring, once ``govbridge.authority`` is on this branch's base -- B2 depends only on B1) can
+    supply the real classifier without editing this file. Absent (the default), every hit still carries the
+    original placeholder (``authority_class=None``, ``classification_note=NOT_YET_ASSIGNED``) -- unchanged."""
     view_path = view_path or _default_paths(repo)
     conn = store.open_db()
     ftsmod.ensure_schema(conn)
@@ -137,9 +143,17 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, vi
             occs = [o for o in occs if pathrules.any_glob_match(o.path, exclude) is None]
             if not occs:
                 continue
-        hits.append(RetrievedItem(item_id=chunk_id, route="lexical", raw_score=score, rank=len(hits) + 1,
-                                   blob_id=blob_id, start_line=start_line, end_line=end_line, text=chunk_text,
-                                   occurrences=occs))
+        item = RetrievedItem(item_id=chunk_id, route="lexical", raw_score=score, rank=len(hits) + 1,
+                              blob_id=blob_id, start_line=start_line, end_line=end_line, text=chunk_text,
+                              occurrences=occs)
+        if classify is not None:
+            try:
+                cls, lifecycle = classify(item)
+                item = dataclasses.replace(item, authority_class=cls, lifecycle=lifecycle,
+                                            classification_note="classified by govbridge.authority")
+            except Exception:
+                pass  # a classifier failure must never fail the route; the placeholder stands
+        hits.append(item)
         if len(hits) >= k:
             break
 

@@ -19,9 +19,16 @@ model:
       sha256: 9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3
     - path: special_tokens_map.json
       sha256: b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3
+    # `local_name` was previously `pooling_config.json` here, which never matched reality: bootstrap.sh's own
+    # download step (below) writes every artefact to `models/<slug>/<revision>/<path>` verbatim -- it does not
+    # read `local_name` or `download.dest_template` at all -- so the artefact has always landed, and been read
+    # back by govbridge.semantic.modelpin, at its literal `path`, `1_Pooling/config.json`. Routed issue
+    # B4/BR-AR-0006 OI-4 ("the model-pin local_name does not match the bootstrapped cache layout"), closed by
+    # I1/BR-AR-0009: the field is removed rather than corrected to a value equal to `path`, since an absent
+    # `local_name` already falls back to `path` (govbridge/semantic/modelpin.py's `load_model_pin`) -- one
+    # honest source of truth instead of two fields that must be kept in sync.
     - path: 1_Pooling/config.json
       sha256: d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c
-      local_name: pooling_config.json
   dimensions: 384
   pooling: cls
   normalize: l2

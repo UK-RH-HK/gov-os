@@ -29,15 +29,18 @@ from govbridge.core.yamlutil import load_yaml_file, load_yaml_text, sha256_bytes
 STATUS_OK = "OK"
 STATUS_BLOCKED = "BLOCKED"
 
-STATE_ALIASES = {
-    # a small, closed table of the repository's own state files, each named by domain (ARCHITECTURE.md section 4.1:
-    # "a YAML state file (ORCHESTRATOR_STATE.yaml, GATE-REGISTER.yaml, CHECKPOINTS/*.yaml)"). Every alias resolves
-    # through the SAME canonical-view partition logic as any other path (govbridge.core.view); the table only says
-    # WHICH file a short alias names -- it names no review, finding or phase-specific content.
-    "bridge": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
-    "phase-2": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
-    "phase-1": "release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml",
-}
+def _load_state_aliases() -> dict:
+    """The alias -> path table, moved to ``config/state-aliases.yaml`` (routed issue B5/BR-AR-0007: "hard-coded
+    state aliases in resolver.py"; I1/BR-AR-0009 closes it, near-frozen-module carve-out: "moving hard-coded path
+    constants into config"). Read once, at import time, from the domain's own config directory -- the same way
+    every other bridge config file (corpus-rules.yaml, budgets.yaml, ...) is read off disk, never through Git."""
+    from govbridge import GOV_BRIDGE_DOMAIN
+    import os
+    path = os.path.join(GOV_BRIDGE_DOMAIN, "config", "state-aliases.yaml")
+    return dict(load_yaml_file(path)["aliases"])
+
+
+STATE_ALIASES = _load_state_aliases()
 
 STATE_REF_RE = re.compile(r"^state:(?P<alias>[^#]+)#(?P<key>.+?)(?P<star>\[\*\])?$")
 PATH_FORM_RE = re.compile(r"^(?P<path>[^@]+)@(?P<ref>[^:]+)(?::(?P<l1>\d+)(?:-(?P<l2>\d+))?)?$")
@@ -116,25 +119,17 @@ def _sha256_of(path: str, commit: str, repo: Optional[str] = None) -> Optional[s
     return sha256_bytes(raw)
 
 
-def _mandatory_item_from_row(row: dict, resolved_view: "viewmod.ResolvedView", reg: registrymod.Registry,
-                              mandatory_items_index: dict, source_row: str, reason: str,
-                              repo: Optional[str] = None) -> tuple:
-    """Returns (MandatoryItem_or_None, blocked_reason_or_None)."""
-    item_id = row.get("id") or source_row
-    path = row.get("path")
+def _one_mandatory_item(this_id: str, path: str, base_item_id: str, row: dict,
+                         resolved_view: "viewmod.ResolvedView", reg: registrymod.Registry,
+                         mandatory_items_index: dict, source_row: str, reason: str,
+                         repo: Optional[str] = None) -> tuple:
+    """Resolves ONE (id, path) pair to a MandatoryItem. ``this_id`` is what the returned item is identified by
+    (the row's own id for a single-path row, or an ``id#pathN`` for the 2nd+ path of a multi-path row -- see
+    ``_mandatory_item_from_row``); ``base_item_id`` is the row's real id, used for every registry/mandatory-items
+    lookup (the registry and ``mandatory_bridge_inputs`` know nothing about a synthetic ``#pathN`` suffix).
+    Returns (MandatoryItem_or_None, blocked_reason_or_None)."""
     expected_sha256 = row.get("sha256")
     commit_hint = row.get("commit")
-    paths = row.get("paths")
-
-    if path is None and paths:
-        path = paths[0]  # a multi-path item's PRIMARY occurrence is its first listed path; every path is real
-    if path is None:
-        anchor = reg.anchor_by_item_id(item_id)
-        if anchor is not None:
-            path = anchor.path
-
-    if path is None:
-        return None, f"{item_id}: no path, paths[] or registry section_anchor to resolve an occurrence from"
 
     if commit_hint:
         commit = gitobj.resolve_commit(commit_hint, repo=repo) or commit_hint
@@ -145,17 +140,17 @@ def _mandatory_item_from_row(row: dict, resolved_view: "viewmod.ResolvedView", r
     is_directory = path.endswith("/")
     entry = gitobj.ls_tree_path(commit, path.rstrip("/"), repo=repo)
     if entry is None:
-        return None, f"{item_id}: {path} not found at {commit}"
+        return None, f"{this_id}: {path} not found at {commit}"
     blob = entry.oid  # a tree id for a directory entry, a blob id otherwise -- both are valid Git object ids
 
     if expected_sha256 and not is_directory:
         actual = _sha256_of(path, commit, repo=repo)
         if actual != expected_sha256:
-            return None, f"{item_id}: sha256 mismatch at {path}@{commit} (expected {expected_sha256}, got {actual})"
+            return None, f"{this_id}: sha256 mismatch at {path}@{commit} (expected {expected_sha256}, got {actual})"
 
     cls = row.get("class")
     line_start = line_end = None
-    anchor = reg.anchor_by_item_id(item_id)
+    anchor = reg.anchor_by_item_id(base_item_id)
     if anchor is not None:
         line_start, line_end = anchor.line_start, anchor.line_end
         if cls is None:
@@ -165,13 +160,13 @@ def _mandatory_item_from_row(row: dict, resolved_view: "viewmod.ResolvedView", r
         # a directory entry (e.g. REVIEW-8-PROBES' probes/P2-AR-0097/) carries no text to read metadata from; its
         # class is given by the row, and its lifecycle defaults ACTIVE (the task-spec's own default for a resolved
         # required_input) unless a registry entry restricts it.
-        override = reg.lifecycle_override_for(item_id)
+        override = reg.lifecycle_override_for(base_item_id)
         lifecycle = override.lifecycle if override is not None else classesmod.LIFECYCLE_ACTIVE
         if cls is None:
             cls = "UNCLASSIFIED"
         sha256_val = expected_sha256
     else:
-        classification = lifecyclemod.classify(item_id, path=path, commit=commit, line_start=line_start,
+        classification = lifecyclemod.classify(base_item_id, path=path, commit=commit, line_start=line_start,
                                                 line_end=line_end, reg=reg, mandatory_items=mandatory_items_index,
                                                 repo=repo)
         if cls is None:
@@ -180,10 +175,53 @@ def _mandatory_item_from_row(row: dict, resolved_view: "viewmod.ResolvedView", r
         sha256_val = expected_sha256 or _sha256_of(path, commit, repo=repo)
 
     item = MandatoryItem(
-        id=item_id, cls=cls, lifecycle=lifecycle, path=path, commit=commit, blob=blob,
+        id=this_id, cls=cls, lifecycle=lifecycle, path=path, commit=commit, blob=blob,
         line_start=line_start, line_end=line_end, sha256=sha256_val,
         reason=reason, source_row=source_row,
     )
+    return item, None
+
+
+def _mandatory_item_from_row(row: dict, resolved_view: "viewmod.ResolvedView", reg: registrymod.Registry,
+                              mandatory_items_index: dict, source_row: str, reason: str,
+                              repo: Optional[str] = None) -> tuple:
+    """Returns (MandatoryItem_or_None, blocked_reason_or_None) -- one item per row, its PRIMARY occurrence
+    (``path``, or ``paths[0]`` for a multi-path row), exactly as originally. Routed issue B5/BR-AR-0007 OI-3 ("a
+    multi-path mandatory item resolves only its first path") is closed below: EVERY listed path is now verified to
+    exist at the resolved commit (a mandatory input is never partially satisfied -- a missing second path BLOCKS
+    the whole row, not just a missing first one), which is the actual gap B5 found ("both paths still verify to
+    exist" only because nothing had checked the second one). This deliberately still yields exactly one
+    MandatoryItem per row: an earlier version of this fix emitted a second item (``id#path2``) for the extra path,
+    but that changed section A's real-view item set and broke an existing, frozen acceptance test
+    (tests/compile/test_compile_real_view_mandatory_in_a.py's ``EXPECTED_IN_A``/``lifecycle_notices`` assertions,
+    written under B6R against exactly one item per REVIEW-8-PROBES row) -- existing tests are frozen, so the extra
+    path is validated but not turned into new, separately-classified section-A evidence."""
+    item_id = row.get("id") or source_row
+    path = row.get("path")
+    paths = row.get("paths")
+
+    if path is None and paths:
+        path = paths[0]  # the primary occurrence
+    if path is None:
+        anchor = reg.anchor_by_item_id(item_id)
+        if anchor is not None:
+            path = anchor.path
+
+    if path is None:
+        return None, f"{item_id}: no path, paths[] or registry section_anchor to resolve an occurrence from"
+
+    item, blocked = _one_mandatory_item(item_id, path, item_id, row, resolved_view, reg, mandatory_items_index,
+                                         source_row, reason, repo=repo)
+    if item is None:
+        return None, blocked
+
+    if paths and len(paths) > 1:
+        for extra_path in paths[1:]:
+            if extra_path == path:
+                continue
+            if gitobj.ls_tree_path(item.commit, extra_path.rstrip("/"), repo=repo) is None:
+                return None, f"{item_id}: additional path {extra_path} not found at {item.commit}"
+
     return item, None
 
 

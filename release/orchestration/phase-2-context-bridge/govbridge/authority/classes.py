@@ -111,7 +111,19 @@ def map_in_effect(in_effect: Optional[bool]) -> Optional[str]:
     return None
 
 
-BRIDGE_STATE_PATH = "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml"
+def _load_bridge_state_path() -> str:
+    """The bridge's own state file path, moved to ``config/state-aliases.yaml`` (routed issue B5/BR-AR-0007:
+    "hard-coded ... BRIDGE_STATE_PATH in classes.py"; I1/BR-AR-0009 closes it, near-frozen-module carve-out:
+    "moving hard-coded path constants into config"). Reads the SAME file, and the SAME "bridge" key, that
+    ``authority.resolver.STATE_ALIASES`` uses, so the path is named in exactly one place."""
+    from govbridge import GOV_BRIDGE_DOMAIN
+    import os
+    from govbridge.core.yamlutil import load_yaml_file
+    path = os.path.join(GOV_BRIDGE_DOMAIN, "config", "state-aliases.yaml")
+    return load_yaml_file(path)["aliases"]["bridge"]
+
+
+BRIDGE_STATE_PATH = _load_bridge_state_path()
 
 
 def load_state_authority_classes(ref: str = "records", view_path: Optional[str] = None,

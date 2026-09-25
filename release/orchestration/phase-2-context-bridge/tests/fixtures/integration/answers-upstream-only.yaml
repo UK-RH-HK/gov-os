@@ -1,0 +1,30 @@
+# Same as answers-passing.yaml except the T-CHAIN-1 enforcement stage cites ONLY the trap anchor (CX-DIRECTION,
+# an upstream representation) -- G4 grades this UPSTREAM_ONLY, which fails the whole chain regardless of every
+# other stage (DEMONSTRATION_DESIGN.md section 4 G4, the launcher's own rule).
+run_id: T-RUN-1
+packets_used: [main]
+answers:
+  - query_id: T-CHAIN-1
+    status: ANSWERED
+    answer_text: chain reconstructed
+    citations: []
+    stages:
+      - {stage: s1, claim: the direction, citations: [CX-DIRECTION], is_enforcement_point: true}
+  - query_id: T-SIDE-BY-SIDE
+    status: ANSWERED
+    answer_text: compared
+    shared_points: []
+    differing_points: []
+    classification: NOT_DETERMINED_BY_BRIDGE
+  - query_id: T-BOTH-WAYS
+    status: ANSWERED
+    answer_text: both ways
+    evidence_for:
+      - {claim: purpose, citations: [CX-0010A]}
+    evidence_against:
+      - {claim: consumer, citations: [CX-0010B]}
+    disposition: NONE_STATED
+  - {query_id: T-QC1-S1, status: ANSWERED, answer_text: answer s1, citations: [CX-0010A]}
+  - {query_id: T-QC1-S2, status: ANSWERED, answer_text: answer s2, citations: [CX-0010A]}
+  - {query_id: T-QC1-S3, status: ANSWERED, answer_text: answer s3, citations: [CX-0010A]}
+  - {query_id: T-CTRL-1, status: ANSWERED, answer_text: control answer, citations: [CX-0010A]}

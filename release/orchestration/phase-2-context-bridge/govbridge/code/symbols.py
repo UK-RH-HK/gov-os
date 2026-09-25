@@ -173,6 +173,34 @@ def _row_for_call(c: resolve.CallSite, res: resolve.Resolution, defs_by_id: dict
     }
 
 
+def definitions(name: str, commit: str, repo: Optional[str] = None) -> dict:
+    """Every definition (across the whole commit's parsed ``.rs`` blobs) whose bare ``name`` or ``qualified_name``
+    matches ``name`` exactly, or whose ``qualified_name`` ends ``::name`` -- the "given symbol names, return each
+    definition" half of ARCHITECTURE.md section 4.6's generic chain probe (``callers``/``reads_key`` already exist
+    as their own commands; this is the definition-SITE lookup the code route needs to show a symbol's own
+    location, with lines, not only its callers). Generic: takes any name as data, never special-cases one."""
+    commit_full = _resolve_commit(commit, repo)
+    conn = _open_conn()
+    entries = ensure_indexed(conn, commit_full, repo=repo)
+    path_by_blob = {b: p for p, b in entries}
+    blob_ids = [b for _, b in entries]
+    rows = codestore.symbols_for_blobs(conn, blob_ids)
+    hits = [
+        r for r in rows
+        if r["name"] == name or r["qualified_name"] == name or r["qualified_name"].endswith("::" + name)
+    ]
+    hits.sort(key=lambda r: (path_by_blob.get(r["blob_id"], ""), r["start_line"]))
+    return {
+        "symbol": name, "commit": commit_full,
+        "definitions": [
+            {"path": path_by_blob.get(r["blob_id"], ""), "qualified_name": r["qualified_name"], "kind": r["kind"],
+             "start_line": r["start_line"], "end_line": r["end_line"], "blob_id": r["blob_id"],
+             "symbol_id": r["symbol_id"]}
+            for r in hits
+        ],
+    }
+
+
 def callers(name: str, commit: str, repo: Optional[str] = None) -> dict:
     commit_full = _resolve_commit(commit, repo)
     conn = _open_conn()
