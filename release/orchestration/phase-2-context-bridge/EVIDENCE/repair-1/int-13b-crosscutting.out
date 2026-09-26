@@ -1,0 +1,15 @@
+# int-13b cross-cutting fixes (check 13), part 2. $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3); pinned view; store-BR-AR-0028-a
+## (R1-14) thread-safe excluded_hits, REAL view: `govbridge gather --task <pinned CONTROL-A> --query CA-DEPS --json` at --threads 1, 4 (default) and 16
+#   threads=4 (default; int-04e run) threads= 4 excluded_hits=1194 merged_sha256=53c5a44f3365f7812a40ee868814bfeedaef9fffd7ce091de69e70443622f676 merged=637 stop=MAX_ROUNDS deterministic=True
+#   threads=1                        threads= 1 excluded_hits=1194 merged_sha256=53c5a44f3365f7812a40ee868814bfeedaef9fffd7ce091de69e70443622f676 merged=637 stop=MAX_ROUNDS deterministic=True
+#   threads=16                       threads=16 excluded_hits=1194 merged_sha256=53c5a44f3365f7812a40ee868814bfeedaef9fffd7ce091de69e70443622f676 merged=637 stop=MAX_ROUNDS deterministic=True
+#   -> identical excluded_hits and merged_sha256 across 1/4/16 threads: True
+#   wall: CA-DEPS threads=1 exit=0 wall_outer=599.913397244 end=2026-09-26T21:01:46Z
+#   wall: CA-DEPS threads=16 exit=0 wall_outer=718.847361709 end=2026-09-26T21:13:45Z
+#   hermetic: tests/integration/test_repair1_integration.py::test_c13_exclusion_counter_is_exact_under_16_threads (16 threads x 20,000 bumps,
+#   switch interval 1 us, exact) -- PASS in int-01; the structural lock test tests/core/test_taskctx_concurrency.py -- PASS. -> R1-14 CLOSED
+## (R1-22) transient-git retry disclosure
+#   gather: every CONTROL-A gather carries telemetry.degraded_git_reads (0 entries) and deterministic:true (int-04e) -- the disclosure exists.
+#   compile: a gather result forced to deterministic:false with one degraded read leaves NO trace in the compiled manifest or rendered
+#   packet (tests/integration/test_repair1_integration.py::test_c13_compile_discloses_a_non_deterministic_gather, strict xfail -> INT-D10).
+## (also found under check 13) INT-D11 freshness fingerprint vs a pinned view (int-02d); INT-D14 exact grep --ref <view ref name> (int-08)

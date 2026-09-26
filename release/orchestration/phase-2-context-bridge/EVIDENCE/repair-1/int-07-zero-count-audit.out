@@ -1,0 +1,483 @@
+# int-07 zero-count audit (check 7, BR-DAG-AMEND-R1-7) on the real view: store-BR-AR-0028-ro (pinned view). $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)
+# step 1+2 raw output: $PY EVIDENCE/repair-1/scripts/int07_zero_count.py $HOME/.cache/gov-bridge/store-BR-AR-0028-ro  (JSON below)
+{
+ "authority_edge": [
+  [
+   "DEFINES",
+   "EXACT_DEFINITION",
+   3688
+  ],
+  [
+   "SUPERSEDES",
+   "REGISTRY_CITED",
+   4
+  ]
+ ],
+ "code_route_labels": {
+  "evidence": {
+   "EXACT_PATH": 1259,
+   "HEURISTIC_AMBIGUOUS": 124987,
+   "HEURISTIC_TYPE_PATH": 2420,
+   "HEURISTIC_UNIQUE_NAME": 10536,
+   "_bare_calls_with_exactly_one_same_file_fn": 6445,
+   "_call_kinds": {
+    "bare": 13000,
+    "generic_function": 138,
+    "macro": 13472,
+    "macro_token": 15015,
+    "method": 44800,
+    "parenthesized_expression": 18,
+    "path": 7455
+   }
+  },
+  "product": {
+   "EXACT_PATH": 1259,
+   "HEURISTIC_AMBIGUOUS": 123948,
+   "HEURISTIC_TYPE_PATH": 2410,
+   "HEURISTIC_UNIQUE_NAME": 10498,
+   "_bare_calls_with_exactly_one_same_file_fn": 6380,
+   "_call_kinds": {
+    "bare": 12899,
+    "generic_function": 138,
+    "macro": 13415,
+    "macro_token": 14952,
+    "method": 44550,
+    "parenthesized_expression": 18,
+    "path": 7417
+   }
+  },
+  "records": {
+   "EXACT_PATH": 1196,
+   "HEURISTIC_AMBIGUOUS": 104500,
+   "HEURISTIC_TYPE_PATH": 2260,
+   "HEURISTIC_UNIQUE_NAME": 9713,
+   "_bare_calls_with_exactly_one_same_file_fn": 5145,
+   "_call_kinds": {
+    "bare": 10935,
+    "generic_function": 132,
+    "macro": 11574,
+    "macro_token": 13267,
+    "method": 40241,
+    "parenthesized_expression": 18,
+    "path": 6672
+   }
+  }
+ },
+ "code_route_labels_zero": {
+  "evidence": [
+   "HEURISTIC_SAME_FILE",
+   "UNRESOLVED_EXTERNAL",
+   "MACRO",
+   "HEURISTIC_MACRO_TOKEN"
+  ],
+  "product": [
+   "HEURISTIC_SAME_FILE",
+   "UNRESOLVED_EXTERNAL",
+   "MACRO",
+   "HEURISTIC_MACRO_TOKEN"
+  ],
+  "records": [
+   "HEURISTIC_SAME_FILE",
+   "UNRESOLVED_EXTERNAL",
+   "MACRO",
+   "HEURISTIC_MACRO_TOKEN"
+  ]
+ },
+ "derivation_labels_zero_persisted": [
+  "EXACT_COMMENT_CITATION",
+  "EXACT_COMMIT",
+  "EXACT_GIT",
+  "EXACT_ID",
+  "EXACT_METADATA",
+  "EXACT_PARSE",
+  "EXACT_PATH",
+  "EXACT_QUALIFIED",
+  "EXACT_SPAN",
+  "EXACT_TEST_REGISTRY_ROW",
+  "HEURISTIC_CLI_DISPATCH",
+  "HEURISTIC_CUE",
+  "HEURISTIC_LOCAL_ID",
+  "HEURISTIC_NAME",
+  "HEURISTIC_SUFFIX"
+ ],
+ "edge_types_zero_persisted": [
+  "AMENDS",
+  "CALLS",
+  "CHANGED_IN",
+  "CITES_COMMIT",
+  "CITES_LINE",
+  "CITES_PATH",
+  "CODE_CITES",
+  "CONTAINS",
+  "DELETED_IN",
+  "EVIDENCE_MAP",
+  "EXTENDS",
+  "INTRODUCED_IN",
+  "MENTIONS",
+  "READS_KEY",
+  "RELATION_CUE",
+  "SYMBOL_MENTION"
+ ],
+ "independent": {
+  "Python `-m <module>` subprocess CLI invocations in tests/ at product (EXACT/HEURISTIC_CLI_DISPATCH shape)": [
+   2,
+   [
+    "3c880d80f81475f5306bdd5f680f2e004df49391:tests/certification/ws06r3.rs:444:            \"command\": [\"python3\", \"-m\", \"govos_capabilities.code_intel_python_ast\"], \"cwd\": \"tools/pyplug\"}),",
+    "3c880d80f81475f5306bdd5f680f2e004df49391:tests/certification/ws07.rs:453:        &json!({\"plugin_id\": \"modplug\", \"capability\": \"embed\", \"version\": \"1\", \"command\": [\"python3\", \"-m\", \"modplug\"]}),"
+   ]
+  ],
+  "Python `-m <module>` subprocess CLI invocations in tests/ at records (EXACT/HEURISTIC_CLI_DISPATCH shape)": [
+   2,
+   [
+    "7bd7598ca3e63f026b25d4bc603a7022e608eb87:tests/certification/ws06r3.rs:444:            \"command\": [\"python3\", \"-m\", \"govos_capabilities.code_intel_python_ast\"], \"cwd\": \"tools/pyplug\"}),",
+    "7bd7598ca3e63f026b25d4bc603a7022e608eb87:tests/certification/ws07.rs:453:        &json!({\"plugin_id\": \"modplug\", \"capability\": \"embed\", \"version\": \"1\", \"command\": [\"python3\", \"-m\", \"modplug\"]}),"
+   ]
+  ],
+  "Rust macro invocations at product (MACRO shape)": 13668,
+  "Rust macro invocations at records (MACRO shape)": 11875,
+  "backticked Rust-path symbol mentions in *.md at records (SYMBOL_MENTION shape)": 2195,
+  "code-comment path:line citations at product (EXACT_COMMENT_CITATION / HEURISTIC_SUFFIX shape)": [
+   2,
+   [
+    "3c880d80f81475f5306bdd5f680f2e004df49391:runtime/src/paths.rs:326:/// (`SYNTHESIS.md \u00a710.4`, verified at `adopt.rs:1579/1585` and `init.rs`'s own `native_layout_rules`).",
+    "3c880d80f81475f5306bdd5f680f2e004df49391:tests/certification/p2ho56_floor.rs:3://! `SYNTHESIS.md \u00a710.4`, verified at `adopt.rs:1579/1585` (and the parallel `init.rs::native_layout_rules`, the"
+   ]
+  ],
+  "code-comment path:line citations at records (EXACT_COMMENT_CITATION / HEURISTIC_SUFFIX shape)": [
+   0,
+   []
+  ],
+  "code-comment section citations at product (HEURISTIC_COMMENT_SECTION / _SECTION_UNRESOLVED / lineage_unresolved shape)": [
+   6,
+   [
+    "3c880d80f81475f5306bdd5f680f2e004df49391:runtime/src/adopt.rs:1547:/// (`SYNTHESIS.md \u00a710.4`), so without being recorded as an authenticated floor here, at the ONE moment this",
+    "3c880d80f81475f5306bdd5f680f2e004df49391:runtime/src/paths.rs:326:/// (`SYNTHESIS.md \u00a710.4`, verified at `adopt.rs:1579/1585` and `init.rs`'s own `native_layout_rules`).",
+    "3c880d80f81475f5306bdd5f680f2e004df49391:tests/certification/p2ho56_floor.rs:3://! `SYNTHESIS.md \u00a710.4`, verified at `adopt.rs:1579/1585` (and the parallel `init.rs::native_layout_rules`, the"
+   ]
+  ],
+  "code-comment section citations at records (HEURISTIC_COMMENT_SECTION / _SECTION_UNRESOLVED / lineage_unresolved shape)": [
+   3,
+   [
+    "7bd7598ca3e63f026b25d4bc603a7022e608eb87:tests/certification/repair.rs:2://! (release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md \u00a711). Each test names the finding it covers.",
+    "7bd7598ca3e63f026b25d4bc603a7022e608eb87:tests/certification/repair2.rs:2://! (release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md \u00a711\u2013\u00a712). Each test names the finding it covers and",
+    "7bd7598ca3e63f026b25d4bc603a7022e608eb87:tests/certification/repair3.rs:2://! (release/verification/4.1.4/INDEPENDENT_REVERIFICATION_REPORT.md \u00a711\u2013\u00a713). Each test names the finding it covers"
+   ]
+  ],
+  "yaml key `amends:` (records/product)": [
+   1,
+   1
+  ],
+  "yaml key `contains:` (records/product)": [
+   2,
+   2
+  ],
+  "yaml key `extends:` (records/product)": [
+   0,
+   0
+  ],
+  "yaml key `superseded_by:` (records/product)": [
+   8,
+   2
+  ],
+  "yaml key `supersedes:` (records/product)": [
+   19,
+   19
+  ]
+ },
+ "layers_rows": {
+  "authority": 11068,
+  "blob": 7445,
+  "chunk": 142924,
+  "code": 197348,
+  "lexical": 142924,
+  "lineage": 3905,
+  "occurrence": 504108,
+  "vector": 48645
+ },
+ "lineage_edge": [
+  [
+   "evidence",
+   "CITES_REQUIREMENT",
+   "HEURISTIC_COMMENT_SECTION",
+   2
+  ],
+  [
+   "evidence",
+   "CITES_REQUIREMENT",
+   "HEURISTIC_SECTION_UNRESOLVED",
+   3
+  ],
+  [
+   "evidence",
+   "DEPENDS_ON_DATA",
+   "EXACT_LITERAL_PATH",
+   378
+  ],
+  [
+   "evidence",
+   "DEPENDS_ON_DATA",
+   "HEURISTIC_JOINED_PATH",
+   24
+  ],
+  [
+   "evidence",
+   "TESTS",
+   "EXACT_RUST_CLI_DISPATCH",
+   32
+  ],
+  [
+   "evidence",
+   "TESTS",
+   "HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM",
+   5
+  ],
+  [
+   "evidence",
+   "TESTS",
+   "HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD",
+   546
+  ],
+  [
+   "evidence",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_ID_TOKEN",
+   135
+  ],
+  [
+   "evidence",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_RAW_TEXT",
+   106
+  ],
+  [
+   "evidence",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_SYMBOL",
+   117
+  ],
+  [
+   "product",
+   "CITES_REQUIREMENT",
+   "HEURISTIC_COMMENT_SECTION",
+   2
+  ],
+  [
+   "product",
+   "CITES_REQUIREMENT",
+   "HEURISTIC_SECTION_UNRESOLVED",
+   3
+  ],
+  [
+   "product",
+   "DEPENDS_ON_DATA",
+   "EXACT_LITERAL_PATH",
+   377
+  ],
+  [
+   "product",
+   "DEPENDS_ON_DATA",
+   "HEURISTIC_JOINED_PATH",
+   24
+  ],
+  [
+   "product",
+   "TESTS",
+   "EXACT_RUST_CLI_DISPATCH",
+   30
+  ],
+  [
+   "product",
+   "TESTS",
+   "HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM",
+   5
+  ],
+  [
+   "product",
+   "TESTS",
+   "HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD",
+   541
+  ],
+  [
+   "product",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_ID_TOKEN",
+   135
+  ],
+  [
+   "product",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_RAW_TEXT",
+   106
+  ],
+  [
+   "product",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_SYMBOL",
+   117
+  ],
+  [
+   "records",
+   "CITES_REQUIREMENT",
+   "HEURISTIC_COMMENT_SECTION",
+   2
+  ],
+  [
+   "records",
+   "DEPENDS_ON_DATA",
+   "EXACT_LITERAL_PATH",
+   360
+  ],
+  [
+   "records",
+   "DEPENDS_ON_DATA",
+   "HEURISTIC_JOINED_PATH",
+   20
+  ],
+  [
+   "records",
+   "TESTS",
+   "EXACT_CLI_DISPATCH",
+   5
+  ],
+  [
+   "records",
+   "TESTS",
+   "EXACT_RUST_CLI_DISPATCH",
+   24
+  ],
+  [
+   "records",
+   "TESTS",
+   "HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM",
+   5
+  ],
+  [
+   "records",
+   "TESTS",
+   "HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD",
+   443
+  ],
+  [
+   "records",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_ID_TOKEN",
+   135
+  ],
+  [
+   "records",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_RAW_TEXT",
+   106
+  ],
+  [
+   "records",
+   "TESTS",
+   "HEURISTIC_TEST_REGISTRY_SYMBOL",
+   117
+  ]
+ ],
+ "lineage_unresolved": [],
+ "pinned": {
+  "evidence": "58219d5628683d6f462aa67bf25dbc2641933bce",
+  "product": "3c880d80f81475f5306bdd5f680f2e004df49391",
+  "records": "7bd7598ca3e63f026b25d4bc603a7022e608eb87"
+ },
+ "producer_line_counts_in_govbridge": {
+  "CONTAINS": 0,
+  "EXACT_COMMENT_CITATION": 2,
+  "EXACT_GIT": 1,
+  "EXACT_PARSE": 4,
+  "EXACT_QUALIFIED": 4,
+  "EXACT_SPAN": 1,
+  "EXACT_TEST_REGISTRY_ROW": 2,
+  "EXTENDS": 1,
+  "HEURISTIC_CLI_DISPATCH": 2,
+  "HEURISTIC_CUE": 1,
+  "HEURISTIC_LOCAL_ID": 2,
+  "HEURISTIC_SAME_FILE": 2,
+  "SYMBOL_MENTION": 3
+ },
+ "store": "/home/usain/.cache/gov-bridge/store-BR-AR-0028-ro",
+ "table_rows": {
+  "authority_edge": 3692,
+  "blob": 7445,
+  "chunk": 142924,
+  "class_lifecycle": 3688,
+  "code_blob": 233,
+  "code_call_site": 111597,
+  "code_excluded_blob": 11,
+  "code_literal": 79518,
+  "code_parse_error": 12,
+  "code_symbol": 6233,
+  "lexical_fts": 142924,
+  "lexical_fts_config": 1,
+  "lexical_fts_content": 142924,
+  "lexical_fts_data": 15012,
+  "lexical_fts_docsize": 142924,
+  "lexical_fts_idx": 4173,
+  "lexical_indexed_blob": 7124,
+  "lineage_edge": 3905,
+  "lineage_unresolved": 0,
+  "occurrence": 504108,
+  "occurrence_distinct_path": 8416,
+  "record_def": 3688,
+  "store_meta": 5,
+  "vector": 48645
+ }
+}
+## CLASSIFICATION of every zero (independent method named; raw git greps from the repository root at the pinned commits)
+# LAYERS: none zero (occurrence 504,108; blob 7,445; chunk 142,924; lexical 142,924; vector 48,645; code 197,348; authority 11,068; lineage 3,905).
+# TABLE lineage_unresolved = 0 rows ................................................ CONFIRMED_ABSENT (for the section form) + see INT-D12
+#     independent: git grep of code-comment '<doc>.<ext> (section|§) N' lines in the code dirs -> product 6, records 3; every cited document
+#     resolves to exactly ONE path (SYNTHESIS.md, three INDEPENDENT_*VERIFICATION_REPORT.md) -> nothing is unresolvable; the persisted edges
+#     account for all but tests/certification/repair.rs:2, whose blob is X-SEC-CONTENT/EXCLUDE (corpus rule, disclosed in code_excluded_blob).
+# LINEAGE CITES_REQUIREMENT:EXACT_COMMENT_CITATION = 0 and :HEURISTIC_SUFFIX = 0 (every ref) ....................... FALSE_ZERO -> INT-D12
+#     independent: git grep '^\s*(//|#|\*).*<file>.<ext>:<digits>' in the code dirs -> product 2 lines (runtime/src/paths.rs:326,
+#     tests/certification/p2ho56_floor.rs:3, both `adopt.rs:1579/1585`), records 0. The <L1>/<L2> form is silently skipped by PATH_CITE_RE
+#     (no edge, no lineage_unresolved row); the single-line form resolves (HEURISTIC_SUFFIX) -- tests/integration test_c7_two_line_...
+# LINEAGE TESTS:EXACT_TEST_REGISTRY_ROW = 0 (every ref) ...................................... STRUCTURAL (R1-RL's accepted residual)
+#     independent: the orchestrator's own count of 158+55 `tests:` registry lines; RL's recorded reason (tree-sitter qualified_name has no
+#     module path, so `mod::fn` entries match only heuristically -> HEURISTIC_TEST_REGISTRY_SYMBOL 117 per ref). Carried, not re-opened.
+# LINEAGE TESTS:HEURISTIC_CLI_DISPATCH = 0 (every ref); EXACT_CLI_DISPATCH = 0 at product/evidence (5 at records) ...... CONFIRMED_ABSENT
+#     independent: git grep '"-m", "<module>"' in tests/ -> 2 lines per ref, both JSON plugin descriptors inside Rust tests
+#     (ws06r3.rs:444, ws07.rs:453), not Python CLI test invocations; the 5 records edges come from the records ref's own Python tests.
+# LINEAGE (records) CITES_REQUIREMENT:HEURISTIC_SECTION_UNRESOLVED = 0 ................................................ CONFIRMED_ABSENT
+#     independent: the 3 section citations at records all resolve their heading (HEURISTIC_COMMENT_SECTION 2 + repair.rs excluded).
+# AUTHORITY-LAYER edge types = 0 persisted: MENTIONS, CITES_PATH/LINE/COMMIT, AMENDS, CALLS, READS_KEY, TESTS, EVIDENCE_MAP, CODE_CITES,
+#     CHANGED_IN/INTRODUCED_IN/DELETED_IN, RELATION_CUE (and their labels EXACT_ID, HEURISTIC_LOCAL_ID, EXACT_COMMIT, EXACT_METADATA,
+#     EXACT_GIT, HEURISTIC_CUE, HEURISTIC_NAME, EXACT_PATH) ......................... STRUCTURAL_BY_DESIGN (derived on demand, derive.py)
+#     independent: each has a producer in govbridge/graph/derive.py and was observed at query time on the real view: `history P2-ADJ-0005`
+#     -> 10 MENTIONS/EXACT_ID; `impact embedded_model` -> 20 CALLS (EXACT_PATH / HEURISTIC_UNIQUE_NAME) (int-08 outputs). AMENDS: corpus
+#     has 1 `amends:` key per ref, derived on demand by metadata_supersession_edges.
+# EXTENDS = 0, no producer ..................................................................................... CONFIRMED_ABSENT
+#     independent: git grep '^\s*extends:' *.yaml -> records 0, product 0.
+# CONTAINS = 0, no producer .................................................................................... CONFIRMED_ABSENT
+#     independent: git grep '^\s*contains:' *.yaml -> 2 per ref, both free-text fields inside finding/evidence YAML, not a record relation.
+# SYMBOL_MENTION = 0, no producer ........................................................ FALSE_ZERO (vocabulary) -> INT-D23 (LOW)
+#     independent: 2,195 lines of backticked Rust-path mentions in *.md at records; graph/history.py's docstring says history returns
+#     SYMBOL_MENTION edges, none can be produced (query-time identifier extraction covers the use case, so LOW).
+# EXACT_QUALIFIED / EXACT_SPAN / EXACT_PARSE / HEURISTIC_LOCAL_ID (edges.py vocabulary) = 0 persisted ....... STRUCTURAL (code-route /
+#     on-demand labels, not lineage/authority rows)
+# CODE ROUTE labels on the shaped connection (graph/code_bridge.py), every ref:
+#   HEURISTIC_SAME_FILE = 0 ................................................................................ FALSE_ZERO -> INT-D16
+#     independent: SQL over the SAME call_site/symbol rows (not the resolver): at the product pin 6,380 bare calls have exactly one fn of
+#     that name in their own file (e.g. runtime/src/contracts.rs:594 `slug(` with `fn slug` at :435) -> 3,901 got HEURISTIC_UNIQUE_NAME
+#     and 2,479 got HEURISTIC_AMBIGUOUS (16,159 candidate rows); cause: Definition(path="") in build_shaped_code_connection.
+#   MACRO / HEURISTIC_MACRO_TOKEN / UNRESOLVED_EXTERNAL = 0 rows ......... STRUCTURAL (a label with no target symbol produces no resolution
+#     row); independent: call_kind macro 13,415 + macro_token 14,952 at product; git grep of '<ident>!(' in *.rs -> 13,668 at product.
+# FACETS (CONTROL-A, real view, int-04e) = 0 items: dependencies, dependents, tests on all 5 queries ................ FALSE_ZERO -> INT-D18
+#     independent: git grep at the product pin -- cli/src/main.rs:1626 `ContractCmd::Verify => "contract verify"` (the command CONTROL-A
+#     asks about) and 2,710 persisted lineage TESTS edges exist (2,743 per the build stats; PK collapses 33); cli/src/main.rs is absent from the main packet AND all 5 supplementary
+#     packets; the base round never gives the code route a symbol (text-only query), the follow-up chases only record ids (90 of 90),
+#     and inside compile the exact+code routes are empty for these queries. The compile's reason ('candidates found ... dropped by budget')
+#     is false -> INT-D17. `versions` reported MISSING by compile although gather returns 145-247 reconciled paths per query (INT-D25).
+# `why` CLI stages dependency/tests = MISSING for every seed ........................................................ FALSE_ZERO -> INT-D19
+#     independent: `impact embedded_model` -> 20 CALLS edges on the same store, `why embedded_model` -> 'MISSING: dependency' (no code_conn).
+# SECTIONS B, C, F = 0 items in the CONTROL-A packet ......................................... STRUCTURAL (no seeds: B/C are seed-driven);
+#     F: independent git grep -> 0 files under lessons/, spec/research, spec/reports mention the evidence map at records or product; the
+#     failed_approaches facet's 32 items land by class in D/G/H.
+# STOP REASONS never observed (5 CLI gathers: final MAX_ROUNDS x5, base FACETS_COVERED x5; 5 compile-internal gathers:
+#     MARGINAL_GAIN_ONLY_DUPLICATES x5): NO_UNRESOLVED_IDENTIFIERS, BUDGET_REACHED_WITH_UNRESOLVED, WALL_TIME_ABORT.
+#     WALL_TIME_ABORT: STRUCTURAL (max_wall_seconds null by default). NO_UNRESOLVED_IDENTIFIERS: CONFIRMED_ABSENT for CONTROL-A (hundreds of
+#     identifiers queued at every stop). BUDGET_REACHED_WITH_UNRESOLVED: UNREACHABLE WITH THE DEFAULTS -- max_rounds 6 x 15 per round = 90 <
+#     max_total_identifiers 250, so the count budget can never trip before MAX_ROUNDS (INT-D20).

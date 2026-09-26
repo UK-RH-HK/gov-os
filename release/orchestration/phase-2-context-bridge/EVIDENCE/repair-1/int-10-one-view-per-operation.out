@@ -1,0 +1,52 @@
+# int-10 one resolved view per operation (check 10, BR-DAG-AMEND-R1-23): dynamic resolution-count probe, real view, pinned view
+# method: scripts/int10_view_probe.py wraps view.load_view / view.resolve_view, subprocess.Popen (every git argv naming a symbolic ref, HEAD,
+#   <ref>:<path> or for-each-ref) and gitobj.CatFileBatch.read (non-hex object names), in-process, around ONE govbridge CLI operation.
+#   Raw probe JSONs in <scratch>/{ro,gather}/*.probe.json; the per-command summary line is copied from int-08 / the gather runner.
+answers_lint    argv0=answers  resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=1 err=None
+cite_id         argv0=cite     resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+cite_symbol     argv0=cite     resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+compile         argv0=compile  resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[['rev-parse', '--verify', '-q', 'HEAD:release/orchestration/phase-2-context-bridge/govbridge']] exit=0 err=None
+exact_grep      argv0=exact    resolve_view=0 records_commits=[] view_files=[] symbolic_git_outside_resolve=[] exit=None err=GitError('git grep failed: fatal: unable to resolve revision: product\n')
+exact_id        argv0=exact    resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+exact_path      argv0=exact    resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+exact_show      argv0=exact    resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+gather          argv0=gather   resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+history         argv0=history  resolve_view=1 records_commits=['46cf1e6b57'] view_files=['config/canonical-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+impact          argv0=impact   resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+notes_validate  argv0=notes    resolve_view=0 records_commits=[] view_files=[] symbolic_git_outside_resolve=[] exit=0 err=None
+packet_verify   argv0=packet   resolve_view=0 records_commits=[] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+receipt_check   argv0=receipt  resolve_view=0 records_commits=[] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+search          argv0=search   resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+state           argv0=state    resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+supp_verify     argv0=packet   resolve_view=0 records_commits=[] view_files=[] symbolic_git_outside_resolve=[] exit=0 err=None
+why             argv0=why      resolve_view=1 records_commits=['46cf1e6b57'] view_files=['config/canonical-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+CA-REQ          argv0=gather   resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+CA-WHY          argv0=gather   resolve_view=1 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[] exit=0 err=None
+bootstrap       argv0=bootstrap resolve_view=6 records_commits=['7bd7598ca3'] view_files=['EVIDENCE/repair-1/pinned-view.yaml'] symbolic_git_outside_resolve=[['rev-parse', '--verify', '-q', 'HEAD:release/orchestration/phase-2-context-bridge/govbridge']] exit=0 err=None
+## recorded view in each output vs the commits used
+  compile (manifest view rows): [('records', '7bd7598ca3'), ('product', '3c880d80f8'), ('evidence', '58219d5628')]
+  gather CA-WHY: [('records', '7bd7598ca3', 'REF_MOVED'), ('product', '3c880d80f8', 'OK'), ('evidence', '58219d5628', 'OK')]
+  why: [('records', '46cf1e6b57', 'OK'), ('product', '3c880d80f8', 'OK'), ('evidence', '58219d5628', 'OK')]
+  history: [('records', '46cf1e6b57', 'OK'), ('product', '3c880d80f8', 'OK'), ('evidence', '58219d5628', 'OK')]
+  cite P2-ADJ-0005: [('records', '7bd7598ca3', 'REF_MOVED'), ('product', '3c880d80f8', 'OK'), ('evidence', '58219d5628', 'OK')]
+  answers lint: [('records', '7bd7598ca3', 'REF_MOVED'), ('product', '3c880d80f8', 'OK'), ('evidence', '58219d5628', 'OK')]
+  impact: NONE RECORDED
+  exact id: NONE RECORDED
+  state get: NONE RECORDED
+  compile's overflow supplementary packet manifest 'view': []
+## reading
+# * compile, gather, cite, answers lint, search, impact, exact, state: ONE resolve_view each, of the pinned view; no tip re-resolution outside
+#   it (the only symbolic git read outside resolve_view is HEAD:<domain>/govbridge -- the bridge code tree id, not a view ref).
+# * why and history: ONE resolution each -- but of config/canonical-view.yaml, NOT the pinned view: neither CLI accepts --view and neither
+#   honours the task spec's view, so both answered from records 46cf1e6 (the live tip after the orchestrator's 20:41 commit) while every
+#   other operation of this audit used 7bd7598. The recorded refs do equal the commits used, but the operation cannot be re-run at a
+#   recorded view -> INT-D09.
+# * impact, search, exact, state outputs and every supplementary packet manifest record NO resolved view -> INT-D15.
+## R1-XC pass-5 residuals, assessed
+# (1) compile/bootstrap.py resolves the view 6 times per run: CONFIRMED (bootstrap probe: resolve_view=6); harmless only while the view is
+#     pinned (all 6 gave records 7bd7598); with config/canonical-view.yaml (records follow: tip) a commit between the 6 splits one bootstrap
+#     across two records commits. Worker-facing (the canonical worker bootstrap). LOW while the bridge branch is frozen during a demonstration.
+# (2) lifecycle.show_many N+2: standalone module CLI, not dispatched by govbridge/cli.py -- ACCEPTED as residual.
+# (3) authority/layer.classify_hit latent re-resolution (commit=None): no caller passes commit=None (grep) -- ACCEPTED.
+# (4) exact.show / cite --commit <live branch>: an explicit branch argument resolves that branch's live tip by design; exact show records
+#     'commit' in its output -- ACCEPTED; but see INT-D14 for exact grep --ref <view ref name> (crash) / <branch> (live tip).

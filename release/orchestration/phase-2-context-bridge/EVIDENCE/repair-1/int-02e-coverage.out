@@ -1,0 +1,10 @@
+# int-02e coverage over the pinned view (every named ref + the 95 history refs). $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)
+# cmd: $PY -m govbridge coverage --view EVIDENCE/repair-1/pinned-view.yaml --rules config/corpus-rules.yaml --json <scratch>/coverage.json (full JSON kept in scratch; summary below)
+# start 2026-09-26T19:50:55Z
+# exit 0 end 2026-09-26T19:51:07Z
+unclassified_total: 0
+union_included_blobs (all refs): 7445
+records 7bd7598ca3e63f026b25d4bc603a7022e608eb87 files 7446 OK included_files 4106 included_bytes 43120206 unclassified 0 by_rule_files {'INCLUDED': 4106, 'L-MACHINE-OUTPUT': 3047, 'M-LARGE': 6, 'X-BINARY': 5, 'X-SEC-CONTENT': 66, 'X-SEC-PATH': 3, 'X-SELF': 213}
+product 3c880d80f81475f5306bdd5f680f2e004df49391 files 6567 OK included_files 3639 included_bytes 38289514 unclassified 0 by_rule_files {'INCLUDED': 3639, 'L-MACHINE-OUTPUT': 2850, 'M-LARGE': 6, 'X-BINARY': 5, 'X-SEC-CONTENT': 65, 'X-SEC-PATH': 2}
+evidence 58219d5628683d6f462aa67bf25dbc2641933bce files 6572 OK included_files 3641 included_bytes 38324373 unclassified 0 by_rule_files {'INCLUDED': 3641, 'L-MACHINE-OUTPUT': 2853, 'M-LARGE': 6, 'X-BINARY': 5, 'X-SEC-CONTENT': 65, 'X-SEC-PATH': 2}
+history refs: 95 unclassified across history: 0 files_total_check mismatches: []

@@ -1,0 +1,43 @@
+# int-09 budget coherence (check 9; BR-DAG-AMEND-R1-21, -R1-22). $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3). Config is READ, never changed.
+## (1) every budget in config/*.yaml, and whether wall-clock time can change CONTENT
+#  config/budgets.yaml: rrf_k=60, graph_neighbour_depth=1, parent_expansion_top_n=3, max_slice_chars=1600, per_item_cap_kb=24,
+#    section_header_bytes=4096, profiles.{bounded-builder total_kb=100, synthesis total_kb=360} section caps + g_fanout, code_test_surfaces
+#    -> all counts/bytes, no clock.
+#  config/budgets.yaml gather: max_items_per_query=500, max_bytes_per_query=2000000 (counts/bytes, read by engine._budget_max_items /
+#    _budget_total_bytes), wall_time_budget_seconds=150 -> read by NO code (grep below): advisory text only, cannot change content.
+#    grep: wall_time_budget_seconds is referenced by no .py file under govbridge/ (exit 1)
+#  config/facets.yaml: default_batch_size=8, default_target_items=16, default_max_rounds=20, default_threads=4 (threads: content-
+#    independent -- see int-13b threads 1 vs 16), followup.{default_max_rounds=6, default_max_identifiers_per_round=15,
+#    default_max_items_per_identifier=50, default_max_total_identifiers=250, default_max_wall_seconds=null} -> the only clock knob is
+#    disabled by default, and when enabled it yields WALL_TIME_ABORT + deterministic:false (followup.py:704-712, 829).
+#  config/embed-profile.yaml / model-pin.yaml / corpus-rules.yaml / id-grammar.yaml / notes-schema.yaml: no time budget.
+#  CODE (not config) clocks that can change an outcome: semantic/runner.py timeout=600 s per embedding call -> EmbedError, which
+#    propagates (a loud crash, never a silent content change); gather/followup.py bounded git-read retry (3 x 0.02 s) -> degraded
+#    reads disclosed in gather telemetry + deterministic:false -- but compile drops that disclosure (INT-D10).
+#  -> R1-22 as a rule HOLDS for the defaults: no content-deciding budget depends on wall-clock time (independently: compile twice
+#     byte-identical across PYTHONHASHSEED 0/1 under concurrent load, int-04a; every CONTROL-A gather deterministic:true, int-04e).
+## (2) gather budget vs follow-up budget vs measured cost (CONTROL-A, pinned view, store-BR-AR-0028-a; load: a concurrent full-suite
+##     run and/or the read-only runner during most gathers -- walls are upper bounds)
+#   # start 2026-09-26T19:55:06Z history-sha 451d23317098539fbfca584cb273677ec8d7515ec2ad581eb2a080a2dc646007
+#   CA-WHY exit=0 wall_outer=667.037357196 end=2026-09-26T20:06:13Z
+#   CA-REQ exit=0 wall_outer=570.754211612 end=2026-09-26T20:15:43Z
+#   CA-ENF exit=0 wall_outer=753.845454700 end=2026-09-26T20:28:17Z
+#   CA-TESTS exit=0 wall_outer=786.594924898 end=2026-09-26T20:41:24Z
+#   CA-DEPS exit=0 wall_outer=622.281421594 end=2026-09-26T20:51:46Z
+#   CA-DEPS threads=1 exit=0 wall_outer=599.913397244 end=2026-09-26T21:01:46Z
+#   CA-DEPS threads=16 exit=0 wall_outer=718.847361709 end=2026-09-26T21:13:45Z
+#   # end 2026-09-26T21:13:45Z history-sha 451d23317098539fbfca584cb273677ec8d7515ec2ad581eb2a080a2dc646007
+#   CA-DEPS: stop=MAX_ROUNDS base_stop=FACETS_COVERED base_rounds=2 followup_rounds=6 merged=637 identifiers_resolved=90 queued_at_end=789 followup_wall_s=544.746
+#   CA-ENF: stop=MAX_ROUNDS base_stop=FACETS_COVERED base_rounds=4 followup_rounds=6 merged=658 identifiers_resolved=90 queued_at_end=422 followup_wall_s=686.157
+#   CA-REQ: stop=MAX_ROUNDS base_stop=FACETS_COVERED base_rounds=2 followup_rounds=6 merged=644 identifiers_resolved=90 queued_at_end=707 followup_wall_s=515.632
+#   CA-TESTS: stop=MAX_ROUNDS base_stop=FACETS_COVERED base_rounds=3 followup_rounds=6 merged=661 identifiers_resolved=90 queued_at_end=578 followup_wall_s=736.669
+#   CA-WHY: stop=MAX_ROUNDS base_stop=FACETS_COVERED base_rounds=3 followup_rounds=6 merged=671 identifiers_resolved=90 queued_at_end=734 followup_wall_s=618.476
+#  vs config: gather.wall_time_budget_seconds=150 (advisory, unread) -- every CONTROL-A query exceeded it several-fold (R1-INT DAG
+#    acceptance 'wall time within the configured gather budget' NOT MET); R1-21's own premise numbers are stale (followup.max_wall_seconds
+#    is now null, not 240; CA-WHY is not 312.9 s here).
+#  vs config: gather.max_items_per_query=500 -- the follow-up does not honour it (CA-WHY merged items above 500).
+#  INTERNAL incoherence: followup.default_max_rounds (6) x default_max_identifiers_per_round (15) = 90 < default_max_total_identifiers (250):
+#    the OVERALL count budget -- R1-22's 'ONLY knob that may produce BUDGET_REACHED_WITH_UNRESOLVED' -- is unreachable with the defaults;
+#    every long query stops at MAX_ROUNDS with hundreds of identifiers queued (INT-D20). With the stated priority rule (record ids
+#    first) the 90 slots go to record ids, so symbol / rust_test_path / tests_of identifiers are never chased (INT-D18).
+#  Measured compile cost (the demonstration-shaped operation R1-21 asks R1-D2 to time): CONTROL-A 5 queries, 177 s per compile (int-04a).

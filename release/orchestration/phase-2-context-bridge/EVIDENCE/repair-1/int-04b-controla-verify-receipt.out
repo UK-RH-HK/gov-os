@@ -1,0 +1,32 @@
+# int-04b packet verify + receipt check (synthetic receipt) on the seed0 CONTROL-A packet; $PY=/home/usain/.cache/gov-bridge/venv/bin/python; store=/home/usain/.cache/gov-bridge/store-BR-AR-0028-a
+## packet verify <seed0>
+{
+ "problems": [],
+ "status": "OK",
+ "verify": "PASS"
+}
+exit=0
+## synthetic receipt (scripts/int04_receipt.py)
+{"receipt": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/034abd76-0719-4661-bb46-b56141b90a16/scratchpad/ca/receipt.json", "acknowledged_packets": 6, "a_items": 1, "omit_supplementary": false}
+## receipt check --packet <seed0> --receipt receipt.json (covers DIR/supplementary/* automatically)
+{
+ "external_read_bytes": 3506,
+ "external_read_files": 1,
+ "problems": [],
+ "status": "PASS"
+}
+exit=0
+## negative control: a receipt that omits the supplementary acknowledgements
+{"receipt": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/034abd76-0719-4661-bb46-b56141b90a16/scratchpad/ca/receipt-omit.json", "acknowledged_packets": 1, "a_items": 1, "omit_supplementary": true}
+{
+ "external_read_bytes": 3506,
+ "external_read_files": 1,
+ "problems": [
+  "supplementary packet 'supplementary/CA-DEPS' (packet_sha256 '1c6cb5abdeaf8d74c0ac07dc45890ed740bffb92c08818b868e68e80edc68cad') is not acknowledged in the receipt's own context_packet_hash ['27a0be2323a9eee5ad74252d1cfc80a20ca82ea478ced911eb26555f2595688f']",
+  "supplementary packet 'supplementary/CA-DEPS' (manifest_sha256 '8cc440f0b6905ef6627dfcd1a555407da0ab3b7539e52eacaa02eb72acf58221') is not acknowledged in the receipt's own manifest_sha256 ['071ab39166dee9a1e087b4ca65ccac5b3183f475a47ee7c4bf44ca567274020c']",
+  "supplementary packet 'supplementary/CA-ENF' (packet_sha256 '71b642ef0597eecba8306b33c234ebe3afc8eb9d26dac39d77b1c1b18b4a6b2a') is not acknowledged in the receipt's own context_packet_hash ['27a0be2323a9eee5ad74252d1cfc80a20ca82ea478ced911eb26555f2595688f']",
+  "supplementary packet 'supplementary/CA-ENF' (manifest_sha256 'a94de27ee23055d2a65c0c417b0898f99b2409ff43a82652a37e9e33d0cd1a61') is not acknowledged in the receipt's own manifest_sha256 ['071ab39166dee9a1e087b4ca65ccac5b3183f475a47ee7c4bf44ca567274020c']",
+  "supplementary packet 'supplementary/CA-REQ' (packet_sha256 'e5cba7b735dc983bc9c1701a72958ad5b91de66bb115e4a770fe54243b1e62e3') is not acknowledged in the receipt's own context_packet_hash ['27a0be2323a9eee5ad74252d1cfc80a20ca82ea478ced911eb26555f2595688f']",
+  "supplementary packet 'supplementary/CA-REQ' (manifest_sha256 'bbbeeb9ceec6c27c93ec166ba7965ce9760b355f2becb19274f4c
+exit=0
+# end 2026-09-26T19:53:59Z

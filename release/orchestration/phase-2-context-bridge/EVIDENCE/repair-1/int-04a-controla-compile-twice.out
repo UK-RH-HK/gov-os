@@ -1,0 +1,63 @@
+# int-04a CONTROL-A compile twice, two separate processes, PYTHONHASHSEED=0 and =1, concurrently, store=/home/usain/.cache/gov-bridge/store-BR-AR-0028-a (read by both)
+# $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3); pinned view EVIDENCE/repair-1/pinned-view.yaml (records 7bd7598ca3e63f026b25d4bc603a7022e608eb87); task spec EVIDENCE/repair-1/control-a-pinned/task-spec.yaml
+# history refs sha256 now: 451d23317098539fbfca584cb273677ec8d7515ec2ad581eb2a080a2dc646007 (pinned 451d23317098539fbfca584cb273677ec8d7515ec2ad581eb2a080a2dc646007)
+# packets written to <scratch>/ca/seed0 and seed1 (not committed -- corpus excerpts stay out of the records ref)
+# start 2026-09-26T19:50:55Z
+seed0 exit=0
+seed1 exit=0
+seed0 wall=176.94 s maxrss=471076 KB
+seed1 wall=177.05 s maxrss=453872 KB
+## compile stdout (meta), seed0:
+{
+ "budgets_path": null,
+ "excluded_hits": 113,
+ "manifest_sha256": "071ab39166dee9a1e087b4ca65ccac5b3183f475a47ee7c4bf44ca567274020c",
+ "out": "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/034abd76-0719-4661-bb46-b56141b90a16/scratchpad/ca/seed0",
+ "overflow_query_ids": [
+  "CA-DEPS",
+  "CA-ENF",
+  "CA-REQ",
+  "CA-TESTS",
+  "CA-WHY"
+ ],
+ "packet_id": "27a0be2323a9eee5",
+ "packet_kind": "main",
+ "packet_sha256": "27a0be2323a9eee5ad74252d1cfc80a20ca82ea478ced911eb26555f2595688f",
+ "registry_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0028/release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+ "status": "OK"
+}
+## byte identity: diff -r seed0 seed1 (main packet, supplementary/, notes/, meta.json, manifest.json, task_spec.yaml)
+DIFF_R: IDENTICAL (exit 0)
+## per-file sha256 (seed0 | seed1)
+SAME ./manifest.json 43d455d7cd74cbec702068c17d83a5be59be4683ea9e4e52accb24a3b7d21624
+SAME ./meta.json 02bf9cfa8d89b71893caf3e905fe8bd78788e5ef7bd0ecb8c88aa65bf66e04f9
+SAME ./notes/CA-DEPS.yaml a2e880c529be66844d7618d37073fae54e0ddef194257dcec37c4217257fc57b
+SAME ./notes/CA-ENF.yaml 3346c9014aeb60ed621da896a1b7ca8f63019a4723ab81b40e4b29e9fb9c262b
+SAME ./notes/CA-REQ.yaml 2cbfbe29ddee0cb9b63e83465a97a256d668870952916d4d31b29f65de5028bf
+SAME ./notes/CA-TESTS.yaml 2bfcc4e1e4a999ed7866f5b98acebaaec655a7fe29c6f200870c652700914ba6
+SAME ./notes/CA-WHY.yaml 5625c20de627452c5620dfc60fddf5fa441c90d3c6f773c8299d29476631397d
+SAME ./packet.md 27a0be2323a9eee5ad74252d1cfc80a20ca82ea478ced911eb26555f2595688f
+SAME ./supplementary/CA-DEPS/manifest.json 02d9d60ef729c387a3b135e1a5f6e805a9929d57548b0e42d58f80c75b803ad5
+SAME ./supplementary/CA-DEPS/meta.json 5b6f7139e828d7ef5061b0f77cd7bb64de25fc415c5b60055fb3cbec2f989d71
+SAME ./supplementary/CA-DEPS/packet.md 1c6cb5abdeaf8d74c0ac07dc45890ed740bffb92c08818b868e68e80edc68cad
+SAME ./supplementary/CA-DEPS/task_spec.yaml 6b54ea58374e726896749c10637a0604149db31c3c96747366a33f898c453c79
+SAME ./supplementary/CA-ENF/manifest.json 8222d33a547f15330855b69c9c54271707584d41629b82bd800a104b4de02636
+SAME ./supplementary/CA-ENF/meta.json fcda7ee46b0cb98d0a89e062607a35b84a3e9ec77f961cf85f078eda83a6fe18
+SAME ./supplementary/CA-ENF/packet.md 71b642ef0597eecba8306b33c234ebe3afc8eb9d26dac39d77b1c1b18b4a6b2a
+SAME ./supplementary/CA-ENF/task_spec.yaml 6b54ea58374e726896749c10637a0604149db31c3c96747366a33f898c453c79
+SAME ./supplementary/CA-REQ/manifest.json 54f8e881b13c9a0a1132ec6c263c538dd5f37d4526162c9f63268868e5e724e3
+SAME ./supplementary/CA-REQ/meta.json eeeb2b65a61824c371fdd9f3a02de82272065090f3877914f0d69d342189c188
+SAME ./supplementary/CA-REQ/packet.md e5cba7b735dc983bc9c1701a72958ad5b91de66bb115e4a770fe54243b1e62e3
+SAME ./supplementary/CA-REQ/task_spec.yaml 6b54ea58374e726896749c10637a0604149db31c3c96747366a33f898c453c79
+SAME ./supplementary/CA-TESTS/manifest.json ec59807566eaa45098e183a5dc3308d3f03d2a52cec09ad8060e6b153d8968af
+SAME ./supplementary/CA-TESTS/meta.json b4e37ffcd815a55e0fb386100328ada51a20f8c652873349cfa5cd45f2e98444
+SAME ./supplementary/CA-TESTS/packet.md 828c680a47635c6be3f6cf08fbcdc744435927dae58bc8fea5162f1ff978369a
+SAME ./supplementary/CA-TESTS/task_spec.yaml 6b54ea58374e726896749c10637a0604149db31c3c96747366a33f898c453c79
+SAME ./supplementary/CA-WHY/manifest.json 49785d3695034e39b4a3f228a2351314f11b28a66e040985eb4f3182ee1e5a02
+SAME ./supplementary/CA-WHY/meta.json de604c59306f430dd8aaf88eda388b85f4207fae0fa44f275dd1d7727266735e
+SAME ./supplementary/CA-WHY/packet.md 05a57ac277ef7506d987ff5c5587ca09a3f6f96813c2dd723eb9b6f6a3ab9456
+SAME ./supplementary/CA-WHY/task_spec.yaml 6b54ea58374e726896749c10637a0604149db31c3c96747366a33f898c453c79
+SAME ./task_spec.yaml 6b54ea58374e726896749c10637a0604149db31c3c96747366a33f898c453c79
+## stderr tail seed0:
+seed0 wall=176.94 s maxrss=471076 KB
+# end 2026-09-26T19:53:52Z
