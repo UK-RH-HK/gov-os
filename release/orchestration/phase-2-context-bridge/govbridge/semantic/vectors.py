@@ -88,35 +88,41 @@ def digest_for_pin(conn: sqlite3.Connection, pin_id: str) -> str:
     return h.hexdigest()
 
 
-_scope_indexes_ensured = False
+#: the BUILD-time deduplicated (blob_id, path) table (REPAIR_DAG.yaml node R1-GA1, second reopening) -- shared with
+#: govbridge.lexical.query (same store.db, same name, same shape). Created and maintained ONLY by
+#: govbridge.core.store/.freshness; this module only ever READS it.
+SCOPE_PATH_CACHE_TABLE = "occurrence_distinct_path"
+#: the BUILD-time index (govbridge.authority.layer's own SCHEMA_SQL) this module's Tier A relies on.
+_RECORD_DEF_PATH_INDEX = "record_def_by_path"
 
-#: this node's OWN small derived-cache table (shared with govbridge.lexical.query -- same store.db, same name, same
-#: shape), added to the shared store exactly the way every other layer already adds its own tables to the SAME file.
-SCOPE_PATH_CACHE_TABLE = "gather_scope_path_cache"
 
+class StoreNeedsRebuild(RuntimeError):
+    """The semantic-route twin of ``govbridge.lexical.query.StoreNeedsRebuild`` -- see its docstring. A separate
+    class (never imported from govbridge.lexical) so this module stays independent of the lexical package."""
+    CODE = "STORE_NEEDS_REBUILD"
 
-def _ensure_scope_indexes(conn: sqlite3.Connection) -> None:
-    """The semantic-route twin of ``govbridge.lexical.query._ensure_scope_indexes`` -- see its docstring for the
-    full rationale (a query-time-only index on an existing column this node does not own the schema of, plus a
-    deduplicated ``(blob_id, path)`` cache measured directly as the fix for a corpus-scale timeout: this corpus's
-    ``occurrence`` table repeats the same blob/path pair once per historical ref/commit, up to hundreds of times)."""
-    global _scope_indexes_ensured
-    if _scope_indexes_ensured:
-        return
-    try:
-        conn.execute("CREATE INDEX IF NOT EXISTS record_def_by_path ON record_def(path)")
-        conn.execute(
-            f"CREATE TABLE IF NOT EXISTS {SCOPE_PATH_CACHE_TABLE} (blob_id TEXT NOT NULL, path TEXT NOT NULL, "
-            f"PRIMARY KEY (blob_id, path))"
+    def __init__(self, missing: str):
+        self.missing = missing
+        super().__init__(
+            f"{self.CODE}: {missing} is missing from this store -- rebuild it (e.g. "
+            f"`python -m govbridge index rebuild`) before running a scoped query against it; a query path never "
+            f"builds this itself"
         )
-        conn.execute(
-            f"INSERT OR IGNORE INTO {SCOPE_PATH_CACHE_TABLE} (blob_id, path) "
-            f"SELECT DISTINCT blob_id, path FROM occurrence"
-        )
-        conn.commit()
-    except Exception:
-        pass
-    _scope_indexes_ensured = True
+
+
+def _sqlite_object_exists(conn: sqlite3.Connection, kind: str, name: str) -> bool:
+    row = conn.execute("SELECT name FROM sqlite_master WHERE type=? AND name=?", (kind, name)).fetchone()
+    return row is not None
+
+
+def _check_scope_structures(conn: sqlite3.Connection, needs_cache_table: bool, needs_record_def_index: bool) -> None:
+    """READ-ONLY (sqlite_master lookups only) -- see govbridge.lexical.query._check_scope_structures's docstring
+    for the full rationale. Checked lazily, only for whichever tier(s) a call's scope_classes/scope_path_globs
+    combination will actually use."""
+    if needs_cache_table and not _sqlite_object_exists(conn, "table", SCOPE_PATH_CACHE_TABLE):
+        raise StoreNeedsRebuild(f"table {SCOPE_PATH_CACHE_TABLE!r} (govbridge.core.store)")
+    if needs_record_def_index and not _sqlite_object_exists(conn, "index", _RECORD_DEF_PATH_INDEX):
+        raise StoreNeedsRebuild(f"index {_RECORD_DEF_PATH_INDEX!r} (govbridge.authority.layer)")
 
 
 def _scope_sql(scope_classes: Optional[tuple], lifecycle_scope: Optional[tuple],
@@ -133,10 +139,11 @@ def _scope_sql(scope_classes: Optional[tuple], lifecycle_scope: Optional[tuple],
     params: list = []
     if scope_classes:
         cls_placeholders = ",".join("?" for _ in scope_classes)
-        # gather_scope_path_cache (see _ensure_scope_indexes), never the raw occurrence table: the SAME blob/path
-        # pair repeats once per historical (ref, commit) on occurrence (hundreds of times for a popular blob on
-        # this corpus), so matching against the deduplicated cache is the difference between a handful of row
-        # checks and hundreds -- measured directly as the actual cost behind a corpus-scale timeout.
+        # occurrence_distinct_path (built at BUILD time, see govbridge.core.store), never the raw occurrence
+        # table: the SAME blob/path pair repeats once per historical (ref, commit) on occurrence (hundreds of
+        # times for a popular blob on this corpus), so matching against the deduplicated table is the difference
+        # between a handful of row checks and hundreds -- measured directly as the actual cost behind a
+        # corpus-scale timeout.
         tier_a = (
             f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} rdo "
             "JOIN record_def rd ON rd.path = rdo.path AND rd.line_start <= c.end_line AND rd.line_end >= c.start_line "
@@ -175,22 +182,27 @@ def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0,
     the same union, one page at a time, as a single unbounded call would.
 
     ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): restricts
-    the candidate SET before ranking (:func:`_scope_sql`), so a scoped facet's top-k is already in scope."""
+    the candidate SET before ranking (:func:`_scope_sql`), so a scoped facet's top-k is already in scope. This
+    function is READ-ONLY with respect to scope filtering: it never creates or populates the structures Tier A/B
+    rely on (built at BUILD time -- see govbridge.core.store/.freshness and govbridge.authority.layer) -- if scope
+    filtering is requested and the store does not have them yet, :class:`StoreNeedsRebuild` is raised (never a
+    silent, slower fallback to an unscoped candidate set, and never a write)."""
     import numpy as np
 
     scope_sql, scope_params = _scope_sql(scope_classes, lifecycle_scope, scope_path_globs)
     if scope_sql:
-        _ensure_scope_indexes(conn)
-    try:
+        _check_scope_structures(conn, needs_cache_table=True, needs_record_def_index=bool(scope_classes))
+        # The `chunk` JOIN is needed ONLY here: _scope_sql's own fragments reference c.blob_id/c.start_line/
+        # c.end_line. An unscoped call (the overwhelming common case, and every pre-existing caller/test) never
+        # joins `chunk` at all -- this table belongs to govbridge.core.store, not to this module's own schema
+        # (vectors.create_table only creates `vector`), so a caller testing `vector` in isolation must not be
+        # required to have a `chunk` table just to run an UNSCOPED search.
         rows = conn.execute(
             "SELECT v.chunk_id, v.dim, v.vec FROM vector v JOIN chunk c ON c.chunk_id = v.chunk_id "
             "WHERE v.pin_id=?" + scope_sql,
             (pin_id, *scope_params),
         ).fetchall()
-    except Exception:
-        # record_def/class_lifecycle may not exist yet (a store that never built the authority layer); an honest
-        # fall-back to the unscoped candidate set is a strict SUPERSET, never a silently narrower result, and the
-        # real classifier's own post-filter (real_routes.py) still applies.
+    else:
         rows = conn.execute("SELECT chunk_id, dim, vec FROM vector WHERE pin_id=?", (pin_id,)).fetchall()
     if not rows:
         return []

@@ -47,6 +47,11 @@ CREATE TABLE IF NOT EXISTS record_def (
     PRIMARY KEY (id, path, line_start)
 );
 CREATE INDEX IF NOT EXISTS record_def_by_id ON record_def(id);
+-- REPAIR_DAG.yaml node R1-GA1 (second reopening): built HERE, at BUILD time (ensure_schema runs as part of this
+-- layer's own build, never at query time), for govbridge.route.real_routes's authority-class scope filter (Tier
+-- A: JOIN record_def ON path, then class_lifecycle ON id). Without it, that join was a full scan of every record
+-- for every candidate row; a query path may only ever READ this index, never create it.
+CREATE INDEX IF NOT EXISTS record_def_by_path ON record_def(path);
 
 CREATE TABLE IF NOT EXISTS authority_edge (
     src TEXT NOT NULL,

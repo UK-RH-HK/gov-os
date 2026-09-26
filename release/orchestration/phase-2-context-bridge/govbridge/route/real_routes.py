@@ -108,6 +108,19 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
     _local = threading.local()
 
     def _conn():
+        # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): this connection's own two uses
+        # (_semantic_classify's SELECT, and classify_occ -> authoritylayer.classify_hit) are both queries, never a
+        # build -- but classify_hit itself still calls authoritylayer.ensure_schema(conn) on every call, a
+        # pre-existing lazy-schema-creation pattern in a module this node is authorized to touch for exactly one
+        # purpose (the record_def_by_path index, not this). Switching this connection to
+        # store.open_db_readonly() breaks that ensure_schema call -- and therefore classification itself -- on any
+        # store whose authority-layer schema was never separately built (this file's OWN pre-existing tests build
+        # a bare git repo and never run govbridge.authority.layer's builder, exactly this situation), which is why
+        # this stays on store.open_db() rather than the stricter read-only connection lexical/semantic queries now
+        # use: it already tolerates a read-only STORE FILE (every write it attempts is wrapped, see its own
+        # docstring), which is what this node's own required tests exercise, without this out-of-scope regression.
+        # Named here, not silently patched: govbridge.authority.layer's own schema lifecycle -- ensure_schema
+        # called from a query path at all -- is unresolved, for whoever owns that module next.
         c = getattr(_local, "conn", None)
         if c is None:
             c = storemod.open_db()

@@ -63,8 +63,15 @@ def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path
     straight through to ``vectors.search``, which restricts the candidate set BEFORE the top-k ranking runs --
     "restrict the candidate set by class before top-k", never a client-side filter after the fact."""
     root = store_root or store.store_root()
-    conn = store.open_db(root=root)
-    vectors.create_table(conn)
+    # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): this is a QUERY path (the one
+    # gather's semantic facets actually call through govbridge.route.real_routes.semantic_route), so it opens the
+    # store via store.open_db_readonly() -- a connection that cannot write, by construction -- rather than
+    # store.open_db()'s read-write connection. ``vectors.create_table`` (a build-time CREATE TABLE/INDEX IF NOT
+    # EXISTS) is dropped from this call site to match: the ``vector`` table already exists on any store this route
+    # can usefully run against (the semantic layer builder creates it), so calling it here was always redundant
+    # with the real build step -- and on a store that genuinely lacks it, the search below now fails with a plain,
+    # clear "no such table: vector" rather than this query path quietly creating its own empty table to search.
+    conn = store.open_db_readonly(root=root)
 
     pin = modelpin.load_model_pin(modelpin.default_pin_path())
     pin_id = modelpin.compute_pin_id(pin)

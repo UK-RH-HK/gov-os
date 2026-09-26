@@ -247,6 +247,10 @@ def _index_one_ref_incremental(conn, ref_name: str, old_commit: str, new_commit:
     # whatever is left at old_commit for this ref is exactly the changed/removed paths -- drop it; a changed path's
     # new row (if any) is written fresh below
     conn.execute("DELETE FROM occurrence WHERE ref_name=? AND commit_id=?", (ref_name, old_commit))
+    # REPAIR_DAG.yaml node R1-GA1 (second reopening): a (blob_id, path) pair the delete above just orphaned must
+    # not survive in occurrence_distinct_path (INSERT OR IGNORE alone never removes one) -- same transaction,
+    # committed together with the rest of this function's own work, never separately.
+    store.prune_stale_distinct_paths(conn)
 
     with gitobj.CatFileBatch(repo=repo) as cat:
         sniffer = corpus.ContentSniffer(cat)
@@ -311,6 +315,7 @@ def core_layer_builder(conn, resolved: viewmod.ResolvedView, rules, repo, from_c
                 used_diff = False
         if not used_diff:
             conn.execute("DELETE FROM occurrence WHERE ref_name=? AND commit_id!=?", (ref_name, new_commit))
+            store.prune_stale_distinct_paths(conn)  # see the incremental path's own comment above
             _index_one_ref(conn, ref_name, new_commit, rules, repo, seen_blobs, stats)
 
     removed = _removed_history_refs(resolved)
@@ -321,6 +326,7 @@ def core_layer_builder(conn, resolved: viewmod.ResolvedView, rules, repo, from_c
                 "SELECT COUNT(*) FROM occurrence WHERE ref_name=?", (ref_name,)
             ).fetchone()[0]
             conn.execute("DELETE FROM occurrence WHERE ref_name=?", (ref_name,))
+        store.prune_stale_distinct_paths(conn)  # see the incremental path's own comment above (once for the whole loop)
         stats["occurrences_removed"] = removed_count
         stats["history_refs_removed"] = removed
 

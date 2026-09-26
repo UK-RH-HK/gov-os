@@ -106,51 +106,45 @@ def _default_paths(repo: Optional[str] = None) -> str:
     return os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
 
 
-_scope_indexes_ensured = False
+#: the BUILD-time deduplicated (blob_id, path) table (REPAIR_DAG.yaml node R1-GA1, second reopening) -- created and
+#: maintained ONLY by govbridge.core.store (put_occurrence/clear_layer_tables/prune_stale_distinct_paths) and
+#: govbridge.core.freshness's incremental deletes. This module only ever READS it.
+SCOPE_PATH_CACHE_TABLE = "occurrence_distinct_path"
+#: the BUILD-time index (govbridge.authority.layer's own SCHEMA_SQL) this module's Tier A relies on.
+_RECORD_DEF_PATH_INDEX = "record_def_by_path"
 
-#: this node's OWN small derived-cache table, added to the shared store.db exactly the way every other layer
-#: (lexical_fts, vector, record_def/class_lifecycle) already adds its own tables to the SAME file -- never a change
-#: to a table another node owns.
-SCOPE_PATH_CACHE_TABLE = "gather_scope_path_cache"
 
+class StoreNeedsRebuild(RuntimeError):
+    """REPAIR_DAG.yaml node R1-GA1, second reopening: "query commands must never write to the store... fail with a
+    clear, typed error... NEVER a silent slow fallback, and NEVER a write." Raised by :func:`_check_scope_structures`
+    when a scoped query's SQL push-down needs a build-time structure (the ``record_def_by_path`` index, or the
+    ``occurrence_distinct_path`` table -- both built by ``govbridge.core.store``/``.freshness``/
+    ``govbridge.authority.layer``, never by a query) that this store does not have yet."""
+    CODE = "STORE_NEEDS_REBUILD"
 
-def _ensure_scope_indexes(conn) -> None:
-    """Two query-time-only preparations, attempted at most once per process (module-level flag) and never allowed
-    to fail the caller (wrapped in try/except; the caller's own try/except around the scoped query itself is a
-    second safety net regardless):
-
-    1. An index on ``record_def(path)`` (``govbridge.authority.layer``, out of this node's mutation scope, is
-       indexed by ``id`` only) -- Tier A's ``JOIN record_def rd ON rd.path = rdo.path`` in :func:`_scope_sql` would
-       otherwise be a full scan of every record for every candidate row. A pure, idempotent (``IF NOT EXISTS``)
-       addition to an EXISTING table's EXISTING column -- no schema owned by this node, no data changed.
-    2. ``gather_scope_path_cache(blob_id, path)`` -- a DEDUPLICATED copy of ``occurrence(blob_id, path)``. The real
-       ``occurrence`` table is keyed by ``(ref_name, commit_id, path)``: on this corpus it holds ~500k rows for only
-       ~8k distinct ``(blob_id, path)`` pairs (many refs/historical commits repeating the SAME path for the SAME
-       blob). Tier B's ``EXISTS (... WHERE occ.blob_id = ? AND path GLOB ...)`` against the raw table means SQLite
-       must walk every one of a popular blob's (sometimes 500+) occurrence rows before it can conclude "no match" --
-       REPAIR_DAG.yaml node R1-GA1 reopening: this was the ACTUAL cost behind the corpus-scale timeout the SQL
-       push-down first hit (measured directly: ~4-6s per scoped COUNT/SELECT on this store, before this cache).
-       Querying the deduplicated cache instead cuts that to a handful of rows per blob. Rebuilt fresh once per
-       process (an ``INSERT OR IGNORE`` is a cheap no-op for rows already present), so it can never go stale within
-       one gather() session and is never more than one process-start stale across sessions -- a performance cache
-       only; a stale/missing cache degrades to the SAME safe fallback path (this whole function is best-effort)."""
-    global _scope_indexes_ensured
-    if _scope_indexes_ensured:
-        return
-    try:
-        conn.execute("CREATE INDEX IF NOT EXISTS record_def_by_path ON record_def(path)")
-        conn.execute(
-            f"CREATE TABLE IF NOT EXISTS {SCOPE_PATH_CACHE_TABLE} (blob_id TEXT NOT NULL, path TEXT NOT NULL, "
-            f"PRIMARY KEY (blob_id, path))"
+    def __init__(self, missing: str):
+        self.missing = missing
+        super().__init__(
+            f"{self.CODE}: {missing} is missing from this store -- rebuild it (e.g. "
+            f"`python -m govbridge index rebuild`) before running a scoped query against it; a query path never "
+            f"builds this itself"
         )
-        conn.execute(
-            f"INSERT OR IGNORE INTO {SCOPE_PATH_CACHE_TABLE} (blob_id, path) "
-            f"SELECT DISTINCT blob_id, path FROM occurrence"
-        )
-        conn.commit()
-    except Exception:
-        pass
-    _scope_indexes_ensured = True
+
+
+def _sqlite_object_exists(conn, kind: str, name: str) -> bool:
+    row = conn.execute("SELECT name FROM sqlite_master WHERE type=? AND name=?", (kind, name)).fetchone()
+    return row is not None
+
+
+def _check_scope_structures(conn, needs_cache_table: bool, needs_record_def_index: bool) -> None:
+    """READ-ONLY: looks up ``sqlite_master`` only, never writes anything, so this is safe to call against a store
+    opened from a read-only file. Checked lazily -- only for whichever tier(s) a caller's actual
+    scope_classes/scope_path_globs combination will use (:func:`query`'s own call site below), so an ordinary,
+    unscoped query -- or one using only Tier B -- never needs a structure it does not actually touch."""
+    if needs_cache_table and not _sqlite_object_exists(conn, "table", SCOPE_PATH_CACHE_TABLE):
+        raise StoreNeedsRebuild(f"table {SCOPE_PATH_CACHE_TABLE!r} (govbridge.core.store)")
+    if needs_record_def_index and not _sqlite_object_exists(conn, "index", _RECORD_DEF_PATH_INDEX):
+        raise StoreNeedsRebuild(f"index {_RECORD_DEF_PATH_INDEX!r} (govbridge.authority.layer)")
 
 
 def _scope_sql(blob_col: str, start_col: str, end_col: str, scope_classes: Optional[tuple],
@@ -182,7 +176,7 @@ def _scope_sql(blob_col: str, start_col: str, end_col: str, scope_classes: Optio
     params: list = []
     if scope_classes:
         cls_placeholders = ",".join("?" for _ in scope_classes)
-        # gather_scope_path_cache (see _ensure_scope_indexes), never the raw occurrence table -- same rationale as
+        # occurrence_distinct_path (built at BUILD time, see govbridge.core.store), never the raw occurrence table --
         # Tier B: joining record_def straight off occurrence would re-walk every historical (ref, commit) repeat of
         # a popular blob's path before ever reaching record_def's own small table.
         tier_a = (
@@ -200,7 +194,7 @@ def _scope_sql(blob_col: str, start_col: str, end_col: str, scope_classes: Optio
         clauses.append(tier_a)
     if scope_path_globs and not lifecycle_scope:
         glob_or = " OR ".join("occ2.path GLOB ?" for _ in scope_path_globs)
-        # gather_scope_path_cache (see _ensure_scope_indexes), never the raw occurrence table: the SAME blob/path
+        # occurrence_distinct_path (built at BUILD time, see govbridge.core.store): the SAME blob/path
         # pair repeats once per historical (ref, commit) on occurrence (hundreds of times for a popular blob), so
         # matching against the deduplicated cache is the difference between a handful of row checks and hundreds.
         clauses.append(f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} occ2 WHERE occ2.blob_id = {blob_col} "
@@ -251,42 +245,37 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, of
     ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): pushed
     down into the SQL itself (:func:`_scope_sql`) rather than filtered after the fact, so a SCOPED facet's page is
     already in scope -- ``total_matching_chunks``/exhaustion accounting is computed over the SAME scoped universe,
-    never the unscoped one, so paging still terminates correctly."""
+    never the unscoped one, so paging still terminates correctly. This function is READ-ONLY with respect to scope
+    filtering: it never creates or populates the structures Tier A/B rely on (those are built at BUILD time, by
+    ``govbridge.core.store``/``.freshness`` and ``govbridge.authority.layer``) -- if scope filtering is requested
+    and the store does not have them yet, :class:`StoreNeedsRebuild` is raised (never a silent, slower fallback to
+    an unscoped query, and never a write)."""
     view_path = view_path or _default_paths(repo)
-    conn = store.open_db()
+    # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): a QUERY never writes, so it opens the
+    # store via store.open_db_readonly() -- a connection that CANNOT write, by construction (mode=ro&immutable=1),
+    # rather than one that merely happens not to be asked to. ftsmod.ensure_schema's CREATE ... IF NOT EXISTS is
+    # still safe to call on it: a no-op against an already-built lexical layer (every store this runs against),
+    # and a clear sqlite3.OperationalError -- never a silent build -- on one that genuinely lacks the table.
+    conn = store.open_db_readonly()
     ftsmod.ensure_schema(conn)
 
     scope_sql, scope_params = _scope_sql("lexical_fts.blob_id", "lexical_fts.start_line", "lexical_fts.end_line",
                                           scope_classes, lifecycle_scope, scope_path_globs)
     if scope_sql:
-        _ensure_scope_indexes(conn)
+        _check_scope_structures(conn, needs_cache_table=True, needs_record_def_index=bool(scope_classes))
 
     fetch_n = max(k * _OVERFETCH_MULTIPLIER, _OVERFETCH_FLOOR) if exclude else k
     t0 = time.monotonic()
-    try:
-        rows = conn.execute(
-            "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
-            "FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql +
-            " ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
-            (text, *scope_params, fetch_n, offset),
-        ).fetchall()
-        total_matches = conn.execute(
-            "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql,
-            (text, *scope_params),
-        ).fetchone()[0]
-    except Exception:
-        # record_def/class_lifecycle may not exist yet on a store that never built the authority layer (a bare B1+
-        # lexical store, or a test fixture); an honest, generic fall-back to the UNSCOPED query is a strict SUPERSET
-        # (never drops evidence a caller could otherwise have seen), and the real classifier's own post-filter
-        # (real_routes.py) still applies -- never a crash, never a silent narrower-than-intended result.
-        rows = conn.execute(
-            "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
-            "FROM lexical_fts WHERE lexical_fts MATCH ? ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
-            (text, fetch_n, offset),
-        ).fetchall()
-        total_matches = conn.execute(
-            "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?", (text,)
-        ).fetchone()[0]
+    rows = conn.execute(
+        "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
+        "FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql +
+        " ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
+        (text, *scope_params, fetch_n, offset),
+    ).fetchall()
+    total_matches = conn.execute(
+        "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql,
+        (text, *scope_params),
+    ).fetchone()[0]
     latency_ms = round((time.monotonic() - t0) * 1000, 3)
 
     resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
