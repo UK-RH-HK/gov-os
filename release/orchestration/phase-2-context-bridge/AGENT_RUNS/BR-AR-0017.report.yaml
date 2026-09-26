@@ -1,0 +1,73 @@
+# BR-AR-0017 typed report. No oracle content; no bridge/grade-* or sealed/oracle path read.
+run_id: BR-AR-0017
+role: 'REPAIR-1 node R1-RN builder -- hierarchical evidence notes: schema, validator and CLI (OD-BR-05 section 7,
+  OD-BR-06 section 4). Did not architect, integrate, gather, compile or grade; did not touch govbridge/cli.py,
+  compile/packet.py or any other shared file outside this node''s own scope.'
+model_observed: claude-sonnet-5 (Sonnet 5)
+branch: bridge/r1-rn-0017
+commit: 93739dc52624df6cedda84fec07de04ecfddb25a
+status: COMPLETED
+claims:
+- 'config/notes-schema.yaml defines the DERIVED_NOTE shape exactly as REPAIR_DAG.yaml node R1-RN''s deliverable
+  names it: note_id; class DERIVED_NOTE (fixed, never ladder-admissible in A); claims[] each with claim_id, text
+  and sources[] = {item_id, path, commit, blob, lines, content_sha256}; unresolved[] (mandatory, may be empty);
+  built_from_sha256'
+- 'govbridge/notes/validate.py resolves every source against real Git objects (govbridge.core.gitobj), never
+  trusting the recorded blob or content_sha256: it re-resolves the commit, re-reads the blob at path@commit,
+  compares it to the recorded blob, and re-hashes the exact line range before comparing to content_sha256'
+- 'the validator refuses exactly the four cases the acceptance check names: a claim with no source; a source that
+  does not resolve (commit/path/blob/lines/hash mismatch, tested five separate ways); a note placed in section A
+  (independent of the note''s own content -- class DERIVED_NOTE is never ladder-admissible there, ARCHITECTURE.md
+  section 5.1''s DERIVED row); a built_from_sha256 mismatch'
+- 'govbridge/notes/build.py computes built_from_sha256 over the SORTED content_sha256 of every source across
+  every claim, so claim/source ordering never affects the hash; rebuilding a note twice from the same sources
+  (govbridge.notes.build.rebuild) yields an identical hash, proved by test_rebuild_twice_from_same_sources_is_identical'
+- 'unresolved[] is mandatory: a note missing the key is refused (test_missing_unresolved_key_is_refused), an empty
+  list is accepted (test_empty_unresolved_list_is_accepted), and a non-empty list is accepted
+  (test_nonempty_unresolved_list_is_accepted)'
+- '`govbridge notes validate <file>` and `govbridge notes build <spec>` exist and run now as
+  `python -m govbridge.notes.cli {validate|build} ...` (both .yaml/.yml and .json note files); not yet reachable
+  as `govbridge notes ...` through the top-level dispatcher, because govbridge/cli.py is outside this node''s
+  mutation_scope (REPAIR_DAG.yaml conventions.shared_files: edited in sequence RX -> GA1 -> RS -> RA) -- one
+  dispatch line is needed from the next editor in that sequence, documented in govbridge/notes/cli.py''s own
+  docstring and in this run''s next_consumer'
+- '35 tests in tests/notes/ pass (`pytest tests/notes -q`, exit 0), against a small synthetic Git repository built
+  inline in this node''s own scope (tests/notes/conftest.py), not tests/fixtures/**, which other REPAIR-1 nodes
+  own; no Review-8 item, F-finding, Phase-2 file or symbol from those chains appears anywhere in code, config or
+  test (OC-BR-02)'
+- 'no bridge/grade-*, govbridge-sealed-*, ~/.config/gov-bridge/sealed/, DEMONSTRATION/oracle* or
+  DEMONSTRATION/grading/** path was read; ARCHITECTURE/demonstration-queries.yaml and DEMONSTRATION/run-1/answers.yaml
+  were not used as acceptance input'
+evidence:
+- claim: DERIVED_NOTE schema definition
+  path: release/orchestration/phase-2-context-bridge/config/notes-schema.yaml
+  sha256: 5ece0b705f3b98b1be9fd228f9137b78371352c595d9f004a29cd33fc30e33fe
+- claim: source resolution against Git, refusal logic, placement guard
+  path: release/orchestration/phase-2-context-bridge/govbridge/notes/validate.py
+  sha256: a81496743ed99b9a918008cc05291177d5fa19df941ea043b83baa1be89ac97e
+- claim: built_from_sha256 computation and rebuild determinism
+  path: release/orchestration/phase-2-context-bridge/govbridge/notes/build.py
+  sha256: 321b192c7b65a3977a33b635d0562485b7a90cc3b396f5de377cbffb79ed3efc
+- claim: CLI dispatch (validate, build)
+  path: release/orchestration/phase-2-context-bridge/govbridge/notes/cli.py
+  sha256: 7fdb01305d0642ac0e1e45329e5f2dc5523730c1f811016de6520fc5df3f4101
+- claim: acceptance check passes, 35/35, exit 0
+  path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0017.evidence/01-pytest-notes.out
+  sha256: 146e3966b5c2ee3ae71a983b00469c0d6eb5a45bc949220be5ab1cbbeae21a43
+mutation_scope_respected: true
+mutation_scope_note: 'only govbridge/notes/**, config/notes-schema.yaml, tests/notes/** and AGENT_RUNS/BR-AR-0017.*
+  changed on the branch (git diff against the merge-base with the bridge branch); no rm used; govbridge/cli.py,
+  govbridge/compile/packet.py, govbridge/authority/classes.py and every other shared file were read for convention
+  only, never written; no store, venv or model weight was written or committed'
+open_issues:
+- 'govbridge/cli.py needs one dispatch line (`if cmd == "notes": from govbridge.notes import cli as notescli;
+  return notescli.main(rest)`) added by whichever REPAIR-1 node next edits it in the shared_files sequence
+  (R1-RX, R1-GA1, R1-RS or R1-RA) to make `govbridge notes validate` reachable from the top-level CLI'
+- 'R1-GA3 (compile integration) is this node''s stated consumer for placement: govbridge.notes.validate.validate_note''s
+  target_section parameter and NEVER_ADMISSIBLE_SECTIONS constant are ready to be called from
+  govbridge/compile/packet.py''s overflow-to-notes path, but that wiring is R1-GA3''s mutation_scope, not this
+  node''s'
+- 'DERIVED_NOTE is not yet registered in govbridge/authority/classes.py''s ALL_CLASSES table (that file is outside
+  this node''s mutation_scope); until a later node adds it there, the class exists in config/notes-schema.yaml and
+  is enforced structurally by govbridge.notes.validate, but a packet-level admissibility check that consults
+  classes.py directly (rather than calling into govbridge.notes.validate) would not yet know about it'
