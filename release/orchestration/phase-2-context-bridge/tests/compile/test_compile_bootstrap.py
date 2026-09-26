@@ -23,9 +23,17 @@ def test_bootstrap_contains_prelude_packet_and_receipt_instructions(fixture_repo
     assert "## Your receipt" in brief
     assert result["packet_sha256"] in brief
 
-    # the packet itself (A-J) is embedded, not summarised away.
-    assert "## A. MANDATORY AUTHORITATIVE INPUTS" in brief
-    assert "## J. COMPLETION / EVIDENCE OBLIGATIONS" in brief
+    # REPAIR_PLAN.md section 6 (RC-9, node R1-RS): the bootstrap references the packet by id and hash instead of
+    # inlining it (run-1's bootstrap was 282,782 bytes and contained the whole packet). Scope correction granted
+    # on BR-AR-0025's reopening -- this assertion previously required the OPPOSITE ("the packet itself (A-J) is
+    # embedded, not summarised away"), which was exactly the RC-9 defect this node's own deliverable removes.
+    assert result.get("packet_id") in brief
+    assert "## A. MANDATORY AUTHORITATIVE INPUTS" not in brief
+    assert "## J. COMPLETION / EVIDENCE OBLIGATIONS" not in brief
+    # ...but the packet the brief REFERENCES genuinely carries both sections -- nothing was silently dropped,
+    # only not duplicated into the brief text itself.
+    assert "## A. MANDATORY AUTHORITATIVE INPUTS" in result["rendered"]
+    assert "## J. COMPLETION / EVIDENCE OBLIGATIONS" in result["rendered"]
 
 
 def test_bootstrap_where_you_are_carries_provenance_not_hardcoded_text(fixture_repo, view_path, registry_path,

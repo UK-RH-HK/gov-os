@@ -31,10 +31,11 @@ def _all_items(manifest: dict) -> dict:
 
 def check(manifest: dict, receipt: dict, task_spec: dict, repo: Optional[str] = None,
           registry_path: Optional[str] = None, rendered: Optional[str] = None,
-          supplementary: Optional[list] = None) -> dict:
+          supplementary: Optional[list] = None, budgets_path: Optional[str] = None) -> dict:
     """``rendered`` (BR-DAG-AMEND-R1-10): the MAIN packet's own rendered ``packet.md`` text -- threaded straight
     into ``validate.verify_packet`` so a receipt check gets the same render-inspecting guarantee ``packet verify``
-    does, not a weaker one.
+    does, not a weaker one. ``budgets_path``: the ``config/budgets.yaml`` the original compile used, when not the
+    default one -- needed so the R1-10 recomposition's oversize/no-selector header text matches exactly.
 
     ``supplementary`` (REPAIR_PLAN.md section 2.9 -- "`receipt check` covers all of them"): an optional list of
     ``{"label": str, "manifest": dict, "rendered": Optional[str]}``, one entry per supplementary packet this run
@@ -45,7 +46,7 @@ def check(manifest: dict, receipt: dict, task_spec: dict, repo: Optional[str] = 
 
     problems += [f"packet verify: {p}" for p in
                  validatemod.verify_packet(manifest, task_spec, repo=repo, registry_path=registry_path,
-                                            rendered=rendered)]
+                                            rendered=rendered, budgets_path=budgets_path)]
 
     packet_hash = receipt.get("context_packet_hash")
     hashes = packet_hash if isinstance(packet_hash, list) else [packet_hash]

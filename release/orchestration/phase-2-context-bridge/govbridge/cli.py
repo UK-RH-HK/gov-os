@@ -429,6 +429,10 @@ def cmd_compile(argv) -> int:
             "packet_kind": "main", "status": result["status"], "packet_id": result.get("packet_id"),
             "packet_sha256": result.get("packet_sha256"), "manifest_sha256": result.get("manifest_sha256"),
             "registry_path": result.get("registry_path"),
+            # BR-DAG-AMEND-R1-10 (reopening): a LATER `packet verify`/`receipt check` needs the same
+            # config/budgets.yaml this compile used to independently recompose an oversize item's expected body
+            # (its per_item_cap_bytes) -- None when the default was used, exactly like registry_path above.
+            "budgets_path": args.budgets,
             # R1-RX (OBS-BR-08): disclosed here too, so a caller of `compile --out` sees it without parsing
             # manifest.json's notices.
             "excluded_hits": result.get("excluded_hits"),
@@ -448,6 +452,9 @@ def cmd_packet(argv) -> int:
     v = sub.add_parser("verify")
     v.add_argument("path", help="a directory written by `govbridge compile --out DIR`")
     v.add_argument("--registry")
+    v.add_argument("--budgets", help="the config/budgets.yaml the packet was compiled with, if not the default -- "
+                                      "needed to independently recompose an oversize item's expected body "
+                                      "(BR-DAG-AMEND-R1-10); defaults to meta.json's own recorded budgets_path.")
     v.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
                                    "the current working directory (see cmd_search's own --repo for why this is "
                                    "worth passing explicitly -- a fixture-repo caller MUST pass it, since cwd-based "
@@ -480,7 +487,8 @@ def cmd_packet(argv) -> int:
         task_spec = load_yaml_file(str(d / "task_spec.yaml"))
         problems = validatemod.verify_packet(manifest, task_spec, repo=args.repo,
                                               registry_path=args.registry or meta.get("registry_path"),
-                                              rendered=rendered)
+                                              rendered=rendered,
+                                              budgets_path=args.budgets or meta.get("budgets_path"))
     result = {"status": meta.get("status", "?"), "verify": "PASS" if not problems else "FAIL", "problems": problems}
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0 if not problems else 1
@@ -493,6 +501,8 @@ def cmd_receipt(argv) -> int:
     c.add_argument("--packet", required=True, help="a directory written by `govbridge compile --out DIR`")
     c.add_argument("--receipt", required=True)
     c.add_argument("--registry")
+    c.add_argument("--budgets", help="see cmd_packet verify's own --budgets; defaults to meta.json's own recorded "
+                                      "budgets_path.")
     c.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
                                    "the current working directory (see cmd_packet verify's own --repo).")
     c.add_argument("--supplementary", action="append", metavar="DIR",
@@ -526,7 +536,8 @@ def cmd_receipt(argv) -> int:
     receipt = _load_receipt(args.receipt)
     result = receiptmod.check(manifest, receipt, task_spec, repo=args.repo,
                                registry_path=args.registry or meta.get("registry_path"),
-                               rendered=rendered, supplementary=supplementary)
+                               rendered=rendered, supplementary=supplementary,
+                               budgets_path=args.budgets or meta.get("budgets_path"))
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0 if result["status"] == "PASS" else 1
 

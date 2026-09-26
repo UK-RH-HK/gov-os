@@ -196,3 +196,146 @@ def test_extract_section_text_isolates_one_section():
     b_text = rendermod.extract_section_text(rendered, "B")
     assert "BBB" in b_text
     assert "AAA" not in b_text
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# BR-AR-0025 reopening: R1-10 must be EXACT for EVERY A-item shape, not a hash-of-the-whole-body-or-containment
+# reading that a selector item's own headers happen to need. ``govbridge.compile.packet``'s own R1-RM fixture
+# (``tests/fixtures/compile/mandatory/repobuilder.py``, imported read-only exactly as
+# ``tests/compile/test_mandatory_fidelity.py`` already does) gives every real shape ``Compiler._mandatory_text``
+# produces: MF-BIG (oversize, no selector), MF-ENTRIES/MF-LEDGER (a Markdown/YAML ``entries`` selector),
+# MF-KEYS (a ``keys`` selector), MF-PATHS (a ``paths``-only selector, no notice), MF-DIR (a directory manifest).
+# ---------------------------------------------------------------------------------------------------------------
+
+from mandatory import repobuilder as mf  # noqa: E402  (tests/fixtures/compile/mandatory/repobuilder.py; reached
+                                          # via tests/compile/conftest.py's own sys.path insert of
+                                          # tests/fixtures/compile -- never imported by, or duplicated from,
+                                          # test_mandatory_fidelity.py, which is R1-RM's file, not this node's)
+
+
+import pytest  # noqa: E402
+
+
+@pytest.fixture
+def mf_repo(tmp_path):
+    return mf.build(tmp_path / "repo")
+
+
+@pytest.fixture
+def mf_view_path(tmp_path, mf_repo):
+    p = tmp_path / "canonical-view.yaml"
+    mf.write_canonical_view(p, mf_repo)
+    return str(p)
+
+
+@pytest.fixture
+def mf_registry_path(tmp_path):
+    p = tmp_path / "authority-registry.yaml"
+    mf.write_registry(p)
+    return str(p)
+
+
+def _mf_compile(mf_repo, mf_view_path, mf_registry_path):
+    task_spec = mf.make_task_spec(mf_view_path)
+    result = packetmod.compile_packet(task_spec, routes=packetmod.FAKE_ROUTES, repo=str(mf_repo.root),
+                                       registry_path=mf_registry_path)
+    assert result["status"] == packetmod.STATUS_OK
+    return task_spec, result
+
+
+def _extract_body_span(rendered: str, unit_id: str) -> tuple:
+    """``(body, body_start, body_end)`` -- the exact span ``extract_item_delivered_body`` would return, plus its
+    absolute offsets in ``rendered``, so a test can splice a tamper INTO that exact span (never touching a
+    marker, another item's body, or anything outside section A)."""
+    begin = rendermod.item_body_marker("record", unit_id, "body-begin")
+    end = rendermod.item_body_marker("record", unit_id, "body-end")
+    b_start = rendered.index(begin) + len(begin) + 1  # +1: the single "\n" _render_item_body's own join adds
+    e_pos = rendered.index(end, b_start) - 1           # -1: the matching "\n" before the end marker
+    return rendered[b_start:e_pos], b_start, e_pos
+
+
+def test_verify_passes_exactly_for_every_real_mandatory_fidelity_shape(mf_repo, mf_view_path, mf_registry_path):
+    """The positive control for this reopening: one compile carries all six MF-* shapes in section A at once, and
+    every one of them must independently recompose EXACTLY from the rendered packet -- not just the shapes
+    test_verify_rendered_body.py's other tests already covered via the default (single-piece) fixture."""
+    task_spec, result = _mf_compile(mf_repo, mf_view_path, mf_registry_path)
+    a_ids = {r["unit"]["id"] for r in result["manifest"]["sections"]["A"]["items"]}
+    assert a_ids >= {"MF-BIG", "MF-ENTRIES", "MF-KEYS", "MF-PATHS", "MF-DIR", "MF-LEDGER"}
+    problems = validatemod.verify_packet(result["manifest"], task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path, rendered=result["rendered"])
+    assert problems == []
+
+
+def test_verify_fails_on_text_inserted_between_two_pieces_of_a_selector_item(mf_repo, mf_view_path,
+                                                                               mf_registry_path):
+    """Negative test 1 (BR-AR-0025 reopening): text inserted BETWEEN two pieces of a selector item (MF-ENTRIES,
+    a Markdown ``entries`` selector delivering 4 pieces) must fail verify. A CONTAINMENT check (every piece's own
+    text still present) would have PASSED this -- only an exact whole-body comparison catches it."""
+    task_spec, result = _mf_compile(mf_repo, mf_view_path, mf_registry_path)
+    manifest_before = json.dumps(result["manifest"], sort_keys=True)
+
+    body, b_start, e_pos = _extract_body_span(result["rendered"], "MF-ENTRIES")
+    piece_header_positions = [i for i in range(len(body)) if body.startswith("--- ", i)]
+    assert len(piece_header_positions) >= 2, "MF-ENTRIES must declare at least 2 pieces for this probe"
+    insert_at = piece_header_positions[1]  # strictly between the end of piece 1's text and piece 2's own header
+    tampered_body = body[:insert_at] + "INSERTED-BETWEEN-PIECES\n" + body[insert_at:]
+    tampered_rendered = result["rendered"][:b_start] + tampered_body + result["rendered"][e_pos:]
+
+    problems = validatemod.verify_packet(result["manifest"], task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path, rendered=tampered_rendered)
+    assert json.dumps(result["manifest"], sort_keys=True) == manifest_before
+    assert any("MF-ENTRIES" in p for p in problems), problems
+
+
+def test_verify_fails_on_a_changed_line_inside_one_of_a_selector_items_delivered_pieces(mf_repo, mf_view_path,
+                                                                                          mf_registry_path):
+    """A mutation (never an insertion) INSIDE one of MF-ENTRIES's own delivered piece texts must also fail --
+    the exact-body comparison catches a changed line inside a genuinely delivered section, not merely a gap
+    between sections."""
+    task_spec, result = _mf_compile(mf_repo, mf_view_path, mf_registry_path)
+    body, b_start, e_pos = _extract_body_span(result["rendered"], "MF-ENTRIES")
+    needle = "entry number 4, generated fixture content"
+    assert needle in body
+    tampered_body = body.replace(needle, "MUTATED " + needle)
+    assert tampered_body != body
+    tampered_rendered = result["rendered"][:b_start] + tampered_body + result["rendered"][e_pos:]
+
+    problems = validatemod.verify_packet(result["manifest"], task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path, rendered=tampered_rendered)
+    assert any("MF-ENTRIES" in p for p in problems), problems
+
+
+def test_verify_fails_on_a_changed_line_inside_an_oversize_items_section_map(mf_repo, mf_view_path,
+                                                                               mf_registry_path):
+    """Negative test 2 (BR-AR-0025 reopening): a changed line inside MF-BIG's own section map (no selector, over
+    the per-item cap -- Contract v3's own real shape) must fail verify. Independently confirmed on the REAL
+    CONTROL-A packet too (AGENT_RUNS/BR-AR-0025.check4...out, a shell/sed-level probe outside this test)."""
+    import re
+
+    task_spec, result = _mf_compile(mf_repo, mf_view_path, mf_registry_path)
+    body, b_start, e_pos = _extract_body_span(result["rendered"], "MF-BIG")
+    m = re.search(r"sha256=([0-9a-f]+)", body)
+    assert m, "MF-BIG's rendered body must disclose at least one section-map sha256 line"
+    pos = m.start(1)
+    flipped = "1" if body[pos] == "0" else "0"
+    tampered_body = body[:pos] + flipped + body[pos + 1:]
+    tampered_rendered = result["rendered"][:b_start] + tampered_body + result["rendered"][e_pos:]
+
+    problems = validatemod.verify_packet(result["manifest"], task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path, rendered=tampered_rendered)
+    assert any("MF-BIG" in p for p in problems), problems
+
+
+def test_verify_fails_on_an_extra_member_line_in_a_directory_manifest(mf_repo, mf_view_path, mf_registry_path):
+    """Negative test 4 (BR-AR-0025 reopening): an extra member line appended to MF-DIR's own directory manifest
+    must fail verify -- a renderer (or an attacker) adding an undeclared member is exactly the kind of insertion
+    into A the hard authority invariant forbids, and a directory item was previously SKIPPED by this check
+    entirely."""
+    task_spec, result = _mf_compile(mf_repo, mf_view_path, mf_registry_path)
+    body, b_start, e_pos = _extract_body_span(result["rendered"], "MF-DIR")
+    tampered_body = body + "\n- fake/injected/member.txt  (blob=deadbeefcafe, size=1, class=EVIDENCE)"
+    tampered_rendered = result["rendered"][:b_start] + tampered_body + result["rendered"][e_pos:]
+
+    problems = validatemod.verify_packet(result["manifest"], task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path, rendered=tampered_rendered)
+    assert any("MF-DIR" in p for p in problems), problems

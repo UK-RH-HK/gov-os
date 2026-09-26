@@ -254,6 +254,9 @@ def main(argv=None) -> int:
             "packet_kind": "main", "status": result["status"], "packet_id": result.get("packet_id"),
             "packet_sha256": result.get("packet_sha256"), "manifest_sha256": result.get("manifest_sha256"),
             "registry_path": result.get("registry_path"), "excluded_hits": result.get("excluded_hits"),
+            # BR-DAG-AMEND-R1-10 (reopening): mirrors cmd_compile's own meta.json field, so a LATER `packet
+            # verify`/`receipt check` on this directory can recompose an oversize item's expected body exactly.
+            "budgets_path": args.budgets,
         }
         (out_dir / "meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True), encoding="utf-8")
     sys.stdout.write(brief)

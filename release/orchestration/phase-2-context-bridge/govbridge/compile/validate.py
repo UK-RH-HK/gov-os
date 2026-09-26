@@ -225,35 +225,79 @@ def verify_declared_and_delivered(manifest: dict, a_items: list, repo: Optional[
     return problems
 
 
-def verify_rendered_delivery(manifest: dict, rendered: str, a_items: list, repo: Optional[str] = None) -> list:
-    """BR-DAG-AMEND-R1-10 (routed from BR-AR-0022's open issue): independently re-extracts each A item's DELIVERED
-    BODY from the RENDERED packet text itself (``govbridge.compile.render.extract_item_delivered_body`` -- never
-    trusts ``manifest['sections']['A']['items'][*]['delivered_sha256']`` alone, the way
-    ``verify_declared_and_delivered`` above still does). This catches a renderer that drops or mangles content
-    AFTER the compiler already computed a correct hash for it: ``verify_declared_and_delivered`` never inspects a
-    single rendered byte, so a bug downstream of that hash computation would otherwise pass silently.
+def _composition_context_class(packetmod):
+    """Builds a minimal ``govbridge.compile.packet.Compiler`` SUBCLASS whose ``__init__`` skips all the real,
+    expensive work the real one does (view/registry resolution, task-context setup, ...) and sets only the three
+    attributes ``Compiler._mandatory_text`` -- and the private per-shape renderers it dispatches to
+    (``_render_selected_parts``/``_render_oversize_no_selector``/``_render_directory_manifest``) -- actually read:
+    ``repo``, ``per_item_cap_bytes`` and ``notices`` (a scratch list; its informational appends, e.g. the
+    keys/entries "here is what else exists" disclosure, are discarded -- this module only wants the returned
+    TEXT). It MUST be a real subclass, never a duck-typed stand-in: those private methods call ``self.
+    _render_whatever(...)`` internally, which Python resolves through the instance's actual class -- a plain
+    object with the same three attributes has no such method to find. Built lazily, inside this function, so
+    ``govbridge.compile.packet`` (already imported lazily by every caller, to avoid a module-load-time
+    circular import) never needs a module-level import here either. Nothing here reimplements packet.py's own
+    composition, and packet.py itself is never edited (R1-GA3 is its next editor)."""
 
-    For the common, single-piece "delivered in full" shape (and the directory/oversize shapes, already skipped
-    above), ``delivered_sha256`` is exactly ``hash_pieces([item.text])`` -- so the body re-extracted here, hashed
-    the SAME way, must reproduce it exactly. A ``keys``/``entries``/``paths`` selector's own delivered body
-    additionally embeds packet.py's own "--- name (loc) ---" piece headers (``declared==delivered`` there
-    "by construction" -- see ``resolver.declared_parts``'s docstring), so an exact whole-body hash match is not
-    expected for that shape; this function instead requires every one of that item's freshly re-read declared
-    pieces (``resolver.declared_parts``, independent of the render entirely) to be verbatim PRESENT in the
-    rendered body -- still an exact, unambiguous, render-inspecting check, just phrased as containment rather than
-    a single hash, since the header formatting is packet.py's own private concern, not this module's."""
+    class _CompositionContext(packetmod.Compiler):
+        def __init__(self, repo: Optional[str], per_item_cap_bytes: int):  # noqa: super().__init__ deliberately
+            self.repo = repo                                               # never called -- it does real work
+            self.per_item_cap_bytes = per_item_cap_bytes                   # (view/registry resolution) this
+            self.notices: list = []                                        # module must never trigger.
+
+    return _CompositionContext
+
+
+def _per_item_cap_bytes(manifest: dict, budgets_path: Optional[str]) -> int:
+    """The per-item cap the ORIGINAL compile used, re-derived the same way ``govbridge.compile.budgets`` itself
+    does (``config/budgets.yaml``'s ``per_item_cap_kb``, a document-level setting shared by every profile --
+    never profile-specific), so an oversize/no-selector item's recomposed section-map header text
+    ("exceeds the N-byte per-item cap") matches exactly. Falls back to the documented default (24 KB) only if no
+    budget_profile is recorded at all (a manifest built before that field existed)."""
+    from govbridge.compile import budgets as budgetsmod
+
+    profile_name = manifest.get("budget_profile")
+    if not profile_name:
+        return 24 * 1024
+    return budgetsmod.load_profile(profile_name, path=budgets_path).per_item_cap_bytes
+
+
+def verify_rendered_delivery(manifest: dict, rendered: str, a_items: list, repo: Optional[str] = None,
+                              budgets_path: Optional[str] = None) -> list:
+    """BR-DAG-AMEND-R1-10 (routed from BR-AR-0022's open issue; reopened on BR-AR-0025 pass 1 for not being EXACT
+    for every shape): independently re-extracts each A item's DELIVERED BODY from the RENDERED packet text itself
+    (``govbridge.compile.render.extract_item_delivered_body`` -- never trusts anything the manifest claims about
+    what was delivered), INDEPENDENTLY RECOMPOSES the body that item should have (from Git, at the packet's own
+    recorded view, via ``resolver.declared_parts`` and ``packet.Compiler._mandatory_text`` -- the SAME composition
+    function the compiler itself calls, imported read-only; ``govbridge/compile/packet.py`` is never edited by
+    this node), and requires the two to be EXACTLY equal, for every one of the four shapes ``_mandatory_text``
+    produces:
+
+    * a directory item's member manifest;
+    * a keys/entries/paths-selector item's piece headers plus pieces;
+    * an oversize/no-selector item's section map plus its ``MANDATORY_PARTIAL_DELIVERY`` disclosure text;
+    * the plain, whole-occurrence body (delivered in full, the common RC-1-relevant case).
+
+    An exact string comparison over the FULL composed body catches content inserted anywhere within it (between
+    two selector pieces, inside a section-map line, an extra directory-manifest member line, ...) -- never only a
+    hash of the whole item or a containment check over a subset of it, both of which a sufficiently placed
+    insertion could survive."""
+    from govbridge.compile import packet as packetmod
+
+    composition_context_cls = _composition_context_class(packetmod)
     problems: list = []
     a_items_by_id = {mi.id: mi for mi in a_items}
-    notices_by_id: dict = {}
-    for n in (manifest.get("notices") or []):
-        if n.get("type") == "MANDATORY_PARTIAL_DELIVERY":
-            notices_by_id.setdefault(n.get("id"), []).append(n)
+    per_item_cap_bytes = _per_item_cap_bytes(manifest, budgets_path)
 
     for row in manifest["sections"]["A"]["items"]:
         uid = row["unit"]["id"]
-        if row.get("is_directory"):
-            continue
         unit_kind = row["unit"]["kind"]
+        mi = a_items_by_id.get(uid)
+        if mi is None:
+            problems.append(f"A/{uid}: not found in the freshly re-derived resolver output at the recorded view "
+                             f"-- cannot independently recompose its expected body")
+            continue
+
         found, body, ambiguous = rendermod.extract_item_delivered_body(rendered, "A", unit_kind, uid)
         if ambiguous:
             problems.append(f"A/{uid}: more than one delivered-body marker pair for this item in the rendered "
@@ -264,54 +308,20 @@ def verify_rendered_delivery(manifest: dict, rendered: str, a_items: list, repo:
                              f"packet's section A -- the renderer did not emit it")
             continue
 
-        delivered_sha256 = row.get("delivered_sha256")
-        mi = a_items_by_id.get(uid)
-        if delivered_sha256 is not None:
-            rendered_sha256 = resolvermod.hash_pieces([body])
-            if rendered_sha256 == delivered_sha256:
-                continue  # exact, render-inspecting confirmation of the common single-piece shape
-            missing = []
-            if mi is not None:
-                fresh_parts = resolvermod.declared_parts(mi, repo=repo)
-                missing = [p["name"] for p in fresh_parts if p["text"].rstrip("\n") not in body]
-            if missing or mi is None:
-                problems.append(
-                    f"A/{uid}: the body re-extracted from the RENDERED packet hashes to {rendered_sha256!r}, not "
-                    f"the manifest's own delivered_sha256 {delivered_sha256!r}"
-                    + (f"; declared part(s) {missing!r} are not verbatim present in the rendered body either -- "
-                       f"the renderer may have dropped content" if missing else ""))
-            continue
+        # the SAME independent third measurement verify_declared_and_delivered already takes (fresh from Git,
+        # never trusting the row's own declared_parts) -- reused here rather than recomputed a second, possibly
+        # diverging way.
+        dparts = resolvermod.declared_parts(mi, repo=repo)
+        ctx = composition_context_cls(repo=repo, per_item_cap_bytes=per_item_cap_bytes)
+        expected_text, _ = ctx._mandatory_text(mi, dparts)
+        expected_body = (expected_text or "").rstrip("\n")
 
-        # delivered_sha256 is None for two shapes, both handled the same way here: a keys/entries/paths partial
-        # delivery (`delivered` non-empty, `undelivered_ranges` the rest) and the no-selector oversize/section-map
-        # shape (`delivered` EMPTY -- rule 1's own comment: "nothing raw was delivered, only the map"). Every
-        # DELIVERED range's own raw text must be verbatim present (mirrors the `delivered_sha256 is not None`
-        # branch above, just per-range instead of whole-body); every range the notice discloses AT ALL --
-        # delivered or not, plus the fuller `section_map` the oversize shape also carries -- must have its own
-        # (name, sha256) identity pair verbatim present, so a render that OMITS a disclosed line, or shows the
-        # wrong name/hash for it, is caught -- never only a check that the notice's OWN claim matches Git (that
-        # is `verify_declared_and_delivered`'s job; this one inspects the actual rendered bytes).
-        for n in notices_by_id.get(uid) or []:
-            for d in (n.get("delivered") or []):
-                d_path = d.get("path") or n.get("path")
-                d_commit = d.get("commit") or n.get("commit")
-                text = resolvermod._read_git_slice(d_path, d_commit, d.get("line_start"), d.get("line_end"),
-                                                    repo=repo)
-                if text is not None and text.rstrip("\n") not in body:
-                    problems.append(f"A/{uid}: disclosed delivered range {d.get('name')!r} is not verbatim "
-                                     f"present in the rendered packet body -- the renderer may have dropped it")
-
-            disclosed_identities = list(n.get("section_map") or [])
-            if not disclosed_identities:
-                disclosed_identities = list(n.get("delivered") or []) + list(n.get("undelivered_ranges") or [])
-            for r in disclosed_identities:
-                name, sha = r.get("name"), r.get("sha256")
-                if name is None or sha is None:
-                    continue
-                if name not in body or sha not in body:
-                    problems.append(f"A/{uid}: disclosed range {name!r} (sha256={sha}) is not identified in the "
-                                     f"rendered packet body at all -- the renderer may have dropped or altered "
-                                     f"its disclosure line")
+        if body != expected_body:
+            problems.append(
+                f"A/{uid}: the body re-extracted from the RENDERED packet does not EXACTLY match the "
+                f"independently recomposed expected body (Git at the recorded view, via "
+                f"packet.Compiler._mandatory_text) -- the renderer may have dropped, altered or had content "
+                f"inserted into it. rendered={body!r} expected={expected_body!r}")
     return problems
 
 
@@ -432,16 +442,20 @@ def verify_ordering(manifest: dict) -> list:
 
 
 def verify_packet(manifest: dict, task_spec: dict, repo: Optional[str] = None,
-                   registry_path: Optional[str] = None, rendered: Optional[str] = None) -> list:
+                   registry_path: Optional[str] = None, rendered: Optional[str] = None,
+                   budgets_path: Optional[str] = None) -> list:
     """Every check this module knows, combined. An empty list means the packet is valid.
 
     ``rendered`` (BR-DAG-AMEND-R1-10): the packet's own rendered ``packet.md`` TEXT, when the caller has it (every
     CLI path does -- ``govbridge packet verify DIR``/``govbridge receipt check`` both read it off disk alongside
-    ``manifest.json``). When given, ``verify_rendered_delivery`` additionally re-extracts each A item's delivered
-    body from THOSE bytes and independently recomputes its hash, catching a renderer that drops content after the
-    compiler already hashed it correctly -- something no other check here can see, since every other check reads
-    only the manifest. ``None`` only for a caller with no rendered text at all (a pre-existing direct unit-test
-    call of this function); such a caller does not get the R1-10 guarantee, so a new caller should always pass it."""
+    ``manifest.json``). When given, ``verify_rendered_delivery`` independently RECOMPOSES each A item's expected
+    body from Git (at the recorded view) and compares it EXACTLY against what the rendered bytes actually
+    contain -- catching a renderer that drops, alters or has content inserted into it, for every mandatory-item
+    shape (directory, selector, oversize/section-map, and the plain whole-occurrence body) -- something no other
+    check here can see, since every other check reads only the manifest. ``None`` only for a caller with no
+    rendered text at all (a pre-existing direct unit-test call of this function); such a caller does not get the
+    R1-10 guarantee, so a new caller should always pass it. ``budgets_path`` lets that recomposition use the SAME
+    ``config/budgets.yaml`` the original compile did, when it was not the default one."""
     problems = []
     problems += verify_section_a(manifest, task_spec, repo=repo, registry_path=registry_path)
     problems += verify_placement(manifest)
@@ -453,7 +467,7 @@ def verify_packet(manifest: dict, task_spec: dict, repo: Optional[str] = None,
                                          resolved_view=pinned_view)
     problems += verify_declared_and_delivered(manifest, a_items, repo=repo)
     if rendered is not None:
-        problems += verify_rendered_delivery(manifest, rendered, a_items, repo=repo)
+        problems += verify_rendered_delivery(manifest, rendered, a_items, repo=repo, budgets_path=budgets_path)
     return problems
 
 

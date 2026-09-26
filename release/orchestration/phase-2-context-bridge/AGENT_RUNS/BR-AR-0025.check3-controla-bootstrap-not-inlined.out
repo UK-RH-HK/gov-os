@@ -2,17 +2,18 @@
 8350
 === compiled main packet byte count (for comparison) ===
 {
+ "budgets_path": null,
  "excluded_hits": 2,
- "manifest_sha256": "a32d1047224b8cbffeeb77edb1a3333a720a78d1edd20694adf6a60d18530946",
- "out": "/tmp/br-ar-0025-final/main1",
- "packet_id": "bf958dc95093c1d8",
+ "manifest_sha256": "9ecccf678ba318e89351c1920e1cd9bd06f0e21583a299a017598987dfbac7a5",
+ "out": "/tmp/br-ar-0025-final2/main1",
+ "packet_id": "168216bf49cb917d",
  "packet_kind": "main",
- "packet_sha256": "bf958dc95093c1d8301f0244306dafc90b128987be8139cf78cbd7d2d4346b5f",
+ "packet_sha256": "168216bf49cb917da598e769defc81af4ecec0515012e6f245f5898815a9af2d",
  "registry_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0025/release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
  "status": "OK"
 }
-134788 /tmp/br-ar-0025-final/main1/packet.md
-=== main packet verify ===
+134788 /tmp/br-ar-0025-final2/main1/packet.md
+=== main packet verify (now EXACT recomposition for every A-item shape) ===
 {
  "problems": [],
  "status": "OK",
