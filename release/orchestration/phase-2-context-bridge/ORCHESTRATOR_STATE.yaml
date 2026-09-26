@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T17:15:06Z'
-state_hash: 93bdd12b62ee31775bd222ca6785816abdef5c926a03ebf1f8cbd7eaa41093f8
+updated_at: '2026-09-26T18:33:06Z'
+state_hash: c9804e79e4c331a499e13a470b28b0c59ff1a7292e9ea14c2dc9da3134c297ed
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1404,6 +1404,23 @@ agent_runs:
     audit_found_outside_scope: 'tip re-resolution on query paths remains in lexical/query.py, semantic/search.py, authority/lifecycle.py
       (3 sites, incl. id_lookup''s definition_sites), gather/followup.py (a second resolution), compile/packet.py (4+ per compile; a
       per-query RouteSet rebuild drops resolved_view), graph/why.py, graph/history.py, answers/cite.py, answers/lint.py -> pass 5'
+  pass_5:
+    final_commit: 50bc2913630b3005b4eebe99a6085ed91c8e3e6e
+    merged_at: f5630d4
+    fixed: 'one resolved view threaded through lexical.query, semantic.search, lifecycle.classify/_find_definition/find_definition (one
+      optional parameter each; the protected tests byte-unmodified), exact.id_lookup (twice -> once), gather.followup (its second
+      resolution removed), graph.why/history (resolved_refs recorded), answers.cite/lint (once per invocation), compile_packet (14 extra
+      resolutions -> 0, by a counting probe), resolver.py''s id-form branch; 8 tests move the records ref mid-operation; its first
+      re-audit method wrongly reported zero and the independent second method (dynamic call-counting) found the two it had missed'
+    orchestrator_verified: integrate-check INTEGRATION_PERMITTED after ratifying three files; FULL suite on the merged tree 731 passed,
+      0 failed; secrecy 0; no install or bare python3 after the recorded pass-3 window; claude-sonnet-5 x2102 over the whole run
+    residuals_for_verifier: compile/bootstrap.py resolves the view 6 times per run (it references the packet by id and hash);
+      lifecycle.show_many N+2 (a standalone CLI not dispatched by cli.py); authority/layer.classify_hit latent (no caller passes
+      commit=None); exact.show and cite --commit <live branch> edge cases
+  pass_5_scope_ratified: 'authority/resolver.py (near-frozen; two calls now receive the already-resolved view, mirroring the function''s own
+    other branches; no section-A boundary change), tests/authority/test_resolver.py (one added test), tests/answers/test_lint.py (a rule-5
+    correction -- the three original key assertions kept exactly, plus a real-content check of the new resolved_refs field) -- ratified
+    by the orchestrator after reading each diff'
   pass_5_reopen: 'complete BR-DAG-AMEND-R1-23 across every audited site (scope extended); lifecycle.py is a near-frozen invariant module
     -- threading a resolved view is permitted only as a non-weakening, listed change'
   pass_4_reopen: 'BR-DAG-AMEND-R1-23 -- ONE RESOLVED VIEW PER OPERATION: every query operation (gather, compile, search, why, impact,
@@ -1461,7 +1478,7 @@ agent_runs:
       (rule 5); typed errors re-raised and other caught exceptions counted; every code-layer query command proven on a
       file-level read-only store'
   dispatched_at: '2026-09-26T08:46Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0034
   dispatch_notes:
   - authority/classes.py -- the config-read change only; the class table byte-unchanged
@@ -1509,6 +1526,9 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/govbridge/graph/history.py
   - release/orchestration/phase-2-context-bridge/govbridge/answers/cite.py
   - release/orchestration/phase-2-context-bridge/govbridge/answers/lint.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
+  - release/orchestration/phase-2-context-bridge/tests/authority/test_resolver.py
+  - release/orchestration/phase-2-context-bridge/tests/answers/test_lint.py
 - run_id: BR-AR-0026
   role: 'REPAIR-1 node R1-GA3 -- compile from gather: facet quotas and a facet-aware drop order, content slices, per-item query and facet tags, overflow to evidence notes and supplementary packets, D.2 via gather; plus BR-DAG-AMEND-R1-11'
   dag_node: R1-GA3
@@ -1627,8 +1647,6 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0027.*
   - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_out_overflow.py
 running_work:
-- run_id: BR-AR-0034
-  liveness_check: subagent transcript mtime + commits on bridge/r1-xc-0034; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -2048,6 +2066,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await the BR-AR-0034 R1-XC fix (one resolved view per operation); integrate-check + FULL suite, merge; then
-  the orchestrator re-runs the CONTROL-A double compile on the merged tree (a store built from clean, bridge commits paused during the
-  run); then R1-INT (BR-AR-0028, OPUS, audit-only); checkpoint after every merge
+next_deterministic_action: dispatch R1-INT (BR-AR-0028, OPUS, audit-only, handoff BR-HO-0028) -- every build node is integrated; INT
+  runs its real-view checks against a PINNED copy of the canonical view (records pinned at a recorded commit) so that orchestrator
+  commits cannot perturb them; checkpoint after its return
