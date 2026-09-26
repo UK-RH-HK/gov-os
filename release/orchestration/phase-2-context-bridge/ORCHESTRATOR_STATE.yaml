@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T16:30:24Z'
-state_hash: 4d0311e650cd253a6ecaa30f84ead5d228cb6054499a9083c707bdb1653acfb1
+updated_at: '2026-09-26T17:15:06Z'
+state_hash: 93bdd12b62ee31775bd222ca6785816abdef5c926a03ebf1f8cbd7eaa41093f8
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1393,6 +1393,19 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-xc-0034
   checkpoint_schema: 2
+  pass_4:
+    final_commit: 331d8f031dff3362604473cca31657f005d64e3e
+    merged_at: 969b623
+    fixed: 'core/exact.py show/grep/path_resolve/id_lookup accept a resolved_view; real_routes.exact_route and build_real_routes thread the
+      one view (also into registry and mandatory loading); RouteSet.resolved_view; ResolvedView.pinned_refs(); a test moving the records
+      ref mid-gather and mid-compile (fails before, passes after); the pass-3 "broken environment" claim corrected in its own record'
+    orchestrator_verified: integrate-check INTEGRATION_PERMITTED; FULL suite on the merged tree 725 passed, 0 failed; no install or bare
+      python3 commands after the recorded pass-3 window (11:10-11:16Z)
+    audit_found_outside_scope: 'tip re-resolution on query paths remains in lexical/query.py, semantic/search.py, authority/lifecycle.py
+      (3 sites, incl. id_lookup''s definition_sites), gather/followup.py (a second resolution), compile/packet.py (4+ per compile; a
+      per-query RouteSet rebuild drops resolved_view), graph/why.py, graph/history.py, answers/cite.py, answers/lint.py -> pass 5'
+  pass_5_reopen: 'complete BR-DAG-AMEND-R1-23 across every audited site (scope extended); lifecycle.py is a near-frozen invariant module
+    -- threading a resolved view is permitted only as a non-weakening, listed change'
   pass_4_reopen: 'BR-DAG-AMEND-R1-23 -- ONE RESOLVED VIEW PER OPERATION: every query operation (gather, compile, search, why, impact,
     history, exact, state, cite, answers lint, packet verify at its recorded view) resolves config/canonical-view.yaml once and threads
     the pinned commits through every route; core/exact.py grep()/id_lookup() and real_routes.exact_route re-resolve the records tip per
@@ -1487,6 +1500,15 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/govbridge/core/view.py
   - release/orchestration/phase-2-context-bridge/govbridge/route/router.py
   - release/orchestration/phase-2-context-bridge/tests/route/test_view_pinned_per_operation.py
+  - release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/search.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/lifecycle.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/why.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/history.py
+  - release/orchestration/phase-2-context-bridge/govbridge/answers/cite.py
+  - release/orchestration/phase-2-context-bridge/govbridge/answers/lint.py
 - run_id: BR-AR-0026
   role: 'REPAIR-1 node R1-GA3 -- compile from gather: facet quotas and a facet-aware drop order, content slices, per-item query and facet tags, overflow to evidence notes and supplementary packets, D.2 via gather; plus BR-DAG-AMEND-R1-11'
   dag_node: R1-GA3
