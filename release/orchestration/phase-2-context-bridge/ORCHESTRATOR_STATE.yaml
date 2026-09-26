@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T02:49:20Z'
-state_hash: 75b714cbf0a7a3803b668901ee42fc69c97426ef73e42da0e3c827e98b92d0ac
+updated_at: '2026-09-26T03:09:27Z'
+state_hash: 2b649ce8625d706281652b5acdeb3cf7dec0ca7a768cbb78fab86fdacf10e1e3
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -818,7 +818,23 @@ agent_runs:
   agent_name: br-r1-rx-0018
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
+  pass_1:
+    final_commit: c11ed0445a4a769e170bf87195262ced5c064112 (report) / 03410b2 (work)
+    integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run)
+    orchestrator_verified:
+    - clean trial merge onto the bridge tip (git merge-tree)
+    - secrecy audit -- 0 accesses to grade/oracle/sealed paths or the public demonstration query set (2 pattern hits are its
+      own note explaining why it used CONTROL-A instead)
+    - genericity grep clean (the one hit, EX-FIND-0001#F1, is a synthetic fixture id)
+    - claude-sonnet-5 x384, as routed
+    reopen_reason: 'the FULL domain suite fails on its own branch (1 failed, 351 passed; the orchestrator also saw it on the
+      trial-merged tree, 386 passed) -- tests/route/test_task_exclusions.py::test_cli_search_applies_task_and_discloses_excluded_hits
+      is ORDER-DEPENDENT (passes alone): `cli search` has no --repo, the test relies on chdir, and a process-global git
+      resolution from an earlier test wins. Its acceptance ran only the targeted set. Merge aborted; nothing of it is on
+      the bridge.'
+    follow_up_required: '`cli search --repo` threaded into the real_routes build; the test passes --repo and does not chdir;
+      name (and fix if in scope) the process-global cache; FULL domain suite saved as a check output'
   store: $HOME/.cache/gov-bridge/store-BR-AR-0018
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
@@ -873,7 +889,27 @@ agent_runs:
   agent_name: br-r1-rg-0020
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
+  final_commit: b6da60a2a00f332eb990a54e36b29e6f81648440
+  merged_at: 0c96e12
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, final pass)
+  follow_ups: 34fe43b (G3 answer-side heuristics -> PENDING_RUBRIC, never FAIL; only schema-defined constants may FAIL) and
+    11daf41 (must_state accepts plain string or {fact, binding}; stage binding -> that stage's claim, `query` binding ->
+    the whole answer; D-1 id-or-section regression tests)
+  orchestrator_verified:
+  - FULL domain suite on the merged tree -- 393 passed, 0 failed
+  - secrecy audit -- 0 accesses to bridge/grade-*, DEMONSTRATION/oracle*, grading, sealed dirs or ~/.config/gov-bridge; it
+    read CAUSE_ANALYSIS.md, which REPAIR-1 rule 2 permits builders; the demonstration-queries.yaml hit is the grader's
+    pre-existing default path in code, not a read
+  - format compatibility with the run-2 oracle, checked by the orchestrator against TA2's committed check_oracle.py (not the
+    oracle) -- TA2 binds a stage fact to its own stage name and a query/control-row fact to `query`; the grader scopes
+    stage facts per D-2 and leaves query-row must_state to the rubric's per-query verdict, so the mapping form is never
+    string-handled
+  - one existing test modified (test_demo_grade.py, FAIL -> PENDING_RUBRIC), justified in its checkpoint, consistent with
+    the reopen instruction; claude-sonnet-5 x451, as routed
+  open_issues_routed:
+  - test_compile_real_view_mandatory_in_a non-determinism (also seen by RX) -> R1-RM (BR-DAG-AMEND-R1-2)
+  - end-to-end bound-oracle x grader cross-check -> R1-INT (BR-DAG-AMEND-R1-3)
   pass_1:
     final_commit: 9cf4a9c (report) / 8b16f33 (work)
     integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run)
@@ -932,8 +968,6 @@ running_work:
   liveness_check: subagent transcript mtime + commits on bridge/r1-rx-0018; never inferred from elapsed time
 - run_id: BR-AR-0019
   liveness_check: subagent transcript mtime + commits on bridge/r1-rl-0019; never inferred from elapsed time
-- run_id: BR-AR-0020
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rg-0020; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -981,6 +1015,29 @@ dag:
       MANIFEST (pinned refs), never at the moving tip, so a stored packet stays re-verifiable at any time (ARCHITECTURE.md 5.3
       item 4); regression test -- compile, commit a new mandatory owner record, re-verify the old packet -> PASS
     reason: the run-1 packet fails verification today only because four owner records were added after it was compiled
+  - id: BR-DAG-AMEND-R1-2
+    by: orchestrator (routing of an observation made independently by BR-AR-0018 and BR-AR-0020)
+    rule: R1-RM makes tests/compile/test_compile_real_view_mandatory_in_a.py hermetic -- it compiles the real view against
+      live refs of the shared repository with no repo/view pin and flakes under concurrent agent git activity (a manifest
+      hash mismatch, a ref that does not resolve, two different manifest_sha256 values within one test). Pin the view
+      (recorded refs/commits) so the byte-identical-twice assertion is tested, never weakened; the correction of an
+      existing test is justified in the checkpoint
+    reason: a non-deterministic acceptance test cannot gate the repaired compile path or R1-D2's frozen-tip rebuild
+  - id: BR-DAG-AMEND-R1-3
+    by: orchestrator (from the R1-RG / R1-TA2 integration)
+    rule: 'R1-INT acceptance additionally includes (a) a synthetic bound-mode oracle that passes DEMONSTRATION/oracle-tools/
+      check_oracle.py --require-binding is graded by `govbridge demo grade` without error, stage-bound facts scoped per D-2
+      and query-bound facts left PENDING_RUBRIC; (b) the GD-7 packet de-duplication re-check on the integrated tree; (c) the
+      FULL domain suite green on the integrated tree. The oracle checker is a public tool; R1-INT builds its own synthetic
+      oracle and never reads a real one.'
+    reason: RG could not read check_oracle.py under REPAIR-1 rule 1's literal DEMONSTRATION/oracle* glob; the orchestrator
+      cross-checked the format by reading, but an executable cross-check belongs in integration
+  - id: BR-DAG-AMEND-R1-4
+    by: orchestrator (lesson of the BR-AR-0018 reopen)
+    rule: every REPAIR-1 node's acceptance includes the FULL domain suite, saved as a check output (template amendment R1-T1
+      in HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md); applies to every run dispatched after this commit and to every
+      reopened pass
+    reason: RX's targeted acceptance passed while its own new test failed in the full suite
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1084,6 +1141,14 @@ observations:
   text: the run-1 oracle is UNSEALED and committed on quarantined bridge/grade-0012; any run-2 needs a FRESH oracle by a
     fresh test-author, sealed at a location NOT recorded in any committed file (lesson of OBS-BR-04), with a committed
     sha256 commitment
+- id: OBS-BR-11
+  text: 'PreCompact hook CONFIRMED LIVE in this session -- at 2026-09-26T03:49:22+01:00 the hook wrote and committed BR-CP-0016
+    on the bridge branch (hooks/checkpoint-hook.log). Manual checkpoints continue after every material transition.'
+- id: OBS-BR-12
+  text: 'orchestrator instruction conflict, self-reported -- my live follow-up to BR-AR-0020 suggested reading
+    DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
+    DEMONSTRATION/oracle*. RG correctly declined; the rule wins. The file is a public tool with no oracle content, but a
+    brief''s prohibitions bind the orchestrator''s own follow-ups too; follow-ups are checked against the brief before sending.'
 - id: OBS-BR-02
   text: SECURITY_POLICY secret-content exclusion hides 8 product files (fake test keys, incl. brownfield.rs) from content
     indexes; they stay reachable by path/blob through the exact route and the exclusion is disclosed in every packet
@@ -1112,5 +1177,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await REPAIR-1 wave 1 (BR-AR-0017 R1-RN, 0018 R1-RX, 0019 R1-RL, 0020 R1-RG sonnet; 0021 R1-TA2 opus);
-  integrate-check each (schema 2), merge; then wave 2 (R1-RM, R1-GA1) per REPAIR_DAG parallel groups; checkpoint after every merge
+next_deterministic_action: await BR-AR-0018 R1-RX follow-up (order-dependent test) and BR-AR-0019 R1-RL; integrate-check each
+  (schema 2) + FULL suite on the trial-merged tree, merge; then wave 2 (R1-RM after RX, R1-GA1 after RX+RL) with template R1-T1;
+  checkpoint after every merge

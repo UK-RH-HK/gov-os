@@ -81,3 +81,21 @@ Commit on your branch.
 
 Self-check with `python3 release/orchestration/phase-2-context-bridge/tools/check_state.py integrate-check <RUN_ID>`
 before you return. End with your commit SHA and `<RUN_ID> RETURNED <COMPLETED|BLOCKED>`.
+
+## Amendment R1-T1 (BR-DAG-AMEND-R1-4): the full suite is part of every node's acceptance
+
+This amendment applies to runs dispatched after wave 1, and to reopened passes. A wave-1 node's targeted acceptance
+passed while its own new test failed in the full suite, because the test depended on test order.
+
+1. **Run the FULL domain suite.** From the domain, run
+   `$HOME/.cache/gov-bridge/venv/bin/python -m pytest -q -p no:cacheprovider tests` as your **last** acceptance check.
+   Save the output as a check output and add it to `commands`. It must show **0 failures**. The one exception is
+   `tests/compile/test_compile_real_view_mandatory_in_a.py`, which is non-hermetic until R1-RM repairs it
+   (BR-DAG-AMEND-R1-2). If that test fails, list the failure explicitly in `open_issues`. Do not skip it or mark it
+   xfail.
+2. **Tests must be hermetic.** A new test must not depend on:
+   * the process cwd (pass `--repo` or `repo=` explicitly; do not `chdir`);
+   * live refs of the shared repository (pin a view or use a fixture repo);
+   * `GOVBRIDGE_*` environment left over from another test (use `monkeypatch.setenv`/`delenv`);
+   * test order.
+   Run each new test file on its own **and** within the full suite.
