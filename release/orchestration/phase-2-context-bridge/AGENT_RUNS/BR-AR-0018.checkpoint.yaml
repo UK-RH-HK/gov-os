@@ -1,6 +1,6 @@
 # BR-AR-0018 schema-2 worker checkpoint (OD-BR-04 A). No oracle content.
 run_id: BR-AR-0018
-commit: 03410b2198bb3813b56f9fc5a3b71f8a2cc7714f
+commit: d2839b33cdd1bb683fdde301e7c2b9148919917c
 role: 'REPAIR-1 node R1-RX -- task context: retrieval_exclusions applied automatically by every route, every CLI
   query command and every compile call site (OBS-BR-08, OD-BR-03 item 1)'
 model_observed: claude-sonnet-5 (Sonnet 5)
@@ -74,8 +74,8 @@ commands:
 - cmd: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/route/test_task_exclusions.py -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check1-pytest-task-exclusions.out
-  output_sha256: 5adae38c247e1faf649c70128b7de4cc94c0cc5dc631d73a2cb2d75765670a76
-  note: 'node acceptance check 1: 23 passed'
+  output_sha256: 88216a0122ef9222c2f3e3cd8c12a3b37d1395350953cfbf8f66aa8100781841
+  note: 'node acceptance check 1, RE-RUN after the --repo fix (post-reopen): 23 passed'
 - cmd: grep -n 'routes.run(' release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check2-packet-routes-run-grep.out
@@ -99,12 +99,25 @@ commands:
   note: '111 passed, 2 failed -- both in tests/compile/test_compile_real_view_mandatory_in_a.py, both pre-existing
     and reproduced with the unmodified packet.py in TWO separate isolated runs (see report.yaml claims); every other
     file in tests/route/tests/graph/tests/authority/tests/core/tests/compile passed, including all 53 tests/authority
-    tests (test_import_boundary.py among them) and every other tests/compile file'
+    tests (test_import_boundary.py among them) and every other tests/compile file. Superseded as the acceptance bar
+    by the next command (whole-domain, per the coordinator''s reopen); kept because it is the direct isolation-vs-
+    order-dependence comparison for the cli search fix below.'
+- cmd: cd release/orchestration/phase-2-context-bridge && GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0018
+    $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check5-full-domain-suite.out
+  output_sha256: 816027fa42fb5b89dd32eed4dd22017f11121aabe2c4d4b4af90e4692afc9927
+  note: 'REOPEN acceptance bar: the full domain suite, exactly as the coordinator ran it. 351 passed, 1 failed --
+    tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice
+    only (the pre-existing live-git-content flake already reproduced against the unmodified packet.py; routed to
+    R1-RM per the coordinator, not this node''s to fix). test_cli_search_applies_task_and_discloses_excluded_hits,
+    the test the coordinator found order-dependent, now passes inside this full run. pytest-randomly is not
+    installed in $PY''s venv, so no -p no:randomly run was recorded (skipped per instruction).'
 artifacts_changed:
 - path: release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
   sha256: 75bfca67ab28de7e7024d31a53c07aaf4e6e8cec5d2c866900ce4c3af64bf04f
 - path: release/orchestration/phase-2-context-bridge/govbridge/cli.py
-  sha256: ada181e8fa51057f99b043309e6255cce38a752f0a6daa49df2fd0a41221aa59
+  sha256: 9658334061c70d11ef1598d0338ac68e2763c11d1bda650c84485e5de7c7a511
 - path: release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
   sha256: e108d4d0b8c1438019576354dafbf2b59cdbc0e86fcd884e4642dfbc2fb78b1f
 - path: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
@@ -120,17 +133,19 @@ artifacts_changed:
 - path: release/orchestration/phase-2-context-bridge/govbridge/core/exact.py
   sha256: a206961e35b8528494f39941c4218f729f46a2dfe53ed9f6a680740bf16b36f7
 - path: release/orchestration/phase-2-context-bridge/tests/route/test_task_exclusions.py
-  sha256: 0755fdbcf02fceb5957651ef40452da83f78a87647770670cc1848814b25a11a
+  sha256: 2284432c2f4f7732b7896592093a240d5da732f8457559e42f109d176fc8f135
 - path: release/orchestration/phase-2-context-bridge/tests/fixtures/route/exclusions/exclusions_repobuilder.py
   sha256: d2fc6431d072151e691143669a5370071eb832e106b87a37f8036658a74fac78
 - path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check1-pytest-task-exclusions.out
-  sha256: 5adae38c247e1faf649c70128b7de4cc94c0cc5dc631d73a2cb2d75765670a76
+  sha256: 88216a0122ef9222c2f3e3cd8c12a3b37d1395350953cfbf8f66aa8100781841
 - path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check2-packet-routes-run-grep.out
   sha256: c3bdb08975da34a574f90772ae725045fc0a3356c7908b96f8bd2a4fa70974e9
 - path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check3-exclusion-probe-adapted.out
   sha256: 59652ab12b8a1be264c0a452d2a198e3df1aab7fd4852c9c14dd02c7ffd0413b
 - path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check4-full-targeted-suite.out
   sha256: 2954886c0c59cd6a6ce0b762d62d54976949cdda3760c9f06445f2fab0adaf70
+- path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check5-full-domain-suite.out
+  sha256: 816027fa42fb5b89dd32eed4dd22017f11121aabe2c4d4b4af90e4692afc9927
 findings:
 - 'RC-8/OBS-BR-08 named exactly two govbridge/compile/packet.py call sites as running without exclusions -- the seed
   code route (compile_packet''s per-seed loop) and the D.2 "evidence both ways" templates (_attach_evidence_both_ways)
@@ -146,6 +161,18 @@ findings:
 - 'govbridge.authority.resolver.STATE_ALIASES is a plain module-level dict imported by name into govbridge.authority.
   state -- monkeypatch.setitem on it (as tests/route/test_task_exclusions.py does) is enough to test state.get''s
   exclusion branch against an arbitrary path, without needing a real state alias pointed at fixture content'
+- 'REOPEN finding: govbridge/core/gitobj.py:22-23 -- `@functools.lru_cache(maxsize=8)` on `def repo_root(start:
+  Optional[str] = None)`. Every OTHER gitobj function resolves its own repo as `repo or repo_root()`
+  (govbridge/core/gitobj.py:37, plus govbridge/semantic/freshness_layer.py:37 and govbridge/core/manifest.py:125
+  do the same `repo or gitobj.repo_root()`), so any call made with `repo=None` anywhere in a process calls
+  `repo_root()` BARE (`start=None`) and caches "the cwd at that first bare call, forever" against the key `None`
+  -- indistinguishable from every OTHER bare call in the same process, whatever cwd is current when THEY run. This
+  is what made tests/route/test_task_exclusions.py''s cli-search test order-dependent: some earlier test in the
+  full suite calls something with repo=None while cwd is the real worktree, caching that root; this test''s own
+  later `monkeypatch.chdir(fixture_repo.root)` (removed in this fix) then had no effect on any subsequent bare
+  call. govbridge/core/gitobj.py is outside R1-RX''s mutation_scope (not fixed here -- see report.yaml
+  open_issues for the suggested fix: key the cache on the RESOLVED absolute path, or drop the cache and let a
+  caller that truly wants memoisation do it itself, explicitly, per repo).'
 failed_approaches:
 - 'first design used a plain list-of-globs exclude= merge with no ambient layer, matching the CLI''s pre-repair
   --exclude flag exactly; rejected because ARCHITECTURE/REPAIR-1/evidence/tools/exclusion_probe.py''s own
@@ -164,9 +191,21 @@ failed_approaches:
   ways" query text would happen to lexically match content under the excluded directory; too fragile (FTS token
   overlap is incidental) -- replaced with a small, deterministic fake RouteSet shared by all three call sites, which
   leaks a distinctive unit id ("LEAK-EXCLUDED") into the rendered packet if ANY call site forgot to pass exclude='
+- 'REOPEN: the cli-search test originally used monkeypatch.chdir(fixture_repo.root) so cli.py''s search (which built
+  real_routes with no repo= of its own) would resolve the fixture repo''s refs via cwd; passed in isolation but
+  failed when run after other tests in the full domain suite, because govbridge.core.gitobj.repo_root()''s process-
+  global lru_cache (findings, above) had already cached a DIFFERENT cwd''s root from an earlier bare call and never
+  saw the chdir. Fixed by giving `search` an explicit --repo instead of depending on cwd/chdir at all -- the only
+  approach immune to that cache regardless of which repo_root() call happened first in the process.'
 unresolved:
-- see report.yaml's open_issues (the real-view test flake, code-route path-blindness, and path_resolve's scoping)
+- see report.yaml's open_issues (the real-view test flake, the gitobj.py:22-23 process-global repo_root() cache,
+  code-route path-blindness, and path_resolve's scoping)
 decisions:
+- 'REOPEN: `govbridge search` gained an explicit --repo (default None, byte-identical prior behaviour), threaded
+  into real_routes.build_real_routes''s existing repo= parameter, rather than fixing govbridge/core/gitobj.py''s
+  repo_root() cache itself -- that file is outside R1-RX''s mutation_scope. Every OTHER CLI command this node
+  touched (why/impact/history/exact/state) already took repo indirectly through view_path/fixture wiring in its own
+  tests, never through cwd, so only `search` needed this.'
 - 'ambient TaskContext installation (taskctx.set_current, via from_args) happens ONLY when --task is actually given
   on that command line -- never merely because GOVBRIDGE_TASK is set in the environment. current() still honours
   GOVBRIDGE_TASK on its own (a non-sticky, per-call env re-check) so a bare env export keeps working for every
@@ -192,9 +231,18 @@ lessons:
 - 'a compile-level test that depends on incidental lexical/semantic content overlap to exercise a specific code path
   (the D.2 templates) is fragile; a small, purpose-built fake RouteSet that all three call sites share is far more
   direct evidence that packet.py''s OWN wiring (not the underlying B2-B4 routes'' relevance) is correct.'
+- 'a test passing in isolation but failing inside the full suite is not necessarily test-order pollution local to
+  this repo''s own fixtures -- it can be a process-GLOBAL cache in a shared utility module (here, functools.
+  lru_cache on a function whose true identity includes an IMPLICIT input, the process cwd, that its cache key
+  ignores). monkeypatch.chdir is the wrong tool whenever the code under test might resolve its repo lazily, through
+  a layer several calls removed, that was already warmed by something else in the same process; passing the repo
+  explicitly end to end is the only fix that does not depend on call order.'
 next_consumer: 'R1-RM (mandatory-input fidelity, R1-PG2) is next in packet.py/cli.py per REPAIR_PLAN.md section 12
   ("RM follows RX, which edits the compile call sites first"); R1-GA1 also depends on this node''s task context and
   R1-RL''s paging. Both should keep every govbridge/compile/packet.py routes.run(...) call passing exclude=/
   exclude_counter= (grep -n "routes.run(" is this node''s own regression guard) and may extend
-  tests/route/test_task_exclusions.py freely but must not weaken any of its 23 assertions.'
-final_commit: 03410b2198bb3813b56f9fc5a3b71f8a2cc7714f
+  tests/route/test_task_exclusions.py freely but must not weaken any of its 23 assertions. R1-RM (or the
+  orchestrator) should also decide whether to key govbridge/core/gitobj.py:22-23''s repo_root() cache on the
+  resolved repo (this node''s own report.yaml open_issues has the suggested fix); that file was outside R1-RX''s
+  mutation_scope.'
+final_commit: d2839b33cdd1bb683fdde301e7c2b9148919917c

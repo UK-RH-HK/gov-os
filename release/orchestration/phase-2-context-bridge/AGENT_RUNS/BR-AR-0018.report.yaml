@@ -5,9 +5,17 @@ role: REPAIR-1 node R1-RX -- retrieval_exclusions applied automatically by every
   scopes, or any other node's mutation_scope
 model_observed: claude-sonnet-5 (Sonnet 5)
 branch: bridge/r1-rx-0018
-commit: 03410b2198bb3813b56f9fc5a3b71f8a2cc7714f
+commit: d2839b33cdd1bb683fdde301e7c2b9148919917c
 status: COMPLETED
 claims:
+- 'REOPENED and fixed: the coordinator''s own run of `pytest -q -p no:cacheprovider tests` from the domain showed
+  test_cli_search_applies_task_and_discloses_excluded_hits failing after other tests, though it passed alone. Root
+  cause: govbridge/core/gitobj.py:22-23''s `repo_root()` is a process-global `functools.lru_cache(maxsize=8)` keyed
+  only on the argument actually passed -- a BARE call (repo=None, "resolve against cwd") anywhere earlier in the
+  same pytest process permanently caches that cwd''s root, so this test''s monkeypatch.chdir() afterwards was
+  invisible to it. gitobj.py is outside this node''s mutation_scope, so the fix is in cli.py: `search` now takes an
+  explicit --repo (default None, identical prior behaviour), threaded into real_routes.build_real_routes''s
+  existing repo= parameter; the test passes --repo <fixture root> and no longer chdirs at all.'
 - 'One TaskContext (govbridge/core/taskctx.py), loaded from an explicit --task <spec>/GOVBRIDGE_TASK or a compile''s
   own task_spec, carries retrieval_exclusions and one exclusion predicate (TaskContext.is_excluded, over
   govbridge.core.pathrules.any_glob_match) used everywhere -- never a second glob-matching implementation.'
@@ -44,10 +52,15 @@ claims:
   passed with both the original and the modified file). This is concurrent-git-activity flakiness in a test this
   node never touches (no edit to resolver.py, validate.py or ARCHITECTURE/demonstration-task.yaml), not a
   regression from this change.'
+- 'New acceptance bar met: `pytest -q -p no:cacheprovider tests` from the domain gives 351 passed, 1 failed -- only
+  tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice
+  (the same pre-existing live-git flake above; routed to R1-RM per the coordinator). tests/route/test_task_
+  exclusions.py alone: 23/23. pytest-randomly is not installed in $HOME/.cache/gov-bridge/venv, so the -p
+  no:randomly run was skipped, as instructed when the plugin is absent.'
 evidence:
-- claim: node acceptance check 1 -- tests/route/test_task_exclusions.py
+- claim: node acceptance check 1 -- tests/route/test_task_exclusions.py alone, post --repo fix
   path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check1-pytest-task-exclusions.out
-  sha256: 5adae38c247e1faf649c70128b7de4cc94c0cc5dc631d73a2cb2d75765670a76
+  sha256: 88216a0122ef9222c2f3e3cd8c12a3b37d1395350953cfbf8f66aa8100781841
 - claim: node acceptance check 2 -- every packet.py routes.run( call site passes exclude=c.exclusions
   path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check2-packet-routes-run-grep.out
   sha256: c3bdb08975da34a574f90772ae725045fc0a3356c7908b96f8bd2a4fa70974e9
@@ -57,9 +70,14 @@ evidence:
   path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check3-exclusion-probe-adapted.out
   sha256: 59652ab12b8a1be264c0a452d2a198e3df1aab7fd4852c9c14dd02c7ffd0413b
 - claim: full targeted regression (tests/route, tests/graph, tests/authority, tests/core/test_exact.py,
-    tests/compile) -- 111 passed, 2 flaked (pre-existing, see claims and unresolved)
+    tests/compile) -- 111 passed, 2 flaked (pre-existing, see claims and unresolved) -- superseded as the acceptance
+    bar by check 5, kept for the isolation-vs-order-dependence comparison it demonstrates
   path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check4-full-targeted-suite.out
   sha256: 2954886c0c59cd6a6ce0b762d62d54976949cdda3760c9f06445f2fab0adaf70
+- claim: new acceptance bar -- `pytest -q -p no:cacheprovider tests` from the domain -- 351 passed, 1 failed (only
+    the pre-existing live-git flake in tests/compile/test_compile_real_view_mandatory_in_a.py, routed to R1-RM)
+  path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0018.check5-full-domain-suite.out
+  sha256: 816027fa42fb5b89dd32eed4dd22017f11121aabe2c4d4b4af90e4692afc9927
 mutation_scope_respected: true
 mutation_scope_note: 'only the 9 declared govbridge/** files, tests/route/test_task_exclusions.py,
   tests/fixtures/route/exclusions/** and AGENT_RUNS/BR-AR-0018.* changed on the branch (governbridge/core/taskctx.py
@@ -67,6 +85,15 @@ mutation_scope_note: 'only the 9 declared govbridge/** files, tests/route/test_t
   No rm; store-BR-AR-0018 is a cp -a of the read-only store-BR-AR-0010, never mutated (no index update/rebuild
   against it -- every test builds its own tmp_path store).'
 open_issues:
+- 'govbridge/core/gitobj.py:22-23: repo_root()''s functools.lru_cache(maxsize=8) is keyed only on the argument
+  actually passed, so every BARE call (repo=None/start=None, "resolve against cwd") in a process shares ONE cached
+  answer regardless of which cwd was current at each call site or afterwards -- this made this node''s own cli
+  search test order-dependent (fixed here by giving search an explicit --repo, never relying on cwd) and is the
+  same class of process-global-state issue as the test_compile_real_view flake below. gitobj.py is outside R1-RX''s
+  mutation_scope: NOT fixed here. A correct fix would key the cache on the resolved repo (e.g. cache by the
+  ABSOLUTE path `start` resolves to via `git -C <cwd-or-start> rev-parse --show-toplevel`, computed once without
+  caching, or drop the cache and let each of the -- currently 8, per maxsize -- callers that truly want a cached
+  cwd-relative root request it explicitly) rather than by the raw, possibly-omitted argument.'
 - 'tests/compile/test_compile_real_view_mandatory_in_a.py flaked non-deterministically under concurrent git activity
   in this shared multi-agent worktree (see claims); it reproduces the same way with the unmodified packet.py, so no
   action is needed from R1-RX, but the next node/integrator should expect it and re-run in isolation if it fires.'
