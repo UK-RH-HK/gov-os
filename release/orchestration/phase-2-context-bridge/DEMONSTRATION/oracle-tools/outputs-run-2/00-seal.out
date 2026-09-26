@@ -1,0 +1,5 @@
+sealed directory: <SEALED> (location given only in the dispatch; never recorded)
+directory mode: 700
+oracle.yaml mode: 600
+oracle.yaml bytes: 95599
+other files in <SEALED>: authoring aids build_oracle.py, build_oracle_part1.py, build_oracle_part2.py (+ __pycache__); not part of the commitment
