@@ -453,3 +453,47 @@ reopened.
 
 **The third freeze begins at this commit.** Next, the demonstration store is updated to this tip, and D1 records an
 addendum. Then `run-1` is compiled and a fresh demonstration agent is dispatched.
+
+## BR-L-0018: the demonstration ran and failed on recall and size; four owner directions; checkpoint discipline is enforced; the freeze lifts (2026-09-26)
+
+**Run-1 was compiled and dispatched at the third frozen view, `94d0211`.** The packet was 274,798 bytes,
+`packet verify` PASSED, and all mandatory inputs sat in A, with the F1 direction in D.2 and the F2/F3 hypothesis in
+D.3. A fresh Opus agent answered all 41 queries. It reached `RepositoryContract::decide` as the enforcement point for
+both chains, and it found things Review 8 had not stated. The orchestrator's secrecy audit found 0 accesses and 0
+oracle-substance overlaps; the 73 verbatim overlaps were all `path:` locators.
+
+**GRADE, a fresh Opus, returned DEMONSTRATION_FAIL.**
+
+* Pass: G1–G3. Authority preservation held exactly.
+* Fail:
+  * **G4**: the chains miss required stage facts and anchors;
+  * **G5**: 1 of 10 query classes pass, with recall below 0.8 on decisions, failed approaches, tests, stale evidence,
+    current-vs-superseded and deletable;
+  * **G6**: consumer recall 0.75;
+  * **G7**: 1.34 MB of packet and raw query outputs, 1.67% of an 80.3 MB corpus;
+  * **G8**: the controls.
+* The grader also found nine defects in the deterministic grader itself, GD-1..9.
+
+**The shape of the failure is informative.** The bridge delivered authority correctly but did not deliver
+**complete relevance**. The agent had to issue 103 queries of its own, and it still missed facets. That points
+directly at the gap OD-BR-05 names: no facet decomposition, no multi-round retrieval, no budgeted supplementary
+packets.
+
+**Four owner directions arrived during the freeze.** Each was recorded verbatim on a side branch, so the view did not
+move:
+
+* **OD-BR-03**: verifier challenge items.
+* **OD-BR-04**: checkpoint discipline. Before it, there had been no outer checkpoint since BR-CP-0002. Enforcement is
+  now in place: `check_state.py checkpoint`; `verify` refuses a state without a matching checkpoint, effective from
+  this commit; `integrate-check` enforces schema-2 worker checkpoints; PreCompact/SessionEnd hooks exist, but are
+  **not confirmed live in this session**. A labelled retrospective reconstruction was also added.
+* **OD-BR-05**: multi-batch / multi-hop retrieval, assessed as not conforming.
+* **OD-BR-06**: the durable architecture and continuity record, with a deterministic resume order and the V8.3
+  carry-forward in `V8_3_CARRY_FORWARD_FROM_CONTEXT_BRIDGE.md`.
+
+**The freeze lifts.** D1, DEMO and the side branch merge. **GRADE stays QUARANTINED** on `bridge/grade-0012`,
+because it holds the unsealed oracle. Builders and any run-2 agent must never read it, and run-2 needs a fresh sealed
+oracle (OBS-BR-10).
+
+**Next:** a fresh failure analyst classifies each failed gate and produces a generic repair DAG that contains no
+oracle content.

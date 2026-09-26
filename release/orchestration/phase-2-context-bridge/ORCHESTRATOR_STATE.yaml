@@ -4,9 +4,10 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-25T22:36:52Z'
-state_hash: 5cf8c15c17df32c2a3a64b4e242bb0e6f16b39a8f77b3013c67cb42f04322993
-lifecycle_state: BR_DEMONSTRATION_FROZEN_VIEW
+updated_at: '2026-09-26T00:33:15Z'
+state_hash: 446283616719db0723500ebfe0651a466068b19c19a192c8e0431f539f8bd31b
+lifecycle_state: BR_DEMONSTRATION_FAILED_REPAIR
+checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
   Review 8 is its first mandatory benchmark, not its corpus boundary'
@@ -127,6 +128,26 @@ owner_records:
     and policy-marked non-indexable material); the bridge is a GENERIC provider/model-replaceable Governance OS self-memory
     foundation, NOT a bespoke Phase-2/Review-8 mechanism; Review 8 is the first mandatory benchmark, not the corpus
     boundary; ten explicit architecture items including the V8.3 promotion path; the write boundary is unchanged
+- id: OD-BR-03
+  path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0003-VERIFIER-CHALLENGE-ITEMS.md
+  sha256: 4afbc78328f6069fb148022dcddf246470a057cac75794efec601d4529ac7c68
+  applies: five verifier challenge items the build stage must carry into the verifier handoff before BUILT
+- id: OD-BR-04
+  path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0004-CHECKPOINT-DISCIPLINE.md
+  sha256: 7783efcba342d765250dc0c1083c518e78788ae4bfdfb1f508cdafd93c84e134
+  applies: worker completion checkpoints (schema 2), outer checkpoint per material transition, pre-compaction rule,
+    no manufactured history (RETROSPECTIVE_CHECKPOINT_RECONSTRUCTION)
+- id: OD-BR-05
+  path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0005-MULTI-BATCH-MULTI-HOP-RETRIEVAL.md
+  sha256: 7c051a1ffeaf2296ca1a225d19f7a173948b8dd72130f86944e8daa952377941
+  applies: multi-batch / multi-hop retrieval, parallel + sequential, continuation, stopping reason, merge, hierarchical
+    synthesis, demonstration with telemetry -- NOT conforming at 94d0211; required before bridge acceptance
+- id: OD-BR-06
+  path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0006-CONTEXT-RETRIEVAL-AND-CONTINUITY.md
+  sha256: 21967774a2b8d150ef0afa4badbdbe81346796cb15b4a1616fed2f7fb954003e
+  applies: durable architecture + continuity requirements; deterministic resume order; carry-forward to full V8.3
+    (V8_3_CARRY_FORWARD_FROM_CONTEXT_BRIDGE.md); verifier must challenge implemented-vs-documented. Owner instruction
+    for this lifecycle; NOT a Contract v3 amendment
 mandatory_bridge_inputs:
   source: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml od_p2_10a_b + evidence_for_the_synthesis, at 6e7a2a3
   refreshed: 2026-09-25 -- release/4.1.6-rc1 tip re-read and still 6e7a2a3; no Phase-2 record newer than the bridge base
@@ -587,7 +608,8 @@ agent_runs:
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0010
   model_requested: none (deterministic tooling)
   model_observed: none -- commands run by the orchestrator (claude-opus-5-5)
-  status: AWAITING_MERGE_ON_BRANCH (work complete; integrate-check PERMITTED at 667f373; merged after the demonstration)
+  status: COMPLETED_INTEGRATED
+  merged_at: 9edd419 (report/checkpoint final at aec095e; integrate-check PERMITTED)
   final_commit: 667f373
   final_results: coverage at frozen tip fa25492 -- 98 refs all equal git ls-tree --full-tree, 0 unclassified; store-BR-AR-0010
     brought to fa25492 by index update (ran FULL -- bridge code tree changed; 2,215 s, 9,023 CPU-s, 0 LLM calls); manifest
@@ -651,7 +673,11 @@ agent_runs:
   role: fresh-agent Review-8 demonstration (DEMO)
   branch: bridge/demo-0011
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0011
-  status: RUN_0_NOT_DISPATCHED
+  status: COMPLETED_INTEGRATED
+  merged_at: 1a9a33d (final a9fc27b; integrate-check PERMITTED)
+  run_1: 'frozen tip 94d0211, store-BR-AR-0010 manifest 11372e02, packet_sha256 b5126140, packet verify PASS; fresh agent br-demo-0011
+    (claude-opus-5-5, 210 turns, peak context 503,981 tokens) answered 41 queries (39 ANSWERED, 2 PARTIAL); receipt check PASS;
+    104 saved query outputs 1,063,203 bytes; secrecy -- 0 accesses, 0 oracle-substance overlaps'
   run_0: 'compiled at fa25492 with real routes, packet_sha256 18be7e6f...2025, packet verify PASS, every mandatory authority
     class correctly placed -- but section G EMPTY; kept as evidence at DEMONSTRATION/run-0-predispatch-g-empty (commit e0631cc);
     never given to an agent'
@@ -699,9 +725,35 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/compile/**
   - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0015.*
-running_work:
-- run_id: BR-AR-0010
-  liveness_check: orchestrator-run D1 addendum -- store-BR-AR-0010 brought to the third frozen tip (FULL, ~37 min) on bridge/d1-0010
+- run_id: BR-AR-0012
+  role: fresh rubric grader of run-1 (GRADE)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0012-grade.md
+  branch: bridge/grade-0012
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0012
+  model_requested: opus
+  model_observed: claude-opus-5-5 (all 222 assistant turns, transcript agent-a820e352e1a3d8d55.jsonl)
+  agent_name: br-grade-0012
+  checkpoint_schema: 2
+  status: QUARANTINED_ON_BRANCH (work complete; NOT merged -- the branch holds the unsealed run-1 oracle and oracle-laden
+    grading detail; builders and any run-2 demonstration agent must never read bridge/grade-*)
+  final_commit: bec00f3ff97a76d09842cb935c21bf4ee6fe75b0
+  verdict: DEMONSTRATION_FAIL -- G1 PASS, G2 PASS, G3 PASS (authority classes preserved; A1 affected 0 of 16 oracle rows),
+    G4 FAIL (both chains reach RepositoryContract::decide but miss required stage facts/anchors), G5 FAIL (1 of 10 query
+    classes; recall < 0.8 on QC3/6/7/8/9/10), G6 FAIL (consumer recall 0.75), G7 FAIL (packet + query outputs 1,338,001 bytes
+    = 1.67% of 80.3 MB corpus; external read bytes 2.0 MB), G8 FAIL (control recall 0.4/0.4/0.33)
+  context_efficiency: 0.0418 (0.0167 without double-counting external content)
+  grader_found_tool_defects: GD-1 exact citations 'START-END' crash the grader; GD-2..GD-9 incl. G6 grading the wrong query,
+    record matching by id only (not section), a literal-phrase G3 check, over-strict side-by-side, 83 false undeclared
+    reads and whole-file external-read counting in G7 -- graded on the section-4 text with tool values printed alongside
+  grader_error_found_by_orchestrator: it reported COVERAGE/p2x-fail-1-bridge.json absent on bridge/d1-0010; it is present
+    (committed in ca3bcf6); the grader used equivalent data, so no verdict change
+  reconstruction_judgement: F2 10/11 stages rest on code/records read at 3c880d8; F3 code stages reconstructed, effective
+    behaviour and tests restated; reading the code was necessary but not sufficient
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle/**
+  - release/orchestration/phase-2-context-bridge/DEMONSTRATION/grading/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0012.*
+running_work: []
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -782,9 +834,9 @@ rulings:
     rows expecting an A-admissible mandatory item outside A are read as A and every affected row is reported; recorded
     before any demonstration run without the orchestrator reading the oracle; delivered live to I1
 demonstration_freeze:
-  status: IN FORCE from THIS commit (third freeze) -- re-established after BR-AR-0015 (section G) merged; no commits to
-    bridge/p2-context-retrieval until GRADE returns
-  frozen_bridge_tip: the commit introducing this line (resolve with `git log -1 --format=%H -S'IN FORCE from THIS commit (third freeze)' -- ORCHESTRATOR_STATE.yaml`)
+  status: LIFTED (2026-09-26) after run-1 was graded -- D1, DEMO and the freeze side branch merged at 65cf1e4; the GRADE
+    branch is QUARANTINED (not merged) because it holds the unsealed run-1 oracle
+  frozen_bridge_tip: none (lifted); the third freeze held 94d0211 from 2026-09-25 23:36 to 2026-09-26 01:3x
   previous_frozen_tips: [cf7efe7 (pass-1 view, lifted -- lazy code layer), fa25492 (lifted -- empty section G)]
   rule: NO commits to bridge/p2-context-retrieval from this commit until GRADE (BR-AR-0012) returns -- the canonical view's
     records ref follows this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here
@@ -821,6 +873,19 @@ observations:
   text: the query commands (search/why/impact/history/exact/state) write no supplementary packets (the design's "every
     query writes a supplementary packet with its own manifest" was not built); the demonstration agent saves each query's
     output with its exact command under supplementary/queries/, and G7 counts those bytes
+- id: OBS-BR-07
+  text: the compiled packet does not carry the public query set or the answers/receipt schemas (they live under ARCHITECTURE/,
+    which the task excludes); the orchestrator copied them verbatim into run-1/task-inputs/
+- id: OBS-BR-08
+  text: the query commands do not apply the task spec's retrieval_exclusions automatically; the run-1 agent's first search
+    returned one snippet of public ARCHITECTURE/demonstration-queries.yaml text before it added --exclude (no gate effect)
+- id: OBS-BR-09
+  text: the deterministic grader (govbridge demo grade) has defects GD-1..GD-9 (see BR-AR-0012); it must be repaired and
+    re-tested before any run-2 is graded
+- id: OBS-BR-10
+  text: the run-1 oracle is UNSEALED and committed on quarantined bridge/grade-0012; any run-2 needs a FRESH oracle by a
+    fresh test-author, sealed at a location NOT recorded in any committed file (lesson of OBS-BR-04), with a committed
+    sha256 commitment
 - id: OBS-BR-02
   text: SECURITY_POLICY secret-content exclusion hides 8 product files (fake test keys, incl. brownfield.rs) from content
     indexes; they stay reachable by path/blob through the exact route and the exclusion is disclosed in every packet
@@ -833,7 +898,8 @@ evidence_status:
   builder_evidence: 'integrated tree after B1-B6 + B6R: 280 tests pass together with --import-mode=importlib (plain collection
     blocked by one basename collision, routed to I1); real-view packet places every mandatory item per BR-ARCH-RULING-1;
     run by the orchestrator'
-  review_8_demonstration: NOT_RUN
+  review_8_demonstration: 'run-1 DEMONSTRATION_FAIL (G4, G5, G6, G7, G8 fail; G1-G3 pass) -- BR-AR-0012 on quarantined bridge/grade-0012
+    at bec00f3; a bounded repair cycle and a run-2 with a FRESH oracle are required before BUILT'
 immutable_evidence:
 - path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
   sha256: 726f3f40f574f14b4e8cc334cba7785542b93b0aa5fc756bf571824e7578c067
@@ -848,6 +914,8 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: 'THIRD FROZEN VIEW: on bridge/d1-0010 merge this tip, `index update` store-BR-AR-0010 (FULL, bridge
-  code changed), freshness NOOP, coverage, commit INDEX manifest + telemetry + D1 addendum; on bridge/demo-0011 merge this tip,
-  compile run-1 (real routes), packet verify, commit, dispatch the fresh opus DEMO agent per HANDOFFS/BR-HO-0011; then GRADE'
+next_deterministic_action: dispatch a fresh opus failure analyst (BR-AR-0016, checkpoint_schema 2) to classify each failed
+  gate's cause (bridge capability gap / agent behaviour / grader defect / oracle strictness) from the quarantined grading and
+  produce a GENERIC repair DAG containing no oracle content (orchestrator overlap-checks it); then build the repairs (incl.
+  B7 govbridge gather for OD-BR-05, grader GD-1..9, budgeted supplementary packets, query-command exclusions, section-I query
+  set), a fresh sealed oracle (fresh TA), rebuild the store, run-2 + fresh GRADE; BUILT only on DEMONSTRATION_PASS
