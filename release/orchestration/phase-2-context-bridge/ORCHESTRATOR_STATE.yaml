@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T09:51:09Z'
-state_hash: a5771f6159fece50924ec75be548ad38d3bb4a3a3bac87a9199fa86c95b02c7b
+updated_at: '2026-09-26T10:50:22Z'
+state_hash: 9db6b5bdeeb9559834e9a08d1198bf80c2a8125a65b91a90f261905fd2e60be7
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1342,6 +1342,19 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-xc-0034
   checkpoint_schema: 2
+  pass_2:
+    final_commit: d36a7a31875ba0034c47c39d0f353eaf9e56c24b
+    accepted: 'ensure_indexed BUILD-ONLY (code/build.py); every query caller -- symbols stats/definitions/callers/reads_key
+      (converted in place, the pass-1 *_readonly duplicates removed), code/history.py, compile/codeseeds.py,
+      graph/code_bridge.py, graph/symbol_history.py, demo/grade.py -- verify-or-raise StoreNeedsRebuild; six tests corrected
+      (rule 5); code_route re-raises typed errors and counts other exceptions in the telemetry sink (never the store);
+      test_query_commands_readonly.py -- 3 of 4 fail at a72dae2, 4 of 4 pass after; integrate-check INTEGRATION_PERMITTED from
+      the bridge worktree; secrecy 0 hits; claude-sonnet-5 x881'
+    follow_up: '(1) the recurring failure of test_real_demonstration_task_compiles_byte_identical_twice is STORE non-hermeticity,
+      not refs -- Compiler.code_conn/code_seeds_for read the machine-wide default store ($HOME/.cache/gov-bridge/store/default,
+      written concurrently by other agents'' suite runs, last modified 11:48) because the test never sets GOVBRIDGE_STORE ->
+      an isolated per-module store; grep for other tests that compile or query without GOVBRIDGE_STORE. (2) graph/impact.py
+      opens the store read-write -> open_db_readonly (scope extended)'
   pass_1:
     final_commit: a72dae24c168f6445c03ea04fdf4645c1fa063e7 (code 4a9dec6)
     interim_merge: 1a46cc5 -- integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree 615 passed, 0 failed
@@ -1392,6 +1405,7 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade.py
   - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade_regressions.py
   - release/orchestration/phase-2-context-bridge/tests/route/test_query_commands_readonly.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/impact.py
 running_work:
 - run_id: BR-AR-0024
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
@@ -1708,6 +1722,11 @@ observations:
   text: 'housekeeping -- $HOME/.cache/gov-bridge holds 77 store directories (17 GB), 2.2 GB of them BR-AR-0019 scratch stores,
     several moved aside as *.trashed-*; the disk has 159 GB free. No deletion (rm is denied); the orchestrator proposes a
     list of stores to retire at R1-D2, keeping store-BR-AR-0010 (the run-1 demonstration store) and the R1-D2 store.'
+- id: OBS-BR-17
+  text: 'the long-running flake of tests/compile/test_compile_real_view_mandatory_in_a.py (seen by RX, RG, RL and XC) has a
+    second cause beyond live refs (fixed by R1-RM) -- the machine-wide DEFAULT store. Tests that do not set GOVBRIDGE_STORE
+    share $HOME/.cache/gov-bridge/store/default, which pre-XC code built lazily during suite runs; concurrent agents'' suites
+    therefore raced on it. Hermeticity must cover the store as well as the refs and the cwd.'
 - id: OBS-BR-12
   text: 'orchestrator instruction conflict, self-reported -- my live follow-up to BR-AR-0020 suggested reading
     DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
