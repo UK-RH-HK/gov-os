@@ -25,6 +25,7 @@ from typing import Optional
 from govbridge.authority import classes as classesmod
 from govbridge.authority import records as recordsmod
 from govbridge.authority import resolver as resolvermod
+from govbridge.compile import render as rendermod
 from govbridge.core.yamlutil import load_yaml_file, sha256_text
 
 
@@ -224,6 +225,116 @@ def verify_declared_and_delivered(manifest: dict, a_items: list, repo: Optional[
     return problems
 
 
+def verify_rendered_delivery(manifest: dict, rendered: str, a_items: list, repo: Optional[str] = None) -> list:
+    """BR-DAG-AMEND-R1-10 (routed from BR-AR-0022's open issue): independently re-extracts each A item's DELIVERED
+    BODY from the RENDERED packet text itself (``govbridge.compile.render.extract_item_delivered_body`` -- never
+    trusts ``manifest['sections']['A']['items'][*]['delivered_sha256']`` alone, the way
+    ``verify_declared_and_delivered`` above still does). This catches a renderer that drops or mangles content
+    AFTER the compiler already computed a correct hash for it: ``verify_declared_and_delivered`` never inspects a
+    single rendered byte, so a bug downstream of that hash computation would otherwise pass silently.
+
+    For the common, single-piece "delivered in full" shape (and the directory/oversize shapes, already skipped
+    above), ``delivered_sha256`` is exactly ``hash_pieces([item.text])`` -- so the body re-extracted here, hashed
+    the SAME way, must reproduce it exactly. A ``keys``/``entries``/``paths`` selector's own delivered body
+    additionally embeds packet.py's own "--- name (loc) ---" piece headers (``declared==delivered`` there
+    "by construction" -- see ``resolver.declared_parts``'s docstring), so an exact whole-body hash match is not
+    expected for that shape; this function instead requires every one of that item's freshly re-read declared
+    pieces (``resolver.declared_parts``, independent of the render entirely) to be verbatim PRESENT in the
+    rendered body -- still an exact, unambiguous, render-inspecting check, just phrased as containment rather than
+    a single hash, since the header formatting is packet.py's own private concern, not this module's."""
+    problems: list = []
+    a_items_by_id = {mi.id: mi for mi in a_items}
+    notices_by_id: dict = {}
+    for n in (manifest.get("notices") or []):
+        if n.get("type") == "MANDATORY_PARTIAL_DELIVERY":
+            notices_by_id.setdefault(n.get("id"), []).append(n)
+
+    for row in manifest["sections"]["A"]["items"]:
+        uid = row["unit"]["id"]
+        if row.get("is_directory"):
+            continue
+        unit_kind = row["unit"]["kind"]
+        found, body, ambiguous = rendermod.extract_item_delivered_body(rendered, "A", unit_kind, uid)
+        if ambiguous:
+            problems.append(f"A/{uid}: more than one delivered-body marker pair for this item in the rendered "
+                             f"packet's section A -- cannot unambiguously re-extract")
+            continue
+        if not found:
+            problems.append(f"A/{uid}: no delivered-body marker pair found for this item in the rendered "
+                             f"packet's section A -- the renderer did not emit it")
+            continue
+
+        delivered_sha256 = row.get("delivered_sha256")
+        mi = a_items_by_id.get(uid)
+        if delivered_sha256 is not None:
+            rendered_sha256 = resolvermod.hash_pieces([body])
+            if rendered_sha256 == delivered_sha256:
+                continue  # exact, render-inspecting confirmation of the common single-piece shape
+            missing = []
+            if mi is not None:
+                fresh_parts = resolvermod.declared_parts(mi, repo=repo)
+                missing = [p["name"] for p in fresh_parts if p["text"].rstrip("\n") not in body]
+            if missing or mi is None:
+                problems.append(
+                    f"A/{uid}: the body re-extracted from the RENDERED packet hashes to {rendered_sha256!r}, not "
+                    f"the manifest's own delivered_sha256 {delivered_sha256!r}"
+                    + (f"; declared part(s) {missing!r} are not verbatim present in the rendered body either -- "
+                       f"the renderer may have dropped content" if missing else ""))
+            continue
+
+        # delivered_sha256 is None for two shapes, both handled the same way here: a keys/entries/paths partial
+        # delivery (`delivered` non-empty, `undelivered_ranges` the rest) and the no-selector oversize/section-map
+        # shape (`delivered` EMPTY -- rule 1's own comment: "nothing raw was delivered, only the map"). Every
+        # DELIVERED range's own raw text must be verbatim present (mirrors the `delivered_sha256 is not None`
+        # branch above, just per-range instead of whole-body); every range the notice discloses AT ALL --
+        # delivered or not, plus the fuller `section_map` the oversize shape also carries -- must have its own
+        # (name, sha256) identity pair verbatim present, so a render that OMITS a disclosed line, or shows the
+        # wrong name/hash for it, is caught -- never only a check that the notice's OWN claim matches Git (that
+        # is `verify_declared_and_delivered`'s job; this one inspects the actual rendered bytes).
+        for n in notices_by_id.get(uid) or []:
+            for d in (n.get("delivered") or []):
+                d_path = d.get("path") or n.get("path")
+                d_commit = d.get("commit") or n.get("commit")
+                text = resolvermod._read_git_slice(d_path, d_commit, d.get("line_start"), d.get("line_end"),
+                                                    repo=repo)
+                if text is not None and text.rstrip("\n") not in body:
+                    problems.append(f"A/{uid}: disclosed delivered range {d.get('name')!r} is not verbatim "
+                                     f"present in the rendered packet body -- the renderer may have dropped it")
+
+            disclosed_identities = list(n.get("section_map") or [])
+            if not disclosed_identities:
+                disclosed_identities = list(n.get("delivered") or []) + list(n.get("undelivered_ranges") or [])
+            for r in disclosed_identities:
+                name, sha = r.get("name"), r.get("sha256")
+                if name is None or sha is None:
+                    continue
+                if name not in body or sha not in body:
+                    problems.append(f"A/{uid}: disclosed range {name!r} (sha256={sha}) is not identified in the "
+                                     f"rendered packet body at all -- the renderer may have dropped or altered "
+                                     f"its disclosure line")
+    return problems
+
+
+def verify_supplementary_packet(manifest: dict) -> list:
+    """A supplementary packet (REPAIR_PLAN.md section 2.9, node R1-RS) carries retrieval EVIDENCE only -- never
+    authority. It has no real section A (there is no task-spec-shaped resolver run for a bare query command's own
+    JSON result to re-derive against), so ``verify_section_a`` does not apply to it; every OTHER structural check
+    still does (placement, banners, ordering), PLUS a hard refusal of any MANDATORY/PINNED item and of a non-empty
+    section A -- a supplementary packet must never carry, or be mistaken for, authority."""
+    problems: list = []
+    if manifest["sections"]["A"]["items"]:
+        problems.append("supplementary packet section A is non-empty -- authority never enters a supplementary "
+                         "packet")
+    for section, row in _rows_of(manifest):
+        if row["delivery"] in ("MANDATORY", "PINNED"):
+            problems.append(f"{section}/{row['item_id']}: delivery {row['delivery']!r} in a supplementary packet "
+                             f"-- supplementary packets carry RETRIEVED/DERIVED evidence only")
+    problems += verify_placement(manifest)
+    problems += verify_banners(manifest)
+    problems += verify_ordering(manifest)
+    return problems
+
+
 def _rows_of(manifest: dict) -> list:
     """``[(section_label, row), ...]`` across every section, D's three sub-blocks counted as their own labels."""
     out = []
@@ -321,8 +432,16 @@ def verify_ordering(manifest: dict) -> list:
 
 
 def verify_packet(manifest: dict, task_spec: dict, repo: Optional[str] = None,
-                   registry_path: Optional[str] = None) -> list:
-    """Every check this module knows, combined. An empty list means the packet is valid."""
+                   registry_path: Optional[str] = None, rendered: Optional[str] = None) -> list:
+    """Every check this module knows, combined. An empty list means the packet is valid.
+
+    ``rendered`` (BR-DAG-AMEND-R1-10): the packet's own rendered ``packet.md`` TEXT, when the caller has it (every
+    CLI path does -- ``govbridge packet verify DIR``/``govbridge receipt check`` both read it off disk alongside
+    ``manifest.json``). When given, ``verify_rendered_delivery`` additionally re-extracts each A item's delivered
+    body from THOSE bytes and independently recomputes its hash, catching a renderer that drops content after the
+    compiler already hashed it correctly -- something no other check here can see, since every other check reads
+    only the manifest. ``None`` only for a caller with no rendered text at all (a pre-existing direct unit-test
+    call of this function); such a caller does not get the R1-10 guarantee, so a new caller should always pass it."""
     problems = []
     problems += verify_section_a(manifest, task_spec, repo=repo, registry_path=registry_path)
     problems += verify_placement(manifest)
@@ -333,6 +452,8 @@ def verify_packet(manifest: dict, task_spec: dict, repo: Optional[str] = None,
     _, _, a_items = recompute_section_a(task_spec, repo=repo, registry_path=registry_path,
                                          resolved_view=pinned_view)
     problems += verify_declared_and_delivered(manifest, a_items, repo=repo)
+    if rendered is not None:
+        problems += verify_rendered_delivery(manifest, rendered, a_items, repo=repo)
     return problems
 
 
@@ -348,7 +469,8 @@ def main(argv=None) -> int:
     task_spec = load_yaml_file(args.task_spec)
     result = packetmod.compile_packet(task_spec, routes=packetmod.FAKE_ROUTES, registry_path=args.registry,
                                        budgets_path=args.budgets)
-    problems = verify_packet(result["manifest"], task_spec, registry_path=result["registry_path"])
+    problems = verify_packet(result["manifest"], task_spec, registry_path=result["registry_path"],
+                              rendered=result["rendered"])
     print(json.dumps({"status": "VALID" if not problems else "INVALID", "problems": problems}, indent=1,
                       sort_keys=True))
     return 0 if not problems else 1

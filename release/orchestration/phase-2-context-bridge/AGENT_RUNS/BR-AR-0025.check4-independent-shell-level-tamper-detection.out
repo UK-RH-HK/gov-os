@@ -1,0 +1,18 @@
+=== independent second-method check (shell/sed, not the pytest suite): mutate one sha256 hex char in a
+=== disclosed section-map line of the REAL CONTROL-A packet.md, manifest.json left byte-identical ===
+before:
+14:- Governance OS Capability Acceptance Contract — v3  lines 1-6  sha256=c29dd7ace647ed5a7b46f33ec610d270d6974d6a77291a6a003dcc7b7f69df84
+after:
+14:- Governance OS Capability Acceptance Contract — v3  lines 1-6  sha256=X29dd7ace647ed5a7b46f33ec610d270d6974d6a77291a6a003dcc7b7f69df84
+manifest.json md5 before vs after (must be identical):
+3cd450177434a2c7aed137eef8ef1f09  /tmp/br-ar-0025-final/main1/manifest.json
+3cd450177434a2c7aed137eef8ef1f09  /tmp/br-ar-0025-final/main1-tampered/manifest.json
+=== packet verify on the TAMPERED directory (expect FAIL) ===
+{
+ "problems": [
+  "A/state:bridge#contract_v3: disclosed range 'Governance OS Capability Acceptance Contract \u2014 v3' (sha256=c29dd7ace647ed5a7b46f33ec610d270d6974d6a77291a6a003dcc7b7f69df84) is not identified in the rendered packet body at all -- the renderer may have dropped or altered its disclosure line"
+ ],
+ "status": "OK",
+ "verify": "FAIL"
+}
+exit=1

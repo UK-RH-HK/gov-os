@@ -1,0 +1,40 @@
+........................................................................ [ 12%]
+........................................................................ [ 24%]
+................F....................................................... [ 37%]
+........................................................................ [ 49%]
+........................................................................ [ 61%]
+........................................................................ [ 74%]
+........................................................................ [ 86%]
+........................................................................ [ 99%]
+.....                                                                    [100%]
+=================================== FAILURES ===================================
+_______ test_bootstrap_contains_prelude_packet_and_receipt_instructions ________
+
+fixture_repo = FixtureRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-421/test_bootstrap_contains_prelud0/repo'), c1='b5c7196ed486d0...296f6ff81415b', records_ref='refs/heads/records', product_ref='refs/heads/product', evidence_ref='refs/heads/evidence')
+view_path = '/tmp/pytest-of-usain/pytest-421/test_bootstrap_contains_prelud0/canonical-view.yaml'
+registry_path = '/tmp/pytest-of-usain/pytest-421/test_bootstrap_contains_prelud0/authority-registry.yaml'
+task_spec_factory = <function make_task_spec at 0x77e53e3f31a0>
+
+    def test_bootstrap_contains_prelude_packet_and_receipt_instructions(fixture_repo, view_path, registry_path,
+                                                                           task_spec_factory):
+        task_spec = task_spec_factory(view_path, seeds=["CX-0001"])
+        brief, result = bootstrapmod.compile_brief(task_spec, routes=RouteSet(), repo=str(fixture_repo.root),
+                                                     registry_path=registry_path)
+        assert result["status"] == packetmod.STATUS_OK
+    
+        assert "## Where you are" in brief
+        assert "## How this repository works" in brief
+        assert "## Your context packet (sections A-J)" in brief
+        assert "## Context and checkpoint protocol" in brief
+        assert "## Completion semantics" in brief
+        assert "## Your receipt" in brief
+        assert result["packet_sha256"] in brief
+    
+        # the packet itself (A-J) is embedded, not summarised away.
+>       assert "## A. MANDATORY AUTHORITATIVE INPUTS" in brief
+E       AssertionError: assert '## A. MANDATORY AUTHORITATIVE INPUTS' in '# Worker bootstrap -- T-COMPILE-1\n\nYou are a **governed worker**. This bootstrap is your operating context: it carr...item_id` you relied on, and every external read. Run `govbridge receipt check` yourself before reporting completion.\n'
+
+tests/compile/test_compile_bootstrap.py:27: AssertionError
+=========================== short test summary info ============================
+FAILED tests/compile/test_compile_bootstrap.py::test_bootstrap_contains_prelude_packet_and_receipt_instructions
+1 failed, 580 passed in 228.06s (0:03:48)
