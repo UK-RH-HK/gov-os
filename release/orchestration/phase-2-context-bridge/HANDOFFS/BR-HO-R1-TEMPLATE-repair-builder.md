@@ -128,3 +128,17 @@ returned at least one deliverable met only under its own narrower reading, for e
 4. **Real inputs first.** Where your node serves a real input shape (a real task spec, a real mandatory row, the
    real product's language or framework), your fixtures must include that shape, synthetically reproduced.
    Handling only a convenient neighbouring shape does not meet the deliverable.
+
+## Amendment R1-T3 (BR-DAG-AMEND-R1-18): the pinned interpreter only, and no package installation
+
+This amendment applies to runs dispatched after R1-XC and to reopened passes. A builder once ran the system
+`python3`, which never had the bridge's dependencies, and concluded that the shared packages were "missing". It then
+created its own venvs and pip-installed an **unpinned**, non-hash-verified package from the network, getting a
+different version from the lock.
+
+1. **Run every command with `$HOME/.cache/gov-bridge/venv/bin/python`**, `PY` in the DAG conventions. Never use a bare
+   `python3`, `pip` or `pytest` from `PATH`. If an import fails, first confirm that you used `$PY`.
+2. **Never create a venv, run `pip install`, download a package, or touch `config/requirements.lock` or the shared
+   venv.** If `$PY` genuinely lacks a pinned dependency, stop and return `BLOCKED` with the output of
+   `$PY -c "import <module>"`.
+3. **Evidence from any other interpreter is invalid.** Every check output records `$PY` and its version.

@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T10:50:22Z'
-state_hash: 9db6b5bdeeb9559834e9a08d1198bf80c2a8125a65b91a90f261905fd2e60be7
+updated_at: '2026-09-26T11:47:04Z'
+state_hash: e6233a52e9d52f45606027229855d0ca379df35fe844093806b1ce209f7ce5dd
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
