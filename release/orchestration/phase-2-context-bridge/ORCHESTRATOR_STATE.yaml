@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T15:01:31Z'
-state_hash: 93746be78aefaff6d6c0e3505c910b64250018ae29e9d571283c2ddd1f3b615f
+updated_at: '2026-09-26T15:02:52Z'
+state_hash: 4550236723bb590caac0540a97e2eeadf50fd95380564ed1a273afa8e3f53559
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1314,6 +1314,11 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga2-0024
   checkpoint_schema: 2
+  pass_3_reopen: 'BR-DAG-AMEND-R1-22 -- the follow-up''s OVERALL wall-clock budget (followup.max_wall_seconds, default 240 s) can stop
+    rounds, so the merged evidence depends on machine load; found via R1-GA3''s CONTROL-A compile-twice check (the only differing
+    field was an overflow supplementary-packet hash). Required -- count-based content budgets only; wall time a disabled-by-default
+    safety abort with a DISTINCT stop reason and deterministic:false; timings never in a content hash; identical merged_sha256
+    under slow and fast resolvers'
   final_commit: 82cb573fac50de9f07e34ad236273df12af975d1
   merged_at: f93d691 (final; interim 36bcd25)
   integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run from the bridge worktree; its own branch refused only
@@ -1347,7 +1352,7 @@ agent_runs:
       queries measured, with at least one reaching 2 or more follow-up rounds on real data'
     scope_extension: config/facets.yaml (a `followup:` section; R1-GA3 owns config/budgets.yaml)
   dispatched_at: '2026-09-26T08:46Z'
-  status: COMPLETED_INTEGRATED
+  status: REOPENED_FOLLOW_UP
   store: $HOME/.cache/gov-bridge/store-BR-AR-0024
   dispatch_notes:
   - builds on R1-GA1 FINAL (engine, scope push-down, read-only lexical/semantic) and R1-RL FINAL (the lineage layer)
@@ -1543,6 +1548,8 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/answers/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0027.*
 running_work:
+- run_id: BR-AR-0024
+  liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
 - run_id: BR-AR-0026
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga3-0026; never inferred from elapsed time
 dag:
@@ -1768,6 +1775,13 @@ dag:
       the wall time of compiling the demonstration task (every instantiated query runs gather_with_followup) on the frozen store
       BEFORE R1-DEMO2 is dispatched, and records it; the orchestrator sets the demonstration''s time bounds from that measurement'
     reason: multi-hop follow-up raised a single query's gather cost to ~5 minutes; the configured budgets were set before it
+  - id: BR-DAG-AMEND-R1-22
+    by: orchestrator (determinism)
+    rule: 'no budget that decides CONTENT may depend on wall-clock time -- R1-GA2 makes gather follow-up budgets count-based, with wall
+      time only a disabled-by-default safety abort that yields a distinct stop reason and deterministic:false; R1-GA3''s "byte-identical
+      compile" row stays NOT_MET until that merges, then GA3 re-runs its two CONTROL-A compiles; R1-INT checks every budget in config
+      for a wall-clock dependency'
+    reason: a compile whose content depends on machine load cannot be re-verified or reproduced by an independent verifier
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
