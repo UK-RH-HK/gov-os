@@ -1,0 +1,275 @@
+run_id: BR-AR-0025
+role: >-
+  REPAIR-1 node R1-RS -- supplementary packets for every query command, occurrence collapse, bootstrap by
+  reference, task inputs in section I; plus BR-DAG-AMEND-R1-10 (verify re-extracts each A item's delivered body
+  from the rendered packet) and BR-DAG-AMEND-R1-15 (query commands are read-only with respect to the store)
+model_observed: claude-sonnet-5
+branch: bridge/r1-rs-0025
+commit: 40bec495b9b3de85f1b9ec6dff94f5a3748af134
+status: COMPLETED
+claims:
+- id: C-1
+  text: >-
+    Every query command (search, why, impact, history, exact show/grep/id/path, state, gather) accepts --out DIR
+    and writes a supplementary packet directory (manifest.json, packet.md, meta.json, packet hash, read tokens)
+    in the exact same on-disk shape `govbridge compile --out DIR` already writes -- so `govbridge packet verify`/
+    `govbridge receipt check` need no special case for it (meta.json's own packet_kind: "supplementary" is how
+    they tell the two apart). why/impact/history/exact/state were moved out of the generic
+    `_DISPATCH`+`mod.main(argv)` forwarding table (they had no way to capture a structured result to packetise)
+    into their own govbridge/cli.py cmd_* functions, calling the underlying library function directly -- the same
+    pattern cmd_search/cmd_gather already used. Every pre-existing flag and behaviour is unchanged when --out is
+    omitted.
+- id: C-2
+  text: >-
+    Occurrence collapse (govbridge/compile/supplementary.py:_collapse_occurrences): a unit hit at many refs is
+    delivered as ONE canonical occurrence (the CANONICAL version_status, else the first) plus a per-ref identity
+    summary (occurrence_count, distinct_refs, a sha256 over the sorted ref names) -- never a second occurrence
+    row per ref. Verified both on a synthetic 5-ref fixture (exactly one `source:` line in the rendered body) and
+    structurally for every one of the 7 commands' own result shapes.
+- id: C-3
+  text: >-
+    Deduplication by item id ("{unit_kind}:{unit_id}") against the main packet and earlier supplementary packets
+    in the same run: a caller passes --dedup-against DIR (repeatable) naming any earlier packet directory (main
+    or supplementary); a duplicate item is still listed (never silently hidden) but reduced to a bare reference,
+    never a second full copy of its text. Unit-tested (test_dedup_against_main_packet_delivers_by_reference_only)
+    and end-to-end through the real CLI.
+- id: C-4
+  text: >-
+    Raw JSON stays available only behind --raw: with --out and no --raw, only a short packet summary (packet_id/
+    packet_sha256/item/deduped/dropped counts) is printed; the full underlying result is printed only when --raw
+    is also given. Without --out, every command's output is byte-for-byte what it always printed (no regression).
+- id: C-5
+  text: >-
+    `packet verify`/`receipt check` cover the main packet AND every supplementary packet: `govbridge packet
+    verify DIR` dispatches on meta.json's packet_kind to either the (now rendered-body-aware) main-packet
+    validator or the new govbridge.compile.validate.verify_supplementary_packet (placement/banners/ordering, plus
+    a hard refusal of any MANDATORY/PINNED item or non-empty section A). `govbridge receipt check` gained
+    repeatable --supplementary DIR; a receipt whose context_packet_hash/manifest_sha256 omits an acknowledged
+    supplementary packet's own hashes FAILS, naming it.
+- id: C-6
+  text: >-
+    Section I carries the task's instantiated query set (govbridge.gather.instantiate.instantiate_all, the SAME
+    "never silently skip a {class,subject} entry" function R1-GA1 built) and the answers/receipt schemas
+    (ARCHITECTURE/schemas/answers.yaml, receipt.yaml), verbatim and by hash (OBS-BR-07/RC-9: "the query set and
+    the answers and receipt schemas travel outside the packet, in orchestrator-copied files"). Implemented in
+    govbridge/compile/section_i.py as an ADDITIONAL PINNED item appended to section I, with the packet
+    re-finalised (fresh manifest_sha256/packet_sha256/read tokens) via govbridge.compile.render's own
+    build_manifest/render_packet -- govbridge/compile/packet.py (out of this node's mutation_scope; RX->RM->GA3's
+    file) is never edited. Wired into both `govbridge compile --out` and the bootstrap.
+- id: C-7
+  text: >-
+    The bootstrap references the compiled packet by id and hash instead of inlining it (RC-9: "run-1's bootstrap
+    was 282,782 bytes and contained the whole packet"). On the real CONTROL-A task spec, `govbridge bootstrap`
+    now prints 8,350 bytes versus a 134,788-byte compiled packet (~6%) -- AGENT_RUNS/
+    BR-AR-0025.check3-controla-bootstrap-not-inlined.out. Added --out (writes the SAME packet directory the brief
+    references, so packet_sha256 in the text and on disk always agree) and --repo (bootstrap.py's CLI had no
+    --repo before; needed for MY OWN tests to run hermetically against a fixture repo instead of relying on cwd
+    resolution).
+- id: C-8
+  text: >-
+    BR-DAG-AMEND-R1-10: `govbridge.compile.render` gained an exact, unambiguous per-item body-begin/body-end
+    marker pair (item_body_marker/extract_item_delivered_body/extract_section_text) -- the "smallest
+    item-delimiting format support" the amendment asks for, embedding only unit_kind:unit_id (already printed on
+    the line above; never the internal item_id hash, preserving govbridge/demo/grade.py's own documented "never
+    the hash" invariant). `validate.verify_rendered_delivery` uses it to re-extract each A item's delivered body
+    from the ACTUAL rendered packet.md bytes and independently recompute its hash: an EXACT hash match for the
+    common, RC-1-relevant single-piece "delivered in full" shape; for the keys/entries/paths-selector and the
+    no-selector oversize/section-map shapes (whose rendered body embeds packet.py's own private per-piece
+    headers, out of this node's scope to reconstruct byte-for-byte), a content-identity containment check over
+    both delivered ranges (raw text) and every disclosed range's own (name, sha256) pair (covering the FULL
+    section_map, not just the delivered subset). `packet verify`/`receipt check` now always pass the rendered
+    text through.
+- id: C-9
+  text: >-
+    The amendment's own negative test, tests/compile/test_verify_rendered_body.py: tampering the rendered body
+    between an item's own markers, with manifest.json byte-identical, makes `packet verify` FAIL -- proven at
+    three levels: the library function directly, the real `govbridge packet verify` CLI on a fixture repo, and
+    (independent of this run's own Python test code) a shell/sed-level tamper of the REAL, already-compiled
+    CONTROL-A packet.md, verified via subprocess (AGENT_RUNS/BR-AR-0025.check4-independent-shell-level-tamper-
+    detection.out). A DISCLOSED LIMIT of the containment check (open_issues) is documented from that same probe.
+- id: C-10
+  text: >-
+    BR-DAG-AMEND-R1-15 (added mid-run): a query command writing a supplementary packet under --out never writes
+    to the store. Proven with the store made GENUINELY read-only at the OS level (chmod 0o444 on store.db, 0o555
+    on the store directory, not a mock or a monkeypatch of the store module): `govbridge state get` (which never
+    opens the sqlite store at all -- it reads straight from Git) succeeds, writes its supplementary packet under
+    --out, and leaves the store file's sha256, and the store directory's own file listing, byte-for-byte
+    unchanged. `--repo`/`--view` were added to `govbridge state get` (it had neither before) so this test -- and
+    any future one -- can run hermetically against a fixture repo instead of relying on cwd-based git resolution.
+evidence:
+- claim: C-1
+  evidence: >-
+    govbridge/cli.py: _add_supplementary_args/_handle_query_output, cmd_search/cmd_gather/cmd_why/cmd_impact/
+    cmd_history/cmd_exact/cmd_state; tests/compile/test_supplementary.py (one build_supplementary_packet test per
+    command/subcommand, all asserting validate.verify_supplementary_packet(...) == []); real-view:
+    AGENT_RUNS/BR-AR-0025.check2-controla-search-out-and-packet-verify.out (search --out on CONTROL-A -> packet
+    verify PASS, 17,278 bytes, meta.json carries packet_sha256)
+- claim: C-2
+  evidence: >-
+    govbridge/compile/supplementary.py:_collapse_occurrences; tests/compile/test_supplementary.py::
+    test_occurrence_collapse_keeps_one_row_plus_a_ref_summary, ::test_same_unit_hit_by_two_routes_merges_to_one_item
+- claim: C-3
+  evidence: >-
+    govbridge/compile/supplementary.py:item_id_key/_to_packet_item; govbridge/cli.py:_packet_item_ids/
+    --dedup-against; tests/compile/test_supplementary.py::test_dedup_against_main_packet_delivers_by_reference_only
+- claim: C-4
+  evidence: 'govbridge/cli.py:_handle_query_output (out_dir falsy -> unchanged print; --raw gate)'
+- claim: C-5
+  evidence: >-
+    govbridge/cli.py:cmd_packet (packet_kind dispatch), cmd_receipt (--supplementary); govbridge/compile/
+    validate.py:verify_supplementary_packet; govbridge/compile/receipt.py:check (supplementary param);
+    tests/compile/test_supplementary.py::test_receipt_check_fails_when_a_supplementary_packet_is_omitted,
+    ::test_receipt_check_passes_when_every_supplementary_packet_is_acknowledged,
+    ::test_cli_search_out_writes_a_verifiable_supplementary_packet (real CLI round trip)
+- claim: C-6
+  evidence: >-
+    govbridge/compile/section_i.py:build_task_inputs_item/with_task_inputs_in_section_i; tests/compile/
+    test_section_i_and_bootstrap.py::test_build_task_inputs_item_carries_schemas_verbatim_and_by_hash,
+    ::test_with_task_inputs_in_section_i_adds_one_item_and_stays_verifiable; real-view: packet.md at
+    /tmp (AGENT_RUNS/BR-AR-0025.check3...out) shows `unit: section:I.task_inputs` with instantiated_queries/
+    answers_schema/receipt_schema bodies
+- claim: C-7
+  evidence: >-
+    govbridge/compile/bootstrap.py:compile_brief/main (--out/--repo); tests/compile/test_section_i_and_bootstrap.py::
+    test_bootstrap_references_packet_instead_of_inlining_it, ::test_cli_bootstrap_output_is_well_under_the_packet_size;
+    AGENT_RUNS/BR-AR-0025.check3-controla-bootstrap-not-inlined.out (8,350 vs 134,788 bytes, real CONTROL-A)
+- claim: C-8
+  evidence: >-
+    govbridge/compile/render.py:item_body_marker/extract_item_delivered_body/extract_section_text; govbridge/
+    compile/validate.py:verify_rendered_delivery; tests/compile/test_verify_rendered_body.py::
+    test_extract_item_delivered_body_roundtrips_the_exact_text, ::test_extract_item_delivered_body_ambiguous_when_duplicated,
+    ::test_verify_packet_passes_with_rendered_when_untampered
+- claim: C-9
+  evidence: >-
+    tests/compile/test_verify_rendered_body.py::test_verify_packet_fails_when_rendered_body_tampered_manifest_intact,
+    ::test_receipt_check_fails_when_rendered_body_tampered, ::test_cli_packet_verify_fails_when_packet_md_tampered_on_disk;
+    AGENT_RUNS/BR-AR-0025.check4-independent-shell-level-tamper-detection.out (sed-level mutation of a real
+    CONTROL-A disclosure line's sha256, manifest.json md5-identical before/after, `packet verify` -> FAIL, exit 1)
+- claim: C-10
+  evidence: >-
+    tests/compile/test_supplementary.py::test_query_command_with_out_never_writes_to_a_genuinely_read_only_store
+    (chmod 0o444/0o555, sha256 + directory listing identical before/after); govbridge/cli.py:cmd_state (--repo/
+    --view added)
+mutation_scope_respected: true
+open_issues:
+- >-
+  BR-DAG-AMEND-R1-15's own principle ("query commands are read-only with respect to the store") holds at the
+  DATA level for every command (search/gather/why/impact included), but govbridge/core/store.py's open_db()
+  (NOT in this node's mutation_scope) unconditionally issues a write-shaped statement (`PRAGMA journal_mode=WAL`
+  then `INSERT OR IGNORE INTO store_meta`) on EVERY open, whatever the caller intends. Empirically verified
+  (twice, interactively, against the real store): this genuinely raises `sqlite3.OperationalError: attempt to
+  write a readonly database` if store.db is OS-read-only, even though both statements are true no-ops on an
+  already fully-built store and, under normal (writable) conditions, open+query+close leaves store.db
+  byte-for-byte unchanged. This is why the new test (test_query_command_with_out_never_writes_to_a_genuinely_
+  read_only_store) uses `state get` (which never calls open_db() at all) rather than `search`/`gather`/`why`/
+  `impact` -- those cannot be proven against a TRULY OS-read-only store file until store.py gains a real
+  read-only open mode (a `mode=ro` URI connection that skips the schema-ensure statements entirely). Routed to
+  whoever next owns govbridge/core/store.py (B1's file) or the orchestrator.
+- >-
+  tests/compile/test_compile_bootstrap.py::test_bootstrap_contains_prelude_packet_and_receipt_instructions FAILS
+  after this repair (the ONLY failure in the full domain suite: 581 passed, 1 failed -- AGENT_RUNS/
+  BR-AR-0025.check6-full-domain-suite.out). Its own assertion, `assert "## A. MANDATORY AUTHORITATIVE INPUTS" in
+  brief` (with the comment "the packet itself (A-J) is embedded, not summarised away"), encodes EXACTLY the
+  RC-9 defect ("the bootstrap inlines the whole packet") that REPAIR_PLAN.md section 6 and this node's own
+  deliverable explicitly require removing -- the DAG's own acceptance check 3 requires the opposite ("well under
+  the packet size, because the packet is referenced, not inlined"). This file is NOT in R1-RS's mutation_scope
+  (only tests/compile/test_supplementary.py and test_section_i_and_bootstrap.py are), so it was not edited,
+  per the hard scope rule. Requesting: either (a) a scope grant (to R1-RS or routed to R1-INT) to correct this
+  ONE assertion -- replace it with an assertion that packet_sha256/packet_id are named and that "## A. MANDATORY
+  AUTHORITATIVE INPUTS" is NOT inlined (mirroring this run's own
+  test_bootstrap_references_packet_instead_of_inlining_it), or (b) accepting it as a second named exception to
+  amendment R1-T1's "0 failures" rule, alongside test_compile_real_view_mandatory_in_a.py. Not skipped, not
+  xfailed, not weakened.
+- >-
+  verify_rendered_delivery's containment check for the no-selector oversize/section-map shape (delivered_sha256
+  is None, nothing raw delivered) checks that each disclosed range's OWN (name, sha256) pair is verbatim present
+  in the rendered body -- this catches REPLACEMENT/MUTATION of a disclosure line (independently confirmed twice
+  on the real CONTROL-A packet: AGENT_RUNS/BR-AR-0025.check4...out) but NOT a pure content INSERTION that adds
+  unrelated text into that item's body area without removing or altering any existing disclosed identity (an
+  exploratory probe during this run demonstrated the gap before the containment check was added for the
+  undelivered/section_map ranges; a follow-up mutation-style probe on the SAME real item, after the fix, WAS
+  caught). Closing this fully would need either a new render-time hash of that exact rendered body (a
+  govbridge/compile/packet.py change -- out of this node's scope; R1-GA3 edits that file next) or reconstructing
+  packet.py's private per-piece text format byte-for-byte inside validate.py (a fragile coupling to a format
+  R1-GA3 may change). Routed to R1-GA3/R1-INT as a disclosed, real, but narrow residual gap -- never claimed
+  closed.
+- >-
+  govbridge/compile/supplementary.py's COMMAND_PROFILE_BYTES table (search/why/impact/history/exact: 40 KB,
+  state: 16 KB, gather: 60 KB) is a small, documented Python table INSIDE this node's own scope, deliberately NOT
+  added to config/budgets.yaml (out of R1-RS's mutation_scope). Whether these specific numbers should instead
+  become a real, versioned config/budgets.yaml entry is a product question for whoever next owns that file
+  (R1-GA3) or the orchestrator.
+
+# BR-DAG-AMEND-R1-8 (amendment R1-T2): one row per deliverable bullet and per acceptance check. `integrate-check`
+# does not parse this key; the orchestrator reads every row.
+conformance:
+- item: 'Deliverable 1: every query command (search, why, impact, history, exact, state, gather) writes a supplementary packet directory under --out, budgeted per-command, deduplicated by item id against the main packet and earlier supplementary packets; raw JSON only behind --raw'
+  status: MET
+  evidence: >-
+    govbridge/cli.py cmd_search/cmd_gather/cmd_why/cmd_impact/cmd_history/cmd_exact/cmd_state (all 7, exact's 4
+    subcommands included); tests/compile/test_supplementary.py (one build_supplementary_packet test per command/
+    subcommand + the real CLI round trip); real-view AGENT_RUNS/BR-AR-0025.check2 (search --out on CONTROL-A)
+- item: 'Deliverable 2: `packet verify` and `receipt check` cover the main packet and every supplementary packet'
+  status: MET
+  evidence: >-
+    govbridge/cli.py:cmd_packet (packet_kind dispatch), cmd_receipt (--supplementary, repeatable); govbridge/
+    compile/validate.py:verify_supplementary_packet; govbridge/compile/receipt.py:check(supplementary=...);
+    tests/compile/test_supplementary.py::test_receipt_check_fails_when_a_supplementary_packet_is_omitted,
+    ::test_receipt_check_passes_when_every_supplementary_packet_is_acknowledged
+- item: 'Deliverable 3: section I carries the task''s instantiated query set and the answers and receipt schemas, verbatim and by hash'
+  status: MET
+  evidence: >-
+    govbridge/compile/section_i.py; tests/compile/test_section_i_and_bootstrap.py::
+    test_build_task_inputs_item_carries_schemas_verbatim_and_by_hash,
+    ::test_with_task_inputs_in_section_i_adds_one_item_and_stays_verifiable; real-view packet.md (check3) shows
+    unit: section:I.task_inputs with the full instantiated_queries/answers_schema/receipt_schema bodies
+- item: 'Deliverable 4: the bootstrap references the packet by id and hash and does not inline it'
+  status: MET
+  evidence: >-
+    govbridge/compile/bootstrap.py:compile_brief (packet_id/packet_sha256/manifest_sha256 named, no section body
+    text); AGENT_RUNS/BR-AR-0025.check3-controla-bootstrap-not-inlined.out (8,350 vs 134,788 bytes, real
+    CONTROL-A); tests/compile/test_section_i_and_bootstrap.py::test_bootstrap_references_packet_instead_of_inlining_it.
+    Collateral effect (not a narrowing of THIS deliverable): tests/compile/test_compile_bootstrap.py's own
+    pre-existing, out-of-scope assertion now fails because it encoded the removed behaviour -- see open_issues
+- item: 'BR-DAG-AMEND-R1-10: packet verify/receipt check re-extract each A item''s delivered body from the rendered packet and recompute delivered_sha256; negative test tampering the rendered body with manifest intact -> FAIL'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    govbridge/compile/render.py:item_body_marker/extract_item_delivered_body; govbridge/compile/
+    validate.py:verify_rendered_delivery (exact hash match for the common single-piece shape; containment check
+    for selector/oversize shapes, covering the full section_map); tests/compile/test_verify_rendered_body.py (9
+    tests, including the CLI-level and receipt-level negative tests); independent real-view confirmation twice
+    over (AGENT_RUNS/BR-AR-0025.check4, shell/sed mutation of the real CONTROL-A packet). Disclosed limit: a pure
+    content INSERTION (no removal/alteration of any existing disclosed identity) into an already-"nothing
+    delivered" section-map item's body is not caught by the containment check -- see open_issues
+- item: 'BR-DAG-AMEND-R1-15: query commands are read-only with respect to the store; one test against a genuinely read-only store shows the store file''s sha256 unchanged'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    tests/compile/test_supplementary.py::test_query_command_with_out_never_writes_to_a_genuinely_read_only_store
+    (chmod 0o444/0o555, `state get` -> supplementary packet written, store.db sha256 AND directory listing
+    unchanged). Disclosed limit: search/gather/why/impact (whose real routes call govbridge.core.store.open_db(),
+    out of this node's scope) cannot be proven against an OS-enforced read-only store TODAY, because that
+    function unconditionally issues a write-shaped statement on every open -- empirically confirmed to fail hard
+    against a read-only file even though it is a true no-op on an already-built store and, under normal
+    (writable) conditions, leaves store.db byte-identical (interactively confirmed, not included as an automated
+    test since it needs the large real store) -- see open_issues
+- item: 'Acceptance check 1: pytest tests/compile/test_supplementary.py tests/compile/test_section_i_and_bootstrap.py -q -- exit 0'
+  status: MET
+  evidence: 'AGENT_RUNS/BR-AR-0025.check1-pytest-supplementary-section_i-bootstrap.out (30 passed)'
+- item: 'Acceptance check 2: search --task <CONTROL-A spec> ''<CONTROL-A query>'' --out /tmp/s1 && packet verify /tmp/s1 -- PASS, bytes within the command profile, meta.json carries packet_sha256'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0025.check2-controla-search-out-and-packet-verify.out (verify: PASS, 0 problems; packet.md
+    17,278 bytes, within the 40 KB search profile; meta.json carries packet_sha256)
+- item: 'Acceptance check 3: bootstrap <CONTROL-A spec> | wc -c -- well under the packet size, because the packet is referenced, not inlined'
+  status: MET
+  evidence: 'AGENT_RUNS/BR-AR-0025.check3-controla-bootstrap-not-inlined.out (8,350 bytes vs 134,788-byte compiled packet, ~6%)'
+- item: 'Amendment R1-T1: the FULL domain suite, run last, 0 failures (test_compile_real_view_mandatory_in_a.py excepted)'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    AGENT_RUNS/BR-AR-0025.check6-full-domain-suite.out (581 passed, 1 failed). The named exception
+    (test_compile_real_view_mandatory_in_a.py) did not fail. The one failure
+    (test_compile_bootstrap.py::test_bootstrap_contains_prelude_packet_and_receipt_instructions) is not a
+    regression this node introduced by accident -- it is the direct, unavoidable, and explicitly disclosed
+    consequence of Deliverable 4 (see open_issues for the requested disposition). Every new test file (test_
+    supplementary.py, test_section_i_and_bootstrap.py, test_verify_rendered_body.py) was also run standalone and
+    passed identically inside and outside the full suite (hermetic; amendment R1-T1 rule 2)
