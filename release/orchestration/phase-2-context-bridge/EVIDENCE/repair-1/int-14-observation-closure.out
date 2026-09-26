@@ -1,0 +1,86 @@
+# int-14 observation closure (check 14). Every observation OBS-BR-01..OBS-BR-20 recorded in ORCHESTRATOR_STATE.yaml
+# (at 7bd7598ca3e63f026b25d4bc603a7022e608eb87), classified: ADDRESSED BY REPAIR-1 -> CLOSED (evidence) or OPEN (reason);
+# or NOT A REPAIR-1 SUBJECT (process/housekeeping/history) with the reason. OBS numbers 01..20 as present in the state (all 20).
+# Mapping sources: REPAIR_DAG.yaml traceability.observations (05,06,07,08,09,10) and the dag.amendments that cite an observation
+# (03 -> R1-23; 13/15 -> R1-7; 17 -> R1-XC pass 3 + this audit's check 11; 18 -> R1-18).
+
+OBS-BR-03  records ref follows the bridge tip; a commit mid-build/demo moves the view      -> R1-23 (+ pinned views)
+  status: OPEN (partly closed)
+  closed:  compile, gather, search, impact, exact, state, cite, answers lint resolve the view ONCE and honour a pinned view (int-10;
+           this audit's own view was pinned and the orchestrator's 20:41 commit (46cf1e6) never reached any of them).
+  open:    why and history cannot be pointed at a pinned/recorded view at all (no --view, task view ignored) -- during this audit
+           they answered from 46cf1e6 while everything else used 7bd7598 (int-10; INT-D09). The canonical-view schema has no pinned
+           form for the history ref_glob, and packet verify drops history entirely (int-12; INT-D05).
+
+OBS-BR-05  grader: G7 1%-of-corpus check silently disabled; query outputs not counted        -> R1-RG
+  status: OPEN
+  closed:  grade_g7 now applies the 1% check whenever --corpus-bytes is given (grade.py:824; int-06 (2)).
+  open:    without --corpus-bytes the check is still silently skipped and G7 reports PASS (INT-D13); supplementary packets
+           (the "query outputs" of D-5) are counted only if passed as --packet, and passing one crashes the grader (INT-D01); a
+           main packet's own DIR/supplementary/* overflow packets are never discovered (INT-D02). Real view: CONTROL-A seed0 graded
+           alone -> G7 counts 143,824 B, not the 455,907 B of main + supplementary (int-06 (5)).
+
+OBS-BR-06  query commands write no supplementary packets                                     -> R1-RS
+  status: CLOSED
+  evidence: search/why/impact/history/exact/state/gather all accept --out (cli.py); real view: `search ... --out` wrote a
+           supplementary packet that `packet verify` PASSES on the read-only store (int-08 search + supp_verify rows);
+           compile --out writes its 5 overflow supplementary packets, verified and receipt-covered (int-04a, int-04b).
+  note:    supplementary manifests record view: [] (INT-D15) -- the cause of INT-D01's grader crash.
+
+OBS-BR-07  compiled packet lacks the public query set and the answers/receipt schemas         -> R1-RS
+  status: CLOSED
+  evidence: CONTROL-A seed0 section I carries a second PINNED item I.task_inputs (4,727 item bytes) beside the task contract
+           (int-05 section I: 2 PINNED items); verified PASS (int-04b).
+
+OBS-BR-08  query commands ignore the task's retrieval_exclusions                              -> R1-RX
+  status: CLOSED
+  evidence: real view, pinned CONTROL-A task: compile reports excluded_hits 113 (int-04a meta), gather CA-WHY excluded_hits 429
+           (int-04e); `search --task` on the read-only store applied them (int-08); no main/supplementary item path falls under
+           ARCHITECTURE/**, AGENT_RUNS/** or DEMONSTRATION/** of the bridge domain (path census over main + 5 supplementary packets:
+           0 excluded-path items; 17 bridge-domain items, all under GATES/, config/ or govbridge/; gather CA-WHY: 0 excluded-path items).
+  note:    the CONTROL-A task excludes only those three bridge directories, so bridge-domain GATES/ (including the ruling that CHOSE
+           CONTROL-A), config/facets.yaml and govbridge/ code are retrieved as CONTROL-A evidence -- a task-spec scoping observation
+           for R1-MB/R1-D2 (self-retrieval of the bridge's own records), not a code defect.
+
+OBS-BR-09  deterministic grader defects GD-1..GD-9                                            -> R1-RG
+  status: OPEN
+  closed:  GD-1..GD-10 each have a regression test (tests/integration/test_demo_grade_regressions.py, green in int-01);
+           GD-7 (windowed external reads) re-checked PASS (test_c6_gd7_...); D-2 stage scoping and PENDING_RUBRIC re-checked on a
+           synthetic bound oracle that passes check_oracle.py --require-binding (int-06 (1),(2)).
+  open:    new grader defects on the integrated tree: INT-D01 (crash on any supplementary packet), INT-D02, INT-D13.
+
+OBS-BR-10  run-1 oracle unsealed; run-2 needs a fresh sealed oracle with a committed commitment -> R1-TA2
+  status: CLOSED (per the state's own orchestrator verification; not re-read here)
+  evidence: DEMONSTRATION/oracle-commitment-run-2.yaml is tracked (git ls-files; added in b7b1900). Its CONTENT was not read: REPAIR-1
+           rule 1 forbids DEMONSTRATION/oracle* to this auditor except check_oracle.py (BR-HO-0028 section 2).
+
+OBS-BR-13  a builder's zero/negative claim was false                                          -> R1-7 (this audit's check 7)
+OBS-BR-15  a second false zero from the same builder                                          -> R1-7
+  status: OPEN -- the zero-count audit finds three new FALSE zeros on the integrated real view: HEURISTIC_SAME_FILE (INT-D16),
+           the <file>:<L1>/<L2> path:line citation shape (INT-D12), and the CONTROL-A code facets dependencies/dependents/tests
+           (INT-D18, with INT-D17's false "candidates found" disclosure); plus the `why` CLI's always-MISSING dependency/tests
+           stages (INT-D19). int-07.
+
+OBS-BR-17  flaky real-view compile test: second cause is the machine-wide DEFAULT store         -> R1-XC pass 3 + check 11
+  status: OPEN -- three R1-RS tests still delenv GOVBRIDGE_STORE in their own body and open (on a clean HOME: create)
+           $HOME/.cache/gov-bridge/store/default/store.db, observed by an audit hook over the full suite (INT-D07); four test packages'
+           autouse fixtures only delenv and four have no conftest (INT-D08). int-11.
+
+OBS-BR-18  a builder pip-installed an unpinned package                                         -> R1-18 (template R1-T3)
+  status: CLOSED (process). This run used only $PY; the one pip-shaped command in this transcript is a read-only
+           `$PY -m pip list` at 18:39Z to learn whether pytest-randomly is installed (it is not) -- nothing was installed.
+
+NOT A REPAIR-1 SUBJECT (no REPAIR-1 node or amendment addresses them; nothing to close in code):
+OBS-BR-01  memory-vs-record claim about OD-P2-08 -- governance history; memory is not a source.
+OBS-BR-02  SECURITY_POLICY secret-content exclusion hides 8 product files from content indexes -- a bounded, disclosed limit;
+           still true on the integrated tree (coverage X-SEC-CONTENT: records 66, product 65, evidence 65 files; int-02e), and it is
+           why tests/certification/repair.rs's §11 citation has no lineage edge (int-07).
+OBS-BR-04  the sealed-oracle directory path was exposed in the state -- procedural; the path string is still in the state file this
+           auditor was told to read (seen passively, never accessed).
+OBS-BR-11  PreCompact hook confirmed live -- process.
+OBS-BR-12  orchestrator instruction conflict about check_oracle.py -- process; this brief's section 2 now grants the exception.
+OBS-BR-14  PreCompact hook also fires for subagents -- process.
+OBS-BR-16  store housekeeping (77 store dirs) -- this audit created store-BR-AR-0028-a, -b and the read-only copy -ro (named);
+           nothing deleted (rm is denied); the ro copy is 0555/0444 and may need a chmod before any cleanup.
+OBS-BR-19  orchestrator self-reported errors -- process.
+OBS-BR-20  concurrent from-clean rebuilds -- this audit ran its own two builds concurrently as its brief requires (66 min each).

@@ -1,0 +1,515 @@
+# int-02c compare the two from-clean stores (build A: -m govbridge.core.freshness; build B: govbridge index rebuild); $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)
+# cmd: $PY EVIDENCE/repair-1/scripts/int02_compare.py $HOME/.cache/gov-bridge/store-BR-AR-0028-a $HOME/.cache/gov-bridge/store-BR-AR-0028-b
+{
+ "bridge_code_tree_equal": true,
+ "config_sha256_equal": true,
+ "coverage_equal": true,
+ "fingerprint_config_files": [
+  "corpus-rules.yaml",
+  "pinned-view.yaml"
+ ],
+ "fingerprint_equal": true,
+ "fingerprint_history_count": 95,
+ "fingerprint_refs": {
+  "evidence": "58219d5628683d6f462aa67bf25dbc2641933bce",
+  "product": "3c880d80f81475f5306bdd5f680f2e004df49391",
+  "records": "7bd7598ca3e63f026b25d4bc603a7022e608eb87"
+ },
+ "layer_errors": {},
+ "layers": {
+  "authority": {
+   "a": {
+    "authority_edge": 3692,
+    "class_lifecycle": 3688,
+    "digest": "3684b6fa9699911444021f3471b853e69e37b4224c377c0c44218b25788b951c",
+    "record_def": 3688,
+    "rows": 11068
+   },
+   "b": {
+    "authority_edge": 3692,
+    "class_lifecycle": 3688,
+    "digest": "3684b6fa9699911444021f3471b853e69e37b4224c377c0c44218b25788b951c",
+    "record_def": 3688,
+    "rows": 11068
+   },
+   "equal": true
+  },
+  "blob": {
+   "a": {
+    "digest": "5b42e7dbdc8ca57a72981100e6de01c7bb34d542b50857936f0a4b5bb04593c4",
+    "rows": 7445
+   },
+   "b": {
+    "digest": "5b42e7dbdc8ca57a72981100e6de01c7bb34d542b50857936f0a4b5bb04593c4",
+    "rows": 7445
+   },
+   "equal": true
+  },
+  "chunk": {
+   "a": {
+    "chunker_version": "govbridge-chunker/1",
+    "digest": "5b68c5e2def3d6c9105a8d261420be6baa2d5c49877abaa5595827f94d931990",
+    "rows": 142924
+   },
+   "b": {
+    "chunker_version": "govbridge-chunker/1",
+    "digest": "5b68c5e2def3d6c9105a8d261420be6baa2d5c49877abaa5595827f94d931990",
+    "rows": 142924
+   },
+   "equal": true
+  },
+  "code": {
+   "a": {
+    "blobs_parsed": 233,
+    "call_site_rows": 111597,
+    "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036",
+    "excluded_blobs": 11,
+    "literal_rows": 79518,
+    "rows": 197348,
+    "symbol_rows": 6233
+   },
+   "b": {
+    "blobs_parsed": 233,
+    "call_site_rows": 111597,
+    "digest": "8b1405e948156a0c70e2daa9fe2f0a022111e3849cbe02bb2896213ca3061036",
+    "excluded_blobs": 11,
+    "literal_rows": 79518,
+    "rows": 197348,
+    "symbol_rows": 6233
+   },
+   "equal": true
+  },
+  "lexical": {
+   "a": {
+    "digest": "47dc015548887d2206c2b31c0b845564c251cf9f2db36e0a5a9d5f168e50f1a7",
+    "rows": 142924,
+    "tokenize": "porter unicode61 tokenchars '_'"
+   },
+   "b": {
+    "digest": "47dc015548887d2206c2b31c0b845564c251cf9f2db36e0a5a9d5f168e50f1a7",
+    "rows": 142924,
+    "tokenize": "porter unicode61 tokenchars '_'"
+   },
+   "equal": true
+  },
+  "lineage": {
+   "a": {
+    "digest": "90bf26d96a7d383bc4fb40af5c676f9e5e1a29291eb7ee8fd8e85f09f4afaa5b",
+    "rows": 3905,
+    "rows_by_ref": {
+     "evidence": 1348,
+     "product": 1340,
+     "records": 1217
+    },
+    "rows_by_type": {
+     "CITES_REQUIREMENT": 12,
+     "DEPENDS_ON_DATA": 1183,
+     "TESTS": 2710
+    },
+    "unresolved_by_form": {},
+    "unresolved_rows": 0
+   },
+   "b": {
+    "digest": "90bf26d96a7d383bc4fb40af5c676f9e5e1a29291eb7ee8fd8e85f09f4afaa5b",
+    "rows": 3905,
+    "rows_by_ref": {
+     "evidence": 1348,
+     "product": 1340,
+     "records": 1217
+    },
+    "rows_by_type": {
+     "CITES_REQUIREMENT": 12,
+     "DEPENDS_ON_DATA": 1183,
+     "TESTS": 2710
+    },
+    "unresolved_by_form": {},
+    "unresolved_rows": 0
+   },
+   "equal": true
+  },
+  "occurrence": {
+   "a": {
+    "digest": "c7f60920b6583a9d50c2b58f17a41ca4169679749793c781c3262257fbca687c",
+    "rows": 504108
+   },
+   "b": {
+    "digest": "c7f60920b6583a9d50c2b58f17a41ca4169679749793c781c3262257fbca687c",
+    "rows": 504108
+   },
+   "equal": true
+  },
+  "vector": {
+   "a": {
+    "digest": "487f666628024c3a15dd2fd6a94dd32c2b9a3cfdb9198f5ca047eb30def1c759",
+    "pin_id": "83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50",
+    "rows": 48645,
+    "semantic_block": {
+     "adapter": {
+      "capability": "embed",
+      "plugin_blob": "0ebe0e4a93d18b59ea15b1bbf9404ab38888a1cc",
+      "plugin_path": "govbridge/semantic/adapters/onnx_embed.py",
+      "protocol": "gov-capability/1"
+     },
+     "embed_profile_sha256": "23cf6fb90023288e253bb713d33a50120e97a344d30f39c7f3a3cd5bad46e821",
+     "encoding": {
+      "max_tokens": 512,
+      "normalize": "l2",
+      "pooling": "cls",
+      "query_prefix": "Represent this sentence for searching relevant passages: "
+     },
+     "model": {
+      "artefacts": {
+       "1_Pooling/config.json": "d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c",
+       "config.json": "094f8e891b932f2000c92cfc663bac4c62069f5d8af5b5278c4306aef3084750",
+       "onnx/model.onnx": "828e1496d7fabb79cfa4dcd84fa38625c0d3d21da474a00f08db0f559940cf35",
+       "special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+       "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+       "tokenizer_config.json": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3"
+      },
+      "id": "BAAI/bge-small-en-v1.5",
+      "revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
+     },
+     "pin_id": "83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50",
+     "runtime": {
+      "numpy": "2.5.3",
+      "onnxruntime": "1.30.0",
+      "provider": "CPUExecutionProvider",
+      "python": "3.12",
+      "session": {
+       "execution_mode": "ORT_SEQUENTIAL",
+       "inter_op_num_threads": 1,
+       "use_deterministic_compute": true
+      },
+      "tokenizers": "0.23.2"
+     }
+    },
+    "status": "BUILT"
+   },
+   "b": {
+    "digest": "487f666628024c3a15dd2fd6a94dd32c2b9a3cfdb9198f5ca047eb30def1c759",
+    "pin_id": "83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50",
+    "rows": 48645,
+    "semantic_block": {
+     "adapter": {
+      "capability": "embed",
+      "plugin_blob": "0ebe0e4a93d18b59ea15b1bbf9404ab38888a1cc",
+      "plugin_path": "govbridge/semantic/adapters/onnx_embed.py",
+      "protocol": "gov-capability/1"
+     },
+     "embed_profile_sha256": "23cf6fb90023288e253bb713d33a50120e97a344d30f39c7f3a3cd5bad46e821",
+     "encoding": {
+      "max_tokens": 512,
+      "normalize": "l2",
+      "pooling": "cls",
+      "query_prefix": "Represent this sentence for searching relevant passages: "
+     },
+     "model": {
+      "artefacts": {
+       "1_Pooling/config.json": "d1caf60c96f5fba2157c0c26b76d80818fad6cf0b8eb5e73ec372ff9818eba5c",
+       "config.json": "094f8e891b932f2000c92cfc663bac4c62069f5d8af5b5278c4306aef3084750",
+       "onnx/model.onnx": "828e1496d7fabb79cfa4dcd84fa38625c0d3d21da474a00f08db0f559940cf35",
+       "special_tokens_map.json": "b6d346be366a7d1d48332dbc9fdf3bf8960b5d879522b7799ddba59e76237ee3",
+       "tokenizer.json": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66",
+       "tokenizer_config.json": "9261e7d79b44c8195c1cada2b453e55b00aeb81e907a6664974b4d7776172ab3"
+      },
+      "id": "BAAI/bge-small-en-v1.5",
+      "revision": "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
+     },
+     "pin_id": "83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50",
+     "runtime": {
+      "numpy": "2.5.3",
+      "onnxruntime": "1.30.0",
+      "provider": "CPUExecutionProvider",
+      "python": "3.12",
+      "session": {
+       "execution_mode": "ORT_SEQUENTIAL",
+       "inter_op_num_threads": 1,
+       "use_deterministic_compute": true
+      },
+      "tokenizers": "0.23.2"
+     }
+    },
+    "status": "BUILT"
+   },
+   "equal": true
+  }
+ },
+ "layers_differing": [],
+ "manifest_sha256": {
+  "a": "d8b68f401c5b744a70b8eb9989c6bbd55afa91a3ec1547288254146a5e1b2bcc",
+  "b": "d8b68f401c5b744a70b8eb9989c6bbd55afa91a3ec1547288254146a5e1b2bcc",
+  "equal": true
+ },
+ "pins_equal": true,
+ "store_a": "/home/usain/.cache/gov-bridge/store-BR-AR-0028-a",
+ "store_b": "/home/usain/.cache/gov-bridge/store-BR-AR-0028-b",
+ "tables": {
+  "authority_edge": {
+   "a": {
+    "rows": 3692,
+    "sha256": "469d9520efac56e0b4079cad54d6fcf84ef7db7ee1f1988bf7a76ec812468e61"
+   },
+   "b": {
+    "rows": 3692,
+    "sha256": "469d9520efac56e0b4079cad54d6fcf84ef7db7ee1f1988bf7a76ec812468e61"
+   },
+   "equal": true
+  },
+  "blob": {
+   "a": {
+    "rows": 7445,
+    "sha256": "0e76c08be596a318fc9921353d184d9f1b1f090336cbeb708c6040706e32fa44"
+   },
+   "b": {
+    "rows": 7445,
+    "sha256": "0e76c08be596a318fc9921353d184d9f1b1f090336cbeb708c6040706e32fa44"
+   },
+   "equal": true
+  },
+  "chunk": {
+   "a": {
+    "rows": 142924,
+    "sha256": "7fbd1d7320cd83f7df61c8d862b7b6e0ce3d68da3760216f1070dc705b38c9e4"
+   },
+   "b": {
+    "rows": 142924,
+    "sha256": "7fbd1d7320cd83f7df61c8d862b7b6e0ce3d68da3760216f1070dc705b38c9e4"
+   },
+   "equal": true
+  },
+  "class_lifecycle": {
+   "a": {
+    "rows": 3688,
+    "sha256": "58de2654e6d8a2cbeede5db4c00e98f7564ab8d08df16704e7b70791fb1efc79"
+   },
+   "b": {
+    "rows": 3688,
+    "sha256": "58de2654e6d8a2cbeede5db4c00e98f7564ab8d08df16704e7b70791fb1efc79"
+   },
+   "equal": true
+  },
+  "code_blob": {
+   "a": {
+    "rows": 233,
+    "sha256": "8f7dfae23855869b642e1540e91f84b8c9f4b703decb4d739874822bd02e33cc"
+   },
+   "b": {
+    "rows": 233,
+    "sha256": "8f7dfae23855869b642e1540e91f84b8c9f4b703decb4d739874822bd02e33cc"
+   },
+   "equal": true
+  },
+  "code_call_site": {
+   "a": {
+    "rows": 111597,
+    "sha256": "aa042c0c54ba3bb27568f9508e29877bc0b492786f5ac9afae31d51e9a6b024c"
+   },
+   "b": {
+    "rows": 111597,
+    "sha256": "aa042c0c54ba3bb27568f9508e29877bc0b492786f5ac9afae31d51e9a6b024c"
+   },
+   "equal": true
+  },
+  "code_excluded_blob": {
+   "a": {
+    "rows": 11,
+    "sha256": "49eda9a42f1a13c917d75819e8b64646969061b7c8881b4ad96e63eeac0e56ba"
+   },
+   "b": {
+    "rows": 11,
+    "sha256": "49eda9a42f1a13c917d75819e8b64646969061b7c8881b4ad96e63eeac0e56ba"
+   },
+   "equal": true
+  },
+  "code_literal": {
+   "a": {
+    "rows": 79518,
+    "sha256": "e6641a2ad3ab52e2c26289c79615f6e514fc4270d1944d8162a122d19df97f84"
+   },
+   "b": {
+    "rows": 79518,
+    "sha256": "e6641a2ad3ab52e2c26289c79615f6e514fc4270d1944d8162a122d19df97f84"
+   },
+   "equal": true
+  },
+  "code_parse_error": {
+   "a": {
+    "rows": 12,
+    "sha256": "69bc651315b38fb41b9714a581684fdeb81a4720d8620e1e2914be553b707e9f"
+   },
+   "b": {
+    "rows": 12,
+    "sha256": "69bc651315b38fb41b9714a581684fdeb81a4720d8620e1e2914be553b707e9f"
+   },
+   "equal": true
+  },
+  "code_symbol": {
+   "a": {
+    "rows": 6233,
+    "sha256": "9073830c1f4899bc6f1c5991f481542165601724e2ef63231a8eb4bba256b91d"
+   },
+   "b": {
+    "rows": 6233,
+    "sha256": "9073830c1f4899bc6f1c5991f481542165601724e2ef63231a8eb4bba256b91d"
+   },
+   "equal": true
+  },
+  "lexical_fts": {
+   "a": {
+    "rows": 142924,
+    "sha256": "94e978f0c63eeb2133f374fcc2c5ad0ff63971ecd137c7f0d4cb0e0d3a5cba8f"
+   },
+   "b": {
+    "rows": 142924,
+    "sha256": "94e978f0c63eeb2133f374fcc2c5ad0ff63971ecd137c7f0d4cb0e0d3a5cba8f"
+   },
+   "equal": true
+  },
+  "lexical_fts_config": {
+   "a": {
+    "rows": 1,
+    "sha256": "4d22cc3d4f1c19eddc0f7b3ada59e7f109661467b3f7c49ed8b4e6c575a03d25"
+   },
+   "b": {
+    "rows": 1,
+    "sha256": "4d22cc3d4f1c19eddc0f7b3ada59e7f109661467b3f7c49ed8b4e6c575a03d25"
+   },
+   "equal": true
+  },
+  "lexical_fts_content": {
+   "a": {
+    "rows": 142924,
+    "sha256": "0718d1f8f48383a90ce0b15bebb6d2c2db431b125543793ea2d06ca3acc13ae4"
+   },
+   "b": {
+    "rows": 142924,
+    "sha256": "0718d1f8f48383a90ce0b15bebb6d2c2db431b125543793ea2d06ca3acc13ae4"
+   },
+   "equal": true
+  },
+  "lexical_fts_data": {
+   "a": {
+    "rows": 15012,
+    "sha256": "0278971faaa14b21ec31cca99cb7ecf5b83f275ee8fb8b0cc12bba06630cf111"
+   },
+   "b": {
+    "rows": 15012,
+    "sha256": "0278971faaa14b21ec31cca99cb7ecf5b83f275ee8fb8b0cc12bba06630cf111"
+   },
+   "equal": true
+  },
+  "lexical_fts_docsize": {
+   "a": {
+    "rows": 142924,
+    "sha256": "e413aa5595997cd24865d5e4553ff6888bd238f892d3971fa870f1af7a59977c"
+   },
+   "b": {
+    "rows": 142924,
+    "sha256": "e413aa5595997cd24865d5e4553ff6888bd238f892d3971fa870f1af7a59977c"
+   },
+   "equal": true
+  },
+  "lexical_fts_idx": {
+   "a": {
+    "rows": 4173,
+    "sha256": "bd7ff922a8568b4974c59c190249617eb240656f3b7fd4f8084917ed8e4eb7d8"
+   },
+   "b": {
+    "rows": 4173,
+    "sha256": "bd7ff922a8568b4974c59c190249617eb240656f3b7fd4f8084917ed8e4eb7d8"
+   },
+   "equal": true
+  },
+  "lexical_indexed_blob": {
+   "a": {
+    "rows": 7124,
+    "sha256": "697c4576017fb3f1761294112b6aa1cf409216bd6d8180854af369e2e8a07935"
+   },
+   "b": {
+    "rows": 7124,
+    "sha256": "697c4576017fb3f1761294112b6aa1cf409216bd6d8180854af369e2e8a07935"
+   },
+   "equal": true
+  },
+  "lineage_edge": {
+   "a": {
+    "rows": 3905,
+    "sha256": "8837b5b4c312876021feea53dce25c2059adf9c770a01370bd55469aa0eb7c6d"
+   },
+   "b": {
+    "rows": 3905,
+    "sha256": "8837b5b4c312876021feea53dce25c2059adf9c770a01370bd55469aa0eb7c6d"
+   },
+   "equal": true
+  },
+  "lineage_unresolved": {
+   "a": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "b": {
+    "rows": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   },
+   "equal": true
+  },
+  "occurrence": {
+   "a": {
+    "rows": 504108,
+    "sha256": "b7c52466ecfb1c956d2e9a5c11814b02e7250d837c9387778fc356495ead63aa"
+   },
+   "b": {
+    "rows": 504108,
+    "sha256": "b7c52466ecfb1c956d2e9a5c11814b02e7250d837c9387778fc356495ead63aa"
+   },
+   "equal": true
+  },
+  "occurrence_distinct_path": {
+   "a": {
+    "rows": 8416,
+    "sha256": "2f8f694e60b3b712bf7b472235092df05c1fe0cf654bb6b23bc238024f3c39da"
+   },
+   "b": {
+    "rows": 8416,
+    "sha256": "2f8f694e60b3b712bf7b472235092df05c1fe0cf654bb6b23bc238024f3c39da"
+   },
+   "equal": true
+  },
+  "record_def": {
+   "a": {
+    "rows": 3688,
+    "sha256": "44b257dbe243f71361aa8ec37e2790ca87149e47d5f6bf267a2dff962746ca6c"
+   },
+   "b": {
+    "rows": 3688,
+    "sha256": "44b257dbe243f71361aa8ec37e2790ca87149e47d5f6bf267a2dff962746ca6c"
+   },
+   "equal": true
+  },
+  "store_meta": {
+   "a": {
+    "rows": 5,
+    "sha256": "fa67aea28f0da358d3f4518d4981e7792a8d553f9131f3a24426f13ed31b86f0"
+   },
+   "b": {
+    "rows": 5,
+    "sha256": "fa67aea28f0da358d3f4518d4981e7792a8d553f9131f3a24426f13ed31b86f0"
+   },
+   "equal": true
+  },
+  "vector": {
+   "a": {
+    "rows": 48645,
+    "sha256": "eff10632ff893279886400883d0d6596d08a96926dcb0115ca8aada9ff592543"
+   },
+   "b": {
+    "rows": 48645,
+    "sha256": "eff10632ff893279886400883d0d6596d08a96926dcb0115ca8aada9ff592543"
+   },
+   "equal": true
+  }
+ },
+ "tables_differing": [],
+ "view_equal": true
+}
+# exit 0

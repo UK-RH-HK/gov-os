@@ -1,0 +1,34 @@
+schema: govbridge-demonstration-queries/1
+chain_stages:
+- stage_01
+- stage_02
+- stage_03
+- stage_04
+- stage_05
+- stage_06
+- stage_07
+- stage_08
+- stage_09
+- stage_10
+- stage_11
+queries:
+- id: SYN-CHAIN-1
+  kind: chain
+  text: synthetic chain one
+- id: SYN-CHAIN-2
+  kind: chain
+  text: synthetic chain two
+- id: SYN-SBS
+  kind: side_by_side
+  text: synthetic side by side
+- id: SYN-BW
+  kind: both_ways
+  text: synthetic both ways
+- id: SYN-Q1
+  kind: query_class
+  class: QC-A
+  subject: S1
+  text: synthetic query
+- id: SYN-CTL
+  kind: control
+  text: synthetic control

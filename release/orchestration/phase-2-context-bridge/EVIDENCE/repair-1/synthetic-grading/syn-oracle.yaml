@@ -1,0 +1,330 @@
+schema: govbridge-oracle/1
+oracle_id: SYN-ORACLE-R1INT
+author:
+  run_id: BR-AR-0028
+  role: test-author
+  model_observed: synthetic
+commits:
+  product: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+  records: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+  evidence: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+written_from:
+- &id001
+  kind: record
+  commit: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+  path: release/orchestration/cx/GATES/OWNER-DECISION-CX-0010A-B-DISPOSITION.md
+  record_id: CX-0010A
+line_tolerance: 3
+chains:
+- query_id: SYN-CHAIN-1
+  stages:
+  - stage: stage_01
+    required: true
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_01
+      binding: stage_01
+    traps: []
+    wrong: []
+  - stage: stage_02
+    required: true
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_02
+      binding: stage_02
+    traps: []
+    wrong: []
+  - stage: stage_03
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_03
+      binding: stage_03
+    traps: []
+    wrong: []
+  - stage: stage_04
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_04
+      binding: stage_04
+    traps: []
+    wrong: []
+  - stage: stage_05
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_05
+      binding: stage_05
+    traps: []
+    wrong: []
+  - stage: stage_06
+    required: true
+    is_enforcement_point: true
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_06
+      binding: stage_06
+    traps:
+    - &id002
+      kind: record
+      commit: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+      path: spec/decisions/CX-0001.yaml
+      record_id: CX-0001
+      why: an upstream representation (synthetic)
+    wrong: []
+  - stage: stage_07
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_07
+      binding: stage_07
+    traps: []
+    wrong: []
+  - stage: stage_08
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_08
+      binding: stage_08
+    traps: []
+    wrong: []
+  - stage: stage_09
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_09
+      binding: stage_09
+    traps: []
+    wrong: []
+  - stage: stage_10
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_10
+      binding: stage_10
+    traps: []
+    wrong: []
+  - stage: stage_11
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_11
+      binding: stage_11
+    traps: []
+    wrong: []
+  acceptable_alternative_enforcement_points: []
+  effective_behaviour:
+    subject: s
+    attribute: a
+    before: b
+    after: c
+    evidence: *id001
+- query_id: SYN-CHAIN-2
+  stages:
+  - stage: stage_01
+    required: true
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_01
+      binding: stage_01
+    traps: []
+    wrong: []
+  - stage: stage_02
+    required: true
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_02
+      binding: stage_02
+    traps: []
+    wrong: []
+  - stage: stage_03
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_03
+      binding: stage_03
+    traps: []
+    wrong: []
+  - stage: stage_04
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_04
+      binding: stage_04
+    traps: []
+    wrong: []
+  - stage: stage_05
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_05
+      binding: stage_05
+    traps: []
+    wrong: []
+  - stage: stage_06
+    required: true
+    is_enforcement_point: true
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_06
+      binding: stage_06
+    traps:
+    - *id002
+    wrong: []
+  - stage: stage_07
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_07
+      binding: stage_07
+    traps: []
+    wrong: []
+  - stage: stage_08
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_08
+      binding: stage_08
+    traps: []
+    wrong: []
+  - stage: stage_09
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_09
+      binding: stage_09
+    traps: []
+    wrong: []
+  - stage: stage_10
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_10
+      binding: stage_10
+    traps: []
+    wrong: []
+  - stage: stage_11
+    required: false
+    is_enforcement_point: false
+    anchors:
+      any_of:
+      - *id001
+    must_state:
+    - fact: fact bound to stage_11
+      binding: stage_11
+    traps: []
+    wrong: []
+  acceptable_alternative_enforcement_points: []
+  effective_behaviour:
+    subject: s
+    attribute: a
+    before: b
+    after: c
+    evidence: *id001
+side_by_side:
+  query_id: SYN-SBS
+  shared_points:
+  - *id001
+  differing_points:
+  - kind: record
+    commit: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+    path: release/orchestration/cx/GATES/OWNER-DECISION-CX-0010A-B-DISPOSITION.md
+    record_id: CX-0010B
+f1_both_ways:
+  query_id: SYN-BW
+  purpose_anchors:
+  - *id001
+  consumer_anchors:
+  - kind: record
+    commit: 638b0876d0d9acd897189ddaf6552db8b15d3bc8
+    path: release/orchestration/cx/GATES/OWNER-DECISION-CX-0010A-B-DISPOSITION.md
+    record_id: CX-0010B
+    process: in
+    production: true
+queries:
+- query_id: SYN-Q1
+  required:
+  - CX-0010A
+  forbidden: []
+  must_state:
+  - fact: a query-level fact
+    binding: query
+authority_expectations:
+- item: CX-0010A
+  sections:
+  - A
+  class: OWNER_DECISION
+- item: CX-0010B
+  sections:
+  - A
+  class: OWNER_DECISION
+controls:
+- query_id: SYN-CTL
+  required:
+  - CX-0010B
+  forbidden: []
+  must_state:
+  - fact: a control fact
+    binding: query

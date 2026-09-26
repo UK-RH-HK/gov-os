@@ -1,0 +1,35 @@
+# int-11 test hermeticity (check 11). $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3); tree HEAD 7bd7598ca3e63f026b25d4bc603a7022e608eb87; pinned records 7bd7598ca3e63f026b25d4bc603a7022e608eb87
+## (1) static: every tests/**/conftest.py and its GOVBRIDGE_STORE handling (grep -n GOVBRIDGE_STORE)
+tests/answers/ (no conftest.py) -> NO_PACKAGE_LEVEL_ISOLATION
+tests/authority/conftest.py setenv=0 delenv=1 -> ONLY_DELENV_OR_NONE
+tests/code/conftest.py setenv=1 delenv=0 -> ISOLATES
+tests/compile/conftest.py setenv=1 delenv=1 -> ISOLATES
+tests/core/conftest.py setenv=0 delenv=1 -> ONLY_DELENV_OR_NONE
+tests/gather/ (no conftest.py) -> NO_PACKAGE_LEVEL_ISOLATION
+tests/graph/conftest.py setenv=1 delenv=0 -> ISOLATES
+tests/integration/ (no conftest.py) -> NO_PACKAGE_LEVEL_ISOLATION
+tests/lexical/conftest.py setenv=1 delenv=1 -> ISOLATES
+tests/notes/conftest.py setenv=0 delenv=1 -> ONLY_DELENV_OR_NONE
+tests/route/ (no conftest.py) -> NO_PACKAGE_LEVEL_ISOLATION
+tests/semantic/conftest.py setenv=1 delenv=1 -> ISOLATES
+## (2) static (ast, same method as tests/integration/test_repair1_integration.py::_store_isolation_breaks): test functions that delenv GOVBRIDGE_STORE and re-point neither GOVBRIDGE_STORE nor GOV_BRIDGE_HOME
+   tests/compile/test_section_i_and_bootstrap.py::test_bootstrap_cli_out_writes_the_same_packet_it_references:140
+   tests/compile/test_section_i_and_bootstrap.py::test_cli_bootstrap_output_is_well_under_the_packet_size:165
+   tests/compile/test_supplementary.py::test_cli_search_out_writes_a_verifiable_supplementary_packet:325
+   tests/compile/test_verify_rendered_body.py::test_cli_packet_verify_fails_when_packet_md_tampered_on_disk:122
+## (3) dynamic, independent method: the FULL suite under a Python audit hook (int-11b-suite-under-audit-hook.out; raw log int-11-audit-hook.jsonl)
+731 passed in 343.52s (0:05:43)
+# exit 0 end 2026-09-26T18:51:30Z
+# default-store dir mtime after: 2026-09-26 19:49:50.878652622 +0100
+  audit rows 284 | machine-wide STORE accesses 16 | shared TELEMETRY accesses 268
+  STORE 2 ('tests/compile/test_section_i_and_bootstrap.py::test_bootstrap_cli_out_writes_the_same_packet_it_references (call)', 'sqlite3.connect', '/home/usain/.cache/gov-bridge/store/default/store.db', None)
+  STORE 2 ('tests/compile/test_section_i_and_bootstrap.py::test_cli_bootstrap_output_is_well_under_the_packet_size (call)', 'os.mkdir', '/home/usain/.cache/gov-bridge/store/default', None)
+  STORE 10 ('tests/compile/test_section_i_and_bootstrap.py::test_cli_bootstrap_output_is_well_under_the_packet_size (call)', 'sqlite3.connect', '/home/usain/.cache/gov-bridge/store/default/store.db', None)
+  STORE 2 ('tests/compile/test_verify_rendered_body.py::test_cli_packet_verify_fails_when_packet_md_tampered_on_disk (call)', 'sqlite3.connect', '/home/usain/.cache/gov-bridge/store/default/store.db', None)
+  telemetry writers by test file: {'tests/answers/test_cite.py': 72, 'tests/answers/test_gather_wiring.py': 28, 'tests/answers/test_lint.py': 48, 'tests/answers/test_lint_readonly.py': 4, 'tests/compile/test_compile_out_overflow.py': 56, 'tests/route/test_query_commands_readonly.py': 20, 'tests/route/test_real_routes.py': 6, 'tests/semantic/test_freshness_layer.py': 22, 'tests/semantic/test_search.py': 12}
+## (4) the default store's directory mtime moved during both full-suite runs (store.db content unchanged -- a WAL-mode open creates/removes -wal/-shm):
+  before int-01 run0 (18:38Z): 2026-09-26 19:31:34 +0100; after run0: 2026-09-26 19:42:59 +0100; after int-11b: 2026-09-26 19:49:50.878652622 +0100
+  store.db sha256 now: 4ad50f4d268ed6d62234c76171f5089f2c9b9274685d1ca19176bd96771b6626 (unchanged from 4ad50f4d...6626 at audit start)
+## (5) reproduction on a CLEAN HOME (HOME=<scratch>/cleanhome, no ~/.cache/gov-bridge at all): the three offending tests pass AND create the machine-wide default store
+  cmd: HOME=<scratch>/cleanhome $PY -m pytest -q -p no:cacheprovider <the 3 tests>  -> 3 passed; files created under the clean HOME:
+  <scratch>/cleanhome/.cache/gov-bridge/store/default/store.db

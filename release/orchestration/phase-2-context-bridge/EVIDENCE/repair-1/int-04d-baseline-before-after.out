@@ -1,0 +1,442 @@
+# int-04d before/after: CONTROL-A baseline packet (tests/fixtures/controls/control-a/baseline/packet, unrepaired bridge 9ba8367, store-BR-AR-0010) vs the repaired seed0 packet (pinned view). $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)
+# cmd: $PY EVIDENCE/repair-1/scripts/int04d_baseline_compare.py tests/fixtures/controls/control-a/baseline/packet <scratch>/ca/seed0
+{
+ "baseline_items": 28,
+ "facet_missing_after": [
+  {
+   "facet": "dependencies",
+   "query_id": "CA-WHY",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependents",
+   "query_id": "CA-WHY",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "tests",
+   "query_id": "CA-WHY",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "versions",
+   "query_id": "CA-WHY",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependencies",
+   "query_id": "CA-REQ",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependents",
+   "query_id": "CA-REQ",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "tests",
+   "query_id": "CA-REQ",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "versions",
+   "query_id": "CA-REQ",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependencies",
+   "query_id": "CA-ENF",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependents",
+   "query_id": "CA-ENF",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "tests",
+   "query_id": "CA-ENF",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "versions",
+   "query_id": "CA-ENF",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependencies",
+   "query_id": "CA-TESTS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependents",
+   "query_id": "CA-TESTS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "tests",
+   "query_id": "CA-TESTS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "versions",
+   "query_id": "CA-TESTS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependencies",
+   "query_id": "CA-DEPS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "dependents",
+   "query_id": "CA-DEPS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "tests",
+   "query_id": "CA-DEPS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  },
+  {
+   "facet": "versions",
+   "query_id": "CA-DEPS",
+   "reason": "gather found candidates for this facet, but none were placed in the compiled packet (deduplicated away or dropped by budget -- see the BUDGE"
+  }
+ ],
+ "kept_same_path_only": 6,
+ "kept_same_unit": 22,
+ "lost": [],
+ "overflow_after": [
+  {
+   "note_id": "overflow-CA-WHY",
+   "overflow_item_count": 102,
+   "query_id": "CA-WHY"
+  },
+  {
+   "note_id": "overflow-CA-REQ",
+   "overflow_item_count": 90,
+   "query_id": "CA-REQ"
+  },
+  {
+   "note_id": "overflow-CA-ENF",
+   "overflow_item_count": 92,
+   "query_id": "CA-ENF"
+  },
+  {
+   "note_id": "overflow-CA-TESTS",
+   "overflow_item_count": 113,
+   "query_id": "CA-TESTS"
+  },
+  {
+   "note_id": "overflow-CA-DEPS",
+   "overflow_item_count": 94,
+   "query_id": "CA-DEPS"
+  }
+ ],
+ "per_item": [
+  {
+   "baseline_section": "A",
+   "now_in": [
+    "main:A"
+   ],
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "status": "SAME_UNIT",
+   "unit": "record:state:bridge#contract_v3"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "tests/governance/capability-evidence-map.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:fe242c342bf9262a1a4ef01c"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "runtime/src/contracts.rs",
+   "status": "SAME_UNIT",
+   "unit": "chunk:ba587648d8cbba4530a17871"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "tests/governance/capability-evidence-map.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:a612b2085ce8e55c954a51ee"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "runtime/src/contracts.rs",
+   "status": "SAME_UNIT",
+   "unit": "chunk:c9652a10dc5b16c7f57df718"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "tests/governance/capability-evidence-map.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:0b0472ab17232830f63cadca"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "runtime/src/release.rs",
+   "status": "SAME_UNIT",
+   "unit": "chunk:b9b7d26e7a82c052bd401b31"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "runtime/src/contracts.rs",
+   "status": "SAME_UNIT",
+   "unit": "chunk:6066b02d31c071bd8cf76337"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G",
+    "notes/CA-DEPS.yaml",
+    "notes/CA-ENF.yaml",
+    "notes/CA-TESTS.yaml",
+    "notes/CA-WHY.yaml",
+    "supplementary/CA-DEPS",
+    "supplementary/CA-ENF",
+    "supplementary/CA-TESTS",
+    "supplementary/CA-WHY"
+   ],
+   "path": "runtime/src/contracts.rs",
+   "status": "SAME_PATH",
+   "unit": "chunk:e8b0ae805ec0f5f0554ec7ce"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "notes/CA-ENF.yaml",
+    "notes/CA-TESTS.yaml",
+    "supplementary/CA-ENF"
+   ],
+   "path": "release/capability-baseline/audit-0/synthesis/evidence/tools/build_synthesis.py",
+   "status": "SAME_PATH",
+   "unit": "chunk:ac15d5eb7eb98e9925f5c298"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "notes/CA-DEPS.yaml",
+    "notes/CA-WHY.yaml"
+   ],
+   "path": "release/capability-baseline/verify-1/delta/evidence/build-capability-audit.py",
+   "status": "SAME_PATH",
+   "unit": "chunk:fb410ac1592e410edbdc4d27"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G"
+   ],
+   "path": "runtime/src/release.rs",
+   "status": "SAME_UNIT",
+   "unit": "chunk:40ed3277968438d38e407e97"
+  },
+  {
+   "baseline_section": "G",
+   "now_in": [
+    "main:G",
+    "notes/CA-DEPS.yaml",
+    "notes/CA-ENF.yaml",
+    "notes/CA-TESTS.yaml",
+    "notes/CA-WHY.yaml",
+    "supplementary/CA-DEPS",
+    "supplementary/CA-ENF",
+    "supplementary/CA-TESTS",
+    "supplementary/CA-WHY"
+   ],
+   "path": "runtime/src/contracts.rs",
+   "status": "SAME_PATH",
+   "unit": "chunk:c886ca01677a1e71875fef8e"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "main:H"
+   ],
+   "path": "release/orchestration/phase-2-context-bridge/GATES/OWNER-LAUNCHER-BR-0001-P2X-FAIL-1.md",
+   "status": "SAME_UNIT",
+   "unit": "chunk:35c85c07366257e130521baa"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-WHY"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0049-integration-4.md",
+   "status": "SAME_UNIT",
+   "unit": "chunk:1339aef918366b1241b2faae"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-ENF",
+    "supplementary/CA-TESTS"
+   ],
+   "path": "release/orchestration/phase-2/AGENT_RUNS/P2-AR-0042.report.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:82f0cd3082b2b2c8b2e7aed4"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-ENF"
+   ],
+   "path": "release/orchestration/phase-2/AGENT_RUNS/P2-AR-0054.report.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:af1bf11e21317883c8154c15"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-WHY"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0050-repair-1-r4-tool-install-gate.md",
+   "status": "SAME_UNIT",
+   "unit": "chunk:73e601733df0390108d1a96a"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "notes/CA-WHY.yaml"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0048-repair-1-r4-residual-continuation.md",
+   "status": "SAME_PATH",
+   "unit": "chunk:a2a7b2044b6b13463459aa3c"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "notes/CA-ENF.yaml",
+    "notes/CA-WHY.yaml",
+    "supplementary/CA-ENF",
+    "supplementary/CA-WHY"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0041-repair-1-r4-ws01-evidence-map.md",
+   "status": "SAME_PATH",
+   "unit": "chunk:c9cb7a00c44c332dbcf33ee1"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-TESTS",
+    "supplementary/CA-WHY"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0051-repair-2-common-protocol.md",
+   "status": "SAME_UNIT",
+   "unit": "chunk:1f605b7857fcbd5d709346ad"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-ENF"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0041-repair-1-r4-ws01-evidence-map.md",
+   "status": "SAME_UNIT",
+   "unit": "chunk:4001af7692243e98de4e848d"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-TESTS",
+    "supplementary/CA-WHY"
+   ],
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0052-repair-3-bounded-final.md",
+   "status": "SAME_UNIT",
+   "unit": "chunk:07a4d559a4464d3b0ec224f2"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-ENF"
+   ],
+   "path": "framework/schemas/governance-capability-acceptance.schema.json",
+   "status": "SAME_UNIT",
+   "unit": "chunk:4b26df2fe9ecff16a3a0d7b9"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-DEPS"
+   ],
+   "path": "release/capability-baseline/repair-1/r4-ws01/evidence/mapping/owner-spec.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:5aee68a10a4450a87d4c9b87"
+  },
+  {
+   "baseline_section": "H",
+   "now_in": [
+    "supplementary/CA-WHY"
+   ],
+   "path": "release/capability-baseline/verify-1/synthesis/evidence/AC-10-gov-contract-matrix-with-my-runs.yaml",
+   "status": "SAME_UNIT",
+   "unit": "chunk:a09a214031aab1ba68054f76"
+  },
+  {
+   "baseline_section": "I",
+   "now_in": [
+    "main:I"
+   ],
+   "path": null,
+   "status": "SAME_UNIT",
+   "unit": "section:I"
+  },
+  {
+   "baseline_section": "J",
+   "now_in": [
+    "main:J"
+   ],
+   "path": null,
+   "status": "SAME_UNIT",
+   "unit": "section:J"
+  }
+ ],
+ "section_counts": {
+  "after_main": {
+   "A": 1,
+   "B": 0,
+   "C": 0,
+   "D": 7,
+   "E": 1,
+   "F": 0,
+   "G": 18,
+   "H": 6,
+   "I": 2,
+   "J": 1
+  },
+  "before": {
+   "A": 1,
+   "B": 0,
+   "C": 0,
+   "D": 0,
+   "E": 0,
+   "F": 0,
+   "G": 12,
+   "H": 13,
+   "I": 1,
+   "J": 1
+  }
+ }
+}

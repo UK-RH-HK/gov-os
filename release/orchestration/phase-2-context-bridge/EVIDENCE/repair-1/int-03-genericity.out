@@ -1,0 +1,1952 @@
+# int-03 genericity audit (OC-BR-02); $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3); pinned view: records 7bd7598ca3e63f026b25d4bc603a7022e608eb87 (tree audited = HEAD 7bd7598ca3e63f026b25d4bc603a7022e608eb87)
+# cmd: $PY EVIDENCE/repair-1/scripts/int03_genericity.py
+{
+ "dag_grep": {
+  "cmd": "grep -rnE 'P2-AR-0097|Review[- ]?8|REVIEW-8' govbridge config tests --include=*.py --include=*.yaml | grep -v '^tests/fixtures/'",
+  "hit_count": 59
+ },
+ "head": "7bd7598ca3e63f026b25d4bc603a7022e608eb87",
+ "hits": [
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 21,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- item_id: OD-P2-10A",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 22,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 23,
+   "matched": [
+    "F_FINDING",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "heading: '## OD-P2-10A \u2014 F2 is NOT scope expansion'",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 26,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 11,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 27,
+   "matched": [
+    "F_FINDING",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "quote: 'OD-P2-10A \u2014 F2 is NOT scope expansion'}",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 28,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- item_id: OD-P2-10B",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 29,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 30,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "heading: '## OD-P2-10B \u2014 the Review-8 failure bridge is authorised and starts now'",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 33,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 25,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 34,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "quote: 'OD-P2-10B \u2014 the Review-8 failure bridge is authorised and starts now'}",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 35,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- item_id: F1-DIRECTION",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 36,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 37,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "heading: '## F1 \u2014 owner direction recorded, NOT yet authority to act'",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 40,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 38,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 41,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "quote: 'F1 \u2014 owner direction recorded, NOT yet authority to act'}",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 42,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- item_id: F2-F3-COMMON-CLASS",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 43,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 44,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "heading: '## F2 / F3 \u2014 classification hypothesis, NOT yet a final owner decision'",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 47,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 59,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 48,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "quote: 'F2 / F3 \u2014 classification hypothesis, NOT yet a final owner decision'}",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 49,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- item_id: OD-P2-10A-B.PROPERTY-A",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 50,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 54,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 69,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 56,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- item_id: OD-P2-10A-B.STANDING-STATE",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 57,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 61,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md, line: 74,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 64,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 68,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "note: the ledger passages P2-L-0046/P2-L-0047 that describe the same errors are also HYPOTHESIS_RELEVANT_OBSERVATION",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 70,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml, line: 1569, quote: 'orchestrator_error_f3'}",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 73,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0010A-B-REVIEW-8-DISPOSITION.md",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 86,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- from: OD-P2-07",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 90,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "OA-P2-06 otherwise stays ACTIVE, annotated \"partially superseded: stop condition\"; OD-P2-08 section 8's",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 92,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 110,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/V8_3_EVIDENCE_PACKAGE.md, line: 253,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 112,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "corroboration: {path: release/orchestration/phase-2/PERFORMANCE_DIAGNOSTIC.md, line: 177,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 123,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "cite: {path: release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md, line: 6,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 138,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- {glob: 'release/orchestration/phase-2/GATES/PHASE-2-FROZEN-GATE-CONTRACT.md', class: FROZEN_GATE_CONTRACT}",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 143,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- {glob: 'release/orchestration/*/GATES/P2-ADJ-*.md', class: ORCHESTRATION_RECORD, type: adjudication,",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_REGISTRY_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 145,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/authority-registry.yaml",
+   "text": "- {glob: 'release/orchestration/**/{ORCHESTRATOR_STATE.yaml,GATE-REGISTER.yaml,PHASE_LEDGER.md,PHASE_1_LEDGER.md}',",
+   "why": "the owner-record registry is instance DATA by design (ARCHITECTURE.md section 5.2: classes are assigned by the cited registry); not code"
+  },
+  {
+   "class": "INSTANCE_VIEW_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 37,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/canonical-view.yaml",
+   "text": "paths_from: \"release/orchestration/phase-2/tools/product_identity.py#PRODUCT_CODE\"",
+   "why": "the canonical view / state alias is instance data by design (section 1.2)"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 6,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "config/corpus-rules.yaml",
+   "text": "(govbridge.core.pathrules). Nothing here names Review 8, a phase or any particular file -- every path below is a",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 59,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/corpus-rules.yaml",
+   "text": "(ARCHITECTURE/, HANDOFFS/, AGENT_RUNS/, ORCHESTRATOR_STATE.yaml, PHASE_LEDGER.md, GATES/, tools/, govbridge/,",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 67,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/corpus-rules.yaml",
+   "text": "source_cite: \"OD-P2-10 section 11 (cost rule); ARCHITECTURE.md section 1.1 (the 6 blobs caught total 26.3 MB, SO-04)\"",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "7830d7bd59",
+   "line": 6,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "config/facets.yaml",
+   "text": "never a path, a file name, a Review-8 item, an F-finding or a symbol from the Review-8 chains (OC-BR-02). Adding,",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "7830d7bd59",
+   "line": 108,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "config/facets.yaml",
+   "text": "# (a class id is caller-chosen data, never a Review-8 name baked in here).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 8,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "decisions, gate answers) -- not a Review-8- or Phase-2-specific list (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 25,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "P2-AR-0097), handoffs (BR-HO-0007), checkpoints (BR-CP-0001), ledger entries (P2-L-0046), owner records",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 26,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "(OD-P2-10, OA-P2-06, OC-P2-04, OC-BR-02), adjudications (P2-ADJ-0006), gates (GATE-P2-REPAIR-1), certified",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "GENERIC_GRAMMAR_EXAMPLE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 31,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "description: a bare short token (F1, F2, C1, A2, B1) that is a RECORD-LOCAL id -- only unique inside the record",
+   "why": "F1/C1 given as examples of the generic bare-local-token SHAPE"
+  },
+  {
+   "class": "GENERIC_GRAMMAR_EXAMPLE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 70,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "a markdown heading whose text is exactly a bare local token (for example a level-2 heading reading only \"F1\"",
+   "why": "F1/C1 given as examples of the generic bare-local-token SHAPE"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 71,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "or \"F2\", as used by owner-decision disposition records) defines that token, LOCAL to the enclosing record",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 77,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "a level-2 ledger heading naming an id that matches the hyphen-token shape (for example \"## P2-L-0046\") defines",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 116,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/id-grammar.yaml",
+   "text": "description: a phase/domain-prefixed ledger entry (P2-L-0046, BR-L-0001); a bare \"L-NNNN\" is a lessons/ id, a",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "INSTANCE_VIEW_DATA",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 11,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "config/state-aliases.yaml",
+   "text": "phase-2: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "why": "the canonical view / state alias is instance data by design (section 1.2)"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 2,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/__init__.py",
+   "text": "foundation (OC-BR-02). Orchestration support only (OD-P2-10 section 3); not product, not an authority source.",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 142,
+   "matched": [
+    "F_FINDING",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/authority/records.py",
+   "text": "# each followed by free-text description, e.g. \"**OD-P2-10A** (F2 scope classification), **OD-P2-10B** ...\")",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "GENERIC_GRAMMAR_EXAMPLE",
+   "era": "REPAIR_1",
+   "introduced_by": "a7990303f9",
+   "line": 318,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "govbridge/authority/records.py",
+   "text": "# `local=False`: unlike DR-MD-HEADING-LOCAL's bare tokens (F1, C1 -- meaningless outside their record,",
+   "why": "F1/C1 given as examples of the generic bare-local-token SHAPE"
+  },
+  {
+   "class": "GENERIC_GRAMMAR_EXAMPLE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 481,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "govbridge/authority/records.py",
+   "text": "continue  # a bare local id (F1, C1) is never censused globally; only RECORD#LOCAL would be",
+   "why": "F1/C1 given as examples of the generic bare-local-token SHAPE"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "REPAIR_1",
+   "introduced_by": "9790a82a79",
+   "line": 187,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/authority/resolver.py",
+   "text": "``entries`` as a free-text, human-readable annotation (e.g. ``entries: 'P2-L-0033..P2-L-0047 (...)'`` on",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "REPAIR_1",
+   "introduced_by": "9790a82a79",
+   "line": 188,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/authority/resolver.py",
+   "text": "``PHASE-2-LEDGER-P2-L-0033-0047``, ORCHESTRATOR_STATE.yaml). That row is left completely alone: a",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "REPAIR_1",
+   "introduced_by": "c9de8d0edc",
+   "line": 227,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/authority/resolver.py",
+   "text": "# PHASE-2-LEDGER-P2-L-0033-0047 shape) -- `entries_of` dispatches on `path`'s extension.",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 443,
+   "matched": [
+    "DAG_GREP",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/authority/resolver.py",
+   "text": "# a directory entry (e.g. REVIEW-8-PROBES' probes/P2-AR-0097/) carries no text to read metadata from; its",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7338caf36d",
+   "line": 115,
+   "matched": [
+    "R8_SYMBOL:policy_precedence"
+   ],
+   "path": "govbridge/code/adapters/rust_treesitter.py",
+   "text": "\"\"\"A generic, path-derived module guess: ``runtime/src/policy_precedence.rs`` -> ``crate::policy_precedence``;",
+   "why": "a code docstring/comment names a Review-8 chain symbol as an example"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "e19adeaac2",
+   "line": 5,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/code/lineage_config.yaml",
+   "text": "# source. Generic: no Review-8/Phase-2 item, F-finding or symbol is named here (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "ADAPT_PROVENANCE_OR_CANON_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "2dd3fd0a2b",
+   "line": 5,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/bootstrap.py",
+   "text": "``release/orchestration/phase-2/tools/worker_bootstrap.py`` at commit",
+   "why": "ARCHITECTURE.md section 7.5 ADAPT provenance / verbatim canon bootstrap text; not retrieval logic"
+  },
+  {
+   "class": "ADAPT_PROVENANCE_OR_CANON_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "2dd3fd0a2b",
+   "line": 7,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/bootstrap.py",
+   "text": "``git show 6e7a2a3495a8d3619759a95b7ed055da9c848618:release/orchestration/phase-2/tools/worker_bootstrap.py``).",
+   "why": "ARCHITECTURE.md section 7.5 ADAPT provenance / verbatim canon bootstrap text; not retrieval logic"
+  },
+  {
+   "class": "ADAPT_PROVENANCE_OR_CANON_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "2dd3fd0a2b",
+   "line": 40,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/bootstrap.py",
+   "text": "ADAPT_SOURCE = (\"release/orchestration/phase-2/tools/worker_bootstrap.py\"",
+   "why": "ARCHITECTURE.md section 7.5 ADAPT provenance / verbatim canon bootstrap text; not retrieval logic"
+  },
+  {
+   "class": "ADAPT_PROVENANCE_OR_CANON_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "2dd3fd0a2b",
+   "line": 72,
+   "matched": [
+    "R8_SYMBOL:policy_precedence"
+   ],
+   "path": "govbridge/compile/bootstrap.py",
+   "text": "`policy_precedence::evaluate_overlay` and `gov policy overrides`.\"\"\",",
+   "why": "ARCHITECTURE.md section 7.5 ADAPT provenance / verbatim canon bootstrap text; not retrieval logic"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "57523cbc2e",
+   "line": 5,
+   "matched": [
+    "DAG_GREP",
+    "F_FINDING",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/codeseeds.py",
+   "text": "seeds\": ``govbridge.compile.packet``'s seed pass handed the code route a record id such as ``P2-AR-0097#F2``, and",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "57523cbc2e",
+   "line": 23,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/compile/codeseeds.py",
+   "text": "Generic (OC-BR-02): every function takes a seed id, a commit and a grammar as DATA. Nothing here names Review 8,",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "57523cbc2e",
+   "line": 121,
+   "matched": [
+    "DAG_GREP",
+    "F_FINDING",
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/codeseeds.py",
+   "text": "``P2-AR-0097#F2``) -- the id-grammar's own MP-BARE-LOCAL/DR-MD-HEADING-LOCAL convention: a local id is defined",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "REPAIR_1",
+   "introduced_by": "a0011e6f48",
+   "line": 153,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/compile/overflow.py",
+   "text": "file name, a Review-8 item\"). A PURE function of the (versioned, sha256'd) config file alone -- the SAME set",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "REPAIR_1",
+   "introduced_by": "c9de8d0edc",
+   "line": 129,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/sectionmap.py",
+   "text": "ledger heading such as \"## P2-L-0046 -- ...\" (``PHASE_LEDGER.md``), but any level works.\"\"\"",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "REPAIR_1",
+   "introduced_by": "c9de8d0edc",
+   "line": 308,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/compile/sectionmap.py",
+   "text": "\"## P2-L-0046 -- ...\" is the common real shape, but any level works, generically, via",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 7,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/core/corpus.py",
+   "text": "Nothing here names Review 8, a phase or a specific file (OC-BR-02): the exclusions on the real repository fall out",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 228,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/core/view.py",
+   "text": "(ARCHITECTURE.md section 1.2: \"the partition reuses product_identity.py's PRODUCT_CODE list\"). This function",
+   "why": "a code docstring/comment/config description uses a real id as an example"
+  },
+  {
+   "class": "ADAPT_PROVENANCE_OR_CANON_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 2,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "govbridge/demo/extract_reads.py",
+   "text": "\"\"\"ADAPT of ``release/orchestration/phase-2/tools/telemetry_context_extract.py``",
+   "why": "ARCHITECTURE.md section 7.5 ADAPT provenance / verbatim canon bootstrap text; not retrieval logic"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 17,
+   "matched": [
+    "DAG_GREP",
+    "F_FINDING"
+   ],
+   "path": "govbridge/demo/extract_reads.py",
+   "text": "25 files in one command). Nothing here names Review 8, F1-F6, Phase 2 or a particular file (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 9,
+   "matched": [
+    "DAG_GREP",
+    "F_FINDING"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "citation/anchor matching, never a special case for Review 8, F1-F6 or Phase 2 (OC-BR-02): every rule below reads",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 215,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "# F1/F2/F3 packet-side placement (generic: only checked if the oracle names these items at all).",
+   "why": "a gate-rule label copied from DEMONSTRATION_DESIGN.md section 4 (G3/G6); the logic reads the oracle's own rows, no id hard-coded"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "REPAIR_1",
+   "introduced_by": "34fe43b4b2",
+   "line": 250,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "answer_side.append({\"rule\": \"F1 direction not presented as a decision (phrase scan; heuristic)\",",
+   "why": "a gate-rule label copied from DEMONSTRATION_DESIGN.md section 4 (G3/G6); the logic reads the oracle's own rows, no id hard-coded"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "REPAIR_1",
+   "introduced_by": "34fe43b4b2",
+   "line": 255,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "answer_side.append({\"rule\": \"F2/F3 not presented as a classification (phrase scan; heuristic)\",",
+   "why": "a gate-rule label copied from DEMONSTRATION_DESIGN.md section 4 (G3/G6); the logic reads the oracle's own rows, no id hard-coded"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "8b16f33d0e",
+   "line": 371,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "second, independent symbol table, and never a Review-8/Phase-2-specific one (OC-BR-02: this looks up whatever",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 671,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "# Review-8 oracle's ten defined query classes (QC1-QC10), not a number this generic grader may hard-code",
+   "why": "a gate-rule label copied from DEMONSTRATION_DESIGN.md section 4 (G3/G6); the logic reads the oracle's own rows, no id hard-coded"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 691,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "govbridge/demo/grade.py",
+   "text": "# G6: F1 evidence both ways.",
+   "why": "a gate-rule label copied from DEMONSTRATION_DESIGN.md section 4 (G3/G6); the logic reads the oracle's own rows, no id hard-coded"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "7830d7bd59",
+   "line": 5,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/gather/facets.py",
+   "text": "config change, never a code change here (OC-BR-02: nothing below ever names a Review-8 item, an F-finding, a",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "7830d7bd59",
+   "line": 192,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/gather/facets.py",
+   "text": "generic and config-driven (OC-BR-02: no facet mapping here ever names a Review-8 item, an F-finding or a",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "ea992f9553",
+   "line": 157,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/gather/followup.py",
+   "text": "#: an instance/Review-8 name (OC-BR-02): id-grammar record ids first, then symbols and Rust test paths, then",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 11,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/graph/why.py",
+   "text": "the GIVEN seed -- the acceptance subject is D-0006 precisely because it is unrelated to Review 8.",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 11,
+   "matched": [
+    "DAG_GREP",
+    "F_FINDING"
+   ],
+   "path": "govbridge/lexical/__init__.py",
+   "text": "Nothing here special-cases Review 8, F1-F6, Phase 2 or any particular file (OC-BR-02): the FTS5 table indexes",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_CODE_COMMENT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 9,
+   "matched": [
+    "R8_SYMBOL:partition_floor_rules_against_kernel"
+   ],
+   "path": "govbridge/lexical/fts.py",
+   "text": "``partition_floor_rules_against_kernel`` stay a single token instead of splitting on ``_``).",
+   "why": "a code docstring/comment names a Review-8 chain symbol as an example"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 14,
+   "matched": [
+    "DAG_GREP",
+    "F_FINDING"
+   ],
+   "path": "govbridge/route/real_routes.py",
+   "text": "Generic, not bespoke (OC-BR-02): nothing here names Review 8, F1-F6, Phase 2 or a particular id/file. The \"product\"",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "617c3cae4f",
+   "line": 6,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "govbridge/semantic/profile.py",
+   "text": "not know or care what any particular path, ref or repository contains. Nothing here names Review 8, a phase or a",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 40,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/authority/test_records.py",
+   "text": "\"release/orchestration/phase-2/GATES/P2-ADJ-0004-SUBJECTLESS-REVIEW-FALLBACK.md\", grammar, 20)",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 41,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/authority/test_records.py",
+   "text": "assert [d.id for d in defs] == [\"P2-ADJ-0004\"]",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 30,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/authority/test_resolver.py",
+   "text": "\"\"\"The fixture analog of node B5's 'six OD-P2-10A/B items resolve to six distinct heading sections' check: our",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7338caf36d",
+   "line": 9,
+   "matched": [
+    "R8_SYMBOL:policy_precedence"
+   ],
+   "path": "tests/code/test_rust_adapter.py",
+   "text": "assert rt.module_path(\"runtime/src/policy_precedence.rs\") == \"crate::policy_precedence\"",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "5b2f7c09e3",
+   "line": 3,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/code/test_rust_cli.py",
+   "text": "resolved wrapper function. Every fixture here is synthetic (OC-BR-02): no Review-8/Phase-2/product symbol or",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "57523cbc2e",
+   "line": 4,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_code_route_seeds.py",
+   "text": "self-contained fixture repo (never Review-8/Phase-2 content -- OC-BR-02): one finding-shaped record, one Rust",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "SYNTHETIC_LOCAL_ID",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "57523cbc2e",
+   "line": 43,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_code_route_seeds.py",
+   "text": "## F1",
+   "why": "a synthetic fixture record's local token (#F1 on a CX-/EX- id); not the Review-8 F1"
+  },
+  {
+   "class": "SYNTHETIC_LOCAL_ID",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "57523cbc2e",
+   "line": 144,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_code_route_seeds.py",
+   "text": "\"seeds\": [\"CX-FIND-0001#F1\"],",
+   "why": "a synthetic fixture record's local token (#F1 on a CX-/EX- id); not the Review-8 F1"
+  },
+  {
+   "class": "SYNTHETIC_LOCAL_ID",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "c99ffac02c",
+   "line": 270,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_code_route_seeds.py",
+   "text": "## F1",
+   "why": "a synthetic fixture record's local token (#F1 on a CX-/EX- id); not the Review-8 F1"
+  },
+  {
+   "class": "SYNTHETIC_LOCAL_ID",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "c99ffac02c",
+   "line": 372,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_code_route_seeds.py",
+   "text": "\"seeds\": [\"CX-TIER-0001#F1\"],",
+   "why": "a synthetic fixture record's local token (#F1 on a CX-/EX- id); not the Review-8 F1"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "2dd3fd0a2b",
+   "line": 2,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_mandatory_classes.py",
+   "text": "generic ``tests/fixtures/compile`` corpus, never a Review-8 id). Every ``mandatory_bridge_inputs`` item appears in",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 5,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_mandatory_lifecycle_in_a.py",
+   "text": "still gates D.1 and the non-ladder classes keep their fixed section regardless. Nothing here is Review-8/Phase-2",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "d75d0129f5",
+   "line": 12,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_out_overflow.py",
+   "text": "``RAOV-*``/``raoverflowterm``, unrelated to Review-8/Phase-2 (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 8,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "This is the ONLY place in ``tests/compile/**`` that reads real Review-8/Phase-2 ids, and only as DATA named",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 114,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "\"OD-P2-10A\", \"OD-P2-10B\",         # OWNER_DECISION (mandatory_bridge_inputs.items, already ACTIVE)",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 115,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "\"REVIEW-8-RETURN\",                # EVIDENCE",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 116,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "\"REVIEW-8-CONTEXT-PACK\",          # ORCHESTRATION_RECORD",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 118,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "\"PHASE-2-LEDGER-P2-L-0033-0047\",  # ORCHESTRATION_RECORD",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 179,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "assert \"F1-DIRECTION\" in d2_ids",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 180,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "assert \"F2-F3-COMMON-CLASS\" in d3_ids",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 184,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "assert \"F1-DIRECTION\" not in ids",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "MANDATED_REAL_VIEW_TEST",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "7a11de13a3",
+   "line": 186,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/compile/test_compile_real_view_mandatory_in_a.py",
+   "text": "assert \"F2-F3-COMMON-CLASS\" not in ids",
+   "why": "ARCHITECTURE.md section 5.3 names this test (test_mandatory_bridge_inputs_classes) over the real ids, as data"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "a0011e6f48",
+   "line": 9,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_content_slices.py",
+   "text": "id here is CS-* (Content Slices), unrelated to Review-8/Phase-2 (OC-BR-02); this file reuses",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "a0011e6f48",
+   "line": 9,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_facet_quotas.py",
+   "text": "Review-8/Phase-2 (OC-BR-02); this file reuses ``tests/compile/conftest.py``'s shared fixture repo/view/registry",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "9790a82a79",
+   "line": 4,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_mandatory_fidelity.py",
+   "text": "the resolver's own source hash. Every id here is ``MF-*`` (Mandatory Fidelity), unrelated to Review-8/Phase-2",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "REPAIR_1",
+   "introduced_by": "9790a82a79",
+   "line": 249,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/compile/test_mandatory_fidelity.py",
+   "text": "\"\"\"A real ``mandatory_bridge_inputs`` row (PHASE-2-LEDGER-P2-L-0033-0047, ORCHESTRATOR_STATE.yaml) already uses",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "a0011e6f48",
+   "line": 9,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_overflow_notes.py",
+   "text": "unrelated to Review-8/Phase-2 (OC-BR-02); this file reuses ``tests/compile/conftest.py``'s shared fixture",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "9790a82a79",
+   "line": 11,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/compile/test_verify_recorded_view.py",
+   "text": "(Recorded View), unrelated to Review-8/Phase-2 (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 21,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/core/test_exact.py",
+   "text": "assert \"native_layout_rules\" in r[\"text\"]",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 50,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/core/test_exact.py",
+   "text": "r = exact.grep(\"native_layout_rules\", ref=\"records\", view_path=view_path, rules_path=rules_path, repo=repo)",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 73,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/core/test_exact.py",
+   "text": "r = exact.id_lookup(\"native_layout_rules\", ref=\"records\", view_path=view_path, repo=repo)",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "39be5e1c96",
+   "line": 58,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/core/test_gitobj.py",
+   "text": "hits = gitobj.git_grep(\"native_layout_rules\", fixture_repo.c1, repo=repo)",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "7830d7bd59",
+   "line": 6,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/gather/test_engine.py",
+   "text": "(REPAIR-1 rule 2), and nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "804da482d8",
+   "line": 6,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/gather/test_followup.py",
+   "text": "run-1 answer (REPAIR-1 rule 2), and nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "7830d7bd59",
+   "line": 3,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/gather/test_instantiate.py",
+   "text": "answers) and generic (OC-BR-02: no class/subject id names a Review-8 item).\"\"\"",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "804da482d8",
+   "line": 4,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/gather/test_merge.py",
+   "text": "(REPAIR-1 rule 2). Nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "571dde6807",
+   "line": 37,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/graph/test_derive.py",
+   "text": "assert any(\"PHASE_LEDGER\" in e.evidence_occurrence for e in edges)",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "REPAIR_1",
+   "introduced_by": "1cf38d2076",
+   "line": 531,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/graph/test_derive.py",
+   "text": "doc = {\"items\": [{\"item\": \"P2-ADJ-0001\", \"tests\": [\"a free-text description with no resolvable token at all\"]}]}",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "REPAIR_1",
+   "introduced_by": "1cf38d2076",
+   "line": 542,
+   "matched": [
+    "PHASE2_FILE_OR_ID"
+   ],
+   "path": "tests/graph/test_derive.py",
+   "text": "doc = {\"items\": [{\"item\": \"P2-ADJ-0001\",",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 6,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/integration/test_demo_grade.py",
+   "text": "the existing ``tests/fixtures/compile/compile_repobuilder`` fixture (CX-* ids, never Review-8/Phase-2 content --",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "REPAIR_1",
+   "introduced_by": "34fe43b4b2",
+   "line": 147,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/integration/test_demo_grade.py",
+   "text": "# \"the F1 direction is presented as a decision\" is marked \"[D + R]\" -- the answer side is [R], the rubric's).",
+   "why": "asserts the grader's G3 rule label (DEMONSTRATION_DESIGN.md section 4)"
+  },
+  {
+   "class": "GRADER_RULE_LABEL",
+   "era": "REPAIR_1",
+   "introduced_by": "34fe43b4b2",
+   "line": 166,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/integration/test_demo_grade.py",
+   "text": "hit = next(a for a in report[\"gates\"][\"G3_authority_classes\"][\"answer_side\"] if \"F1 direction\" in a[\"rule\"])",
+   "why": "asserts the grader's G3 rule label (DEMONSTRATION_DESIGN.md section 4)"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "8b16f33d0e",
+   "line": 4,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/integration/test_demo_grade_regressions.py",
+   "text": "Every fixture here is synthetic (``T-*``/``CX-*`` ids, never Review-8/Phase-2 content -- OC-BR-02) and every",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 14,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "res = querymod.query(\"native_layout_rules\", view_path=view_path, repo=str(fixture_repo.root))",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 20,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "assert hit[\"start_line\"] <= 1 <= hit[\"end_line\"]  # native_layout_rules is defined on line 1 of the fixture",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 25,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "res = querymod.query(\"native_layout_rules\", view_path=view_path, repo=str(fixture_repo.root))",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 40,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "unfiltered = querymod.query(\"native_layout_rules\", view_path=view_path, repo=str(fixture_repo.root))",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 43,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "excluded = querymod.query(\"native_layout_rules\", view_path=view_path, repo=str(fixture_repo.root),",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 68,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "whole = querymod.query(\"native_layout_rules\", view_path=view_path, repo=str(fixture_repo.root))",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 70,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "assert \"native_layout_rules\" in whole[\"hits\"][0][\"text\"]",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 90,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "lib_result = querymod.query(\"native_layout_rules\", view_path=view_path, repo=str(fixture_repo.root))",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_CODE",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "d48d6eb555",
+   "line": 101,
+   "matched": [
+    "R8_SYMBOL:native_layout_rules"
+   ],
+   "path": "tests/lexical/test_query.py",
+   "text": "[sys.executable, \"-m\", \"govbridge.lexical.query\", \"native_layout_rules\", \"--view\", view_path, \"--json\"],",
+   "why": "test CODE names a Review-8 chain symbol as its query literal (fixture data carries it; the test code itself is not data)"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "REPAIR_1",
+   "introduced_by": "93739dc526",
+   "line": 4,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/notes/conftest.py",
+   "text": "only (OC-BR-02): no Review-8 item, F-finding, Phase-2 file or symbol from those chains.",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "RULE_TEXT",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 4,
+   "matched": [
+    "DAG_GREP"
+   ],
+   "path": "tests/route/test_real_routes.py",
+   "text": "self-contained fixture repo (never Review-8/Phase-2 content -- OC-BR-02): one YAML decision record and one Rust",
+   "why": "the line states the genericity rule itself (a negative/rule statement), not a use"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 148,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/route/test_real_routes.py",
+   "text": "assert _safe_fts_query(\"consumers, dependents and uses of F1-DIRECTION\") == (",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "VIOLATION_LETTER_TEST_DATA_STRING",
+   "era": "PRE_REPAIR_1",
+   "introduced_by": "37cd586474",
+   "line": 149,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/route/test_real_routes.py",
+   "text": "'\"consumers\" OR \"dependents\" OR \"and\" OR \"uses\" OR \"of\" OR \"F1\" OR \"DIRECTION\"'",
+   "why": "a test names a real Phase-2 path/id as an inline string"
+  },
+  {
+   "class": "SYNTHETIC_LOCAL_ID",
+   "era": "REPAIR_1",
+   "introduced_by": "03410b2198",
+   "line": 343,
+   "matched": [
+    "F_FINDING"
+   ],
+   "path": "tests/route/test_task_exclusions.py",
+   "text": "\"seeds\": [\"EX-FIND-0001#F1\"],",
+   "why": "a synthetic fixture record's local token (#F1 on a CX-/EX- id); not the Review-8 F1"
+  }
+ ],
+ "python": "/home/usain/.cache/gov-bridge/venv/bin/python",
+ "python_version": "3.12.3",
+ "repair1_base": "f85d5f3",
+ "review8_chain_symbols_extracted": [
+  "FloorIdentity",
+  "LD_AUDIT",
+  "NOT_INSTALLED",
+  "PROJECT_ADOPTION_FLOOR",
+  "PolicySet",
+  "RESIDUAL_DEFECTS",
+  "ar88_floor",
+  "ar90_probe",
+  "ar92_probe",
+  "ar94_c1",
+  "ar94_d0",
+  "ar94_nc2",
+  "ar97_a1",
+  "ar97_a2",
+  "ar97_b1",
+  "ar97_b2",
+  "ar97_c1",
+  "ar97_c2",
+  "bound_project_identity",
+  "brownfield_adoption_end_to_end",
+  "cit_status",
+  "clone_rebuilds_identical_derived_state",
+  "code_index",
+  "contract_override",
+  "creator_is_alive",
+  "evaluate_path_rules_overlay",
+  "execute_check",
+  "floor_requires_product",
+  "floor_rules",
+  "floor_sequence",
+  "has_local_adoption_anchor",
+  "is_installed",
+  "last_known_rules",
+  "multi_machine",
+  "native_layout_rules",
+  "other_live_claim",
+  "overlap_is_no_less_restrictive",
+  "owner_role",
+  "p2ho56_closure",
+  "p2ho56_floor",
+  "partition_floor_rules_against_kernel",
+  "policy_precedence",
+  "process_start_time",
+  "read_project_adoption_floor",
+  "reclassify_adoption_floor",
+  "refused_overrides",
+  "remember_rules",
+  "sandbox_is_ready",
+  "union_last_known_rules_across_store",
+  "write_overlay",
+  "write_project_adoption_floor"
+ ],
+ "summary_by_class": {
+  "ADAPT_PROVENANCE_OR_CANON_TEXT": {
+   "PRE_REPAIR_1": 5,
+   "REPAIR_1": 0,
+   "total": 5
+  },
+  "GENERIC_GRAMMAR_EXAMPLE": {
+   "PRE_REPAIR_1": 3,
+   "REPAIR_1": 1,
+   "total": 4
+  },
+  "GRADER_RULE_LABEL": {
+   "PRE_REPAIR_1": 3,
+   "REPAIR_1": 4,
+   "total": 7
+  },
+  "INSTANCE_REGISTRY_DATA": {
+   "PRE_REPAIR_1": 39,
+   "REPAIR_1": 0,
+   "total": 39
+  },
+  "INSTANCE_VIEW_DATA": {
+   "PRE_REPAIR_1": 2,
+   "REPAIR_1": 0,
+   "total": 2
+  },
+  "MANDATED_REAL_VIEW_TEST": {
+   "PRE_REPAIR_1": 9,
+   "REPAIR_1": 0,
+   "total": 9
+  },
+  "RULE_TEXT": {
+   "PRE_REPAIR_1": 17,
+   "REPAIR_1": 20,
+   "total": 37
+  },
+  "SYNTHETIC_LOCAL_ID": {
+   "PRE_REPAIR_1": 4,
+   "REPAIR_1": 1,
+   "total": 5
+  },
+  "VIOLATION_LETTER_CODE_COMMENT": {
+   "PRE_REPAIR_1": 13,
+   "REPAIR_1": 6,
+   "total": 19
+  },
+  "VIOLATION_LETTER_TEST_CODE": {
+   "PRE_REPAIR_1": 14,
+   "REPAIR_1": 0,
+   "total": 14
+  },
+  "VIOLATION_LETTER_TEST_DATA_STRING": {
+   "PRE_REPAIR_1": 6,
+   "REPAIR_1": 3,
+   "total": 9
+  }
+ }
+}

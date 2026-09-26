@@ -1,0 +1,38 @@
+# int-02d freshness NOOP on both stores. $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3); view $V=EVIDENCE/repair-1/pinned-view.yaml (records pinned 7bd7598c); $R=config/corpus-rules.yaml
+# independent method first (no build can start): compute_fingerprint + determine_trigger against each store's own manifest.json
+store-a dry-run trigger: ('NOOP', [])
+store-b dry-run trigger: ('NOOP', [])
+## store-a: cmd: GOVBRIDGE_STORE=store-BR-AR-0028-a $PY -m govbridge freshness --view $V --rules $R
+store.db sha256 before: beee7d57460311ee0a549770e997721f37ec3c3d9ad096c816994b14c08b0b50
+{
+ "blobs_processed": 0,
+ "chunks_processed": 0,
+ "layer": "core",
+ "llm_invocations": 0,
+ "manifest_sha256": "d8b68f401c5b744a70b8eb9989c6bbd55afa91a3ec1547288254146a5e1b2bcc",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "NOOP",
+ "wall_seconds": 0.016
+}
+exit=0
+store.db sha256 after: beee7d57460311ee0a549770e997721f37ec3c3d9ad096c816994b14c08b0b50
+## store-b: cmd: GOVBRIDGE_STORE=store-BR-AR-0028-b $PY -m govbridge freshness --view $V --rules $R
+store.db sha256 before: f88765a4e71d6e50d9c9bfb457bbafc2b8fc28922ce366252bb64d877e774b27
+{
+ "blobs_processed": 0,
+ "chunks_processed": 0,
+ "layer": "core",
+ "llm_invocations": 0,
+ "manifest_sha256": "d8b68f401c5b744a70b8eb9989c6bbd55afa91a3ec1547288254146a5e1b2bcc",
+ "occurrences_processed": 0,
+ "refs_changed": [],
+ "trigger": "NOOP",
+ "wall_seconds": 0.016
+}
+exit=0
+store.db sha256 after: f88765a4e71d6e50d9c9bfb457bbafc2b8fc28922ce366252bb64d877e774b27
+## NOTE (defect INT-D11): each store's own fingerprint config_sha256 covers only: ['corpus-rules.yaml', 'pinned-view.yaml'] -- with a view outside config/, _config_sha256 hashes the VIEW's directory, so config/{embed-profile,id-grammar,authority-registry,model-pin,state-aliases}.yaml, which the layer builders read, are not fingerprinted
+## the converse, measured after this audit wrote EVIDENCE/repair-1/INT-VERDICT.yaml beside the pinned view (independent dry-run, no build):
+#   compute_fingerprint + determine_trigger on store-b -> ('FULL', []) with config_sha256 keys ['INT-VERDICT.yaml', 'corpus-rules.yaml',
+#   'pinned-view.yaml'] -- an unrelated file in the view's directory forces a full rebuild (INT-D11). All NOOP checks above ran before it existed.
