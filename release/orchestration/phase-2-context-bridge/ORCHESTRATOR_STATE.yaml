@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T04:56:35Z'
-state_hash: c350b082b5282b46430a9c22dec31ef1735a62e59af57aa0ebcf80da79ba1465
+updated_at: '2026-09-26T05:35:07Z'
+state_hash: 925ed594b787922b0be1d51349edcb1739a10fe51bf60eb5ac4567bfb25fb8e9
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -898,6 +898,21 @@ agent_runs:
     - symbol-history max_commits from configuration; truncation disclosed (bounded_incomplete)
     - a hermeticity defect in its own first-pass test found and fixed; full domain suite 361 passed, 0 failed
     - secrecy audit -- 0 hits; claude-sonnet-5 x727
+    pass_4:
+      final_commit: f490d3c (work 89950cb)
+      interim_merge_2: 4b91106 -- integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree (with
+        RM) 500 passed, 0 failed
+      accepted: 'Defect A -- the lineage layer walks every eager ref (via govbridge.code.build.eager_ref_names) with a
+        per-row ref, commit and version_status (82 HISTORICAL_VERSION rows on records against 979 CANONICAL on product);
+        Defect B -- harness methods resolved (576 product-ref TESTS edges from this shape, reconciled at ~9% against 636
+        independently counted pairs); two from-clean builds of one resolved view -> identical digest 374cf96b over 2830
+        edges; secrecy 0 hits; claude-sonnet-5 x1383 over the whole run'
+      reopen_4_reason: 'the zero for TESTS (c) registry shape is FALSE -- an independent git grep finds 158 YAML lines
+        starting a `tests:` list at EACH of the three refs (outside the bridge domain), in schema-shaped rows nested
+        under ordinary keys; test_registry_edges_in_doc accepts only a top-level list or rows/entries, and the per-id
+        function greps only tests/. Required -- the shape by schema at a bounded depth, no path prefix, entries
+        resolved against code-layer test functions or the id grammar, unresolved entries counted, per-ref counts
+        reconciled'
     pass_3:
       final_commit: b4929ca731ce8be96787b4f780a890745d861924
       interim_merge: cd87f36 (BR-DAG-AMEND-R1-9 -- the accepted work merged so that R1-GA1 can start; the node stays OPEN)
@@ -1383,6 +1398,15 @@ observations:
     while the orchestrator had not compacted, most likely by a long-running builder''s compaction. The checkpoint is valid
     (it records the then-current sealed state). Correction: commit e594159''s message names its checkpoint BR-CP-0023;
     the checkpoint it wrote is BR-CP-0024.'
+- id: OBS-BR-15
+  text: 'a second false zero from the same builder -- after the rule of OBS-BR-13, BR-AR-0019 still reported "0 registry-shape
+    TESTS rows, confirmed by shape sampling"; the orchestrator''s grep finds 158 rows. The builder''s "independent" checks
+    re-used its own shape assumption. An independent measurement must not share the assumption under test; for a shape
+    claim, grep the raw key, not the recogniser''s shape.'
+- id: OBS-BR-16
+  text: 'housekeeping -- $HOME/.cache/gov-bridge holds 77 store directories (17 GB), 2.2 GB of them BR-AR-0019 scratch stores,
+    several moved aside as *.trashed-*; the disk has 159 GB free. No deletion (rm is denied); the orchestrator proposes a
+    list of stores to retire at R1-D2, keeping store-BR-AR-0010 (the run-1 demonstration store) and the R1-D2 store.'
 - id: OBS-BR-12
   text: 'orchestrator instruction conflict, self-reported -- my live follow-up to BR-AR-0020 suggested reading
     DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
