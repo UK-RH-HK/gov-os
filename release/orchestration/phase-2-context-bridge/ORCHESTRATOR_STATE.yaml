@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T00:33:15Z'
-state_hash: 446283616719db0723500ebfe0651a466068b19c19a192c8e0431f539f8bd31b
-lifecycle_state: BR_DEMONSTRATION_FAILED_REPAIR
+updated_at: '2026-09-26T00:34:19Z'
+state_hash: 09f6bf70893094f488383671e750a418b53bc63022f7600ed2936187e1d37227
+lifecycle_state: BR_FAILURE_ANALYSIS
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -753,11 +753,29 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle/**
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/grading/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0012.*
-running_work: []
+- run_id: BR-AR-0016
+  role: fresh run-1 failure analyst (classify failed-gate causes; generic repair DAG; no oracle content)
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0016-failure-analyst.md
+  handoff_sha256: 720a809c71310b02d6c663617a0daea9c343848213e29ab2887bd0fafa61669d
+  branch: bridge/analyst-0016
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0016
+  model_requested: opus
+  model_observed: null
+  agent_name: br-analyst-0016
+  checkpoint_schema: 2
+  status: DISPATCHED
+  may_read_quarantined: bridge/grade-0012 (the ONLY role that may, besides the verifier)
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0016.*
+running_work:
+- run_id: BR-AR-0016
+  liveness_check: subagent transcript mtime + commits on bridge/analyst-0016; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
-    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012, B6R: BR-AR-0013, B3R: BR-AR-0014, B6R2: BR-AR-0015}
+    I1: BR-AR-0009, D1: BR-AR-0010, DEMO: BR-AR-0011, GRADE: BR-AR-0012, B6R: BR-AR-0013, B3R: BR-AR-0014, B6R2: BR-AR-0015,
+    ANALYST: BR-AR-0016}
   amendments:
   - id: BR-DAG-AMEND-1
     by: orchestrator (deterministic isolation of parallel work; no design change)
@@ -914,8 +932,7 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: dispatch a fresh opus failure analyst (BR-AR-0016, checkpoint_schema 2) to classify each failed
-  gate's cause (bridge capability gap / agent behaviour / grader defect / oracle strictness) from the quarantined grading and
-  produce a GENERIC repair DAG containing no oracle content (orchestrator overlap-checks it); then build the repairs (incl.
-  B7 govbridge gather for OD-BR-05, grader GD-1..9, budgeted supplementary packets, query-command exclusions, section-I query
-  set), a fresh sealed oracle (fresh TA), rebuild the store, run-2 + fresh GRADE; BUILT only on DEMONSTRATION_PASS
+next_deterministic_action: await BR-AR-0016 (failure analyst); verify its schema-2 checkpoint via integrate-check; run a
+  verbatim-overlap check of ARCHITECTURE/REPAIR-1/** against the quarantined oracle (must be 0 substantive overlaps) before
+  any builder sees it; merge; dispatch the repair DAG nodes (schema 2) and a fresh test-author for the run-2 oracle (sealed at
+  a location recorded in no committed file)
