@@ -108,22 +108,21 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
     _local = threading.local()
 
     def _conn():
-        # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): this connection's own two uses
-        # (_semantic_classify's SELECT, and classify_occ -> authoritylayer.classify_hit) are both queries, never a
-        # build -- but classify_hit itself still calls authoritylayer.ensure_schema(conn) on every call, a
-        # pre-existing lazy-schema-creation pattern in a module this node is authorized to touch for exactly one
-        # purpose (the record_def_by_path index, not this). Switching this connection to
-        # store.open_db_readonly() breaks that ensure_schema call -- and therefore classification itself -- on any
-        # store whose authority-layer schema was never separately built (this file's OWN pre-existing tests build
-        # a bare git repo and never run govbridge.authority.layer's builder, exactly this situation), which is why
-        # this stays on store.open_db() rather than the stricter read-only connection lexical/semantic queries now
-        # use: it already tolerates a read-only STORE FILE (every write it attempts is wrapped, see its own
-        # docstring), which is what this node's own required tests exercise, without this out-of-scope regression.
-        # Named here, not silently patched: govbridge.authority.layer's own schema lifecycle -- ensure_schema
-        # called from a query path at all -- is unresolved, for whoever owns that module next.
+        # BR-DAG-AMEND-R1-17 item 6 (R1-XC): this connection's own two uses (_semantic_classify's SELECT, and
+        # classify_occ -> authoritylayer.classify_hit) are both queries, never a build. classify_hit (and
+        # record_id_for_occurrence, which it calls) no longer call authoritylayer.ensure_schema() at query time --
+        # the authority layer's schema is built once, eagerly, by authority.layer.build() at BUILD time, the same
+        # "built at build time, read at query time" split govbridge.lexical.query/govbridge.semantic.search already
+        # follow. This connection can therefore move to the same stricter store.open_db_readonly() those query
+        # paths already use -- a connection that CANNOT write, by construction -- instead of the weaker
+        # store.open_db(), which only tolerated a read-only store FILE by catching each write attempt individually.
+        # A store whose authority layer was never built at all (this file's own pre-existing tests: a bare git repo
+        # with no govbridge.authority.layer builder run) still works exactly as before: record_id_for_occurrence's
+        # "no such table" sqlite3.Error is caught by classify_hit itself, degrading to an unclassified result --
+        # the SAME outcome ensure_schema used to produce by creating the (then-empty) table first.
         c = getattr(_local, "conn", None)
         if c is None:
-            c = storemod.open_db()
+            c = storemod.open_db_readonly()
             _local.conn = c
         return c
 
@@ -302,8 +301,15 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             _blob_to_path_state["attempted"] = True
             if product_commit:
                 try:
-                    raw_conn = codesymbols._open_conn()
-                    entries = codesymbols.ensure_indexed(raw_conn, product_commit, repo=repo)
+                    # BR-DAG-AMEND-R1-17 item 5 (R1-XC): this only ever needs to READ the blob_id->path map for
+                    # product_commit's already-eager-indexed .rs blobs (govbridge.code.build.code_layer_builder
+                    # indexes every eager ref's current commit at BUILD time, "product" among them by default) --
+                    # never to classify/parse/persist one itself. codesymbols._open_conn_readonly()/
+                    # ensure_indexed_readonly() are this module's own read-only counterparts to
+                    # _open_conn()/ensure_indexed(): a missing/stale blob raises the typed StoreNeedsRebuild instead
+                    # of silently building it here, and this connection cannot write at all, by construction.
+                    raw_conn = codesymbols._open_conn_readonly()
+                    entries = codesymbols.ensure_indexed_readonly(raw_conn, product_commit, repo=repo)
                     _blob_to_path_state["map"] = {blob_id: p for p, blob_id in entries}
                 except Exception:
                     _blob_to_path_state["map"] = {}
@@ -500,7 +506,11 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         caller_tier = "T2" if is_seeded else "T3"
         for name in names:
             try:
-                defs_out = codesymbols.definitions(name, product_commit, repo=repo)
+                # BR-DAG-AMEND-R1-17 item 5: the READ-ONLY counterpart of codesymbols.definitions() -- raises the
+                # typed StoreNeedsRebuild instead of classifying/parsing/persisting a not-yet-eager-indexed blob;
+                # this route never builds the code layer itself (govbridge.code.build.code_layer_builder does, at
+                # BUILD time).
+                defs_out = codesymbols.definitions_readonly(name, product_commit, repo=repo)
             except Exception:
                 defs_out = {"definitions": []}
             for d in defs_out.get("definitions", []):
@@ -523,11 +533,13 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 cursor_key = (name, "callers")
                 cur = (cursor_in or {}).get(cursor_key)
                 try:
+                    # BR-DAG-AMEND-R1-17 item 5: the read-only counterpart, same reasoning as definitions_readonly
+                    # above.
                     if page_size is not None:
-                        callers_out = codesymbols.callers(name, product_commit, repo=repo, page_size=page_size,
-                                                           cursor=cur)
+                        callers_out = codesymbols.callers_readonly(name, product_commit, repo=repo,
+                                                                    page_size=page_size, cursor=cur)
                     else:
-                        callers_out = codesymbols.callers(name, product_commit, repo=repo)
+                        callers_out = codesymbols.callers_readonly(name, product_commit, repo=repo)
                 except Exception:
                     callers_out = {"callers": []}
                 caller_rows = callers_out.get("callers", [])

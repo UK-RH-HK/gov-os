@@ -104,8 +104,16 @@ def test_lexical_route_hits_carry_real_classification(tmp_path):
 
 
 def test_code_route_hits_carry_real_classification_and_real_definitions(tmp_path):
+    # BR-DAG-AMEND-R1-17 item 6 (rule-5 correction, justified in this run's checkpoint `decisions`): this test used
+    # to rely on codesymbols.ensure_indexed's OWN query-time build (the code layer had never been built -- no
+    # freshness.run() call at all -- so the route's first-ever call parsed and persisted runtime/src/mod.rs itself,
+    # on the spot). The code route now reads codesymbols.definitions_readonly/callers_readonly, which never build;
+    # a real caller always builds the store first (the eager code-layer builder, govbridge.code.build), so this
+    # test now does too -- never a narrower assertion, the same real classification and definitions as before.
     repo_root = _build_repo(tmp_path)
     view_path, rules_path, registry_path = _write_configs(tmp_path)
+    r = freshness.run(view_path=view_path, rules_path=rules_path, repo=str(repo_root), from_clean=True)
+    assert r["trigger"] == "FULL"
 
     routes = real_routes.build_real_routes(view_path=view_path, repo=str(repo_root), registry_path=registry_path)
     hits = routes.code(seeds=["example_route_fn"])
@@ -118,8 +126,15 @@ def test_code_route_hits_carry_real_classification_and_real_definitions(tmp_path
 
 
 def test_exact_route_hits_carry_real_classification(tmp_path):
+    # BR-DAG-AMEND-R1-17 item 6 (rule-5 correction, justified in this run's checkpoint `decisions`): this test used
+    # to rely on authority.layer.classify_hit's OWN query-time ensure_schema() call to lazily create the (empty)
+    # authority tables on a store that had never been built at all. classify_hit no longer does that, and
+    # real_routes._conn() now opens the store via store.open_db_readonly() (which never creates a store that does
+    # not exist yet) -- a real caller always builds the store first, so this test now does too.
     repo_root = _build_repo(tmp_path)
     view_path, rules_path, registry_path = _write_configs(tmp_path)
+    r = freshness.run(view_path=view_path, rules_path=rules_path, repo=str(repo_root), from_clean=True)
+    assert r["trigger"] == "FULL"
 
     routes = real_routes.build_real_routes(view_path=view_path, repo=str(repo_root), registry_path=registry_path)
     hits = routes.exact(text="example_route_fn")
@@ -149,3 +164,109 @@ def test_lexical_route_survives_a_comma_bearing_free_text_query(tmp_path):
     # templates produce, and what broke fts5 before _safe_fts_query existed.
     hits = routes.lexical(text="consumers, dependents and uses of example_route_fn", k=5)
     assert isinstance(hits, list)  # must not raise
+
+
+# --- BR-DAG-AMEND-R1-17 items 5+6 combined acceptance ---------------------------------------------------------
+
+def _write_all_route_facets(tmp_path: Path) -> str:
+    """A minimal facets registry admitting every route (lexical, semantic, code, exact) across three facets, for
+    this test alone -- distinct from tests/fixtures/gather/test-facets.yaml (which deliberately excludes semantic
+    and code to stay fast)."""
+    p = tmp_path / "all-route-facets.yaml"
+    p.write_text(
+        "schema: govbridge-facets/1\n"
+        "purpose: minimal all-route facet registry for the R1-XC combined read-only acceptance test\n"
+        "default_batch_size: 8\n"
+        "default_max_rounds: 5\n"
+        "default_threads: 1\n"
+        "default_target_items: 8\n"
+        "facets:\n"
+        "  purpose:\n"
+        "    routes: [lexical, semantic]\n"
+        "    scope_classes: null\n"
+        "    lifecycle_scope: null\n"
+        "    extra_terms: []\n"
+        "    min_share: 0.05\n"
+        "  impl:\n"
+        "    routes: [code]\n"
+        "    extra_terms: []\n"
+        "    min_share: 0.05\n"
+        "  id_lookup:\n"
+        "    routes: [exact]\n"
+        "    extra_terms: []\n"
+        "    min_share: 0.05\n"
+        "class_facets: {}\n",
+        encoding="utf-8",
+    )
+    return str(p)
+
+
+def test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store(tmp_path, monkeypatch):
+    """The combined acceptance check for BR-DAG-AMEND-R1-17 items 5 and 6: before R1-XC this failed via THREE
+    separate query-time write paths this run fixed -- real_routes._conn() (feeding authoritylayer.classify_hit's
+    own ensure_schema() call), govbridge.code.symbols.ensure_indexed() called from real_routes' code route (both
+    _shaped_code_conn() directly and, before this run split them, definitions()/callers()), and
+    authority.layer.record_id_for_occurrence's own ensure_schema() call. A gather exercising EVERY route (lexical,
+    semantic, code, exact) plus real hit classification, against a store that is genuinely read-only at the FILE
+    level AND at its DIRECTORY level (chmod'd 0o444/0o555 -- the stricter of the two scenarios R1-GA1's own
+    tests/core/test_scope_path_cache.py already covers for lexical/semantic), leaves the store file's sha256
+    byte-identical."""
+    import hashlib
+    import os
+
+    from govbridge.core import store as storemod
+    from govbridge.gather import engine as enginemod
+
+    # The real semantic route needs the shared, read-only model cache under the REAL $GOV_BRIDGE_HOME (this file's
+    # own autouse _isolated_store fixture redirects it into an isolated tmp_path, for STORE isolation, exactly like
+    # every other test here -- tests/semantic/conftest.py's own `built` fixture leaves it at its real default for
+    # this exact reason). GOVBRIDGE_STORE (the index store itself) stays isolated either way.
+    monkeypatch.delenv("GOV_BRIDGE_HOME", raising=False)
+
+    repo_root = _build_repo(tmp_path)
+    view_path, rules_path, registry_path = _write_configs(tmp_path)
+    facets_path = _write_all_route_facets(tmp_path)
+
+    r = freshness.run(view_path=view_path, rules_path=rules_path, repo=str(repo_root), from_clean=True)
+    assert r["trigger"] == "FULL"
+
+    store_dir = storemod.store_root()
+    db_path = storemod.db_path(store_dir)
+    before_sha = hashlib.sha256(db_path.read_bytes()).hexdigest()
+
+    os.chmod(db_path, 0o444)
+    os.chmod(store_dir, 0o555)
+    try:
+        routes = real_routes.build_real_routes(view_path=view_path, repo=str(repo_root),
+                                                registry_path=registry_path)
+        # "example_route_fn" is real content at every route: the .rs file itself (lexical/semantic chunk text,
+        # code seed, and a literal git-grep match for exact) -- classified EVIDENCE by _write_configs' own registry
+        # (runtime/**).
+        query = {"id": "Q1", "text": "example_route_fn", "class": None, "subject": None,
+                 "facets": ["purpose", "impl", "id_lookup"]}
+        result = enginemod.gather(query, routes, seeds=["example_route_fn"], batch_size=8, max_rounds=5, threads=1,
+                                   facets_path=facets_path)
+    finally:
+        os.chmod(store_dir, 0o755)
+        os.chmod(db_path, 0o644)
+
+    assert result["stop_reason"] in enginemod.STOP_REASONS
+    merged_paths = [h["occurrences"][0]["path"] for h in result["merged"] if h["occurrences"]]
+    assert merged_paths, "no route returned any hit at all -- this test proves nothing about classify_hit"
+    assert "runtime/src/mod.rs" in merged_paths, merged_paths
+    routes_run = {h["route"] for h in result["merged"]}
+    assert routes_run == {"lexical", "semantic", "code", "exact"}, (
+        f"not every route actually ran/contributed a hit: {routes_run}"
+    )
+    # real classification, through the now-read-only classify_hit/_conn() path -- never a placeholder: the
+    # registry (_write_configs) classifies runtime/** as EVIDENCE, spec/decisions/*.yaml as ARCHITECTURE_DECISION,
+    # and everything else (e.g. the bridge state file lexical/semantic also happen to surface) UNCLASSIFIED.
+    code_hit_classes = {h["authority_class"] for h in result["merged"] if h["occurrences"][0]["path"] == "runtime/src/mod.rs"}
+    assert code_hit_classes == {"EVIDENCE"}, (
+        f"real classification did not run correctly through the read-only path: {code_hit_classes}"
+    )
+    merged_classes = {h.get("authority_class") for h in result["merged"]}
+    assert merged_classes <= {"EVIDENCE", "ARCHITECTURE_DECISION", "UNCLASSIFIED"}, merged_classes
+
+    after_sha = hashlib.sha256(db_path.read_bytes()).hexdigest()
+    assert after_sha == before_sha, "the store file's bytes changed across a fully read-only gather run"

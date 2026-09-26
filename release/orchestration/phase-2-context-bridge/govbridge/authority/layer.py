@@ -225,8 +225,15 @@ def record_id_for_occurrence(conn: sqlite3.Connection, path: str, line_start: Op
     hit its real classification unit instead of a bare path. Among several candidates the narrowest (smallest)
     span wins (the most specific enclosing section); a non-local definition is preferred over a local one
     (RECORD#LOCAL) when both cover the same lines. ``line_start``/``line_end`` absent means "the whole occurrence"
-    (line 1)."""
-    ensure_schema(conn)
+    (line 1).
+
+    BR-DAG-AMEND-R1-17 item 6: does NOT call ``ensure_schema`` -- this is a QUERY-time lookup (called from every
+    route via ``classify_hit`` below), and the authority layer's schema is built once, eagerly, at BUILD time
+    (``authority.layer.build``), the same "built at build time, read at query time" split ``govbridge.lexical.
+    query``/``govbridge.semantic.search`` already follow. A store whose authority layer was never built at all
+    raises a plain ``sqlite3.Error`` (no ``record_def`` table) -- ``classify_hit``'s own ``except sqlite3.Error``
+    around this call already degrades that to "no record id found," exactly the outcome ``ensure_schema`` used to
+    produce by creating the (then-empty) table first."""
     ls = line_start if line_start is not None else 1
     le = line_end if line_end is not None else ls
     rows = conn.execute(
@@ -252,8 +259,14 @@ def classify_hit(conn: sqlite3.Connection, path: Optional[str], commit: Optional
     ``class_lifecycle`` cache, the SAME ``lifecycle.classify()`` call ``authority.layer.build()`` made), that row
     is returned directly -- no recomputation, no extra Git reads. Otherwise ``lifecycle.classify()`` is called
     fresh, with the found id (full rule 1-4 classification) or the bare path (registry section_anchors-by-path and
-    class_rules only -- the honest ceiling for an arbitrary chunk of text that is not itself one whole record)."""
-    ensure_schema(conn)
+    class_rules only -- the honest ceiling for an arbitrary chunk of text that is not itself one whole record).
+
+    BR-DAG-AMEND-R1-17 item 6: does NOT call ``ensure_schema`` -- a QUERY must never build the authority layer's
+    schema (``govbridge.route.real_routes``'s own connection moved to ``store.open_db_readonly()`` for exactly this
+    reason, and a read-only connection cannot run ``ensure_schema``'s ``CREATE TABLE``/``executescript`` anyway).
+    The schema is built once, eagerly, by ``authority.layer.build()`` at BUILD time; a store that never ran it
+    degrades gracefully below (``record_id_for_occurrence``'s own ``sqlite3.Error``, caught here) rather than
+    being silently repaired by the query itself."""
     unit = None
     if path:
         try:

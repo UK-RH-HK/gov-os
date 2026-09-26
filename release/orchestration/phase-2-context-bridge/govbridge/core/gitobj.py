@@ -19,17 +19,29 @@ class GitError(RuntimeError):
     """A git subprocess failed or returned something the caller cannot use."""
 
 
-@functools.lru_cache(maxsize=8)
-def repo_root(start: Optional[str] = None) -> str:
-    """The absolute path of the repository containing ``start`` (default: the current working directory)."""
-    cmd = ["git"]
-    if start:
-        cmd += ["-C", start]
-    cmd += ["rev-parse", "--show-toplevel"]
-    r = subprocess.run(cmd, capture_output=True, text=True)
+@functools.lru_cache(maxsize=64)
+def _repo_root_cached(start: str) -> str:
+    r = subprocess.run(["git", "-C", start, "rev-parse", "--show-toplevel"], capture_output=True, text=True)
     if r.returncode != 0:
-        raise GitError(f"not a git repository (from {start or '.'}): {r.stderr.strip()}")
+        raise GitError(f"not a git repository (from {start}): {r.stderr.strip()}")
     return r.stdout.strip()
+
+
+def repo_root(start: Optional[str] = None) -> str:
+    """The absolute path of the repository containing ``start`` (default: the current working directory).
+
+    BR-DAG-AMEND-R1-6: cached PER RESOLVED STARTING DIRECTORY, not per raw argument. This used to be
+    ``functools.lru_cache`` directly on this function, keyed on ``start`` verbatim -- every bare ``repo_root()``
+    call (every ``repo or repo_root()`` caller in this package passes exactly this, ``None``) shared the SAME cache
+    key, so the FIRST bare caller's current working directory won that one slot for the rest of the process, and a
+    later ``os.chdir`` in the same process was invisible to it (the same process-global-cache class of defect as
+    ``govbridge.authority.classes``'s import-time config read, BR-DAG-AMEND-R1-12). Resolving ``start`` -- or the
+    CURRENT working directory, read fresh at THIS call, when ``start`` is not given -- before the value ever
+    reaches the cache means two ``os.chdir`` calls in one process resolve two distinct cache keys, each memoised
+    independently, and a caller that always passes ``start`` (or ``repo=``) explicitly is completely unaffected
+    either way."""
+    key = str(Path(start).resolve()) if start is not None else str(Path.cwd())
+    return _repo_root_cached(key)
 
 
 def run_git(args: Sequence[str], repo: Optional[str] = None, input_bytes: Optional[bytes] = None,

@@ -1,0 +1,39 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___________ test_two_chdirs_in_one_process_resolve_two_repositories ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-496/test_two_chdirs_in_one_process0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7df4a0feb5c0>
+
+    def test_two_chdirs_in_one_process_resolve_two_repositories(tmp_path, monkeypatch):
+        repo_a = tmp_path / "repo_a"
+        repo_b = tmp_path / "repo_b"
+        root_a = _init_repo(repo_a)
+        root_b = _init_repo(repo_b)
+        assert root_a != root_b
+    
+        _clear_repo_root_cache()
+    
+        monkeypatch.chdir(repo_a)
+        resolved_a = gitobj.repo_root()
+        assert resolved_a == root_a
+    
+        monkeypatch.chdir(repo_b)
+        resolved_b = gitobj.repo_root()
+>       assert resolved_b == root_b, (
+            "repo_root() returned the FIRST chdir's repo after a second chdir -- the process-lifetime cache is still "
+            "keyed on the bare call, not on the resolved starting directory"
+        )
+E       AssertionError: repo_root() returned the FIRST chdir's repo after a second chdir -- the process-lifetime cache is still keyed on the bare call, not on the resolved starting directory
+E       assert '/tmp/pytest-...ocess0/repo_a' == '/tmp/pytest-...ocess0/repo_b'
+E         
+E         Skipping 59 identical leading characters in diff, use -v to show
+E         - ess0/repo_b
+E         ?           ^
+E         + ess0/repo_a
+E         ?           ^
+
+/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0034/release/orchestration/phase-2-context-bridge/tests/core/test_gitobj_repo_root.py:59: AssertionError
+=========================== short test summary info ============================
+FAILED tests/core/test_gitobj_repo_root.py::test_two_chdirs_in_one_process_resolve_two_repositories
+1 failed, 1 passed in 0.05s

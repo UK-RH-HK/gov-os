@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import dataclasses
 import os
+import threading
 from typing import Any, Iterable, Optional
 
 from govbridge.core import pathrules
@@ -77,14 +78,25 @@ class ExclusionCounter:
     """A tiny mutable counter a route/query call is handed (``exclude_counter=``) so its caller learns, right
     after the call returns, how many candidate hits its own exclusions caused to be dropped -- without changing
     the ``RouteFn``/``RouteSet.run`` contract (``govbridge.route.router``, out of this node's scope): a plain list
-    of ``RouteHit`` is still all that ever comes back from ``routes.run``."""
-    __slots__ = ("count",)
+    of ``RouteHit`` is still all that ever comes back from ``routes.run``.
+
+    Thread-safe (BR-DAG-AMEND-R1-14): ``govbridge.gather.engine`` runs independent facets CONCURRENTLY on a thread
+    pool (``concurrent.futures.ThreadPoolExecutor``, its own ``--threads`` option), sharing ONE ``ExclusionCounter``
+    across every worker thread so the gather's final ``excluded_hits`` covers every facet's own drops. ``count +=
+    n`` is a read-modify-write, not atomic under the GIL across bytecode boundaries; several threads bumping it
+    concurrently can lose an update (two threads read the same old value before either writes back the new one).
+    ``bump`` now serialises through a lock, so ``excluded_hits`` is exact regardless of how many threads bump it or
+    how they interleave -- verified directly (``tests/core/test_taskctx_concurrency.py``) and via a real gather at
+    ``--threads 16`` vs. ``--threads 1`` over the same query and corpus."""
+    __slots__ = ("count", "_lock")
 
     def __init__(self) -> None:
         self.count = 0
+        self._lock = threading.Lock()
 
     def bump(self, n: int = 1) -> None:
-        self.count += n
+        with self._lock:
+            self.count += n
 
 
 def _coerce_exclusions(doc: Any) -> tuple:
