@@ -1,0 +1,205 @@
+FFFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-502/test_gather_every_route_and_cl0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70b032f6d130>
+
+    def test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store(tmp_path, monkeypatch):
+        """The combined acceptance check for BR-DAG-AMEND-R1-17 items 5 and 6: before R1-XC this failed via THREE
+        separate query-time write paths this run fixed -- real_routes._conn() (feeding authoritylayer.classify_hit's
+        own ensure_schema() call), govbridge.code.symbols.ensure_indexed() called from real_routes' code route (both
+        _shaped_code_conn() directly and, before this run split them, definitions()/callers()), and
+        authority.layer.record_id_for_occurrence's own ensure_schema() call. A gather exercising EVERY route (lexical,
+        semantic, code, exact) plus real hit classification, against a store that is genuinely read-only at the FILE
+        level AND at its DIRECTORY level (chmod'd 0o444/0o555 -- the stricter of the two scenarios R1-GA1's own
+        tests/core/test_scope_path_cache.py already covers for lexical/semantic), leaves the store file's sha256
+        byte-identical."""
+        import hashlib
+        import os
+    
+        from govbridge.core import store as storemod
+        from govbridge.gather import engine as enginemod
+    
+        # The real semantic route needs the shared, read-only model cache under the REAL $GOV_BRIDGE_HOME (this file's
+        # own autouse _isolated_store fixture redirects it into an isolated tmp_path, for STORE isolation, exactly like
+        # every other test here -- tests/semantic/conftest.py's own `built` fixture leaves it at its real default for
+        # this exact reason). GOVBRIDGE_STORE (the index store itself) stays isolated either way.
+        monkeypatch.delenv("GOV_BRIDGE_HOME", raising=False)
+    
+        repo_root = _build_repo(tmp_path)
+        view_path, rules_path, registry_path = _write_configs(tmp_path)
+        facets_path = _write_all_route_facets(tmp_path)
+    
+        r = freshness.run(view_path=view_path, rules_path=rules_path, repo=str(repo_root), from_clean=True)
+        assert r["trigger"] == "FULL"
+    
+        store_dir = storemod.store_root()
+        db_path = storemod.db_path(store_dir)
+        before_sha = hashlib.sha256(db_path.read_bytes()).hexdigest()
+    
+        os.chmod(db_path, 0o444)
+        os.chmod(store_dir, 0o555)
+        try:
+            routes = real_routes.build_real_routes(view_path=view_path, repo=str(repo_root),
+                                                    registry_path=registry_path)
+            # "example_route_fn" is real content at every route: the .rs file itself (lexical/semantic chunk text,
+            # code seed, and a literal git-grep match for exact) -- classified EVIDENCE by _write_configs' own registry
+            # (runtime/**).
+            query = {"id": "Q1", "text": "example_route_fn", "class": None, "subject": None,
+                     "facets": ["purpose", "impl", "id_lookup"]}
+>           result = enginemod.gather(query, routes, seeds=["example_route_fn"], batch_size=8, max_rounds=5, threads=1,
+                                       facets_path=facets_path)
+
+tests/route/test_real_routes.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+govbridge/gather/engine.py:352: in gather
+    results_by_facet[n] = _run_facet_round(all_facets[n], states[n], base_text, routes, batch_size,
+govbridge/gather/engine.py:215: in _run_facet_round
+    page_raw = routes.run("semantic", text=text, k=k, offset=state.semantic_offset, exclude=exclude,
+govbridge/route/router.py:105: in run
+    return list(fn(**kwargs) or [])
+                ^^^^^^^^^^^^
+govbridge/route/real_routes.py:262: in semantic_route
+    result = semanticsearch.search(text, k=k, view_path=view_path, repo=repo, classify=_semantic_classify,
+govbridge/semantic/search.py:120: in search
+    authority_class, lifecycle = classify(blob_id)
+                                 ^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+blob_id = 'cb6eb18981f440c1db2e2d7df3b9edf5f447c590'
+
+    def _semantic_classify(blob_id: str) -> tuple:
+>       row = _conn().execute("SELECT path, commit_id FROM occurrence WHERE blob_id=? LIMIT 1", (blob_id,)).fetchone()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       sqlite3.OperationalError: attempt to write a readonly database
+
+govbridge/route/real_routes.py:246: OperationalError
+_____ test_ensure_indexed_readonly_matches_ensure_indexed_once_eager_built _____
+
+repo = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_m0/repo')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_m0')
+
+    def test_ensure_indexed_readonly_matches_ensure_indexed_once_eager_built(repo, tmp_path):
+        """Once the eager builder has already reached a commit's .rs blobs, the read-only path returns EXACTLY the
+        same (path, blob_id) entries the lazy path would -- same content, only the connection and the write-avoidance
+        differ."""
+        rb.write(repo, "runtime/src/mod_a.rs", "pub fn helper() {}\n")
+        c1 = rb.commit(repo, "v1")
+    
+        store_root = tmp_path / "store"
+        conn = corestore.open_db(root=store_root)
+        codebuild.code_layer_builder(conn, _eager_view_for(repo, c1), rules=None, repo=str(repo), from_clean=True)
+        conn.close()
+    
+        conn_ro = corestore.open_db_readonly(root=store_root)
+>       got = codesymbols.ensure_indexed_readonly(conn_ro, c1, repo=str(repo))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'govbridge.code.symbols' has no attribute 'ensure_indexed_readonly'
+
+tests/code/test_symbols_readonly.py:70: AttributeError
+_ test_ensure_indexed_readonly_raises_store_needs_rebuild_when_the_code_layer_never_built _
+
+repo = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_r0/repo')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_r0')
+
+    def test_ensure_indexed_readonly_raises_store_needs_rebuild_when_the_code_layer_never_built(repo, tmp_path):
+        """A store whose code layer was NEVER built at all (no code_blob table): the typed error, never a silent
+        build, never a raw sqlite3 traceback."""
+        rb.write(repo, "runtime/src/mod_a.rs", "pub fn helper() {}\n")
+        c1 = rb.commit(repo, "v1")
+    
+        store_root = tmp_path / "store"
+        conn = corestore.open_db(root=store_root)  # core layer only -- codestore.ensure_schema() never called
+        conn.close()
+    
+        conn_ro = corestore.open_db_readonly(root=store_root)
+>       with pytest.raises(codesymbols.StoreNeedsRebuild) as exc_info:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'govbridge.code.symbols' has no attribute 'StoreNeedsRebuild'
+
+tests/code/test_symbols_readonly.py:85: AttributeError
+_ test_ensure_indexed_readonly_raises_store_needs_rebuild_for_a_blob_the_eager_build_never_reached _
+
+repo = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_r1/repo')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_r1')
+
+    def test_ensure_indexed_readonly_raises_store_needs_rebuild_for_a_blob_the_eager_build_never_reached(repo, tmp_path):
+        """The eager builder reached commit c1's blobs; a LATER commit c2 adds a new .rs file the eager build never
+        saw (this repo's own "records" ref is still pinned at c1 in the resolved view passed to the builder) -- a
+        read-only query at c2 must raise, never silently parse the new blob."""
+        rb.write(repo, "runtime/src/mod_a.rs", "pub fn helper() {}\n")
+        c1 = rb.commit(repo, "v1")
+    
+        store_root = tmp_path / "store"
+        conn = corestore.open_db(root=store_root)
+        codebuild.code_layer_builder(conn, _eager_view_for(repo, c1), rules=None, repo=str(repo), from_clean=True)
+        conn.close()
+    
+        rb.write(repo, "runtime/src/mod_b.rs", "pub fn never_eager_indexed() {}\n")
+        c2 = rb.commit(repo, "v2: a blob the eager build at c1 never reached")
+    
+        conn_ro = corestore.open_db_readonly(root=store_root)
+>       with pytest.raises(codesymbols.StoreNeedsRebuild) as exc_info:
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'govbridge.code.symbols' has no attribute 'StoreNeedsRebuild'
+
+tests/code/test_symbols_readonly.py:107: AttributeError
+_ test_ensure_indexed_readonly_never_writes_against_a_file_and_directory_read_only_store _
+
+repo = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_n0/repo')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-502/test_ensure_indexed_readonly_n0')
+
+    def test_ensure_indexed_readonly_never_writes_against_a_file_and_directory_read_only_store(repo, tmp_path):
+        rb.write(repo, "runtime/src/mod_a.rs", "pub fn helper() {}\n")
+        c1 = rb.commit(repo, "v1")
+    
+        store_root = tmp_path / "store"
+        conn = corestore.open_db(root=store_root)
+        codebuild.code_layer_builder(conn, _eager_view_for(repo, c1), rules=None, repo=str(repo), from_clean=True)
+        conn.close()
+    
+        db_path = corestore.db_path(store_root)
+        before_sha = _sha256_file(db_path)
+        os.chmod(db_path, 0o444)
+        os.chmod(store_root, 0o555)
+        try:
+            conn_ro = corestore.open_db_readonly(root=store_root)
+>           got = codesymbols.ensure_indexed_readonly(conn_ro, c1, repo=str(repo))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AttributeError: module 'govbridge.code.symbols' has no attribute 'ensure_indexed_readonly'
+
+tests/code/test_symbols_readonly.py:128: AttributeError
+_ test_definitions_readonly_and_callers_readonly_match_the_lazy_functions_once_built _
+
+repo = PosixPath('/tmp/pytest-of-usain/pytest-502/test_definitions_readonly_and_0/repo')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-502/test_definitions_readonly_and_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x70b032f1d340>
+
+    def test_definitions_readonly_and_callers_readonly_match_the_lazy_functions_once_built(repo, tmp_path, monkeypatch):
+        """No behaviour change for a caller that already has an eager-built store: definitions_readonly/callers_readonly
+        return exactly what definitions/callers (the lazy, build-on-first-use originals) would."""
+        rb.write(repo, "runtime/src/mod_a.rs", "pub fn target_fn() {}\n")
+        rb.write(repo, "runtime/src/mod_b.rs", "fn caller() {\n    target_fn();\n}\n")
+        c1 = rb.commit(repo, "v1")
+    
+        store_root = tmp_path / "store"
+        conn = corestore.open_db(root=store_root)
+        codebuild.code_layer_builder(conn, _eager_view_for(repo, c1), rules=None, repo=str(repo), from_clean=True)
+        conn.close()
+    
+        monkeypatch.setenv("GOVBRIDGE_STORE", str(store_root))
+        lazy_defs = codesymbols.definitions("target_fn", c1, repo=str(repo))
+>       ro_defs = codesymbols.definitions_readonly("target_fn", c1, repo=str(repo))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'govbridge.code.symbols' has no attribute 'definitions_readonly'
+
+tests/code/test_symbols_readonly.py:150: AttributeError
+=========================== short test summary info ============================
+FAILED tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store
+FAILED tests/code/test_symbols_readonly.py::test_ensure_indexed_readonly_matches_ensure_indexed_once_eager_built
+FAILED tests/code/test_symbols_readonly.py::test_ensure_indexed_readonly_raises_store_needs_rebuild_when_the_code_layer_never_built
+FAILED tests/code/test_symbols_readonly.py::test_ensure_indexed_readonly_raises_store_needs_rebuild_for_a_blob_the_eager_build_never_reached
+FAILED tests/code/test_symbols_readonly.py::test_ensure_indexed_readonly_never_writes_against_a_file_and_directory_read_only_store
+FAILED tests/code/test_symbols_readonly.py::test_definitions_readonly_and_callers_readonly_match_the_lazy_functions_once_built
+6 failed in 1.68s

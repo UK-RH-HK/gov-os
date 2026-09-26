@@ -1,0 +1,281 @@
+run_id: BR-AR-0034
+commit: 4a9dec6c4b94ce39228573101f3a072093500ad6
+role: >-
+  REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
+  repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14), and
+  read-only code/classification query paths (R1-17 items 5 and 6)
+model_observed: claude-sonnet-5
+commands:
+- cmd: cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/core/freshness.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_freshness_entrypoint.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check01-r15-before.out
+  output_sha256: b5bd54a8fc9ccdb3b0f7be96c8b8637be7f0085d9c15e03f602717f358200657
+- cmd: cd $D && git checkout 4a9dec6c4b94ce39228573101f3a072093500ad6 -- govbridge/core/freshness.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_freshness_entrypoint.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check02-r15-after.out
+  output_sha256: 0cddb2f9522c5fc98e9503738cea759bed811b3ad3b391083a46a5d5f403e174
+- cmd: cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/core/gitobj.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_gitobj_repo_root.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check03-r16-before.out
+  output_sha256: 994386a13b4a9a20cc71310993eca1f020863ab2a02c6004cc18e54520df45a5
+- cmd: cd $D && git checkout 4a9dec6c4b94ce39228573101f3a072093500ad6 -- govbridge/core/gitobj.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_gitobj_repo_root.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check04-r16-after.out
+  output_sha256: fa9cd0e25dcc1e230610463c80c04cc48c6c326debe3521403b94a8e7f25f4ae
+- cmd: cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/authority/classes.py && $PY -m pytest -q -p no:cacheprovider tests/authority/test_lazy_config.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check05-r112-before.out
+  output_sha256: c5c2a1d7d031bc7922a4b461f8d5b9ace17e4cec4faa7da0f76024666ff095bb
+- cmd: cd $D && git checkout 4a9dec6c4b94ce39228573101f3a072093500ad6 -- govbridge/authority/classes.py && $PY -m pytest -q -p no:cacheprovider tests/authority/test_lazy_config.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check06-r112-after.out
+  output_sha256: dc73d5669fe02105037ac272969a74c0e92d8e4eda11ab9f36efd14f0fd1c648
+- cmd: cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/core/taskctx.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_taskctx_concurrency.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check07-r114-before.out
+  output_sha256: 7a6d37b28f1ff138988f983a4bc27e2132e9103163f8a18dd846d2dfd85aadf2
+- cmd: cd $D && git checkout 4a9dec6c4b94ce39228573101f3a072093500ad6 -- govbridge/core/taskctx.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_taskctx_concurrency.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check08-r114-after.out
+  output_sha256: 54d23ef0b56f99d2cbe2d50ca07723596b53070e1dcae86069f33fb176336fed
+- cmd: >-
+    cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/code/symbols.py govbridge/route/real_routes.py govbridge/authority/layer.py
+    && $PY -m pytest -q -p no:cacheprovider
+    "tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store"
+    tests/code/test_symbols_readonly.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check09-r117-before.out
+  output_sha256: 3edbfb746290b77fceee0ad25debb7f3a80171797898c9f8d5adea17bb860334
+- cmd: >-
+    cd $D && git checkout 4a9dec6c4b94ce39228573101f3a072093500ad6 -- govbridge/code/symbols.py govbridge/route/real_routes.py govbridge/authority/layer.py
+    && $PY -m pytest -q
+    -p no:cacheprovider
+    "tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store"
+    tests/code/test_symbols_readonly.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check10-r117-after.out
+  output_sha256: cd313f0df9c28a248e486310772d3a03f4cdf3cffc1330cb9a8adbee0c486abf
+- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests/code
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check11-r112-testscode-alone.out
+  output_sha256: 92c766a7d8f9d2fc01afa07239c6efa6d0a1d5b8263a2ee077cfc5e394272449
+- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests/code/test_lineage_layer.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check12-r112-onefile-alone-first.out
+  output_sha256: b09d241111e3b4c19eaefdf3ba4c3ee4cbc877351ea27fb901bdbf0c95b21be6
+- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check13-full-domain-suite.out
+  output_sha256: 285036243f58050a2cc3483976b97a8c32f5b5a42a00c684053a2a02a0a20b88
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+  sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  sha256: ad483a753f717e34fc3ed21f52260fed4e1de95f3a4155d09a1ef6786400027c
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/CAUSE_ANALYSIS.md
+  sha256: 72261a14909afe24e838e963aa6b6bae9775004a47a9c143b76914423c7623f3
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/build.py
+  sha256: d8711412959cfc73e1d80b1be71d82ad9bf3d0603faa51313290f817b373660d
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/store.py
+  sha256: 424bd9db609dbe9223bc0ebb220ac6afc605a59b03a381a92608450f058d5b22
+- path: release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+  sha256: a26bcc3e3dbfb53f404f9f4bcd533f48d886d81836ca3c619b52b05ac9cbfd19
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/core/repobuilder.py
+  sha256: b1f3d2003aa798ae46bc41a1a8b724908dc8b6387eb064be08572403aad53d25
+- path: release/orchestration/phase-2-context-bridge/tests/code/_repobuilder.py
+  sha256: 19eb4cbe0cd5c24af2d5c6c289d4ab9e7ec281d72547811a87d0d83274de08ca
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/gather/gather_repobuilder.py
+  sha256: 447bb095a66d275d0631d48f3f2cbc96bc1e27803fb1fb17f37584e650275651
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/gather/test-facets.yaml
+  sha256: 22b876eec3cae66e772cd1bc4b562117481bf643d66f963125018826ae36d802
+- path: release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  sha256: 9ad1e6bbb9bdbda91b3187599014a853ac2cfe4b7ce5968e1c8c1fb2397ee733
+- path: release/orchestration/phase-2-context-bridge/config/facets.yaml
+  sha256: 761dd3b1838d89470e939901c1b78b9eb353c68e224ae93a3caac2744d41c81f
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/__init__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/classes.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+  - release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+  - release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  - release/orchestration/phase-2-context-bridge/tests/code/conftest.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_freshness_entrypoint.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_gitobj_repo_root.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_taskctx_concurrency.py
+  - release/orchestration/phase-2-context-bridge/tests/authority/test_lazy_config.py
+  - release/orchestration/phase-2-context-bridge/tests/route/test_real_routes.py
+  - release/orchestration/phase-2-context-bridge/tests/code/test_symbols_readonly.py
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.*
+artifacts_changed:
+- release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+- release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
+- release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
+- release/orchestration/phase-2-context-bridge/govbridge/authority/classes.py
+- release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+- release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+- release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+- release/orchestration/phase-2-context-bridge/tests/code/conftest.py
+- release/orchestration/phase-2-context-bridge/tests/route/test_real_routes.py
+- release/orchestration/phase-2-context-bridge/tests/core/test_freshness_entrypoint.py
+- release/orchestration/phase-2-context-bridge/tests/core/test_gitobj_repo_root.py
+- release/orchestration/phase-2-context-bridge/tests/core/test_taskctx_concurrency.py
+- release/orchestration/phase-2-context-bridge/tests/authority/test_lazy_config.py
+- release/orchestration/phase-2-context-bridge/tests/code/test_symbols_readonly.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.checkpoint.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.report.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check01-r15-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check02-r15-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check03-r16-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check04-r16-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check05-r112-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check06-r112-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check07-r114-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check08-r114-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check09-r117-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check10-r117-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check11-r112-testscode-alone.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check12-r112-onefile-alone-first.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check13-full-domain-suite.out
+findings:
+- >-
+  govbridge/graph/code_bridge.py's build_shaped_code_connection (out of this node's mutation_scope) still calls
+  codesymbols._open_conn()/ensure_indexed() (read-write) at query time, from real_routes.py's own
+  _shaped_code_conn() second block -- the SAME query-time-write pattern R1-17 item 5 fixes elsewhere in this file.
+  Currently a no-op in practice against the acceptance scenario (a file+directory read-only store built by the
+  eager code-layer builder, B3R): ensure_indexed's own classify-then-parse loop finds every product-role .rs blob
+  already cached and never reaches its write branch. It is a LATENT write-at-query-time path for any commit the
+  eager builder does not cover (e.g. a shaped code connection built for a non-eager/history commit), left for
+  whoever next owns govbridge/graph/code_bridge.py -- reported per the brief's "find another cross-cutting defect,
+  report it, do not fix it," not fixed here.
+- >-
+  govbridge/route/real_routes.py's code_route wraps BOTH codesymbols.definitions_readonly(...) and
+  codesymbols.callers_readonly(...) in a bare `except Exception: ... = {...: []}` (pre-existing, not introduced by
+  this run). This means a StoreNeedsRebuild raised by either (a genuinely missing/not-yet-eager-indexed commit) is
+  silently swallowed into an empty result at the ROUTE level, rather than surfacing as the typed error to a CLI/
+  gather caller. Calling ensure_indexed_readonly/definitions_readonly/callers_readonly directly (this run's own
+  new tests, tests/code/test_symbols_readonly.py) DOES see the typed exception; only the pre-existing broad
+  except in real_routes.py's own code_route masks it for that one call site. Named for whoever next tightens that
+  exception handling; not one of this run's six named fixes.
+- >-
+  govbridge/authority/classes.py's BRIDGE_STATE_PATH is now a process-wide-cached lazy value (computed on first
+  ACCESS, via a module __getattr__, never at import time) rather than fully uncached: BR-DAG-AMEND-R1-12 asks for
+  "lazy or path-explicit" specifically to stop the FIRST IMPORTER's environment from fixing the process-wide
+  result -- deferring the read to first ACCESS (by an actual consumer of the value, never an unrelated importer
+  like govbridge.code.lineage_layer/govbridge.graph.derive) fully closes that race. Caching thereafter is a
+  deliberate, load-bearing choice (this value is read on a potential per-hit hot path via authority.layer.
+  classify_hit/record_id_for_occurrence): every real domain and every test fixture in this repository already
+  treats this value as a fixed convention (every repobuilder hard-codes the identical string), so re-reading and
+  re-parsing config/state-aliases.yaml on every hit would be a pure, unnecessary performance regression with no
+  behavioural benefit. Recorded as a decision below, not left implicit.
+failed_approaches:
+- >-
+  Converting govbridge.code.symbols.stats/definitions/callers/reads_key themselves (not just real_routes.py's own
+  code route) to the read-only, non-building path. This is the LITERAL first reading of "ensure_indexed must not
+  build at query time" -- but tests/code/test_symbols_integration.py, tests/code/test_definitions_lookup.py and
+  tests/code/test_corpus_exclusion.py all call these functions DIRECTLY against a commit no eager build has ever
+  touched, relying on their lazy, build-on-first-use behaviour as a deliberate test convenience (none of them are
+  one of BR-DAG-AMEND-R1-15's enumerated "query commands" -- they are govbridge.code.symbols's own diagnostic CLI/
+  library surface, not the gather/search query path). Converting them broke 2 of those tests immediately
+  (confirmed by running them) and would have broken the other pre-existing suites' own lazy-build convention too.
+  Reverted; replaced with the narrower, correct fix: real_routes.py's code route (the ACTUAL query surface BR-
+  DAG-AMEND-R1-17 item 5's acceptance check measures) now calls two NEW read-only counterparts,
+  definitions_readonly/callers_readonly (sharing their result-computation logic with the originals via
+  _definitions_result/_callers_result), while stats/definitions/callers/reads_key themselves keep their original,
+  unmodified, lazy behaviour for every existing caller.
+- >-
+  Switching govbridge.route.real_routes._conn() to store.open_db_readonly() without first correcting
+  tests/route/test_real_routes.py::test_code_route_hits_carry_real_classification_and_real_definitions and
+  ::test_exact_route_hits_carry_real_classification. Both pre-existing tests called the route directly against a
+  store that had NEVER been built at all (no freshness.run() call), relying on authority.layer.classify_hit's own
+  query-time ensure_schema() to silently create the (empty) authority tables on the spot, and on
+  govbridge.code.symbols.ensure_indexed's own query-time build for the code route. Once classify_hit stopped
+  calling ensure_schema() and _conn() moved to open_db_readonly() (which never creates a store that does not
+  exist), both tests failed -- confirmed by running them before making the correction. This is exactly the
+  scenario BR-DAG-AMEND-R1-17 item 6 anticipates ("pre-existing tests that relied on query-time schema creation
+  are corrected to run the builder first, a rule-5 correction, justified") -- see decisions.
+- >-
+  Trying to reproduce ExclusionCounter's pre-fix race with a pure Python busy-loop stress test (many threads,
+  `counter.bump()` in a tight loop, up to 500 threads x 200,000 bumps = 6.4M operations, at several
+  sys.setswitchinterval settings). It never lost a single update against the UNFIXED implementation on this
+  interpreter (CPython 3.12.3): its specializing adaptive interpreter appears to make a bare `self.count += n` on
+  a tiny __slots__ int attribute effectively atomic in practice for this shape of workload, so the eval-breaker's
+  GIL-drop point never lands inside the load/add/store sequence often enough to observe within a practical test
+  budget. Replaced the "fails before, passes after" proof with a DETERMINISTIC structural test
+  (test_bump_serialises_through_a_lock, tests/core/test_taskctx_concurrency.py) that holds the counter's own lock
+  from the main thread and asserts a concurrent bump() call genuinely blocks on it -- this fails immediately and
+  unambiguously against the pre-fix class (no lock attribute at all) and passes deterministically against the
+  fixed one. The busy-loop stress tests are kept (they pass both before and after on this interpreter, so they
+  are not evidence of the fix by themselves, but they do confirm exactness/no-regression under real concurrency,
+  and the brief's own literal request: "many threads bump, and the count is exact").
+unresolved: []
+decisions:
+- >-
+  D-R1-XC-1 (within authority; a rule-5 correction, justified per BR-DAG-AMEND-R1-17 item 6's own text): corrected
+  two pre-existing tests in tests/route/test_real_routes.py --
+  test_code_route_hits_carry_real_classification_and_real_definitions and
+  test_exact_route_hits_carry_real_classification -- to call freshness.run(..., from_clean=True) before building
+  routes and querying, matching the file's own test_lexical_route_hits_carry_real_classification (which already
+  did). Both previously relied on query-time store/schema creation (authority.layer.classify_hit's own
+  ensure_schema() call, and govbridge.code.symbols.ensure_indexed's own query-time build) against a store that was
+  never built at all -- a real caller always builds the store first; this is never a narrower assertion, the
+  SAME real classification and definitions are asserted, just against a store built the way a real deployment
+  (and every other test in the same file) already does.
+- >-
+  D-R1-XC-2 (within authority): govbridge.code.symbols.stats/definitions/callers/reads_key are left UNCHANGED
+  (lazy, build-on-first-use) rather than converted to the read-only path; two NEW functions,
+  definitions_readonly/callers_readonly, are added instead and used only by govbridge.route.real_routes's code
+  route -- see failed_approaches for why the literal "convert every function" reading would have silently
+  narrowed/broken three pre-existing test files' own, deliberate use of the lazy behaviour as a test convenience.
+  stats/reads_key keep no read-only counterpart at all: neither is called by real_routes.py, so BR-DAG-AMEND-R1-17
+  item 5's actual query surface (the code route) never reaches them.
+- >-
+  D-R1-XC-3 (within authority): govbridge.authority.classes.BRIDGE_STATE_PATH becomes a PEP 562 module
+  `__getattr__` lazy attribute (computed and cached on first ACCESS, never at import time), not a fully uncached
+  per-access recompute -- see findings for the reasoning (every real caller already treats it as a fixed
+  convention; recomputing per-access would be a pure performance regression on a per-hit-classification hot path
+  with no closed race left to fix once the read is deferred past import time).
+- >-
+  D-R1-XC-4 (within authority): govbridge.core.gitobj.repo_root()'s error message on a resolution failure now
+  names the RESOLVED starting directory (an absolute path) rather than the original, possibly-relative `start`
+  argument or the literal string '.' -- a direct, minor consequence of resolving the cache key before the
+  subprocess call. No test (in this run or pre-existing) asserts the exact text of that message; grepped to
+  confirm (see evidence in the report).
+lessons:
+- >-
+  When a fix note says "X must not build/write at query time," check FIRST whether the function named is shared
+  between a genuine query surface (a route, a CLI query command) and a separate diagnostic/library surface
+  (govbridge.code.symbols's own stats/callers CLI here) that pre-existing tests already depend on for its OTHER
+  behaviour (lazy build-on-first-use, as a test convenience). Converting the shared function outright breaks the
+  diagnostic surface's own tests; splitting into a read-only counterpart used only by the actual query caller
+  (real_routes.py here) satisfies the literal fix, its acceptance check, AND "no silent narrowing" for the
+  pre-existing surface, at the cost of a small amount of duplication (resolved here by factoring the shared
+  result-computation logic into a private helper both the lazy and read-only entry points call).
+- >-
+  A GIL-based "not thread-safe" defect does not always reproduce empirically via a pure busy-loop stress test on
+  a modern CPython interpreter (3.12's specializing adaptive interpreter can make a tiny slots-attribute `+= `
+  appear atomic in practice) -- when a stress test passes on BOTH the pre-fix and post-fix code, that is not
+  proof the fix is unnecessary; it is a interpreter-specific gap in that test's own ability to observe the race.
+  A deterministic, structural test (assert the lock exists and that a concurrent call genuinely blocks on it) is
+  the reliable "fails before, passes after" proof REPAIR-1 requires when the dynamic reproduction is unreliable;
+  keep the stress test too, for the exactness/no-regression guarantee it DOES provide.
+next_consumer: >-
+  R1-INT (now audit-only, routed to opus, BR-DAG-AMEND-R1-16 part 2): runs BR-DAG-AMEND-R1-3/-7/-15's own
+  integration checks over this run's merged tree, including the zero-count audit and the generic-rule (OC-BR-02)
+  audit; any defect it finds is routed back to its owner, never fixed by it. R1-GA2 (running in parallel, disjoint
+  scope: gather/followup, identifiers, merge, versions) is unaffected by this run's changes. The two findings
+  above (govbridge/graph/code_bridge.py's own latent query-time write path; real_routes.py's pre-existing broad
+  except around definitions_readonly/callers_readonly) are for whoever next owns those files, not for R1-INT to
+  fix itself.
+final_commit: 4a9dec6c4b94ce39228573101f3a072093500ad6

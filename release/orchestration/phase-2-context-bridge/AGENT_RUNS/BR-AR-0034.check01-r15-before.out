@@ -1,0 +1,59 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_module_entrypoint_and_top_level_cli_build_the_same_layer_set_and_digests _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-494/test_module_entrypoint_and_top0')
+fixture_repo = FixtureRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-494/test_module_entrypoint_and_top0/repo'), c1='93cde1634410f2...2a6d41e1a710e84ebdc92adb0d3373526a0a17', history_refs=['refs/heads/history/attempt-1', 'refs/heads/history/attempt-2'])
+view_path = '/tmp/pytest-of-usain/pytest-494/test_module_entrypoint_and_top0/canonical-view.yaml'
+rules_path = '/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0034/release/orchestration/phase-2-context-bridge/tests/fixtures/core/fixture-corpus-rules.yaml'
+
+    def test_module_entrypoint_and_top_level_cli_build_the_same_layer_set_and_digests(
+        tmp_path, fixture_repo, view_path, rules_path
+    ):
+        base_env = dict(os.environ)
+        base_env.pop("GOVBRIDGE_STORE", None)
+        base_env["GOV_BRIDGE_HOME"] = str(tmp_path / "home")  # never the developer's real, shared cache
+        base_env["PYTHONPATH"] = str(DOMAIN) + os.pathsep + base_env.get("PYTHONPATH", "")
+    
+        store_m = tmp_path / "store-module-entrypoint"
+        store_cli = tmp_path / "store-top-level-cli"
+        repo_root = fixture_repo.root
+    
+        env_m = dict(base_env)
+        env_m["GOVBRIDGE_STORE"] = str(store_m)
+        _run(
+            [sys.executable, "-m", "govbridge.core.freshness", "rebuild", "--view", view_path, "--rules", rules_path,
+             "--from-clean"],
+            env=env_m, cwd=repo_root,
+        )
+    
+        env_cli = dict(base_env)
+        env_cli["GOVBRIDGE_STORE"] = str(store_cli)
+        _run(
+            [sys.executable, "-m", "govbridge", "index", "rebuild", "--view", view_path, "--rules", rules_path,
+             "--from-clean"],
+            env=env_cli, cwd=repo_root,
+        )
+    
+        layers_m = _manifest_layers(store_m)
+        layers_cli = _manifest_layers(store_cli)
+    
+        assert set(layers_m) == set(layers_cli), (sorted(layers_m), sorted(layers_cli))
+>       assert layers_m == layers_cli, (
+            "the -m entry point built a different layer set/digest than the top-level CLI -- "
+            f"m={layers_m} cli={layers_cli}"
+        )
+E       AssertionError: the -m entry point built a different layer set/digest than the top-level CLI -- m={'authority': {'authority_edge': 0, 'class_lifecycle': 0, 'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'record_def': 0, 'rows': 0}, 'blob': {'digest': '9226a99a341cac19052922b4ab381c73d7961c285130eb423699959ad0449dfb', 'rows': 14}, 'chunk': {'chunker_version': 'govbridge-chunker/1', 'digest': 'f0ccd1705dd66022241d819f056f81da0d2ec3c14942edf9080b2a2c0b39001c', 'rows': 10}, 'code': {'blobs_parsed': 0, 'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'excluded_blobs': 0, 'rows': 0}, 'lexical': {'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'rows': 0, 'tokenize': "porter unicode61 tokenchars '_'"}, 'lineage': {'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'rows': 0, 'rows_by_ref': {}, 'rows_by_type': {}, 'unresolved_by_form': {}, 'unresolved_rows': 0}, 'occurrence': {'digest': 'cc01ae031a3a374324cdde42c2a5b79a0ba644b8d9c9732c1b1f3ecfc2991db4', 'rows': 50}, 'vector': {'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'pin_id': '83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50', 'rows': 0, 'status': 'UNAVAILABLE'}} cli={'authority': {'authority_edge': 0, 'class_lifecycle': 0, 'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'record_def': 0, 'rows': 0}, 'blob': {'digest': '9226a99a341cac19052922b4ab381c73d7961c285130eb423699959ad0449dfb', 'rows': 14}, 'chunk': {'chunker_version': 'govbridge-chunker/1', 'digest': 'f0ccd1705dd66022241d819f056f81da0d2ec3c14942edf9080b2a2c0b39001c', 'rows': 10}, 'code': {'blobs_parsed': 1, 'call_site_rows': 0, 'digest': 'fb1d38af7fddbda5c14a68a3d34dcac284469b4113d839111506abf7258c1cd5', 'excluded_blobs': 0, 'literal_rows': 0, 'rows': 1, 'symbol_rows': 1}, 'lexical': {'digest': '90bbdb12beb24f2a5a9a0b0747db47dece4fbf684bdca9cf05eb353ee6af8c41', 'rows': 10, 'tokenize': "porter unicode61 tokenchars '_'"}, 'lineage': {'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'rows': 0, 'rows_by_ref': {}, 'rows_by_type': {}, 'unresolved_by_form': {}, 'unresolved_rows': 0}, 'occurrence': {'digest': 'cc01ae031a3a374324cdde42c2a5b79a0ba644b8d9c9732c1b1f3ecfc2991db4', 'rows': 50}, 'vector': {'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'pin_id': '83f5fd888296eb4576d82392e079c447770292f16305b9ecf2f2d767c01aee50', 'rows': 0, 'status': 'UNAVAILABLE'}}
+E       assert {'authority':...ows': 0}, ...} == {'authority':... 0, ...}, ...}
+E         
+E         Omitting 6 identical items, use -vv to show
+E         Differing items:
+E         {'code': {'blobs_parsed': 0, 'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'excluded_blobs': 0, 'rows': 0}} != {'code': {'blobs_parsed': 1, 'call_site_rows': 0, 'digest': 'fb1d38af7fddbda5c14a68a3d34dcac284469b4113d839111506abf7258c1cd5', 'excluded_blobs': 0, ...}}
+E         {'lexical': {'digest': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'rows': 0, 'tokenize': "porter unicode61 tokenchars '_'"}} != {'lexical': {'digest': '90bbdb12beb24f2a5a9a0b0747db47dece4fbf684bd...
+E         
+E         ...Full output truncated (2 lines hidden), use '-vv' to show
+
+tests/core/test_freshness_entrypoint.py:70: AssertionError
+=========================== short test summary info ============================
+FAILED tests/core/test_freshness_entrypoint.py::test_module_entrypoint_and_top_level_cli_build_the_same_layer_set_and_digests
+1 failed in 0.44s
