@@ -1,0 +1,24 @@
+schema: govbridge-task-spec/1
+task_id: CONTROL-A
+role: control worker (OC-BR-02 regression control; not a demonstration)
+objective: Explain why renaming or removing a certification test breaks gov contract
+  verify, which requirement the governed evidence map serves, where the check is enforced
+  in code, and which tests prove it.
+view: config/canonical-view.yaml
+required_inputs:
+- state_ref: state:bridge#contract_v3
+  reason: the owner source contract (the evidence-owner requirement)
+seeds: []
+queries: tests/fixtures/controls/control-a/queries.yaml
+retrieval_exclusions:
+- release/orchestration/phase-2-context-bridge/ARCHITECTURE/**
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/**
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/**
+mutation_scope: []
+prohibitions: []
+required_checks: []
+completion_vocabulary:
+- ANSWERED
+- PARTIAL
+- BLOCKED
+budget_profile: bounded-builder

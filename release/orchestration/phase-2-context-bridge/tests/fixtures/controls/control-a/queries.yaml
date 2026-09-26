@@ -1,0 +1,24 @@
+schema: govbridge-demonstration-queries/1
+note: CONTROL-A, the visible regression control (BR-ARCH-RULING-2). It is unrelated to Review 8 and to CTRL-1..3.
+case: control-a
+queries:
+- id: CA-WHY
+  kind: query
+  text: Why does renaming or removing a certification test break gov contract verify? What is the governed evidence map for?
+  k: 8
+- id: CA-REQ
+  kind: query
+  text: Which Contract v3 capability and which frozen Phase-2 acceptance criterion require every capability to have a running evidence owner?
+  k: 8
+- id: CA-ENF
+  kind: query
+  text: Where in code does gov contract verify resolve evidence owners against the product and fail on a capability with no running owner?
+  k: 8
+- id: CA-TESTS
+  kind: query
+  text: Which tests prove that the contract-binding chain and the evidence map are verified and that a missing owner fails?
+  k: 8
+- id: CA-DEPS
+  kind: query
+  text: What depends on the evidence map and what becomes stale if the evidence map or the contract source changes?
+  k: 8
