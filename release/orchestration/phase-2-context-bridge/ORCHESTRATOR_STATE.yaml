@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T08:01:42Z'
-state_hash: f7e40185abba414ae26a7fcf849fabc81d69b6cd142b7431ab67a357840418a5
+updated_at: '2026-09-26T04:45:16Z'
+state_hash: dacb4ebfde1e869933da9739d38903820f0f6f2128097a4a7aaaf09280d64592
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -234,11 +234,7 @@ mandatory_bridge_inputs:
     class: ORCHESTRATION_RECORD
     path: release/orchestration/phase-2/PHASE_LEDGER.md
     sha256: f7b643a38955571cf493a2f6dadd67949b352377f43026d6e50979c683c0ebc4
-    entries: {start: P2-L-0033, end: P2-L-0047}
-    entries_note: P2-L-0033..P2-L-0047 (P2-L-0047 records OD-P2-10A/B)
-    restated: 'by the orchestrator after R1-RM''s merge (732e34b) -- the same id, class, path, hash and range; the prose moved
-      to entries_note so that the resolver now delivers exactly these 15 entries instead of treating the prose as an
-      annotation and falling back to a partial section map of the whole 120 KB ledger'
+    entries: P2-L-0033..P2-L-0047 (P2-L-0047 records OD-P2-10A/B)
   - id: PHASE-2-STATE
     class: ORCHESTRATION_RECORD
     path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
@@ -875,26 +871,7 @@ agent_runs:
   agent_name: br-r1-rl-0019
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: COMPLETED_INTEGRATED
-  final_commit: 84ca2d6 (work 1cf38d2)
-  merged_at: 6eba56f (final; interim merges cd87f36 and 4b91106)
-  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, final pass)
-  pass_5:
-    fixed: registry rows recognised by schema at any depth (a mapping whose own `tests` is a list of strings), identifier from
-      id/item or else the key path; no path prefix; entries resolved to code-layer test symbols, id tokens or raw text,
-      always counted -- 558 rows (186 per ref), 1107 new TESTS edges, digest reproducible
-    orchestrator_verified:
-    - independent count at the product pin -- 158 block-style + 55 flow-style `tests:` lines = 213 against 186 recognised
-      rows; the difference points the right way (a `tests:` key holding a MAPPING, for example a policy's settings block,
-      is correctly not a registry)
-    - FULL domain suite on the merged tree -- 509 passed, 0 failed; secrecy 0 hits over the whole run (claude-sonnet-5 x1758);
-      invariant, class-table and import-boundary tests untouched
-    residuals_carried:
-    - EXACT_TEST_REGISTRY_ROW = 0 is structural -- the tree-sitter adapter gives a free or mod-nested Rust fn a qualified_name
-      without its module path, so a registry entry `mod::fn` can only match heuristically by its trailing segment
-      (HEURISTIC_TEST_REGISTRY_SYMBOL); carried to the verifier handoff as a residual and to R1-INT's zero-count audit
-    - tests/code/conftest.py pre-imports govbridge.authority at collection time to work around an import-time config read
-      -> the root cause is routed to R1-INT (BR-DAG-AMEND-R1-12)
+  status: REOPENED_FOLLOW_UP
   pass_1:
     final_commit: 98f295da8c7f6b0c1080fd5577b0723d8ce158ce (report) / a799030 (work)
     integrate_check: INTEGRATION_PERMITTED (its own self-check)
@@ -917,21 +894,6 @@ agent_runs:
     - symbol-history max_commits from configuration; truncation disclosed (bounded_incomplete)
     - a hermeticity defect in its own first-pass test found and fixed; full domain suite 361 passed, 0 failed
     - secrecy audit -- 0 hits; claude-sonnet-5 x727
-    pass_4:
-      final_commit: f490d3c (work 89950cb)
-      interim_merge_2: 4b91106 -- integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree (with
-        RM) 500 passed, 0 failed
-      accepted: 'Defect A -- the lineage layer walks every eager ref (via govbridge.code.build.eager_ref_names) with a
-        per-row ref, commit and version_status (82 HISTORICAL_VERSION rows on records against 979 CANONICAL on product);
-        Defect B -- harness methods resolved (576 product-ref TESTS edges from this shape, reconciled at ~9% against 636
-        independently counted pairs); two from-clean builds of one resolved view -> identical digest 374cf96b over 2830
-        edges; secrecy 0 hits; claude-sonnet-5 x1383 over the whole run'
-      reopen_4_reason: 'the zero for TESTS (c) registry shape is FALSE -- an independent git grep finds 158 YAML lines
-        starting a `tests:` list at EACH of the three refs (outside the bridge domain), in schema-shaped rows nested
-        under ordinary keys; test_registry_edges_in_doc accepts only a top-level list or rows/entries, and the per-id
-        function greps only tests/. Required -- the shape by schema at a bounded depth, no path prefix, entries
-        resolved against code-layer test functions or the id grammar, unresolved entries counted, per-ref counts
-        reconciled'
     pass_3:
       final_commit: b4929ca731ce8be96787b4f780a890745d861924
       interim_merge: cd87f36 (BR-DAG-AMEND-R1-9 -- the accepted work merged so that R1-GA1 can start; the node stays OPEN)
@@ -1069,26 +1031,6 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-rm-0022
   checkpoint_schema: 2
-  final_commit: 02b010d130426870d852df5c1ae64054e9e760fc
-  merged_at: 732e34b
-  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, pass 2)
-  pass_2:
-    fixed:
-    - packet verify detects truncation -- declared_sha256 is recomputed from git at the recorded view; delivered must
-      equal declared, or a MANDATORY_PARTIAL_DELIVERY notice must exactly tile the declared span (each range re-hashed);
-      three negative tests (truncated with no notice, a gap in the notice, a declared mismatch)
-    - entries works on Markdown (heading ids via config/id-grammar.yaml) and YAML, start/end in DOCUMENT order (this also
-      fixed a pre-existing lexicographic bug in the YAML path)
-    conformance: 9 rows; 8 MET, 1 MET_WITH_DISCLOSED_LIMIT (facet-selected sections for oversize items -- no facet system
-      yet; routed to R1-GA3, BR-DAG-AMEND-R1-11)
-    orchestrator_verified:
-    - FULL domain suite on the merged tree (with RX, RG, RL interim) -- 489 passed, 0 failed
-    - secrecy -- 0 hits over the whole transcript; claude-sonnet-5 x617; invariant, class-table and import-boundary tests untouched
-    - real resolver probe at the bridge tip -- the ledger row, restated as entries {start P2-L-0033, end P2-L-0047},
-      resolves exactly 15 entries (lines 336-749), unresolved ()
-    open_issues_routed:
-    - re-extraction of each A item's delivered body from the rendered packet (needs govbridge/cli.py) -> R1-RS
-      (BR-DAG-AMEND-R1-10)
   pass_1:
     final_commit: ce971200a16a8f691455d47a56a11cf06ee158b2
     integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
@@ -1111,7 +1053,7 @@ agent_runs:
     - the ledger row's entries is prose -> the orchestrator restates it in the structured form after the merge (same
       id, same meaning; the prose is kept as a note)
   dispatched_at: '2026-09-26T03:18Z'
-  status: COMPLETED_INTEGRATED
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0022
   dispatch_notes:
   - implement R1-1 inside compile/validate.py and compile/receipt.py (verify_section_a recomputes A at the manifest's
@@ -1145,50 +1087,8 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga1-0023
   checkpoint_schema: 2
-  pass_1:
-    final_commit: fbeabd2875d3c907e1f1fcea7deb207f6e978d23
-    interim_merge: 4114437 (BR-DAG-AMEND-R1-13 -- so R1-RS can start; the node stays OPEN)
-    orchestrator_verified:
-    - integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree 543 passed, 0 failed
-    - claude-sonnet-5 x603; invariant, class-table and import-boundary tests untouched; genericity grep -- rule text only
-    - 'secrecy -- it READ ARCHITECTURE/demonstration-queries.yaml four times to learn the query-set FORMAT (instantiation
-      of class x subject entries is its RC-2 deliverable); query texts and query-class texts were masked (lengths only),
-      but the three public SUBJECT descriptions were printed. Its report says "key names and value types only", which
-      is inaccurate on that point. The facet registry equals REPAIR_PLAN section 2.2 name for name and class_facets is
-      empty (every query gets every facet), so no tuning to the demonstration queries. Not an oracle or grading
-      access; recorded for the verifier.'
-    accepted: instantiation (QUERY_NOT_EXECUTABLE), the facet registry, deterministic concurrent merge in registry order,
-      batch-size-independent paging (48 identical unit ids, 8 rounds vs 1), telemetry, closed stop reasons, thread-local
-      sqlite connections (a real crash fixed), no hard-coded 8, the notes dispatch line
-    reopen_reason: '(1) a scoped facet filters AFTER retrieval, so requirement/decisions_* page through corpus-wide
-      rankings and end at MAX_ROUNDS or time out -> push scope down into the routes by class/lifecycle; (2) AC2 graded
-      MET on a 6-facet subset, while the full default facet set timed out after more than 115 s -> the full set,
-      per-query wall times for all 5 CONTROL-A queries, a budget in config/budgets.yaml; (3) AC3 cites an unsaved
-      "check3b" run -> re-run and save. govbridge/cli.py is NOT edited in this pass (R1-RS is its next editor)'
-    pass_2:
-      final_commit: c9a8832cda95627e40d342524271d65d1787fdb7
-      accepted: 'scope pushed into SQL before top-k (Tier A record_def+class_lifecycle; Tier B path globs from class_rules,
-        skipped under lifecycle scope); code/exact assert; the post-filter kept as a backstop with out_of_scope_dropped
-        telemetry; AC2 on the FULL default facet set, identical merged_sha256 across threads 1/4/16; all 5 CONTROL-A queries
-        at 47.7-96.2 s, FACETS_COVERED in 2 rounds; budget 150 s; AC3 on the full set, 118 identical items, 8 rounds vs 1;
-        merged items for CA-WHY rose from ~65 to 118 (scoped facets now fill)'
-      orchestrator_verified: store-BR-AR-0010 is UNTOUCHED (mtime 2026-09-26 00:19 +01:00, before GA1; no scope cache or path
-        index in its schema)
-      reopen_2_reason: 'query commands WRITE to the store -- _ensure_scope_indexes runs CREATE INDEX/CREATE TABLE/INSERT OR IGNORE
-        on store.db at query time: (a) it would mutate the run-2 demonstration store during the demonstration; (b) on a
-        read-only store it silently falls back to the 4-6 s/call path; (c) INSERT OR IGNORE never prunes stale (blob, path)
-        pairs. Required: build both structures at BUILD time in their owning layer builders (digested); query paths
-        read-only with a typed STORE_NEEDS_REBUILD error; tests (read-only store unchanged by sha256, missing structure
-        -> typed error, no stale pair after an incremental rebuild, identical digests); CA-WHY re-measured within 150 s'
-      scope_extension: govbridge/authority/layer.py, govbridge/core/store.py, govbridge/core/freshness.py and
-        tests/core/test_scope_path_cache.py, for the build-time structures ONLY (R1-INT edits core/freshness.py later, in PG5)
-    open_issues_routed:
-    - taskctx.ExclusionCounter.bump() is not thread-safe under concurrent facets (excluded_hits could under-count) -> R1-INT
-      (BR-DAG-AMEND-R1-14)
-    - callees are not paged, and reads_key_of consumer paging is not round-driven -> R1-GA2's follow-up resolvers page
-      callers, tests_of and reads_key_of through their cursors within budget
   dispatched_at: '2026-09-26T04:45Z'
-  status: REOPENED_FOLLOW_UP
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0023
   dispatch_notes:
   - base contains R1-RX (taskctx, --task, exclusions) and R1-RL's accepted paging primitives (interim merge,
@@ -1212,66 +1112,13 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
-  - release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
-  - release/orchestration/phase-2-context-bridge/govbridge/core/store.py
-  - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
-  - release/orchestration/phase-2-context-bridge/tests/core/test_scope_path_cache.py
-- run_id: BR-AR-0025
-  role: 'REPAIR-1 node R1-RS -- supplementary packets for every query command, occurrence collapse, bootstrap by reference,
-    task inputs in section I; plus BR-DAG-AMEND-R1-10 (verify re-extracts each A item''s delivered body from the rendered packet)'
-  dag_node: R1-RS
-  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
-  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
-  handoff_note: template revision with amendments R1-T1 and R1-T2
-  branch: bridge/r1-rs-0025
-  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0025
-  model_requested: sonnet
-  model_observed: PENDING (checked from the transcript at return)
-  agent_name: br-r1-rs-0025
-  checkpoint_schema: 2
-  pass_1:
-    final_commit: b6c0b59af473e5d09001e19bebf3af8a48461388
-    integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
-    accepted: 'supplementary packets for every query command (--out; budgeted; deduplicated against the main and earlier
-      packets; --raw only for raw JSON); occurrence collapse; section I carries the instantiated query set and the answers
-      and receipt schemas by hash (post-compile re-finalisation, packet.py untouched); bootstrap by reference (8,350 bytes
-      against a 134,788-byte CONTROL-A packet); receipt check covers supplementary packets; exact body markers in
-      render.py; secrecy 0 hits; claude-sonnet-5 x437; protected tests untouched'
-    reopen_reason: '(1) test_compile_bootstrap.py (NOT a protected test) asserts the RC-9 defect -- scope correction GRANTED
-      (rule 5; justified in decisions); 0 failures required. (2) R1-10 re-extraction SKIPS directory and oversize items and
-      uses CONTAINMENT for selector items, so an insertion into A, or any change inside an oversize item (Contract v3),
-      passes -> recompose every shape independently from git at the recorded view (composition imported read-only) and
-      compare exactly; four negative tests'
-    open_issues_routed:
-    - core/store.py open_db() runs a write-shaped statement on every open, which blocks read-only stores -> R1-GA1 (core/store.py
-      is in its extended scope for the read-only query paths)
-  dispatched_at: '2026-09-26T06:45Z'
-  status: RUNNING
-  store: $HOME/.cache/gov-bridge/store-BR-AR-0025
-  dispatch_notes:
-  - govbridge/compile/render.py is added for ONE purpose -- the smallest item-delimiting format that makes the R1-10 re-extraction
-    exact (R1-GA3 edits render.py after RS); tests/compile/test_verify_rendered_body.py is added for R1-10's tests
-  - fourth editor of govbridge/cli.py (RX -> GA1 -> RS -> RA); R1-GA1's reopened pass does NOT touch cli.py
-  - second editor of compile/validate.py and receipt.py (RM -> RS)
-  mutation_scope:
-  - release/orchestration/phase-2-context-bridge/govbridge/compile/supplementary.py
-  - release/orchestration/phase-2-context-bridge/govbridge/compile/bootstrap.py
-  - release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py
-  - release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py
-  - release/orchestration/phase-2-context-bridge/govbridge/compile/section_i.py
-  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
-  - release/orchestration/phase-2-context-bridge/govbridge/compile/render.py
-  - release/orchestration/phase-2-context-bridge/tests/compile/test_supplementary.py
-  - release/orchestration/phase-2-context-bridge/tests/compile/test_section_i_and_bootstrap.py
-  - release/orchestration/phase-2-context-bridge/tests/compile/test_verify_rendered_body.py
-  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/supplementary/**
-  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.*
-  - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_bootstrap.py
 running_work:
-- run_id: BR-AR-0025
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rs-0025; never inferred from elapsed time
 - run_id: BR-AR-0023
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
+- run_id: BR-AR-0022
+  liveness_check: subagent transcript mtime + commits on bridge/r1-rm-0022; never inferred from elapsed time
+- run_id: BR-AR-0019
+  liveness_check: subagent transcript mtime + commits on bridge/r1-rl-0019; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -1387,53 +1234,6 @@ dag:
     reason: GA1 needs only the paging API, accepted since pass 1 and untouched by the reopen; RL's remaining scope
       (govbridge/code/**, graph/derive.py) is disjoint from GA1's; integrate-check requires only that the listed
       artifacts cover the diff, so a later delta merge stays checkable
-  - id: BR-DAG-AMEND-R1-10
-    by: orchestrator (routing of a BR-AR-0022 open issue)
-    rule: 'R1-RS additionally makes `packet verify` (and `receipt check`) re-extract each A item''s delivered body from the
-      rendered packet and recompute delivered_sha256 from it, so a renderer that drops content after hashing is caught;
-      a negative test tampers the rendered body with the manifest left intact -> FAIL. RS is the next editor of
-      govbridge/cli.py and of compile/validate.py and receipt.py (shared-file sequences RX -> GA1 -> RS and RM -> RS)'
-    reason: R1-RM's verify now compares the manifest's delivered hash with the declared span, but reads the delivered hash
-      from the manifest; re-extraction needs cli.py to pass the rendered packet, which is outside RM's scope
-  - id: BR-DAG-AMEND-R1-11
-    by: orchestrator (routing of R1-RM's MET_WITH_DISCLOSED_LIMIT row)
-    rule: 'R1-GA3 additionally chooses the selected sections of an OVERSIZE A item (delivered as section map, selected
-      sections and a by-reference remainder, REPAIR_PLAN.md section 3) with the task''s gather facets as well as its
-      declared selectors; nothing is ever removed from A; the MANDATORY_PARTIAL_DELIVERY notice and the exact-tiling
-      verify rule stay unchanged'
-    reason: RM had no facet system to use (R1-GA1 builds it); GA3 is the node that compiles from gather and edits packet.py
-      next (RX -> RM -> GA3)
-  - id: BR-DAG-AMEND-R1-12
-    by: orchestrator (routing of a BR-AR-0019 workaround)
-    rule: 'R1-INT''s mutation_scope is further extended with govbridge/authority/__init__.py and govbridge/authority/classes.py
-      for ONE change: the state-aliases/config read that runs at IMPORT time (resolved against GOV_BRIDGE_DOMAIN at
-      that moment) becomes lazy or path-explicit, so the first importer''s environment can no longer fix the process-wide
-      result; then tests/code/conftest.py''s collection-time pre-import is removed. The class table, the class-table
-      test and the six named invariant tests stay byte-unchanged'
-    reason: the pre-import makes the suite order-independent but hides a process-global dependency of the same class as
-      the gitobj repo_root cache (BR-DAG-AMEND-R1-6)
-  - id: BR-DAG-AMEND-R1-13
-    by: orchestrator (scheduling; no design change)
-    rule: 'R1-RS''s dependency on R1-GA1 is satisfied by GA1''s accepted `govbridge gather` command and output format, merged as an
-      INTERIM integration at 4114437 (543/0). GA1 stays OPEN on scope push-down and full-facet acceptance, with scope
-      disjoint from RS (no cli.py). R1-GA2 builds on the engine internals and waits for GA1''s FINAL pass'
-    reason: RS needs only the gather command and its result shape; GA1's remaining work is inside routes, lexical, semantic
-      and gather, which RS does not touch
-  - id: BR-DAG-AMEND-R1-14
-    by: orchestrator (routing of a BR-AR-0023 open issue)
-    rule: R1-INT's mutation_scope is further extended with govbridge/core/taskctx.py for ONE change -- ExclusionCounter is made
-      thread-safe (a lock or per-thread counters merged deterministically), with a concurrency test showing that
-      excluded_hits is exact under --threads 16
-    reason: gather runs facets concurrently; an under-counted excluded_hits is an under-disclosure of retrieval exclusions
-  - id: BR-DAG-AMEND-R1-15
-    by: orchestrator (generalisation of the R1-GA1 second reopen)
-    rule: 'QUERY COMMANDS ARE READ-ONLY. (a) R1-INT acceptance runs every query command -- search, why, impact, history, exact,
-      state, gather, compile, packet verify, receipt check, notes -- against a store opened read-only (and a read-only file)
-      and shows the store file sha256 unchanged; any write attempt is a defect. (b) R1-D2 makes the run-2 demonstration
-      store read-only (file mode) after its build and records its sha256 before and after R1-DEMO2 and R1-MB. (c) Every
-      builder brief from PG3 on states the rule'
-    reason: a query-time cache write was found in R1-GA1 pass 2; a demonstration store mutated by the demonstrating agent's
-      own queries breaks the frozen-store evidence chain
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1540,20 +1340,6 @@ observations:
 - id: OBS-BR-11
   text: 'PreCompact hook CONFIRMED LIVE in this session -- at 2026-09-26T03:49:22+01:00 the hook wrote and committed BR-CP-0016
     on the bridge branch (hooks/checkpoint-hook.log). Manual checkpoints continue after every material transition.'
-- id: OBS-BR-14
-  text: 'the project PreCompact hook also fires when a SUBAGENT compacts -- BR-CP-0023 (04:39Z, reason pre-compact) was written
-    while the orchestrator had not compacted, most likely by a long-running builder''s compaction. The checkpoint is valid
-    (it records the then-current sealed state). Correction: commit e594159''s message names its checkpoint BR-CP-0023;
-    the checkpoint it wrote is BR-CP-0024.'
-- id: OBS-BR-15
-  text: 'a second false zero from the same builder -- after the rule of OBS-BR-13, BR-AR-0019 still reported "0 registry-shape
-    TESTS rows, confirmed by shape sampling"; the orchestrator''s grep finds 158 rows. The builder''s "independent" checks
-    re-used its own shape assumption. An independent measurement must not share the assumption under test; for a shape
-    claim, grep the raw key, not the recogniser''s shape.'
-- id: OBS-BR-16
-  text: 'housekeeping -- $HOME/.cache/gov-bridge holds 77 store directories (17 GB), 2.2 GB of them BR-AR-0019 scratch stores,
-    several moved aside as *.trashed-*; the disk has 159 GB free. No deletion (rm is denied); the orchestrator proposes a
-    list of stores to retire at R1-D2, keeping store-BR-AR-0010 (the run-1 demonstration store) and the R1-D2 store.'
 - id: OBS-BR-12
   text: 'orchestrator instruction conflict, self-reported -- my live follow-up to BR-AR-0020 suggested reading
     DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
@@ -1591,6 +1377,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0025 R1-RS and the BR-AR-0023 R1-GA1 follow-up (scope push-down; full-facet acceptance);
-  integrate-check (schema 2) + FULL suite on the trial-merged tree, merge; on GA1 FINAL dispatch R1-GA2 (BR-AR-0024, draft
-  ready); then PG4 (R1-GA3, R1-RA); checkpoint after every merge
+next_deterministic_action: await BR-AR-0023 R1-GA1, the BR-AR-0022 R1-RM follow-up (fidelity check; Markdown entries) and the BR-AR-0019 R1-RL third follow-up (multi-ref walk; harness methods);
+  integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; on RL's merge dispatch R1-GA1 (BR-AR-0023,
+  template R1-T1); checkpoint after every merge
