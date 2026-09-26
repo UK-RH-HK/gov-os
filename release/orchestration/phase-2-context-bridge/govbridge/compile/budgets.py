@@ -155,6 +155,100 @@ def enforce_section(section: str, items: list, profile: BudgetProfile) -> tuple:
     return kept, drops
 
 
+def enforce_section_with_quotas(section: str, items: list, profile: BudgetProfile,
+                                 facet_min_shares: Optional[dict] = None) -> tuple:
+    """REPAIR_PLAN.md section 2.8 (RC-4, REPAIR_DAG.yaml node R1-GA3): "facet quotas (a minimum share for every
+    requested facet that has candidates) and a drop order that is round-robin across facets; a resolution label is
+    never a global sort key; per-facet drops are disclosed with continuation handles."
+
+    Falls back to plain :func:`enforce_section` when this section has no byte cap, no facet shares were supplied,
+    or none of ``items`` carries a ``facet_tags`` tuple at all (a seed-derived B/C/F/G item never does -- this
+    keeps every non-gather-sourced section BYTE-FOR-BYTE unaffected by this function's existence, "quotas leave
+    section A [and every seed-derived section] unchanged").
+
+    Algorithm, over the DROPPABLE (RETRIEVED/DERIVED) items only (never-dropped items are kept exactly as
+    :func:`enforce_section` keeps them):
+
+    1. bucket every droppable item under its own PRIMARY facet -- the first name, in the facet REGISTRY's own
+       declared order, among the facets it is tagged with (:func:`govbridge.compile.overflow.
+       facet_tags_for_merged_item`) -- so a multi-facet item is counted against exactly ONE facet's own quota
+       bookkeeping, never double-counted (its OTHER tags are still rendered on the item itself, disclosed, just
+       not spent twice here);
+    2. sort each facet's own bucket by ``sort_key`` (best -- lowest rank/lifecycle -- first);
+    3. round-robin across facets (one item per facet per pass, in the registry's declared order) filling each
+       facet's own RESERVED share of the section cap (``min_share * cap``) first;
+    4. round-robin again, unreserved, over whatever remains, until the section cap is exhausted;
+    5. everything left over is dropped, one drop record per item, each carrying its own facet name and a
+       continuation handle (never a bare "BUDGET" with no path forward)."""
+    cap = profile.section_caps_bytes.get(section)
+    if cap is None or not facet_min_shares:
+        return enforce_section(section, items, profile)
+    if not any(getattr(i, "facet_tags", None) for i in items):
+        return enforce_section(section, items, profile)
+
+    never_drop = [i for i in items if i.delivery in NEVER_DROPPED_DELIVERIES]
+    droppable = [i for i in items if i.delivery not in NEVER_DROPPED_DELIVERIES]
+
+    kept = list(never_drop)
+    used = sum(_item_bytes(i) for i in never_drop)
+
+    order = list(facet_min_shares.keys())
+
+    def _primary_facet(item) -> str:
+        tags = getattr(item, "facet_tags", None) or ()
+        for name in order:
+            if name in tags:
+                return name
+        return tags[0] if tags else "unattributed"
+
+    buckets: dict = {}
+    for item in droppable:
+        buckets.setdefault(_primary_facet(item), []).append(item)
+    for name in buckets:
+        buckets[name].sort(key=_sort_key_of)
+
+    names = sorted(buckets.keys())
+    reserved = {name: int(cap * facet_min_shares.get(name, 0.0)) for name in names}
+    facet_used = {name: 0 for name in names}
+
+    def _round_robin(respect_reserve: bool) -> bool:
+        nonlocal used
+        moved_any = False
+        for name in names:
+            q = buckets[name]
+            if not q:
+                continue
+            item = q[0]
+            b = _item_bytes(item)
+            if used + b > cap:
+                continue
+            if respect_reserve and facet_used[name] + b > reserved.get(name, 0):
+                continue
+            kept.append(q.pop(0))
+            used += b
+            facet_used[name] += b
+            moved_any = True
+        return moved_any
+
+    while _round_robin(respect_reserve=True):
+        pass
+    while _round_robin(respect_reserve=False):
+        pass
+
+    drops: list = []
+    for name in names:
+        for item in buckets[name]:
+            drops.append({
+                "item_id": item.item_id, "unit": {"kind": item.unit_kind, "id": item.unit_id},
+                "reason": "BUDGET", "score": item.fused_score, "bytes": _item_bytes(item), "_section": section,
+                "tier": getattr(item, "tier", None), "facet": name,
+                "continuation": f"facet {name!r} was dropped by budget in section {section}; re-run "
+                                f"`govbridge gather` for this query with facet_names=[{name!r}] (or a larger "
+                                f"target_items/batch_size) to reach more of it",
+            })
+    return kept, drops
+
+
 def enforce_section_g(items: list, profile: BudgetProfile) -> tuple:
     """G's own tiered enforcement (BR-AR-0015 reopening, defect 2): T1 items (delivery PINNED -- every code/test
     citation the seed records themselves make, plus its enclosing definition) are NEVER dropped, matching
@@ -231,12 +325,17 @@ def enforce_combined(letter: str, subsections: dict, profile: BudgetProfile) -> 
     return kept, drops
 
 
-def apply_budgets(sections: dict, profile: BudgetProfile) -> tuple:
+def apply_budgets(sections: dict, profile: BudgetProfile, facet_min_shares: Optional[dict] = None) -> tuple:
     """``sections``: ``{letter_or_subblock: [PacketItem, ...]}``, already fully assembled (pre-budget). Returns
     ``(sections_after, all_drops, blocked_budget, notices)``. Section A (and A alone) uses ``enforce_section_a``;
     D's three sub-blocks (D.1/D.2/D.3, if present) share ARCHITECTURE.md section 7.3's one "D" cap via
     ``enforce_combined``; G uses ``enforce_section_g`` (BR-AR-0015 reopening: T1 pinned/by-reference, T2/T3/T4
-    dropped in tier order); every other section uses ``enforce_section``."""
+    dropped in tier order; layering a SECOND, per-facet quota system on top of G's own already-tiered, already-
+    tested T1-T4 budget was judged disproportionate for this pass -- disclosed, not silent); every other section
+    uses ``enforce_section_with_quotas`` (REPAIR_DAG.yaml node R1-GA3, RC-4) when ``facet_min_shares`` is given AND
+    at least one of that section's own items actually carries a ``facet_tags`` tuple (a seed-derived item never
+    does, so a section with no gather-sourced content is untouched, byte-for-byte, by this parameter's presence) --
+    ``enforce_section`` otherwise, unchanged from before this node."""
     out: dict = {}
     all_drops: list = []
     blocked_budget = False
@@ -258,7 +357,7 @@ def apply_budgets(sections: dict, profile: BudgetProfile) -> tuple:
             kept, drops, g_notices = enforce_section_g(items, profile)
             notices.extend(g_notices)
         else:
-            kept, drops = enforce_section(key, items, profile)
+            kept, drops = enforce_section_with_quotas(key, items, profile, facet_min_shares)
         out[key] = kept
         all_drops.extend(drops)
 

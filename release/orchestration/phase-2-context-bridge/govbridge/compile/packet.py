@@ -29,17 +29,21 @@ from govbridge.authority import resolver as resolvermod
 from govbridge.compile import budgets as budgetsmod
 from govbridge.compile import codeseeds as codeseedsmod
 from govbridge.compile import codesurfaces as codesurfacesmod
+from govbridge.compile import overflow as overflowmod
 from govbridge.compile import render as rendermod
 from govbridge.compile import sectionmap as sectionmapmod
 from govbridge.core import gitobj, store as storemod, view as viewmod
 from govbridge.core import taskctx as taskctxmod
 from govbridge.core.manifest import bridge_code_tree
 from govbridge.core.yamlutil import canonical_json, load_yaml_file, sha256_text
+from govbridge.gather import facets as facetsmod
+from govbridge.gather import instantiate as instantiatemod
+from govbridge.gather.followup import gather_with_followup
 from govbridge.graph import history as historymod
 from govbridge.graph import traverse as traversemod
 from govbridge.graph import why as whymod
 from govbridge.route import router as routermod
-from govbridge.route.router import FAKE_ROUTES, RouteSet
+from govbridge.route.router import FAKE_ROUTES, RouteHit, RouteOccurrence, RouteSet
 
 STATUS_OK = "OK"
 STATUS_BLOCKED = "BLOCKED"
@@ -151,6 +155,13 @@ class PacketItem:
     # manifest too (never guessed at by a downstream reader). Empty/False for everything else.
     is_directory: bool = False
     directory_members: tuple = ()
+    # REPAIR_DAG node R1-GA3 (REPAIR_PLAN.md section 2.8, RC-4/RC-5): "per-item tags: the query ids and facets each
+    # item serves, so an agent can find 'the tests for query X'". Empty for anything not produced by
+    # ``govbridge.gather`` (a seed-derived B/C/F/G item, section A, I, J) -- ``Compiler.add`` UNIONS these tuples
+    # in when the SAME unit id is placed again for a different query/facet, rather than silently keeping only the
+    # first query/facet that happened to reach a section first.
+    query_ids: tuple = ()
+    facet_tags: tuple = ()
     item_id: str = dataclasses.field(init=False)
 
     def __post_init__(self):
@@ -266,28 +277,19 @@ def _abs_path(maybe_rel: str) -> str:
     return os.path.join(GOV_BRIDGE_DOMAIN, maybe_rel)
 
 
-def _load_queries(task_spec: dict, repo: Optional[str] = None) -> list:
-    """``schemas/task-spec.yaml``: ``queries: 'path | list'``, ``[{id, text, routes?, target_section?}]`` or a
-    queries file. A file (like ``ARCHITECTURE/demonstration-queries.yaml``) that is a query-DESIGN document rather
-    than a flat executable list yields no mechanically-run queries here -- generic, never an error: the sections
-    such a task still gets (A from the resolver, B/F from the seeds) are honestly complete on their own, and the
-    worker issues further live ``govbridge`` queries during the task itself."""
-    raw = task_spec.get("queries")
-    if raw is None:
-        return []
-    if isinstance(raw, list):
-        candidates = raw
-    elif isinstance(raw, str):
-        doc = load_yaml_file(_abs_path(raw))
-        if isinstance(doc, list):
-            candidates = doc
-        elif isinstance(doc, dict) and isinstance(doc.get("queries"), list):
-            candidates = doc["queries"]
-        else:
-            candidates = []
-    else:
-        candidates = []
-    return [q for q in candidates if isinstance(q, dict) and isinstance(q.get("text"), str)]
+def _hit_from_merged(md: dict) -> RouteHit:
+    """One row of ``gather_with_followup(...)["merged"]`` (``govbridge.gather.merge.MergedItem.to_dict()``) as a
+    ``govbridge.route.router.RouteHit`` -- so the existing ``item_from_hit``/``FusedHit`` machinery this module
+    already uses for a plain route hit needs no second construction path for gather's richer, provenance-bearing
+    shape. ``md["occurrence"]`` is already a ``RouteOccurrence.to_dict()`` (the canonical occurrence gather's own
+    merge step already chose -- ``govbridge.gather.merge.collapse_occurrences``), so this is a lossless, direct
+    round-trip, never a re-derivation."""
+    occ_d = md.get("occurrence")
+    occs = (RouteOccurrence(**occ_d),) if occ_d else ()
+    return RouteHit(unit_id=md.get("unit_id"), unit_kind=md.get("unit_kind"), route=md.get("route") or "gather",
+                     rank=1, delivery=md.get("delivery") or "RETRIEVED", occurrences=occs, text=md.get("text"),
+                     authority_class=md.get("authority_class"), lifecycle=md.get("lifecycle"), edge_path=(),
+                     tier=md.get("tier"), resolution=md.get("resolution"))
 
 
 def _read_excerpt(path: str, commit: str, l1: Optional[int], l2: Optional[int],
@@ -328,7 +330,9 @@ class Compiler:
 
     def __init__(self, task_spec: dict, routes: RouteSet, repo: Optional[str], view_path: str,
                  registry_path: Optional[str], rrf_k: int, graph_depth: int, budgets_path: Optional[str] = None,
-                 fanout: Optional[dict] = None, per_item_cap_bytes: Optional[int] = None):
+                 fanout: Optional[dict] = None, per_item_cap_bytes: Optional[int] = None,
+                 max_slice_chars: Optional[int] = None, top_n: Optional[int] = None,
+                 facets_path: Optional[str] = None):
         self.task_spec = task_spec
         # BR-DAG node R1-RM: the same per-item cap ARCHITECTURE.md section 7.3 already names (24 KB by default,
         # config/budgets.yaml) decides when a MANDATORY item's own content is "oversize" enough to need a section
@@ -349,6 +353,14 @@ class Compiler:
         # code_route adapter's own generous fallback when the caller gives none (e.g. an existing test that
         # predates this reopening).
         self.fanout = fanout or {}
+        # REPAIR_DAG node R1-GA3 (REPAIR_PLAN.md section 2.8, RC-5): "content slices... up to max_slice_chars
+        # (1,600), with a larger slice for the facet's top items" -- the SAME config/budgets.yaml value every
+        # profile already carries (previously read only by govbridge.gather.followup's own hard-coded mirror of
+        # it; this is the compiler's own copy, defaulted so an existing direct ``Compiler(...)`` construction that
+        # predates this node keeps working unmodified).
+        self.max_slice_chars = max_slice_chars if max_slice_chars is not None else 1600
+        self.top_n = top_n if top_n is not None else 3
+        self.facets_path = facets_path
         # R1-RX (OBS-BR-08, RC-8): the task's own retrieval_exclusions, PLUS whatever the ambient task context
         # (GOVBRIDGE_TASK / --task, govbridge.core.taskctx) additionally names -- one merged list, used by every
         # c.routes.run(...) call site below, never just the query loop. exclusion_counter accumulates how many
@@ -551,26 +563,69 @@ class Compiler:
         return "\n".join(pieces) + "\n", delivered_sha256
 
     def _render_oversize_no_selector(self, mi: resolvermod.MandatoryItem, primary: dict) -> tuple:
+        """BR-DAG-AMEND-R1-11 (routing of R1-RM's own MET_WITH_DISCLOSED_LIMIT row): R1-RM could only ever disclose
+        this item's sections BY REFERENCE, because no facet system existed yet in its own wave (R1-GA1 built it).
+        This node additionally DELIVERS IN FULL whichever sections the gather facet vocabulary
+        (``govbridge.compile.overflow.select_oversize_facet_sections``) scores as relevant -- a PURE function of
+        the document's own content and the (default, versioned) facet registry alone, so
+        ``govbridge.compile.validate``'s blind re-derivation (``_composition_context_class``, which supplies no
+        task or query set at all) reproduces the exact same selection and therefore the exact same body, byte for
+        byte. Nothing is ever removed from A; every un-selected section stays exactly the by-reference row it
+        already was (REPAIR_PLAN.md section 3 rule 1's own coverage/tiling notice is unchanged in shape -- only
+        some of its rows move from ``undelivered_ranges`` into ``delivered``, with their own real content now
+        also printed above, inline)."""
         disclosure = resolvermod.oversize_disclosure_map(mi, repo=self.repo)
         lines = [f"[section map: {mi.path}@{mi.commit} exceeds the {self.per_item_cap_bytes}-byte per-item cap; "
-                 f"every section below is delivered BY REFERENCE -- read it by its exact line range and verify "
-                 f"its own sha256 (REPAIR_PLAN.md section 3 rule 1: never a silent, unmarked cut)]"]
+                 f"every section below is delivered BY REFERENCE unless marked DELIVERED IN FULL -- read a "
+                 f"by-reference section by its exact line range and verify its own sha256 (REPAIR_PLAN.md section "
+                 f"3 rule 1: never a silent, unmarked cut)]"]
+        delivered_rows: list = []
         if disclosure:
-            for r in disclosure:
+            selected, remaining = overflowmod.select_oversize_facet_sections(disclosure)
+            for r in selected:
+                text = _read_excerpt(r["path"], r["commit"], r["line_start"], r["line_end"], repo=self.repo,
+                                      max_chars=None)
+                if text is None:
+                    remaining = list(remaining) + [r]  # could not actually be re-read -- falls back, disclosed
+                    continue
+                lines.append(f"- {r['name']}  lines {r['line_start']}-{r['line_end']}  sha256={r['sha256']}  "
+                              f"[DELIVERED IN FULL -- selected by the gather facet vocabulary]")
+                lines.append(f"--- {r['name']} ---")
+                lines.append(text.rstrip("\n"))
+                delivered_rows.append(dict(r))
+            for r in sorted(remaining, key=lambda row: (row["line_start"] if row["line_start"] is not None else 0)):
                 lines.append(f"- {r['name']}  lines {r['line_start']}-{r['line_end']}  sha256={r['sha256']}")
-            undelivered = [dict(r) for r in disclosure]
+            undelivered = [dict(r) for r in remaining]
         else:
             lines.append("- (no structural map available for this format; read the whole item by exact reference)")
             undelivered = [{"path": primary["path"], "commit": primary["commit"],
                             "line_start": primary["line_start"], "line_end": primary["line_end"],
                             "name": "(whole item)", "sha256": primary["sha256"], "bytes": primary["bytes"]}]
+        # REPAIR_DAG node R1-GA3 real-view finding (CONTROL-A: a 132-section oversize mandatory item): the
+        # notice's own "section_map" field this compiler used to carry (every disclosure row a SECOND time, on
+        # top of "delivered"/"undelivered_ranges", which already partition that exact same set) is dead weight --
+        # `governbridge.compile.validate.verify_declared_and_delivered`'s tiling check reads only "delivered" and
+        # "undelivered_ranges" (confirmed by reading it directly, and by grep: nothing anywhere reads
+        # notice["section_map"]), and every disclosed name/range/sha256 is ALSO already printed, human-readably,
+        # in this item's own rendered body above. A real oversize mandatory item's own J section (PINNED, never
+        # budget-dropped) was measured at 76,978 bytes for this ONE notice alone before this fix (CONTROL-A's
+        # real contract_v3, 132 structural sections) -- material against "the main packet is within the profile
+        # total". Replaced with a compact summary (count + a digest over the sorted names), the same "verification
+        # stays possible, the rendered/manifest copy stops being triplicated" discipline BR-AR-0015's own
+        # ``budgets.compact_drops`` already established for G's own oversized drop lists.
+        section_map_summary = {
+            "count": len(disclosure) if disclosure else len(undelivered),
+            "names_sha256": sha256_text("\n".join(sorted(r["name"] for r in disclosure))) if disclosure else None,
+        }
         self.notices.append({
             "type": "MANDATORY_PARTIAL_DELIVERY", "id": mi.id, "path": mi.path, "commit": mi.commit,
-            "section_map": undelivered, "delivered": [], "undelivered_ranges": undelivered,
+            "section_map_summary": section_map_summary,
+            "delivered": delivered_rows, "undelivered_ranges": undelivered,
         })
-        # nothing raw was delivered (only the map above) -- delivered_sha256 stays None so `packet verify` is
-        # forced onto the coverage/tiling check (2b) rather than a hash comparison that could never legitimately
-        # pass here.
+        # BR-DAG-AMEND-R1-11's newly-delivered sections above are still never HASHED as "the item's delivered
+        # body" -- delivered_sha256 stays None so `packet verify` is forced onto the coverage/tiling check (2b),
+        # which now legitimately covers a MIX of full-text and by-reference rows, rather than a whole-body hash
+        # comparison that could never pass for a partially-delivered item.
         return "\n".join(lines) + "\n", None
 
     def reference_item(self, source: PacketItem, section: str) -> PacketItem:
@@ -587,14 +642,54 @@ class Compiler:
                            banner=None, source_sha256=source.source_sha256, delivered_sha256=source.delivered_sha256,
                            is_directory=source.is_directory, directory_members=source.directory_members)
 
+    def reference_to_a_item(self, a_item: PacketItem, section: str, query_ids: tuple = (),
+                             facet_tags: tuple = ()) -> PacketItem:
+        """REPAIR_PLAN.md section 2.8: "content already present is cited by item id". A gather hit whose unit id
+        this compile ALREADY placed in section A is never duplicated into B-H a second time -- it is cited here
+        instead, by ``a_item.item_id``, so the packet still records that query/facet as having touched it (the
+        tag), without a second copy of its body. Deliberately RETRIEVED/UNCLASSIFIED here (never A's own
+        MANDATORY/PINNED delivery or class): this pointer is an ordinary, droppable B-H row, not a second
+        authoritative entry, so it never inherits A's budget exemption."""
+        return PacketItem(unit_kind=a_item.unit_kind, unit_id=a_item.unit_id, section=section,
+                           delivery="RETRIEVED", cls=None, lifecycle=classesmod.LIFECYCLE_UNKNOWN,
+                           version_status=a_item.version_status, ref=a_item.ref, commit=a_item.commit,
+                           path=a_item.path, blob=a_item.blob, line_start=a_item.line_start,
+                           line_end=a_item.line_end, text=f"[see A: {a_item.item_id} ({a_item.unit_id})]",
+                           content_sha256=a_item.content_sha256, by_reference=True, route="resolver",
+                           raw_score=None, rank=None, fused_score=None, edge_path=(),
+                           reason="content already delivered in section A", banner=None,
+                           source_sha256=a_item.source_sha256, delivered_sha256=a_item.delivered_sha256,
+                           query_ids=tuple(sorted(set(query_ids))), facet_tags=tuple(sorted(set(facet_tags))))
+
     # -- construction from a route hit (delivery RETRIEVED/DERIVED) -------------------------------------------
 
-    def item_from_hit(self, fused: "routermod.FusedHit", section: str) -> PacketItem:
+    def item_from_hit(self, fused: "routermod.FusedHit", section: str, facet_tags: tuple = (),
+                       query_ids: tuple = (), top: bool = False) -> PacketItem:
+        """``facet_tags``/``query_ids`` (REPAIR_DAG node R1-GA3, REPAIR_PLAN.md section 2.8): "per-item tags: the
+        query ids and facets each item serves" -- both default to ``()`` so every pre-existing caller (the seed
+        why/history/traverse/code loop, ``_attach_evidence_both_ways``'s pre-gather callers) is unaffected. ``top``
+        (REPAIR_PLAN.md section 2.8, RC-5): "a larger slice for the facet's top items" -- doubles this item's own
+        content-slice cap.
+
+        RC-5 ("pointer-only delivery"): a code-route hit's own ``text`` is a bare signature or edge label
+        (``govbridge.route.real_routes``, not this node's file to edit); a semantic-route hit carries no text at
+        all. ``govbridge.compile.overflow.needs_content_slice`` recognises both shapes; when it does, this method
+        reads the item's own definition/context body FRESH from Git (``overflow.read_content_slice``) and appends
+        it below the original pointer line (kept as a one-line header -- never discarded, since it names the kind/
+        qualified name or the edge's own label) -- an honest MISSING (the pointer alone, unchanged) if Git cannot
+        supply it."""
         h = fused.hit
         occ = h.occurrences[0] if h.occurrences else None
         lifecycle = h.lifecycle or classesmod.LIFECYCLE_UNKNOWN
         banner = LIFECYCLE_BANNERS.get(lifecycle) if lifecycle != classesmod.LIFECYCLE_ACTIVE else None
         text = h.text or ""
+        if occ is not None and overflowmod.needs_content_slice(h.unit_kind, h.route, text):
+            pad = 0 if h.unit_kind == "symbol" else 3
+            cap = self.max_slice_chars * (2 if top else 1)
+            fetched = overflowmod.read_content_slice(occ.path, occ.commit, occ.line_start, occ.line_end,
+                                                       self.repo, cap, pad=pad)
+            if fetched:
+                text = f"{text}\n{fetched}" if text else fetched
         # a RETRIEVED/DERIVED hit has no separate "source" to diverge from -- content_sha256 already hashes
         # exactly the bytes delivered, so source_sha256/delivered_sha256 both mirror it (BR-DAG node R1-RM: the
         # delivered-vs-source distinction only ever BITES for a MANDATORY item; see item_from_mandatory).
@@ -608,7 +703,8 @@ class Compiler:
                            route=h.route, raw_score=None, rank=h.rank, fused_score=fused.fused_score,
                            edge_path=tuple(h.edge_path), reason=None, banner=banner,
                            tier=getattr(h, "tier", None), resolution=getattr(h, "resolution", None),
-                           source_sha256=content_sha256, delivered_sha256=content_sha256)
+                           source_sha256=content_sha256, delivered_sha256=content_sha256,
+                           query_ids=tuple(sorted(set(query_ids))), facet_tags=tuple(sorted(set(facet_tags))))
 
     # -- construction from a graph.why/history Edge hop (delivery DERIVED) --------------------------------------
 
@@ -637,13 +733,29 @@ class Compiler:
         NEVER accepted here -- ARCHITECTURE.md section 5.3 rule 1 ("Packet.section_a accepts only MandatoryItem,
         checked with isinstance") is enforced by routing every A-bound item through ``add_to_a`` instead, which is
         the only method that ever appends to ``sections["A"]``. Returns the item actually stored, or None if it
-        was a duplicate (never stored)."""
+        was a duplicate (never stored).
+
+        REPAIR_DAG node R1-GA3: a duplicate is never a pure no-op when it carries a NEW ``query_ids``/
+        ``facet_tags`` value -- the already-stored item is replaced IN PLACE (same position, same text/placement/
+        score -- ``dataclasses.replace`` touches only these two fields) by the UNION of both tuples, so an item
+        two different queries or facets both surface keeps every one of its tags rather than silently keeping only
+        whichever query/facet reached this section first."""
         if section == "A":
             raise SectionAViolation(
                 f"section A must be filled through Compiler.add_to_a, never Compiler.add -- refused "
                 f"{item.unit_kind}:{item.unit_id} (delivery={item.delivery}, route={item.route})")
         seen = self._seen.setdefault(section, set())
         if item.unit_id in seen:
+            if item.query_ids or item.facet_tags:
+                lst = sections.get(section) or []
+                for i, existing in enumerate(lst):
+                    if existing.unit_id != item.unit_id:
+                        continue
+                    merged_q = tuple(sorted(set(existing.query_ids) | set(item.query_ids)))
+                    merged_f = tuple(sorted(set(existing.facet_tags) | set(item.facet_tags)))
+                    if merged_q != existing.query_ids or merged_f != existing.facet_tags:
+                        lst[i] = dataclasses.replace(existing, query_ids=merged_q, facet_tags=merged_f)
+                    break
             return None
         seen.add(item.unit_id)
         sections.setdefault(section, []).append(item)
@@ -665,11 +777,17 @@ class Compiler:
 
 
 def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Optional[str] = None,
-                    registry_path: Optional[str] = None, budgets_path: Optional[str] = None) -> dict:
+                    registry_path: Optional[str] = None, budgets_path: Optional[str] = None,
+                    facets_path: Optional[str] = None) -> dict:
     """Compiles ``task_spec`` into a packet. Returns a dict with keys ``status``, ``sections`` (post-budget,
     post-sort ``{letter_or_subblock: [PacketItem]}``), ``drops`` (``{letter_or_subblock: [drop dict]}``),
     ``queries_log``, ``notices``, ``resolve_result``, ``manifest``, ``rendered``, ``packet_sha256``,
-    ``manifest_sha256``, ``packet_id``."""
+    ``manifest_sha256``, ``packet_id``, ``gather_results``, ``evidence_notes``, ``supplementary_packets``.
+
+    ``facets_path`` (REPAIR_DAG.yaml node R1-GA3): overrides ``config/facets.yaml`` for every
+    ``govbridge.gather``/``govbridge.compile.overflow`` call this compile makes (facet quotas, per-item facet
+    tags, D.2's both-ways gather, the oversize-mandatory-item facet vocabulary) -- ``None`` (the default) uses the
+    real, versioned registry, exactly as before this node."""
     routes = routes or FAKE_ROUTES
     view_path = _abs_path(task_spec["view"])
     profile = budgetsmod.load_profile(task_spec["budget_profile"], path=budgets_path)
@@ -678,7 +796,9 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     status = STATUS_OK if resolve_result.status == resolvermod.STATUS_OK else STATUS_BLOCKED
 
     c = Compiler(task_spec, routes, repo, view_path, registry_path, profile.rrf_k, profile.graph_neighbour_depth,
-                 budgets_path=budgets_path, fanout=profile.g_fanout, per_item_cap_bytes=profile.per_item_cap_bytes)
+                 budgets_path=budgets_path, fanout=profile.g_fanout, per_item_cap_bytes=profile.per_item_cap_bytes,
+                 max_slice_chars=profile.max_slice_chars, top_n=profile.parent_expansion_top_n,
+                 facets_path=facets_path)
 
     sections: dict = {k: [] for k in ("A", "B", "C", "D.1", "D.2", "D.3", "E", "F", "G", "H")}
     queries_log: dict = {}
@@ -712,7 +832,7 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
             c.notices.append({"type": "MANDATORY_ITEM_NOT_IN_A", "id": mi.id, "class": mi.cls,
                                "lifecycle": mi.lifecycle, "placed_in": section})
         if section == "D.2":
-            _attach_evidence_both_ways(c, sections, queries_log, item)
+            _attach_evidence_both_ways(c, sections, queries_log, item, view_path, repo, budgets_path=budgets_path)
 
     # --- B (why) and F (history), from seeds -- real B5 graph modules, git-backed, outage-proof.
     for seed in task_spec.get("seeds", []) or []:
@@ -775,50 +895,131 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
                     item, delivery=("RETRIEVED" if item.delivery == "PINNED" else item.delivery), tier=None)
             c.add(sections, target, item)
 
-    # --- queries: exact/lexical/semantic/code routes, fused, placed by (class, lifecycle) alone.
-    for q in _load_queries(task_spec, repo=repo):
-        route_names = routermod.select_routes(q, grammar=c.grammar)
-        hits_by_route = {
-            rn: c.routes.run(rn, text=q.get("text"), k=q.get("k", 8), exclude=c.exclusions,
-                              exclude_counter=c.exclusion_counter)
-            for rn in route_names if rn in ("exact", "lexical", "semantic", "code")
-        }
-        fused = routermod.fuse(hits_by_route, rrf_k=c.rrf_k)
+    # --- queries: govbridge.gather (facets, parallel retrieval, adaptive follow-up), one call per INSTANTIATED
+    # task query -- REPAIR_DAG.yaml node R1-GA3 (REPAIR_PLAN.md sections 2.1, 2.8; RC-2, RC-4, RC-5). A query with
+    # no executable text is the compile error QUERY_NOT_EXECUTABLE, never a silent skip (RC-2) -- the SAME
+    # instantiation govbridge.compile.section_i.instantiated_query_set and govbridge.gather.followup's own CLI
+    # already use, never a second, diverging reading of the query-set document.
+    all_facets = facetsmod.load_facets(c.facets_path)
+    a_by_unit_id = {i.unit_id: i for i in sections.get("A", [])}
+    gather_results_by_query: dict = {}
+    try:
+        raw_queries = task_spec.get("queries")
+        query_doc = instantiatemod.load_query_set(raw_queries, repo=repo, base_dir=GOV_BRIDGE_DOMAIN)
+        instantiated_queries = instantiatemod.instantiate_all(query_doc)
+    except instantiatemod.QueryNotExecutable as exc:
+        instantiated_queries = []
+        status = STATUS_BLOCKED
+        c.notices.append({"type": "QUERY_NOT_EXECUTABLE", **exc.to_dict()})
+
+    for q in instantiated_queries:
+        requested_names = facetsmod.facets_for_query(q, c.facets_path)
+        requested_facets = {n: all_facets[n] for n in requested_names if n in all_facets}
         target_section = q.get("target_section")
-        query_row = {"id": q.get("id"), "text": q.get("text"), "routes": list(route_names), "k": q.get("k", 8)}
+
+        # ARCHITECTURE.md section 7.2 / govbridge.route.router.select_routes: an explicit `routes` list on the
+        # query (or the auto-detected shape of its own text) has ALWAYS decided which routes may run for it --
+        # unchanged by this node. A facet may declare a route this ONE query never asked for (e.g. "purpose"
+        # declares semantic; a query with `routes: [lexical]` never wants a real embedding call at all) -- rather
+        # than widening every query to every facet's own routes, the query's own route selection is honoured by
+        # zeroing the disallowed route SLOTS for this one gather call (a facet whose every route is zeroed simply
+        # reports MISSING, exactly as it would with genuinely no candidates -- never a crash, never a silent
+        # widening of what this query was allowed to touch).
+        allowed_routes = set(routermod.select_routes(q, grammar=c.grammar))
+        q_routes = routermod.RouteSet(
+            exact=c.routes.exact if "exact" in allowed_routes else routermod.empty_route,
+            lexical=c.routes.lexical if "lexical" in allowed_routes else routermod.empty_route,
+            semantic=c.routes.semantic if "semantic" in allowed_routes else routermod.empty_route,
+            code=c.routes.code if "code" in allowed_routes else routermod.empty_route,
+        )
+
+        gather_result = gather_with_followup(
+            q, q_routes, task=c.task_ctx, facet_names=(list(requested_names) if requested_names else None),
+            exclude=list(c.exclusions), view_path=view_path, repo=repo, facets_path=c.facets_path,
+            budgets_path=budgets_path,
+        )
+        gather_results_by_query[q["id"]] = gather_result
+        c.exclusion_counter.bump(gather_result.get("excluded_hits", 0))
+
+        merged = gather_result.get("merged") or []
         touched_sections = set()
-        for f in fused:
-            section, also_d1 = place_item(f.hit.authority_class, f.hit.lifecycle, f.hit.delivery, f.hit.unit_id,
-                                           c.grammar)
+        facet_present = {name: False for name in requested_names}
+        # REPAIR_PLAN.md section 2.8: "a larger slice for the facet's TOP items" -- a per-FACET rank, never a
+        # single rank over the whole merged list (which would only ever mark the first facet in registry order as
+        # having "top" items at all). ``merged`` accumulates facet-by-facet within a round (govbridge.gather.
+        # engine.gather's own "walk facets in registry order" merge), so counting each facet's own occurrences as
+        # they are encountered approximates that facet's own internal rank order closely enough to decide "is this
+        # one of this facet's own first c.top_n items."
+        facet_rank_counters: dict = {}
+        for rank, md in enumerate(merged, start=1):
+            tags = overflowmod.facet_tags_for_merged_item(md, requested_facets)
+            top = False
+            for name in tags:
+                if name in facet_present:
+                    facet_present[name] = True
+                facet_rank_counters[name] = facet_rank_counters.get(name, 0) + 1
+                if facet_rank_counters[name] <= c.top_n:
+                    top = True
+
+            a_item = a_by_unit_id.get(md.get("unit_id"))
+            if a_item is not None:
+                # REPAIR_PLAN.md section 2.8: "content already present is cited by item id" -- never a second copy
+                # of an item this compile already placed in section A.
+                ref = c.reference_to_a_item(a_item, target_section or "H", query_ids=(q["id"],), facet_tags=tags)
+                c.add(sections, ref.section, ref)
+                touched_sections.add(ref.section)
+                continue
+
+            hit = _hit_from_merged(md)
+            section, also_d1 = place_item(hit.authority_class, hit.lifecycle, hit.delivery, hit.unit_id, c.grammar)
             if section == "H":
-                # BR-HO-0015 defect 3 (G row): a RETRIEVED/DERIVED item (here, a lexical/semantic query hit -- the
-                # code route's own hits are already redirected in the seed loop above) whose canonical occurrence
-                # is a code or test surface goes to G, never H; D.1/D.2/D.3/E/F placements above are unaffected
-                # (this branch only ever runs on the section == "H" fallback). Only a LADDER class may move to G
-                # (g_admissible) -- a non-ladder class (UNCLASSIFIED, FIXTURE) is H-only by its fixed
-                # allowed_sections, whatever its occurrence path looks like.
-                occ_path = f.hit.occurrences[0].path if f.hit.occurrences else None
-                if (occ_path and g_admissible(f.hit.authority_class)
+                # BR-HO-0015 defect 3 (G row), unchanged: a RETRIEVED/DERIVED item whose canonical occurrence is a
+                # code or test surface goes to G, never H.
+                occ_path = hit.occurrences[0].path if hit.occurrences else None
+                if (occ_path and g_admissible(hit.authority_class)
                         and codesurfacesmod.is_code_or_test_surface(occ_path, c.code_surface_rules)):
                     section = "G"
                 elif target_section:
                     section = target_section
-            item = c.item_from_hit(f, section)
+            fused = routermod.FusedHit(hit=hit, fused_score=1.0 / rank, routes=(hit.route,))
+            item = c.item_from_hit(fused, section, facet_tags=tags, query_ids=(q["id"],), top=top)
             if section == "G" and item.tier is None:
-                # a lexical/semantic hit redirected into G carries no tier of its own (only the code route's hits
-                # set one) -- it is T3 ("code or test hits from lexical, semantic or code retrieval") by
-                # construction, since this whole branch only runs for a query hit whose occurrence is a code/test
-                # surface (defect 2's tier order).
                 item = dataclasses.replace(item, tier="T3")
+            elif item.tier is not None and section != "G":
+                item = dataclasses.replace(
+                    item, delivery=("RETRIEVED" if item.delivery == "PINNED" else item.delivery), tier=None)
             c.add(sections, section, item)
             touched_sections.add(section)
             if also_d1:
-                c.add(sections, "D.1", c.item_from_hit(f, "D.1"))
+                d1_item = c.item_from_hit(fused, "D.1", facet_tags=tags, query_ids=(q["id"],), top=top)
+                c.add(sections, "D.1", d1_item)
                 touched_sections.add("D.1")
-        # a query with no hits still records itself, under its target_section (or H, its generic default landing
-        # spot) -- "every section records its queries" holds even when a query returns nothing.
+
+        query_row = {
+            "id": q.get("id"), "text": q.get("text"), "facets": list(requested_names),
+            "stop_reason": gather_result.get("stop_reason"),
+            "followup_rounds": gather_result.get("followup_rounds"), "merged_items": len(merged),
+        }
         for sec in (touched_sections or {target_section or "H"}):
             queries_log.setdefault(sec, []).append(query_row)
+
+        # REPAIR_PLAN.md section 2.6/2.8: "every requested facet of every query is present, or disclosed as
+        # MISSING". A facet whose own base-round telemetry already reported it MISSING (no candidates anywhere,
+        # engine.gather's own disclosed reason) is reported with that reason; one that had candidates but never
+        # got a single item PLACED into the compiled packet (dedup/budget) is disclosed generically -- neither
+        # case is silently absent.
+        per_round = ((gather_result.get("telemetry") or {}).get("per_round")) or []
+        for name in requested_names:
+            if facet_present.get(name):
+                continue
+            facet_rounds = [r for r in per_round if r.get("facet") == name]
+            reason = next((r.get("missing_reason") for r in facet_rounds if r.get("missing")), None)
+            c.notices.append({
+                "type": "FACET_MISSING", "query_id": q["id"], "facet": name,
+                "reason": reason or "gather found candidates for this facet, but none were placed in the "
+                                     "compiled packet (deduplicated away or dropped by budget -- see the BUDGET "
+                                     "drop records for this section)",
+            })
 
     # R1-RX (OBS-BR-08): "each output discloses how many hits were excluded" -- one notice, always present (even
     # at 0), summing every c.routes.run(...) call this compile made (the query loop, the seed code route and the
@@ -832,13 +1033,48 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     c.notices = all_notices
     c.add(sections, "J", j_item)
 
-    # --- budgets, then final deterministic ordering.
-    sections, drops_list, blocked_budget, budget_notices = budgetsmod.apply_budgets(sections, profile)
+    # --- budgets (facet-quota-aware, REPAIR_DAG.yaml node R1-GA3), then final deterministic ordering.
+    facet_shares = overflowmod.facet_min_shares(c.facets_path)
+    sections, drops_list, blocked_budget, budget_notices = budgetsmod.apply_budgets(
+        sections, profile, facet_min_shares=facet_shares)
     if blocked_budget:
         status = STATUS_BLOCKED_BUDGET
     c.notices.extend(budget_notices)  # e.g. G_T1_OVER_BUDGET (BR-AR-0015 reopening defect 2)
     for key in sections:
         sections[key] = sorted(sections[key], key=sort_key)
+
+    # --- overflow: REPAIR_PLAN.md section 2.8 ("if merged evidence exceeds the profile, the compiler emits
+    # hierarchical evidence notes and supplementary packets... nothing is silently discarded"). An item this
+    # compile's own gather calls retrieved but the budget then dropped (``drops_list``, BEFORE it is compacted
+    # below) is never simply lost: it is shaped into an R1-RN evidence note (grounded claims, when a concrete line
+    # range is groundable) PLUS an R1-RS supplementary packet (the full remainder, deduplicated against what the
+    # main packet already kept) per query. Neither artifact is validated here (a caller runs ``govbridge notes
+    # validate`` / ``packet verify`` on them, exactly like every other note/supplementary packet in this domain);
+    # this only shapes the data and discloses it in J, in both directions (never a silent overflow).
+    from govbridge.compile import supplementary as supplementarymod  # lazy: supplementary.py imports this module
+
+    dropped_keys = {f"{d['unit']['kind']}:{d['unit']['id']}" for d in drops_list}
+    already_placed_keys = {f"{i.unit_kind}:{i.unit_id}" for items in sections.values() for i in items}
+    evidence_notes: dict = {}
+    supplementary_packets: dict = {}
+    for qid, g_result in gather_results_by_query.items():
+        overflow_items = [md for md in (g_result.get("merged") or [])
+                           if f"{md.get('unit_kind')}:{md.get('unit_id')}" in dropped_keys]
+        if not overflow_items:
+            continue
+        note = overflowmod.build_overflow_note(qid, overflow_items, repo=repo)
+        if note is not None:
+            evidence_notes[qid] = note
+        supplementary_built = supplementarymod.build_supplementary_packet(
+            "gather", {"merged": overflowmod.merged_items_as_hit_dicts(overflow_items)}, task_spec,
+            dedup_ids=already_placed_keys)
+        supplementary_packets[qid] = supplementary_built
+        c.notices.append({
+            "type": "EVIDENCE_OVERFLOW", "query_id": qid, "overflow_item_count": len(overflow_items),
+            "note_id": (note or {}).get("note_id"), "note_unresolved_count": len((note or {}).get("unresolved", [])),
+            "supplementary_packet_sha256": supplementary_built.get("packet_sha256"),
+        })
+
     # BR-AR-0015 reopening, defect 4: compact, per (section, tier) -- a count, a sha256 over the sorted dropped
     # unit ids, and the first 50 of those ids -- never the raw per-item drop list the manifest used to carry.
     drops_by_section = budgetsmod.compact_drops(drops_list)
@@ -869,6 +1105,15 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         # R1-RX (OBS-BR-08): the same count as the RETRIEVAL_EXCLUSIONS_APPLIED notice, surfaced at the top level
         # too so a caller (govbridge.cli, a test) never has to scan notices for it.
         "excluded_hits": c.exclusion_counter.count,
+        # REPAIR_DAG.yaml node R1-GA3: per-query gather results (telemetry, stop reasons, facets) and this
+        # compile's own overflow shaping -- a DERIVED_NOTE dict (unvalidated: run govbridge.notes.validate) and a
+        # built (unwritten: run govbridge.compile.supplementary.write_supplementary_packet) supplementary packet
+        # per query whose gathered evidence did not entirely fit. Both are `{}` when nothing overflowed. Writing
+        # these to disk under `govbridge compile --out DIR` is a govbridge/cli.py change, outside this node's
+        # mutation scope this wave (see this node's checkpoint decisions/next_consumer).
+        "gather_results": gather_results_by_query,
+        "evidence_notes": evidence_notes,
+        "supplementary_packets": supplementary_packets,
     }
 
 
@@ -925,11 +1170,20 @@ def _build_j_item(task_spec: dict, resolve_result: resolvermod.ResolveResult, ex
     return item, all_notices
 
 
-def _attach_evidence_both_ways(c: Compiler, sections: dict, queries_log: dict, d2_item: PacketItem) -> None:
+def _attach_evidence_both_ways(c: Compiler, sections: dict, queries_log: dict, d2_item: PacketItem,
+                                view_path: str, repo: Optional[str], budgets_path: Optional[str] = None) -> None:
     """ARCHITECTURE.md section 7.3: for every OWNER_DIRECTION_TO_TEST item, two symmetric fixed query templates,
     placed side by side, never labelled as supporting. ``d2_item`` is already the list entry ``c.add`` just placed
     in ``sections["D.2"]``; this replaces it IN PLACE with a copy carrying the extra text (same unit id/section/
-    delivery, so its ``item_id`` -- and ``c._seen`` membership -- is unchanged)."""
+    delivery, so its ``item_id`` -- and ``c._seen`` membership -- is unchanged).
+
+    REPAIR_PLAN.md section 2.8: "D.2 both-ways evidence is produced by gather with the task context's exclusions"
+    (REPAIR_DAG.yaml node R1-GA3) -- each template is now one ``govbridge.gather.followup.gather_with_followup``
+    call (facets, parallel retrieval, one bounded round of adaptive follow-up) instead of a single-round ad hoc
+    route fuse; the task context's exclusions (``c.task_ctx``, merged with the ambient ``GOVBRIDGE_TASK`` exactly
+    as every other gather call in this module already does) are honoured through the same ``task=``/``exclude=``
+    plumbing, never a second, diverging exclusion path for D.2 alone. ``max_followup_rounds=1``: bounded, since
+    this runs once per OWNER_DIRECTION_TO_TEST item, potentially several per compile."""
     subject = d2_item.unit_id
     templates = [
         ("consumers_and_uses", f"consumers, dependents and uses of {subject}"),
@@ -938,15 +1192,26 @@ def _attach_evidence_both_ways(c: Compiler, sections: dict, queries_log: dict, d
     blocks = []
     for label, text in templates:
         q = {"id": f"{subject}#{label}", "text": text}
-        route_names = routermod.select_routes(q, grammar=c.grammar)
-        # R1-RX (RC-8): the other of the two compile call sites CAUSE_ANALYSIS.md named as running without
-        # exclusions -- the D.2 "evidence both ways" templates.
-        hits_by_route = {rn: c.routes.run(rn, text=text, k=5, exclude=c.exclusions,
-                                           exclude_counter=c.exclusion_counter)
-                          for rn in route_names if rn in ("exact", "lexical", "semantic", "code")}
-        fused = routermod.fuse(hits_by_route, rrf_k=c.rrf_k)
-        queries_log.setdefault("D.2", []).append({"id": q["id"], "text": text, "routes": list(route_names)})
-        blocks.append((label, [c.item_from_hit(f, "D.2") for f in fused[:5]]))
+        allowed_routes = set(routermod.select_routes(q, grammar=c.grammar))
+        q_routes = routermod.RouteSet(
+            exact=c.routes.exact if "exact" in allowed_routes else routermod.empty_route,
+            lexical=c.routes.lexical if "lexical" in allowed_routes else routermod.empty_route,
+            semantic=c.routes.semantic if "semantic" in allowed_routes else routermod.empty_route,
+            code=c.routes.code if "code" in allowed_routes else routermod.empty_route,
+        )
+        result = gather_with_followup(q, q_routes, task=c.task_ctx, exclude=list(c.exclusions),
+                                       view_path=view_path, repo=repo, facets_path=c.facets_path,
+                                       budgets_path=budgets_path, max_followup_rounds=1)
+        c.exclusion_counter.bump(result.get("excluded_hits", 0))
+        queries_log.setdefault("D.2", []).append({
+            "id": q["id"], "text": text, "facets": result.get("facets"), "stop_reason": result.get("stop_reason"),
+        })
+        items = []
+        for md in (result.get("merged") or [])[:5]:
+            hit = _hit_from_merged(md)
+            fused = routermod.FusedHit(hit=hit, fused_score=1.0, routes=(hit.route,))
+            items.append(c.item_from_hit(fused, "D.2", query_ids=(q["id"],)))
+        blocks.append((label, items))
 
     extra = ["", "--- evidence bearing on this direction, both ways (neither side is labelled as supporting) ---"]
     for label, items in blocks:

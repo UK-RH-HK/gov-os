@@ -77,6 +77,11 @@ def item_manifest_row(item) -> dict:
         "score": {"raw": item.raw_score, "rank": item.rank, "fused": item.fused_score},
         "edge_path": list(item.edge_path),
         "banner": item.banner,
+        # REPAIR_DAG node R1-GA3 (REPAIR_PLAN.md section 2.8): "per-item tags: the query ids and facets each item
+        # serves, so an agent can find 'the tests for query X'". () for anything not produced by
+        # govbridge.gather (section A, I, J, and every seed-derived B/C/F/G item) -- unchanged by this node.
+        "query_ids": list(getattr(item, "query_ids", ()) or ()),
+        "facet_tags": list(getattr(item, "facet_tags", ()) or ()),
     }
 
 
@@ -104,6 +109,14 @@ def _render_item_body(item) -> str:
         lines.append(f"  [{item.banner}]")
     if item.reason:
         lines.append(f"  reason: {item.reason}")
+    # REPAIR_DAG node R1-GA3 (REPAIR_PLAN.md section 2.8): per-item query/facet tags, printed only when present
+    # (a seed-derived item, or anything from section A/I/J, carries neither -- this line never appears for those,
+    # so their own rendered body is byte-for-byte unchanged by this node) -- outside the body-marker pair below,
+    # so it never perturbs the delivered-body re-extraction/recomposition check.
+    query_ids = tuple(getattr(item, "query_ids", ()) or ())
+    facet_tags = tuple(getattr(item, "facet_tags", ()) or ())
+    if query_ids or facet_tags:
+        lines.append(f"  queries: {list(query_ids)}  facets: {list(facet_tags)}")
     body = (item.text or "").rstrip("\n")
     # BR-DAG-AMEND-R1-10 (routed from BR-AR-0022's open issue): bracket the delivered body with an exact,
     # unambiguous marker pair so `packet verify`/`receipt check` can re-extract precisely this substring from the

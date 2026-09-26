@@ -1,0 +1,227 @@
+run_id: BR-AR-0026
+role: >-
+  REPAIR-1 node R1-GA3 -- compile from gather: facet quotas and a facet-aware drop order, content slices, per-item
+  query and facet tags, overflow to evidence notes and supplementary packets, D.2 via gather; plus
+  BR-DAG-AMEND-R1-11 (oversize-mandatory-item facet-selected sections).
+model_observed: claude-sonnet-5
+branch: bridge/r1-ga3-0026
+commit: PENDING_COMMIT
+status: COMPLETED
+claims:
+- >-
+  govbridge.compile.packet.compile_packet's query loop now instantiates every task query
+  (govbridge.gather.instantiate, RC-2's "a query with no executable text is a compile error, never a silent skip")
+  and compiles sections B-H from govbridge.gather.followup.gather_with_followup results, one call per query, with
+  each query's own explicit/auto-detected route selection honoured (router.select_routes) rather than silently
+  widened to every facet's own routes.
+- >-
+  Every gather-sourced PacketItem carries facet_tags/query_ids (new fields), unioned across duplicate placements,
+  visible in both the manifest row (item_manifest_row) and the rendered packet text (_render_item_body) -- never
+  only internal Python state.
+- >-
+  Facet quotas: govbridge.compile.budgets.enforce_section_with_quotas reserves each requested facet's own
+  min_share of a section's budget before a general, round-robin fill, with a continuation handle on every
+  resulting drop record; wired into apply_budgets for every section except A (resolver-only, untouched) and G
+  (kept on its own pre-existing BR-AR-0015 T1-T4 tiered budget -- a disclosed, owner-accepted limit, not stacked
+  with a second quota system).
+- >-
+  Content slices (RC-5): Compiler.item_from_hit now fetches a real body slice from Git for a code-route
+  symbol/occurrence hit (previously a bare signature or edge-label pointer) and for a semantic hit with no text at
+  all (previously 0 bytes) -- via govbridge.compile.overflow.needs_content_slice/read_content_slice -- with a
+  larger cap for a facet's own top-ranked items (a per-facet rank counter, not a single global rank over the whole
+  merged list). An item already delivered in section A is cited by item id (Compiler.reference_to_a_item), never
+  duplicated.
+- >-
+  Overflow (REPAIR_PLAN.md section 2.8): an item a query's own gather call retrieved but the budget then dropped
+  is shaped into an R1-RN hierarchical evidence note (govbridge.compile.overflow.build_overflow_note, grounded
+  claims re-verified by govbridge.notes.validate.validate_note) and an R1-RS supplementary packet
+  (govbridge.compile.supplementary.build_supplementary_packet, re-verified by
+  govbridge.compile.validate.verify_supplementary_packet) per query, returned in compile_packet's own
+  evidence_notes/supplementary_packets dict keys and disclosed by an EVIDENCE_OVERFLOW J notice -- nothing
+  silently discarded. Writing these to disk under `govbridge compile --out DIR` needs a govbridge/cli.py change,
+  routed by the orchestrator to R1-RA (outside this node's mutation_scope).
+- >-
+  D.2 both-ways evidence (_attach_evidence_both_ways) now runs each of its two fixed templates through
+  gather_with_followup (bounded to one follow-up round), honouring the task context's exclusions through the same
+  plumbing every other gather call in this module uses, instead of a single-round ad hoc route fuse.
+- >-
+  BR-DAG-AMEND-R1-11: an oversize mandatory item with no declared selector now additionally delivers, in full, the
+  sections the gather facet vocabulary (config/facets.yaml's own facet names and extra_terms, matched against a
+  section's own NAME, never its body text) scores as relevant -- govbridge.compile.overflow.
+  select_oversize_facet_sections, wired into Compiler._render_oversize_no_selector. Nothing is ever removed from
+  A; the MANDATORY_PARTIAL_DELIVERY notice's shape and the exact-tiling verify rule are unchanged (rows move
+  between its delivered/undelivered_ranges lists, never dropped). Owner-accepted disclosed limit: selection uses
+  the DEFAULT global facet registry, not a specific task's own requested facet subset, because
+  govbridge.compile.validate's blind re-derivation (_composition_context_class) supplies no task/query context at
+  all when it recomposes an A item's expected body -- a task-specific dependency there would make `packet verify`
+  permanently disagree with the real compile. The better design (record the selected ranges in the manifest so
+  verify can check a task-specific selection) needs a validate.py change, outside this node's mutation_scope;
+  carried as a residual for the verifier per the coordinator's ruling.
+- >-
+  BR-DAG-AMEND-R1-15 (query paths read-only): a compile against a genuinely (file-level chmod) read-only real
+  store never writes to it -- tests/compile/test_facet_quotas.py::
+  test_compile_against_a_read_only_store_never_writes_to_it, store file sha256 unchanged before/after.
+- >-
+  govbridge/gather/** is completely untouched by this node (independently confirmed by `git diff --stat --
+  govbridge/gather/`, empty output) -- BR-DAG-AMEND-R1-19's function is consumed, never edited or forked.
+- >-
+  120/120 tests pass in `pytest tests/compile -q` (0 failures); the FULL domain suite passes with 0 failures
+  (665/665, including tests/compile/test_compile_real_view_mandatory_in_a.py, R1-T1's one named exception, which
+  did not fail).
+evidence:
+- claim: query loop compiles B-H from gather_with_followup per instantiated query
+  command_or_file: govbridge/compile/packet.py:892-976 (the query loop); tests/compile/test_facet_quotas.py::test_facet_quota_keeps_the_small_facets_minimum_share
+- claim: facet quotas with continuation handles
+  command_or_file: govbridge/compile/budgets.py:enforce_section_with_quotas; tests/compile/test_facet_quotas.py
+- claim: content slices, no 0-byte symbol/semantic item
+  command_or_file: govbridge/compile/overflow.py:needs_content_slice/read_content_slice; tests/compile/test_content_slices.py
+- claim: overflow to notes + supplementary packets
+  command_or_file: govbridge/compile/overflow.py:build_overflow_note; tests/compile/test_overflow_notes.py
+- claim: D.2 via gather
+  command_or_file: govbridge/compile/packet.py:_attach_evidence_both_ways
+- claim: BR-DAG-AMEND-R1-11
+  command_or_file: govbridge/compile/overflow.py:select_oversize_facet_sections; tests/compile/test_content_slices.py::test_oversize_mandatory_item_delivers_facet_matching_sections_in_full
+- claim: read-only store
+  command_or_file: tests/compile/test_facet_quotas.py::test_compile_against_a_read_only_store_never_writes_to_it
+- claim: gather/** untouched
+  command_or_file: AGENT_RUNS/BR-AR-0026.check3-gather-untouched.out
+- claim: 120/120 targeted; 665/665 full suite
+  command_or_file: AGENT_RUNS/BR-AR-0026.check1-pytest-compile.out; AGENT_RUNS/BR-AR-0026.check2-full-domain-suite.out
+- claim: real-view CONTROL-A compile determinism + packet verify
+  command_or_file: AGENT_RUNS/BR-AR-0026.check5-controla-compile-twice.out; AGENT_RUNS/BR-AR-0026.check6-controla-packet-verify.out
+mutation_scope_respected: true
+open_issues:
+- >-
+  govbridge/cli.py's `govbridge compile --out DIR` does not yet write evidence_notes/supplementary_packets to
+  disk -- compile_packet returns them built (result["evidence_notes"], result["supplementary_packets"], keyed by
+  query id) but unwritten; wiring needs govbridge/cli.py, owned next by R1-RA per BR-DAG-AMEND-R1-19's own
+  cli.py sequence (RX -> GA1 -> RS -> RA). See decisions/next_consumer.
+- >-
+  BR-DAG-AMEND-R1-11's oversize-section selection uses the default, global facet registry rather than a specific
+  task's own requested facet subset (owner-accepted, see decisions) -- a stronger design would record the
+  selected ranges in the manifest so validate.py could check a task-specific selection; that touches
+  govbridge/compile/validate.py, outside this node's mutation_scope, and is carried as a residual for the
+  verifier/R1-INT.
+- >-
+  Facet quotas are not layered on top of section G's own pre-existing BR-AR-0015 T1-T4 tiered budget (owner-
+  accepted, see decisions) -- G keeps exactly its prior behaviour.
+- >-
+  Per-item facet tags for a BASE-ROUND gather item are a disclosed, defensible SUPERSET (route+scope consistency
+  against the query's own requested facets), not a precise single-facet claim -- gather_with_followup's own
+  return shape does not itemise which facet produced a base-round hit (confirmed by reading R1-GA2's own
+  checkpoint failed_approaches, which tried and reverted calling the engine once per facet inside
+  gather_with_followup itself, because it would drop R1-GA1's tested cross-facet-parallel property for every
+  caller including the CLI `gather` command). Follow-up-round items ARE tagged precisely, by their own trigger
+  identifier kind.
+- >-
+  govbridge.compile.section_i.instantiated_query_set and this node's own query-instantiation call both use
+  govbridge.gather.instantiate.load_query_set, which can raise an uncaught exception (not QueryNotExecutable) if
+  a task spec's `queries` field is a STRING path to a genuinely missing file -- not caught into a graceful J
+  notice by this node. Not currently exercised by any real caller (every existing task spec passes a list or an
+  existing real file); flagged rather than silently left unhandled.
+- >-
+  `govbridge compile --out DIR` never persists a supplementary packet's own rendered content to disk (only its
+  sha256 reaches the main packet's EVIDENCE_OVERFLOW notice) -- this made one real-view determinism divergence
+  (see below) un-diffable after the fact. BR-DAG-AMEND-R1-20, routed to R1-RA, closes it.
+- >-
+  One real-view CONTROL-A compile pair (before this node's section_map fix) diverged in exactly one query's
+  (CA-DEPS) supplementary-packet reference hash; the main packet, drop records and facet coverage were all
+  identical. Exhaustively investigated (PYTHONHASHSEED cross-check refuted it; 6 of 6 clean re-runs of the
+  current code matched); the cause could not be confirmed directly (the differing artifact was never persisted).
+  Best explanation: a transient git-read degradation in govbridge/gather/followup.py (its own documented
+  behaviour) under confirmed-concurrent repository activity. Routed to R1-GA2 for hardening (bounded retry, then
+  explicit deterministic:false); the orchestrator will re-run the double compile once that merges.
+conformance:
+- item: 'deliverable 1: compile B-H from gather results for every instantiated task query, with per-item query ids and facets'
+  status: MET
+  evidence: >-
+    packet.py's query loop (govbridge.gather.instantiate + gather_with_followup, one call per query);
+    tests/compile/test_facet_quotas.py (manifest row + rendered-text visibility of query_ids/facet_tags);
+    real-view: AGENT_RUNS/BR-AR-0026.check5/6 (CONTROL-A).
+- item: 'deliverable 2: facet quotas (minimum share per requested facet with candidates) and a round-robin drop order; per-facet drops carry a continuation handle'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    govbridge.compile.budgets.enforce_section_with_quotas, wired for every section except A and G;
+    tests/compile/test_facet_quotas.py::test_facet_quota_keeps_the_small_facets_minimum_share (a 3-item facet
+    ranked strictly worst-of-300 still keeps its full min_share allocation under a tight cap; drop records carry
+    "continuation"). Disclosed limit (owner-accepted): section G keeps its own pre-existing BR-AR-0015 T1-T4
+    tiered budget unmodified; a second, per-facet quota layer was not stacked on top of it.
+- item: 'deliverable 3: code/test items carry a definition body slice (larger for a facets top items); semantic items carry chunk text; content already present is cited by item id'
+  status: MET
+  evidence: >-
+    govbridge.compile.overflow.needs_content_slice/read_content_slice + Compiler.item_from_hit (per-facet rank
+    counter, not a single global rank, decides "top"); Compiler.reference_to_a_item; tests/compile/
+    test_content_slices.py (9 tests, including a compile-level "no symbol/semantic item has a 0-byte body" proof).
+- item: 'deliverable 4: overflow -> evidence notes (R1-RN) + supplementary packets (R1-RS); nothing silently discarded'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    compile_packet's post-budget overflow shaping (evidence_notes/supplementary_packets return-dict keys);
+    tests/compile/test_overflow_notes.py (independently re-verified via govbridge.notes.validate.validate_note and
+    govbridge.compile.validate.verify_supplementary_packet, plus an explicit "every overflow item is grounded,
+    listed unresolved, or present in the supplementary packet" accounting check). Disclosed limit (owner-routed to
+    R1-RA): `govbridge compile --out DIR` does not yet write these to disk -- that needs govbridge/cli.py, outside
+    this node's mutation_scope.
+- item: 'deliverable 5: D.2 both-ways evidence is produced by gather with the task contexts exclusions'
+  status: MET
+  evidence: >-
+    _attach_evidence_both_ways rewritten to call gather_with_followup per template (max_followup_rounds=1),
+    honouring c.task_ctx/c.exclusions through the same plumbing every other gather call in this module uses;
+    covered by the pre-existing, unmodified D.2 fixtures in tests/compile/test_compile_authority_invariant.py and
+    test_compile_mandatory_lifecycle_in_a.py, both still passing.
+- item: 'BR-DAG-AMEND-R1-11: an oversize A items selected sections are chosen with the tasks gather facets as well as its declared selectors; nothing removed from A; MANDATORY_PARTIAL_DELIVERY notice + exact-tiling verify rule unchanged'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    govbridge.compile.overflow.select_oversize_facet_sections + Compiler._render_oversize_no_selector;
+    tests/compile/test_content_slices.py::test_oversize_mandatory_item_delivers_facet_matching_sections_in_full
+    (facet-matching sections delivered in full, packet verify PASS including rendered-body recomposition),
+    ::test_oversize_mandatory_item_facet_selection_is_deterministic_across_two_compiles (byte-identical across 2
+    independent compiles -- the load-bearing property for validate.py's blind re-derivation),
+    ::test_mf_big_style_fixture_with_no_facet_matching_headings_is_unaffected (reproduces R1-RM's own MF-BIG
+    `notice["delivered"] == []` invariant generically, without touching test_mandatory_fidelity.py, which is
+    outside this node's mutation_scope). Disclosed limit, ACCEPTED by the coordinator: selection uses the DEFAULT
+    global facet registry, never a specific task's own requested facet subset, because govbridge.compile.
+    validate's blind re-derivation supplies no task/query context when it recomposes an A item's expected body --
+    a task-specific dependency there would make `packet verify` permanently disagree with the real compile. The
+    stronger design (record the selected ranges in the manifest so verify can check a task-specific selection)
+    needs a validate.py change, outside this node's mutation_scope; carried as a residual for the verifier/R1-INT.
+- item: 'BR-DAG-AMEND-R1-15: query commands are read-only -- a compile against a read-only store never writes to it'
+  status: MET
+  evidence: 'tests/compile/test_facet_quotas.py::test_compile_against_a_read_only_store_never_writes_to_it (chmod 0o444, real store, sha256 unchanged before/after)'
+- item: 'BR-DAG-AMEND-R1-19: R1-GA3 compiles sections B-H from gather_with_followup results; gather/** is never edited or forked'
+  status: MET
+  evidence: 'packet.py imports and calls govbridge.gather.followup.gather_with_followup directly; AGENT_RUNS/BR-AR-0026.check3-gather-untouched.out (git diff --stat over govbridge/gather/, empty)'
+- item: 'acceptance check 1 (targeted): cd $D && $PY -m pytest tests/compile -q, exit 0'
+  status: MET
+  evidence: 'AGENT_RUNS/BR-AR-0026.check1-pytest-compile.out: 120 passed, 0 failures'
+- item: 'acceptance check 2 (real view): CONTROL-A compile twice, byte-identical, packet verify PASS, every requested facet of every query present/MISSING/BUDGET-with-handle, main packet within the profile total'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    AGENT_RUNS/BR-AR-0026.check5-controla-compile-twice.out / check6-controla-packet-verify.out. Two sequential
+    CONTROL-A compiles (seq1/seq2) against store-BR-AR-0026 are byte-identical (packet_sha256/manifest_sha256
+    equal; diff -q of packet.md and manifest.json both exit 0), and `packet verify` PASSes on both with 0
+    problems. 20 FACET_MISSING notices disclose every facet with no placed items, each with an honest reason;
+    every other requested facet is present or shows a facet-tagged BUDGET drop with a continuation handle. Main
+    packet is 143,688 bytes (1.29% of the 11,105,922-byte corpus at the resolved "records" commit) after this
+    node's own section_map-compaction fix (down from 187,881 bytes); A (the real oversize contract_v3 mandatory
+    item) and J (PINNED notices) are exempt from the profile's own per-section caps by design (ARCHITECTURE.md
+    section 5.3 point 6/7.2), so the packet legitimately exceeds the 100KB nominal bounded-builder total when a
+    real mandatory input is itself oversize -- disclosed, not hidden. DISCLOSED LIMIT (coordinator-ruled, not
+    plain MET): an EARLIER compile pair (before the section_map fix) diverged in one query's (CA-DEPS)
+    supplementary-packet reference hash only (main packet content, drop records, and facet coverage were all
+    identical). Investigated exhaustively -- PYTHONHASHSEED cross-check (3 concurrent runs, seeds 0/0/1, all
+    identical) refutes hash-seed as the cause; semantic-route determinism confirmed by the coordinator; 6 of 6
+    clean re-runs of the current code (3 concurrent cross-seed + 2 in-process + this check's own 2 sequential)
+    matched byte-for-byte. The cause could not be confirmed directly against the original pair because
+    `govbridge compile --out DIR` never persists a supplementary packet's own content to disk (a separate,
+    disclosed finding, BR-DAG-AMEND-R1-20, routed to R1-RA). Best explanation, coordinator-endorsed but not
+    directly provable: a transient git read failure under concurrent repository activity (confirmed present at
+    that wall-clock time -- 2-3 sibling agents' own from-clean rebuilds were observed running concurrently)
+    degraded one follow-up-resolved identifier to an honest MISSING via govbridge/gather/followup.py's own
+    documented degradation path -- outside this node's mutation_scope, routed to R1-GA2 for hardening (bounded
+    retry, then explicit deterministic:false).
+- item: 'R1-T1: the FULL domain suite passes with 0 failures, as the last acceptance check'
+  status: MET
+  evidence: 'AGENT_RUNS/BR-AR-0026.check2-full-domain-suite.out: 665 passed, 0 failures, including the one R1-T1-exempted real-view file, which did not fail'
+- item: 'OC-BR-02 genericity: no code/config/facet/scope/test names a Review-8 item, F-finding, Phase-2 file or symbol'
+  status: MET
+  evidence: 'AGENT_RUNS/BR-AR-0026.check4-genericity-audit.out: only standard "unrelated to Review-8/Phase-2" disclosure boilerplate matched'
