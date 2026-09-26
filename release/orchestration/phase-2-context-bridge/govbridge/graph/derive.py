@@ -459,13 +459,34 @@ def tests_of(conn: Optional[sqlite3.Connection], qualified_name: str, page_size:
 # anywhere, recognised by SHAPE (a row with a `tests:` list field) rather than by name.
 # ---------------------------------------------------------------------------------------------------------------
 
+def test_registry_edges_in_doc(doc, path: str, commit: str, unit: Optional[str] = None) -> list:
+    """Every TESTS edge in an ALREADY-PARSED YAML document recognised as a test registry by SHAPE -- a top-level
+    list (or a `rows`/`entries` key holding one) of mapping rows, each with a `tests` key that is itself a list of
+    test paths/ids -- rather than by a specific file name (OC-BR-02; contrast ``evidence_map_edges_for_id``'s own
+    fixed default path, an EXISTING, narrower capability this one generalises). ``unit``, if given, filters to rows
+    mentioning it (``test_registry_edges_for_id``'s bounded, per-id use); omitted, every row's edges are returned
+    (a whole-corpus layer builder's use, which already has the doc in hand and wants every row in one pass)."""
+    rows = doc if isinstance(doc, list) else ((doc.get("rows") or doc.get("entries")) if isinstance(doc, dict)
+                                                else None)
+    if not isinstance(rows, list):
+        return []
+    out: list = []
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("tests"), list):
+            continue
+        if unit is not None and unit not in str(row):
+            continue
+        dst = unit if unit is not None else str(
+            row.get("capability") or row.get("id") or row.get("requirement") or "?")
+        for t in row["tests"]:
+            out.append(E.Edge(src=str(t), type=E.TESTS, dst=dst, derivation=E.EXACT_TEST_REGISTRY_ROW,
+                               evidence_occurrence=occ(path, commit)))
+    return out
+
+
 def test_registry_edges_for_id(unit: str, commit: str, repo: Optional[str] = None) -> list:
-    """A test registry binds a capability/requirement id to the tests that evidence it via a generic SHAPE -- a
-    top-level list (or a `rows`/`entries` key holding one) of mapping rows, each with a `tests` key that is itself
-    a list of test paths/ids -- rather than by a specific file name (OC-BR-02; contrast
-    ``evidence_map_edges_for_id``'s own fixed default path, an EXISTING, narrower capability this one generalises).
-    Bounded exactly like every other function here: a targeted git-grep for ``unit`` under ``tests/``, then each
-    hit path is read once and checked for the registry shape."""
+    """Bounded exactly like every other function here: a targeted git-grep for ``unit`` under ``tests/``, then each
+    hit path is read once and checked for the registry shape (``test_registry_edges_in_doc``)."""
     from govbridge.core.yamlutil import load_yaml_text
 
     hits = gitobj.git_grep(unit, commit, paths=["tests/"], repo=repo)
@@ -482,18 +503,7 @@ def test_registry_edges_for_id(unit: str, commit: str, repo: Optional[str] = Non
             doc = load_yaml_text(raw.decode("utf-8"))
         except Exception:
             continue
-        rows = doc if isinstance(doc, list) else ((doc.get("rows") or doc.get("entries")) if isinstance(doc, dict)
-                                                    else None)
-        if not isinstance(rows, list):
-            continue
-        for row in rows:
-            if not isinstance(row, dict) or not isinstance(row.get("tests"), list):
-                continue
-            if unit not in str(row):
-                continue
-            for t in row["tests"]:
-                out.append(E.Edge(src=str(t), type=E.TESTS, dst=unit, derivation=E.EXACT_TEST_REGISTRY_ROW,
-                                   evidence_occurrence=occ(path, commit)))
+        out += test_registry_edges_in_doc(doc, path, commit, unit=unit)
     return out
 
 

@@ -7,6 +7,37 @@ branch: bridge/r1-rl-0019
 commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
 status: COMPLETED
 claims:
+- 'REOPENING (orchestrator ruling, after first COMPLETED return): TESTS edges (b, c), DEPENDS_ON_DATA and
+  CITES_REQUIREMENT now persist in a NEW, registered, digested store layer, "lineage"
+  (govbridge/code/lineage_layer.py: table lineage_edge; govbridge/code/__init__.py registers it exactly like
+  "code"). It lives under govbridge/code/ (a `**` wildcard in this node''s mutation_scope), not
+  govbridge/graph/, because govbridge/graph/__init__.py -- the usual self-registration point -- is OUTSIDE this
+  node''s scope (individual files are named there, no wildcard); govbridge/code/__init__.py is already imported
+  by every ensure_all_layer_packages_imported() walk. The DERIVATION logic stays exactly where the brief puts it
+  (govbridge/graph/derive.py); this new file only walks the corpus once per build and calls it. Two independent
+  from-clean builds against the REAL current view produce an IDENTICAL digest (227 rows: 225 DEPENDS_ON_DATA + 2
+  TESTS, both real EXACT_CLI_DISPATCH hits -- one in this domain''s own tests, one newly found in
+  tests/notes/test_cli.py); a third call is freshness-NOOP. CITES_REQUIREMENT is 0 on the REAL corpus (verified
+  genuine by direct git-grep: the product''s Rust comments do not use a `<doc>:<line>`/`<doc> section N`
+  citation convention today) but NONZERO, with correct derivation labels, on a controlled fixture
+  (tests/code/test_lineage_layer.py). Cost: ~77s wall, ~328 KiB store size on the real corpus -- not
+  disproportionate (the same box''s semantic/embedding layer alone took ~885s). Full evidence in
+  AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out'
+- 'REOPENING: symbol_history''s max_commits bound is now CONFIGURATION (govbridge/code/lineage_config.yaml''s
+  symbol_history.default_max_commits key, or the GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS env var), resolved FRESH
+  on every call (introduced_in/deleted_in default max_commits=None -> _default_max_commits()), never a value
+  baked into a module constant at import time. Truncation is disclosed: every result carries
+  bounded_incomplete (true only when the walk hit its bound without falsifying presence/absence) -- unchanged
+  from the first return, now re-confirmed by test_default_max_commits_is_configuration_not_a_code_literal'
+- 'BR-DAG-AMEND-R1-4: the full domain suite ($PY -m pytest -q -p no:cacheprovider tests, from the domain) passes
+  with 0 failures (361 passed) on the final state of this branch. One EARLIER run of the same command, before
+  this reopening''s fixes, showed tests/compile/test_compile_real_view_mandatory_in_a.py failing (a manifest_sha256
+  mismatch between two in-process compiles) -- exactly the non-hermetic-until-R1-RM-repairs-it test the amendment
+  names; not reproduced on the final run, but noted in open_issues per the amendment''s instruction (report, never
+  skip/xfail). Every new/modified test file was also run standalone (outside the full suite) and passes; the one
+  hermeticity defect found in my OWN first-return test suite (test_derive.py''s CLI-dispatch test relied on
+  gitobj.resolve_commit("HEAD") with repo=None -- the shared repository''s LIVE HEAD -- and a CWD-relative file
+  read) was rewritten to a fully synthetic, explicit-repo= fixture with GOV_BRIDGE_DOMAIN monkeypatched per-test'
 - 'TESTS edges beyond a direct in-test call: (b) a test that drives the product through its command-line binary
   is mapped to its dispatch handler generically, by parsing the invoked module''s OWN argparse structure at the
   same commit (govbridge.graph.derive.resolve_cli_handler/cli_dispatch_tests_edges) -- no subcommand is ever
@@ -71,16 +102,28 @@ evidence:
   file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
 - claim: CONTROL-A compile + packet verify still PASS on this branch (real-view regression check)
   command: cd release/orchestration/phase-2-context-bridge && $PY -m govbridge compile tests/fixtures/controls/control-a/task-spec.yaml --out /tmp/ca0019 && $PY -m govbridge packet verify /tmp/ca0019
+- claim: 'REOPENING: the "lineage" layer persists all four new edge kinds, is registered with freshness/manifest,
+    is reproducible across two from-clean builds on the real view, and goes NOOP afterward'
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out
+- claim: full domain suite passes with 0 failures (BR-DAG-AMEND-R1-4)
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
 mutation_scope_respected: true
 open_issues:
 - 'govbridge/core/freshness.py''s `-m govbridge.core.freshness` double-import defect (see above) is real and
   reproducible but outside R1-RL''s mutation scope; whichever node/owner is responsible for that file should be
-  told (I1''s original owner, or the orchestrator directly)'
-- 'the DAG''s "every addition registered as a store layer with a digest" is satisfied for the ONE addition that
-  is persisted (state records, via the EXISTING authority layer); TESTS/DEPENDS_ON_DATA/CITES_REQUIREMENT/symbol
-  history stay on-demand and unpersisted, by the SAME precedent govbridge/graph/derive.py''s sibling functions
-  (MENTIONS/CITES_PATH/CODE_CITES/CALLS/READS_KEY/TESTS) and govbridge/code/history.py''s own diff() already
-  set -- flagged for R1-INT/the orchestrator to confirm that reading is correct'
+  told (I1''s original owner, or the orchestrator directly) -- the orchestrator has said it is routing this
+  elsewhere'
 - 'resolve_cli_handler resolves at most two dispatch hops (a top govbridge dispatch, then one submodule''s own);
   a third-level subcommand (none exist in this repository today) would resolve only to the coarser
   HEURISTIC_CLI_DISPATCH module::subcommand form, never crashing, but also never more precise'
+- 'CITES_REQUIREMENT is 0 rows on the REAL corpus (verified genuine -- see the REOPENING claim above and
+  AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out item 3), and no real test-registry-shaped YAML
+  exists yet either (TESTS row-kind "c" is 0 on real data, proven only on a fixture); both mechanisms are
+  correct and will start producing real rows the moment the corpus gains matching content'
+- 'tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice
+  failed ONCE during this run (an EARLIER full-suite pass, before this reopening''s other fixes), with a
+  manifest_sha256 mismatch between two in-process compile_packet() calls in the same test -- the exact
+  non-hermetic-until-R1-RM-repairs-it test BR-DAG-AMEND-R1-4 names. It passed on the FINAL full-suite run
+  (AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out, 361 passed, 0 failures) attached to this checkpoint. Not
+  this node''s file to fix (outside mutation_scope); reported per the amendment''s instruction, not skipped or
+  marked xfail'

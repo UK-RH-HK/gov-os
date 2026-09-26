@@ -107,6 +107,20 @@ def test_deleted_in_rejects_a_since_commit_without_the_symbol(repo):
     assert "not present" in result["reason"]
 
 
+def test_default_max_commits_is_configuration_not_a_code_literal(monkeypatch):
+    """BR-AR-0019 reopening ruling item 3: the bound must come from configuration, resolved FRESH on every call
+    (never baked into a module-level constant at import time), so a config/env-var change takes effect
+    immediately -- proven here via monkeypatch, without ever touching a real environment variable."""
+    assert SH._default_max_commits() == 500  # govbridge/code/lineage_config.yaml's own default, unmodified
+    monkeypatch.setenv("GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS", "7")
+    assert SH._default_max_commits() == 7
+    # introduced_in/deleted_in resolve max_commits fresh (never DEFAULT_MAX_COMMITS baked in at import time)
+    # when the caller omits it -- confirmed by inspecting the default parameter value directly.
+    import inspect
+    assert inspect.signature(SH.introduced_in).parameters["max_commits"].default is None
+    assert inspect.signature(SH.deleted_in).parameters["max_commits"].default is None
+
+
 def test_cli_introduced_in(repo):
     """A subprocess invocation (never an in-process ``os.chdir`` + call: ``govbridge.core.gitobj.repo_root`` is
     ``functools.lru_cache``d by its ``start`` argument, so an in-process ``chdir`` after an earlier test already

@@ -21,7 +21,30 @@ from typing import Optional
 from govbridge.core import gitobj, store as corestore
 from govbridge.code import store as codestore, symbols as symbolsmod
 
-DEFAULT_MAX_COMMITS = 500
+
+def _default_max_commits() -> int:
+    """The bounded-walk limit, from CONFIGURATION -- never a code literal (BR-AR-0019 reopening ruling, item 3):
+    the ``GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS`` environment variable if set, else
+    ``govbridge/code/lineage_config.yaml``'s own ``symbol_history.default_max_commits`` key. 500 is used only as
+    a last-resort fallback if that config file is ever missing or unreadable (never the normal path)."""
+    import os
+
+    env = os.environ.get("GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS")
+    if env:
+        try:
+            return int(env)
+        except ValueError:
+            pass
+    try:
+        from govbridge.core.yamlutil import load_yaml_file
+        cfg_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "code",
+                                 "lineage_config.yaml")
+        return int(load_yaml_file(cfg_path)["symbol_history"]["default_max_commits"])
+    except Exception:
+        return 500
+
+
+DEFAULT_MAX_COMMITS = _default_max_commits()
 
 
 def _resolve_commit(commit: str, repo: Optional[str]) -> str:
@@ -55,13 +78,17 @@ def _definition_present(conn, commit: str, repo: Optional[str], qualified_name: 
 
 
 def introduced_in(qualified_name: str, commit: str, repo: Optional[str] = None,
-                   max_commits: int = DEFAULT_MAX_COMMITS) -> dict:
+                   max_commits: Optional[int] = None) -> dict:
     """For every path that currently defines ``qualified_name`` at ``commit``, walk that path's own history
     (newest-first, bounded to ``max_commits``) to find the commit at which the symbol FIRST appears -- the closest
     commit, walking backward, whose immediate (still-examined) predecessor does not yet have it. When the walk
     reaches its bound without finding an absence, the oldest EXAMINED commit is reported as an honest LOWER bound
     (``bounded_incomplete: true``), never claimed as the true origin -- the same "honest MISSING, not a guess"
-    discipline ``govbridge.graph.derive``'s own module docstring already documents."""
+    discipline ``govbridge.graph.derive``'s own module docstring already documents. ``max_commits``, when omitted,
+    is resolved FRESH from configuration (``_default_max_commits()``) on every call -- never a value baked in at
+    import time -- so a config/env-var change (or a test's monkeypatch) takes effect immediately."""
+    if max_commits is None:
+        max_commits = _default_max_commits()
     commit_full = _resolve_commit(commit, repo)
     conn = corestore.open_db()
     codestore.ensure_schema(conn)
@@ -98,13 +125,16 @@ def introduced_in(qualified_name: str, commit: str, repo: Optional[str] = None,
 
 
 def deleted_in(qualified_name: str, since_commit: str, until_ref: str = "HEAD", repo: Optional[str] = None,
-                max_commits: int = DEFAULT_MAX_COMMITS) -> dict:
+                max_commits: Optional[int] = None) -> dict:
     """The inverse question: ``qualified_name`` is known present at ``since_commit`` (typically a caller's own
     earlier ``introduced_in``/``definitions`` result); walk FORWARD (oldest-first, ``since_commit`` EXCLUDED) along
     ``until_ref``'s own history to find the first commit at which it is gone. Unlike ``introduced_in`` (which walks
     one known path's own history backward), this walks the whole ref's ancestry-path history forward, because the
     defining path itself might be deleted, renamed away, or replaced -- the SAME kind of bounded, configuration-
-    limited walk (``max_commits``), never a whole-repository history sweep."""
+    limited walk (``max_commits``, resolved fresh from configuration when omitted -- see ``introduced_in``'s own
+    docstring), never a whole-repository history sweep."""
+    if max_commits is None:
+        max_commits = _default_max_commits()
     since_full = _resolve_commit(since_commit, repo)
     until_full = _resolve_commit(until_ref, repo)
     conn = corestore.open_db()
@@ -143,14 +173,14 @@ def main(argv=None) -> int:
     i = sub.add_parser("introduced-in")
     i.add_argument("name")
     i.add_argument("--commit", required=True)
-    i.add_argument("--max-commits", type=int, default=DEFAULT_MAX_COMMITS)
+    i.add_argument("--max-commits", type=int, default=None)
     i.add_argument("--json", action="store_true")
 
     d = sub.add_parser("deleted-in")
     d.add_argument("name")
     d.add_argument("--since", required=True)
     d.add_argument("--until", default="HEAD")
-    d.add_argument("--max-commits", type=int, default=DEFAULT_MAX_COMMITS)
+    d.add_argument("--max-commits", type=int, default=None)
     d.add_argument("--json", action="store_true")
 
     args = p.parse_args(argv)

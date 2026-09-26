@@ -325,16 +325,56 @@ def test_registry_edges_generic_shape(tmp_path):
     assert all(e.type == E.TESTS and e.derivation == E.EXACT_TEST_REGISTRY_ROW for e in edges)
 
 
-def test_cli_dispatch_tests_edge_resolves_a_subprocess_invoked_subcommand():
-    """A process-level test reaches its handler (the acceptance check, verbatim): the SAME real, already-committed
-    `python -m govbridge.code.symbols callers ...` invocation `tests/code/test_symbols_integration.py` uses --
-    resolved generically, by parsing govbridge/code/symbols.py's own argparse dispatch, never a hard-coded table."""
-    from govbridge.core import gitobj
+def test_cli_dispatch_tests_edge_resolves_a_subprocess_invoked_subcommand(tmp_path, monkeypatch):
+    """A process-level test reaches its handler (the acceptance check, verbatim). Fully hermetic (BR-DAG-AMEND-R1-4):
+    a SYNTHETIC two-level CLI dispatch (mirroring govbridge/cli.py's own "if cmd == '<name>': from <pkg> import
+    <mod> as alias; return alias.main(rest)" shape, generically -- never this repository's real cli.py content, and
+    never its live HEAD) committed to its own throwaway repo. ``resolve_cli_handler`` resolves a module path via a
+    GOV_BRIDGE_DOMAIN-relative git path, so GOV_BRIDGE_DOMAIN is monkeypatched (module attribute, not env -- read
+    inside the function via a fresh `from govbridge import GOV_BRIDGE_DOMAIN` every call) to this fixture's own
+    root; no chdir, no dependence on the shared repository's refs, and no GOVBRIDGE_* environment leak."""
+    import govbridge as govbridge_pkg
 
-    commit = gitobj.resolve_commit("HEAD")
-    text = Path("tests/code/test_symbols_integration.py").read_text()
-    edges = D.cli_dispatch_tests_edges(text, "tests/code/test_symbols_integration.py", commit)
-    matches = [e for e in edges if e.dst == "govbridge.code.symbols.callers"]
+    rb, root = _code_repo(tmp_path)
+    monkeypatch.setattr(govbridge_pkg, "GOV_BRIDGE_DOMAIN", str(root))
+
+    rb.write(root, "topcli/__init__.py", "")
+    rb.write(
+        root, "topcli/main.py",
+        "def main(argv):\n"
+        "    cmd, rest = argv[0], argv[1:]\n"
+        "    if cmd == 'greet':\n"
+        "        from topcli import greeter\n"
+        "        return greeter.main(rest)\n"
+        "    return 2\n",
+    )
+    rb.write(
+        root, "topcli/greeter.py",
+        "import argparse\n"
+        "def say_hello(name):\n"
+        "    return f'hello {name}'\n"
+        "def main(argv):\n"
+        "    p = argparse.ArgumentParser()\n"
+        "    sub = p.add_subparsers(dest='cmd', required=True)\n"
+        "    s = sub.add_parser('hello')\n"
+        "    s.add_argument('name')\n"
+        "    args = p.parse_args(argv)\n"
+        "    if args.cmd == 'hello':\n"
+        "        result = say_hello(args.name)\n"
+        "    print(result)\n"
+        "    return 0\n",
+    )
+    test_source = (
+        "import subprocess, sys\n"
+        "def test_cli_invocation():\n"
+        "    subprocess.run([sys.executable, '-m', 'topcli.main', 'greet', 'hello', 'world'])\n"
+    )
+    rb.write(root, "tests/test_via_cli.py", test_source)
+    commit = rb.commit(root, "synthetic CLI dispatch fixture")
+
+    edges = D.cli_dispatch_tests_edges(test_source, "tests/test_via_cli.py", commit, repo=str(root))
+    matches = [e for e in edges if e.dst == "topcli.greeter.say_hello"]
     assert matches, [e.to_dict() for e in edges]
     assert matches[0].derivation == E.EXACT_CLI_DISPATCH
     assert matches[0].type == E.TESTS
+    assert matches[0].src == "test_cli_invocation"
