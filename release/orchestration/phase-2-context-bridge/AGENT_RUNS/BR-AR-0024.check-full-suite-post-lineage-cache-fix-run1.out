@@ -1,7 +1,8 @@
 # interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)
 # cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
-# re-run after BR-DAG-AMEND-R1-22 (content-budget/wall-time separation, cross-process determinism,
-# git-read retry+disclosure) -- full domain suite, last, R1-T1
+# run 1 of 2, AFTER fixing identifiers.py's id(conn)-keyed _lineage_table_exists cache (the root cause
+# of the coordinator-reported one-off flake in test_gather_with_followup_is_byte_identical_across_thread_counts
+# under heavy load) -- required proof: the test passes inside the full suite, twice
 ........................................................................ [ 10%]
 ........................................................................ [ 20%]
 ........................................................................ [ 30%]
@@ -12,5 +13,5 @@
 ........................................................................ [ 82%]
 ........................................................................ [ 92%]
 ...................................................                      [100%]
-699 passed in 379.13s (0:06:19)
-exit=0
+699 passed in 311.82s (0:05:11)
+run1 exit=0

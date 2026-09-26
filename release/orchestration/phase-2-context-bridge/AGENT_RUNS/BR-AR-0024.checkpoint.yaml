@@ -1,17 +1,26 @@
 run_id: BR-AR-0024
-commit: ea992f95532da1e9765d38698310fe709f9ff0d8
+commit: PENDING
 role: >-
   REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
   rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
-  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7). REOPENED once (follow-up budget
-  semantics); this checkpoint covers the state AFTER that reopening's own fix (a deterministic, carry-forward
-  priority queue).
+  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7). REOPENED THREE TIMES -- see
+  BR-AR-0024.report.yaml's own `role` field for the full account. This checkpoint covers the state after all
+  three, plus two addenda to the third reopening and a fourth, self-found fix: (1) the carry-forward priority
+  queue, (2) BR-DAG-AMEND-R1-22's content-budget/wall-time separation plus its own cross-process (PYTHONHASHSEED)
+  determinism addendum, (3) a bounded, disclosed retry around this node's own direct git reads, and (4) an
+  id(conn)-reuse cache-staleness bug in identifiers.py, found and fixed while investigating a one-off
+  under-load flake of this node's own thread-count-determinism test.
 model_observed: claude-sonnet-5
 commands:
-- cmd: cd $D && $PY -m pytest tests/gather/test_followup.py tests/gather/test_merge.py -q
+- cmd: >-
+    RE-RUN after BR-DAG-AMEND-R1-22 + its cross-process addendum + the git-read-retry addendum ($PY=
+    /home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3): cd $D && $PY -m pytest
+    tests/gather/test_followup.py tests/gather/test_merge.py -q -> 43 passed (up from 31: +2 wall-time-disabled-by-
+    default/priority tests already counted, +4 wall-time-separation tests, +2 cross-process tests (the hermetic
+    subprocess test plus the retry-primitive's own two hermetic tests), +2 git-read-retry/degradation tests)
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check1-pytest-gather.out
-  output_sha256: 579967b54b9beb8351133018b10c39b31379a4b3bb30b35626504e789501f4c7
+  output_sha256: 7b9a252c1bf3058b03780efc6096ca84db01a6a4f531d0dab95204f73e522125
 - cmd: >-
     ACCEPTANCE CHECK 2 ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3 -- BR-DAG-AMEND-R1-18):
     $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --json, then
@@ -44,22 +53,28 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-sweep.out
   output_sha256: e2509cd09d4cdd77b588fd9a975950f64abb897db2cc62ded67efa253740aeff
-- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
+- cmd: >-
+    RE-RUN after BR-DAG-AMEND-R1-22 + its cross-process addendum + the git-read-retry addendum ($PY=
+    /home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3): cd $D && $PY -m pytest -q -p no:cacheprovider
+    tests -> 699 passed, 0 failed (up from 691 at the last accepted merge point, +8 new tests this pass)
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check2-full-domain-suite.out
-  output_sha256: b2d27b5b3e1151288d547753d58fa0b375ff462055de734d74a19e5f93bb4b97
+  output_sha256: a58460b136a01a8324a5e31e2dedd41439ce0d5862780f5bb465d8efe28d1ffe
 - cmd: >-
-    R1-T1 hermeticity: tests/gather/test_followup.py and tests/gather/test_merge.py run alone, then together in
-    each order
+    RE-RUN after this pass's own edits: R1-T1 hermeticity -- tests/gather/test_followup.py and
+    tests/gather/test_merge.py run alone, then together in each order -> 30/13/43, byte-identical to running them
+    together the other way
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check3-order-independence.out
-  output_sha256: 10303cefcae628774bfb095906b873ee2644c1bff0122161fce41c7d4313f48f
+  output_sha256: c2275c4ef585d2c07dee0851e78d3c7ce911d6baa550f9c7e38ae782e7cb2f13
 - cmd: >-
-    OC-BR-02 generic-rule self-audit: grep -nE 'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|
-    phase2/review-8' over every file this node added
+    RE-RUN after this pass's own edits: OC-BR-02 generic-rule self-audit, grep -nE
+    'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|phase2/review-8' over every file this node touched
+    this pass (including the new tests/fixtures/gather/followup/hash_seed_probe.py) -- only this node's own
+    self-referential compliance-statement docstrings match, never a real reference
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out
-  output_sha256: fdd1b022f9a9f427ea8c0dc3782e275aad35f85dc59522e7885ca97665521f21
+  output_sha256: a2d19de8b8fc944c77c358040cefba36dd4c5d84b08c9fc6ffb90f4b21af63e5
 - cmd: >-
     R1-T2 rule 3 independent re-measurement: an ad hoc script (not committed) re-runs the read-only-store test's
     OWN query PLUS a second, code-route-dependent query, both against a chmod'd read-only store file, to check
@@ -67,6 +82,43 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out
   output_sha256: cbe9275320bab049b2764054f9c72f05454fc179932143d703a92ec252350029
+- cmd: >-
+    THREAD-DETERMINISM FLAKE ADDENDUM ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3): a
+    self-started/stopped bash script spawns 40 CPU-burning busy-loop processes (2x nproc, nproc=20) to reach and
+    exceed the coordinator-observed load average of ~14 (measured 14.37 rising to 39.66 across the run), then runs
+    $PY -m pytest -q tests/gather/test_followup.py::test_gather_with_followup_is_byte_identical_across_thread_counts
+    20 times in a loop, then kills the load generators -- 20/20 passed after fixing identifiers.py's id(conn)
+    cache (see decisions/findings)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-thread-determinism-stress.out
+  output_sha256: 7a6919b367c6356b9ece354bd1c88fcc2663d943b236733410ad33ff8d642d4e
+- cmd: >-
+    RE-RUN, twice in parallel, after fixing identifiers.py's id(conn) cache ($PY as above): cd $D && $PY -m pytest
+    -q -p no:cacheprovider tests -> 699 passed, 0 failed, BOTH runs -- the required "run it inside the full suite
+    twice" proof
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-full-suite-post-lineage-cache-fix-run1.out
+  output_sha256: c555882fb1d0465f98e3110486c23f3bfe6fcc52e89bde338cec9728ac23b478
+- cmd: 'same as above, the second of the two parallel runs'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-full-suite-post-lineage-cache-fix-run2.out
+  output_sha256: 0cf20ea926ae09d4634f0a9aed0e16abf46eed3c9fe5757d49254d84d0d56961
+- cmd: >-
+    BR-DAG-AMEND-R1-22 requirement 5 re-verification, and its own investigation ($PY as above, GOVBRIDGE_STORE=
+    $HOME/.cache/gov-bridge/store-BR-AR-0024, PYTHONPATH=$D): two sequential $PY -m govbridge.gather.followup
+    --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --json invocations, plus a full
+    diff of their own `merged` lists and a trace of every "records"-ref occurrence's own `commit` field, to root-
+    cause the divergence this found (see this file's own contents; NOT a defect in this node's own mutation_scope)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out
+  output_sha256: c6a28ed21635e9f9cbfded0c48679d84dbe1093affc8397f49e9c76377739c98
+- cmd: >-
+    Cross-process determinism addendum re-verification ($PY as above): three concurrent $PY -m
+    govbridge.gather.followup ... --query CA-WHY --json invocations against the real store, PYTHONHASHSEED=0,
+    PYTHONHASHSEED=1 and unset (default/random), compared pairwise
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-ca-why-hash-seeds.out
+  output_sha256: 5f93243159f8950a8411e8e964013f150a6be61d8087daa6d5267d0b157736c2
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
@@ -144,6 +196,7 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/tests/gather/test_followup.py
 - release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
 - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/followup_repobuilder.py
+- release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/hash_seed_probe.py
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.report.yaml
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.checkpoint.yaml
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check1-pytest-gather.out
@@ -154,6 +207,11 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-sweep.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-ca-why-hash-seeds.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-thread-determinism-stress.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-full-suite-post-lineage-cache-fix-run1.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-full-suite-post-lineage-cache-fix-run2.out
 findings:
 - >-
   govbridge.gather.engine's own identifier_extractor hook (R1-GA1's extension point) discloses whatever it returns
@@ -181,6 +239,30 @@ findings:
   empty (an honest MISSING, never an error) -- found while building the "ambiguous trailing segment" fixture (a
   single-ref repo originally), fixed by giving that fixture a second, product-role ref pointed at the same commit,
   exactly like config/canonical-view.yaml's real product/records pair.
+- >-
+  CRITICAL, found while re-running CA-WHY on the real store to satisfy BR-DAG-AMEND-R1-22 requirement 5 ("confirm
+  two consecutive runs give an identical merged_sha256"): they did NOT match (a real, reproduced divergence, not a
+  transient fluke -- see AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out for the full investigation and
+  every commit hash involved). Root-caused to code OUTSIDE this node's mutation_scope:
+  config/canonical-view.yaml's "records" ref (role: primary) is `follow: tip` against refs/heads/bridge/
+  p2-context-retrieval -- THIS session's own live, actively-committed-to orchestration branch. govbridge/core/
+  exact.py's `grep()` (lines ~125-130: `vc = viewmod.load_view(view_path); resolved = viewmod.resolve_view(vc,
+  repo=repo); ... commit = resolved.named[primary.name].commit`), called by `id_lookup()` (line ~189), called by
+  govbridge/route/real_routes.py's `exact_route` (which forwards `view_path`/`repo` STRINGS, never a pre-resolved
+  view/commit, at every call -- see its own call to `exactmod.id_lookup(text, view_path=view_path, repo=repo)`),
+  re-resolves that ref's LIVE TIP FRESH ON EVERY CALL, with no caching or pinning for the RouteSet's or the
+  gather's own lifetime -- unlike `code_route`, which correctly freezes `product_commit` ONCE
+  (`_product_commit(resolved_view)`) at `build_real_routes()` time and closes over it. PROOF this is a live-ref
+  race, not anything in gather/identifiers/merge/versions: run1's own single, uninterrupted gather_with_followup
+  call (~1031s wall, this session's own heavy multi-agent load) contains FOUR DIFFERENT commits for the SAME
+  "records" ref across its own 675 merged items -- meaning the branch tip moved multiple times WHILE that one call
+  was still in flight, entirely independent of any second run. Base-round (lexical/semantic) items, which read the
+  pre-built, frozen store rather than live git, are unaffected -- consistent with only exact-route-resolved
+  (KIND_RECORD_ID/KIND_COMMIT) items showing the drift. This node's OWN determinism guarantee holds, proven
+  byte-for-byte, on every hermetic test using a static (non-"follow: tip") fixture; this is a pre-existing property
+  of govbridge.core.exact/govbridge.route.real_routes that affects EVERY caller of the exact route against this
+  domain's live primary ref, not something this reopening introduced or could fix within its own four-file
+  mutation_scope.
 failed_approaches:
 - >-
   Tried resolving a Rust ``mod::fn``-shaped identifier's trailing segment straight through
@@ -203,11 +285,21 @@ failed_approaches:
   in open_issues, rather than add the write.
 unresolved:
 - >-
-  BLOCKS integrate-check, orchestrator action needed: ORCHESTRATOR_STATE.yaml's own `agent_runs` entry for
-  BR-AR-0024 has not yet been updated to include config/facets.yaml in this run's mutation_scope (the reopening
-  dispatch message granted this extension directly, not yet reflected in that file, which is not this node's to
-  edit). `python3 tools/check_state.py integrate-check BR-AR-0024` currently returns INTEGRATION_REFUSED for
-  exactly this one path; every other check passes. See open_issues for the full detail.
+  RESOLVED since this checkpoint was first written: ORCHESTRATOR_STATE.yaml's own `agent_runs` entry for
+  BR-AR-0024 now lists config/facets.yaml in its mutation_scope (confirmed by reading that file directly this
+  pass) -- the scope-record gap this item used to describe is closed. Kept here, marked resolved, rather than
+  silently deleted, per this node's own "never silently narrow/erase a prior disclosure" discipline; re-verified by
+  re-running `integrate-check` this pass (see this checkpoint's own `commands`).
+- >-
+  ROUTING NEEDED (new this pass, not this node's file to fix): govbridge/core/exact.py's `grep()`/`id_lookup()`
+  and govbridge/route/real_routes.py's `exact_route` re-resolve the "primary"-role ref's LIVE TIP on every call
+  instead of pinning it once per RouteSet/gather (unlike `code_route`'s own `product_commit`, frozen once) -- on
+  THIS domain's own live, actively-committed-to `bridge/p2-context-retrieval` branch, this makes even a SINGLE
+  gather_with_followup call internally inconsistent across a long-running follow-up (proven: one call recorded
+  4 different commits for the same ref). See findings (this file) and AGENT_RUNS/
+  BR-AR-0024.check-ca-why-wall-time-defaults.out for full evidence. Needs an owner for govbridge/core/exact.py and
+  govbridge/route/real_routes.py to pin the resolved commit once per RouteSet build, exactly as code_route already
+  does.
 - >-
   Full CLI wiring of `govbridge gather` to this node's triggered-round capability needs a one-line change to
   govbridge/cli.py's cmd_gather (replace the engine import with followup and call gather_with_followup) -- outside
@@ -323,12 +415,64 @@ lessons:
   before returning, caught it -- cheap enough to make a standing habit whenever a prior dispatch's own identifier
   gets reused in a new pass's own prose.
 - >-
+  "Degrade to MISSING on any exception" and "byte-identical regardless of speed/load" are both good, individually
+  correct instincts that can quietly fight each other: a fix that makes a subsystem more ROBUST to a transient
+  environment failure (this node's own first-pass git-call try/except) can simultaneously make it LESS deterministic
+  (a race that lands differently on two otherwise-identical runs now silently produces different content), unless
+  the failure path itself is made deterministic too -- here, by retrying first (closing the common case) and
+  disclosing, never silently absorbing, the rare case that still fails. Whenever a defect fix reaches for a bare
+  try/except around an external call, the right follow-up question is "does WHEN this triggers depend on anything
+  the caller cannot control (timing, concurrent load), and if so, does that leak into the output" -- not just
+  "does it stop the crash".
+- >-
+  A wall-clock safety net (a timeout/abort) and a content budget (a count) look similar -- both "stop follow-up
+  before it runs away" -- but they are answers to two different questions ("has this taken too long" vs. "have we
+  seen enough") and belong in two different code paths with two different disclosure stories the moment EITHER one
+  can affect what gets returned to a caller who expects reproducible evidence. Folding them into one check (this
+  node's own first-pass mistake) is an easy, natural-looking shortcut that only shows up as a bug once someone
+  compiles the SAME query twice and diffs the result.
+- >-
   A shared, real repository under concurrent multi-agent access moves out from under a long-lived store: a ref
   this domain's own store indexed can advance (another agent's own commits) while that store is still being
   queried, which is exactly why "build from clean with the current tree" is not a formality -- it was necessary
   here (the "records" ref had moved since this node's own first-pass store build) and the resulting number
   (identifiers/rounds/timings) can differ across two "from-clean" builds of the SAME store path for exactly that
   reason, never because the code changed.
+- >-
+  BR-DAG-AMEND-R1-22 (second reopening): the defect was max_wall_seconds (default 240s) being checked ALONGSIDE
+  max_total_identifiers in the SAME overall-budget decision, so a slower run of the identical query against the
+  identical store could stop with a different prefix of the queue resolved -- R1-GA3's own CONTROL-A compile-twice
+  check caught two compiles differing in exactly the resulting overflow set. Fixed by moving the wall-time check
+  to run FIRST and SEPARATELY, before the content-budget check, with its own distinct stop reason
+  (STOP_WALL_TIME_ABORT) never added to govbridge.gather.engine.STOP_REASONS, and disabling it by default
+  (DEFAULT_MAX_WALL_SECONDS = None; config/facets.yaml's own default_max_wall_seconds: null, changed from 240).
+  gather_with_followup's own return shape gained one new top-level field, `deterministic` (bool) -- a disclosed,
+  additive, backward-compatible change (no existing key removed or repurposed).
+- >-
+  BR-DAG-AMEND-R1-22's own mid-pass addendum (cross-process determinism): read every module in this reopening's
+  scope for a PYTHONHASHSEED-sensitive ordering (raw set/frozenset iteration, or a sort key that can tie without a
+  total tie-break) and found none needing a fix -- identifiers.py/merge.py already key by dict+list, never a bare
+  set for output order; collapse_occurrences/reconcile_path sort by an explicit value, never hash; this node's own
+  _priority_sort_key already ends in a total (kind, value) tie-break. Verified empirically with a new hermetic
+  subprocess script (tests/fixtures/gather/followup/hash_seed_probe.py) rather than relying on inspection alone.
+  No upstream file needed a change; this decision records that the audit was done and DID find candidate risk
+  points (documented above), not that none existed to check.
+- >-
+  A second coordinator addendum (git-read retry) arrived after BR-DAG-AMEND-R1-22's own fix and its cross-process
+  addendum were both already complete: this node's FIRST pass (C-10, findings) made every direct git call degrade
+  to an honest MISSING on any exception, which stopped crashes but reintroduced a determinism gap of its own -- a
+  transient failure (a repack race) could silently change WHICH items a gather found. Fixed with a bounded retry
+  (_retry_transient_git_read, 3 attempts, a short fixed backoff) in front of the existing degrade-to-MISSING
+  behaviour, plus a new, disclosed `degraded_git_reads` list (threaded exactly like tree_cache: call-scoped, never
+  a module-global) that the `deterministic` field's second condition now also checks. This is a REFINEMENT of C-10
+  layered on top of it, never a reversion -- an exception still degrades rather than crashes; it is simply retried
+  first and disclosed if it persists.
+- >-
+  Made within this node's own authority: a degraded (post-retry-exhaustion) `_safe_ls_tree_paths` result is
+  deliberately NEVER written into `tree_cache`. Caching would make a LATER lookup against the same commit silently
+  reuse the failure (and look exactly like a genuinely empty tree) instead of getting its own fresh retry budget on
+  its own next call -- the opposite of the "never let a degraded item look like genuine absence" instruction this
+  addendum states explicitly.
 next_consumer: >-
   Whoever next owns govbridge/cli.py in the RX -> GA1 -> RS -> RA sequence (R1-RA, most likely), for the one-line
   wiring described in decisions/open_issues; R1-GA3, which depends on this node and wires `gather` into
@@ -337,6 +481,10 @@ next_consumer: >-
   reads, in case a compile-time caller wants to override the same five knobs; R1-XC, already tracking the
   code-route/classify_hit query-time writes this node independently reconfirmed (findings) and deliberately did
   not extend (failed_approaches); whoever owns govbridge/code/symbols.py next, for the Python-adapter gap
-  (findings, unresolved); the orchestrator, for the remaining disclosed open_issues and the cli.py-wiring decision
-  request.
-final_commit: ea992f95532da1e9765d38698310fe709f9ff0d8
+  (findings, unresolved); whoever owns govbridge/core/exact.py and govbridge/route/real_routes.py next, for the
+  live-ref-per-call finding (findings, unresolved, AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out) --
+  the "primary"/records ref should be resolved ONCE per RouteSet build (exactly like code_route's own
+  product_commit) rather than fresh on every exact_route call, or any long-running gather against this domain's
+  own live branch can observe more than one commit for the same ref within a SINGLE call; the orchestrator, for the
+  remaining disclosed open_issues and the cli.py-wiring decision request.
+final_commit: PENDING

@@ -1,10 +1,10 @@
-# interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)  -- BR-DAG-AMEND-R1-18 (R1-T3)
+# interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)  -- re-run after BR-DAG-AMEND-R1-22 + git-read-retry addendum
 === test_followup.py alone ===
-......................                                                   [100%]
-22 passed in 6.82s
+..............................                                           [100%]
+30 passed in 17.78s
 === test_merge.py alone ===
 .............                                                            [100%]
 13 passed in 0.04s
 === reversed order: test_merge.py then test_followup.py ===
-...................................                                      [100%]
-35 passed in 6.71s
+...........................................                              [100%]
+43 passed in 17.99s

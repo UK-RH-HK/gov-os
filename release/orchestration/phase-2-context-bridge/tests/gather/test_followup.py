@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 import stat
+import subprocess
 import sys
 from pathlib import Path
 
@@ -338,12 +339,18 @@ class _ResolvableExactRoutes:
     own resolved text mentions the SAME id again, never a fresh one, so the visited set -- not a lack of
     resolvable content -- is what eventually empties the queue). Used to prove the priority QUEUE carries
     identifiers across rounds (the BR-AR-0024 reopening) rather than measuring "found nothing" as a stand-in
-    for "had no budget"."""
+    for "had no budget". ``sleep_seconds`` (BR-DAG-AMEND-R1-22): an artificial per-call delay, so the SAME fixture
+    can stand in for "a slow environment" without changing WHAT it resolves or in what order -- content must stay
+    byte-identical regardless."""
 
-    def __init__(self):
+    def __init__(self, sleep_seconds: float = 0.0):
         self.exact_calls = []
+        self.sleep_seconds = sleep_seconds
 
     def run(self, name, **kwargs):
+        if self.sleep_seconds:
+            import time as _time
+            _time.sleep(self.sleep_seconds)
         if name == "lexical":
             text = " ".join(f"ZZ-{i:04d}" for i in range(5))
             return [make_hit("SEED", "a/x.md", text=text)]
@@ -364,7 +371,8 @@ def test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_t
     result = followupmod.gather_with_followup(_query("five ids", facets=["purpose"]), routes, task=ctx,
                                                 batch_size=8, threads=1, max_followup_rounds=5,
                                                 max_identifiers_per_round=2, max_total_identifiers=100,
-                                                max_wall_seconds=60.0, facets_path=TEST_FACETS_PATH)
+                                                facets_path=TEST_FACETS_PATH)  # max_wall_seconds: left at its own
+    # disabled (None) default -- BR-DAG-AMEND-R1-22: content budgets are count-based only.
     assert result["followup_rounds"] >= 3, "5 candidates at 2 per round need at least 3 rounds to drain"
     assert result["stop_reason"] == enginemod.STOP_NO_UNRESOLVED_IDENTIFIERS
     chased = {t["identifier"]["value"] for t in result["telemetry"]["follow_up_triggers"]}
@@ -376,13 +384,14 @@ def test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_t
 
 def test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted():
     """The per-round cap ALONE (max_identifiers_per_round) must never produce BUDGET_REACHED_WITH_UNRESOLVED --
-    only the OVERALL budget (max_total_identifiers and/or max_wall_seconds) does, with the queue still non-empty."""
+    only the OVERALL, COUNT-based budget (max_total_identifiers) does, with the queue still non-empty.
+    BR-DAG-AMEND-R1-22: wall time is NEVER part of this budget/stop reason (see the dedicated wall-time tests)."""
     routes = _ResolvableExactRoutes()
     ctx = taskctxmod.TaskContext(source="test")
     result = followupmod.gather_with_followup(_query("five ids", facets=["purpose"]), routes, task=ctx,
                                                 batch_size=8, threads=1, max_followup_rounds=5,
                                                 max_identifiers_per_round=2, max_total_identifiers=2,
-                                                max_wall_seconds=60.0, facets_path=TEST_FACETS_PATH)
+                                                facets_path=TEST_FACETS_PATH)
     assert result["followup_rounds"] == 1
     assert result["stop_reason"] == enginemod.STOP_BUDGET_REACHED_WITH_UNRESOLVED
     chased = {t["identifier"]["value"] for t in result["telemetry"]["follow_up_triggers"]}
@@ -449,3 +458,169 @@ def test_gather_with_followup_is_byte_identical_across_thread_counts(built_repo,
         )
         shas.add(result["merged_sha256"])
     assert len(shas) == 1, shas
+
+
+def test_merged_sha256_is_identical_across_process_hash_seeds():
+    """BR-DAG-AMEND-R1-22 addition: Python randomises str hashing per PROCESS (PYTHONHASHSEED) unless pinned, so
+    an ordering that (even indirectly) depends on iterating a bare set/frozenset of strings can differ between two
+    CLI invocations while looking identical within one in-process test run -- the --threads test above cannot see
+    this at all, since every thread shares the SAME process's hash seed. Runs the SAME hermetic fixture
+    (tests/fixtures/gather/followup/hash_seed_probe.py, reusing this file's own _ResolvableExactRoutes) in TWO
+    SEPARATE SUBPROCESSES with PYTHONHASHSEED=0 and PYTHONHASHSEED=1 and asserts an identical merged_sha256."""
+    probe = str(FIXTURES_FOLLOWUP / "hash_seed_probe.py")
+    shas = {}
+    for seed in ("0", "1"):
+        env = dict(os.environ)
+        env["PYTHONHASHSEED"] = seed
+        env.pop("GOVBRIDGE_STORE", None)  # the probe never needs a real store; stay isolated from any ambient one
+        proc = subprocess.run([sys.executable, probe], capture_output=True, text=True, env=env, timeout=60)
+        assert proc.returncode == 0, proc.stderr
+        shas[seed] = proc.stdout.strip()
+    assert shas["0"] == shas["1"], shas
+    assert len(shas["0"]) == 64, shas  # a real sha256 hex digest, not an empty/error string
+
+
+def test_merged_sha256_is_identical_regardless_of_wall_clock_speed_when_wall_time_is_disabled():
+    """BR-DAG-AMEND-R1-22 requirement 1/4: a SLOWED resolver and a FAST one, same inputs, same count-based budgets,
+    wall time left at its own disabled (None) default -- the merged evidence (and its merged_sha256) must be
+    byte-identical, since content budgets are count-based only and never depend on the clock."""
+    ctx = taskctxmod.TaskContext(source="test")
+
+    def _run(sleep_seconds):
+        routes = _ResolvableExactRoutes(sleep_seconds=sleep_seconds)
+        return followupmod.gather_with_followup(
+            _query("five ids", facets=["purpose"]), routes, task=ctx, batch_size=8, threads=1,
+            max_followup_rounds=5, max_identifiers_per_round=2, max_total_identifiers=100,
+            facets_path=TEST_FACETS_PATH,
+        )
+
+    fast = _run(0.0)
+    slow = _run(0.3)
+    assert fast["telemetry"]["followup_budget"]["max_wall_seconds"] is None
+    assert fast["deterministic"] is True and slow["deterministic"] is True
+    assert fast["stop_reason"] == slow["stop_reason"]
+    assert fast["merged_sha256"] == slow["merged_sha256"]
+    # a robust margin (not a tight one): this fixture's OWN identifier resolution calls the fake route ~5-10
+    # times, so 0.3s/call must add at least a couple of seconds -- comfortably clear of unrelated per-process
+    # overhead (e.g. resolving the real canonical view when no fixture resolved_view is passed), which this
+    # assertion is not trying to measure precisely, only confirm "slow" genuinely was.
+    assert (slow["telemetry"]["followup_wall_seconds"] - fast["telemetry"]["followup_wall_seconds"]) > 1.0
+
+
+def test_a_tripped_wall_time_limit_gives_a_distinct_stop_reason_and_marks_the_result_non_deterministic():
+    """BR-DAG-AMEND-R1-22 requirement 2: an operator who explicitly sets max_wall_seconds and it trips gets
+    WALL_TIME_ABORT -- NEVER BUDGET_REACHED_WITH_UNRESOLVED -- and `deterministic: False`, distinct from every
+    count-based stop reason (all of which stay `deterministic: True`)."""
+    routes = _ResolvableExactRoutes(sleep_seconds=0.2)
+    ctx = taskctxmod.TaskContext(source="test")
+    result = followupmod.gather_with_followup(
+        _query("five ids", facets=["purpose"]), routes, task=ctx, batch_size=8, threads=1,
+        max_followup_rounds=10, max_identifiers_per_round=1, max_total_identifiers=100, max_wall_seconds=0.05,
+        facets_path=TEST_FACETS_PATH,
+    )
+    assert result["stop_reason"] == followupmod.STOP_WALL_TIME_ABORT
+    assert result["stop_reason"] != enginemod.STOP_BUDGET_REACHED_WITH_UNRESOLVED
+    assert result["stop_reason"] not in enginemod.STOP_REASONS  # a distinct vocabulary, never folded into theirs
+    assert result["deterministic"] is False
+    assert result["telemetry"]["wall_time_aborted"] is True
+    # some identifiers must still be genuinely queued (never silently dropped, same disclosure as any other stop).
+    assert len(result["telemetry"]["unresolved_identifiers"]) > 0
+
+
+def test_wall_time_disabled_by_default_never_aborts_even_when_slow():
+    """The deployed default (config/facets.yaml's own default_max_wall_seconds: null, and this module's own
+    DEFAULT_MAX_WALL_SECONDS fallback) is DISABLED -- a slow environment alone must never trigger WALL_TIME_ABORT
+    unless an operator explicitly opts in."""
+    assert followupmod.DEFAULT_MAX_WALL_SECONDS is None
+    routes = _ResolvableExactRoutes(sleep_seconds=0.05)
+    ctx = taskctxmod.TaskContext(source="test")
+    result = followupmod.gather_with_followup(
+        _query("five ids", facets=["purpose"]), routes, task=ctx, batch_size=8, threads=1,
+        max_followup_rounds=5, max_identifiers_per_round=2, max_total_identifiers=100,
+        facets_path=TEST_FACETS_PATH,
+    )
+    assert result["stop_reason"] != followupmod.STOP_WALL_TIME_ABORT
+    assert result["deterministic"] is True
+
+
+# --- BR-DAG-AMEND-R1-22 (git-read retry): a bounded retry closes the transient-repack-race window, and a read that -
+# --- still fails after every attempt is disclosed, never mistaken for genuine absence -------------------------------
+
+def test_a_transient_git_read_failure_is_retried_and_never_shows_up_in_the_merged_content(
+        built_repo, real_routes_and_view, monkeypatch):
+    """The real-world shape this addition fixes: a `cat-file`/`ls-tree` call racing another agent's concurrent
+    `git gc`/repack, observed as a single transient exception that clears on the very next attempt. A gather that
+    hits this once must be BYTE-IDENTICAL to one that never hit it at all -- never a truncated/different merged set
+    depending on how the race landed, and never counted as a degraded read either (a retry that SUCCEEDS is not a
+    degradation)."""
+    routes, resolved_view = real_routes_and_view
+    clean = _run(built_repo, routes, resolved_view, "load values path join area_data")
+
+    real_ls_tree_path = followupmod.gitobj.ls_tree_path
+    calls = {"n": 0}
+
+    def _flaky_ls_tree_path(commit, path, repo=None):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise followupmod.gitobj.GitError("bad file (simulated transient repack race)")
+        return real_ls_tree_path(commit, path, repo=repo)
+
+    monkeypatch.setattr(followupmod.gitobj, "ls_tree_path", _flaky_ls_tree_path)
+    flaky = _run(built_repo, routes, resolved_view, "load values path join area_data")
+
+    assert calls["n"] >= 2, "the flaky call must actually have been exercised and retried at least once"
+    assert flaky["merged_sha256"] == clean["merged_sha256"], "a retried-away transient failure must change nothing"
+    assert flaky["deterministic"] is True
+    assert flaky["telemetry"]["degraded_git_reads"] == []
+
+
+def test_a_persistently_failing_git_read_marks_the_result_non_deterministic_and_discloses_it(
+        built_repo, real_routes_and_view, monkeypatch):
+    """When every attempt (not just one) fails, the bounded retry cannot save it -- the read degrades to an honest
+    MISSING, but that degradation must be DISCLOSED (telemetry's own ``degraded_git_reads``, with the error) and
+    the whole result marked ``deterministic: False``, never left indistinguishable from a query that genuinely
+    found nothing at that commit."""
+    routes, resolved_view = real_routes_and_view
+
+    def _always_failing_ls_tree_path(commit, path, repo=None):
+        raise followupmod.gitobj.GitError("bad file (simulated persistent repack race)")
+
+    monkeypatch.setattr(followupmod.gitobj, "ls_tree_path", _always_failing_ls_tree_path)
+    result = _run(built_repo, routes, resolved_view, "load values path join area_data")
+
+    assert result["deterministic"] is False
+    degraded = result["telemetry"]["degraded_git_reads"]
+    assert degraded, "a persistently failing read must be disclosed, never silently treated as genuine absence"
+    assert all(d["call"] == "ls_tree_path" for d in degraded)
+    assert all(d.get("error") for d in degraded)
+
+
+def test_git_read_retry_is_bounded_never_retrying_forever():
+    """A direct, hermetic check on the retry primitive itself (BR-DAG-AMEND-R1-22): exactly
+    ``_GIT_READ_MAX_ATTEMPTS`` calls, never more, and the caller gets the last exception's message back rather than
+    the exception itself (so a wrapper can degrade instead of crashing the whole gather)."""
+    calls = {"n": 0}
+
+    def _always_raises():
+        calls["n"] += 1
+        raise RuntimeError("simulated persistent failure")
+
+    value, err = followupmod._retry_transient_git_read(_always_raises)
+    assert value is None
+    assert "simulated persistent failure" in err
+    assert calls["n"] == followupmod._GIT_READ_MAX_ATTEMPTS
+
+
+def test_git_read_retry_stops_as_soon_as_an_attempt_succeeds():
+    calls = {"n": 0}
+
+    def _fails_once_then_succeeds():
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise RuntimeError("simulated transient failure")
+        return "ok"
+
+    value, err = followupmod._retry_transient_git_read(_fails_once_then_succeeds)
+    assert value == "ok"
+    assert err is None
+    assert calls["n"] == 2, "must not keep retrying past the first success"

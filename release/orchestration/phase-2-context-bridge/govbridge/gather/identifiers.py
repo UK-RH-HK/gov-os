@@ -307,25 +307,30 @@ def extract_from_text(hits: list, grammar=None, repo: Optional[str] = None) -> l
 # passing a connection opened ``store.open_db_readonly()`` when the read-only property must hold.
 # ---------------------------------------------------------------------------------------------------------------
 
-_LINEAGE_TABLE_CACHE: dict = {}
-
-
 def _lineage_table_exists(conn: sqlite3.Connection) -> bool:
     """``lineage_edge`` may not exist at all on a bare/isolated connection (a unit test's own in-memory store that
     never ran ``govbridge.code.lineage_layer_builder``) -- an honest empty result in that case, the same
     "code-route-optional... honest MISSING, never a crash" discipline ``govbridge.graph.derive`` already documents
-    (module docstring), never a raised exception."""
-    key = id(conn)
-    cached = _LINEAGE_TABLE_CACHE.get(key)
-    if cached is not None:
-        return cached
+    (module docstring), never a raised exception.
+
+    DELIBERATELY UNCACHED (a fix within this same pass): this used to memoise its result in a module-level dict
+    keyed by ``id(conn)``. ``govbridge.gather.followup`` opens and closes its OWN connection per
+    ``gather_with_followup`` call (BR-DAG-AMEND-R1-15), and CPython is free to reuse a closed/collected object's
+    memory address for an UNRELATED, LATER connection (``sqlite3.Connection`` supports neither ``weakref`` nor
+    arbitrary instance attributes, so there is no sound way to tie a cache entry to the object's own lifetime) --
+    a later connection that happens to land on a stale, recycled ``id()`` would silently inherit a PRIOR
+    connection's cached True/False, which is correct only by coincidence. Found via a real, one-off flake
+    (test_gather_with_followup_is_byte_identical_across_thread_counts, only under heavy system load: higher
+    allocation/deallocation churn makes id-reuse far more likely) that traced back to exactly this: one of two
+    same-test, same-store calls silently skipped lineage-edge-derived identifiers because it inherited a stale
+    ``False`` from a long-dead, unrelated connection earlier in the same test session. The query this call makes
+    (``SELECT 1 FROM lineage_edge LIMIT 1``) is trivial -- once per :func:`extract_all` call (never per hit), the
+    caching this removes was never a measurable cost, only a correctness hazard."""
     try:
         conn.execute("SELECT 1 FROM lineage_edge LIMIT 1")
-        ok = True
+        return True
     except sqlite3.OperationalError:
-        ok = False
-    _LINEAGE_TABLE_CACHE[key] = ok
-    return ok
+        return False
 
 
 def extract_from_lineage(conn: Optional[sqlite3.Connection], hits: list) -> list:

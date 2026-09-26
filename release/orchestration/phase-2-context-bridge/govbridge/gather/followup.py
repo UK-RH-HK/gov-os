@@ -72,20 +72,86 @@ DEFAULT_MAX_ITEMS_PER_IDENTIFIER = 50
 #: never counted against a later round's own fresh cap. Follow-up keeps hopping (OD-BR-05 section 3: "the next
 #: query may be generated from the evidence returned by the previous query") until the queue empties
 #: (NO_UNRESOLVED_IDENTIFIERS), max_followup_rounds is reached (MAX_ROUNDS), a round adds no genuinely new merged
-#: item (MARGINAL_GAIN_ONLY_DUPLICATES), or the OVERALL follow-up budget (max_total_identifiers and/or
-#: max_wall_seconds, both configurable, checked BEFORE taking a round's own batch) is exhausted with the queue
-#: still non-empty (BUDGET_REACHED_WITH_UNRESOLVED) -- the ONLY one of the four that means "there is more, we
-#: chose to stop", and the only one this per-round cap can ever contribute to (by making MORE rounds necessary to
-#: drain the same queue, never by itself ending follow-up early).
+#: item (MARGINAL_GAIN_ONLY_DUPLICATES), the OVERALL CONTENT budget (max_total_identifiers, checked BEFORE taking
+#: a round's own batch) is exhausted with the queue still non-empty (BUDGET_REACHED_WITH_UNRESOLVED), or the
+#: SEPARATE wall-clock safety abort trips (WALL_TIME_ABORT -- see DEFAULT_MAX_WALL_SECONDS below, never conflated
+#: with the budget reason). This per-round cap can only ever make MORE rounds necessary to drain the same queue,
+#: never by itself end follow-up early.
 DEFAULT_MAX_IDENTIFIERS_PER_ROUND = 20
-#: The OVERALL item budget across every follow-up round combined (never per-round -- see above). ``None`` (from
-#: config or here) disables this specific check; at least one of this and DEFAULT_MAX_WALL_SECONDS should stay set
-#: so an adversarial/dense corpus cannot make follow-up unboundedly expensive even across many small rounds.
+#: The OVERALL, COUNT-based content budget across every follow-up round combined (never per-round -- see above).
+#: ``None`` (from config or here) disables this specific check. THE BR-AR-0024 SECOND REOPENING (BR-DAG-AMEND-
+#: R1-22): this is now the ONLY knob that may produce BUDGET_REACHED_WITH_UNRESOLVED -- given the same store and
+#: inputs, the merged result this budget alone can truncate is byte-identical regardless of machine speed, load or
+#: --threads, because it counts IDENTIFIERS RESOLVED, never elapsed time. R1-GA3's own CONTROL-A compile-twice
+#: check found two compiles differing in exactly the overflow set derived from gather's merged results, traced to
+#: the wall-clock budget below ALSO being able to produce this same stop reason -- fixed by removing wall time
+#: from the content-budget decision entirely (see DEFAULT_MAX_WALL_SECONDS's own docstring).
 DEFAULT_MAX_TOTAL_IDENTIFIERS = 200
-#: The OVERALL wall-clock budget (seconds) across every follow-up round combined. ``None`` disables it. Checked at
-#: the TOP of each round, before that round's own batch is taken -- a round already in flight always finishes.
-DEFAULT_MAX_WALL_SECONDS = 240.0
+#: THE BR-AR-0024 SECOND REOPENING (BR-DAG-AMEND-R1-22): wall-clock time is a SAFETY ABORT, never a content
+#: budget, and never produces BUDGET_REACHED_WITH_UNRESOLVED. Disabled (``None``) by default, both here and in
+#: config/facets.yaml's own ``followup:`` section -- content budgets (max_rounds/max_identifiers_per_round/
+#: max_items_per_identifier/max_total_identifiers, all COUNT-based) are the only defaults in force out of the box,
+#: so the merged result and its merged_sha256 never depend on the clock unless an operator explicitly opts in. A
+#: caller that DOES set this (a real deployment guarding against a runaway corpus/environment) gets a DISTINCT stop
+#: reason when it trips (STOP_WALL_TIME_ABORT, never BUDGET_REACHED_WITH_UNRESOLVED) and the result is marked
+#: ``deterministic: False`` -- a caller (eventually govbridge.compile) can surface that as a J notice rather than
+#: silently trusting a clock-dependent evidence set. Checked at the TOP of each round, before that round's own
+#: batch is taken -- a round already in flight always finishes.
+DEFAULT_MAX_WALL_SECONDS = None
 _MAX_SLICE_CHARS = 1600
+
+#: BR-DAG-AMEND-R1-22: a distinct stop reason for the wall-clock SAFETY ABORT, deliberately NOT a member of
+#: ``govbridge.gather.engine.STOP_REASONS`` (that closed vocabulary is OD-BR-05's own CONTENT-stopping reasons,
+#: all of them deterministic; a clock-triggered abort is a different kind of event and must never be mistaken for
+#: one of them, least of all BUDGET_REACHED_WITH_UNRESOLVED, which this module's own docstring above now reserves
+#: for the count-based budget alone). Never present unless a caller explicitly set max_wall_seconds AND it tripped.
+STOP_WALL_TIME_ABORT = "WALL_TIME_ABORT"
+
+#: BR-DAG-AMEND-R1-22 (git-read retry): a bounded retry for the three direct-git-read wrappers below
+#: (:func:`_safe_ls_tree_path`, :func:`_safe_ls_tree_paths`, :func:`_safe_read_path`), so a single TRANSIENT
+#: failure against this domain's own, multi-agent-shared repository (the real shape observed: a `cat-file blob`
+#: raising with "bad file" moments after a `blob_at`/`ls-tree` call resolved that same object -- a concurrent
+#: `git gc`/repack racing an ordinary read) never changes WHICH items a gather finds depending on how the race
+#: happened to land. R1-GA3 traced exactly one CONTROL-A compile-twice divergence to this: the earlier pass-1 fix
+#: (degrade any exception to an honest MISSING) stopped crashes but made CONTENT depend on concurrent repo
+#: activity -- retrying first, bounded, closes that window in the common case; see _record_degraded below for what
+#: happens on the rarer case where every attempt still fails.
+_GIT_READ_MAX_ATTEMPTS = 3
+_GIT_READ_RETRY_BACKOFF_SECONDS = 0.02
+
+
+def _retry_transient_git_read(fn, *args, **kwargs):
+    """Runs ``fn(*args, **kwargs)`` up to ``_GIT_READ_MAX_ATTEMPTS`` times, with a short fixed backoff between
+    attempts. Returns ``(value, None)`` the moment any attempt SUCCEEDS -- including a legitimate, non-exception
+    ``None``/``[]`` "not found at this commit" result, which is a normal return value, never an exception, and is
+    therefore never retried past the first attempt (govbridge.core.gitobj's own functions never raise for a
+    genuine absence -- only a real failure, e.g. the transient repack race above, raises). Only an actual exception
+    counts as transient; after ``_GIT_READ_MAX_ATTEMPTS`` such exceptions in a row, returns
+    ``(None, "<str(last exception)>")`` so the caller can degrade AND disclose that degradation, never degrade
+    silently into something indistinguishable from genuine absence."""
+    last_exc: Optional[BaseException] = None
+    for attempt in range(_GIT_READ_MAX_ATTEMPTS):
+        try:
+            return fn(*args, **kwargs), None
+        except Exception as exc:
+            last_exc = exc
+            if attempt < _GIT_READ_MAX_ATTEMPTS - 1:
+                time.sleep(_GIT_READ_RETRY_BACKOFF_SECONDS)
+    return None, str(last_exc)
+
+
+def _record_degraded(degraded: Optional[list], call: str, error: str, **context) -> None:
+    """Appends one disclosed-degradation record (BR-DAG-AMEND-R1-22, git-read retry requirement 2) to ``degraded``
+    -- a plain, call-scoped list a caller threads through exactly like ``tree_cache`` (created fresh and thrown
+    away with each :func:`gather_with_followup` call, never a module-global/shared-across-calls structure).
+    ``degraded is None`` (a caller that does not care -- e.g. a direct unit-test call to :func:`resolve_identifier`
+    with no gather around it) is a silent no-op, never an error."""
+    if degraded is None:
+        return
+    entry = {"call": call, "error": error}
+    entry.update(context)
+    degraded.append(entry)
+
 
 #: The generic, stated priority rule (the BR-AR-0024 reopening, requirement 2), by KIND CONSTANT only -- never
 #: an instance/Review-8 name (OC-BR-02): id-grammar record ids first, then symbols and Rust test paths, then
@@ -242,40 +308,52 @@ def _dedupe_hits_locally(hits: list) -> list:
 # `cat-file blob <oid>` failing with "bad file" moments after `blob_at` resolved that same oid). None of
 # govbridge.core.gitobj's own functions catch that for a caller; every direct gitobj call this module makes for
 # ITS OWN resolution (never the routes, which are not this module's to change) goes through one of these three
-# wrappers instead, degrading to an honest MISSING rather than propagating the exception.
+# wrappers instead. BR-DAG-AMEND-R1-22 (git-read retry): each wrapper first RETRIES the call, bounded
+# (:func:`_retry_transient_git_read`), so a race that clears within a couple of attempts never affects content at
+# all; only if every attempt still fails does it degrade to an honest MISSING, and even then it DISCLOSES that
+# degradation into the ``degraded`` list a caller threads through (:func:`_record_degraded`) rather than letting a
+# degraded read look like genuine absence.
 
-def _safe_ls_tree_path(commit: str, path: str, repo: Optional[str]):
-    try:
-        return gitobj.ls_tree_path(commit, path, repo=repo)
-    except Exception:
+def _safe_ls_tree_path(commit: str, path: str, repo: Optional[str], degraded: Optional[list] = None):
+    value, err = _retry_transient_git_read(gitobj.ls_tree_path, commit, path, repo=repo)
+    if err is not None:
+        _record_degraded(degraded, "ls_tree_path", err, commit=commit, path=path)
         return None
+    return value
 
 
-def _safe_ls_tree_paths(commit: str, repo: Optional[str], tree_cache: Optional[dict] = None) -> list:
+def _safe_ls_tree_paths(commit: str, repo: Optional[str], tree_cache: Optional[dict] = None,
+                         degraded: Optional[list] = None) -> list:
     """``tree_cache``, when given, memoises one FULL ``git ls-tree -r`` per ``(commit, repo)`` for the lifetime of
     one :func:`gather_with_followup` call -- a real-view performance fix, not a persisted cache (BR-DAG-AMEND-R1-15
     is about the STORE; this is a plain in-process dict, created fresh and thrown away by every call, never shared
     across gathers or written anywhere). Without this, a round whose evidence carries many unresolved path/joined-
     path-literal identifiers against the SAME commit re-walks the whole tree once per identifier -- on this
     domain's own real, multi-thousand-file, multi-ref corpus that dominated wall time badly enough to make this
-    node's own CONTROL-A acceptance-check run impractical (this node's checkpoint ``lessons``)."""
+    node's own CONTROL-A acceptance-check run impractical (this node's checkpoint ``lessons``).
+
+    BR-DAG-AMEND-R1-22 (git-read retry): a result that only came back empty because every retried attempt raised is
+    NEVER written into ``tree_cache`` -- caching a degraded ``[]`` would make every LATER lookup against the same
+    commit silently reuse that failure instead of getting its own fresh retry budget (and would look exactly like a
+    genuinely empty/unreadable tree, which this pass exists to stop happening)."""
     key = (commit, repo)
     if tree_cache is not None and key in tree_cache:
         return tree_cache[key]
-    try:
-        result = gitobj.ls_tree_paths(commit, repo=repo)
-    except Exception:
-        result = []
+    value, err = _retry_transient_git_read(gitobj.ls_tree_paths, commit, repo=repo)
+    if err is not None:
+        _record_degraded(degraded, "ls_tree_paths", err, commit=commit)
+        return []
     if tree_cache is not None:
-        tree_cache[key] = result
-    return result
+        tree_cache[key] = value
+    return value
 
 
-def _safe_read_path(commit: str, path: str, repo: Optional[str]):
-    try:
-        return gitobj.read_path(commit, path, repo=repo)
-    except Exception:
+def _safe_read_path(commit: str, path: str, repo: Optional[str], degraded: Optional[list] = None):
+    value, err = _retry_transient_git_read(gitobj.read_path, commit, path, repo=repo)
+    if err is not None:
+        _record_degraded(degraded, "read_path", err, commit=commit, path=path)
         return None
+    return value
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -287,7 +365,8 @@ def _safe_read_path(commit: str, path: str, repo: Optional[str]):
 # ---------------------------------------------------------------------------------------------------------------
 
 def _hit_from_git_slice(path: str, commit: str, ref: Optional[str], line_start: Optional[int],
-                         line_end: Optional[int], resolution: str, repo: Optional[str] = None) -> Optional[RouteHit]:
+                         line_end: Optional[int], resolution: str, repo: Optional[str] = None,
+                         degraded: Optional[list] = None) -> Optional[RouteHit]:
     """A hit built directly from git content (never through a route) -- used only for the two lineage-edge-only
     kinds (``CITES_REQUIREMENT``'s resolved section, ``DEPENDS_ON_DATA``'s resolved data file) that no existing
     route can fetch content for. Deliberately carries NO authority classification
@@ -297,9 +376,10 @@ def _hit_from_git_slice(path: str, commit: str, ref: Optional[str], line_start: 
     never a silent misclassification. Never raises: ``gitobj.read_path`` itself already returns ``None`` for a
     path genuinely absent at ``commit``, but a real, shared-repository git call can also fail transiently (a
     concurrent ``git gc``/repack racing this read -- observed against the real, multi-agent-shared repository this
-    domain lives in); that failure degrades to an honest MISSING here too, never a crash that would take down an
+    domain lives in); ``_safe_read_path`` retries that, bounded, and degrades to an honest MISSING (disclosed via
+    ``degraded``, BR-DAG-AMEND-R1-22) only if every attempt still fails -- never a crash that would take down an
     entire gather over one unlucky git call."""
-    raw = _safe_read_path(commit, path, repo)
+    raw = _safe_read_path(commit, path, repo, degraded=degraded)
     if raw is None:
         return None
     try:
@@ -373,7 +453,7 @@ def _resolve_symbol_or_rust_test_path(identifier, routes, k: int, exclude, exclu
 
 
 def _resolve_requirement_citation(identifier, resolved_view, repo: Optional[str],
-                                   tree_cache: Optional[dict] = None) -> list:
+                                   tree_cache: Optional[dict] = None, degraded: Optional[list] = None) -> list:
     """Two shapes, both this node's brief's "sections of a known document":
 
     * a lineage-edge-derived citation (``identifier.note`` names the row's own derivation): ``identifier.value`` is
@@ -393,15 +473,15 @@ def _resolve_requirement_citation(identifier, resolved_view, repo: Optional[str]
         else:
             path, l1, l2 = value, None, None
         label = "HEURISTIC_SECTION_UNRESOLVED" if l1 is None else "HEURISTIC_COMMENT_SECTION"
-        hit = _hit_from_git_slice(path, commit, ref, l1, l2, label, repo=repo)
+        hit = _hit_from_git_slice(path, commit, ref, l1, l2, label, repo=repo, degraded=degraded)
         return [hit] if hit is not None else []
     # text-extracted: identifier.value is a candidate document path; resolve it against the tree at commit.
     if commit is None:
         return []
-    entry = _safe_ls_tree_path(commit, identifier.value, repo)
+    entry = _safe_ls_tree_path(commit, identifier.value, repo, degraded=degraded)
     resolved_path = identifier.value if entry is not None else None
     if resolved_path is None:
-        matches = [p for p in _safe_ls_tree_paths(commit, repo, tree_cache)
+        matches = [p for p in _safe_ls_tree_paths(commit, repo, tree_cache, degraded=degraded)
                    if p == identifier.value or p.endswith("/" + identifier.value)]
         if len(matches) == 1:
             resolved_path = matches[0]
@@ -426,7 +506,7 @@ def _resolve_requirement_citation(identifier, resolved_view, repo: Optional[str]
         except Exception:
             section_no = None
         if section_no:
-            raw = _safe_read_path(commit, resolved_path, repo)
+            raw = _safe_read_path(commit, resolved_path, repo, degraded=degraded)
             try:
                 decoded = raw.decode("utf-8") if raw is not None else None
             except UnicodeDecodeError:
@@ -437,26 +517,28 @@ def _resolve_requirement_citation(identifier, resolved_view, repo: Optional[str]
                 label = "HEURISTIC_COMMENT_SECTION"
             else:
                 label = "HEURISTIC_SECTION_UNRESOLVED"
-    hit = _hit_from_git_slice(resolved_path, commit, ref, l1, l2, label, repo=repo)
+    hit = _hit_from_git_slice(resolved_path, commit, ref, l1, l2, label, repo=repo, degraded=degraded)
     return [hit] if hit is not None else []
 
 
 def _resolve_path_literal(identifier, routes, resolved_view, repo: Optional[str], k: int, exclude,
-                           exclude_counter, tree_cache: Optional[dict] = None) -> list:
+                           exclude_counter, tree_cache: Optional[dict] = None,
+                           degraded: Optional[list] = None) -> list:
     commit = identifier.source_commit
     value = identifier.value
     resolved_path = None
     if commit is not None:
-        if _safe_ls_tree_path(commit, value, repo) is not None:
+        if _safe_ls_tree_path(commit, value, repo, degraded=degraded) is not None:
             resolved_path = value
         else:
-            matches = [p for p in _safe_ls_tree_paths(commit, repo, tree_cache)
+            matches = [p for p in _safe_ls_tree_paths(commit, repo, tree_cache, degraded=degraded)
                        if p == value or p.endswith("/" + value)]
             if len(matches) == 1:
                 resolved_path = matches[0]
     if resolved_path is not None and commit is not None:
         label = "HEURISTIC_JOINED_PATH" if identifier.kind == identifiersmod.KIND_JOINED_PATH_LITERAL else "EXACT_LITERAL_PATH"
-        hit = _hit_from_git_slice(resolved_path, commit, identifier.source_ref, None, None, label, repo=repo)
+        hit = _hit_from_git_slice(resolved_path, commit, identifier.source_ref, None, None, label, repo=repo,
+                                   degraded=degraded)
         if hit is not None:
             return [hit]
     # Fall back to a mention lookup via the exact route (still generic, still "path resolution" -- REPAIR_PLAN.md
@@ -465,13 +547,17 @@ def _resolve_path_literal(identifier, routes, resolved_view, repo: Optional[str]
 
 
 def resolve_identifier(identifier, routes, *, resolved_view=None, repo: Optional[str] = None, batch_size: int = 8,
-                        exclude=None, exclude_counter=None, tree_cache: Optional[dict] = None) -> list:
+                        exclude=None, exclude_counter=None, tree_cache: Optional[dict] = None,
+                        degraded: Optional[list] = None) -> list:
     """One :class:`govbridge.gather.identifiers.Identifier` -> ``list[RouteHit]``, each already tagged with a
     ``resolution`` label. Never raises: an identifier this module cannot resolve at all yields an empty list
     (recorded as a trigger with zero new items, never silently omitted from telemetry -- see
     :func:`gather_with_followup`). ``tree_cache``: an optional, call-scoped dict (see
     :func:`_safe_ls_tree_paths`) a caller resolving MANY identifiers in one gather should share across every one of
-    these calls; omitted, each call that needs a whole-tree listing pays for its own."""
+    these calls; omitted, each call that needs a whole-tree listing pays for its own. ``degraded``: an optional,
+    call-scoped list (BR-DAG-AMEND-R1-22) that every direct git read this identifier's resolution makes appends to
+    if it exhausts its retry budget -- omitted (``None``), a caller gets the SAME resolution behaviour with no
+    disclosure, which is fine for a caller with no gather-level telemetry to attach it to (e.g. a direct unit test)."""
     K = identifiersmod
     kind = identifier.kind
     if kind == K.KIND_RECORD_ID:
@@ -486,11 +572,12 @@ def resolve_identifier(identifier, routes, *, resolved_view=None, repo: Optional
         return _dedupe_hits_locally(hits)
     if kind in (K.KIND_PATH_LITERAL, K.KIND_JOINED_PATH_LITERAL):
         return _resolve_path_literal(identifier, routes, resolved_view, repo, batch_size, exclude, exclude_counter,
-                                      tree_cache=tree_cache)
+                                      tree_cache=tree_cache, degraded=degraded)
     if kind == K.KIND_COMMIT:
         return _resolve_via_exact(identifier, routes, batch_size, exclude, exclude_counter)
     if kind == K.KIND_REQUIREMENT_CITATION:
-        return _resolve_requirement_citation(identifier, resolved_view, repo, tree_cache=tree_cache)
+        return _resolve_requirement_citation(identifier, resolved_view, repo, tree_cache=tree_cache,
+                                              degraded=degraded)
     return []
 
 
@@ -581,10 +668,18 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
     # A plain in-process dict, thrown away with this call (see _safe_ls_tree_paths's own docstring) -- never a
     # store cache, never shared across gathers.
     tree_cache: dict = {}
+    # BR-DAG-AMEND-R1-22 (git-read retry): a plain, call-scoped list -- exactly like tree_cache, created fresh and
+    # thrown away here, never a module-global -- that every direct git read this call's own resolution makes
+    # appends to if it exhausts its bounded retry (_retry_transient_git_read) and has to degrade. Non-empty is the
+    # SECOND thing (besides a tripped wall-time abort) that makes `result["deterministic"]` False.
+    degraded_git_reads: list = []
     query_text_lower = (query.get("text") or "").lower()
     queue = _PriorityQueue()
     total_resolved_count = 0
     started_at = time.monotonic()
+    # BR-DAG-AMEND-R1-22: set ONLY when the wall-clock SAFETY ABORT actually trips -- never when max_wall_seconds
+    # is merely configured/passed but the loop finishes some other way first.
+    wall_time_aborted = False
 
     try:
         round_idx = 1
@@ -597,12 +692,21 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
             if not len(queue):
                 followup_stop_reason = enginemod.STOP_NO_UNRESOLVED_IDENTIFIERS
                 break
-            wall_elapsed = time.monotonic() - started_at
-            overall_budget_exhausted = (
-                (max_total_identifiers is not None and total_resolved_count >= max_total_identifiers)
-                or (max_wall_seconds is not None and wall_elapsed >= max_wall_seconds)
-            )
-            if overall_budget_exhausted:
+            # BR-DAG-AMEND-R1-22: the wall-clock SAFETY ABORT is checked FIRST and separately -- it is never part
+            # of the deterministic content budget below, and it never reports as BUDGET_REACHED_WITH_UNRESOLVED.
+            # Disabled (None) by default (DEFAULT_MAX_WALL_SECONDS/config's own default_max_wall_seconds); an
+            # operator who explicitly sets it accepts that THIS ONE stop path is clock-dependent, disclosed via
+            # the distinct STOP_WALL_TIME_ABORT reason and `deterministic: False`, never silently folded into a
+            # reason that implies the evidence set is otherwise reproducible.
+            if max_wall_seconds is not None and (time.monotonic() - started_at) >= max_wall_seconds:
+                followup_stop_reason = STOP_WALL_TIME_ABORT
+                wall_time_aborted = True
+                break
+            # The CONTENT budget: COUNT-based only (BR-DAG-AMEND-R1-22 requirement 1). Given the same store and
+            # inputs, whether/when this fires depends only on how many identifiers have been RESOLVED so far --
+            # never on wall-clock time, machine load or --threads -- so the resulting merged set (and its
+            # merged_sha256) is byte-identical across runs whenever this is what stops follow-up.
+            if max_total_identifiers is not None and total_resolved_count >= max_total_identifiers:
                 followup_stop_reason = enginemod.STOP_BUDGET_REACHED_WITH_UNRESOLVED
                 break
             queue_before = len(queue)
@@ -615,7 +719,8 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
                 total_resolved_count += 1
                 resolved = resolve_identifier(ident, routes, resolved_view=resolved_view, repo=repo,
                                                batch_size=batch_size, exclude=exclude_merged,
-                                               exclude_counter=followup_exclude_counter, tree_cache=tree_cache)
+                                               exclude_counter=followup_exclude_counter, tree_cache=tree_cache,
+                                               degraded=degraded_git_reads)
                 resolved = resolved[:max_items_per_identifier]
                 round_candidate_items += len(resolved)
                 trigger_dict = ident.to_dict()
@@ -681,12 +786,22 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
     telemetry_summary["followup_round_summary"] = round_summaries
     telemetry_summary["identifiers_resolved_total"] = total_resolved_count
     telemetry_summary["identifiers_queued_at_end"] = len(still_queued)
+    # BR-DAG-AMEND-R1-22 requirement 3: timing values are DIAGNOSTIC telemetry only -- never inputs to
+    # merged_dicts/merged_sha256 above (computed already, from merged_dicts alone, before any of these are even
+    # assigned) and never inputs to anything that decides WHICH identifiers were chased (the priority sort key,
+    # _priority_sort_key, takes no timing argument at all). wall_elapsed_seconds/followup_wall_seconds below are
+    # for a human/log to read, nothing else.
     telemetry_summary["followup_wall_seconds"] = round(time.monotonic() - started_at, 3)
     telemetry_summary["followup_budget"] = {
         "max_followup_rounds": max_followup_rounds, "max_identifiers_per_round": max_identifiers_per_round,
         "max_items_per_identifier": max_items_per_identifier, "max_total_identifiers": max_total_identifiers,
         "max_wall_seconds": max_wall_seconds,
     }
+    telemetry_summary["wall_time_aborted"] = wall_time_aborted
+    # BR-DAG-AMEND-R1-22 (git-read retry): every git read that exhausted its bounded retry, disclosed by call/
+    # commit/path/error -- never folded into a merged item as if it were a genuine "not found at this commit", and
+    # never silently dropped. Empty whenever no read ever needed to degrade (the common case).
+    telemetry_summary["degraded_git_reads"] = degraded_git_reads
 
     result = {
         "query": base_result["query"], "batch_size": base_result["batch_size"],
@@ -695,6 +810,16 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
         "merged_sha256": sha256_text(canonical_json(merged_dicts)), "telemetry": telemetry_summary,
         "excluded_hits": total_excluded, "followup_rounds": followup_rounds_run,
         "visited_identifiers": [{"kind": k, "value": v} for (k, v) in sorted(visited)],
+        # False when EITHER of two things happened, each disclosed separately in telemetry above:
+        # (1) BR-DAG-AMEND-R1-22 requirement 2: the wall-clock safety abort actually fired -- a circumstance under
+        #     which this same store/inputs could, on a different machine or under different load, have produced a
+        #     DIFFERENT merged_sha256 (a different prefix of the queue resolved before the clock tripped);
+        # (2) BR-DAG-AMEND-R1-22 (git-read retry): at least one direct git read exhausted its bounded retry and had
+        #     to degrade -- the same "this run's evidence may not match a luckier run against the SAME store"
+        #     property, caused by a transient repository race rather than the clock.
+        # A caller (eventually govbridge.compile) can surface either as a J notice rather than silently trusting a
+        # non-reproducible evidence set. True whenever NEITHER happened, regardless of how long the call took.
+        "deterministic": not wall_time_aborted and not degraded_git_reads,
     }
     if versions_report is not None:
         result["versions"] = versions_report
@@ -733,8 +858,11 @@ def main(argv=None) -> int:
                     help="default: config/facets.yaml's followup.default_max_total_identifiers -- the OVERALL "
                          "item budget across every follow-up round combined")
     p.add_argument("--max-wall-seconds", type=float, default=None,
-                    help="default: config/facets.yaml's followup.default_max_wall_seconds -- the OVERALL "
-                         "wall-clock budget across every follow-up round combined")
+                    help="default: config/facets.yaml's followup.default_max_wall_seconds (null/disabled out of "
+                         "the box). BR-DAG-AMEND-R1-22: a SAFETY ABORT, never a content budget -- setting this "
+                         "makes the result clock-dependent (a distinct WALL_TIME_ABORT stop reason, "
+                         "`deterministic: false`), never BUDGET_REACHED_WITH_UNRESOLVED; leave unset for a "
+                         "byte-identical merge regardless of machine speed or load")
     p.add_argument("--threads", type=int, default=None)
     p.add_argument("--facets", action="append", metavar="NAME")
     p.add_argument("--exclude", action="append", metavar="GLOB")
