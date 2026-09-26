@@ -1,5 +1,5 @@
 run_id: BR-AR-0034
-commit: PENDING
+commit: b43d7a244199887ae795871cd026cf024f1da7b6
 role: >-
   REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
   repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14), and
@@ -411,4 +411,4 @@ next_consumer: >-
   builder's own tool permissions correctly refuse to perform that merge itself. The two NEW findings above
   (compile_packet's own unwrapped main code-route call now correctly raising; govbridge/graph/impact.py's own,
   separate store.open_db() query-time-write-shaped defect, unfixed) are for whoever next owns those files.
-final_commit: PENDING
+final_commit: b43d7a244199887ae795871cd026cf024f1da7b6
