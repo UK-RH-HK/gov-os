@@ -1,0 +1,68 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 486,
+   "path": "runtime/src/paths.rs",
+   "text": "/// * a health-check sandbox (`scheduler::sandbox::Sandbox::create`, a byte copy of the repository under a"
+  },
+  {
+   "line": 603,
+   "path": "runtime/src/paths.rs",
+   "text": "/// Is `root` an OS-created, single-use health-check sandbox (`scheduler::sandbox::Sandbox::create`: `<project>/"
+  },
+  {
+   "line": 627,
+   "path": "runtime/src/paths.rs",
+   "text": "/// [`Sandbox::create`] runs. [`creator_is_alive`] re-reads that same pid's CURRENT start time and refuses unless"
+  },
+  {
+   "line": 656,
+   "path": "runtime/src/paths.rs",
+   "text": "/// [`Sandbox::create`]: crate::scheduler::sandbox::Sandbox::create"
+  },
+  {
+   "line": 692,
+   "path": "runtime/src/paths.rs",
+   "text": "/// Where [`Sandbox::create`] records that `root` (already canonicalised by every caller) is a genuine, OS-created"
+  },
+  {
+   "line": 699,
+   "path": "runtime/src/paths.rs",
+   "text": "/// [`Sandbox::create`]: crate::scheduler::sandbox::Sandbox::create"
+  },
+  {
+   "line": 739,
+   "path": "runtime/src/paths.rs",
+   "text": "/// `std::process::id()`, at the moment this runs \u2014 `Sandbox::create` calls this synchronously in its own"
+  },
+  {
+   "line": 740,
+   "path": "runtime/src/paths.rs",
+   "text": "/// process) stays alive. Called once, from [`Sandbox::create`] itself, before any project code can run inside the"
+  },
+  {
+   "line": 751,
+   "path": "runtime/src/paths.rs",
+   "text": "/// [`Sandbox::create`]: crate::scheduler::sandbox::Sandbox::create"
+  },
+  {
+   "line": 569,
+   "path": "runtime/src/scheduler/mod.rs",
+   "text": "            match sandbox::Sandbox::create("
+  },
+  {
+   "line": 528,
+   "path": "runtime/src/skills.rs",
+   "text": "    let sb = crate::scheduler::sandbox::Sandbox::create("
+  },
+  {
+   "line": 379,
+   "path": "tests/certification/ar94_floor.rs",
+   "text": "// `Sandbox::create` writes the marker BEFORE the sandbox is used and `Sandbox::drop` removes it -- so the marker"
+  }
+ ],
+ "query": "Sandbox::create",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

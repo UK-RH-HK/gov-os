@@ -1,0 +1,17 @@
+{
+ "blob": "7673c461d8a8c73a86e1c6b6de354cbbfced503b",
+ "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "canonical_ref": "records",
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 31,
+ "line_start": 1,
+ "path": "release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "size": 15853,
+ "text": "# Signed Release Root v1 \u2014 R0 architecture candidate\n\n## Status\n\n- Lineage: `Signed Release Root` (`SRR-1`)\n- Architecture record: `spec/architecture/ARCH-0003.yaml`\n- Governing owner decision: `spec/decisions/D-0009.yaml`\n- Owner directive: `OWNER-DIRECTIVE-0004`\n- State: `PROVISIONAL \u2014 PENDING FRESH R0 ARCHITECTURE REVIEW`\n- Implementation: none authorised or performed\n- Predecessor disposition: CP-1/RoT-1 retained as non-active high-assurance research, not revised\n\n## Architecture outcome\n\nThe Phase-1 distribution trust boundary is deliberately small:\n\n```text\ntrusted platform/admin bootstrap\n  -> bootstrap verifier + public root metadata\n  -> signed root/delegation metadata\n  -> signed release/targets + snapshot + timestamp metadata\n  -> uniform verifier for init/adopt/update/reinstall/rollback/recovery\n  -> private verified-byte staging\n  -> atomic commit + protected monotonic high-water\n  -> separate installed-kernel integrity verification\n```\n\nThis chain authenticates Governance OS releases. It does not attempt to prove every property of the build organizations, compilers, suppliers or human custodians at R0.\n\n## Security objective\n\n",
+ "text_sha256": "098d5adcfe1310ea17d43fe5ff403c48fa5792473375698c21fa885a3b6f1bf2",
+ "version_status": "CANONICAL"
+}

@@ -1,0 +1,17 @@
+{
+ "blob": "3fbc43a0cad312b5fa5f601ca26ba14573a1ef6d",
+ "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "canonical_ref": "records",
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 566,
+ "line_start": 540,
+ "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "size": 120188,
+ "text": "nondeterministic concurrent re-anchor race. That is not confirmable from durable state: AR95 has committed nothing\nand has not reported. The race evidence on record is P2-AR-0094's `ar94_c5`, which **constructed** the interleaving\nbut observed the invocations serialise \u2014 explicitly *not ruled out* rather than proven. Flagged to the owner so the\nsweep does not inherit an unverified premise.\n\n**First sweep finding, verified at `f2a9ab9`.** `init.rs:303` and `adopt.rs:1840` both gate\n`write_project_adoption_floor` on `!already_installed`, and a relocated checkout carries `framework.lock` \u2014 so\nneither onboarding path re-establishes a floor at a new path (`--force` explicitly reinstalls the kernel without\nre-running the adoption decision). **Deleting `floor-reanchor` is therefore not a pure deletion**: it removes the\nidentity-transfer surface but leaves same-machine relocation with no in-product remedy unless a re-onboarding path is\nalso provided. Mitigating half, also verified: `PolicySet::load` reconstructs from native layout plus AR86-C6\n`last_known_rules`, so a refused floor leaves the checkout DEGRADED/UNHEALTHY rather than unprotected.\n\n## P2-L-0043 \u2014 P2-AR-0095 lands all five items (373/0); the sweep answers 5B and 5C from evidence (2026-09-24)\n\n`92982ff` on `phase2/remediation-ar94`, base `f2a9ab9`, full suite **373/0** in 3,617 s (60m17s). Scope confined to\n`paths.rs`, `cli/src/main.rs`, two test files and a checkpoint; **`exec_resolve.rs` untouched**, so Property A is\ncarried forward unmodified for the fourth round.\n\n**All five non-deferrable items landed.** `gov floor-reanchor` now requires `--from <previous path>` and compares the\ndocument's `bound_project_identity` against the entry at that **operator-named** key (`paths.rs:1555`) \u2014 AR94-C2\nclosed by narrowing, with the whole-store identity scan deleted rather than guarded.\n\n**The builder declared one deviation rather than burying it**, which is the reason this round is adjudicable. It did\n**not** delete the durable sandbox marker as \u00a71.2 prescribed; it re-keyed the marker to the OS-created object's own\n`(device, inode)` and added GC. Its stated reason: `ar94_nc2` \u2014 the AR94 reviewer's own positive control \u2014 requires\n**post-mortem** recognition, and a process-local registry cannot satisfy that by construction.\n",
+ "text_sha256": "2a4df212b4431f4a3f51cca9641c2d26f1a69f1b104501b765d5a246142a0002",
+ "version_status": "CANONICAL"
+}

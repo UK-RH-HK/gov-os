@@ -1,0 +1,28 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 645,
+   "path": "runtime/src/capabilities/governance.rs",
+   "text": "        \"current_state\": format!(\"plugin {id} is not registered and does not run. {prior}\"),"
+  },
+  {
+   "line": 1650,
+   "path": "runtime/src/cit/mod.rs",
+   "text": "/// as pinned (not registered or approved as declared, not usable by the acting role, another revision or identity"
+  },
+  {
+   "line": 186,
+   "path": "runtime/src/orchestration/dag.rs",
+   "text": "            None => Err(format!(\"required tool {t} is not registered (tool registry, MCP registry or capability plugins); raise a tooling task or register it (`gov tools install`)\")),"
+  },
+  {
+   "line": 203,
+   "path": "runtime/src/orchestration/dag.rs",
+   "text": "            None => Err(format!(\"required skill {s} is not registered (capability gap: `gov skills resolve <task>`)\")),"
+  }
+ ],
+ "query": "not registered",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

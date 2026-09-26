@@ -1,0 +1,48 @@
+{
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 87,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- migration/rollback evidence;"
+  },
+  {
+   "line": 145,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- [ ] Init/adopt/update/reinstall/recovery/rollback ingress paths share a non-circular trust root."
+  },
+  {
+   "line": 454,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- [ ] pause/freeze/rollback as applicable"
+  },
+  {
+   "line": 636,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- [ ] commit or rollback/block atomically"
+  },
+  {
+   "line": 650,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- [ ] R0-R5 or equivalent affects traversal/test scope/model tier/agents/human approval/rollback."
+  },
+  {
+   "line": 911,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- [ ] rollback"
+  },
+  {
+   "line": 944,
+   "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+   "text": "- [ ] rollback"
+  },
+  {
+   "line": 34,
+   "path": "spec/decisions/D-0009.yaml",
+   "text": "  rollback protection and bounded freshness with a smaller trusted and reviewable surface."
+  }
+ ],
+ "query": "rollback",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592"
+}

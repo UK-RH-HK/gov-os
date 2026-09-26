@@ -1,0 +1,17 @@
+{
+ "blob": "9ccde661b67529a8846546ac77e37334b5e82f2f",
+ "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "canonical_ref": "records",
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 150,
+ "line_start": 128,
+ "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "size": 42302,
+ "text": "\n\n# GATE A \u2014 Constitutional and Trust Foundations\n\n## A1. Canonical authority and policy precedence\n- [ ] Constitution/hard invariants are identifiable and machine-readable.\n- [ ] Security and authority floors cannot be weakened by lower-precedence policy.\n- [ ] Project policy may specialise/strengthen only within allowed override modes.\n- [ ] Active decision/spec/task context follows deterministic precedence.\n- [ ] Retrieved context/model inference cannot override higher authority.\n- [ ] Invalid weakening attempts fail closed and are observable.\n\n**Advanced qualification challenge:** inject contradictory project policies, obsolete provider rules, active/superseded decisions, malicious exceptions, and attempted authority/sensitivity weakening.\n\n## A2. Authentic root of trust **[POST-VERIFICATION HARDENING]**\n- [ ] Release/source authenticity is established before any privileged kernel material is staged or installed.\n- [ ] Integrity and authenticity are treated as separate properties.\n- [ ] Init/adopt/update/reinstall/recovery/rollback ingress paths share a non-circular trust root.\n- [ ] Installed-kernel verification detects post-install tampering.\n- [ ] Source-release authentication detects pre-install tampering.\n- [ ] A source directory cannot regenerate its own trusted identity.\n- [ ] Trusted release identity is recorded, not invented, by `framework.lock`.\n- [ ] Bootstrap/dev/test trust modes cannot masquerade as certified production.\n",
+ "text_sha256": "5eb31fe20966b1d64b977c122ce8aa23e9f624929c8e77189a9e642a08e6226f",
+ "version_status": "CANONICAL"
+}

@@ -1,0 +1,331 @@
+context_packet_hash: b5126140f52ea5f1c640935692ec27fb0fcb91db541c59241b790ae52b4e2019
+manifest_sha256: 2aa3045e1b7b2d4b9c9021373cebb5ceba78987997c838d11db659a1478e6c3f
+read_tokens:
+  A: 81a210252294
+  B: 375c1488602d
+  C: 5808663dfe92
+  D: 7c80906d9954
+  E: 9eec62257f6e
+  F: 95b9f606bc41
+  G: dbb30bc0e214
+  H: 7a17d473e9e0
+  I: 494bfb4ffc8c
+  J: 6691923a83c3
+inputs_consumed:
+- OC-BR-02@44a206eda6d7c8228059115aef4f4bbaef2f8d6cb43eff8b4d4b30deb4154e16
+- OC-P2-04@e295af0b7300eae826cfc6e93cbc75f61362078b45320a1cbf5b8a4af950e658
+- OD-P2-08@c7bb4cbae6a8595c3bba9608d7d31bd7911abf876825e3427a39ad5a10a90af8
+- OD-P2-09@3f0cd498cd7a7927e3175529ec3d4b14d9f953a89fb45ce4ae287948226b3999
+- OD-P2-10@8cc0f3bbf74238f5d0c8b28f00b581c2878154faa69895af35a7f35447c3c7b3
+- OD-P2-10A@847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff
+- OD-P2-10A-B.PROPERTY-A@847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff
+- OD-P2-10A-B.STANDING-STATE@847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff
+- OD-P2-10B@847dbae019b760e5ad7706fc37d170078141b8a4ab79b3483b7c4df3b72e0fff
+- OWNER-LAUNCHER-BR-0001@6bbd4141478fd944937deaae82e14cfce6aa2a9372a287c93f32c8e8181446f2
+- state:bridge#contract_v3@4c2df29115c8d5389034b2e2d817772add80d61678807c23e0d520c937cb5ed3
+- PHASE-2-FROZEN-GATE-CONTRACT@d2f33e89d5459dd809e17271e46854cc886ed958ca63f89765e16d6a26a9f25e
+- DESIGN-P2-HISTORICAL-RULE-SOURCE@c586d6387fcf8a7676aa06e1eada910030ef36a52b2e173b4f825e8e51a78e67
+- DESIGN-P2-PROBE-OPTION-C@6cfb3af478f2aef244cfffb93b98c44e2f86139306d5037f772506ba5728afe4
+- PHASE-2-LEDGER-P2-L-0033-0047@f7b643a38955571cf493a2f6dadd67949b352377f43026d6e50979c683c0ebc4
+- PHASE-2-STATE@dc864a92616bc80657f952675244a9eb247e3db74d42e697b39fa5e581cf07f4
+- REVIEW-8-CONTEXT-PACK@d69c2f8cec12b0790c0f310f54d4865ce06f003abd1feb70986102630d514684
+- REVIEW-8-PROBES@None
+- AR96-BUILDER-CHECKPOINT@4cea3b8c341c0e481937eaba1d4895563a6b3fa02365d8716b7313a377f200bc
+- REVIEW-8-RETURN@726f3f40f574f14b4e8cc334cba7785542b93b0aa5fc756bf571824e7578c067
+items_relied_on:
+- 1c969abaa170663d7847f9a6
+- 21924dd6ba6b2a3b5e893f6d
+- c00344b52377e2e162398ca6
+- ea7d63a46f55beb186a07933
+- f147910c5776149d42a1fb98
+- d6d824cda11b6ff1ecaca09b
+- 7648c4e001705b1f1ee38ac3
+- c258a21c05cf9959f575c6b2
+- 34f6a93dfc7efef2648742ad
+- ad8d17f03838816b4bbe86f5
+- cd637653bc7a90d5df308b3b
+- 1b287faa1e8dfa375dea7c81
+- 5388dac2b516fd150ccca7b6
+- a8fea41bb6115df7ce7225c4
+- 65b22a602d54c678a3778d3f
+- 2ffb4a9f657cd26bd971fd87
+- 1391d63d7aed3f71c7bf1b8a
+- aae6914eff5bba723f414485
+- ce69172d4a3abb811e273e8f
+- 3a3bc81c090993696f7bd1ed
+- 2fc1c38003e3ad30b42852cd
+- ee5c53d49d8ddca66eedcba7
+- 915681fc061e6a2ea9e24011
+- 0354f8c29ae2d8eb8124c8d3
+- 09d6ca9913342a7a9aa4118c
+- 5e27f30d0834957fb4a45c23
+- ae2377052c687944eca322e2
+- 299a8c02a4d00d534fa673a6
+- e9a64958e6030cfc6df2a0a4
+- 2b083bd379b48a25d8bf6fb5
+- bbe87e0b5479387a99d27a14
+- c379cfbfa152da144ee4dd1a
+- 98a89d943382b106a9d50b5b
+- d30d1465f4d853fe2430f5f2
+- b3f5e55bbf58d2552950d940
+- c5f604ca2b9cbd0ff85bfacc
+- ccd93b2077283380e7c0f943
+- db2ad6abab4332f5cbd652eb
+- 254c6d71ea0da81962bc18fa
+- d026b3736202df12d8c0d456
+- 91759beb38b2f42a79d6b04d
+- e2210b618da0a1728131b529
+- 85c9d82c3bb2d6e4b0849384
+- e13bfeeb7e0fb3dd0397f51d
+- 035a3f785cf34a925791237b
+- bf724c8e060a2a0c6e8fca46
+- f7da6ec56651f271341182bc
+- acb349555f1381f2dd6f1f44
+- 2b342f6bb828bca608faf01d
+- 1fc95ed471ded2017875752b
+- 6aa4684758a611f610b1d15a
+- 67042e74d70e5f6f69e98cbe
+- 110b2b4d36d63d5fa604a34b
+- b7b5c47c99f4ac8962abe021
+- 668a53a835f5da2b5f8c3653
+- ac9049a48623ec57220e1e01
+- 3e9404c04d79a3bdbf3694dd
+- d709f79d0f293d97c54f4d2e
+- a29fe8bdd8d03898cf4bde3b
+- 476a7df6ea0da5e92e48d0ff
+- e2b0ec0fac1ee579045d373c
+- ead9c82adc58828ee99911ff
+- 6309a101da1f4dc7217f6ecc
+- 52f4379725a56da0735fa574
+- f6a29442035024f22e1b1c51
+- b4e3610b131a2f9f495ec17c
+- ad4aa805368e0a8569abfa07
+- a40a240e10d32dd097524ffb
+- 70dce322ea632f964a712a4b
+- 27fbe0bdc7b73d9318218c70
+- d895248db12df9ea55a3f386
+- 7f4cd37ea8cf146dc7f02dce
+- 07298e8ae35a1e5d9b82b37a
+- 5e39184716b10e7d4917941d
+- a24846c7fab3382e863ef093
+- 3fa08416d7a5ef5942b05580
+- 284189a52ecc899a9a14c262
+- ba8a63b26fbae8734d6778c4
+- 01adb32eb048068410221814
+- 208f330afa6498564027d19f
+- 82a5fe03f308b2e3b62d2fc1
+- 4ee364ae2670d5193933115d
+- 8af076ee4ad87e028a0f659f
+external_reads:
+- path: framework/policies/TOOL_POLICY.yaml
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 191-193
+  blob: 12ed080ab4b056b8bc9f354f60d5b9e28ea00292
+  why: installation_envelope.policy_paths (governance/** short-circuit before decide) -- obtained ONLY via govbridge exact
+    show/grep (supplementary/queries/24-exact.json,98-exact.json); no direct file read
+- path: runtime/src/adopt.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 1788-1789,1803-1846,1901-1903
+  blob: 47541bb9a688e6977446c7c0d6a5ba4397a39c8f
+  why: 'adopt batch-0 re-onboarding mirror: union call, contract splice, floor write -- obtained ONLY via govbridge exact
+    show/grep (supplementary/queries/20-exact.json,31-exact.json,32-exact.json,34-exact.json); no direct file read'
+- path: runtime/src/capabilities/governance.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 480-488
+  blob: 588b222e43745f98d8301b29f32cfad462a73a31
+  why: CTRL-2 unregistered executable plugin refusal -- obtained ONLY via govbridge exact show/grep (supplementary/queries/62-exact.json,63-exact.json,64-exact.json,65-exact.json);
+    no direct file read
+- path: runtime/src/cit/mod.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 1622-1630
+  blob: 2c920ca625107e63de6eae0e6af623456b61ca97
+  why: the only production caller of partition_floor_rules_against_kernel (reclassify_adoption_floor) -- obtained ONLY via
+    govbridge exact show/grep (supplementary/queries/30-exact.json,35-exact.json,63-exact.json); no direct file read
+- path: runtime/src/init.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 89-149,151-170,280-280,311-376
+  blob: eaf1532ec9db8f5c2c8680bf8204ef5b081bc671
+  why: F2 source construction (native_layout_rules), F3 re-onboarding branch, contract splice, floor write -- obtained ONLY
+    via govbridge exact show/grep (supplementary/queries/07-exact.json,08-exact.json,09-exact.json,10-exact.json,31-exact.json,32-exact.json);
+    no direct file read
+- path: runtime/src/paths.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 486-490,603-735,737-743,752-770,804-807,867-890,892-938,973-979,985-994,1014-1053,1165-1328,1353-1402,1405-1425,1427-1485,1492-1494,1601-1669,1786-1896,2101-2101
+  blob: 51c8c16cefa3e411068e777af9c0cf8eb1f1d4ba
+  why: floor read/write, FloorIdentity, union, sandbox exemption + creator liveness, RepositoryContract::decide -- obtained
+    ONLY via govbridge exact show/grep (supplementary/queries/11-exact.json,12-exact.json,13-exact.json,14-exact.json,15-exact.json,18-exact.json,19-exact.json,27-exact.json,31-exact.json,32-exact.json,33-exact.json,36-exact.json,39-exact.json,82-exact.json,83-exact.json);
+    no direct file read
+- path: runtime/src/policy.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 425-570
+  blob: a682a3f6de7ce79ba515eb945b6da0fe54f1a111
+  why: PolicySet::load floor read, reconstruction, kernel-tier baseline, overlay evaluation wiring -- obtained ONLY via govbridge
+    exact show/grep (supplementary/queries/16-exact.json,33-exact.json); no direct file read
+- path: runtime/src/policy_precedence.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 632-653,776-785,815-939,1636-1687
+  blob: 0ff34907edcdadf6c42a42df9e22e28f2972c07a
+  why: evaluate_path_rules_overlay restore-last, partition gate, overlap check, ar68_f3 unit test -- obtained ONLY via govbridge
+    exact show/grep (supplementary/queries/17-exact.json,20-exact.json,27-exact.json,28-exact.json,29-exact.json,30-exact.json);
+    no direct file read
+- path: runtime/src/project.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 143-178
+  blob: 4cf3bcd0b439fd56045c8de7b90cc9436164bd5a
+  why: Project::contract builds the RepositoryContract decide() runs on -- obtained ONLY via govbridge exact show/grep (supplementary/queries/101-exact.json,102-exact.json,103-exact.json);
+    no direct file read
+- path: runtime/src/scheduler/mod.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 567-594
+  blob: 0f5154b359f1ce9fb9fd6ebc57ca15f6037bc123
+  why: 'execute_one: in-process git:false sandbox (exemption''s production reconcile consumer) -- obtained ONLY via govbridge
+    exact show/grep (supplementary/queries/38-exact.json,39-exact.json); no direct file read'
+- path: runtime/src/scheduler/sandbox.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 59-68,102-122
+  blob: 554707e03f92c81fcc45e784b3eb247bddff8877
+  why: 'Sandbox::create: marker recording, git:true fresh git init -- obtained ONLY via govbridge exact show/grep (supplementary/queries/11-exact.json,37-exact.json);
+    no direct file read'
+- path: runtime/src/skills.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 482-502
+  blob: 173dc5e3d8d3c61216d1acf0f973995393ad6baa
+  why: execute_check (git:true sandbox) and run_gov child processes (cross-process) -- obtained ONLY via govbridge exact show/grep
+    (supplementary/queries/39-exact.json,40-exact.json); no direct file read
+- path: runtime/src/srr/verifier.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 755-800,1060-1078
+  blob: a00b9f8cf1e7ec0c6a7faf4edc5c13185378e181
+  why: CTRL-1 high-water / floor enforcement point -- obtained ONLY via govbridge exact show/grep (supplementary/queries/46-exact.json,47-exact.json,48-exact.json);
+    no direct file read
+- path: runtime/src/tools.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 1787-1824,1937-1956
+  blob: 445bd61a05ca03285f71046d9678fdd6860e6480
+  why: 'installation_authority: policy_paths short-circuit and decide().mutation consumer (effective behaviour) -- obtained
+    ONLY via govbridge exact show/grep (supplementary/queries/22-exact.json,23-exact.json,24-exact.json,25-exact.json,26-exact.json,27-exact.json);
+    no direct file read'
+- path: runtime/src/util.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 133-185
+  blob: ce712695cfec731bad3811ab11ae80d7974a36a4
+  why: glob_to_regex / glob_match semantics (matcher stage) -- obtained ONLY via govbridge exact show/grep (supplementary/queries/20-exact.json,21-exact.json);
+    no direct file read
+- path: tests/certification/ar94_floor.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 295-345,647-700
+  blob: 78d29aaa501f5133129e12ee3eb7030661486dbd
+  why: sandbox-exemption tests, spawn/kill helper (reaps), ar94_nc2 in-process probe -- obtained ONLY via govbridge exact
+    show/grep (supplementary/queries/11-exact.json,39-exact.json,41-exact.json,84-exact.json,85-exact.json); no direct file
+    read
+- path: tests/certification/srr.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 353-358,382-382,392-392,423-423,793-793
+  blob: 76398cdee02ba9ca6838ddef49f2f10481918ba6
+  why: CTRL-1 high-water tests (names/assertions via exact show + grep) -- obtained ONLY via govbridge exact show/grep (supplementary/queries/49-exact.json,50-exact.json,51-exact.json,100-exact.json);
+    no direct file read
+- path: tests/certification/ws07.rs
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 172-200
+  blob: fae52b95090f1b58f921f07ab1e4673a952dcf95
+  why: CTRL-2 unregistered-plugin refusal test -- obtained ONLY via govbridge exact show/grep (supplementary/queries/68-exact.json,99-exact.json);
+    no direct file read
+- path: tests/governance/capability-evidence-map.yaml
+  commit: 3c880d80f81475f5306bdd5f680f2e004df49391
+  lines: 186-235
+  blob: 16d8bedce7908eae8b64934ade27689060a2bb7b
+  why: Contract v3 A1 checklist -> mapped checks/tests (QC2/QC7/QC8) -- obtained ONLY via govbridge exact show/grep (supplementary/queries/96-exact.json,97-exact.json);
+    no direct file read
+- path: Governance_OS_Capability_Acceptance_Contract_v3.md
+  commit: 94d02116e770e0c4e99fe62367f89cd915692592
+  lines: 130-138,142-154,156-159,182-195,425-431
+  blob: 9ccde661b67529a8846546ac77e37334b5e82f2f
+  why: Contract v3 A1, A2, A3, B1/B2, F4 text beyond the packet's truncated A item -- obtained ONLY via govbridge exact show/grep
+    (supplementary/queries/52-exact.json,54-exact.json,56-exact.json,57-exact.json,58-exact.json,59-exact.json,60-exact.json,61-exact.json);
+    no direct file read
+- path: release/orchestration/phase-2-context-bridge/EVIDENCE/review-8/P2-AR-0097-return.verbatim.md
+  commit: 94d02116e770e0c4e99fe62367f89cd915692592
+  lines: 12-12,18-36,41-43,45-45,47-100,109-109,115-120,124-136,142-143,147-151,153-153,164-164
+  blob: 1f896d30c43b78b114f87293cdd22d86c2bc0c58
+  why: Review-8 F1-F6, rulings, stop-condition table beyond the packet's truncated A item -- obtained ONLY via govbridge exact
+    show/grep (supplementary/queries/04-exact.json,05-exact.json); no direct file read
+- path: release/orchestration/phase-2/HANDOFFS/P2-HO-0060-approved-delta.md
+  commit: 94d02116e770e0c4e99fe62367f89cd915692592
+  lines: 76-96
+  blob: 46e05870a7f7db2986fd578d88b51f61c5e25686
+  why: owner-approved 5C Option B semantics (section 4) -- obtained ONLY via govbridge exact show/grep (supplementary/queries/79-exact.json,81-exact.json);
+    no direct file read
+- path: release/orchestration/phase-2/PHASE_LEDGER.md
+  commit: 94d02116e770e0c4e99fe62367f89cd915692592
+  lines: 545-551,559-561,570-573,576-581,590-592
+  blob: 3fbc43a0cad312b5fa5f601ca26ba14573a1ef6d
+  why: 5A/5B/5C sweep evidence, P2-L-0043/0044 beyond the packet's truncated A item -- obtained ONLY via govbridge exact show/grep
+    (supplementary/queries/72-exact.json,74-exact.json,77-exact.json,78-exact.json,79-exact.json,80-exact.json); no direct
+    file read
+- path: spec/decisions/D-0009.yaml
+  commit: 94d02116e770e0c4e99fe62367f89cd915692592
+  lines: 1-13,31-54
+  blob: de0788cf5376698d6c4fd70e2aa4877676f23a6f
+  why: 'CTRL-1/CTRL-3: decision adopting the Signed Release Root; ARCH-0002/D-0008 non-active -- obtained ONLY via govbridge
+    exact show/grep (supplementary/queries/52-exact.json,53-exact.json); no direct file read'
+- path: spec/decisions/D-0010.yaml
+  commit: 94d02116e770e0c4e99fe62367f89cd915692592
+  lines: 1-45
+  blob: 171397a5377c50e0267337274921b6ba46f7786e
+  why: 'CTRL-2: executable plugins run only with an approved registration -- obtained ONLY via govbridge exact show/grep (supplementary/queries/67-exact.json);
+    no direct file read'
+outputs_produced:
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/answers.yaml
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/receipt.yaml
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/supplementary/queries/INDEX.md
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/supplementary/queries/NN-<command>.json (103 saved govbridge
+  query outputs)
+decisions_applied:
+- OD-P2-10A
+- OD-P2-10B
+- OD-P2-10A-B.STANDING-STATE
+- OD-P2-10A-B.PROPERTY-A
+- OD-P2-10
+- OC-BR-02
+- OWNER-LAUNCHER-BR-0001
+deviations:
+- REVIEW-8-PROBES is acknowledged as 'REVIEW-8-PROBES@None' because the manifest carries no content_sha256 for this by-reference
+  item (the receipt checker expects that literal). probes/P2-AR-0097/ and tests/certification/ar97_probe.rs were NOT read;
+  ar97_* outcomes are cited from the Review-8 return.
+- Every byte of repository content outside the packet was obtained through govbridge exact show / exact grep / search / why
+  / impact / history / state (103 outputs under supplementary/queries/, command lines in INDEX.md); no cat/git show/Read of
+  repository files was made other than this run's bootstrap.md, packet/ and task-inputs/. external_reads therefore declares
+  the 25 files cited by exact (path, commit, lines) citations, each with the query outputs its content came through.
+- 'Files whose content I also saw through govbridge exact show but do NOT cite: release/orchestration/phase-2-context-bridge/config/authority-registry.yaml@94d0211
+  lines 84-140 (70-exact), release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml@94d0211 lines 1070-1090 and 1535-1568 (75/76-exact),
+  release/root-of-trust/signed-release-root-v1/00-ARCHITECTURE.md@94d0211 lines 1-31 and 80-100 (44/45-exact), spec/decisions/D-0011.yaml@94d0211
+  lines 1-16 (88-exact); exact-grep outputs also show single matching lines from other files (e.g. tests/certification/p2_ar0096_reonboarding.rs
+  and ar92_floor.rs test names, 41/42-exact).'
+- 'Retrieval-exclusion exposure: 43-search (run before I added --exclude) returned one lexical hit in release/orchestration/phase-2-context-bridge/ARCHITECTURE/demonstration-queries.yaml
+  lines 105-123 whose snippet (the public AUTH-2..AUTH-4 query text, identical in substance to task-inputs/demonstration-queries.yaml)
+  was partly displayed while summarising hits; it was not used as evidence. 89-history lists mention metadata (path and line
+  only, no content) under ARCHITECTURE/, AGENT_RUNS/ and HANDOFFS/BR-HO-0*; none was read. Later searches passed --exclude
+  for the four retrieval-exclusion globs.'
+- 01-03-exact.json are failed exact-show attempts (REF_NOT_FOUND) while learning the spec format; 90-impact failed (the --view
+  flag expects a view file) and was re-run as 91-impact.
+- The ORCHESTRATOR-REASONING-ERRORS observation and the withdrawn AR96 positive-control record are cited only in AUTH-1/AUTH-2/AUTH-3
+  (authority listing and withdrawal history), never as evidence for a hypothesis or as a finding.
+unresolved:
+- Project::contract builds RepositoryContract from overlay().get('REPOSITORY_CONTRACT.yaml') after forcing PolicySet::load,
+  which calls overlay.set_effective (project.rs:143-178, policy.rs:568-570); that get() returns the effective document is
+  inferred -- the overlay get/set_effective implementation was not read.
+- 'S1-QC5 (PARTIAL): consumers of PathDecision beyond tools.rs:1808-1824, paths.rs:2101 and the class-exemption/indexing accessors
+  were not enumerated (no whole-tree sweep).'
+- 'S3/F1: whether any shipped scenario check runs a floor-writing command inside an execute_check sandbox (making has_local_adoption_anchor
+  / FloorIdentity::write_full cross-process, outcome-changing consumers of the exemption) was not established.'
+- 'S3-QC2 (PARTIAL): no Contract-v3 line names the sandbox exemption (grep: 0 hits); its mapping to frozen-gate item 5 (health
+  scheduler) and to A1.2 is my inference.'
+- 'F2 effective behaviour: for governance/** paths the tool-install gate raises a policy_paths finding before decide (tools.rs:1799);
+  other consumers of the displaced class/owner_role/namespace/code_index attributes for governance/project/** were not traced.'
+- 'CTRL-1: srr/state.rs Floors (persistence/raise logic) was located by grep but not read; the enforcement point cited is
+  srr/verifier.rs.'
+acceptance_evidence:
+- check: govbridge receipt check --packet DEMONSTRATION/run-1/packet --receipt DEMONSTRATION/run-1/receipt.yaml
+  result: PASS
+  evidence: run from release/orchestration/phase-2-context-bridge with PYTHONPATH=. and GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0010;
+    result re-checked after this field was added

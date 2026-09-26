@@ -1,0 +1,28 @@
+{
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 51,
+   "path": "release/orchestration/phase-2/GATES/OWNER-DIRECTION-P2-0009-COMPLETE-WITH-SWEEP.md",
+   "text": "re-anchor; **5C** whether a sandbox exemption must remain authority-bearing after its creating process dies."
+  },
+  {
+   "line": 76,
+   "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-0060-approved-delta.md",
+   "text": "## 4. Sandbox exemption = creator liveness \u2014 non-deferrable (owner-approved 5C Option B)"
+  },
+  {
+   "line": 553,
+   "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+   "text": "## P2-L-0043 \u2014 P2-AR-0095 lands all five items (373/0); the sweep answers 5B and 5C from evidence (2026-09-24)"
+  },
+  {
+   "line": 576,
+   "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+   "text": "**5C \u2014 production never needs post-mortem sandbox recognition.** `skills.rs:528 execute_check` holds its `Sandbox`"
+  }
+ ],
+ "query": "5C",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592"
+}

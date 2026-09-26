@@ -1,0 +1,17 @@
+{
+ "blob": "12ed080ab4b056b8bc9f354f60d5b9e28ea00292",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 194,
+ "line_start": 186,
+ "path": "framework/policies/TOOL_POLICY.yaml",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 22004,
+ "text": "  # `tools/registry/TOOLS.yaml` key `network_allowlist` (`approved_registries`, `allowlisted_services`), beside the\n  # language-native tools. That document is part of the verified kernel payload, so a project cannot alter it either.\n  # argument and environment names the OS reads as credential access (case-insensitive globs)\n  credential_patterns: [\"*TOKEN*\", \"*SECRET*\", \"*PASSWORD*\", \"*PASSWD*\", \"*API_KEY*\", \"*APIKEY*\", \"*CREDENTIAL*\",\n                        \"*PRIVATE_KEY*\", \"*ACCESS_KEY*\"]\n  # paths whose mutation is governance or security policy mutation; the installation's own descriptor and the\n  # generated tool registry it regenerates are excluded by the OS, being exactly what an installation writes\n  policy_paths: [\"framework/**\", \"governance/**\", \"spec/decisions/**\", \".governance-state/**\"]\napproved_licences: [MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, MPL-2.0, PSF-2.0, Python-2.0, Unlicense, CC0-1.0]\n",
+ "text_sha256": "8280802fdc0ec94de2808a90a3ea945e58cdb31b1c2a16972658e61ebc8f6a46",
+ "version_status": "CANONICAL"
+}

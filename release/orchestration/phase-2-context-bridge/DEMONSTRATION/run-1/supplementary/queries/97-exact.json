@@ -1,0 +1,17 @@
+{
+ "blob": "16d8bedce7908eae8b64934ade27689060a2bb7b",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 236,
+ "line_start": 186,
+ "path": "tests/governance/capability-evidence-map.yaml",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 526441,
+ "text": "  checklist:\n  - id: A1.1\n    line: 133\n    text: Constitution/hard invariants are identifiable and machine-readable.\n    automated_checks:\n    - doctor:D029\n    - test:certification:repair3::constitutional_floors_require_a_verified_kernel\n    - test:certification:arch::schemas_policies_and_registries_validate_against_kernel_schemas\n  - id: A1.2\n    line: 134\n    text: Security and authority floors cannot be weakened by lower-precedence policy.\n    automated_checks:\n    - check:policy_precedence\n    - doctor:D027\n    - doctor:D029\n    - test:certification:repair2::project_policy_cannot_weaken_constitutional_floors\n    - test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them\n    - test:certification:repair3::constitutional_floors_require_a_verified_kernel\n    - test:lib:policy_precedence::tests::overlay_documents_may_raise_floors_but_never_lower_them\n  - id: A1.3\n    line: 135\n    text: Project policy may specialise/strengthen only within allowed override modes.\n    automated_checks:\n    - check:policy_precedence\n    - doctor:D027\n    - test:certification:repair2::project_policy_cannot_weaken_constitutional_floors\n    - test:certification:ws03::project_overlays_may_raise_floors_but_never_lower_them\n    - test:certification:repair3::policy_exceptions_require_a_real_governing_decision\n    - test:lib:policy_precedence::tests::overlay_documents_may_raise_floors_but_never_lower_them\n  - id: A1.4\n    line: 136\n    text: Active decision/spec/task context follows deterministic precedence.\n    automated_checks:\n    - check:authority_unambiguous\n    - check:schema_invariants\n    - test:lib:context::contradictions::tests::precedence_resolves_first_and_undecidable_pairs_are_detected\n  - id: A1.5\n    line: 137\n    text: Retrieved context/model inference cannot override higher authority.\n    automated_checks:\n    - test:certification:repair::context_packet_layers_and_contradiction_flags\n  - id: A1.6\n    line: 138\n    text: Invalid weakening attempts fail closed and are observable.\n    automated_checks:\n    - check:policy_precedence\n    - doctor:D027\n    - test:certification:repair2::project_policy_cannot_weaken_constitutional_floors\n    - test:certification:repair3::constitutional_floors_require_a_verified_kernel\n    - test:certification:repair3::policy_exceptions_require_a_real_governing_decision\n  statements: []\n",
+ "text_sha256": "12bd62df5874b1455663ad01d118151e5c8285c821c38311d84f6c679e2082c0",
+ "version_status": "CANONICAL"
+}

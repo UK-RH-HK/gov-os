@@ -1,0 +1,38 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 1806,
+   "path": "runtime/src/adopt.rs",
+   "text": "                let unioned = crate::paths::union_last_known_rules_across_store(&adoption_floor);"
+  },
+  {
+   "line": 328,
+   "path": "runtime/src/init.rs",
+   "text": "            // install (see `union_last_known_rules_across_store`'s own doc for why)."
+  },
+  {
+   "line": 329,
+   "path": "runtime/src/init.rs",
+   "text": "            let unioned = crate::paths::union_last_known_rules_across_store(&adoption_floor);"
+  },
+  {
+   "line": 551,
+   "path": "runtime/src/paths.rs",
+   "text": "    /// [`has_local_adoption_anchor`]/[`union_last_known_rules_across_store`]), leaving this entry exactly where it"
+  },
+  {
+   "line": 573,
+   "path": "runtime/src/paths.rs",
+   "text": "/// scanning `adoption-floors/` for one naming a given identity) and [`union_last_known_rules_across_store`]"
+  },
+  {
+   "line": 1453,
+   "path": "runtime/src/paths.rs",
+   "text": "pub fn union_last_known_rules_across_store(fresh: &[Value]) -> Vec<Value> {"
+  }
+ ],
+ "query": "union_last_known_rules_across_store",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

@@ -1,0 +1,23 @@
+run_id: BR-AR-0011
+commit: 813fa8afd1cca19e2ba3d3b46cb4dd18d860735a
+commands:
+- cmd: govbridge packet verify DEMONSTRATION/run-1/packet (orchestrator, before dispatch)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/packet-verify.out
+  output_sha256: 2a7e2cf12b69bf3eefefb16de13c51c6ed497a47c9e2b5975604da6f4f0e2df4
+- cmd: govbridge receipt check --packet run-1/packet --receipt run-1/receipt.yaml (orchestrator re-run after return)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/receipt-check.orchestrator.out
+  output_sha256: 8c6e5157cfcad4893186d66d5a38ae326a46ac6c56623ca0044ac2fa26f02ba7
+- cmd: govbridge demo extract-reads <demo transcript> --out run-1/reads.json
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/reads.json
+  output_sha256: 17b5d999293c3ed225d3ed5a1d78da6b0b73b091435bc4bac101edfe59daebc9
+- cmd: oracle-overlap categorisation by YAML key (orchestrator; no oracle values printed)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/oracle-overlap-audit.orchestrator.out
+  output_sha256: 046176dd25e5c276e708f2c5ab1b643958ea8cc4896eacc9894e3360be3efcfa
+- cmd: consumption + secrecy audit over the demo transcript (orchestrator)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/CONSUMPTION-AND-SECRECY.orchestrator.md
+  output_sha256: 7f0f50fdbece47a0f3cae69caf02ecded182bf67d172c3137f7084701b7a8c1e

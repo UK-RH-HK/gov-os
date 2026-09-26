@@ -1,0 +1,17 @@
+{
+ "blob": "4cf3bcd0b439fd56045c8de7b90cc9436164bd5a",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 175,
+ "line_start": 140,
+ "path": "runtime/src/project.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 10984,
+ "text": "        self.overlay\n            .get_or_init(|| load_overlay(&self.overlay_dir(), Some(self.schemas())))\n    }\n    pub fn policies(&self) -> &PolicySet {\n        self.policies\n            .get_or_init(|| PolicySet::load(&self.root, self.overlay(), self.schemas()))\n    }\n    pub fn contract(&self) -> &RepositoryContract {\n        self.contract.get_or_init(|| {\n            let pol = self.policies();\n            let ds = self.overlay().get(\"DATA_SENSITIVITY.yaml\");\n            let classifications: Vec<(String, String)> = ds\n                .get(\"classifications\")\n                .and_then(|v| v.as_array())\n                .map(|a| {\n                    a.iter()\n                        .filter_map(|c| {\n                            Some((\n                                c.get(\"pattern\")?.as_str()?.to_string(),\n                                c.get(\"class\")?.as_str()?.to_string(),\n                            ))\n                        })\n                        .collect()\n                })\n                .unwrap_or_default();\n            let rules = crate::paths::SensitivityRules {\n                classifications,\n                never_index: pol.get_list(\"SECURITY_POLICY\", \"never_index_classes\"),\n                never_export: pol.get_list(\"SECURITY_POLICY\", \"never_export_classes\"),\n                archive_default_retrieval: pol\n                    .get(\"ARCHIVE_POLICY\", \"default_retrieval_for_archive\")\n                    .and_then(|v| v.as_bool()),\n                secret_agent_read: pol\n                    .get(\"SECURITY_POLICY\", \"agent_read_default_for_secret_class\")\n                    .and_then(|v| v.as_str().map(|s| s.to_string())),\n            };\n",
+ "text_sha256": "bb7d658d88b08ed3492922cb81c9b2093446a14fb17814cdb7c53e1829dc3454",
+ "version_status": "CANONICAL"
+}

@@ -1,0 +1,863 @@
+{
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 1456,
+   "path": "release/capability-baseline/audit-0/delta-r/capability-audit.yaml",
+   "text": "    - runtime/src/orchestration/dag.rs:75-83 (only PENDING/PRESENTED gates block; ANSWERED(any option)/WITHDRAWN/MISSING do not)"
+  },
+  {
+   "line": 1484,
+   "path": "release/capability-baseline/audit-0/delta-r/capability-audit.yaml",
+   "text": "    - runtime/src/orchestration/dag.rs:75-83 (only PENDING/PRESENTED gates block; ANSWERED(any option)/WITHDRAWN/MISSING do not)"
+  },
+  {
+   "line": 1517,
+   "path": "release/capability-baseline/audit-0/delta-r/capability-audit.yaml",
+   "text": "    - runtime/src/orchestration/dag.rs:75-83 (only PENDING/PRESENTED gates block; ANSWERED(any option)/WITHDRAWN/MISSING do not)"
+  },
+  {
+   "line": 1545,
+   "path": "release/capability-baseline/audit-0/delta-r/capability-audit.yaml",
+   "text": "    - runtime/src/orchestration/dag.rs:75-83 (only PENDING/PRESENTED gates block; ANSWERED(any option)/WITHDRAWN/MISSING do not)"
+  },
+  {
+   "line": 1584,
+   "path": "release/capability-baseline/audit-0/delta-r/capability-audit.yaml",
+   "text": "    - runtime/src/orchestration/dag.rs:75-83 (only PENDING/PRESENTED gates block; ANSWERED(any option)/WITHDRAWN/MISSING do not)"
+  },
+  {
+   "line": 134,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-18T20:29:52Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-eed1f327\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\"}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 148,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0004\"]}}}"
+  },
+  {
+   "line": 155,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 157,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-18T20:29:52Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-eed1f327\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\"}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 271,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"READY\"}"
+  },
+  {
+   "line": 284,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 139,
+   "path": "release/capability-baseline/audit-0/delta-r/evidence/L3-gate-presentation-attacks.py",
+   "text": "check(\"L3.b4.r1\", (not v[\"ok\"]) and v[\"error\"][\"code\"] == \"GATE_REVOKED\", \"approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED\", v.get(\"error\"))"
+  },
+  {
+   "line": 50,
+   "path": "release/capability-baseline/audit-0/synthesis/evidence/AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 865,
+   "path": "release/capability-baseline/repair-1/integration-2/evidence/merge-and-change-log.out",
+   "text": "+     /// FRAMED/IN_PROGRESS \u2192 WITHDRAWN"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T02:33:20Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-a864986e\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T02:33:20Z\", \"binding\": \"VERIFIED\", \"key_id\": \"de0988ac1a308645\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T02:33:21Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-a864986e\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T02:33:21Z\", \"binding\": \"VERIFIED\", \"key_id\": \"de0988ac1a308645\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/synthesis.AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T06:01:52Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-c2531862\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T06:01:52Z\", \"binding\": \"VERIFIED\", \"key_id\": \"41d703796d4324ae\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T06:01:52Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-c2531862\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T06:01:52Z\", \"binding\": \"VERIFIED\", \"key_id\": \"41d703796d4324ae\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/after-shim/synthesis.AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T04:23:41Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-8461c6fc\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T04:23:41Z\", \"binding\": \"VERIFIED\", \"key_id\": \"19ae40474e6400c5\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T04:23:41Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-8461c6fc\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T04:23:41Z\", \"binding\": \"VERIFIED\", \"key_id\": \"19ae40474e6400c5\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 53,
+   "path": "release/capability-baseline/repair-1/r2-ws02/evidence/before-shim/synthesis.AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 128,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN"
+  },
+  {
+   "line": 129,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 130,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T06:39:57Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-05e5be8c\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T06:39:57Z\", \"binding\": \"VERIFIED\", \"key_id\": \"188b43e8c743c7b6\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN\"}"
+  },
+  {
+   "line": 142,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 261,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 274,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0016\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/after/synthesis.AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T03:30:19Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-db3b9032\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T03:30:19Z\", \"binding\": \"VERIFIED\", \"key_id\": \"fa422d3e816ad034\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T03:30:19Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-db3b9032\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T03:30:19Z\", \"binding\": \"VERIFIED\", \"key_id\": \"fa422d3e816ad034\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws04/evidence/before/synthesis.AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 180,
+   "path": "release/capability-baseline/repair-1/r2-ws05/00-REPAIR-REPORT.md",
+   "text": "  (WAITING_HUMAN); DECLINED, WITHDRAWN, MISSING and UNVERIFIED block with the gate's own reason. Removing `human_gate`"
+  },
+  {
+   "line": 88,
+   "path": "release/capability-baseline/repair-1/r2-ws05/claims.yaml",
+   "text": "      - \"dag::DagCtx::governing_gates \u2014 the task's human_gate plus the latest T2-verified gate whose blocks_tasks names it; each checked by gates::task_gate_authorisation_in (PENDING waits; DECLINED/WITHDRAWN/MISSING/UNVERIFIED block)\""
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T05:52:32Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-50a94924\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T05:52:32Z\", \"binding\": \"VERIFIED\", \"key_id\": \"2f68a734aed3f6b1\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T05:52:33Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-50a94924\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T05:52:33Z\", \"binding\": \"VERIFIED\", \"key_id\": \"2f68a734aed3f6b1\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 278,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"claim\": {\"code\": \"TASK_NOT_RUNNABLE\", \"details\": {\"gates\": [{\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\"}], \"manifest\": null, \"pending_gates\": [], \"reasons\": [\"human gate HDG-0017 was withdrawn/revoked: its authorisation no longer exists\"], \"state\": \"BLOCKED\", \"task\": \"TASK-0003\"}, \"message\": \"TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): human gate HDG-0017 was withdrawn/revoked: its authorisation no longer exists. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`\"}, \"replan\": []}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"authorisation\": {\"option\": \"B\", \"state\": \"DECLINED\"}, \"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"authorisation\": {\"state\": \"MISSING\"}, \"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": []}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T04:57:01Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-57a2964a\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T04:57:00Z\", \"binding\": \"VERIFIED\", \"key_id\": \"3b151bc10f5c29f3\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T04:57:03Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-57a2964a\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T04:57:02Z\", \"binding\": \"VERIFIED\", \"key_id\": \"3b151bc10f5c29f3\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/audit-probes/base-shim/synthesis.AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/derived/after-shim/AC16-X2-authority-gate-chain.derived.P2-AR-0026.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/derived/base-shim/AC16-X2-authority-gate-chain.derived.P2-AR-0026.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T04:55:21Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-e802d8d9\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T04:55:20Z\", \"binding\": \"VERIFIED\", \"key_id\": \"4ffefef9c488775d\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T04:55:22Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-e802d8d9\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T04:55:21Z\", \"binding\": \"VERIFIED\", \"key_id\": \"4ffefef9c488775d\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 278,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"claim\": {\"code\": \"TASK_NOT_RUNNABLE\", \"details\": {\"gates\": [{\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\"}], \"manifest\": null, \"pending_gates\": [], \"reasons\": [\"human gate HDG-0017 was withdrawn/revoked: its authorisation no longer exists\"], \"state\": \"BLOCKED\", \"task\": \"TASK-0003\"}, \"message\": \"TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): human gate HDG-0017 was withdrawn/revoked: its authorisation no longer exists. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`\"}, \"replan\": []}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/after-shim/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"authorisation\": {\"option\": \"B\", \"state\": \"DECLINED\"}, \"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"authorisation\": {\"state\": \"MISSING\"}, \"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": []}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws05/evidence/intermediate-1de472e/derived/after-shim/AC16-X2-authority-gate-chain.derived.P2-AR-0026.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T05:23:24Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-1dacb4c2\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T05:23:24Z\", \"binding\": \"VERIFIED\", \"key_id\": \"3bf45522b1a42aa5\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T05:23:24Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-1dacb4c2\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T05:23:24Z\", \"binding\": \"VERIFIED\", \"key_id\": \"3bf45522b1a42aa5\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/after/synthesis.AC16-X2-authority-gate-chain.shim.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 137,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T05:07:19Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-4323e302\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T05:07:18Z\", \"binding\": \"VERIFIED\", \"key_id\": \"8577bd4825bd2d07\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 149,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 156,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 158,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T05:07:20Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-4323e302\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\", \"t2_binding_before\": {\"at\": \"2026-09-19T05:07:20Z\", \"binding\": \"VERIFIED\", \"key_id\": \"8577bd4825bd2d07\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 283,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/delta-r.L3-gate-presentation-attacks.shim.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 52,
+   "path": "release/capability-baseline/repair-1/r2-ws06/evidence/probes/before/synthesis.AC16-X2-authority-gate-chain.shim.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 75,
+   "path": "release/capability-baseline/repair-1/r2-ws07/evidence/COMPARE-probes.out",
+   "text": "    final [INFO] doctor D028 ok=False sev=high: plugin elev: its registration gate HDG-0002 does not approve it now (GATE_REVOKED: human gate HDG-0002 is WITHDRAWN); it is refused at exec"
+  },
+  {
+   "line": 64,
+   "path": "release/capability-baseline/repair-1/r2-ws07/evidence/probes/final-371794a-shim/gamma-r.F4-plugins.out",
+   "text": "  after revoke: ok=False PLUGIN_NOT_APPROVED plugin 'elev' is declared but not usable: plugin 'elev' is registered but its registration is not approved now: human gate HDG-0002 is WITHDRAWN (GATE_REVOKED). An executable plugi"
+  },
+  {
+   "line": 89,
+   "path": "release/capability-baseline/repair-1/r2-ws07/evidence/probes/final-371794a-shim/gamma-r.F4-plugins.out",
+   "text": "  doctor D028 ok=False sev=high: plugin elev: its registration gate HDG-0002 does not approve it now (GATE_REVOKED: human gate HDG-0002 is WITHDRAWN); it is refused at execution; plugin exfil is an executable plugin with no registration: it never runs (whatever it declares) until `gov plugins register` and an answered gate raised for it; plugin inline is an executable plugin with no registration: it never runs (whatever it declar"
+  },
+  {
+   "line": 53,
+   "path": "release/capability-baseline/repair-1/r2-ws10/00-REPAIR-REPORT.md",
+   "text": "| `research.schema.json` | `$defs/j1_complete`: `question`, `reason`, `method`, `sources` or `data` (non-empty), `measurements` (non-empty), `uncertainty`, `conclusion` (non-blank), `confidence` (number in [0,1]). Required (a) for a current record presented as evidence \u2014 `state_class` absent (the `AUTHORITY_POLICY` default for research is EVIDENCE) or EVIDENCE/AUTHORITATIVE/DERIVED \u2014 and (b) for `research_state: CONCLUDED`. `research_state` FRAMED/IN_PROGRESS/WITHDRAWN requires `state_class` NARRATIVE/HISTORICAL (framework \u00a745 \"reference only until transformed\"). |"
+  },
+  {
+   "line": 54,
+   "path": "release/capability-baseline/repair-1/r2-ws10/00-REPAIR-REPORT.md",
+   "text": "| `lifecycle::research` | State machine FRAMED \u2192 IN_PROGRESS \u2192 CONCLUDED, \u2192 WITHDRAWN (`RESEARCH_TRANSITION_INVALID`). `record` refuses incomplete research as evidence (`RESEARCH_INCOMPLETE`, naming each missing item) unless `--draft`, which records it FRAMED/IN_PROGRESS and NARRATIVE; `conclude` requires every J1 field and makes it EVIDENCE; `update` edits drafts only (concluded research is superseded, not edited); references (`data`, id-shaped `sources`, `influences`, `--task`) must resolve. Every write stamps `recorded_by`/`concluded_by` and the lifecycle history and is T2-sealed. |"
+  },
+  {
+   "line": 23,
+   "path": "release/capability-baseline/repair-1/r2-ws10/claims.yaml",
+   "text": "      - \"schema research.schema.json 1.1.0: a current research record presented as evidence (state_class absent = policy default EVIDENCE, or EVIDENCE/AUTHORITATIVE/DERIVED) records question, reason, method, sources|data, measurements, uncertainty, conclusion, confidence; FRAMED/IN_PROGRESS/WITHDRAWN require NARRATIVE/HISTORICAL \u2014 enforced by CIT execution (append_record, post-execution schema_validation) and by the governance suite family schema_invariants (tiers G1 G2 G4 G5 G6 per scheduler catalogue)\""
+  },
+  {
+   "line": 131,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN"
+  },
+  {
+   "line": 132,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 133,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T11:34:01Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-04d331ec\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T11:34:01Z\", \"binding\": \"VERIFIED\", \"key_id\": \"261fd81fd2711e44\", \"operation\": \"gate answer\", \"scope\": \"machine\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN\"}"
+  },
+  {
+   "line": 145,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 264,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 272,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"claim\": {\"code\": \"TASK_NOT_RUNNABLE\", \"details\": {\"gates\": [{\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\"}], \"manifest\": null, \"pending_gates\": [], \"reasons\": [\"human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists\"], \"state\": \"BLOCKED\", \"task\": \"TASK-0003\"}, \"message\": \"TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`\"}, \"replan\": []}"
+  },
+  {
+   "line": 277,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"authorisation\": {\"option\": \"B\", \"state\": \"DECLINED\"}, \"gate\": \"HDG-0016\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"authorisation\": {\"state\": \"MISSING\"}, \"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": []}"
+  },
+  {
+   "line": 131,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN"
+  },
+  {
+   "line": 132,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 133,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T10:38:27Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-ef6c8b68\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T10:38:27Z\", \"binding\": \"VERIFIED\", \"key_id\": \"e7d1c336a285d437\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN\"}"
+  },
+  {
+   "line": 145,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 264,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 272,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"claim\": {\"code\": \"TASK_NOT_RUNNABLE\", \"details\": {\"gates\": [{\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\"}], \"manifest\": null, \"pending_gates\": [], \"reasons\": [\"human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists\"], \"state\": \"BLOCKED\", \"task\": \"TASK-0003\"}, \"message\": \"TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`\"}, \"replan\": []}"
+  },
+  {
+   "line": 277,
+   "path": "release/capability-baseline/repair-1/r3-ws03/evidence/probes/audit-base-53897c1/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"authorisation\": {\"option\": \"B\", \"state\": \"DECLINED\"}, \"gate\": \"HDG-0016\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"authorisation\": {\"state\": \"MISSING\"}, \"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": []}"
+  },
+  {
+   "line": 129,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN"
+  },
+  {
+   "line": 130,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 131,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T11:09:58Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-b70a6f0f\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T11:09:57Z\", \"binding\": \"VERIFIED\", \"key_id\": \"b2e1e546fc8f59ad\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN\"}"
+  },
+  {
+   "line": 143,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 262,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"claim\": {\"code\": \"TASK_NOT_RUNNABLE\", \"details\": {\"gates\": [{\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\"}], \"manifest\": null, \"pending_gates\": [], \"reasons\": [\"human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists\"], \"state\": \"BLOCKED\", \"task\": \"TASK-0003\"}, \"message\": \"TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`\"}, \"replan\": []}"
+  },
+  {
+   "line": 275,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"authorisation\": {\"option\": \"B\", \"state\": \"DECLINED\"}, \"gate\": \"HDG-0016\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"authorisation\": {\"state\": \"MISSING\"}, \"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": []}"
+  },
+  {
+   "line": 51,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/after/derived.AC16-X2-authority-gate-chain.derived.P2-AR-0026.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 129,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN"
+  },
+  {
+   "line": 130,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 131,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T10:53:20Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-bbaee14e\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\", \"t2_binding_before\": {\"at\": \"2026-09-19T10:53:17Z\", \"binding\": \"VERIFIED\", \"key_id\": \"7b223edef5e8c9ae\", \"operation\": \"gate answer\"}}}, \"message\": \"human gate HDG-0007 is WITHDRAWN\"}"
+  },
+  {
+   "line": 143,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0003\"]}}}"
+  },
+  {
+   "line": 262,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0004\"], \"task_status\": \"BLOCKED\"}"
+  },
+  {
+   "line": 270,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"claim\": {\"code\": \"TASK_NOT_RUNNABLE\", \"details\": {\"gates\": [{\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\"}], \"manifest\": null, \"pending_gates\": [], \"reasons\": [\"human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists\"], \"state\": \"BLOCKED\", \"task\": \"TASK-0003\"}, \"message\": \"TASK-0003 cannot be claimed: the task DAG does not allow it (BLOCKED): human gate HDG-0018 was withdrawn/revoked: its authorisation no longer exists. `gov task dag` lists every blocking reason; resolve them (complete dependencies, provide the mandatory inputs, obtain an authorising gate answer, satisfy readiness/TEST_POLICY), then `gov task replan`\"}, \"replan\": []}"
+  },
+  {
+   "line": 275,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/delta-r.L3-gate-presentation-attacks.out",
+   "text": "      detail: {\"gate_deps\": [{\"authorisation\": {\"option\": \"B\", \"state\": \"DECLINED\"}, \"gate\": \"HDG-0016\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"authorisation\": {\"state\": \"WITHDRAWN\"}, \"gate\": \"HDG-0018\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"authorisation\": {\"state\": \"MISSING\"}, \"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": []}"
+  },
+  {
+   "line": 51,
+   "path": "release/capability-baseline/repair-1/r3-ws04/evidence/audit-probes/base/derived.AC16-X2-authority-gate-chain.derived.P2-AR-0026.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"blocked_tasks\": [], \"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 65,
+   "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/base-53897c1/gamma-r.F4-plugins.shim.out",
+   "text": "  after revoke: ok=False PLUGIN_NOT_APPROVED plugin 'elev' is declared but not usable: plugin 'elev' is registered but its registration is not approved now: human gate HDG-0002 is WITHDRAWN (GATE_REVOKED). An executable plugi"
+  },
+  {
+   "line": 90,
+   "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/base-53897c1/gamma-r.F4-plugins.shim.out",
+   "text": "  doctor D028 ok=False sev=high: plugin elev: its registration gate HDG-0002 does not approve it now (GATE_REVOKED: human gate HDG-0002 is WITHDRAWN); it is refused at execution; plugin exfil is an executable plugin with no registration: it never runs (whatever it declares) until `gov plugins register` and an answered gate raised for it; plugin inline is an executable plugin with no registration: it never runs (whatever it declar"
+  },
+  {
+   "line": 63,
+   "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/final-0393bca/derived.gamma-r.F4-plugins.registry-path.shim.out",
+   "text": "  after revoke: ok=False PLUGIN_NOT_APPROVED plugin 'elev' is declared but not usable: plugin 'elev' is registered but its registration is not approved now: human gate HDG-0002 is WITHDRAWN (GATE_REVOKED). An executable plugi"
+  },
+  {
+   "line": 88,
+   "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/final-0393bca/derived.gamma-r.F4-plugins.registry-path.shim.out",
+   "text": "  doctor D028 ok=False sev=high: plugin elev: its registration gate HDG-0002 does not approve it now (GATE_REVOKED: human gate HDG-0002 is WITHDRAWN); it is refused at execution; plugin exfil is an executable plugin with no registration: it never runs (whatever it declares) until `gov plugins register` and an answered gate raised for it; plugin inline is an executable plugin with no registration: it never runs (whatever it declar"
+  },
+  {
+   "line": 65,
+   "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/final-0393bca/gamma-r.F4-plugins.shim.out",
+   "text": "  after revoke: ok=False PLUGIN_NOT_APPROVED plugin 'elev' is declared but not usable: plugin 'elev' is registered but its registration is not approved now: human gate HDG-0002 is WITHDRAWN (GATE_REVOKED). An executable plugi"
+  },
+  {
+   "line": 92,
+   "path": "release/capability-baseline/repair-1/r3-ws07/evidence/probes/final-0393bca/gamma-r.F4-plugins.shim.out",
+   "text": "  doctor D028 ok=False sev=high: plugin elev: its registration gate HDG-0002 does not approve it now (GATE_REVOKED: human gate HDG-0002 is WITHDRAWN); it is refused at execution; plugin exfil is an executable plugin with no registration: it never runs (whatever it declares) until `gov plugins register` and an answered gate raised for it; plugin inline is an executable plugin with no registration: it never runs (whatever it declar"
+  },
+  {
+   "line": 50,
+   "path": "release/capability-baseline/repair-1/ws04/evidence/after/AC16-X2-authority-gate-chain.out",
+   "text": "   ok {\"gate\": \"HDG-0005\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"cit\": null, \"decisions\": []}}"
+  },
+  {
+   "line": 134,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T00:04:21Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-652daa71\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\"}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 148,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0004\"]}}}"
+  },
+  {
+   "line": 155,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 157,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T00:04:21Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-652daa71\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\"}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 271,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"READY\"}"
+  },
+  {
+   "line": 284,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.pre-repair.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 134,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007"
+  },
+  {
+   "line": 135,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "CHECK L3.b4.r1 PASS approval against a revoked (WITHDRAWN) gate is refused GATE_REVOKED"
+  },
+  {
+   "line": 136,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0007\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T00:36:29Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-a6ad4d2f\", \"previous_status\": \"ANSWERED\", \"reason\": \"probe\"}}, \"message\": \"human gate HDG-0007 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0007\"}"
+  },
+  {
+   "line": 148,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "      detail: {\"cit_status\": \"SIMULATED\", \"has_approval\": false, \"revoke\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"touched\": {\"cit\": {\"cit_status\": \"SIMULATED\", \"id\": \"CIT-0008\"}, \"decisions\": [\"D-0004\"]}}}"
+  },
+  {
+   "line": 155,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "  -> ERROR [GATE_REVOKED] human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008"
+  },
+  {
+   "line": 157,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "      detail: {\"code\": \"GATE_REVOKED\", \"details\": {\"gate\": \"HDG-0008\", \"gate_status\": \"WITHDRAWN\", \"revoked\": {\"at\": \"2026-09-19T00:36:29Z\", \"by_role\": \"orchestrator\", \"by_session\": \"probe-a6ad4d2f\", \"previous_status\": \"ANSWERED\", \"reason\": \"changed mind\"}}, \"message\": \"human gate HDG-0008 is WITHDRAWN; a withdrawn/expired gate cannot approve CIT-0008\"}"
+  },
+  {
+   "line": 271,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "      detail: {\"gate_status\": \"WITHDRAWN\", \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0004\"], \"task_status\": \"READY\"}"
+  },
+  {
+   "line": 284,
+   "path": "release/capability-baseline/repair-1/ws05/evidence/probe-reruns/delta-r/L3-gate-presentation-attacks.repaired.out",
+   "text": "      detail: {\"gate_deps\": [{\"gate\": \"HDG-0015\", \"gate_status\": \"ANSWERED\", \"task\": \"TASK-0001\"}, {\"gate\": \"HDG-0016\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0002\"}, {\"gate\": \"HDG-0017\", \"gate_status\": \"WITHDRAWN\", \"task\": \"TASK-0003\"}, {\"gate\": \"HDG-9999\", \"gate_status\": \"MISSING\", \"task\": \"TASK-0004\"}], \"runnable\": [\"TASK-0001\", \"TASK-0002\", \"TASK-0003\", \"TASK-0004\"]}"
+  },
+  {
+   "line": 1557,
+   "path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+   "text": "  status: WITHDRAWN -- the finding was wrong"
+  },
+  {
+   "line": 1,
+   "path": "release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md",
+   "text": "# P2-AR-0096 \u2014 orchestrator finding: **WITHDRAWN**"
+  },
+  {
+   "line": 6,
+   "path": "release/orchestration/phase-2/RESEARCH/P2-AR0096-POSITIVE-CONTROL-GAP.md",
+   "text": "| **Status** | **WITHDRAWN 2026-09-25 \u2014 the finding was wrong.** Retained, not deleted: failed iterations are historical evidence (OD-P2-08 \u00a710). |"
+  }
+ ],
+ "query": "WITHDRAWN",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592"
+}

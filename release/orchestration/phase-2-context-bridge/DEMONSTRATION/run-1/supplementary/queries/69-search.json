@@ -1,0 +1,1032 @@
+{
+ "fused": [
+  {
+   "authority_class": "UNCLASSIFIED",
+   "fused_score": 0.03278688524590164,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "6cc4993c02f79d19a4ed43af",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.03149801587301587,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "3571321b58fa4a4b7afff335",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.03125763125763126,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "16142fb7a92af1f224644378",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.030621785881252923,
+   "lifecycle": "UNKNOWN",
+   "route": "semantic",
+   "unit_id": "ad4babb5862f6414fd3b3a9b",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "OWNER_DECISION",
+   "fused_score": 0.016129032258064516,
+   "lifecycle": "ACTIVE",
+   "route": "lexical",
+   "unit_id": "5b3b37a8a73105e05451293a",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "OWNER_DIRECTION_TO_TEST",
+   "fused_score": 0.015384615384615385,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "a60f3ef3a1df144fde1b4a70",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.015151515151515152,
+   "lifecycle": "UNKNOWN",
+   "route": "semantic",
+   "unit_id": "c3809e348149f477c79a6d41",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.015151515151515152,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "ce4e8d6d4c4616a5e7ce2aff",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.014925373134328358,
+   "lifecycle": "UNKNOWN",
+   "route": "semantic",
+   "unit_id": "4f0ff70f3f28dc4f2cea043b",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.014925373134328358,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "a3bb181a874f95bae8605828",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "fused_score": 0.014705882352941176,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "0403b78b81fc454a2a317aa4",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.014705882352941176,
+   "lifecycle": "UNKNOWN",
+   "route": "semantic",
+   "unit_id": "3e0958c3346f61eb74b06b85",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "UNCLASSIFIED",
+   "fused_score": 0.014492753623188406,
+   "lifecycle": "UNKNOWN",
+   "route": "semantic",
+   "unit_id": "055eb9e65236eae56c45186d",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.014285714285714285,
+   "lifecycle": "UNKNOWN",
+   "route": "lexical",
+   "unit_id": "42abba45ef1f3132d17fa8c8",
+   "unit_kind": "chunk"
+  },
+  {
+   "authority_class": "ORCHESTRATION_RECORD",
+   "fused_score": 0.014285714285714285,
+   "lifecycle": "UNKNOWN",
+   "route": "semantic",
+   "unit_id": "adf2b079d1f6fce2bc7ef82e",
+   "unit_kind": "chunk"
+  }
+ ],
+ "hits_by_route": {
+  "exact": [],
+  "lexical": [
+   {
+    "authority_class": "UNCLASSIFIED",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 107,
+      "line_start": 84,
+      "path": "release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 1,
+    "resolution": null,
+    "route": "lexical",
+    "text": "# -----------------------------------------------------------------------------------------------------------------\nsupersessions:\n  - from: OD-P2-07\n    to: OA-P2-06\n    scope: stop condition\n    note: >-\n      OA-P2-06 otherwise stays ACTIVE, annotated \"partially superseded: stop condition\"; OD-P2-08 section 8's\n      stop conditions are the current ones\n    cite: {path: release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md,\n           line: 9, quote: \"continuation **beyond** OA-P2-06's previous stop condition\"}\n  - from: V8.2\n    to: V8.1\n    scope: WHOLE\n    cite: {path: release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml, line: 70,\n           quote: \"HISTORICAL_PHASE_1_OPERATOR_EVIDENCE\"}\n  - from: OWNER-DIRECTIVE-0004\n    to: CP-1\n    scope: WHOLE\n    note: retired as the Phase-1 target\n    cite: {path: release/orchestration/phase-1/GATES/OWNER-DIRECTIVE-0004-SIGNED-RELEASE-ROOT-REBASE.md, line: 43,\n           quote: \"CP-1 is retired as the Phase-1 target\"}\n  - from: 'V8_3_EVIDENCE_PACKAGE.md#5.0'\n    to: 'V8_3_EVIDENCE_PACKAGE.md#5.3(only serialised runs are authoritative)'\n    scope: section\n",
+    "tier": null,
+    "unit_id": "6cc4993c02f79d19a4ed43af",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "OWNER_DECISION",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "ACTIVE",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 24,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/GATES/OWNER-DECISION-P2-0007-A-PLUS-C-STRUCTURAL-REMEDIATION.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 2,
+    "resolution": null,
+    "route": "lexical",
+    "text": "# OWNER-DECISION-P2-0007 \u2014 A + C: remove the architectural pattern, not another enumeration\n\n| Field | Value |\n|---|---|\n| Record | Owner decision (product owner, 2026-09-22) |\n| Id | **OD-P2-07** |\n| Status | IN FORCE for Phase 2 |\n| Answers | `PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md`, the escalation OA-P2-06's stop condition produced after P2-AR-0077 |\n| Authorises | continuation **beyond** OA-P2-06's previous stop condition |\n| Supersedes | nothing; OD-P2-03, OC-P2-04 and OD-P2-05 all stand, and this settles *how* their requirements are met on this surface |\n\n## The decision\n\n**A + C, as one bounded structural architecture remediation.** In the owner's words:\n\n> Do NOT treat this as another local enumeration/patch round. The purpose is to remove the architectural pattern\n> responsible for the repeated failures, then subject the result to fresh independent attack before any candidate is\n> minted.\n\n`cap2-candidate-2` must not be minted until the conditions in \u00a77\u2013\u00a710 below are satisfied.\n\n## A \u2014 no raw or unbound command may acquire ungated installation authority\n\nFour rounds established that predicting arbitrary raw-command semantics through program lists, argument lists, flag\n",
+    "tier": null,
+    "unit_id": "5b3b37a8a73105e05451293a",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 93,
+      "line_start": 92,
+      "path": "release/orchestration/phase-2/AGENT_RUNS/P2-AR-0077.run.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 3,
+    "resolution": null,
+    "route": "lexical",
+    "text": "    pattern failing for a second consumer. A shape worth an architecture review rather than a fifth repair, which is what the stopping rule already provides for.\norchestrator_disposition: OA-P2-06's stop condition triggered on both limbs. No mint, no fifth repair round. Architecture/meta-review package produced and escalated to the owner.\n",
+    "tier": null,
+    "unit_id": "16142fb7a92af1f224644378",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 23,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 4,
+    "resolution": null,
+    "route": "lexical",
+    "text": "# Phase 2 \u2014 architecture / meta-review package: the install-trust surface after four rounds\n\n| Field | Value |\n|---|---|\n| Date | 2026-09-22 |\n| For | the product owner |\n| From | the Phase-2 outer orchestrator |\n| Trigger | **OA-P2-06's stop condition, triggered on both limbs** by P2-AR-0077 |\n| Status | **STOPPED.** `cap2-candidate-2` **not** minted. No fifth repair round started. No formal verification dispatched. |\n| Evidence | `AGENT_RUNS/P2-AR-0077.run.yaml`; probes and raw results at `probes/P2-AR-0077/`; review commit `b96109d`; repair under review `e25ca70` |\n\n## 1. Why I stopped\n\nYou set two conditions. Both fired:\n\n> STOP and return to me for an architecture/meta-review if that fourth adversarial review: finds another materially new\n> HIGH blocker on the install-trust surface; **or** leaves AR75-F1 or AR75-F2 materially open.\n\nP2-AR-0077 (fresh Opus 5, independent of every repair and all three prior reviews) returned **`RESIDUAL_DEFECTS` \u2014 3 HIGH,\n1 MEDIUM, 1 LOW**, with all three HIGHs materially new, and both AR75 findings materially open as *classes*.\n\n## 2. First, what the repair did achieve \u2014 this is not a failed round\n\n",
+    "tier": null,
+    "unit_id": "3571321b58fa4a4b7afff335",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "OWNER_DIRECTION_TO_TEST",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 803,
+      "line_start": 790,
+      "path": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 5,
+    "resolution": null,
+    "route": "lexical",
+    "text": "    records ref follows this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here\n    would move the demonstration's view mid-run (OBS-BR-03)\n  progress_is_recorded_on: [bridge/d1-0010 (BR-AR-0010 coverage/cost, orchestrator-run), bridge/demo-0011 (bootstrap, packet,\n      answers, receipt, reads), bridge/grade-0012 (unsealed oracle copy, grading report)]\n  demonstration_store: $HOME/.cache/gov-bridge/store-BR-AR-0010 (built from clean by D1 at the frozen tip)\n  resume_rule: a resumed orchestrator reads those branches' commits as the durable progress record, then merges them in\n    order D1 -> DEMO -> GRADE and lifts the freeze\nobservations:\n- id: OBS-BR-01\n  text: 'the orchestrator''s auto-memory claims OD-P2-08 superseded OA-P2-06''s hard stops and AR75 framing entirely; no\n    committed record says so -- OD-P2-07 line 9 authorises continuation beyond OA-P2-06''s stop condition and OD-P2-08\n    line 7 supersedes only two escalation packages. The architecture''s cited, scoped representation is grounded in\n    the records and stands; memory is not a source.'\n- id: OBS-BR-03\n",
+    "tier": null,
+    "unit_id": "a60f3ef3a1df144fde1b4a70",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 367,
+      "line_start": 361,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 6,
+    "resolution": null,
+    "route": "lexical",
+    "text": "| Disposition | **STOPPED.** `cap2-candidate-2` not minted; no fifth repair round; no formal verification dispatched. `PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md` escalates with options A\u2013E: (A) empty the exception list so installs must execute pinned artefacts; (B) constrain effects by isolation instead of predicting them; (C) make the `class` exemption set derived rather than enumerated; (D) re-scope the surface to R2; (E) mint and disclose. Orchestrator recommends **A + C** as a bounded round, notes **B** as the right long-term answer and beyond this phase, and marks **D** as the owner's alone. |\n\n## P2-L-0035 \u2014 2026-09-22 \u2014 Owner decides A + C: remove the pattern, not another enumeration\n\n| Field | Value |\n|---|---|\n| Decision | **OD-P2-07.** A + C as one bounded **structural architecture remediation**, explicitly authorising continuation beyond OA-P2-06's stop condition. The owner's framing: *\"Do NOT treat this as another local enumeration/patch round. The purpose is to remove the architectural pattern responsible for the repeated failures.\"* |\n",
+    "tier": null,
+    "unit_id": "ce4e8d6d4c4616a5e7ce2aff",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 125,
+      "line_start": 110,
+      "path": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 7,
+    "resolution": null,
+    "route": "lexical",
+    "text": "  existing `gov-capability/1` protocol.\n\nThe hard authority invariant is enforced four ways: by type (only the resolver constructs a section-A item), by an\nimport boundary, by an independent validator that re-derives section A, and by an ordering invariant that no score\ncan invert. The `mandatory_bridge_inputs` classes are verbatim. OD-P2-10A/B are section-scoped, so the F1 direction\ncannot inherit OWNER_DECISION from its file. D is split into D.1 decisions, D.2 directions and D.3 hypotheses.\n\n**Why the product's own memory engine is not used.** Running it would call `gov init`, which writes the machine\nadoption-floor store that F3's union reads. The bridge reuses the engine's designs instead.\n\n**Three things the orchestrator checked or changed before dispatch:**\n\n1. **OA-P2-06.** The architect models OA-P2-06 as ACTIVE, with only its stop condition superseded. The orchestrator's\n   own memory said more had been superseded. The committed records support the architect, and no record supports\n   the memory, so the memory claim is noted as unsupported (OBS-BR-01).\n2. **Store isolation (BR-DAG-AMEND-1).** The store path had no override, and B2\u2013B5 will run in parallel. B1 must\n",
+    "tier": null,
+    "unit_id": "a3bb181a874f95bae8605828",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "UNCLASSIFIED",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 89,
+      "line_start": 75,
+      "path": "release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 8,
+    "resolution": null,
+    "route": "lexical",
+    "text": "      every line outside the six anchored sections above (lines 1-10, the header table before the first heading)\n      is UNCLASSIFIED, scoped to that section -- the file-level OWNER_DECISION class (from the class_rules OWNER-*.md\n      rule below) never flows into a section, and a request for the file as ONE occurrence (no item_id, no line\n      range inside a single anchor) is likewise UNCLASSIFIED, because the file is not uniformly one class.\n\n# -----------------------------------------------------------------------------------------------------------------\n# supersessions: derivation REGISTRY_CITED. scope: WHOLE flips `to`'s lifecycle via the same status-vocabulary\n# mapping applied to the cited quote (ARCHITECTURE.md section 5.1's fixed table); any other scope leaves `to`'s\n# lifecycle unchanged and adds a \"partially superseded: <scope>\" note only (govbridge.authority.lifecycle).\n# -----------------------------------------------------------------------------------------------------------------\nsupersessions:\n  - from: OD-P2-07\n    to: OA-P2-06\n    scope: stop condition\n    note: >-\n",
+    "tier": null,
+    "unit_id": "0403b78b81fc454a2a317aa4",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "evidence",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "product",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/approved-delta",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "46f0a4b3b0cea9d775be7185d07eb4940aa4ef2d",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/ar84-repair",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "52f14484a212d3c116e4e9f072fdd975b9215ea5",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/ar86-repair",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "526f789c580bbf6c86dac0b1def97e3c70ab2369",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/ar88-repair",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "a01f0c9c005c6cb5a488e5e5fcb28c744f7718d1",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/ar90-repair",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "e74e4097d70edc7d7cfd9279243422f5663e2027",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/final-review",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "85856e7058c1a7dd5acd33b35840c34499dfde76",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/option1",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "3fa75818b9269049e6335c690ccfcc0986247d01",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/option1-floor",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "4f3d61420aa8ed8575900dae460a82c74e9ef910",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/option1-repair",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "c6d3be094de8c74b0dff4ff1177d19e82e30a3c8",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/option1-review",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "31dcfa060b9ddf63940d658ddacc401bc7eca1f4",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/perf-diag",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "35461c9ef6d1b714a34ac3e60d7112de4db503a5",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/remediation-ac",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "7f78ede29838d0ba5125be7317e34d048362fa1e",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/remediation-ac-review",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "a376cc4236da880db34cead269947cabc84a2b5e",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/remediation-ar92",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "92982ff002caa4708a39255847e3830b12fa10e0",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/remediation-ar94",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "fe614e3bbf765ba5064e67852d5333d80e12be3c",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-adversarial",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "24940407662b4e89636f3593c21fa0a8a9555c00",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-adversarial-2",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "2ca0f776a972e7f4007d168636ea3c34a3ed9d9a",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-adversarial-3",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "bbf7c7a404f18244166bd739cd19d8ba4cbcda38",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-f3",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "c34c43999200b8f96226cc3f12ee0a9184ea8cac",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-failclosed",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "1c6a3a2930fbdf985951354d78d551b27def76e9",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-final",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "61e39b6ce8e551c12dc730027a2fd5a05a001f01",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-integration",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "fabb145c0cef3cb7de3bd9cce5adf6a2f350f741",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-reviewbind",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "55d1c9071d67e3eb2c5973394e93ca9f25745558",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-reviewbind2",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "9597d904d92d71ad8907d1d645692d2486c1758e",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-toolbind",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "27dd443f6834f22db26f82a2c253b988dcd87df6",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsA",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "a9bdab2f55f4e8f25f6bfb0dff7620ad85509a8e",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsB",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "a945e1d64ff5a2f80ffca8c2b834a39c05a635dd",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsC",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "8a0eccbb5cab2d7c247ef5ac1cd12d02e0c73aac",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsD",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "cc85bd4a7df9a63a6665af7bbf6e79193d24c047",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsE",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "6aa1cf8cbf97d61f11431cb92fee0052b91976bc",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsF",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "52816e4992bf07a0d61ed123fa2c6da049fe2973",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-2-wsG",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "b96109dc17f47bc5b592080ae25b432a44031e88",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-3-adversarial",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "e25ca70ed258fcaa1f391c1b16570c689ff48d89",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/repair-3-boundary",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "d2f981a71cb79f36d4a0c488ff5eb838bd1621d0",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/review-3",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "4b677bc5aba1c8ce01cad7d9f4319c46e48881e9",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/review-4",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "9af14f6686acd9717c097d73ac0dbd545fa0b8d0",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/review-5",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "4686e8d26e0a7c0640f244f6cc2ce8a0d5b20939",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/review-6",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "f2a9ab9f331496e5a646d52b0d332e63588d6103",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/review-7",
+      "version_status": "SAME_AS_CANONICAL"
+     },
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "58219d5628683d6f462aa67bf25dbc2641933bce",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "refs/heads/phase2/review-8",
+      "version_status": "SAME_AS_CANONICAL"
+     }
+    ],
+    "rank": 9,
+    "resolution": null,
+    "route": "lexical",
+    "text": "# P2-HO-ORCH-0003 \u2014 Orchestrator continuity: Phase 2 stopped for owner review\n\n| Field | Value |\n|---|---|\n| Written | 2026-09-21, by the Phase-2 outer orchestrator, on the owner's stop condition of 2026-09-20 |\n| For | this session after an owner instruction, or a fresh replacement outer orchestrator |\n| Supersedes | `P2-HO-ORCH-0002-safe-hold-continuity.md` (kept as history; its conventions and hazards still apply) |\n| Authority | Durable state wins over this note. Run `python3 release/orchestration/phase-2/tools/check_state.py show`, then `verify`, then read `CHECKPOINTS/P2-CP-0011.yaml` and `PHASE_2_DECISION_PACKAGE.md`. |\n\n## Stop rule now in force\n\nVerification iteration 1 **rejected** `cap2-candidate-1`. Under the owner's instruction of 2026-09-20 the orchestrator\nrecorded the verifier evidence and **stopped**. Until the owner gives an explicit instruction:\n\n- start **no** repair iteration 2, no repair or build agent, and no further verification;\n- do not alter the candidate, its tag, the frozen gate contract or any recorded verdict;\n- do not relabel any finding or class \u2014 the convergence count is 1 of 3 and only a fresh independent verifier may change\n  a label.\n\n",
+    "tier": null,
+    "unit_id": "ad4babb5862f6414fd3b3a9b",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 368,
+      "line_start": 367,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 10,
+    "resolution": null,
+    "route": "lexical",
+    "text": "| Decision | **OD-P2-07.** A + C as one bounded **structural architecture remediation**, explicitly authorising continuation beyond OA-P2-06's stop condition. The owner's framing: *\"Do NOT treat this as another local enumeration/patch round. The purpose is to remove the architectural pattern responsible for the repeated failures.\"* |\n| Property A | **No raw or unbound command may acquire ungated installation authority.** The ungated path requires that every executed file be pinned in the descriptor and byte-verified immediately before execution; anything not reducible to an exact bound artefact is `undetermined` and gates. Adding another curl flag, command shape, program, path syntax or parser exception is **forbidden by name**. Raw commands may still run through a gate; ordinary acquisition survives by wrapping installation logic in a pinned reviewed artefact. |\n",
+    "tier": null,
+    "unit_id": "42abba45ef1f3132d17fa8c8",
+    "unit_kind": "chunk"
+   }
+  ],
+  "semantic": [
+   {
+    "authority_class": "UNCLASSIFIED",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 107,
+      "line_start": 84,
+      "path": "release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 1,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "6cc4993c02f79d19a4ed43af",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 19,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/HANDOFFS/P2-HO-ORCH-0003-post-verification-owner-review.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 2,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "ad4babb5862f6414fd3b3a9b",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 23,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/PHASE_2_ARCHITECTURE_REVIEW_PACKAGE.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 3,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "3571321b58fa4a4b7afff335",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 93,
+      "line_start": 92,
+      "path": "release/orchestration/phase-2/AGENT_RUNS/P2-AR-0077.run.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 5,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "16142fb7a92af1f224644378",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 724,
+      "line_start": 710,
+      "path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 6,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "c3809e348149f477c79a6d41",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 26,
+      "line_start": 1,
+      "path": "release/orchestration/phase-2/PHASE_2_OPTION_B_ESCALATION_PACKAGE.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 7,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "4f0ff70f3f28dc4f2cea043b",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 32,
+      "line_start": 14,
+      "path": "release/orchestration/phase-2/PHASE_2_PROGRESS_AND_MODEL_TELEMETRY.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 8,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "3e0958c3346f61eb74b06b85",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "UNCLASSIFIED",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 187,
+      "line_start": 171,
+      "path": "release/root-of-trust/4.1.6-review-r6/00-REVIEW-REPORT.md",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 9,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "055eb9e65236eae56c45186d",
+    "unit_kind": "chunk"
+   },
+   {
+    "authority_class": "ORCHESTRATION_RECORD",
+    "delivery": "RETRIEVED",
+    "edge_path": [],
+    "lifecycle": "UNKNOWN",
+    "occurrences": [
+     {
+      "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "canonical_ref": "records",
+      "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+      "line_end": 465,
+      "line_start": 454,
+      "path": "release/orchestration/phase-1/ORCHESTRATOR_STATE.yaml",
+      "ref": "records",
+      "version_status": "CANONICAL"
+     }
+    ],
+    "rank": 10,
+    "resolution": null,
+    "route": "semantic",
+    "text": null,
+    "tier": null,
+    "unit_id": "adf2b079d1f6fce2bc7ef82e",
+    "unit_kind": "chunk"
+   }
+  ]
+ },
+ "routes": [
+  "lexical",
+  "exact",
+  "semantic"
+ ],
+ "text": "Phase-2 stop condition superseded OA-P2-06 stop condition current"
+}

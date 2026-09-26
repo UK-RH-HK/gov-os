@@ -1,0 +1,17 @@
+{
+ "blob": "9ccde661b67529a8846546ac77e37334b5e82f2f",
+ "canonical_commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "canonical_ref": "records",
+ "commit": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 200,
+ "line_start": 151,
+ "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+ "ref": "94d02116e770e0c4e99fe62367f89cd915692592",
+ "size": 42302,
+ "text": "- [ ] Signing keys/trust anchors support rotation/revocation/recovery.\n- [ ] Release verification works offline after obtaining an authentic release envelope where designed.\n\n**Advanced qualification challenge:** tampered source payload, stale/forged manifest, wrong key, altered security policy, modified migration, downgrade/replay attempt, interrupted install.\n\n## A3. Security, sensitivity and permissions\n- [ ] Paths/datasets/tools/namespaces carry sensitivity/access classification.\n- [ ] Secret/credential/restricted content is excluded according to policy.\n- [ ] Restricted/confidential namespaces cannot be weakened by project overrides.\n- [ ] Tool execution respects role/authority/permission boundaries.\n- [ ] Destructive/elevated operations require correct gates.\n- [ ] Outbound/export controls are default-deny where required.\n\n**Advanced qualification challenge:** seeded secrets, restricted research, confidential project files, malicious plugin descriptors, weakened project policy.\n\n## A4. Budget/resource governance\n- [ ] Model/API/cloud/network/tool-install/parallel-agent/experiment budgets are governed.\n- [ ] Delegated thresholds are executable, not merely declared.\n- [ ] Exceeding delegated limits creates the required Human Decision Gate.\n- [ ] Budget state and interventions are observable.\n\n## A5. Emergency controls\n- [ ] `PAUSE`\n- [ ] `FREEZE_WRITES`\n- [ ] `CANCEL_AGENTS`\n- [ ] `ROLLBACK_TRANSACTION`\n- [ ] Emergency commands are deterministic and authority-gated.\n- [ ] Recovery from emergency controls is auditable.\n\n---\n\n# GATE B \u2014 Repository Contract, Paths and State\n\n## B1. Standard repository contract\n- [ ] Governance/framework/project/generated/runtime boundaries are explicit.\n- [ ] Good native product architecture is preserved when healthy.\n- [ ] Repository contract maps project-specific layout without cosmetic refactoring.\n- [ ] Generated/runtime state is distinguished from authoritative tracked state.\n\n## B2. Path map\n- [ ] Every material artefact can be classified by current path, class, authority and intended target.\n- [ ] Target action supports KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE.\n- [ ] Unknown material artefacts block destructive migration.\n- [ ] Imports/references/citations/consumers are represented.\n- [ ] Path-map compliance is machine-checkable.\n\n**Advanced qualification challenge:** Repo B starts without a path map; includes misplaced specs, duplicate authority, provider rules, dead code, generated files in wrong locations and hidden cross-references.\n\n## B3. Authoritative vs derived state\n- [ ] Git/project records remain authoritative.\n",
+ "text_sha256": "80e82716a1300ddf5ba7421c5b65864ca5ccf3b127280b8ecac73cc7dd4e92de",
+ "version_status": "CANONICAL"
+}

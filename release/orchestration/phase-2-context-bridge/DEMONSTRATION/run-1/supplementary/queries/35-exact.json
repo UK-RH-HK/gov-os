@@ -1,0 +1,17 @@
+{
+ "blob": "2c920ca625107e63de6eae0e6af623456b61ca97",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 1640,
+ "line_start": 1598,
+ "path": "runtime/src/cit/mod.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 140504,
+ "text": "            // Reuses `policy_precedence::overlap_is_no_less_restrictive` -- the SAME comparison the live overlay\n            // already trusts for exactly this question -- rather than a second, parallel one. Partitioned, not\n            // all-or-nothing: an ordinary reclassification legitimately carries many rules, and one bad rule must\n            // not block the rest, exactly as the live overlay treats REPOSITORY_CONTRACT.paths rule by rule.\n            let kernel_dir = crate::kernel_trust::trusted_root(p);\n            let kernel_paths = crate::util::read_yaml(\n                &kernel_dir.join(\"overlay-templates\").join(\"REPOSITORY_CONTRACT.yaml\"),\n            )\n            .ok()\n            .and_then(|v| v.get(\"paths\").and_then(|a| a.as_array().cloned()))\n            .unwrap_or_default();\n            // Fail closed, not fail open: an empty `kernel_paths` here (an unreadable or malformed kernel template)\n            // would otherwise make every proposed rule pass the loop below vacuously -- no kernel rule to overlap,\n            // so nothing to compare against. The kernel template genuinely carries dozens of rules; an empty result\n            // means the baseline this validation needs could not be established, which must refuse the transaction,\n            // not silently validate nothing.\n            if kernel_paths.is_empty() {\n                return Err(GovError::new(\n                    \"ADOPTION_FLOOR_KERNEL_BASELINE_UNAVAILABLE\",\n                    \"reclassify_adoption_floor: the kernel template's own REPOSITORY_CONTRACT.yaml paths could not \\\n                     be read (AR84-C2's validation has nothing to compare proposed rules against); refusing rather \\\n                     than writing an unvalidated floor\",\n                ));\n            }\n            let (accepted, refused) =\n                crate::policy_precedence::partition_floor_rules_against_kernel(&kernel_paths, &rules);\n            seals.floor_rules_refused.extend(refused);\n            crate::paths::write_project_adoption_floor(\n                &p.root,\n                &accepted,\n                &seals.op_name(kind),\n                Some(&seals.cit),\n            )?;\n            touched.push(crate::paths::PROJECT_ADOPTION_FLOOR_PATH.to_string());\n        }\n        \"set_lock_field\" => {\n            return Err(GovError::new(\n                \"USAGE\",\n                \"set_lock_field is reserved for framework migrations (gov update)\",\n            ));\n        }\n        other => {\n            return Err(GovError::new(\n",
+ "text_sha256": "e227e7335d2b34e9c914180af6196f6ed519ab99e0a8a23453af12220c9d6fa7",
+ "version_status": "CANONICAL"
+}

@@ -1,0 +1,13 @@
+{
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "excluded_skipped": 0,
+ "hits": [
+  {
+   "line": 147,
+   "path": "runtime/src/project.rs",
+   "text": "    pub fn contract(&self) -> &RepositoryContract {"
+  }
+ ],
+ "query": "pub fn contract",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391"
+}

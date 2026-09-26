@@ -1,0 +1,17 @@
+{
+ "blob": "78d29aaa501f5133129e12ee3eb7030661486dbd",
+ "canonical_commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "canonical_ref": "product",
+ "commit": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "corpus_effect": "INCLUDE",
+ "corpus_rule": "INCLUDED",
+ "excluded": false,
+ "line_end": 345,
+ "line_start": 290,
+ "path": "tests/certification/ar94_floor.rs",
+ "ref": "3c880d80f81475f5306bdd5f680f2e004df49391",
+ "size": 40728,
+ "text": "    spawn_and_kill_when(root, state_of, session, args, |_| true)\n}\n\n/// As above, but the kill waits until `ready(markers)` as well \u2014 used to catch a sandbox once its byte copy has\n/// been populated rather than at the instant the marker is written.\nfn spawn_and_kill_when(\n    root: &Path,\n    state_of: &Path,\n    session: &str,\n    args: &[&str],\n    ready: impl Fn(&[String]) -> bool,\n) -> (Vec<String>, usize) {\n    const MAX_POLLS: usize = 120_000; // 1 ms each => 120 s ceiling, never reached in practice\n    let mut c = std::process::Command::new(gov_bin());\n    c.arg(\"--json\")\n        .arg(\"--root\")\n        .arg(root)\n        .arg(\"--session\")\n        .arg(session)\n        .arg(\"--role\")\n        .arg(\"orchestrator\")\n        .args(args)\n        .env(\"GOV_CANONICAL_ROOT\", canonical_root())\n        .env(\"XDG_STATE_HOME\", machine_state_home(state_of))\n        .env_remove(\"GOV_SESSION\")\n        .env_remove(\"GOV_ROLE\")\n        .stdout(std::process::Stdio::null())\n        .stderr(std::process::Stdio::null());\n    let mut child = c.spawn().expect(\"spawn gov\");\n    let mut seen: Vec<String> = vec![];\n    let mut polls = 0usize;\n    while polls < MAX_POLLS {\n        let m = sandbox_markers(state_of);\n        if !m.is_empty() && ready(&m) {\n            seen = m;\n            break;\n        }\n        // deterministic exit if the command finished without our ever observing a live marker\n        if let Ok(Some(_)) = child.try_wait() {\n            break;\n        }\n        std::thread::sleep(std::time::Duration::from_millis(1));\n        polls += 1;\n    }\n    let _ = child.kill(); // SIGKILL: no unwinding, no Drop, no cleanup\n    let _ = child.wait();\n    (seen, polls)\n}\n\n/// Not an assertion \u2014 a measurement, so the rest of this file attacks what the product actually does. Which\n/// `gov` command creates an `Isolation::Sandbox` family run, does it write a marker, and is the marker (and the\n/// sandbox directory) cleaned up on a NORMAL exit?\n#[test]\nfn ar94_d0_measure_sandbox_marker_lifecycle() {\n    let (root, g) = fresh(\"ar94d0\");\n    let machine = root.clone();\n",
+ "text_sha256": "1ec5235f8d28acea8f0dd98d5bdd775bf652e42bb6f3c44ccf88e8152a174361",
+ "version_status": "CANONICAL"
+}
