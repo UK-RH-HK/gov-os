@@ -34,11 +34,19 @@ node owns it:
 * ``gather``'s own default engine (node R1-RA, BR-DAG-AMEND-R1-19): calls
   ``govbridge.gather.followup.gather_with_followup`` (sequential, adaptive follow-up rounds on top of the R1-GA1
   base engine) unless ``--no-followup`` asks for the single-pass ``govbridge.gather.engine.gather`` this command
-  used before this node.
+  used before this node;
+* ``compile --out DIR`` (BR-DAG-AMEND-R1-20): also WRITES the overflow artifacts R1-GA3's ``compile_packet``
+  already returns but never persisted -- each ``result["supplementary_packets"][qid]`` under
+  ``DIR/supplementary/<query_id>/`` (R1-RS's own on-disk packet shape) and each non-``None``
+  ``result["evidence_notes"][qid]`` under ``DIR/notes/<query_id>.yaml``. ``packet verify DIR`` and ``receipt
+  check --packet DIR`` are extended to cover them, orchestrating the EXISTING validators
+  (``govbridge.compile.validate.verify_supplementary_packet``, ``govbridge.notes.validate.validate_note``) --
+  no new validation logic, only new call sites.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -427,6 +435,37 @@ def cmd_state(argv) -> int:
     return 2
 
 
+def _write_overflow_artifacts(out_dir: Path, result: dict, task_spec: dict) -> list:
+    """BR-DAG-AMEND-R1-20: persists the overflow artifacts R1-GA3's ``compile_packet`` already returns --
+    ``result["supplementary_packets"]``/``result["evidence_notes"]``, both keyed by query id -- which
+    ``compile --out`` never wrote before this node's own resumption. A supplementary packet is written with
+    R1-RS's OWN ``write_supplementary_packet`` (the exact on-disk shape ``packet verify``/``receipt check``
+    already know how to read); an evidence note (when it is not ``None`` -- an overflowing query with nothing
+    groundable AND nothing unresolved never gets one, ``govbridge.compile.overflow.build_overflow_note``'s own
+    contract) is written as plain YAML. Deterministic names (the query id itself) and order (sorted) -- a second
+    compile of the same inputs writes byte-identical files. Returns the sorted list of query ids that overflowed,
+    for ``meta.json``."""
+    from govbridge.compile import supplementary as suppmod
+
+    supplementary_packets = result.get("supplementary_packets") or {}
+    evidence_notes = result.get("evidence_notes") or {}
+    overflow_qids = sorted(supplementary_packets)
+
+    for qid in overflow_qids:
+        suppmod.write_supplementary_packet(str(out_dir / "supplementary" / qid), supplementary_packets[qid],
+                                            task_spec)
+
+    note_qids = sorted(qid for qid, note in evidence_notes.items() if note is not None)
+    if note_qids:
+        notes_dir = out_dir / "notes"
+        notes_dir.mkdir(parents=True, exist_ok=True)
+        for qid in note_qids:
+            (notes_dir / f"{qid}.yaml").write_text(
+                yaml.safe_dump(evidence_notes[qid], sort_keys=False), encoding="utf-8")
+
+    return overflow_qids
+
+
 def cmd_compile(argv) -> int:
     p = argparse.ArgumentParser(prog="govbridge compile")
     p.add_argument("task_spec")
@@ -436,6 +475,14 @@ def cmd_compile(argv) -> int:
                     help="use the all-empty RouteSet; the DEFAULT is the real B2/B3/B4 routes")
     p.add_argument("--registry")
     p.add_argument("--budgets")
+    p.add_argument("--facets-path", help="override config/facets.yaml (govbridge.compile.packet.compile_packet's "
+                                          "own facets_path parameter, e.g. for a small, controlled facet registry "
+                                          "in a test); default: the real config/facets.yaml")
+    p.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see cmd_search's own --repo docstring above). "
+                                   "Not previously a cmd_compile flag; added by this node (same as --repo on "
+                                   "cmd_gather, BR-DAG-AMEND-R1-19's own D-R1-RA-1) so this command can be tested "
+                                   "hermetically against a fixture repo instead of relying on cwd resolution.")
     p.add_argument("--json", action="store_true", help="print the manifest instead of the rendered packet")
     args = p.parse_args(argv)
 
@@ -444,14 +491,14 @@ def cmd_compile(argv) -> int:
 
     task_spec = load_yaml_file(args.task_spec)
     routes = packetmod.FAKE_ROUTES if args.fake_routes else packetmod.real_routes_for(
-        task_spec, registry_path=args.registry)
-    result = packetmod.compile_packet(task_spec, routes=routes, registry_path=args.registry,
-                                       budgets_path=args.budgets)
+        task_spec, registry_path=args.registry, repo=args.repo)
+    result = packetmod.compile_packet(task_spec, routes=routes, repo=args.repo, registry_path=args.registry,
+                                       budgets_path=args.budgets, facets_path=args.facets_path)
     # OBS-BR-07 (RC-9, node R1-RS): section I additionally carries the task's instantiated query set and the
     # answers/receipt schemas, verbatim and by hash -- re-finalises manifest_sha256/packet_sha256 around the
     # exact same sections/queries_log/drops compile_packet already computed (govbridge.compile.packet, this
     # function's own caller of it, is untouched).
-    result = section_i_mod.with_task_inputs_in_section_i(result, task_spec)
+    result = section_i_mod.with_task_inputs_in_section_i(result, task_spec, repo=args.repo)
 
     if args.out:
         out_dir = Path(args.out)
@@ -460,6 +507,9 @@ def cmd_compile(argv) -> int:
         (out_dir / "manifest.json").write_text(
             json.dumps(result["manifest"], indent=1, sort_keys=True), encoding="utf-8")
         (out_dir / "task_spec.yaml").write_text(yaml.safe_dump(task_spec, sort_keys=False), encoding="utf-8")
+        # BR-DAG-AMEND-R1-20: written BEFORE meta.json, so meta.json's own overflow_query_ids reflects exactly
+        # what was written this call.
+        overflow_qids = _write_overflow_artifacts(out_dir, result, task_spec)
         meta = {
             "packet_kind": "main", "status": result["status"], "packet_id": result.get("packet_id"),
             "packet_sha256": result.get("packet_sha256"), "manifest_sha256": result.get("manifest_sha256"),
@@ -471,6 +521,10 @@ def cmd_compile(argv) -> int:
             # R1-RX (OBS-BR-08): disclosed here too, so a caller of `compile --out` sees it without parsing
             # manifest.json's notices.
             "excluded_hits": result.get("excluded_hits"),
+            # BR-DAG-AMEND-R1-20: every query id whose overflow this call wrote to DIR/supplementary/<qid>/ (and,
+            # when it has one, DIR/notes/<qid>.yaml) -- so a caller of `compile --out` sees the overflow set
+            # without parsing manifest.json's own EVIDENCE_OVERFLOW notices.
+            "overflow_query_ids": overflow_qids,
         }
         (out_dir / "meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True), encoding="utf-8")
         print(json.dumps({"out": str(out_dir), **meta}, indent=1, sort_keys=True))
@@ -479,6 +533,78 @@ def cmd_compile(argv) -> int:
     else:
         sys.stdout.write(result["rendered"])
     return 0 if result["status"] == packetmod.STATUS_OK else 1
+
+
+def _verify_overflow_artifacts(packet_dir: Path, manifest: dict, repo: Optional[str]) -> list:
+    """BR-DAG-AMEND-R1-20: every ``EVIDENCE_OVERFLOW`` notice in the MAIN packet's own manifest names exactly one
+    supplementary packet (by its own ``supplementary_packet_sha256``) and, when its ``note_id`` is not null,
+    exactly one evidence note -- both written by ``_write_overflow_artifacts`` under THIS SAME packet directory
+    (``supplementary/<query_id>/``, ``notes/<query_id>.yaml``). Missing, extra or mismatched -> a problem string,
+    never silently skipped. Orchestrates the EXISTING validators
+    (``govbridge.compile.validate.verify_supplementary_packet``, ``govbridge.notes.validate.validate_note``); no
+    new validation logic of its own beyond the two direct sha256 recomputations neither existing validator can do
+    on its own (``verify_supplementary_packet`` takes a manifest only, never the rendered bytes; a note's own
+    ``built_from_sha256``/source hashes say nothing about which QUERY it belongs to)."""
+    from govbridge.compile import validate as validatemod
+    from govbridge.notes import validate as notesvalidatemod
+
+    problems: list = []
+    overflow_notices = [n for n in (manifest.get("notices") or []) if n.get("type") == "EVIDENCE_OVERFLOW"]
+    expected_qids = {n["query_id"] for n in overflow_notices}
+    expected_note_qids = {n["query_id"] for n in overflow_notices if n.get("note_id")}
+
+    supp_root = packet_dir / "supplementary"
+    actual_supp_qids = {p.name for p in supp_root.iterdir() if p.is_dir()} if supp_root.is_dir() else set()
+    notes_root = packet_dir / "notes"
+    actual_note_qids = ({p.stem for p in notes_root.iterdir() if p.is_file() and p.suffix in (".yaml", ".yml")}
+                         if notes_root.is_dir() else set())
+
+    for missing in sorted(expected_qids - actual_supp_qids):
+        problems.append(f"EVIDENCE_OVERFLOW for query {missing!r}: supplementary/{missing}/ is missing")
+    for extra in sorted(actual_supp_qids - expected_qids):
+        problems.append(f"supplementary/{extra}/ has no matching EVIDENCE_OVERFLOW notice for query {extra!r}")
+    for missing in sorted(expected_note_qids - actual_note_qids):
+        problems.append(f"EVIDENCE_OVERFLOW for query {missing!r} names a note (note_id set) but "
+                         f"notes/{missing}.yaml is missing")
+    for extra in sorted(actual_note_qids - expected_note_qids):
+        problems.append(f"notes/{extra}.yaml has no EVIDENCE_OVERFLOW notice naming a note for query {extra!r}")
+
+    for n in overflow_notices:
+        qid = n["query_id"]
+        if qid not in actual_supp_qids:
+            continue  # already reported as missing above
+        supp_dir = supp_root / qid
+        supp_manifest_path = supp_dir / "manifest.json"
+        supp_packet_md_path = supp_dir / "packet.md"
+        if not supp_manifest_path.is_file():
+            problems.append(f"supplementary/{qid}/manifest.json is missing")
+            continue
+        supp_manifest = json.loads(supp_manifest_path.read_text(encoding="utf-8"))
+        problems.extend(f"supplementary/{qid}: {p}" for p in validatemod.verify_supplementary_packet(supp_manifest))
+        expected_sha = n.get("supplementary_packet_sha256")
+        if supp_manifest.get("packet_sha256") != expected_sha:
+            problems.append(f"supplementary/{qid}: manifest.json packet_sha256 "
+                             f"{supp_manifest.get('packet_sha256')!r} != the EVIDENCE_OVERFLOW notice's "
+                             f"supplementary_packet_sha256 {expected_sha!r}")
+        if not supp_packet_md_path.is_file():
+            problems.append(f"supplementary/{qid}/packet.md is missing")
+        else:
+            actual_bytes_sha = hashlib.sha256(supp_packet_md_path.read_bytes()).hexdigest()
+            if actual_bytes_sha != supp_manifest.get("packet_sha256"):
+                # verify_supplementary_packet never reads the rendered bytes (it takes a manifest only) -- this
+                # is the ONE check that actually catches a packet.md tamper (BR-DAG-AMEND-R1-20's own "tampering
+                # a supplementary packet... makes verify FAIL"), by direct, independent sha256 recomputation.
+                problems.append(f"supplementary/{qid}/packet.md bytes hash to {actual_bytes_sha}, but its own "
+                                 f"manifest.json records packet_sha256 {supp_manifest.get('packet_sha256')!r} "
+                                 f"(tampered)")
+
+    for qid in sorted(actual_note_qids & expected_note_qids):
+        note = load_yaml_file(str(notes_root / f"{qid}.yaml"))
+        note_result = notesvalidatemod.validate_note(note, repo=repo)
+        if note_result["status"] != "PASS":
+            problems.extend(f"notes/{qid}.yaml: {p}" for p in note_result["problems"])
+
+    return problems
 
 
 def cmd_packet(argv) -> int:
@@ -524,6 +650,10 @@ def cmd_packet(argv) -> int:
                                               registry_path=args.registry or meta.get("registry_path"),
                                               rendered=rendered,
                                               budgets_path=args.budgets or meta.get("budgets_path"))
+        # BR-DAG-AMEND-R1-20: every EVIDENCE_OVERFLOW notice's own supplementary packet and (when it names one)
+        # evidence note, both written by `compile --out` under this same directory -- missing, extra or
+        # mismatched fails verify, exactly like every other structural check above.
+        problems += _verify_overflow_artifacts(d, manifest, repo=args.repo)
     result = {"status": meta.get("status", "?"), "verify": "PASS" if not problems else "FAIL", "problems": problems}
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0 if not problems else 1
@@ -567,6 +697,19 @@ def cmd_receipt(argv) -> int:
         sd = Path(supp_dir)
         supp_manifest = json.loads((sd / "manifest.json").read_text(encoding="utf-8"))
         supplementary.append({"label": supp_dir, "manifest": supp_manifest})
+
+    # BR-DAG-AMEND-R1-20: `compile --out`'s own overflow supplementary packets (DIR/supplementary/<query_id>/,
+    # written by `_write_overflow_artifacts`) are covered automatically -- reusing R1-RS's own supplementary
+    # coverage (receiptmod.check's `supplementary` param) means a caller never has to name each one via the
+    # pre-existing, explicit-only `--supplementary` (still available, unchanged, for a query command's own
+    # supplementary packet written elsewhere).
+    overflow_supp_root = d / "supplementary"
+    if overflow_supp_root.is_dir():
+        for qid_dir in sorted(overflow_supp_root.iterdir()):
+            overflow_manifest_path = qid_dir / "manifest.json"
+            if qid_dir.is_dir() and overflow_manifest_path.is_file():
+                overflow_manifest = json.loads(overflow_manifest_path.read_text(encoding="utf-8"))
+                supplementary.append({"label": f"supplementary/{qid_dir.name}", "manifest": overflow_manifest})
 
     receipt = _load_receipt(args.receipt)
     result = receiptmod.check(manifest, receipt, task_spec, repo=args.repo,

@@ -1,10 +1,12 @@
 run_id: BR-AR-0027
 role: >-
-  REPAIR-1 node R1-RA -- answer-side aids: govbridge cite and govbridge answers lint (RC-11); plus
-  BR-DAG-AMEND-R1-19 (`govbridge gather` wired to gather_with_followup, single-pass kept behind --no-followup)
+  REPAIR-1 node R1-RA -- answer-side aids: govbridge cite and govbridge answers lint (RC-11); BR-DAG-AMEND-R1-19
+  (`govbridge gather` wired to gather_with_followup, single-pass kept behind --no-followup); resumed a second time
+  for BR-DAG-AMEND-R1-20 (`govbridge compile --out` persists and verifies R1-GA3's evidence-note/supplementary-
+  packet overflow artifacts) after R1-GA3 merged
 model_observed: claude-sonnet-5
 branch: bridge/r1-ra-0027
-commit: c5eaf592401aa22c0769bb41fd1e81da1dd02f9f
+commit: d75d0129f5409bff9fd9e62e95f1e8df866c0b2b
 status: COMPLETED
 claims:
 - id: C-1
@@ -114,6 +116,61 @@ claims:
     existing cmd_* function's behaviour changes when the new flags are omitted, confirmed by the pre-existing
     tests/compile/test_supplementary.py::test_search_out_and_packet_verify-style CLI round trips still passing
     unmodified in the full suite.
+- id: C-11
+  text: >-
+    BR-DAG-AMEND-R1-20 (resumed after R1-GA3 merged at 8a6f3d9): `govbridge compile --out DIR` now writes BOTH
+    overflow artifacts `compile_packet` already returned but never persisted --
+    `result["supplementary_packets"][qid]` under `DIR/supplementary/<query_id>/`, written with R1-RS's OWN
+    `write_supplementary_packet` (the identical on-disk shape `packet verify`/`receipt check` already read, so
+    neither needed a new format), and each non-null `result["evidence_notes"][qid]` under
+    `DIR/notes/<query_id>.yaml`. Names and order are deterministic (the query id itself, sorted) -- proven byte-
+    identical across two independent compiles of the same inputs (test_compiling_twice_gives_byte_identical_directories).
+- id: C-12
+  text: >-
+    `govbridge packet verify DIR` (new `_verify_overflow_artifacts` helper, govbridge/cli.py) now also: verifies
+    every written supplementary packet with the EXISTING `govbridge.compile.validate.verify_supplementary_packet`;
+    independently recomputes each supplementary packet's OWN `packet.md` sha256 against its OWN `manifest.json`
+    `packet_sha256` (`verify_supplementary_packet` takes a manifest only and never reads rendered bytes, so this
+    is the ONE check that actually catches a `packet.md` tamper -- confirmed empirically, not merely by
+    inspection: without it, tests/compile/test_compile_out_overflow.py::
+    test_packet_verify_fails_when_a_supplementary_packet_is_tampered would pass a tampered packet) and against
+    the MAIN manifest's own `EVIDENCE_OVERFLOW` notice's `supplementary_packet_sha256`; validates every note with
+    the EXISTING `govbridge.notes.validate.validate_note` (which independently re-verifies every claim's source
+    against Git -- path/commit/blob/lines/content_sha256 -- so a tampered note fails there too, not just a
+    deleted one). FAILS on missing (a notice with no corresponding directory/file), extra (a directory/file with
+    no corresponding notice) or mismatched (wrong hash) -- three distinct, independently tested failure shapes
+    (test_packet_verify_fails_when_a_supplementary_packet_is_tampered,
+    test_packet_verify_fails_when_a_note_is_deleted, test_packet_verify_fails_when_a_supplementary_packet_is_extra).
+- id: C-13
+  text: >-
+    `govbridge receipt check` auto-discovers `DIR/supplementary/<query_id>/` (the overflow packets `compile --out`
+    just wrote) and appends each one to the SAME `supplementary` list `receiptmod.check` already accepts (R1-RS's
+    own mechanism, previously populated only from the explicit, repeatable `--supplementary DIR` flag) -- so a
+    receipt that never acknowledges an overflow supplementary packet's own `packet_sha256`/`manifest_sha256`
+    fails, exactly like an explicitly-named one already did. The explicit `--supplementary` flag is untouched and
+    still works for a query command's own supplementary packet written elsewhere. Proven both ways in one test
+    (test_receipt_check_requires_overflow_supplementary_acknowledgement: the SAME receipt document, once without
+    and once with the overflow packet's hashes acknowledged).
+- id: C-14
+  text: >-
+    Real retrieval, not a re-test of `compile_packet`'s own return value: tests/compile/test_overflow_notes.py
+    (R1-GA3, already merged) proves `compile_packet` builds correct overflow artifacts from a FAKE route; this
+    node's own new tests/compile/test_compile_out_overflow.py instead builds a REAL, from-clean store over a real
+    git-backed fixture repo (tests/compile/conftest.py's shared `fixture_repo`) with genuine multi-paragraph
+    content, and drives it through a REAL lexical (FTS5) route with a byte-tiny custom H budget -- proving the
+    ACTUAL CLI file-writing path end to end. The precondition is independently checked a second way
+    (test_overflow_actually_happens_in_this_fixture greps the rendered `packet.md` directly for how many times
+    the fixture's own distinctive term survives, rather than trusting only the code under test's own
+    `overflow_query_ids`/notices), per R1-T2 rule 3.
+- id: C-15
+  text: >-
+    Added `--repo` and `--facets-path` to `cmd_compile` (govbridge/cli.py) -- neither existed before, the same
+    class of hermetic-testing gap `--repo` on `cmd_gather` closed in this node's first pass (decision D-R1-RA-1);
+    `--facets-path` threads straight through to `compile_packet`'s own, pre-existing `facets_path` parameter (no
+    new capability, only a new way to reach an existing one from the CLI). Both are additive and backward
+    compatible: omitting either keeps this command's exact pre-existing default behaviour (cwd-based repo
+    resolution; `config/facets.yaml`), confirmed by the full suite's own pre-existing `compile --out` tests
+    passing unmodified.
 mutation_scope_respected: true
 open_issues:
 - >-
@@ -138,6 +195,15 @@ open_issues:
   cross-reference phrased unusually and missed, or an unrelated phrase incidentally matched) -- this is an
   inherent property of a fixed phrase list, not a defect this node is aware of leaving open, and is flagged here
   so a future reopening knows where to look first if the run-2 protocol observes either failure mode.
+- >-
+  BR-DAG-AMEND-R1-20's own acceptance (this run's dispatch message) names a real-RETRIEVAL fixture test, not a
+  real-CORPUS (CONTROL-A) one, and this node's own CHECKPOINTS/BR-CP-0048.yaml already records "orchestrator
+  re-runs the CONTROL-A double compile" as a SEPARATE, orchestrator-owned next step. This run therefore did not
+  rebuild the real store (~4,264 s in this node's own first pass, AGENT_RUNS/BR-AR-0027.check04) a second time for
+  a CLI-only orchestration change that adds no new retrieval capability; every new command path is instead proven
+  through REAL git/lexical retrieval (never a FakeRouteSet) on a small, from-clean-built fixture store (C-14). If
+  the orchestrator's own CONTROL-A re-run surfaces anything specific to the real corpus's own overflow shape, it
+  should route back here as a reopening rather than being treated as a gap in this run's own testing.
 evidence:
 - claim: C-1
   command_or_file: govbridge/answers/cite.py:cite_identifier
@@ -170,8 +236,32 @@ evidence:
     govbridge/cli.py:cmd_gather; tests/answers/test_gather_wiring.py (4 tests, all passing)
 - claim: C-10
   command_or_file: 'git diff <merge-base> -- govbridge/cli.py; AGENT_RUNS/BR-AR-0027.check03-full-domain-suite.out'
-- claim: full suite
+- claim: C-11
+  command_or_file: >-
+    govbridge/cli.py:_write_overflow_artifacts; tests/compile/test_compile_out_overflow.py::
+    test_compile_out_writes_supplementary_and_notes, ::test_compiling_twice_gives_byte_identical_directories
+- claim: C-12
+  command_or_file: >-
+    govbridge/cli.py:_verify_overflow_artifacts; tests/compile/test_compile_out_overflow.py::
+    test_packet_verify_passes_on_a_freshly_written_overflow_packet,
+    ::test_packet_verify_fails_when_a_supplementary_packet_is_tampered,
+    ::test_packet_verify_fails_when_a_note_is_deleted, ::test_packet_verify_fails_when_a_supplementary_packet_is_extra
+- claim: C-13
+  command_or_file: >-
+    govbridge/cli.py:cmd_receipt; tests/compile/test_compile_out_overflow.py::
+    test_receipt_check_requires_overflow_supplementary_acknowledgement
+- claim: C-14
+  command_or_file: >-
+    tests/compile/test_compile_out_overflow.py::test_overflow_actually_happens_in_this_fixture (independent
+    packet.md grep, not just the notices list); AGENT_RUNS/BR-AR-0027.check-standalone-test_compile_out_overflow.out
+- claim: C-15
+  command_or_file: 'govbridge/cli.py:cmd_compile (--repo, --facets-path arguments)'
+- claim: full suite (pass 1)
   command_or_file: 'cd $D && $PY -m pytest -q -p no:cacheprovider tests -> 687 passed, 0 failed'
+- claim: full suite (pass 2, after BR-DAG-AMEND-R1-20 and the R1-GA3 merge)
+  command_or_file: >-
+    cd $D && $PY -m pytest -q -p no:cacheprovider tests -> 715 passed, 0 failed
+    (AGENT_RUNS/BR-AR-0027.check09-full-domain-suite-pass2.out)
 conformance:
 - item: 'Deliverable 1: `govbridge cite <identifier> [--commit C]` returns an exact (path, commit, lines, symbol if any), or AMBIGUOUS with every candidate'
   status: MET
@@ -264,3 +354,34 @@ conformance:
     ~/.config/gov-bridge/sealed/**, ARCHITECTURE/demonstration-queries.yaml or DEMONSTRATION/run-1/answers.yaml;
     every fixture and the real-view answers.yaml (/tmp/br-ar-0027-realview/answers.yaml, a scratch file, not
     committed) is this run's own synthetic construction against CONTROL-A and the schema only
+- item: 'BR-DAG-AMEND-R1-20 item 1: `compile --out DIR` writes each supplementary packet under DIR/supplementary/<query_id>/ (R1-RS''s own on-disk shape) and each evidence note under DIR/notes/<query_id>.yaml, deterministic names and order'
+  status: MET
+  evidence: >-
+    govbridge/cli.py:_write_overflow_artifacts (called from cmd_compile, before meta.json is written);
+    tests/compile/test_compile_out_overflow.py::test_compile_out_writes_supplementary_and_notes (asserts every
+    file's presence and shape); ::test_compiling_twice_gives_byte_identical_directories (proves the ordering/
+    naming is deterministic, not merely present)
+- item: 'BR-DAG-AMEND-R1-20 item 2: `packet verify DIR` verifies every supplementary packet with verify_supplementary_packet, checks each packet_sha256 against the EVIDENCE_OVERFLOW notice''s supplementary_packet_sha256, validates every note with notes validate, and FAILS if any is missing, extra or mismatched; `receipt check` requires acknowledgement'
+  status: MET
+  evidence: >-
+    govbridge/cli.py:_verify_overflow_artifacts, cmd_receipt's overflow auto-discovery block;
+    tests/compile/test_compile_out_overflow.py::test_packet_verify_passes_on_a_freshly_written_overflow_packet
+    (PASS case), ::test_packet_verify_fails_when_a_supplementary_packet_is_tampered (mismatched -> FAIL, caught by
+    the independent sha256 recomputation since verify_supplementary_packet alone never reads rendered bytes),
+    ::test_packet_verify_fails_when_a_note_is_deleted (missing -> FAIL), ::
+    test_packet_verify_fails_when_a_supplementary_packet_is_extra (extra -> FAIL), ::
+    test_receipt_check_requires_overflow_supplementary_acknowledgement (both the unacknowledged-fails and
+    acknowledged-passes halves)
+- item: 'BR-DAG-AMEND-R1-20 item 3: tests in a NEW file tests/compile/test_compile_out_overflow.py, on a fixture that overflows -- files written, verify PASSES, tampering/deletion make verify FAIL, compiling twice is byte-identical, a read-only store is left unchanged'
+  status: MET
+  evidence: >-
+    tests/compile/test_compile_out_overflow.py (9 tests, all passing standalone and in the full suite); real
+    retrieval (a from-clean store, real lexical route), not a FakeRouteSet, per C-14;
+    ::test_compile_and_verify_leave_a_read_only_store_unchanged (chmod 0444/0555, sha256 unchanged before/after
+    both compile --out and packet verify)
+- item: 'R1-T1/R1-T2/R1-T3 for this reopening: full suite last with 0 failures; conformance rows for this item; $PY only'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0027.check09-full-domain-suite-pass2.out (715 passed, 0 failed, run AFTER the R1-GA3 merge and
+    every code change in this pass); every command in this pass's own checkpoint records $PY and its version; the
+    four conformance rows above cover every deliverable/acceptance item this reopening named
