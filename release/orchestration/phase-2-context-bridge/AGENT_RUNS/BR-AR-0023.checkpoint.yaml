@@ -31,7 +31,7 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out
   output_sha256: ef393a35e9b3caf7b1f7a5b01477a9888bb6dea128a8e95823a8bf90d81a2b60
-- cmd: grep -rnE 'k: int = 8|DEFAULT_K = 8|k=8\b' $D/govbridge/
+- cmd: 'grep -rnE ''k: int = 8|DEFAULT_K = 8|k=8\b'' $D/govbridge/'
   exit_code: 1
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out
   output_sha256: 85acfd2e79dd47df07d214334642196301332f72d792b52068cdfd8898755409
