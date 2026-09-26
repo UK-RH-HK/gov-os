@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T07:44:34Z'
-state_hash: 78d14b72502258de54218cbfc2a5cff0553f215c1af4c1241f6ce63e12e668df
+updated_at: '2026-09-26T08:01:42Z'
+state_hash: f7e40185abba414ae26a7fcf849fabc81d69b6cd142b7431ab67a357840418a5
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1229,6 +1229,22 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-rs-0025
   checkpoint_schema: 2
+  pass_1:
+    final_commit: b6c0b59af473e5d09001e19bebf3af8a48461388
+    integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+    accepted: 'supplementary packets for every query command (--out; budgeted; deduplicated against the main and earlier
+      packets; --raw only for raw JSON); occurrence collapse; section I carries the instantiated query set and the answers
+      and receipt schemas by hash (post-compile re-finalisation, packet.py untouched); bootstrap by reference (8,350 bytes
+      against a 134,788-byte CONTROL-A packet); receipt check covers supplementary packets; exact body markers in
+      render.py; secrecy 0 hits; claude-sonnet-5 x437; protected tests untouched'
+    reopen_reason: '(1) test_compile_bootstrap.py (NOT a protected test) asserts the RC-9 defect -- scope correction GRANTED
+      (rule 5; justified in decisions); 0 failures required. (2) R1-10 re-extraction SKIPS directory and oversize items and
+      uses CONTAINMENT for selector items, so an insertion into A, or any change inside an oversize item (Contract v3),
+      passes -> recompose every shape independently from git at the recorded view (composition imported read-only) and
+      compare exactly; four negative tests'
+    open_issues_routed:
+    - core/store.py open_db() runs a write-shaped statement on every open, which blocks read-only stores -> R1-GA1 (core/store.py
+      is in its extended scope for the read-only query paths)
   dispatched_at: '2026-09-26T06:45Z'
   status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0025
@@ -1250,6 +1266,7 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/compile/test_verify_rendered_body.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/supplementary/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.*
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_bootstrap.py
 running_work:
 - run_id: BR-AR-0025
   liveness_check: subagent transcript mtime + commits on bridge/r1-rs-0025; never inferred from elapsed time
