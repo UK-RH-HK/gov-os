@@ -1,0 +1,58 @@
+run_id: BR-AR-0010
+role: D1 whole-repository coverage and index-cost measurement (deterministic tooling, run by the orchestrator)
+model_observed: none -- deterministic commands executed by the outer orchestrator session (claude-opus-5-5)
+branch: bridge/d1-0010
+commit: ca3bcf69970d9496060bafc35cc6ff70997c0e4e
+status: COMPLETED
+claims:
+- 'coverage spans the WHOLE canonical repository: for all 98 view refs (records, product 3c880d8, evidence 58219d5, 95 phase2/* history tips)
+  the per-rule file counts sum exactly to git ls-tree -r --full-tree; unclassified_total 0; every exclusion names a rule id -- at both the pass-1
+  view cf7efe7 and the frozen demonstration view fa25492'
+- 'pass 1 from-clean build at cf7efe7: manifest fb413f63...f7ec, 2,302 s wall, 9,253 CPU-s, peak RSS 530 MB, 0 LLM calls; per layer core 17 s,
+  lexical 5 s, authority 230 s, semantic 2,047 s; freshness NOOP 0.02 s'
+- pass 1 found the code layer lazy (digest = sha256 of the empty string, 0 rows) -- repaired by BR-AR-0014
+- 'final: store-BR-AR-0010 brought to the frozen tip fa25492 by `index update`, which ran FULL (bridge code tree changed): manifest 5535bb9c...c96c,
+  2,215 s wall, 9,023 CPU-s, 0 LLM calls; code layer 233 parsed blobs / 197,348 rows / 11 disclosed exclusions; authority 8,830 rows; vectors
+  45,083 BUILT; store 889 MB (uncommitted)'
+- 'freshness at the frozen tip: NOOP in 0.012 s, 0 LLM calls'
+- 'closes I1 deliverable gap: INDEX/manifests/p2x-fail-1-bridge.json (the frozen-tip build manifest) and telemetry/index/{builds,coverage}.jsonl
+  committed'
+- 'secrecy audit over every non-TA subagent transcript: 0 tool calls touching .local/share, govbridge-sealed or .authoring; 4 roles saw the sealed
+  path string passively via ORCHESTRATOR_STATE.yaml (OBS-BR-04)'
+- 'addendum (third freeze): store-BR-AR-0010 brought to 94d0211 after BR-AR-0015 -- FULL 2530 s wall, 9329 CPU-s, 0 LLM calls; manifest 11372e02...d5b0
+  (code 233 blobs / 11 disclosed exclusions, vectors 45193); freshness NOOP 0.03 s; coverage 98 refs == git ls-tree --full-tree, 0 unclassified;
+  this is the DEMONSTRATION view and store'
+evidence:
+- claim: govbridge coverage --view config/canonical-view.yaml --json COVERAGE/p2x-fail-1-bridge.json  (pass 1, view cf7efe7)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check1-coverage.out
+- claim: 'independent cross-check: per-ref by_rule_files sum == git ls-tree -r --full-tree (pass 1)'
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check1b-coverage-vs-ls-tree.out
+- claim: /usr/bin/time -v govbridge index rebuild --from-clean --timings  (pass 1 at cf7efe7; store-BR-AR-0010)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check2-rebuild-timed.out
+- claim: govbridge freshness  (pass 1, NOOP expected)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check3-freshness-noop.out
+- claim: 'secrecy check: sealed-name occurrences per non-TA subagent transcript'
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.secrecy-check-pre-demo.out
+- claim: 'secrecy check: tool calls touching .local/share / govbridge-sealed / oracle.yaml / .authoring per non-TA role'
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.secrecy-check-access.out
+- claim: /usr/bin/time -v govbridge index update  (to frozen tip fa25492; ran FULL because the bridge code tree changed)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check4-update-to-frozen-tip.out
+- claim: govbridge freshness  (frozen tip fa25492, NOOP expected)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check5-freshness-noop-frozen.out
+- claim: govbridge coverage --view config/canonical-view.yaml --json COVERAGE/p2x-fail-1-bridge.json  (frozen tip)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check6-coverage-frozen.out
+- claim: 'independent cross-check at the frozen tip: per-ref sums == git ls-tree -r --full-tree'
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check6b-coverage-vs-ls-tree-frozen.out
+- claim: /usr/bin/time -v govbridge index update  (to third frozen tip 94d0211; FULL -- bridge code changed)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check7-update-to-third-tip.out
+- claim: govbridge freshness  (third frozen tip, NOOP expected)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check8-freshness-noop-third.out
+- claim: govbridge coverage  (third frozen tip)
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check9-coverage-third.out
+- claim: 'independent cross-check at the third frozen tip: per-ref sums == git ls-tree -r --full-tree'
+  command: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0010.check9b-coverage-vs-ls-tree-third.out
+mutation_scope_respected: true
+open_issues:
+- any bridge-code change makes the next index update run FULL (~37 min, dominated by CPU embedding) because the bridge code tree is part of the
+  manifest -- correct but costly; a verifier may judge whether layer-scoped invalidation is needed
+- packets.jsonl and receipts.jsonl telemetry rows come from the demonstration run (BR-AR-0011), not from D1
