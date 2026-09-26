@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T08:46:08Z'
-state_hash: ac2f2abd4336e04aa8bb73bfdc6d9bf679011c8bf3ab6bf8774b679ae303281c
+updated_at: '2026-09-26T09:51:09Z'
+state_hash: a5771f6159fece50924ec75be548ad38d3bb4a3a3bac87a9199fa86c95b02c7b
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1342,6 +1342,22 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-xc-0034
   checkpoint_schema: 2
+  pass_1:
+    final_commit: a72dae24c168f6445c03ea04fdf4645c1fa063e7 (code 4a9dec6)
+    interim_merge: 1a46cc5 -- integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree 615 passed, 0 failed
+    accepted: 'R1-5 (-m delegates to the canonical module; identical layer set and digests); R1-6 (repo_root keyed on the resolved
+      cwd); R1-12 (PEP 562 lazy BRIDGE_STATE_PATH; conftest pre-import removed; tests/code alone and one file alone-first pass);
+      R1-14 (a lock; the race never reproduced on CPython 3.12.3, so a deterministic structural test proves serialisation);
+      R1-17(6) (classify_hit without ensure_schema; real_routes._conn read-only; a file-and-directory read-only gather over
+      every route leaves the store sha256 unchanged); secrecy 0 hits; claude-sonnet-5 x495; class table and protected tests
+      untouched'
+    reopen_reason: 'R1-17(5) narrowed -- read-only variants were added for gather''s code route only, while ensure_indexed still
+      lazily builds at QUERY time behind symbols.definitions/callers/stats/reads_key and in code/history.py (history),
+      compile/codeseeds.py (compile), graph/code_bridge.py (why, impact), graph/symbol_history.py and demo/grade.py; on the
+      file-level read-only run-2 store those commands would crash. Also a broad except in code_route swallows
+      StoreNeedsRebuild. Required -- ensure_indexed build-only; one verify-or-raise path for every query caller; tests corrected
+      (rule 5); typed errors re-raised and other caught exceptions counted; every code-layer query command proven on a
+      file-level read-only store'
   dispatched_at: '2026-09-26T08:46Z'
   status: BR-AR-0034NING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0034
@@ -1365,6 +1381,17 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/route/test_real_routes.py
   - release/orchestration/phase-2-context-bridge/tests/code/test_symbols_readonly.py
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.*
+  - release/orchestration/phase-2-context-bridge/govbridge/code/history.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/codeseeds.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/code_bridge.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
+  - release/orchestration/phase-2-context-bridge/govbridge/demo/grade.py
+  - release/orchestration/phase-2-context-bridge/tests/code/**
+  - release/orchestration/phase-2-context-bridge/tests/graph/**
+  - release/orchestration/phase-2-context-bridge/tests/compile/**
+  - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade.py
+  - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade_regressions.py
+  - release/orchestration/phase-2-context-bridge/tests/route/test_query_commands_readonly.py
 running_work:
 - run_id: BR-AR-0024
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
