@@ -31,6 +31,7 @@ from govbridge.compile import codeseeds as codeseedsmod
 from govbridge.compile import codesurfaces as codesurfacesmod
 from govbridge.compile import render as rendermod
 from govbridge.core import gitobj, store as storemod, view as viewmod
+from govbridge.core import taskctx as taskctxmod
 from govbridge.core.manifest import bridge_code_tree
 from govbridge.core.yamlutil import canonical_json, load_yaml_file, sha256_text
 from govbridge.graph import history as historymod
@@ -310,6 +311,14 @@ class Compiler:
         # code_route adapter's own generous fallback when the caller gives none (e.g. an existing test that
         # predates this reopening).
         self.fanout = fanout or {}
+        # R1-RX (OBS-BR-08, RC-8): the task's own retrieval_exclusions, PLUS whatever the ambient task context
+        # (GOVBRIDGE_TASK / --task, govbridge.core.taskctx) additionally names -- one merged list, used by every
+        # c.routes.run(...) call site below, never just the query loop. exclusion_counter accumulates how many
+        # candidate hits every such call excluded, for the single J-notice disclosure at the end of compile_packet.
+        self.task_ctx = taskctxmod.TaskContext(
+            source="task_spec", retrieval_exclusions=tuple(task_spec.get("retrieval_exclusions") or ()))
+        self.exclusions = self.task_ctx.merge_exclude(taskctxmod.current().retrieval_exclusions)
+        self.exclusion_counter = taskctxmod.ExclusionCounter()
         self.notices: list = []
         self._seen: dict = {}  # section -> set(unit_id) -- prevents literal duplicate placement
         self._code_conn_cache = None
@@ -585,8 +594,11 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         # callers, callees, TESTS edges and READS_KEY consumers are all expanded uniformly (defect 1 + defect 2). A
         # seed that is already a code symbol keeps working exactly as before (seed_names always starts with seed).
         seed_names, seed_labels, bare_occurrences = c.code_seeds_for(seed)
+        # R1-RX (RC-8): this call previously passed no exclude= at all -- the seed code route is one of the two
+        # compile call sites CAUSE_ANALYSIS.md named as running without exclusions.
         for hit in c.routes.run("code", seeds=seed_names, seed_labels=seed_labels,
-                                 bare_occurrences=bare_occurrences, fanout=c.fanout):
+                                 bare_occurrences=bare_occurrences, fanout=c.fanout, exclude=c.exclusions,
+                                 exclude_counter=c.exclusion_counter):
             cls_section, _ = place_item(hit.authority_class, hit.lifecycle, hit.delivery, hit.unit_id, c.grammar)
             # BR-HO-0015 defect 3: only a LADDER class may be redirected H -> G (g_admissible); a non-ladder class
             # (UNCLASSIFIED, FIXTURE) has a FIXED allowed_sections that never names G, and redirecting one there
@@ -609,7 +621,8 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     for q in _load_queries(task_spec, repo=repo):
         route_names = routermod.select_routes(q, grammar=c.grammar)
         hits_by_route = {
-            rn: c.routes.run(rn, text=q.get("text"), k=q.get("k", 8), exclude=task_spec.get("retrieval_exclusions"))
+            rn: c.routes.run(rn, text=q.get("text"), k=q.get("k", 8), exclude=c.exclusions,
+                              exclude_counter=c.exclusion_counter)
             for rn in route_names if rn in ("exact", "lexical", "semantic", "code")
         }
         fused = routermod.fuse(hits_by_route, rrf_k=c.rrf_k)
@@ -648,6 +661,12 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         # spot) -- "every section records its queries" holds even when a query returns nothing.
         for sec in (touched_sections or {target_section or "H"}):
             queries_log.setdefault(sec, []).append(query_row)
+
+    # R1-RX (OBS-BR-08): "each output discloses how many hits were excluded" -- one notice, always present (even
+    # at 0), summing every c.routes.run(...) call this compile made (the query loop, the seed code route and the
+    # D.2 both-ways templates all share c.exclusion_counter).
+    c.notices.append({"type": "RETRIEVAL_EXCLUSIONS_APPLIED", "excluded_hits": c.exclusion_counter.count,
+                       "retrieval_exclusions": list(c.exclusions)})
 
     # --- I / J: verbatim task-spec content, never computed.
     c.add(sections, "I", _build_i_item(task_spec))
@@ -689,6 +708,9 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         "notices": c.notices, "resolve_result": resolve_result, "manifest": manifest, "rendered": rendered,
         "packet_sha256": manifest["packet_sha256"], "manifest_sha256": manifest["manifest_sha256"],
         "packet_id": packet_id, "view_path": view_path, "registry_path": c.registry_path,
+        # R1-RX (OBS-BR-08): the same count as the RETRIEVAL_EXCLUSIONS_APPLIED notice, surfaced at the top level
+        # too so a caller (govbridge.cli, a test) never has to scan notices for it.
+        "excluded_hits": c.exclusion_counter.count,
     }
 
 
@@ -759,8 +781,11 @@ def _attach_evidence_both_ways(c: Compiler, sections: dict, queries_log: dict, d
     for label, text in templates:
         q = {"id": f"{subject}#{label}", "text": text}
         route_names = routermod.select_routes(q, grammar=c.grammar)
-        hits_by_route = {rn: c.routes.run(rn, text=text, k=5) for rn in route_names
-                          if rn in ("exact", "lexical", "semantic", "code")}
+        # R1-RX (RC-8): the other of the two compile call sites CAUSE_ANALYSIS.md named as running without
+        # exclusions -- the D.2 "evidence both ways" templates.
+        hits_by_route = {rn: c.routes.run(rn, text=text, k=5, exclude=c.exclusions,
+                                           exclude_counter=c.exclusion_counter)
+                          for rn in route_names if rn in ("exact", "lexical", "semantic", "code")}
         fused = routermod.fuse(hits_by_route, rrf_k=c.rrf_k)
         queries_log.setdefault("D.2", []).append({"id": q["id"], "text": text, "routes": list(route_names)})
         blocks.append((label, [c.item_from_hit(f, "D.2") for f in fused[:5]]))

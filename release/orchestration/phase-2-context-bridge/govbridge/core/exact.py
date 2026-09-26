@@ -16,6 +16,7 @@ import sys
 from typing import Optional
 
 from govbridge.core import corpus, gitobj, view as viewmod
+from govbridge.core import taskctx as taskctxmod
 from govbridge.core.yamlutil import sha256_text
 
 REF_PATH_RE = re.compile(r"^(?P<ref>[^:]+):(?P<path>.+?)(?::(?P<l1>\d+)(?:-(?P<l2>\d+))?)?$")
@@ -54,7 +55,8 @@ def _classify_path(commit: str, path: str, rules_path: str, repo: Optional[str])
 
 
 def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] = None,
-          repo: Optional[str] = None) -> dict:
+          repo: Optional[str] = None, task: Optional[taskctxmod.TaskContext] = None) -> dict:
+    task = task or taskctxmod.current()
     default_view, default_rules = _default_paths(repo)
     view_path = view_path or default_view
     rules_path = rules_path or default_rules
@@ -67,6 +69,11 @@ def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] =
     if entry is None:
         return {"error": "PATH_NOT_FOUND", "ref": ref, "commit": commit, "path": path}
 
+    # R1-RX (OBS-BR-08): the task's own retrieval_exclusions, generically -- checked separately from (and
+    # disclosed separately from) corpus-rules.yaml's own, pre-existing EXCLUDE effect below; either one withholds
+    # content the same way.
+    task_excluded = task.is_excluded(path)
+
     rules = corpus.load_rules(rules_path)
     with gitobj.CatFileBatch(repo=repo) as cat:
         sniffer = corpus.ContentSniffer(cat)
@@ -75,6 +82,7 @@ def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] =
         result = {
             "ref": ref, "commit": commit, "path": path, "blob": entry.oid, "size": entry.size,
             "corpus_rule": verdict.rule_id, "corpus_effect": verdict.effect,
+            "excluded_hits": 1 if task_excluded else 0,
         }
 
         vc = viewmod.load_view(view_path)
@@ -84,7 +92,7 @@ def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] =
         result["canonical_ref"] = classification.canonical_ref
         result["canonical_commit"] = classification.canonical_commit
 
-        if verdict.effect == "EXCLUDE":
+        if verdict.effect == "EXCLUDE" or task_excluded:
             result["excluded"] = True
             return result
 
@@ -108,7 +116,9 @@ def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] =
 
 
 def grep(literal: str, ref: Optional[str] = None, paths: Optional[list[str]] = None,
-          view_path: Optional[str] = None, rules_path: Optional[str] = None, repo: Optional[str] = None) -> dict:
+          view_path: Optional[str] = None, rules_path: Optional[str] = None, repo: Optional[str] = None,
+          task: Optional[taskctxmod.TaskContext] = None) -> dict:
+    task = task or taskctxmod.current()
     default_view, default_rules = _default_paths(repo)
     view_path = view_path or default_view
     rules_path = rules_path or default_rules
@@ -125,10 +135,16 @@ def grep(literal: str, ref: Optional[str] = None, paths: Optional[list[str]] = N
     rules = corpus.load_rules(rules_path)
     out = []
     skipped = 0
+    task_excluded = 0
     verdict_cache: dict[str, str] = {}
     with gitobj.CatFileBatch(repo=repo) as cat:
         sniffer = corpus.ContentSniffer(cat)
         for path, lineno, text in hits:
+            # R1-RX (OBS-BR-08): the task's own retrieval_exclusions, checked (and counted) separately from
+            # corpus-rules.yaml's pre-existing EXCLUDE effect below -- excluded_skipped keeps its original meaning.
+            if task.is_excluded(path):
+                task_excluded += 1
+                continue
             if path not in verdict_cache:
                 entry = gitobj.ls_tree_path(commit, path, repo=repo)
                 v = corpus.classify_entry(entry, rules, sniffer) if entry else None
@@ -137,7 +153,8 @@ def grep(literal: str, ref: Optional[str] = None, paths: Optional[list[str]] = N
                 skipped += 1
                 continue
             out.append({"path": path, "line": lineno, "text": text})
-    return {"ref": ref, "commit": commit, "query": literal, "hits": out, "excluded_skipped": skipped}
+    return {"ref": ref, "commit": commit, "query": literal, "hits": out, "excluded_skipped": skipped,
+            "excluded_hits": task_excluded}
 
 
 def path_resolve(suffix: str, ref: Optional[str] = None, view_path: Optional[str] = None,
@@ -162,14 +179,14 @@ def path_resolve(suffix: str, ref: Optional[str] = None, view_path: Optional[str
 
 
 def id_lookup(token: str, ref: Optional[str] = None, view_path: Optional[str] = None,
-               repo: Optional[str] = None) -> dict:
+               repo: Optional[str] = None, task: Optional[taskctxmod.TaskContext] = None) -> dict:
     """Every literal mention of ``token`` (found generically via Git), plus its definition site if one resolves
     through the id grammar (B1 OI-2, closed by I1/BR-AR-0009: node B5's ``config/id-grammar.yaml`` interpreter,
     reused here via ``govbridge.authority.lifecycle.find_definition`` -- a bounded, git-grep-based lookup, never a
     whole-corpus scan). ``definition_sites`` is empty, with an explanatory note, when the token is not an
     id-grammar-shaped record id (e.g. a bare code symbol) or the lookup is unavailable in this environment: a
     mention is never mistaken for a definition either way."""
-    r = grep(token, ref=ref, view_path=view_path, repo=repo)
+    r = grep(token, ref=ref, view_path=view_path, repo=repo, task=task)
     r["mention_sites"] = r.pop("hits")
     definition_sites: list = []
     try:
@@ -196,6 +213,7 @@ def main(argv=None) -> int:
     sp_show.add_argument("spec")
     sp_show.add_argument("--view")
     sp_show.add_argument("--rules")
+    taskctxmod.add_cli_arg(sp_show)
 
     sp_grep = sub.add_parser("grep")
     sp_grep.add_argument("-F", dest="literal", required=True)
@@ -203,11 +221,13 @@ def main(argv=None) -> int:
     sp_grep.add_argument("--paths", nargs="*")
     sp_grep.add_argument("--view")
     sp_grep.add_argument("--rules")
+    taskctxmod.add_cli_arg(sp_grep)
 
     sp_id = sub.add_parser("id")
     sp_id.add_argument("token")
     sp_id.add_argument("--ref")
     sp_id.add_argument("--view")
+    taskctxmod.add_cli_arg(sp_id)
 
     sp_path = sub.add_parser("path")
     sp_path.add_argument("suffix")
@@ -215,12 +235,14 @@ def main(argv=None) -> int:
     sp_path.add_argument("--view")
 
     args = p.parse_args(argv)
+    ctx = taskctxmod.from_args(args)
     if args.cmd == "show":
-        result = show(args.spec, view_path=args.view, rules_path=args.rules)
+        result = show(args.spec, view_path=args.view, rules_path=args.rules, task=ctx)
     elif args.cmd == "grep":
-        result = grep(args.literal, ref=args.ref, paths=args.paths, view_path=args.view, rules_path=args.rules)
+        result = grep(args.literal, ref=args.ref, paths=args.paths, view_path=args.view, rules_path=args.rules,
+                       task=ctx)
     elif args.cmd == "id":
-        result = id_lookup(args.token, ref=args.ref, view_path=args.view)
+        result = id_lookup(args.token, ref=args.ref, view_path=args.view, task=ctx)
     elif args.cmd == "path":
         result = path_resolve(args.suffix, ref=args.ref, view_path=args.view)
     else:

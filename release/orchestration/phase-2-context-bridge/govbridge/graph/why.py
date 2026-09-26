@@ -20,6 +20,7 @@ from typing import Optional
 from govbridge.authority import lifecycle as lifecyclemod
 from govbridge.authority import records as recordsmod
 from govbridge.authority import registry as registrymod
+from govbridge.core import taskctx as taskctxmod
 from govbridge.core import view as viewmod
 from govbridge.graph import derive as D
 from govbridge.graph import edges as E
@@ -58,7 +59,8 @@ def _class_of_path(path: str, reg: registrymod.Registry) -> Optional[str]:
 
 
 def why(seed: str, repo: Optional[str] = None, view_path: Optional[str] = None,
-        registry_path: Optional[str] = None, code_conn=None) -> dict:
+        registry_path: Optional[str] = None, code_conn=None,
+        task: Optional[taskctxmod.TaskContext] = None) -> dict:
     resolved_view = _resolved_view(view_path, repo=repo)
     commit = resolved_view.ref_commit("records")
     grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
@@ -137,7 +139,17 @@ def why(seed: str, repo: Optional[str] = None, view_path: Optional[str] = None,
                          note=f"class={seed_classification.cls}")
     chain["current_status"] = [status_hop]
 
-    result = {"seed": seed, "stages": {}}
+    # R1-RX (OBS-BR-08): the task context (explicit, or the ambient one -- GOVBRIDGE_TASK/--task) applies here too:
+    # a hop whose evidence occurrence falls under an excluded path is dropped, generically, the same way it would
+    # be dropped from a route's own hits -- never a special case per stage.
+    task = task or taskctxmod.current()
+    excluded_hits = 0
+    for stage in list(chain.keys()):
+        kept, dropped = taskctxmod.filter_edges(chain[stage], task)
+        chain[stage] = kept
+        excluded_hits += dropped
+
+    result = {"seed": seed, "stages": {}, "excluded_hits": excluded_hits}
     for stage in STAGES:
         hops = chain.get(stage, [])
         if hops:
@@ -151,9 +163,11 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(prog="govbridge.graph.why")
     p.add_argument("seed")
     p.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
+    taskctxmod.add_cli_arg(p)
     args = p.parse_args(argv)
 
-    result = why(args.seed)
+    ctx = taskctxmod.from_args(args)
+    result = why(args.seed, task=ctx)
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0
 

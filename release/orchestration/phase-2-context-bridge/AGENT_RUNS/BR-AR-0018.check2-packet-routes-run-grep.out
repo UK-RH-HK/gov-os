@@ -1,0 +1,5 @@
+316:        # c.routes.run(...) call site below, never just the query loop. exclusion_counter accumulates how many
+599:        for hit in c.routes.run("code", seeds=seed_names, seed_labels=seed_labels,
+624:            rn: c.routes.run(rn, text=q.get("text"), k=q.get("k", 8), exclude=c.exclusions,
+666:    # at 0), summing every c.routes.run(...) call this compile made (the query loop, the seed code route and the
+786:        hits_by_route = {rn: c.routes.run(rn, text=text, k=5, exclude=c.exclusions,
