@@ -28,7 +28,10 @@ FIXTURES_COMPILE = Path(__file__).resolve().parents[1] / "fixtures" / "compile"
 sys.path.insert(0, str(FIXTURES_COMPILE))
 import compile_repobuilder as repobuilder  # noqa: E402
 
+from govbridge.code import build as codebuild
 from govbridge.compile import packet as packetmod
+from govbridge.core import store as corestore
+from govbridge.core.view import Partition, RefSpec, ResolvedRef, ResolvedView, ViewConfig
 from govbridge.core.yamlutil import load_yaml_file
 from govbridge.demo import extract_reads as ermod
 from govbridge.demo import grade as g
@@ -44,8 +47,14 @@ TRANSCRIPT_GD6_PATH = str(FIXTURES_DEMO / "transcript-gd6.jsonl")
 
 
 @pytest.fixture(autouse=True)
-def _no_env_leak(monkeypatch):
-    monkeypatch.delenv("GOVBRIDGE_STORE", raising=False)
+def _no_env_leak(tmp_path, monkeypatch):
+    """BR-DAG-AMEND-R1-17 reopening (pass 3, coordinator finding, same class of bug as
+    ``tests/compile/conftest.py``'s own fix -- see its docstring for the full root-cause account): this used to
+    only ``delenv``, which does not stop GD-10's ``compile_packet`` call (over the git-backed
+    ``compile_repobuilder`` fixture) from falling through to ``govbridge.core.store``'s machine-wide default
+    store when the test itself never sets ``GOVBRIDGE_STORE``. Pointing it at a fresh ``tmp_path`` directory
+    instead makes every test in this module hermetic (R1-T1)."""
+    monkeypatch.setenv("GOVBRIDGE_STORE", str(tmp_path / "isolated-govbridge-store"))
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -419,8 +428,38 @@ def test_gd9_rubric_flips_the_passing_fixture_to_fail(tmp_path):
 # GD-10: a symbol-qualified anchor is never matched by an exact line citation inside that symbol.
 # ---------------------------------------------------------------------------------------------------------------
 
+def _eager_build_code_layer(root, commit: str) -> None:
+    """BR-DAG-AMEND-R1-17 reopening (pass 3, rule-5 correction, justified in this run's checkpoint `decisions`):
+    ``grademod._enclosing_symbol`` (this node's own pass-2 fix) now reads the code layer through
+    ``ensure_indexed_readonly``, which raises ``StoreNeedsRebuild`` for a commit the eager builder has not
+    already reached, rather than lazily indexing it on the spot as the pre-fix ``ensure_indexed`` did. This test
+    always called ``anchor_matches`` against a commit whose code layer was never built by anything in the test
+    itself -- it passed before only because the module's ``GOVBRIDGE_STORE`` isolation was `delenv`-only (see
+    ``tests/compile/conftest.py``'s docstring for the general root cause), so it happened to read the
+    machine-wide shared default store, which some OTHER concurrently- or previously-run test had already built
+    the identical fixture commit's code layer into. Isolating this module's own store (this reopening) exposed
+    that hidden, test-order-dependent reliance as a hard failure (`StoreNeedsRebuild` swallowed by
+    ``_enclosing_symbol``'s own deliberate ``except Exception: return None`` -> ``anchor_matches`` sees no
+    enclosing symbol -> wrongly returns ``False``), never something this fix's own store isolation broke on its
+    own. Building the code layer eagerly here (mirroring ``tests/code/test_eager_build.py``'s own pattern) makes
+    the test genuinely hermetic, asserting the exact same, unweakened ``is True``/``is False`` outcomes."""
+    view = ViewConfig(view_id="gd10-test-view", refs=[
+        RefSpec(name="records", ref="refs/heads/records", ref_glob=None, follow="tip", pinned_commit=None,
+                role="primary", layers=None),
+    ], partitions=[Partition(name="all", owner="records", fallback=[], paths=["**"])], raw={})
+    resolved = ResolvedView(
+        view_id=view.view_id, config=view,
+        named={"records": ResolvedRef(name="records", commit=commit, status="OK")},
+        history=[], repo=str(root),
+    )
+    conn = corestore.open_db()
+    codebuild.code_layer_builder(conn, resolved, rules=None, repo=str(root), from_clean=True)
+    conn.close()
+
+
 def test_gd10_a_line_citation_inside_a_function_matches_that_functions_symbol_anchor(tmp_path):
     fixture_repo = repobuilder.build(tmp_path / "repo")
+    _eager_build_code_layer(fixture_repo.root, fixture_repo.c2)
     # `runtime/src/cx_module.rs`'s `cx_rule` function spans lines 2-4 (compile_repobuilder.py's own CODE_TEXT).
     anchor = {"path": "runtime/src/cx_module.rs", "commit": fixture_repo.c2, "symbol": "cx_rule"}
     inside = {"path": "runtime/src/cx_module.rs", "commit": fixture_repo.c2, "lines": [3, 3]}

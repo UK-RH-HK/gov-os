@@ -9,8 +9,16 @@ A record's own text cites code in exactly the four shapes BR-HO-0015 names: ``pa
 path-qualified symbol (``module::fn``, ``Type::fn``), or a bare symbol in backticks. This module resolves each of
 them at the view's CANONICAL PRODUCT ref (never the citing record's own ref -- G's job, ARCHITECTURE.md section
 7.2, is "the code route at the canonical product ref"), using only the public entry points of
-``govbridge.code.symbols`` (``definitions``, ``ensure_indexed``) and B5's own ``govbridge.graph.derive``
+``govbridge.code.symbols`` (``definitions``, ``ensure_indexed_readonly``) and B5's own ``govbridge.graph.derive``
 (``cites_edges_in_text``) -- neither module is edited here.
+
+BR-DAG-AMEND-R1-17 item 5 reopening: this module is a QUERY at compile time, always against the canonical product
+commit (an eager ref by default -- ``govbridge.code.build.eager_ref_names``). It reads via
+``codesymbols._open_conn_readonly()``/``codesymbols.ensure_indexed_readonly()`` (never the BUILD-only
+``_open_conn()``/``ensure_indexed``, which this module used to call, writing to the store on any commit the eager
+builder had not already reached). A commit whose ``.rs`` blobs the eager builder has not indexed raises the typed
+``codesymbols.StoreNeedsRebuild``, propagated to this module's own caller (``govbridge.compile.packet.Compiler.
+code_seeds_for``, out of this node's mutation scope) unchanged.
 
 Generic (OC-BR-02): every function takes a seed id, a commit and a grammar as DATA. Nothing here names Review 8,
 Phase 2 or a particular file; the acceptance control for this module is D-0006, deliberately unrelated.
@@ -135,9 +143,11 @@ def _section_text(decoded: str, line_start: int, line_end: int) -> str:
 
 def _path_to_blob(conn, product_commit: str, repo: Optional[str]) -> dict:
     """path -> blob_id for every ``.rs`` blob reachable at ``product_commit`` -- computed ONCE per
-    ``cited_code_units`` call (``ensure_indexed`` itself is cheap per blob once parsed/classified, but it still
-    walks the whole ``.rs`` tree, so this is looked up once per seed here, never once per citation)."""
-    return {p: blob_id for p, blob_id in codesymbols.ensure_indexed(conn, product_commit, repo=repo)}
+    ``cited_code_units`` call (the underlying read is cheap per blob, but it still walks the whole ``.rs`` tree, so
+    this is looked up once per seed here, never once per citation). BR-DAG-AMEND-R1-17 item 5 reopening: reads via
+    ``ensure_indexed_readonly`` -- raises ``StoreNeedsRebuild`` rather than classifying/parsing/persisting a
+    not-yet-eager-indexed blob."""
+    return {p: blob_id for p, blob_id in codesymbols.ensure_indexed_readonly(conn, product_commit, repo=repo)}
 
 
 def _enclosing_symbol(conn, blob_id: str, line: int) -> Optional[dict]:
@@ -214,7 +224,7 @@ def cited_code_units(seed_id: str, product_commit: str, records_commit: str, gra
     cite_path, line_start, line_end, decoded = span
     text = _section_text(decoded, line_start, line_end)
 
-    conn = codesymbols._open_conn()
+    conn = codesymbols._open_conn_readonly()
     path_to_blob = _path_to_blob(conn, product_commit, repo)
     by_name, by_qualname = _symbol_name_index(conn, path_to_blob)
     symbols_out: list = []

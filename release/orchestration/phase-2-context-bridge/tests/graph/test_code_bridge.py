@@ -14,8 +14,29 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "code"))
 import _repobuilder as rb  # noqa: E402
 
+from govbridge.code import build as codebuild
+from govbridge.core import store as corestore
+from govbridge.core.view import Partition, RefSpec, ResolvedRef, ResolvedView, ViewConfig
 from govbridge.graph import code_bridge
 from govbridge.graph import derive as D
+
+
+def _eager_build(root, commit: str) -> None:
+    """BR-DAG-AMEND-R1-17 item 5 reopening (rule-5 correction, justified in this run's checkpoint `decisions`):
+    code_bridge.build_shaped_code_connection() no longer lazily builds the code layer itself -- it reads via
+    ensure_indexed_readonly, raising StoreNeedsRebuild for a commit the eager builder has not already reached (or
+    returning an sqlite3.OperationalError-turned-nothing for a store that does not exist at all). Every test in
+    this file now builds the code layer eagerly first, exactly as tests/code/test_eager_build.py does directly."""
+    view = ViewConfig(view_id="test-view", refs=[
+        RefSpec(name="records", ref="refs/heads/main", ref_glob=None, follow="tip", pinned_commit=None,
+                role="primary", layers=None),
+    ], partitions=[Partition(name="all", owner="records", fallback=[], paths=["**"])], raw={})
+    resolved = ResolvedView(view_id=view.view_id, config=view,
+                             named={"records": ResolvedRef(name="records", commit=commit, status="OK")},
+                             history=[], repo=str(root))
+    conn = corestore.open_db()
+    codebuild.code_layer_builder(conn, resolved, rules=None, repo=str(root), from_clean=True)
+    conn.close()
 
 
 @pytest.fixture(autouse=True)
@@ -44,12 +65,14 @@ def _write_fixture_crate(root) -> str:
 def test_shaped_connection_is_none_for_a_commit_with_no_rust(repo):
     rb.write(repo, "README.md", "no rust here\n")
     c1 = rb.commit(repo, "no rust")
+    _eager_build(repo, c1)
     conn = code_bridge.build_shaped_code_connection(c1, repo=str(repo))
     assert conn is None
 
 
 def test_callers_and_tests_reach_real_code_through_the_shaped_connection(repo):
     c1 = _write_fixture_crate(repo)
+    _eager_build(repo, c1)
     conn = code_bridge.build_shaped_code_connection(c1, repo=str(repo))
     assert conn is not None
 
@@ -70,6 +93,7 @@ def test_callers_and_tests_reach_real_code_through_the_shaped_connection(repo):
 
 def test_reads_key_reaches_the_macro_token_literal(repo):
     c1 = _write_fixture_crate(repo)
+    _eager_build(repo, c1)
     conn = code_bridge.build_shaped_code_connection(c1, repo=str(repo))
     assert conn is not None
     reads = D.reads_key_of(conn, "mutation")

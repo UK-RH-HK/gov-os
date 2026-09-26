@@ -369,11 +369,14 @@ def _enclosing_symbol(path: Optional[str], commit: Optional[str], line: Optional
     """GD-10: resolves the symbol (function/type) enclosing ``line`` in ``path`` at ``commit``, through the SAME
     code store the code route already builds (``govbridge.code.symbols``/``govbridge.code.store``) -- never a
     second, independent symbol table, and never a Review-8/Phase-2-specific one (OC-BR-02: this looks up whatever
-    path/commit/line it is given, generically). Read-only from this module's point of view: it only ever looks up
-    an already-parseable blob (lazily indexing it on first use, exactly like any other code-route query) and never
-    writes anything this grader owns. Returns ``None`` (never raises) whenever the lookup cannot be completed --
-    no repo, an unindexable path, a store error, no enclosing definition -- so a citation simply falls through to
-    the ordinary line-range check below instead of crashing the grade."""
+    path/commit/line it is given, generically). Genuinely read-only (BR-DAG-AMEND-R1-17 item 5 reopening: this used
+    to call the BUILD-only ``ensure_indexed`` here, lazily writing to the store on any citation commit the eager
+    code-layer builder had not already reached -- the exact query-time write this reopening exists to close):
+    ``govbridge.core.store.open_db_readonly()``/``govbridge.code.symbols.ensure_indexed_readonly`` never classify,
+    parse or persist anything. Returns ``None`` (never raises -- this grader's own, deliberate contract, kept
+    unchanged) whenever the lookup cannot be completed -- no repo, an unindexable path, the code layer not yet
+    built for this citation's commit (``StoreNeedsRebuild``), any other store error, no enclosing definition -- so
+    a citation simply falls through to the ordinary line-range check below instead of crashing the grade."""
     if not (path and commit and line and repo):
         return None
     try:
@@ -382,9 +385,8 @@ def _enclosing_symbol(path: Optional[str], commit: Optional[str], line: Optional
         blob_id = gitobj.blob_at(commit, path, repo=repo)
         if not blob_id:
             return None
-        conn = corestore.open_db()
-        codestore.ensure_schema(conn)
-        codesymbols.ensure_indexed(conn, commit, repo=repo)
+        conn = corestore.open_db_readonly()
+        codesymbols.ensure_indexed_readonly(conn, commit, repo=repo)
         rows = codestore.symbols_for_blobs(conn, [blob_id])
         candidates = [r for r in rows if r["start_line"] <= line <= r["end_line"]]
         if not candidates:

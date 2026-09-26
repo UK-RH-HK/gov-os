@@ -7,10 +7,14 @@ Git history of the symbol's own defining path(s) -- bounded by configuration (``
 walk of the whole repository history).
 
 This module is exact about the parse tables, exactly like ``govbridge.code.history``: a symbol either has a
-definition (by ``(kind, qualified_name)``) at a commit's view or it does not. It reuses ``govbridge.code.symbols``'s
-existing lazy, per-blob cache -- a commit visited more than once (by ``introduced_in`` and later by a caller's own
-``history diff``) is never re-parsed.
-"""
+definition (by ``(kind, qualified_name)``) at a commit's view or it does not.
+
+BR-DAG-AMEND-R1-17 item 5 reopening: every commit this module examines is read via
+``govbridge.core.store.open_db_readonly()``/``govbridge.code.symbols.ensure_indexed_readonly`` (never the
+BUILD-only ``open_db()``/``ensure_indexed``, which this module used to call for every commit its own bounded
+history walk visited). Because the walk can cross many HISTORICAL commits -- never eager-built by
+``govbridge.code.build`` -- a commit whose ``.rs`` blobs the eager builder has not reached raises the typed
+``symbolsmod.StoreNeedsRebuild``, reported the same way ``main()`` reports a ``ValueError``, below."""
 from __future__ import annotations
 
 import argparse
@@ -71,7 +75,9 @@ def _log_commits_for_path(path: str, start_commit: str, repo: Optional[str], max
 
 
 def _definition_present(conn, commit: str, repo: Optional[str], qualified_name: str) -> bool:
-    entries = symbolsmod.ensure_indexed(conn, commit, repo=repo)
+    # BR-DAG-AMEND-R1-17 item 5 reopening: read-only -- raises StoreNeedsRebuild instead of lazily indexing a
+    # commit the eager code-layer builder has not already reached (this module's own module docstring).
+    entries = symbolsmod.ensure_indexed_readonly(conn, commit, repo=repo)
     blob_ids = [b for _, b in entries]
     rows = codestore.symbols_for_blobs(conn, blob_ids)
     return any(r["qualified_name"] == qualified_name for r in rows)
@@ -90,8 +96,7 @@ def introduced_in(qualified_name: str, commit: str, repo: Optional[str] = None,
     if max_commits is None:
         max_commits = _default_max_commits()
     commit_full = _resolve_commit(commit, repo)
-    conn = corestore.open_db()
-    codestore.ensure_schema(conn)
+    conn = corestore.open_db_readonly()
 
     current = symbolsmod.definitions(qualified_name, commit_full, repo=repo)["definitions"]
     if not current:
@@ -137,8 +142,7 @@ def deleted_in(qualified_name: str, since_commit: str, until_ref: str = "HEAD", 
         max_commits = _default_max_commits()
     since_full = _resolve_commit(since_commit, repo)
     until_full = _resolve_commit(until_ref, repo)
-    conn = corestore.open_db()
-    codestore.ensure_schema(conn)
+    conn = corestore.open_db_readonly()
 
     if not _definition_present(conn, since_full, repo, qualified_name):
         return {"symbol": qualified_name, "since": since_full, "until": until_full, "found": False,
@@ -193,6 +197,9 @@ def main(argv=None) -> int:
             return 2
     except ValueError as e:
         print(json.dumps({"error": str(e)}))
+        return 1
+    except symbolsmod.StoreNeedsRebuild as e:
+        print(json.dumps({"error": str(e), "code": e.CODE}))
         return 1
 
     print(json.dumps(result, sort_keys=True) if args.json else json.dumps(result, indent=1, sort_keys=True))

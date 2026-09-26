@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
-"""The code route's query surface (ARCHITECTURE.md section 4.6, DAG node B3): given a commit, lazily parse and
-cache every Rust blob it reaches (``ensure_indexed``), then answer generic symbol/call/literal-key questions over
-that commit's view -- ``stats``, ``callers`` and ``reads-key``. The operation is generic: it takes a symbol or
-literal name as data and returns whatever the parse tables say, never special-casing any particular name, file or
-lifecycle (OC-BR-02). An ambiguous call is always returned with every surviving candidate and its
-``HEURISTIC_AMBIGUOUS`` label -- this module never collapses that to a single chosen target (BR-HO-0005 notes).
+"""The code route's query surface (ARCHITECTURE.md section 4.6, DAG node B3): given a commit, answer generic
+symbol/call/literal-key questions over that commit's view -- ``stats``, ``definitions``, ``callers`` and
+``reads-key``. The operation is generic: it takes a symbol or literal name as data and returns whatever the parse
+tables say, never special-casing any particular name, file or lifecycle (OC-BR-02). An ambiguous call is always
+returned with every surviving candidate and its ``HEURISTIC_AMBIGUOUS`` label -- this module never collapses that
+to a single chosen target (BR-HO-0005 notes).
 
-"Lazy per commit": parsing (the expensive step, ~1.56 s for the whole corpus, SO-12) is cached per blob in the
-store and only ever redone for a blob this run has not seen before (or whose adapter/grammar version changed).
+BR-DAG-AMEND-R1-17 item 5 (R1-XC reopening): ``ensure_indexed`` is now BUILD-ONLY. Its only legitimate caller is
+``govbridge.code.build.code_layer_builder``, at BUILD time, with a read-write connection. Every QUERY -- this
+module's own ``stats``/``definitions``/``callers``/``reads_key``, and every external caller
+(``govbridge.code.history``, ``govbridge.graph.code_bridge``, ``govbridge.graph.symbol_history``,
+``govbridge.compile.codeseeds``, ``govbridge.demo.grade``) -- goes through :func:`ensure_indexed_readonly` instead:
+it opens the store read-only (:func:`_open_conn_readonly`), classifies/parses nothing, and raises the typed
+:class:`StoreNeedsRebuild` for any ``.rs`` blob the eager code-layer builder has not already reached, rather than
+silently building it on the spot. Before this reopening, every one of those callers still called ``ensure_indexed``
+against a read-write connection, so a query against a commit the eager builder had not already touched (a
+``history``-only commit; the FIRST call in a fresh process at any commit) silently wrote to the store -- exactly
+the query-time write BR-DAG-AMEND-R1-15 forbids.
+
+Parsing (the expensive step, ~1.56 s for the whole corpus, SO-12) is cached per blob in the store by
+``ensure_indexed``, and only ever redone for a blob the eager builder has not seen before (or whose adapter/
+grammar version changed) -- this caching discipline is unchanged, it just only ever runs at BUILD time now.
 Resolution (the ~0.1 s step, SO-12) is never cached -- it is recomputed in memory, every query, from exactly the
 blobs reachable at the commit being asked about, because it depends on that commit's whole symbol set, not on any
 one call site alone (govbridge.code.resolve's module docstring).
@@ -18,16 +31,13 @@ route already honours -- BEFORE ever parsing it. A blob whose verdict is anythin
 METADATA_ONLY, LEXICAL_ONLY, NO_DEFAULT_RETRIEVAL -- generic, never only "EXCLUDE" by name) is never handed to
 ``rust_treesitter.parse_module`` and never gets a ``code_symbol``/``code_call_site``/``code_literal`` row; it is
 recorded instead, with its rule id, in ``govbridge.code.store.code_excluded_blob`` (``put_excluded_blob``), so
-``stats()`` can disclose it explicitly rather than the blob simply looking unindexed. This is the ONE place in the
-code route that classification happens -- both the eager builder (``govbridge.code.build.code_layer_builder``,
-which passes its already-loaded ``rules``) and every lazy caller (``stats``/``callers``/``reads-key``/
-``history diff``, or a query at a ``history`` commit) go through this SAME function, so neither path can diverge
-from the other or from what the exact/lexical/semantic routes already exclude. ``rules``, if not given, defaults to
-loading the real ``config/corpus-rules.yaml`` (``_default_rules``) -- the same "resolve from GOV_BRIDGE_DOMAIN when
-the caller does not say otherwise" convention ``govbridge.code.adapters.python_ast._default_view_path`` already
-uses, so every EXISTING caller of ``ensure_indexed`` (the CLI below, ``govbridge.code.history``,
-``govbridge.graph.code_bridge`` -- none of which pass ``rules``) gets real corpus-rule enforcement automatically,
-with no signature change visible to them.
+``stats()`` can disclose it explicitly rather than the blob simply looking unindexed. This is the ONE place
+classification happens -- the eager builder (``govbridge.code.build.code_layer_builder``, which passes its already-
+loaded ``rules``) is now the ONLY caller that can ever add a row, so every query (this module's own, and every
+external caller) sees exactly what the eager builder decided, never a second, possibly-diverging classification
+pass of its own. ``rules``, if not given, defaults to loading the real ``config/corpus-rules.yaml``
+(``_default_rules``) -- the same "resolve from GOV_BRIDGE_DOMAIN when the caller does not say otherwise" convention
+``govbridge.code.adapters.python_ast._default_view_path`` already uses.
 """
 from __future__ import annotations
 
@@ -50,6 +60,12 @@ INCLUDE_EFFECT = "INCLUDE"  # config/corpus-rules.yaml's own vocabulary (govbrid
 
 
 def _open_conn():
+    """A read-write connection with the code layer's schema ensured. BR-DAG-AMEND-R1-17 item 5 reopening:
+    ``ensure_indexed`` is now BUILD-ONLY, so this is a BUILD-time primitive -- its only remaining callers are
+    ``govbridge.code.build``'s own eager builder (which actually receives its connection from
+    ``govbridge.core.freshness``, not from here) and tests that legitimately pre-seed a store's code layer directly
+    (e.g. ``tests/code/test_corpus_exclusion.py``, which calls ``ensure_indexed`` here with synthetic corpus rules
+    before querying it). No query path may call this."""
     conn = corestore.open_db()
     codestore.ensure_schema(conn)
     return conn
@@ -171,11 +187,12 @@ def ensure_indexed_readonly(conn, commit: str, repo: Optional[str] = None) -> li
     persists anything itself. A blob this store has not already indexed raises :class:`StoreNeedsRebuild` (never a
     silent, slower fallback to building it here, and never a write) -- exactly the discipline
     ``govbridge.lexical.query.StoreNeedsRebuild``/``govbridge.semantic.vectors.StoreNeedsRebuild`` already use for
-    their own build-time structures. Every existing caller of ``ensure_indexed`` that legitimately needs the LAZY,
-    build-on-demand behaviour (``govbridge.code.build.code_layer_builder`` itself, at build time; ``govbridge.code.
-    history``'s own historical-commit diffs; ``govbridge.graph.code_bridge``) keeps calling ``ensure_indexed``
-    unchanged -- this function is additive, used only by this module's own query surface
-    (``stats``/``definitions``/``callers``/``reads_key``) and by ``govbridge.route.real_routes``'s code route."""
+    their own build-time structures. ``ensure_indexed`` itself is now BUILD-ONLY (BR-DAG-AMEND-R1-17 item 5
+    reopening): its only legitimate caller is ``govbridge.code.build.code_layer_builder``, at build time, with a
+    read-write connection. Every query -- this module's own ``stats``/``definitions``/``callers``/``reads_key``,
+    ``govbridge.route.real_routes``'s code route, and every external caller (``govbridge.code.history``,
+    ``govbridge.graph.code_bridge``, ``govbridge.graph.symbol_history``, ``govbridge.compile.codeseeds``,
+    ``govbridge.demo.grade``) -- calls this function instead."""
     entries = _rs_tree_entries(commit, repo=repo)
     if not entries:
         return []
@@ -256,16 +273,12 @@ def _resolve_commit(commit: str, repo: Optional[str]) -> str:
 
 
 def stats(commit: str, repo: Optional[str] = None) -> dict:
-    # NOT converted to the read-only path (BR-DAG-AMEND-R1-17 item 5's own read-only discipline binds the QUERY
-    # surface real_routes.py's code route actually calls -- definitions_readonly/callers_readonly below, and
-    # ensure_indexed_readonly itself); this is a diagnostic/inspection command (govbridge.code.symbols's own CLI,
-    # `python -m govbridge.code.symbols stats`), not one of BR-DAG-AMEND-R1-15's enumerated query commands, and
-    # every existing caller (tests/code/test_symbols_integration.py, tests/code/test_corpus_exclusion.py) already
-    # relies on its lazy, build-on-first-use behaviour against a commit no eager build has ever touched -- keeping
-    # it lazy is "no silent narrowing" for those callers, not an omission of this repair.
+    """BR-DAG-AMEND-R1-17 item 5 reopening: reads via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly` --
+    a query never builds the code layer itself. Raises :class:`StoreNeedsRebuild` for a commit whose ``.rs`` blobs
+    the eager builder has not already reached."""
     commit_full = _resolve_commit(commit, repo)
-    conn = _open_conn()
-    entries = ensure_indexed(conn, commit_full, repo=repo)
+    conn = _open_conn_readonly()
+    entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
     blob_ids = [b for _, b in entries]
     symbol_rows = codestore.symbols_for_blobs(conn, blob_ids)
     error_rows = codestore.parse_errors_for_blobs(conn, blob_ids)
@@ -316,12 +329,11 @@ def definitions(name: str, commit: str, repo: Optional[str] = None) -> dict:
     as their own commands; this is the definition-SITE lookup the code route needs to show a symbol's own
     location, with lines, not only its callers). Generic: takes any name as data, never special-cases one.
 
-    NOT converted to the read-only path: existing callers (tests/code/test_definitions_lookup.py) rely on its lazy,
-    build-on-first-use behaviour. ``govbridge.route.real_routes``'s code route uses :func:`definitions_readonly`
-    instead (BR-DAG-AMEND-R1-17 item 5)."""
+    BR-DAG-AMEND-R1-17 item 5 reopening: reads via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly`;
+    raises :class:`StoreNeedsRebuild` for a commit the eager code-layer builder has not already reached."""
     commit_full = _resolve_commit(commit, repo)
-    conn = _open_conn()
-    entries = ensure_indexed(conn, commit_full, repo=repo)
+    conn = _open_conn_readonly()
+    entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
     return _definitions_result(conn, name, commit_full, entries)
 
 
@@ -343,18 +355,6 @@ def _definitions_result(conn, name: str, commit_full: str, entries: list[tuple[s
             for r in hits
         ],
     }
-
-
-def definitions_readonly(name: str, commit: str, repo: Optional[str] = None) -> dict:
-    """The query-time counterpart of :func:`definitions` (BR-DAG-AMEND-R1-17 item 5): identical result shape and
-    matching logic (:func:`_definitions_result`, shared by both), but reads the commit's already-indexed ``.rs``
-    blobs via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly` instead of classifying/parsing/persisting
-    them itself. Used by ``govbridge.route.real_routes``'s code route -- the actual query surface this item binds,
-    per its own acceptance check (a gather against a file-level read-only store)."""
-    commit_full = _resolve_commit(commit, repo)
-    conn = _open_conn_readonly()
-    entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
-    return _definitions_result(conn, name, commit_full, entries)
 
 
 def _callers_result(conn, name: str, commit_full: str, entries: list[tuple[str, str]],
@@ -402,21 +402,8 @@ def callers(name: str, commit: str, repo: Optional[str] = None, page_size: Optio
     following ``next_cursor`` to exhaustion yields exactly the union an unpaged call returns (the acceptance
     check).
 
-    NOT converted to the read-only path: existing callers (tests/code/test_symbols_integration.py) rely on its
-    lazy, build-on-first-use behaviour. ``govbridge.route.real_routes``'s code route uses :func:`callers_readonly`
-    instead (BR-DAG-AMEND-R1-17 item 5)."""
-    commit_full = _resolve_commit(commit, repo)
-    conn = _open_conn()
-    entries = ensure_indexed(conn, commit_full, repo=repo)
-    return _callers_result(conn, name, commit_full, entries, page_size, cursor)
-
-
-def callers_readonly(name: str, commit: str, repo: Optional[str] = None, page_size: Optional[int] = None,
-                      cursor: Optional[str] = None) -> dict:
-    """The query-time counterpart of :func:`callers` (BR-DAG-AMEND-R1-17 item 5): identical result shape and
-    matching logic (:func:`_callers_result`, shared by both), but reads the commit's already-indexed ``.rs`` blobs
-    via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly` instead of classifying/parsing/persisting them
-    itself. Used by ``govbridge.route.real_routes``'s code route."""
+    BR-DAG-AMEND-R1-17 item 5 reopening: reads via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly`;
+    raises :class:`StoreNeedsRebuild` for a commit the eager code-layer builder has not already reached."""
     commit_full = _resolve_commit(commit, repo)
     conn = _open_conn_readonly()
     entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
@@ -429,12 +416,11 @@ def reads_key(key_name: str, commit: str, repo: Optional[str] = None) -> dict:
     ``r.get("mutation")``) -- a READS_KEY fact. Generic: this answers "who consumes attribute X" for any literal,
     never one name in particular.
 
-    NOT converted to the read-only path (BR-DAG-AMEND-R1-17 item 5): not called by ``govbridge.route.real_routes``
-    at all, and existing callers (tests/code/test_symbols_integration.py) rely on its lazy, build-on-first-use
-    behaviour."""
+    BR-DAG-AMEND-R1-17 item 5 reopening: reads via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly`;
+    raises :class:`StoreNeedsRebuild` for a commit the eager code-layer builder has not already reached."""
     commit_full = _resolve_commit(commit, repo)
-    conn = _open_conn()
-    entries = ensure_indexed(conn, commit_full, repo=repo)
+    conn = _open_conn_readonly()
+    entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
     blob_ids = [b for _, b in entries]
     path_by_blob = {b: p for p, b in entries}
     definitions = _definitions(conn, blob_ids, path_by_blob)
@@ -500,6 +486,9 @@ def main(argv=None) -> int:
             return 2
     except ValueError as e:
         print(json.dumps({"error": str(e)}))
+        return 1
+    except StoreNeedsRebuild as e:
+        print(json.dumps({"error": str(e), "code": e.CODE}))
         return 1
 
     if args.json:

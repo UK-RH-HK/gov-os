@@ -409,7 +409,11 @@ def test_impact_filters_graph_hops_by_excluded_path(fixture_repo, view_path, mon
         }
 
     monkeypatch.setattr(impactmod.T, "bfs", fake_bfs)
-    monkeypatch.setattr(impactmod.store, "open_db", lambda: object())
+    # BR-DAG-AMEND-R1-17 reopening (pass 3, coordinator-directed): impact() moved its own store access from
+    # store.open_db() to store.open_db_readonly() (a genuine query, never a build) -- this mock's target name
+    # follows that rename; T.bfs above is what actually supplies this test's own canned edges regardless of what
+    # the connection object is, so no other behaviour here changes.
+    monkeypatch.setattr(impactmod.store, "open_db_readonly", lambda: object())
     monkeypatch.setattr(impactmod.code_bridge, "build_shaped_code_connection", lambda *_a, **_kw: None)
 
     ctx = taskctxmod.TaskContext(source="t", retrieval_exclusions=("excluded/**",))

@@ -6,15 +6,35 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from govbridge.code import build as codebuild
 from govbridge.code import symbols
+from govbridge.core import store as corestore
+from govbridge.core.view import Partition, RefSpec, ResolvedRef, ResolvedView, ViewConfig
 
 import _repobuilder as rb
+
+
+def _eager_build(root: Path, commit: str) -> None:
+    """BR-DAG-AMEND-R1-17 item 5 reopening (rule-5 correction, justified in this run's checkpoint `decisions`):
+    symbols.definitions() no longer lazily builds the code layer itself -- it raises StoreNeedsRebuild for a
+    commit the eager builder has not already reached, so this test builds the code layer eagerly first."""
+    view = ViewConfig(view_id="test-view", refs=[
+        RefSpec(name="records", ref="refs/heads/main", ref_glob=None, follow="tip", pinned_commit=None,
+                role="primary", layers=None),
+    ], partitions=[Partition(name="all", owner="records", fallback=[], paths=["**"])], raw={})
+    resolved = ResolvedView(view_id=view.view_id, config=view,
+                             named={"records": ResolvedRef(name="records", commit=commit, status="OK")},
+                             history=[], repo=str(root))
+    conn = corestore.open_db()
+    codebuild.code_layer_builder(conn, resolved, rules=None, repo=str(root), from_clean=True)
+    conn.close()
 
 
 def test_definitions_finds_bare_and_qualified_name_matches(repo):
     rb.write(repo, "runtime/src/paths.rs", "pub fn reanchor_project_identity() {}\n")
     rb.write(repo, "runtime/src/other.rs", "fn unrelated() {}\n")
     c1 = rb.commit(repo, "c1")
+    _eager_build(repo, c1)
 
     out = symbols.definitions("reanchor_project_identity", c1, repo=str(repo))
     assert out["symbol"] == "reanchor_project_identity"
@@ -33,5 +53,6 @@ def test_definitions_finds_bare_and_qualified_name_matches(repo):
 def test_definitions_empty_for_unknown_name(repo):
     rb.write(repo, "runtime/src/x.rs", "pub fn known() {}\n")
     c1 = rb.commit(repo, "c1")
+    _eager_build(repo, c1)
     out = symbols.definitions("does_not_exist_anywhere", c1, repo=str(repo))
     assert out["definitions"] == []

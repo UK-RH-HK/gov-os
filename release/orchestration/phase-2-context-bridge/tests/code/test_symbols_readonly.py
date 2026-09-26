@@ -1,17 +1,20 @@
 """BR-DAG-AMEND-R1-17 item 5 regression test.
 
 ``govbridge.code.symbols.ensure_indexed`` used to be called from EVERY query entry point
-(``stats``/``definitions``/``callers``/``reads_key``, and ``govbridge.route.real_routes``'s code route) against a
-read-write connection (``_open_conn()``) -- so a query against a commit the eager code-layer builder
-(``govbridge.code.build.code_layer_builder``, run at BUILD time) had not already reached silently classified,
-parsed and persisted it on the spot, a genuine write at query time.
+(``stats``/``definitions``/``callers``/``reads_key``, and ``govbridge.route.real_routes``'s code route, and every
+external caller: ``govbridge.code.history``, ``govbridge.graph.code_bridge``, ``govbridge.graph.symbol_history``,
+``govbridge.compile.codeseeds``, ``govbridge.demo.grade``) against a read-write connection (``_open_conn()``) -- so
+a query against a commit the eager code-layer builder (``govbridge.code.build.code_layer_builder``, run at BUILD
+time) had not already reached silently classified, parsed and persisted it on the spot, a genuine write at query
+time.
 
-The code route's own query surface (``govbridge.route.real_routes``) now goes through
-``definitions_readonly``/``callers_readonly``, which read via ``ensure_indexed_readonly`` -- READ-ONLY, by
-construction (``_open_conn_readonly`` -> ``store.open_db_readonly()``) -- and raise the typed
+Reopening (BR-DAG-AMEND-R1-17 item 5, second pass): ``ensure_indexed`` is now BUILD-ONLY -- its only legitimate
+caller is ``code_layer_builder``. Every query, INCLUDING this module's own ``stats``/``definitions``/``callers``/
+``reads_key``, now goes through :func:`govbridge.code.symbols.ensure_indexed_readonly` -- READ-ONLY, by
+construction (``_open_conn_readonly`` -> ``store.open_db_readonly()``) -- which raises the typed
 :class:`govbridge.code.symbols.StoreNeedsRebuild` for any blob the eager build never reached, rather than building
-it there. ``stats``/``definitions``/``callers``/``reads_key`` themselves stay lazy (unchanged, module docstring
-explains why): this file covers only the new read-only surface.
+it there. There are no more separate ``*_readonly`` duplicates of ``definitions``/``callers``: those functions
+themselves are the read-only ones now, converted rather than duplicated (this run's own `decisions`).
 """
 from __future__ import annotations
 
@@ -133,25 +136,42 @@ def test_ensure_indexed_readonly_never_writes_against_a_file_and_directory_read_
     assert _sha256_file(db_path) == before_sha
 
 
-def test_definitions_readonly_and_callers_readonly_match_the_lazy_functions_once_built(repo, tmp_path, monkeypatch):
-    """No behaviour change for a caller that already has an eager-built store: definitions_readonly/callers_readonly
-    return exactly what definitions/callers (the lazy, build-on-first-use originals) would."""
+def test_definitions_and_callers_work_once_eager_built_and_raise_when_not(repo, tmp_path, monkeypatch):
+    """``definitions``/``callers`` themselves are the read-only implementations now (no separate ``*_readonly``
+    duplicate): they return real results once the eager builder has reached the commit, and raise the typed
+    StoreNeedsRebuild -- never a silent lazy build -- when it has not."""
     rb.write(repo, "runtime/src/mod_a.rs", "pub fn target_fn() {}\n")
     rb.write(repo, "runtime/src/mod_b.rs", "fn caller() {\n    target_fn();\n}\n")
     c1 = rb.commit(repo, "v1")
 
     store_root = tmp_path / "store"
+    monkeypatch.setenv("GOVBRIDGE_STORE", str(store_root))
+    # a store that EXISTS (the core layer built) but whose code layer specifically was never built -- the real
+    # failure shape StoreNeedsRebuild names; a store that does not exist AT ALL is a different, one-layer-up error
+    # (open_db_readonly's own docstring), not this function's concern.
+    corestore.open_db(root=store_root).close()
+
+    with pytest.raises(codesymbols.StoreNeedsRebuild):
+        codesymbols.definitions("target_fn", c1, repo=str(repo))
+    with pytest.raises(codesymbols.StoreNeedsRebuild):
+        codesymbols.callers("target_fn", c1, repo=str(repo))
+    with pytest.raises(codesymbols.StoreNeedsRebuild):
+        codesymbols.stats(c1, repo=str(repo))
+    with pytest.raises(codesymbols.StoreNeedsRebuild):
+        codesymbols.reads_key("no_such_key", c1, repo=str(repo))
+
     conn = corestore.open_db(root=store_root)
     codebuild.code_layer_builder(conn, _eager_view_for(repo, c1), rules=None, repo=str(repo), from_clean=True)
     conn.close()
 
-    monkeypatch.setenv("GOVBRIDGE_STORE", str(store_root))
-    lazy_defs = codesymbols.definitions("target_fn", c1, repo=str(repo))
-    ro_defs = codesymbols.definitions_readonly("target_fn", c1, repo=str(repo))
-    assert ro_defs == lazy_defs
-    assert ro_defs["definitions"]
+    defs = codesymbols.definitions("target_fn", c1, repo=str(repo))
+    assert defs["definitions"]
 
-    lazy_callers = codesymbols.callers("target_fn", c1, repo=str(repo))
-    ro_callers = codesymbols.callers_readonly("target_fn", c1, repo=str(repo))
-    assert ro_callers == lazy_callers
-    assert ro_callers["callers"]
+    callers = codesymbols.callers("target_fn", c1, repo=str(repo))
+    assert callers["callers"]
+
+    stats = codesymbols.stats(c1, repo=str(repo))
+    assert stats["rs_files"] == 2
+
+    reads = codesymbols.reads_key("no_such_key", c1, repo=str(repo))
+    assert reads["reads"] == []
