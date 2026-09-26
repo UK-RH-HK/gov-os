@@ -1,21 +1,24 @@
 # BR-AR-0019 schema-2 worker checkpoint (OD-BR-04 A). REPAIR-1 node R1-RL. No oracle content.
-# THRICE-REVISED: (1) the orchestrator's first reopening ruling (persist the new edge kinds as a registered,
+# FOUR TIMES REVISED: (1) the orchestrator's first reopening ruling (persist the new edge kinds as a registered,
 # digested store layer) and BR-DAG-AMEND-R1-4 (full domain suite as the last acceptance check; test hermeticity);
 # (2) the orchestrator's SECOND reopening (Gap 1: CITES_REQUIREMENT silently dropped real citations; Gap 2: TESTS
 # edges must also cover the Rust product binary, not only this domain's own Python tooling) plus
 # BR-DAG-AMEND-R1-8 (a `conformance` table in the typed report, one row per deliverable/acceptance check);
 # (3) the orchestrator's THIRD reopening (Defect A: the lineage layer walked only the "records" ref, never the
 # canonical "product"/"evidence" refs; Defect B: TESTS(b)-Rust covered only the bare-function-wrapper shape, not
-# the dominant real harness-METHOD shape) -- see the new claims/conformance rows and check8 output file.
+# the dominant real harness-METHOD shape) -- see the check8 output file; (4) the orchestrator's FOURTH reopening
+# (TESTS(c)'s own zero count was false: the test-registry schema check was too narrow -- top-level/rows/entries
+# only, missing this repository's own registries under an ordinary key at arbitrary depth) -- see check9 and a
+# real store-isolation bug found and fixed during this round (never opening a second sqlite connection).
 run_id: BR-AR-0019
-commit: 89950cb401cf7b93adc5cf7060251a97743b945c
+commit: 1cf38d2076351a23bdadad54022735639be93a32
 role: 'REPAIR-1 node R1-RL builder: graph and lineage additions -- code/test lineage, data dependencies,
   requirement lineage, structured-record identity, continuation'
 commands:
 - cmd: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/code tests/graph tests/authority/test_state_records.py -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
-  output_sha256: 154d1db2f34070c68cc12df5052cc46757f6e1a8b903a038c5eb12c312dbc448
+  output_sha256: b44122866e6da445aca509dbc07363f4f9fee4ae605508d6aa14f7a59aa7f40c
 - cmd: '$PY -m govbridge.core.freshness rebuild --from-clean (twice, into two fresh stores) -- see the output file
     for the pre-existing CLI double-import defect found in this literal form (outside R1-RL''s scope, orchestrator
     is routing its repair elsewhere) and the equivalent, correctly-shared invocations substituted for the real
@@ -39,7 +42,7 @@ commands:
     pytest -q -p no:cacheprovider tests (from the domain, the full suite)'
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
-  output_sha256: e3e9977db82cf8b95a6ea37d93b294d965b60992714da6287a66cf0b624fd522
+  output_sha256: c51cbddbe7ef109cc15cb72b1f7c634d27f99969a69916d4df641df426d84a90
 - cmd: 'SECOND reopening, Gap 1: the orchestrator''s own git grep re-run against the frozen 3c880d8, showing 6
     real hits; cites_requirement_edges_in_text re-run on the SAME 6 files at the SAME frozen commit, showing 6/6
     now resolve (0 dropped, 0 unresolved); the real ("records") view''s corpus-rule-honouring behaviour and a
@@ -66,6 +69,17 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
   output_sha256: 4f1fdf327f209ef51a3518588b553897c298395a85ef7ea566a78ba648533a4c
+- cmd: 'FOURTH reopening: govbridge.core.view.resolve_view called ONCE, then core_layer_builder + code_layer_builder
+    + lineage_layer_builder called in-process on the SAME connection, TWICE, with that SAME resolved view --
+    identical digest, stats and lineage_edge row count; per-ref test-registry-row counts and per-derivation
+    breakdowns; the coordinator''s own 158-line-per-ref measurement re-run at the current commits; reconciliation
+    of the +28/ref gap (YAML flow-style rows a line-anchored regex cannot see); a second, independent raw-SQL
+    verification of the EXACT_TEST_REGISTRY_ROW=0 zero count; the store-isolation bug found (a second sqlite
+    connection bumping an unrelated store''s file-change-counter) and its fix verified against
+    tests/core/test_freshness.py standalone and in the full suite'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out
+  output_sha256: c270af8af4fc10381c53c3670913d2b9c56c5d843c7cf8798b9b7cd2b9578e75
 model_observed: claude-sonnet-5 (Sonnet 5)
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
@@ -103,15 +117,15 @@ input_manifest:
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/adapters/rust_treesitter.py
   sha256: 9cbf73fb250df296051f81479a7faf8e704d93fbfd7a62009aac607ada3b618b
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
-  sha256: aaad038af8fe433c7c407c366342744a5df9851ca1b4f41a0726ab56b3733ee6
+  sha256: c55d55d9e025ee972e84e85e50818ebc66f66bbc8e07a21fa943bf9dd4644aaf
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
-  sha256: 8a245b485a07964732608d6652743cff3127eb930604ccb0b23f9c6c536ead47
+  sha256: 53dcf9743aa4a0e9ea12b20937b5429c2444dfe58c90d5a0ddc12881a85f1b57
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
   sha256: a15a39292ebc615a3fb09b22143050839e76a66eb5982bce7bdd297cb45ce2e3
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/__init__.py
   sha256: 35b8b0a66013e30f0d668c6ef4e5a68d320c73491d4e9f23338b99ce7623716f
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_layer.py
-  sha256: ea3d20d4630f39f543be8b44472f64c41c9b4cc183b7de5a4e7585b232b498c2
+  sha256: e19cf4bf503b2decd8c6ce5617bde328e69084df353f205c5c0522331160e9ad
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_config.yaml
   sha256: 99fa7344215464dddf136ef341ff22380668535e83f6b39ceac525b2524efe47
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/rust_cli.py
@@ -154,6 +168,7 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check6-gap1-cites-requirement.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.checkpoint.yaml
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.report.yaml
 - release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
@@ -167,6 +182,7 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
 - release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
 - release/orchestration/phase-2-context-bridge/tests/authority/test_state_records.py
+- release/orchestration/phase-2-context-bridge/tests/code/conftest.py
 - release/orchestration/phase-2-context-bridge/tests/code/test_lineage_layer.py
 - release/orchestration/phase-2-context-bridge/tests/code/test_rust_cli.py
 - release/orchestration/phase-2-context-bridge/tests/code/test_symbols_integration.py
@@ -254,7 +270,37 @@ findings:
   methods (gov, active_references_to, run, ok, err) exist in the whole real corpus at the product pin, and every
   one of the 5 names has EXACTLY ONE real slice-parameter definition -- independently re-derived by raw
   `git grep -nE "fn <name>(&self"` and manual inspection, not by trusting the resolver''s own count.'
+- 'FOURTH reopening root cause: the ORIGINAL test-registry shape check (a top-level list, or a rows/entries key
+  holding one) missed every real registry in this corpus, because every one of them sits under an ORDINARY key
+  (decisions:/procedure_inputs:/excluded_inputs:/items:), at nesting depth 1-2, never at the document root and
+  never under rows/entries. Independently confirmed the coordinator''s own 158-line count at all 3 refs BEFORE
+  writing any fix. Fixed by walking the WHOLE parsed document for the schema condition itself (a mapping with its
+  own "tests": [strings] key), never a containing-key allowlist.'
+- 'FOURTH reopening: my own schema-based count (186 rows/ref) came out HIGHER than the coordinator''s own 158-line
+  measurement, not lower -- investigated rather than just reported as a discrepancy. Root cause:
+  DECISION_REGISTER.yaml writes 47 of its 92 real rows (procedure_inputs:, excluded_inputs:) in YAML FLOW style
+  on ONE line each (`- {id: PI-01, ..., tests: [...]}`), which a line-anchored regex requiring "tests:" to START
+  a line can never see, but a parsed-YAML walk finds identically to block style. The excluded_inputs: rows also
+  use a THIRD real identifier-key convention this repository uses ("exclusion", not "id"/"item") -- correctly
+  falls back to the row''s own key-path (excluded_inputs/0, .../1, ...) rather than silently guessing a wrong key
+  or crashing.'
+- 'FOURTH reopening: the first working version of code-symbol resolution opened a SECOND sqlite connection to the
+  store (via govbridge.code.symbols.ensure_indexed''s own _open_conn()), which broke
+  tests/core/test_freshness.py''s own byte-for-byte store-isolation guarantee -- found by running the REQUIRED
+  full domain suite (BR-DAG-AMEND-R1-4) as this round''s own last check, not by any targeted test of the new
+  feature itself. Root-caused by isolating the change (reverting lineage_layer.py alone reproduces the OLD
+  passing behaviour; the new version alone reproduces the failure, standalone, no full suite needed). Fixed by
+  reading code_symbol through the SAME shared connection every build already has open (a JOIN against the "core"
+  layer''s own occurrence table), never opening a second one.'
 failed_approaches:
+- 'FOURTH reopening: tried resolving a Rust-path registry entry''s FULL text against code_symbol.qualified_name
+  only (no bare-name fallback): found 0 real matches on the whole corpus, because this repository''s own
+  tree-sitter adapter (rust_treesitter.py''s own _walk) never prefixes a plain/mod-nested function''s
+  qualified_name with its enclosing module at all (only an `impl` method''s qualified_name carries a "::" at
+  all, as `Type::method`) -- confirmed with a synthetic tree-sitter parse before concluding this. Added a
+  bare-trailing-segment fallback (still a DISTINCT, less-precise heuristic label, never conflated with a genuine
+  full-string EXACT match) so the dominant real shape (a module-prefixed registry entry naming a plain function)
+  resolves to something real instead of nothing.'
 - 'Tried addressing nested state keys with a synthetic "state:<alias>#<dotted.path>" id: abandoned because
   govbridge.authority.lifecycle._find_definition resolves by git-grepping the literal token first, and that
   compound string never appears verbatim in any file. Switched to the key''s own bare name as the id'
@@ -296,9 +342,11 @@ unresolved:
   TUPLE-style nested subcommand field (`Variant(NestedEnum)`, no real instance measured) resolves no further than
   the outer arm; a receiver''s type wrapped in `Box<T>`/`&T`/a generic parameter is not unwrapped by declared-type
   inference (falls back to unique-name resolution, never a silent miss).'
-- 'No real test-registry-shaped YAML (TESTS sub-kind c) exists in the corpus today (sampled several of 32
-  candidate files using a bare "tests:" key; none match the required row-shape) -- correct and proven on a
-  fixture, will start producing real rows the moment matching content is added'
+- 'RESOLVED (was WRONG) by the FOURTH reopening: previously claimed no real test-registry-shaped YAML exists.
+  False -- 558 real rows recognised across all 3 refs once the schema check walks the whole document at any
+  depth. See findings/decisions above and AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out. One
+  genuinely structural zero remains: EXACT_TEST_REGISTRY_ROW (0 of 928 real is_test symbols in the corpus have a
+  "::"-qualified name at all -- independently confirmed by direct SQL query).'
 - 'tests/compile/test_compile_real_view_mandatory_in_a.py failed once (a manifest_sha256 mismatch across two
   in-process compiles) on an EARLIER full-suite run this session, before this reopening round''s fixes; passed on
   the FINAL full-suite run committed here. Not this node''s file; the amendment itself names it as non-hermetic
@@ -306,6 +354,10 @@ unresolved:
 - 'the "records" ref is a live, moving branch (see findings) -- every "identical digest across two builds" proof
   in this checkpoint pins the resolved view once per comparison and is immune to this, but a casual re-run of the
   same measurement as two separate process invocations minutes apart would not be'
+- 'RESOLVED (found and fixed within this same fourth-reopening round, never shipped broken): an early version of
+  the code-symbol resolution opened a second sqlite connection to the store, breaking
+  tests/core/test_freshness.py''s own isolation guarantee. Fixed by reading through the shared connection instead
+  -- see findings/decisions and D-R1-RL-12.'
 decisions:
 - 'D-R1-RL-1 (within authority): state-key record ids are the key''s own bare name (not a synthetic
   "state:alias#path" token) -- see failed_approaches. The full dotted path is recorded in Definition.record_path'
@@ -359,6 +411,27 @@ decisions:
   type verified at all) than what EXACT/OUTER_ARM already encode (was the dispatch arm resolved to the innermost
   handler) -- when a call is BOTH unverified-receiver and outer-arm, the receiver-uncertainty label takes
   precedence, documented explicitly rather than silently choosing one.'
+- 'D-R1-RL-10 (FOURTH reopening): REGISTRY_ROW_ID_KEYS=("id","item") is a SMALL, ORDERED, stated set, not an
+  attempt to enumerate every identifier-key convention this repository could ever use (a third, "exclusion", was
+  found in the real corpus and correctly falls back to the key-path identifier instead) -- the ruling''s own
+  wording ("the first of a configured set of id-like keys, else the containing key path plus the index") asks for
+  exactly this bounded design, not an unbounded guess-every-key-name heuristic.'
+- 'D-R1-RL-11 (FOURTH reopening): a registry entry''s resolution precision is decided by ONE extraction
+  (_rust_path_candidate: the entry''s own TRAILING whitespace-separated token), tried against TWO code-symbol
+  lookups (the full candidate string, then its own trailing "::"-segment) before falling through to the
+  id-grammar/raw-text buckets -- both lookups fold into the SAME single HEURISTIC_TEST_REGISTRY_SYMBOL label when
+  not a full-string match, matching the reopening ruling''s own literal two-outcome wording for this bucket
+  ("EXACT when unique; a distinct HEURISTIC label otherwise") rather than inventing a THIRD, "bare-name" precision
+  tier the ruling never asked for. The finer distinction (why: not-found / ambiguous / bare-name-only) is kept in
+  the edge''s own `note` field for real-view reconciliation reporting, not promoted into the derivation vocabulary.'
+- 'D-R1-RL-12 (FOURTH reopening, the isolation-bug fix): _test_symbol_counts_for_ref reads code_symbol through a
+  JOIN on the SAME connection every layer builder already shares, via the "core" layer''s own always-populated
+  occurrence table -- never a second sqlite3.connect() to the store, and never govbridge.code.symbols.
+  ensure_indexed''s own _open_conn() (which manages its own, independent connection, correct for a QUERY-time
+  caller like govbridge.graph.code_bridge but wrong for a BUILD-time caller that already has a shared connection
+  open). The new end-to-end test (tests/code/test_lineage_layer.py) sets up code_symbol on that SAME in-memory
+  connection first, by calling core_layer_builder then code_layer_builder directly, mirroring a real
+  freshness.run()''s own layer order exactly, rather than depending on any on-disk store at all.'
 lessons:
 - 'When a new record-addressing scheme must work through an EXISTING, out-of-scope resolver that git-greps the
   literal token first, design the id format to BE that literal text -- check the consumer''s resolution mechanism
@@ -407,6 +480,19 @@ lessons:
   every real harness type in the corpus uses `Type::new()`) can silently exercise the WRONG code path (a fallback,
   not the primary path) and still pass -- when a fixture''s result surprises you, check whether the fixture itself
   matches the real corpus''s own shape before altering the implementation to accommodate it'
+- 'a schema-recognition mechanism that walks PARSED structure (not raw text) can legitimately find MORE real rows
+  than a hand-written regex the counterparty''s own verification command uses, not just fewer -- when a real-view
+  count comes out higher than an independent measurement, investigate why before assuming the independent
+  measurement is the ceiling; here it was a YAML style difference (flow vs block) the parsed walk is naturally
+  immune to and a line-anchored regex structurally cannot see'
+- 'a build-time function that needs data another layer''s table holds should read it through the CALLER''S OWN
+  already-open connection (a JOIN against a table that layer''s own builder already populated), never by calling
+  a QUERY-time helper designed for a caller with no shared connection of its own (which opens its own,
+  independent one) -- the two call sites have genuinely different correct designs, and using the wrong one for a
+  BUILD context can have a side effect (a spurious write to whatever store the environment currently names) with
+  no connection to the feature''s own correctness at all; the full domain suite (BR-DAG-AMEND-R1-4''s own
+  "run it last") is what caught this, not any test of the new feature itself -- one more reason it is a HARD
+  requirement, not a formality'
 next_consumer: 'R1-GA1/R1-GA2/R1-GA3 (the "govbridge gather" retrieval-loop nodes), which consume these new
   derive.py/rust_cli.py/symbol_history.py/code.symbols/lineage_layer capabilities from within the gather loop
   (they, not this node, wire them into govbridge why/impact); R1-INT for the generic-rule audit and the
@@ -416,4 +502,4 @@ next_consumer: 'R1-GA1/R1-GA2/R1-GA3 (the "govbridge gather" retrieval-loop node
   tests/compile/test_compile_real_view_mandatory_in_a.py flake is R1-RM''s to fix; the conformance table
   (report.yaml) for whoever adjudicates this reopening, with every MET_WITH_DISCLOSED_LIMIT row naming its own
   bound explicitly'
-final_commit: 89950cb401cf7b93adc5cf7060251a97743b945c
+final_commit: 1cf38d2076351a23bdadad54022735639be93a32

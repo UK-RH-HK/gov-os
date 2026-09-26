@@ -1,0 +1,103 @@
+=== BR-AR-0019 REOPENING (fourth pass): TESTS (c), the test-registry shape, recognised at ANY nesting depth and
+    resolved against real code-layer test symbols / the id grammar ===
+
+--- Mechanism ---
+govbridge/graph/derive.py: _iter_registry_rows walks the WHOLE parsed YAML document (every dict, every list
+element, at every depth) and yields any mapping whose OWN "tests" key is a list of strings -- never a top-level-
+or rows/entries-only check. _registry_row_identifier: the first of REGISTRY_ROW_ID_KEYS=("id","item") present,
+else the row's own containing key-path + index (never a guess). _resolve_registry_test_entry resolves each entry
+in three buckets: (1) a Rust a::b::fn-shaped candidate (_rust_path_candidate: the entry's own TRAILING
+whitespace-separated token, generic enough to read through a free-text prefix like "unit ...") against
+{qualified_name: count} for every is_test=1 code_symbol reachable at the ref's own commit
+(_test_symbol_counts_for_ref, a JOIN against the ALREADY-SHARED conn's own "occurrence" table -- never a second
+sqlite connection to the store, see the fixed isolation bug below); EXACT_TEST_REGISTRY_ROW on a unique full-string
+match, HEURISTIC_TEST_REGISTRY_SYMBOL otherwise (not found, ambiguous, or resolved only by the candidate's own
+trailing segment since this repository's own tree-sitter adapter gives a bare/mod-nested function's qualified_name
+no module prefix at all -- rust_treesitter.py's own _walk); (2) failing that, the id grammar's mention shape ->
+HEURISTIC_TEST_REGISTRY_ID_TOKEN; (3) neither -> HEURISTIC_TEST_REGISTRY_RAW_TEXT, ALWAYS counted, never dropped.
+test_registry_edges_for_id's own git-grep is no longer restricted to tests/.
+
+--- A real isolation bug found and fixed before this reopening's return ---
+The first working version of requirement 3 resolved code symbols via govbridge.code.symbols.ensure_indexed
+through its OWN _open_conn() -- a SEPARATE sqlite3 connection to whatever GOVBRIDGE_STORE currently names,
+setting PRAGMA journal_mode=WAL on it as a side effect of opening. Called during ANY "lineage" build (every ref,
+every build), this silently broke tests/core/test_freshness.py::
+test_two_govbridge_store_values_build_independent_stores's own byte-for-byte "rebuilding store A never touches
+store B's file" guarantee (a store's file-change-counter bumps on a redundant, no-op open_db() call too).
+Confirmed by isolating the change: reverting lineage_layer.py to its pre-fourth-reopening state makes the test
+pass again; the current lineage_layer.py without the fix reproduces the failure standalone. Fixed by NEVER
+opening a second connection: _test_symbol_counts_for_ref reads code_symbol via a JOIN on the SAME, already-open
+conn every build already shares, through the "core" layer's own occurrence table (always populated first,
+structurally -- see the function's own comment for why). Verified: tests/core/test_freshness.py passes standalone
+and in the full suite; the new registry/code-symbol test itself now sets up code_symbol on the SAME in-memory
+connection first (core_layer_builder then code_layer_builder then lineage_layer_builder), exactly mirroring a
+real freshness.run()'s own layer order, never a second connection anywhere.
+
+--- Real-view proof, pinned to ONE resolved view for the whole two-build comparison ---
+resolved refs: evidence 58219d5628683d6f462aa67bf25dbc2641933bce (pinned) / product 3c880d80f81475f5306bdd5f680f2e004df49391
+(pinned) / records 393f1e6c813e94fdbcdd26dcb48d8a629207cc23 (moved again since the third reopening's 000367f4...;
+immaterial, see prior rounds' own finding on this)
+
+build 1: core+code_pre=18.7s lineage_wall=346.4s edges=3937 test_registry_rows=558
+         digest=0fc1bc49dd1baeea63ba60f91ad1c23b29f5899dfea8c054f98d3d7a57af19d7
+build 2: core+code_pre=18.1s lineage_wall=359.1s edges=3937 test_registry_rows=558
+         digest=IDENTICAL to build 1
+IDENTICAL digest, stats and lineage_edge row count (3904) across two from-clean builds of the SAME pinned view.
+
+TESTS(c) real counts, whole corpus (sum of all 3 refs, each ref: 186 rows recognised, identical across all 3 --
+these registries have not diverged between records/product/evidence):
+  test_registry_rows: 558 (186 per ref)
+  HEURISTIC_TEST_REGISTRY_ID_TOKEN:     405  (RT-134-shaped decision-register test-id tokens)
+  HEURISTIC_TEST_REGISTRY_SYMBOL:       351  (303 resolved by bare name only -- module path unverified;
+                                               48 not found at all; 0 ambiguous)
+  HEURISTIC_TEST_REGISTRY_RAW_TEXT:     318  (free-text descriptions, file::line refs, "ws08::* (7/7)"-shaped
+                                               summaries -- genuinely unresolvable, counted, never dropped)
+  EXACT_TEST_REGISTRY_ROW:                0  (see the independent zero-count verification below)
+TESTS total, all sub-kinds combined: 2742 (up from the third reopening's 1635 -- entirely this new capability).
+
+--- Reconciliation against the coordinator's own 158-line measurement (and a second, independent one of my own) ---
+Coordinator's command, re-run at the SAME 3 refs, unchanged: 158 lines match at EACH of records/product/evidence
+(confirmed independently before writing any fix). My own schema-based count is 186 rows per ref -- HIGHER, by 28,
+not lower. Explained, not hand-waved: the coordinator's own regex is LINE-anchored
+(^\s*(-\s+)?tests:\s*(\[|$)), so it only ever sees a "tests:" key written in YAML BLOCK style (its own line). This
+repository's own release/root-of-trust/4.1.6/decision-register/DECISION_REGISTER.yaml writes its
+procedure_inputs: and excluded_inputs: rows in FLOW style on ONE line each, e.g.
+  - {id: PI-01, input: "...", role: selector, decision: DR-38, ..., tests: ["FA7:...", RT-184]}
+  - {exclusion: EX-01, input: "...", role: excluded, mechanism: "...", tests: ["PROF7:EX-01", RT-190]}
+-- 23 procedure_inputs rows (id: PI-NN) and 24 excluded_inputs rows (identifier key "exclusion", NOT in
+REGISTRY_ROW_ID_KEYS -- correctly falls back to its own key-path: excluded_inputs/0 .. excluded_inputs/23) are
+BOTH genuinely real registry rows a PARSED-YAML walk finds correctly and a raw LINE regex structurally cannot
+(independently confirmed: `git show <commit>:.../DECISION_REGISTER.yaml | grep -c ...` finds only the 45
+block-style decisions: rows in that one file; this build's own per-path breakdown finds 92 distinct row
+identifiers there -- 45 decisions + 23 procedure_inputs + 24 excluded_inputs). This ONE file alone accounts for
++47 rows over what line-counting would show; the remaining files' rows net back down by the SAME ~19 files
+already identified (in the second reopening's own check6/second-check-cycle work) as containing a "tests:" key
+that is a MAPPING (RPT-*.yaml's own tests:{status,reason}, PROJECT_POLICY.yaml's tests:{product_test_command,
+baseline_record}, migrations/M-4.1.5-4.1.6.yaml's identical shape) or a list of DICTS, never strings
+(release/capability-baseline/verify-1/synthesis/evidence/AC-10-gov-contract-matrix-with-my-runs.yaml's own
+resolved.tests:[{test,file,line}] rows) -- all correctly EXCLUDED by the schema (a list of strings, never a
+mapping or a list of dicts), matching a "tests:" LINE by the coordinator's own pattern but never a genuine
+registry row. No unexplained gap either direction.
+
+--- Second, independent measurement of the zero-count EXACT_TEST_REGISTRY_ROW (BR-DAG-AMEND-R1-8 item 4) ---
+A DIRECT SQL query against the real, persisted code_symbol table (no derive.py/lineage_layer.py resolution code
+involved at all): `SELECT COUNT(*) FROM code_symbol WHERE is_test=1 AND qualified_name LIKE '%::%'` -> 0, out of
+928 real is_test=1 symbols in the whole indexed corpus. Structurally explained, not a bug: this repository's own
+tree-sitter adapter (rust_treesitter.py's own _walk) gives a qualified_name a "::"-prefix ONLY for a function
+defined inside an `impl` block (Type::method); EVERY real #[test] function in this corpus is a plain top-level or
+mod-nested free function, which the SAME adapter gives a BARE qualified_name (no module prefix at all,
+independently confirmed with a synthetic tree-sitter parse in this reopening's own working notes). It is
+therefore structurally impossible for the exact-full-string-match bucket to fire on this corpus today; the
+bare-name fallback (351 HEURISTIC_TEST_REGISTRY_SYMBOL rows, 303 of them resolved-by-bare-name-uniquely) is the
+realistic, honest precision tier for this corpus's own shape, exactly as the reopening ruling's own wording
+anticipated ("EXACT when unique; a distinct HEURISTIC label otherwise").
+
+--- Cost measurement ---
+lineage's OWN persisted footprint stays small: lineage_edge 3904 rows, lineage_unresolved 0 -- unchanged in kind
+from prior rounds. Registry resolution's real cost is the PREREQUISITE "core"+"code" layer indexing this
+capability now genuinely depends on (occurrence/code_symbol/code_call_site/code_literal, needed by ANY consumer
+of code-layer data, not specific to this feature): ~18-19s per build in this measurement (a fresh, throwaway
+store, never store-BR-AR-0010); "lineage" layer's own wall time grew from round 3's ~326s average to ~353s
+average (the extra ~27s split between the wider registry walk and the code_symbol JOIN lookups, once per ref).
+Not disproportionate: still well under the semantic/embedding layer's own ~885s single-layer figure measured
+earlier this run.
