@@ -64,6 +64,12 @@ def cmd_search(argv) -> int:
     p.add_argument("--exclude", action="append", metavar="GLOB")
     p.add_argument("--view")
     p.add_argument("--registry")
+    p.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (govbridge.core.gitobj.repo_root's own default). "
+                                   "Pass this explicitly rather than relying on cwd: repo_root() is process-cached "
+                                   "(functools.lru_cache, keyed only on the argument actually passed) the first "
+                                   "time it is called bare, so a caller who changes cwd afterwards would otherwise "
+                                   "see a stale resolution shared with any other bare caller in the same process.")
     taskctxmod.add_cli_arg(p)
     args = p.parse_args(argv)
 
@@ -79,7 +85,7 @@ def cmd_search(argv) -> int:
     merged_exclude = ctx.merge_exclude(args.exclude)
     counter = taskctxmod.ExclusionCounter()
 
-    routes = real_routesmod.build_real_routes(view_path=args.view, registry_path=args.registry)
+    routes = real_routesmod.build_real_routes(view_path=args.view, registry_path=args.registry, repo=args.repo)
     if args.route:
         route_names = tuple(args.route)
     else:

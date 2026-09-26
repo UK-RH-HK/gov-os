@@ -256,14 +256,17 @@ def test_semantic_route_excludes_ambiently(fixture_repo, view_path, registry_pat
 # ---------------------------------------------------------------------------------------------------------------
 
 def test_cli_search_applies_task_and_discloses_excluded_hits(fixture_repo, view_path, registry_path,
-                                                                task_spec_path, capsys, monkeypatch):
+                                                                task_spec_path, capsys):
     freshness.run(view_path=view_path, rules_path=str(fixture_repo.root / "config" / "corpus-rules.yaml"),
                   repo=str(fixture_repo.root), from_clean=True)
-    # cli.py's `search` has no --repo of its own (a pre-existing gap, not this node's to add): its real_routes
-    # build resolves git refs against the process cwd, so the fixture repo must BE that cwd for this one test.
-    monkeypatch.chdir(fixture_repo.root)
+    # --repo is passed explicitly (never a chdir): govbridge.core.gitobj.repo_root() is a process-global
+    # functools.lru_cache keyed only on the argument it is actually called with, so a BARE call (repo=None,
+    # i.e. "resolve against cwd") made anywhere earlier in a shared pytest process permanently caches that
+    # cwd's root -- a later os.chdir() in this test would not be seen by it (see BR-AR-0018's checkpoint
+    # findings; govbridge/core/gitobj.py is outside this node's mutation_scope, so cli.py gets an explicit
+    # --repo instead of relying on cwd at all).
     rc = cli.main(["search", '"zzyzx" OR "quartz"', "--route", "lexical", "--view", view_path,
-                   "--registry", registry_path, "--task", task_spec_path])
+                   "--registry", registry_path, "--task", task_spec_path, "--repo", str(fixture_repo.root)])
     assert rc == 0
     out = json.loads(capsys.readouterr().out)
     assert out["excluded_hits"] > 0
