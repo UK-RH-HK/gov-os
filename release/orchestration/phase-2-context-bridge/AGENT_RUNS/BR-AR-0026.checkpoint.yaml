@@ -1,5 +1,5 @@
 run_id: BR-AR-0026
-commit: PENDING_COMMIT
+commit: a0011e6f4850a056ebd6f626aa8302ab9c4e0c1f
 role: >-
   REPAIR-1 node R1-GA3 -- compile from gather: facet quotas and a facet-aware drop order, content slices, per-item
   query and facet tags, overflow to evidence notes and supplementary packets, D.2 via gather; plus
@@ -303,4 +303,4 @@ next_consumer: >-
   confirmed) cause of this node's one real-view determinism divergence.
   The verifier/R1-INT, for the BR-DAG-AMEND-R1-11 residual named in decisions (task-specific oversize-section
   selection recorded in the manifest, needs validate.py).
-final_commit: PENDING_COMMIT
+final_commit: a0011e6f4850a056ebd6f626aa8302ab9c4e0c1f

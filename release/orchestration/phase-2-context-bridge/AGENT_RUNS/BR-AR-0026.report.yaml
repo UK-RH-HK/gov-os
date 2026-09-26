@@ -5,7 +5,7 @@ role: >-
   BR-DAG-AMEND-R1-11 (oversize-mandatory-item facet-selected sections).
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga3-0026
-commit: PENDING_COMMIT
+commit: a0011e6f4850a056ebd6f626aa8302ab9c4e0c1f
 status: COMPLETED
 claims:
 - >-
