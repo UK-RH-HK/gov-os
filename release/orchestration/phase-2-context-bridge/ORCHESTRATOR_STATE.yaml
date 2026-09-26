@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T15:50:54Z'
-state_hash: f3ba93a180130eca17bbc2c64e76698de9a8b9fef25dd88a345e5507913a69bb
+updated_at: '2026-09-26T15:51:25Z'
+state_hash: 1a7b47e6bbbe4b21f78dbb8e85c0b78a4668f47ca7304a3f9a0b7b7cd06c0363
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1555,11 +1555,14 @@ agent_runs:
   - FULL domain suite on the merged tree (GA2 final + RA) -- 691 passed, 0 failed
   - secrecy -- 5 pattern hits, all in its own conformance text listing what it never read; 0 install commands; 0 bare-python3
     test or govbridge runs; claude-sonnet-5 x425; gather/** and protected tests untouched
+  follow_up_dispatched: 'resumed after R1-GA3''s merge (8a6f3d9) -- compile --out writes DIR/supplementary/<qid>/ and DIR/notes/<qid>.yaml;
+    packet verify checks each against the EVIDENCE_OVERFLOW sha and the notes schema; receipt check requires them; scope +
+    tests/compile/test_compile_out_overflow.py'
   follow_up_pending: BR-DAG-AMEND-R1-20 -- after R1-GA3 merges, RA wires `compile --out` to write compile_packet's
     result["evidence_notes"] and result["supplementary_packets"] (both keyed by query id) and packet verify / receipt check to
     cover them
   dispatched_at: '2026-09-26T12:40Z'
-  status: COMPLETED_INTEGRATED
+  status: REOPENED_FOLLOW_UP
   store: $HOME/.cache/gov-bridge/store-BR-AR-0027
   dispatch_notes:
   - the LAST editor of govbridge/cli.py (RX -> GA1 -> RS -> RA)
@@ -1570,7 +1573,10 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/answers/**
   - release/orchestration/phase-2-context-bridge/tests/fixtures/answers/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0027.*
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_out_overflow.py
 running_work:
+- run_id: BR-AR-0027
+  liveness_check: subagent transcript mtime + commits on bridge/r1-ra-0027; never inferred from elapsed time
 - run_id: BR-AR-0024
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
 dag:
