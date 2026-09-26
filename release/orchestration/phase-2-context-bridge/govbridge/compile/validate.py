@@ -25,7 +25,7 @@ from typing import Optional
 from govbridge.authority import classes as classesmod
 from govbridge.authority import records as recordsmod
 from govbridge.authority import resolver as resolvermod
-from govbridge.core.yamlutil import load_yaml_file
+from govbridge.core.yamlutil import load_yaml_file, sha256_text
 
 
 def _a_tuple(mi_id, cls, lifecycle, commit, path, blob, l1, l2, sha256) -> tuple:
@@ -58,9 +58,11 @@ def pinned_view_from_manifest(manifest: dict, task_spec: dict, repo: Optional[st
 
 def recompute_section_a(task_spec: dict, repo: Optional[str] = None,
                          registry_path: Optional[str] = None, resolved_view=None) -> tuple:
-    """Recomputes the resolver from scratch and returns ``(expected_a_tuples, resolve_result)``. The tuples are in
-    the SAME canonical order ``govbridge.compile.packet`` renders A in (ARCHITECTURE.md section 5.3 rule 5: ordered
-    by authority rank, since every A item shares tier=MANDATORY and lifecycle=ACTIVE by construction).
+    """Recomputes the resolver from scratch and returns ``(expected_a_tuples, resolve_result, a_items)``. The
+    tuples/items are in the SAME canonical order ``govbridge.compile.packet`` renders A in (ARCHITECTURE.md
+    section 5.3 rule 5: ordered by authority rank, since every A item shares tier=MANDATORY and lifecycle=ACTIVE
+    by construction). ``a_items`` (the raw ``MandatoryItem`` list) lets a caller (``verify_declared_and_delivered``)
+    recompute a PER-ITEM declared span too, not just the tuple used for section-A membership/ordering.
 
     ``resolved_view``, when given, overrides live resolution (BR-DAG-AMEND-R1-1: ``verify_section_a`` below always
     passes the packet's OWN recorded view; a caller that wants today's live-tip behaviour -- there is none left in
@@ -85,7 +87,7 @@ def recompute_section_a(task_spec: dict, repo: Optional[str] = None,
     )))
     expected = [_a_tuple(mi.id, mi.cls, mi.lifecycle, mi.commit, mi.path, mi.blob, mi.line_start, mi.line_end,
                           mi.sha256) for mi in a_items]
-    return expected, result
+    return expected, result, a_items
 
 
 def _manifest_a_tuples(manifest: dict) -> list:
@@ -104,7 +106,8 @@ def verify_section_a(manifest: dict, task_spec: dict, repo: Optional[str] = None
     refs/commits), never at the repository's moving tip -- so a stored packet stays re-verifiable at any later
     time, even after a new mandatory record has since been committed to the same ref."""
     pinned_view = pinned_view_from_manifest(manifest, task_spec, repo=repo)
-    expected, _ = recompute_section_a(task_spec, repo=repo, registry_path=registry_path, resolved_view=pinned_view)
+    expected, _, _ = recompute_section_a(task_spec, repo=repo, registry_path=registry_path,
+                                          resolved_view=pinned_view)
     actual = _manifest_a_tuples(manifest)
     if expected != actual:
         return [f"section A does not equal the freshly recomputed resolver output (at the packet's own recorded "
@@ -113,27 +116,111 @@ def verify_section_a(manifest: dict, task_spec: dict, repo: Optional[str] = None
     return []
 
 
-def verify_delivered_fidelity(manifest: dict) -> list:
-    """BR-DAG node R1-RM (REPAIR_PLAN.md section 3 rule 4): "the receipt acknowledges delivered_sha256 separately
-    from source_sha256... must not appear to acknowledge content that was never delivered." The concrete
-    historical failure (run-1, ``DEMONSTRATION/run-1/receipt.yaml``): a by-reference A item carried NO recorded
-    hash at all, so a receipt could only acknowledge it as the degenerate ``"ID@None"``. Every A item must
-    therefore carry a non-None ``source_sha256`` (a directory item's is now derived from its own member manifest --
-    ``resolver.py`` -- rather than left ``None`` when the row declares no explicit hash) and a non-None
-    ``delivered_sha256`` for whatever this packet actually placed in that item's body.
+def _line_ranges(rows: list) -> list:
+    return [(r.get("line_start"), r.get("line_end")) for r in rows]
 
-    This deliberately does NOT assert ``source_sha256 == delivered_sha256``: an ANCHORED item's source_sha256 is
-    the whole occurrence's file-level integrity hash (ARCHITECTURE.md section 5.3 rule 4's own re-derivation keys
-    on exactly that), while its delivered_sha256 is the hash of its own anchored slice -- the two legitimately
-    differ for every anchored mandatory item, whole-file or not, and that is not a fidelity gap."""
-    problems = []
+
+def _tiles_exactly(declared_ranges: list, disclosed_ranges: list) -> bool:
+    """True iff ``disclosed_ranges`` (a notice's ``delivered`` + ``undelivered_ranges``, combined) partitions the
+    UNION of ``declared_ranges`` EXACTLY -- same total line coverage, no gaps, no overlaps. Line-set based (not
+    merge-interval arithmetic) for a direct, hard-to-get-subtly-wrong implementation; mandatory items are bounded
+    in size (the whole point of the per-item cap this checks around), so this is cheap in practice."""
+    def _expand(ranges):
+        s: set = set()
+        for a, b in ranges:
+            if a is None or b is None:
+                continue
+            s.update(range(a, b + 1))
+        return s
+    declared_set = _expand(declared_ranges)
+    usable_disclosed = [(a, b) for a, b in disclosed_ranges if a is not None and b is not None]
+    disclosed_set = _expand(usable_disclosed)
+    if declared_set != disclosed_set:
+        return False
+    total = sum(b - a + 1 for a, b in usable_disclosed)
+    return total == len(disclosed_set)  # equal iff no two disclosed ranges overlapped
+
+
+def verify_declared_and_delivered(manifest: dict, a_items: list, repo: Optional[str] = None) -> list:
+    """BR-DAG-AMEND reopening ("packet verify cannot detect silent truncation"): for every A item, recomputes
+    ``declared_sha256``/``declared_bytes`` FRESH from Git at the packet's own recorded view (never trusts the
+    stored value -- a compiler that cut a body could just as easily have written a wrong hash for the cut), then
+    requires ONE of:
+
+    (a) ``delivered_sha256 == declared_sha256`` (computed the SAME way -- ``resolver.hash_pieces`` over the exact
+        same ordered raw pieces both times, so this is a real byte-level equality, not two different schemes that
+        happen to look similar); or
+    (b) a ``MANDATORY_PARTIAL_DELIVERY`` notice for that item whose ``delivered`` + ``undelivered_ranges``,
+        combined, exactly TILE the declared span (every declared line accounted for exactly once -- no gaps, no
+        overlaps), with every disclosed range's own sha256 independently re-verified against Git at the recorded
+        view (never trusted from the notice itself).
+
+    A directory item is skipped here (its declared form is the member manifest, checked by
+    ``resolver.declared_regions``'s caller elsewhere -- ``is_directory``/``directory_members`` are already
+    presence-checked structurally by the manifest schema itself)."""
+    problems: list = []
+    a_items_by_id = {mi.id: mi for mi in a_items}
+    notices_by_id: dict = {}
+    for n in (manifest.get("notices") or []):
+        if n.get("type") == "MANDATORY_PARTIAL_DELIVERY":
+            notices_by_id.setdefault(n.get("id"), []).append(n)
+
     for row in manifest["sections"]["A"]["items"]:
-        if row.get("source_sha256") is None:
-            problems.append(f"A/{row['unit']['id']}: source_sha256 is missing -- inputs_consumed could only "
-                             f"acknowledge this item as '{row['unit']['id']}@None'")
-        if row.get("delivered_sha256") is None:
-            problems.append(f"A/{row['unit']['id']}: delivered_sha256 is missing -- the receipt cannot honestly "
-                             f"acknowledge what this packet actually delivered")
+        uid = row["unit"]["id"]
+        if row.get("is_directory"):
+            continue
+        mi = a_items_by_id.get(uid)
+        if mi is None:
+            problems.append(f"A/{uid}: not found in the freshly re-derived resolver output at the recorded view "
+                             f"-- cannot verify declared_sha256")
+            continue
+
+        fresh_parts = resolvermod.declared_parts(mi, repo=repo)
+        fresh_declared_sha256, fresh_declared_bytes = resolvermod.declared_hash_and_bytes(fresh_parts)
+
+        if row.get("declared_sha256") != fresh_declared_sha256:
+            problems.append(f"A/{uid}: declared_sha256 {row.get('declared_sha256')!r} does not match the source "
+                             f"at the recorded view (recomputed {fresh_declared_sha256!r})")
+            continue  # the stored value is already untrustworthy; nothing further to check against it
+        if row.get("declared_bytes") != fresh_declared_bytes:
+            problems.append(f"A/{uid}: declared_bytes {row.get('declared_bytes')!r} != recomputed "
+                             f"{fresh_declared_bytes!r}")
+
+        delivered_sha256 = row.get("delivered_sha256")
+        if delivered_sha256 is not None and delivered_sha256 == fresh_declared_sha256:
+            continue  # (a): full, honest delivery -- confirmed by an exact, independently-recomputed hash
+
+        # (a) does not hold -- (b) is the only remaining honest possibility.
+        item_notices = notices_by_id.get(uid) or []
+        if not item_notices:
+            problems.append(f"A/{uid}: delivered_sha256 {delivered_sha256!r} != declared_sha256 "
+                             f"{fresh_declared_sha256!r}, and no MANDATORY_PARTIAL_DELIVERY notice explains the "
+                             f"gap -- undisclosed truncation")
+            continue
+
+        notice = item_notices[0]
+        declared_ranges = _line_ranges(fresh_parts)
+        disclosed = list(notice.get("delivered") or []) + list(notice.get("undelivered_ranges") or [])
+        disclosed_ranges = _line_ranges(disclosed)
+        if not _tiles_exactly(declared_ranges, disclosed_ranges):
+            problems.append(f"A/{uid}: MANDATORY_PARTIAL_DELIVERY notice's delivered+undelivered ranges do not "
+                             f"exactly tile the declared span {declared_ranges} (a gap or an overlap) -- "
+                             f"disclosed={disclosed_ranges}")
+            continue
+
+        for d in disclosed:
+            d_path = d.get("path") or notice.get("path")
+            d_commit = d.get("commit") or notice.get("commit")
+            text = resolvermod._read_git_slice(d_path, d_commit, d.get("line_start"), d.get("line_end"), repo=repo)
+            if text is None:
+                problems.append(f"A/{uid}: disclosed range {d.get('name')!r} ({d_path}@{d_commit}:"
+                                 f"{d.get('line_start')}-{d.get('line_end')}) could not be re-read from Git at "
+                                 f"the recorded view")
+                continue
+            actual = sha256_text(text)
+            if d.get("sha256") != actual:
+                problems.append(f"A/{uid}: disclosed range {d.get('name')!r} sha256 {d.get('sha256')!r} != "
+                                 f"recomputed {actual!r} at the recorded view")
     return problems
 
 
@@ -241,7 +328,11 @@ def verify_packet(manifest: dict, task_spec: dict, repo: Optional[str] = None,
     problems += verify_placement(manifest)
     problems += verify_banners(manifest)
     problems += verify_ordering(manifest)
-    problems += verify_delivered_fidelity(manifest)
+    # BR-DAG-AMEND reopening: recompute at the packet's OWN recorded view (never live), same as verify_section_a.
+    pinned_view = pinned_view_from_manifest(manifest, task_spec, repo=repo)
+    _, _, a_items = recompute_section_a(task_spec, repo=repo, registry_path=registry_path,
+                                         resolved_view=pinned_view)
+    problems += verify_declared_and_delivered(manifest, a_items, repo=repo)
     return problems
 
 

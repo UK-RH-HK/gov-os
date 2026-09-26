@@ -1,157 +1,157 @@
 # Context packet
 
-manifest_sha256: 8df4f0d26f23d970066c505567641142136114bf164f418d5b9d3c9b32190523
+manifest_sha256: cd84403dc45d3a9f16d37af52fd10b6272ef0df6c303faaeacf664d273506f66
 status: OK
 
 ## A. MANDATORY AUTHORITATIVE INPUTS
 
 - unit: record:state:bridge#contract_v3  (delivery=MANDATORY, route=resolver, class=CONTRACT, lifecycle=UNKNOWN)
-  source: Governance_OS_Capability_Acceptance_Contract_v3.md@ad791bae3b2fe4c4b16265263a774fbe6d37a3ec
+  source: Governance_OS_Capability_Acceptance_Contract_v3.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d
   [UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.]
   reason: the owner source contract (the evidence-owner requirement) -- CONTROL-A's own required input, unchanged
-[section map: Governance_OS_Capability_Acceptance_Contract_v3.md@ad791bae3b2fe4c4b16265263a774fbe6d37a3ec exceeds the 24576-byte per-item cap; every section below is delivered BY REFERENCE -- read it by its exact line range and verify its own sha256 (REPAIR_PLAN.md section 3 rule 1: never a silent, unmarked cut)]
-- heading:Governance OS Capability Acceptance Contract — v3  lines 1-129  sha256=31262ae5041b859dd7ca88897531dba62e2029258ece24773e23b62937a5eb35
-- heading:Canonical implementation in the Governance OS repository  lines 7-52  sha256=bf0c531fe5a1f3a5097f01a171b27424259b7f53bfee92e2c784b3c6fa8abbe3
-- heading:Contract authority model  lines 37-52  sha256=f35342ba7d46380fcb19daf60f68a23004b7a1ad56ef967b517ff0332df5d4bf
-- heading:Required contract fields per capability  lines 53-74  sha256=17af8b544cbfae8a39aebefd54db5944987bcd3a37d230dd3551ff8b00ef1fae
-- heading:Relationship between the contract and the governance suite  lines 75-94  sha256=0ec8e46735d29afd95e40aa4661d95e7a40b44337383f8fc45e31c58ff3fa818
-- heading:Evidence freshness  lines 95-112  sha256=9cc375692a2b1972e09636a4892119592f4defe5920969e3f2fdd039f6afac13
-- heading:Lifecycle  lines 113-129  sha256=9c21397bf12d1fb058ea87bfe3ca0fd23f5ffe6a6628e66ffac4f5df7de389a1
-- heading:GATE A — Constitutional and Trust Foundations  lines 130-181  sha256=533e84d9e5e932a6f4a71ee9799ea51da4a765ed79c187a9e85701646d64b7bc
-- heading:A1. Canonical authority and policy precedence  lines 132-141  sha256=9fcea758fb553d0e648bd3e7fe91dfaadc29d49f2312e54c0ef69fccc5901a65
-- heading:A2. Authentic root of trust **[POST-VERIFICATION HARDENING]**  lines 142-155  sha256=2151a89c20f9a536dbf48f3379b57ffa498621ff62bf6d3c1c1c76d32ec8c997
-- heading:A3. Security, sensitivity and permissions  lines 156-165  sha256=3e757d6b9337f4681cd80f321d1d2e65fdb251b6e99249d13651b4808c137394
-- heading:A4. Budget/resource governance  lines 166-171  sha256=bd878ca7b363b31efa87045dcbbfc23c7b141629c355a4c0db9e578e8c36071d
-- heading:A5. Emergency controls  lines 172-181  sha256=76d5b8a490ce44387220120b6178f932e156e9ede5f3b923a9e8a91fb1e6a480
-- heading:GATE B — Repository Contract, Paths and State  lines 182-206  sha256=4e50e69070aed2931dcb4e8b6711f1ef17497f1c918f5d426de5197edf746e00
-- heading:B1. Standard repository contract  lines 184-189  sha256=b689d89ca7e98457877f00d8aed48467a074c03ff7a3236927e9cc1ebbc56412
-- heading:B2. Path map  lines 190-198  sha256=ddab43fcfad48640709e3f198921eaf16e0f047d2173c53c0ac5c6339f48229f
-- heading:B3. Authoritative vs derived state  lines 199-206  sha256=6d4ef1d38971e8311691691a99184f9b35c362fb12d7e4cc947077b007c0595d
-- heading:GATE C — Development Knowledge Fabric  lines 207-304  sha256=c596d4cd98ed2a3f8a5a7a86a1b4e7dbb2202c690d6e86c4e6d5e7eeb14623fe
-- heading:C1. Deterministic structured memory  lines 209-228  sha256=0a1b30be86cf88d1446fe21df2f313eac1bb928da3d7097e6123d514ecc3e354
-- heading:C2. Relationship/graph memory  lines 229-233  sha256=2fe6d25053c384ff2a3cd2a862b2d3a68b58e4b02cb5607bc579dae17d30e288
-- heading:C3. Semantic memory  lines 234-242  sha256=c6f57f3187073f3d285882b71508da0312d547afdc26527de09aaed83f87cbf1
-- heading:C4. Lexical memory  lines 243-250  sha256=8506a83dac18a96d7fff8b93a5dee7dc69a4b9e59e4b52f05878ac8705946021
-- heading:C5. Code-structural memory  lines 251-260  sha256=ff9e1035d443bf19069ee18e65115c98c977d80a0de4ed19d15d154070e42219
-- heading:C6. Temporal memory  lines 261-267  sha256=2d4820d01a72b412dd780ea0aa87ddb7bd87f8260f7c8eeb82bed98d68ad58c5
-- heading:C7. Episodic execution memory  lines 268-275  sha256=7b47d932a1252f6e8cb303229343e139e96645f43460fbf7a76d2011a58a4515
-- heading:C8. Failure memory  lines 276-284  sha256=3ef58b8bcd25a72f95862cc61dfd9c90542197dc12b522269d1b6f05fc47d061
-- heading:C9. Working memory/context packet  lines 285-293  sha256=b97777bb5c25a9ac4f5cf47700e87966f6113d7d5d864054ec29b2a0eac10081
-- heading:C10. Capability memory  lines 294-304  sha256=2699e58bc8ce50edf16eff5d1b5c1c832f814fbb1533aa0d5b9722df4f008313
-- heading:GATE D — Indexing, Retrieval and Context  lines 305-359  sha256=234aaedd9e64f205edd926c94f95acbd412a23f1a29d711234e6869f361d034b
-- heading:D1. Incremental indexing/freshness  lines 307-314  sha256=f3d790920cb7a786a0817bc4493d480ae8dc4a16c66ca25cd21afbb5c17f4c59
-- heading:D2. Retrieval router  lines 315-322  sha256=535f2ffef7dd316704ef87b8e3acc35fce5f33a96e2397dd937005001d6e503e
-- heading:D3. Hierarchical retrieval  lines 323-328  sha256=51d47be1c8079080b9508fd843795e813e2b2233e09cf24a6ab1917eafb054d4
-- heading:D4. Component separation  lines 329-341  sha256=5f96964cb02e463a58f5dd3a80ac6203172e9e22c1410c6210f8f4a94cd1e83a
-- heading:D5. Evidence-driven retrieval model selection  lines 342-349  sha256=618f8759c479543be3fb9c03dd813bf40af10811c7bc27c85c098792fe006f11
-- heading:D6. Rebuild guarantee  lines 350-359  sha256=4abdc826774026b4465efd0518c085fbbcbd238f0bb99159dcb3dc174caf2a24
-- heading:GATE E — Agent Organisation and Independent Work  lines 360-395  sha256=5eb4d0708973ac37b1cd28e157ff3234811f1be4881d1cf2fe1b1b8cf1620d56
-- heading:E1. Authority levels  lines 362-367  sha256=dcece6b5900c240f4c657e252538e549165a99fb3353204794836831b002bb47
-- heading:E2. Representative roles  lines 368-376  sha256=2e4ee40c65a7efc12535795b166d3ed24680e4ba6a2bcfed55d6418b81bb2cd9
-- heading:E3. Typed A2A handoffs  lines 377-386  sha256=5f1180a83420247352c05eb679e6dce85620f5d01b89995f1f4c1afb0f9c8d99
-- heading:E4. Concurrency/task claims  lines 387-395  sha256=83914eb10853edf43d570d05dc780e9454f9b6c42ca834b12b6f8fb7878bedda
-- heading:GATE F — Skills, Tools, MCP and Capabilities  lines 396-440  sha256=893ef9fea49046616624bfbee994e449179daff99036cce6ac042bc1838c5d44
-- heading:F1. Skill lifecycle  lines 398-403  sha256=b25cda96310a283379c593490633509db321afb9f91a916324a7d1aa68c6fe41
-- heading:F2. Tool Capability Registry  lines 404-413  sha256=36b4a191658ed09d0ff01e4dbd43feda758a07ec965310d3fcb5caf5f5fb77bf
-- heading:F3. Missing-tool acquisition  lines 414-424  sha256=be3c342a88145b9008ab0e62ba61feba01d31298237bb2d658210993d694042e
-- heading:F4. Plugin trust boundary **[POST-VERIFICATION HARDENING]**  lines 425-432  sha256=a8e3d011acee60a66db8ae376799893519ca62dc1d6f195ec81faf786aff24dd
-- heading:F5. MCP/A2A/tool separation  lines 433-440  sha256=54628b0507315b5c704ae549809304194b5a629851a46b2d73841c33bfcb6fd7
-- heading:GATE G — Human Command Surface  lines 441-457  sha256=d8113edbf1c5e2009642a5d623100ccfd91716972a5ada5bceee2e1257cfd748
-- heading:G1. Natural-language intent  lines 443-447  sha256=a6f10fa5b1560fc6cf59245702f87ee13f5d5eb0d8103f6ea42494e01885e0ef
-- heading:G2. Small explicit human control set  lines 448-457  sha256=b618142b64f401e0de44a29cbb1b03879526f37fa97d1bb11eaf666ceb93f4fe
-- heading:GATE H — Specification and Readiness  lines 458-532  sha256=db241678429ffd78e53379f779f5278e81d8966da82ee04b77b45aed022ec1b6
-- heading:H1. SPEC lineage  lines 460-479  sha256=a0d9012823f85a53216fc2e377f505135d21182aee5aeb74720c575dce5623c9
-- heading:H2. 26-dimension Feature/Capability Readiness Contract  lines 480-516  sha256=93c113e43be981b8f75ea8010c9d4bccdd4ea2960c7e75c7149b99b43433f660
-- heading:H3. Readiness generates work  lines 517-523  sha256=401ea9cfa6b2fea8c2875bd450474f32853df4ad7ce318a84def4d221026bc03
-- heading:H4. Scenarios drive data/tests  lines 524-532  sha256=b5933ba69a933da2cdbdcd3ebb8ad3f4bfb315304185eabe93d122d3f0bee276
-- heading:GATE I — Dynamic Work System  lines 533-593  sha256=0e22a70d55fe8efda1b749ad7d270d31dfdd884e005d9c81403d8d87d423225f
-- heading:I1. Unified task DAG  lines 535-559  sha256=25bbc16aee5da396f59187fbfaafb5ab2edc1eb20af67a77115d8eb277b86e43
-- heading:I2. Task contract  lines 560-570  sha256=6c05fbe01e99b09ad29233970aeefbdf79c355d8a5d3716f24cf0b147811900f
-- heading:I3. Dynamic generation  lines 571-584  sha256=dfb0f6580c5f8918f137df4b750d46b05267f5183dcc9520ee4a33338ba4fb61
-- heading:I4. Parallel execution  lines 585-593  sha256=e27a49020a26d057cb0d9f5ba9e911c401786024db3f3de1e51a5c78fc8d9016
-- heading:GATE J — Research and Experimentation  lines 594-619  sha256=d202816c874e55bca35e86bc6ce4a1ba47cbeb1265f91d773e070bbb6722306c
-- heading:J1. Research becomes evidence  lines 596-606  sha256=99340791b9d95caa63d9c71901161f0d99a8cdde1d2a35d568ffbbe19e502ded
-- heading:J2. Experiment lifecycle  lines 607-619  sha256=cbd07f5b366f227fc24e905a466e4965d8ffb84a48ec2b3455d492f8972fc441
-- heading:GATE K — Change Control and Impact  lines 620-653  sha256=edc8e58a841633e30021675e7d8babd0473f02b1a743eb6c8e7c4c552a571d30
-- heading:K1. CIT-P  lines 622-627  sha256=0d2e9ff9d4feeb8a97a8f662e3bea16940628be9c04ef3cd994c11c67f08fa81
-- heading:K2. CIT-E  lines 628-637  sha256=d35b0a83ceecfc90d32bf6c5315561f181bfaac29f21678a589b2c3667beb922
-- heading:K3. Automatic impact simulation  lines 638-648  sha256=56ffaf0990ac5535ac4950fbccb71102b8d4aebadb58e67ce7d490069561ae05
-- heading:K4. Impact radius  lines 649-653  sha256=f242a8014f4de0375564bc23385ac3285b9a84490643bf18b2bcbf5bd355820a
-- heading:GATE L — Human Decision Gates and Contradictions  lines 654-686  sha256=11c908d1f0894490834438fd9dd42d6cca0eb433e1d83bff43c6fd1b5772f043
-- heading:L1. Contradiction resolution  lines 656-661  sha256=eee87c687d426bf4d69ad3955df2644cae56fa28ddff4fde15492e94370e68b4
-- heading:L2. Human Decision Gate package  lines 662-673  sha256=f0b89996713697721ec2ac5134c110587773584f39fef01117e6efe5d9a5e887
-- heading:L3. Gate presentation  lines 674-680  sha256=43352d1cf2bea4185901bae1c58a372de0b06452444b7487a92ee02df09f2dc4
-- heading:L4. Non-global blocking  lines 681-686  sha256=8ece657141c14be955e4d553f8d54928b65f5efaa948c826129fa1f3bed37e3a
-- heading:GATE M — Model Routing  lines 687-714  sha256=fc50214331c145d89e3904992eba71724a7ec4fe2a71a3b8f36ff4dfa057f54a
-- heading:M1. T0-T3 or equivalent capability tiers  lines 689-694  sha256=a3817f23ee18827c974e157ff21d2067be361f6615024ff1ce708d36ac11601d
-- heading:M2. Reasoning requirement  lines 695-697  sha256=4deabf820af1b9906f302a85b6f34f40c15f8fdb5ece798f11582a154a707d34
-- heading:M3. Role defaults  lines 698-701  sha256=e8ce481926f611e59c88428d4e478b62589fe246f8dcab91c795a4c640774d81
-- heading:M4. Empirical routing  lines 702-714  sha256=17abc48a8d994878980270b67f9cd761c50f359c2ec7bcc9919fa131d708f415
-- heading:GATE N — Checkpoints, Compaction and Handoffs  lines 715-748  sha256=91356ddee4a8a8980db6a9a941e5035d41a6c1f27a3bb9b6a9e767bccd91cfe6
-- heading:N1. Structured checkpoint  lines 717-728  sha256=f72db90c1e5bfc1cc7448e4c15502cdbec3bc5d175319b9fc4594d46f103d8d8
-- heading:N2. Mandatory triggers  lines 729-738  sha256=cc40975bfa58c9525e613cfae84fc9740f73510042301e2715bc655743b14667
-- heading:N3. Provider-independent checkpoint watchdog  lines 739-743  sha256=83c88975aeb730b32eb36993d39f27942436715bd76e4b2ed267ac2ea9ab6b26
-- heading:N4. Worker return contract  lines 744-748  sha256=7a4704c2199e2ef60f0f79e1352d7730fb3fb549e3589b2b8f99cd701c49f450
-- heading:GATE O — Verification and Continuous Governance Health  lines 749-811  sha256=4cd41a9bd638522df6d90b1348e9ae758ad4615178fbf7f1cf846530f924271e
-- heading:O1. Product test families  lines 751-762  sha256=b8eb70c9f051182e114cd2553268d718ab0125fdb259421aff40d649db691d1b
-- heading:O2. Governance test families  lines 763-781  sha256=34281a998e06d5485195a992ecaf05c274d1ac365721204242c61aca0c9aa661
-- heading:O3. Independent test authorship  lines 782-786  sha256=b88126907701074f2f6afd53959aa5edbf11daf065e3fa23acac7008791cb2e3
-- heading:O4. Governance suite currency  lines 787-790  sha256=de3f59f0c17908884431e10267fad753dcbcb6f39a2b4035756520d5e0be2b5c
-- heading:O5. Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**  lines 791-811  sha256=43d4e0f87601618e2b7d0d3b48dfae5392caec018c9a08dad0efc414e9bda8d6
-- heading:GATE P — Observability and Telemetry  lines 812-841  sha256=1420c1796a1adb8a42e8168a44f169468eda24109ccf9cb29d52a6e5f28dc30e
-- heading:P1. Execution telemetry  lines 814-828  sha256=0b541a7f86b9500bd9a1724a00e15a3d97a012543e394aec99e5f23ca9ceea54
-- heading:P2. Organisational questions  lines 829-841  sha256=f2c2f7ac87f22d7c822793fe5d21c5231bd2f3cbd257d7669a9e86472ccb6241
-- heading:GATE Q — Learning, Lessons and Upstream Improvement  lines 842-869  sha256=02c5bad82c9154fe03641a1d2103ab087d8a17ec40d2dd065449c3d3fabe3e68
-- heading:Q1. Lesson lifecycle  lines 844-853  sha256=46cf010edf4d88c18f8e50fc934a778c0ee3a62755abb038fb212c8f66e3246b
-- heading:Q2. Decision vs lesson  lines 854-857  sha256=edabb3297d59c5fab83e920a6e6af8b0bb29006f867f03071b014aebee9883b4
-- heading:Q3. PROJECT/PRODUCT/FRAMEWORK scope  lines 858-860  sha256=9421bd0d7450e5d4ec013302c4a325818862bba089ef3eb3f3b78354ceb58157
-- heading:Q4. Upstream Export Gate  lines 861-869  sha256=cbf9293d484238100f041b3b46d5895872d4b40f509fb2baf4aa6c5bbad3abfe
-- heading:GATE R — Legacy, Archive and Historical State  lines 870-893  sha256=3912b7c1b87d6510ff5c408ae789b6b0cc0b4a04234f48f19cb27043b074762d
-- heading:R1. Legacy Governance Retirement  lines 872-880  sha256=b8b9752a607ff085040d8d77e9dbce7955fdd0b392efdf1d5c3fd4e7205df784
-- heading:R2. Chat-memory retirement  lines 881-886  sha256=8c6caac52ac9a052cc2cab1b91df99dcc1a3b09efeca377977440dbd700a3caa
-- heading:R3. Archive policy  lines 887-893  sha256=1454ce10f7bb0562164b041b1b3b207eed2dc4269eecaa4c0acb26f3ae8fc51a
-- heading:GATE S — Release, Distribution, Init, Adopt and Update  lines 894-953  sha256=ea0a62c8404ff7158570f09e041908a753937f929eb88bf86ec47adb3156160b
-- heading:S1. Canonical OS repo  lines 896-899  sha256=bb3cc6e4f2b16d15e8a91e855080f6bf1c29bd3a59e02a9daa2b661983c613f9
-- heading:S2. Immutable releases  lines 900-912  sha256=5719d6b5b746bf481ecf336815992861d746abc10d43bc835760327043a67c72
-- heading:S3. `gov init`  lines 913-920  sha256=6115b41f9e386471b4e6753b31906dcd3e1c89c233f79eedf5075cad422a9b0f
-- heading:S4. `gov adopt`  lines 921-935  sha256=bdbbb01f04237ded01500f1ce7819ac029ba899b316a52f70906eee2e632137c
-- heading:S5. `gov update`  lines 936-946  sha256=fbc976ec9924efd484eebdafa39d01c8aa4c57e9a1141980cd668f11f052c29e
-- heading:S6. Cross-machine mechanics  lines 947-953  sha256=46edede4cdd99edae05c0987e779fbc4f010f187e61d26eecd9859286a7058b5
-- heading:GATE T — Independent Adoption and Audit Roles  lines 954-975  sha256=c1972fabacb64385565a7eb220d45fc493c4c23e305703354124c7c09b09ea89
-- heading:T1. Role separation  lines 956-966  sha256=3e15a92414286374a4356ed4fb8e1198e423286518a551e00e848baec5c6b121
-- heading:T2. Fresh-session independence  lines 967-970  sha256=fc04901bc14fb788e7baf01fa642eb2925cfd57e03a7eee4a763afda6e1865cd
-- heading:T3. Adoption evidence tree  lines 971-975  sha256=da680ad2517f8fff6e658c975fde18fa433ac58a2c04e309cc05e60bee8de831
-- heading:GATE U — Framework Health SLOs  lines 976-1011  sha256=cdab09c2b8971010ca264b9cc73c02cce547c04f631dcdabea3b848f4dbff5b7
-- heading:GATE V — Qualification Oracle **[NEW TESTING REFINEMENT]**  lines 1012-1065  sha256=e1dd7f1a9c69b857d5ac7f45d531ce16f35014c1b700fd4451333b218793d08a
-- heading:V1. Fault manifest  lines 1016-1027  sha256=8f9e5316a1da6a20d0dc2e96b704d1a9b7b0f730eb7ff667cb42c552a0344c53
-- heading:V2. Hidden path-map oracle  lines 1028-1037  sha256=7e4d2783dfe4420cdd6cebfc162894cba6cf07bc3cfa0309f1c0120b109cb8bd
-- heading:V3. Hidden memory oracle  lines 1038-1046  sha256=b221e1a30efc28cd65351abeab01da5485cf6199a2a9b766d37d07c8b4062abc
-- heading:V4. Quantitative qualification scoring  lines 1047-1065  sha256=2240c2bb025784d94bf46b1603ef98db7ed1b2fcbe82131083efd17b4c9d515d
-- heading:GATE W — Artifact Flow, Dependency Consumption and End-to-End Traceability  lines 1066-1196  sha256=aa062a4c5558c1f534a76321abee8a58d0fff3d4ee5a55e980cebe6b40dc3a4f
-- heading:W1. Stable artefact identity  lines 1068-1081  sha256=ece0bedfa3767be65d83e0217e9abb453136db86f2949c7d41195b83b2ed066f
-- heading:W2. Typed output → input contracts  lines 1082-1091  sha256=fbe7cd0a619ba2e102f0f456b154592ce571016919149743a50c303f63f6bacf
-- heading:W3. Mandatory task-input manifest  lines 1092-1105  sha256=97019fb2dee456f28660942c1d89b6daec883bb629c5238cca40a39e39f10ac9
-- heading:W4. Context compiler delivery proof  lines 1106-1113  sha256=2437e1fb4fd7cf5410441cba77f1656fb5742e7e0eb1105d26071cd87ae3361b
-- heading:W5. Consumption receipt and implementation traceability  lines 1114-1127  sha256=5c922bec8b0d726f02321f0459ed4023bce760e57b8ec3ef0cf891c28dcd9003
-- heading:W6. Upstream-change staleness propagation  lines 1128-1137  sha256=45896cb02fda202d0fa47287ac0e943572556dc2b150fedfe920ea346ae7e956
-- heading:W7. Orphan/dead-output and unexplained-output detection  lines 1138-1145  sha256=57cbdd1adcf519d73eba4400f766168876f60c70b94a40344512c69178f18dea
-- heading:W8. Forward and reverse lineage  lines 1146-1153  sha256=f29d776707544a4997688661094313214bcf891a371af5a77bd13d49d9fe216f
-- heading:W9. Session/handoff continuity of mandatory inputs  lines 1154-1161  sha256=39c3891ba622d1163e31c3354b3348bee7b036b3ba54990cc8e6281602e4d269
-- heading:W10. Deterministic mandatory inputs outrank retrieval  lines 1162-1172  sha256=813cf325ab30c5a2ed6eb75a79a8ff9181b1d2db1c171c51ecf99a5d66354583
-- heading:W11. Artifact-flow quantitative health  lines 1173-1184  sha256=3e1e8c35cc4195ad11a9f6831f033544245d113fa431fcc01042e030abb81dcd
-- heading:W12. Health-scheduler integration  lines 1185-1196  sha256=0f7de9ac1876b48b3a2ff86badb61c1feab65cda877cc63a0587c713e3380765
-- heading:PRE-ADVANCED-QUALIFICATION ACCEPTANCE GATE  lines 1197-1218  sha256=6835881dee2ab17d43334d03c753cbd926c0e06341442114edb7beae78342518
-- heading:PROPOSED ORDER AFTER THIS CHECKLIST IS ACCEPTED  lines 1219-1255  sha256=04a62b75267b58e2890ac16cdbeb8d92912e19b0efe6f5c38e2ab5d27d7aa84b
+[section map: Governance_OS_Capability_Acceptance_Contract_v3.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d exceeds the 24576-byte per-item cap; every section below is delivered BY REFERENCE -- read it by its exact line range and verify its own sha256 (REPAIR_PLAN.md section 3 rule 1: never a silent, unmarked cut)]
+- Governance OS Capability Acceptance Contract — v3  lines 1-6  sha256=c29dd7ace647ed5a7b46f33ec610d270d6974d6a77291a6a003dcc7b7f69df84
+- Canonical implementation in the Governance OS repository  lines 7-36  sha256=900a25fbed93a1128f1679b1bd299eeab88696b9ae20a7930dd93fc164098afe
+- Contract authority model  lines 37-52  sha256=f35342ba7d46380fcb19daf60f68a23004b7a1ad56ef967b517ff0332df5d4bf
+- Required contract fields per capability  lines 53-74  sha256=17af8b544cbfae8a39aebefd54db5944987bcd3a37d230dd3551ff8b00ef1fae
+- Relationship between the contract and the governance suite  lines 75-94  sha256=0ec8e46735d29afd95e40aa4661d95e7a40b44337383f8fc45e31c58ff3fa818
+- Evidence freshness  lines 95-112  sha256=9cc375692a2b1972e09636a4892119592f4defe5920969e3f2fdd039f6afac13
+- Lifecycle  lines 113-129  sha256=9c21397bf12d1fb058ea87bfe3ca0fd23f5ffe6a6628e66ffac4f5df7de389a1
+- GATE A — Constitutional and Trust Foundations  lines 130-131  sha256=de9e2bfcd37066c8d8c3cd832c0b9196b7a1857d748a092b234a903b5d958f6e
+- A1. Canonical authority and policy precedence  lines 132-141  sha256=9fcea758fb553d0e648bd3e7fe91dfaadc29d49f2312e54c0ef69fccc5901a65
+- A2. Authentic root of trust **[POST-VERIFICATION HARDENING]**  lines 142-155  sha256=2151a89c20f9a536dbf48f3379b57ffa498621ff62bf6d3c1c1c76d32ec8c997
+- A3. Security, sensitivity and permissions  lines 156-165  sha256=3e757d6b9337f4681cd80f321d1d2e65fdb251b6e99249d13651b4808c137394
+- A4. Budget/resource governance  lines 166-171  sha256=bd878ca7b363b31efa87045dcbbfc23c7b141629c355a4c0db9e578e8c36071d
+- A5. Emergency controls  lines 172-181  sha256=76d5b8a490ce44387220120b6178f932e156e9ede5f3b923a9e8a91fb1e6a480
+- GATE B — Repository Contract, Paths and State  lines 182-183  sha256=fc2dd6079238a240afdf12d27177e7ff70a7758a1cc1c62fcbc3d8cacc9b0ed9
+- B1. Standard repository contract  lines 184-189  sha256=b689d89ca7e98457877f00d8aed48467a074c03ff7a3236927e9cc1ebbc56412
+- B2. Path map  lines 190-198  sha256=ddab43fcfad48640709e3f198921eaf16e0f047d2173c53c0ac5c6339f48229f
+- B3. Authoritative vs derived state  lines 199-206  sha256=6d4ef1d38971e8311691691a99184f9b35c362fb12d7e4cc947077b007c0595d
+- GATE C — Development Knowledge Fabric  lines 207-208  sha256=75508e79b52a06e6ef49ca1df56b011c3159b9c7567ab38f8eb2ac44643856b3
+- C1. Deterministic structured memory  lines 209-228  sha256=0a1b30be86cf88d1446fe21df2f313eac1bb928da3d7097e6123d514ecc3e354
+- C2. Relationship/graph memory  lines 229-233  sha256=2fe6d25053c384ff2a3cd2a862b2d3a68b58e4b02cb5607bc579dae17d30e288
+- C3. Semantic memory  lines 234-242  sha256=c6f57f3187073f3d285882b71508da0312d547afdc26527de09aaed83f87cbf1
+- C4. Lexical memory  lines 243-250  sha256=8506a83dac18a96d7fff8b93a5dee7dc69a4b9e59e4b52f05878ac8705946021
+- C5. Code-structural memory  lines 251-260  sha256=ff9e1035d443bf19069ee18e65115c98c977d80a0de4ed19d15d154070e42219
+- C6. Temporal memory  lines 261-267  sha256=2d4820d01a72b412dd780ea0aa87ddb7bd87f8260f7c8eeb82bed98d68ad58c5
+- C7. Episodic execution memory  lines 268-275  sha256=7b47d932a1252f6e8cb303229343e139e96645f43460fbf7a76d2011a58a4515
+- C8. Failure memory  lines 276-284  sha256=3ef58b8bcd25a72f95862cc61dfd9c90542197dc12b522269d1b6f05fc47d061
+- C9. Working memory/context packet  lines 285-293  sha256=b97777bb5c25a9ac4f5cf47700e87966f6113d7d5d864054ec29b2a0eac10081
+- C10. Capability memory  lines 294-304  sha256=2699e58bc8ce50edf16eff5d1b5c1c832f814fbb1533aa0d5b9722df4f008313
+- GATE D — Indexing, Retrieval and Context  lines 305-306  sha256=72e96a4776242614b2e26de76d3d5f5349065d74d5c5c4b465def31796f721e9
+- D1. Incremental indexing/freshness  lines 307-314  sha256=f3d790920cb7a786a0817bc4493d480ae8dc4a16c66ca25cd21afbb5c17f4c59
+- D2. Retrieval router  lines 315-322  sha256=535f2ffef7dd316704ef87b8e3acc35fce5f33a96e2397dd937005001d6e503e
+- D3. Hierarchical retrieval  lines 323-328  sha256=51d47be1c8079080b9508fd843795e813e2b2233e09cf24a6ab1917eafb054d4
+- D4. Component separation  lines 329-341  sha256=5f96964cb02e463a58f5dd3a80ac6203172e9e22c1410c6210f8f4a94cd1e83a
+- D5. Evidence-driven retrieval model selection  lines 342-349  sha256=618f8759c479543be3fb9c03dd813bf40af10811c7bc27c85c098792fe006f11
+- D6. Rebuild guarantee  lines 350-359  sha256=4abdc826774026b4465efd0518c085fbbcbd238f0bb99159dcb3dc174caf2a24
+- GATE E — Agent Organisation and Independent Work  lines 360-361  sha256=4a854b2903ef63d76faeb163e4b38d6681ddccdf8c5129739e7a2e14c4b02a08
+- E1. Authority levels  lines 362-367  sha256=dcece6b5900c240f4c657e252538e549165a99fb3353204794836831b002bb47
+- E2. Representative roles  lines 368-376  sha256=2e4ee40c65a7efc12535795b166d3ed24680e4ba6a2bcfed55d6418b81bb2cd9
+- E3. Typed A2A handoffs  lines 377-386  sha256=5f1180a83420247352c05eb679e6dce85620f5d01b89995f1f4c1afb0f9c8d99
+- E4. Concurrency/task claims  lines 387-395  sha256=83914eb10853edf43d570d05dc780e9454f9b6c42ca834b12b6f8fb7878bedda
+- GATE F — Skills, Tools, MCP and Capabilities  lines 396-397  sha256=51a0eb08f9a6c0bcc410e9b2c1d711b9eebc49b42242eb621003fb5a2b00fe94
+- F1. Skill lifecycle  lines 398-403  sha256=b25cda96310a283379c593490633509db321afb9f91a916324a7d1aa68c6fe41
+- F2. Tool Capability Registry  lines 404-413  sha256=36b4a191658ed09d0ff01e4dbd43feda758a07ec965310d3fcb5caf5f5fb77bf
+- F3. Missing-tool acquisition  lines 414-424  sha256=be3c342a88145b9008ab0e62ba61feba01d31298237bb2d658210993d694042e
+- F4. Plugin trust boundary **[POST-VERIFICATION HARDENING]**  lines 425-432  sha256=a8e3d011acee60a66db8ae376799893519ca62dc1d6f195ec81faf786aff24dd
+- F5. MCP/A2A/tool separation  lines 433-440  sha256=54628b0507315b5c704ae549809304194b5a629851a46b2d73841c33bfcb6fd7
+- GATE G — Human Command Surface  lines 441-442  sha256=e495195f67bf7df382aa8e6e1b5ded4c3aef9aed9fd65453579ad220a2aae172
+- G1. Natural-language intent  lines 443-447  sha256=a6f10fa5b1560fc6cf59245702f87ee13f5d5eb0d8103f6ea42494e01885e0ef
+- G2. Small explicit human control set  lines 448-457  sha256=b618142b64f401e0de44a29cbb1b03879526f37fa97d1bb11eaf666ceb93f4fe
+- GATE H — Specification and Readiness  lines 458-459  sha256=b7cda6e8c2be848c443be210e65324a3d6258e51da33c4d6bb7d41ba855a3a92
+- H1. SPEC lineage  lines 460-479  sha256=a0d9012823f85a53216fc2e377f505135d21182aee5aeb74720c575dce5623c9
+- H2. 26-dimension Feature/Capability Readiness Contract  lines 480-516  sha256=93c113e43be981b8f75ea8010c9d4bccdd4ea2960c7e75c7149b99b43433f660
+- H3. Readiness generates work  lines 517-523  sha256=401ea9cfa6b2fea8c2875bd450474f32853df4ad7ce318a84def4d221026bc03
+- H4. Scenarios drive data/tests  lines 524-532  sha256=b5933ba69a933da2cdbdcd3ebb8ad3f4bfb315304185eabe93d122d3f0bee276
+- GATE I — Dynamic Work System  lines 533-534  sha256=f2f4320d593802d3b0ee2e6ffdb253d51669928aab8e77ebfe02b7e5febe9f54
+- I1. Unified task DAG  lines 535-559  sha256=25bbc16aee5da396f59187fbfaafb5ab2edc1eb20af67a77115d8eb277b86e43
+- I2. Task contract  lines 560-570  sha256=6c05fbe01e99b09ad29233970aeefbdf79c355d8a5d3716f24cf0b147811900f
+- I3. Dynamic generation  lines 571-584  sha256=dfb0f6580c5f8918f137df4b750d46b05267f5183dcc9520ee4a33338ba4fb61
+- I4. Parallel execution  lines 585-593  sha256=e27a49020a26d057cb0d9f5ba9e911c401786024db3f3de1e51a5c78fc8d9016
+- GATE J — Research and Experimentation  lines 594-595  sha256=dfad0cb9cf45ea1421c563e6c07b4dc1523568d4fee882c5b0b1ec1c13dc90f6
+- J1. Research becomes evidence  lines 596-606  sha256=99340791b9d95caa63d9c71901161f0d99a8cdde1d2a35d568ffbbe19e502ded
+- J2. Experiment lifecycle  lines 607-619  sha256=cbd07f5b366f227fc24e905a466e4965d8ffb84a48ec2b3455d492f8972fc441
+- GATE K — Change Control and Impact  lines 620-621  sha256=b2be556eaa72bd125d323241840f985ceff800fa1482de05bb244cefe334611c
+- K1. CIT-P  lines 622-627  sha256=0d2e9ff9d4feeb8a97a8f662e3bea16940628be9c04ef3cd994c11c67f08fa81
+- K2. CIT-E  lines 628-637  sha256=d35b0a83ceecfc90d32bf6c5315561f181bfaac29f21678a589b2c3667beb922
+- K3. Automatic impact simulation  lines 638-648  sha256=56ffaf0990ac5535ac4950fbccb71102b8d4aebadb58e67ce7d490069561ae05
+- K4. Impact radius  lines 649-653  sha256=f242a8014f4de0375564bc23385ac3285b9a84490643bf18b2bcbf5bd355820a
+- GATE L — Human Decision Gates and Contradictions  lines 654-655  sha256=16e840682a348929e142911008adcf3dd49e684a83bd7511e6d38a8a1bccfcca
+- L1. Contradiction resolution  lines 656-661  sha256=eee87c687d426bf4d69ad3955df2644cae56fa28ddff4fde15492e94370e68b4
+- L2. Human Decision Gate package  lines 662-673  sha256=f0b89996713697721ec2ac5134c110587773584f39fef01117e6efe5d9a5e887
+- L3. Gate presentation  lines 674-680  sha256=43352d1cf2bea4185901bae1c58a372de0b06452444b7487a92ee02df09f2dc4
+- L4. Non-global blocking  lines 681-686  sha256=8ece657141c14be955e4d553f8d54928b65f5efaa948c826129fa1f3bed37e3a
+- GATE M — Model Routing  lines 687-688  sha256=271f1ef4613a80db08df98c7c3f033192d8691a456625494e24c12ad3ca1d9b0
+- M1. T0-T3 or equivalent capability tiers  lines 689-694  sha256=a3817f23ee18827c974e157ff21d2067be361f6615024ff1ce708d36ac11601d
+- M2. Reasoning requirement  lines 695-697  sha256=4deabf820af1b9906f302a85b6f34f40c15f8fdb5ece798f11582a154a707d34
+- M3. Role defaults  lines 698-701  sha256=e8ce481926f611e59c88428d4e478b62589fe246f8dcab91c795a4c640774d81
+- M4. Empirical routing  lines 702-714  sha256=17abc48a8d994878980270b67f9cd761c50f359c2ec7bcc9919fa131d708f415
+- GATE N — Checkpoints, Compaction and Handoffs  lines 715-716  sha256=c9d547075c3064888b0bafdeca71c1813fdf69cbdb99c191db496f59d3056b11
+- N1. Structured checkpoint  lines 717-728  sha256=f72db90c1e5bfc1cc7448e4c15502cdbec3bc5d175319b9fc4594d46f103d8d8
+- N2. Mandatory triggers  lines 729-738  sha256=cc40975bfa58c9525e613cfae84fc9740f73510042301e2715bc655743b14667
+- N3. Provider-independent checkpoint watchdog  lines 739-743  sha256=83c88975aeb730b32eb36993d39f27942436715bd76e4b2ed267ac2ea9ab6b26
+- N4. Worker return contract  lines 744-748  sha256=7a4704c2199e2ef60f0f79e1352d7730fb3fb549e3589b2b8f99cd701c49f450
+- GATE O — Verification and Continuous Governance Health  lines 749-750  sha256=14ad3338c3341be071a39ebed2cc7ff6c2e93202b2cc25896b95f9aea540642d
+- O1. Product test families  lines 751-762  sha256=b8eb70c9f051182e114cd2553268d718ab0125fdb259421aff40d649db691d1b
+- O2. Governance test families  lines 763-781  sha256=34281a998e06d5485195a992ecaf05c274d1ac365721204242c61aca0c9aa661
+- O3. Independent test authorship  lines 782-786  sha256=b88126907701074f2f6afd53959aa5edbf11daf065e3fa23acac7008791cb2e3
+- O4. Governance suite currency  lines 787-790  sha256=de3f59f0c17908884431e10267fad753dcbcb6f39a2b4035756520d5e0be2b5c
+- O5. Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**  lines 791-811  sha256=43d4e0f87601618e2b7d0d3b48dfae5392caec018c9a08dad0efc414e9bda8d6
+- GATE P — Observability and Telemetry  lines 812-813  sha256=75d12985167799874cfbe1044b08d43fc5664f5bea0c57420806da947328f2b9
+- P1. Execution telemetry  lines 814-828  sha256=0b541a7f86b9500bd9a1724a00e15a3d97a012543e394aec99e5f23ca9ceea54
+- P2. Organisational questions  lines 829-841  sha256=f2c2f7ac87f22d7c822793fe5d21c5231bd2f3cbd257d7669a9e86472ccb6241
+- GATE Q — Learning, Lessons and Upstream Improvement  lines 842-843  sha256=7c71f0fd84296d0cf4e40c3fffa70e51fa3289d43a723c71dc309e62dd955b8e
+- Q1. Lesson lifecycle  lines 844-853  sha256=46cf010edf4d88c18f8e50fc934a778c0ee3a62755abb038fb212c8f66e3246b
+- Q2. Decision vs lesson  lines 854-857  sha256=edabb3297d59c5fab83e920a6e6af8b0bb29006f867f03071b014aebee9883b4
+- Q3. PROJECT/PRODUCT/FRAMEWORK scope  lines 858-860  sha256=9421bd0d7450e5d4ec013302c4a325818862bba089ef3eb3f3b78354ceb58157
+- Q4. Upstream Export Gate  lines 861-869  sha256=cbf9293d484238100f041b3b46d5895872d4b40f509fb2baf4aa6c5bbad3abfe
+- GATE R — Legacy, Archive and Historical State  lines 870-871  sha256=ebce8c630981084f4e33953f0137b7057ee383b3c83b87d1077d90f72b4c7b86
+- R1. Legacy Governance Retirement  lines 872-880  sha256=b8b9752a607ff085040d8d77e9dbce7955fdd0b392efdf1d5c3fd4e7205df784
+- R2. Chat-memory retirement  lines 881-886  sha256=8c6caac52ac9a052cc2cab1b91df99dcc1a3b09efeca377977440dbd700a3caa
+- R3. Archive policy  lines 887-893  sha256=1454ce10f7bb0562164b041b1b3b207eed2dc4269eecaa4c0acb26f3ae8fc51a
+- GATE S — Release, Distribution, Init, Adopt and Update  lines 894-895  sha256=d1aab207883d45f39e9b9c185050922777bf88c260b4e45156b68608579b5c5d
+- S1. Canonical OS repo  lines 896-899  sha256=bb3cc6e4f2b16d15e8a91e855080f6bf1c29bd3a59e02a9daa2b661983c613f9
+- S2. Immutable releases  lines 900-912  sha256=5719d6b5b746bf481ecf336815992861d746abc10d43bc835760327043a67c72
+- S3. `gov init`  lines 913-920  sha256=6115b41f9e386471b4e6753b31906dcd3e1c89c233f79eedf5075cad422a9b0f
+- S4. `gov adopt`  lines 921-935  sha256=bdbbb01f04237ded01500f1ce7819ac029ba899b316a52f70906eee2e632137c
+- S5. `gov update`  lines 936-946  sha256=fbc976ec9924efd484eebdafa39d01c8aa4c57e9a1141980cd668f11f052c29e
+- S6. Cross-machine mechanics  lines 947-953  sha256=46edede4cdd99edae05c0987e779fbc4f010f187e61d26eecd9859286a7058b5
+- GATE T — Independent Adoption and Audit Roles  lines 954-955  sha256=66bcc6825d9a8a0fe7994c31b28e4b7d17e039f0affaee3e6bdacc7ab8a33356
+- T1. Role separation  lines 956-966  sha256=3e15a92414286374a4356ed4fb8e1198e423286518a551e00e848baec5c6b121
+- T2. Fresh-session independence  lines 967-970  sha256=fc04901bc14fb788e7baf01fa642eb2925cfd57e03a7eee4a763afda6e1865cd
+- T3. Adoption evidence tree  lines 971-975  sha256=da680ad2517f8fff6e658c975fde18fa433ac58a2c04e309cc05e60bee8de831
+- GATE U — Framework Health SLOs  lines 976-1011  sha256=cdab09c2b8971010ca264b9cc73c02cce547c04f631dcdabea3b848f4dbff5b7
+- GATE V — Qualification Oracle **[NEW TESTING REFINEMENT]**  lines 1012-1015  sha256=85de6c70816a11bf32b93e3cb1b88bb0a9dcef1178de2a41ff9333e901a2b461
+- V1. Fault manifest  lines 1016-1027  sha256=8f9e5316a1da6a20d0dc2e96b704d1a9b7b0f730eb7ff667cb42c552a0344c53
+- V2. Hidden path-map oracle  lines 1028-1037  sha256=7e4d2783dfe4420cdd6cebfc162894cba6cf07bc3cfa0309f1c0120b109cb8bd
+- V3. Hidden memory oracle  lines 1038-1046  sha256=b221e1a30efc28cd65351abeab01da5485cf6199a2a9b766d37d07c8b4062abc
+- V4. Quantitative qualification scoring  lines 1047-1065  sha256=2240c2bb025784d94bf46b1603ef98db7ed1b2fcbe82131083efd17b4c9d515d
+- GATE W — Artifact Flow, Dependency Consumption and End-to-End Traceability  lines 1066-1067  sha256=8709182e646962c844561a98348bf0b18b63fa6334b0cec8816ea53e7dd3a7a0
+- W1. Stable artefact identity  lines 1068-1081  sha256=ece0bedfa3767be65d83e0217e9abb453136db86f2949c7d41195b83b2ed066f
+- W2. Typed output → input contracts  lines 1082-1091  sha256=fbe7cd0a619ba2e102f0f456b154592ce571016919149743a50c303f63f6bacf
+- W3. Mandatory task-input manifest  lines 1092-1105  sha256=97019fb2dee456f28660942c1d89b6daec883bb629c5238cca40a39e39f10ac9
+- W4. Context compiler delivery proof  lines 1106-1113  sha256=2437e1fb4fd7cf5410441cba77f1656fb5742e7e0eb1105d26071cd87ae3361b
+- W5. Consumption receipt and implementation traceability  lines 1114-1127  sha256=5c922bec8b0d726f02321f0459ed4023bce760e57b8ec3ef0cf891c28dcd9003
+- W6. Upstream-change staleness propagation  lines 1128-1137  sha256=45896cb02fda202d0fa47287ac0e943572556dc2b150fedfe920ea346ae7e956
+- W7. Orphan/dead-output and unexplained-output detection  lines 1138-1145  sha256=57cbdd1adcf519d73eba4400f766168876f60c70b94a40344512c69178f18dea
+- W8. Forward and reverse lineage  lines 1146-1153  sha256=f29d776707544a4997688661094313214bcf891a371af5a77bd13d49d9fe216f
+- W9. Session/handoff continuity of mandatory inputs  lines 1154-1161  sha256=39c3891ba622d1163e31c3354b3348bee7b036b3ba54990cc8e6281602e4d269
+- W10. Deterministic mandatory inputs outrank retrieval  lines 1162-1172  sha256=813cf325ab30c5a2ed6eb75a79a8ff9181b1d2db1c171c51ecf99a5d66354583
+- W11. Artifact-flow quantitative health  lines 1173-1184  sha256=3e1e8c35cc4195ad11a9f6831f033544245d113fa431fcc01042e030abb81dcd
+- W12. Health-scheduler integration  lines 1185-1196  sha256=0f7de9ac1876b48b3a2ff86badb61c1feab65cda877cc63a0587c713e3380765
+- PRE-ADVANCED-QUALIFICATION ACCEPTANCE GATE  lines 1197-1218  sha256=6835881dee2ab17d43334d03c753cbd926c0e06341442114edb7beae78342518
+- PROPOSED ORDER AFTER THIS CHECKLIST IS ACCEPTED  lines 1219-1255  sha256=04a62b75267b58e2890ac16cdbeb8d92912e19b0efe6f5c38e2ab5d27d7aa84b
 
 - unit: record:release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml  (delivery=MANDATORY, route=resolver, class=ORCHESTRATION_RECORD, lifecycle=UNKNOWN)
-  source: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@ad791bae3b2fe4c4b16265263a774fbe6d37a3ec
+  source: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d
   [UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.]
   reason: R1-RM acceptance check 3: a real, ~89KB mandatory item (over the 24KB per-item cap) with a declared `keys` selector -- exactly `schema` and `current_prohibitions` must be delivered in full, every other top-level key disclosed as an undelivered range via MANDATORY_PARTIAL_DELIVERY
-[selected: 2 part(s) of release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@ad791bae3b2fe4c4b16265263a774fbe6d37a3ec, honouring the declared selector(s) verbatim (REPAIR_PLAN.md section 3 rule 2)]
---- keys:schema  (release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@ad791bae3b2fe4c4b16265263a774fbe6d37a3ec:1-1) ---
+[selected: 2 part(s) of release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d, honouring the declared selector(s) verbatim (REPAIR_PLAN.md section 3 rule 2)]
+--- schema  (release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d:1-1) ---
 schema: bridge-orchestrator-state/1
 
---- keys:current_prohibitions  (release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@ad791bae3b2fe4c4b16265263a774fbe6d37a3ec:1274-1282) ---
+--- current_prohibitions  (release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d:1305-1313) ---
 current_prohibitions:
 - mutate the frozen Phase-2 product (3c880d8) or any phase2/* branch
 - write release/orchestration/phase-2/ or the release/4.1.6-rc1 branch
@@ -161,17 +161,88 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-read_token: ce15c01d8ba6
+
+- unit: record:release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md  (delivery=MANDATORY, route=resolver, class=ORCHESTRATION_RECORD, lifecycle=UNKNOWN)
+  source: release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d
+  [UNKNOWN: lifecycle could not be determined; never treated as ACTIVE.]
+  reason: R1-RM reopening point 2: `entries` over a real MARKDOWN ledger (not a Review-8 subject, not ORCHESTRATOR_STATE.yaml) -- BR-L-0002 through BR-L-0004 inclusive, in document order, matched by config/id-grammar.yaml mention_patterns against each level-2 heading
+[selected: 3 part(s) of release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d, honouring the declared selector(s) verbatim (REPAIR_PLAN.md section 3 rule 2)]
+--- BR-L-0002: the owner's Review-8 disposition is reconciled as mandatory input, with its authority classes kept exact (2026-09-25)  (release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d:34-60) ---
+## BR-L-0002: the owner's Review-8 disposition is reconciled as mandatory input, with its authority classes kept exact (2026-09-25)
+
+The owner sent a message during the session: refresh the Phase-2 durable records, then take OD-P2-10A/B and its
+`evidence_for_the_synthesis` references in as mandatory bridge inputs, with the authority distinctions preserved.
+The bridge had already been based on `6e7a2a3`, which records OD-P2-10A/B, and the architect had not yet been
+dispatched. Nothing validly completed was therefore restarted.
+
+**Refreshed.** The `release/4.1.6-rc1` tip was re-read. It is still `6e7a2a3`; no Phase-2 record is newer than the
+bridge base, and the main checkout is clean. `P2-AR-0096.checkpoint.md` is not under `release/orchestration/phase-2/`
+where the Review-8 brief implied it would be. It lives in the frozen product tree at
+`3c880d8:telemetry/checkpoints/`, and is recorded there.
+
+**Reconciled.** The state now carries `mandatory_bridge_inputs`, in which each item is hash-bound where it is a file
+and carries an explicit class:
+
+* `OWNER_DECISION`: OD-P2-10A, OD-P2-10B, Property-A preservation, the standing state;
+* `OWNER_DIRECTION_TO_TEST`: F1 deletion/simplification, which is **not yet authority**;
+* `HYPOTHESIS_TO_TEST`: F2/F3 as one class, which has **no classificatory force**;
+* `HYPOTHESIS_RELEVANT_OBSERVATION`: the Phase-2 orchestrator's three reasoning errors, which concern its reasoning
+  rather than the implementation;
+* `EVIDENCE`, and `EVIDENCE_WITHDRAWN` for the withdrawn AR96 positive-control finding;
+* `ORCHESTRATION_RECORD`: the context pack, the design records, ledger entries P2-L-0033..0047 and the Phase-2 state.
+
+`check_state.py verify` now re-hashes these items. BR-HO-0001 makes them mandatory reading. It requires the
+architect's authority model to represent these exact classes, and a direction or hypothesis must be structurally
+incapable of entering packet section A. The demonstration's grading now fails any packet that blurs the classes.
+
+
+--- BR-L-0003: the enforced pre-merge checkpoint is proven on synthetic branches (2026-09-25)  (release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d:61-75) ---
+## BR-L-0003: the enforced pre-merge checkpoint is proven on synthetic branches (2026-09-25)
+
+`integrate-check` was run against four synthetic cases before any real run depended on it:
+
+* a conforming branch: **PERMITTED**;
+* a branch with a stray `runtime/` file and a tampered output: **REFUSED** on both counts;
+* a branch without its typed report: **REFUSED**;
+* a run whose declared scope lies outside the domain: **REFUSED**.
+
+The throwaway branches and worktree were removed. The script is `selftest_integrate.sh` in the session scratchpad; it
+is not committed.
+
+The test surfaced one defect, and it has been fixed. Empty domain directories were not tracked, so role worktrees
+had no `AGENT_RUNS/`. `.gitkeep` files now keep them.
+
+
+--- BR-L-0004: the owner clarifies the corpus and purpose (OC-BR-02), and the running architect is redirected (2026-09-25)  (release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@56095c38e0f71edc63abe50b8aa2d9bdd2ba533d:76-94) ---
+## BR-L-0004: the owner clarifies the corpus and purpose (OC-BR-02), and the running architect is redirected (2026-09-25)
+
+The owner clarified the bridge's scope while BR-AR-0001 was running. The bridge is **not** a retrieval system for
+Review 8. Its corpus is the **whole canonical Governance OS repository**, with principled exclusions. Its purpose is a
+**generic, provider/model-replaceable Governance OS self-memory/context foundation** that can later be promoted into
+V8.3, rather than thrown away. Review 8 stays as the **first mandatory benchmark**, a difficult known case, and must
+not bias the design.
+
+The clarification is recorded verbatim, hash-bound, as `GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md`.
+The orchestrator's reading of it is in `HANDOFFS/BR-HO-0001-A1`, which now governs over BR-HO-0001 where they
+differ. The addendum names the ten items the architecture must define, one heading each. It adds a design test:
+*if every Review-8 reference were deleted, would the architecture change?* Only the demonstration and oracle should.
+It also adds a corpus-coverage node to the DAG.
+
+**Liveness was checked, not assumed.** The architect's transcript was written seconds before the redirect. Its branch
+had no commits and no `ARCHITECTURE.md`, only spike outputs, so the clarification reached it before any design was
+frozen, and nothing is restarted. The write boundary is unchanged: the bridge reads the whole repository and still
+writes only its own domain.
+read_token: cdd41bd8627f
 
 ## B. SYSTEM PURPOSE / WHY
 
 (none)
-read_token: 1e52ad1a15c4
+read_token: 773cad7f37c3
 
 ## C. DIRECT DEPENDENCY / IMPACT CONTEXT
 
 (none)
-read_token: 5491e806a851
+read_token: b8467548531f
 
 ## D. RELEVANT ACTIVE DECISIONS
 
@@ -186,28 +257,28 @@ read_token: 5491e806a851
 ### D.3 -- HYPOTHESIS TO TEST (no classificatory force)
 
 (none)
-read_token: a590285823a2
+read_token: 73e76ffe5804
 
 ## E. RELEVANT HISTORICAL / SUPERSEDED DECISIONS
 
 (none)
-read_token: e56917936ef3
+read_token: 0ecf0caf52f9
 
 ## F. FAILED APPROACHES / LESSONS
 
 (none)
-read_token: 0d4327b02dc8
+read_token: c85293f8bc3c
 
 ## G. CODE / TEST / ENFORCEMENT SURFACES
 
 (none)
-read_token: 1dbb14f6b3bc
+read_token: 9cfa6ba1a8b8
 
 ## H. SUPPLEMENTARY RETRIEVED CONTEXT
 
 queries: [{"id":"CA-WHY","k":8,"routes":["lexical","semantic"],"text":"Why does renaming or removing a certification test break gov contract verify? What is the governed evidence map for?"},{"id":"CA-REQ","k":8,"routes":["lexical","semantic"],"text":"Which Contract v3 capability and which frozen Phase-2 acceptance criterion require every capability to have a running evidence owner?"},{"id":"CA-ENF","k":8,"routes":["lexical","semantic"],"text":"Where in code does gov contract verify resolve evidence owners against the product and fail on a capability with no running owner?"},{"id":"CA-TESTS","k":8,"routes":["lexical","semantic"],"text":"Which tests prove that the contract-binding chain and the evidence map are verified and that a missing owner fails?"},{"id":"CA-DEPS","k":8,"routes":["lexical","semantic"],"text":"What depends on the evidence map and what becomes stale if the evidence map or the contract source changes?"}]
 (none)
-read_token: 992df1f535ec
+read_token: 9afae807a947
 
 ## I. TASK CONTRACT / MUTATION SCOPE
 
@@ -215,10 +286,10 @@ read_token: 992df1f535ec
   reason: task_spec, verbatim
 {
  "mutation_scope": [],
- "objective": "Explain why renaming or removing a certification test breaks gov contract verify, which requirement the governed evidence map serves, where the check is enforced in code, and which tests prove it -- plus prove mandatory-input fidelity end to end on the real view, with one oversize mandatory item (no selector) and one real mandatory item narrowed by a declared `keys` selector.",
+ "objective": "Explain why renaming or removing a certification test breaks gov contract verify, which requirement the governed evidence map serves, where the check is enforced in code, and which tests prove it -- plus prove mandatory-input fidelity end to end on the real view, with one oversize mandatory item (no selector), one real mandatory item narrowed by a declared `keys` selector, and one real mandatory item narrowed by a declared `entries` selector over MARKDOWN (the reopening's point 2).",
  "prohibitions": []
 }
-read_token: 16442e97af0e
+read_token: 620658cd56e3
 
 ## J. COMPLETION / EVIDENCE OBLIGATIONS
 
@@ -232,1860 +303,2388 @@ read_token: 16442e97af0e
  ],
  "notices": [
   {
-   "commit": "ad791bae3b2fe4c4b16265263a774fbe6d37a3ec",
+   "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
    "delivered": [],
    "id": "state:bridge#contract_v3",
    "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
    "section_map": [
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 129,
+     "bytes": 395,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 6,
      "line_start": 1,
      "name": "Governance OS Capability Acceptance Contract \u2014 v3",
-     "sha256": "31262ae5041b859dd7ca88897531dba62e2029258ece24773e23b62937a5eb35"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "c29dd7ace647ed5a7b46f33ec610d270d6974d6a77291a6a003dcc7b7f69df84"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 52,
+     "bytes": 882,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 36,
      "line_start": 7,
      "name": "Canonical implementation in the Governance OS repository",
-     "sha256": "bf0c531fe5a1f3a5097f01a171b27424259b7f53bfee92e2c784b3c6fa8abbe3"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "900a25fbed93a1128f1679b1bd299eeab88696b9ae20a7930dd93fc164098afe"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 1042,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 52,
      "line_start": 37,
      "name": "Contract authority model",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f35342ba7d46380fcb19daf60f68a23004b7a1ad56ef967b517ff0332df5d4bf"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 675,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 74,
      "line_start": 53,
      "name": "Required contract fields per capability",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "17af8b544cbfae8a39aebefd54db5944987bcd3a37d230dd3551ff8b00ef1fae"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 679,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 94,
      "line_start": 75,
      "name": "Relationship between the contract and the governance suite",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0ec8e46735d29afd95e40aa4661d95e7a40b44337383f8fc45e31c58ff3fa818"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 502,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 112,
      "line_start": 95,
      "name": "Evidence freshness",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9cc375692a2b1972e09636a4892119592f4defe5920969e3f2fdd039f6afac13"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 444,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 129,
      "line_start": 113,
      "name": "Lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9c21397bf12d1fb058ea87bfe3ca0fd23f5ffe6a6628e66ffac4f5df7de389a1"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 181,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 131,
      "line_start": 130,
      "name": "GATE A \u2014 Constitutional and Trust Foundations",
-     "sha256": "533e84d9e5e932a6f4a71ee9799ea51da4a765ed79c187a9e85701646d64b7bc"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "de9e2bfcd37066c8d8c3cd832c0b9196b7a1857d748a092b234a903b5d958f6e"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 704,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 141,
      "line_start": 132,
      "name": "A1. Canonical authority and policy precedence",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9fcea758fb553d0e648bd3e7fe91dfaadc29d49f2312e54c0ef69fccc5901a65"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 1072,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 155,
      "line_start": 142,
      "name": "A2. Authentic root of trust **[POST-VERIFICATION HARDENING]**",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2151a89c20f9a536dbf48f3379b57ffa498621ff62bf6d3c1c1c76d32ec8c997"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 635,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 165,
      "line_start": 156,
      "name": "A3. Security, sensitivity and permissions",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3e757d6b9337f4681cd80f321d1d2e65fdb251b6e99249d13651b4808c137394"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 318,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 171,
      "line_start": 166,
      "name": "A4. Budget/resource governance",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "bd878ca7b363b31efa87045dcbbfc23c7b141629c355a4c0db9e578e8c36071d"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 236,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 181,
      "line_start": 172,
      "name": "A5. Emergency controls",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "76d5b8a490ce44387220120b6178f932e156e9ede5f3b923a9e8a91fb1e6a480"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 206,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 183,
      "line_start": 182,
      "name": "GATE B \u2014 Repository Contract, Paths and State",
-     "sha256": "4e50e69070aed2931dcb4e8b6711f1ef17497f1c918f5d426de5197edf746e00"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "fc2dd6079238a240afdf12d27177e7ff70a7758a1cc1c62fcbc3d8cacc9b0ed9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 347,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 189,
      "line_start": 184,
      "name": "B1. Standard repository contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b689d89ca7e98457877f00d8aed48467a074c03ff7a3236927e9cc1ebbc56412"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 601,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 198,
      "line_start": 190,
      "name": "B2. Path map",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "ddab43fcfad48640709e3f198921eaf16e0f047d2173c53c0ac5c6339f48229f"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 288,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 206,
      "line_start": 199,
      "name": "B3. Authoritative vs derived state",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6d4ef1d38971e8311691691a99184f9b35c362fb12d7e4cc947077b007c0595d"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 304,
+     "bytes": 43,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 208,
      "line_start": 207,
      "name": "GATE C \u2014 Development Knowledge Fabric",
-     "sha256": "c596d4cd98ed2a3f8a5a7a86a1b4e7dbb2202c690d6e86c4e6d5e7eeb14623fe"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "75508e79b52a06e6ef49ca1df56b011c3159b9c7567ab38f8eb2ac44643856b3"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 380,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 228,
      "line_start": 209,
      "name": "C1. Deterministic structured memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0a1b30be86cf88d1446fe21df2f313eac1bb928da3d7097e6123d514ecc3e354"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 399,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 233,
      "line_start": 229,
      "name": "C2. Relationship/graph memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2fe6d25053c384ff2a3cd2a862b2d3a68b58e4b02cb5607bc579dae17d30e288"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 251,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 242,
      "line_start": 234,
      "name": "C3. Semantic memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "c6f57f3187073f3d285882b71508da0312d547afdc26527de09aaed83f87cbf1"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 140,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 250,
      "line_start": 243,
      "name": "C4. Lexical memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8506a83dac18a96d7fff8b93a5dee7dc69a4b9e59e4b52f05878ac8705946021"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 299,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 260,
      "line_start": 251,
      "name": "C5. Code-structural memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "ff9e1035d443bf19069ee18e65115c98c977d80a0de4ed19d15d154070e42219"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 121,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 267,
      "line_start": 261,
      "name": "C6. Temporal memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2d4820d01a72b412dd780ea0aa87ddb7bd87f8260f7c8eeb82bed98d68ad58c5"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 158,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 275,
      "line_start": 268,
      "name": "C7. Episodic execution memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "7b47d932a1252f6e8cb303229343e139e96645f43460fbf7a76d2011a58a4515"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 168,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 284,
      "line_start": 276,
      "name": "C8. Failure memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3ef58b8bcd25a72f95862cc61dfd9c90542197dc12b522269d1b6f05fc47d061"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 275,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 293,
      "line_start": 285,
      "name": "C9. Working memory/context packet",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b97777bb5c25a9ac4f5cf47700e87966f6113d7d5d864054ec29b2a0eac10081"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 196,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 304,
      "line_start": 294,
      "name": "C10. Capability memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2699e58bc8ce50edf16eff5d1b5c1c832f814fbb1533aa0d5b9722df4f008313"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 359,
+     "bytes": 46,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 306,
      "line_start": 305,
      "name": "GATE D \u2014 Indexing, Retrieval and Context",
-     "sha256": "234aaedd9e64f205edd926c94f95acbd412a23f1a29d711234e6869f361d034b"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "72e96a4776242614b2e26de76d3d5f5349065d74d5c5c4b465def31796f721e9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 412,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 314,
      "line_start": 307,
      "name": "D1. Incremental indexing/freshness",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f3d790920cb7a786a0817bc4493d480ae8dc4a16c66ca25cd21afbb5c17f4c59"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 206,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 322,
      "line_start": 315,
      "name": "D2. Retrieval router",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "535f2ffef7dd316704ef87b8e3acc35fce5f33a96e2397dd937005001d6e503e"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 211,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 328,
      "line_start": 323,
      "name": "D3. Hierarchical retrieval",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "51d47be1c8079080b9508fd843795e813e2b2233e09cf24a6ab1917eafb054d4"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 326,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 341,
      "line_start": 329,
      "name": "D4. Component separation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5f96964cb02e463a58f5dd3a80ac6203172e9e22c1410c6210f8f4a94cd1e83a"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 377,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 349,
      "line_start": 342,
      "name": "D5. Evidence-driven retrieval model selection",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "618f8759c479543be3fb9c03dd813bf40af10811c7bc27c85c098792fe006f11"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 547,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 359,
      "line_start": 350,
      "name": "D6. Rebuild guarantee",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "4abdc826774026b4465efd0518c085fbbcbd238f0bb99159dcb3dc174caf2a24"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 395,
+     "bytes": 54,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 361,
      "line_start": 360,
      "name": "GATE E \u2014 Agent Organisation and Independent Work",
-     "sha256": "5eb4d0708973ac37b1cd28e157ff3234811f1be4881d1cf2fe1b1b8cf1620d56"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "4a854b2903ef63d76faeb163e4b38d6681ddccdf8c5129739e7a2e14c4b02a08"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 257,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 367,
      "line_start": 362,
      "name": "E1. Authority levels",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "dcece6b5900c240f4c657e252538e549165a99fb3353204794836831b002bb47"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 288,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 376,
      "line_start": 368,
      "name": "E2. Representative roles",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2e4ee40c65a7efc12535795b166d3ed24680e4ba6a2bcfed55d6418b81bb2cd9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 225,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 386,
      "line_start": 377,
      "name": "E3. Typed A2A handoffs",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5f1180a83420247352c05eb679e6dce85620f5d01b89995f1f4c1afb0f9c8d99"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 289,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 395,
      "line_start": 387,
      "name": "E4. Concurrency/task claims",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "83914eb10853edf43d570d05dc780e9454f9b6c42ca834b12b6f8fb7878bedda"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 440,
+     "bytes": 50,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 397,
      "line_start": 396,
      "name": "GATE F \u2014 Skills, Tools, MCP and Capabilities",
-     "sha256": "893ef9fea49046616624bfbee994e449179daff99036cce6ac042bc1838c5d44"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "51a0eb08f9a6c0bcc410e9b2c1d711b9eebc49b42242eb621003fb5a2b00fe94"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 242,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 403,
      "line_start": 398,
      "name": "F1. Skill lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b25cda96310a283379c593490633509db321afb9f91a916324a7d1aa68c6fe41"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 258,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 413,
      "line_start": 404,
      "name": "F2. Tool Capability Registry",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "36b4a191658ed09d0ff01e4dbd43feda758a07ec965310d3fcb5caf5f5fb77bf"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 276,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 424,
      "line_start": 414,
      "name": "F3. Missing-tool acquisition",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "be3c342a88145b9008ab0e62ba61feba01d31298237bb2d658210993d694042e"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 365,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 432,
      "line_start": 425,
      "name": "F4. Plugin trust boundary **[POST-VERIFICATION HARDENING]**",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a8e3d011acee60a66db8ae376799893519ca62dc1d6f195ec81faf786aff24dd"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 181,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 440,
      "line_start": 433,
      "name": "F5. MCP/A2A/tool separation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "54628b0507315b5c704ae549809304194b5a629851a46b2d73841c33bfcb6fd7"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 457,
+     "bytes": 36,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 442,
      "line_start": 441,
      "name": "GATE G \u2014 Human Command Surface",
-     "sha256": "d8113edbf1c5e2009642a5d623100ccfd91716972a5ada5bceee2e1257cfd748"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "e495195f67bf7df382aa8e6e1b5ded4c3aef9aed9fd65453579ad220a2aae172"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 241,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 447,
      "line_start": 443,
      "name": "G1. Natural-language intent",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a6f10fa5b1560fc6cf59245702f87ee13f5d5eb0d8103f6ea42494e01885e0ef"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 177,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 457,
      "line_start": 448,
      "name": "G2. Small explicit human control set",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b618142b64f401e0de44a29cbb1b03879526f37fa97d1bb11eaf666ceb93f4fe"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 532,
+     "bytes": 42,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 459,
      "line_start": 458,
      "name": "GATE H \u2014 Specification and Readiness",
-     "sha256": "db241678429ffd78e53379f779f5278e81d8966da82ee04b77b45aed022ec1b6"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "b7cda6e8c2be848c443be210e65324a3d6258e51da33c4d6bb7d41ba855a3a92"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 408,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 479,
      "line_start": 460,
      "name": "H1. SPEC lineage",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a0d9012823f85a53216fc2e377f505135d21182aee5aeb74720c575dce5623c9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 963,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 516,
      "line_start": 480,
      "name": "H2. 26-dimension Feature/Capability Readiness Contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "93c113e43be981b8f75ea8010c9d4bccdd4ea2960c7e75c7149b99b43433f660"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 350,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 523,
      "line_start": 517,
      "name": "H3. Readiness generates work",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "401ea9cfa6b2fea8c2875bd450474f32853df4ad7ce318a84def4d221026bc03"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 405,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 532,
      "line_start": 524,
      "name": "H4. Scenarios drive data/tests",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b5933ba69a933da2cdbdcd3ebb8ad3f4bfb315304185eabe93d122d3f0bee276"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 593,
+     "bytes": 34,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 534,
      "line_start": 533,
      "name": "GATE I \u2014 Dynamic Work System",
-     "sha256": "0e22a70d55fe8efda1b749ad7d270d31dfdd884e005d9c81403d8d87d423225f"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "f2f4320d593802d3b0ee2e6ffdb253d51669928aab8e77ebfe02b7e5febe9f54"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 407,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 559,
      "line_start": 535,
      "name": "I1. Unified task DAG",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "25bbc16aee5da396f59187fbfaafb5ab2edc1eb20af67a77115d8eb277b86e43"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 264,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 570,
      "line_start": 560,
      "name": "I2. Task contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6c05fbe01e99b09ad29233970aeefbdf79c355d8a5d3716f24cf0b147811900f"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 304,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 584,
      "line_start": 571,
      "name": "I3. Dynamic generation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "dfb0f6580c5f8918f137df4b750d46b05267f5183dcc9520ee4a33338ba4fb61"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 219,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 593,
      "line_start": 585,
      "name": "I4. Parallel execution",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "e27a49020a26d057cb0d9f5ba9e911c401786024db3f3de1e51a5c78fc8d9016"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 619,
+     "bytes": 43,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 595,
      "line_start": 594,
      "name": "GATE J \u2014 Research and Experimentation",
-     "sha256": "d202816c874e55bca35e86bc6ce4a1ba47cbeb1265f91d773e070bbb6722306c"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "dfad0cb9cf45ea1421c563e6c07b4dc1523568d4fee882c5b0b1ec1c13dc90f6"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 231,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 606,
      "line_start": 596,
      "name": "J1. Research becomes evidence",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "99340791b9d95caa63d9c71901161f0d99a8cdde1d2a35d568ffbbe19e502ded"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 392,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 619,
      "line_start": 607,
      "name": "J2. Experiment lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cbd07f5b366f227fc24e905a466e4965d8ffb84a48ec2b3455d492f8972fc441"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 653,
+     "bytes": 40,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 621,
      "line_start": 620,
      "name": "GATE K \u2014 Change Control and Impact",
-     "sha256": "edc8e58a841633e30021675e7d8babd0473f02b1a743eb6c8e7c4c552a571d30"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "b2be556eaa72bd125d323241840f985ceff800fa1482de05bb244cefe334611c"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 228,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 627,
      "line_start": 622,
      "name": "K1. CIT-P",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0d2e9ff9d4feeb8a97a8f662e3bea16940628be9c04ef3cd994c11c67f08fa81"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 249,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 637,
      "line_start": 628,
      "name": "K2. CIT-E",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "d35b0a83ceecfc90d32bf6c5315561f181bfaac29f21678a589b2c3667beb922"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 227,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 648,
      "line_start": 638,
      "name": "K3. Automatic impact simulation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "56ffaf0990ac5535ac4950fbccb71102b8d4aebadb58e67ce7d490069561ae05"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 125,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 653,
      "line_start": 649,
      "name": "K4. Impact radius",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f242a8014f4de0375564bc23385ac3285b9a84490643bf18b2bcbf5bd355820a"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 686,
+     "bytes": 54,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 655,
      "line_start": 654,
      "name": "GATE L \u2014 Human Decision Gates and Contradictions",
-     "sha256": "11c908d1f0894490834438fd9dd42d6cca0eb433e1d83bff43c6fd1b5772f043"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "16e840682a348929e142911008adcf3dd49e684a83bd7511e6d38a8a1bccfcca"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 232,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 661,
      "line_start": 656,
      "name": "L1. Contradiction resolution",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "eee87c687d426bf4d69ad3955df2644cae56fa28ddff4fde15492e94370e68b4"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 238,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 673,
      "line_start": 662,
      "name": "L2. Human Decision Gate package",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f0b89996713697721ec2ac5134c110587773584f39fef01117e6efe5d9a5e887"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 287,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 680,
      "line_start": 674,
      "name": "L3. Gate presentation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "43352d1cf2bea4185901bae1c58a372de0b06452444b7487a92ee02df09f2dc4"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 147,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 686,
      "line_start": 681,
      "name": "L4. Non-global blocking",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8ece657141c14be955e4d553f8d54928b65f5efaa948c826129fa1f3bed37e3a"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 714,
+     "bytes": 28,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 688,
      "line_start": 687,
      "name": "GATE M \u2014 Model Routing",
-     "sha256": "fc50214331c145d89e3904992eba71724a7ec4fe2a71a3b8f36ff4dfa057f54a"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "271f1ef4613a80db08df98c7c3f033192d8691a456625494e24c12ad3ca1d9b0"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 169,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 694,
      "line_start": 689,
      "name": "M1. T0-T3 or equivalent capability tiers",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a3817f23ee18827c974e157ff21d2067be361f6615024ff1ce708d36ac11601d"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 111,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 697,
      "line_start": 695,
      "name": "M2. Reasoning requirement",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "4deabf820af1b9906f302a85b6f34f40c15f8fdb5ece798f11582a154a707d34"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 162,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 701,
      "line_start": 698,
      "name": "M3. Role defaults",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "e8ce481926f611e59c88428d4e478b62589fe246f8dcab91c795a4c640774d81"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 199,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 714,
      "line_start": 702,
      "name": "M4. Empirical routing",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "17abc48a8d994878980270b67f9cd761c50f359c2ec7bcc9919fa131d708f415"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 748,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 716,
      "line_start": 715,
      "name": "GATE N \u2014 Checkpoints, Compaction and Handoffs",
-     "sha256": "91356ddee4a8a8980db6a9a941e5035d41a6c1f27a3bb9b6a9e767bccd91cfe6"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "c9d547075c3064888b0bafdeca71c1813fdf69cbdb99c191db496f59d3056b11"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 278,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 728,
      "line_start": 717,
      "name": "N1. Structured checkpoint",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f72db90c1e5bfc1cc7448e4c15502cdbec3bc5d175319b9fc4594d46f103d8d8"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 232,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 738,
      "line_start": 729,
      "name": "N2. Mandatory triggers",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cc40975bfa58c9525e613cfae84fc9740f73510042301e2715bc655743b14667"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 259,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 743,
      "line_start": 739,
      "name": "N3. Provider-independent checkpoint watchdog",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "83c88975aeb730b32eb36993d39f27942436715bd76e4b2ed267ac2ea9ab6b26"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 98,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 748,
      "line_start": 744,
      "name": "N4. Worker return contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "7a4704c2199e2ef60f0f79e1352d7730fb3fb549e3589b2b8f99cd701c49f450"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 811,
+     "bytes": 60,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 750,
      "line_start": 749,
      "name": "GATE O \u2014 Verification and Continuous Governance Health",
-     "sha256": "4cd41a9bd638522df6d90b1348e9ae758ad4615178fbf7f1cf846530f924271e"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "14ad3338c3341be071a39ebed2cc7ff6c2e93202b2cc25896b95f9aea540642d"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 184,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 762,
      "line_start": 751,
      "name": "O1. Product test families",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b8eb70c9f051182e114cd2553268d718ab0125fdb259421aff40d649db691d1b"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 513,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 781,
      "line_start": 763,
      "name": "O2. Governance test families",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "34281a998e06d5485195a992ecaf05c274d1ac365721204242c61aca0c9aa661"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 244,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 786,
      "line_start": 782,
      "name": "O3. Independent test authorship",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b88126907701074f2f6afd53959aa5edbf11daf065e3fa23acac7008791cb2e3"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 168,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 790,
      "line_start": 787,
      "name": "O4. Governance suite currency",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "de3f59f0c17908884431e10267fad753dcbcb6f39a2b4035756520d5e0be2b5c"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 939,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 811,
      "line_start": 791,
      "name": "O5. Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "43d4e0f87601618e2b7d0d3b48dfae5392caec018c9a08dad0efc414e9bda8d6"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 841,
+     "bytes": 42,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 813,
      "line_start": 812,
      "name": "GATE P \u2014 Observability and Telemetry",
-     "sha256": "1420c1796a1adb8a42e8168a44f169468eda24109ccf9cb29d52a6e5f28dc30e"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "75d12985167799874cfbe1044b08d43fc5664f5bea0c57420806da947328f2b9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 316,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 828,
      "line_start": 814,
      "name": "P1. Execution telemetry",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0b541a7f86b9500bd9a1724a00e15a3d97a012543e394aec99e5f23ca9ceea54"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 289,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 841,
      "line_start": 829,
      "name": "P2. Organisational questions",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f2c2f7ac87f22d7c822793fe5d21c5231bd2f3cbd257d7669a9e86472ccb6241"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 869,
+     "bytes": 57,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 843,
      "line_start": 842,
      "name": "GATE Q \u2014 Learning, Lessons and Upstream Improvement",
-     "sha256": "02c5bad82c9154fe03641a1d2103ab087d8a17ec40d2dd065449c3d3fabe3e68"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "7c71f0fd84296d0cf4e40c3fffa70e51fa3289d43a723c71dc309e62dd955b8e"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 247,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 853,
      "line_start": 844,
      "name": "Q1. Lesson lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "46cf010edf4d88c18f8e50fc934a778c0ee3a62755abb038fb212c8f66e3246b"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 108,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 857,
      "line_start": 854,
      "name": "Q2. Decision vs lesson",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "edabb3297d59c5fab83e920a6e6af8b0bb29006f867f03071b014aebee9883b4"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 106,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 860,
      "line_start": 858,
      "name": "Q3. PROJECT/PRODUCT/FRAMEWORK scope",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9421bd0d7450e5d4ec013302c4a325818862bba089ef3eb3f3b78354ceb58157"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 209,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 869,
      "line_start": 861,
      "name": "Q4. Upstream Export Gate",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cbf9293d484238100f041b3b46d5895872d4b40f509fb2baf4aa6c5bbad3abfe"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 893,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 871,
      "line_start": 870,
      "name": "GATE R \u2014 Legacy, Archive and Historical State",
-     "sha256": "3912b7c1b87d6510ff5c408ae789b6b0cc0b4a04234f48f19cb27043b074762d"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "ebce8c630981084f4e33953f0137b7057ee383b3c83b87d1077d90f72b4c7b86"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 297,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 880,
      "line_start": 872,
      "name": "R1. Legacy Governance Retirement",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b8b9752a607ff085040d8d77e9dbce7955fdd0b392efdf1d5c3fd4e7205df784"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 210,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 886,
      "line_start": 881,
      "name": "R2. Chat-memory retirement",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8c6caac52ac9a052cc2cab1b91df99dcc1a3b09efeca377977440dbd700a3caa"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 238,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 893,
      "line_start": 887,
      "name": "R3. Archive policy",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "1454ce10f7bb0562164b041b1b3b207eed2dc4269eecaa4c0acb26f3ae8fc51a"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 953,
+     "bytes": 60,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 895,
      "line_start": 894,
      "name": "GATE S \u2014 Release, Distribution, Init, Adopt and Update",
-     "sha256": "ea0a62c8404ff7158570f09e041908a753937f929eb88bf86ec47adb3156160b"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "d1aab207883d45f39e9b9c185050922777bf88c260b4e45156b68608579b5c5d"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 226,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 899,
      "line_start": 896,
      "name": "S1. Canonical OS repo",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "bb3cc6e4f2b16d15e8a91e855080f6bf1c29bd3a59e02a9daa2b661983c613f9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 284,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 912,
      "line_start": 900,
      "name": "S2. Immutable releases",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5719d6b5b746bf481ecf336815992861d746abc10d43bc835760327043a67c72"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 218,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 920,
      "line_start": 913,
      "name": "S3. `gov init`",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6115b41f9e386471b4e6753b31906dcd3e1c89c233f79eedf5075cad422a9b0f"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 448,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 935,
      "line_start": 921,
      "name": "S4. `gov adopt`",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "bdbbb01f04237ded01500f1ce7819ac029ba899b316a52f70906eee2e632137c"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 254,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 946,
      "line_start": 936,
      "name": "S5. `gov update`",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "fbc976ec9924efd484eebdafa39d01c8aa4c57e9a1141980cd668f11f052c29e"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 198,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 953,
      "line_start": 947,
      "name": "S6. Cross-machine mechanics",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "46edede4cdd99edae05c0987e779fbc4f010f187e61d26eecd9859286a7058b5"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 975,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 955,
      "line_start": 954,
      "name": "GATE T \u2014 Independent Adoption and Audit Roles",
-     "sha256": "c1972fabacb64385565a7eb220d45fc493c4c23e305703354124c7c09b09ea89"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "66bcc6825d9a8a0fe7994c31b28e4b7d17e039f0affaee3e6bdacc7ab8a33356"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 314,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 966,
      "line_start": 956,
      "name": "T1. Role separation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3e15a92414286374a4356ed4fb8e1198e423286518a551e00e848baec5c6b121"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 162,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 970,
      "line_start": 967,
      "name": "T2. Fresh-session independence",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "fc04901bc14fb788e7baf01fa642eb2925cfd57e03a7eee4a763afda6e1865cd"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 232,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 975,
      "line_start": 971,
      "name": "T3. Adoption evidence tree",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "da680ad2517f8fff6e658c975fde18fa433ac58a2c04e309cc05e60bee8de831"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 1019,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1011,
      "line_start": 976,
      "name": "GATE U \u2014 Framework Health SLOs",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cdab09c2b8971010ca264b9cc73c02cce547c04f631dcdabea3b848f4dbff5b7"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 1065,
+     "bytes": 152,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 1015,
      "line_start": 1012,
      "name": "GATE V \u2014 Qualification Oracle **[NEW TESTING REFINEMENT]**",
-     "sha256": "e1dd7f1a9c69b857d5ac7f45d531ce16f35014c1b700fd4451333b218793d08a"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "85de6c70816a11bf32b93e3cb1b88bb0a9dcef1178de2a41ff9333e901a2b461"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 290,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1027,
      "line_start": 1016,
      "name": "V1. Fault manifest",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8f9e5316a1da6a20d0dc2e96b704d1a9b7b0f730eb7ff667cb42c552a0344c53"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 274,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1037,
      "line_start": 1028,
      "name": "V2. Hidden path-map oracle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "7e4d2783dfe4420cdd6cebfc162894cba6cf07bc3cfa0309f1c0120b109cb8bd"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 272,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1046,
      "line_start": 1038,
      "name": "V3. Hidden memory oracle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b221e1a30efc28cd65351abeab01da5485cf6199a2a9b766d37d07c8b4062abc"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 493,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1065,
      "line_start": 1047,
      "name": "V4. Quantitative qualification scoring",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2240c2bb025784d94bf46b1603ef98db7ed1b2fcbe82131083efd17b4c9d515d"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
-     "line_end": 1196,
+     "bytes": 80,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 1067,
      "line_start": 1066,
      "name": "GATE W \u2014 Artifact Flow, Dependency Consumption and End-to-End Traceability",
-     "sha256": "aa062a4c5558c1f534a76321abee8a58d0fff3d4ee5a55e980cebe6b40dc3a4f"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "8709182e646962c844561a98348bf0b18b63fa6334b0cec8816ea53e7dd3a7a0"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 550,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1081,
      "line_start": 1068,
      "name": "W1. Stable artefact identity",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "ece0bedfa3767be65d83e0217e9abb453136db86f2949c7d41195b83b2ed066f"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 620,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1091,
      "line_start": 1082,
      "name": "W2. Typed output \u2192 input contracts",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "fbe7cd0a619ba2e102f0f456b154592ce571016919149743a50c303f63f6bacf"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 627,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1105,
      "line_start": 1092,
      "name": "W3. Mandatory task-input manifest",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "97019fb2dee456f28660942c1d89b6daec883bb629c5238cca40a39e39f10ac9"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 575,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1113,
      "line_start": 1106,
      "name": "W4. Context compiler delivery proof",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2437e1fb4fd7cf5410441cba77f1656fb5742e7e0eb1105d26071cd87ae3361b"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 526,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1127,
      "line_start": 1114,
      "name": "W5. Consumption receipt and implementation traceability",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5c922bec8b0d726f02321f0459ed4023bce760e57b8ec3ef0cf891c28dcd9003"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 520,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1137,
      "line_start": 1128,
      "name": "W6. Upstream-change staleness propagation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "45896cb02fda202d0fa47287ac0e943572556dc2b150fedfe920ea346ae7e956"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 562,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1145,
      "line_start": 1138,
      "name": "W7. Orphan/dead-output and unexplained-output detection",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "57cbdd1adcf519d73eba4400f766168876f60c70b94a40344512c69178f18dea"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 441,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1153,
      "line_start": 1146,
      "name": "W8. Forward and reverse lineage",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f29d776707544a4997688661094313214bcf891a371af5a77bd13d49d9fe216f"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 495,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1161,
      "line_start": 1154,
      "name": "W9. Session/handoff continuity of mandatory inputs",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "39c3891ba622d1163e31c3354b3348bee7b036b3ba54990cc8e6281602e4d269"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 704,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1172,
      "line_start": 1162,
      "name": "W10. Deterministic mandatory inputs outrank retrieval",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "813cf325ab30c5a2ed6eb75a79a8ff9181b1d2db1c171c51ecf99a5d66354583"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 451,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1184,
      "line_start": 1173,
      "name": "W11. Artifact-flow quantitative health",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3e1e8c35cc4195ad11a9f6831f033544245d113fa431fcc01042e030abb81dcd"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 1110,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1196,
      "line_start": 1185,
      "name": "W12. Health-scheduler integration",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0f7de9ac1876b48b3a2ff86badb61c1feab65cda877cc63a0587c713e3380765"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 1113,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1218,
      "line_start": 1197,
      "name": "PRE-ADVANCED-QUALIFICATION ACCEPTANCE GATE",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6835881dee2ab17d43334d03c753cbd926c0e06341442114edb7beae78342518"
     },
     {
-     "entry_id": null,
-     "kind": "heading",
+     "bytes": 811,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1255,
      "line_start": 1219,
      "name": "PROPOSED ORDER AFTER THIS CHECKLIST IS ACCEPTED",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "04a62b75267b58e2890ac16cdbeb8d92912e19b0efe6f5c38e2ab5d27d7aa84b"
     }
    ],
    "type": "MANDATORY_PARTIAL_DELIVERY",
    "undelivered_ranges": [
     {
-     "line_end": 129,
+     "bytes": 395,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 6,
      "line_start": 1,
      "name": "Governance OS Capability Acceptance Contract \u2014 v3",
-     "sha256": "31262ae5041b859dd7ca88897531dba62e2029258ece24773e23b62937a5eb35"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "c29dd7ace647ed5a7b46f33ec610d270d6974d6a77291a6a003dcc7b7f69df84"
     },
     {
-     "line_end": 52,
+     "bytes": 882,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 36,
      "line_start": 7,
      "name": "Canonical implementation in the Governance OS repository",
-     "sha256": "bf0c531fe5a1f3a5097f01a171b27424259b7f53bfee92e2c784b3c6fa8abbe3"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "900a25fbed93a1128f1679b1bd299eeab88696b9ae20a7930dd93fc164098afe"
     },
     {
+     "bytes": 1042,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 52,
      "line_start": 37,
      "name": "Contract authority model",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f35342ba7d46380fcb19daf60f68a23004b7a1ad56ef967b517ff0332df5d4bf"
     },
     {
+     "bytes": 675,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 74,
      "line_start": 53,
      "name": "Required contract fields per capability",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "17af8b544cbfae8a39aebefd54db5944987bcd3a37d230dd3551ff8b00ef1fae"
     },
     {
+     "bytes": 679,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 94,
      "line_start": 75,
      "name": "Relationship between the contract and the governance suite",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0ec8e46735d29afd95e40aa4661d95e7a40b44337383f8fc45e31c58ff3fa818"
     },
     {
+     "bytes": 502,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 112,
      "line_start": 95,
      "name": "Evidence freshness",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9cc375692a2b1972e09636a4892119592f4defe5920969e3f2fdd039f6afac13"
     },
     {
+     "bytes": 444,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 129,
      "line_start": 113,
      "name": "Lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9c21397bf12d1fb058ea87bfe3ca0fd23f5ffe6a6628e66ffac4f5df7de389a1"
     },
     {
-     "line_end": 181,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 131,
      "line_start": 130,
      "name": "GATE A \u2014 Constitutional and Trust Foundations",
-     "sha256": "533e84d9e5e932a6f4a71ee9799ea51da4a765ed79c187a9e85701646d64b7bc"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "de9e2bfcd37066c8d8c3cd832c0b9196b7a1857d748a092b234a903b5d958f6e"
     },
     {
+     "bytes": 704,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 141,
      "line_start": 132,
      "name": "A1. Canonical authority and policy precedence",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9fcea758fb553d0e648bd3e7fe91dfaadc29d49f2312e54c0ef69fccc5901a65"
     },
     {
+     "bytes": 1072,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 155,
      "line_start": 142,
      "name": "A2. Authentic root of trust **[POST-VERIFICATION HARDENING]**",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2151a89c20f9a536dbf48f3379b57ffa498621ff62bf6d3c1c1c76d32ec8c997"
     },
     {
+     "bytes": 635,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 165,
      "line_start": 156,
      "name": "A3. Security, sensitivity and permissions",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3e757d6b9337f4681cd80f321d1d2e65fdb251b6e99249d13651b4808c137394"
     },
     {
+     "bytes": 318,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 171,
      "line_start": 166,
      "name": "A4. Budget/resource governance",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "bd878ca7b363b31efa87045dcbbfc23c7b141629c355a4c0db9e578e8c36071d"
     },
     {
+     "bytes": 236,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 181,
      "line_start": 172,
      "name": "A5. Emergency controls",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "76d5b8a490ce44387220120b6178f932e156e9ede5f3b923a9e8a91fb1e6a480"
     },
     {
-     "line_end": 206,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 183,
      "line_start": 182,
      "name": "GATE B \u2014 Repository Contract, Paths and State",
-     "sha256": "4e50e69070aed2931dcb4e8b6711f1ef17497f1c918f5d426de5197edf746e00"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "fc2dd6079238a240afdf12d27177e7ff70a7758a1cc1c62fcbc3d8cacc9b0ed9"
     },
     {
+     "bytes": 347,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 189,
      "line_start": 184,
      "name": "B1. Standard repository contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b689d89ca7e98457877f00d8aed48467a074c03ff7a3236927e9cc1ebbc56412"
     },
     {
+     "bytes": 601,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 198,
      "line_start": 190,
      "name": "B2. Path map",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "ddab43fcfad48640709e3f198921eaf16e0f047d2173c53c0ac5c6339f48229f"
     },
     {
+     "bytes": 288,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 206,
      "line_start": 199,
      "name": "B3. Authoritative vs derived state",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6d4ef1d38971e8311691691a99184f9b35c362fb12d7e4cc947077b007c0595d"
     },
     {
-     "line_end": 304,
+     "bytes": 43,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 208,
      "line_start": 207,
      "name": "GATE C \u2014 Development Knowledge Fabric",
-     "sha256": "c596d4cd98ed2a3f8a5a7a86a1b4e7dbb2202c690d6e86c4e6d5e7eeb14623fe"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "75508e79b52a06e6ef49ca1df56b011c3159b9c7567ab38f8eb2ac44643856b3"
     },
     {
+     "bytes": 380,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 228,
      "line_start": 209,
      "name": "C1. Deterministic structured memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0a1b30be86cf88d1446fe21df2f313eac1bb928da3d7097e6123d514ecc3e354"
     },
     {
+     "bytes": 399,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 233,
      "line_start": 229,
      "name": "C2. Relationship/graph memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2fe6d25053c384ff2a3cd2a862b2d3a68b58e4b02cb5607bc579dae17d30e288"
     },
     {
+     "bytes": 251,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 242,
      "line_start": 234,
      "name": "C3. Semantic memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "c6f57f3187073f3d285882b71508da0312d547afdc26527de09aaed83f87cbf1"
     },
     {
+     "bytes": 140,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 250,
      "line_start": 243,
      "name": "C4. Lexical memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8506a83dac18a96d7fff8b93a5dee7dc69a4b9e59e4b52f05878ac8705946021"
     },
     {
+     "bytes": 299,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 260,
      "line_start": 251,
      "name": "C5. Code-structural memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "ff9e1035d443bf19069ee18e65115c98c977d80a0de4ed19d15d154070e42219"
     },
     {
+     "bytes": 121,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 267,
      "line_start": 261,
      "name": "C6. Temporal memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2d4820d01a72b412dd780ea0aa87ddb7bd87f8260f7c8eeb82bed98d68ad58c5"
     },
     {
+     "bytes": 158,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 275,
      "line_start": 268,
      "name": "C7. Episodic execution memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "7b47d932a1252f6e8cb303229343e139e96645f43460fbf7a76d2011a58a4515"
     },
     {
+     "bytes": 168,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 284,
      "line_start": 276,
      "name": "C8. Failure memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3ef58b8bcd25a72f95862cc61dfd9c90542197dc12b522269d1b6f05fc47d061"
     },
     {
+     "bytes": 275,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 293,
      "line_start": 285,
      "name": "C9. Working memory/context packet",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b97777bb5c25a9ac4f5cf47700e87966f6113d7d5d864054ec29b2a0eac10081"
     },
     {
+     "bytes": 196,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 304,
      "line_start": 294,
      "name": "C10. Capability memory",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2699e58bc8ce50edf16eff5d1b5c1c832f814fbb1533aa0d5b9722df4f008313"
     },
     {
-     "line_end": 359,
+     "bytes": 46,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 306,
      "line_start": 305,
      "name": "GATE D \u2014 Indexing, Retrieval and Context",
-     "sha256": "234aaedd9e64f205edd926c94f95acbd412a23f1a29d711234e6869f361d034b"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "72e96a4776242614b2e26de76d3d5f5349065d74d5c5c4b465def31796f721e9"
     },
     {
+     "bytes": 412,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 314,
      "line_start": 307,
      "name": "D1. Incremental indexing/freshness",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f3d790920cb7a786a0817bc4493d480ae8dc4a16c66ca25cd21afbb5c17f4c59"
     },
     {
+     "bytes": 206,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 322,
      "line_start": 315,
      "name": "D2. Retrieval router",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "535f2ffef7dd316704ef87b8e3acc35fce5f33a96e2397dd937005001d6e503e"
     },
     {
+     "bytes": 211,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 328,
      "line_start": 323,
      "name": "D3. Hierarchical retrieval",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "51d47be1c8079080b9508fd843795e813e2b2233e09cf24a6ab1917eafb054d4"
     },
     {
+     "bytes": 326,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 341,
      "line_start": 329,
      "name": "D4. Component separation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5f96964cb02e463a58f5dd3a80ac6203172e9e22c1410c6210f8f4a94cd1e83a"
     },
     {
+     "bytes": 377,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 349,
      "line_start": 342,
      "name": "D5. Evidence-driven retrieval model selection",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "618f8759c479543be3fb9c03dd813bf40af10811c7bc27c85c098792fe006f11"
     },
     {
+     "bytes": 547,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 359,
      "line_start": 350,
      "name": "D6. Rebuild guarantee",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "4abdc826774026b4465efd0518c085fbbcbd238f0bb99159dcb3dc174caf2a24"
     },
     {
-     "line_end": 395,
+     "bytes": 54,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 361,
      "line_start": 360,
      "name": "GATE E \u2014 Agent Organisation and Independent Work",
-     "sha256": "5eb4d0708973ac37b1cd28e157ff3234811f1be4881d1cf2fe1b1b8cf1620d56"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "4a854b2903ef63d76faeb163e4b38d6681ddccdf8c5129739e7a2e14c4b02a08"
     },
     {
+     "bytes": 257,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 367,
      "line_start": 362,
      "name": "E1. Authority levels",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "dcece6b5900c240f4c657e252538e549165a99fb3353204794836831b002bb47"
     },
     {
+     "bytes": 288,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 376,
      "line_start": 368,
      "name": "E2. Representative roles",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2e4ee40c65a7efc12535795b166d3ed24680e4ba6a2bcfed55d6418b81bb2cd9"
     },
     {
+     "bytes": 225,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 386,
      "line_start": 377,
      "name": "E3. Typed A2A handoffs",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5f1180a83420247352c05eb679e6dce85620f5d01b89995f1f4c1afb0f9c8d99"
     },
     {
+     "bytes": 289,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 395,
      "line_start": 387,
      "name": "E4. Concurrency/task claims",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "83914eb10853edf43d570d05dc780e9454f9b6c42ca834b12b6f8fb7878bedda"
     },
     {
-     "line_end": 440,
+     "bytes": 50,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 397,
      "line_start": 396,
      "name": "GATE F \u2014 Skills, Tools, MCP and Capabilities",
-     "sha256": "893ef9fea49046616624bfbee994e449179daff99036cce6ac042bc1838c5d44"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "51a0eb08f9a6c0bcc410e9b2c1d711b9eebc49b42242eb621003fb5a2b00fe94"
     },
     {
+     "bytes": 242,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 403,
      "line_start": 398,
      "name": "F1. Skill lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b25cda96310a283379c593490633509db321afb9f91a916324a7d1aa68c6fe41"
     },
     {
+     "bytes": 258,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 413,
      "line_start": 404,
      "name": "F2. Tool Capability Registry",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "36b4a191658ed09d0ff01e4dbd43feda758a07ec965310d3fcb5caf5f5fb77bf"
     },
     {
+     "bytes": 276,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 424,
      "line_start": 414,
      "name": "F3. Missing-tool acquisition",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "be3c342a88145b9008ab0e62ba61feba01d31298237bb2d658210993d694042e"
     },
     {
+     "bytes": 365,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 432,
      "line_start": 425,
      "name": "F4. Plugin trust boundary **[POST-VERIFICATION HARDENING]**",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a8e3d011acee60a66db8ae376799893519ca62dc1d6f195ec81faf786aff24dd"
     },
     {
+     "bytes": 181,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 440,
      "line_start": 433,
      "name": "F5. MCP/A2A/tool separation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "54628b0507315b5c704ae549809304194b5a629851a46b2d73841c33bfcb6fd7"
     },
     {
-     "line_end": 457,
+     "bytes": 36,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 442,
      "line_start": 441,
      "name": "GATE G \u2014 Human Command Surface",
-     "sha256": "d8113edbf1c5e2009642a5d623100ccfd91716972a5ada5bceee2e1257cfd748"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "e495195f67bf7df382aa8e6e1b5ded4c3aef9aed9fd65453579ad220a2aae172"
     },
     {
+     "bytes": 241,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 447,
      "line_start": 443,
      "name": "G1. Natural-language intent",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a6f10fa5b1560fc6cf59245702f87ee13f5d5eb0d8103f6ea42494e01885e0ef"
     },
     {
+     "bytes": 177,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 457,
      "line_start": 448,
      "name": "G2. Small explicit human control set",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b618142b64f401e0de44a29cbb1b03879526f37fa97d1bb11eaf666ceb93f4fe"
     },
     {
-     "line_end": 532,
+     "bytes": 42,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 459,
      "line_start": 458,
      "name": "GATE H \u2014 Specification and Readiness",
-     "sha256": "db241678429ffd78e53379f779f5278e81d8966da82ee04b77b45aed022ec1b6"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "b7cda6e8c2be848c443be210e65324a3d6258e51da33c4d6bb7d41ba855a3a92"
     },
     {
+     "bytes": 408,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 479,
      "line_start": 460,
      "name": "H1. SPEC lineage",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a0d9012823f85a53216fc2e377f505135d21182aee5aeb74720c575dce5623c9"
     },
     {
+     "bytes": 963,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 516,
      "line_start": 480,
      "name": "H2. 26-dimension Feature/Capability Readiness Contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "93c113e43be981b8f75ea8010c9d4bccdd4ea2960c7e75c7149b99b43433f660"
     },
     {
+     "bytes": 350,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 523,
      "line_start": 517,
      "name": "H3. Readiness generates work",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "401ea9cfa6b2fea8c2875bd450474f32853df4ad7ce318a84def4d221026bc03"
     },
     {
+     "bytes": 405,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 532,
      "line_start": 524,
      "name": "H4. Scenarios drive data/tests",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b5933ba69a933da2cdbdcd3ebb8ad3f4bfb315304185eabe93d122d3f0bee276"
     },
     {
-     "line_end": 593,
+     "bytes": 34,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 534,
      "line_start": 533,
      "name": "GATE I \u2014 Dynamic Work System",
-     "sha256": "0e22a70d55fe8efda1b749ad7d270d31dfdd884e005d9c81403d8d87d423225f"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "f2f4320d593802d3b0ee2e6ffdb253d51669928aab8e77ebfe02b7e5febe9f54"
     },
     {
+     "bytes": 407,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 559,
      "line_start": 535,
      "name": "I1. Unified task DAG",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "25bbc16aee5da396f59187fbfaafb5ab2edc1eb20af67a77115d8eb277b86e43"
     },
     {
+     "bytes": 264,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 570,
      "line_start": 560,
      "name": "I2. Task contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6c05fbe01e99b09ad29233970aeefbdf79c355d8a5d3716f24cf0b147811900f"
     },
     {
+     "bytes": 304,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 584,
      "line_start": 571,
      "name": "I3. Dynamic generation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "dfb0f6580c5f8918f137df4b750d46b05267f5183dcc9520ee4a33338ba4fb61"
     },
     {
+     "bytes": 219,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 593,
      "line_start": 585,
      "name": "I4. Parallel execution",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "e27a49020a26d057cb0d9f5ba9e911c401786024db3f3de1e51a5c78fc8d9016"
     },
     {
-     "line_end": 619,
+     "bytes": 43,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 595,
      "line_start": 594,
      "name": "GATE J \u2014 Research and Experimentation",
-     "sha256": "d202816c874e55bca35e86bc6ce4a1ba47cbeb1265f91d773e070bbb6722306c"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "dfad0cb9cf45ea1421c563e6c07b4dc1523568d4fee882c5b0b1ec1c13dc90f6"
     },
     {
+     "bytes": 231,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 606,
      "line_start": 596,
      "name": "J1. Research becomes evidence",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "99340791b9d95caa63d9c71901161f0d99a8cdde1d2a35d568ffbbe19e502ded"
     },
     {
+     "bytes": 392,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 619,
      "line_start": 607,
      "name": "J2. Experiment lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cbd07f5b366f227fc24e905a466e4965d8ffb84a48ec2b3455d492f8972fc441"
     },
     {
-     "line_end": 653,
+     "bytes": 40,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 621,
      "line_start": 620,
      "name": "GATE K \u2014 Change Control and Impact",
-     "sha256": "edc8e58a841633e30021675e7d8babd0473f02b1a743eb6c8e7c4c552a571d30"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "b2be556eaa72bd125d323241840f985ceff800fa1482de05bb244cefe334611c"
     },
     {
+     "bytes": 228,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 627,
      "line_start": 622,
      "name": "K1. CIT-P",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0d2e9ff9d4feeb8a97a8f662e3bea16940628be9c04ef3cd994c11c67f08fa81"
     },
     {
+     "bytes": 249,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 637,
      "line_start": 628,
      "name": "K2. CIT-E",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "d35b0a83ceecfc90d32bf6c5315561f181bfaac29f21678a589b2c3667beb922"
     },
     {
+     "bytes": 227,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 648,
      "line_start": 638,
      "name": "K3. Automatic impact simulation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "56ffaf0990ac5535ac4950fbccb71102b8d4aebadb58e67ce7d490069561ae05"
     },
     {
+     "bytes": 125,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 653,
      "line_start": 649,
      "name": "K4. Impact radius",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f242a8014f4de0375564bc23385ac3285b9a84490643bf18b2bcbf5bd355820a"
     },
     {
-     "line_end": 686,
+     "bytes": 54,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 655,
      "line_start": 654,
      "name": "GATE L \u2014 Human Decision Gates and Contradictions",
-     "sha256": "11c908d1f0894490834438fd9dd42d6cca0eb433e1d83bff43c6fd1b5772f043"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "16e840682a348929e142911008adcf3dd49e684a83bd7511e6d38a8a1bccfcca"
     },
     {
+     "bytes": 232,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 661,
      "line_start": 656,
      "name": "L1. Contradiction resolution",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "eee87c687d426bf4d69ad3955df2644cae56fa28ddff4fde15492e94370e68b4"
     },
     {
+     "bytes": 238,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 673,
      "line_start": 662,
      "name": "L2. Human Decision Gate package",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f0b89996713697721ec2ac5134c110587773584f39fef01117e6efe5d9a5e887"
     },
     {
+     "bytes": 287,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 680,
      "line_start": 674,
      "name": "L3. Gate presentation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "43352d1cf2bea4185901bae1c58a372de0b06452444b7487a92ee02df09f2dc4"
     },
     {
+     "bytes": 147,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 686,
      "line_start": 681,
      "name": "L4. Non-global blocking",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8ece657141c14be955e4d553f8d54928b65f5efaa948c826129fa1f3bed37e3a"
     },
     {
-     "line_end": 714,
+     "bytes": 28,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 688,
      "line_start": 687,
      "name": "GATE M \u2014 Model Routing",
-     "sha256": "fc50214331c145d89e3904992eba71724a7ec4fe2a71a3b8f36ff4dfa057f54a"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "271f1ef4613a80db08df98c7c3f033192d8691a456625494e24c12ad3ca1d9b0"
     },
     {
+     "bytes": 169,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 694,
      "line_start": 689,
      "name": "M1. T0-T3 or equivalent capability tiers",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "a3817f23ee18827c974e157ff21d2067be361f6615024ff1ce708d36ac11601d"
     },
     {
+     "bytes": 111,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 697,
      "line_start": 695,
      "name": "M2. Reasoning requirement",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "4deabf820af1b9906f302a85b6f34f40c15f8fdb5ece798f11582a154a707d34"
     },
     {
+     "bytes": 162,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 701,
      "line_start": 698,
      "name": "M3. Role defaults",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "e8ce481926f611e59c88428d4e478b62589fe246f8dcab91c795a4c640774d81"
     },
     {
+     "bytes": 199,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 714,
      "line_start": 702,
      "name": "M4. Empirical routing",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "17abc48a8d994878980270b67f9cd761c50f359c2ec7bcc9919fa131d708f415"
     },
     {
-     "line_end": 748,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 716,
      "line_start": 715,
      "name": "GATE N \u2014 Checkpoints, Compaction and Handoffs",
-     "sha256": "91356ddee4a8a8980db6a9a941e5035d41a6c1f27a3bb9b6a9e767bccd91cfe6"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "c9d547075c3064888b0bafdeca71c1813fdf69cbdb99c191db496f59d3056b11"
     },
     {
+     "bytes": 278,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 728,
      "line_start": 717,
      "name": "N1. Structured checkpoint",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f72db90c1e5bfc1cc7448e4c15502cdbec3bc5d175319b9fc4594d46f103d8d8"
     },
     {
+     "bytes": 232,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 738,
      "line_start": 729,
      "name": "N2. Mandatory triggers",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cc40975bfa58c9525e613cfae84fc9740f73510042301e2715bc655743b14667"
     },
     {
+     "bytes": 259,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 743,
      "line_start": 739,
      "name": "N3. Provider-independent checkpoint watchdog",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "83c88975aeb730b32eb36993d39f27942436715bd76e4b2ed267ac2ea9ab6b26"
     },
     {
+     "bytes": 98,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 748,
      "line_start": 744,
      "name": "N4. Worker return contract",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "7a4704c2199e2ef60f0f79e1352d7730fb3fb549e3589b2b8f99cd701c49f450"
     },
     {
-     "line_end": 811,
+     "bytes": 60,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 750,
      "line_start": 749,
      "name": "GATE O \u2014 Verification and Continuous Governance Health",
-     "sha256": "4cd41a9bd638522df6d90b1348e9ae758ad4615178fbf7f1cf846530f924271e"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "14ad3338c3341be071a39ebed2cc7ff6c2e93202b2cc25896b95f9aea540642d"
     },
     {
+     "bytes": 184,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 762,
      "line_start": 751,
      "name": "O1. Product test families",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b8eb70c9f051182e114cd2553268d718ab0125fdb259421aff40d649db691d1b"
     },
     {
+     "bytes": 513,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 781,
      "line_start": 763,
      "name": "O2. Governance test families",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "34281a998e06d5485195a992ecaf05c274d1ac365721204242c61aca0c9aa661"
     },
     {
+     "bytes": 244,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 786,
      "line_start": 782,
      "name": "O3. Independent test authorship",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b88126907701074f2f6afd53959aa5edbf11daf065e3fa23acac7008791cb2e3"
     },
     {
+     "bytes": 168,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 790,
      "line_start": 787,
      "name": "O4. Governance suite currency",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "de3f59f0c17908884431e10267fad753dcbcb6f39a2b4035756520d5e0be2b5c"
     },
     {
+     "bytes": 939,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 811,
      "line_start": 791,
      "name": "O5. Governance Health Scheduler **[NEW EXECUTION REFINEMENT]**",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "43d4e0f87601618e2b7d0d3b48dfae5392caec018c9a08dad0efc414e9bda8d6"
     },
     {
-     "line_end": 841,
+     "bytes": 42,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 813,
      "line_start": 812,
      "name": "GATE P \u2014 Observability and Telemetry",
-     "sha256": "1420c1796a1adb8a42e8168a44f169468eda24109ccf9cb29d52a6e5f28dc30e"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "75d12985167799874cfbe1044b08d43fc5664f5bea0c57420806da947328f2b9"
     },
     {
+     "bytes": 316,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 828,
      "line_start": 814,
      "name": "P1. Execution telemetry",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0b541a7f86b9500bd9a1724a00e15a3d97a012543e394aec99e5f23ca9ceea54"
     },
     {
+     "bytes": 289,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 841,
      "line_start": 829,
      "name": "P2. Organisational questions",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f2c2f7ac87f22d7c822793fe5d21c5231bd2f3cbd257d7669a9e86472ccb6241"
     },
     {
-     "line_end": 869,
+     "bytes": 57,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 843,
      "line_start": 842,
      "name": "GATE Q \u2014 Learning, Lessons and Upstream Improvement",
-     "sha256": "02c5bad82c9154fe03641a1d2103ab087d8a17ec40d2dd065449c3d3fabe3e68"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "7c71f0fd84296d0cf4e40c3fffa70e51fa3289d43a723c71dc309e62dd955b8e"
     },
     {
+     "bytes": 247,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 853,
      "line_start": 844,
      "name": "Q1. Lesson lifecycle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "46cf010edf4d88c18f8e50fc934a778c0ee3a62755abb038fb212c8f66e3246b"
     },
     {
+     "bytes": 108,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 857,
      "line_start": 854,
      "name": "Q2. Decision vs lesson",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "edabb3297d59c5fab83e920a6e6af8b0bb29006f867f03071b014aebee9883b4"
     },
     {
+     "bytes": 106,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 860,
      "line_start": 858,
      "name": "Q3. PROJECT/PRODUCT/FRAMEWORK scope",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "9421bd0d7450e5d4ec013302c4a325818862bba089ef3eb3f3b78354ceb58157"
     },
     {
+     "bytes": 209,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 869,
      "line_start": 861,
      "name": "Q4. Upstream Export Gate",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cbf9293d484238100f041b3b46d5895872d4b40f509fb2baf4aa6c5bbad3abfe"
     },
     {
-     "line_end": 893,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 871,
      "line_start": 870,
      "name": "GATE R \u2014 Legacy, Archive and Historical State",
-     "sha256": "3912b7c1b87d6510ff5c408ae789b6b0cc0b4a04234f48f19cb27043b074762d"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "ebce8c630981084f4e33953f0137b7057ee383b3c83b87d1077d90f72b4c7b86"
     },
     {
+     "bytes": 297,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 880,
      "line_start": 872,
      "name": "R1. Legacy Governance Retirement",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b8b9752a607ff085040d8d77e9dbce7955fdd0b392efdf1d5c3fd4e7205df784"
     },
     {
+     "bytes": 210,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 886,
      "line_start": 881,
      "name": "R2. Chat-memory retirement",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8c6caac52ac9a052cc2cab1b91df99dcc1a3b09efeca377977440dbd700a3caa"
     },
     {
+     "bytes": 238,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 893,
      "line_start": 887,
      "name": "R3. Archive policy",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "1454ce10f7bb0562164b041b1b3b207eed2dc4269eecaa4c0acb26f3ae8fc51a"
     },
     {
-     "line_end": 953,
+     "bytes": 60,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 895,
      "line_start": 894,
      "name": "GATE S \u2014 Release, Distribution, Init, Adopt and Update",
-     "sha256": "ea0a62c8404ff7158570f09e041908a753937f929eb88bf86ec47adb3156160b"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "d1aab207883d45f39e9b9c185050922777bf88c260b4e45156b68608579b5c5d"
     },
     {
+     "bytes": 226,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 899,
      "line_start": 896,
      "name": "S1. Canonical OS repo",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "bb3cc6e4f2b16d15e8a91e855080f6bf1c29bd3a59e02a9daa2b661983c613f9"
     },
     {
+     "bytes": 284,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 912,
      "line_start": 900,
      "name": "S2. Immutable releases",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5719d6b5b746bf481ecf336815992861d746abc10d43bc835760327043a67c72"
     },
     {
+     "bytes": 218,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 920,
      "line_start": 913,
      "name": "S3. `gov init`",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6115b41f9e386471b4e6753b31906dcd3e1c89c233f79eedf5075cad422a9b0f"
     },
     {
+     "bytes": 448,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 935,
      "line_start": 921,
      "name": "S4. `gov adopt`",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "bdbbb01f04237ded01500f1ce7819ac029ba899b316a52f70906eee2e632137c"
     },
     {
+     "bytes": 254,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 946,
      "line_start": 936,
      "name": "S5. `gov update`",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "fbc976ec9924efd484eebdafa39d01c8aa4c57e9a1141980cd668f11f052c29e"
     },
     {
+     "bytes": 198,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 953,
      "line_start": 947,
      "name": "S6. Cross-machine mechanics",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "46edede4cdd99edae05c0987e779fbc4f010f187e61d26eecd9859286a7058b5"
     },
     {
-     "line_end": 975,
+     "bytes": 51,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 955,
      "line_start": 954,
      "name": "GATE T \u2014 Independent Adoption and Audit Roles",
-     "sha256": "c1972fabacb64385565a7eb220d45fc493c4c23e305703354124c7c09b09ea89"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "66bcc6825d9a8a0fe7994c31b28e4b7d17e039f0affaee3e6bdacc7ab8a33356"
     },
     {
+     "bytes": 314,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 966,
      "line_start": 956,
      "name": "T1. Role separation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3e15a92414286374a4356ed4fb8e1198e423286518a551e00e848baec5c6b121"
     },
     {
+     "bytes": 162,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 970,
      "line_start": 967,
      "name": "T2. Fresh-session independence",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "fc04901bc14fb788e7baf01fa642eb2925cfd57e03a7eee4a763afda6e1865cd"
     },
     {
+     "bytes": 232,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 975,
      "line_start": 971,
      "name": "T3. Adoption evidence tree",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "da680ad2517f8fff6e658c975fde18fa433ac58a2c04e309cc05e60bee8de831"
     },
     {
+     "bytes": 1019,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1011,
      "line_start": 976,
      "name": "GATE U \u2014 Framework Health SLOs",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "cdab09c2b8971010ca264b9cc73c02cce547c04f631dcdabea3b848f4dbff5b7"
     },
     {
-     "line_end": 1065,
+     "bytes": 152,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 1015,
      "line_start": 1012,
      "name": "GATE V \u2014 Qualification Oracle **[NEW TESTING REFINEMENT]**",
-     "sha256": "e1dd7f1a9c69b857d5ac7f45d531ce16f35014c1b700fd4451333b218793d08a"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "85de6c70816a11bf32b93e3cb1b88bb0a9dcef1178de2a41ff9333e901a2b461"
     },
     {
+     "bytes": 290,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1027,
      "line_start": 1016,
      "name": "V1. Fault manifest",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "8f9e5316a1da6a20d0dc2e96b704d1a9b7b0f730eb7ff667cb42c552a0344c53"
     },
     {
+     "bytes": 274,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1037,
      "line_start": 1028,
      "name": "V2. Hidden path-map oracle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "7e4d2783dfe4420cdd6cebfc162894cba6cf07bc3cfa0309f1c0120b109cb8bd"
     },
     {
+     "bytes": 272,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1046,
      "line_start": 1038,
      "name": "V3. Hidden memory oracle",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "b221e1a30efc28cd65351abeab01da5485cf6199a2a9b766d37d07c8b4062abc"
     },
     {
+     "bytes": 493,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1065,
      "line_start": 1047,
      "name": "V4. Quantitative qualification scoring",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2240c2bb025784d94bf46b1603ef98db7ed1b2fcbe82131083efd17b4c9d515d"
     },
     {
-     "line_end": 1196,
+     "bytes": 80,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+     "line_end": 1067,
      "line_start": 1066,
      "name": "GATE W \u2014 Artifact Flow, Dependency Consumption and End-to-End Traceability",
-     "sha256": "aa062a4c5558c1f534a76321abee8a58d0fff3d4ee5a55e980cebe6b40dc3a4f"
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
+     "sha256": "8709182e646962c844561a98348bf0b18b63fa6334b0cec8816ea53e7dd3a7a0"
     },
     {
+     "bytes": 550,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1081,
      "line_start": 1068,
      "name": "W1. Stable artefact identity",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "ece0bedfa3767be65d83e0217e9abb453136db86f2949c7d41195b83b2ed066f"
     },
     {
+     "bytes": 620,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1091,
      "line_start": 1082,
      "name": "W2. Typed output \u2192 input contracts",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "fbe7cd0a619ba2e102f0f456b154592ce571016919149743a50c303f63f6bacf"
     },
     {
+     "bytes": 627,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1105,
      "line_start": 1092,
      "name": "W3. Mandatory task-input manifest",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "97019fb2dee456f28660942c1d89b6daec883bb629c5238cca40a39e39f10ac9"
     },
     {
+     "bytes": 575,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1113,
      "line_start": 1106,
      "name": "W4. Context compiler delivery proof",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "2437e1fb4fd7cf5410441cba77f1656fb5742e7e0eb1105d26071cd87ae3361b"
     },
     {
+     "bytes": 526,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1127,
      "line_start": 1114,
      "name": "W5. Consumption receipt and implementation traceability",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "5c922bec8b0d726f02321f0459ed4023bce760e57b8ec3ef0cf891c28dcd9003"
     },
     {
+     "bytes": 520,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1137,
      "line_start": 1128,
      "name": "W6. Upstream-change staleness propagation",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "45896cb02fda202d0fa47287ac0e943572556dc2b150fedfe920ea346ae7e956"
     },
     {
+     "bytes": 562,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1145,
      "line_start": 1138,
      "name": "W7. Orphan/dead-output and unexplained-output detection",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "57cbdd1adcf519d73eba4400f766168876f60c70b94a40344512c69178f18dea"
     },
     {
+     "bytes": 441,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1153,
      "line_start": 1146,
      "name": "W8. Forward and reverse lineage",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "f29d776707544a4997688661094313214bcf891a371af5a77bd13d49d9fe216f"
     },
     {
+     "bytes": 495,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1161,
      "line_start": 1154,
      "name": "W9. Session/handoff continuity of mandatory inputs",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "39c3891ba622d1163e31c3354b3348bee7b036b3ba54990cc8e6281602e4d269"
     },
     {
+     "bytes": 704,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1172,
      "line_start": 1162,
      "name": "W10. Deterministic mandatory inputs outrank retrieval",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "813cf325ab30c5a2ed6eb75a79a8ff9181b1d2db1c171c51ecf99a5d66354583"
     },
     {
+     "bytes": 451,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1184,
      "line_start": 1173,
      "name": "W11. Artifact-flow quantitative health",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "3e1e8c35cc4195ad11a9f6831f033544245d113fa431fcc01042e030abb81dcd"
     },
     {
+     "bytes": 1110,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1196,
      "line_start": 1185,
      "name": "W12. Health-scheduler integration",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "0f7de9ac1876b48b3a2ff86badb61c1feab65cda877cc63a0587c713e3380765"
     },
     {
+     "bytes": 1113,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1218,
      "line_start": 1197,
      "name": "PRE-ADVANCED-QUALIFICATION ACCEPTANCE GATE",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "6835881dee2ab17d43334d03c753cbd926c0e06341442114edb7beae78342518"
     },
     {
+     "bytes": 811,
+     "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
      "line_end": 1255,
      "line_start": 1219,
      "name": "PROPOSED ORDER AFTER THIS CHECKLIST IS ACCEPTED",
+     "path": "Governance_OS_Capability_Acceptance_Contract_v3.md",
      "sha256": "04a62b75267b58e2890ac16cdbeb8d92912e19b0efe6f5c38e2ab5d27d7aa84b"
     }
    ]
@@ -2097,19 +2696,19 @@ read_token: 16442e97af0e
    "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
   },
   {
-   "commit": "ad791bae3b2fe4c4b16265263a774fbe6d37a3ec",
+   "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
    "delivered": [
     {
-     "kind": "keys",
      "line_end": 1,
      "line_start": 1,
-     "name": "schema"
+     "name": "schema",
+     "sha256": "76c30c45f03e82b368322cff84504dcf269bca5bc68e9664fc945aaca5176ded"
     },
     {
-     "kind": "keys",
-     "line_end": 1282,
-     "line_start": 1274,
-     "name": "current_prohibitions"
+     "line_end": 1313,
+     "line_start": 1305,
+     "name": "current_prohibitions",
+     "sha256": "c96d57612209f2c818b0619d280b69fdee26c33048194b5c3784ec80259f7c85"
     }
    ],
    "id": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
@@ -2121,6 +2720,7 @@ read_token: 16442e97af0e
      "line_end": 1,
      "line_start": 1,
      "name": "schema",
+     "nbytes": 36,
      "sha256": "76c30c45f03e82b368322cff84504dcf269bca5bc68e9664fc945aaca5176ded"
     },
     {
@@ -2129,6 +2729,7 @@ read_token: 16442e97af0e
      "line_end": 2,
      "line_start": 2,
      "name": "lifecycle_id",
+     "nbytes": 32,
      "sha256": "a00e3326fc170637c941ee976726d3886eaacd39a18891ceabfb2481e18283ef"
     },
     {
@@ -2137,6 +2738,7 @@ read_token: 16442e97af0e
      "line_end": 3,
      "line_start": 3,
      "name": "lifecycle_name",
+     "nbytes": 75,
      "sha256": "68ee5dc0219eca3beb05b443fe7b5e015d0fca63599e7528b1f70dece7283fa6"
     },
     {
@@ -2145,6 +2747,7 @@ read_token: 16442e97af0e
      "line_end": 4,
      "line_start": 4,
      "name": "build_stage_token",
+     "nbytes": 53,
      "sha256": "9f222689e5349ef9f51dcb4fd00ec567bbc80ff482ffb1762d91dc99bb07a71e"
     },
     {
@@ -2153,6 +2756,7 @@ read_token: 16442e97af0e
      "line_end": 5,
      "line_start": 5,
      "name": "acceptance_token",
+     "nbytes": 52,
      "sha256": "56108fe111b1d4342de4316bca4b2de9f344644acafb53ab661e7a0eade8ad19"
     },
     {
@@ -2161,6 +2765,7 @@ read_token: 16442e97af0e
      "line_end": 6,
      "line_start": 6,
      "name": "acceptance_token_issuer",
+     "nbytes": 124,
      "sha256": "14460268bc47d1bb3dd4d4df1bb271374c8b8c4f5dfcd8954b8328e8a85769e9"
     },
     {
@@ -2169,7 +2774,8 @@ read_token: 16442e97af0e
      "line_end": 7,
      "line_start": 7,
      "name": "updated_at",
-     "sha256": "8b4634dbbb57fc7de270ef66c6cf824200f5c55779d511e0cdec8afab678c646"
+     "nbytes": 35,
+     "sha256": "09e5b852a0c35e3d2ef941fa01315d94a053c9fbd4dc69364c638cfb25bb285d"
     },
     {
      "entry_id": null,
@@ -2177,7 +2783,8 @@ read_token: 16442e97af0e
      "line_end": 8,
      "line_start": 8,
      "name": "state_hash",
-     "sha256": "53ab042b20113b3016178ce1670406e49cec3ff266cf06b9721528925d8ed772"
+     "nbytes": 77,
+     "sha256": "0f12f2d3e746a50a1106d2363b03b86c6eea7382dc6a4f6baed17c27f5a2a030"
     },
     {
      "entry_id": null,
@@ -2185,6 +2792,7 @@ read_token: 16442e97af0e
      "line_end": 9,
      "line_start": 9,
      "name": "lifecycle_state",
+     "nbytes": 36,
      "sha256": "02340fd0a0bf5f667b40979aab88262f531da0a71a92caac933152c250f5c5a7"
     },
     {
@@ -2193,6 +2801,7 @@ read_token: 16442e97af0e
      "line_end": 10,
      "line_start": 10,
      "name": "checkpoint_discipline",
+     "nbytes": 32,
      "sha256": "a3113541ca14f0c4c58102f13899f8c2fb30f3caed058a6848ffed609d69a91b"
     },
     {
@@ -2201,6 +2810,7 @@ read_token: 16442e97af0e
      "line_end": 11,
      "line_start": 11,
      "name": "loop_status",
+     "nbytes": 21,
      "sha256": "a7bd5d30ca83141e0f4bfe13d755081e8f38aaa677814173e3b0e556313c3233"
     },
     {
@@ -2209,6 +2819,7 @@ read_token: 16442e97af0e
      "line_end": 13,
      "line_start": 12,
      "name": "purpose",
+     "nbytes": 193,
      "sha256": "e05fa025138845fd7c9a9cb51f6c013421b729a897f94dabec9c3bfb937e650e"
     },
     {
@@ -2217,6 +2828,7 @@ read_token: 16442e97af0e
      "line_end": 15,
      "line_start": 14,
      "name": "authority_status",
+     "nbytes": 191,
      "sha256": "82a8921fc4708d2dd0164417167e8c97983293fc8e197965ffb7127f301eeab5"
     },
     {
@@ -2225,6 +2837,7 @@ read_token: 16442e97af0e
      "line_end": 21,
      "line_start": 16,
      "name": "protocol",
+     "nbytes": 445,
      "sha256": "0fa697f94ccb24310f976aa2b72877d9056bf2d297639c5a7e656e1d95a3ca7f"
     },
     {
@@ -2233,6 +2846,7 @@ read_token: 16442e97af0e
      "line_end": 34,
      "line_start": 22,
      "name": "repository",
+     "nbytes": 831,
      "sha256": "8dac50f0f0a4e863cead75b6c7f5b09f4d187e3ba2b4a4ad008a19c9c2537116"
     },
     {
@@ -2241,6 +2855,7 @@ read_token: 16442e97af0e
      "line_end": 46,
      "line_start": 35,
      "name": "frozen_phase_2_product",
+     "nbytes": 861,
      "sha256": "de3f67cfb508ce7ccd1b94a380ca4b806c8d1045a2eb6b0c6aa90930f12592fd"
     },
     {
@@ -2249,6 +2864,7 @@ read_token: 16442e97af0e
      "line_end": 80,
      "line_start": 47,
      "name": "review_8",
+     "nbytes": 2469,
      "sha256": "9befa5a9a5e03aa36ed769efdeb5f9ad1ba4039559c227e5a65f3858b095d14b"
     },
     {
@@ -2257,6 +2873,7 @@ read_token: 16442e97af0e
      "line_end": 86,
      "line_start": 81,
      "name": "contract_v3",
+     "nbytes": 437,
      "sha256": "db28270009e01ad33413aaeadf6f24494e8b87ca9a044efc219158de17e22889"
     },
     {
@@ -2265,6 +2882,7 @@ read_token: 16442e97af0e
      "line_end": 90,
      "line_start": 87,
      "name": "operator_ui",
+     "nbytes": 251,
      "sha256": "46599c98d9a761102878a92b4d46789e1f29dfc07def6982afac3cc191a989d7"
     },
     {
@@ -2273,6 +2891,7 @@ read_token: 16442e97af0e
      "line_end": 94,
      "line_start": 91,
      "name": "non_normative_known_inputs",
+     "nbytes": 288,
      "sha256": "1856019fda7da43e497bfb02761570f0213a62fd502d785d8ca568075ac4ae19"
     },
     {
@@ -2281,6 +2900,7 @@ read_token: 16442e97af0e
      "line_end": 150,
      "line_start": 95,
      "name": "owner_records",
+     "nbytes": 4306,
      "sha256": "6daa5cd7ada3734353c91c60bffffc0e8b0cd2f80998ffacf758f5fdabd964fd"
     },
     {
@@ -2289,6 +2909,7 @@ read_token: 16442e97af0e
      "line_end": 246,
      "line_start": 151,
      "name": "mandatory_bridge_inputs",
+     "nbytes": 6401,
      "sha256": "37c4b7be0ea6d39c52791b41e18473464b32432219109043c5a346ed3fe21a52"
     },
     {
@@ -2297,6 +2918,7 @@ read_token: 16442e97af0e
      "line_end": 253,
      "line_start": 247,
      "name": "phase_2_records_read_only",
+     "nbytes": 480,
      "sha256": "497ec5955bef65e9bf8a7736bd8d83fa0b34cbebcf8ce6b13f3f0f804f8edbd7"
     },
     {
@@ -2305,6 +2927,7 @@ read_token: 16442e97af0e
      "line_end": 263,
      "line_start": 254,
      "name": "routing",
+     "nbytes": 710,
      "sha256": "8845e6b1e40c34b0e7386b5f5046af15758c19d30302b45a7fc502aeef650fec"
     },
     {
@@ -2313,6 +2936,7 @@ read_token: 16442e97af0e
      "line_end": 273,
      "line_start": 264,
      "name": "environment_observed_2026_09_25",
+     "nbytes": 464,
      "sha256": "ec4e42b7b6627a3321f6c92e94da9c15c324d725305e8bf7e19f03263eb3199b"
     },
     {
@@ -2321,119 +2945,134 @@ read_token: 16442e97af0e
      "line_end": 276,
      "line_start": 274,
      "name": "spawned_roles",
+     "nbytes": 72,
      "sha256": "e1bdfb112bd1c5b63675cffbde4d3a00a4acb07f7ee393a565cd87c5cf3b86e3"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1038,
+     "line_end": 1059,
      "line_start": 277,
      "name": "agent_runs",
-     "sha256": "0b6fea340173b1e88b780ad3193b48fd1d3a90345be2367d2c890ecf60ee30b7"
+     "nbytes": 54332,
+     "sha256": "b57e6cb52eeeae99c4d33a5fb76458ac205fa584c7fd97533b6db57cd05279c1"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1043,
-     "line_start": 1039,
+     "line_end": 1064,
+     "line_start": 1060,
      "name": "running_work",
+     "nbytes": 274,
      "sha256": "03b4cd5fcdf77b52cb0ceb331c154af189f400575862b1d666d3a9680c8ea50f"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1139,
-     "line_start": 1044,
+     "line_end": 1170,
+     "line_start": 1065,
      "name": "dag",
-     "sha256": "55c60802ec8fd7b998dff1a8b84f1df4929891adcf7f51385a288b5f54c45013"
+     "nbytes": 9604,
+     "sha256": "cc913b0f92eef88321266fee213b621e2bcbb416c5fc3d5c1d5e5922b37dfea1"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1152,
-     "line_start": 1140,
+     "line_end": 1183,
+     "line_start": 1171,
      "name": "sealed_oracle",
+     "nbytes": 971,
      "sha256": "366f21b8b36da03afa85d4086d70cc9bb2b364eb906a7eaccebae61cbaeebc58"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1157,
-     "line_start": 1153,
+     "line_end": 1188,
+     "line_start": 1184,
      "name": "checkpoints",
+     "nbytes": 209,
      "sha256": "2863c422401321555685a266b870a228eb266a89621db91f981072341cd375f8"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1176,
-     "line_start": 1158,
+     "line_end": 1207,
+     "line_start": 1189,
      "name": "handoffs",
+     "nbytes": 937,
      "sha256": "55f46a570c8b9bf163af27f615fc259df5cca915336bf7dff0f91a560c75dba5"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1177,
-     "line_start": 1177,
+     "line_end": 1208,
+     "line_start": 1208,
      "name": "unresolved_questions",
+     "nbytes": 25,
      "sha256": "dc934de039cf6ba0c569a8848d08f3946bd46c153872d90eea0b8cefdaf739fe"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1189,
-     "line_start": 1178,
+     "line_end": 1220,
+     "line_start": 1209,
      "name": "rulings",
+     "nbytes": 1126,
      "sha256": "15f5bfa92b207a8f12e6e1fb8834a9bf887b8f076157355ea8295c7d94109b98"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1202,
-     "line_start": 1190,
+     "line_end": 1233,
+     "line_start": 1221,
      "name": "demonstration_freeze",
+     "nbytes": 1243,
      "sha256": "8951efe30b6134ba832b8bf9810670845e9bb37e7d0d52080a549cd1682c7224"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1258,
-     "line_start": 1203,
+     "line_end": 1289,
+     "line_start": 1234,
      "name": "observations",
+     "nbytes": 4809,
      "sha256": "f1bf6c31974262f64aa878c812073be1ef327e5620aefcc1b352ffed7ee94ae5"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1268,
-     "line_start": 1259,
+     "line_end": 1299,
+     "line_start": 1290,
      "name": "evidence_status",
+     "nbytes": 902,
      "sha256": "f7e79529dc7a08ab068690d8eb3e7c3358c9e78937f56ecfa1ec0f06415d338a"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1273,
-     "line_start": 1269,
+     "line_end": 1304,
+     "line_start": 1300,
      "name": "immutable_evidence",
+     "nbytes": 367,
      "sha256": "deab89ac1576707f3b7dd39e427d1da5d49ab03aa2d01b6cb7bec979001aaa70"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1282,
-     "line_start": 1274,
+     "line_end": 1313,
+     "line_start": 1305,
      "name": "current_prohibitions",
+     "nbytes": 508,
      "sha256": "c96d57612209f2c818b0619d280b69fdee26c33048194b5c3784ec80259f7c85"
     },
     {
      "entry_id": null,
      "kind": "yaml_key",
-     "line_end": 1285,
-     "line_start": 1283,
+     "line_end": 1316,
+     "line_start": 1314,
      "name": "next_deterministic_action",
-     "sha256": "98fa0a09812c3768a270d0fdea20ed84a6fc5d0e3af53d38e9390de31925087b"
+     "nbytes": 344,
+     "sha256": "e75a817b8213966a5691607f5b6dd9c2a371ed427495fe292b5dca8baefc4279"
     }
    ],
    "type": "MANDATORY_PARTIAL_DELIVERY",
@@ -2472,13 +3111,13 @@ read_token: 16442e97af0e
      "line_end": 7,
      "line_start": 7,
      "name": "updated_at",
-     "sha256": "8b4634dbbb57fc7de270ef66c6cf824200f5c55779d511e0cdec8afab678c646"
+     "sha256": "09e5b852a0c35e3d2ef941fa01315d94a053c9fbd4dc69364c638cfb25bb285d"
     },
     {
      "line_end": 8,
      "line_start": 8,
      "name": "state_hash",
-     "sha256": "53ab042b20113b3016178ce1670406e49cec3ff266cf06b9721528925d8ed772"
+     "sha256": "0f12f2d3e746a50a1106d2363b03b86c6eea7382dc6a4f6baed17c27f5a2a030"
     },
     {
      "line_end": 9,
@@ -2589,88 +3228,391 @@ read_token: 16442e97af0e
      "sha256": "e1bdfb112bd1c5b63675cffbde4d3a00a4acb07f7ee393a565cd87c5cf3b86e3"
     },
     {
-     "line_end": 1038,
+     "line_end": 1059,
      "line_start": 277,
      "name": "agent_runs",
-     "sha256": "0b6fea340173b1e88b780ad3193b48fd1d3a90345be2367d2c890ecf60ee30b7"
+     "sha256": "b57e6cb52eeeae99c4d33a5fb76458ac205fa584c7fd97533b6db57cd05279c1"
     },
     {
-     "line_end": 1043,
-     "line_start": 1039,
+     "line_end": 1064,
+     "line_start": 1060,
      "name": "running_work",
      "sha256": "03b4cd5fcdf77b52cb0ceb331c154af189f400575862b1d666d3a9680c8ea50f"
     },
     {
-     "line_end": 1139,
-     "line_start": 1044,
+     "line_end": 1170,
+     "line_start": 1065,
      "name": "dag",
-     "sha256": "55c60802ec8fd7b998dff1a8b84f1df4929891adcf7f51385a288b5f54c45013"
+     "sha256": "cc913b0f92eef88321266fee213b621e2bcbb416c5fc3d5c1d5e5922b37dfea1"
     },
     {
-     "line_end": 1152,
-     "line_start": 1140,
+     "line_end": 1183,
+     "line_start": 1171,
      "name": "sealed_oracle",
      "sha256": "366f21b8b36da03afa85d4086d70cc9bb2b364eb906a7eaccebae61cbaeebc58"
     },
     {
-     "line_end": 1157,
-     "line_start": 1153,
+     "line_end": 1188,
+     "line_start": 1184,
      "name": "checkpoints",
      "sha256": "2863c422401321555685a266b870a228eb266a89621db91f981072341cd375f8"
     },
     {
-     "line_end": 1176,
-     "line_start": 1158,
+     "line_end": 1207,
+     "line_start": 1189,
      "name": "handoffs",
      "sha256": "55f46a570c8b9bf163af27f615fc259df5cca915336bf7dff0f91a560c75dba5"
     },
     {
-     "line_end": 1177,
-     "line_start": 1177,
+     "line_end": 1208,
+     "line_start": 1208,
      "name": "unresolved_questions",
      "sha256": "dc934de039cf6ba0c569a8848d08f3946bd46c153872d90eea0b8cefdaf739fe"
     },
     {
-     "line_end": 1189,
-     "line_start": 1178,
+     "line_end": 1220,
+     "line_start": 1209,
      "name": "rulings",
      "sha256": "15f5bfa92b207a8f12e6e1fb8834a9bf887b8f076157355ea8295c7d94109b98"
     },
     {
-     "line_end": 1202,
-     "line_start": 1190,
+     "line_end": 1233,
+     "line_start": 1221,
      "name": "demonstration_freeze",
      "sha256": "8951efe30b6134ba832b8bf9810670845e9bb37e7d0d52080a549cd1682c7224"
     },
     {
-     "line_end": 1258,
-     "line_start": 1203,
+     "line_end": 1289,
+     "line_start": 1234,
      "name": "observations",
      "sha256": "f1bf6c31974262f64aa878c812073be1ef327e5620aefcc1b352ffed7ee94ae5"
     },
     {
-     "line_end": 1268,
-     "line_start": 1259,
+     "line_end": 1299,
+     "line_start": 1290,
      "name": "evidence_status",
      "sha256": "f7e79529dc7a08ab068690d8eb3e7c3358c9e78937f56ecfa1ec0f06415d338a"
     },
     {
-     "line_end": 1273,
-     "line_start": 1269,
+     "line_end": 1304,
+     "line_start": 1300,
      "name": "immutable_evidence",
      "sha256": "deab89ac1576707f3b7dd39e427d1da5d49ab03aa2d01b6cb7bec979001aaa70"
     },
     {
-     "line_end": 1285,
-     "line_start": 1283,
+     "line_end": 1316,
+     "line_start": 1314,
      "name": "next_deterministic_action",
-     "sha256": "98fa0a09812c3768a270d0fdea20ed84a6fc5d0e3af53d38e9390de31925087b"
+     "sha256": "e75a817b8213966a5691607f5b6dd9c2a371ed427495fe292b5dca8baefc4279"
     }
    ]
   },
   {
    "class": "ORCHESTRATION_RECORD",
    "id": "release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml",
+   "lifecycle": "UNKNOWN",
+   "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
+  },
+  {
+   "commit": "56095c38e0f71edc63abe50b8aa2d9bdd2ba533d",
+   "delivered": [
+    {
+     "line_end": 60,
+     "line_start": 34,
+     "name": "BR-L-0002: the owner's Review-8 disposition is reconciled as mandatory input, with its authority classes kept exact (2026-09-25)",
+     "sha256": "25f2bc2d53cbf08f5a365ca4e3b509f7e5fa099f8da124d8c5a06f009f0f9cbe"
+    },
+    {
+     "line_end": 75,
+     "line_start": 61,
+     "name": "BR-L-0003: the enforced pre-merge checkpoint is proven on synthetic branches (2026-09-25)",
+     "sha256": "723aefbcc9d147f8bd8a020a3c00d861b34e39f214e309ace13d2a81e8d10e13"
+    },
+    {
+     "line_end": 94,
+     "line_start": 76,
+     "name": "BR-L-0004: the owner clarifies the corpus and purpose (OC-BR-02), and the running architect is redirected (2026-09-25)",
+     "sha256": "55d9b9155e38ed70c6af77b57f402a348c04982c0a8ab6104a47b2acf1e6580e"
+    }
+   ],
+   "id": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+   "path": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
+   "section_map": [
+    {
+     "entry_id": null,
+     "kind": "heading",
+     "line_end": 2,
+     "line_start": 1,
+     "name": "Phase-2 Context/Retrieval Bridge: ledger (P2X-FAIL-1)",
+     "nbytes": 57,
+     "sha256": "1dbde9e887eaff64d2690b0c5cf55234e2a5c6d4cd830163ddfa64c7fcf1474b"
+    },
+    {
+     "entry_id": "BR-L-0001",
+     "kind": "md_entry",
+     "line_end": 33,
+     "line_start": 3,
+     "name": "BR-L-0001: the bridge domain is established (2026-09-25)",
+     "nbytes": 2501,
+     "sha256": "a5e1261c4b6805491e18a6ce19919dc5b579e99ffdaf62dc59abfe7f0ea900b4"
+    },
+    {
+     "entry_id": "BR-L-0002",
+     "kind": "md_entry",
+     "line_end": 60,
+     "line_start": 34,
+     "name": "BR-L-0002: the owner's Review-8 disposition is reconciled as mandatory input, with its authority classes kept exact (2026-09-25)",
+     "nbytes": 2009,
+     "sha256": "25f2bc2d53cbf08f5a365ca4e3b509f7e5fa099f8da124d8c5a06f009f0f9cbe"
+    },
+    {
+     "entry_id": "BR-L-0003",
+     "kind": "md_entry",
+     "line_end": 75,
+     "line_start": 61,
+     "name": "BR-L-0003: the enforced pre-merge checkpoint is proven on synthetic branches (2026-09-25)",
+     "nbytes": 739,
+     "sha256": "723aefbcc9d147f8bd8a020a3c00d861b34e39f214e309ace13d2a81e8d10e13"
+    },
+    {
+     "entry_id": "BR-L-0004",
+     "kind": "md_entry",
+     "line_end": 94,
+     "line_start": 76,
+     "name": "BR-L-0004: the owner clarifies the corpus and purpose (OC-BR-02), and the running architect is redirected (2026-09-25)",
+     "nbytes": 1491,
+     "sha256": "55d9b9155e38ed70c6af77b57f402a348c04982c0a8ab6104a47b2acf1e6580e"
+    },
+    {
+     "entry_id": "BR-L-0005",
+     "kind": "md_entry",
+     "line_end": 134,
+     "line_start": 95,
+     "name": "BR-L-0005: the architecture lands, the first wave is dispatched (2026-09-25)",
+     "nbytes": 2903,
+     "sha256": "3969ef1cdc7ed7443cc37575a648a0b4b00d680f54be51ec8e482609835a5044"
+    },
+    {
+     "entry_id": "BR-L-0006",
+     "kind": "md_entry",
+     "line_end": 159,
+     "line_start": 135,
+     "name": "BR-L-0006: the held-out oracle is written and committed by hash (2026-09-25)",
+     "nbytes": 1571,
+     "sha256": "e3b219a5f3ea7fb7cab244d0f2a43f52ffa8bb24ce42fda93445493048673cd1"
+    },
+    {
+     "entry_id": "BR-L-0007",
+     "kind": "md_entry",
+     "line_end": 185,
+     "line_start": 160,
+     "name": "BR-L-0007: B1 (core) lands, and PG1 is dispatched in parallel (2026-09-25)",
+     "nbytes": 1333,
+     "sha256": "64f1bb19f546281f6426f4a815b69c1f861834086d4dc6ab09f3de26492842ec"
+    },
+    {
+     "entry_id": "BR-L-0008",
+     "kind": "md_entry",
+     "line_end": 204,
+     "line_start": 186,
+     "name": "BR-L-0008: B2 (lexical) and B3 (code) land; B2 exposes a cross-module hazard (2026-09-25)",
+     "nbytes": 1425,
+     "sha256": "14259ba4ba3aa3a5e64ddf662f6b1aab29ea4b489eae6efae5bafd35ae7abd45"
+    },
+    {
+     "entry_id": "BR-L-0009",
+     "kind": "md_entry",
+     "line_end": 236,
+     "line_start": 205,
+     "name": "BR-L-0009: B4 (semantic) lands; the four routes are integrated (2026-09-25)",
+     "nbytes": 1549,
+     "sha256": "a45bbbb693fa8076bcb32cf6f2ae459be3163805348fe5ed04fd7e264daa2e1e"
+    },
+    {
+     "entry_id": "BR-L-0010",
+     "kind": "md_entry",
+     "line_end": 260,
+     "line_start": 237,
+     "name": "BR-L-0010: B5 (authority and graph) lands; the authority classes are verified by the orchestrator; B6 is dispatched (2026-09-25)",
+     "nbytes": 1439,
+     "sha256": "87255ecf47b4154e9475abca02819ecd9a25f67750fd2cecda3ac76b711ebff5"
+    },
+    {
+     "entry_id": "BR-L-0011",
+     "kind": "md_entry",
+     "line_end": 292,
+     "line_start": 261,
+     "name": "BR-L-0011: B6 (route and compile) lands; the orchestrator finds mandatory inputs demoted to \"supplementary\" and rules on it (2026-09-25)",
+     "nbytes": 1821,
+     "sha256": "97a64534bb7a9f7abf26636ef6e94ae9999c0db12295bbdbfcbc2ed6a07f8172"
+    },
+    {
+     "entry_id": "BR-L-0012",
+     "kind": "md_entry",
+     "line_end": 320,
+     "line_start": 293,
+     "name": "BR-L-0012: B6R lands; every mandatory input is now delivered as mandatory; I1 is dispatched (2026-09-25)",
+     "nbytes": 1536,
+     "sha256": "8b187b0121ab2cae2ffc855588a1f707e1fdd023ab0e1064c4c81491f33377d8"
+    },
+    {
+     "entry_id": "BR-L-0013",
+     "kind": "md_entry",
+     "line_end": 347,
+     "line_start": 321,
+     "name": "BR-L-0013: I1 lands; the integrated bridge is reproducible; the view is frozen for the demonstration (2026-09-25)",
+     "nbytes": 1577,
+     "sha256": "f5760ac5ec245a6a15bf6dddbb8cf07f5fbea917697bb90e0cdfc0a2e8e02eea"
+    },
+    {
+     "entry_id": "BR-L-0014",
+     "kind": "md_entry",
+     "line_end": 378,
+     "line_start": 348,
+     "name": "BR-L-0014: D1 measures the whole repository, and finds that the code layer was never in the reproducibility proof (2026-09-25)",
+     "nbytes": 2287,
+     "sha256": "d3a5ac2358e3b86646e80a898c73f58a739be66dcb7e4be800b63fd0f69d8838"
+    },
+    {
+     "entry_id": "BR-L-0015",
+     "kind": "md_entry",
+     "line_end": 403,
+     "line_start": 379,
+     "name": "BR-L-0015: B3R lands; the code layer is eager, deterministic, query-invariant and honours exclusions; the view is frozen again (2026-09-25)",
+     "nbytes": 1691,
+     "sha256": "9a774518b0d57d93bbdcb7c53b6d1ab25e2fd8823d880ddf0e25409d41504e20"
+    },
+    {
+     "entry_id": "BR-L-0016",
+     "kind": "md_entry",
+     "line_end": 429,
+     "line_start": 404,
+     "name": "BR-L-0016: the demonstration packet is compiled and not dispatched, because section G is empty; B6R2 is dispatched (2026-09-25)",
+     "nbytes": 1789,
+     "sha256": "b34a4050f6964b8f9113c4335f1b9aef4fc41f0ec3f2370b6a7c0370b9580fca"
+    },
+    {
+     "entry_id": "BR-L-0017",
+     "kind": "md_entry",
+     "line_end": 456,
+     "line_start": 430,
+     "name": "BR-L-0017: B6R2 needed two passes; the demonstration packet now carries the enforcement points; third freeze (2026-09-25)",
+     "nbytes": 1621,
+     "sha256": "9b51c5e8a7846d00ec40c3e9715576bd694fc6835c837aca7c05445b96f0ec34"
+    },
+    {
+     "entry_id": "BR-L-0018",
+     "kind": "md_entry",
+     "line_end": 499,
+     "line_start": 457,
+     "name": "BR-L-0018: the demonstration ran and failed on recall and size; four owner directions; checkpoint discipline is enforced; the freeze lifts (2026-09-26)",
+     "nbytes": 2836,
+     "sha256": "b7984481ae6dcb24509dbe2f0df3f74ef88bb898dc05eee0c8bc0c461d718cc7"
+    }
+   ],
+   "type": "MANDATORY_PARTIAL_DELIVERY",
+   "undelivered_ranges": [
+    {
+     "line_end": 2,
+     "line_start": 1,
+     "name": "Phase-2 Context/Retrieval Bridge: ledger (P2X-FAIL-1)",
+     "sha256": "1dbde9e887eaff64d2690b0c5cf55234e2a5c6d4cd830163ddfa64c7fcf1474b"
+    },
+    {
+     "line_end": 33,
+     "line_start": 3,
+     "name": "BR-L-0001: the bridge domain is established (2026-09-25)",
+     "sha256": "a5e1261c4b6805491e18a6ce19919dc5b579e99ffdaf62dc59abfe7f0ea900b4"
+    },
+    {
+     "line_end": 134,
+     "line_start": 95,
+     "name": "BR-L-0005: the architecture lands, the first wave is dispatched (2026-09-25)",
+     "sha256": "3969ef1cdc7ed7443cc37575a648a0b4b00d680f54be51ec8e482609835a5044"
+    },
+    {
+     "line_end": 159,
+     "line_start": 135,
+     "name": "BR-L-0006: the held-out oracle is written and committed by hash (2026-09-25)",
+     "sha256": "e3b219a5f3ea7fb7cab244d0f2a43f52ffa8bb24ce42fda93445493048673cd1"
+    },
+    {
+     "line_end": 185,
+     "line_start": 160,
+     "name": "BR-L-0007: B1 (core) lands, and PG1 is dispatched in parallel (2026-09-25)",
+     "sha256": "64f1bb19f546281f6426f4a815b69c1f861834086d4dc6ab09f3de26492842ec"
+    },
+    {
+     "line_end": 204,
+     "line_start": 186,
+     "name": "BR-L-0008: B2 (lexical) and B3 (code) land; B2 exposes a cross-module hazard (2026-09-25)",
+     "sha256": "14259ba4ba3aa3a5e64ddf662f6b1aab29ea4b489eae6efae5bafd35ae7abd45"
+    },
+    {
+     "line_end": 236,
+     "line_start": 205,
+     "name": "BR-L-0009: B4 (semantic) lands; the four routes are integrated (2026-09-25)",
+     "sha256": "a45bbbb693fa8076bcb32cf6f2ae459be3163805348fe5ed04fd7e264daa2e1e"
+    },
+    {
+     "line_end": 260,
+     "line_start": 237,
+     "name": "BR-L-0010: B5 (authority and graph) lands; the authority classes are verified by the orchestrator; B6 is dispatched (2026-09-25)",
+     "sha256": "87255ecf47b4154e9475abca02819ecd9a25f67750fd2cecda3ac76b711ebff5"
+    },
+    {
+     "line_end": 292,
+     "line_start": 261,
+     "name": "BR-L-0011: B6 (route and compile) lands; the orchestrator finds mandatory inputs demoted to \"supplementary\" and rules on it (2026-09-25)",
+     "sha256": "97a64534bb7a9f7abf26636ef6e94ae9999c0db12295bbdbfcbc2ed6a07f8172"
+    },
+    {
+     "line_end": 320,
+     "line_start": 293,
+     "name": "BR-L-0012: B6R lands; every mandatory input is now delivered as mandatory; I1 is dispatched (2026-09-25)",
+     "sha256": "8b187b0121ab2cae2ffc855588a1f707e1fdd023ab0e1064c4c81491f33377d8"
+    },
+    {
+     "line_end": 347,
+     "line_start": 321,
+     "name": "BR-L-0013: I1 lands; the integrated bridge is reproducible; the view is frozen for the demonstration (2026-09-25)",
+     "sha256": "f5760ac5ec245a6a15bf6dddbb8cf07f5fbea917697bb90e0cdfc0a2e8e02eea"
+    },
+    {
+     "line_end": 378,
+     "line_start": 348,
+     "name": "BR-L-0014: D1 measures the whole repository, and finds that the code layer was never in the reproducibility proof (2026-09-25)",
+     "sha256": "d3a5ac2358e3b86646e80a898c73f58a739be66dcb7e4be800b63fd0f69d8838"
+    },
+    {
+     "line_end": 403,
+     "line_start": 379,
+     "name": "BR-L-0015: B3R lands; the code layer is eager, deterministic, query-invariant and honours exclusions; the view is frozen again (2026-09-25)",
+     "sha256": "9a774518b0d57d93bbdcb7c53b6d1ab25e2fd8823d880ddf0e25409d41504e20"
+    },
+    {
+     "line_end": 429,
+     "line_start": 404,
+     "name": "BR-L-0016: the demonstration packet is compiled and not dispatched, because section G is empty; B6R2 is dispatched (2026-09-25)",
+     "sha256": "b34a4050f6964b8f9113c4335f1b9aef4fc41f0ec3f2370b6a7c0370b9580fca"
+    },
+    {
+     "line_end": 456,
+     "line_start": 430,
+     "name": "BR-L-0017: B6R2 needed two passes; the demonstration packet now carries the enforcement points; third freeze (2026-09-25)",
+     "sha256": "9b51c5e8a7846d00ec40c3e9715576bd694fc6835c837aca7c05445b96f0ec34"
+    },
+    {
+     "line_end": 499,
+     "line_start": 457,
+     "name": "BR-L-0018: the demonstration ran and failed on recall and size; four owner directions; checkpoint discipline is enforced; the freeze lifts (2026-09-26)",
+     "sha256": "b7984481ae6dcb24509dbe2f0df3f74ef88bb898dc05eee0c8bc0c461d718cc7"
+    }
+   ]
+  },
+  {
+   "class": "ORCHESTRATION_RECORD",
+   "id": "release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md",
    "lifecycle": "UNKNOWN",
    "type": "MANDATORY_LIFECYCLE_NOT_ACTIVE"
   },
@@ -2687,4 +3629,4 @@ read_token: 16442e97af0e
  "receipt_schema": "govbridge-receipt/1",
  "required_checks": []
 }
-read_token: 5a29872d09e7
+read_token: d89d00676efa

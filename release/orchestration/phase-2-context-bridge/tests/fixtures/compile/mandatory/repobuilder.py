@@ -41,6 +41,7 @@ KEYS_YAML_PATH = "spec/mf/keys.yaml"
 PATH_A = "spec/mf/two-path-a.md"
 PATH_B = "spec/mf/two-path-b.md"
 DIR_PATH = "spec/mf/bundle"  # a by-reference directory item (no trailing slash here; the row declares it with one)
+LEDGER_MD_PATH = "spec/mf/ledger.md"
 
 
 def _big_markdown(min_bytes: int = 30_000) -> str:
@@ -84,6 +85,21 @@ delta:
   value: 4
 """
 
+LEDGER_MD_TEXT = """# MF Ledger -- a synthetic entries-over-Markdown fixture (REPAIR_PLAN.md section 3 rule 2)
+
+## MF-GEN-010: entry at position 0 -- deliberately the HIGHEST id, lexicographically, but FIRST in the document
+
+body for MF-GEN-010
+
+## MF-GEN-002: entry at position 1 -- deliberately the LOWEST id, lexicographically, but SECOND in the document
+
+body for MF-GEN-002
+
+## MF-GEN-005: entry at position 2 -- a MIDDLE id, lexicographically, but LAST in the document
+
+body for MF-GEN-005
+"""
+
 PATH_A_TEXT = "# MF-PATHS -- primary path\n\nContent of the FIRST declared path.\n"
 PATH_B_TEXT = "# MF-PATHS -- secondary path\n\nContent of the SECOND declared path -- must be delivered too, not " \
               "merely existence-checked (REPAIR_PLAN.md section 3 rule 2).\n"
@@ -117,6 +133,7 @@ rules:
     write(root, f"{DIR_PATH}/{DIR_FILE_1}", "member one\n")
     write(root, f"{DIR_PATH}/{DIR_FILE_2}", "# member two\n")
     write(root, f"{DIR_PATH}/{DIR_FILE_3}", "member three, nested\n")
+    write(root, LEDGER_MD_PATH, LEDGER_MD_TEXT)
 
     write(root, BRIDGE_STATE_PATH, f"""schema: bridge-orchestrator-state/1
 mandatory_bridge_inputs:
@@ -143,14 +160,23 @@ mandatory_bridge_inputs:
   - id: MF-DIR
     class: EVIDENCE
     path: {DIR_PATH}/
+  - id: MF-LEDGER
+    class: ORCHESTRATION_RECORD
+    path: {LEDGER_MD_PATH}
+    entries: {{start: MF-GEN-010, end: MF-GEN-005}}
   unresolvable_probe_items:
   # an isolated, second mandatory-items list (never referenced by mandatory_bridge_inputs.items[*], so it never
   # perturbs the "everything above resolves" happy-path test) -- a `keys` selector naming a key the document does
-  # not have, exercising "an unresolvable selector fails closed" on its own.
+  # not have, exercising "an unresolvable selector fails closed" on its own; a Markdown `entries` range given in
+  # REVERSE document order (start comes AFTER end), exercising "document order, never lexicographic" fails-closed.
   - id: MF-UNRESOLVABLE
     class: ORCHESTRATION_RECORD
     path: {KEYS_YAML_PATH}
     keys: [alpha, no-such-key]
+  - id: MF-REVERSE-ORDER
+    class: ORCHESTRATION_RECORD
+    path: {LEDGER_MD_PATH}
+    entries: {{start: MF-GEN-002, end: MF-GEN-010}}
 """)
 
     c1 = _commit(root, "mandatory-fidelity fixture: initial content")

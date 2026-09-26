@@ -60,6 +60,12 @@ def item_manifest_row(item) -> dict:
         # the SOURCE record's identity, never claiming it read bytes that were never delivered.
         "source_sha256": getattr(item, "source_sha256", None),
         "delivered_sha256": getattr(item, "delivered_sha256", None),
+        # BR-DAG-AMEND reopening ("packet verify cannot detect silent truncation"): the THIRD, independent
+        # measurement -- what the row DECLARES (whole file, anchored slice, or the ordered selector parts),
+        # recomputable from Git alone (``resolver.declared_parts``). ``packet verify`` recomputes this fresh and
+        # only then checks delivered_sha256 against it (directly, or via a notice's tiled ranges).
+        "declared_sha256": getattr(item, "declared_sha256", None),
+        "declared_bytes": getattr(item, "declared_bytes", None),
         "is_directory": getattr(item, "is_directory", False),
         "directory_members": list(getattr(item, "directory_members", ()) or ()),
         "bytes": item.bytes_len(),

@@ -43,12 +43,13 @@ _HEADING_RE = re.compile(r"^(#{1,6})(\s+.*)?$")
 
 @dataclasses.dataclass(frozen=True)
 class Section:
-    kind: str  # "heading" | "yaml_key" | "yaml_entry"
-    name: str  # heading text, dotted key path, or "<under>[<entry_id>]"
+    kind: str  # "heading" | "yaml_key" | "yaml_entry" | "md_entry" | "preamble"
+    name: str  # heading text, dotted key path, "<under>[<entry_id>]", or "(preamble)"
     line_start: int  # 1-based, inclusive
     line_end: int  # 1-based, inclusive
     sha256: str  # sha256 of the exact text slice this section covers (its own content, independently re-readable)
-    entry_id: Optional[str] = None  # yaml_entry only: the entry's own `id` scalar, or its position if it has none
+    nbytes: int = 0  # UTF-8 byte length of that same exact text slice
+    entry_id: Optional[str] = None  # an entry's own `id` (YAML key or matched Markdown token), or position
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self)
@@ -58,6 +59,13 @@ def _slice_text(lines: list, line_start: int, line_end: int) -> str:
     return "".join(lines[line_start - 1:line_end])
 
 
+def _section_of(kind: str, name: str, lines: list, line_start: int, line_end: int,
+                 entry_id: Optional[str] = None) -> "Section":
+    body = _slice_text(lines, line_start, line_end)
+    return Section(kind=kind, name=name, line_start=line_start, line_end=line_end, sha256=sha256_text(body),
+                   nbytes=len(body.encode("utf-8")), entry_id=entry_id)
+
+
 def _heading_level(line: str) -> Optional[int]:
     m = _HEADING_RE.match(line.rstrip("\n"))
     if not m:
@@ -65,16 +73,23 @@ def _heading_level(line: str) -> Optional[int]:
     return len(m.group(1))
 
 
-def markdown_sections(text: str) -> list:
-    """Every heading run, in document order. A run at level N ends right before the next heading whose level is
-    <= N (a subsection is nested INSIDE its parent's span, matching how a reader would name "the section starting
-    at this heading")."""
+def _md_headings(text: str) -> tuple:
+    """``(lines, headings)`` -- ``headings`` is ``[(line_no_1based, level, title)]`` for every ATX heading line."""
     lines = text.splitlines(keepends=True)
     headings = []
     for i, raw in enumerate(lines, start=1):
         level = _heading_level(raw)
         if level is not None:
             headings.append((i, level, raw.lstrip("#").strip()))
+    return lines, headings
+
+
+def markdown_sections(text: str) -> list:
+    """Every heading run, in document order. A run at level N ends right before the next heading whose level is
+    <= N (a subsection is nested INSIDE its parent's span, matching how a reader would name "the section starting
+    at this heading"). NESTED spans OVERLAP by construction (a level-1 run contains its level-2 children) -- fine
+    for "give me the section named X", wrong for a non-overlapping TILING (see ``flat_tiling`` for that)."""
+    lines, headings = _md_headings(text)
     sections = []
     for idx, (start, level, title) in enumerate(headings):
         end = len(lines)
@@ -82,10 +97,63 @@ def markdown_sections(text: str) -> list:
             if nxt_level <= level:
                 end = nxt_start - 1
                 break
-        body = _slice_text(lines, start, end)
-        sections.append(Section(kind="heading", name=title or f"(heading at line {start})", line_start=start,
-                                 line_end=end, sha256=sha256_text(body)))
+        sections.append(_section_of("heading", title or f"(heading at line {start})", lines, start, end))
     return sections
+
+
+def _match_id_token(title: str, id_patterns: Optional[list]) -> Optional[str]:
+    for pat in (id_patterns or ()):
+        m = pat.match(title)
+        if m:
+            return m.group(0)
+    return None
+
+
+def markdown_flat_tiling(text: str, id_patterns: Optional[list] = None) -> list:
+    """A FLAT (non-overlapping, gap-free) decomposition of a Markdown document -- unlike ``markdown_sections``,
+    whose nested spans OVERLAP (a level-1 run contains its level-2 children) by design. Used wherever a partial
+    mandatory delivery's disclosed ranges must exactly TILE the document (REPAIR_PLAN.md section 3 rule 1/2; the
+    "id-range reopening": a coverage check built on overlapping regions could pass while hiding a real gap).
+
+    Every heading -- at EVERY level, not one chosen level -- gets its own region, covering only its OWN direct
+    content: from its heading line up to (but not including) its first CHILD heading (a heading at a deeper
+    level, still within its own nested span), or to the end of its own span if it has no child. A "(preamble)"
+    region covers whatever precedes the very first heading. This partitions the WHOLE document exhaustively for
+    ANY heading structure -- uniform (every "## Part N" a sibling) or mixed (some headings have nested
+    subsections, some do not) -- with no gaps and no overlaps, unlike a single fixed "pick one level" rule, which
+    breaks as soon as a document mixes depths.
+
+    A heading whose title begins with a token matched by ``id_patterns`` (``config/id-grammar.yaml``'s
+    mention_patterns -- the ``entries`` selector's generic "an id-range of record ids", extended to Markdown) is
+    returned as kind ``"md_entry"`` with ``entry_id`` set to the matched token; the common real shape is a level-2
+    ledger heading such as "## P2-L-0046 -- ..." (``PHASE_LEDGER.md``), but any level works."""
+    lines, headings = _md_headings(text)
+    if not headings:
+        return [_section_of("heading", "(whole document)", lines, 1, len(lines))] if lines else []
+
+    n = len(lines)
+    spans = []  # (start, level, title, end) -- end per markdown_sections' own nested-aware rule
+    for idx, (start, level, title) in enumerate(headings):
+        end = n
+        for nxt_start, nxt_level, _ in headings[idx + 1:]:
+            if nxt_level <= level:
+                end = nxt_start - 1
+                break
+        spans.append((start, level, title, end))
+
+    out = []
+    if spans[0][0] > 1:
+        out.append(_section_of("preamble", "(preamble)", lines, 1, spans[0][0] - 1))
+    for idx, (start, level, title, end) in enumerate(spans):
+        own_end = end
+        if idx + 1 < len(headings):
+            nxt_start, nxt_level, _ = headings[idx + 1]
+            if nxt_start <= end and nxt_level > level:
+                own_end = nxt_start - 1  # a CHILD heading follows -- our own content stops right before it
+        entry_id = _match_id_token(title, id_patterns)
+        out.append(_section_of(("md_entry" if entry_id else "heading"), title, lines, start, own_end,
+                                entry_id=entry_id))
+    return out
 
 
 def _compose(text: str):
@@ -140,15 +208,13 @@ def yaml_key_sections(text: str, keys: Optional[list] = None) -> list:
             key_node, val_node = found
             node = val_node
         l1, l2 = _node_start_1based(key_node), _node_end_1based(val_node)
-        return Section(kind="yaml_key", name=dotted, line_start=l1, line_end=l2,
-                        sha256=sha256_text(_slice_text(lines, l1, l2)))
+        return _section_of("yaml_key", dotted, lines, l1, l2)
 
     if keys is None:
         out = []
         for k, v in root.value:
             l1, l2 = _node_start_1based(k), _node_end_1based(v)
-            out.append(Section(kind="yaml_key", name=str(k.value), line_start=l1, line_end=l2,
-                                sha256=sha256_text(_slice_text(lines, l1, l2))))
+            out.append(_section_of("yaml_key", str(k.value), lines, l1, l2))
         return out
 
     out = []
@@ -198,9 +264,71 @@ def yaml_entry_sections(text: str, under: Optional[str] = None) -> list:
                 break
         l1, l2 = _node_start_1based(item), _node_end_1based(item)
         name = f"{under + '.' if under else ''}[{entry_id}]"
-        out.append(Section(kind="yaml_entry", name=name, line_start=l1, line_end=l2,
-                            sha256=sha256_text(_slice_text(lines, l1, l2)), entry_id=entry_id))
+        out.append(_section_of("yaml_entry", name, lines, l1, l2, entry_id=entry_id))
     return out
+
+
+def yaml_flat_tiling(text: str, entries_under: Optional[str] = None) -> list:
+    """A flat, non-overlapping decomposition of a YAML document's top-level keys (PyYAML's block-style node marks
+    are contiguous by construction, so this is already gap-free) -- except that, when ``entries_under`` names one
+    of those keys, that ONE key's region is REPLACED by its own entry sub-regions (``yaml_entry_sections``),
+    giving entry-level tiling exactly where an ``entries`` selector needs it, and key-level tiling everywhere
+    else."""
+    sections = yaml_key_sections(text)
+    if not entries_under:
+        return sections
+    out = []
+    for s in sections:
+        if s.name == entries_under:
+            out.extend(yaml_entry_sections(text, under=entries_under))
+        else:
+            out.append(s)
+    return out
+
+
+def flat_tiling(text: str, path: Optional[str], entries_under: Optional[str] = None,
+                 id_patterns: Optional[list] = None) -> list:
+    """The generic, non-overlapping, gap-free reference a partial mandatory delivery's disclosed
+    delivered+undelivered ranges must exactly cover (BR-DAG-AMEND reopening, "packet verify cannot detect silent
+    truncation": the check needs a TILING reference, never ``markdown_sections``'s possibly-nested/overlapping
+    spans). Dispatched purely on ``path``'s extension: YAML top-level keys (with ``entries_under`` expanded into
+    entries) for ``.yaml``/``.yml``, Markdown's flat heading tiling (``markdown_flat_tiling``) otherwise."""
+    ext = _extension_of(path)
+    if ext in _YAML_EXTS:
+        return yaml_flat_tiling(text, entries_under=entries_under)
+    return markdown_flat_tiling(text, id_patterns=id_patterns)
+
+
+def entries_of(text: str, path: Optional[str], under: Optional[str] = None,
+                id_patterns: Optional[list] = None) -> list:
+    """Every entry of the document, in DOCUMENT ORDER -- REPAIR_PLAN.md section 3 rule 2's "entries (an id range
+    of record ids)", generically over both shapes a mandatory item's occurrence may take: a YAML sequence's list
+    items (``under``, a dotted key path to the sequence) and a Markdown document's id-prefixed headings
+    (``id_patterns`` -- ``config/id-grammar.yaml``'s mention_patterns; a level-2 ledger heading such as
+    "## P2-L-0046 -- ..." is the common real shape, but any level works, generically, via
+    ``markdown_flat_tiling``)."""
+    ext = _extension_of(path)
+    if ext in _YAML_EXTS:
+        return yaml_entry_sections(text, under=under)
+    return [s for s in markdown_flat_tiling(text, id_patterns=id_patterns) if s.entry_id is not None]
+
+
+def select_entry_range(entries: list, start, end) -> tuple:
+    """``(selected, ok)`` -- ``entries`` MUST already be in document order (as ``entries_of`` returns them). The
+    slice from the entry whose ``entry_id == start`` through the entry whose ``entry_id == end``, inclusive, in
+    DOCUMENT ORDER -- never by string/lexicographic comparison (a "reopening" fix: entry ids are not guaranteed
+    to sort the way they appear in the document). ``ok`` is False (``selected`` is ``[]``) when either id is
+    missing, or ``start`` does not precede (or equal) ``end`` in document order -- REPAIR_PLAN.md section 3 rule
+    2's "fails closed", generalised from existence to POSITION."""
+    ids = [e.entry_id for e in entries]
+    try:
+        i = ids.index(str(start))
+        j = ids.index(str(end))
+    except ValueError:
+        return [], False
+    if i > j:
+        return [], False
+    return entries[i:j + 1], True
 
 
 _MARKDOWN_EXTS = (".md", ".markdown")
@@ -214,17 +342,6 @@ def _extension_of(path: Optional[str]) -> str:
     if "." not in base:
         return ""
     return "." + base.rsplit(".", 1)[-1].lower()
-
-
-def whole_map(text: str, path: Optional[str]) -> list:
-    """Every detected section, in document order, dispatched purely on ``path``'s extension (never on sniffing
-    content, which a governance record's free-form prose could fool): YAML top-level keys for ``.yaml``/``.yml``,
-    Markdown headings otherwise. Returns ``[]`` (honest, no structure claimed) when the format has no headings and
-    is not YAML -- the caller then discloses the item by exact reference alone, never a guess at internal shape."""
-    ext = _extension_of(path)
-    if ext in _YAML_EXTS:
-        return yaml_key_sections(text)
-    return markdown_sections(text)
 
 
 def select(sections: list, names: list) -> tuple:

@@ -138,6 +138,14 @@ class PacketItem:
     # that was never sent). None outside a MANDATORY item that this module has actually resolved.
     source_sha256: Optional[str] = None
     delivered_sha256: Optional[str] = None
+    # BR-DAG-AMEND reopening ("packet verify cannot detect silent truncation"): declared_sha256/declared_bytes are
+    # an INDEPENDENT third measurement -- the hash/byte-count of ``resolver.declared_regions(mi)``, i.e. exactly
+    # what the row's own occurrence/selectors DECLARE, recomputable from Git alone. ``packet verify`` recomputes
+    # this FRESH (never trusts the stored value) and only then checks delivered_sha256 == declared_sha256, or a
+    # MANDATORY_PARTIAL_DELIVERY notice whose ranges exactly tile the declared regions. None for anything that
+    # is not a mandatory item resolved from a real occurrence (a directory item, or an unreadable path).
+    declared_sha256: Optional[str] = None
+    declared_bytes: Optional[int] = None
     # BR-DAG node R1-RM (REPAIR_PLAN.md section 3 rule 3): a by-reference directory mandatory item's member
     # manifest, propagated from ``resolver.MandatoryItem.directory_members`` so it is visible in the rendered
     # manifest too (never guessed at by a downstream reader). Empty/False for everything else.
@@ -436,56 +444,65 @@ class Compiler:
             # LADDER row), so this never overwrites one -- it only ever replaces None.
             banner = LIFECYCLE_BANNERS.get(mi.lifecycle, banner)
 
-        text = self._mandatory_text(mi)
+        # declared_parts/declared_sha256 are the INDEPENDENT third measurement the BR-DAG-AMEND reopening asks
+        # for: "the hash of exactly what the row declares" (whole file, anchored slice, or the ordered selector
+        # parts), computed BEFORE `text` is built so `packet verify` has a ground truth that never depends on
+        # this module's own rendering. See resolver.declared_parts's docstring for the three shapes.
+        dparts = resolvermod.declared_parts(mi, repo=self.repo)
+        declared_sha256, declared_bytes = resolvermod.declared_hash_and_bytes(dparts)
+        text, delivered_sha256 = self._mandatory_text(mi, dparts)
         # source_sha256 is the resolver's OWN recorded hash, verbatim -- never a hash of this module's rendered
         # text (a directory-form item legitimately carries sha256=None; validate.py's independent re-derivation
         # compares content_sha256 against the freshly recomputed MandatoryItem field-for-field, so it must never
-        # diverge from what the resolver itself reported). delivered_sha256 is what ``text`` (the bytes actually
-        # placed in the packet) hashes to -- BR-DAG node R1-RM, REPAIR_PLAN.md section 3 rule 4: "the receipt
-        # acknowledges delivered_sha256 separately from source_sha256... must not appear to acknowledge content
-        # that was never delivered."
+        # diverge from what the resolver itself reported).
         source_sha256 = mi.sha256
-        delivered_sha256 = sha256_text(text) if text else None
         return PacketItem(unit_kind="record", unit_id=mi.id, section=section, delivery=delivery, cls=mi.cls,
                            lifecycle=mi.lifecycle, version_status=None, ref=None, commit=mi.commit, path=mi.path,
                            blob=mi.blob, line_start=mi.line_start, line_end=mi.line_end, text=text,
                            content_sha256=source_sha256, by_reference=False, route="resolver", raw_score=None,
                            rank=None, fused_score=None, edge_path=(), reason=mi.reason, banner=banner,
                            source_sha256=source_sha256, delivered_sha256=delivered_sha256,
+                           declared_sha256=declared_sha256, declared_bytes=declared_bytes,
                            is_directory=mi.is_directory, directory_members=mi.directory_members)
 
     # -- mandatory-item TEXT (BR-DAG node R1-RM, REPAIR_PLAN.md section 3): never a silent cut ------------------
 
-    def _mandatory_text(self, mi: resolvermod.MandatoryItem) -> str:
-        """The full text a MANDATORY item delivers. Exactly one of three shapes, and every one of them ends
-        cleanly (never mid-content with no marker):
+    def _mandatory_text(self, mi: resolvermod.MandatoryItem, dparts: tuple) -> tuple:
+        """``(text, delivered_sha256)``. ``text`` is the full body a MANDATORY item delivers -- exactly one of
+        three shapes, and every one of them ends cleanly (never mid-content with no marker):
 
-        * a directory item's member manifest (rule 3) -- always its own complete representation;
+        * a directory item's member manifest (rule 3) -- always its own complete representation; delivered_sha256
+          is None (its "declared" form is the member manifest, not a text body -- see ``declared_parts``);
         * a row with resolved ``parts`` (rule 2's ``keys``/``entries``/extra-``paths`` selectors) -- every part
-          delivered in FULL, with a ``MANDATORY_PARTIAL_DELIVERY`` notice for whatever the selectors left out;
-        * the plain occurrence's own text -- delivered whole when it fits the per-item cap, else a section map
-          (rule 1) plus a ``MANDATORY_PARTIAL_DELIVERY`` notice, never a bare truncated string.
+          delivered in FULL; delivered_sha256 is ``resolver.hash_pieces`` over exactly those parts' own raw text,
+          which is IDENTICAL, byte for byte, to how ``declared_sha256`` was computed from the SAME ``dparts`` --
+          so delivered always equals declared here, by construction (a selector narrows what is DECLARED, not
+          what is delivered of it);
+        * the plain occurrence's own text -- delivered whole (delivered_sha256 == declared_sha256, the same
+          ``hash_pieces`` scheme) when it fits the per-item cap, else a section map (rule 1) plus a
+          ``MANDATORY_PARTIAL_DELIVERY`` notice and delivered_sha256 = None (nothing raw was sent; ``packet
+          verify`` must find the notice and check its ranges tile the declared span -- see ``validate.py``).
         """
         if mi.is_directory:
-            return self._render_directory_manifest(mi)
+            # the member manifest text IS the complete, honest representation of a directory item -- never
+            # "partial" in the rule-1 sense -- so its delivered_sha256 mirrors source_sha256 (both independently
+            # derived from the SAME member list; resolver.py's docstring on the directory sha256 derivation).
+            return self._render_directory_manifest(mi), mi.sha256
 
-        if mi.parts:
-            return self._render_selected_parts(mi)
-
-        if mi.path is None or mi.commit is None:
-            return f"[reference only: {mi.path}@{mi.commit}]"
-
-        full = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo, max_chars=None)
-        if full is None:
+        if not dparts:
             loc = f"{mi.path}@{mi.commit}"
             if mi.line_start is not None:
                 loc += f":{mi.line_start}-{mi.line_end}"
-            return f"[reference only: {loc}]"
+            return f"[reference only: {loc}]", None
 
-        if len(full.encode("utf-8")) <= self.per_item_cap_bytes:
-            return full
+        if mi.parts:
+            return self._render_selected_parts(mi, dparts)
 
-        return self._render_oversize_no_selector(mi, full)
+        primary = dparts[0]
+        if primary["bytes"] <= self.per_item_cap_bytes:
+            return primary["text"], resolvermod.hash_pieces([primary["text"]])
+
+        return self._render_oversize_no_selector(mi, primary)
 
     def _render_directory_manifest(self, mi: resolvermod.MandatoryItem) -> str:
         lines = [f"[directory manifest: {mi.path}@{mi.commit} -- {len(mi.directory_members)} member(s), by "
@@ -498,77 +515,63 @@ class Compiler:
             lines.append("(no tracked files under this directory at this commit)")
         return "\n".join(lines) + "\n"
 
-    def _render_selected_parts(self, mi: resolvermod.MandatoryItem) -> str:
-        # a `keys`/`entries` selector NARROWS the primary occurrence itself (only the matched keys/entries are
-        # "the item"); an extra `paths` entry does not narrow the primary at all -- it is an ADDITIONAL whole file
-        # alongside it. So the primary's own full text is rendered here too, but only when nothing narrowed it.
-        narrowing = any(p["kind"] in ("keys", "entries") for p in mi.parts)
-        pieces = [f"[selected: {len(mi.parts)} part(s) of {mi.path}@{mi.commit}, honouring the declared selector(s) "
+    def _render_selected_parts(self, mi: resolvermod.MandatoryItem, dparts: tuple) -> tuple:
+        pieces = [f"[selected: {len(dparts)} part(s) of {mi.path}@{mi.commit}, honouring the declared selector(s) "
                   f"verbatim (REPAIR_PLAN.md section 3 rule 2)]"]
-        delivered_names = set()
+        for part in dparts:
+            loc = f"{part['path']}@{part['commit']}:{part['line_start']}-{part['line_end']}"
+            pieces.append(f"--- {part['name']}  ({loc}) ---")
+            pieces.append(part["text"])
+        delivered_sha256 = resolvermod.hash_pieces([p["text"] for p in dparts])
 
-        if not narrowing and mi.path is not None and mi.commit is not None:
-            primary_text = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo,
-                                          max_chars=None)
-            loc = f"{mi.path}@{mi.commit}"
-            if mi.line_start is not None:
-                loc += f":{mi.line_start}-{mi.line_end}"
-            pieces.append(f"--- primary:{mi.path}  ({loc}) ---")
-            pieces.append(primary_text if primary_text is not None else f"[reference only: {loc}]")
-
-        for part in mi.parts:
-            p_path, p_commit = part["path"], part["commit"]
-            loc = p_path
-            if p_commit:
-                loc += f"@{p_commit}"
-            if part["line_start"] is not None:
-                loc += f":{part['line_start']}-{part['line_end']}"
-            p_text = _read_excerpt(p_path, p_commit, part["line_start"], part["line_end"], repo=self.repo,
-                                    max_chars=None)
-            pieces.append(f"--- {part['kind']}:{part['name']}  ({loc}) ---")
-            pieces.append(p_text if p_text is not None else f"[reference only: {loc}]")
-            if part["path"] == mi.path:
-                delivered_names.add(part["name"])
-
-        # disclose the REST of the primary occurrence as undelivered, when a keys/entries selector narrowed it and
-        # it maps structurally -- a selector legitimately narrows delivery, but rule 1's "never end mid-content
-        # without the notice" still applies to whatever the selector left out. A paths-only row narrows nothing
-        # (the primary was just rendered above IN FULL), so there is no "remainder" of the primary to disclose.
-        if narrowing and mi.line_start is None and mi.path is not None and mi.commit is not None:
+        # a `keys`/`entries` selector narrows the PRIMARY occurrence itself -- disclose what else exists in it,
+        # informationally (REPAIR_PLAN.md section 3's "declared selectors honoured" transparency). This notice is
+        # never required for `packet verify` to PASS this item (delivered_sha256 == declared_sha256 already,
+        # since dparts IS exactly what was declared): it is read-for-humans context, not a fidelity gate. A
+        # `paths`-only row narrows nothing (every declared path is already delivered above in full), so there is
+        # no "remainder" to disclose.
+        narrowing_parts = [p for p in mi.parts if p["kind"] in ("keys", "entries")]
+        if narrowing_parts and mi.line_start is None and mi.path is not None and mi.commit is not None:
             full = _read_excerpt(mi.path, mi.commit, None, None, repo=self.repo, max_chars=None)
             if full is not None:
-                whole = sectionmapmod.whole_map(full, mi.path)
+                under = resolvermod._entries_under_from_parts(mi.parts)
+                whole = sectionmapmod.flat_tiling(full, mi.path, entries_under=under,
+                                                   id_patterns=resolvermod.ID_MENTION_REGEXES)
+                delivered_names = {p["name"] for p in narrowing_parts}
                 undelivered = [s for s in whole if s.name not in delivered_names]
-                if whole:
+                if undelivered:
                     self.notices.append({
                         "type": "MANDATORY_PARTIAL_DELIVERY", "id": mi.id, "path": mi.path, "commit": mi.commit,
                         "section_map": [s.to_dict() for s in whole],
-                        "delivered": [{"kind": p["kind"], "name": p["name"], "line_start": p["line_start"],
-                                       "line_end": p["line_end"]} for p in mi.parts],
+                        "delivered": [{"name": p["name"], "line_start": p["line_start"], "line_end": p["line_end"],
+                                       "sha256": p["sha256"]} for p in dparts],
                         "undelivered_ranges": [{"name": s.name, "line_start": s.line_start,
                                                  "line_end": s.line_end, "sha256": s.sha256} for s in undelivered],
                     })
-        return "\n".join(pieces) + "\n"
+        return "\n".join(pieces) + "\n", delivered_sha256
 
-    def _render_oversize_no_selector(self, mi: resolvermod.MandatoryItem, full: str) -> str:
-        whole = sectionmapmod.whole_map(full, mi.path)
+    def _render_oversize_no_selector(self, mi: resolvermod.MandatoryItem, primary: dict) -> tuple:
+        disclosure = resolvermod.oversize_disclosure_map(mi, repo=self.repo)
         lines = [f"[section map: {mi.path}@{mi.commit} exceeds the {self.per_item_cap_bytes}-byte per-item cap; "
                  f"every section below is delivered BY REFERENCE -- read it by its exact line range and verify "
                  f"its own sha256 (REPAIR_PLAN.md section 3 rule 1: never a silent, unmarked cut)]"]
-        if whole:
-            undelivered = [{"name": s.name, "line_start": s.line_start, "line_end": s.line_end, "sha256": s.sha256}
-                           for s in whole]
-            for s in whole:
-                lines.append(f"- {s.kind}:{s.name}  lines {s.line_start}-{s.line_end}  sha256={s.sha256}")
+        if disclosure:
+            for r in disclosure:
+                lines.append(f"- {r['name']}  lines {r['line_start']}-{r['line_end']}  sha256={r['sha256']}")
+            undelivered = [dict(r) for r in disclosure]
         else:
-            undelivered = [{"name": "(whole item)", "line_start": mi.line_start, "line_end": mi.line_end,
-                            "sha256": mi.sha256}]
             lines.append("- (no structural map available for this format; read the whole item by exact reference)")
+            undelivered = [{"path": primary["path"], "commit": primary["commit"],
+                            "line_start": primary["line_start"], "line_end": primary["line_end"],
+                            "name": "(whole item)", "sha256": primary["sha256"], "bytes": primary["bytes"]}]
         self.notices.append({
             "type": "MANDATORY_PARTIAL_DELIVERY", "id": mi.id, "path": mi.path, "commit": mi.commit,
-            "section_map": [s.to_dict() for s in whole], "delivered": [], "undelivered_ranges": undelivered,
+            "section_map": undelivered, "delivered": [], "undelivered_ranges": undelivered,
         })
-        return "\n".join(lines) + "\n"
+        # nothing raw was delivered (only the map above) -- delivered_sha256 stays None so `packet verify` is
+        # forced onto the coverage/tiling check (2b) rather than a hash comparison that could never legitimately
+        # pass here.
+        return "\n".join(lines) + "\n", None
 
     def reference_item(self, source: PacketItem, section: str) -> PacketItem:
         """A cheap D.1 pointer to an item already fully rendered in A (never a second copy of its content --

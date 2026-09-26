@@ -5,6 +5,7 @@ the resolver's own source hash. Every id here is ``MF-*`` (Mandatory Fidelity), 
 (OC-BR-02); the fixture repo (``tests/fixtures/compile/mandatory/repobuilder.py``) is this node's own, independent
 of the shared ``tests/fixtures/compile/compile_repobuilder.py``.
 """
+import copy
 from pathlib import Path
 
 import pytest
@@ -62,7 +63,7 @@ def test_all_mandatory_items_resolve_and_land_in_a(mf_repo, mf_view_path, mf_reg
     task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path)
     assert result["status"] == packetmod.STATUS_OK, result["resolve_result"].blocked_reasons
     a_rows = _a_rows(result["manifest"])
-    for item_id in ("MF-BIG", "MF-ENTRIES", "MF-KEYS", "MF-PATHS", "MF-DIR"):
+    for item_id in ("MF-BIG", "MF-ENTRIES", "MF-KEYS", "MF-PATHS", "MF-DIR", "MF-LEDGER"):
         assert item_id in a_rows, f"{item_id} must be in A (never dropped, whatever its size or shape)"
     assert validatemod.verify_packet(result["manifest"], task_spec, repo=str(mf_repo.root),
                                       registry_path=mf_registry_path) == []
@@ -78,7 +79,7 @@ def test_oversize_item_never_ends_mid_content(mf_repo, mf_view_path, mf_registry
     row = a_rows["MF-BIG"]
 
     raw = gitobj.read_path(row["source"]["commit"], row["source"]["path"], repo=str(mf_repo.root)).decode("utf-8")
-    expected_sections = sectionmapmod.markdown_sections(raw)
+    expected_sections = sectionmapmod.markdown_flat_tiling(raw)
     assert len(expected_sections) >= 5, "the generated fixture must have several headings to be a meaningful probe"
 
     # the delivered TEXT is the section map itself, not a truncated prefix of the raw document -- it never just
@@ -101,8 +102,13 @@ def test_oversize_item_never_ends_mid_content(mf_repo, mf_view_path, mf_registry
         assert got_by_name[s.name]["line_start"] == s.line_start
         assert got_by_name[s.name]["line_end"] == s.line_end
 
-    assert row["delivered_sha256"] is not None
+    # nothing raw was delivered (only the map above) -- delivered_sha256 stays None, forcing `packet verify` onto
+    # the coverage/tiling check (2b) rather than a hash comparison that could never legitimately pass here.
+    assert row["delivered_sha256"] is None
     assert row["source_sha256"] is not None
+    assert row["declared_sha256"] is not None
+    assert validatemod.verify_packet(manifest, task_spec, repo=str(mf_repo.root),
+                                      registry_path=mf_registry_path) == []
     assert row["delivered_sha256"] != row["source_sha256"], \
         "a section-map delivery must never be mistaken for the full source"
 
@@ -190,6 +196,40 @@ def test_directory_item_becomes_a_member_manifest(mf_repo, mf_view_path, mf_regi
     assert row["delivered_sha256"] is not None
 
 
+def test_markdown_entries_resolve_in_document_order_not_lexicographic(mf_repo, mf_view_path, mf_registry_path):
+    """MF-LEDGER declares ``entries: {start: MF-GEN-010, end: MF-GEN-005}`` over a Markdown ledger whose entries
+    are, in DOCUMENT order, GEN-010, GEN-002, GEN-005 -- the LOWEST id (GEN-002) sits between the two named
+    endpoints in the document, but is neither endpoint. A correct, document-order resolver must select ALL THREE
+    entries (position 0 through position 2, inclusive); a buggy lexicographic-comparison resolver would either
+    select nothing (since "MF-GEN-005" <= "MF-GEN-010" as strings makes the range look empty/backwards) or the
+    wrong subset."""
+    task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path)
+    assert result["status"] == packetmod.STATUS_OK
+    delivered_text = next(i.text for i in result["sections"]["A"] if i.unit_id == "MF-LEDGER")
+    for entry_id in ("MF-GEN-010", "MF-GEN-002", "MF-GEN-005"):
+        assert f"body for {entry_id}" in delivered_text
+
+    resolve_result = result["resolve_result"]
+    mi = next(m for m in resolve_result.items if m.id == "MF-LEDGER")
+    assert [p["kind"] for p in mi.parts] == ["entries", "entries", "entries"]
+    got_ids = [p["name"].split(":")[0] for p in mi.parts]  # each part's name is the full heading title
+    assert got_ids == ["MF-GEN-010", "MF-GEN-002", "MF-GEN-005"], \
+        f"parts must be in DOCUMENT order, not lexicographic: got {got_ids}"
+
+
+def test_markdown_entries_reverse_document_order_fails_closed(mf_repo, mf_view_path, mf_registry_path):
+    """``entries: {start: MF-GEN-002, end: MF-GEN-010}`` -- MF-GEN-002 sits AFTER MF-GEN-010 in the document, so
+    ``start`` does not precede ``end`` in document order (even though it does lexicographically: "002" < "010").
+    This must fail closed, never silently resolve via string comparison."""
+    task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path, required_inputs=[
+        {"state_ref": "state:bridge#mandatory_bridge_inputs.unresolvable_probe_items[*]", "reason": "test"},
+    ])
+    assert result["status"] == packetmod.STATUS_BLOCKED
+    reasons = " ".join(result["resolve_result"].blocked_reasons)
+    assert "MF-REVERSE-ORDER" in reasons
+    assert "DOCUMENT order" in reasons
+
+
 def test_unresolvable_selector_fails_closed(mf_repo, mf_view_path, mf_registry_path):
     """A ``keys`` selector naming a key the document does not have must BLOCK the whole resolution (never a
     silent partial match) and disclose why."""
@@ -223,3 +263,57 @@ def test_full_compile_suite_untouched_by_this_fixture(mf_repo, mf_view_path, mf_
     assert mf_repo.root != Path(".")
     task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path)
     assert result["status"] == packetmod.STATUS_OK
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# BR-DAG-AMEND reopening ("packet verify cannot detect silent truncation"): negative controls. Each of these
+# MUST make `packet verify` FAIL -- proving the declared/delivered coverage check actually catches the three
+# concrete failure shapes the reopening named, not merely that it passes on well-formed input.
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_truncated_body_with_no_notice_fails_verify(mf_repo, mf_view_path, mf_registry_path):
+    """A compiler that delivered something OTHER than the declared content, but recorded a delivered_sha256 for
+    it anyway with NO ``MANDATORY_PARTIAL_DELIVERY`` notice to explain the gap, must fail ``packet verify``. This
+    is RC-1's exact silent-truncation shape: a hash is present, but it does not match what was declared, and
+    nothing discloses why."""
+    task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path)
+    assert result["status"] == packetmod.STATUS_OK
+    manifest = copy.deepcopy(result["manifest"])
+    row = next(r for r in manifest["sections"]["A"]["items"] if r["unit"]["id"] == "MF-PATHS")
+    assert row["delivered_sha256"] == row["declared_sha256"], "MF-PATHS must be a fully-delivered, no-notice item"
+    row["delivered_sha256"] = "0" * 64  # a body silently swapped/cut, with a hash recorded for the wrong content
+    problems = validatemod.verify_packet(manifest, task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path)
+    assert any("MF-PATHS" in p and "no MANDATORY_PARTIAL_DELIVERY notice" in p for p in problems), problems
+
+
+def test_notice_with_a_gap_fails_verify(mf_repo, mf_view_path, mf_registry_path):
+    """A ``MANDATORY_PARTIAL_DELIVERY`` notice whose disclosed ranges leave a GAP (one undisclosed range is
+    simply dropped) must fail ``packet verify``'s coverage/tiling check -- proving a real gap is detected, not
+    just that a complete disclosure is accepted."""
+    task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path)
+    assert result["status"] == packetmod.STATUS_OK
+    manifest = copy.deepcopy(result["manifest"])
+    notice = next(n for n in manifest["notices"]
+                  if n["type"] == "MANDATORY_PARTIAL_DELIVERY" and n["id"] == "MF-BIG")
+    assert len(notice["undelivered_ranges"]) >= 2, "MF-BIG's fixture must have several disclosed ranges"
+    notice["undelivered_ranges"].pop()  # drop one disclosed range -- introduces a real gap
+    problems = validatemod.verify_packet(manifest, task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path)
+    assert any("MF-BIG" in p and "gap" in p for p in problems), problems
+
+
+def test_declared_sha256_mismatch_fails_verify(mf_repo, mf_view_path, mf_registry_path):
+    """A tampered ``declared_sha256`` that no longer matches the source at the recorded view must fail ``packet
+    verify`` -- proving the value is independently RECOMPUTED from Git at verify time, never trusted from the
+    stored manifest (the whole point of the reopening: a compiler's own claim about what it declared is not
+    evidence)."""
+    task_spec, result = _compile(mf_repo, mf_view_path, mf_registry_path)
+    assert result["status"] == packetmod.STATUS_OK
+    manifest = copy.deepcopy(result["manifest"])
+    row = next(r for r in manifest["sections"]["A"]["items"] if r["unit"]["id"] == "MF-KEYS")
+    row["declared_sha256"] = "f" * 64
+    problems = validatemod.verify_packet(manifest, task_spec, repo=str(mf_repo.root),
+                                          registry_path=mf_registry_path)
+    assert any("MF-KEYS" in p and "declared_sha256" in p and "does not match the source" in p for p in problems), \
+        problems

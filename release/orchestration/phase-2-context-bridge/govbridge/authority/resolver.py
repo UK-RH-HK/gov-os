@@ -42,6 +42,21 @@ def _load_state_aliases() -> dict:
 
 STATE_ALIASES = _load_state_aliases()
 
+
+def _load_id_mention_regexes() -> tuple:
+    """Compiled ``config/id-grammar.yaml`` mention_patterns (REPAIR_PLAN.md section 3 rule 2's ``entries``
+    selector, generalised to Markdown -- "a section whose heading begins with a token matched by
+    config/id-grammar.yaml is an entry"). Read once, at import time, the same way ``STATE_ALIASES`` is -- this is
+    real, repository-wide grammar data, never a fixture-overridable path. A lazy import of
+    ``govbridge.authority.records`` (a PEER module in this same package, not a layering violation) avoids a
+    module-load-time cost for callers that never touch a row with an ``entries`` selector."""
+    from govbridge.authority import records as recordsmod
+    grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
+    return tuple(m["regex"] for m in grammar.mention_patterns)
+
+
+ID_MENTION_REGEXES = _load_id_mention_regexes()
+
 STATE_REF_RE = re.compile(r"^state:(?P<alias>[^#]+)#(?P<key>.+?)(?P<star>\[\*\])?$")
 PATH_FORM_RE = re.compile(r"^(?P<path>[^@]+)@(?P<ref>[^:]+)(?::(?P<l1>\d+)(?:-(?P<l2>\d+))?)?$")
 
@@ -207,25 +222,34 @@ def _resolve_row_selectors(row: dict, path: str, commit: str, repo: Optional[str
                     parts.append({"kind": "keys", "name": sec.name, "path": path, "commit": commit,
                                   "line_start": sec.line_start, "line_end": sec.line_end, "sha256": sec.sha256})
             if entries:
+                # REPAIR_PLAN.md section 3 rule 2, generalised (reopening): `entries` works over BOTH a YAML
+                # sequence (`under`, a dotted key path) and a Markdown document's id-prefixed headings (the real
+                # PHASE-2-LEDGER-P2-L-0033-0047 shape) -- `entries_of` dispatches on `path`'s extension.
+                # `{start, end}` is resolved in DOCUMENT ORDER (never lexicographically): `select_entry_range`.
                 under = entries.get("under")
-                all_entries = sectionmapmod.yaml_entry_sections(text, under=under)
-                by_id = {e.entry_id: e for e in all_entries}
+                all_entries = sectionmapmod.entries_of(text, path, under=under, id_patterns=ID_MENTION_REGEXES)
                 ids = entries.get("ids")
                 start, end = entries.get("start"), entries.get("end")
                 if ids is not None:
-                    chosen_ids = [str(i) for i in ids]
+                    by_id = {e.entry_id: e for e in all_entries}
+                    order = {e.entry_id: idx for idx, e in enumerate(all_entries)}
+                    chosen = []
+                    for i in ids:
+                        sec = by_id.get(str(i))
+                        if sec is None:
+                            unresolved.append(f"entries:{i}")
+                        else:
+                            chosen.append(sec)
+                    chosen.sort(key=lambda s: order[s.entry_id])  # DOCUMENT order, whatever order `ids` declared
                 elif start is not None and end is not None:
-                    chosen_ids = [e.entry_id for e in all_entries if str(start) <= e.entry_id <= str(end)]
-                    if not chosen_ids:
-                        unresolved.append(f"entries:{start}-{end}")
+                    chosen, ok = sectionmapmod.select_entry_range(all_entries, start, end)
+                    if not ok:
+                        unresolved.append(f"entries:{start}-{end} (both ids must exist and {start} must precede "
+                                           f"or equal {end} in DOCUMENT order, not lexicographic order)")
                 else:
-                    chosen_ids = []
+                    chosen = []
                     unresolved.append("entries: neither ids nor start/end declared")
-                for eid in chosen_ids:
-                    sec = by_id.get(eid)
-                    if sec is None:
-                        unresolved.append(f"entries:{eid}")
-                        continue
+                for sec in chosen:
                     parts.append({"kind": "entries", "name": sec.name, "path": path, "commit": commit,
                                   "line_start": sec.line_start, "line_end": sec.line_end, "sha256": sec.sha256})
 
@@ -241,6 +265,139 @@ def _resolve_row_selectors(row: dict, path: str, commit: str, repo: Optional[str
                       "line_end": None, "sha256": _sha256_of(extra, commit, repo=repo)})
 
     return tuple(parts), tuple(unresolved)
+
+
+def _read_git_slice(path: str, commit: str, l1: Optional[int], l2: Optional[int],
+                     repo: Optional[str] = None) -> Optional[str]:
+    """The text of ``path``@``commit`` (or lines ``l1``-``l2`` of it), or None -- never truncated (this module
+    computes identity/metadata, not a bounded excerpt; ``govbridge.compile.packet`` owns budget-shaped reading).
+    A small, deliberate duplicate of ``packet._read_excerpt``'s non-truncating half: resolver.py must not import
+    packet.py (packet.py already imports resolver.py; the reverse would be circular)."""
+    raw = gitobj.read_path(commit, path, repo=repo)
+    if raw is None:
+        return None
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        return None
+    if l1 is not None:
+        lines = text.splitlines(keepends=True)
+        l2 = l2 or l1
+        text = "".join(lines[max(l1 - 1, 0):l2])
+    return text
+
+
+def _entries_under_from_parts(parts: tuple) -> Optional[str]:
+    """Recovers an ``entries`` selector's own ``under`` value from an already-resolved ``entries``-kind part's
+    ``name`` (``f"{under + '.' if under else ''}[{entry_id}]"`` -- see ``sectionmap.yaml_entry_sections``), so
+    ``declared_regions`` below can re-expand the SAME key when it recomputes the item's declared span. Avoids
+    adding a redundant field to ``MandatoryItem`` purely to carry a value already implicit in ``parts``."""
+    for p in parts:
+        if p["kind"] == "entries":
+            prefix = p["name"].split("[", 1)[0]
+            return prefix[:-1] if prefix.endswith(".") else (prefix or None)
+    return None
+
+
+def hash_pieces(pieces: "list") -> str:
+    """The ONE canonical hash both ``declared_hash_and_bytes`` (below) and ``packet.item_from_mandatory``'s
+    ``delivered_sha256`` use, so equality between the two is a meaningful, exact byte-level comparison rather than
+    two independently-invented schemes that happen to look similar. Each piece is stripped of trailing newlines
+    before joining (matching how every renderer in this package already ends a body -- ``rstrip("\\n")`` -- so a
+    delivered piece's own trailing-newline convention never causes a spurious mismatch)."""
+    return sha256_text("\n".join(p.rstrip("\n") for p in pieces))
+
+
+def _total_lines(text: str) -> int:
+    return len(text.splitlines())
+
+
+def declared_parts(mi: "MandatoryItem", repo: Optional[str] = None) -> tuple:
+    """The ORDERED list of raw pieces that constitute EXACTLY what this mandatory item's row DECLARES -- read
+    fresh from Git, never trusted from a stored value (BR-DAG-AMEND reopening, "packet verify cannot detect
+    silent truncation": RC-1's whole defect was a compiler that could cut a body while the manifest still claimed
+    a hash for it; a check that trusts the compiler's own declared_sha256 catches nothing, so this function is the
+    independent ground truth ``validate.py`` recomputes at verify time).
+
+    * a directory item: ``()`` -- its declared form is its member manifest, checked separately;
+    * a ``keys``/``entries`` selector (it narrows the PRIMARY occurrence itself): EXACTLY ``mi.parts``' own
+      resolved sub-ranges, in the given order -- the row asked for precisely these, and delivering precisely
+      these IS full, honest delivery (never "partial" relative to what was actually requested);
+    * a ``paths``-only selector (nothing narrows the primary): the primary's own whole occurrence, plus one
+      whole-file piece per additional declared path, in declaration order;
+    * no selector at all: ONE piece -- the item's own occurrence (whole file, or its registry-anchored slice).
+
+    Each piece is ``{path, commit, line_start, line_end, name, text, sha256, bytes}`` -- ``line_start``/
+    ``line_end`` are always CONCRETE (a whole-file piece resolves to ``(1, total_lines)``, never ``(None, None)``),
+    so a caller can do line-range arithmetic without a special case for "whole file"."""
+    if mi.is_directory:
+        return ()
+
+    def _piece(path, commit, l1, l2, name):
+        text = _read_git_slice(path, commit, l1, l2, repo=repo)
+        if text is None:
+            return None
+        if l1 is None:
+            l1, l2 = 1, _total_lines(text)
+        return {"path": path, "commit": commit, "line_start": l1, "line_end": l2, "name": name, "text": text,
+                "sha256": sha256_text(text), "bytes": len(text.encode("utf-8"))}
+
+    narrowing_parts = [p for p in mi.parts if p["kind"] in ("keys", "entries")]
+    path_parts = [p for p in mi.parts if p["kind"] == "paths"]
+
+    pieces: list = []
+    if narrowing_parts:
+        for p in narrowing_parts:
+            piece = _piece(p["path"], p["commit"], p["line_start"], p["line_end"], p["name"])
+            if piece is not None:
+                pieces.append(piece)
+    else:
+        if mi.path is not None and mi.commit is not None:
+            piece = _piece(mi.path, mi.commit, mi.line_start, mi.line_end, "(primary)")
+            if piece is not None:
+                pieces.append(piece)
+        for p in path_parts:
+            piece = _piece(p["path"], p["commit"], p["line_start"], p["line_end"], p["name"])
+            if piece is not None:
+                pieces.append(piece)
+    return tuple(pieces)
+
+
+def declared_hash_and_bytes(parts: tuple) -> tuple:
+    """``(declared_sha256, declared_bytes)`` from ``declared_parts``'s output -- ``hash_pieces`` over each part's
+    own raw text, in order, and the sum of their byte lengths. ``(None, 0)`` for an empty part list (a directory
+    item, or an occurrence that could not be read -- honest MISSING, never a fabricated hash)."""
+    if not parts:
+        return None, 0
+    return hash_pieces([p["text"] for p in parts]), sum(p["bytes"] for p in parts)
+
+
+def oversize_disclosure_map(mi: "MandatoryItem", repo: Optional[str] = None) -> tuple:
+    """The FULL, FLAT structural tiling (``sectionmap.flat_tiling``) of a NO-SELECTOR mandatory item's own primary
+    occurrence -- used ONLY for the oversize-with-no-selector disclosure (rule 1): the row declares the WHOLE
+    file/slice as ONE piece (``declared_parts``), but a useful ``MANDATORY_PARTIAL_DELIVERY`` notice needs a finer
+    breakdown (headings, or YAML keys) to be worth reading, and ``packet verify``'s coverage check needs that same
+    breakdown to confirm nothing was silently dropped BETWEEN the disclosed ranges. Returns ``()`` for a directory
+    item or a ``keys``/``entries``/``paths`` row (those never need this: see ``declared_parts``'s own docstring)."""
+    if mi.is_directory or mi.parts:
+        return ()
+    if mi.path is None or mi.commit is None:
+        return ()
+    if mi.line_start is not None:
+        # an ANCHORED item's flat_tiling would be computed against the SLICE's own local line numbers, not the
+        # file's real ones -- re-verifying a disclosed range against Git would then read the wrong lines. No
+        # current registry anchor is oversize (anchors are small, hand-placed subsections); until one is, this
+        # case falls back to the coarser single-piece disclosure (declared_parts already covers correctness).
+        return ()
+    from govbridge.compile import sectionmap as sectionmapmod  # see _resolve_row_selectors: no import cycle
+    text = _read_git_slice(mi.path, mi.commit, None, None, repo=repo)
+    if text is None:
+        return ()
+    out = []
+    for sec in sectionmapmod.flat_tiling(text, mi.path, id_patterns=ID_MENTION_REGEXES):
+        out.append({"path": mi.path, "commit": mi.commit, "line_start": sec.line_start, "line_end": sec.line_end,
+                    "name": sec.name, "sha256": sec.sha256, "bytes": sec.nbytes})
+    return tuple(out)
 
 
 def _one_mandatory_item(this_id: str, path: str, base_item_id: str, row: dict,

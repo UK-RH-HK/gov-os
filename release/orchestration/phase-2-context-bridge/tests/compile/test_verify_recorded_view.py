@@ -105,7 +105,8 @@ def test_verify_section_a_fails_without_the_pinned_view_fix(tmp_path):
     manifest = result["manifest"]
     rv.add_new_mandatory_record(repo)
 
-    expected_live, _ = validatemod.recompute_section_a(task_spec, repo=str(repo.root), registry_path=registry_path)
+    expected_live, _, _ = validatemod.recompute_section_a(task_spec, repo=str(repo.root),
+                                                            registry_path=registry_path)
     actual = validatemod._manifest_a_tuples(manifest)
     assert expected_live != actual, \
         "a LIVE (un-pinned) re-derivation must disagree with the stored packet once a new record lands -- this is " \
