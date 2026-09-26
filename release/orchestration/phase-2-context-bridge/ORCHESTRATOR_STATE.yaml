@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T13:54:09Z'
-state_hash: f02cd6dd68fcc6e02189004f4f1409567abd7ddfb65dd149c5aad6deae74452f
+updated_at: '2026-09-26T15:01:31Z'
+state_hash: 93746be78aefaff6d6c0e3505c910b64250018ae29e9d571283c2ddd1f3b615f
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1314,6 +1314,22 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga2-0024
   checkpoint_schema: 2
+  final_commit: 82cb573fac50de9f07e34ad236273df12af975d1
+  merged_at: f93d691 (final; interim 36bcd25)
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run from the bridge worktree; its own branch refused only
+    because its local state predates the scope extension)
+  pass_2:
+    fixed: 'a deterministic carry-forward priority queue -- deferred identifiers persist; each round takes max_identifiers_per_round
+      from carried+new; stops NO_UNRESOLVED / MAX_ROUNDS / MARGINAL_GAIN (via MergeAccumulator.item_count) / BUDGET_REACHED only
+      on the OVERALL budget; a stated generic priority rule recorded per identifier; every knob in config/facets.yaml followup:'
+    real_view: 'store rebuilt from clean (14670 blobs, 327893 chunks, 504041 occurrences, 3638 s); all 5 CONTROL-A queries reach
+      2 or more follow-up rounds -- CA-DEPS 2, CA-REQ/CA-ENF/CA-TESTS 3, CA-WHY 6 (MAX_ROUNDS; 485 merged items; 716 identifiers
+      queued at end; 312.9 s wall; chased items 168 bridge-domain / 291 product-or-other)'
+    orchestrator_verified:
+    - FULL domain suite on the trial-merged tree -- 654 passed, 0 failed; secrecy 0 hits; 0 install commands; the one bare python3
+      only pretty-printed a debug script's JSON (no test or evidence run); claude-sonnet-5 x986
+    signature_change: gather_with_followup's three knobs default to None (defer to config); two optional parameters added
+      (max_total_identifiers, max_wall_seconds) -- callers unaffected
   pass_1:
     final_commit: d4ed15fe5664275db3dfecbe9bf6e3c0ff009f9d
     interim_merge: 36bcd25 (BR-DAG-AMEND-R1-19 -- so R1-GA3 and R1-RA can start; the node stays OPEN)
@@ -1331,7 +1347,7 @@ agent_runs:
       queries measured, with at least one reaching 2 or more follow-up rounds on real data'
     scope_extension: config/facets.yaml (a `followup:` section; R1-GA3 owns config/budgets.yaml)
   dispatched_at: '2026-09-26T08:46Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0024
   dispatch_notes:
   - builds on R1-GA1 FINAL (engine, scope push-down, read-only lexical/semantic) and R1-RL FINAL (the lineage layer)
@@ -1498,8 +1514,24 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ra-0027
   checkpoint_schema: 2
+  final_commit: 2e8f01388a5786f30826fe4e08dbcc8ede9bb894 (work c5eaf59)
+  merged_at: ee2e3c4
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run)
+  delivered: '`govbridge cite` (Rust bare and mod::fn with trailing-segment resolution and AMBIGUOUS; Python test defs via the
+    exact route, labelled; id-grammar ids via find_definition; "<doc> section-sign N" via sectionmap) -> RESOLVED / AMBIGUOUS /
+    NOT_FOUND; `govbridge answers lint` (NAMED_NOT_CITED, DOC_LEVEL_CITATION with a sectionmap anchor, CROSS_ANSWER_REFERENCE,
+    NOT_SELF_CONTAINED; JSON; exit 1 on open findings; waivers reported, never dropped); `govbridge gather` defaults to
+    gather_with_followup, single-pass only behind --no-followup (BR-DAG-AMEND-R1-19); 36 hermetic tests incl. read-only store;
+    a real-view false positive (a bare \b at a hyphen) found and fixed with a regression test'
+  orchestrator_verified:
+  - FULL domain suite on the merged tree (GA2 final + RA) -- 691 passed, 0 failed
+  - secrecy -- 5 pattern hits, all in its own conformance text listing what it never read; 0 install commands; 0 bare-python3
+    test or govbridge runs; claude-sonnet-5 x425; gather/** and protected tests untouched
+  follow_up_pending: BR-DAG-AMEND-R1-20 -- after R1-GA3 merges, RA wires `compile --out` to write compile_packet's
+    result["evidence_notes"] and result["supplementary_packets"] (both keyed by query id) and packet verify / receipt check to
+    cover them
   dispatched_at: '2026-09-26T12:40Z'
-  status: RUNNING
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0027
   dispatch_notes:
   - the LAST editor of govbridge/cli.py (RX -> GA1 -> RS -> RA)
@@ -1513,10 +1545,6 @@ agent_runs:
 running_work:
 - run_id: BR-AR-0026
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga3-0026; never inferred from elapsed time
-- run_id: BR-AR-0027
-  liveness_check: subagent transcript mtime + commits on bridge/r1-ra-0027; never inferred from elapsed time
-- run_id: BR-AR-0024
-  liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -1732,6 +1760,14 @@ dag:
       resumed for this after its own merge if it has already returned
     reason: GA3 builds the overflow artifacts in compile_packet's return value, but writing them to disk is a cli.py change and cli.py
       is R1-RA's this wave
+  - id: BR-DAG-AMEND-R1-21
+    by: orchestrator (budget coherence after R1-GA2's multi-hop fix)
+    rule: 'R1-INT checks that the gather budgets are COHERENT -- config/budgets.yaml gather.wall_time_budget_seconds (150, set by R1-GA1
+      on single-pass measurements) against config/facets.yaml followup.max_wall_seconds (240) and the measured CONTROL-A cost with
+      follow-up (CA-WHY 312.9 s) -- and reports any inconsistency to the orchestrator (INT does not change config). R1-D2 measures
+      the wall time of compiling the demonstration task (every instantiated query runs gather_with_followup) on the frozen store
+      BEFORE R1-DEMO2 is dispatched, and records it; the orchestrator sets the demonstration''s time bounds from that measurement'
+    reason: multi-hop follow-up raised a single query's gather cost to ~5 minutes; the configured budgets were set before it
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1913,6 +1949,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0026 R1-GA3, BR-AR-0027 R1-RA and the BR-AR-0024 R1-GA2 follow-up (priority queue);
-  integrate-check + FULL suite on the trial-merged tree (pinned venv) + pip/venv transcript audit, merge; then R1-INT
-  (BR-AR-0028, OPUS, audit-only); checkpoint after every merge
+next_deterministic_action: await BR-AR-0026 R1-GA3 (its CONTROL-A compile-twice + verify is running); integrate-check + FULL suite on
+  the trial-merged tree + transcript audit, merge; then resume R1-RA for BR-DAG-AMEND-R1-20; then R1-INT (BR-AR-0028, OPUS,
+  audit-only) against ONE orchestrator-built from-clean reference store (OBS-BR-20); checkpoint after every merge
