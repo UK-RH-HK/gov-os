@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T11:48:40Z'
-state_hash: 70a3a5a0afbfeae4c67430704fc12738fe4966c72428be3b9180044033555065
+updated_at: '2026-09-26T12:40:24Z'
+state_hash: fa427ecf43cfa0e7b99e9fa559bde83cd6d41aab374d6026e5ef51ff3ddbff41
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1314,8 +1314,24 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga2-0024
   checkpoint_schema: 2
+  pass_1:
+    final_commit: d4ed15fe5664275db3dfecbe9bf6e3c0ff009f9d
+    interim_merge: 36bcd25 (BR-DAG-AMEND-R1-19 -- so R1-GA3 and R1-RA can start; the node stays OPEN)
+    orchestrator_verified:
+    - integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree 650 passed, 0 failed
+    - claude-sonnet-5 x684; secrecy 0 hits; 0 install commands; cli.py and protected tests untouched
+    accepted: identifier extraction (grammars reused, lineage_edge read-only), visited set, trailing-segment Rust resolution,
+      MergeAccumulator (dedupe_key, provenance, occurrence collapse), versions by role, git-race degradation to MISSING,
+      read-only proof; CONTROL-A CA-WHY merged items 31 -> 164
+    reopen_reason: 'a round with more than max_identifiers_per_round candidates defers the rest and then BREAKS -- the whole
+      follow-up ends, taking the first 20 in extraction order; real round-0 frontiers carry ~81 candidates, so real queries
+      get ONE hop (CA-WHY stopped BUDGET_REACHED_WITH_UNRESOLVED after 1 of 3 rounds). Required -- a deterministic priority
+      queue carrying deferred identifiers across rounds; a stated generic priority rule recorded in telemetry;
+      BUDGET_REACHED only when the OVERALL budget is exhausted; the follow-up config in config/facets.yaml; all 5 CONTROL-A
+      queries measured, with at least one reaching 2 or more follow-up rounds on real data'
+    scope_extension: config/facets.yaml (a `followup:` section; R1-GA3 owns config/budgets.yaml)
   dispatched_at: '2026-09-26T08:46Z'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
   store: $HOME/.cache/gov-bridge/store-BR-AR-0024
   dispatch_notes:
   - builds on R1-GA1 FINAL (engine, scope push-down, read-only lexical/semantic) and R1-RL FINAL (the lineage layer)
@@ -1330,6 +1346,7 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.*
+  - release/orchestration/phase-2-context-bridge/config/facets.yaml
 - run_id: BR-AR-0034
   role: 'REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point, gitobj repo_root cache, authority import-time config read, thread-safe ExclusionCounter, read-only code and classification query paths'
   dag_node: R1-XC
@@ -1428,7 +1445,66 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/route/test_query_commands_readonly.py
   - release/orchestration/phase-2-context-bridge/govbridge/graph/impact.py
   - release/orchestration/phase-2-context-bridge/tests/route/test_task_exclusions.py
+- run_id: BR-AR-0026
+  role: 'REPAIR-1 node R1-GA3 -- compile from gather: facet quotas and a facet-aware drop order, content slices, per-item query and facet tags, overflow to evidence notes and supplementary packets, D.2 via gather; plus BR-DAG-AMEND-R1-11'
+  dag_node: R1-GA3
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 03cb76766dea59a75108ef17a3f53d2c2bb62b10deb453a197cd981191f2db34
+  handoff_note: template revision with amendments R1-T1, R1-T2 and R1-T3
+  branch: bridge/r1-ga3-0026
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0026
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-ga3-0026
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T12:40Z'
+  status: RUNNING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0026
+  dispatch_notes:
+  - compiles from gather_with_followup (R1-GA2, interim) -- BR-DAG-AMEND-R1-19
+  - third editor of compile/packet.py (RX -> RM -> GA3) and next editor of render.py after RS; keep RS's body markers and packet.Compiler._mandatory_text's contract (validate.verify_rendered_delivery imports it)
+  - BR-DAG-AMEND-R1-11 -- an oversize A item's selected sections chosen with the task's gather facets as well as its selectors
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/budgets.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/render.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/codesurfaces.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/overflow.py
+  - release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_facet_quotas.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_content_slices.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_overflow_notes.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/gather/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0026.*
+- run_id: BR-AR-0027
+  role: 'REPAIR-1 node R1-RA -- answer-side aids: govbridge cite and govbridge answers lint (RC-11); plus BR-DAG-AMEND-R1-19 (`govbridge gather` wired to gather_with_followup)'
+  dag_node: R1-RA
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 03cb76766dea59a75108ef17a3f53d2c2bb62b10deb453a197cd981191f2db34
+  handoff_note: template revision with amendments R1-T1, R1-T2 and R1-T3
+  branch: bridge/r1-ra-0027
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0027
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-ra-0027
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T12:40Z'
+  status: RUNNING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0027
+  dispatch_notes:
+  - the LAST editor of govbridge/cli.py (RX -> GA1 -> RS -> RA)
+  - BR-DAG-AMEND-R1-19 -- `govbridge gather` calls gather_with_followup; the single-pass engine only behind --no-followup
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/answers/**
+  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - release/orchestration/phase-2-context-bridge/tests/answers/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/answers/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0027.*
 running_work:
+- run_id: BR-AR-0026
+  liveness_check: subagent transcript mtime + commits on bridge/r1-ga3-0026; never inferred from elapsed time
+- run_id: BR-AR-0027
+  liveness_check: subagent transcript mtime + commits on bridge/r1-ra-0027; never inferred from elapsed time
 - run_id: BR-AR-0024
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
 dag:
@@ -1631,6 +1707,14 @@ dag:
       integration
     reason: a builder installed an unpinned, non-hash-verified package from the network after misdiagnosing the system python3
       as the shared environment
+  - id: BR-DAG-AMEND-R1-19
+    by: orchestrator (scheduling and routing; no design change)
+    rule: 'R1-GA3''s and R1-RA''s dependency on R1-GA2 is satisfied by GA2''s accepted gather_with_followup API, merged as an
+      INTERIM integration at 36bcd25 (650/0); GA2 stays OPEN on the follow-up budget semantics (inside gather/followup.py
+      and config/facets.yaml, disjoint from GA3 and RA). R1-RA (the last cli.py editor) wires `govbridge gather` to
+      gather_with_followup (the single-pass engine only behind an explicit --no-followup flag). R1-GA3 compiles sections
+      B-H from gather_with_followup results'
+    reason: GA2 left `govbridge gather` single-pass because cli.py was outside its scope; GA3 and RA need only the stable API
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1807,7 +1891,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0024 R1-GA2; integrate-check + FULL suite on the trial-merged tree (pinned venv), merge;
-  then dispatch PG4 -- R1-GA3 (BR-AR-0026) and R1-RA (BR-AR-0027), drafts ready, with template amendments R1-T1..T3; after GA3 and
-  RA, dispatch R1-INT (BR-AR-0028, OPUS, audit-only); audit every builder transcript for pip/venv commands; checkpoint after
-  every merge
+next_deterministic_action: await BR-AR-0026 R1-GA3, BR-AR-0027 R1-RA and the BR-AR-0024 R1-GA2 follow-up (priority queue);
+  integrate-check + FULL suite on the trial-merged tree (pinned venv) + pip/venv transcript audit, merge; then R1-INT
+  (BR-AR-0028, OPUS, audit-only); checkpoint after every merge
