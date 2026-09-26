@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T15:51:25Z'
-state_hash: 1a7b47e6bbbe4b21f78dbb8e85c0b78a4668f47ca7304a3f9a0b7b7cd06c0363
+updated_at: '2026-09-26T16:30:24Z'
+state_hash: 4d0311e650cd253a6ecaa30f84ead5d228cb6054499a9083c707bdb1653acfb1
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1314,6 +1314,19 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga2-0024
   checkpoint_schema: 2
+  pass_3:
+    final_commit: b7bae67 (work 765a3c2)
+    merged_at: fe42179
+    fixed: 'content budgets COUNT-based only (max_total_identifiers is the sole BUDGET_REACHED source); max_wall_seconds a disabled-by-
+      default safety abort (STOP_WALL_TIME_ABORT, deterministic:false); timings never in merged_sha256 (slow vs fast resolver test);
+      bounded retry on transient git reads, degraded reads disclosed in telemetry with deterministic:false; cross-process
+      PYTHONHASHSEED 0 vs 1 test; the flaky thread test''s root cause -- identifiers._lineage_table_exists cached by id(conn), an
+      id-reuse hazard under allocation churn -- removed; 20 stress iterations under load 14-40, 0 failures; full suite 699/699 twice'
+    orchestrator_verified: integrate-check INTEGRATION_PERMITTED; FULL suite on the trial-merged tree 714 passed, 0 failed; secrecy 0;
+      install 0; bare python3 0; in-scope files only; claude-sonnet-5 x1475
+    finding_routed: 'govbridge/core/exact.py grep()/id_lookup() (via real_routes.exact_route) re-resolve the records ref''s LIVE tip on
+      every call; one ~1031 s gather recorded FOUR different records commits across its merged items while the orchestrator committed
+      -> R1-XC (BR-DAG-AMEND-R1-23); also the most probable cause of R1-GA3''s one unreproduced CA-DEPS divergence'
   pass_3_reopen: 'BR-DAG-AMEND-R1-22 -- the follow-up''s OVERALL wall-clock budget (followup.max_wall_seconds, default 240 s) can stop
     rounds, so the merged evidence depends on machine load; found via R1-GA3''s CONTROL-A compile-twice check (the only differing
     field was an overflow supplementary-packet hash). Required -- count-based content budgets only; wall time a disabled-by-default
@@ -1352,7 +1365,7 @@ agent_runs:
       queries measured, with at least one reaching 2 or more follow-up rounds on real data'
     scope_extension: config/facets.yaml (a `followup:` section; R1-GA3 owns config/budgets.yaml)
   dispatched_at: '2026-09-26T08:46Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0024
   dispatch_notes:
   - builds on R1-GA1 FINAL (engine, scope push-down, read-only lexical/semantic) and R1-RL FINAL (the lineage layer)
@@ -1380,6 +1393,10 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-xc-0034
   checkpoint_schema: 2
+  pass_4_reopen: 'BR-DAG-AMEND-R1-23 -- ONE RESOLVED VIEW PER OPERATION: every query operation (gather, compile, search, why, impact,
+    history, exact, state, cite, answers lint, packet verify at its recorded view) resolves config/canonical-view.yaml once and threads
+    the pinned commits through every route; core/exact.py grep()/id_lookup() and real_routes.exact_route re-resolve the records tip per
+    call; audit every resolve_commit/tip resolution on query paths'
   final_commit: 0eddd3ae106d75151cc7ccd25c62deb00086c720
   merged_at: c617f82 (final; interim 1a46cc5)
   integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run from the bridge worktree)
@@ -1431,7 +1448,7 @@ agent_runs:
       (rule 5); typed errors re-raised and other caught exceptions counted; every code-layer query command proven on a
       file-level read-only store'
   dispatched_at: '2026-09-26T08:46Z'
-  status: COMPLETED_INTEGRATED
+  status: REOPENED_FOLLOW_UP
   store: $HOME/.cache/gov-bridge/store-BR-AR-0034
   dispatch_notes:
   - authority/classes.py -- the config-read change only; the class table byte-unchanged
@@ -1466,6 +1483,10 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/route/test_query_commands_readonly.py
   - release/orchestration/phase-2-context-bridge/govbridge/graph/impact.py
   - release/orchestration/phase-2-context-bridge/tests/route/test_task_exclusions.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/exact.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/view.py
+  - release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+  - release/orchestration/phase-2-context-bridge/tests/route/test_view_pinned_per_operation.py
 - run_id: BR-AR-0026
   role: 'REPAIR-1 node R1-GA3 -- compile from gather: facet quotas and a facet-aware drop order, content slices, per-item query and facet tags, overflow to evidence notes and supplementary packets, D.2 via gather; plus BR-DAG-AMEND-R1-11'
   dag_node: R1-GA3
@@ -1555,6 +1576,15 @@ agent_runs:
   - FULL domain suite on the merged tree (GA2 final + RA) -- 691 passed, 0 failed
   - secrecy -- 5 pattern hits, all in its own conformance text listing what it never read; 0 install commands; 0 bare-python3
     test or govbridge runs; claude-sonnet-5 x425; gather/** and protected tests untouched
+  pass_2:
+    final_commit: 3f49f6022920dddbbd6d6d94d1825a7d51947033 (work d75d012)
+    merged_at: ae96b36
+    delivered: 'compile --out writes DIR/supplementary/<qid>/ (R1-RS''s writer) and DIR/notes/<qid>.yaml; packet verify verifies each
+      supplementary packet, recomputes its packet.md sha256 against its own manifest AND the main EVIDENCE_OVERFLOW notice, validates
+      every note, and fails on missing/extra/mismatched; receipt check requires acknowledgement; --repo and --facets-path on compile;
+      9 tests with real retrieval on a from-clean fixture store'
+    orchestrator_verified: integrate-check INTEGRATION_PERMITTED; FULL suite on the merged tree (with GA2 pass 3) 723 passed, 0 failed;
+      secrecy -- 12 hits, all edits of its own "never read" conformance text; install 0; bare python3 0; in-scope files only
   follow_up_dispatched: 'resumed after R1-GA3''s merge (8a6f3d9) -- compile --out writes DIR/supplementary/<qid>/ and DIR/notes/<qid>.yaml;
     packet verify checks each against the EVIDENCE_OVERFLOW sha and the notes schema; receipt check requires them; scope +
     tests/compile/test_compile_out_overflow.py'
@@ -1562,7 +1592,7 @@ agent_runs:
     result["evidence_notes"] and result["supplementary_packets"] (both keyed by query id) and packet verify / receipt check to
     cover them
   dispatched_at: '2026-09-26T12:40Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0027
   dispatch_notes:
   - the LAST editor of govbridge/cli.py (RX -> GA1 -> RS -> RA)
@@ -1575,10 +1605,8 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0027.*
   - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_out_overflow.py
 running_work:
-- run_id: BR-AR-0027
-  liveness_check: subagent transcript mtime + commits on bridge/r1-ra-0027; never inferred from elapsed time
-- run_id: BR-AR-0024
-  liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
+- run_id: BR-AR-0034
+  liveness_check: subagent transcript mtime + commits on bridge/r1-xc-0034; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -1809,6 +1837,14 @@ dag:
       compile" row stays NOT_MET until that merges, then GA3 re-runs its two CONTROL-A compiles; R1-INT checks every budget in config
       for a wall-clock dependency'
     reason: a compile whose content depends on machine load cannot be re-verified or reproduced by an independent verifier
+  - id: BR-DAG-AMEND-R1-23
+    by: orchestrator (routing of R1-GA2's pass-3 finding)
+    rule: 'ONE RESOLVED VIEW PER OPERATION -- a query operation resolves the canonical view ONCE at its start (every follow:tip ref pinned to
+      a commit, recorded in its output) and every route, graph hop and git read uses those pinned commits; no route re-resolves a tip
+      mid-operation. R1-XC fixes core/exact.py and real_routes.exact_route and audits every tip resolution on query paths; test -- move a
+      ref DURING a fixture gather and assert every merged item carries the same pinned commit and the merged_sha256 equals an unmoved run'
+    reason: one gather recorded four records commits across its own items while the orchestrator committed; a packet must answer from one
+      view, and an independent verifier must be able to reproduce it
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1990,6 +2026,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await the BR-AR-0024 R1-GA2 determinism pass (count-only budgets, transient-git retry, cross-process seeds,
-  the flaky thread test); merge after a FULL green suite; resume R1-RA for BR-DAG-AMEND-R1-20; orchestrator re-runs the CONTROL-A
-  double compile on the merged tree; then R1-INT (BR-AR-0028, OPUS, audit-only); checkpoint after every merge
+next_deterministic_action: await the BR-AR-0034 R1-XC fix (one resolved view per operation); integrate-check + FULL suite, merge; then
+  the orchestrator re-runs the CONTROL-A double compile on the merged tree (a store built from clean, bridge commits paused during the
+  run); then R1-INT (BR-AR-0028, OPUS, audit-only); checkpoint after every merge
