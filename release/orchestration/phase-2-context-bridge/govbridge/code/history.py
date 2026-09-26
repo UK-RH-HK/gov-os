@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
-"""Lazy per-commit symbol history (ARCHITECTURE.md section 4.6, "Symbol history (C6 temporal)"): ``DELETED_IN``
-and ``INTRODUCED_IN`` facts, taken as the set difference between two commits' parsed Rust definitions. Both commits
-are indexed through ``govbridge.code.symbols.ensure_indexed`` -- the usual lazy, per-blob cache, so a file unchanged
-between the two commits is parsed once (govbridge.code.symbols' module docstring), and the same blob's symbols are
-therefore identical whichever commit encounters it first.
+"""Per-commit symbol history (ARCHITECTURE.md section 4.6, "Symbol history (C6 temporal)"): ``DELETED_IN`` and
+``INTRODUCED_IN`` facts, taken as the set difference between two commits' parsed Rust definitions.
 
 This module is exact about the parse tables -- a symbol either has a definition (by ``(kind, qualified_name)``) at
 a commit's view or it does not -- and says nothing about *why* it went; every fact it emits carries the
 ``EXACT_PARSE`` derivation label, never a heuristic one. It does not track renames or moves: a symbol that only
 changed file or line keeps the same ``(kind, qualified_name)`` and is therefore never reported as deleted+
 introduced (this is intentional, not an oversight -- see the module-level comment below ``diff``).
-"""
+
+BR-DAG-AMEND-R1-17 item 5 reopening: this is a QUERY (a diff between two already-committed commits), read via
+``govbridge.core.store.open_db_readonly()``/``govbridge.code.symbols.ensure_indexed_readonly`` -- never the
+BUILD-only ``open_db()``/``ensure_indexed``, which this module used to call, lazily writing to the store on every
+commit it was asked to diff. A commit whose ``.rs`` blobs the eager code-layer builder has not already reached
+raises the typed ``symbolsmod.StoreNeedsRebuild`` (``main()`` reports it the same way it reports a ``ValueError``,
+below) rather than silently indexing it here."""
 from __future__ import annotations
 
 import argparse
@@ -37,7 +40,7 @@ def _definition_set(conn, commit: str, repo: Optional[str]) -> dict:
     """{(kind, qualified_name): row} for every Rust definition reachable at ``commit``. Keyed by (kind,
     qualified_name) rather than by symbol_id (which also folds in the blob and the line, and so would treat a pure
     line-shift as a delete+introduce pair)."""
-    entries = symbolsmod.ensure_indexed(conn, commit, repo=repo)
+    entries = symbolsmod.ensure_indexed_readonly(conn, commit, repo=repo)
     blob_ids = [b for _, b in entries]
     path_by_blob = {b: p for p, b in entries}
     rows = codestore.symbols_for_blobs(conn, blob_ids)
@@ -56,8 +59,7 @@ def _definition_set(conn, commit: str, repo: Optional[str]) -> dict:
 def diff(from_commit: str, to_commit: str, repo: Optional[str] = None) -> dict:
     from_full = _resolve_commit(from_commit, repo)
     to_full = _resolve_commit(to_commit, repo)
-    conn = corestore.open_db()
-    codestore.ensure_schema(conn)
+    conn = corestore.open_db_readonly()
 
     before = _definition_set(conn, from_full, repo)
     after = _definition_set(conn, to_full, repo)
@@ -109,6 +111,9 @@ def main(argv=None) -> int:
             return 2
     except ValueError as e:
         print(json.dumps({"error": str(e)}))
+        return 1
+    except symbolsmod.StoreNeedsRebuild as e:
+        print(json.dumps({"error": str(e), "code": e.CODE}))
         return 1
 
     print(json.dumps(result, sort_keys=True) if args.json else json.dumps(result, indent=1, sort_keys=True))

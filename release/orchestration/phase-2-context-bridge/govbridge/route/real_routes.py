@@ -29,6 +29,7 @@ from govbridge.core import exact as exactmod
 from govbridge.core import pathrules
 from govbridge.core import store as storemod
 from govbridge.core import taskctx as taskctxmod
+from govbridge.core import telemetry as telemetrymod
 from govbridge.core import view as viewmod
 from govbridge.graph import derive as derivemod
 from govbridge.lexical import query as lexicalquery
@@ -37,6 +38,28 @@ from govbridge.route.router import RouteHit, RouteOccurrence, RouteSet
 from govbridge.semantic import search as semanticsearch
 
 UNCLASSIFIED = ("UNCLASSIFIED", "UNKNOWN")
+
+
+def _record_unexpected_exception(site: str, exc: Exception, **extra) -> None:
+    """BR-DAG-AMEND-R1-17 item 6 reopening (open issue 2): the code route's own broad excepts around
+    ``govbridge.code.symbols``/``govbridge.graph.code_bridge`` calls used to swallow EVERY exception, including
+    :class:`govbridge.code.symbols.StoreNeedsRebuild` -- a genuine, typed store problem that "never a silent
+    under-retrieval" requires to surface, not to be hidden behind an empty result indistinguishable from "nothing
+    to find here." Every call site below now re-raises ``StoreNeedsRebuild`` (and any other typed store error)
+    instead of catching it, and catches only the ONE other exception shape each call site genuinely expects (a
+    :class:`ValueError` for a commit that does not resolve -- honestly nothing to retrieve, not a hidden problem).
+    Anything else still degrades that one call to an empty/None result (a single unanticipated failure must not
+    take a whole gather down), but is never silent about it: it is written here, to the shared local telemetry
+    sink (``$GOV_BRIDGE_HOME/telemetry/queries.jsonl``, never the git-tracked store -- writing here is not the
+    query-time store write BR-DAG-AMEND-R1-15 forbids), with its exact exception type, so an under-retrieval this
+    node did not anticipate is auditable rather than invisible."""
+    try:
+        telemetrymod.write_row("queries", {
+            "event": "real_routes_code_route_unexpected_exception", "site": site,
+            "exception_type": type(exc).__name__, **extra,
+        })
+    except Exception:
+        pass  # telemetry itself must never be why a route call fails
 
 _FTS_TOKEN_RE = re.compile(r"[A-Za-z0-9_]+")
 _FTS_QUOTED_RE = re.compile(r'^\s*"[^"]*"\s*$')
@@ -311,7 +334,12 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                     raw_conn = codesymbols._open_conn_readonly()
                     entries = codesymbols.ensure_indexed_readonly(raw_conn, product_commit, repo=repo)
                     _blob_to_path_state["map"] = {blob_id: p for p, blob_id in entries}
-                except Exception:
+                except codesymbols.StoreNeedsRebuild:
+                    raise  # BR-DAG-AMEND-R1-17 item 6 reopening: never swallowed -- see open issue 2
+                except ValueError:
+                    _blob_to_path_state["map"] = {}
+                except Exception as exc:
+                    _record_unexpected_exception("shaped_code_conn_blob_map", exc)
                     _blob_to_path_state["map"] = {}
         if not hasattr(_code_local, "conn"):
             code_conn = None
@@ -319,7 +347,10 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 try:
                     from govbridge.graph import code_bridge
                     code_conn = code_bridge.build_shaped_code_connection(product_commit, repo=repo)
-                except Exception:
+                except codesymbols.StoreNeedsRebuild:
+                    raise
+                except Exception as exc:
+                    _record_unexpected_exception("shaped_code_conn_build", exc)
                     code_conn = None
             _code_local.conn = code_conn
         return _code_local.conn, _blob_to_path_state["map"]
@@ -506,12 +537,17 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         caller_tier = "T2" if is_seeded else "T3"
         for name in names:
             try:
-                # BR-DAG-AMEND-R1-17 item 5: the READ-ONLY counterpart of codesymbols.definitions() -- raises the
+                # BR-DAG-AMEND-R1-17 item 5: codesymbols.definitions() itself is now read-only -- it raises the
                 # typed StoreNeedsRebuild instead of classifying/parsing/persisting a not-yet-eager-indexed blob;
                 # this route never builds the code layer itself (govbridge.code.build.code_layer_builder does, at
-                # BUILD time).
-                defs_out = codesymbols.definitions_readonly(name, product_commit, repo=repo)
-            except Exception:
+                # BUILD time). Re-raised here, never swallowed (open issue 2).
+                defs_out = codesymbols.definitions(name, product_commit, repo=repo)
+            except codesymbols.StoreNeedsRebuild:
+                raise
+            except ValueError:
+                defs_out = {"definitions": []}
+            except Exception as exc:
+                _record_unexpected_exception("definitions", exc, name=name)
                 defs_out = {"definitions": []}
             for d in defs_out.get("definitions", []):
                 if exclude and pathrules.any_glob_match(d["path"], exclude) is not None:
@@ -533,14 +569,19 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 cursor_key = (name, "callers")
                 cur = (cursor_in or {}).get(cursor_key)
                 try:
-                    # BR-DAG-AMEND-R1-17 item 5: the read-only counterpart, same reasoning as definitions_readonly
-                    # above.
+                    # BR-DAG-AMEND-R1-17 item 5: codesymbols.callers() is now read-only, same reasoning as
+                    # definitions() above; StoreNeedsRebuild is re-raised, never swallowed (open issue 2).
                     if page_size is not None:
-                        callers_out = codesymbols.callers_readonly(name, product_commit, repo=repo,
-                                                                    page_size=page_size, cursor=cur)
+                        callers_out = codesymbols.callers(name, product_commit, repo=repo,
+                                                           page_size=page_size, cursor=cur)
                     else:
-                        callers_out = codesymbols.callers_readonly(name, product_commit, repo=repo)
-                except Exception:
+                        callers_out = codesymbols.callers(name, product_commit, repo=repo)
+                except codesymbols.StoreNeedsRebuild:
+                    raise
+                except ValueError:
+                    callers_out = {"callers": []}
+                except Exception as exc:
+                    _record_unexpected_exception("callers", exc, name=name)
                     callers_out = {"callers": []}
                 caller_rows = callers_out.get("callers", [])
                 if page_size is not None:

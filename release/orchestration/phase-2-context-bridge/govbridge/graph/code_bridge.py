@@ -32,10 +32,23 @@ CREATE TABLE resolution (call_site INTEGER, target_symbol TEXT, label TEXT, n_ca
 
 def build_shaped_code_connection(commit: str, repo: Optional[str] = None) -> Optional[sqlite3.Connection]:
     """An in-memory connection matching ``govbridge.graph.derive``'s expected schema, for every ``.rs`` blob
-    reachable at ``commit`` (lazily parsed/cached the same way ``govbridge.code.symbols`` already does -- this
+    reachable at ``commit`` (already parsed/cached by the eager code-layer builder, ``govbridge.code.build`` -- this
     function never re-implements parsing or caching, only the SHAPE translation). Returns None if ``commit`` does
-    not resolve, or if the code route itself is unavailable (defensive: a code-route failure must never break
-    ``why``/``impact``, matching the "honest MISSING, not an error" discipline ``derive.py`` already documents)."""
+    not resolve, or if the code route module itself is unavailable (defensive: an import-time failure must never
+    break ``why``/``impact``, matching the "honest MISSING, not an error" discipline ``derive.py`` already
+    documents).
+
+    BR-DAG-AMEND-R1-17 item 5 reopening: this is a QUERY, at query time -- it reads via
+    ``codesymbols._open_conn_readonly()``/``codesymbols.ensure_indexed_readonly()`` (never
+    ``_open_conn()``/``ensure_indexed``, which now BUILD, and which this function used to call, writing to the
+    store on any commit the eager builder had not already reached). A commit whose ``.rs`` blobs the eager builder
+    has not indexed raises the typed ``codesymbols.StoreNeedsRebuild`` -- deliberately NOT caught here (the
+    pre-existing ``except Exception: return None`` around this call used to swallow it, indistinguishable from a
+    genuinely code-less commit): a caller that wants the old "honest MISSING, never an error" degradation for this
+    one, specific, typed condition catches it itself (``govbridge.route.real_routes``'s own code route does, and
+    counts any other exception rather than swallowing it silently -- see that module's own
+    ``_record_unexpected_exception``); ``govbridge.graph.impact`` does not catch anything here at all, so it now
+    raises through, exactly like every other read-only query command (BR-DAG-AMEND-R1-15)."""
     try:
         from govbridge.code import resolve as coderesolve
         from govbridge.code import store as codestore
@@ -48,11 +61,8 @@ def build_shaped_code_connection(commit: str, repo: Optional[str] = None) -> Opt
     except ValueError:
         return None
 
-    try:
-        real_conn = codesymbols._open_conn()
-        entries = codesymbols.ensure_indexed(real_conn, commit_full, repo=repo)
-    except Exception:
-        return None
+    real_conn = codesymbols._open_conn_readonly()
+    entries = codesymbols.ensure_indexed_readonly(real_conn, commit_full, repo=repo)
     if not entries:
         return None
     blob_ids = [b for _, b in entries]

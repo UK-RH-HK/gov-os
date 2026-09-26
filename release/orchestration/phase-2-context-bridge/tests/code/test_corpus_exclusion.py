@@ -161,6 +161,10 @@ def test_callers_at_a_commit_discloses_the_exclusion_via_stats(repo, monkeypatch
 
     conn = codesymbols._open_conn()
     codesymbols.ensure_indexed(conn, c1, repo=str(repo), rules=rules)
+    conn.close()  # BR-DAG-AMEND-R1-17 item 5 reopening (rule-5 correction, checkpoint `decisions`): stats() now
+    # reads via store.open_db_readonly() (mode=ro&immutable=1), which never looks at an un-checkpointed WAL file --
+    # the write above must be closed (SQLite auto-checkpoints a WAL-mode db on the last connection's close) before
+    # a separate read-only connection can see it, exactly like an ordinary build-then-query sequence would.
     # stats() itself resolves its own rules by default (real corpus-rules.yaml); call ensure_indexed directly
     # above with the SYNTHETIC rules first so the blob is already cached-excluded by the time stats() runs (it
     # will see is_excluded() True and skip reclassifying under the real rules, which would not exclude it).
