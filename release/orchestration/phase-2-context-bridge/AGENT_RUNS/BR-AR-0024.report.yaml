@@ -227,6 +227,17 @@ evidence:
 mutation_scope_respected: true
 open_issues:
 - >-
+  ACTION NEEDED FROM THE ORCHESTRATOR before this run can pass integrate-check: the reopening dispatch message
+  extended this node's mutation_scope to config/facets.yaml (for the `followup:` section only), and this
+  checkpoint's own task_contract.mutation_scope/input_manifest reflect that -- but ORCHESTRATOR_STATE.yaml's own
+  `agent_runs` entry for BR-AR-0024 (the ENFORCED record `check_state.py integrate-check` reads) still lists this
+  run's ORIGINAL mutation_scope, without config/facets.yaml. Self-check run as instructed:
+  `python3 tools/check_state.py integrate-check BR-AR-0024` -> INTEGRATION_REFUSED, "changes .../config/facets.yaml,
+  outside run BR-AR-0024's mutation_scope". ORCHESTRATOR_STATE.yaml is not this node's file to edit. Once the
+  orchestrator records the scope grant there (matching this checkpoint's own task_contract), integrate-check
+  should pass -- every other check already does (see this checkpoint's own commands list, all re-verified against
+  the actual committed files).
+- >-
   Template amendment R1-T3 (BR-DAG-AMEND-R1-18) arrived mid-pass, direct from the orchestrator (bridge tip
   2713afd): every command must run through $PY=$HOME/.cache/gov-bridge/venv/bin/python (never a bare python3/pip/
   pytest), no venv creation or package install, and every check output must record $PY and its version. Already

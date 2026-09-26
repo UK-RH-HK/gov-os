@@ -203,6 +203,12 @@ failed_approaches:
   in open_issues, rather than add the write.
 unresolved:
 - >-
+  BLOCKS integrate-check, orchestrator action needed: ORCHESTRATOR_STATE.yaml's own `agent_runs` entry for
+  BR-AR-0024 has not yet been updated to include config/facets.yaml in this run's mutation_scope (the reopening
+  dispatch message granted this extension directly, not yet reflected in that file, which is not this node's to
+  edit). `python3 tools/check_state.py integrate-check BR-AR-0024` currently returns INTEGRATION_REFUSED for
+  exactly this one path; every other check passes. See open_issues for the full detail.
+- >-
   Full CLI wiring of `govbridge gather` to this node's triggered-round capability needs a one-line change to
   govbridge/cli.py's cmd_gather (replace the engine import with followup and call gather_with_followup) -- outside
   this node's mutation_scope this wave (R1-RS owns cli.py in the same parallel group). See open_issues/decisions.
