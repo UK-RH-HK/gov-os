@@ -1,15 +1,18 @@
 # BR-AR-0022 schema-2 worker checkpoint (OD-BR-04 A). No oracle content.
 run_id: BR-AR-0022
-commit: 9790a82a797a4edc5cd18e7e5911f570148d298f
+commit: c9de8d0edc74f3b45dc017c806540a168b46dced
 role: 'REPAIR-1 node R1-RM -- mandatory-input fidelity (no silent truncation, declared selectors honoured,
   directory items expanded, receipt acknowledges what was delivered) + BR-DAG-AMEND-R1-1 (verify at the recorded
-  view) + BR-DAG-AMEND-R1-2 (hermetic real-view compile test)'
+  view) + BR-DAG-AMEND-R1-2 (hermetic real-view compile test) + a reopening repair (packet verify could not
+  detect silent truncation; entries worked only on YAML)'
 model_observed: claude-sonnet-5 (Sonnet 5)
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
   sha256: 1a4edd365b42a270d794c3bfe0432c727a82151ffba730d54efcae851b8ddb20
+  note: pre-reopening hash; the reopening added amendment R1-T2 (BR-DAG-AMEND-R1-8, the `conformance` key), read
+    live from the bridge tip at 56095c3 rather than re-fetched into this file's own worktree copy
 - path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
   sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
   note: my node section, R1-RM
@@ -19,14 +22,30 @@ input_manifest:
 - path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
   sha256: d4c8b22d82192b5965d3a1e7b3fd01e79054bd96b110ba6bff78633307b328b0
   note: dag.amendments BR-DAG-AMEND-R1-1/R1-2, my own run entry (mutation_scope, dispatch_notes), current_prohibitions,
-    mandatory_bridge_inputs.authority_classes
+    mandatory_bridge_inputs.authority_classes -- including the REAL PHASE-2-LEDGER-P2-L-0033-0047 row (free-text
+    `entries` value) that motivated the "never treat non-structured entries as a selector" rule
 - path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md
   sha256: 3c84370c83396277d2ce065be06f0cf45e1cad2584188f753a057254c95bdddd
   note: read sections 5.3 (the hard authority invariant), 7.1-7.4 (task spec, sections A-J, budgets, manifest/receipt)
 - path: release/orchestration/phase-2-context-bridge/config/state-aliases.yaml
   sha256: 6d7af11bdb9804ea3588d1ebbd5a928b859e0ad6c5a5d55a63b721750add0969
   note: read only -- authority.classes.BRIDGE_STATE_PATH/resolver.STATE_ALIASES both read this real,
-    non-fixture-overridable config; my fixture's own state file path is chosen to match its `bridge` alias
+    non-fixture-overridable config; my fixtures' own state files are chosen to match its `bridge` alias
+- path: release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+  sha256: 009ce18d5cb8f082431dcd9516060c1c919e6188f040e43404676f4901441f6d
+  note: read only (reopening point 2) -- resolver.ID_MENTION_REGEXES loads this real, non-fixture-overridable
+    grammar's mention_patterns once at import time, the same way STATE_ALIASES already does; a Markdown heading
+    is an `entries` candidate when its title matches one of these patterns at position 0
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
+  sha256: e962634c219cc95c4a02c5d3295e6e0e27f7f4a493fca2dcba6f0a109d9e1627
+  note: read only, outside mutation_scope (a PEER module inside authority/, not a layering violation) --
+    load_grammar/_default_grammar_path/Grammar.mention_patterns reused as-is; resolver.py imports this directly
+    (authority -> authority), never through compile/
+- path: release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md
+  sha256: fd058c093d30da97fb899835ad6ea6ca58cf422ff241b62cb8ba2c8143a64516
+  note: read only (reopening point 2's real-view check) -- the bridge domain's OWN ledger, not a Review-8 subject,
+    used as the real Markdown `entries` probe (BR-L-0002..BR-L-0004); hash is of this worktree's copy at the time
+    of the probe run, not committed by this node
 - path: release/orchestration/phase-2-context-bridge/govbridge/core/view.py
   sha256: 6cab1991b435d2a4d7f6de8676738ff101bd77d2aa387e1a9b76fae388679c13
   note: read only, outside mutation_scope -- ResolvedView/ResolvedRef/REF_OK reused as-is by
@@ -51,12 +70,13 @@ input_manifest:
   note: read only -- in mutation_scope but left UNCHANGED; enforce_section_a's existing by-reference-over-budget
     fallback stays the last-resort safety net behind the new section-map mechanism, which runs earlier
     (item_from_mandatory), and _item_bytes/_as_reference already work unmodified against the new PacketItem fields
-    (both have defaults)
+    (all have defaults)
 - path: release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py
   sha256: 1a88a7414c16b1478d99112777d6f027e5f014746fc932d4352f73ceb6a02cfb
   note: read only -- in mutation_scope but left UNCHANGED; receipt.check already calls into
-    validate.verify_packet, so BR-DAG-AMEND-R1-1's recorded-view fix and verify_delivered_fidelity both apply to
-    `receipt check` without a separate code change here
+    validate.verify_packet, so both amendments and the reopening's fix apply to `receipt check` without a
+    separate code change here (the packet-body re-extraction gap in open_issues applies equally to receipt.py's
+    own call path, for the same cli.py-out-of-scope reason)
 - path: release/orchestration/phase-2-context-bridge/tests/compile/conftest.py
   sha256: 9d61d2bbb6b7c4ab34448df402d8119170738752af3b5825cc383880c133bce4
   note: read only, outside mutation_scope -- fixture_repo/view_path/registry_path/task_spec_factory patterns
@@ -68,11 +88,11 @@ input_manifest:
     used only as a style reference for my own independent fixture builders
 - path: release/orchestration/phase-2-context-bridge/tests/compile/test_compile_authority_invariant.py
   sha256: cac9f4ec7303e28f0e20328516ea511b3d37b6d1717e786133ff42474c1c6d6e
-  note: read only -- one of the six ARCHITECTURE.md section 5.3 named invariant tests; confirmed it passes
-    unmodified against my changes
+  note: read only -- one of the six ARCHITECTURE.md section 5.3 named invariant tests; confirmed it still passes
+    unmodified after the reopening's changes too
 - path: release/orchestration/phase-2-context-bridge/tests/compile/test_compile_mandatory_lifecycle_in_a.py
   sha256: 5fee6068519d82bc5efbe33bbc35efcf9a46e013d110c7424edd572b10e74bb0
-  note: read only -- confirmed BR-ARCH-RULING-1 lifecycle-in-A behaviour is unaffected by my changes
+  note: read only -- confirmed BR-ARCH-RULING-1 lifecycle-in-A behaviour is unaffected
 - path: release/orchestration/phase-2-context-bridge/tests/compile/test_compile_receipt.py
   sha256: fed6c3b062a2e24da37d9d74850435e7e42688f0b557eb3b1c416546db757d78
   note: read only -- confirmed receipt.check's existing pass/fail fixtures are unaffected (no exact-dict
@@ -102,31 +122,43 @@ commands:
 - cmd: $PY -m pytest -q -p no:cacheprovider tests/compile/test_mandatory_fidelity.py tests/compile
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check1-pytest-mandatory-fidelity-and-compile.out
-  output_sha256: f0161329a3d06686bad3786999a19b32f90ab0173483e2333c5b5f087808311f
-- cmd: $PY -m govbridge compile AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-task-spec.yaml --out /tmp/rm-probe --fake-routes
+  output_sha256: a27906622890eeeba56dfc859cc3113f0f35ca87d6fa3b90214a67aacc49dacf
+- cmd: $PY -m govbridge compile AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-task-spec.yaml --out /tmp/rm-probe2 --fake-routes
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3-compile.out
-  output_sha256: f2eee453a42022b71af16c120655c8d241cb04cc150178cd16bf9099fb88b21e
-- cmd: $PY -m govbridge packet verify /tmp/rm-probe
+  output_sha256: 327ea91119da9148fbc198e10ff375cc86c4d8d6677bfc6f00472ba05ab827e3
+- cmd: $PY -m govbridge packet verify /tmp/rm-probe2
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3-packet-verify.out
   output_sha256: 2a7e2cf12b69bf3eefefb16de13c51c6ed497a47c9e2b5975604da6f4f0e2df4
+- cmd: git show <records-commit>:PHASE_LEDGER.md | grep -n '^## BR-L-000[2-4]' (independent, non-Python confirmation)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3b-independent-git-grep-ledger-entries.out
+  output_sha256: df8b2095b811f6f824832e0385fe56212934689b35424de9d626e0aa1c866737
+- cmd: grep -n 'section map:' control-a-rm-probe-packet.md (independent confirmation the notice is really rendered)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3c-independent-grep-section-map-in-packet.out
+  output_sha256: 964bb64b2b60bf6a194e64dffcb13b165f6551bc81ca5f986f07086a6a8251c4
+- cmd: (in-process, pinned real view) compile demonstration-task.yaml; inspect the REVIEW-8-PROBES A row
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check4-real-view-directory-manifest-review8probes.out
+  output_sha256: 5abbef39ac1d15d353c53fe989d64519d7028dc62c45994eb7760cb2e0e08d96
 - cmd: $PY -m pytest -q -p no:cacheprovider tests/compile/test_verify_recorded_view.py
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check-standalone-test_verify_recorded_view.out
-  output_sha256: f3cf71dccb7a621f56841c650ccf4b13e6d03fc8b67506e77bbfbce55ddae13c
+  output_sha256: f341f786316bbf0e322950957e43b50bdb0cb375e28c43d3d4ae4a477d821a20
 - cmd: $PY -m pytest -q -p no:cacheprovider tests/compile/test_mandatory_fidelity.py
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check-standalone-test_mandatory_fidelity.out
-  output_sha256: d47dbf99ec5be5e51649587f33348b04e1867ce4ccbc09b11077ce75061b3a2d
+  output_sha256: 6e158a4b2b65d38b06ceffdedb621ae75168d4c562388ee315c3f2840085dd36
 - cmd: $PY -m pytest -q -p no:cacheprovider tests/compile/test_compile_real_view_mandatory_in_a.py
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check-standalone-test_compile_real_view_mandatory_in_a.out
-  output_sha256: 81716262b80b377afd3942ea8ce9fcae4879babfd674980aa09c6e9125e94c6f
+  output_sha256: adfa4cdcf5e6ecd657f29aa00f8c6c235b3e94de9067c4f0f9d6f2674b755b31
 - cmd: $PY -m pytest -q -p no:cacheprovider tests
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out
-  output_sha256: ce9ef461e616853cd5ff7a9bbf1437716c1f8c3c803cff23c9bf224cdc6e8695
+  output_sha256: ac66c93bfac0eb36b711623504a8e29eed000073532157caabf1084713a55689
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
 - release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
@@ -146,6 +178,10 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check2-grep-max_chars.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3-compile.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3-packet-verify.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3b-independent-git-grep-ledger-entries.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check3c-independent-grep-section-map-in-packet.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check4-real-view-directory-manifest-review8probes.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check-grep-new-sectionmap-functions.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-manifest.json
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-meta.json
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-packet.md
@@ -157,81 +193,123 @@ findings:
   over-budget-as-reference fallback never even saw most oversize items, because they were already cut upstream).'
 - 'A mandatory item''s existing ``content_sha256`` field was ALREADY documented in
   ARCHITECTURE/schemas/packet-manifest.yaml as "sha256 of the delivered bytes", but the code set it to the
-  resolver''s whole-occurrence hash regardless of what was actually delivered -- the schema''s own intent and the
-  code disagreed before this fix. I did not repoint ``content_sha256`` itself (several existing, frozen tests and
-  ``validate.verify_section_a``''s re-derivation key on it staying exactly the resolver''s hash); I added
-  ``delivered_sha256``/``source_sha256`` alongside it instead, so both meanings are now available and distinct.'
-- 'An anchored mandatory item''s ``source_sha256``/``content_sha256`` (the resolver''s whole-FILE hash) and its
-  ``delivered_sha256`` (the hash of just its anchored slice) legitimately differ even when the item is fully,
-  honestly delivered -- so ``verify_delivered_fidelity`` checks PRESENCE of both fields, never their equality
-  (an earlier draft asserted equality-unless-notice and produced false positives against every real anchored
-  item, e.g. CX-0010A in the shared fixture -- caught by the existing compile suite before it ever reached a
-  commit).'
+  resolver''s whole-occurrence hash regardless of what was actually delivered. I added ``delivered_sha256``/
+  ``source_sha256`` alongside it rather than repoint it (several existing, frozen tests and
+  ``validate.verify_section_a``''s re-derivation key on it staying exactly the resolver''s hash).'
+- 'An anchored mandatory item''s ``source_sha256`` (the resolver''s whole-FILE hash) and its ``delivered_sha256``
+  (the hash of just its anchored slice) legitimately differ even when fully, honestly delivered -- my FIRST
+  presence-only fidelity check accepted this correctly, but (per the reopening) presence alone cannot catch a
+  compiler that cuts a body and writes SOME hash for the cut text anyway.'
 - 'A real ``mandatory_bridge_inputs`` row (PHASE-2-LEDGER-P2-L-0033-0047) already uses the field name ``entries``
   as free, human-readable prose, not a structured selector -- discovered when the corrected real-view test first
   crashed against it. ``keys``/``entries`` are therefore selectors ONLY when they carry their expected structured
   shape (a list / a mapping respectively); any other shape is left completely alone, never an error.'
-- 'The real ``records`` ref (``refs/heads/bridge/p2-context-retrieval``) is exactly the branch this whole
-  REPAIR-1 effort''s parallel builders commit to, in the SAME object store every git worktree of this repository
-  shares -- confirmed by ``config/canonical-view.yaml`` itself (only ``records`` is ``follow: tip``; ``product``/
-  ``evidence`` were already ``follow: pinned``), which is why BR-DAG-AMEND-R1-2''s hermeticity fix only needs to
-  pin that one named ref.'
+- 'The real ``records`` ref is exactly the branch this whole REPAIR-1 effort''s parallel builders commit to, in
+  the SAME object store every git worktree of this repository shares -- confirmed by
+  ``config/canonical-view.yaml`` itself (only ``records`` is ``follow: tip``), which is why BR-DAG-AMEND-R1-2''s
+  hermeticity fix only needs to pin that one named ref.'
+- 'REOPENING finding: "declared" is not one uniform concept -- it means the WHOLE file/slice when no selector
+  narrows it (comparable directly to a full delivery''s hash), but the SELECTOR''S OWN resolved parts when
+  ``keys``/``entries``/``paths`` apply (also directly comparable, since every matched part is delivered in full
+  by construction). Treating "declared" as ALWAYS "the whole document, structurally decomposed" (my first draft)
+  made ``delivered_sha256`` and ``declared_sha256`` use two DIFFERENT hash shapes (a raw-text hash vs. a
+  JSON-wrapped structural hash) that could never equal each other even for a perfectly honest, full delivery --
+  caught immediately by the existing compile suite (every anchored/full-delivery test failed).'
+- 'REOPENING finding: my first Markdown flat-tiling algorithm picked ONE heading level for the whole document
+  (shallowest, or the level carrying entries). This is WRONG for a document that mixes depths (some headings have
+  nested subsections, some do not) -- a heading between two chosen-level siblings that happens to be shallower
+  swallows everything after it up to the next entry, silently absorbing a sibling''s content. Replaced with a
+  per-heading "own content only" partition (every heading, at every level, contributes exactly its own text up to
+  its first CHILD heading or its own end) -- this tiles ANY heading structure exhaustively, verified with an
+  automated overlap/gap check against both a synthetic mixed-depth fixture and the real 499-line PHASE_LEDGER.md
+  (19 sections, 18 entries, zero gaps, zero overlaps).'
+- 'REOPENING finding: the real ``mandatory_bridge_inputs.items[*]``/``owner_records[*]``/``contract_v3`` required
+  inputs (demonstration-task.yaml) are ALL ``state_ref`` (state_form) rows -- so generalising selector support to
+  ``path_form`` entries (a decision from the FIRST pass) changed no real production behaviour, but did let
+  acceptance check 3 exercise the entries-over-Markdown fix against REAL content (PHASE_LEDGER.md) via a
+  read-only ``path_form`` probe, without needing to edit real state.'
 failed_approaches:
-- 'First draft of ``verify_delivered_fidelity`` asserted ``delivered_sha256 == source_sha256`` for every A item
-  unless a ``MANDATORY_PARTIAL_DELIVERY`` notice named it. This failed
-  ``test_hand_edited_packet_with_extra_a_item_fails_verify``/``test_semantic_trap``/
-  ``test_mandatory_bridge_inputs_classes``/two ``test_compile_receipt.py`` cases -- EVERY anchored mandatory item
-  in the shared fixture corpus (CX-0010A etc.) legitimately has a whole-file source hash and an anchored-slice
-  delivered hash, so the two never matched even for a fully, honestly delivered item. Replaced with a
-  presence-only check (see findings).'
+- 'First draft of the (now-removed) ``verify_delivered_fidelity`` asserted ``delivered_sha256 == source_sha256``
+  for every A item unless a notice named it. Failed on every anchored fixture item (whole-file vs. slice hashes
+  legitimately differ). Replaced with a presence-only check -- which the reopening then correctly identified as
+  too weak to catch silent truncation, since presence alone says nothing about whether the delivered bytes match
+  what was declared.'
+- 'REOPENING first draft of ``declared_parts``/``declared_hash_and_bytes`` computed a structural, JSON-wrapped
+  hash over ``sectionmap.flat_tiling``''s FULL decomposition for EVERY mandatory item (treating "declared" as
+  always "the whole document, finely decomposed"). This made ``delivered_sha256`` (a raw-text hash) and
+  ``declared_sha256`` (a JSON-wrapped structural hash) use incompatible schemes -- even a perfectly-delivered,
+  unselected, undersized item failed 2(a) trivially. Redesigned so "declared" means exactly what the ROW asks for
+  (whole file/slice, or the selector''s own resolved parts) and both hashes use the SAME
+  ``resolver.hash_pieces`` -- confirmed working via a targeted compile-suite run showing the SAME class of
+  failure (every item, not just anchored ones) before the fix, none after.'
+- 'REOPENING first draft of the Markdown flat-tiling picked ONE heading level for the whole document (shallowest
+  present, or the entries'' own level). Caught immediately by a manual overlap/gap probe against a synthetic
+  mixed-depth fixture (a heading with a nested subsection, followed by a sibling at the SAME level as the parent)
+  -- the sibling''s content was silently absorbed into the nested heading''s span. Replaced with the
+  per-heading "own content up to its first child" partition (see findings) before it reached any committed test.'
 - 'Considered emitting a second MandatoryItem (``id#path2``) per extra declared path, mirroring an earlier,
   since-reverted approach the resolver''s own docstring warned against (it changes section A''s real-view item
   set and breaks the frozen ``EXPECTED_IN_A``/``lifecycle_notices`` shape of
-  ``test_compile_real_view_mandatory_in_a.py``). Used ``MandatoryItem.parts`` instead -- additional, fully-resolved
-  sub-occurrences of the SAME one item, never a second section-A entry.'
-- 'Considered treating a `keys`/`entries` selector''s "remainder" disclosure the same way for a paths-only row
-  (deliver primary in full via a part, then ALSO run the remainder-of-primary disclosure). Realised a paths-only
-  row narrows NOTHING about the primary (both paths are meant in full), so the disclosure only fires when a
-  keys/entries selector ACTUALLY narrowed the primary occurrence itself -- gated on a `narrowing` flag in
-  ``Compiler._render_selected_parts``.'
+  ``test_compile_real_view_mandatory_in_a.py``). Used ``MandatoryItem.parts`` instead.'
 unresolved:
-- see report.yaml open_issues (history-glob-ref pinning left to R1-INT; id_form selector support left for a
-  future need; task-spec.yaml schema documentation of the new keys/entries fields left for a schema-owning node)
+- see report.yaml open_issues (packet-body re-extraction from rendered text not implemented under this
+  reopening's time budget -- decision requested; history-glob-ref pinning left to R1-INT; id_form selector
+  support left for a future need; task-spec.yaml schema documentation of the new keys/entries fields left for a
+  schema-owning node; the exact structured PHASE-2-LEDGER-P2-L-0033-0047 row shape is given for the coordinator
+  to apply, per instruction, never edited by this node)
 decisions:
 - 'Modified an EXISTING test file, tests/compile/test_compile_real_view_mandatory_in_a.py (BR-DAG-AMEND-R1-2,
-  explicitly assigned to this node): added a module-level pin of every follow:tip named ref (config/canonical-view.yaml
-  currently has exactly one -- `records`) to the commit it resolves to once, at import time, and threaded that
-  pinned view + an explicit `repo=` into both test functions'' compile/verify calls. The byte-identical-twice
-  assertion itself, and every other assertion in the file, is UNCHANGED and unweakened -- only the input view each
-  assertion runs against is now fixed instead of live. Justification: the amendment names this exact file and
-  exact defect; the fix is orthogonal to, and does not touch, any assertion''s meaning.'
-- 'Also modified _mandatory_item_from_row''s docstring in resolver.py (not a test) to describe the NEW
-  multi-path/selector behaviour instead of the old "extra paths are checked but never delivered" rationale it
-  used to document, since that rationale (protecting the frozen real-view test''s exact item count) still holds
-  -- the real-view test''s own assertions were never about path COUNT, only about which item_ids land in A -- and
-  is now literally re-verified by the corrected test itself.'
-- 'Chose to generalise `keys`/`entries`/`paths` selector resolution (`_resolve_row_selectors`) to path_form
-  required_inputs entries as well as state_ref rows, though REPAIR_PLAN.md section 3 rule 2 frames selectors as
-  "declared in the bridge state." All three real production required_inputs (demonstration-task.yaml) are
-  state_form already, so this generalisation changes no real behaviour; it let acceptance check 3 exercise the
-  selector mechanism against REAL, already-existing production content (ORCHESTRATOR_STATE.yaml, read-only)
-  instead of requiring either a synthetic-only demonstration or an edit to real state. Flagged as a decision
-  rather than silently assumed because it slightly broadens the node''s original one-line description.'
+  explicitly assigned to this node): pinned every follow:tip named ref once at module load and passed repo=
+  explicitly everywhere. The byte-identical-twice assertion itself is UNCHANGED and unweakened.'
+- 'Chose to generalise `keys`/`entries`/`paths` selector resolution to path_form required_inputs entries as well
+  as state_ref rows (REPAIR_PLAN.md section 3 rule 2 frames selectors as "declared in the bridge state," a
+  slightly narrower reading). All three real production required_inputs are state_form already, so this changes
+  no real behaviour; it let acceptance check 3 and the reopening''s real-view probe exercise the fix against
+  REAL, already-existing content (ORCHESTRATOR_STATE.yaml, PHASE_LEDGER.md) read-only.'
+- 'REOPENING decision: chose "declared" = what the row itself asks for (whole file/slice, or exactly the
+  selector''s resolved parts) rather than "the whole underlying document, always" -- see findings/
+  failed_approaches for why the alternative breaks hash comparability. This means a `keys`/`entries` row''s
+  informational "remainder" notice (disclosing the NON-selected keys/entries, unchanged from before the
+  reopening) is no longer part of the pass/fail gate for that row -- 2(a) already holds by construction, since
+  every declared (= selected) part is delivered in full. The gate (2a/2b) now applies in earnest only to the
+  no-selector, oversize case, which is exactly RC-1''s original shape.'
+- 'REOPENING decision: did NOT implement packet-body re-extraction from the rendered packet.md text (reopening
+  point 3), despite adding an item-id marker being cheap. Reasoned that without a corresponding cli.py change
+  (out of this node''s scope) to actually PASS the rendered text into `packet verify`/`receipt check`, adding the
+  extraction machinery would be inert for the one path (the CLI) where it would matter most, while the
+  in-process (test-suite) path already gets a genuine, independent check via declared_sha256 recomputed from
+  Git plus per-range re-verification. Flagged as an open_issue with a concrete, scoped next step rather than
+  built partially; requesting a decision on ownership (R1-INT vs. a follow-up) since it spans two nodes'' scopes.'
+- 'REOPENING decision: fixed the pre-existing lexicographic-comparison bug in the YAML `entries` `{start, end}`
+  path (not just added Markdown support), since the coordinator''s point 2.2 explicitly requires document-order
+  resolution "for YAML entries" too, and the two code paths were already unified through one
+  `sectionmap.select_entry_range` helper -- fixing one and not the other would have left an inconsistent, still-
+  buggy sibling.'
 - 'Did not modify govbridge/compile/budgets.py or govbridge/compile/receipt.py: both are in mutation_scope but
-  needed no code change (see input_manifest notes) -- their existing behaviour already composes correctly with
-  every new field/mechanism, which I verified rather than assumed (ran the full compile suite after every change).'
+  needed no code change -- verified (full compile suite re-run after every change), not assumed.'
 lessons:
-- 'When a field''s DOCUMENTED meaning (a schema file) and its ACTUAL code meaning disagree, prefer ADDING the
-  correctly-named field alongside the old one over silently repointing the old field -- the old field usually has
-  load-bearing consumers (here: validate.py''s section-A re-derivation, three other tests'' content_sha256
-  comparisons) that assume its EXISTING semantics.'
+- 'When a field''s DOCUMENTED meaning and its ACTUAL code meaning disagree, prefer ADDING the correctly-named
+  field alongside the old one over silently repointing it -- the old field usually has load-bearing consumers
+  that assume its EXISTING semantics.'
 - 'A "this must always equal that" validator invariant needs to be checked against every EXISTING legitimate
-  shape in the corpus (here: an anchored sub-record''s whole-file vs. slice hashes) before it is trusted, not just
-  against the new code path it was written for -- the full compile suite caught this in under a minute.'
+  shape in the corpus BEFORE it is trusted -- true twice in this same node (the first presence-only check''s
+  predecessor, and the reopening''s first declared/delivered hash scheme), and both times the existing compile
+  suite caught it in well under a minute.'
+- 'A structural "pick one representative level/shape for the whole input" simplification is a common source of
+  silent, hard-to-notice gaps in a tiling/coverage algorithm -- an algorithm that instead computes each unit''s
+  OWN contribution generically (here: each heading''s own content, never a level chosen for the whole document)
+  is more code but far harder to get subtly wrong, and is exactly the kind of check a grader for "did you
+  actually detect truncation" will stress in ways a single happy-path fixture will not.'
+- 'When a coordinator names a concrete, minimal counter-example while reopening a finding ("an id-range selector
+  implemented for YAML only, while the real input is Markdown"), checking the REAL input shape FIRST (before
+  writing any fix) surfaces load-bearing surprises early -- here, that PHASE_LEDGER.md''s real entries are level-2
+  ATX headings with a specific id-grammar-recognisable prefix, not a hand-invented shape.'
 next_consumer: 'R1-GA1 (BR-AR-0023, parallel_group R1-PG2, needs RX''s task context + RL''s paging) and R1-RS
   (BR-AR-0025, R1-PG3, needs GA1 and R1-RM) consume this node''s output next; R1-GA3 (BR-AR-0026, R1-PG4) is the
-  THIRD and final editor of govbridge/compile/packet.py after RX and RM, per REPAIR_PLAN.md section 12 -- its
-  base will already contain this commit merged. R1-INT (BR-AR-0028) is this node''s acceptance gate: the whole
-  suite, store rebuild, determinism and the generic-rule audit, plus (per this checkpoint''s open_issues) the
-  history-glob-ref pinning question.'
-final_commit: 9790a82a797a4edc5cd18e7e5911f570148d298f
+  THIRD and final editor of govbridge/compile/packet.py after RX and RM, per REPAIR_PLAN.md section 12. R1-INT
+  (BR-AR-0028) is this node''s acceptance gate: the whole suite, store rebuild, determinism, the generic-rule
+  audit, plus (per this checkpoint''s open_issues) the packet-body re-extraction gap, the history-glob-ref
+  pinning question, and the task-spec.yaml schema documentation gap. The coordinator is the next consumer for the
+  exact PHASE-2-LEDGER-P2-L-0033-0047 structured-row shape (report.yaml open_issues), which this node did not
+  and must not write into ORCHESTRATOR_STATE.yaml itself.'
+final_commit: c9de8d0edc74f3b45dc017c806540a168b46dced

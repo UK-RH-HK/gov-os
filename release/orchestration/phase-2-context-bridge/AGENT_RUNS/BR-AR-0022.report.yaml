@@ -3,11 +3,12 @@ run_id: BR-AR-0022
 role: 'REPAIR-1 node R1-RM -- mandatory-input fidelity (no silent truncation, declared selectors honoured,
   directory items expanded, receipt acknowledges what was delivered) + BR-DAG-AMEND-R1-1 (packet verify/receipt
   check re-derive section A at the packet''s own recorded view) + BR-DAG-AMEND-R1-2 (hermetic real-view compile
-  test). Did not touch govbridge/cli.py (sequenced RX -> GA1 -> RS -> RA; GA1 runs in parallel), grading, the
-  oracle, or any other node''s mutation_scope.'
+  test). REOPENED once (two points: packet verify could not detect silent truncation; `entries` worked only on
+  YAML) and repaired -- see the reopening claims below. Did not touch govbridge/cli.py (sequenced
+  RX -> GA1 -> RS -> RA; GA1 runs in parallel), grading, the oracle, or any other node''s mutation_scope.'
 model_observed: claude-sonnet-5 (Sonnet 5)
 branch: bridge/r1-rm-0022
-commit: 9790a82a797a4edc5cd18e7e5911f570148d298f
+commit: c9de8d0edc74f3b45dc017c806540a168b46dced
 status: COMPLETED
 claims:
 - 'RC-1 fixed: govbridge/compile/packet.py''s _read_excerpt used to silently cut EVERY mandatory item at 4000
@@ -20,26 +21,18 @@ claims:
   oversize mandatory item) now triggers this path instead of being silently cut (AGENT_RUNS/BR-AR-0022.evidence/
   control-a-rm-probe-manifest.json).'
 - 'Selectors honoured: a mandatory-input row (bridge-state item or task-spec path_form entry) may declare `keys`
-  (dotted YAML key paths), `entries` ({under, ids} or {under, start, end} -- an id range/set within a YAML
-  sequence) and multiple `paths`; govbridge/authority/resolver.py resolves each to exact line spans via the new
-  govbridge/compile/sectionmap.py and delivers every matched part in full. An unresolvable selector fails the
-  WHOLE row closed (added to blocked_reasons, a BLOCKED_INPUT J notice), exactly like a missing path already did
-  -- never a silent partial match. A pre-existing, real, non-structured `entries` value
-  (PHASE-2-LEDGER-P2-L-0033-0047''s free-text annotation in ORCHESTRATOR_STATE.yaml) is left completely alone --
-  discovered by running the corrected test_compile_real_view_mandatory_in_a.py, which crashed against it before
-  the fix (`entries` is only ever treated as a selector when it is a dict; `keys` only when it is a list).'
+  (dotted YAML key paths), `entries` ({under, ids} or {under, start, end} -- an id range/set) and multiple `paths`;
+  govbridge/authority/resolver.py resolves each to exact line spans via govbridge/compile/sectionmap.py and
+  delivers every matched part in full. An unresolvable selector fails the WHOLE row closed (added to
+  blocked_reasons, a BLOCKED_INPUT J notice), exactly like a missing path already did -- never a silent partial
+  match. A pre-existing, real, non-structured `entries` value (PHASE-2-LEDGER-P2-L-0033-0047''s free-text
+  annotation in ORCHESTRATOR_STATE.yaml) is left completely alone -- `entries`/`keys` are only ever treated as
+  selectors when they carry their expected structured shape (a dict / a list respectively).'
 - 'Multi-path items now deliver every declared path in full (previously: every path was existence-checked but
   only the first delivered), and a by-reference directory item is expanded into a member manifest (path, blob,
-  size, class per tracked file under it, via a generic Registry.class_for_path glob lookup) -- proven on a
-  synthetic MF-PATHS/MF-DIR fixture (tests/compile/test_mandatory_fidelity.py).'
-- 'Receipt/manifest now carry delivered_sha256 (what the packet''s body actually contains) separately from
-  source_sha256 (the resolver''s own recorded hash, unchanged in meaning from the old content_sha256 field, kept
-  for backward compatibility). The two coincide for a fully-delivered item and legitimately differ only for a
-  partially-delivered mandatory item (disclosed by its own MANDATORY_PARTIAL_DELIVERY notice).
-  validate.verify_delivered_fidelity asserts both are present for every A item -- a directory item with no
-  row-declared hash no longer carries source_sha256=None (the concrete run-1 pain point: "acknowledged as
-  ''ID@None'' because the manifest carries no content_sha256 for this by-reference [item]"); it now gets a real,
-  deterministic hash derived from its own member manifest.'
+  size, class per tracked file under it, via a generic Registry.class_for_path glob lookup). Confirmed on REAL
+  content: REVIEW-8-PROBES (probes/P2-AR-0097/) resolves with 4 real members, source_sha256 == delivered_sha256
+  (AGENT_RUNS/BR-AR-0022.evidence/check4-real-view-directory-manifest-review8probes.out).'
 - 'BR-DAG-AMEND-R1-1: govbridge.compile.validate.verify_section_a (and therefore receipt.check, which calls into
   the SAME function) now re-derives section A at the packet''s OWN recorded view (pinned_view_from_manifest,
   built from manifest[''view''] -- every named ref pinned to its recorded commit), never the repository''s moving
@@ -53,23 +46,135 @@ claims:
   of this repository shares). Made hermetic: every follow:tip NAMED ref is resolved ONCE, at module load, and
   pinned into a temp copy of the view for both assertions in the file; repo= is now passed explicitly to every
   compile_packet/verify_packet call (never relying on gitobj.repo_root()''s process-global cwd cache -- R1-INT''s
-  routed fix). The byte-identical-twice assertion is unchanged and unweakened. Verified standalone (2 passed,
-  ~156s, real view) and inside the full domain suite.'
-- 'Full domain suite: 428 passed, 0 failed (tests/compile/test_compile_real_view_mandatory_in_a.py included, now
-  hermetic). AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out.'
+  routed fix). The byte-identical-twice assertion is unchanged and unweakened.'
+- 'REOPENING POINT 1 fixed ("packet verify cannot detect silent truncation"): a THIRD, independent measurement,
+  declared_sha256/declared_bytes (govbridge.authority.resolver.declared_parts/hash_pieces), is recomputed FRESH
+  from Git at the packet''s recorded view -- never trusted from the manifest. `packet verify`
+  (validate.verify_declared_and_delivered) now requires delivered_sha256 == declared_sha256 (a real byte-level
+  equality: both computed via the SAME resolver.hash_pieces over the SAME ordered raw pieces) OR a
+  MANDATORY_PARTIAL_DELIVERY notice whose delivered+undelivered ranges EXACTLY TILE the declared span (no gaps,
+  no overlaps -- checked with an interval/line-set comparison), with every disclosed range independently
+  re-verified against Git. Proven to actually CATCH all three named failure shapes on synthetic negative
+  controls: a body swapped/cut with no notice, a notice with a dropped (gapped) range, and a tampered
+  declared_sha256 -- each makes `packet verify` FAIL
+  (tests/compile/test_mandatory_fidelity.py::test_truncated_body_with_no_notice_fails_verify,
+  ::test_notice_with_a_gap_fails_verify, ::test_declared_sha256_mismatch_fails_verify). Packet-body
+  re-extraction (point 3 of the reopening) was NOT implemented -- see decisions/open_issues for why and what the
+  smallest remaining step is.'
+- 'REOPENING POINT 2 fixed ("entries works only on YAML"): `entries` now resolves over Markdown too -- a heading
+  whose title begins with a token matched by config/id-grammar.yaml''s mention_patterns is an entry
+  (govbridge.compile.sectionmap.markdown_flat_tiling), and `{start, end}` is resolved in DOCUMENT ORDER (list
+  position), never lexicographically, for BOTH YAML and Markdown entries
+  (govbridge.compile.sectionmap.select_entry_range) -- fixing a real lexicographic-comparison bug in the
+  original YAML-only implementation along the way. Proven on a synthetic fixture whose entry ids are
+  deliberately out of lexicographic order
+  (test_markdown_entries_resolve_in_document_order_not_lexicographic,
+  test_markdown_entries_reverse_document_order_fails_closed) and on the REAL bridge-domain PHASE_LEDGER.md (not
+  a Review-8 subject): `entries: {start: BR-L-0002, end: BR-L-0004}` resolves and delivers exactly those 3
+  entries, delivered_sha256 == declared_sha256, packet verify PASS
+  (control-a-rm-probe-manifest.json/packet.md, check3-packet-verify.out) -- independently re-confirmed by a
+  SECOND method (raw `git show`+`grep`, not this node''s own code) that those three headings sit at exactly the
+  disclosed lines, in that document order (check3b-independent-git-grep-ledger-entries.out). The exact structured
+  row shape the resolver now expects for the REAL PHASE-2-LEDGER-P2-L-0033-0047 row (never edited here; the
+  coordinator restates it) is: `entries: {start: <first ledger id>, end: <last ledger id>}` (optionally `under:`
+  if the ids are nested inside a YAML key rather than being the row''s own Markdown headings -- not applicable to
+  a Markdown ledger like PHASE_LEDGER.md, where `under` is unused).'
+- 'Full domain suite: 433 passed, 0 failed (tests/compile/test_compile_real_view_mandatory_in_a.py included, now
+  hermetic, ~154s of the ~214s total). AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out.'
+conformance:
+- item: 'deliverable 1 -- item_from_mandatory never cuts text; an oversize item is delivered as a section map
+    (headings or keys, with line ranges and hashes) plus facet-selected sections plus a by-reference remainder,
+    with the J notice MANDATORY_PARTIAL_DELIVERY listing every undelivered range'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: 'test: test_oversize_item_never_ends_mid_content (synthetic, markdown_flat_tiling-based section map,
+    tiling checked gap/overlap-free). Real-view measurement: state:bridge#contract_v3 (genuinely oversize real
+    mandatory item) triggers the section-map path -- control-a-rm-probe-manifest.json (delivered_sha256=None, a
+    MANDATORY_PARTIAL_DELIVERY notice present) and an independent grep confirming the literal notice text inside
+    the rendered packet.md, not just the manifest (check3c-independent-grep-section-map-in-packet.out).
+    Disclosed limit: no `facet` system exists yet (R1-GA1, same wave as this node, not yet built) -- declared
+    `keys`/`entries` selectors serve as this node''s facet-equivalent for "facet-selected sections", per
+    REPAIR_PLAN.md section 12''s own sequencing.'
+- item: 'deliverable 2 -- the resolver honours entries (an id range), keys (YAML keys) and multiple paths; an
+    unresolvable selector fails closed with a J notice'
+  status: MET
+  evidence: 'tests: test_entries_selector_delivers_exactly_those_entries, test_keys_selector_delivers_exactly_those_keys,
+    test_two_path_item_delivers_both_paths, test_markdown_entries_resolve_in_document_order_not_lexicographic,
+    test_markdown_entries_reverse_document_order_fails_closed, test_unresolvable_selector_fails_closed (all
+    synthetic, tests/compile/test_mandatory_fidelity.py). Real-view measurement: ORCHESTRATOR_STATE.yaml (~89KB)
+    `keys: [schema, current_prohibitions]` and the real PHASE_LEDGER.md (499 lines, 18 real entries)
+    `entries: {start: BR-L-0002, end: BR-L-0004}` both resolve and deliver exactly the declared content
+    (control-a-rm-probe-manifest.json/packet.md); independently re-confirmed by a SECOND method (raw `git show` +
+    `grep`, not this node''s code) that BR-L-0002/0003/0004 sit at exactly the disclosed lines, in that document
+    order -- check3b-independent-git-grep-ledger-entries.out.'
+- item: 'deliverable 3 -- a by-reference directory is expanded to a member manifest (path, blob, size, class)'
+  status: MET
+  evidence: 'test: test_directory_item_becomes_a_member_manifest (synthetic, 3-file nested directory). Real-view
+    measurement: REVIEW-8-PROBES (a real by-reference directory item) resolves to is_directory=True with 4 real
+    members (path/blob/size/class each independently listed), source_sha256 == delivered_sha256 --
+    check4-real-view-directory-manifest-review8probes.out.'
+- item: 'deliverable 4 -- the receipt and manifest carry delivered_sha256 and source_sha256 separately; packet
+    verify checks both'
+  status: MET
+  evidence: 'Originally returned narrowed (reopening point 1: "checks both" read as "both fields are present,"
+    which could not detect silent truncation) -- now repaired: a THIRD, independent hash (declared_sha256/
+    declared_bytes) is recomputed fresh from Git and packet verify requires delivered_sha256 == declared_sha256
+    OR a notice whose ranges exactly tile the declared span, gap/overlap-checked, every range re-verified against
+    Git. Proven to catch all three named failure shapes: test_truncated_body_with_no_notice_fails_verify,
+    test_notice_with_a_gap_fails_verify, test_declared_sha256_mismatch_fails_verify. Real-view measurement: the
+    probe packet''s contract_v3/ORCHESTRATOR_STATE.yaml/PHASE_LEDGER.md items all show correct, distinct
+    source/declared/delivered hashes and PASS packet verify -- control-a-rm-probe-manifest.json,
+    check3-packet-verify.out.'
+- item: "acceptance check 1 -- pytest tests/compile/test_mandatory_fidelity.py tests/compile -q"
+  status: MET
+  evidence: 'check1-pytest-mandatory-fidelity-and-compile.out -- 61 passed, 0 failed, includes the (now hermetic)
+    test_compile_real_view_mandatory_in_a.py.'
+- item: "acceptance check 2 -- grep -n 'max_chars' govbridge/compile/packet.py"
+  status: MET
+  evidence: 'check2-grep-max_chars.out -- every mandatory-item call site passes max_chars=None explicitly; the
+    4000-char default remains reachable only from item_from_edge_hop (a RETRIEVED/DERIVED graph-hop excerpt),
+    consistent with ARCHITECTURE.md''s "any remaining cap applies only to RETRIEVED or DERIVED excerpts".'
+- item: 'acceptance check 3 -- govbridge compile <CONTROL-A task spec with oversize item + selector> --out ... &&
+    govbridge packet verify ...; expect PASS with delivered_bytes==source_bytes or a MANDATORY_PARTIAL_DELIVERY
+    notice'
+  status: MET
+  evidence: 'check3-compile.out, check3-packet-verify.out (PASS, 0 problems) -- real view, real oversize item
+    (contract_v3), real keys selector (ORCHESTRATOR_STATE.yaml) and real Markdown entries selector
+    (PHASE_LEDGER.md). The check''s own "source_bytes" maps onto this reopening''s declared_bytes; every A item''s
+    declared_bytes/declared_sha256 is independently recomputed and checked by verify_declared_and_delivered.'
+- item: "BR-DAG-AMEND-R1-1 -- packet verify / receipt check re-derive section A at the packet's own recorded view"
+  status: MET
+  evidence: 'tests/compile/test_verify_recorded_view.py (3 tests: the regression itself, plus two negative
+    controls proving the fixture genuinely exercises a moving tip and that the pre-repair, live-view
+    re-derivation would have disagreed). No real-view measurement applies by construction: this fix concerns
+    behaviour under a moving `records` tip, which only a controlled fixture can exercise deterministically; the
+    real view''s own moving-tip risk is independently neutralised by BR-DAG-AMEND-R1-2 (next row).'
+- item: "BR-DAG-AMEND-R1-2 -- tests/compile/test_compile_real_view_mandatory_in_a.py made hermetic"
+  status: MET
+  evidence: 'check-standalone-test_compile_real_view_mandatory_in_a.out (2 passed, real view, pinned `records`
+    ref) and check-full-domain-suite.out (433 passed, this test included, still hermetic and green inside the
+    full suite).'
 evidence:
 - claim: RC-1 no-truncation
   command: grep -n 'max_chars' govbridge/compile/packet.py
   output: AGENT_RUNS/BR-AR-0022.evidence/check2-grep-max_chars.out
-- claim: RC-1/selectors/directory manifest on synthetic fixtures + full compile suite
+- claim: RC-1/selectors/directory manifest/reopening negative controls on synthetic fixtures + full compile suite
   command: $PY -m pytest -q -p no:cacheprovider tests/compile/test_mandatory_fidelity.py tests/compile
   output: AGENT_RUNS/BR-AR-0022.evidence/check1-pytest-mandatory-fidelity-and-compile.out
-- claim: RC-1/selectors on the real view (state:bridge#contract_v3 oversize; ORCHESTRATOR_STATE.yaml `keys` selector)
-  command: $PY -m govbridge compile AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-task-spec.yaml --out /tmp/rm-probe --fake-routes
+- claim: RC-1/selectors on the real view (contract_v3 oversize; ORCHESTRATOR_STATE.yaml `keys`; PHASE_LEDGER.md `entries`)
+  command: $PY -m govbridge compile AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-task-spec.yaml --out /tmp/rm-probe2 --fake-routes
   output: AGENT_RUNS/BR-AR-0022.evidence/check3-compile.out, control-a-rm-probe-manifest.json, control-a-rm-probe-packet.md
 - claim: packet verify PASSes on that real-view packet
-  command: $PY -m govbridge packet verify /tmp/rm-probe
+  command: $PY -m govbridge packet verify /tmp/rm-probe2
   output: AGENT_RUNS/BR-AR-0022.evidence/check3-packet-verify.out
+- claim: independent (non-Python-under-test) confirmation of the real Markdown entries selector
+  command: git show <records-commit>:PHASE_LEDGER.md | grep -n '^## BR-L-000[2-4]'
+  output: AGENT_RUNS/BR-AR-0022.evidence/check3b-independent-git-grep-ledger-entries.out
+- claim: independent confirmation that the oversize section-map notice is literally rendered, not just claimed in the manifest
+  command: grep -n 'section map:' control-a-rm-probe-packet.md
+  output: AGENT_RUNS/BR-AR-0022.evidence/check3c-independent-grep-section-map-in-packet.out
+- claim: real-view directory member manifest (REVIEW-8-PROBES)
+  command: (in-process, pinned real view) compile_packet(demonstration-task.yaml) and inspect the REVIEW-8-PROBES A row
+  output: AGENT_RUNS/BR-AR-0022.evidence/check4-real-view-directory-manifest-review8probes.out
 - claim: BR-DAG-AMEND-R1-1 regression
   command: $PY -m pytest -q -p no:cacheprovider tests/compile/test_verify_recorded_view.py
   output: AGENT_RUNS/BR-AR-0022.evidence/check-standalone-test_verify_recorded_view.out
@@ -81,6 +186,19 @@ evidence:
   output: AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out
 mutation_scope_respected: true
 open_issues:
+- 'Packet-body re-extraction (reopening point 3, "recompute delivered_sha256 from the packet itself") was NOT
+  implemented. `validate.verify_declared_and_delivered` verifies delivered_sha256 against the INDEPENDENTLY
+  recomputed declared_sha256 (from Git) and, for a partial delivery, independently re-verifies every disclosed
+  range against Git too -- but it does not currently re-parse `packet.md` to confirm the manifest''s own
+  delivered_sha256 matches what was literally rendered. govbridge.cli''s `packet verify`/`receipt check` entry
+  points also do not pass the rendered text into the validator (govbridge/cli.py is out of this node''s scope,
+  sequenced RX -> GA1 -> RS -> RA). The smallest remaining step, inside this node''s own scope, would be: (a) wrap
+  each item''s body in render.py with an `<!-- item:<item_id> body-begin/end -->` marker pair (cheap, additive,
+  breaks no existing test -- checked), (b) add `validate.extract_delivered_body(rendered, item_id)`, (c) an
+  optional `rendered=` parameter on verify_packet/verify_declared_and_delivered that, when given, re-hashes the
+  extracted body and compares it to the stored delivered_sha256. Not implemented under this reopening''s time
+  budget; requesting a decision on whether R1-INT or a follow-up should close this, since it also needs a
+  cli.py-side wire-up outside this node''s scope to matter for the CLI path specifically.'
 - 'pinned_view_from_manifest (validate.py) leaves `history` (a ref_glob of many equally-historical tips) unpinned
   -- manifest[''view''] does not itemise glob refs (only named refs), so a mandatory item resolved only through a
   partition''s history fallback is not covered by this amendment''s own regression test. No real
@@ -93,5 +211,12 @@ open_issues:
   for whichever node next extends id_form, should a future task need it.'
 - 'The `entries`/`keys` selector shape (`{under, start, end}` / `{under, ids}` / a plain list) is new, generic
   syntax on top of the existing required_inputs/mandatory_bridge_inputs row schema; ARCHITECTURE/schemas/
-  task-spec.yaml (not in this node''s mutation_scope) does not yet document it. Recommend R1-INT or a schema-owning
-  node add the two new optional fields to that schema file.'
+  task-spec.yaml (not in this node''s mutation_scope) does not yet document it. Recommend R1-INT or a
+  schema-owning node add the two new optional fields to that schema file.'
+- 'Per the coordinator''s instruction: I did NOT edit ORCHESTRATOR_STATE.yaml''s PHASE-2-LEDGER-P2-L-0033-0047 row.
+  The exact structured shape the resolver now expects, for the coordinator to apply: add
+  `entries: {start: <first ledger entry id the row means>, end: <last ledger entry id the row means>}` to that
+  row (a plain dict value for the `entries` key, replacing its current free-text string) -- both ids must be
+  real ## headings in PHASE_LEDGER.md (or PHASE_LEDGER.md@phase-2, depending which ledger the row means) whose
+  title begins with a config/id-grammar.yaml-recognised token, and `start` must not come AFTER `end` in that
+  document''s own order (checked by position, not string comparison).'
