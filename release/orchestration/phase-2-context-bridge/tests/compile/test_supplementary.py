@@ -345,3 +345,64 @@ def test_cli_search_out_writes_a_verifiable_supplementary_packet(tmp_path, monke
 
     rc_verify = cli.main(["packet", "verify", str(out_dir)])
     assert rc_verify == 0
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# BR-DAG-AMEND-R1-15 (added mid-run, ORCHESTRATOR_STATE.yaml at bridge tip e23adb0): "query commands are
+# READ-ONLY with respect to the store. Supplementary packets go under --out, never into the store: no caches,
+# tables or indexes written at query time."
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_query_command_with_out_never_writes_to_a_genuinely_read_only_store(fixture_repo, view_path, tmp_path,
+                                                                               monkeypatch):
+    """``govbridge state get`` (govbridge/authority/state.py) never opens the index store at all -- it reads the
+    state file straight from Git (govbridge.core.gitobj) -- so it is the command this test can prove the
+    amendment against with the store made GENUINELY read-only at the OS level (0o444/0o555), not merely "happens
+    not to write under normal conditions."
+
+    Note on scope (recorded here and in this run's own checkpoint/report open_issues): `search`/`gather`/`why`/
+    `impact`, whose real routes open the sqlite store via govbridge.core.store.open_db(), CANNOT be proven this
+    strictly today. That function (govbridge/core/store.py, NOT in this node's mutation_scope) unconditionally
+    runs `PRAGMA journal_mode=WAL` and an `INSERT OR IGNORE` schema-version row on EVERY open -- verified
+    empirically (not merely read from the source) to raise `sqlite3.OperationalError: attempt to write a
+    readonly database` against an OS-read-only store.db, even though both statements are true no-ops on an
+    already fully-built store and, under normal (writable) conditions, leave store.db byte-for-byte unchanged
+    (confirmed separately, interactively, on the real store: open+query+close hashes identical before/after).
+    Making store.py itself tolerate a read-only-opened connection is out of this node's scope; routed as an
+    open_issue."""
+    import hashlib
+
+    store_dir = tmp_path / "readonly-store"
+    store_dir.mkdir()
+    store_db = store_dir / "store.db"
+    # content is irrelevant -- `state get` never opens this file at all; a real store.db would do just as well.
+    store_db.write_bytes(b"placeholder store contents -- never opened by a command that skips the sqlite store")
+    before_sha256 = hashlib.sha256(store_db.read_bytes()).hexdigest()
+    before_dir_listing = sorted(p.name for p in store_dir.iterdir())
+
+    # genuinely read-only at the OS level -- not a mock, not a monkeypatch of the store module.
+    store_db.chmod(0o444)
+    store_dir.chmod(0o555)
+    monkeypatch.setenv("GOVBRIDGE_STORE", str(store_dir))
+    try:
+        from govbridge import cli
+        out_dir = tmp_path / "s1"
+        rc = cli.main(["state", "get", "bridge", "lifecycle_id", "--view", view_path, "--repo",
+                       str(fixture_repo.root), "--out", str(out_dir)])
+        assert rc == 0, "a query command must succeed with --out even when GOVBRIDGE_STORE points at a read-only directory"
+    finally:
+        # restore before pytest's own tmp_path cleanup runs (a read-only dir/file can otherwise block teardown).
+        store_dir.chmod(0o755)
+        store_db.chmod(0o644)
+
+    # the supplementary packet landed under --out, never inside the (untouched, read-only-while-running) store.
+    meta = json.loads((out_dir / "meta.json").read_text(encoding="utf-8"))
+    assert meta["packet_kind"] == "supplementary"
+    assert validatemod.verify_supplementary_packet(json.loads((out_dir / "manifest.json").read_text(
+        encoding="utf-8"))) == []
+
+    after_sha256 = hashlib.sha256(store_db.read_bytes()).hexdigest()
+    assert after_sha256 == before_sha256, "the store file's own bytes must be unchanged by a query command's --out"
+    # independent, second method (per REPAIR-1's own "no silent narrowing" rule 3): the store DIRECTORY gained no
+    # new file either (no cache, no -wal/-shm sidecar, no index) -- not just "the one file we happened to hash".
+    assert sorted(p.name for p in store_dir.iterdir()) == before_dir_listing

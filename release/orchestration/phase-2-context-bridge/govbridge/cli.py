@@ -371,6 +371,9 @@ def cmd_state(argv) -> int:
     g = sub.add_parser("get")
     g.add_argument("alias")
     g.add_argument("key_path")
+    g.add_argument("--view")
+    g.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see cmd_search's own --repo).")
     g.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
     taskctxmod.add_cli_arg(g)
     _add_supplementary_args(g)
@@ -380,7 +383,7 @@ def cmd_state(argv) -> int:
     from govbridge.authority import state as statemod
     if args.cmd == "get":
         try:
-            result = statemod.get(args.alias, args.key_path, task=ctx)
+            result = statemod.get(args.alias, args.key_path, repo=args.repo, view_path=args.view, task=ctx)
         except (KeyError, ValueError, FileNotFoundError) as e:
             print(json.dumps({"error": str(e)}, indent=1))
             return 1
