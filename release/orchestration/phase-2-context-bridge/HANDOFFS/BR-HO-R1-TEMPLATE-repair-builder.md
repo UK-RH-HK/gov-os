@@ -99,3 +99,32 @@ passed while its own new test failed in the full suite, because the test depende
    * `GOVBRIDGE_*` environment left over from another test (use `monkeypatch.setenv`/`delenv`);
    * test order.
    Run each new test file on its own **and** within the full suite.
+
+## Amendment R1-T2 (BR-DAG-AMEND-R1-8): deliverable conformance and no silent narrowing
+
+This amendment applies to runs dispatched after wave 2 and to reopened passes. In waves 1 and 2, every builder
+returned at least one deliverable met only under its own narrower reading, for example:
+* "registered as a store layer with a digest" delivered as edges computed on demand;
+* "packet verify checks both" delivered as a check that the hashes are present;
+* an id-range selector implemented for YAML only, while the real input is Markdown;
+* a zero count on the real view reported as genuine without an independent measurement.
+
+1. **Add a `conformance` key to your report.** Give one row for **every** deliverable bullet and **every**
+   acceptance check of your node. Each row has:
+   * `{item, status, evidence}`;
+   * `status` is one of `MET`, `MET_WITH_DISCLOSED_LIMIT` or `NOT_MET`;
+   * `evidence` names the test and the real-view measurement.
+
+   `integrate-check` does not parse this key. The orchestrator reads every row.
+2. **Never replace a deliverable with a narrower reading of your own.** If a deliverable is ambiguous, infeasible
+   or disproportionate:
+   * implement the literal reading if you can;
+   * otherwise mark the row `NOT_MET` and put the question in `decisions` as a request.
+
+   A narrowed deliverable reported as `MET` is a defect in your return.
+3. **Check every zero or negative claim about the real view by a second, independent method**, for example a
+   `git grep` of the shape you derive, and record that command. A zero confirmed only by the code under test is not
+   evidence.
+4. **Real inputs first.** Where your node serves a real input shape (a real task spec, a real mandatory row, the
+   real product's language or framework), your fixtures must include that shape, synthetically reproduced.
+   Handling only a convenient neighbouring shape does not meet the deliverable.

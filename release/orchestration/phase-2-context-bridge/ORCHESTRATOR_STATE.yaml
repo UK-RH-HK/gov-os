@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T04:06:31Z'
-state_hash: e38d70e801e9f9495123a159bd1378de7455adac1fcd95baa14b364112701377
+updated_at: '2026-09-26T04:06:56Z'
+state_hash: cd44fb04a413b6ecd214973255dba3cb81d068af261b641b54ec19a9b4295daa
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1158,6 +1158,16 @@ dag:
       is never accepted without it
     reason: a builder reported CITES_REQUIREMENT = 0 as verified genuine while the frozen product carries such citations;
       a silent zero removes a whole edge class from every gather without any disclosure
+  - id: BR-DAG-AMEND-R1-8
+    by: orchestrator (lesson of waves 1-2 -- RX, RL (twice) and RM each returned a deliverable met only under the
+      builder's own narrower reading)
+    rule: 'template amendment R1-T2 -- every report carries a conformance row per deliverable and per acceptance check
+      (MET / MET_WITH_DISCLOSED_LIMIT / NOT_MET, with evidence); a narrowed deliverable must be NOT_MET plus a requested
+      decision, never MET; zero or negative real-view claims need an independent second measurement; fixtures must
+      reproduce the real input shape the node serves. Applies to every run dispatched after this commit and to every
+      reopened pass'
+    reason: reopen cycles caught every case, but each costs a full builder pass; the conformance table makes the gap
+      visible at return instead of at the orchestrator's re-measurement
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
