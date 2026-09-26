@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T18:33:06Z'
-state_hash: c9804e79e4c331a499e13a470b28b0c59ff1a7292e9ea14c2dc9da3134c297ed
+updated_at: '2026-09-26T18:34:26Z'
+state_hash: af0407870f41db2511814e072e46ae6fb2a717a4eb5172a280c54a91e298c538
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1646,7 +1646,33 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/answers/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0027.*
   - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_out_overflow.py
+- run_id: BR-AR-0028
+  role: 'REPAIR-1 node R1-INT -- fresh, independent, AUDIT-ONLY integration audit of the whole integrated REPAIR-1 tree (15 checks,
+    verdict INTEGRATION_ACCEPTED or DEFECTS_FOUND; defects routed, never fixed by it)'
+  dag_node: R1-INT
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0028-r1-int-audit.md
+  handoff_sha256: 2c5b00cd0e6602490fe874df6a9b62f2cd32ce5fb95f835a9d6aae58d8448008
+  branch: bridge/r1-int-0028
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0028
+  model_requested: opus
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-int-0028
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T18:34Z'
+  status: RUNNING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0028-a and -b (from clean, pinned view)
+  dispatch_notes:
+  - audit-only (BR-DAG-AMEND-R1-16); routed to opus; runs every real-view check against EVIDENCE/repair-1/pinned-view.yaml so orchestrator
+    commits cannot perturb it
+  - the one secrecy exception -- it may read DEMONSTRATION/oracle-tools/check_oracle.py and ARCHITECTURE/schemas/oracle.yaml (public, no
+    oracle content) to build a SYNTHETIC bound oracle for BR-DAG-AMEND-R1-3
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/tests/integration/test_repair1_integration.py
+  - release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0028.*
 running_work:
+- run_id: BR-AR-0028
+  liveness_check: subagent transcript mtime + commits on bridge/r1-int-0028; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
