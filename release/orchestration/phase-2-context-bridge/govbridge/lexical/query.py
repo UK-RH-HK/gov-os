@@ -106,6 +106,105 @@ def _default_paths(repo: Optional[str] = None) -> str:
     return os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
 
 
+#: the BUILD-time deduplicated (blob_id, path) table (REPAIR_DAG.yaml node R1-GA1, second reopening) -- created and
+#: maintained ONLY by govbridge.core.store (put_occurrence/clear_layer_tables/prune_stale_distinct_paths) and
+#: govbridge.core.freshness's incremental deletes. This module only ever READS it.
+SCOPE_PATH_CACHE_TABLE = "occurrence_distinct_path"
+#: the BUILD-time index (govbridge.authority.layer's own SCHEMA_SQL) this module's Tier A relies on.
+_RECORD_DEF_PATH_INDEX = "record_def_by_path"
+
+
+class StoreNeedsRebuild(RuntimeError):
+    """REPAIR_DAG.yaml node R1-GA1, second reopening: "query commands must never write to the store... fail with a
+    clear, typed error... NEVER a silent slow fallback, and NEVER a write." Raised by :func:`_check_scope_structures`
+    when a scoped query's SQL push-down needs a build-time structure (the ``record_def_by_path`` index, or the
+    ``occurrence_distinct_path`` table -- both built by ``govbridge.core.store``/``.freshness``/
+    ``govbridge.authority.layer``, never by a query) that this store does not have yet."""
+    CODE = "STORE_NEEDS_REBUILD"
+
+    def __init__(self, missing: str):
+        self.missing = missing
+        super().__init__(
+            f"{self.CODE}: {missing} is missing from this store -- rebuild it (e.g. "
+            f"`python -m govbridge index rebuild`) before running a scoped query against it; a query path never "
+            f"builds this itself"
+        )
+
+
+def _sqlite_object_exists(conn, kind: str, name: str) -> bool:
+    row = conn.execute("SELECT name FROM sqlite_master WHERE type=? AND name=?", (kind, name)).fetchone()
+    return row is not None
+
+
+def _check_scope_structures(conn, needs_cache_table: bool, needs_record_def_index: bool) -> None:
+    """READ-ONLY: looks up ``sqlite_master`` only, never writes anything, so this is safe to call against a store
+    opened from a read-only file. Checked lazily -- only for whichever tier(s) a caller's actual
+    scope_classes/scope_path_globs combination will use (:func:`query`'s own call site below), so an ordinary,
+    unscoped query -- or one using only Tier B -- never needs a structure it does not actually touch."""
+    if needs_cache_table and not _sqlite_object_exists(conn, "table", SCOPE_PATH_CACHE_TABLE):
+        raise StoreNeedsRebuild(f"table {SCOPE_PATH_CACHE_TABLE!r} (govbridge.core.store)")
+    if needs_record_def_index and not _sqlite_object_exists(conn, "index", _RECORD_DEF_PATH_INDEX):
+        raise StoreNeedsRebuild(f"index {_RECORD_DEF_PATH_INDEX!r} (govbridge.authority.layer)")
+
+
+def _scope_sql(blob_col: str, start_col: str, end_col: str, scope_classes: Optional[tuple],
+               lifecycle_scope: Optional[tuple], scope_path_globs: Optional[tuple]) -> tuple:
+    """A SQL fragment (``''`` or ``' AND (...)'``) plus its bound params, restricting rows to a facet's declared
+    authority-class/lifecycle scope -- PUSHED DOWN into SQL so a scoped facet's page is already in scope, rather
+    than filtered client-side after the fact (REPAIR_DAG.yaml node R1-GA1 reopening: a scoped facet must not page
+    through corpus-wide rankings, advancing its cursor without advancing its count). Reuses the SAME tables
+    ``govbridge.authority`` already persists (``record_def``/``class_lifecycle``, the B5 cache layer built by
+    ``govbridge.authority.layer``) and the store's own ``occurrence`` table -- no new schema, and no Python
+    ``import`` of ``govbridge.authority`` (this module stays a B1-only dependency; the caller,
+    ``govbridge.route.real_routes``, is the one place that already knows about authority classes and translates
+    them into these plain, generic SQL-facing parameters -- a class or lifecycle name is never spelled out here).
+
+    Two tiers, OR'd together:
+
+    * **Tier A** -- a RECORD-BACKED span: the occurrence's ``(path, line)`` falls inside a ``record_def`` row whose
+      ``class_lifecycle`` cache entry matches ``scope_classes`` AND ``lifecycle_scope``. Precise on both axes.
+    * **Tier B** -- a bare PATH GLOB (translated by the caller from the registry's own ``class_rules``, in the SAME
+      glob syntax SQLite's ``GLOB`` operator uses) matches an occurrence's path. Class-only: no lifecycle signal
+      exists for content outside a record, so Tier B is skipped whenever ``lifecycle_scope`` is given (never a
+      wrong-lifecycle false positive let through by the path alone).
+
+    This is a PRE-FILTER, not the final word: the caller still runs the real classifier on every survivor and may
+    still drop one it disagrees with -- kept as an assertion, disclosed in telemetry, never the primary mechanism."""
+    if not scope_classes and not scope_path_globs:
+        return "", []
+    clauses: list = []
+    params: list = []
+    if scope_classes:
+        cls_placeholders = ",".join("?" for _ in scope_classes)
+        # occurrence_distinct_path (built at BUILD time, see govbridge.core.store), never the raw occurrence table --
+        # Tier B: joining record_def straight off occurrence would re-walk every historical (ref, commit) repeat of
+        # a popular blob's path before ever reaching record_def's own small table.
+        tier_a = (
+            f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} rdo "
+            f"JOIN record_def rd ON rd.path = rdo.path AND rd.line_start <= {end_col} AND rd.line_end >= {start_col} "
+            f"JOIN class_lifecycle cl ON cl.unit = rd.id "
+            f"WHERE rdo.blob_id = {blob_col} AND cl.cls IN ({cls_placeholders})"
+        )
+        params.extend(scope_classes)
+        if lifecycle_scope:
+            lc_placeholders = ",".join("?" for _ in lifecycle_scope)
+            tier_a += f" AND cl.lifecycle IN ({lc_placeholders})"
+            params.extend(lifecycle_scope)
+        tier_a += ")"
+        clauses.append(tier_a)
+    if scope_path_globs and not lifecycle_scope:
+        glob_or = " OR ".join("occ2.path GLOB ?" for _ in scope_path_globs)
+        # occurrence_distinct_path (built at BUILD time, see govbridge.core.store): the SAME blob/path
+        # pair repeats once per historical (ref, commit) on occurrence (hundreds of times for a popular blob), so
+        # matching against the deduplicated cache is the difference between a handful of row checks and hundreds.
+        clauses.append(f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} occ2 WHERE occ2.blob_id = {blob_col} "
+                        f"AND ({glob_or}))")
+        params.extend(scope_path_globs)
+    if not clauses:
+        return "", []
+    return " AND (" + " OR ".join(clauses) + ")", params
+
+
 def _occurrences_for_blob(conn, blob_id: str, resolved: "viewmod.ResolvedView") -> list[Occurrence]:
     rows = conn.execute(
         "SELECT ref_name, commit_id, path FROM occurrence WHERE blob_id=? ORDER BY ref_name, commit_id, path",
@@ -121,7 +220,9 @@ def _occurrences_for_blob(conn, blob_id: str, resolved: "viewmod.ResolvedView") 
 
 def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, offset: int = 0,
           view_path: Optional[str] = None, repo: Optional[str] = None, record_telemetry: bool = True,
-          classify: Optional["Callable[[RetrievedItem], tuple]"] = None) -> dict:
+          classify: Optional["Callable[[RetrievedItem], tuple]"] = None,
+          scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
+          scope_path_globs: Optional[tuple] = None) -> dict:
     """Run ``text`` (an FTS5 MATCH expression -- a phrase, NEAR(), a bareword query, ...) against the lexical
     index and return up to ``k`` RetrievedItems, ranked by BM25 (ascending: SQLite's bm25() is a cost, lower is
     better -- ORDER BY score ASC is the correct direction, matching fts_spike.py), with ``chunk_id`` ASC as a
@@ -139,20 +240,41 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, of
     ``govbridge.semantic.search`` already has (its ``Classifier`` callable), added here for symmetry so a caller
     (I1's real-route wiring, once ``govbridge.authority`` is on this branch's base -- B2 depends only on B1) can
     supply the real classifier without editing this file. Absent (the default), every hit still carries the
-    original placeholder (``authority_class=None``, ``classification_note=NOT_YET_ASSIGNED``) -- unchanged."""
+    original placeholder (``authority_class=None``, ``classification_note=NOT_YET_ASSIGNED``) -- unchanged.
+
+    ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): pushed
+    down into the SQL itself (:func:`_scope_sql`) rather than filtered after the fact, so a SCOPED facet's page is
+    already in scope -- ``total_matching_chunks``/exhaustion accounting is computed over the SAME scoped universe,
+    never the unscoped one, so paging still terminates correctly. This function is READ-ONLY with respect to scope
+    filtering: it never creates or populates the structures Tier A/B rely on (those are built at BUILD time, by
+    ``govbridge.core.store``/``.freshness`` and ``govbridge.authority.layer``) -- if scope filtering is requested
+    and the store does not have them yet, :class:`StoreNeedsRebuild` is raised (never a silent, slower fallback to
+    an unscoped query, and never a write)."""
     view_path = view_path or _default_paths(repo)
-    conn = store.open_db()
+    # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): a QUERY never writes, so it opens the
+    # store via store.open_db_readonly() -- a connection that CANNOT write, by construction (mode=ro&immutable=1),
+    # rather than one that merely happens not to be asked to. ftsmod.ensure_schema's CREATE ... IF NOT EXISTS is
+    # still safe to call on it: a no-op against an already-built lexical layer (every store this runs against),
+    # and a clear sqlite3.OperationalError -- never a silent build -- on one that genuinely lacks the table.
+    conn = store.open_db_readonly()
     ftsmod.ensure_schema(conn)
+
+    scope_sql, scope_params = _scope_sql("lexical_fts.blob_id", "lexical_fts.start_line", "lexical_fts.end_line",
+                                          scope_classes, lifecycle_scope, scope_path_globs)
+    if scope_sql:
+        _check_scope_structures(conn, needs_cache_table=True, needs_record_def_index=bool(scope_classes))
 
     fetch_n = max(k * _OVERFETCH_MULTIPLIER, _OVERFETCH_FLOOR) if exclude else k
     t0 = time.monotonic()
     rows = conn.execute(
         "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
-        "FROM lexical_fts WHERE lexical_fts MATCH ? ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
-        (text, fetch_n, offset),
+        "FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql +
+        " ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
+        (text, *scope_params, fetch_n, offset),
     ).fetchall()
     total_matches = conn.execute(
-        "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?", (text,)
+        "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql,
+        (text, *scope_params),
     ).fetchone()[0]
     latency_ms = round((time.monotonic() - t0) * 1000, 3)
 

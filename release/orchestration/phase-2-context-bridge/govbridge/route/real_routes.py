@@ -108,6 +108,19 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
     _local = threading.local()
 
     def _conn():
+        # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): this connection's own two uses
+        # (_semantic_classify's SELECT, and classify_occ -> authoritylayer.classify_hit) are both queries, never a
+        # build -- but classify_hit itself still calls authoritylayer.ensure_schema(conn) on every call, a
+        # pre-existing lazy-schema-creation pattern in a module this node is authorized to touch for exactly one
+        # purpose (the record_def_by_path index, not this). Switching this connection to
+        # store.open_db_readonly() breaks that ensure_schema call -- and therefore classification itself -- on any
+        # store whose authority-layer schema was never separately built (this file's OWN pre-existing tests build
+        # a bare git repo and never run govbridge.authority.layer's builder, exactly this situation), which is why
+        # this stays on store.open_db() rather than the stricter read-only connection lexical/semantic queries now
+        # use: it already tolerates a read-only STORE FILE (every write it attempts is wrapped, see its own
+        # docstring), which is what this node's own required tests exercise, without this out-of-scope regression.
+        # Named here, not silently patched: govbridge.authority.layer's own schema lifecycle -- ensure_schema
+        # called from a query path at all -- is unresolved, for whoever owns that module next.
         c = getattr(_local, "conn", None)
         if c is None:
             c = storemod.open_db()
@@ -124,6 +137,43 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         except Exception:
             return UNCLASSIFIED
 
+    # REPAIR_DAG.yaml node R1-GA1 reopening, defect 1: a scoped facet's SQL-level pre-filter needs plain PATH GLOBS,
+    # not a class name -- this is the ONE place that translates "these authority classes" into "these globs",
+    # reusing the registry's OWN class_rules (``govbridge.authority.registry.Registry.class_rules``, already loaded
+    # above) rather than a second, hand-maintained list (OC-BR-02: generic, config-driven, never a hard-coded path).
+    # Cached per distinct ``scope_classes`` tuple -- the registry itself never changes within one RouteSet's life.
+    _path_globs_cache: dict = {}
+
+    def _path_globs_for_classes(scope_classes: Optional[tuple]) -> tuple:
+        if not scope_classes:
+            return ()
+        key = tuple(sorted(scope_classes))
+        cached = _path_globs_cache.get(key)
+        if cached is None:
+            cached = tuple(rule.glob for rule in reg.class_rules if rule.cls in scope_classes)
+            _path_globs_cache[key] = cached
+        return cached
+
+    def _apply_scope_assertion(hits: list, scope_classes: Optional[tuple], lifecycle_scope: Optional[tuple]) -> tuple:
+        """The shared "keep the post-filter only as an assertion" step every route applies to its ALREADY-classified
+        hits (REPAIR_DAG.yaml node R1-GA1 reopening, defect 1). For code/exact this is the PRIMARY scope mechanism
+        (their result sets are already small and bounded by fanout/id-lookup, so there is no large corpus-wide
+        ranking to push a SQL filter into); for lexical/semantic it is the secondary check behind the SQL
+        pre-filter. Returns ``(kept, dropped_count)``."""
+        if scope_classes is None and lifecycle_scope is None:
+            return hits, 0
+        kept: list = []
+        dropped = 0
+        for h in hits:
+            if scope_classes is not None and h.authority_class not in scope_classes:
+                dropped += 1
+                continue
+            if lifecycle_scope is not None and h.lifecycle not in lifecycle_scope:
+                dropped += 1
+                continue
+            kept.append(h)
+        return kept, dropped
+
     # --- lexical -------------------------------------------------------------------------------------------
 
     def _lexical_classify(item: "lexicalquery.RetrievedItem") -> tuple:
@@ -134,6 +184,7 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     def lexical_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None,
                        exclude_counter=None, offset: int = 0, page_info_out: Optional[dict] = None,
+                       scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
                        **_kw) -> list:
         if not text:
             return []
@@ -142,8 +193,13 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         # them even for a caller that passes exclude=None (the CLI default before this repair) -- see
         # govbridge.core.taskctx's module docstring.
         exclude = taskctxmod.current().merge_exclude(exclude)
+        # REPAIR_DAG.yaml node R1-GA1 reopening, defect 1: scope is pushed DOWN into the SQL itself
+        # (lexicalquery.query's own scope_classes/lifecycle_scope/scope_path_globs params) so a scoped facet's page
+        # is already in scope, rather than filtered client-side after paging through a corpus-wide ranking.
+        scope_path_globs = _path_globs_for_classes(scope_classes)
         result = lexicalquery.query(_safe_fts_query(text), k=k, exclude=exclude, offset=offset, view_path=view_path,
-                                     repo=repo, classify=_lexical_classify)
+                                     repo=repo, classify=_lexical_classify, scope_classes=scope_classes,
+                                     lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs)
         # REPAIR_PLAN.md section 2.4 ("lexical and semantic take an offset"): the paging metadata lexicalquery.query
         # already computes (govbridge.gather.engine's own per-facet cursor) -- an out-param, the SAME idiom
         # exclude_counter already uses here, since RouteFn's own contract returns a plain list of RouteHit.
@@ -157,7 +213,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             # ARCHITECTURE/REPAIR-1/evidence/tools/exclusion_probe.py itself used to first diagnose RC-8. Its
             # result is used only to count; it is never returned or delivered as a hit.
             raw = lexicalquery.query(_safe_fts_query(text), k=k, exclude=None, offset=offset, view_path=view_path,
-                                      repo=repo, classify=_lexical_classify)
+                                      repo=repo, classify=_lexical_classify, scope_classes=scope_classes,
+                                      lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs)
             exclude_counter.bump(sum(
                 1 for h in raw["hits"]
                 if any(pathrules.any_glob_match(o["path"], exclude) is not None for o in h["occurrences"])
@@ -173,6 +230,14 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             hits.append(RouteHit(unit_id=h["item_id"], unit_kind="chunk", route="lexical", rank=h["rank"],
                                   occurrences=occs, text=h["text"], authority_class=h.get("authority_class"),
                                   lifecycle=h.get("lifecycle")))
+        # The SQL-level pre-filter above is a PRE-filter, not the final word (its Tier B path-glob half, and a
+        # stale/partial authority layer, can both let an out-of-scope hit through); the REAL classification this
+        # route already computed for every hit is the final, asserted check -- REPAIR_DAG.yaml node R1-GA1
+        # reopening: "keep the post-filter only as an assertion." A drop here means the SQL pre-filter itself was
+        # imperfect for this hit, never that scoped paging is silently degrading to corpus-wide paging.
+        hits, scope_dropped = _apply_scope_assertion(hits, scope_classes, lifecycle_scope)
+        if page_info_out is not None:
+            page_info_out["scope_assertion_dropped"] = scope_dropped
         return hits
 
     # --- semantic --------------------------------------------------------------------------------------------
@@ -185,13 +250,18 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     def semantic_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None,
                         exclude_counter=None, offset: int = 0, page_info_out: Optional[dict] = None,
+                        scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
                         **_kw) -> list:
         if not text:
             return []
         k = lexicalquery.DEFAULT_K if k is None else k
         exclude = taskctxmod.current().merge_exclude(exclude)
+        # REPAIR_DAG.yaml node R1-GA1 reopening, defect 1: restrict the candidate set by class BEFORE top-k, never
+        # after (semanticsearch.search -> vectors.search's own scope_classes/lifecycle_scope/scope_path_globs).
+        scope_path_globs = _path_globs_for_classes(scope_classes)
         result = semanticsearch.search(text, k=k, view_path=view_path, repo=repo, classify=_semantic_classify,
-                                        offset=offset)
+                                        offset=offset, scope_classes=scope_classes, lifecycle_scope=lifecycle_scope,
+                                        scope_path_globs=scope_path_globs)
         if page_info_out is not None:
             page_info_out["next_offset"] = result.get("next_offset")
         hits = []
@@ -210,6 +280,10 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             hits.append(RouteHit(unit_id=r["id"], unit_kind="chunk", route="semantic", rank=r["rank"],
                                   occurrences=occs, text=None, authority_class=r.get("authority_class"),
                                   lifecycle=r.get("lifecycle")))
+        # The SQL pre-filter's assertion (kept only as an assertion -- see lexical_route's own comment).
+        hits, scope_dropped = _apply_scope_assertion(hits, scope_classes, lifecycle_scope)
+        if page_info_out is not None:
+            page_info_out["scope_assertion_dropped"] = scope_dropped
         return hits
 
     # --- code ------------------------------------------------------------------------------------------------
@@ -391,7 +465,9 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                    bare_occurrences=None, fanout=None, exclude_counter=None, include_callers: bool = True,
                    include_callees: bool = True, include_tests: bool = True, include_reads_key: bool = True,
                    page_size: Optional[int] = None, cursor_in: Optional[dict] = None,
-                   cursor_out: Optional[dict] = None, **_kw) -> list:
+                   cursor_out: Optional[dict] = None, scope_classes: Optional[tuple] = None,
+                   lifecycle_scope: Optional[tuple] = None, scope_info_out: Optional[dict] = None,
+                   **_kw) -> list:
         """``include_callers``/``include_callees``/``include_tests``/``include_reads_key`` and
         ``page_size``/``cursor_in``/``cursor_out`` (REPAIR_DAG.yaml node R1-GA1): every existing caller (``govbridge
         search``, ``govbridge.compile.packet``) passes none of these, so it sees EXACTLY the pre-existing behaviour
@@ -399,7 +475,16 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         the edge kinds per facet (``dependencies`` vs ``dependents`` vs ``tests``, ``config/facets.yaml``'s
         ``code_mode``) and pages ``callers``/``tests`` round over round through R1-RL's own cursor, keyed by
         ``(seed name, edge type)`` in ``cursor_in``/``cursor_out`` so a multi-seed call pages every seed
-        independently."""
+        independently.
+
+        ``scope_classes``/``lifecycle_scope`` (REPAIR_DAG.yaml node R1-GA1 reopening, defect 1): applied as the
+        SAME post-hoc assertion every route uses (``_apply_scope_assertion``) -- this route's own result sets are
+        already small and bounded (one symbol's definitions/callers/callees, or a fanout-capped query-mode top-k),
+        so there is no large corpus-wide ranking to push a SQL pre-filter into; a post-filter here has no
+        "advances the cursor without advancing the count" failure mode to guard against the way lexical/semantic
+        did. ``scope_info_out``, filled with ``{"dropped": n}`` when given, discloses how many hits this call
+        itself dropped, so a caller (govbridge.gather.engine) can tell scoped code-route filtering apart from a
+        genuinely empty result."""
         if not product_commit:
             return []
         exclude = taskctxmod.current().merge_exclude(exclude)
@@ -466,12 +551,22 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             h = _code_hit_from_bare_occurrence(occ, len(hits) + 1)
             if h is not None:
                 hits.append(h)
+        hits, scope_dropped = _apply_scope_assertion(hits, scope_classes, lifecycle_scope)
+        if scope_info_out is not None:
+            scope_info_out["dropped"] = scope_dropped
         return hits[:k] if (text and not seeds and not bare_occurrences) else hits
 
     # --- exact -----------------------------------------------------------------------------------------------
 
     def exact_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None,
-                     exclude_counter=None, **_kw) -> list:
+                     exclude_counter=None, scope_classes: Optional[tuple] = None,
+                     lifecycle_scope: Optional[tuple] = None, scope_info_out: Optional[dict] = None,
+                     **_kw) -> list:
+        """``scope_classes``/``lifecycle_scope`` (REPAIR_DAG.yaml node R1-GA1 reopening, defect 1): applied as a
+        post-hoc assertion (``_apply_scope_assertion``), same rationale as ``code_route``'s own docstring -- an id
+        lookup's mention sites are already a small, bounded set. Truncation to ``k`` happens AFTER the scope
+        filter, not before, so a scoped caller gets up to ``k`` IN-SCOPE mentions rather than up to ``k`` raw ones
+        that scope then thins out further."""
         if not text:
             return []
         k = lexicalquery.DEFAULT_K if k is None else k
@@ -495,8 +590,9 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             hits.append(RouteHit(unit_id=f"{path}:{line}", unit_kind="occurrence", route="exact",
                                   rank=len(hits) + 1, occurrences=occs, text=m.get("text"), authority_class=cls,
                                   lifecycle=lifecycle))
-            if len(hits) >= k:
-                break
-        return hits
+        hits, scope_dropped = _apply_scope_assertion(hits, scope_classes, lifecycle_scope)
+        if scope_info_out is not None:
+            scope_info_out["dropped"] = scope_dropped
+        return hits[:k]
 
     return RouteSet(exact=exact_route, lexical=lexical_route, semantic=semantic_route, code=code_route)

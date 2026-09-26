@@ -1,0 +1,7 @@
+=== AC2 (full default facet set): govbridge gather --threads 1,4,16 on CONTROL-A (CA-WHY) ===
+--- threads=1 ---
+query='CA-WHY' facets=['purpose', 'requirement', 'decisions_active', 'decisions_history', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests', 'evidence_staleness', 'versions'] rounds=2 stop_reason=FACETS_COVERED merged_items=118 excluded_hits=5 merged_sha256=1696698f7ffd7adeae16f060bc468a38895609be92c60a0707050130f6fec1a2
+--- threads=4 ---
+query='CA-WHY' facets=['purpose', 'requirement', 'decisions_active', 'decisions_history', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests', 'evidence_staleness', 'versions'] rounds=2 stop_reason=FACETS_COVERED merged_items=118 excluded_hits=5 merged_sha256=1696698f7ffd7adeae16f060bc468a38895609be92c60a0707050130f6fec1a2
+--- threads=16 ---
+query='CA-WHY' facets=['purpose', 'requirement', 'decisions_active', 'decisions_history', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests', 'evidence_staleness', 'versions'] rounds=2 stop_reason=FACETS_COVERED merged_items=118 excluded_hits=5 merged_sha256=1696698f7ffd7adeae16f060bc468a38895609be92c60a0707050130f6fec1a2

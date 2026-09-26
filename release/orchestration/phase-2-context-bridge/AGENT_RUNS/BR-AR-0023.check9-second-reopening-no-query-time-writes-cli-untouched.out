@@ -1,0 +1,21 @@
+=== check9: second reopening -- no query-time _ensure_scope_indexes remains, and cli.py untouched this pass ===
+--- grep _ensure_scope_indexes (expect: no match, exit 1) ---
+grep exit: 1
+--- git diff --stat against the prior (second-reopening interim) commit for govbridge/cli.py (expect: empty) ---
+diff exit: 0
+--- files touched this pass (git status --short) ---
+ M AGENT_RUNS/BR-AR-0023.checkpoint.yaml
+ M AGENT_RUNS/BR-AR-0023.report.yaml
+ M govbridge/authority/layer.py
+ M govbridge/core/freshness.py
+ M govbridge/core/store.py
+ M govbridge/lexical/query.py
+ M govbridge/route/real_routes.py
+ M govbridge/semantic/search.py
+ M govbridge/semantic/vectors.py
+?? AGENT_RUNS/BR-AR-0023.check-pass3-controla-cawhy-remeasure.out
+?? AGENT_RUNS/BR-AR-0023.check-pass3-full-domain-suite.out
+?? AGENT_RUNS/BR-AR-0023.check-pass3-scoped-suites.out
+?? AGENT_RUNS/BR-AR-0023.check8-scope-path-cache-buildtime.out
+?? AGENT_RUNS/BR-AR-0023.check9-second-reopening-no-query-time-writes-cli-untouched.out
+?? tests/core/test_scope_path_cache.py

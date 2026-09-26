@@ -88,7 +88,88 @@ def digest_for_pin(conn: sqlite3.Connection, pin_id: str) -> str:
     return h.hexdigest()
 
 
-def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0):
+#: the BUILD-time deduplicated (blob_id, path) table (REPAIR_DAG.yaml node R1-GA1, second reopening) -- shared with
+#: govbridge.lexical.query (same store.db, same name, same shape). Created and maintained ONLY by
+#: govbridge.core.store/.freshness; this module only ever READS it.
+SCOPE_PATH_CACHE_TABLE = "occurrence_distinct_path"
+#: the BUILD-time index (govbridge.authority.layer's own SCHEMA_SQL) this module's Tier A relies on.
+_RECORD_DEF_PATH_INDEX = "record_def_by_path"
+
+
+class StoreNeedsRebuild(RuntimeError):
+    """The semantic-route twin of ``govbridge.lexical.query.StoreNeedsRebuild`` -- see its docstring. A separate
+    class (never imported from govbridge.lexical) so this module stays independent of the lexical package."""
+    CODE = "STORE_NEEDS_REBUILD"
+
+    def __init__(self, missing: str):
+        self.missing = missing
+        super().__init__(
+            f"{self.CODE}: {missing} is missing from this store -- rebuild it (e.g. "
+            f"`python -m govbridge index rebuild`) before running a scoped query against it; a query path never "
+            f"builds this itself"
+        )
+
+
+def _sqlite_object_exists(conn: sqlite3.Connection, kind: str, name: str) -> bool:
+    row = conn.execute("SELECT name FROM sqlite_master WHERE type=? AND name=?", (kind, name)).fetchone()
+    return row is not None
+
+
+def _check_scope_structures(conn: sqlite3.Connection, needs_cache_table: bool, needs_record_def_index: bool) -> None:
+    """READ-ONLY (sqlite_master lookups only) -- see govbridge.lexical.query._check_scope_structures's docstring
+    for the full rationale. Checked lazily, only for whichever tier(s) a call's scope_classes/scope_path_globs
+    combination will actually use."""
+    if needs_cache_table and not _sqlite_object_exists(conn, "table", SCOPE_PATH_CACHE_TABLE):
+        raise StoreNeedsRebuild(f"table {SCOPE_PATH_CACHE_TABLE!r} (govbridge.core.store)")
+    if needs_record_def_index and not _sqlite_object_exists(conn, "index", _RECORD_DEF_PATH_INDEX):
+        raise StoreNeedsRebuild(f"index {_RECORD_DEF_PATH_INDEX!r} (govbridge.authority.layer)")
+
+
+def _scope_sql(scope_classes: Optional[tuple], lifecycle_scope: Optional[tuple],
+               scope_path_globs: Optional[tuple]) -> tuple:
+    """The semantic-route twin of ``govbridge.lexical.query._scope_sql`` (REPAIR_DAG.yaml node R1-GA1 reopening):
+    a SQL fragment (``''`` or ``' AND (...)'``) plus its bound params, joined against ``chunk``/``occurrence``/
+    ``record_def``/``class_lifecycle`` (all pre-existing store tables; no new schema, no ``govbridge.authority``
+    import) so a SCOPED facet's candidate set is restricted BEFORE the top-k cosine ranking runs, never after.
+    Duplicated rather than imported from ``govbridge.lexical.query`` on purpose: this module stays independent of
+    the lexical package (SEMANTIC_ROUTE.md's own "B2/B4 are siblings, neither depends on the other")."""
+    if not scope_classes and not scope_path_globs:
+        return "", []
+    clauses: list = []
+    params: list = []
+    if scope_classes:
+        cls_placeholders = ",".join("?" for _ in scope_classes)
+        # occurrence_distinct_path (built at BUILD time, see govbridge.core.store), never the raw occurrence
+        # table: the SAME blob/path pair repeats once per historical (ref, commit) on occurrence (hundreds of
+        # times for a popular blob on this corpus), so matching against the deduplicated table is the difference
+        # between a handful of row checks and hundreds -- measured directly as the actual cost behind a
+        # corpus-scale timeout.
+        tier_a = (
+            f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} rdo "
+            "JOIN record_def rd ON rd.path = rdo.path AND rd.line_start <= c.end_line AND rd.line_end >= c.start_line "
+            "JOIN class_lifecycle cl ON cl.unit = rd.id "
+            f"WHERE rdo.blob_id = c.blob_id AND cl.cls IN ({cls_placeholders})"
+        )
+        params.extend(scope_classes)
+        if lifecycle_scope:
+            lc_placeholders = ",".join("?" for _ in lifecycle_scope)
+            tier_a += f" AND cl.lifecycle IN ({lc_placeholders})"
+            params.extend(lifecycle_scope)
+        tier_a += ")"
+        clauses.append(tier_a)
+    if scope_path_globs and not lifecycle_scope:
+        glob_or = " OR ".join("occ2.path GLOB ?" for _ in scope_path_globs)
+        clauses.append(f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} occ2 WHERE occ2.blob_id = c.blob_id "
+                        f"AND ({glob_or}))")
+        params.extend(scope_path_globs)
+    if not clauses:
+        return "", []
+    return " AND (" + " OR ".join(clauses) + ")", params
+
+
+def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0,
+           scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
+           scope_path_globs: Optional[tuple] = None):
     """Brute-force cosine search (vectors are already L2-normalised at embed time, so dot product == cosine).
     Returns [(chunk_id, score)], highest score first, ties broken by ``chunk_id`` ASC for full determinism (two
     vectors can legitimately tie on score, especially in small/synthetic corpora; a fixed tiebreaker is what makes
@@ -98,10 +179,31 @@ def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0)
 
     ``offset`` (REPAIR_PLAN.md section 2.4, "lexical and semantic take an offset"): pages through the SAME full,
     deterministic ranking -- ``search(..., k=k, offset=0)`` then ``search(..., k=k, offset=k)`` etc. returns exactly
-    the same union, one page at a time, as a single unbounded call would."""
+    the same union, one page at a time, as a single unbounded call would.
+
+    ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): restricts
+    the candidate SET before ranking (:func:`_scope_sql`), so a scoped facet's top-k is already in scope. This
+    function is READ-ONLY with respect to scope filtering: it never creates or populates the structures Tier A/B
+    rely on (built at BUILD time -- see govbridge.core.store/.freshness and govbridge.authority.layer) -- if scope
+    filtering is requested and the store does not have them yet, :class:`StoreNeedsRebuild` is raised (never a
+    silent, slower fallback to an unscoped candidate set, and never a write)."""
     import numpy as np
 
-    rows = conn.execute("SELECT chunk_id, dim, vec FROM vector WHERE pin_id=?", (pin_id,)).fetchall()
+    scope_sql, scope_params = _scope_sql(scope_classes, lifecycle_scope, scope_path_globs)
+    if scope_sql:
+        _check_scope_structures(conn, needs_cache_table=True, needs_record_def_index=bool(scope_classes))
+        # The `chunk` JOIN is needed ONLY here: _scope_sql's own fragments reference c.blob_id/c.start_line/
+        # c.end_line. An unscoped call (the overwhelming common case, and every pre-existing caller/test) never
+        # joins `chunk` at all -- this table belongs to govbridge.core.store, not to this module's own schema
+        # (vectors.create_table only creates `vector`), so a caller testing `vector` in isolation must not be
+        # required to have a `chunk` table just to run an UNSCOPED search.
+        rows = conn.execute(
+            "SELECT v.chunk_id, v.dim, v.vec FROM vector v JOIN chunk c ON c.chunk_id = v.chunk_id "
+            "WHERE v.pin_id=?" + scope_sql,
+            (pin_id, *scope_params),
+        ).fetchall()
+    else:
+        rows = conn.execute("SELECT chunk_id, dim, vec FROM vector WHERE pin_id=?", (pin_id,)).fetchall()
     if not rows:
         return []
     dim = rows[0][1]

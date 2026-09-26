@@ -51,15 +51,27 @@ def _representative_occurrence(conn: sqlite3.Connection, blob_id: str, resolved:
 
 def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path: Optional[str] = None,
            repo: Optional[str] = None, threads: int = 4, classify: Classifier = default_classify,
-           offset: int = 0) -> dict:
+           offset: int = 0, scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
+           scope_path_globs: Optional[tuple] = None) -> dict:
     """``offset`` (REPAIR_PLAN.md section 2.4, "lexical and semantic take an offset"): pages through
     ``vectors.search``'s own deterministic, tie-broken ranking. One extra candidate is always requested beyond
     ``k`` (never returned) purely to learn whether a further page exists, without needing a second, separate
     "how many vectors are there" query -- ``next_offset`` is ``offset + k`` when that extra candidate showed up,
-    else ``None`` (this page reached the end of the ranking)."""
+    else ``None`` (this page reached the end of the ranking).
+
+    ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): threaded
+    straight through to ``vectors.search``, which restricts the candidate set BEFORE the top-k ranking runs --
+    "restrict the candidate set by class before top-k", never a client-side filter after the fact."""
     root = store_root or store.store_root()
-    conn = store.open_db(root=root)
-    vectors.create_table(conn)
+    # REPAIR_DAG.yaml node R1-GA1 (second reopening, coordinator addendum): this is a QUERY path (the one
+    # gather's semantic facets actually call through govbridge.route.real_routes.semantic_route), so it opens the
+    # store via store.open_db_readonly() -- a connection that cannot write, by construction -- rather than
+    # store.open_db()'s read-write connection. ``vectors.create_table`` (a build-time CREATE TABLE/INDEX IF NOT
+    # EXISTS) is dropped from this call site to match: the ``vector`` table already exists on any store this route
+    # can usefully run against (the semantic layer builder creates it), so calling it here was always redundant
+    # with the real build step -- and on a store that genuinely lacks it, the search below now fails with a plain,
+    # clear "no such table: vector" rather than this query path quietly creating its own empty table to search.
+    conn = store.open_db_readonly(root=root)
 
     pin = modelpin.load_model_pin(modelpin.default_pin_path())
     pin_id = modelpin.compute_pin_id(pin)
@@ -67,7 +79,8 @@ def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path
                             extra_args=["--threads", str(threads)])
     qvec = outputs["vectors"][0]
 
-    overfetched = vectors.search(conn, qvec, k + 1, pin_id, offset=offset)
+    overfetched = vectors.search(conn, qvec, k + 1, pin_id, offset=offset, scope_classes=scope_classes,
+                                  lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs)
     has_more = len(overfetched) > k
     hits = overfetched[:k]
 

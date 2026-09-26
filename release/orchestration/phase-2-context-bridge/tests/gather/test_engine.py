@@ -128,6 +128,10 @@ def test_versions_facet_is_always_reported_missing_never_silently_dropped():
 
 
 def test_scope_filtering_drops_out_of_scope_hits_and_pages_past_them():
+    """``FakeRouteSet`` does not implement scope filtering itself (unlike the real routes -- see
+    test_requirement_facet_finds_the_one_contract_item_via_the_sql_scope_pushdown), so this exercises the
+    GATHER-LEVEL assertion (``Facet.filter_in_scope_counted``), the backstop REPAIR_DAG.yaml node R1-GA1's
+    reopening asked to keep for exactly this case: a route that does not (or cannot) push scope down itself."""
     # 3 UNCLASSIFIED (out of scope for a CONTRACT-scoped facet) + 1 CONTRACT item, all in one lexical stream.
     items = [
         make_hit("U1", "a/x.md", authority_class="UNCLASSIFIED"),
@@ -140,6 +144,22 @@ def test_scope_filtering_drops_out_of_scope_hits_and_pages_past_them():
     assert len(result["merged"]) == 1
     assert result["merged"][0]["unit_id"] == "U4"
     assert result["telemetry"]["rounds"] > 1  # had to page past 3 out-of-scope pages first
+    assert result["telemetry"]["out_of_scope_dropped"] == 3
+    assert result["telemetry"]["out_of_scope_dropped_by_facet"] == {"requirement": 3}
+
+
+def test_engine_passes_scope_classes_and_lifecycle_scope_to_every_route_call():
+    """The generic route keyword argument REPAIR_DAG.yaml node R1-GA1's reopening asks for: every ``routes.run()``
+    call for a scoped facet carries its ``scope_classes``/``lifecycle_scope`` verbatim, so a real route (which DOES
+    push them down into SQL) has them available on every single call, never just the first."""
+    routes = FakeRouteSet(lexical=[make_hit("U1", "a/x.md", authority_class="CONTRACT")],
+                           semantic=[make_hit("U2", "b/y.md", authority_class="CONTRACT", route="semantic")])
+    enginemod.gather(_query(facets=["requirement"]), routes, batch_size=8, threads=1)
+    lexical_calls = [kw for (name, kw) in routes.calls if name == "lexical"]
+    semantic_calls = [kw for (name, kw) in routes.calls if name == "semantic"]
+    assert lexical_calls and lexical_calls[0]["scope_classes"] == ("CONTRACT", "FROZEN_GATE_CONTRACT")
+    assert lexical_calls[0]["lifecycle_scope"] is None
+    assert semantic_calls and semantic_calls[0]["scope_classes"] == ("CONTRACT", "FROZEN_GATE_CONTRACT")
 
 
 def test_identifier_extractor_hook_is_called_and_disclosed_never_acted_on():
@@ -227,7 +247,13 @@ def test_five_directory_subject_needs_more_than_one_round_on_the_real_lexical_ro
     assert result["stop_reason"] in enginemod.STOP_REASONS
 
 
-def test_requirement_facet_pages_past_out_of_scope_hits_to_find_the_one_contract_item(built_repo):
+def test_requirement_facet_finds_the_one_contract_item_via_the_sql_scope_pushdown(built_repo):
+    """REPAIR_DAG.yaml node R1-GA1 reopening, defect 1: a scoped facet's authority-class restriction is pushed
+    DOWN into the lexical route's own SQL (govbridge.lexical.query._scope_sql's Tier B path-glob half, since this
+    fixture's CONTRACT classification comes from the registry's class_rules, not a record_def-backed span), so the
+    ``requirement`` facet finds its one in-scope item WITHOUT first paging through the 10 out-of-scope EVIDENCE
+    items -- 1 round, not many, and the scope assertion (the route's own, plus the gather-level backstop) reports
+    (near-)zero drops, because almost nothing out-of-scope was even fetched in the first place."""
     from govbridge.route import real_routes
 
     routes = real_routes.build_real_routes(view_path=built_repo.view_path, repo=str(built_repo.root),
@@ -236,7 +262,8 @@ def test_requirement_facet_pages_past_out_of_scope_hits_to_find_the_one_contract
                                max_rounds=20, threads=1, facets_path=TEST_FACETS_PATH)
     assert len(result["merged"]) == 1
     assert result["merged"][0]["occurrences"][0]["path"] == repobuilder.CONTRACT_PATH
-    assert result["telemetry"]["rounds"] > 1
+    assert result["telemetry"]["rounds"] == 1
+    assert result["telemetry"]["out_of_scope_dropped"] == 0
 
 
 def test_real_view_thread_determinism(built_repo):

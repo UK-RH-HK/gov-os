@@ -1,3 +1,12 @@
+SUPERSEDED by AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-full-default.out (REPAIR_DAG.yaml node R1-GA1
+reopening, task 2: "AC2 was graded MET on a 6-facet subset. The check names the CONTROL-A query, which means its
+DEFAULT facet set... re-run AC2 ... on the full default facet set, to completion"). Kept here, rather than removed
+(workers never `rm`), as an honest record of this node's first (narrower) attempt at AC2, made BEFORE the SQL
+scope-pushdown performance fix (govbridge.lexical.query._ensure_scope_indexes / govbridge.semantic.vectors.
+_ensure_scope_indexes) made the full default facet set complete in reasonable time at all.
+
+Original content follows, unchanged:
+
 === AC2: govbridge gather --threads 1,4,16 on CONTROL-A (CA-WHY, facets=purpose+failed_approaches+dependencies+dependents+enforcement+tests), byte-identical merged_sha256 ===
 --- threads=1 ---
 query='CA-WHY' facets=['purpose', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests'] rounds=2 stop_reason=FACETS_COVERED merged_items=59 excluded_hits=5 merged_sha256=1f120bfde801c7f117690f7a5da3d1276455e6d5b222e5af8d2b63e94dfd2598
