@@ -11,7 +11,7 @@ role: >-
   report covers all four.
 model_observed: claude-sonnet-5
 branch: bridge/r1-xc-0034
-commit: e78eaf05cd458a716c8aeba2bb7c5814e23163bf
+commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
 status: COMPLETED
 claims:
 - id: C-1

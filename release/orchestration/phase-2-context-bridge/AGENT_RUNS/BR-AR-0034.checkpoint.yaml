@@ -1,5 +1,5 @@
 run_id: BR-AR-0034
-commit: e78eaf05cd458a716c8aeba2bb7c5814e23163bf
+commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
 role: >-
   REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17/-23) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
   repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14),
@@ -891,4 +891,4 @@ next_consumer: >-
   wiring every caller (real_routes.py, packet.py, cli.py, followup.py) to pass `routes.resolved_view` (or the
   view an operation already resolved) into each of them, instead of a bare `view_path`. None of that is in this
   run's own mutation_scope.
-final_commit: e78eaf05cd458a716c8aeba2bb7c5814e23163bf
+final_commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
