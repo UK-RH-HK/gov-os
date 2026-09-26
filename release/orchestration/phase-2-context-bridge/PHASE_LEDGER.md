@@ -541,3 +541,25 @@ BR-HO-0028; it pins the view and builds two from-clean stores. It started at 202
 6. The secrecy audit of DEMO2.
 7. R1-GRADE2, on a quarantined branch.
 8. On DEMONSTRATION_PASS only: finalise the verifier handoff §5, then BUILT.
+
+## BR-L-0020: the integration audit finds defects; a repair round is needed before the demonstrations (2026-09-26)
+
+**R1-INT (BR-AR-0028), a fresh and audit-only Opus run, returned DEFECTS_FOUND: 3 HIGH, 15 MEDIUM and 7 LOW.** The
+index location of every defect is `EVIDENCE/repair-1/INT-VERDICT.yaml`. The 18 strict xfails in
+`tests/integration/test_repair1_integration.py` encode them; the suite is 742 passed and 18 xfailed.
+
+The three HIGH defects:
+* The run-2 grader would crash on supplementary packets (INT-D01).
+* CONTROL-A packet bytes exceed the budget profiles (INT-D04).
+* Inside compile, the code facets are empty, because compile hands gather no code or exact route (INT-D18).
+
+**What held:**
+* identical from-clean builds from both entry points;
+* a byte-identical compile across hash seeds;
+* read-only query commands;
+* one view per operation;
+* the cross-cutting fixes.
+
+**Next.** Two G7 rulings (the corpus definition, and how pinned sections are treated) must be recorded, then a
+REPAIR-1b fix round with disjoint file scopes, then an INT re-check, before R1-MB. This was recorded at the owner's
+continuity check, and **a fresh session continues from here.**
