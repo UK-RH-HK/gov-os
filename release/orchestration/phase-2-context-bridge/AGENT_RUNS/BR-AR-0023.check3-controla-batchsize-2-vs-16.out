@@ -1,3 +1,14 @@
+SUPERSEDED by AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16-full-default.out (REPAIR_DAG.yaml node R1-GA1
+reopening, task 3: "AC3's note cites 'check3b' for a full-facet run, and no such file exists... Re-run AC3 on the
+full default facet set and save it. No evidence may cite an unsaved run."). The line below citing "check3b" was
+exactly that defect -- no such file was ever created in this node's first pass. Kept here, rather than removed
+(workers never `rm`), as an honest record of this node's first (narrower, and in one respect incompletely
+documented) attempt at AC3, made BEFORE the SQL scope-pushdown performance fix (govbridge.lexical.query.
+_ensure_scope_indexes / govbridge.semantic.vectors._ensure_scope_indexes) made the full default facet set complete
+in reasonable time at all.
+
+Original content follows, unchanged:
+
 === AC3: govbridge gather --batch-size 2 vs 16 on CONTROL-A (CA-WHY, facets=purpose+failed_approaches) ===
 Restricted to two unscoped facets for a fast, clean demonstration; a supplementary run with the FULL
 facet set (including CONTRACT/decision-scoped facets, which can need many more rounds -- MAX_ROUNDS is a

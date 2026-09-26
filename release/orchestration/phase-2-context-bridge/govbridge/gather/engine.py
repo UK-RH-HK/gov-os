@@ -171,27 +171,37 @@ def _run_facet_round(facet: "facetsmod.Facet", state: _FacetState, base_text: st
     accumulated count is always exactly ``min(target_items, total_available)``, WHATEVER ``batch_size`` was, and
     only the number of rounds needed to get there depends on it (REPAIR_DAG.yaml node R1-GA1 acceptance check 3).
 
-    Returns ``(filtered_hits, raw_hits)``. ``filtered_hits`` is narrowed to this facet's own
-    ``scope_classes``/``lifecycle_scope`` (ARCHITECTURE.md section 5.3 rule 5: placement/scope is class/lifecycle-
-    only, never a route's own job) -- a route has no notion of "facet," so this is the ONE place a scoped facet's
-    out-of-scope candidates are dropped, and is also WHY a scoped facet (``requirement``, ``decisions_active``/
-    ``decisions_history``) can legitimately need more than one round: a page of otherwise-plentiful but
-    out-of-scope candidates advances the route's cursor without advancing its count. ``raw_hits`` is EVERY hit this
-    round actually fetched, before that filter -- the caller uses it (never ``filtered_hits``) to tell "this round
-    turned up fresh, unseen evidence that a scope filter happened to reject" apart from "this round turned up
-    nothing genuinely new at all" (MARGINAL_GAIN_ONLY_DUPLICATES): the latter, never the former, is a stopping
-    condition."""
+    Returns ``(filtered_hits, raw_hits, out_of_scope_dropped)``. As of the R1-GA1 reopening (defect 1), a scoped
+    facet's ``scope_classes``/``lifecycle_scope`` are passed to EVERY route call (a generic route keyword argument
+    every real route now honours -- ``govbridge.route.real_routes``, ARCHITECTURE.md section 5.3 rule 5 still
+    holds: placement/scope stays class/lifecycle-only, never a route's own invention). Lexical/semantic push the
+    restriction into SQL, before top-k; code/exact apply it as a post-filter (their result sets are already small
+    and bounded). ``facet.filter_in_scope`` below is kept ONLY as a second, gather-level assertion -- a no-op in
+    the normal case, since the route already filtered, but a safety net for a fake/test route that does not
+    implement scope filtering itself. ``out_of_scope_dropped`` is how many candidates EITHER assertion (the
+    route's own, or this one) actually dropped this call -- disclosed per round/facet in telemetry precisely so
+    "MAX_ROUNDS on a scoped facet" can be told apart from "MAX_ROUNDS caused by out-of-scope paging" (REPAIR_DAG.
+    yaml node R1-GA1 reopening: "if it happens, count that in telemetry"). ``raw_hits`` is EVERY hit this round
+    actually fetched, before ANY scope filtering -- the caller uses it (never ``filtered_hits``) to tell "this
+    round turned up fresh, unseen evidence" apart from "this round turned up nothing genuinely new at all"
+    (MARGINAL_GAIN_ONLY_DUPLICATES): the latter, never the former, is a stopping condition."""
     hits: list = []
     raw_hits: list = []
+    out_of_scope_dropped = 0
     text = facet.query_text(base_text)
+    scope_classes = facet.scope_classes
+    lifecycle_scope = facet.lifecycle_scope
 
     if "lexical" in facet.routes and not state.route_satisfied("lexical", target_items):
         k = min(batch_size, target_items - state.lexical_count)
         info: dict = {}
         page_raw = routes.run("lexical", text=text, k=k, offset=state.lexical_offset, exclude=exclude,
-                               exclude_counter=exclude_counter, page_info_out=info)
+                               exclude_counter=exclude_counter, page_info_out=info,
+                               scope_classes=scope_classes, lifecycle_scope=lifecycle_scope)
         raw_hits.extend(page_raw)
-        page_hits = facet.filter_in_scope(page_raw)
+        out_of_scope_dropped += info.get("scope_assertion_dropped") or 0
+        page_hits, dropped = facet.filter_in_scope_counted(page_raw)
+        out_of_scope_dropped += dropped
         hits.extend(page_hits)
         state.lexical_count += len(page_hits)
         next_offset = info.get("next_offset")
@@ -203,9 +213,12 @@ def _run_facet_round(facet: "facetsmod.Facet", state: _FacetState, base_text: st
         k = min(batch_size, target_items - state.semantic_count)
         info = {}
         page_raw = routes.run("semantic", text=text, k=k, offset=state.semantic_offset, exclude=exclude,
-                               exclude_counter=exclude_counter, page_info_out=info)
+                               exclude_counter=exclude_counter, page_info_out=info,
+                               scope_classes=scope_classes, lifecycle_scope=lifecycle_scope)
         raw_hits.extend(page_raw)
-        page_hits = facet.filter_in_scope(page_raw)
+        out_of_scope_dropped += info.get("scope_assertion_dropped") or 0
+        page_hits, dropped = facet.filter_in_scope_counted(page_raw)
+        out_of_scope_dropped += dropped
         hits.extend(page_hits)
         state.semantic_count += len(page_hits)
         next_offset = info.get("next_offset")
@@ -215,9 +228,14 @@ def _run_facet_round(facet: "facetsmod.Facet", state: _FacetState, base_text: st
 
     if "exact" in facet.routes and not state.route_satisfied("exact", target_items):
         k = min(batch_size, target_items)
-        page_raw = routes.run("exact", text=text, k=k, exclude=exclude, exclude_counter=exclude_counter)
+        scope_info: dict = {}
+        page_raw = routes.run("exact", text=text, k=k, exclude=exclude, exclude_counter=exclude_counter,
+                               scope_classes=scope_classes, lifecycle_scope=lifecycle_scope,
+                               scope_info_out=scope_info)
         raw_hits.extend(page_raw)
-        page_hits = facet.filter_in_scope(page_raw)
+        out_of_scope_dropped += scope_info.get("dropped") or 0
+        page_hits, dropped = facet.filter_in_scope_counted(page_raw)
+        out_of_scope_dropped += dropped
         hits.extend(page_hits)
         state.exact_count += len(page_hits)
         state.exact_done = True  # an id lookup, never paged -- one call is always "satisfied"
@@ -225,6 +243,10 @@ def _run_facet_round(facet: "facetsmod.Facet", state: _FacetState, base_text: st
     if "code" in facet.routes and not state.route_satisfied("code", target_items):
         k = min(batch_size, target_items - state.code_count)
         code_kwargs = _code_kwargs_for_mode(facet.code_mode, k, state)
+        code_kwargs["scope_classes"] = scope_classes
+        code_kwargs["lifecycle_scope"] = lifecycle_scope
+        code_scope_info: dict = {}
+        code_kwargs["scope_info_out"] = code_scope_info
         if seeds:
             page_raw = routes.run("code", seeds=list(seeds), k=k, exclude=exclude,
                                    exclude_counter=exclude_counter, **code_kwargs)
@@ -232,7 +254,9 @@ def _run_facet_round(facet: "facetsmod.Facet", state: _FacetState, base_text: st
             page_raw = routes.run("code", text=text, k=k, exclude=exclude,
                                    exclude_counter=exclude_counter, **code_kwargs)
         raw_hits.extend(page_raw)
-        page_hits = facet.filter_in_scope(page_raw)
+        out_of_scope_dropped += code_scope_info.get("dropped") or 0
+        page_hits, dropped = facet.filter_in_scope_counted(page_raw)
+        out_of_scope_dropped += dropped
         hits.extend(page_hits)
         state.code_count += len(page_hits)
         if facet.code_mode in ("dependents", "tests"):
@@ -240,7 +264,7 @@ def _run_facet_round(facet: "facetsmod.Facet", state: _FacetState, base_text: st
         else:
             state.code_exhausted = True  # dependencies (callees-only) and plain code: single-shot, unpaged
 
-    return hits, raw_hits
+    return hits, raw_hits, out_of_scope_dropped
 
 
 def gather(query: dict, routes, *, task=None, seeds: Optional[list] = None, facet_names: Optional[list] = None,
@@ -336,7 +360,7 @@ def gather(query: dict, routes, *, task=None, seeds: Optional[list] = None, face
         for n, f in selected:
             if n not in results_by_facet:
                 continue
-            hits, raw_hits = results_by_facet[n]
+            hits, raw_hits, out_of_scope_dropped = results_by_facet[n]
             round_hits_flat.extend(hits)
             for rh in raw_hits:
                 key = routermod.dedupe_key(rh)
@@ -360,6 +384,7 @@ def gather(query: dict, routes, *, task=None, seeds: Optional[list] = None, face
                 candidate_bytes=sum(_hit_bytes(h) for h in raw_hits), new_items=new_count,
                 new_bytes=sum(_hit_bytes(h) for h in new_items), exhausted=satisfied,
                 missing=missing, missing_reason=(_MISSING_GENERIC_REASON if missing else None),
+                out_of_scope_dropped=out_of_scope_dropped,
             ))
 
         if total_bytes_budget is not None and sum(_hit_bytes(h) for h in merged) >= total_bytes_budget:

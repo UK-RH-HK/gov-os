@@ -88,7 +88,81 @@ def digest_for_pin(conn: sqlite3.Connection, pin_id: str) -> str:
     return h.hexdigest()
 
 
-def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0):
+_scope_indexes_ensured = False
+
+#: this node's OWN small derived-cache table (shared with govbridge.lexical.query -- same store.db, same name, same
+#: shape), added to the shared store exactly the way every other layer already adds its own tables to the SAME file.
+SCOPE_PATH_CACHE_TABLE = "gather_scope_path_cache"
+
+
+def _ensure_scope_indexes(conn: sqlite3.Connection) -> None:
+    """The semantic-route twin of ``govbridge.lexical.query._ensure_scope_indexes`` -- see its docstring for the
+    full rationale (a query-time-only index on an existing column this node does not own the schema of, plus a
+    deduplicated ``(blob_id, path)`` cache measured directly as the fix for a corpus-scale timeout: this corpus's
+    ``occurrence`` table repeats the same blob/path pair once per historical ref/commit, up to hundreds of times)."""
+    global _scope_indexes_ensured
+    if _scope_indexes_ensured:
+        return
+    try:
+        conn.execute("CREATE INDEX IF NOT EXISTS record_def_by_path ON record_def(path)")
+        conn.execute(
+            f"CREATE TABLE IF NOT EXISTS {SCOPE_PATH_CACHE_TABLE} (blob_id TEXT NOT NULL, path TEXT NOT NULL, "
+            f"PRIMARY KEY (blob_id, path))"
+        )
+        conn.execute(
+            f"INSERT OR IGNORE INTO {SCOPE_PATH_CACHE_TABLE} (blob_id, path) "
+            f"SELECT DISTINCT blob_id, path FROM occurrence"
+        )
+        conn.commit()
+    except Exception:
+        pass
+    _scope_indexes_ensured = True
+
+
+def _scope_sql(scope_classes: Optional[tuple], lifecycle_scope: Optional[tuple],
+               scope_path_globs: Optional[tuple]) -> tuple:
+    """The semantic-route twin of ``govbridge.lexical.query._scope_sql`` (REPAIR_DAG.yaml node R1-GA1 reopening):
+    a SQL fragment (``''`` or ``' AND (...)'``) plus its bound params, joined against ``chunk``/``occurrence``/
+    ``record_def``/``class_lifecycle`` (all pre-existing store tables; no new schema, no ``govbridge.authority``
+    import) so a SCOPED facet's candidate set is restricted BEFORE the top-k cosine ranking runs, never after.
+    Duplicated rather than imported from ``govbridge.lexical.query`` on purpose: this module stays independent of
+    the lexical package (SEMANTIC_ROUTE.md's own "B2/B4 are siblings, neither depends on the other")."""
+    if not scope_classes and not scope_path_globs:
+        return "", []
+    clauses: list = []
+    params: list = []
+    if scope_classes:
+        cls_placeholders = ",".join("?" for _ in scope_classes)
+        # gather_scope_path_cache (see _ensure_scope_indexes), never the raw occurrence table: the SAME blob/path
+        # pair repeats once per historical (ref, commit) on occurrence (hundreds of times for a popular blob on
+        # this corpus), so matching against the deduplicated cache is the difference between a handful of row
+        # checks and hundreds -- measured directly as the actual cost behind a corpus-scale timeout.
+        tier_a = (
+            f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} rdo "
+            "JOIN record_def rd ON rd.path = rdo.path AND rd.line_start <= c.end_line AND rd.line_end >= c.start_line "
+            "JOIN class_lifecycle cl ON cl.unit = rd.id "
+            f"WHERE rdo.blob_id = c.blob_id AND cl.cls IN ({cls_placeholders})"
+        )
+        params.extend(scope_classes)
+        if lifecycle_scope:
+            lc_placeholders = ",".join("?" for _ in lifecycle_scope)
+            tier_a += f" AND cl.lifecycle IN ({lc_placeholders})"
+            params.extend(lifecycle_scope)
+        tier_a += ")"
+        clauses.append(tier_a)
+    if scope_path_globs and not lifecycle_scope:
+        glob_or = " OR ".join("occ2.path GLOB ?" for _ in scope_path_globs)
+        clauses.append(f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} occ2 WHERE occ2.blob_id = c.blob_id "
+                        f"AND ({glob_or}))")
+        params.extend(scope_path_globs)
+    if not clauses:
+        return "", []
+    return " AND (" + " OR ".join(clauses) + ")", params
+
+
+def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0,
+           scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
+           scope_path_globs: Optional[tuple] = None):
     """Brute-force cosine search (vectors are already L2-normalised at embed time, so dot product == cosine).
     Returns [(chunk_id, score)], highest score first, ties broken by ``chunk_id`` ASC for full determinism (two
     vectors can legitimately tie on score, especially in small/synthetic corpora; a fixed tiebreaker is what makes
@@ -98,10 +172,26 @@ def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0)
 
     ``offset`` (REPAIR_PLAN.md section 2.4, "lexical and semantic take an offset"): pages through the SAME full,
     deterministic ranking -- ``search(..., k=k, offset=0)`` then ``search(..., k=k, offset=k)`` etc. returns exactly
-    the same union, one page at a time, as a single unbounded call would."""
+    the same union, one page at a time, as a single unbounded call would.
+
+    ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): restricts
+    the candidate SET before ranking (:func:`_scope_sql`), so a scoped facet's top-k is already in scope."""
     import numpy as np
 
-    rows = conn.execute("SELECT chunk_id, dim, vec FROM vector WHERE pin_id=?", (pin_id,)).fetchall()
+    scope_sql, scope_params = _scope_sql(scope_classes, lifecycle_scope, scope_path_globs)
+    if scope_sql:
+        _ensure_scope_indexes(conn)
+    try:
+        rows = conn.execute(
+            "SELECT v.chunk_id, v.dim, v.vec FROM vector v JOIN chunk c ON c.chunk_id = v.chunk_id "
+            "WHERE v.pin_id=?" + scope_sql,
+            (pin_id, *scope_params),
+        ).fetchall()
+    except Exception:
+        # record_def/class_lifecycle may not exist yet (a store that never built the authority layer); an honest
+        # fall-back to the unscoped candidate set is a strict SUPERSET, never a silently narrower result, and the
+        # real classifier's own post-filter (real_routes.py) still applies.
+        rows = conn.execute("SELECT chunk_id, dim, vec FROM vector WHERE pin_id=?", (pin_id,)).fetchall()
     if not rows:
         return []
     dim = rows[0][1]

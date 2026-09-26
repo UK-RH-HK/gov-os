@@ -51,12 +51,17 @@ def _representative_occurrence(conn: sqlite3.Connection, blob_id: str, resolved:
 
 def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path: Optional[str] = None,
            repo: Optional[str] = None, threads: int = 4, classify: Classifier = default_classify,
-           offset: int = 0) -> dict:
+           offset: int = 0, scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
+           scope_path_globs: Optional[tuple] = None) -> dict:
     """``offset`` (REPAIR_PLAN.md section 2.4, "lexical and semantic take an offset"): pages through
     ``vectors.search``'s own deterministic, tie-broken ranking. One extra candidate is always requested beyond
     ``k`` (never returned) purely to learn whether a further page exists, without needing a second, separate
     "how many vectors are there" query -- ``next_offset`` is ``offset + k`` when that extra candidate showed up,
-    else ``None`` (this page reached the end of the ranking)."""
+    else ``None`` (this page reached the end of the ranking).
+
+    ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): threaded
+    straight through to ``vectors.search``, which restricts the candidate set BEFORE the top-k ranking runs --
+    "restrict the candidate set by class before top-k", never a client-side filter after the fact."""
     root = store_root or store.store_root()
     conn = store.open_db(root=root)
     vectors.create_table(conn)
@@ -67,7 +72,8 @@ def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path
                             extra_args=["--threads", str(threads)])
     qvec = outputs["vectors"][0]
 
-    overfetched = vectors.search(conn, qvec, k + 1, pin_id, offset=offset)
+    overfetched = vectors.search(conn, qvec, k + 1, pin_id, offset=offset, scope_classes=scope_classes,
+                                  lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs)
     has_more = len(overfetched) > k
     hits = overfetched[:k]
 

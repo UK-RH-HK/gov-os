@@ -139,6 +139,17 @@ class Facet:
             return hits
         return [h for h in hits if self.in_scope(h.authority_class, h.lifecycle)]
 
+    def filter_in_scope_counted(self, hits: list) -> tuple:
+        """``(kept, dropped_count)`` -- the SAME filter as :meth:`filter_in_scope`, plus how many were dropped
+        (REPAIR_DAG.yaml node R1-GA1 reopening: kept only as a gather-level ASSERTION now that every real route
+        already pushes this filter down/applies it itself -- a caller uses the count to disclose, in telemetry,
+        whether a round's MAX_ROUNDS/exhaustion was caused by out-of-scope paging rather than a genuine absence of
+        evidence)."""
+        if self.scope_classes is None and self.lifecycle_scope is None:
+            return hits, 0
+        kept = [h for h in hits if self.in_scope(h.authority_class, h.lifecycle)]
+        return kept, len(hits) - len(kept)
+
 
 def _as_tuple(value) -> Optional[tuple]:
     if not value:

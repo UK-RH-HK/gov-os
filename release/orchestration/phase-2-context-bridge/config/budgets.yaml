@@ -71,3 +71,19 @@ gather:
   max_items_per_query: 500
   max_bytes_per_query: 2000000   # ~2 MB of raw candidate text -- generous headroom well above any one compiled
                                   # packet profile, so an ordinary gather stops on facet coverage, not on this.
+  # REPAIR_DAG.yaml node R1-GA1 reopening (task 2): a per-query WALL-TIME budget for the query's own DEFAULT facet
+  # set (every registered facet -- config/facets.yaml's own class_facets default), --threads 4, --batch-size 8,
+  # against the real store. Advisory only (govbridge.gather.engine does not itself enforce a wall clock; this is
+  # the number an operator/CI wrapper times a gather call against). Justified by AGENT_RUNS/BR-AR-0023.
+  # check7-controla-all-5-queries-default-facets.out -- all 5 CONTROL-A queries, full default facet set,
+  # --threads 4 --batch-size 8, real store, each reaching FACETS_COVERED in 2 rounds:
+  #   CA-WHY 93.25s (118 items)  CA-REQ 76.81s (97 items)   CA-ENF 96.17s (107 items)
+  #   CA-TESTS 47.74s (125 items)  CA-DEPS 89.06s (107 items)
+  # max 96.17s, min 47.74s, mean ~80.6s, all comfortably under the 180s per-call ceiling those measurements were
+  # taken with. wall_time_budget_seconds is set to 150s: above the measured max with a ~1.5x margin for a slower
+  # machine/cold model-load/larger corpus growth, not a bare ceiling-match. The dominant cost is NOT this node's
+  # own SQL work (post the R1-GA1 reopening's scope-index fix, a scoped facet's SQL query is sub-second -- see
+  # govbridge.lexical.query._ensure_scope_indexes/govbridge.semantic.vectors._ensure_scope_indexes) but the
+  # semantic route's embedding subprocess, spawned once per (facet, round); a query whose facets almost all need
+  # semantic (govbridge.route.real_routes.semantic_route) is the realistic worst case this budget covers.
+  wall_time_budget_seconds: 150

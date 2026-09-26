@@ -106,6 +106,111 @@ def _default_paths(repo: Optional[str] = None) -> str:
     return os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
 
 
+_scope_indexes_ensured = False
+
+#: this node's OWN small derived-cache table, added to the shared store.db exactly the way every other layer
+#: (lexical_fts, vector, record_def/class_lifecycle) already adds its own tables to the SAME file -- never a change
+#: to a table another node owns.
+SCOPE_PATH_CACHE_TABLE = "gather_scope_path_cache"
+
+
+def _ensure_scope_indexes(conn) -> None:
+    """Two query-time-only preparations, attempted at most once per process (module-level flag) and never allowed
+    to fail the caller (wrapped in try/except; the caller's own try/except around the scoped query itself is a
+    second safety net regardless):
+
+    1. An index on ``record_def(path)`` (``govbridge.authority.layer``, out of this node's mutation scope, is
+       indexed by ``id`` only) -- Tier A's ``JOIN record_def rd ON rd.path = rdo.path`` in :func:`_scope_sql` would
+       otherwise be a full scan of every record for every candidate row. A pure, idempotent (``IF NOT EXISTS``)
+       addition to an EXISTING table's EXISTING column -- no schema owned by this node, no data changed.
+    2. ``gather_scope_path_cache(blob_id, path)`` -- a DEDUPLICATED copy of ``occurrence(blob_id, path)``. The real
+       ``occurrence`` table is keyed by ``(ref_name, commit_id, path)``: on this corpus it holds ~500k rows for only
+       ~8k distinct ``(blob_id, path)`` pairs (many refs/historical commits repeating the SAME path for the SAME
+       blob). Tier B's ``EXISTS (... WHERE occ.blob_id = ? AND path GLOB ...)`` against the raw table means SQLite
+       must walk every one of a popular blob's (sometimes 500+) occurrence rows before it can conclude "no match" --
+       REPAIR_DAG.yaml node R1-GA1 reopening: this was the ACTUAL cost behind the corpus-scale timeout the SQL
+       push-down first hit (measured directly: ~4-6s per scoped COUNT/SELECT on this store, before this cache).
+       Querying the deduplicated cache instead cuts that to a handful of rows per blob. Rebuilt fresh once per
+       process (an ``INSERT OR IGNORE`` is a cheap no-op for rows already present), so it can never go stale within
+       one gather() session and is never more than one process-start stale across sessions -- a performance cache
+       only; a stale/missing cache degrades to the SAME safe fallback path (this whole function is best-effort)."""
+    global _scope_indexes_ensured
+    if _scope_indexes_ensured:
+        return
+    try:
+        conn.execute("CREATE INDEX IF NOT EXISTS record_def_by_path ON record_def(path)")
+        conn.execute(
+            f"CREATE TABLE IF NOT EXISTS {SCOPE_PATH_CACHE_TABLE} (blob_id TEXT NOT NULL, path TEXT NOT NULL, "
+            f"PRIMARY KEY (blob_id, path))"
+        )
+        conn.execute(
+            f"INSERT OR IGNORE INTO {SCOPE_PATH_CACHE_TABLE} (blob_id, path) "
+            f"SELECT DISTINCT blob_id, path FROM occurrence"
+        )
+        conn.commit()
+    except Exception:
+        pass
+    _scope_indexes_ensured = True
+
+
+def _scope_sql(blob_col: str, start_col: str, end_col: str, scope_classes: Optional[tuple],
+               lifecycle_scope: Optional[tuple], scope_path_globs: Optional[tuple]) -> tuple:
+    """A SQL fragment (``''`` or ``' AND (...)'``) plus its bound params, restricting rows to a facet's declared
+    authority-class/lifecycle scope -- PUSHED DOWN into SQL so a scoped facet's page is already in scope, rather
+    than filtered client-side after the fact (REPAIR_DAG.yaml node R1-GA1 reopening: a scoped facet must not page
+    through corpus-wide rankings, advancing its cursor without advancing its count). Reuses the SAME tables
+    ``govbridge.authority`` already persists (``record_def``/``class_lifecycle``, the B5 cache layer built by
+    ``govbridge.authority.layer``) and the store's own ``occurrence`` table -- no new schema, and no Python
+    ``import`` of ``govbridge.authority`` (this module stays a B1-only dependency; the caller,
+    ``govbridge.route.real_routes``, is the one place that already knows about authority classes and translates
+    them into these plain, generic SQL-facing parameters -- a class or lifecycle name is never spelled out here).
+
+    Two tiers, OR'd together:
+
+    * **Tier A** -- a RECORD-BACKED span: the occurrence's ``(path, line)`` falls inside a ``record_def`` row whose
+      ``class_lifecycle`` cache entry matches ``scope_classes`` AND ``lifecycle_scope``. Precise on both axes.
+    * **Tier B** -- a bare PATH GLOB (translated by the caller from the registry's own ``class_rules``, in the SAME
+      glob syntax SQLite's ``GLOB`` operator uses) matches an occurrence's path. Class-only: no lifecycle signal
+      exists for content outside a record, so Tier B is skipped whenever ``lifecycle_scope`` is given (never a
+      wrong-lifecycle false positive let through by the path alone).
+
+    This is a PRE-FILTER, not the final word: the caller still runs the real classifier on every survivor and may
+    still drop one it disagrees with -- kept as an assertion, disclosed in telemetry, never the primary mechanism."""
+    if not scope_classes and not scope_path_globs:
+        return "", []
+    clauses: list = []
+    params: list = []
+    if scope_classes:
+        cls_placeholders = ",".join("?" for _ in scope_classes)
+        # gather_scope_path_cache (see _ensure_scope_indexes), never the raw occurrence table -- same rationale as
+        # Tier B: joining record_def straight off occurrence would re-walk every historical (ref, commit) repeat of
+        # a popular blob's path before ever reaching record_def's own small table.
+        tier_a = (
+            f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} rdo "
+            f"JOIN record_def rd ON rd.path = rdo.path AND rd.line_start <= {end_col} AND rd.line_end >= {start_col} "
+            f"JOIN class_lifecycle cl ON cl.unit = rd.id "
+            f"WHERE rdo.blob_id = {blob_col} AND cl.cls IN ({cls_placeholders})"
+        )
+        params.extend(scope_classes)
+        if lifecycle_scope:
+            lc_placeholders = ",".join("?" for _ in lifecycle_scope)
+            tier_a += f" AND cl.lifecycle IN ({lc_placeholders})"
+            params.extend(lifecycle_scope)
+        tier_a += ")"
+        clauses.append(tier_a)
+    if scope_path_globs and not lifecycle_scope:
+        glob_or = " OR ".join("occ2.path GLOB ?" for _ in scope_path_globs)
+        # gather_scope_path_cache (see _ensure_scope_indexes), never the raw occurrence table: the SAME blob/path
+        # pair repeats once per historical (ref, commit) on occurrence (hundreds of times for a popular blob), so
+        # matching against the deduplicated cache is the difference between a handful of row checks and hundreds.
+        clauses.append(f"EXISTS (SELECT 1 FROM {SCOPE_PATH_CACHE_TABLE} occ2 WHERE occ2.blob_id = {blob_col} "
+                        f"AND ({glob_or}))")
+        params.extend(scope_path_globs)
+    if not clauses:
+        return "", []
+    return " AND (" + " OR ".join(clauses) + ")", params
+
+
 def _occurrences_for_blob(conn, blob_id: str, resolved: "viewmod.ResolvedView") -> list[Occurrence]:
     rows = conn.execute(
         "SELECT ref_name, commit_id, path FROM occurrence WHERE blob_id=? ORDER BY ref_name, commit_id, path",
@@ -121,7 +226,9 @@ def _occurrences_for_blob(conn, blob_id: str, resolved: "viewmod.ResolvedView") 
 
 def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, offset: int = 0,
           view_path: Optional[str] = None, repo: Optional[str] = None, record_telemetry: bool = True,
-          classify: Optional["Callable[[RetrievedItem], tuple]"] = None) -> dict:
+          classify: Optional["Callable[[RetrievedItem], tuple]"] = None,
+          scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
+          scope_path_globs: Optional[tuple] = None) -> dict:
     """Run ``text`` (an FTS5 MATCH expression -- a phrase, NEAR(), a bareword query, ...) against the lexical
     index and return up to ``k`` RetrievedItems, ranked by BM25 (ascending: SQLite's bm25() is a cost, lower is
     better -- ORDER BY score ASC is the correct direction, matching fts_spike.py), with ``chunk_id`` ASC as a
@@ -139,21 +246,47 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, of
     ``govbridge.semantic.search`` already has (its ``Classifier`` callable), added here for symmetry so a caller
     (I1's real-route wiring, once ``govbridge.authority`` is on this branch's base -- B2 depends only on B1) can
     supply the real classifier without editing this file. Absent (the default), every hit still carries the
-    original placeholder (``authority_class=None``, ``classification_note=NOT_YET_ASSIGNED``) -- unchanged."""
+    original placeholder (``authority_class=None``, ``classification_note=NOT_YET_ASSIGNED``) -- unchanged.
+
+    ``scope_classes``/``lifecycle_scope``/``scope_path_globs`` (REPAIR_DAG.yaml node R1-GA1 reopening): pushed
+    down into the SQL itself (:func:`_scope_sql`) rather than filtered after the fact, so a SCOPED facet's page is
+    already in scope -- ``total_matching_chunks``/exhaustion accounting is computed over the SAME scoped universe,
+    never the unscoped one, so paging still terminates correctly."""
     view_path = view_path or _default_paths(repo)
     conn = store.open_db()
     ftsmod.ensure_schema(conn)
 
+    scope_sql, scope_params = _scope_sql("lexical_fts.blob_id", "lexical_fts.start_line", "lexical_fts.end_line",
+                                          scope_classes, lifecycle_scope, scope_path_globs)
+    if scope_sql:
+        _ensure_scope_indexes(conn)
+
     fetch_n = max(k * _OVERFETCH_MULTIPLIER, _OVERFETCH_FLOOR) if exclude else k
     t0 = time.monotonic()
-    rows = conn.execute(
-        "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
-        "FROM lexical_fts WHERE lexical_fts MATCH ? ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
-        (text, fetch_n, offset),
-    ).fetchall()
-    total_matches = conn.execute(
-        "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?", (text,)
-    ).fetchone()[0]
+    try:
+        rows = conn.execute(
+            "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
+            "FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql +
+            " ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
+            (text, *scope_params, fetch_n, offset),
+        ).fetchall()
+        total_matches = conn.execute(
+            "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?" + scope_sql,
+            (text, *scope_params),
+        ).fetchone()[0]
+    except Exception:
+        # record_def/class_lifecycle may not exist yet on a store that never built the authority layer (a bare B1+
+        # lexical store, or a test fixture); an honest, generic fall-back to the UNSCOPED query is a strict SUPERSET
+        # (never drops evidence a caller could otherwise have seen), and the real classifier's own post-filter
+        # (real_routes.py) still applies -- never a crash, never a silent narrower-than-intended result.
+        rows = conn.execute(
+            "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
+            "FROM lexical_fts WHERE lexical_fts MATCH ? ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
+            (text, fetch_n, offset),
+        ).fetchall()
+        total_matches = conn.execute(
+            "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?", (text,)
+        ).fetchone()[0]
     latency_ms = round((time.monotonic() - t0) * 1000, 3)
 
     resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)

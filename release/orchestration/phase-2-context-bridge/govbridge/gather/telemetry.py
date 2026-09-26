@@ -25,6 +25,13 @@ class FacetRoundStat:
     exhausted: bool          # true once this facet has no further page/cursor to fetch
     missing: bool = False    # true for a facet that produced zero items across every round it ran
     missing_reason: Optional[str] = None
+    # REPAIR_DAG.yaml node R1-GA1 reopening, defect 1: how many candidates a scope assertion (the route's own, or
+    # the gather-level backstop) dropped THIS call, across every route this facet used this round. Every real
+    # route now pushes a scoped facet's authority-class/lifecycle restriction down before/into its own candidate
+    # generation, so this should normally read 0 for a scoped facet; a persistently non-zero value here, alongside
+    # MAX_ROUNDS/exhaustion-with-few-items, is the disclosed signal that a facet's rounds were spent on paging past
+    # out-of-scope material rather than genuine scarcity.
+    out_of_scope_dropped: int = 0
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self)
@@ -63,6 +70,20 @@ class GatherTelemetry:
     def candidate_bytes(self) -> int:
         return sum(r.candidate_bytes for r in self.rounds)
 
+    def out_of_scope_dropped(self) -> int:
+        return sum(r.out_of_scope_dropped for r in self.rounds)
+
+    def out_of_scope_dropped_by_facet(self) -> dict:
+        """{facet_name: total out_of_scope_dropped across every round} -- REPAIR_DAG.yaml node R1-GA1 reopening:
+        "MAX_ROUNDS on a scoped facet must never be caused by out-of-scope paging; if it happens, count that in
+        telemetry." Only facets with a non-zero total are included, so an empty dict here IS the disclosure that no
+        scoped facet spent any round on out-of-scope material."""
+        totals: dict = {}
+        for r in self.rounds:
+            if r.out_of_scope_dropped:
+                totals[r.facet] = totals.get(r.facet, 0) + r.out_of_scope_dropped
+        return totals
+
     def summary(self, final_bytes: int) -> dict:
         return {
             "query_id": self.query_id,
@@ -78,6 +99,8 @@ class GatherTelemetry:
             "unresolved_facets": list(self.unresolved_facets),
             "unresolved_identifiers": list(self.unresolved_identifiers),
             "excluded_hits": self.excluded_hits,
+            "out_of_scope_dropped": self.out_of_scope_dropped(),
+            "out_of_scope_dropped_by_facet": self.out_of_scope_dropped_by_facet(),
         }
 
     def write_best_effort(self) -> None:
@@ -92,7 +115,7 @@ class GatherTelemetry:
                     "route": "gather", "query_id": self.query_id, "facet": r.facet, "round": r.round,
                     "routes": list(r.routes), "candidate_items": r.candidate_items,
                     "candidate_bytes": r.candidate_bytes, "new_items": r.new_items, "new_bytes": r.new_bytes,
-                    "exhausted": r.exhausted, "missing": r.missing,
+                    "exhausted": r.exhausted, "missing": r.missing, "out_of_scope_dropped": r.out_of_scope_dropped,
                 })
             coretelemetry.write_row("queries", {
                 "route": "gather", "query_id": self.query_id, "facet": "__summary__",
