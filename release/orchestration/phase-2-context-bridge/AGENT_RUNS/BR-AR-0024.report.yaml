@@ -8,7 +8,7 @@ role: >-
   fix (a deterministic, carry-forward priority queue -- see claims C-11/C-12/C-13/C-14).
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga2-0024
-commit: PENDING
+commit: ea992f95532da1e9765d38698310fe709f9ff0d8
 status: COMPLETED
 claims:
 - id: C-1
