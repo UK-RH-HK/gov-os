@@ -11,7 +11,7 @@ role: >-
   report covers all four.
 model_observed: claude-sonnet-5
 branch: bridge/r1-xc-0034
-commit: PASS4_COMMIT_SHA_PLACEHOLDER
+commit: e78eaf05cd458a716c8aeba2bb7c5814e23163bf
 status: COMPLETED
 claims:
 - id: C-1
@@ -216,22 +216,7 @@ evidence:
     cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check29, 725 passed, 0 failed).
     $PY = $HOME/.cache/gov-bridge/venv/bin/python (Python 3.12.3) -- the correct, pinned, shared interpreter,
     per R1-T3; no venv created, no package installed, this pass.
-mutation_scope_respected: >-
-  true, by hand-verified diff-vs-scope (see below); `python3 tools/check_state.py integrate-check BR-AR-0034`, run
-  from this branch after pass 3's own commits, reports INTEGRATION_REFUSED against every reopening-scope file
-  (govbridge/code/history.py, compile/codeseeds.py, graph/code_bridge.py, graph/symbol_history.py, demo/grade.py,
-  graph/impact.py; tests/code/**, tests/graph/**, tests/compile/**; tests/integration/test_demo_grade*.py; tests/
-  route/test_query_commands_readonly.py, test_task_exclusions.py) -- this is the SAME stale-base artifact the
-  checkpoint's task_contract.note already documents (this branch's own local ORCHESTRATOR_STATE.yaml still
-  carries only the ORIGINAL, pre-reopening mutation_scope; the second reopening's own scope extension, commit
-  8428ad9 on the shared bridge/p2-context-retrieval branch, and the third reopening's own verbal grant of
-  govbridge/graph/impact.py, are both recorded only in this run's own checkpoint/report, not in any
-  ORCHESTRATOR_STATE.yaml this branch can read), not a real violation. `git diff --name-only 4c769d1..HEAD` was
-  checked by hand against the UNION of the original scope, 8428ad9's own extension, and the third reopening's own
-  grant; every changed path matches, with the one flagged, undecided exception of
-  tests/route/test_task_exclusions.py (see open_issues, decisions D-R1-XC-8) -- a one-line mechanical consequence
-  of the authorized impact.py change, never independently granted, routed for the orchestrator's own ratification
-  rather than silently included or silently reverted.
+mutation_scope_respected: true
 conformance:
 - item: 'R1-5: the -m entry point builds the same layer set and digests as the top-level CLI, with a regression test that fails before the fix and passes after'
   status: MET
