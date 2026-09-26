@@ -4,7 +4,7 @@ role: 'REPAIR-1 node R1-RL builder -- code/test lineage, data dependencies, requ
   identity, continuation'
 model_observed: claude-sonnet-5 (Sonnet 5)
 branch: bridge/r1-rl-0019
-commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
+commit: e19adeaac2a251ce82fe70ae903c72f49806b24f
 status: COMPLETED
 claims:
 - 'REOPENING (orchestrator ruling, after first COMPLETED return): TESTS edges (b, c), DEPENDS_ON_DATA and

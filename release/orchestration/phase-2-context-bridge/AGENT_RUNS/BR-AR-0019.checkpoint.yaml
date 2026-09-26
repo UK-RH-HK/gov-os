@@ -1,17 +1,20 @@
 # BR-AR-0019 schema-2 worker checkpoint (OD-BR-04 A). REPAIR-1 node R1-RL. No oracle content.
+# REVISED after the orchestrator's reopening ruling (persist the new edge kinds as a registered, digested store
+# layer) and BR-DAG-AMEND-R1-4 (full domain suite as the last acceptance check; test hermeticity).
 run_id: BR-AR-0019
-commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
+commit: e19adeaac2a251ce82fe70ae903c72f49806b24f
 role: 'REPAIR-1 node R1-RL builder: graph and lineage additions -- code/test lineage, data dependencies,
   requirement lineage, structured-record identity, continuation'
 commands:
 - cmd: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/code tests/graph tests/authority/test_state_records.py -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
-  output_sha256: f54fa10b7e44b03156844c6cc819a770e03ec4107eca4745937ce132ce805875
+  output_sha256: d4f07f1ff0a7f19efe6f5ff2485798b5d6f5c4e76bdcbf6efb99274ad2132a64
 - cmd: '$PY -m govbridge.core.freshness rebuild --from-clean (twice, into two fresh stores) -- see the output file
-    for the pre-existing CLI double-import defect found in this literal form (outside R1-RL''s scope) and the
-    equivalent, correctly-shared invocations substituted for the real determinism proof (govbridge.core.freshness.run()
-    in-process, and a dedicated fixture-based pytest test)'
+    for the pre-existing CLI double-import defect found in this literal form (outside R1-RL''s scope, orchestrator
+    is routing its repair elsewhere) and the equivalent, correctly-shared invocations substituted for the real
+    determinism proof (govbridge.core.freshness.run() in-process, and a dedicated fixture-based pytest test) --
+    covers state records, flowing into the EXISTING authority layer'
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check2-freshness-determinism.out
   output_sha256: 1ae3bea1b0c95a83dc888c1e38ec18231c654f857de2b008ad6ee2c1a4443ee2
@@ -21,6 +24,19 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-paging.out
   output_sha256: 00d380fbe5f94c0ff24c0a3fa3feec7618982746223a92463120d70277ff2aaa
+- cmd: 'REOPENING ruling item 1/4/5: govbridge.core.freshness.run(from_clean=True, layer="lineage") called
+    in-process twice, into two FRESH, independent stores (never store-BR-AR-0010 itself), against the real
+    current view -- identical digest, nonzero DEPENDS_ON_DATA/TESTS row counts, then freshness NOOP; plus the
+    fixture proof (tests/code/test_lineage_layer.py) that all four edge kinds persist with correct derivation
+    labels, and the build-time/store-size cost measurement'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out
+  output_sha256: 184723128ad2c30e72f8dee136d950e6936413421a392ec812e4922fdd4f438b
+- cmd: 'BR-DAG-AMEND-R1-4: $HOME/.cache/gov-bridge/venv/bin/python -m pytest -q -p no:cacheprovider tests (from
+    the domain, the full suite)'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
+  output_sha256: e80df2f9197abd18674aeac4cba812c6c1f51f42dda4b2b5d824f5c1b8520254
 model_observed: claude-sonnet-5 (Sonnet 5)
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
@@ -53,12 +69,20 @@ input_manifest:
   sha256: 33f342d524b6722cade35f907fab52748d02f97bd23f54d18ac7a4ae55d6d924
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/history.py
   sha256: 3b966b4e13e957c03fccf6dfab61ce73e92139a456f6a62af60b9267ca121b8d
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/build.py
+  sha256: d8711412959cfc73e1d80b1be71d82ad9bf3d0603faa51313290f817b373660d
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
-  sha256: c2fdb9d40ad91e92f54765395d5d965cafcd9a1affb7a8cb6924e9c88a3f8757
+  sha256: c242674c850ae5e01fcd717249aa16bf0ff820170a4c422e2f2b4dc4729d268a
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
   sha256: b5bbababe6f2a042fe64eed971b3f836cf5eb0206a4d86fddb5d79f95f0569f9
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
-  sha256: 8a18651658bfa17941293ac730ed3f4ac00cefae5687e5327987d65cce1c9914
+  sha256: a15a39292ebc615a3fb09b22143050839e76a66eb5982bce7bdd297cb45ce2e3
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/__init__.py
+  sha256: 35b8b0a66013e30f0d668c6ef4e5a68d320c73491d4e9f23338b99ce7623716f
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_layer.py
+  sha256: 201188af85e941384cb3390726a3e22b0ef68e72092a7928cc57ababb188b49c
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_config.yaml
+  sha256: 99fa7344215464dddf136ef341ff22380668535e83f6b39ceac525b2524efe47
 - path: release/orchestration/phase-2-context-bridge/govbridge/cli.py
   sha256: c35066d5a3ace8cedf855b87a68d6293e9af5ae8f23fa56e37a7dd6b3c029b56
 - path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/task-spec.yaml
@@ -87,23 +111,29 @@ task_contract:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/graph/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.*
 artifacts_changed:
-- release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
-- release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
-- release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
-- release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
-- release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
-- release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
-- release/orchestration/phase-2-context-bridge/tests/authority/test_state_records.py
-- release/orchestration/phase-2-context-bridge/tests/code/test_symbols_integration.py
-- release/orchestration/phase-2-context-bridge/tests/graph/test_derive.py
-- release/orchestration/phase-2-context-bridge/tests/graph/test_symbol_history.py
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check2-freshness-determinism.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-page1.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-paging.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-unpaged.out
-- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.report.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.checkpoint.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.report.yaml
+- release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+- release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
+- release/orchestration/phase-2-context-bridge/govbridge/code/__init__.py
+- release/orchestration/phase-2-context-bridge/govbridge/code/lineage_config.yaml
+- release/orchestration/phase-2-context-bridge/govbridge/code/lineage_layer.py
+- release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
+- release/orchestration/phase-2-context-bridge/tests/authority/test_state_records.py
+- release/orchestration/phase-2-context-bridge/tests/code/test_lineage_layer.py
+- release/orchestration/phase-2-context-bridge/tests/code/test_symbols_integration.py
+- release/orchestration/phase-2-context-bridge/tests/graph/test_derive.py
+- release/orchestration/phase-2-context-bridge/tests/graph/test_symbol_history.py
 findings:
 - 'Confirmed by direct testing that govbridge.authority.lifecycle._find_definition (which govbridge.core.exact.
   id_lookup / `govbridge exact id` already calls, UNCHANGED) resolves a new state-key record the moment
@@ -120,9 +150,32 @@ findings:
   the deepest START mark reached by any descendant node instead (always precisely placed, at every depth) --
   see extract_definitions_state_keys''s _max_start_line'
 - 'govbridge/core/freshness.py has a pre-existing double-import defect when invoked as `python -m
-  govbridge.core.freshness ...` directly (see open_issues in the report); `python -m govbridge index rebuild`/
-  `python -m govbridge freshness` (through the top-level CLI) and any in-process govbridge.core.freshness.run()
-  call are unaffected. Not this node''s file to fix; flagged for the orchestrator'
+  govbridge.core.freshness ...` directly: `-m pkg.submodule` runs the target as `__main__`, a module object
+  SEPARATE from `govbridge.core.freshness` as normally imported, so sibling packages'' register_layer_builder/
+  register_layer calls (against the real module) are invisible to `main()`''s own copy of `_LAYER_BUILDERS` --
+  a bare `rebuild --from-clean` silently runs only the "core" builder while still calling every digest via the
+  correctly-shared govbridge.core.manifest, producing an empty-hash digest for every OTHER layer regardless of
+  its actual content. `python -m govbridge index rebuild`/`python -m govbridge freshness` (through the top-level
+  CLI) and any in-process `govbridge.core.freshness.run()` call are unaffected. Not this node''s file to fix;
+  the orchestrator has said it is routing the repair elsewhere'
+- 'REOPENING: govbridge/graph/__init__.py -- the usual place a layer package registers itself at import time --
+  is OUTSIDE this node''s mutation_scope (individual govbridge/graph/*.py files are named, never a `**`
+  wildcard). govbridge/code/__init__.py IS a wildcard (govbridge/code/**) and is already imported by every
+  ensure_all_layer_packages_imported() walk (it registers "code"). Registering the new "lineage" layer there,
+  with its OWN builder file (govbridge/code/lineage_layer.py) calling INTO govbridge/graph/derive.py''s
+  edge-deriving functions, keeps every derivation function exactly where the brief puts it while still reaching
+  the real registration point from within scope'
+- 'REOPENING: on the REAL current view, DEPENDS_ON_DATA (225 rows) and TESTS (2 rows, both EXACT_CLI_DISPATCH)
+  are genuinely present; CITES_REQUIREMENT is genuinely 0 -- verified by a direct git-grep for a comment-shaped
+  "<path>.md:<N>"/"<path>.rs:<N>" citation under every CODE_DIRS prefix, which returns zero hits repo-wide. The
+  product''s Rust comments do not use this citation convention today. Not a defect in the derivation logic
+  (proven nonzero, correctly labelled, on a controlled fixture); a property of the current corpus'
+- 'REOPENING/hermeticity: my own first-return test (tests/graph/test_derive.py::
+  test_cli_dispatch_tests_edge_resolves_a_subprocess_invoked_subcommand) depended on gitobj.resolve_commit("HEAD")
+  with repo=None (the shared, live repository''s current HEAD, which other agents mutate this session) and a
+  CWD-relative file read -- exactly the class of bug BR-DAG-AMEND-R1-4 exists to catch. Fixed with a fully
+  synthetic fixture and explicit repo=; the mechanism it tests (resolve_cli_handler) is unaffected, only the test
+  changed'
 failed_approaches:
 - 'Tried addressing nested state keys with a synthetic "state:<alias>#<dotted.path>" id (matching the resolver''s
   own state_ref syntax): abandoned because govbridge.authority.lifecycle._find_definition resolves a token by
@@ -134,28 +187,48 @@ failed_approaches:
   -1 if column==0): produced an off-by-one-line span for any node with more than one child (see findings) --
   that function is only ever asked to resolve a single caller-given LEAF key path, so the bug was never
   triggered there; replaced with the start-mark-based approach for this walk-every-depth use case'
+- 'REOPENING: tried gating the new lineage layer''s test-file scan to a hard-coded "tests/" REPO-ROOT prefix
+  (mirroring an early draft): on the real view this matched only the product''s OWN Rust test suite (top-level
+  tests/**/*.rs) and found ZERO Python test files, because this domain''s own Python tests live nested under
+  release/orchestration/phase-2-context-bridge/tests/ -- a DIFFERENT top-level path in the same "records" tree.
+  Replaced with a generic "a .py file inside any directory literally named tests, at any depth" rule
+  (_is_test_python_path), which correctly found this domain''s own CLI-dispatch tests without naming any path'
+- 'REOPENING: tried computing the real-view lineage-layer cost via `python -m govbridge index rebuild
+  --from-clean` (the full pipeline, all layers): correct, but the semantic/embedding layer alone took ~885s,
+  swamping the ~77s the lineage layer itself needs. Measured the lineage layer in isolation instead via
+  `freshness.run(from_clean=True, layer="lineage")`, which the run() API already supports'
 unresolved:
 - 'the govbridge/core/freshness.py `-m` double-import defect (found, documented, worked around; not fixed --
-  outside mutation scope)'
-- 'whether R1-INT''s generic-rule audit is satisfied by this run''s comments/docstrings (they discuss the
-  MECHANISM generically -- CLI dispatch shapes, test-registry shape, state-file registry -- and name no Review-8
-  item, F-finding or Phase-2 file; fixture DATA in the new tests uses synthetic ids like FX-CAP-1, never a real
-  finding id)'
+  outside mutation scope; orchestrator is routing its repair elsewhere)'
+- 'CITES_REQUIREMENT and the registry-shape (c) TESTS sub-kind are 0 on the real corpus today (see findings);
+  both will start producing rows the moment matching content is added, and are proven correct on fixtures now'
+- 'tests/compile/test_compile_real_view_mandatory_in_a.py failed once (a manifest_sha256 mismatch across two
+  in-process compiles) on an EARLIER full-suite run this session, before this reopening''s fixes; passed on the
+  FINAL full-suite run committed here (361 passed, 0 failures). Not this node''s file; the amendment itself
+  names it as non-hermetic until R1-RM'
 decisions:
 - 'D-R1-RL-1 (within authority): state-key record ids are the key''s own bare name (not a synthetic
   "state:alias#path" token), because the existing, unmodified exact-id resolution path is git-grep-first --
   see findings/failed_approaches above. The full dotted path is still recorded, in Definition.record_path, for
   precision'
-- 'D-R1-RL-2 (within authority): no new store layer is registered. State records flow into the EXISTING
-  "authority" layer (govbridge/authority/layer.py, untouched) automatically, because extract_definitions_yaml
-  is the function records.scan_ref/layer.build already call for every YAML file. TESTS(b)/(c), DEPENDS_ON_DATA,
-  CITES_REQUIREMENT and symbol history stay on-demand, bounded, git-content functions -- never persisted --
-  exactly like every sibling function already in govbridge/graph/derive.py and govbridge/code/history.py''s own
-  diff(). Flagged in open_issues/unresolved for the orchestrator/R1-INT to confirm this reading of "every
-  addition registered as a store layer with a digest" is correct'
-- 'no modification to any existing test file''s assertions: tests/graph/test_derive.py and
-  tests/code/test_symbols_integration.py were extended by pure addition (git diff shows 0 deletions in either
-  file); no existing test needed correcting'
+- 'D-R1-RL-2, REVISED by the reopening ruling: the new edge kinds (TESTS b/c, DEPENDS_ON_DATA, CITES_REQUIREMENT)
+  now persist in a NEW registered, digested store layer, "lineage" (govbridge/code/lineage_layer.py,
+  table lineage_edge), rather than staying on-demand. Chosen over extending the existing "authority"
+  authority_edge table because that table''s rows are all produced by ONE whole-corpus pass over
+  records.scan_ref''s id-grammar definitions (govbridge/authority/layer.py, outside this node''s mutation scope
+  to edit); the new edge kinds need a DIFFERENT whole-corpus pass (code/test/yaml blobs, not id-grammar
+  definitions), so a separate table and a separate builder is the smaller, more localised change. Registered
+  from govbridge/code/__init__.py (in scope, a `**` wildcard, already on the ensure_all_layer_packages_imported()
+  path) rather than govbridge/graph/__init__.py (out of scope) -- see findings'
+- 'D-R1-RL-3 (REOPENING item 3): symbol_history''s max_commits bound is read from
+  govbridge/code/lineage_config.yaml''s symbol_history.default_max_commits key (or the
+  GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS env var), resolved fresh on every call via _default_max_commits(), not
+  baked into a module constant at import time (a prior draft did the latter; fixed so a config/env-var change,
+  or a test''s monkeypatch, takes effect immediately, matching the hermeticity/test-order requirements of
+  BR-DAG-AMEND-R1-4 too)'
+- 'no modification to any existing test file''s assertions: every test-file diff in this run (both the first
+  return and this reopening) is a pure addition or, in ONE case (the CLI-dispatch test), a REWRITE of a test
+  this node itself introduced in the first return -- never an existing, previously-accepted test''s assertion'
 lessons:
 - 'When a new record-addressing scheme must work through an EXISTING, out-of-scope resolver that works by
   git-grepping the literal token first, design the id format to BE that literal text, not a synthetic
@@ -166,10 +239,26 @@ lessons:
   embedding layer alone took ~15 minutes on this box) and will happily run at 400%+ CPU per embedding worker
   process if left unattended -- run it in the true background (nohup, detached) and kill it (and its orphaned
   onnx_embed.py children specifically -- SIGKILLing the parent does not reap them) rather than block on it
-  when a faster, equally valid, isolated fixture-based proof already exists'
+  when a faster, equally valid, isolated fixture-based proof already exists. `freshness.run(layer="<name>")`
+  isolates one layer''s own cost cleanly, without needing the whole pipeline'
+- 'REOPENING: "on-demand, never persisted" is not a free pass just because sibling functions in the same file
+  already work that way -- when the acceptance check itself says "identical digests for every new layer", a
+  capability that changes nothing persisted makes that check vacuous, and this programme has rejected exactly
+  that pattern twice before (BR-DAG-AMEND-3, B3R). Read the acceptance-check TEXT as binding before assuming an
+  existing code pattern settles the question'
+- 'a mutation-scope boundary that excludes an __init__.py can still be worked around, generically and without
+  scope creep, by finding an IN-SCOPE package whose __init__.py is already on the same import-discovery path and
+  registering there instead -- no scope amendment needed for this particular shape of blocker'
+- 'when a "must be configuration" requirement has no natural home in the existing config/ directory (semantic
+  mismatch) and no wildcard scope covers config/, a small YAML file placed inside an in-scope wildcarded package
+  directory (govbridge/code/**) is a legitimate, in-scope alternative to either violating scope or leaving the
+  bound as a code literal'
 next_consumer: 'R1-GA1/R1-GA2/R1-GA3 (the "govbridge gather" retrieval-loop nodes), which consume these new
-  derive.py/symbol_history.py/code.symbols capabilities from within the gather loop (they, not this node, wire
-  them into govbridge why/impact -- why.py/impact.py are outside R1-RL''s mutation scope and were not touched);
-  R1-INT for the generic-rule audit and the mutation-scope/overlap check; the orchestrator for the
-  govbridge/core/freshness.py double-import defect'
-final_commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
+  derive.py/symbol_history.py/code.symbols/lineage_layer capabilities from within the gather loop (they, not
+  this node, wire them into govbridge why/impact -- why.py/impact.py are outside R1-RL''s mutation scope and
+  were not touched); R1-INT for the generic-rule audit and the mutation-scope/overlap check (the new
+  govbridge/code/lineage_layer.py registration point should be checked against whatever R1-INT expects); the
+  orchestrator for the govbridge/core/freshness.py double-import defect (already being routed elsewhere per the
+  reopening message) and for confirming the tests/compile/test_compile_real_view_mandatory_in_a.py flake is
+  R1-RM''s to fix'
+final_commit: e19adeaac2a251ce82fe70ae903c72f49806b24f
