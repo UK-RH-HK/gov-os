@@ -176,7 +176,7 @@ def _version_status(resolved_view, ref_trees: dict, ref_name: str, commit: str, 
 
 def _empty_ref_stats() -> dict:
     return {
-        "blobs_scanned": 0, "edges": 0, "edges_by_type": {},
+        "blobs_scanned": 0, "edges": 0, "edges_by_type": {}, "edges_by_derivation": {},
         "cites_requirement_resolved_to_section": 0,
         "cites_requirement_resolved_to_document_only": 0,
         "cites_requirement_unresolved_by_reason": {},
@@ -185,6 +185,10 @@ def _empty_ref_stats() -> dict:
         "rust_cli_harness_wrapper_methods": 0, "rust_cli_test_files_scanned": 0,
         "rust_cli_harness_dispatch_edges_declared_type": 0, "rust_cli_harness_dispatch_edges_unique_name": 0,
         "rust_harness_method_unresolved_by_reason": {},
+        # BR-AR-0019 reopening (fourth pass): test-registry (c) telemetry -- rows recognised (by the widened,
+        # any-depth schema walk) and, of the entries those rows carry, how many resolved through each of
+        # requirement 3's three buckets (see govbridge.graph.edges's own comments on the four registry labels).
+        "test_registry_rows": 0,
     }
 
 
@@ -198,8 +202,30 @@ def _merge_counts(agg: dict, add: dict) -> None:
             agg[k] = agg.get(k, 0) + v
 
 
+def _test_symbol_counts_for_ref(conn: sqlite3.Connection, ref_name: str, commit: str) -> dict:
+    """{qualified_name: count} for every ``is_test=1`` ``code_symbol`` row reachable at ``(ref_name, commit)`` --
+    BR-AR-0019 reopening (fourth pass), requirement 3. Joins the ALREADY-SHARED ``conn``'s own ``occurrence``
+    table (B1's own, always populated before this layer runs -- see this function's own caller for why) against
+    ``code_symbol`` (B3's own, populated by the "code" layer's eager builder for every eager ref); never opens a
+    second connection to the store (see the caller's own comment for the concrete isolation bug that caused).
+    ``code_symbol`` may not exist at all yet on a bare/isolated connection (a unit test that calls
+    ``lineage_layer_builder`` directly, never through a full ``freshness.run()`` -- the "code" layer's own builder
+    then never ran on this ``conn``) -- an empty dict in that case, the SAME honest-MISSING degrade every other
+    code-route-optional function in this module documents, never a crash."""
+    from collections import Counter
+
+    try:
+        rows = conn.execute(
+            "SELECT cs.qualified_name FROM code_symbol cs JOIN occurrence o ON o.blob_id = cs.blob_id "
+            "WHERE o.ref_name = ? AND o.commit_id = ? AND cs.is_test = 1", (ref_name, commit),
+        ).fetchall()
+    except sqlite3.OperationalError:
+        return {}
+    return Counter(r[0] for r in rows)
+
+
 def _scan_one_ref(conn: sqlite3.Connection, resolved_view, ref_trees: dict, ref_name: str, commit: str, rules,
-                   repo: Optional[str]) -> dict:
+                   repo: Optional[str], grammar) -> dict:
     """One ref's own full corpus walk: classify, derive every edge kind exactly as R1-RL's brief describes, tag
     each row/unresolved-item with THIS ref's own ``(ref_name, commit)`` and version status, and return this ref's
     own stats dict (the caller sums these into the build-wide aggregate -- see ``lineage_layer_builder``)."""
@@ -210,6 +236,23 @@ def _scan_one_ref(conn: sqlite3.Connection, resolved_view, ref_trees: dict, ref_
     from govbridge.code import rust_cli as RC
 
     ref_stats = _empty_ref_stats()
+
+    # BR-AR-0019 reopening (fourth pass), requirement 3: {qualified_name: count} for every is_test=1 code-layer
+    # symbol reachable at THIS ref's own commit -- computed ONCE per ref (never per registry entry), reused by
+    # every test_registry_edges_in_doc call below. Read from the SAME shared `conn` this whole build already has
+    # open (via the "core" layer's own `occurrence` table, ALWAYS populated before any sibling layer's builder
+    # runs -- core_layer_builder registers first, structurally: nothing can call
+    # ensure_all_layer_packages_imported() without govbridge.core.freshness, which OWNS that registration, already
+    # being loaded), joined against code_symbol (populated by the "code" layer's OWN eager builder for every
+    # eager ref, the SAME ref set Defect A already reuses -- see this module's own docstring). Deliberately NEVER
+    # a second sqlite3 connection to the store (an earlier version of this fix called
+    # govbridge.code.symbols.ensure_indexed via its own _open_conn(), which opens a SEPARATE connection to
+    # whatever GOVBRIDGE_STORE currently names and sets PRAGMA journal_mode=WAL on it -- harmless in isolation, but
+    # a second concurrent writer to the SAME on-disk store file, whose own commit/WAL-checkpoint behaviour bumped
+    # the file's change-counter as an observable side effect completely unrelated to this feature, breaking
+    # tests/core/test_freshness.py's OWN "two GOVBRIDGE_STORE values build independent stores" byte-for-byte
+    # isolation guarantee -- found and fixed before this reopening's return, never shipped).
+    test_symbol_counts = _test_symbol_counts_for_ref(conn, ref_name, commit)
 
     def _record_for_blob(edges: list, blob_id: str, path: str) -> None:
         """Every edge kind below is derived FROM one already-read file (blob_id, path) -- its own version status
@@ -223,6 +266,8 @@ def _scan_one_ref(conn: sqlite3.Connection, resolved_view, ref_trees: dict, ref_
             put_edge(conn, ref_name, commit, e, status, canon_ref, canon_commit)
             ref_stats["edges"] += 1
             ref_stats["edges_by_type"][e.type] = ref_stats["edges_by_type"].get(e.type, 0) + 1
+            deriv_key = f"{e.type}:{e.derivation}"
+            ref_stats["edges_by_derivation"][deriv_key] = ref_stats["edges_by_derivation"].get(deriv_key, 0) + 1
             if e.type == E.CITES_REQUIREMENT:
                 if e.derivation == E.HEURISTIC_COMMENT_SECTION:
                     ref_stats["cites_requirement_resolved_to_section"] += 1
@@ -288,7 +333,13 @@ def _scan_one_ref(conn: sqlite3.Connection, resolved_view, ref_trees: dict, ref_
                 except Exception:
                     doc = None
                 if doc is not None:
-                    _record_for_blob(D.test_registry_edges_in_doc(doc, path, commit), entry.oid, path)
+                    # counted separately (a row with an EMPTY `tests: []` still counts as a recognised row, even
+                    # though it produces zero edges) -- the edges themselves always come from the one real
+                    # function, test_registry_edges_in_doc, never reimplemented inline here.
+                    ref_stats["test_registry_rows"] += sum(1 for _ in D._iter_registry_rows(doc))
+                    _record_for_blob(D.test_registry_edges_in_doc(
+                        doc, path, commit, test_symbol_counts=test_symbol_counts, grammar=grammar,
+                    ), entry.oid, path)
 
     # Gap 2, pass B: every wrapper (free function OR Defect B's harness METHOD) needs the FULL bin-helper set
     # (defined in one file, reused by many others), so wrapper detection runs only now, once pass A above has
@@ -330,6 +381,22 @@ def lineage_layer_builder(conn: sqlite3.Connection, resolved_view, rules, repo: 
     ensure_schema(conn)
     clear_layer_tables(conn)
 
+    # BR-AR-0019 reopening (fourth pass): loaded ONCE, reused for every ref -- the SAME
+    # config/id-grammar.yaml every other id-grammar consumer in this domain loads (recordsmod._default_grammar_
+    # path(), never a second copy). Both the IMPORT (govbridge.authority's own package __init__ eagerly reads
+    # config/state-aliases.yaml at import time, module-cached process-wide the first time anything imports it --
+    # a minimal test fixture that lacks that unrelated file would otherwise crash HERE, the first place in a
+    # given process that happens to import govbridge.authority, purely an artifact of import order/caching, never
+    # a real-domain concern) and the grammar load itself are guarded: a fixture/domain whose grammar file is
+    # minimal or absent (most of this node's OWN unit tests write only "version: 1") degrades to None --
+    # test_registry_edges_in_doc's own id-grammar bucket then simply never triggers, an honest MISSING, never a
+    # crash (the same discipline every other code-route-optional function in this module already documents).
+    try:
+        from govbridge.authority import records as recordsmod
+        grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
+    except Exception:
+        grammar = None
+
     # Defect A: the same eager-ref selection the "code" layer already makes -- RefSpec.role/layers, never a ref
     # NAME (see this module's own docstring). On this repository's real config/canonical-view.yaml this evaluates
     # to {records, product, evidence}; on a single-ref fixture/test view it is exactly that one ref, so every
@@ -349,7 +416,7 @@ def lineage_layer_builder(conn: sqlite3.Connection, resolved_view, rules, repo: 
 
     for ref_name in eager_refs:
         commit = resolved_view.ref_commit(ref_name)
-        ref_stats = _scan_one_ref(conn, resolved_view, ref_trees, ref_name, commit, rules, repo)
+        ref_stats = _scan_one_ref(conn, resolved_view, ref_trees, ref_name, commit, rules, repo, grammar)
         stats["by_ref"][ref_name] = ref_stats
         _merge_counts(stats, ref_stats)
 

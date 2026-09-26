@@ -60,7 +60,17 @@ HEURISTIC_SECTION_UNRESOLVED = "HEURISTIC_SECTION_UNRESOLVED"  # the document re
                                                                 # silently dropped (BR-AR-0019 reopening, Gap 1)
 EXACT_CLI_DISPATCH = "EXACT_CLI_DISPATCH"          # a subprocess CLI invocation resolved to its exact handler fn
 HEURISTIC_CLI_DISPATCH = "HEURISTIC_CLI_DISPATCH"  # ... resolved only to the owning module/subcommand pair
-EXACT_TEST_REGISTRY_ROW = "EXACT_TEST_REGISTRY_ROW"  # a row of a schema/shape-recognised test registry
+EXACT_TEST_REGISTRY_ROW = "EXACT_TEST_REGISTRY_ROW"  # a row of a schema/shape-recognised test registry, entry
+                                                      # resolved to a UNIQUE, exact code-layer test symbol
+# BR-AR-0019 reopening (fourth pass): a test-registry ENTRY that looked like a Rust `a::b::fn` path but did not
+# resolve to exactly one code-layer test symbol (none found, or more than one) -- a distinct precision tier from
+# EXACT_TEST_REGISTRY_ROW, never silently promoted or demoted into it.
+HEURISTIC_TEST_REGISTRY_SYMBOL = "HEURISTIC_TEST_REGISTRY_SYMBOL"
+# an entry that is not Rust-path-shaped at all, but whose own trailing token matches the id grammar's MENTION
+# shape (config/id-grammar.yaml) -- kept as an id edge, never conflated with a genuine code-symbol resolution.
+HEURISTIC_TEST_REGISTRY_ID_TOKEN = "HEURISTIC_TEST_REGISTRY_ID_TOKEN"
+# an entry that resolves as neither of the above -- kept as raw text, counted, never silently dropped.
+HEURISTIC_TEST_REGISTRY_RAW_TEXT = "HEURISTIC_TEST_REGISTRY_RAW_TEXT"
 # BR-AR-0019 reopening, Gap 2: a Rust integration test that spawns the product's clap-derive binary.
 EXACT_RUST_CLI_DISPATCH = "EXACT_RUST_CLI_DISPATCH"  # resolved to the innermost handler call a match arm names
 HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM = "HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM"  # resolved only to the outer

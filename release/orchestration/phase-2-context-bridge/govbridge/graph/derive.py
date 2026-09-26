@@ -513,39 +513,164 @@ def tests_of(conn: Optional[sqlite3.Connection], qualified_name: str, page_size:
 # generically -- by parsing the invoked module's OWN argparse dispatch structure at the same commit, never a
 # hard-coded subcommand table of our own (OC-BR-02) -- through to its handler; (c) a test registry: a YAML file,
 # anywhere, recognised by SHAPE (a row with a `tests:` list field) rather than by name.
+#
+# BR-AR-0019 reopening (fourth pass): the ORIGINAL shape check ("a top-level list, or a rows/entries key holding
+# one") measured a genuine zero real-view count only because it was too narrow -- the real corpus's own registries
+# (45 rows under release/root-of-trust/4.1.6/decision-register/DECISION_REGISTER.yaml's own `decisions:` key; 13+
+# rows under a `claims.yaml`'s own `items:` key; more under tests/governance/capability-evidence-map.yaml's own
+# `independent_verification:` key) sit under an ORDINARY key, at ARBITRARY nesting depth, never `rows`/`entries`.
+# Fixed generically: ``_iter_registry_rows`` walks the WHOLE parsed document -- every dict, every list element, at
+# every depth -- and yields any mapping that carries a `tests` key whose value is itself a list of strings,
+# regardless of what key(s) contain it. This never matches on a file name (OC-BR-02): the schema check is the
+# SAME "does this mapping have a tests: [...] field" test the original code already used, just no longer gated to
+# one or two specific containing shapes.
 # ---------------------------------------------------------------------------------------------------------------
 
-def test_registry_edges_in_doc(doc, path: str, commit: str, unit: Optional[str] = None) -> list:
-    """Every TESTS edge in an ALREADY-PARSED YAML document recognised as a test registry by SHAPE -- a top-level
-    list (or a `rows`/`entries` key holding one) of mapping rows, each with a `tests` key that is itself a list of
-    test paths/ids -- rather than by a specific file name (OC-BR-02; contrast ``evidence_map_edges_for_id``'s own
-    fixed default path, an EXISTING, narrower capability this one generalises). ``unit``, if given, filters to rows
-    mentioning it (``test_registry_edges_for_id``'s bounded, per-id use); omitted, every row's edges are returned
-    (a whole-corpus layer builder's use, which already has the doc in hand and wants every row in one pass)."""
-    rows = doc if isinstance(doc, list) else ((doc.get("rows") or doc.get("entries")) if isinstance(doc, dict)
-                                                else None)
-    if not isinstance(rows, list):
-        return []
-    out: list = []
-    for row in rows:
-        if not isinstance(row, dict) or not isinstance(row.get("tests"), list):
+#: the identifier-key convention this repository's own registries use for "this row's own id" -- tried in this
+#: order, first present wins. "id" is not a new convention invented here: it is the SAME key
+#: config/id-grammar.yaml's own DR-YAML-LIST-ID rule already privileges ("a YAML list item that is itself a
+#: mapping with an `id:` key ... defines that id"); "item" is the second real convention this repository's own
+#: registries measured (a P2-style `claims.yaml`'s `items:` list). A row using neither falls back to its own
+#: containing key-path plus index (see ``_registry_row_identifier``) -- generic either way, never a guess at
+#: unlisted domain-specific key names.
+REGISTRY_ROW_ID_KEYS = ("id", "item")
+
+#: a bare Rust qualified path: colon-colon-separated plain identifiers ONLY -- no '/', no '.', no other
+#: punctuation. Deliberately excludes a pytest-style node id ("tests/fx/test_fx_cap.py::test_one" has a '/' and
+#: a '.') and a bare id-shaped token with no "::" at all ("RT-134") -- both fall through to a LATER bucket.
+RUST_QUALIFIED_PATH_RE = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)+$')
+
+
+def _iter_registry_rows(node, key_path: tuple = ()):
+    """Yields ``(row, key_path)`` for every mapping, ANYWHERE in a parsed YAML document (a dict value, or a list
+    element, at any nesting depth), whose own ``tests`` key is a list of strings -- the schema this deliverable
+    recognises, independent of which key(s) contain it. ``key_path`` is the tuple of dict keys / list indices
+    leading to this row, used only by ``_registry_row_identifier``'s fallback."""
+    if isinstance(node, dict):
+        tests_val = node.get("tests")
+        if isinstance(tests_val, list) and all(isinstance(t, str) for t in tests_val):
+            yield node, key_path
+        for k, v in node.items():
+            yield from _iter_registry_rows(v, key_path + (k,))
+    elif isinstance(node, list):
+        for i, item in enumerate(node):
+            yield from _iter_registry_rows(item, key_path + (i,))
+
+
+def _registry_row_identifier(row: dict, key_path: tuple) -> str:
+    """The row's own identifier: the first of ``REGISTRY_ROW_ID_KEYS`` present with a non-empty scalar value,
+    else the row's own containing key-path (dict keys / list indices joined by '/') -- always defined, never a
+    guess at the row's SEMANTIC meaning, generic over every registry shape this repository measures."""
+    for key in REGISTRY_ROW_ID_KEYS:
+        val = row.get(key)
+        if isinstance(val, (str, int, float)) and str(val).strip():
+            return str(val)
+    return "/".join(str(p) for p in key_path) or "?"
+
+
+def _rust_path_candidate(entry: str) -> Optional[str]:
+    """The entry's own TRAILING whitespace-separated token, if (and only if) it fully matches
+    ``RUST_QUALIFIED_PATH_RE`` -- generic enough to also read a free-text-prefixed reference such as
+    ``"unit human_channel::tests::the_embedded_kernel_keeps_the_standalone_anchor_off"`` (the token AFTER the
+    last space, never a hard-coded "unit " prefix check) while still excluding a pytest-style node id or a bare
+    id-shaped token outright (see ``RUST_QUALIFIED_PATH_RE``'s own docstring)."""
+    stripped = entry.strip()
+    if not stripped:
+        return None
+    token = stripped.split()[-1]
+    return token if RUST_QUALIFIED_PATH_RE.match(token) else None
+
+
+def _matches_id_grammar_mention(entry: str, grammar: Optional[recordsmod.Grammar]) -> bool:
+    """Does this entry's own trailing token fully match one of config/id-grammar.yaml's MENTION patterns
+    (never a ``local`` one -- MP-BARE-LOCAL's own two-letter-plus-digit shape is far too weak a signal to accept
+    from a bare test-registry entry, and is "only unique inside the record that defines it" by the grammar's own
+    definition, never resolvable as a standalone id here)."""
+    if grammar is None:
+        return False
+    stripped = entry.strip()
+    if not stripped:
+        return False
+    token = stripped.split()[-1]
+    for pat in grammar.mention_patterns:
+        if pat["local"]:
             continue
+        if pat["regex"].fullmatch(token):
+            return True
+    return False
+
+
+def _resolve_registry_test_entry(entry: str, test_symbol_counts, grammar: Optional[recordsmod.Grammar]) -> tuple:
+    """(derivation, note) for ONE test-registry entry -- BR-AR-0019 reopening (fourth pass), requirement 3's
+    three buckets, tried in order:
+
+    1. A Rust ``a::b::fn``-shaped candidate, resolved against ``test_symbol_counts``
+       (``govbridge.graph.code_bridge.test_symbol_qualified_names``'s own {qualified_name: count} map for the
+       commit being scanned) two ways: the candidate's OWN full text (EXACT_TEST_REGISTRY_ROW when it names
+       exactly one real code-layer test symbol -- a literal, unambiguous string match, the same bar every other
+       EXACT_* label in this module holds to); failing that, the candidate's own TRAILING segment after the last
+       "::" (this repository's own tree-sitter adapter -- rust_treesitter.py's own ``_walk`` -- gives a bare
+       top-level or ``mod``-nested function's ``qualified_name`` as just its OWN name, with no enclosing module
+       prefix at all, unlike an ``impl`` method's ``Type::method``; a registry entry that DOES carry a module
+       prefix, e.g. ``ws03::some_test``, therefore usually needs this bare-name fallback to find anything real).
+       Either way, anything other than a unique FULL-STRING match is HEURISTIC_TEST_REGISTRY_SYMBOL -- a single
+       "distinct heuristic label", not a further-split tier, matching the ruling's own two-outcome wording for
+       this bucket; ``note`` still records WHICH of "not found" / "ambiguous" / "bare-name only" applied, for
+       real-view reconciliation reporting, without inventing a fourth derivation label for it.
+    2. Failing that, an id-grammar-shaped token -> HEURISTIC_TEST_REGISTRY_ID_TOKEN.
+    3. Neither -> HEURISTIC_TEST_REGISTRY_RAW_TEXT, the entry kept as raw text, ALWAYS counted, never dropped."""
+    cand = _rust_path_candidate(entry)
+    if cand is not None:
+        counts = test_symbol_counts or {}
+        if counts.get(cand, 0) == 1:
+            return E.EXACT_TEST_REGISTRY_ROW, f"rust path exact match: {cand}"
+        bare = cand.rsplit("::", 1)[-1]
+        bare_count = counts.get(bare, 0)
+        if counts.get(cand, 0) > 1:
+            return E.HEURISTIC_TEST_REGISTRY_SYMBOL, f"rust path ambiguous (full match): {cand}"
+        if bare_count == 1:
+            return E.HEURISTIC_TEST_REGISTRY_SYMBOL, f"rust path resolved by bare name only, module path unverified: {cand}"
+        if bare_count > 1:
+            return E.HEURISTIC_TEST_REGISTRY_SYMBOL, f"rust path ambiguous (bare name): {cand}"
+        return E.HEURISTIC_TEST_REGISTRY_SYMBOL, f"rust path not found: {cand}"
+    if _matches_id_grammar_mention(entry, grammar):
+        return E.HEURISTIC_TEST_REGISTRY_ID_TOKEN, None
+    return E.HEURISTIC_TEST_REGISTRY_RAW_TEXT, None
+
+
+def test_registry_edges_in_doc(doc, path: str, commit: str, unit: Optional[str] = None,
+                                test_symbol_counts=None, grammar: Optional[recordsmod.Grammar] = None) -> list:
+    """Every TESTS edge in an ALREADY-PARSED YAML document recognised as a test registry by SHAPE -- ANY mapping,
+    at any nesting depth, under any key, with a ``tests`` key that is itself a list of strings -- rather than by a
+    specific file name or containing-key convention (OC-BR-02; contrast ``evidence_map_edges_for_id``'s own fixed
+    default path, an EXISTING, narrower capability this one generalises; see this section's own module comment
+    for why the shape check itself widened in the fourth reopening). ``unit``, if given, filters to rows
+    mentioning it (``test_registry_edges_for_id``'s bounded, per-id use, dst=``unit`` itself); omitted, every
+    row's edges are returned with the row's OWN identifier as dst (``_registry_row_identifier``) -- a
+    whole-corpus layer builder's use, which already has the doc in hand and wants every row in one pass.
+    ``test_symbol_counts``/``grammar`` are optional, forwarded straight to ``_resolve_registry_test_entry``;
+    omitted (the per-id function's own default), every entry resolves through buckets 2/3 only -- an honest
+    degrade, never a crash, matching every other code-route-optional function in this module."""
+    out: list = []
+    for row, key_path in _iter_registry_rows(doc):
         if unit is not None and unit not in str(row):
             continue
-        dst = unit if unit is not None else str(
-            row.get("capability") or row.get("id") or row.get("requirement") or "?")
+        dst = unit if unit is not None else _registry_row_identifier(row, key_path)
         for t in row["tests"]:
-            out.append(E.Edge(src=str(t), type=E.TESTS, dst=dst, derivation=E.EXACT_TEST_REGISTRY_ROW,
-                               evidence_occurrence=occ(path, commit)))
+            derivation, note = _resolve_registry_test_entry(t, test_symbol_counts, grammar)
+            out.append(E.Edge(src=t, type=E.TESTS, dst=dst, derivation=derivation,
+                               evidence_occurrence=occ(path, commit), note=note))
     return out
 
 
 def test_registry_edges_for_id(unit: str, commit: str, repo: Optional[str] = None) -> list:
-    """Bounded exactly like every other function here: a targeted git-grep for ``unit`` under ``tests/``, then each
-    hit path is read once and checked for the registry shape (``test_registry_edges_in_doc``)."""
+    """Bounded exactly like every other function here: a targeted git-grep for ``unit`` (BR-AR-0019 reopening,
+    fourth pass, requirement 2: no longer restricted to ``tests/`` -- a registry can live anywhere a YAML file
+    does, exactly like Gap 2's own Rust-CLI-dispatch scan already established), then each hit path is read once
+    and checked for the registry shape (``test_registry_edges_in_doc``)."""
     from govbridge.core.yamlutil import load_yaml_text
 
-    hits = gitobj.git_grep(unit, commit, paths=["tests/"], repo=repo)
+    hits = gitobj.git_grep(unit, commit, repo=repo)
     out: list = []
     seen_paths: set = set()
     for path, _line, _text in hits:

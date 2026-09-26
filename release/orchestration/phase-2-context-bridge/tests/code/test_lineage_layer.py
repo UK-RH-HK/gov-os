@@ -135,7 +135,11 @@ def test_lineage_layer_builder_persists_all_four_edge_kinds(repo, monkeypatch):
     assert ("CITES_REQUIREMENT", "EXACT_COMMENT_CITATION") in by_type_derivation
     assert ("CITES_REQUIREMENT", "HEURISTIC_COMMENT_SECTION") in by_type_derivation
     assert ("TESTS", "EXACT_CLI_DISPATCH") in by_type_derivation
-    assert ("TESTS", "EXACT_TEST_REGISTRY_ROW") in by_type_derivation
+    # BR-AR-0019 reopening (fourth pass): this fixture's own registry entry ("tests/fx/test_fx_cap.py::test_one",
+    # a pytest node id -- a '/' and a '.', never a bare Rust `a::b::fn` path) now correctly lands in the raw-text
+    # bucket rather than the old blanket EXACT label; see tests/graph/test_derive.py's own registry tests for
+    # full coverage of the OTHER three buckets (exact code-symbol match, ambiguous symbol, id-grammar token).
+    assert ("TESTS", "HEURISTIC_TEST_REGISTRY_RAW_TEXT") in by_type_derivation
 
     digest = LL.lineage_layer_digest(conn)
     assert digest.rows == len(rows)
@@ -468,6 +472,66 @@ def test_lineage_layer_builder_persists_harness_method_dispatch_edges(repo, monk
     ).fetchall()
     assert rows == [("test_harness_version", "print_version", "EXACT_RUST_CLI_DISPATCH")]
     assert stats["rust_cli_harness_dispatch_edges_declared_type"] == 1
+
+
+def test_lineage_layer_builder_test_registry_resolves_against_real_code_symbols(repo, monkeypatch):
+    """BR-AR-0019 reopening (fourth pass), requirement 3, wired end to end through the builder against the SAME
+    on-disk code index the real pipeline shares (tests/code/conftest.py's autouse ``_isolated_store`` fixture
+    gives this test its own, so it never touches another test's or the real domain's store). Two real code-layer
+    test symbols: an ``impl`` method (qualified_name carries "Type::method", so a registry entry with that SHAPE
+    resolves EXACTLY) and a plain ``mod``-nested function (this repository's own tree-sitter adapter gives it a
+    BARE qualified_name, no module prefix at all -- rust_treesitter.py's own ``_walk``, module comment above --
+    so a registry entry that itself carries a module prefix, e.g. "ws03::my_check", resolves only by its own
+    trailing segment, landing in the heuristic bucket with a note saying exactly why)."""
+    monkeypatch.setattr(govbridge, "GOV_BRIDGE_DOMAIN", str(repo))
+    authority_repobuilder.write(repo, "config/id-grammar.yaml", "version: 1\n")
+    authority_repobuilder.write(
+        repo, "tests/certification/demo.rs",
+        "mod ws03 {\n"
+        "    #[test]\n"
+        "    fn my_check() {}\n"
+        "}\n"
+        "struct Harness2;\n"
+        "impl Harness2 {\n"
+        "    #[test]\n"
+        "    fn my_method_test() {}\n"
+        "}\n",
+    )
+    authority_repobuilder.write(
+        repo, "release/decision-register/DEMO_REGISTER.yaml",
+        "decisions:\n"
+        "  - id: DR-01\n"
+        "    tests: [Harness2::my_method_test]\n"
+        "  - id: DR-02\n"
+        "    tests: [ws03::my_check]\n",
+    )
+    rules = _rules(repo)
+    commit = authority_repobuilder._commit(repo, "registry code-symbol fixture")
+    resolved = _resolved_view_one_ref(repo, commit)
+
+    # populate code_symbol on the SAME connection first, exactly like a real freshness.run() would (the "core"
+    # then "code" layer builders run before "lineage" -- see _test_symbol_counts_for_ref's own comment for why
+    # this MUST be the same connection, never a second one opened internally)
+    conn = sqlite3.connect(":memory:")
+    from govbridge.core import freshness as F
+    from govbridge.core import store as corestore
+    from govbridge.code import build as codebuild
+    conn.executescript(corestore.SCHEMA_SQL)
+    F.core_layer_builder(conn, resolved, rules, str(repo), from_clean=True)
+    codebuild.code_layer_builder(conn, resolved, rules, str(repo), from_clean=True)
+
+    stats = LL.lineage_layer_builder(conn, resolved, rules, str(repo), from_clean=True)
+
+    assert stats["test_registry_rows"] == 2
+    rows = conn.execute(
+        "SELECT dst, src, derivation, note FROM lineage_edge WHERE type = 'TESTS' "
+        "AND (derivation LIKE 'HEURISTIC_TEST_REGISTRY%' OR derivation = 'EXACT_TEST_REGISTRY_ROW') "
+        "ORDER BY dst"
+    ).fetchall()
+    by_dst = {r[0]: r for r in rows}
+    assert by_dst["DR-01"][2] == "EXACT_TEST_REGISTRY_ROW"
+    assert by_dst["DR-02"][2] == "HEURISTIC_TEST_REGISTRY_SYMBOL"
+    assert "bare name only" in by_dst["DR-02"][3]
 
 
 def test_lineage_layer_builder_records_ambiguous_harness_method_unresolved(repo, monkeypatch):
