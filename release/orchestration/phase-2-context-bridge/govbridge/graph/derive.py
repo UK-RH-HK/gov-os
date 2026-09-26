@@ -22,11 +22,19 @@ PATH_CITE_RE = re.compile(
     r"(?<![\w/.-])(?P<path>[A-Za-z0-9_./-]+\.[A-Za-z0-9_]+)(?::(?P<l1>\d+)(?:-(?P<l2>\d+))?)?(?![\w/.-])"
 )
 SECTION_CITE_RE = re.compile(
-    r"(?P<path>[A-Za-z0-9_./-]+\.[A-Za-z0-9_]+)\s+(?:section|§)\s*(?P<sec>\d+(?:\.\d+)*)", re.IGNORECASE
+    r"(?P<path>[A-Za-z0-9_./-]+\.[A-Za-z0-9_]+)\s+(?:section|§)\s*(?P<sec>\d+(?:\.\d+)*)"
+    r"(?:\s*[-–—]\s*§?\s*(?P<sec2>\d+(?:\.\d+)*))?",  # an optional range: §N-M / §N–M / §N—§M
+    re.IGNORECASE,
 )
 STRING_LITERAL_RE = re.compile(r'"((?:[^"\\]|\\.)*)"')
 COMMENT_PREFIXES = ("//", "///", "//!", "#", "*", "\"\"\"", "'''")
-CODE_DIRS = ("runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/")
+CODE_DIRS = ("runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/",
+             # BR-AR-0019 reopening (Gap 1): "tests/" carries real Rust SOURCE (tests/certification/*.rs and
+             # friends) with the SAME doc-comment/string-literal shapes as any other code file -- excluding it
+             # silently dropped every CITES_REQUIREMENT/DEPENDS_ON_DATA citation living in a certification test's
+             # own `///`/`//!` header. Generic (a path-class prefix, not a file name); code_cites_edges_for_id
+             # gains the same reach, since it shares this constant.
+             "tests/")
 
 
 def occ(path: str, commit: str, line: Optional[int] = None) -> str:
@@ -257,12 +265,25 @@ def depends_on_data_edges(text: str, path: str, commit: str, repo: Optional[str]
 # first markdown heading at <doc> whose own leading numbering starts with N).
 # ---------------------------------------------------------------------------------------------------------------
 
+def _resolve_cited_path_verbose(candidate: str, commit: str, repo: Optional[str],
+                                 all_paths_cache: list) -> tuple:
+    """(resolved_path, reason): resolved_path is None exactly when reason is set, so a caller can ALWAYS tell
+    unresolved-with-a-reason apart from resolved (BR-AR-0019 reopening, Gap 1: "never drop a citation silently
+    ... resolves ambiguously, is counted ... as unresolved, with its reason")."""
+    if gitobj.ls_tree_path(commit, candidate, repo=repo) is not None:
+        return candidate, None
+    matches = [p for p in all_paths_cache if p == candidate or p.endswith("/" + candidate)]
+    if len(matches) == 1:
+        return matches[0], None
+    if not matches:
+        return None, f"no path matches {candidate!r}"
+    return None, f"ambiguous suffix {candidate!r}: {len(matches)} candidates"
+
+
 def _resolve_cited_path(candidate: str, commit: str, repo: Optional[str],
                          all_paths_cache: list) -> Optional[str]:
-    if gitobj.ls_tree_path(commit, candidate, repo=repo) is not None:
-        return candidate
-    matches = [p for p in all_paths_cache if p == candidate or p.endswith("/" + candidate)]
-    return matches[0] if len(matches) == 1 else None
+    resolved, _reason = _resolve_cited_path_verbose(candidate, commit, repo, all_paths_cache)
+    return resolved
 
 
 def _first_heading_for_section(text: str, section_no: str) -> Optional[int]:
@@ -274,10 +295,28 @@ def _first_heading_for_section(text: str, section_no: str) -> Optional[int]:
 
 
 def cites_requirement_edges_in_text(text: str, citing_path: str, citing_commit: str,
-                                     repo: Optional[str] = None, code_dirs: tuple = CODE_DIRS) -> list:
+                                     repo: Optional[str] = None, code_dirs: tuple = CODE_DIRS) -> tuple:
+    """Returns ``(edges, unresolved)``. ``unresolved`` is a list of
+    ``{"path", "line", "candidate", "form", "reason"}`` dicts -- BR-AR-0019 reopening, Gap 1: a citation is NEVER
+    silently dropped. Three outcomes, all reported:
+
+    * the document AND the cited section/line resolve -> an edge with an EXACT_*/HEURISTIC_SUFFIX/
+      HEURISTIC_COMMENT_SECTION derivation (unchanged from before);
+    * the document resolves but the cited section heading does not -> an edge to the DOCUMENT itself, derivation
+      ``HEURISTIC_SECTION_UNRESOLVED`` (never dropped -- this is the exact case CAUSE_ANALYSIS''s own SYNTHESIS.md
+      §10.4 example hits: the document is real and unique, the cited section number simply is not a heading
+      there);
+    * the document itself does not resolve, or resolves ambiguously -> no edge; recorded in ``unresolved`` with
+      the reason (``_resolve_cited_path_verbose``'s own message).
+
+    A ``§N-M``/``§N–M`` RANGE resolves against its START section ``N`` (the primary anchor); if the END section
+    ``M`` ALSO resolves to its own heading, the edge's ``dst`` extends to cover through that heading's line too,
+    noted as a range; if ``M`` does not resolve, the edge still stands on ``N`` alone (a partially-resolved range
+    is not a wholly-dropped one)."""
     if not any(citing_path.startswith(d) for d in code_dirs):
-        return []
+        return [], []
     out: list = []
+    unresolved: list = []
     all_paths_cache: Optional[list] = None
     heading_cache: dict = {}
 
@@ -287,6 +326,18 @@ def cites_requirement_edges_in_text(text: str, citing_path: str, citing_commit: 
             all_paths_cache = gitobj.ls_tree_paths(citing_commit, repo=repo)
         return all_paths_cache
 
+    def _heading_text(resolved_path: str) -> Optional[str]:
+        if resolved_path not in heading_cache:
+            raw = gitobj.read_path(citing_commit, resolved_path, repo=repo)
+            decoded = None
+            if raw is not None:
+                try:
+                    decoded = raw.decode("utf-8")
+                except UnicodeDecodeError:
+                    decoded = None
+            heading_cache[resolved_path] = decoded
+        return heading_cache[resolved_path]
+
     for i, line in enumerate(text.splitlines(), start=1):
         if not _looks_like_comment(line):
             continue
@@ -295,8 +346,10 @@ def cites_requirement_edges_in_text(text: str, citing_path: str, citing_commit: 
             l1 = m.group("l1")
             if l1 is None or ("/" not in candidate and "." not in candidate):
                 continue  # a bare path mention with no line, in a comment, is not a requirement citation
-            resolved_path = _resolve_cited_path(candidate, citing_commit, repo, _all_paths())
+            resolved_path, reason = _resolve_cited_path_verbose(candidate, citing_commit, repo, _all_paths())
             if resolved_path is None:
+                unresolved.append({"path": citing_path, "line": i, "candidate": candidate, "form": "path:line",
+                                    "reason": reason})
                 continue
             derivation = E.EXACT_COMMENT_CITATION if resolved_path == candidate else E.HEURISTIC_SUFFIX
             l2 = int(m.group("l2")) if m.group("l2") else int(l1)
@@ -305,30 +358,33 @@ def cites_requirement_edges_in_text(text: str, citing_path: str, citing_commit: 
                                derivation=derivation, evidence_occurrence=occ(citing_path, citing_commit),
                                evidence_line=i))
         for m in SECTION_CITE_RE.finditer(line):
-            candidate, section_no = m.group("path"), m.group("sec")
-            resolved_path = _resolve_cited_path(candidate, citing_commit, repo, _all_paths())
+            candidate, section_no, section_no2 = m.group("path"), m.group("sec"), m.group("sec2")
+            resolved_path, reason = _resolve_cited_path_verbose(candidate, citing_commit, repo, _all_paths())
             if resolved_path is None:
+                unresolved.append({"path": citing_path, "line": i, "candidate": candidate, "form": "section",
+                                    "reason": reason})
                 continue
-            if resolved_path not in heading_cache:
-                raw = gitobj.read_path(citing_commit, resolved_path, repo=repo)
-                decoded = None
-                if raw is not None:
-                    try:
-                        decoded = raw.decode("utf-8")
-                    except UnicodeDecodeError:
-                        decoded = None
-                heading_cache[resolved_path] = decoded
-            decoded = heading_cache[resolved_path]
-            if decoded is None:
-                continue
-            found_line = _first_heading_for_section(decoded, section_no)
+            note = f"section {section_no}" if not section_no2 else f"sections {section_no}-{section_no2}"
+            decoded = _heading_text(resolved_path)
+            found_line = _first_heading_for_section(decoded, section_no) if decoded is not None else None
             if found_line is None:
+                # the document is real; the numbered heading is not there -- an edge to the DOCUMENT, never a
+                # silent drop (Gap 1's central requirement).
+                out.append(E.Edge(src=occ(citing_path, citing_commit, i), type=E.CITES_REQUIREMENT,
+                                   dst=resolved_path, derivation=E.HEURISTIC_SECTION_UNRESOLVED,
+                                   evidence_occurrence=occ(citing_path, citing_commit), evidence_line=i,
+                                   note=note))
                 continue
+            end_line = found_line
+            if section_no2 and decoded is not None:
+                end_found = _first_heading_for_section(decoded, section_no2)
+                if end_found is not None:
+                    end_line = max(end_line, end_found)
+            dst = f"{resolved_path}:{found_line}" if end_line == found_line else f"{resolved_path}:{found_line}-{end_line}"
             out.append(E.Edge(src=occ(citing_path, citing_commit, i), type=E.CITES_REQUIREMENT,
-                               dst=f"{resolved_path}:{found_line}", derivation=E.HEURISTIC_COMMENT_SECTION,
-                               evidence_occurrence=occ(citing_path, citing_commit), evidence_line=i,
-                               note=f"section {section_no}"))
-    return out
+                               dst=dst, derivation=E.HEURISTIC_COMMENT_SECTION,
+                               evidence_occurrence=occ(citing_path, citing_commit), evidence_line=i, note=note))
+    return out, unresolved
 
 
 # ---------------------------------------------------------------------------------------------------------------

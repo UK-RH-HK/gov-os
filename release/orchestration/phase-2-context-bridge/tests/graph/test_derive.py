@@ -290,7 +290,8 @@ def test_cites_requirement_line_and_section_forms(tmp_path):
     )
     commit = rb.commit(root, "c1")
     text = (root / "runtime/src/lib.rs").read_text()
-    edges = D.cites_requirement_edges_in_text(text, "runtime/src/lib.rs", commit, repo=str(root))
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/lib.rs", commit, repo=str(root))
+    assert unresolved == []
     by_derivation = {e.derivation: e for e in edges}
     assert by_derivation[E.EXACT_COMMENT_CITATION].dst == "framework/contracts/contract.md:3-3"
     assert by_derivation[E.HEURISTIC_COMMENT_SECTION].dst == "framework/contracts/contract.md:3"
@@ -302,7 +303,117 @@ def test_cites_requirement_ignores_non_comment_lines(tmp_path):
     rb.write(root, "runtime/src/lib.rs", 'let s = "framework/contracts/contract.md:1";\n')
     commit = rb.commit(root, "c1")
     text = (root / "runtime/src/lib.rs").read_text()
-    assert D.cites_requirement_edges_in_text(text, "runtime/src/lib.rs", commit, repo=str(root)) == []
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/lib.rs", commit, repo=str(root))
+    assert edges == []
+    assert unresolved == []
+
+
+def test_cites_requirement_backtick_bare_name_and_doc_comments(tmp_path):
+    """BR-AR-0019 reopening, Gap 1's own worked example: a backticked BARE document name (no path separator),
+    resolved as a unique suffix, inside a `///`/`//!` doc comment, with a decimal section number."""
+    rb, root = _code_repo(tmp_path)
+    rb.write(root, "release/x/SYNTHESIS.md", "# Synthesis\n\n## 10 Something\ntext\n\n### 10.4 Sub-point\nmore\n")
+    rb.write(
+        root, "runtime/src/adopt.rs",
+        "/// (`SYNTHESIS.md §10.4`), so without being recorded as an authenticated floor\n"
+        "//! also verified here, in an inner doc comment\n"
+        "fn f() {}\n",
+    )
+    commit = rb.commit(root, "c1")
+    text = (root / "runtime/src/adopt.rs").read_text()
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/adopt.rs", commit, repo=str(root))
+    assert unresolved == []
+    section_edges = [e for e in edges if e.derivation == E.HEURISTIC_COMMENT_SECTION]
+    assert len(section_edges) == 1
+    assert section_edges[0].dst == "release/x/SYNTHESIS.md:6"  # the "### 10.4 Sub-point" heading line
+    assert section_edges[0].note == "section 10.4"
+
+
+def test_cites_requirement_document_resolves_but_section_does_not_is_never_dropped(tmp_path):
+    """BR-AR-0019 reopening, Gap 1's central requirement: the document is real and unique, but the cited section
+    number is not a heading there -- an edge to the DOCUMENT, never a silent drop."""
+    rb, root = _code_repo(tmp_path)
+    rb.write(root, "release/x/SYNTHESIS.md", "# Synthesis\n\n## 0 Independence\ntext\n\n## 6 Something\nmore\n")
+    rb.write(
+        root, "runtime/src/adopt.rs",
+        "/// (`SYNTHESIS.md §10.4`), a section that this document does not have\n"
+        "fn f() {}\n",
+    )
+    commit = rb.commit(root, "c1")
+    text = (root / "runtime/src/adopt.rs").read_text()
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/adopt.rs", commit, repo=str(root))
+    assert unresolved == []
+    assert len(edges) == 1
+    assert edges[0].derivation == E.HEURISTIC_SECTION_UNRESOLVED
+    assert edges[0].dst == "release/x/SYNTHESIS.md"
+    assert edges[0].note == "section 10.4"
+
+
+def test_cites_requirement_range_form(tmp_path):
+    """A §N-M / §N–M range (BR-AR-0019 reopening, Gap 1): resolves against its start section; extends through the
+    end section's own heading when that ALSO resolves."""
+    rb, root = _code_repo(tmp_path)
+    rb.write(
+        root, "release/x/REPORT.md",
+        "# Report\n\n## 11 First\ntext\n\n## 12 Second\nmore\n\n## 13 Third\nyet more\n",
+    )
+    rb.write(
+        root, "runtime/src/repair.rs",
+        "//! (release/x/REPORT.md §11–12). Each test names the finding it covers\n"
+        "fn f() {}\n",
+    )
+    commit = rb.commit(root, "c1")
+    text = (root / "runtime/src/repair.rs").read_text()
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/repair.rs", commit, repo=str(root))
+    assert unresolved == []
+    assert len(edges) == 1
+    assert edges[0].derivation == E.HEURISTIC_COMMENT_SECTION
+    assert edges[0].dst == "release/x/REPORT.md:3-6"  # section 11's heading line through section 12's own line
+    assert edges[0].note == "sections 11-12"
+
+
+def test_cites_requirement_document_does_not_resolve_is_reported_unresolved(tmp_path):
+    rb, root = _code_repo(tmp_path)
+    rb.write(root, "runtime/src/lib.rs", "// See NOSUCHDOC.md:3 for the rule.\n// NOSUCHDOC.md section 4 too.\nfn f() {}\n")
+    commit = rb.commit(root, "c1")
+    text = (root / "runtime/src/lib.rs").read_text()
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/lib.rs", commit, repo=str(root))
+    assert edges == []
+    forms = {u["form"] for u in unresolved}
+    assert forms == {"path:line", "section"}
+    assert all(u["reason"] and "no path matches" in u["reason"] for u in unresolved)
+
+
+def test_cites_requirement_ambiguous_document_is_reported_unresolved(tmp_path):
+    rb, root = _code_repo(tmp_path)
+    rb.write(root, "a/NOTES.md", "# A\n")
+    rb.write(root, "b/NOTES.md", "# B\n")
+    rb.write(root, "runtime/src/lib.rs", "// See NOTES.md section 1 for context.\nfn f() {}\n")
+    commit = rb.commit(root, "c1")
+    text = (root / "runtime/src/lib.rs").read_text()
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "runtime/src/lib.rs", commit, repo=str(root))
+    assert edges == []
+    assert len(unresolved) == 1
+    assert unresolved[0]["form"] == "section"
+    assert "ambiguous" in unresolved[0]["reason"]
+
+
+def test_cites_requirement_scans_rust_test_files_too(tmp_path):
+    """The CODE_DIRS gate must reach tests/**/*.rs (BR-AR-0019 reopening, Gap 1: certification tests' own doc
+    comments were silently excluded before)."""
+    rb, root = _code_repo(tmp_path)
+    rb.write(root, "release/x/REPORT.md", "# Report\n\n## 11 Something\ntext\n")
+    rb.write(
+        root, "tests/certification/repair.rs",
+        "//! (release/x/REPORT.md §11). Each test names the finding it covers\nfn f() {}\n",
+    )
+    commit = rb.commit(root, "c1")
+    text = (root / "tests/certification/repair.rs").read_text()
+    edges, unresolved = D.cites_requirement_edges_in_text(text, "tests/certification/repair.rs", commit,
+                                                            repo=str(root))
+    assert unresolved == []
+    assert len(edges) == 1
+    assert edges[0].derivation == E.HEURISTIC_COMMENT_SECTION
 
 
 # --- R1-RL additions: TESTS beyond a direct call -- a test registry, and a CLI-dispatch-driven test ---------------

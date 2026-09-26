@@ -163,3 +163,122 @@ def test_lineage_layer_never_descends_into_excluded_paths(repo, monkeypatch):
     rows = conn.execute("SELECT * FROM lineage_edge WHERE src LIKE 'runtime/src/secret.rs%'").fetchall()
     assert rows == []
     assert stats["blobs_scanned"] == 1  # only config/corpus-rules.yaml itself (a yaml file, INCLUDEd)
+
+
+# --- BR-AR-0019 REOPENING: Gap 1 telemetry (never silently drop a citation) ----------------------------------
+
+def test_lineage_layer_gap1_telemetry_document_only_and_unresolved(repo, monkeypatch):
+    """The three-way split the reopening ruling asks for: resolved to section, resolved to document only,
+    unresolved by reason -- and every unresolved citation persisted, never just discarded."""
+    monkeypatch.setattr(govbridge, "GOV_BRIDGE_DOMAIN", str(repo))
+    authority_repobuilder.write(repo, "config/id-grammar.yaml", "version: 1\n")
+    authority_repobuilder.write(repo, "release/x/DOC.md", "# Doc\n\n## 1 Something\ntext\n")
+    authority_repobuilder.write(
+        repo, "runtime/src/lib.rs",
+        "// resolved to section: release/x/DOC.md section 1\n"
+        "// resolved to document only: release/x/DOC.md section 99\n"
+        "// unresolved (no such document): NOSUCHDOC.md section 1\n"
+        "fn f() {}\n",
+    )
+    rules = _rules(repo)
+    commit = authority_repobuilder._commit(repo, "gap1 telemetry fixture")
+
+    conn = sqlite3.connect(":memory:")
+    stats = LL.lineage_layer_builder(conn, _FakeResolvedView(commit), rules, str(repo), from_clean=True)
+
+    assert stats["cites_requirement_resolved_to_section"] == 1
+    assert stats["cites_requirement_resolved_to_document_only"] == 1
+    assert stats["cites_requirement_unresolved_by_reason"]
+    assert sum(stats["cites_requirement_unresolved_by_reason"].values()) == 1
+
+    unresolved_rows = conn.execute("SELECT path, candidate, form, reason FROM lineage_unresolved").fetchall()
+    assert len(unresolved_rows) == 1
+    assert unresolved_rows[0][1] == "NOSUCHDOC.md"
+    assert unresolved_rows[0][2] == "section"
+    assert "no path matches" in unresolved_rows[0][3]
+
+    doc_only_rows = conn.execute(
+        "SELECT dst FROM lineage_edge WHERE derivation = ?", ("HEURISTIC_SECTION_UNRESOLVED",)
+    ).fetchall()
+    assert doc_only_rows == [("release/x/DOC.md",)]
+
+
+def test_lineage_layer_digest_covers_unresolved_rows_too(repo, monkeypatch):
+    """Two from-clean builds of the SAME fixture (including its unresolved citation) still produce an identical
+    digest -- the digest is not blind to what lineage_unresolved holds."""
+    monkeypatch.setattr(govbridge, "GOV_BRIDGE_DOMAIN", str(repo))
+    authority_repobuilder.write(repo, "config/id-grammar.yaml", "version: 1\n")
+    authority_repobuilder.write(
+        repo, "runtime/src/lib.rs", "// NOSUCHDOC.md section 1\nfn f() {}\n",
+    )
+    rules = _rules(repo)
+    commit = authority_repobuilder._commit(repo, "digest fixture")
+
+    digests = []
+    for _ in range(2):
+        conn = sqlite3.connect(":memory:")
+        LL.lineage_layer_builder(conn, _FakeResolvedView(commit), rules, str(repo), from_clean=True)
+        digests.append(LL.lineage_layer_digest(conn))
+    assert digests[0].digest == digests[1].digest
+    assert digests[0].extra["unresolved_rows"] == 1
+
+
+# --- BR-AR-0019 REOPENING: Gap 2 (Rust CLI dispatch), wired end to end through the builder ---------------------
+
+def test_lineage_layer_builder_persists_rust_cli_dispatch_edges(repo, monkeypatch):
+    monkeypatch.setattr(govbridge, "GOV_BRIDGE_DOMAIN", str(repo))
+    authority_repobuilder.write(repo, "config/id-grammar.yaml", "version: 1\n")
+    authority_repobuilder.write(
+        repo, "cli/src/main.rs",
+        "#[derive(Parser)]\nstruct Cli { #[command(subcommand)] cmd: Cmd }\n"
+        "#[derive(Subcommand)]\nenum Cmd { Version }\n"
+        "fn dispatch(cli: &Cli) { match &cli.cmd { Cmd::Version => print_version(), } }\n",
+    )
+    authority_repobuilder.write(
+        repo, "tests/certification/basic.rs",
+        "fn my_bin() -> std::path::PathBuf { std::path::PathBuf::from(env!(\"CARGO_BIN_EXE_mybin\")) }\n"
+        "#[test]\nfn test_version() {\n"
+        "    let out = std::process::Command::new(my_bin()).args([\"version\"]).output().unwrap();\n"
+        "}\n",
+    )
+    rules = _rules(repo)
+    commit = authority_repobuilder._commit(repo, "gap2 fixture")
+
+    conn = sqlite3.connect(":memory:")
+    stats = LL.lineage_layer_builder(conn, _FakeResolvedView(commit), rules, str(repo), from_clean=True)
+
+    assert stats["rust_cli_dispatch_variants"] > 0
+    assert stats["rust_cli_bin_helpers"] == 1
+    assert stats["rust_cli_test_files_scanned"] == 1
+
+    rows = conn.execute(
+        "SELECT src, dst, derivation FROM lineage_edge WHERE derivation = ?", ("EXACT_RUST_CLI_DISPATCH",)
+    ).fetchall()
+    assert rows == [("test_version", "print_version", "EXACT_RUST_CLI_DISPATCH")]
+
+
+def test_lineage_layer_rust_cli_dispatch_digest_reproducible(repo, monkeypatch):
+    monkeypatch.setattr(govbridge, "GOV_BRIDGE_DOMAIN", str(repo))
+    authority_repobuilder.write(repo, "config/id-grammar.yaml", "version: 1\n")
+    authority_repobuilder.write(
+        repo, "cli/src/main.rs",
+        "#[derive(Parser)]\nstruct Cli { #[command(subcommand)] cmd: Cmd }\n"
+        "#[derive(Subcommand)]\nenum Cmd { Version }\n"
+        "fn dispatch(cli: &Cli) { match &cli.cmd { Cmd::Version => print_version(), } }\n",
+    )
+    authority_repobuilder.write(
+        repo, "tests/certification/basic.rs",
+        "fn my_bin() -> std::path::PathBuf { std::path::PathBuf::from(env!(\"CARGO_BIN_EXE_mybin\")) }\n"
+        "#[test]\nfn test_version() {\n"
+        "    let out = std::process::Command::new(my_bin()).args([\"version\"]).output().unwrap();\n"
+        "}\n",
+    )
+    rules = _rules(repo)
+    commit = authority_repobuilder._commit(repo, "gap2 digest fixture")
+
+    digests = []
+    for _ in range(2):
+        conn = sqlite3.connect(":memory:")
+        LL.lineage_layer_builder(conn, _FakeResolvedView(commit), rules, str(repo), from_clean=True)
+        digests.append(LL.lineage_layer_digest(conn).digest)
+    assert digests[0] == digests[1]
