@@ -1,0 +1,128 @@
+schema: govbridge-schema/1
+describes: govbridge-derived-note/1
+purpose: >-
+  Hierarchical evidence notes (REPAIR_PLAN.md section 2.10; OD-BR-05 section 7 "context larger than one model
+  packet"; OD-BR-06 section 4 "evidence larger than the final context budget"). A note is a DERIVED record the
+  bridge itself computes when complete relevant evidence for a query does not fit in one packet: it groups the
+  overflow into claims, each grounded in one or more cited sources, so the claim survives even though the raw
+  evidence had to be summarised. A note is never authoritative and never a substitute for the sources it cites
+  (OD-BR-05 section 7: "Intermediate synthesis must not become an authority source and must remain traceable to
+  original evidence"). Read and enforced by govbridge.notes.schema/build/validate; consumed by the packet compiler
+  (R1-GA3) for overflow placement, never in section A.
+class: DERIVED_NOTE
+ladder: false
+admissible_in_a: false
+admissible_in_d1: false
+banner: >-
+  DERIVED EVIDENCE NOTE: summarised from cited sources, not itself an authority source. Verify against the cited
+  sources before relying on a claim.
+
+# -----------------------------------------------------------------------------------------------------------------
+# Field tables, block-style (one mapping per field, not `{...}` flow style, so prose can use ':' and '(' freely).
+# govbridge.notes reads this file at runtime (govbridge.notes.schema.load_schema) rather than hard-coding the shape
+# a second time, so the schema stays the single source of truth for both the structural validator and this
+# document. Shape matches ARCHITECTURE/schemas/receipt.yaml's own {type, required, desc} convention, one level
+# deeper for the two nested record kinds (claim, source).
+# -----------------------------------------------------------------------------------------------------------------
+fields:
+  note_id:
+    type: string
+    required: true
+    desc: a stable, non-empty identifier for the note, unique within the packet build that produced it
+  class:
+    type: string
+    required: true
+    const: DERIVED_NOTE
+    desc: >-
+      fixed; a note with any other class value is refused as malformed, and DERIVED_NOTE is never ladder-admissible
+      in A regardless of this field
+  claims:
+    type: list of claim
+    required: true
+    desc: >-
+      evidence-grounded intermediate claims (OD-BR-05 section 7: "evidence batches -> evidence-grounded
+      intermediate notes/claims")
+  unresolved:
+    type: list
+    required: true
+    desc: >-
+      evidence the note could not resolve or ground in a source; the key is mandatory and the list may be empty
+      (OD-BR-06 section 4: "disclose unresolved evidence")
+  built_from_sha256:
+    type: sha256
+    required: true
+    desc: >-
+      sha256 over the SORTED content_sha256 of every source across every claim, joined by newline. Lets the note
+      be rebuilt from its sources and the rebuild checked byte for byte (OD-BR-06 section 4: "be rebuildable from
+      original evidence")
+
+claim_fields:
+  claim_id:
+    type: string
+    required: true
+    desc: unique within the note
+  text:
+    type: string
+    required: true
+    desc: the claim statement; grounded only in this claim's own sources, never in the note's other claims
+  sources:
+    type: list of source
+    required: true
+    min_items: 1
+    desc: at least one; a claim with no source is refused (REPAIR_PLAN.md section 2.10)
+
+source_fields:
+  item_id:
+    type: string
+    required: true
+    desc: >-
+      the retrieved/derived unit id this source traces back to in the packet build; lineage metadata, not itself
+      re-resolved
+  path:
+    type: string
+    required: true
+    desc: repository-relative path, as Git tracks it
+  commit:
+    type: string
+    required: true
+    desc: >-
+      a commit-ish Git can resolve (a 40-hex id or a ref); re-resolved on every validate, never trusted from the
+      recorded string alone
+  blob:
+    type: string
+    required: true
+    desc: >-
+      the Git blob id `path` names at `commit`; a recorded blob that no longer matches path@commit is a source
+      that does not resolve
+  lines:
+    type: "[line_start, line_end], 1-indexed, inclusive"
+    required: true
+    desc: >-
+      the exact slice the claim is grounded in, matching the range convention of govbridge.core.exact's
+      "<ref>:<path>[:L1-L2]" and the authority registry's section_anchors `lines`
+  content_sha256:
+    type: sha256
+    required: true
+    desc: >-
+      sha256 of the exact text of `lines` (each line joined by a single "\n", no trailing newline) at `blob`;
+      re-verified on every validate, never trusted from the recorded string alone
+
+# -----------------------------------------------------------------------------------------------------------------
+# checks: exactly the refusal/acceptance vocabulary R1-RN's acceptance check names (REPAIR_DAG.yaml, node R1-RN).
+# -----------------------------------------------------------------------------------------------------------------
+checks (govbridge notes validate):
+  - a claim with no source is refused
+  - >-
+    a source that does not resolve is refused: its commit does not resolve, its path does not exist at that
+    commit, its recorded blob does not match the actual blob at path@commit, its lines fall outside the file, or
+    its content_sha256 does not match the exact text of those lines
+  - >-
+    a note placed in section A is refused, independent of its content -- class DERIVED_NOTE is never
+    ladder-admissible in A (ARCHITECTURE.md section 5.1's DERIVED row; REPAIR_PLAN.md section 2.10)
+  - >-
+    a built_from_sha256 mismatch is refused -- it must equal the sha256 recomputed over the sorted content_sha256
+    of every current source
+  - >-
+    a note rebuilt twice from the same sources is accepted, with an identical built_from_sha256 (rebuild
+    determinism; the sort makes claim/source ordering irrelevant to the hash)
+  - "unresolved[] is mandatory and may be empty; its absence is refused, an empty list is accepted"
