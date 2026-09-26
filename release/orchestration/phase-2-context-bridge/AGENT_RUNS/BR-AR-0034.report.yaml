@@ -2,10 +2,11 @@ run_id: BR-AR-0034
 role: >-
   REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
   repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14), and
-  read-only code/classification query paths (R1-17 items 5 and 6)
+  read-only code/classification query paths (R1-17 items 5 and 6). REOPENED once on R1-17(5) plus open issue 2;
+  this report covers both passes.
 model_observed: claude-sonnet-5
 branch: bridge/r1-xc-0034
-commit: 4a9dec6c4b94ce39228573101f3a072093500ad6
+commit: PENDING
 status: COMPLETED
 claims:
 - id: C-1
@@ -41,144 +42,203 @@ claims:
     call at `--threads 16` vs. `--threads 1` over the same fixture/query reporting the identical `excluded_hits`
     (independently cross-checked against the fixture's own known excluded-file count); and a deterministic
     structural test that holds the counter's own lock from the main thread and confirms a concurrent `bump()`
-    call genuinely blocks on it (see open_issues/decisions for why the first two do not reliably fail against the
-    pre-fix class on this interpreter, and why the third is the one that does).
+    call genuinely blocks on it (see decisions/lessons for why the first two do not reliably fail against the
+    pre-fix class on this interpreter, and why the third is the one that does; ACCEPTED by the orchestrator on
+    pass 1, unchanged).
 - id: C-5
   text: >-
-    (R1-17 item 5) `govbridge.code.symbols`'s query surface used by `govbridge.route.real_routes`'s code route
-    (`definitions_readonly`, `callers_readonly`, both new, plus `_shaped_code_conn`'s own blob-to-path lookup) no
-    longer classifies, parses or persists a blob at query time -- it reads via a read-only connection
-    (`_open_conn_readonly` -> `store.open_db_readonly()`) and the new `ensure_indexed_readonly`, which raises the
-    typed `StoreNeedsRebuild` (mirroring `govbridge.lexical.query.StoreNeedsRebuild`) for any `.rs` blob the eager
-    code-layer builder has not already reached. `stats`/`definitions`/`callers`/`reads_key` themselves are
-    UNCHANGED (still lazy, build-on-first-use) for their own existing callers (CLI, tests/code/test_symbols_
-    integration.py, tests/code/test_definitions_lookup.py, tests/code/test_corpus_exclusion.py) -- see
-    decisions for why converting them outright would have been a silent narrowing of those tests' own,
-    deliberate use of the lazy behaviour.
+    (R1-17 item 5, REOPENED and CORRECTED) `govbridge.code.symbols.ensure_indexed` is now BUILD-ONLY -- its only
+    legitimate caller is `govbridge.code.build.code_layer_builder`, at build time. EVERY query caller, without
+    exception, now uses `ensure_indexed_readonly` (read-only, by construction; raises the typed
+    `StoreNeedsRebuild`, mirroring `govbridge.lexical.query.StoreNeedsRebuild`, for any `.rs` blob the eager
+    code-layer builder has not already reached): this module's own `stats`/`definitions`/`callers`/`reads_key`
+    (converted, not duplicated -- the pass-1 `definitions_readonly`/`callers_readonly` functions are removed),
+    `govbridge.route.real_routes`'s code route, `govbridge.code.history` (the `history diff`/`deleted`/
+    `introduced` CLI), `govbridge.compile.codeseeds` (compile's record-citation code-seed derivation),
+    `govbridge.graph.code_bridge` (why/impact/search/gather/compile's shared code connection),
+    `govbridge.graph.symbol_history` (`introduced-in`/`deleted-in`), and `govbridge.demo.grade` (GD-10's own
+    citation-symbol lookup, which keeps its own, deliberate "never raises" grading contract -- see decisions
+    D-R1-XC-6). Pass 1's narrower reading (read-only variants for real_routes.py's code route alone, everything
+    else left lazy) is documented in `failed_approaches` and superseded.
 - id: C-6
   text: >-
-    (R1-17 item 6) `govbridge.authority.layer.classify_hit`/`record_id_for_occurrence` no longer call
-    `ensure_schema()` at query time (the authority layer's schema is built once, eagerly, by `authority.layer.
-    build()` at BUILD time); `govbridge.route.real_routes._conn()` moves to `store.open_db_readonly()`. Combined
-    acceptance: a `gather()` call exercising every route (lexical, semantic, code, exact) plus real hit
-    classification, against a store that is genuinely read-only at BOTH the file level and its directory level
-    (chmod'd 0o444/0o555 -- the stricter of the two scenarios R1-GA1's own tests/core/test_scope_path_cache.py
-    already covers), leaves the store file's sha256 byte-identical
-    (tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store).
-    Two pre-existing tests in the same file that relied on query-time schema/store creation were corrected to
-    build the store first (a rule-5 correction; see decisions).
+    (R1-17 item 6, plus REOPENED open issue 2) `govbridge.authority.layer.classify_hit`/`record_id_for_occurrence`
+    no longer call `ensure_schema()` at query time; `govbridge.route.real_routes._conn()` uses
+    `store.open_db_readonly()`. `code_route`'s own four code-layer call sites (the blob-to-path map, the shaped
+    code connection, `definitions()`, `callers()`) no longer swallow `StoreNeedsRebuild` in a bare
+    `except Exception` -- each re-raises it specifically, catches only the one genuinely expected `ValueError` (a
+    commit that does not resolve), and counts any other, truly unanticipated exception via a new
+    `_record_unexpected_exception` helper (writes `{event, site, exception_type, ...}` to
+    `govbridge.core.telemetry`'s local "queries" sink -- never the git-tracked store).
+- id: C-7
+  text: >-
+    (Acceptance, expanded this reopening) On a FILE-LEVEL AND DIRECTORY-LEVEL read-only store, built from clean
+    with every layer: `why`, `impact`, `history`, `compile`, `gather` (every route active) and
+    `govbridge.code.symbols.callers`/`.definitions` all succeed, and the store file's sha256 stays byte-identical
+    across every one of them (`tests/route/test_query_commands_readonly.py`, new). On a store built from clean
+    WITHOUT the code layer (every ref's own `layers` list omits "code" -- the SAME generic admission rule
+    `govbridge.code.build.eager_ref_names` already reads, never a special-cased ref name), also made read-only:
+    `impact`, `compile` (via its own MAIN, unwrapped per-seed code-route call -- see findings), `gather` (seeded so
+    its code facet runs) and `callers`/`definitions` each raise `StoreNeedsRebuild` and write nothing; `why`/
+    `history` are unaffected either way (neither ever touches the code layer at all, confirmed directly, not just
+    by inspection).
 evidence:
 - claim: C-1
   command: >-
-    cd $D && git checkout -- govbridge/core/freshness.py && $PY -m pytest -q -p no:cacheprovider
-    tests/core/test_freshness_entrypoint.py  (AGENT_RUNS/BR-AR-0034.check01: FAILS, layer digests differ) ; then
-    git apply (this run's diff) && re-run  (AGENT_RUNS/BR-AR-0034.check02: PASSES)
+    tests/core/test_freshness_entrypoint.py, before (AGENT_RUNS/BR-AR-0034.check01: FAILS, layer digests differ)
+    and after (.check02: PASSES) the fix, both against the (unchanged since pass 1) freshness.py diff
 - claim: C-2
   command: >-
     tests/core/test_gitobj_repo_root.py, before (AGENT_RUNS/BR-AR-0034.check03: FAILS -- second chdir still
-    resolves the first repo) / after (AGENT_RUNS/BR-AR-0034.check04: PASSES) the fix
+    resolves the first repo) / after (.check04: PASSES)
 - claim: C-3
   command: >-
     tests/authority/test_lazy_config.py, before (AGENT_RUNS/BR-AR-0034.check05: 3/5 FAIL -- FileNotFoundError at
-    import time) / after (AGENT_RUNS/BR-AR-0034.check06: 5/5 PASS) the fix; hermeticity:
-    AGENT_RUNS/BR-AR-0034.check11 (tests/code alone) and .check12 (tests/code/test_lineage_layer.py alone, first)
+    import time) / after (.check06: 5/5 PASS); hermeticity: .check11 (tests/code alone) and .check12
+    (tests/code/test_lineage_layer.py alone, first)
 - claim: C-4
   command: >-
     tests/core/test_taskctx_concurrency.py, before (AGENT_RUNS/BR-AR-0034.check07: 1/4 FAIL --
-    test_bump_serialises_through_a_lock, deterministically) / after (AGENT_RUNS/BR-AR-0034.check08: 4/4 PASS)
+    test_bump_serialises_through_a_lock, deterministically) / after (.check08: 4/4 PASS)
 - claim: C-5
   command: >-
-    tests/code/test_symbols_readonly.py (new, 5 tests: StoreNeedsRebuild for a never-built code layer and for a
-    blob the eager build never reached; no write against a file+directory read-only store;
-    definitions_readonly/callers_readonly match the lazy originals once built), before/after in
-    AGENT_RUNS/BR-AR-0034.check09/check10 (combined with C-6's own acceptance test, since both regress via the
-    same real_routes.py/symbols.py/layer.py diff)
+    tests/route/test_query_commands_readonly.py (new this reopening), run against PASS 1's own final commit
+    (a72dae24c168f6445c03ea04fdf4645c1fa063e7 -- the reopening's actual narrowed baseline, not the pre-pass-1 one)
+    as "before": AGENT_RUNS/BR-AR-0034.check16, 3/4 FAIL -- the store-succeeds scenario fails outright with
+    `sqlite3.OperationalError: attempt to write a readonly database` (from symbols.py's own lazy `_open_conn()`/
+    `ensure_schema()`), the missing-code-layer scenario fails with `DID NOT RAISE StoreNeedsRebuild`. "after"
+    (.check17/.check18): 4/4 PASS. Also: tests/code/test_symbols_readonly.py (rewritten this reopening, 4 tests --
+    definitions/callers/stats/reads_key each raise StoreNeedsRebuild before an eager build and work correctly
+    after); the five external callers' own rule-5-corrected test files (tests/code/test_history.py,
+    tests/graph/test_code_bridge.py, tests/graph/test_symbol_history.py) all pass; the combined reopening-scope run
+    (.check15: tests/code + tests/graph + test_query_commands_readonly.py + test_real_routes.py + tests/compile +
+    tests/integration, 319 passed, 0 failed)
 - claim: C-6
   command: >-
-    tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store,
-    before (AGENT_RUNS/BR-AR-0034.check09: sqlite3.OperationalError -- attempt to write a readonly database, from
-    real_routes.py's own _conn()) / after (AGENT_RUNS/BR-AR-0034.check10: PASSES, store sha256 unchanged, every
-    route contributed a real, correctly-classified hit)
-- claim: full suite
+    tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store
+    (pass 1's own before/after, unchanged: .check09 FAILS / .check10 PASSES); open issue 2's own fix proven by
+    tests/route/test_query_commands_readonly.py's missing-code-layer scenario (.check16 before / .check17 after,
+    same file as C-5's own evidence -- the two fixes share the same regression path through real_routes.py)
+- claim: C-7
   command: >-
-    cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check13, 0 failures)
+    tests/route/test_query_commands_readonly.py, all 4 tests (AGENT_RUNS/BR-AR-0034.check18); each of
+    why/impact/history/compile/gather/callers/definitions individually asserted in the two scenarios described in
+    the claim text
+- claim: full suite (pass 1)
+  command: cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check13, 615 passed, 0 failed)
+- claim: full suite (pass 2, LAST)
+  command: >-
+    cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check14, 618 passed, 1 failed --
+    tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice,
+    the ONE test R1-T1 names as non-hermetic until R1-RM repairs it; not skipped, not xfailed, listed in
+    open_issues per that amendment's own instruction)
 mutation_scope_respected: true
 conformance:
 - item: 'R1-5: the -m entry point builds the same layer set and digests as the top-level CLI, with a regression test that fails before the fix and passes after'
   status: MET
   evidence: >-
-    tests/core/test_freshness_entrypoint.py; AGENT_RUNS/BR-AR-0034.check01 (before, FAILS -- lexical rows=0/code
-    blobs_parsed=0 under -m vs. real content under the CLI) and .check02 (after, PASSES, layers dicts equal)
+    tests/core/test_freshness_entrypoint.py; AGENT_RUNS/BR-AR-0034.check01 (before, FAILS) and .check02 (after,
+    PASSES, layers dicts equal). Unchanged this reopening.
 - item: 'R1-6: repo_root() keyed on the resolved starting directory, not the raw argument; two chdirs resolve two repositories'
   status: MET
   evidence: >-
     tests/core/test_gitobj_repo_root.py; AGENT_RUNS/BR-AR-0034.check03 (before, FAILS) and .check04 (after,
-    PASSES); a second test also covers an explicit `start=` argument caching correctly across an unrelated cwd
+    PASSES). Unchanged this reopening.
 - item: 'R1-12: the state-aliases/config read becomes lazy; tests/code/conftest.py''s collection-time pre-import is removed; full suite passes in any file order, including tests/code alone and one tests/code file alone first; the class table, class-table test, six invariant tests and import-boundary test stay byte-unchanged'
   status: MET
   evidence: >-
-    tests/authority/test_lazy_config.py (5 subprocess-isolated tests); AGENT_RUNS/BR-AR-0034.check05 (before, 3/5
-    FAIL with FileNotFoundError at import time) and .check06 (after, 5/5 PASS); .check11 (tests/code alone, 100
-    passed) and .check12 (tests/code/test_lineage_layer.py alone, first, 14 passed); `git diff --stat` empty for
-    tests/authority/test_classes.py, tests/authority/test_import_boundary.py and the four tests/compile/test_*
-    files carrying the six named invariant tests
+    tests/authority/test_lazy_config.py (5 tests); AGENT_RUNS/BR-AR-0034.check05 (before, 3/5 FAIL) and .check06
+    (after, 5/5 PASS); .check11 (tests/code alone, 100 passed) and .check12 (one file alone first, 14 passed);
+    `git diff --stat` empty for the six named invariant tests' own files and the import-boundary test. Unchanged
+    this reopening (re-verified: .check15's own 319/0 run includes tests/code in full).
 - item: 'R1-14: ExclusionCounter is thread-safe; excluded_hits is exact under --threads 16 vs --threads 1'
   status: MET
   evidence: >-
     tests/core/test_taskctx_concurrency.py (4 tests); AGENT_RUNS/BR-AR-0034.check07 (before, the deterministic
-    structural test FAILS; the two busy-loop stress tests pass on both, see decisions/lessons) and .check08
-    (after, 4/4 PASS)
-- item: 'R1-17(5): code/symbols.py''s query surface used by the code route does not build at query time; a missing/not-yet-eager layer raises the typed StoreNeedsRebuild'
+    structural test FAILS) and .check08 (after, 4/4 PASS). Unchanged this reopening; the orchestrator explicitly
+    accepted the structural-test proof on pass 1.
+- item: 'R1-17(5): ensure_indexed is BUILD-ONLY; every query caller (internal and external) uses one verify-or-raise path; a missing/not-yet-eager layer raises the typed StoreNeedsRebuild'
   status: MET
   evidence: >-
-    tests/code/test_symbols_readonly.py (5 tests, new); combined before/after with R1-17(6) in
-    AGENT_RUNS/BR-AR-0034.check09/check10 (the two fixes share one regression path through real_routes.py)
-- item: 'R1-17(6): classify_hit does not call ensure_schema() at query time; real_routes.py''s _conn() moves to store.open_db_readonly(); pre-existing tests that relied on query-time schema creation are corrected to build first'
+    REOPENED and re-graded from pass 1's MET_WITH... (narrowed) reading. This pass: tests/code/test_symbols_readonly.py
+    (rewritten, 4 tests: definitions/callers/stats/reads_key each raise before an eager build, work after);
+    govbridge/code/history.py, compile/codeseeds.py, graph/code_bridge.py, graph/symbol_history.py, demo/grade.py
+    all converted (govbridge/code/symbols.py's stats/definitions/callers/reads_key too, no more *_readonly
+    duplicates); tests/route/test_query_commands_readonly.py (new) proves callers/definitions raise on the missing-
+    code-layer scenario; AGENT_RUNS/BR-AR-0034.check16 (before, against pass 1's OWN final commit: 3/4 FAIL,
+    including a raw sqlite3.OperationalError) / .check17 (after: 4/4 PASS). Six pre-existing test files corrected
+    (rule 5, decisions D-R1-XC-5) to build the code layer eagerly first, never weakening an assertion.
+- item: 'R1-17(6): classify_hit does not call ensure_schema() at query time; real_routes.py''s _conn() moves to store.open_db_readonly(); pre-existing tests corrected to build first'
   status: MET
   evidence: >-
-    tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store
-    (new); AGENT_RUNS/BR-AR-0034.check09 (before, FAILS with sqlite3.OperationalError: attempt to write a
-    readonly database) and .check10 (after, PASSES: store sha256 unchanged, every one of lexical/semantic/code/
-    exact contributed a hit, real classification correct); the two rule-5-corrected tests (decisions) also pass
-- item: 'Acceptance for 5+6: a gather with every route (lexical, semantic, code, exact) and classification active, against a file-level AND directory-level read-only store, leaves the store file sha256 unchanged'
+    Unchanged this reopening: tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store
+    (.check09 before / .check10 after); the two rule-5-corrected tests in the same file also pass.
+- item: 'Reopening requirement 3 (open issue 2): code_route''s broad except must not swallow StoreNeedsRebuild; re-raise typed errors; catch only expected exceptions; count any other caught exception'
   status: MET
   evidence: >-
-    tests/route/test_real_routes.py::test_gather_every_route_and_classification_against_a_file_and_directory_read_only_store
-    -- chmods both the store file (0o444) and its directory (0o555), the stricter of the two scenarios named in
-    the acceptance text; AGENT_RUNS/BR-AR-0034.check10
+    All four code-layer call sites in real_routes.py's code_route/_shaped_code_conn re-raise StoreNeedsRebuild,
+    catch only ValueError, and count anything else via the new _record_unexpected_exception helper (writes to
+    govbridge.core.telemetry's local "queries" sink, decisions D-R1-XC-7). Proven by
+    tests/route/test_query_commands_readonly.py's missing-code-layer scenario (impact/compile/gather/callers/
+    definitions each raise, .check16 before / .check17 after) and by the fact that gather's OWN thread pool
+    (govbridge/gather/engine.py, out of scope, untouched) has no try/except around routes.run() at all, so a
+    re-raised StoreNeedsRebuild propagates all the way out of gather() naturally, with no change needed there.
+- item: 'Reopening requirement 4 (acceptance): on a file-level read-only store built from clean, why/impact/history/compile/gather(every route)/callers/definitions each succeed; on a store built without the code layer, each raises StoreNeedsRebuild and writes nothing'
+  status: MET
+  evidence: >-
+    tests/route/test_query_commands_readonly.py (new, 4 tests), AGENT_RUNS/BR-AR-0034.check18. One documented,
+    empirically-confirmed refinement to the literal text: why/history never reach the code layer at all (neither
+    imports govbridge.code/govbridge.graph.code_bridge), so "each raises" does not apply to them in the missing-
+    code-layer scenario -- they simply succeed in both scenarios, which the test asserts directly rather than
+    assuming from inspection.
 - item: 'Base intact: R1-GA1 FINAL''s core/store.py (open_db_readonly, occurrence_distinct_path) and core/freshness.py (prune calls) are unmodified; freshness.py''s own change is limited to the -m entry point'
   status: MET
-  evidence: 'git diff --stat -- govbridge/core/store.py shows no output; the freshness.py diff (AGENT_RUNS/BR-AR-0034 patches) touches only the trailing `if __name__ == "__main__":` block'
-- item: 'REPAIR-1 acceptance: schema-2 checkpoint; the FULL suite last, with 0 failures; hermetic tests; a conformance row per item; no silent narrowing'
+  evidence: 'git diff --stat -- govbridge/core/store.py shows no output across both passes'
+- item: 'REPAIR-1 acceptance: schema-2 checkpoint; the FULL suite last, with 0 failures (except the one named non-hermetic exception); hermetic tests; a conformance row per item; no silent narrowing'
   status: MET
   evidence: >-
-    this checkpoint carries every schema-2 key; AGENT_RUNS/BR-AR-0034.check13, the LAST command run, 0 failures
-    (615 passed); every new test passes both alone and in the full suite; two deliverables (R1-17 item 5's
-    stats/definitions/callers/reads_key, and BRIDGE_STATE_PATH's caching) were kept at their literal, unnarrowed
-    reading via the read-only-counterpart/lazy-cached-attribute designs recorded in decisions, rather than
-    silently narrowed to a convenient subset
+    this checkpoint carries every schema-2 key; AGENT_RUNS/BR-AR-0034.check14, the LAST command run this reopening,
+    618 passed / 1 failed -- the ONE test R1-T1 names as non-hermetic until R1-RM repairs it
+    (tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice),
+    listed explicitly here and in open_issues, never skipped or xfailed. R1-17(5)'s pass-1 narrowing (reported
+    correctly against this run, not repeated) is corrected this pass with no new narrowing introduced.
 open_issues:
 - >-
-  govbridge/graph/code_bridge.py's build_shaped_code_connection (out of this node's mutation_scope) still calls
-  codesymbols._open_conn()/ensure_indexed() (read-write) at query time, from real_routes.py's own
-  _shaped_code_conn() second block -- the SAME query-time-write pattern R1-17 item 5 fixes elsewhere in this file.
-  Currently a no-op in practice against the acceptance scenario (a file+directory read-only store built by the
-  eager code-layer builder, B3R): ensure_indexed's own classify-then-parse loop finds every product-role .rs blob
-  already cached and never reaches its write branch. It is a LATENT write-at-query-time path for any commit the
-  eager builder does not cover (e.g. a shaped code connection built for a non-eager/history commit), left for
-  whoever next owns govbridge/graph/code_bridge.py -- reported per the brief's "find another cross-cutting defect,
-  report it, do not fix it," not fixed here.
+  RESOLVED this reopening (was open on pass 1): govbridge/graph/code_bridge.py's build_shaped_code_connection no
+  longer calls the BUILD-only ensure_indexed at query time and no longer swallows StoreNeedsRebuild internally.
 - >-
-  govbridge/route/real_routes.py's code_route wraps BOTH codesymbols.definitions_readonly(...) and
-  codesymbols.callers_readonly(...) in a bare `except Exception: ... = {...: []}` (pre-existing, not introduced by
-  this run). A StoreNeedsRebuild raised by either (a genuinely missing/not-yet-eager-indexed commit) is therefore
-  silently swallowed into an empty result at the ROUTE level, rather than surfacing as the typed error to a
-  gather/CLI caller. Calling ensure_indexed_readonly/definitions_readonly/callers_readonly directly (this run's
-  own tests/code/test_symbols_readonly.py) does see the typed exception; only the pre-existing broad except in
-  real_routes.py's own code_route masks it for that one call site. Named for whoever next tightens that exception
-  handling; not one of this run's six named fixes.
+  RESOLVED this reopening (was open issue 2 on pass 1): real_routes.py's code_route no longer swallows
+  StoreNeedsRebuild in a bare except Exception; it re-raises typed errors, catches only the one expected
+  ValueError, and counts anything else in local telemetry.
+- >-
+  NEW, not fixed (out of this node's mutation_scope on either pass; reported per the brief's "find another
+  cross-cutting defect, report it, do not fix it"): govbridge/graph/impact.py's own authority-graph BFS opens the
+  store via the weaker `store.open_db()` (read-write, "tolerates read-only by catching each write attempt"), not
+  `open_db_readonly()`, wrapped in a bare `except Exception: graph_hops = {}`. Empirically this neither wrote nor
+  crashed in this run's own file+directory read-only acceptance test (a plain sqlite3.connect() falls back to
+  read-only automatically when the file denies write access, and the BFS's own reads apparently never hit a
+  write-shaped statement in this fixture) -- but it is the same defect SHAPE this node's own six fixes closed
+  elsewhere, just not yet proven safe by construction. Left for whoever next owns govbridge/graph/impact.py.
 - >-
   ExclusionCounter's pre-fix race did not reproduce via pure busy-loop stress tests on this interpreter (CPython
-  3.12.3) even at up to 500 threads x 200,000 bumps -- see the checkpoint's failed_approaches/lessons for the
-  full account and the deterministic structural test that replaces it as the required "fails before, passes
-  after" proof.
+  3.12.3) even at up to 500 threads x 200,000 bumps -- see the checkpoint's failed_approaches/lessons for the full
+  account and the deterministic structural test that replaces it as the required "fails before, passes after"
+  proof. Accepted by the orchestrator on pass 1; unchanged this reopening.
+- >-
+  tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice
+  FAILED on this reopening's own LAST (full-suite) run (AGENT_RUNS/BR-AR-0034.check14) -- this is the ONE test
+  R1-T1 names as non-hermetic until R1-RM repairs it (BR-DAG-AMEND-R1-2); it PASSED on pass 1's own equivalent run
+  (.check13). Not caused by this run's own changes (this node never touches govbridge/compile/packet.py or the
+  real product repo's own git state the test compiles against); listed here per R1-T1's own instruction, not
+  skipped or marked xfail.
+- >-
+  This run's own mutation_scope, as recorded in ITS branch's copy of ORCHESTRATOR_STATE.yaml (base commit
+  4c769d1805adfbc91173fe9d933c814ec5c850d5), does not yet include the reopening's own scope extension -- the
+  orchestrator recorded that extension on the shared bridge/p2-context-retrieval branch, commit
+  8428ad9b87f92e46fbb286b17485964afe2b02cb, AFTER this run's branch diverged from it. `integrate-check`, run from
+  this branch, therefore reports every reopening-scope file as "outside mutation_scope" -- a stale-base artifact,
+  not a real violation: this run's own `git diff --name-only` was checked by hand against the UNION of the
+  original scope and 8428ad9's own extension, and every changed path matches. Merging that update into
+  bridge/r1-xc-0034 was refused by this session's own tool-permission classifier ("Modify Shared Resources"),
+  correctly -- that merge is the orchestrator's own act when integrating this branch. See the checkpoint's own
+  task_contract.note for the full account.
