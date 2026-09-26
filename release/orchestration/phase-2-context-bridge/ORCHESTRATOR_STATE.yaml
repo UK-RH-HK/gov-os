@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T12:40:24Z'
-state_hash: fa427ecf43cfa0e7b99e9fa559bde83cd6d41aab374d6026e5ef51ff3ddbff41
+updated_at: '2026-09-26T13:54:09Z'
+state_hash: f02cd6dd68fcc6e02189004f4f1409567abd7ddfb65dd149c5aad6deae74452f
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1457,6 +1457,16 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga3-0026
   checkpoint_schema: 2
+  interim_handback: 'forced by a system trigger while waiting on its from-clean store rebuild -- NOT a return; nothing committed.
+    Source work reported complete (overflow.py; the packet.py query loop via instantiate + gather_with_followup with per-query
+    route selection; content slices; references to A items by id; R1-11 oversize sections; D.2 via gather; budgets.py facet
+    quotas; render.py query/facet tags); full suite 665 passed (its third run, confirmed by the orchestrator from the output
+    file). Resumed with rulings: R1-11 using the DEFAULT facet vocabulary (verify recomposes without task context) and G keeping
+    its BR-AR-0015 tiers are MET_WITH_DISCLOSED_LIMIT; base-round facet tags a disclosed superset; compile --out writing notes
+    and supplementary packets routed to R1-RA (BR-DAG-AMEND-R1-20); a bounded 90-minute poll on its store'
+  residual_for_verifier: 'R1-11 selects an oversize A item''s sections with the GLOBAL facet vocabulary, not the task''s own facets,
+    because packet verify recomposes A without task context; a manifest-recorded selection verified range by range would allow a
+    task-specific choice (validate.py, outside GA3 scope)'
   dispatched_at: '2026-09-26T12:40Z'
   status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0026
@@ -1715,6 +1725,13 @@ dag:
       gather_with_followup (the single-pass engine only behind an explicit --no-followup flag). R1-GA3 compiles sections
       B-H from gather_with_followup results'
     reason: GA2 left `govbridge gather` single-pass because cli.py was outside its scope; GA3 and RA need only the stable API
+  - id: BR-DAG-AMEND-R1-20
+    by: orchestrator (routing of R1-GA3's next_consumer item)
+    rule: after R1-GA3 merges, R1-RA (the last cli.py editor) wires `govbridge compile --out DIR` to write the evidence notes and
+      supplementary packets that compile_packet returns, and `packet verify` / `receipt check` to cover them; R1-RA's run is
+      resumed for this after its own merge if it has already returned
+    reason: GA3 builds the overflow artifacts in compile_packet's return value, but writing them to disk is a cli.py change and cli.py
+      is R1-RA's this wave
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1854,6 +1871,11 @@ observations:
     (2) commit 3a3b669 ran seal, checkpoint and commit after its state patch had FAILED (a heredoc not chained with &&), so
     it carries template amendment R1-T3 but not the R1-XC record. Both are corrected in the commit after 3a3b669. Patches are
     now run from a script file with every step chained by &&, and placeholders never share a prefix with real words.'
+- id: OBS-BR-20
+  text: 'scheduling -- R1-GA2, R1-GA3 and R1-RA each ran their own from-clean store rebuild concurrently (load ~13.6 on 20 cores),
+    each taking 35-60+ minutes, although none of these nodes changes indexing code. For later stages (R1-INT, R1-MB, R1-D2) the
+    orchestrator builds ONE from-clean reference store at a recorded tip and hands out copies (cp -a), unless a node changes
+    indexing code.'
 - id: OBS-BR-12
   text: 'orchestrator instruction conflict, self-reported -- my live follow-up to BR-AR-0020 suggested reading
     DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
