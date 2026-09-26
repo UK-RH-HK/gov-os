@@ -1,18 +1,26 @@
 run_id: BR-AR-0034
-commit: e73e84858b9a04537b59ee30934dcf7432b116d7
+commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
 role: >-
-  REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
-  repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14), and
-  read-only code/classification query paths (R1-17 items 5 and 6). Reopened THREE times: R1-17(5) was narrowed on
-  pass 1 (read-only variants added for gather's code route only, while ensure_indexed still lazily built at query
-  time behind symbols.stats/definitions/callers/reads_key and in five external callers; a broad except in
-  code_route also swallowed StoreNeedsRebuild) -- pass 2 makes ensure_indexed BUILD-ONLY everywhere and re-raises
-  typed errors. Pass 3 (accepted pass 2's own six fixes; two follow-ups before merge): fixes the REAL cause of the
-  one remaining full-suite flake (tests/compile/conftest.py's own GOVBRIDGE_STORE isolation, not the git-ref
-  concord R1-RM already closed), applies the same fix to tests/graph/conftest.py once the same grep found the same
-  bug there, uncovers and rule-5-corrects a hidden hermeticity bug in GD-10's own regression test that the store
-  isolation fix exposed, and moves govbridge/graph/impact.py's own BFS store access to open_db_readonly() (scope
-  explicitly extended by the coordinator).
+  REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17/-23) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
+  repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14),
+  read-only code/classification query paths (R1-17 items 5 and 6), and one resolved view per operation (R1-23).
+  Reopened FOUR times: R1-17(5) was narrowed on pass 1 (read-only variants added for gather's code route only,
+  while ensure_indexed still lazily built at query time behind symbols.stats/definitions/callers/reads_key and in
+  five external callers; a broad except in code_route also swallowed StoreNeedsRebuild) -- pass 2 makes
+  ensure_indexed BUILD-ONLY everywhere and re-raises typed errors. Pass 3 (accepted pass 2's own six fixes; two
+  follow-ups before merge): fixes the REAL cause of the one remaining full-suite flake (tests/compile/conftest.py's
+  own GOVBRIDGE_STORE isolation, not the git-ref concord R1-RM already closed), applies the same fix to
+  tests/graph/conftest.py once the same grep found the same bug there, uncovers and rule-5-corrects a hidden
+  hermeticity bug in GD-10's own regression test that the store isolation fix exposed, and moves
+  govbridge/graph/impact.py's own BFS store access to open_db_readonly() (scope explicitly extended by the
+  coordinator) -- ALSO the pass where this run itself breached REPAIR-1 rule 6 (ran the system python3, not the
+  pinned venv, misdiagnosed the result, pip-installed an unpinned package into a scratch venv) -- see findings for
+  the correction, now closed via R1-T3 (BR-DAG-AMEND-R1-18). Pass 4 (BR-DAG-AMEND-R1-23, this pass): fixes
+  govbridge/core/exact.py's grep()/id_lookup() re-resolving the "records" ref's live tip on every call (the
+  confirmed cause of a single ~1031s gather recording four different "records" commits,
+  AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out), threads the ONE view real_routes.build_real_routes
+  already resolves through exact_route/registrymod.load/lifecyclemod._load_mandatory_items, and audits (but per
+  scope does not fix) every other tip-resolution site across govbridge/**.
 model_observed: claude-sonnet-5
 commands:
 - cmd: cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/core/freshness.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_freshness_entrypoint.py
@@ -188,6 +196,27 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check26-full-domain-suite-pass3-final.out
   output_sha256: 1f0018861279b68b4e527c1cd9d73d79ae96c3d58a97eb002333d80424e90e4d
+- cmd: >-
+    PASS 4 (BR-DAG-AMEND-R1-23), before -- interpreter: $PY (only, per R1-T3): cd $D && git checkout HEAD --
+    govbridge/core/exact.py govbridge/route/real_routes.py govbridge/core/view.py govbridge/route/router.py &&
+    $PY -m pytest -q -p no:cacheprovider tests/route/test_view_pinned_per_operation.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check27-r123-view-pinning-before.out
+  output_sha256: 60d9b4279666ddf6c4b9c6f7e205c0ade6abbabc796e5ba3234f3701963a7950
+- cmd: >-
+    PASS 4, after -- interpreter: $PY: cd $D && (restore the pass-4 fix to govbridge/core/exact.py,
+    govbridge/route/real_routes.py, govbridge/core/view.py, govbridge/route/router.py) && $PY -m pytest -q
+    -p no:cacheprovider tests/route/test_view_pinned_per_operation.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check28-r123-view-pinning-after.out
+  output_sha256: 6265b7dc32dba77c83bc2122ef5ee39d73e7b7299ea1aff306427621bf34c360
+- cmd: >-
+    PASS 4's own full-suite acceptance (LAST). Interpreter: $PY = $HOME/.cache/gov-bridge/venv/bin/python
+    (Python 3.12.3) ONLY, per R1-T3 -- no bare python3, no venv creation, no pip install this pass: cd $D &&
+    $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check29-full-domain-suite-pass4-final.out
+  output_sha256: b6e49a897119d6d7d4b664f78ef10caa9b0bfaf4e0b6eb6dc60d7286d0749779
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
@@ -253,6 +282,10 @@ task_contract:
   - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade_regressions.py
   - release/orchestration/phase-2-context-bridge/tests/route/test_query_commands_readonly.py
   - release/orchestration/phase-2-context-bridge/govbridge/graph/impact.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/exact.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/view.py
+  - release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+  - release/orchestration/phase-2-context-bridge/tests/route/test_view_pinned_per_operation.py
   note: >-
     The reopening's scope extension (the last 11 entries above, from govbridge/code/history.py onward) was recorded
     by the orchestrator on the shared bridge/p2-context-retrieval branch, commit 8428ad9b87f92e46fbb286b17485964afe2b02cb
@@ -278,6 +311,17 @@ task_contract:
     `store.open_db_readonly`, tracking impact.py's own authorized rename; no assertion or behaviour changed) as a
     direct, unavoidable consequence of the impact.py fix, never independently decided. See decisions D-R1-XC-8 for
     the full justification; flagged in the report's `open_issues` for the orchestrator's own ratification.
+
+
+    PASS 4 (third reopening, BR-DAG-AMEND-R1-23, ONE RESOLVED VIEW PER OPERATION): the coordinator confirmed pass
+    3 merged at c617f82 (bridge tip now a97d53e, carrying R1-GA2 pass 3 and R1-RA pass 2) and explicitly extended
+    this run's scope with `core/exact.py`, `core/view.py`, `route/router.py` and a new
+    `tests/route/test_view_pinned_per_operation.py` (added above; `route/real_routes.py` already this run's own).
+    Unlike pass 3's own verbal grant, this one WAS mergeable this time: `git merge --no-edit
+    bridge/p2-context-retrieval` from this worktree succeeded as a clean FAST-FORWARD (this branch's own final
+    pass-3 commit, 0eddd3a, was already an ancestor of the bridge tip -- the orchestrator's own merge at c617f82
+    had already folded it in), so this branch now sits AT a97d53e with no divergence and no manual scope
+    cross-check needed for this pass's own integrate-check (see `evidence`).
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
 - release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
@@ -340,6 +384,13 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check24-gd10-after.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check25-task-exclusions-impact-rename.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check26-full-domain-suite-pass3-final.out
+- release/orchestration/phase-2-context-bridge/govbridge/core/exact.py
+- release/orchestration/phase-2-context-bridge/govbridge/core/view.py
+- release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+- release/orchestration/phase-2-context-bridge/tests/route/test_view_pinned_per_operation.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check27-r123-view-pinning-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check28-r123-view-pinning-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check29-full-domain-suite-pass4-final.out
 findings:
 - >-
   RESOLVED this reopening (was an open finding on pass 1): govbridge/graph/code_bridge.py's
@@ -473,6 +524,121 @@ findings:
   Caching thereafter is deliberate (this value sits on a potential per-hit hot path via authority.layer.
   classify_hit/record_id_for_occurrence, and every real domain/test fixture already treats it as a fixed
   convention) -- recorded as decision D-R1-XC-3, unchanged this reopening.
+- >-
+  RESOLVED, PASS 4 (BR-DAG-AMEND-R1-23, ONE RESOLVED VIEW PER OPERATION): govbridge/core/exact.py's grep()/
+  id_lookup() (called by govbridge/route/real_routes.py's exact_route) re-resolved config/canonical-view.yaml's
+  "records" ref FRESH on every call, rather than reusing the ONE view build_real_routes already resolved and
+  closed over for the code route's own product_commit -- the confirmed root cause of
+  AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out's own finding (a single ~1031s gather recording FOUR
+  different "records" commits). Fixed: show/grep/path_resolve/id_lookup (govbridge/core/exact.py) all now accept
+  an optional `resolved_view`, using it instead of re-resolving when given (None, the default, preserves exact
+  standalone-CLI behaviour); grep()/path_resolve() additionally skip resolving the view AT ALL when an explicit
+  `ref` is given (previously wasted work: `govbridge/answers/cite.py`'s own grep/path_resolve calls always pass
+  `ref=`, so the view was resolved and discarded unread on every one of THOSE calls too). real_routes.py's
+  exact_route now passes `resolved_view=resolved_view` through to id_lookup; build_real_routes also now passes
+  the same `resolved_view` into `registrymod.load(...)` and `lifecyclemod._load_mandatory_items(...)` (both
+  already accepted it; only the call sites were missing the argument), closing two more independent resolutions
+  this run found while fixing exact.py. `govbridge/route/router.py`'s RouteSet gained a `resolved_view` field
+  (populated by build_real_routes) so a caller that builds a RouteSet can record/reuse the one view its routes
+  were pinned to, without importing govbridge.core.view into router.py itself. `govbridge/core/view.py` gained
+  `ResolvedView.pinned_refs()` (a generic `{name, commit, status}` list) and a module-docstring statement of the
+  "one resolved view per operation" contract for future maintainers. Proven by
+  tests/route/test_view_pinned_per_operation.py (new): a fixture gather and a fixture compile each move the
+  fixture's own "records" ref via a monkeypatched hook fired exactly once, between two exact-route retrievals
+  inside ONE operation -- AGENT_RUNS/BR-AR-0034.check27 (before this fix: every exact-route item shows the MOVED
+  commit) / .check28 (after: every item shows the commit pinned once at the operation's own start; the gather
+  test's own control run, over the identical repo/commit content with the ref reset back, produces an identical
+  merged_sha256).
+- >-
+  NEW, PASS 4, an independent read-only audit (delegated to an Explore agent, covering the whole of govbridge/**)
+  found many MORE tip-resolution sites outside this run's own mutation_scope (core/exact.py, core/view.py,
+  route/router.py, route/real_routes.py) -- reported here per the reopening's own instruction ("report any outside
+  your scope with file:line; do not fix those"), organised by operation. Two items ARE inside real_routes.py and
+  were fixed above (registrymod.load/`_load_mandatory_items`); everything below is unfixed:
+
+  LEXICAL/SEMANTIC (called from real_routes.py, but the re-resolution lives in the callee, not this file):
+  govbridge/lexical/query.py:281 `query()` has no `resolved_view` parameter and always resolves fresh -- called
+  from real_routes.py's own lexical_route TWICE per page when exclusions apply (the main call and the
+  exclusion-count probe run). govbridge/semantic/search.py:89 `search()` is the same shape, called once per page
+  from semantic_route.
+
+  AUTHORITY (govbridge/authority/lifecycle.py): three independent resolution sites -- lines 72-73 (`classify`,
+  when no `resolved_view`/`commit`+`path` combination lets it skip resolving), 166-167 (a second internal
+  helper), and 275-276 (`_find_definition`, wrapped by the public `find_definition` at 318-324). None accepts a
+  `resolved_view` parameter. `find_definition` is reached from `exact.id_lookup` itself (this run's own fix
+  threads `resolved_view` into `grep()`, but `id_lookup`'s OWN separate `find_definition` call for
+  `definition_sites` is NOT threaded -- documented directly in `id_lookup`'s own updated docstring as a residual
+  gap), from `govbridge/answers/cite.py:166`, from `govbridge/authority/resolver.py:575`, and from
+  `lifecycle.classify`'s own seed-classification path (used by why/history). `classify` also loads a fresh
+  registry/mandatory-items pair (lines 108-109, 111) when neither is passed in.
+
+  GATHER: govbridge/gather/followup.py:641 (`_resolve_view_for`, defined 289-296) resolves a SECOND, independent
+  view for `gather_with_followup` unless the caller passes `resolved_view` -- no caller currently does (cli.py's
+  cmd_gather passes only `view_path`; compile/packet.py's two per-query call sites; followup.py's own `main()`).
+  This second view drives follow-up identifier resolution and the versions facet, separate from the view the
+  route hits themselves came from (`build_real_routes`'s own resolution, now exposed as `routes.resolved_view` by
+  this run's own router.py fix) -- the two happen to agree today only because nothing moves the ref between them
+  in the SAME call, not by construction.
+
+  COMPILE (govbridge/compile/packet.py): the most heavily affected operation -- at least four independent
+  resolutions before a single query runs (`real_routes_for`/`build_real_routes` at line ~1242, `resolver.resolve`
+  at ~795 for section A, `Compiler.__init__` at 345, and `registrymod.load` at 347 without
+  `resolved_view=self.resolved_view`), then MORE per seed/query: `whymod.why`/`historymod.history` per seed
+  (~840/849, each itself resolving several times internally -- see why/history below), and
+  `gather_with_followup` once per query (~936-940, ~1202-1204 for D.2's both-ways gather) -- each of THOSE calls
+  drops `routes.resolved_view` entirely, because packet.py's own per-query loop builds a brand-new
+  `routermod.RouteSet(exact=c.routes.exact, ...)` (lines ~926-931, ~1195-1201 in the tip) that never copies the
+  `resolved_view` field this run's own router.py fix just added. Consequence: `packet verify` recomputes section
+  A against the RECORDED view (compliant -- see below), but the ORIGINAL compile that produced that manifest
+  could have compiled section A, the routes' own hits, and each query's own follow-up identifiers against as many
+  as four-plus DIFFERENT resolutions of "records" if the ref moved during that one compile.
+
+  WHY (govbridge/graph/why.py): resolves once, correctly, at its own line 64 -- but `registrymod.load` (67-68)
+  and `_load_mandatory_items` (69) right after it don't pass `resolved_view`, and `lifecycle.classify` (71-72,
+  seed classification with no explicit path/commit) falls through to `_find_definition` or `classify`'s own
+  165-167 resolution. `why()` itself has no `resolved_view` parameter, so even compile.py could not hand it one
+  without this file's own change.
+
+  HISTORY (govbridge/graph/history.py -- the module `govbridge history`/`cmd_history` actually dispatches to;
+  NOT `code/history.py` or `graph/symbol_history.py`, both confirmed compliant standalone CLIs below): the same
+  shape as why -- one correct resolution at line 36, then `registrymod.load` (39-40) without `resolved_view`, and
+  `classify` (73) omitting `mandatory_items` so it falls through to lifecycle.py:111's own resolution and, from
+  there, potentially `_find_definition` again.
+
+  CITE / ANSWERS LINT (govbridge/answers/cite.py, lint.py): `cite_identifier` (212-237) has NO top-level
+  resolution at all -- each branch resolves independently (a document anchor via `exact.path_resolve`, a record
+  id via `lifecycle.find_definition`, a code identifier via its own `_default_product_commit` then, if nothing
+  is found, `exact.grep` as a SECOND resolution in the same call); a `--commit` that names a branch is
+  re-resolved separately again by `codesymbols.definitions` (twice) and by `exact.grep`. `lint.py`'s
+  `lint_answers` (222, calling `cite_identifier` at 242-243) never resolves once itself, so a lint run makes one
+  independent resolution per uncited identifier, per claim, per answer -- N resolutions, not one. `lint.py` also
+  never reads the packet's OWN recorded view (`manifest["view"]`), checking findings against the live tip
+  instead -- flagged as ambiguous (possibly intended, not judged) rather than a confirmed defect.
+
+  MISC, low priority, confirmed but not detailed further here: `compile/bootstrap.py:137`'s `where_you_are`
+  resolves once per state key (5 times) via `authority/state.py`'s own `get()`; `lifecycle.py:327-335`'s
+  `show_many` (a standalone CLI, not reached by any operation this amendment names) resolves its own
+  registry/mandatory-items fresh, then again per id via `classify`/`find_definition`; `authority/resolver.py:575`
+  (an id-form `required_inputs` entry) and `:604` (a `path@ref` where `ref` is not a view ref name) each fall
+  back to a live resolution, but both are LATENT today -- no real task spec in this domain uses either shape.
+
+  CONFIRMED COMPLIANT (no action needed, traced by the same audit): govbridge/graph/impact.py (resolves once via
+  its own `_resolved_view()`, confirmed nothing inside re-resolves "records" or "product" -- code_bridge/
+  traverse/derive all read the pinned sha or the store only); govbridge/authority/state.py's `get()` (resolves
+  once, threads through classify_occurrence/read_path/blame); packet verify/receipt check's main path
+  (`compile/validate.py`'s `pinned_view_from_manifest` rebuilds from the RECORDED `manifest['view']`, threaded
+  through resolver.resolve/registry.load/`_load_mandatory_items`/receipt.py/the overflow and notes checks);
+  `build_real_routes`'s own `product_commit` (computed once, closed over by every code-route call); every gather
+  internal (`engine.py`, `versions.py`, `identifiers.py`, `merge.py`, `facets.py`, `instantiate.py`,
+  `telemetry.py` -- none resolves anything); `resolver.resolve`'s own top-level call, `_one_mandatory_item`, and
+  its own `classify` calls at lines 582/619 (path, commit, reg and mandatory_items all passed explicitly);
+  build-time code (`authority/layer.build`, `core/freshness.compute_fingerprint`, `core/corpus.coverage` -- these
+  run once at BUILD time, out of this amendment's own query-time scope, and were confirmed non-re-resolving
+  regardless); `code/history.py`'s `diff()` and `graph/symbol_history.py` (each resolves the caller's own refs
+  once at the top and passes full shas down -- standalone module CLIs, not what `govbridge history` itself runs);
+  and criterion (c) -- `build_real_routes` is called exactly once per operation everywhere it is called
+  (cli.py's cmd_search/cmd_gather, packet.py's `real_routes_for`/`Compiler` construction, followup.py's own
+  `main()`, bootstrap.py) -- nothing rebuilds routes per query or per round anywhere in this domain.
 failed_approaches:
 - >-
   PASS 1 (superseded this reopening -- kept for the record; see decisions D-R1-XC-2/D-R1-XC-5): read "ensure_indexed
@@ -605,6 +771,25 @@ decisions:
   due to fixture-scope ordering (see findings), and (b) the SAME conftest-level shape already exists, working
   correctly, in tests/code/conftest.py and tests/lexical/conftest.py -- this is the established idiom in this
   codebase for this exact problem, not a new pattern introduced here.
+- >-
+  D-R1-XC-11 (within authority; pass 4, BR-DAG-AMEND-R1-23): grep()/path_resolve() (govbridge/core/exact.py) skip
+  resolving the view ENTIRELY when an explicit `ref` is given, rather than resolving it unconditionally and only
+  conditionally READING the result (the pre-existing shape). Chosen because the `ref is not None` branch never
+  read `resolved`/`vc` at all in `grep()` -- the resolution was pure waste on every one of `govbridge/answers/
+  cite.py`'s own calls (which always pass `ref=`) -- and because fewer live git reads per call is strictly safer
+  for this amendment's own goal, not just faster.
+- >-
+  D-R1-XC-12 (within authority; pass 4): `RouteSet.resolved_view` (govbridge/route/router.py) is typed as
+  `Optional[object]`, never `Optional[viewmod.ResolvedView]` with an import, preserving router.py's own
+  pre-existing rule ("node B6 never imports govbridge.lexical/.semantic/.code") extended here to never importing
+  govbridge.core.view either -- a caller that already imports it (real_routes.py, gather, compile) gets full
+  typing on its own end; router.py itself only carries the reference through.
+- >-
+  D-R1-XC-13 (within authority; pass 4): `id_lookup`'s own `resolved_view` parameter is threaded through to
+  `grep()` but deliberately NOT to its separate `lifecycle.find_definition()` call, because `find_definition`
+  (govbridge/authority/lifecycle.py, out of this run's mutation_scope) has no `resolved_view` parameter to accept
+  one -- adding it would require editing that file. Documented as a residual gap directly in `id_lookup`'s own
+  docstring and in this checkpoint's `findings`, rather than silently claimed as fixed.
 lessons:
 - >-
   When a fix note says "X must not build/write at query time," trace EVERY caller of X across the whole domain
@@ -643,6 +828,23 @@ lessons:
   unintended reliance on shared, external state (another test's, or another process's, side effects on a store
   neither test nor process was ever supposed to share). When this happens, the correct response is to fix the
   test's own missing setup (rule 5), not to weaken the assertion or revert the isolation fix.
+- >-
+  A "byte-identical across a moved vs. unmoved run" control comparison needs the SAME repo/commit content in both
+  runs, not two separately-built fixtures -- ``followup_repobuilder.build()`` (and every git-commit-based fixture
+  builder in this domain) stamps a real commit with a real timestamp, so two independent ``build()`` calls
+  produce two DIFFERENT commit shas for otherwise-identical content, making any hash-based determinism comparison
+  across them meaningless. The fix is to reuse ONE built repo for both the "moved" and "control" runs, restoring
+  the moved ref back to its original commit (``git update-ref``, never a checkout -- nothing in this domain reads
+  the working tree, only git plumbing) between them, rather than building a second, superficially-identical repo.
+- >-
+  A query's own explicit `routes: [...]` field only RESTRICTS which routes a facet may use for that query; it can
+  never make a facet invoke a route the facet's own config (`config/facets.yaml`) does not itself list. Neither
+  the real config nor this domain's own lexical-only test fixture (`tests/fixtures/gather/test-facets.yaml`)
+  declares any facet using "exact" -- the ONLY path to the exact route, in gather and in compile alike, is
+  follow-up identifier resolution (`resolve_identifier` -> `_resolve_via_exact`), never a facet's own base-round
+  retrieval. A test that wants to exercise the exact route through `compile_packet`/`gather_with_followup` must
+  trigger a real KIND_RECORD_ID/KIND_COMMIT/KIND_TESTS_OF identifier (e.g. a record citing another record's id),
+  not merely list "exact" on the query.
 next_consumer: >-
   R1-INT (audit-only, routed to opus, BR-DAG-AMEND-R1-16 part 2): runs BR-DAG-AMEND-R1-3/-7/-15's own integration
   checks over this run's merged tree, including the zero-count audit and the generic-rule (OC-BR-02) audit; any
@@ -654,17 +856,39 @@ next_consumer: >-
   builder's own tool permissions correctly refuse to perform that merge itself.
 
 
-  UPDATED, this third reopening: govbridge/graph/impact.py's own store.open_db() finding is RESOLVED (fixed this
-  pass, scope explicitly extended by the coordinator). Three items remain for whoever next touches this area:
-  (1) tests/route/test_task_exclusions.py's one-line mechanical rename (decisions D-R1-XC-8) needs the
-  orchestrator's own ratification into mutation_scope, since it was never explicitly granted, only a direct
-  unavoidable consequence of an authorized change; (2) the SAME delenv-only (not isolating) GOVBRIDGE_STORE
-  pattern this run fixed in tests/compile/conftest.py and tests/graph/conftest.py also exists in
+  UPDATED, third reopening (pass 3): govbridge/graph/impact.py's own store.open_db() finding is RESOLVED. Two
+  items remained: (1) tests/route/test_task_exclusions.py's one-line mechanical rename (decisions D-R1-XC-8)
+  needed the orchestrator's own ratification into mutation_scope; (2) the SAME delenv-only (not isolating)
+  GOVBRIDGE_STORE pattern this run fixed in tests/compile/conftest.py and tests/graph/conftest.py also exists in
   tests/authority/conftest.py, tests/notes/conftest.py, tests/semantic/conftest.py and tests/core/conftest.py --
-  confirmed latent (no CURRENT test in any of those four directories relies on it) but a trap for any future test
-  that forgets its own explicit setenv; out of this run's own mutation_scope, so left unfixed and routed here;
-  (3) the shared system Python interpreter this whole multi-agent session's tests run against was found mid-run
-  to be missing tree_sitter_rust/tree_sitter/onnxruntime/tokenizers entirely (see findings) -- this affects EVERY
-  concurrent agent's own test suite, not just this run's, and should be escalated to whoever owns the shared
-  machine to re-run bootstrap/bootstrap.sh, independently of this node's own disposition.
-final_commit: e73e84858b9a04537b59ee30934dcf7432b116d7
+  confirmed latent, out of this run's own mutation_scope, routed to R1-INT's own audit per the orchestrator's own
+  disposition of this run (ORCHESTRATOR_STATE.yaml's own BR-AR-0034 run entry, `open_issues_routed`).
+
+
+  CORRECTION, pass 3's own third finding (previously reported here as an "operational, shared-environment"
+  issue): this run's pass-3 self, mistakenly, ran the bare SYSTEM `python3` (never `$HOME/.cache/gov-bridge/
+  venv/bin/python`, this domain's own pinned interpreter -- REPAIR-1 rule 6, "never pip-install; if a wheel is
+  missing, report BLOCKED"), misdiagnosed the resulting ModuleNotFoundErrors as "the shared venv was wiped", and
+  then created two throwaway venvs in the session scratchpad and pip-installed tree-sitter==0.25.2 plus an
+  UNPINNED tree-sitter-rust (0.24.2, not the locked 0.24.0) from the network -- a genuine REPAIR-1 rule-6 breach
+  (the orchestrator's own BR-DAG-AMEND-R1-18/amendment R1-T3 exists because of it). The actual shared venv was
+  never touched and was never broken; every pass-3 check output produced under the wrong interpreter was
+  therefore correctly ruled NOT accepted as evidence by the orchestrator, which re-ran the acceptance suite
+  itself on the correct, pinned venv (619 passed, 0 failed) before merging. This run now uses ONLY
+  `$HOME/.cache/gov-bridge/venv/bin/python` for every command in this and all future passes, per R1-T3. Both
+  throwaway venvs were deleted this pass.
+
+
+  PASS 4 (BR-DAG-AMEND-R1-23, ONE RESOLVED VIEW PER OPERATION): fixed within this run's own scope (core/exact.py,
+  core/view.py, route/router.py, route/real_routes.py) -- see findings for the full fix and the tests-wide audit's
+  own results. R1-INT (or whoever next owns the affected files) inherits a LARGE list of confirmed-but-unfixed
+  tip-resolution sites, organised by operation in findings above: lexical/query.py, semantic/search.py,
+  authority/lifecycle.py (three sites), gather/followup.py's own second resolution, compile/packet.py (the most
+  affected -- four-plus independent resolutions per compile, and its own per-query RouteSet rebuild that drops
+  the new `routes.resolved_view` field), graph/why.py, graph/history.py, answers/cite.py and answers/lint.py.
+  Fixing these fully would mean: adding `resolved_view` parameters to lexical.query.query, semantic.search.search,
+  lifecycle.classify/_find_definition/find_definition, why.why, history.history, and cite.cite_identifier; then
+  wiring every caller (real_routes.py, packet.py, cli.py, followup.py) to pass `routes.resolved_view` (or the
+  view an operation already resolved) into each of them, instead of a bare `view_path`. None of that is in this
+  run's own mutation_scope.
+final_commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0

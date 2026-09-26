@@ -6,6 +6,17 @@ definition-site resolution needs the id-grammar (``config/id-grammar.yaml``, nod
 
 Every subcommand honours the corpus rules (``config/corpus-rules.yaml``): for a path whose corpus_effect is
 EXCLUDE, only metadata and the rule id are returned, never the content.
+
+BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): every function below took a bare ``view_path`` and called
+``viewmod.load_view``/``resolve_view`` internally, on EVERY call -- fine for a single, standalone ``govbridge
+exact ...`` CLI invocation (that IS the whole operation), but wrong when a caller that is itself already inside
+a longer-running operation (a gather round, a search) invokes one of these repeatedly: the ``records`` role's
+``follow: tip`` ref could resolve to a different commit on each call, mid-operation (confirmed empirically:
+AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out, four different "records" commits inside one ~1031s
+gather). Every function now also accepts an optional ``resolved_view`` (a ``govbridge.core.view.ResolvedView``
+the CALLER already resolved once); when given, it is used directly and no fresh ``load_view``/``resolve_view``
+call happens. ``resolved_view=None`` (the default) preserves the exact pre-existing behaviour for a genuinely
+standalone call -- this module's own ``main()``/CLI dispatch never passes one, by design.
 """
 from __future__ import annotations
 
@@ -55,7 +66,8 @@ def _classify_path(commit: str, path: str, rules_path: str, repo: Optional[str])
 
 
 def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] = None,
-          repo: Optional[str] = None, task: Optional[taskctxmod.TaskContext] = None) -> dict:
+          repo: Optional[str] = None, task: Optional[taskctxmod.TaskContext] = None,
+          resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
     task = task or taskctxmod.current()
     default_view, default_rules = _default_paths(repo)
     view_path = view_path or default_view
@@ -85,8 +97,10 @@ def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] =
             "excluded_hits": 1 if task_excluded else 0,
         }
 
-        vc = viewmod.load_view(view_path)
-        resolved = viewmod.resolve_view(vc, repo=repo)
+        if resolved_view is not None:
+            resolved = resolved_view
+        else:
+            resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
         classification = resolved.classify_occurrence(path, commit, queried_blob=entry.oid)
         result["version_status"] = classification.status
         result["canonical_ref"] = classification.canonical_ref
@@ -117,15 +131,22 @@ def show(spec: str, view_path: Optional[str] = None, rules_path: Optional[str] =
 
 def grep(literal: str, ref: Optional[str] = None, paths: Optional[list[str]] = None,
           view_path: Optional[str] = None, rules_path: Optional[str] = None, repo: Optional[str] = None,
-          task: Optional[taskctxmod.TaskContext] = None) -> dict:
+          task: Optional[taskctxmod.TaskContext] = None,
+          resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
     task = task or taskctxmod.current()
     default_view, default_rules = _default_paths(repo)
     view_path = view_path or default_view
     rules_path = rules_path or default_rules
-    vc = viewmod.load_view(view_path)
-    resolved = viewmod.resolve_view(vc, repo=repo)
     if ref is None:
-        primary = next(r for r in vc.refs if r.role == "primary")
+        # BR-DAG-AMEND-R1-23: the view is only ever needed here, to find the primary ref's OWN pinned commit --
+        # resolved ONCE per call to this branch, reusing the caller's own resolved_view when given (never a
+        # fresh, independent resolution mid-operation) rather than unconditionally resolving it even when an
+        # explicit `ref` makes it unnecessary (the `ref is not None` branch below never reads it at all).
+        if resolved_view is not None:
+            resolved = resolved_view
+        else:
+            resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
+        primary = next(r for r in resolved.config.refs if r.role == "primary")
         commit = resolved.named[primary.name].commit
         ref = primary.name
     else:
@@ -158,13 +179,15 @@ def grep(literal: str, ref: Optional[str] = None, paths: Optional[list[str]] = N
 
 
 def path_resolve(suffix: str, ref: Optional[str] = None, view_path: Optional[str] = None,
-                   repo: Optional[str] = None) -> dict:
-    default_view, _ = _default_paths(repo)
-    view_path = view_path or default_view
-    vc = viewmod.load_view(view_path)
-    resolved = viewmod.resolve_view(vc, repo=repo)
+                   repo: Optional[str] = None, resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
+    if resolved_view is not None:
+        resolved = resolved_view
+    else:
+        default_view, _ = _default_paths(repo)
+        view_path = view_path or default_view
+        resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
     if ref is None:
-        primary = next(r for r in vc.refs if r.role == "primary")
+        primary = next(r for r in resolved.config.refs if r.role == "primary")
         commit = resolved.named[primary.name].commit
         ref = primary.name
     else:
@@ -179,14 +202,22 @@ def path_resolve(suffix: str, ref: Optional[str] = None, view_path: Optional[str
 
 
 def id_lookup(token: str, ref: Optional[str] = None, view_path: Optional[str] = None,
-               repo: Optional[str] = None, task: Optional[taskctxmod.TaskContext] = None) -> dict:
+               repo: Optional[str] = None, task: Optional[taskctxmod.TaskContext] = None,
+               resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
     """Every literal mention of ``token`` (found generically via Git), plus its definition site if one resolves
     through the id grammar (B1 OI-2, closed by I1/BR-AR-0009: node B5's ``config/id-grammar.yaml`` interpreter,
     reused here via ``govbridge.authority.lifecycle.find_definition`` -- a bounded, git-grep-based lookup, never a
     whole-corpus scan). ``definition_sites`` is empty, with an explanatory note, when the token is not an
     id-grammar-shaped record id (e.g. a bare code symbol) or the lookup is unavailable in this environment: a
-    mention is never mistaken for a definition either way."""
-    r = grep(token, ref=ref, view_path=view_path, repo=repo, task=task)
+    mention is never mistaken for a definition either way.
+
+    ``resolved_view`` (BR-DAG-AMEND-R1-23) is threaded straight through to :func:`grep`, so a caller already
+    inside a one-resolved-view-per-operation context (``govbridge.route.real_routes.exact_route``, closing over
+    the ONE view its own ``build_real_routes`` resolved) never causes a second, independent tip resolution here.
+    ``govbridge.authority.lifecycle.find_definition`` below is OUTSIDE this module's own scope and still resolves
+    its own view internally on every call (reported, not fixed here, in this run's own checkpoint findings) --
+    a residual gap for whoever next owns that file."""
+    r = grep(token, ref=ref, view_path=view_path, repo=repo, task=task, resolved_view=resolved_view)
     r["mention_sites"] = r.pop("hits")
     definition_sites: list = []
     try:

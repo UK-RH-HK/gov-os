@@ -7,6 +7,23 @@ version status" (CANONICAL / CANONICAL_FALLBACK / SAME_AS_CANONICAL / HISTORICAL
 Nothing here is specific to any one repository's history. The product/records/evidence names, the pinned commits and
 the partition rules all come from config/canonical-view.yaml; this module only knows the *shape* of that config
 (refs with follow: tip|pinned, partitions with an owner and a fallback chain).
+
+BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): ``resolve_view`` is a pure function of ``(config, repo)`` --
+calling it is itself never the problem. The defect this amendment repairs is a CALLER resolving it more than once
+inside what should be a single logical query operation (gather, compile, search, why, impact, history, exact,
+state, cite, answers lint, packet verify/receipt check): a ``follow: tip`` ref (concretely, config/canonical-
+view.yaml's ``records`` ref, which tracks this session's own actively-committed-to orchestration branch) can
+resolve to a DIFFERENT commit the second time, inside ONE operation that a verifier expects to have answered from
+one, internally consistent view (evidence: AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out -- a single,
+uninterrupted ~1031s gather call recorded FOUR different "records" commits across its own merged items). The
+contract every operation's own top-level entry point must follow: resolve the view EXACTLY ONCE, at the start,
+and thread the resulting :class:`ResolvedView` down through every route/graph-hop/git-read that operation makes --
+never hand a callee a bare ``view_path`` and let it re-resolve for itself. A function several layers down that
+still needs to record or reuse the pin takes a ``resolved_view: Optional[ResolvedView] = None`` parameter and, when
+given one, MUST use it instead of calling ``load_view``/``resolve_view`` itself; ``None`` (the default) is reserved
+for a genuinely standalone, single-call use (a bare CLI invocation IS its own one-call operation, so resolving
+fresh there is correct, not a violation). See :meth:`ResolvedView.pinned_refs` for the generic shape an operation's
+own output records this in.
 """
 from __future__ import annotations
 
@@ -96,6 +113,16 @@ class ResolvedView:
         if name in self.named:
             return self.named[name].commit
         return None
+
+    def pinned_refs(self) -> list:
+        """BR-DAG-AMEND-R1-23: every named ref this ONE resolution pinned, as ``{"name", "commit", "status"}``
+        dicts (``status`` is ``REF_OK``/``REF_MOVED``, ``view.py``'s own vocabulary) -- the generic shape an
+        operation's own result records so an independent verifier can see exactly which commit every follow:tip
+        ref was pinned to for that operation's whole lifetime, without re-deriving the list from ``self.named`` by
+        hand at each call site. Deliberately excludes ``self.history`` (the ``ref_glob`` matches): those branches
+        are the frozen, many-tips-at-once case (never one designated canonical ref), disclosed instead via
+        ``all_ref_commits()`` when a caller needs them too."""
+        return [{"name": r.name, "commit": r.commit, "status": r.status} for r in self.named.values()]
 
     def all_ref_commits(self) -> list[tuple[str, str]]:
         out = [(r.name, r.commit) for r in self.named.values()]

@@ -14,6 +14,14 @@ only ``RouteHit``, never ``MandatoryItem`` -- no conversion function exists betw
 Generic, not bespoke (OC-BR-02): nothing here names Review 8, F1-F6, Phase 2 or a particular id/file. The "product"
 ref is resolved by its ``role`` in ``config/canonical-view.yaml``, exactly as ``govbridge.compile.packet.Compiler.
 code_conn`` and ``govbridge.graph.impact`` already do.
+
+BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): ``build_real_routes`` already resolved the view exactly
+ONCE (``resolved_view``, below) and closed over it for ``code_route``'s own ``product_commit``/
+``classify_occurrence`` calls -- ``exact_route`` was the one exception, handing ``exactmod.id_lookup`` a bare
+``view_path`` and letting it re-resolve fresh on every call. Fixed by threading ``resolved_view`` through to
+``exactmod.id_lookup``/``grep`` too (see their own module docstring in ``govbridge.core.exact``), and by exposing
+``resolved_view`` on the returned ``RouteSet`` itself so a caller of ``build_real_routes`` (gather, compile,
+search) can record every pinned ref in its own output.
 """
 from __future__ import annotations
 
@@ -116,9 +124,14 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     view_path = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
     resolved_view = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
+    # BR-DAG-AMEND-R1-23: both callees already accept an already-resolved view (registrymod.load's own docstring:
+    # "reusing the CALLER's resolved view is what keeps this generic across callers") -- passed here so neither
+    # re-resolves the "records" ref independently of the ONE resolution above, which would otherwise let the
+    # registry's own cite-verification commit and the mandatory-items commit each drift from `resolved_view`'s
+    # (and from each other) if the ref moves between these three calls.
     reg = registrymod.load(registry_path or registrymod._default_registry_path(), verify_commit="records",
-                            view_path=view_path, repo=repo)
-    mandatory_items = lifecyclemod._load_mandatory_items(repo=repo, view_path=view_path)
+                            view_path=view_path, repo=repo, resolved_view=resolved_view)
+    mandatory_items = lifecyclemod._load_mandatory_items(repo=repo, view_path=view_path, resolved_view=resolved_view)
     product_commit = _product_commit(resolved_view)
 
     # REPAIR_DAG.yaml node R1-GA1 (OD-BR-05 section 2: "independent facets MAY be retrieved concurrently"): a
@@ -625,7 +638,17 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         k = lexicalquery.DEFAULT_K if k is None else k
         exclude = taskctxmod.current().merge_exclude(exclude)
         try:
-            result = exactmod.id_lookup(text, view_path=view_path, repo=repo)
+            # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): `resolved_view` closes over the ONE view
+            # `build_real_routes` resolved once, at this RouteSet's own construction -- passed straight through
+            # instead of `view_path` alone, so `exactmod.id_lookup`/`grep` never re-resolve the "records" ref's
+            # own live tip on this call. Previously this was the exact defect
+            # AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out found: a single, uninterrupted ~1031s
+            # gather calling this route dozens of times (once per identifier `govbridge.gather.followup`
+            # resolves) saw FOUR different "records" commits, because every one of those calls used to trigger
+            # its own fresh `load_view`/`resolve_view` here -- exactly the shared, orchestration-branch tip this
+            # whole multi-agent session commits to continuously. code_route (above) never had this problem: it
+            # already closed over `product_commit`, computed once, the same way this now does for the view.
+            result = exactmod.id_lookup(text, view_path=view_path, repo=repo, resolved_view=resolved_view)
         except Exception:
             return []
         hits = []
@@ -648,4 +671,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             scope_info_out["dropped"] = scope_dropped
         return hits[:k]
 
-    return RouteSet(exact=exact_route, lexical=lexical_route, semantic=semantic_route, code=code_route)
+    # BR-DAG-AMEND-R1-23: exposed on the RouteSet itself (routermod.RouteSet.resolved_view), so a caller that
+    # already resolved this ONE view for its own whole operation (gather, compile, search) can record every
+    # pinned ref in ITS OWN output (resolved_view.pinned_refs()) without a second, independent resolution.
+    return RouteSet(exact=exact_route, lexical=lexical_route, semantic=semantic_route, code=code_route,
+                     resolved_view=resolved_view)
