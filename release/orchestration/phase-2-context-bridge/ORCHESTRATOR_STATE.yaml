@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T03:18:56Z'
-state_hash: d01b761f23afae43fdd4d5cf16bf6e2c6ee1bdbbfadd808fa21449110684a3fb
+updated_at: '2026-09-26T03:40:33Z'
+state_hash: 395511a8cab5a41fe344cbd5ba3cc93394cd0881f6ae15e99a6dc44cb498894b
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -885,6 +885,22 @@ agent_runs:
       Ruling by the orchestrator: the DAG text governs. State records (in the existing authority layer), symbol history and
       paging (queries) accepted; build cost and store size to be measured.'
     also_sent_live: amendment R1-T1 (full suite), delivered before the reopen
+  pass_2:
+    final_commit: 9420b3f1ba9f3664c724523f0321412681d15d12
+    integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+    accepted:
+    - lineage layer (govbridge/code/lineage_layer.py, table lineage_edge) registered from govbridge/code/__init__.py (D-R1-RL-2);
+      two from-clean builds give an identical digest over 227 rows; freshness NOOP; about 77 s and 328 KiB on the real view
+    - symbol-history max_commits from configuration; truncation disclosed (bounded_incomplete)
+    - a hermeticity defect in its own first-pass test found and fixed; full domain suite 361 passed, 0 failed
+    - secrecy audit -- 0 hits; claude-sonnet-5 x727
+    reopen_2_reason: 'two measured gaps. (1) CITES_REQUIREMENT = 0 on the real view, reported as "verified genuine", is FALSE:
+      a git grep at 3c880d8 finds >= 6 code-comment citations of the form <doc> section-sign N that its own SECTION_CITE_RE
+      matches, so a later step drops them silently; fix generically, never drop silently (document-only edges get a
+      distinct label; unresolved citations counted with a reason). (2) TESTS (b) covers only Python argparse, while the
+      node text means the product, a Rust clap-derive binary driven by >= 10 integration-test files through a
+      CARGO_BIN_EXE helper; derive it generically via the tree-sitter Rust layer (subcommand literal -> enum variant ->
+      match arm -> handler, bounded wrapper indirection). Measurements only were sent; no file names.'
   store: $HOME/.cache/gov-bridge/store-BR-AR-0019
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/code/**
@@ -1113,6 +1129,14 @@ dag:
       resolved absolute cwd (or drop it), with a regression test that two chdirs in one process resolve two repositories'
     reason: a process-global cache makes tests order-dependent and would make a long-lived gather/compile process resolve
       the wrong repository; R1-T1 already requires new tests to pass repo explicitly, so the fix can wait for R1-INT
+  - id: BR-DAG-AMEND-R1-7
+    by: orchestrator (lesson of the BR-AR-0019 second reopen)
+    rule: R1-INT acceptance includes a ZERO-COUNT AUDIT -- every edge kind, layer, facet or derivation label that has 0 rows
+      on the real view is re-measured by an independent method (for example a git grep of the shape it derives) and is
+      either confirmed absent, with the command recorded, or reported as a defect. A builder's own "0 is genuine" claim
+      is never accepted without it
+    reason: a builder reported CITES_REQUIREMENT = 0 as verified genuine while the frozen product carries such citations;
+      a silent zero removes a whole edge class from every gather without any disclosure
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1224,6 +1248,10 @@ observations:
     DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
     DEMONSTRATION/oracle*. RG correctly declined; the rule wins. The file is a public tool with no oracle content, but a
     brief''s prohibitions bind the orchestrator''s own follow-ups too; follow-ups are checked against the brief before sending.'
+- id: OBS-BR-13
+  text: 'a builder''s negative claim ("0 real-view citations; verified genuine by git-grep") was false; the orchestrator''s
+    independent grep found >= 6. Negative and zero-count claims are now independently re-measured by the orchestrator at
+    integration and by R1-INT (BR-DAG-AMEND-R1-7).'
 - id: OBS-BR-02
   text: SECURITY_POLICY secret-content exclusion hides 8 product files (fake test keys, incl. brownfield.rs) from content
     indexes; they stay reachable by path/blob through the exact route and the exclusion is disclosed in every packet
@@ -1252,6 +1280,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0022 R1-RM (wave 2) and the BR-AR-0019 R1-RL follow-up (digested edge layer);
+next_deterministic_action: await BR-AR-0022 R1-RM (wave 2) and the BR-AR-0019 R1-RL second follow-up (citations; Rust binary tests);
   integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; on RL's merge dispatch R1-GA1 (BR-AR-0023,
   template R1-T1); checkpoint after every merge
