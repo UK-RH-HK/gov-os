@@ -15,6 +15,20 @@ fields:
       state_form: {state_ref: 'state:<alias>#<yaml key path>[*]', reason: string}
       path_form: {path: 'path@ref[:L1-L2]', reason: string, content_hash: 'sha256, optional'}
     rule: resolved ONLY by govbridge.authority.resolver; missing, or hash mismatch => BLOCKED (W3/W4)
+    selectors:
+      added_by: R1-RM (BR-AR-0022), merged at 732e34b; documented by the orchestrator
+      applies_to: path_form items, and the rows a state_form reference expands to (for example mandatory_bridge_inputs rows)
+      keys: 'list of dotted YAML key paths; each resolves to that key''s exact line span; a missing key fails the WHOLE item
+        closed. Only a LIST is a selector; any other value is an annotation and is ignored'
+      entries: '{ids: [..]} or {start: <id>, end: <id>} (optional `under` for a YAML sequence). YAML: the items of a sequence.
+        Markdown: a heading whose title begins with a token matched by config/id-grammar.yaml mention_patterns is an entry,
+        and it runs to its first child heading. start/end resolve in DOCUMENT ORDER, inclusive; a missing id or start after
+        end fails the item closed. Only a MAPPING is a selector; a string is an annotation (keep prose in `entries_note`)'
+      paths: 'list; every path is delivered in full, not merely existence-checked'
+    delivery_fidelity: 'the manifest records source_sha256 (the whole file), declared_sha256 and declared_bytes (exactly what
+      the item declares -- the whole file, an anchored slice, or the ordered selector parts) and delivered_sha256. packet
+      verify recomputes declared_sha256 from git at the packet''s RECORDED view and requires delivered == declared, or a
+      MANDATORY_PARTIAL_DELIVERY notice whose delivered and undelivered ranges exactly tile the declared span'
   seeds: {type: list, required: false, desc: 'record ids, record-local ids (ID#local), symbols or paths the graph starts from'}
   queries: {type: 'path | list', required: false, desc: '[{id, text, routes?, target_section?}] or a queries file'}
   supplementary_context: {type: list, required: false, desc: 'ids or paths delivered to H as RETRIEVED, never authority'}

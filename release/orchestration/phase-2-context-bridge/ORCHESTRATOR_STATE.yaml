@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T04:45:16Z'
-state_hash: dacb4ebfde1e869933da9739d38903820f0f6f2128097a4a7aaaf09280d64592
+updated_at: '2026-09-26T04:56:35Z'
+state_hash: c350b082b5282b46430a9c22dec31ef1735a62e59af57aa0ebcf80da79ba1465
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -234,7 +234,11 @@ mandatory_bridge_inputs:
     class: ORCHESTRATION_RECORD
     path: release/orchestration/phase-2/PHASE_LEDGER.md
     sha256: f7b643a38955571cf493a2f6dadd67949b352377f43026d6e50979c683c0ebc4
-    entries: P2-L-0033..P2-L-0047 (P2-L-0047 records OD-P2-10A/B)
+    entries: {start: P2-L-0033, end: P2-L-0047}
+    entries_note: P2-L-0033..P2-L-0047 (P2-L-0047 records OD-P2-10A/B)
+    restated: 'by the orchestrator after R1-RM''s merge (732e34b) -- the same id, class, path, hash and range; the prose moved
+      to entries_note so that the resolver now delivers exactly these 15 entries instead of treating the prose as an
+      annotation and falling back to a partial section map of the whole 120 KB ledger'
   - id: PHASE-2-STATE
     class: ORCHESTRATION_RECORD
     path: release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml
@@ -1031,6 +1035,26 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-rm-0022
   checkpoint_schema: 2
+  final_commit: 02b010d130426870d852df5c1ae64054e9e760fc
+  merged_at: 732e34b
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, pass 2)
+  pass_2:
+    fixed:
+    - packet verify detects truncation -- declared_sha256 is recomputed from git at the recorded view; delivered must
+      equal declared, or a MANDATORY_PARTIAL_DELIVERY notice must exactly tile the declared span (each range re-hashed);
+      three negative tests (truncated with no notice, a gap in the notice, a declared mismatch)
+    - entries works on Markdown (heading ids via config/id-grammar.yaml) and YAML, start/end in DOCUMENT order (this also
+      fixed a pre-existing lexicographic bug in the YAML path)
+    conformance: 9 rows; 8 MET, 1 MET_WITH_DISCLOSED_LIMIT (facet-selected sections for oversize items -- no facet system
+      yet; routed to R1-GA3, BR-DAG-AMEND-R1-11)
+    orchestrator_verified:
+    - FULL domain suite on the merged tree (with RX, RG, RL interim) -- 489 passed, 0 failed
+    - secrecy -- 0 hits over the whole transcript; claude-sonnet-5 x617; invariant, class-table and import-boundary tests untouched
+    - real resolver probe at the bridge tip -- the ledger row, restated as entries {start P2-L-0033, end P2-L-0047},
+      resolves exactly 15 entries (lines 336-749), unresolved ()
+    open_issues_routed:
+    - re-extraction of each A item's delivered body from the rendered packet (needs govbridge/cli.py) -> R1-RS
+      (BR-DAG-AMEND-R1-10)
   pass_1:
     final_commit: ce971200a16a8f691455d47a56a11cf06ee158b2
     integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
@@ -1053,7 +1077,7 @@ agent_runs:
     - the ledger row's entries is prose -> the orchestrator restates it in the structured form after the merge (same
       id, same meaning; the prose is kept as a note)
   dispatched_at: '2026-09-26T03:18Z'
-  status: RUNNING
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0022
   dispatch_notes:
   - implement R1-1 inside compile/validate.py and compile/receipt.py (verify_section_a recomputes A at the manifest's
@@ -1115,8 +1139,6 @@ agent_runs:
 running_work:
 - run_id: BR-AR-0023
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
-- run_id: BR-AR-0022
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rm-0022; never inferred from elapsed time
 - run_id: BR-AR-0019
   liveness_check: subagent transcript mtime + commits on bridge/r1-rl-0019; never inferred from elapsed time
 dag:
@@ -1234,6 +1256,22 @@ dag:
     reason: GA1 needs only the paging API, accepted since pass 1 and untouched by the reopen; RL's remaining scope
       (govbridge/code/**, graph/derive.py) is disjoint from GA1's; integrate-check requires only that the listed
       artifacts cover the diff, so a later delta merge stays checkable
+  - id: BR-DAG-AMEND-R1-10
+    by: orchestrator (routing of a BR-AR-0022 open issue)
+    rule: 'R1-RS additionally makes `packet verify` (and `receipt check`) re-extract each A item''s delivered body from the
+      rendered packet and recompute delivered_sha256 from it, so a renderer that drops content after hashing is caught;
+      a negative test tampers the rendered body with the manifest left intact -> FAIL. RS is the next editor of
+      govbridge/cli.py and of compile/validate.py and receipt.py (shared-file sequences RX -> GA1 -> RS and RM -> RS)'
+    reason: R1-RM's verify now compares the manifest's delivered hash with the declared span, but reads the delivered hash
+      from the manifest; re-extraction needs cli.py to pass the rendered packet, which is outside RM's scope
+  - id: BR-DAG-AMEND-R1-11
+    by: orchestrator (routing of R1-RM's MET_WITH_DISCLOSED_LIMIT row)
+    rule: 'R1-GA3 additionally chooses the selected sections of an OVERSIZE A item (delivered as section map, selected
+      sections and a by-reference remainder, REPAIR_PLAN.md section 3) with the task''s gather facets as well as its
+      declared selectors; nothing is ever removed from A; the MANDATORY_PARTIAL_DELIVERY notice and the exact-tiling
+      verify rule stay unchanged'
+    reason: RM had no facet system to use (R1-GA1 builds it); GA3 is the node that compiles from gather and edits packet.py
+      next (RX -> RM -> GA3)
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1340,6 +1378,11 @@ observations:
 - id: OBS-BR-11
   text: 'PreCompact hook CONFIRMED LIVE in this session -- at 2026-09-26T03:49:22+01:00 the hook wrote and committed BR-CP-0016
     on the bridge branch (hooks/checkpoint-hook.log). Manual checkpoints continue after every material transition.'
+- id: OBS-BR-14
+  text: 'the project PreCompact hook also fires when a SUBAGENT compacts -- BR-CP-0023 (04:39Z, reason pre-compact) was written
+    while the orchestrator had not compacted, most likely by a long-running builder''s compaction. The checkpoint is valid
+    (it records the then-current sealed state). Correction: commit e594159''s message names its checkpoint BR-CP-0023;
+    the checkpoint it wrote is BR-CP-0024.'
 - id: OBS-BR-12
   text: 'orchestrator instruction conflict, self-reported -- my live follow-up to BR-AR-0020 suggested reading
     DEMONSTRATION/oracle-tools/check_oracle.py for the must_state grammar, but REPAIR-1 rule 1 forbids the literal glob
@@ -1377,6 +1420,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0023 R1-GA1, the BR-AR-0022 R1-RM follow-up (fidelity check; Markdown entries) and the BR-AR-0019 R1-RL third follow-up (multi-ref walk; harness methods);
-  integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; on RL's merge dispatch R1-GA1 (BR-AR-0023,
-  template R1-T1); checkpoint after every merge
+next_deterministic_action: await BR-AR-0023 R1-GA1 and the BR-AR-0019 R1-RL third follow-up (multi-ref walk; harness methods);
+  integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; then PG3 -- R1-RS (after GA1; RM is merged;
+  carries BR-DAG-AMEND-R1-10) and R1-GA2 (after GA1 and RL FINAL); templates R1-T1 and R1-T2; checkpoint after every merge
