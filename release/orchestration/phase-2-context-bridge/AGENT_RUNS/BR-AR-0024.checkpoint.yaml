@@ -1,15 +1,17 @@
 run_id: BR-AR-0024
-commit: 804da482d8cbe04baf878f68b5acb7aeeef96857
+commit: ea992f95532da1e9765d38698310fe709f9ff0d8
 role: >-
   REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
   rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
-  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7).
+  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7). REOPENED once (follow-up budget
+  semantics); this checkpoint covers the state AFTER that reopening's own fix (a deterministic, carry-forward
+  priority queue).
 model_observed: claude-sonnet-5
 commands:
 - cmd: cd $D && $PY -m pytest tests/gather/test_followup.py tests/gather/test_merge.py -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check1-pytest-gather.out
-  output_sha256: abf611c3c2827357603a9ba2c824763e0369c8471aa1e771eb5d569e3bbb7e3e
+  output_sha256: 579967b54b9beb8351133018b10c39b31379a4b3bb30b35626504e789501f4c7
 - cmd: >-
     ACCEPTANCE CHECK 2 ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3 -- BR-DAG-AMEND-R1-18):
     $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --json, then
@@ -21,40 +23,50 @@ commands:
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-literal-cli.out
   output_sha256: 4e937bd568557c0abe16a6d7af4b42dd58605892e0ed1297ae65b16053fc1abe
 - cmd: >-
-    ACCEPTANCE CHECK 2, this node's own equivalent entry point ($PY as above): $PY -m govbridge.gather.followup
-    --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --facets purpose --max-followup-rounds 2
-    --json, then a $PY -c script extracting telemetry and independently checking every merged item's own shape
-    (provenance present; exactly one `occurrence`, never a raw `occurrences` list) -- proves >= 1 follow-up round
-    (round 1, stop_reason BUDGET_REACHED_WITH_UNRESOLVED after 20 identifiers -- disclosed, not silently dropped:
-    65 more are named in telemetry.unresolved_identifiers) whose triggers (D-5, CONTROL-A, R1-CTRL, R1-INT, CTRL-1,
-    CONTROL-B, ...) are identifiers first seen in round 0's own evidence, growing merged items from 31 to 164; the
-    programmatic shape check ("items failing that shape check") returns empty
+    SUPERSEDED (kept as the historical record of the defect this reopening fixes -- see the file's own header):
+    $PY -m govbridge.gather.followup --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
+    --facets purpose --max-followup-rounds 2 --json, from BEFORE the priority-queue fix -- 1 follow-up round,
+    BUDGET_REACHED_WITH_UNRESOLVED after 20 identifiers. Superseded by the command below.
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-followup-module.out
-  output_sha256: 96a98259b809823198611964fa1969a687a02cf022718f48020735629ea92156
+  output_sha256: fdcd1bc4ad35b42f1d89c7710ef6ed064ecad73796049011bfec920ee0c867c8
+- cmd: >-
+    ACCEPTANCE CHECK 4 (REOPENING requirement 4; $PY as above): all 5 CONTROL-A queries (CA-WHY, CA-REQ, CA-ENF,
+    CA-TESTS, CA-DEPS), facets=[purpose], follow-up enabled with config/facets.yaml's own deployed defaults
+    (max_rounds=6, max_identifiers_per_round=15, max_total_identifiers=250, max_wall_seconds=240), against a store
+    rebuilt --from-clean at this run's own current tree (bridge tip commit ade7ff8 -- the "records" ref had moved
+    since this node's first pass; manifest: 14670 blobs, 327893 chunks, 504041 occurrences, 3638.15s build).
+    Reports, per query: follow-up rounds reached, identifiers resolved/deferred/queued-at-end per round, stop
+    reason, merged items, wall time, and the bridge-domain-vs-product split of every chased (follow-up-resolved)
+    merged item's own source path -- ALL FIVE queries reach >= 2 follow-up rounds (CA-DEPS: 2; CA-REQ/CA-ENF/
+    CA-TESTS: 3; CA-WHY: 6, stopping at MAX_ROUNDS itself), satisfying the reopening's own "at least one query must
+    reach 2 or more" requirement with margin to spare.
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-sweep.out
+  output_sha256: e2509cd09d4cdd77b588fd9a975950f64abb897db2cc62ded67efa253740aeff
 - cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check2-full-domain-suite.out
-  output_sha256: 8ccb598c231a722e896ff45c471fcd5192f794182bec41792bfb26363d0fdfec
+  output_sha256: b2d27b5b3e1151288d547753d58fa0b375ff462055de734d74a19e5f93bb4b97
 - cmd: >-
     R1-T1 hermeticity: tests/gather/test_followup.py and tests/gather/test_merge.py run alone, then together in
     each order
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check3-order-independence.out
-  output_sha256: 917d2582181fff1a9a039fe5f74121bee07f0fd4526c3ddb154e12008a6a363a
+  output_sha256: 10303cefcae628774bfb095906b873ee2644c1bff0122161fce41c7d4313f48f
 - cmd: >-
     OC-BR-02 generic-rule self-audit: grep -nE 'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|
     phase2/review-8' over every file this node added
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out
-  output_sha256: a1437348cd6645d17cfd58445132d4050f073e762a750f40a83ad28d888be7a8
+  output_sha256: fdd1b022f9a9f427ea8c0dc3782e275aad35f85dc59522e7885ca97665521f21
 - cmd: >-
     R1-T2 rule 3 independent re-measurement: an ad hoc script (not committed) re-runs the read-only-store test's
     OWN query PLUS a second, code-route-dependent query, both against a chmod'd read-only store file, to check
     whether the sha256-unchanged property depends on which routes a query happens to use
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out
-  output_sha256: 2e026068805724847caed36e4b9e4770a602b37ed97d965ef4cb114a7617923b
+  output_sha256: cbe9275320bab049b2764054f9c72f05454fc179932143d703a92ec252350029
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
@@ -105,7 +117,7 @@ input_manifest:
 - path: release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
   sha256: 6958afc4a1b4d7848e6b0aba9bd8239184f25043f8121bbbcd0bbed30bb4bc08
 - path: release/orchestration/phase-2-context-bridge/config/facets.yaml
-  sha256: 761dd3b1838d89470e939901c1b78b9eb353c68e224ae93a3caac2744d41c81f
+  sha256: f7cceb05f8ba7ee58cbc7ba7f2a75e27df94b1c6b4ef21c76f8cbec6e435aa28
 - path: release/orchestration/phase-2-context-bridge/config/canonical-view.yaml
   sha256: 3184499a276cd93c81025dbae7c8633d9e6c97a9908f646b276db0232a760b03
 task_contract:
@@ -120,11 +132,15 @@ task_contract:
   - release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.*
+  # REOPENING (coordinator message, not a REPAIR_DAG.yaml row): scope extended to config/facets.yaml, for the
+  # follow-up:  section ONLY -- config/budgets.yaml stays R1-GA3's, untouched.
+  - release/orchestration/phase-2-context-bridge/config/facets.yaml
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
 - release/orchestration/phase-2-context-bridge/govbridge/gather/identifiers.py
 - release/orchestration/phase-2-context-bridge/govbridge/gather/merge.py
 - release/orchestration/phase-2-context-bridge/govbridge/gather/versions.py
+- release/orchestration/phase-2-context-bridge/config/facets.yaml
 - release/orchestration/phase-2-context-bridge/tests/gather/test_followup.py
 - release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
 - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/followup_repobuilder.py
@@ -137,6 +153,7 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check3-order-independence.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-sweep.out
 findings:
 - >-
   govbridge.gather.engine's own identifier_extractor hook (R1-GA1's extension point) discloses whatever it returns
@@ -186,6 +203,12 @@ failed_approaches:
   in open_issues, rather than add the write.
 unresolved:
 - >-
+  BLOCKS integrate-check, orchestrator action needed: ORCHESTRATOR_STATE.yaml's own `agent_runs` entry for
+  BR-AR-0024 has not yet been updated to include config/facets.yaml in this run's mutation_scope (the reopening
+  dispatch message granted this extension directly, not yet reflected in that file, which is not this node's to
+  edit). `python3 tools/check_state.py integrate-check BR-AR-0024` currently returns INTEGRATION_REFUSED for
+  exactly this one path; every other check passes. See open_issues for the full detail.
+- >-
   Full CLI wiring of `govbridge gather` to this node's triggered-round capability needs a one-line change to
   govbridge/cli.py's cmd_gather (replace the engine import with followup and call gather_with_followup) -- outside
   this node's mutation_scope this wave (R1-RS owns cli.py in the same parallel group). See open_issues/decisions.
@@ -218,16 +241,58 @@ decisions:
   facet just because "versions" was not itself a registered facet row in whatever config the caller happened to
   load.
 - >-
-  Made within this node's own authority: per-identifier resolution is capped at
-  DEFAULT_MAX_ITEMS_PER_IDENTIFIER=50 and follow-up depth defaults to DEFAULT_MAX_FOLLOWUP_ROUNDS=3 (both
-  govbridge/gather/followup.py module constants, overridable by a caller's own keyword argument) -- config/
-  facets.yaml is out of this node's mutation_scope, so these two knobs have no config-file home this pass; a
-  future node that owns that file could promote them there.
+  SUPERSEDED by this reopening: the first pass's own decision (per-identifier/round caps as bare module constants,
+  config/facets.yaml out of scope) is no longer current -- the coordinator's reopening extended this node's
+  mutation_scope to config/facets.yaml for exactly this purpose (task_contract.mutation_scope, above), and all
+  five follow-up knobs now live in that file's own `followup:` section (govbridge/gather/followup._followup_config),
+  the module's own DEFAULT_* constants demoted to a documented code fallback only.
 - >-
-  No existing test file was modified (R1-T1's own rule 5 does not apply: this node added test files, and only
-  ever appended to govbridge/gather/telemetry.py's already-existing, DOCUMENTED extension slot --
-  follow_up_triggers -- by constructing NEW GatherTelemetry instances from this node's own code, never editing
-  telemetry.py itself, which stays outside this node's mutation_scope).
+  REOPENING (required by the dispatch message, not requested by this node): gather_with_followup's own signature
+  changed. max_followup_rounds/max_identifiers_per_round/max_items_per_identifier now default to None (defer to
+  config/facets.yaml) instead of a literal module constant; two NEW keyword-only parameters were added
+  (max_total_identifiers, max_wall_seconds), both also defaulting to None (defer to config). Both changes are
+  backward compatible for any caller that named these arguments explicitly (the resolved VALUE for the three
+  pre-existing ones is unchanged unless config/facets.yaml's own new defaults differ from the old module
+  constants, which they now deliberately do -- see the next decision); a caller that relied on the OLD literal
+  defaults without reading config could observe a different number. Stated per the dispatch message's own
+  instruction ("keep that function's signature stable, or state any change in decisions").
+- >-
+  Made within this node's own authority: the five new config/facets.yaml `followup:` defaults
+  (default_max_rounds: 6, default_max_identifiers_per_round: 15, default_max_total_identifiers: 250,
+  default_max_wall_seconds: 240, default_max_items_per_identifier: 50 unchanged) were tuned from a real-view
+  timing measurement (~2-5s per identifier resolution on this domain's own corpus) so that a real CONTROL-A-shaped
+  query can reach multiple follow-up rounds within the wall budget (acceptance check evidence:
+  AGENT_RUNS/BR-AR-0024.check-controla-sweep.out) while still bounding one gather's own follow-up phase to a few
+  minutes.
+- >-
+  Made within this node's own authority: a round's own "added nothing genuinely new" check
+  (MARGINAL_GAIN_ONLY_DUPLICATES) now compares merge.MergeAccumulator.item_count() before/after the round, not
+  "the round resolved zero items" -- the more correct reading of the OD-BR-05 wording ("only duplicates"), since a
+  round whose every resolution DID return content that was already merged (a genuine duplicate, not an empty
+  result) is exactly the case this stop reason names, and the old, narrower reading conflated "found nothing" with
+  "found only what we already had".
+- >-
+  No existing test file was modified beyond the ONE correction this reopening itself required and already
+  disclosed in the FIRST pass's own decisions (govbridge/gather/telemetry.py's own follow_up_triggers slot is
+  appended to via new GatherTelemetry instances, never edited). This reopening's own test-file change is
+  REWRITING one test this node wrote in its OWN first pass
+  (test_a_round_with_more_identifiers_than_budget_stops_disclosed_never_silently_dropped), which measured the now-
+  fixed-as-defective immediate-stop behaviour as if it were correct -- split into
+  test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_to_a_later_round and
+  test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted, neither of which weakens
+  any assertion (both are strictly MORE specific about what must happen) -- the same "extend or correct, never
+  weaken, and justify every modification" discipline the REPAIR-1 builder template states for any existing test,
+  applied here to this node's OWN first-pass test now that the behaviour it measured is understood to be the
+  defect this reopening fixes.
+- >-
+  Found and corrected before returning: this reopening's own first drafts of the code comments/docstrings/tests
+  mislabelled the priority-queue fix as "BR-DAG-AMEND-R1-18 (R1-T3)" -- that id is the PRIOR, unrelated dispatch
+  message (interpreter pinning), not this reopening, which the coordinator's own message never numbered. Every
+  such mention in govbridge/gather/{followup,identifiers,merge}.py, tests/gather/test_followup.py,
+  config/facets.yaml and this checkpoint/report was corrected to "the BR-AR-0024 reopening" before commit (a
+  `grep -rn 'BR-DAG-AMEND-R1-18'` over every file this node touched, kept only where it correctly names the
+  interpreter-pinning amendment: the `# interpreter: $PY (...)` header lines and this checkpoint's own R1-T3
+  entries).
 lessons:
 - >-
   When a DAG node's own mutation_scope excludes the file that would be the "obvious" integration point (here,
@@ -250,12 +315,28 @@ lessons:
   Building a real-view store `index rebuild --from-clean` for a whole-repository domain is a multi-minute
   operation (semantic embeddings dominate); budget for it as a background task with a bounded poll, not a
   synchronous command with a short timeout.
+- >-
+  A stop-reason or defect name that "sounds right" from a recent message still needs to be checked against the
+  ACTUAL identifier the coordinator used, not assumed: this reopening's own first drafts attached the previous
+  dispatch's amendment id (BR-DAG-AMEND-R1-18, interpreter pinning) to an unrelated fix (the priority queue) simply
+  because it was the most recently mentioned id in context. A `grep` for the id across every touched file, right
+  before returning, caught it -- cheap enough to make a standing habit whenever a prior dispatch's own identifier
+  gets reused in a new pass's own prose.
+- >-
+  A shared, real repository under concurrent multi-agent access moves out from under a long-lived store: a ref
+  this domain's own store indexed can advance (another agent's own commits) while that store is still being
+  queried, which is exactly why "build from clean with the current tree" is not a formality -- it was necessary
+  here (the "records" ref had moved since this node's own first-pass store build) and the resulting number
+  (identifiers/rounds/timings) can differ across two "from-clean" builds of the SAME store path for exactly that
+  reason, never because the code changed.
 next_consumer: >-
   Whoever next owns govbridge/cli.py in the RX -> GA1 -> RS -> RA sequence (R1-RA, most likely), for the one-line
   wiring described in decisions/open_issues; R1-GA3, which depends on this node and wires `gather` into
   govbridge.compile (a natural second integration point for gather_with_followup, alongside or instead of the CLI
-  one); R1-XC, already tracking the code-route/classify_hit query-time writes this node independently reconfirmed
-  (findings) and deliberately did not extend (failed_approaches); whoever owns govbridge/code/symbols.py next, for
-  the Python-adapter gap (findings, unresolved); the orchestrator, for the remaining disclosed open_issues and the
-  cli.py-wiring decision request.
-final_commit: 804da482d8cbe04baf878f68b5acb7aeeef96857
+  one) -- and should know config/facets.yaml now carries a `followup:` section alongside the facet rows it already
+  reads, in case a compile-time caller wants to override the same five knobs; R1-XC, already tracking the
+  code-route/classify_hit query-time writes this node independently reconfirmed (findings) and deliberately did
+  not extend (failed_approaches); whoever owns govbridge/code/symbols.py next, for the Python-adapter gap
+  (findings, unresolved); the orchestrator, for the remaining disclosed open_issues and the cli.py-wiring decision
+  request.
+final_commit: ea992f95532da1e9765d38698310fe709f9ff0d8

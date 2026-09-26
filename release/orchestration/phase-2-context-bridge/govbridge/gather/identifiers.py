@@ -56,7 +56,12 @@ _MIN_PATH_LITERAL_LEN = 3
 class Identifier:
     """One candidate identifier discovered in a round's evidence. ``source_*`` is the occurrence it was found IN
     (never confused with the identifier's own, not-yet-resolved location); ``note`` carries a human-readable reason
-    (e.g. which lineage_edge row/derivation produced it) for telemetry/debugging, never used for matching."""
+    (e.g. which lineage_edge row/derivation produced it) for telemetry/debugging, never used for matching.
+    ``mention_count``: how many hits, across every extractor and every batch this identifier has been merged from
+    (the BR-AR-0024 reopening), mentioned this exact ``(kind, value)`` -- :func:`_dedupe_identifiers` SUMS this
+    across duplicates rather than discarding them, so a caller merging identifiers across rounds
+    (:mod:`govbridge.gather.followup`'s own priority queue) can use it as a relevance signal ("how many frontier
+    items mention them") without re-scanning anything."""
     kind: str
     value: str
     source_unit_id: Optional[str] = None
@@ -65,6 +70,7 @@ class Identifier:
     source_commit: Optional[str] = None
     source_ref: Optional[str] = None
     note: Optional[str] = None
+    mention_count: int = 1
 
     def key(self) -> tuple:
         """The visited-set key (REPAIR_PLAN.md section 2.5: "a visited set prevents loops") -- kind+value only,
@@ -265,14 +271,21 @@ def extract_requirement_citations(hits: list) -> list:
 
 
 def _dedupe_identifiers(idents: list) -> list:
-    seen: set = set()
-    out: list = []
+    """First occurrence wins for ``source_*``/``note``; ``mention_count`` is SUMMED across every duplicate
+    (the BR-AR-0024 reopening) -- correct whether the duplicates being merged already carry a summed count
+    themselves (this function is applied in two stages: once per extractor, then again over the combined list in
+    :func:`extract_all`) or a fresh count of 1 each."""
+    seen: dict = {}
+    order: list = []
     for i in idents:
-        if i.key() in seen:
-            continue
-        seen.add(i.key())
-        out.append(i)
-    return out
+        key = i.key()
+        if key not in seen:
+            seen[key] = i
+            order.append(key)
+        else:
+            existing = seen[key]
+            seen[key] = dataclasses.replace(existing, mention_count=existing.mention_count + i.mention_count)
+    return [seen[k] for k in order]
 
 
 def extract_from_text(hits: list, grammar=None, repo: Optional[str] = None) -> list:

@@ -107,3 +107,27 @@ facets:
 # add a row to narrow one query class, with no code change and no instance-specific name required to satisfy OC-BR-02
 # (a class id is caller-chosen data, never a Review-8 name baked in here).
 class_facets: {}
+
+# govbridge.gather.followup's own knobs (REPAIR_DAG.yaml node R1-GA2; the BR-AR-0024 reopening) -- read by
+# govbridge.gather.followup._followup_config, never by govbridge.gather.facets/engine.py (R1-GA1's own base loop
+# has no follow-up knobs of its own). config/budgets.yaml stays R1-GA3's; this section is the ONE place these five
+# defaults live -- the module's own DEFAULT_* constants are a code fallback only, used when this file (or this
+# section of it) is missing.
+followup:
+  # a round bound (OD-BR-05 section 3: multi-hop, not unbounded) -- generous enough that a real, dense-prose
+  # corpus can drain a realistic identifier queue within the overall budget below before ever hitting this.
+  default_max_rounds: 6
+  # the PER-ROUND fan-out cap (the BR-AR-0024 reopening: this bounds one round's own cost, never the number of
+  # rounds -- an identifier over this cap is carried forward to the NEXT round's own fresh cap, in priority order,
+  # never dropped and never itself a reason to stop).
+  default_max_identifiers_per_round: 15
+  # how many items ONE identifier's own resolution may add (code route paging, exact-route mentions).
+  default_max_items_per_identifier: 50
+  # the OVERALL item budget across every follow-up round combined -- `null` disables this specific check (kept
+  # alongside default_max_wall_seconds below so at least one overall bound is always in force by default).
+  default_max_total_identifiers: 250
+  # the OVERALL wall-clock budget (seconds) across every follow-up round combined -- `null` disables this specific
+  # check. Checked at the TOP of each round, before that round's own batch is taken (a round already in flight
+  # always finishes); real-view measurement on this domain's own CONTROL-A corpus found ~2-5s per identifier
+  # resolution (route/git subprocess overhead), so this bounds one gather's own follow-up phase to a few minutes.
+  default_max_wall_seconds: 240

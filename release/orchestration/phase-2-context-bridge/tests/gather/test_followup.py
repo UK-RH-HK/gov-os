@@ -333,17 +333,56 @@ def test_followup_stops_at_max_followup_rounds_never_looping_forever():
     assert result["stop_reason"] == enginemod.STOP_MAX_ROUNDS
 
 
-def test_a_round_with_more_identifiers_than_budget_stops_disclosed_never_silently_dropped():
-    """OD-BR-05 section 5: real prose is dense with identifier-shaped tokens (a real-view measurement on this
-    domain's own CONTROL-A found 81 candidates from just 31 items) -- a per-round cap is necessary, and exceeding
-    it must stop with BUDGET_REACHED_WITH_UNRESOLVED, naming every deferred identifier, never silently dropping
-    it."""
-    text = " ".join(f"ZZ-{i:04d}" for i in range(5))  # 5 distinct id-grammar-shaped tokens, one round
-    routes = FakeRouteSet(lexical=[make_hit("U1", "a/x.md", text=text)])
+class _ResolvableExactRoutes:
+    """A hermetic fake whose ``exact`` route resolves EVERY queried id to a genuinely NEW, unique merged item (its
+    own resolved text mentions the SAME id again, never a fresh one, so the visited set -- not a lack of
+    resolvable content -- is what eventually empties the queue). Used to prove the priority QUEUE carries
+    identifiers across rounds (the BR-AR-0024 reopening) rather than measuring "found nothing" as a stand-in
+    for "had no budget"."""
+
+    def __init__(self):
+        self.exact_calls = []
+
+    def run(self, name, **kwargs):
+        if name == "lexical":
+            text = " ".join(f"ZZ-{i:04d}" for i in range(5))
+            return [make_hit("SEED", "a/x.md", text=text)]
+        if name == "exact":
+            text = kwargs.get("text", "")
+            self.exact_calls.append(text)
+            return [make_hit(f"H-{text}", f"dir/{text}.md", text=f"resolved content for {text}, no new ids here.")]
+        return []
+
+
+def test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_to_a_later_round():
+    """the BR-AR-0024 reopening, requirement 1/5: 5 candidates appear in round 0's own evidence; a per-round
+    cap of 2 must not end follow-up after round 1 -- the other 3 carry forward and get chased in round 2 (and, if
+    needed, round 3), draining the queue via NO_UNRESOLVED_IDENTIFIERS, never stopping early just because one
+    round's own fan-out cap was smaller than the queue."""
+    routes = _ResolvableExactRoutes()
     ctx = taskctxmod.TaskContext(source="test")
     result = followupmod.gather_with_followup(_query("five ids", facets=["purpose"]), routes, task=ctx,
-                                                batch_size=8, threads=1, max_followup_rounds=3,
-                                                max_identifiers_per_round=2, facets_path=TEST_FACETS_PATH)
+                                                batch_size=8, threads=1, max_followup_rounds=5,
+                                                max_identifiers_per_round=2, max_total_identifiers=100,
+                                                max_wall_seconds=60.0, facets_path=TEST_FACETS_PATH)
+    assert result["followup_rounds"] >= 3, "5 candidates at 2 per round need at least 3 rounds to drain"
+    assert result["stop_reason"] == enginemod.STOP_NO_UNRESOLVED_IDENTIFIERS
+    chased = {t["identifier"]["value"] for t in result["telemetry"]["follow_up_triggers"]}
+    assert chased == {f"ZZ-{i:04d}" for i in range(5)}
+    assert result["telemetry"]["identifiers_queued_at_end"] == 0
+    rounds_seen = {t["round"] for t in result["telemetry"]["follow_up_triggers"]}
+    assert rounds_seen >= {1, 2}, "the carried identifiers must actually be chased in round 2 or later"
+
+
+def test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted():
+    """The per-round cap ALONE (max_identifiers_per_round) must never produce BUDGET_REACHED_WITH_UNRESOLVED --
+    only the OVERALL budget (max_total_identifiers and/or max_wall_seconds) does, with the queue still non-empty."""
+    routes = _ResolvableExactRoutes()
+    ctx = taskctxmod.TaskContext(source="test")
+    result = followupmod.gather_with_followup(_query("five ids", facets=["purpose"]), routes, task=ctx,
+                                                batch_size=8, threads=1, max_followup_rounds=5,
+                                                max_identifiers_per_round=2, max_total_identifiers=2,
+                                                max_wall_seconds=60.0, facets_path=TEST_FACETS_PATH)
     assert result["followup_rounds"] == 1
     assert result["stop_reason"] == enginemod.STOP_BUDGET_REACHED_WITH_UNRESOLVED
     chased = {t["identifier"]["value"] for t in result["telemetry"]["follow_up_triggers"]}
@@ -352,3 +391,61 @@ def test_a_round_with_more_identifiers_than_budget_stops_disclosed_never_silentl
     assert len(deferred) == 3
     assert chased.isdisjoint(deferred)
     assert chased | deferred == {f"ZZ-{i:04d}" for i in range(5)}
+    assert result["telemetry"]["identifiers_queued_at_end"] == 3
+
+
+def test_priority_order_is_deterministic_and_matches_the_stated_rule():
+    """the BR-AR-0024 reopening, requirement 2: matches-query first; then kind (record ids, then symbols/test
+    paths, then citations, then path literals, then commit hashes); then mention count (descending); then first
+    appearance; then a lexical tie-break. No instance names (OC-BR-02): only kind CONSTANTS are used."""
+    from govbridge.gather.identifiers import Identifier
+
+    query_text_lower = "please chase zz-0001 now"
+    commit_ident = Identifier(kind=identifiersmod.KIND_COMMIT, value="aaaa111", mention_count=1)
+    matching_id = Identifier(kind=identifiersmod.KIND_RECORD_ID, value="ZZ-0001", mention_count=1)
+    popular_id = Identifier(kind=identifiersmod.KIND_RECORD_ID, value="ZZ-0002", mention_count=5)
+    symbol_ident = Identifier(kind=identifiersmod.KIND_SYMBOL, value="foo", mention_count=1)
+    order = sorted([commit_ident, matching_id, popular_id, symbol_ident],
+                   key=lambda i: followupmod._priority_sort_key(i, query_text_lower, {}))
+    assert [i.value for i in order] == ["ZZ-0001", "ZZ-0002", "foo", "aaaa111"]
+
+
+def test_priority_order_is_the_same_object_the_queue_actually_uses():
+    """The sort key computation is not a second, silently-diverging copy: a real _PriorityQueue.take() call
+    resolves candidates in EXACTLY the order test_priority_order_is_deterministic_and_matches_the_stated_rule
+    predicts, and the SAME priority_info is what gets recorded per identifier."""
+    from govbridge.gather.identifiers import Identifier
+
+    queue = followupmod._PriorityQueue()
+    queue.merge_new([
+        Identifier(kind=identifiersmod.KIND_COMMIT, value="aaaa111"),
+        Identifier(kind=identifiersmod.KIND_RECORD_ID, value="ZZ-0001"),
+        Identifier(kind=identifiersmod.KIND_RECORD_ID, value="ZZ-0002", mention_count=5),
+        Identifier(kind=identifiersmod.KIND_SYMBOL, value="foo"),
+    ], visited=set())
+    taken = queue.take(10, "please chase zz-0001 now")
+    assert [ident.value for ident, _info in taken] == ["ZZ-0001", "ZZ-0002", "foo", "aaaa111"]
+    zz0001_info = taken[0][1]
+    assert zz0001_info["matches_query"] is True
+    assert zz0001_info["kind_rank"] == 0
+    aaaa_info = taken[3][1]
+    assert aaaa_info["matches_query"] is False
+    assert aaaa_info["kind_rank"] == 4
+
+
+def test_gather_with_followup_is_byte_identical_across_thread_counts(built_repo, real_routes_and_view):
+    """R1-GA1's own proof (test_engine.py::test_merge_is_byte_identical_across_thread_counts) extended through the
+    whole follow-up pipeline: --threads only ever affects wall-clock time for the base round's own facet
+    concurrency (already thread-count-independent); this module's own round loop is sequential, and the priority
+    queue's sort key never depends on wall-clock/thread-scheduling order."""
+    routes, resolved_view = real_routes_and_view
+    shas = set()
+    for threads in (1, 4):
+        ctx = taskctxmod.TaskContext(source="test")
+        result = followupmod.gather_with_followup(
+            _query("citing record explains a rule", facets=["purpose"]), routes, task=ctx, batch_size=8,
+            max_rounds=10, threads=threads, max_followup_rounds=3, resolved_view=resolved_view,
+            repo=str(built_repo.root), facets_path=TEST_FACETS_PATH,
+        )
+        shas.add(result["merged_sha256"])
+    assert len(shas) == 1, shas
