@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T08:01:42Z'
-state_hash: f7e40185abba414ae26a7fcf849fabc81d69b6cd142b7431ab67a357840418a5
+updated_at: '2026-09-26T08:39:34Z'
+state_hash: fee85e556bdfebbb6f3c0952824cc87994dcc37f3eada07c25496977a2ab3aa8
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1229,6 +1229,21 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-rs-0025
   checkpoint_schema: 2
+  final_commit: 0a8666f2f4176694eb7dad3232e498b09313db99
+  merged_at: 1b9ba24
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, pass 2)
+  pass_2:
+    fixed: 'verify_rendered_delivery recomposes EVERY A-item shape (directory manifest, selector pieces, oversize section map,
+      plain body) from git at the recorded view with packet.Compiler._mandatory_text imported read-only, and compares with
+      exact equality; four negative tests plus a six-shape positive control; a real-view shell insertion right after
+      Contract v3''s body-begin marker now FAILS verify with manifest.json byte-identical; budgets_path threaded into
+      meta.json and verify so the recomposition uses the compile''s own caps; test_compile_bootstrap.py corrected to the
+      by-reference contract (granted)'
+    independence_note: the recomposition reuses the compiler's composition function, so it detects RENDER-stage divergence;
+      COMPOSITION-stage truncation is caught independently by R1-RM's declared-vs-delivered check (resolver.declared_parts)
+    orchestrator_verified:
+    - FULL domain suite on the merged tree -- 587 passed, 0 failed (no second named exception)
+    - secrecy 0 hits over the whole run; claude-sonnet-5 x631; packet.py, core/store.py and every protected test untouched
   pass_1:
     final_commit: b6c0b59af473e5d09001e19bebf3af8a48461388
     integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
@@ -1246,7 +1261,7 @@ agent_runs:
     - core/store.py open_db() runs a write-shaped statement on every open, which blocks read-only stores -> R1-GA1 (core/store.py
       is in its extended scope for the read-only query paths)
   dispatched_at: '2026-09-26T06:45Z'
-  status: RUNNING
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0025
   dispatch_notes:
   - govbridge/compile/render.py is added for ONE purpose -- the smallest item-delimiting format that makes the R1-10 re-extraction
@@ -1268,8 +1283,6 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.*
   - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_bootstrap.py
 running_work:
-- run_id: BR-AR-0025
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rs-0025; never inferred from elapsed time
 - run_id: BR-AR-0023
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
 dag:
@@ -1591,6 +1604,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0025 R1-RS and the BR-AR-0023 R1-GA1 follow-up (scope push-down; full-facet acceptance);
-  integrate-check (schema 2) + FULL suite on the trial-merged tree, merge; on GA1 FINAL dispatch R1-GA2 (BR-AR-0024, draft
-  ready); then PG4 (R1-GA3, R1-RA); checkpoint after every merge
+next_deterministic_action: await the BR-AR-0023 R1-GA1 follow-up (build-time scope structures; read-only query paths; open_db
+  ro mode); integrate-check + FULL suite on the trial-merged tree, merge; then dispatch R1-GA2 (BR-AR-0024; draft ready, with
+  BR-DAG-AMEND-R1-15); then PG4 (R1-GA3 after GA2+RS+RN+RM; R1-RA after GA2+RS); checkpoint after every merge
