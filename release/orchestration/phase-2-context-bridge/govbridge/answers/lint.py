@@ -222,6 +222,16 @@ def _finding_key(f: dict) -> str:
 def lint_answers(answers_doc: dict, packet_dirs: list, *, commit: Optional[str] = None,
                   view_path: Optional[str] = None, repo: Optional[str] = None,
                   registry_path: Optional[str] = None, waivers: Optional[list] = None) -> dict:
+    # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): a lint run used to make one INDEPENDENT
+    # config/canonical-view.yaml resolution per uncited identifier, per claim, per answer (each of citemod.
+    # cite_identifier's own calls below, previously never given a resolved_view). One "answers lint" invocation
+    # now resolves ONCE, here, and threads the SAME view through every cite_identifier call in this run.
+    from govbridge.core import view as viewmod
+    from govbridge import GOV_BRIDGE_DOMAIN
+    import os
+    vp = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
+    resolved_view = viewmod.resolve_view(viewmod.load_view(vp), repo=repo)
+
     findings: list = []
     answers = answers_doc.get("answers") or []
     all_query_ids = [a.get("query_id") for a in answers]
@@ -240,7 +250,7 @@ def lint_answers(answers_doc: dict, packet_dirs: list, *, commit: Optional[str] 
                 if _is_cited(ident, citations):
                     continue
                 res = citemod.cite_identifier(ident, commit=commit, view_path=view_path, repo=repo,
-                                               registry_path=registry_path)
+                                               registry_path=registry_path, resolved_view=resolved_view)
                 if res["status"] in (citemod.STATUS_RESOLVED, citemod.STATUS_AMBIGUOUS):
                     findings.append({
                         "kind": KIND_NAMED_NOT_CITED, "query_id": query_id, "context": label, "identifier": ident,
@@ -280,8 +290,9 @@ def lint_answers(answers_doc: dict, packet_dirs: list, *, commit: Optional[str] 
         if not waived:
             open_count += 1
 
+    # BR-DAG-AMEND-R1-23 requirement 1: the recorded view in this output must equal the commits actually used.
     return {"findings": out_findings, "open_findings": open_count,
-            "status": "PASS" if open_count == 0 else "FINDINGS"}
+            "status": "PASS" if open_count == 0 else "FINDINGS", "resolved_refs": resolved_view.pinned_refs()}
 
 
 def main(argv=None) -> int:

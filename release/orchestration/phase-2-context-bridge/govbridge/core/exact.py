@@ -211,18 +211,24 @@ def id_lookup(token: str, ref: Optional[str] = None, view_path: Optional[str] = 
     id-grammar-shaped record id (e.g. a bare code symbol) or the lookup is unavailable in this environment: a
     mention is never mistaken for a definition either way.
 
-    ``resolved_view`` (BR-DAG-AMEND-R1-23) is threaded straight through to :func:`grep`, so a caller already
-    inside a one-resolved-view-per-operation context (``govbridge.route.real_routes.exact_route``, closing over
-    the ONE view its own ``build_real_routes`` resolved) never causes a second, independent tip resolution here.
-    ``govbridge.authority.lifecycle.find_definition`` below is OUTSIDE this module's own scope and still resolves
-    its own view internally on every call (reported, not fixed here, in this run's own checkpoint findings) --
-    a residual gap for whoever next owns that file."""
+    ``resolved_view`` (BR-DAG-AMEND-R1-23) is threaded straight through to both :func:`grep` (so ``mention_sites``
+    never causes a second, independent tip resolution) and ``govbridge.authority.lifecycle.find_definition`` (pass
+    5: that module now accepts it too, so ``definition_sites`` uses the SAME pinned "records" commit as
+    ``mention_sites`` -- closing the residual gap pass 4's own docstring here used to document). When the caller
+    gives no ``resolved_view`` (a standalone ``govbridge exact id`` invocation), THIS function resolves exactly
+    ONCE, itself, right here -- never leaving `grep`/`find_definition` to each resolve independently on their own
+    ``None`` fallback (a second re-audit, pass 5, found this was still happening: two separate resolutions for
+    one `id_lookup` call, mention_sites and definition_sites each potentially seeing a different "records" tip)."""
+    default_view, _ = _default_paths(repo)
+    view_path = view_path or default_view
+    if resolved_view is None:
+        resolved_view = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
     r = grep(token, ref=ref, view_path=view_path, repo=repo, task=task, resolved_view=resolved_view)
     r["mention_sites"] = r.pop("hits")
     definition_sites: list = []
     try:
         from govbridge.authority import lifecycle as lifecyclemod
-        found = lifecyclemod.find_definition(token, repo=repo, view_path=view_path)
+        found = lifecyclemod.find_definition(token, repo=repo, view_path=view_path, resolved_view=resolved_view)
         if found is not None:
             def_path, def_commit, line_start, line_end = found
             definition_sites.append({

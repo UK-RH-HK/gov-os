@@ -234,7 +234,14 @@ def test_clean_answers_document_passes(built):
         {"query_id": "QC1", "status": "ANSWERED", "answer_text": "a clean answer", "citations": [{"item_id": "x"}]},
     ]}
     result = lintmod.lint_answers(doc, [], view_path=built.view_path, repo=str(built.root))
-    assert result == {"findings": [], "open_findings": 0, "status": "PASS"}
+    # BR-DAG-AMEND-R1-23 reopening (pass 5, rule-5 correction): lint_answers now ALSO records the one resolved
+    # view this run used (requirement 1: "the recorded view in each output must equal the commits actually
+    # used") -- an additive field, so the pre-existing three keys are still asserted exactly as before, plus the
+    # new one is checked for real content instead of being dropped from the comparison.
+    assert result["findings"] == []
+    assert result["open_findings"] == 0
+    assert result["status"] == "PASS"
+    assert {"name": "records", "commit": built.commit, "status": "OK"} in result["resolved_refs"]
 
 
 def test_extract_candidate_identifiers_shapes():

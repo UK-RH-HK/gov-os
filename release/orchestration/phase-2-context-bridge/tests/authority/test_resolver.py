@@ -79,3 +79,46 @@ def test_path_form_required_input(fixture_repo, view_path):
     result = resolver.resolve(task_spec, repo=str(fixture_repo.root), registry_path="tests/fixtures/authority/fixture-authority-registry.yaml")
     assert result.status == "OK", result.blocked_reasons
     assert result.items[0].path == repobuilder.LEDGER_PATH
+
+
+def test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_after_it_was_resolved(
+        fixture_repo, view_path):
+    """BR-DAG-AMEND-R1-23 reopening (pass 5, an independent re-audit's own finding, confirmed empirically before
+    this fix -- a `resolve_view` call-counting probe showed 2 resolutions for one `resolve()` call, not 1): the
+    id-form branch used to call `lifecycle._find_definition` WITHOUT threading `resolved_view` through, even
+    though `resolve()`'s own OTHER two branches (state_ref/path-form, exercised by the tests above) already did.
+    A "records" ref that moves between `resolve()`'s own one resolution and this branch's own separate one could
+    build the returned MandatoryItem from a DIFFERENT commit than the view a compile or `packet verify` had
+    already resolved once -- exactly the "recorded view, never the moving tip" property BR-DAG-AMEND-R1-1 already
+    requires for every OTHER form. An empty commit (never touching tracked content) stands in for "another agent
+    commits to the shared orchestration branch between this compile's own resolution and this one lookup"."""
+    import subprocess
+
+    from govbridge.core import view as viewmod
+
+    def _git(root, *args):
+        r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+        if r.returncode != 0:
+            raise RuntimeError(f"git {args} failed: {r.stderr}")
+        return r
+
+    resolved_view = viewmod.resolve_view(viewmod.load_view(view_path), repo=str(fixture_repo.root))
+    original_commit = resolved_view.named["records"].commit
+
+    _git(fixture_repo.root, "commit", "--allow-empty", "-q", "-m", "simulated concurrent commit (BR-DAG-AMEND-R1-23)")
+    moved_commit = _git(fixture_repo.root, "rev-parse", "HEAD").stdout.strip()
+    assert moved_commit != original_commit
+
+    task_spec = _task_spec(view_path, [
+        {"id": "FX-0002", "reason": "test", "required_status": "ACTIVE"},
+    ])
+    result = resolver.resolve(task_spec, repo=str(fixture_repo.root),
+                               registry_path="tests/fixtures/authority/fixture-authority-registry.yaml",
+                               resolved_view=resolved_view)
+    assert result.status == "OK", result.blocked_reasons
+    item = result.items[0]
+    assert item.id == "FX-0002"
+    assert item.commit == original_commit, (
+        f"id-form item {item.id!r} carries commit {item.commit!r}, not the pinned view's own {original_commit!r}"
+        f" -- resolve() re-resolved the records ref live instead of reusing the resolved_view it was given"
+    )

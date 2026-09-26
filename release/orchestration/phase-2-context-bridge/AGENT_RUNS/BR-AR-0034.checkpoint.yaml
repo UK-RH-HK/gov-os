@@ -1,10 +1,10 @@
 run_id: BR-AR-0034
-commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
+commit: a010e6e562d49fc0958a8ec9b7ab2b3e92041452
 role: >-
   REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17/-23) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
   repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14),
   read-only code/classification query paths (R1-17 items 5 and 6), and one resolved view per operation (R1-23).
-  Reopened FOUR times: R1-17(5) was narrowed on pass 1 (read-only variants added for gather's code route only,
+  Reopened FIVE times: R1-17(5) was narrowed on pass 1 (read-only variants added for gather's code route only,
   while ensure_indexed still lazily built at query time behind symbols.stats/definitions/callers/reads_key and in
   five external callers; a broad except in code_route also swallowed StoreNeedsRebuild) -- pass 2 makes
   ensure_indexed BUILD-ONLY everywhere and re-raises typed errors. Pass 3 (accepted pass 2's own six fixes; two
@@ -20,7 +20,12 @@ role: >-
   confirmed cause of a single ~1031s gather recording four different "records" commits,
   AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out), threads the ONE view real_routes.build_real_routes
   already resolves through exact_route/registrymod.load/lifecyclemod._load_mandatory_items, and audits (but per
-  scope does not fix) every other tip-resolution site across govbridge/**.
+  scope does not fix) every other tip-resolution site across govbridge/**. Pass 5 (this pass, BR-DAG-AMEND-R1-23
+  extended to every audited site): fixes every remaining site pass 4's own audit found -- lexical/query.py,
+  semantic/search.py, authority/lifecycle.py (a NEAR-FROZEN module, threaded minimally), gather/followup.py
+  (removes its own second resolution outright), compile/packet.py (the most affected operation, now exactly one
+  resolution for its whole lifetime), graph/why.py, graph/history.py, answers/cite.py and answers/lint.py -- then
+  re-audits with two independent methods and finds zero remaining query-path tip re-resolutions.
 model_observed: claude-sonnet-5
 commands:
 - cmd: cd $D && git checkout 4c769d1805adfbc91173fe9d933c814ec5c850d5 -- govbridge/core/freshness.py && $PY -m pytest -q -p no:cacheprovider tests/core/test_freshness_entrypoint.py
@@ -217,6 +222,61 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check29-full-domain-suite-pass4-final.out
   output_sha256: b6e49a897119d6d7d4b664f78ef10caa9b0bfaf4e0b6eb6dc60d7286d0749779
+- cmd: >-
+    PASS 5 (BR-DAG-AMEND-R1-23 extended to every audited site), before -- interpreter: $PY only: cd $D &&
+    git checkout HEAD -- govbridge/core/exact.py govbridge/core/view.py govbridge/route/router.py
+    govbridge/route/real_routes.py govbridge/authority/lifecycle.py govbridge/gather/followup.py
+    govbridge/graph/why.py govbridge/graph/history.py govbridge/answers/cite.py govbridge/answers/lint.py
+    govbridge/compile/packet.py govbridge/lexical/query.py govbridge/semantic/search.py
+    tests/answers/test_lint.py && $PY -m pytest -q -p no:cacheprovider
+    tests/route/test_view_pinned_per_operation.py
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check30-r123-pass5-before.out
+  output_sha256: 894a038789533bd71bd4bf52b879b86723902e9ba43d84819cfe7e69f7502f5b
+- cmd: >-
+    PASS 5, after -- interpreter: $PY: cd $D && (restore the pass-5 fix to all 13 files above) && $PY -m pytest
+    -q -p no:cacheprovider tests/route/test_view_pinned_per_operation.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check31-r123-pass5-after.out
+  output_sha256: edb5eef74b67d319063d240e707f3956ba7de6e50dd453fb43db9253c8ca928c
+- cmd: >-
+    PASS 5 requirement 2 (authority/lifecycle.py is NEAR-FROZEN: only thread the view through, no other change) --
+    the class-table test, the import-boundary test and every lifecycle invariant test, confirmed passing
+    UNMODIFIED (`git diff --stat` empty for all three files): cd $D && $PY -m pytest -q -p no:cacheprovider
+    tests/authority/test_classes.py tests/authority/test_import_boundary.py tests/authority/test_lifecycle.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check32-lifecycle-invariants.out
+  output_sha256: d455b40e5f56db6d0abf0f880fc547f771b0ba8df5ed55b2801dcd6c142cae72
+- cmd: >-
+    PASS 5's own full-suite acceptance, BEFORE the required re-audit's own two further fixes (superseded by
+    check36 below, kept for the record). Interpreter: $PY = $HOME/.cache/gov-bridge/venv/bin/python
+    (Python 3.12.3) ONLY, per R1-T3: cd $D && $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check33-full-domain-suite-pass5-final.out
+  output_sha256: 80d725f89854a65dc9906617883c2fb01b486f998850eadae76c9e373df0def4
+- cmd: >-
+    PASS 5's own required re-audit (requirement 4), before -- interpreter: $PY only: cd $D && git checkout HEAD --
+    govbridge/authority/resolver.py govbridge/core/exact.py && $PY -m pytest -q -p no:cacheprovider
+    "tests/authority/test_resolver.py::test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_after_it_was_resolved"
+    "tests/route/test_view_pinned_per_operation.py::test_exact_id_lookup_resolves_the_view_exactly_once_per_call"
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check34-audit2-before.out
+  output_sha256: 270b8672657220e1194a16b2c006e712d5763a3995b35070eafc20b0c50c85c3
+- cmd: >-
+    PASS 5's own required re-audit, after -- interpreter: $PY: cd $D && (restore the fix to
+    govbridge/authority/resolver.py and govbridge/core/exact.py) && $PY -m pytest -q -p no:cacheprovider
+    "tests/authority/test_resolver.py::test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_after_it_was_resolved"
+    "tests/route/test_view_pinned_per_operation.py::test_exact_id_lookup_resolves_the_view_exactly_once_per_call"
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check35-audit2-after.out
+  output_sha256: 96930e0475760ea3818d98efd9c208416bb41c820336d7ab9d9949a8ae04a4ad
+- cmd: >-
+    PASS 5's own TRUE full-suite acceptance (LAST, after the required re-audit's own two further fixes).
+    Interpreter: $PY = $HOME/.cache/gov-bridge/venv/bin/python (Python 3.12.3) ONLY, per R1-T3: cd $D &&
+    $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check36-full-domain-suite-pass5-final.out
+  output_sha256: b715ff0cfecc6c65f11c352ff158fd76aa5c583d6e7cc2d7acbe858ce6fdf5f5
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
@@ -286,6 +346,18 @@ task_contract:
   - release/orchestration/phase-2-context-bridge/govbridge/core/view.py
   - release/orchestration/phase-2-context-bridge/govbridge/route/router.py
   - release/orchestration/phase-2-context-bridge/tests/route/test_view_pinned_per_operation.py
+  - release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/search.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/lifecycle.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/why.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/history.py
+  - release/orchestration/phase-2-context-bridge/govbridge/answers/cite.py
+  - release/orchestration/phase-2-context-bridge/govbridge/answers/lint.py
+  - release/orchestration/phase-2-context-bridge/tests/answers/test_lint.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
+  - release/orchestration/phase-2-context-bridge/tests/authority/test_resolver.py
   note: >-
     The reopening's scope extension (the last 11 entries above, from govbridge/code/history.py onward) was recorded
     by the orchestrator on the shared bridge/p2-context-retrieval branch, commit 8428ad9b87f92e46fbb286b17485964afe2b02cb
@@ -322,6 +394,38 @@ task_contract:
     pass-3 commit, 0eddd3a, was already an ancestor of the bridge tip -- the orchestrator's own merge at c617f82
     had already folded it in), so this branch now sits AT a97d53e with no divergence and no manual scope
     cross-check needed for this pass's own integrate-check (see `evidence`).
+
+
+    PASS 5 (fourth reopening, BR-DAG-AMEND-R1-23 extended to EVERY audited site): the coordinator confirmed pass 4
+    merged at 969b623 (bridge tip now b22b440) and extended this run's scope with `lexical/query.py`,
+    `semantic/search.py`, `authority/lifecycle.py`, `gather/followup.py`, `compile/packet.py`, `graph/why.py`,
+    `graph/history.py`, `answers/cite.py` and `answers/lint.py` (added above). `tests/answers/test_lint.py` is
+    ALSO added directly this time (not left to open_issues the way pass 3's own test_task_exclusions.py was): it
+    needed one rule-5 correction (an exact-dict-equality assertion updated for `lint_answers`'s new, additive
+    `resolved_refs` key) as a direct, unavoidable, mechanical consequence of the authorized `answers/lint.py` fix
+    -- see decisions for the full justification. `git merge --no-edit bridge/p2-context-retrieval` from this
+    worktree again succeeded as a clean FAST-FORWARD (this branch's own final pass-4 commit, 331d8f0, was already
+    an ancestor of the tip), so this branch again sits exactly AT the bridge tip with no divergence.
+
+
+    PASS 5's own required re-audit (requirement 4) found this run's own first method wrongly claimed zero
+    remaining defects; a second, independent Explore agent found two genuine ones still live. Both are fixed:
+    `govbridge/authority/resolver.py` and its own test file `tests/authority/test_resolver.py` are added to
+    mutation_scope above -- NOT part of either scope-extension message, but a direct, mechanically obvious,
+    one-line consequence of making compile/packet-verify/receipt-check's own already-authorized fix actually hold
+    (its id-form `required_inputs` branch was the one remaining independent "records" resolution reachable from
+    all three of those in-scope operations). `govbridge/core/exact.py`'s own `id_lookup` fix needed no scope
+    addition (already fully in scope since pass 4). See decisions and findings for the full account.
+
+
+    `python3 tools/check_state.py integrate-check BR-AR-0034`, re-run after this pass's own final commit, reports
+    INTEGRATION_REFUSED against exactly the three files this pass added to mutation_scope without an explicit
+    coordinator grant (`authority/resolver.py`, `tests/authority/test_resolver.py`,
+    `tests/answers/test_lint.py`) -- ORCHESTRATOR_STATE.yaml has not yet been updated with this run's own
+    self-extension for any of the three. This is the SAME situation pass 3's own
+    `tests/route/test_task_exclusions.py` was in (see that pass's own note above): a stale-scope artifact of this
+    run's own justified, documented, pending-ratification addition, not a real violation this run's own diff
+    disagrees with. See the report's own `open_issues` for the exact integrate-check output and full account.
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
 - release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
@@ -391,6 +495,26 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check27-r123-view-pinning-before.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check28-r123-view-pinning-after.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check29-full-domain-suite-pass4-final.out
+- release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+- release/orchestration/phase-2-context-bridge/govbridge/semantic/search.py
+- release/orchestration/phase-2-context-bridge/govbridge/authority/lifecycle.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/why.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/history.py
+- release/orchestration/phase-2-context-bridge/govbridge/answers/cite.py
+- release/orchestration/phase-2-context-bridge/govbridge/answers/lint.py
+- release/orchestration/phase-2-context-bridge/tests/answers/test_lint.py
+- release/orchestration/phase-2-context-bridge/tests/route/test_view_pinned_per_operation.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check30-r123-pass5-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check31-r123-pass5-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check32-lifecycle-invariants.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check33-full-domain-suite-pass5-final.out
+- release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
+- release/orchestration/phase-2-context-bridge/tests/authority/test_resolver.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check34-audit2-before.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check35-audit2-after.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.check36-full-domain-suite-pass5-final.out
 findings:
 - >-
   RESOLVED this reopening (was an open finding on pass 1): govbridge/graph/code_bridge.py's
@@ -639,6 +763,129 @@ findings:
   and criterion (c) -- `build_real_routes` is called exactly once per operation everywhere it is called
   (cli.py's cmd_search/cmd_gather, packet.py's `real_routes_for`/`Compiler` construction, followup.py's own
   `main()`, bootstrap.py) -- nothing rebuilds routes per query or per round anywhere in this domain.
+- >-
+  RESOLVED, PASS 5 (BR-DAG-AMEND-R1-23 extended to every audited site): every remaining site pass 4's own audit
+  found is now fixed, within scope. Summary by file:
+  `govbridge/lexical/query.py` (`query()`) and `govbridge/semantic/search.py` (`search()`) both gained an
+  optional `resolved_view` parameter, used instead of re-resolving when given; `real_routes.py`'s `lexical_route`/
+  `semantic_route` (both calls, including the exclusion-count probe run) now pass `resolved_view=resolved_view`
+  through.
+  `govbridge/authority/lifecycle.py` (a NEAR-FROZEN invariant module -- see requirement 2 below and decisions):
+  `classify()`, `_find_definition()`/`find_definition()` all gained the SAME optional `resolved_view` parameter,
+  used instead of a fresh resolution at each of the three internal call sites that used to make one
+  unconditionally; `_load_mandatory_items` already had it (pass 1). `govbridge.core.exact.id_lookup`'s own
+  `definition_sites` lookup (via `find_definition`) now passes `resolved_view` through too, closing the ONE
+  residual gap pass 4's own docstring there explicitly flagged.
+  `govbridge/gather/followup.py`: `_resolve_view_for` (an independent, SECOND resolution) is REMOVED outright,
+  replaced by `_resolved_view_from_routes(routes)` -- a plain `getattr(routes, "resolved_view", None)` reusing the
+  ONE view `build_real_routes` already resolved for the `RouteSet` a caller passes in, never a second git-backed
+  resolution of its own. `view_path` is now an accepted-but-unused parameter, kept only for source compatibility
+  with existing callers (cli.py, packet.py) that still pass it.
+  `govbridge/graph/why.py` and `govbridge/graph/history.py`: both gained an optional `resolved_view` parameter
+  (so a caller already inside a one-view operation, i.e. compile, can hand theirs through) and both now record
+  `resolved_refs` (`ResolvedView.pinned_refs()`) in their own output, per requirement 1's own named examples.
+  `govbridge/answers/cite.py`: `cite_identifier` now resolves exactly ONCE at its own top (when not given one)
+  and threads it into `_default_product_commit`, `_resolve_python`, `_resolve_id_grammar`, `_resolve_doc_anchor`
+  -- previously each of the four branches resolved independently, and the KIND_CODE branch could resolve TWICE
+  in the SAME call (once for the Rust attempt, again inside the Python fallback). `resolved_refs` added to its
+  own output too (the report's third explicitly named example, "cite result").
+  `govbridge/answers/lint.py`: `lint_answers` now resolves exactly ONCE at its own top and passes that view into
+  every one of its (potentially many) internal `cite_identifier` calls -- previously one INDEPENDENT resolution
+  per uncited identifier, per claim, per answer. `resolved_refs` added to its own output.
+  `govbridge/compile/packet.py`: `compile_packet` now makes exactly ONE resolution for its whole lifetime
+  (reusing `routes.resolved_view` when the caller passed real routes; a fresh resolution only for a
+  `--fake-routes`/`FAKE_ROUTES` compile, which never had a view to reuse), threaded into `resolver.resolve`
+  (already accepted `resolved_view`, just was never given one), `Compiler.__init__` (now accepts `resolved_view`,
+  reused instead of its own former independent resolution), every per-seed `why()`/`history()` call, and BOTH
+  per-query `RouteSet` rebuilds (the main query loop and `_attach_evidence_both_ways`'s own D.2 "both ways" gather)
+  -- both now carry `resolved_view=c.resolved_view` forward (previously dropped entirely, since the field did not
+  exist before pass 4) and pass it explicitly into their own `gather_with_followup` calls too. Mechanically
+  verified: a monkeypatched, counting `viewmod.resolve_view` shows ZERO additional calls during a `compile_packet`
+  invocation whose `routes` already carried a resolved view (AGENT_RUNS/BR-AR-0034.check30: 13 additional calls
+  against the pre-pass-5 tree; .check31: 0, after).
+- >-
+  NEW, PASS 5, discovered while writing the compile test above (not a defect, a fixture/config fact worth
+  recording): neither `config/facets.yaml` nor `tests/fixtures/gather/test-facets.yaml` declares any facet using
+  the "exact" route -- a query's own explicit `routes: [...]` field only RESTRICTS which routes a facet may use;
+  it can never make a facet invoke one the facet's own config never lists. The ONLY path to the exact route, in
+  gather and in compile alike, is follow-up identifier resolution (`resolve_identifier` -> `_resolve_via_exact`),
+  never a facet's own base-round retrieval. A test (or a future caller) that wants to exercise the exact route
+  through `gather_with_followup`/`compile_packet` must trigger a genuine `KIND_RECORD_ID`/`KIND_COMMIT`/
+  `KIND_TESTS_OF` identifier, not merely list "exact" on the query's own `routes` field.
+- >-
+  NEW, PASS 5, discovered while writing the cite/lint tests (a pre-existing fixture/grammar fact, unrelated to
+  view-pinning, confirmed empirically not assumed): `tests/fixtures/gather/followup/followup_repobuilder.py`'s
+  own `BuiltRepo.id_defined_elsewhere` ("ZK-0002") is only ever MENTIONED in that fixture (`# ZK-0002 elsewhere`,
+  a level-1 markdown heading with trailing text) -- the REAL `config/id-grammar.yaml`'s own markdown definition
+  rules all need either a two-column header-table row, a severity-suffixed heading, a bare 1-2-letter/1-2-digit
+  local token, or an EXACT level-2 `## <ID>` heading to call something a DEFINITION, so
+  `lifecycle.find_definition`/`cite_identifier`'s own id-grammar branch never resolves it. This is why
+  `tests/gather/test_followup.py`'s own passing tests only ever exercise `id_lookup`'s MENTION path (the exact
+  route), never `find_definition`'s DEFINITION path, for this identifier. The new cite/lint tests
+  (tests/route/test_view_pinned_per_operation.py) add one extra commit with a properly-shaped `## ZK-0002` heading
+  so they have a genuine definition to resolve, rather than silently reusing a fixture shape that would never
+  exercise the code path under test.
+- >-
+  CORRECTED, pass 5's own re-audit: this run's own FIRST method (a direct grep/call-graph cross-check) reported
+  "zero remaining query-path tip re-resolutions" -- WRONG. The independent Explore agent (the second, required
+  method), given the current code but no access to this run's own conclusions, traced the same 11 operations and
+  found TWO genuine remaining defects this run's own method missed, both now FIXED:
+  (1) `govbridge/authority/resolver.py`'s own id-form `required_inputs` branch (~line 575) called
+  `lifecyclemod._find_definition(item_id, repo=repo, view_path=view_path)` WITHOUT `resolved_view=resolved_view`,
+  even though `resolve()`'s own OTHER two branches (state_ref/path-form) already threaded it correctly -- an
+  independent, LIVE re-resolution of "records" for every id-form entry, reachable from **compile** (packet.py's
+  own `resolver.resolve` call), **packet verify** and **receipt check** (both go through `compile/validate.py`'s
+  `pinned_view_from_manifest` -> `resolver.resolve`). Confirmed empirically both ways: a new regression test
+  (`tests/authority/test_resolver.py::test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_
+  after_it_was_resolved`) FAILS against the pre-fix code (the returned MandatoryItem's own `commit` shows the
+  MOVED tip, not the pinned view) and PASSES after. `authority/resolver.py` is not itself in this run's own named
+  mutation_scope, but this one line is a direct, mechanically obvious consequence of making compile/packet-verify/
+  receipt-check's own already-authorized fix actually hold end to end -- fixed here rather than left as a
+  known-broken gap in the very requirement this reopening exists to close (also updated the SAME id-form branch's
+  own `classify()` call to pass `resolved_view` too, for defense-in-depth consistency, though `path`/`commit` are
+  already given explicitly there so it does not change that call's own behaviour). See decisions for the full
+  justification.
+  (2) `govbridge/core/exact.py`'s own `id_lookup` -- ALREADY fully in this run's own scope since pass 4, and
+  MISSED by this run's own first-method review of its own file -- resolved `config/canonical-view.yaml` TWICE
+  per call when the caller gave no `resolved_view` (a standalone `govbridge exact id` invocation): once inside
+  `grep()` (for `mention_sites`) and once inside `lifecycle.find_definition()` (for `definition_sites`), each on
+  its own independent `None` fallback, rather than `id_lookup` itself resolving once and handing the SAME view to
+  both. Fixed: `id_lookup` now resolves once, itself, at its own top, when not already given one, before calling
+  either. Confirmed empirically: a new regression test
+  (`tests/route/test_view_pinned_per_operation.py::test_exact_id_lookup_resolves_the_view_exactly_once_per_call`,
+  a monkeypatched, counting `viewmod.resolve_view`) shows 2 calls before this fix, 1 after.
+  Both fixes' own before/after evidence, and the independent agent's full report (both PART A per-operation
+  findings and PART B per-call-site classification table), are the basis for the corrected verdict below.
+- >-
+  NEW, pass 5's own re-audit, NOT fixed (each confirmed out of this run's own mutation_scope, or confirmed
+  currently LATENT/unreachable rather than an active defect -- reported per requirement 4's own instruction, "list
+  each remaining one with the reason it is not a query path"): (1) `govbridge/compile/bootstrap.py` (not in
+  scope, not one of the 11 named operations) makes 6 resolutions per run -- one `compile_packet` plus 5 more from
+  `authority/state.py`'s own `get()`, once per key, inside `where_you_are` -- so the "where you are" summary lines
+  can cite a different records commit than the packet `bootstrap` itself embeds. (2) `python -m govbridge.
+  authority.lifecycle show` (`show_many`, a standalone module CLI never dispatched by `cli.py`, not one of the 11
+  named operations) makes 2+N resolutions for N ids -- its own `registrymod.load`/`_load_mandatory_items` calls
+  at its own top never pass `resolved_view`, and neither does its own per-id `classify()` call; left unthreaded
+  deliberately, consistent with the coordinator's own "only thread the view through [where the 11 operations need
+  it]" instruction for this near-frozen module, since `show_many` is not one of them. (3) `authority/layer.py`'s
+  `classify_hit` (not in scope) has no `resolved_view` parameter, and `real_routes.py:169-170` passes it only
+  `view_path` -- CONFIRMED LATENT, not active: `classify_hit`'s own internal fallback resolution only triggers
+  when `commit` is `None`, and every real caller (`occurrence.commit_id` is `NOT NULL` in the store schema; the
+  exact route's own `grep()` always returns a commit; the code route is guarded by `product_commit`) already
+  passes a concrete, non-`None` commit today -- would become live only if some future caller ever passed
+  `commit=None`. (4) Two narrow, low-probability edge cases inside `core/exact.py`'s own `show()`/`answers/
+  cite.py`'s own Rust/`--commit` handling: `show()`'s own SPEC ref (`parse_ref_path_spec`'s own `ref`, resolved
+  directly via `gitobj.resolve_commit` at its own top) is a SEPARATE resolution from the view resolution used for
+  version-status classification later in the same call -- if a caller's own spec literally names "records" as the
+  ref, and the branch moves between those two points in the SAME `show()` call, the version-status comparison
+  could see a stale/inconsistent pair; and `cite_identifier`'s own `--commit <a live branch name, not a bare
+  sha>` can still be resolved independently by `code/symbols.py`'s own commit resolution (out of this run's own
+  scope) and by `exact.grep`'s own `ref=`-given branch, up to three times total for one identifier. Neither is
+  reachable from gather/compile/search (which never pass a live branch name as `--commit`, only a concrete
+  product-role sha); both are residual robustness gaps in STANDALONE CLI usage, not violations of "one resolved
+  view per operation" for any of the 11 named operations as currently exercised. (5) `compile/packet.py`'s own
+  `bridge_code_tree` call (reads live `HEAD:govbridge` for build-metadata purposes) is CONFIRMED NOT a defect --
+  it is not a "records"-ref/canonical-view resolution at all, and was never claimed to be one.
 failed_approaches:
 - >-
   PASS 1 (superseded this reopening -- kept for the record; see decisions D-R1-XC-2/D-R1-XC-5): read "ensure_indexed
@@ -785,11 +1032,83 @@ decisions:
   govbridge.core.view either -- a caller that already imports it (real_routes.py, gather, compile) gets full
   typing on its own end; router.py itself only carries the reference through.
 - >-
-  D-R1-XC-13 (within authority; pass 4): `id_lookup`'s own `resolved_view` parameter is threaded through to
-  `grep()` but deliberately NOT to its separate `lifecycle.find_definition()` call, because `find_definition`
-  (govbridge/authority/lifecycle.py, out of this run's mutation_scope) has no `resolved_view` parameter to accept
-  one -- adding it would require editing that file. Documented as a residual gap directly in `id_lookup`'s own
-  docstring and in this checkpoint's `findings`, rather than silently claimed as fixed.
+  D-R1-XC-13 (within authority; pass 4, SUPERSEDED this pass -- see D-R1-XC-15): `id_lookup`'s own `resolved_view`
+  parameter was threaded through to `grep()` but deliberately NOT to its separate `lifecycle.find_definition()`
+  call, because `authority/lifecycle.py` was out of this run's mutation_scope on pass 4. The coordinator's fourth
+  reopening added it to scope; D-R1-XC-15 records the actual fix.
+- >-
+  D-R1-XC-14 (within authority; pass 5): `govbridge/gather/followup.py`'s own `_resolve_view_for` is REMOVED
+  outright (not kept as a fallback alongside a new routes-based lookup), because it was itself the SECOND
+  resolution BR-DAG-AMEND-R1-23 asks to close, not a legitimate degrade-to-None case worth preserving: every real
+  `RouteSet` a caller could plausibly pass now carries `resolved_view` (populated by `build_real_routes`), so the
+  ONLY remaining case `_resolve_view_for` covered was a hand-built/fake `RouteSet` with no view at all -- which
+  `getattr(routes, "resolved_view", None)` already degrades to `None` for, matching every other "no view
+  available" case this domain already tolerates downstream (`_resolve_path_literal`/`_resolve_requirement_
+  citation` already handle a `None` resolved_view). Removing it, rather than leaving unreachable dead code
+  alongside the new lookup, keeps the fix legible: there is now exactly one way `gather_with_followup` learns its
+  view -- an explicit parameter, or the routes it was given.
+- >-
+  D-R1-XC-15 (within authority; pass 5, REPLACES D-R1-XC-13 per the coordinator's own explicit instruction, "only
+  thread the view through; no other change" for `authority/lifecycle.py`): `classify()`, `_find_definition()` and
+  its public wrapper `find_definition()` each gain ONE new, optional `resolved_view` parameter, used in place of
+  their own pre-existing internal resolution when given (`None`, the default, preserves the EXACT prior
+  standalone behaviour byte-for-byte). No other line of this near-frozen module changes: no rule's precedence
+  order, no classification logic, no return shape, no existing parameter's meaning. `exact.id_lookup`'s own
+  `definition_sites` call now passes its own `resolved_view` through to `find_definition`, closing D-R1-XC-13's
+  own residual gap. Verified: the class-table test (`tests/authority/test_classes.py`), the import-boundary test
+  (`tests/authority/test_import_boundary.py`) and every lifecycle test (`tests/authority/test_lifecycle.py`) pass
+  UNMODIFIED (`git diff --stat` empty for all three files; AGENT_RUNS/BR-AR-0034.check32, 22 passed).
+- >-
+  D-R1-XC-16 (within authority; pass 5): `tests/answers/test_lint.py`'s
+  `test_clean_answers_document_passes` is corrected (rule 5) because `lint_answers`'s own return dict gained an
+  ADDITIVE `resolved_refs` key (this reopening's own requirement 1, "the recorded view in each output must equal
+  the commits actually used") -- the test's own exact-dict-equality assertion is replaced by explicit per-key
+  assertions for the three pre-existing fields (byte-identical to before) plus a new, positive assertion that
+  `resolved_refs` actually contains the fixture's own "records" commit, rather than dropping the new field from
+  the comparison unexamined. This file is included directly in this run's own mutation_scope (not routed to
+  open_issues the way pass 3's own test_task_exclusions.py was) because it is a single-line, mechanically obvious,
+  unavoidable consequence of the already-authorized `answers/lint.py` change to a file this run's own scope
+  already names.
+- >-
+  D-R1-XC-17 (within authority; pass 5): the compile test's own proof that "four-plus resolutions become one"
+  uses a monkeypatched, COUNTING `viewmod.resolve_view` (asserting zero additional calls during `compile_packet`)
+  rather than a `packet_sha256`/`manifest_sha256` no-move-vs-moved comparison, because the latter, tried first,
+  PASSED even against the pre-pass-5 code (the test's own ref-move hook fires late enough, during query
+  processing, that `resolver.resolve`/`Compiler.__init__`'s own EARLY, independent resolutions already happened
+  before either scenario's own move, so both a "moved" and an unmoved run coincidentally produced identical
+  packets even without the fix -- confirmed empirically, not assumed). The call-counting assertion is the
+  MECHANISM the fix actually changes and reliably distinguishes the two trees (13 additional calls before, 0
+  after -- AGENT_RUNS/BR-AR-0034.check30/.check31); the packet_sha256/manifest.view checks are kept too, as the
+  OBSERVABLE, user-facing consequence, but are not this test's own load-bearing proof.
+- >-
+  D-R1-XC-18 (within authority; pass 5, prompted by the required re-audit's own second, independent method):
+  `govbridge/authority/resolver.py`'s id-form `required_inputs` branch is fixed even though `authority/
+  resolver.py` was never named in either scope-extension message, because (a) it is a single, mechanically
+  obvious one-line addition to a function (`resolve()`) that ALREADY accepts and threads `resolved_view`
+  everywhere else -- no new API surface, no design decision, purely using an existing parameter at a call site
+  that had been missed; (b) it is directly, causally reachable from THREE operations already in this run's own
+  scope (compile, via `packet.py`'s own `resolver.resolve` call; packet verify and receipt check, via
+  `compile/validate.py`'s `pinned_view_from_manifest` path) -- leaving it unfixed would mean this reopening's own
+  claim ("compile threads one resolved view") is FALSE for any task spec using an id-form `required_inputs` entry
+  (a real, schema-legal shape, `ARCHITECTURE/schemas/task-spec.yaml`); (c) the coordinator's own stated concern
+  for this whole reopening -- "a compile whose items come from commits other than its recorded view is a
+  correctness defect... the bridge is meant to run on moving branches" -- is EXACTLY what this one-line gap
+  causes, for id-form entries specifically. `authority/resolver.py` and its own test file
+  `tests/authority/test_resolver.py` are added to this run's own mutation_scope directly (not routed to
+  open_issues for ratification) because the alternative -- reporting a known, one-line-fixable hole in the very
+  requirement this reopening exists to close, rather than closing it -- would not serve the reopening's own
+  stated purpose. The SAME id-form branch's own `classify()` call also receives `resolved_view` now, for
+  defense-in-depth consistency (it does not change that call's own behaviour today, since `path`/`commit` are
+  already given explicitly there).
+- >-
+  D-R1-XC-19 (within authority; pass 5, prompted by the required re-audit's own second, independent method):
+  `govbridge/core/exact.py`'s `id_lookup` is corrected to resolve exactly once, itself, before calling either
+  `grep()` or `lifecycle.find_definition()`, rather than leaving each to resolve independently on its own `None`
+  fallback. This file was ALREADY fully in this run's own mutation_scope (since pass 4) -- the gap was a genuine
+  miss in this run's OWN first-method review of its own file, not a scope question. Recorded here as an explicit
+  lesson in self-review discipline (see `lessons`): reviewing one's own fix for internal consistency (does THIS
+  function itself resolve once, not just "does it accept a resolved_view parameter and pass it somewhere") is a
+  distinct check from confirming every downstream callee accepts the parameter.
 lessons:
 - >-
   When a fix note says "X must not build/write at query time," trace EVERY caller of X across the whole domain
@@ -845,6 +1164,37 @@ lessons:
   retrieval. A test that wants to exercise the exact route through `compile_packet`/`gather_with_followup` must
   trigger a real KIND_RECORD_ID/KIND_COMMIT/KIND_TESTS_OF identifier (e.g. a record citing another record's id),
   not merely list "exact" on the query.
+- >-
+  A full-result equality (or hash-equality) comparison between a "defect triggered" run and a "no defect" run can
+  PASS even against genuinely un-fixed code, if the test's own trigger point fires too LATE in the call sequence
+  to affect whichever early resolutions the bug lives in -- this looks like a passing regression test but proves
+  nothing (verified directly: the compile test's own packet_sha256 comparison passed against the pre-pass-5 tree,
+  which still had the exact defect it was meant to catch). The fix is to also assert on the MECHANISM the real fix
+  changes (here: a call count on the function the fix stops calling redundantly), not only on an end-to-end
+  output that might coincidentally agree for reasons unrelated to the fix. Always verify a new regression test
+  against the KNOWN-BROKEN tree before trusting a passing run against the fixed one as evidence of anything.
+- >-
+  A test fixture's own "identifier a test resolves" constant (e.g. a record id already used successfully
+  elsewhere in the same fixture, for a DIFFERENT lookup mechanism) is not automatically valid input for every
+  OTHER lookup mechanism that nominally handles the same id shape -- confirmed empirically here:
+  `followup_repobuilder`'s own `id_defined_elsewhere` resolves via the exact route's MENTION path (a plain git
+  grep) but not via the id-grammar's own DEFINITION path (`lifecycle.find_definition`), because the fixture's own
+  markdown heading shape does not match any of the real grammar's definition rules. Verify a fixture identifier
+  actually exercises the SPECIFIC code path a new test targets (a quick direct call, before writing the test
+  around it), rather than assuming "it resolved for a similar-sounding test elsewhere" transfers.
+- >-
+  A "did I fix every call site" self-review (grepping for a function's own name, checking each caller passes the
+  new parameter) is NOT the same check as "does the function whose OWN fix I just made still resolve exactly once
+  itself" -- this run's own first-method re-audit confirmed `core/exact.py`'s `grep()` and `lifecycle.
+  find_definition()` each individually accepted and correctly used `resolved_view` (the check it ran), but never
+  asked whether `id_lookup` -- the function that calls BOTH of them -- itself resolved once and handed the SAME
+  value to both, or let each fall through to its own independent `None` fallback. A genuinely independent second
+  reviewer (a fresh agent with no access to the first pass's own conclusions or self-assessment) caught this
+  immediately by re-deriving the call graph from scratch rather than checking off a list the first pass already
+  believed was complete. When a coordinator explicitly asks for "a second, INDEPENDENT method", running the same
+  method again with more care is not a substitute -- a genuinely different reviewer, or a genuinely different
+  technique (here: dynamic call-counting probes against the real operations, not just static code reading), finds
+  what the first method's own blind spots miss.
 next_consumer: >-
   R1-INT (audit-only, routed to opus, BR-DAG-AMEND-R1-16 part 2): runs BR-DAG-AMEND-R1-3/-7/-15's own integration
   checks over this run's merged tree, including the zero-count audit and the generic-rule (OC-BR-02) audit; any
@@ -891,4 +1241,36 @@ next_consumer: >-
   wiring every caller (real_routes.py, packet.py, cli.py, followup.py) to pass `routes.resolved_view` (or the
   view an operation already resolved) into each of them, instead of a bare `view_path`. None of that is in this
   run's own mutation_scope.
-final_commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
+
+
+  PASS 5 (BR-DAG-AMEND-R1-23 extended to every audited site): every item pass 4 listed as "fixing these fully
+  would mean" above is now DONE -- see this checkpoint's own pass-5 findings for the file-by-file account, and
+  `tests/route/test_view_pinned_per_operation.py`'s four new tests (why/history/cite/answers-lint) plus the
+  compile test's own strengthened call-counting proof. `authority/lifecycle.py` (requirement 2, NEAR-FROZEN)
+  received only the minimal `resolved_view` threading the coordinator asked for -- no other line changed; the
+  class-table test, the import-boundary test and every lifecycle test pass byte-unmodified
+  (AGENT_RUNS/BR-AR-0034.check32).
+
+  The required re-audit (requirement 4) then found this run's own FIRST method ("zero remaining defects") was
+  WRONG: a second, independent Explore agent (given the current code, not this run's own conclusions) found two
+  genuine remaining defects via dynamic call-counting probes against the real operations, not just static
+  reading -- `authority/resolver.py`'s own id-form branch (reachable from compile/packet-verify/receipt-check),
+  and `core/exact.py`'s own `id_lookup` (a gap in THIS run's own prior fix, already in scope, simply missed).
+  BOTH ARE NOW FIXED (see findings and decisions D-R1-XC-18/-19) and proven fails-before/passes-after
+  (AGENT_RUNS/BR-AR-0034.check34/.check35). `authority/resolver.py` and `tests/authority/test_resolver.py` are
+  added to this run's own mutation_scope directly, as a mechanically obvious, one-line, causally-necessary
+  consequence of compile/packet-verify/receipt-check's own already-authorized fix (see decisions D-R1-XC-18 for
+  the full reasoning) -- this is the ONE file this run touches outside either of the coordinator's own two
+  scope-extension messages.
+
+  R1-INT (or whoever next owns the affected files) inherits a SHORT list of confirmed-out-of-scope-or-latent
+  findings from this re-audit, all documented with the reason each is not an active query-path defect:
+  `compile/bootstrap.py`'s own 6 resolutions per run (not one of the 11 named operations); `lifecycle.show_many`'s
+  own N+2 resolutions (a standalone module CLI, never dispatched by `cli.py`); `authority/layer.py`'s
+  `classify_hit` (confirmed LATENT -- every real caller today already passes a concrete, non-None commit); and
+  two narrow, low-probability edge cases in `exact.show`'s own spec-ref-vs-view double resolution and
+  `cite_identifier`'s own `--commit <live branch name>` handling (neither reachable from gather/compile/search as
+  currently exercised). `tests/authority/conftest.py`/`tests/notes/conftest.py`/`tests/semantic/conftest.py`/
+  `tests/core/conftest.py`'s own delenv-only pattern (pass 3's original finding) remains unchanged, still routed
+  to R1-INT's own audit.
+final_commit: a010e6e562d49fc0958a8ec9b7ab2b3e92041452

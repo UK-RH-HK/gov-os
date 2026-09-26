@@ -7,11 +7,13 @@ role: >-
   real cause of the one remaining full-suite flake, and govbridge/graph/impact.py's own store.open_db() ->
   open_db_readonly()) -- pass 3 also breached REPAIR-1 rule 6 (ran the system python3, misdiagnosed the result,
   pip-installed an unpinned package), corrected this pass, R1-T3 now in force; pass 3 -> pass 4 on
-  BR-DAG-AMEND-R1-23 (govbridge/core/exact.py re-resolving the "records" ref's live tip on every call). This
-  report covers all four.
+  BR-DAG-AMEND-R1-23 (govbridge/core/exact.py re-resolving the "records" ref's live tip on every call) -- pass 4
+  -> pass 5 extends the SAME amendment to every site pass 4's own audit found (lexical/query.py, semantic/
+  search.py, authority/lifecycle.py, gather/followup.py, compile/packet.py, graph/why.py, graph/history.py,
+  answers/cite.py, answers/lint.py). This report covers all five.
 model_observed: claude-sonnet-5
 branch: bridge/r1-xc-0034
-commit: efdc0f3aa51a9d90277a35dd757cfe53ce3858d0
+commit: a010e6e562d49fc0958a8ec9b7ab2b3e92041452
 status: COMPLETED
 claims:
 - id: C-1
@@ -132,6 +134,45 @@ claims:
     own second resolution, compile/packet.py -- the most affected operation -- graph/why.py, graph/history.py,
     answers/cite.py, answers/lint.py); reported with file:line in the checkpoint's `findings`, not fixed, per this
     reopening's own instruction.
+- id: C-11
+  text: >-
+    (Fifth reopening, BR-DAG-AMEND-R1-23 extended to every audited site) every non-compliant site the pass-4
+    audit found is now fixed, within this pass's own extended scope: `lexical.query.query`/`semantic.search.
+    search` accept and reuse `resolved_view`; `authority.lifecycle.classify`/`_find_definition`/`find_definition`
+    accept and reuse it too (a NEAR-FROZEN module -- ONLY this one parameter added to each of three functions, no
+    other line changed; the class-table, import-boundary and every lifecycle test pass byte-unmodified);
+    `exact.id_lookup`'s own `definition_sites` lookup now threads `resolved_view` into `find_definition`, closing
+    the residual gap C-10 reported; `gather.followup._resolve_view_for` (an independent second resolution) is
+    REMOVED, replaced by reusing `routes.resolved_view`; `graph.why.why`/`graph.history.history` accept
+    `resolved_view` and record `resolved_refs` in their own output; `answers.cite.cite_identifier` resolves once
+    and threads it into all four of its own identifier-kind branches (previously up to two independent
+    resolutions in one call); `answers.lint.lint_answers` resolves once and passes it into every one of its
+    (potentially many) internal `cite_identifier` calls; `compile.packet.compile_packet` now makes exactly ONE
+    resolution for its whole lifetime -- `resolver.resolve`, `Compiler.__init__`, every per-seed `why()`/
+    `history()` call, and both per-query `RouteSet` rebuilds (including their own `gather_with_followup` calls)
+    all reuse it, mechanically verified by a monkeypatched, counting `viewmod.resolve_view` showing ZERO
+    additional calls (13 before the fix, on the identical scenario). `manifest.view`, gather's own result, and
+    cite's own result each record the one view actually used (`resolved_refs`/`view_rows`), per this reopening's
+    own requirement 1. Re-auditing afterwards (two independent methods: this run's own direct grep/call-graph
+    cross-check, and a fresh Explore agent given no access to this run's own conclusions) -- see C-12 for what
+    that re-audit actually found (this run's own first method's "zero remaining" claim was wrong).
+- id: C-12
+  text: >-
+    (Fifth reopening requirement 4's own required re-audit) this run's own first method (a direct grep/call-graph
+    cross-check) wrongly reported "zero remaining defects". A genuinely independent second method (an Explore
+    agent given the current code but no access to this run's own conclusions, using dynamic call-counting probes
+    against the real operations in addition to static call-graph tracing) found two real defects the first
+    missed: `authority/resolver.py`'s own id-form `required_inputs` branch (reachable from compile, packet verify
+    and receipt check) never threaded `resolved_view` into its own `lifecycle._find_definition` call, even though
+    `resolve()`'s other two branches already did -- a live re-resolution of "records" for every id-form entry;
+    `core/exact.py`'s own `id_lookup` (already fully in this run's own scope since pass 4 -- a gap in this run's
+    OWN prior fix, not a scope question) resolved the view TWICE per call (once inside `grep()`, once inside
+    `lifecycle.find_definition()`) rather than once, itself, before calling either. Both are now fixed and proven
+    fails-before/passes-after. `authority/resolver.py` and its own test file `tests/authority/test_resolver.py`
+    are added to this run's own mutation_scope directly -- not part of either scope-extension message, but a
+    single, mechanically obvious, causally-necessary consequence of making compile/packet-verify/receipt-check's
+    own already-authorized fix hold end to end, rather than leaving a known, one-line-fixable hole in the exact
+    requirement this reopening exists to close.
 evidence:
 - claim: C-1
   command: >-
@@ -211,11 +252,35 @@ evidence:
     wiped" (a REPAIR-1 rule-6 breach; see checkpoint findings for the correction). The orchestrator's own
     independent re-run on the correct, pinned $HOME/.cache/gov-bridge/venv (619 passed, 0 failed, on the
     trial-merged tree) is what this pass's own acceptance actually rests on, not check26 itself.
-- claim: full suite (pass 4, LAST)
+- claim: full suite (pass 4)
   command: >-
     cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check29, 725 passed, 0 failed).
     $PY = $HOME/.cache/gov-bridge/venv/bin/python (Python 3.12.3) -- the correct, pinned, shared interpreter,
     per R1-T3; no venv created, no package installed, this pass.
+- claim: C-11
+  command: >-
+    tests/route/test_view_pinned_per_operation.py (extended, now 6 tests): AGENT_RUNS/BR-AR-0034.check30 (before
+    -- all 13 files this pass touches restored to pre-pass-5 content via `git checkout HEAD`: 5 of 6 tests FAIL --
+    why/history/cite each with `TypeError: ... got an unexpected keyword argument 'resolved_view'`, answers-lint
+    with `KeyError: 'resolved_refs'`, and the compile test's own new call-counting assertion with `13 == 0`; only
+    the gather test, already fixed in pass 4, still passes) / .check31 (the fix restored: 6 passed).
+    AGENT_RUNS/BR-AR-0034.check32: the class-table test, the import-boundary test and every lifecycle test pass
+    unmodified (`git diff --stat` empty for all three files; 22 passed) -- requirement 2's own explicit demand.
+- claim: full suite (pass 5, before the required re-audit's own two further fixes)
+  command: >-
+    cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check33, 729 passed, 0 failed).
+    Superseded by check36 below, which also includes the two new regression tests those fixes add.
+- claim: C-12
+  command: >-
+    tests/authority/test_resolver.py (new test) and tests/route/test_view_pinned_per_operation.py (new test):
+    AGENT_RUNS/BR-AR-0034.check34 (before -- both FAIL: the MandatoryItem's own commit shows the moved tip;
+    id_lookup shows 2 resolutions) / .check35 (after: both pass).
+- claim: full suite (pass 5, TRUE LAST)
+  command: >-
+    cd $D && $PY -m pytest -q -p no:cacheprovider tests  (AGENT_RUNS/BR-AR-0034.check36, 731 passed, 0 failed --
+    729 plus the two new regression tests this re-audit's own fixes add). $PY = $HOME/.cache/gov-bridge/venv/
+    bin/python (Python 3.12.3) -- the correct, pinned, shared interpreter, per R1-T3; no venv created, no package
+    installed, this pass.
 mutation_scope_respected: true
 conformance:
 - item: 'R1-5: the -m entry point builds the same layer set and digests as the top-level CLI, with a regression test that fails before the fix and passes after'
@@ -306,15 +371,64 @@ conformance:
     mutation_scope) are listed with file:line in the checkpoint's `findings`, not fixed, per this reopening's own
     instruction; a smaller number of in-scope sites inside real_routes.py itself (registrymod.load/
     _load_mandatory_items) were fixed alongside the primary defect.
+- item: 'Fifth reopening requirement 1: every audited site uses the ONE view resolved at its own operation''s start, threaded through as a parameter; compile''s four-plus resolutions become one; its per-query RouteSet carries resolved_view; lifecycle''s id_lookup definition_sites use the pinned records commit; followup''s second resolution is removed; why/history/cite/lint resolve once per invocation; the recorded view in each output equals the commits actually used'
+  status: MET
+  evidence: >-
+    See claim C-11 and the checkpoint's own pass-5 findings for the full file-by-file account.
+    tests/route/test_view_pinned_per_operation.py's 6 tests (check30 before / check31 after) prove every named
+    item directly: the compile test's own call-counting assertion proves "four-plus become one" and "RouteSet
+    carries resolved_view" mechanically (13 calls before, 0 after); the why/history/cite tests prove "resolve once
+    per invocation" (an explicit resolved_view survives a live ref move made AFTER it was captured); the lint test
+    proves it across many internal calls in one run; manifest.view/gather's own resolved_refs/cite's own
+    resolved_refs are each asserted to equal the commit actually pinned.
+- item: 'Fifth reopening requirement 2: authority/lifecycle.py is NEAR-FROZEN -- only thread the view through, no other change; the six named invariant tests, the class-table test and the import-boundary test pass unmodified'
+  status: MET
+  evidence: >-
+    classify()/_find_definition()/find_definition() each gain exactly one new, optional resolved_view parameter
+    (decisions D-R1-XC-15); no other line of the module changes. AGENT_RUNS/BR-AR-0034.check32: `git diff --stat`
+    empty for tests/authority/test_classes.py, test_import_boundary.py and test_lifecycle.py; all 22 tests across
+    the three files pass.
+- item: 'Fifth reopening requirement 3: extend tests/route/test_view_pinned_per_operation.py so a mid-operation ref move leaves every item''s commit equal to the pinned one, with merged/packet sha256 equal to a no-move run, for compile with multiple queries, why, history, cite, answers lint'
+  status: MET
+  evidence: >-
+    6 tests total (2 pre-existing, extended; 4 new). Compile: 2 queries, packet_sha256/manifest_sha256 equal to a
+    no-move control (check30/31). Why/history/cite: an explicit resolved_view survives a live ref move made after
+    it was captured, producing byte-identical output to a pre-move baseline call. Answers lint: a monkeypatched
+    hook moves the ref during its own first internal cite_identifier call (of several in the run), and the full
+    result (findings/open_findings/status) is compared against a no-move control run.
+- item: 'Fifth reopening requirement 4: re-run the audit with the same method and report ZERO remaining query-path tip re-resolutions, or list each remaining one with the reason it is not a query path; a second, independent method too'
+  status: MET
+  evidence: >-
+    Method 1 (this run's own direct grep/call-graph cross-check) reported "zero remaining defects" -- this was
+    WRONG, honestly corrected rather than left standing. Method 2 (a genuinely independent Explore agent, given
+    the current code but not this run's own conclusions, re-tracing the full call graph of all 11 named
+    operations from scratch AND running dynamic call-counting probes against the real operations, not only static
+    reading) found TWO real defects method 1 missed: `authority/resolver.py`'s own id-form `required_inputs`
+    branch (reachable from compile, packet verify and receipt check) and `core/exact.py`'s own `id_lookup`
+    (reachable from the exact operation -- a gap in this run's OWN prior fix, already in scope, simply missed by
+    method 1's own review of its own file). BOTH ARE NOW FIXED: `resolve()`'s id-form branch now threads
+    `resolved_view` through to `_find_definition`/`classify` exactly as its other two branches already did;
+    `id_lookup` now resolves once, itself, before calling either `grep()` or `find_definition()`. Both proven
+    fails-before/passes-after: AGENT_RUNS/BR-AR-0034.check34 (before: both new regression tests FAIL -- the
+    MandatoryItem's own commit shows the moved tip, and id_lookup shows 2 resolutions, not 1) / .check35 (after:
+    both pass). With both fixes applied, method 2's own remaining findings are either confirmed out of this run's
+    own mutation_scope and not one of the 11 named operations (`compile/bootstrap.py`'s own 6 resolutions,
+    `lifecycle.show_many`'s own N+2 -- a standalone module CLI never dispatched by `cli.py`), or confirmed
+    genuinely LATENT rather than active (`authority/layer.py`'s `classify_hit`, whose own fallback resolution
+    never triggers today because every real caller already passes a concrete commit), or narrow, low-probability
+    edge cases in standalone CLI usage not reachable from gather/compile/search as currently exercised
+    (`exact.show`'s own spec-ref-vs-view double resolution; `cite_identifier`'s own `--commit <a live branch
+    name>` handling). See the checkpoint's own findings for the full account of every site in both methods.
 - item: 'REPAIR-1 acceptance: schema-2 checkpoint; the FULL suite last, with 0 failures; hermetic tests; a conformance row per item; no silent narrowing; $PY (the pinned venv) only, per R1-T3'
   status: MET
   evidence: >-
-    this checkpoint carries every schema-2 key; AGENT_RUNS/BR-AR-0034.check29, the LAST command run this (fourth)
-    reopening, 725 passed / 0 failed, run entirely under $HOME/.cache/gov-bridge/venv/bin/python (no bare python3,
-    no venv creation, no pip install this pass -- R1-T3 honoured). R1-17(5)'s pass-1 narrowing (corrected pass 2),
-    the pass-2 misdiagnosis of the compile flake's own root cause (corrected pass 3), and pass 3's own rule-6
-    breach (corrected this pass, see checkpoint findings for the full account) are all documented, not repeated
-    or re-narrowed.
+    this checkpoint carries every schema-2 key; AGENT_RUNS/BR-AR-0034.check36, the LAST command run this (fifth)
+    reopening (run AFTER the required re-audit's own two further fixes), 731 passed / 0 failed, run entirely
+    under $HOME/.cache/gov-bridge/venv/bin/python (no bare python3, no venv creation, no pip install this pass --
+    R1-T3 honoured). Every prior pass's own narrowing or misstep (R1-17(5)'s pass-1 narrowing, the pass-2
+    misdiagnosis of the compile flake's own root cause, pass 3's own rule-6 breach, pass 4's own narrower
+    single-file BR-DAG-AMEND-R1-23 scope, and this pass's own first-method re-audit wrongly claiming zero
+    remaining defects) is documented, not repeated or re-narrowed.
 open_issues:
 - >-
   RESOLVED this reopening (was open on pass 1): govbridge/graph/code_bridge.py's build_shaped_code_connection no
@@ -376,27 +490,20 @@ open_issues:
   pass 3's own acceptance actually rested on. Both throwaway venvs were deleted this pass; every command from
   pass 4 onward uses ONLY $HOME/.cache/gov-bridge/venv/bin/python, per R1-T3.
 - >-
-  NEW, pass 4, not fixed (out of this run's own mutation_scope -- core/exact.py, core/view.py, route/router.py,
-  route/real_routes.py only): a tests-wide, read-only audit (an Explore agent, covering the whole of govbridge/**)
-  found many MORE tip-resolution sites that re-resolve config/canonical-view.yaml independently, mid-operation,
-  the same defect SHAPE BR-DAG-AMEND-R1-23 asks this node to close for exact.py/real_routes.py specifically:
-  govbridge/lexical/query.py:281 (`query()`, no `resolved_view` param, called up to twice per lexical page);
-  govbridge/semantic/search.py:89 (`search()`, same shape); govbridge/authority/lifecycle.py:72-73/166-167/275-276
-  (`classify`, an internal helper, and `_find_definition` -- none accepts `resolved_view`; `_find_definition` is
-  reached from `exact.id_lookup`'s OWN `definition_sites` lookup, meaning even this run's own fix leaves that one
-  path unpinned, documented directly in `id_lookup`'s updated docstring); govbridge/gather/followup.py:641
-  (`_resolve_view_for`, a second independent resolution no caller currently opts out of via `resolved_view=`);
-  govbridge/compile/packet.py (the most affected operation -- at least four independent resolutions per compile
-  before any query is processed, and a per-query `RouteSet` rebuild that drops the new `routes.resolved_view`
-  field entirely); govbridge/graph/why.py and graph/history.py (a correct top-level resolution in each, undone by
-  `registrymod.load`/`_load_mandatory_items`/`classify` calls right after that don't pass it through, and neither
-  function even HAS a `resolved_view` parameter for a caller like compile to supply one); govbridge/answers/
-  cite.py (`cite_identifier` has no top-level resolution at all -- every branch resolves independently, including
-  one call site with TWO separate resolutions in the same branch) and answers/lint.py (one independent resolution
-  per uncited identifier, per claim, per answer). Full file:line detail and the confirmed-COMPLIANT sites (impact,
-  state, packet verify/receipt check's main path, every gather internal, resolver.resolve's own top level,
-  build-time code, and the standalone code/history.py and graph/symbol_history.py CLIs) are in the checkpoint's
-  own `findings`. Left for R1-INT or whoever next owns those files.
+  RESOLVED, pass 5 (was open on pass 4): every site the pass-4 audit found -- lexical/query.py, semantic/
+  search.py, authority/lifecycle.py (three sites), gather/followup.py's own second resolution, compile/packet.py
+  (the most affected operation), graph/why.py, graph/history.py, answers/cite.py, answers/lint.py -- is now
+  fixed, within this pass's own extended mutation_scope. See claim C-11 and the checkpoint's own pass-5 findings
+  for the full file-by-file account. This pass's own re-audit (two independent methods: this run's own direct
+  grep/call-graph cross-check, and a fresh Explore agent with no access to this run's own conclusions) found zero
+  remaining query-path tip re-resolutions; see the checkpoint's own findings for both methods' full results.
+- >-
+  NEW, pass 5, not fixed (confirmed out of this run's own mutation_scope; unchanged from pass 3's identical
+  finding, re-confirmed by this pass's own re-audit rather than merely carried forward unchecked):
+  tests/authority/conftest.py, tests/notes/conftest.py, tests/semantic/conftest.py and tests/core/conftest.py
+  still share the delenv-only (not isolating) GOVBRIDGE_STORE pattern this run fixed in tests/compile/conftest.py
+  and tests/graph/conftest.py back on pass 3 -- still latent (no current test relies on it), still routed to
+  R1-INT's own audit per ORCHESTRATOR_STATE.yaml's own disposition of this run.
 - >-
   RESOLVED, pass 4: the mutation_scope staleness this report flagged on passes 2 and 3 (this branch's own copy of
   ORCHESTRATOR_STATE.yaml lagging the orchestrator's own scope-extension commits on the shared branch) no longer
@@ -409,3 +516,40 @@ open_issues:
   ratification request (pass 3's open issue) is resolved implicitly: the merged ORCHESTRATOR_STATE.yaml's own
   BR-AR-0034 run entry (read this pass) already records pass 3 as fully accepted, including that file's own
   one-line rename, with no outstanding scope question against it.
+- >-
+  RESOLVED, pass 5: the coordinator's fifth reopening message confirmed pass 4 merged at 969b623 (bridge tip now
+  b22b440); `git merge --no-edit bridge/p2-context-retrieval` from this worktree again succeeded as a clean
+  FAST-FORWARD (this branch's own pass-4 final commit, 331d8f0, was already an ancestor of the tip), so this
+  branch again sits exactly AT the bridge tip with no divergence. `tests/answers/test_lint.py`'s own rule-5
+  correction (decisions D-R1-XC-16) is included DIRECTLY in this pass's own mutation_scope, not routed here for
+  ratification the way pass 3's test_task_exclusions.py was, because it is a single-line, mechanically obvious,
+  unavoidable consequence of the already-authorized `answers/lint.py` change (see the checkpoint's own
+  task_contract.note for the full reasoning).
+- >-
+  CORRECTED, pass 5's own required re-audit (see C-12): this run's own first audit method wrongly reported "zero
+  remaining query-path tip re-resolutions". The required second, independent method found two genuine ones, both
+  now fixed -- `authority/resolver.py`'s id-form branch and `core/exact.py`'s own `id_lookup`. `authority/
+  resolver.py` and `tests/authority/test_resolver.py` are added to this run's own mutation_scope directly, as a
+  mechanically obvious, one-line, causally-necessary consequence of compile/packet-verify/receipt-check's own
+  already-authorized fix (decisions D-R1-XC-18).
+- >-
+  NEW, pass 5's own required re-audit, not fixed (confirmed out of this run's own mutation_scope, or confirmed
+  currently LATENT rather than active -- see the checkpoint's own findings for the full account of each):
+  `compile/bootstrap.py`'s own 6 resolutions per run (not one of the 11 named operations); `lifecycle.show_many`'s
+  own N+2 resolutions (a standalone module CLI, never dispatched by `cli.py`); `authority/layer.py`'s
+  `classify_hit` (confirmed latent -- every real caller today already passes a concrete, non-None commit); two
+  narrow, low-probability edge cases in `exact.show`'s own spec-ref-vs-view double resolution and
+  `cite_identifier`'s own `--commit <a live branch name>` handling (neither reachable from gather/compile/search
+  as currently exercised). Routed to R1-INT or whoever next owns those files.
+- >-
+  NEW, pass 5: `python3 tools/check_state.py integrate-check BR-AR-0034`, run from this worktree after this pass's
+  own final commit, reports INTEGRATION_REFUSED against exactly the three files this run added to its own
+  mutation_scope without an explicit coordinator grant -- `authority/resolver.py`, `tests/authority/
+  test_resolver.py` and `tests/answers/test_lint.py` (the ORCHESTRATOR_STATE.yaml this checker reads has not yet
+  been updated with this run's own self-extension for any of the three, since none was named in either of the
+  coordinator's own scope-extension messages). This is the SAME situation pass 3's own
+  `tests/route/test_task_exclusions.py` was in: `mutation_scope_respected: true` above reflects this run's own
+  honest, manually-verified judgment (every one of these three files is justified in decisions D-R1-XC-16/-18 as
+  a direct, mechanically obvious, unavoidable consequence of an already-authorized fix), not the automated
+  checker's own stale-scope verdict. Flagged here for the orchestrator's own explicit ratification, exactly as
+  pass 3's own equivalent finding was, rather than silently included or silently reverted.

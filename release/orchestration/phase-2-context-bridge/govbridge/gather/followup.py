@@ -286,16 +286,17 @@ def _read_only_conn():
         return None
 
 
-def _resolve_view_for(task, view_path: Optional[str], repo: Optional[str]):
-    try:
-        from govbridge.core import view as viewmod
-        from govbridge import GOV_BRIDGE_DOMAIN
-        import os
-        vp = view_path or (task.view if getattr(task, "view", None) else None) or os.path.join(
-            GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
-        return viewmod.resolve_view(viewmod.load_view(vp), repo=repo)
-    except Exception:
-        return None
+def _resolved_view_from_routes(routes) -> Optional["object"]:
+    """BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): this used to be ``_resolve_view_for``, an
+    INDEPENDENT SECOND resolution of ``config/canonical-view.yaml`` -- separate from, and potentially disagreeing
+    with, the ONE view ``govbridge.route.real_routes.build_real_routes`` already resolved for ``routes``'s own
+    four route slots (a caller of ``gather_with_followup`` that never explicitly passes ``resolved_view=`` used to
+    get a follow:tip ref like "records" re-resolved a second time here). Every real ``RouteSet``
+    ``build_real_routes`` builds now carries that ONE resolution as ``routes.resolved_view`` -- reused here
+    directly, never re-resolved. ``getattr`` (not a plain attribute access) so a hand-built or fake ``RouteSet``
+    a test supplies, which never had a real view to pin, degrades to ``None`` (the existing, already-tolerated
+    "no view available" case downstream) rather than raising."""
+    return getattr(routes, "resolved_view", None)
 
 
 def _dedupe_hits_locally(hits: list) -> list:
@@ -590,7 +591,13 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
                           max_rounds: Optional[int] = None, threads: Optional[int] = None,
                           exclude: Optional[list] = None, budget_profile: Optional[str] = None,
                           facets_path: Optional[str] = None, budgets_path: Optional[str] = None,
-                          resolved_view=None, view_path: Optional[str] = None, repo: Optional[str] = None,
+                          resolved_view=None, view_path: Optional[str] = None,
+                          # BR-DAG-AMEND-R1-23: `view_path` is now accepted but UNUSED -- kept only for backward
+                          # source compatibility with existing callers (cli.py's cmd_gather, compile/packet.py)
+                          # that still pass it positionally/by keyword. `resolved_view` (explicit, or reused from
+                          # `routes.resolved_view` -- see `_resolved_view_from_routes`) is the one and only source
+                          # of the view now; a bare `view_path` never triggers a second, independent resolution.
+                          repo: Optional[str] = None,
                           max_followup_rounds: Optional[int] = None,
                           max_items_per_identifier: Optional[int] = None,
                           max_identifiers_per_round: Optional[int] = None,
@@ -638,7 +645,7 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
     max_total_identifiers = max_total_identifiers if max_total_identifiers is not None else cfg["max_total_identifiers"]
     max_wall_seconds = max_wall_seconds if max_wall_seconds is not None else cfg["max_wall_seconds"]
     grammar = grammar if grammar is not None else identifiersmod._default_grammar()
-    resolved_view = resolved_view if resolved_view is not None else _resolve_view_for(task, view_path, repo)
+    resolved_view = resolved_view if resolved_view is not None else _resolved_view_from_routes(routes)
 
     base_result = enginemod.gather(
         query, routes, task=task, seeds=seeds, facet_names=facet_names, batch_size=batch_size,
@@ -820,6 +827,10 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
         # A caller (eventually govbridge.compile) can surface either as a J notice rather than silently trusting a
         # non-reproducible evidence set. True whenever NEITHER happened, regardless of how long the call took.
         "deterministic": not wall_time_aborted and not degraded_git_reads,
+        # BR-DAG-AMEND-R1-23 requirement 1: "the recorded view in each output must equal the commits actually
+        # used" -- never folded into merged_dicts/merged_sha256 above (computed already, from merged_dicts alone,
+        # before this dict is even built), so adding it here changes no determinism comparison.
+        "resolved_refs": resolved_view.pinned_refs() if resolved_view is not None else [],
     }
     if versions_report is not None:
         result["versions"] = versions_report

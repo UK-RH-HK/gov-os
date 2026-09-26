@@ -1,0 +1,95 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_after_it_was_resolved _
+
+fixture_repo = FixtureRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-722/test_id_form_uses_the_resolved0/repo'), c1='f6ff018f295c38...273b87e17ad2f', records_ref='refs/heads/records', product_ref='refs/heads/product', evidence_ref='refs/heads/evidence')
+view_path = '/tmp/pytest-of-usain/pytest-722/test_id_form_uses_the_resolved0/canonical-view.yaml'
+
+    def test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_after_it_was_resolved(
+            fixture_repo, view_path):
+        """BR-DAG-AMEND-R1-23 reopening (pass 5, an independent re-audit's own finding, confirmed empirically before
+        this fix -- a `resolve_view` call-counting probe showed 2 resolutions for one `resolve()` call, not 1): the
+        id-form branch used to call `lifecycle._find_definition` WITHOUT threading `resolved_view` through, even
+        though `resolve()`'s own OTHER two branches (state_ref/path-form, exercised by the tests above) already did.
+        A "records" ref that moves between `resolve()`'s own one resolution and this branch's own separate one could
+        build the returned MandatoryItem from a DIFFERENT commit than the view a compile or `packet verify` had
+        already resolved once -- exactly the "recorded view, never the moving tip" property BR-DAG-AMEND-R1-1 already
+        requires for every OTHER form. An empty commit (never touching tracked content) stands in for "another agent
+        commits to the shared orchestration branch between this compile's own resolution and this one lookup"."""
+        import subprocess
+    
+        from govbridge.core import view as viewmod
+    
+        def _git(root, *args):
+            r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+            if r.returncode != 0:
+                raise RuntimeError(f"git {args} failed: {r.stderr}")
+            return r
+    
+        resolved_view = viewmod.resolve_view(viewmod.load_view(view_path), repo=str(fixture_repo.root))
+        original_commit = resolved_view.named["records"].commit
+    
+        _git(fixture_repo.root, "commit", "--allow-empty", "-q", "-m", "simulated concurrent commit (BR-DAG-AMEND-R1-23)")
+        moved_commit = _git(fixture_repo.root, "rev-parse", "HEAD").stdout.strip()
+        assert moved_commit != original_commit
+    
+        task_spec = _task_spec(view_path, [
+            {"id": "FX-0002", "reason": "test", "required_status": "ACTIVE"},
+        ])
+        result = resolver.resolve(task_spec, repo=str(fixture_repo.root),
+                                   registry_path="tests/fixtures/authority/fixture-authority-registry.yaml",
+                                   resolved_view=resolved_view)
+        assert result.status == "OK", result.blocked_reasons
+        item = result.items[0]
+        assert item.id == "FX-0002"
+>       assert item.commit == original_commit, (
+            f"id-form item {item.id!r} carries commit {item.commit!r}, not the pinned view's own {original_commit!r}"
+            f" -- resolve() re-resolved the records ref live instead of reusing the resolved_view it was given"
+        )
+E       AssertionError: id-form item 'FX-0002' carries commit '02a588d45b24e74235ab57f752d3c803163df2d1', not the pinned view's own 'bd40c7ba6a4c34772f811e09b39273b87e17ad2f' -- resolve() re-resolved the records ref live instead of reusing the resolved_view it was given
+E       assert '02a588d45b24...3c803163df2d1' == 'bd40c7ba6a4c...273b87e17ad2f'
+E         
+E         - bd40c7ba6a4c34772f811e09b39273b87e17ad2f
+E         + 02a588d45b24e74235ab57f752d3c803163df2d1
+
+tests/authority/test_resolver.py:121: AssertionError
+_________ test_exact_id_lookup_resolves_the_view_exactly_once_per_call _________
+
+built_repo = BuiltRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-722/test_exact_id_lookup_resolves_0/repo'), records_commit='8f11...s-rules.yaml', registry_path='/tmp/pytest-of-usain/pytest-722/test_exact_id_lookup_resolves_0/authority-registry.yaml')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x79d418e77e90>
+
+    def test_exact_id_lookup_resolves_the_view_exactly_once_per_call(built_repo, monkeypatch):
+        """A second, independent re-audit (pass 5) found this INSIDE govbridge/core/exact.py itself, already in this
+        run's own scope: `id_lookup`'s own `mention_sites` (via `grep`) and `definition_sites` (via `lifecycle.
+        find_definition`) each resolved `config/canonical-view.yaml` independently whenever the caller (a standalone
+        `govbridge exact id` invocation) gave no `resolved_view` -- one `id_lookup` call, two live resolutions of the
+        SAME "records" ref, which could disagree if it moved between them. Counting `resolve_view` calls (the same
+        technique the compile test above uses) proves it directly: one call must make exactly ONE resolution."""
+        from govbridge.core import exact as exactmod
+    
+        original_commit = _add_definable_record(built_repo.root)
+    
+        resolve_view_calls = {"n": 0}
+        real_resolve_view = viewmod.resolve_view
+    
+        def _counting_resolve_view(*args, **kwargs):
+            resolve_view_calls["n"] += 1
+            return real_resolve_view(*args, **kwargs)
+    
+        monkeypatch.setattr(viewmod, "resolve_view", _counting_resolve_view)
+    
+        result = exactmod.id_lookup(built_repo.id_defined_elsewhere, view_path=built_repo.view_path,
+                                     repo=str(built_repo.root))
+    
+>       assert resolve_view_calls["n"] == 1, (
+            f"id_lookup made {resolve_view_calls['n']} view resolution(s) for one call, not one -- mention_sites and "
+            f"definition_sites could see different commits if the records ref moved between them"
+        )
+E       AssertionError: id_lookup made 2 view resolution(s) for one call, not one -- mention_sites and definition_sites could see different commits if the records ref moved between them
+E       assert 2 == 1
+
+tests/route/test_view_pinned_per_operation.py:464: AssertionError
+=========================== short test summary info ============================
+FAILED tests/authority/test_resolver.py::test_id_form_uses_the_resolved_view_passed_in_even_if_the_records_ref_moves_after_it_was_resolved
+FAILED tests/route/test_view_pinned_per_operation.py::test_exact_id_lookup_resolves_the_view_exactly_once_per_call
+2 failed in 0.52s

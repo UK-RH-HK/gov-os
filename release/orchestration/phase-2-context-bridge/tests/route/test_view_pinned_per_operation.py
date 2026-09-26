@@ -16,16 +16,20 @@ thread or a sleep, so the test's own pass is fully deterministic (R1-T1), not me
 branch while this operation is still running" -- it never touches tracked file content, so nothing about the
 fixture's own corpus changes, only its "records" ref's tip commit.
 
-The compile test is deliberately narrower than the gather test: this run's own mutation_scope is
-``core/exact.py``, ``core/view.py``, ``route/router.py`` and ``route/real_routes.py`` (``compile/packet.py`` is
-not). The tests-wide audit this reopening also ran (checkpoint ``findings``) found ``compile_packet`` itself
-resolves the view independently, several MORE times, in places this run cannot fix (``resolver.resolve``,
-``Compiler.__init__``, each query's own ``gather_with_followup`` call, which never receives ``routes.
-resolved_view``) -- a broader defect this test does not claim to close. What IS proven here is the exact slice
-BR-DAG-AMEND-R1-23 asks this node to fix for compile too: the SAME ``RouteSet.exact`` closure this compile's own
-``real_routes.build_real_routes`` call built is reused, unchanged, across every query -- so every exact-route
-occurrence in the resulting packet carries the ONE commit pinned when that RouteSet was built, regardless of
-what the live ref does afterward.
+PASS 5 (BR-DAG-AMEND-R1-23 extended to every audited site -- the coordinator's own second reopening of this
+amendment) widens this file's own scope to match: ``compile_packet`` now makes exactly ONE resolution for its
+whole lifetime (``resolver.resolve``, ``Compiler.__init__``, every per-query ``gather_with_followup`` call, and
+the D.2 "both ways" gather all reuse it -- the compile test below now also asserts full ``packet_sha256``/
+``manifest_sha256`` reproducibility, not just per-item commits), and ``why``/``history``/``cite``/``answers lint``
+each resolve exactly once per invocation and accept (why/history/cite) or make internal use of (lint, which calls
+cite_identifier many times per run) that one resolution. Since each of why/history/cite is a SINGLE call (no
+internal rounds/queries the way gather/compile has), the natural way to prove "threaded as a parameter, not
+re-resolved" for them is: resolve the view once, then move the LIVE ref, then make the call PASSING that
+already-resolved view explicitly -- if the callee were still re-resolving internally, it would see the moved
+commit; since it is fixed, it returns byte-identical output to a call made before the move. ``answers lint``
+additionally gets a gather/compile-style internal hook (it calls ``cite_identifier`` once per uncited identifier,
+per claim, per answer), proving its own many internal calls all agree with each other, not only with an external
+caller.
 """
 from __future__ import annotations
 
@@ -174,17 +178,35 @@ def test_gather_merged_items_all_carry_the_records_commit_pinned_at_gather_start
 
 def test_compile_exact_route_items_all_carry_the_records_commit_pinned_once_even_if_the_ref_moves_mid_compile(
         built_repo, monkeypatch):
-    """See the module docstring for why this is narrower than the gather test above: it proves exactly what this
-    reopening's own fix guarantees for compile (every exact-route occurrence across every query in ONE compile
-    shares the ONE commit ``real_routes.build_real_routes`` pinned), not that ``compile_packet`` as a whole is
-    immune to a mid-compile ref move (it is not, for reasons outside this node's mutation_scope -- see this run's
-    own checkpoint findings)."""
+    """PASS 5: ``compile_packet`` now makes exactly ONE resolution for its whole lifetime, reusing
+    ``routes.resolved_view`` (the one ``real_routes.build_real_routes`` already made, before this test even calls
+    ``compile_packet``) instead of a fresh one -- so this test asserts ``viewmod.resolve_view`` is called ZERO
+    ADDITIONAL times during the ``compile_packet`` call itself. This is the precise, mechanical form of "four-plus
+    resolutions become one": before pass 5, ``resolver.resolve``'s own call, ``Compiler.__init__``'s own call, and
+    every per-query ``gather_with_followup``'s own fallback call would each show up here as a further
+    ``resolve_view`` invocation (this assertion FAILS against that code, not merely a coincidence of this
+    scenario -- verified directly against the pre-pass-5 tree). The per-item and manifest.view checks below are
+    the OBSERVABLE consequence of that one resolution; the count is the mechanism."""
     from govbridge.compile import packet as packetmod
 
     original_commit = built_repo.records_commit
     routes = real_routesmod.build_real_routes(view_path=built_repo.view_path, repo=str(built_repo.root),
                                                registry_path=built_repo.registry_path)
     assert routes.resolved_view.named["records"].commit == original_commit
+
+    resolve_view_calls = {"n": 0}
+    real_resolve_view = viewmod.resolve_view
+
+    def _counting_resolve_view(*args, **kwargs):
+        resolve_view_calls["n"] += 1
+        return real_resolve_view(*args, **kwargs)
+
+    # Patched on the SHARED govbridge.core.view module object: every caller in this codebase does
+    # `from govbridge.core import view as viewmod` and then `viewmod.resolve_view(...)` (an attribute lookup at
+    # CALL time, never `from ... import resolve_view` directly), so one patch here is visible to every one of
+    # them -- resolver.py, packet.py's own Compiler, followup.py's fallback, lexical/query.py, semantic/search.py,
+    # answers/cite.py, all alike.
+    monkeypatch.setattr(viewmod, "resolve_view", _counting_resolve_view)
 
     moved = {"done": False, "new_commit": None}
     real_exact = routes.exact
@@ -231,6 +253,10 @@ def test_compile_exact_route_items_all_carry_the_records_commit_pinned_once_even
     result = packetmod.compile_packet(task_spec, routes=routes, repo=str(built_repo.root),
                                        registry_path=built_repo.registry_path, facets_path=TEST_FACETS_PATH)
 
+    assert resolve_view_calls["n"] == 0, (
+        f"compile_packet made {resolve_view_calls['n']} additional view resolution(s) beyond the one already in "
+        f"routes.resolved_view -- it is not reusing the one view resolved at this operation's own start"
+    )
     assert moved["done"], "the ref-move hook never fired -- this test would prove nothing"
     assert moved["new_commit"] != original_commit
 
@@ -244,3 +270,202 @@ def test_compile_exact_route_items_all_carry_the_records_commit_pinned_once_even
             f"compile's own exact-route item {m['unit_id']!r} carries commit {m['occurrence']['commit']!r}, not "
             f"the commit ({original_commit!r}) this compile's own RouteSet was built with"
         )
+    # manifest.view (BR-DAG-AMEND-R1-23 requirement 1's own named example) must show the ONE commit actually used.
+    view_rows = {r["name"]: r["commit"] for r in result["manifest"]["view"]}
+    assert view_rows["records"] == original_commit, view_rows
+
+    # PASS 5: compile_packet now makes exactly ONE resolution for its whole lifetime (resolver.resolve,
+    # Compiler.__init__, every per-query gather_with_followup call, and the D.2 both-ways gather all reuse it --
+    # see govbridge/compile/packet.py's own BR-DAG-AMEND-R1-23 comments), so a mid-compile ref move must now leave
+    # the WHOLE packet -- not just its exact-route items -- byte-identical to a no-move run, over the identical
+    # repo/commit content (the ref is reset back, exactly like the gather test above, never rebuilt fresh).
+    _reset_records_ref(built_repo.root, original_commit)
+    routes_b = real_routesmod.build_real_routes(view_path=built_repo.view_path, repo=str(built_repo.root),
+                                                 registry_path=built_repo.registry_path)
+    control = packetmod.compile_packet(task_spec, routes=routes_b, repo=str(built_repo.root),
+                                        registry_path=built_repo.registry_path, facets_path=TEST_FACETS_PATH)
+    assert result["packet_sha256"] == control["packet_sha256"]
+    assert result["manifest_sha256"] == control["manifest_sha256"]
+
+
+def _hop_commits(edge_dicts: list) -> set:
+    """Every commit embedded in a list of ``govbridge.graph.edges.Edge.to_dict()`` rows'
+    ``evidence_occurrence`` ("path@commit" or "path@commit:L1-L2")."""
+    out = set()
+    for e in edge_dicts:
+        occ = e.get("evidence_occurrence") if isinstance(e, dict) else None
+        if occ and "@" in occ:
+            out.add(occ.split("@", 1)[1].split(":", 1)[0])
+    return out
+
+
+def test_why_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call(built_repo):
+    """``why()`` is a single call (no internal rounds/queries) -- the way to prove "threaded as a parameter, not
+    re-resolved" for a single-call operation is: resolve once, move the LIVE ref, then call PASSING that already-
+    resolved view explicitly. If ``why()`` still re-resolved internally despite being given one, the second call
+    would see the moved commit and disagree with the first; since it is fixed (BR-DAG-AMEND-R1-23, pass 5), the
+    two calls are byte-identical."""
+    from govbridge.graph import why as whymod
+
+    original_commit = built_repo.records_commit
+    resolved_view = viewmod.resolve_view(viewmod.load_view(built_repo.view_path), repo=str(built_repo.root))
+    assert resolved_view.named["records"].commit == original_commit
+
+    baseline = whymod.why(built_repo.id_defined_elsewhere, repo=str(built_repo.root), view_path=built_repo.view_path,
+                           registry_path=built_repo.registry_path, resolved_view=resolved_view)
+    assert any(s["status"] == "PRESENT" for s in baseline["stages"].values()), baseline
+
+    moved_commit = _move_records_ref(built_repo.root)
+    assert moved_commit != original_commit
+
+    moved = whymod.why(built_repo.id_defined_elsewhere, repo=str(built_repo.root), view_path=built_repo.view_path,
+                        registry_path=built_repo.registry_path, resolved_view=resolved_view)
+
+    assert moved == baseline, "why() disagreed with itself after the ref moved -- it re-resolved internally"
+    assert {"name": "records", "commit": original_commit, "status": "OK"} in moved["resolved_refs"]
+    for stage in moved["stages"].values():
+        commits = _hop_commits(stage["hops"])
+        assert commits <= {original_commit}, (stage, commits)
+
+
+def test_history_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call(built_repo):
+    """Same technique as the ``why()`` test above, for ``history()``."""
+    from govbridge.graph import history as historymod
+
+    original_commit = built_repo.records_commit
+    resolved_view = viewmod.resolve_view(viewmod.load_view(built_repo.view_path), repo=str(built_repo.root))
+
+    baseline = historymod.history(built_repo.id_defined_elsewhere, repo=str(built_repo.root),
+                                   view_path=built_repo.view_path, registry_path=built_repo.registry_path,
+                                   resolved_view=resolved_view)
+
+    moved_commit = _move_records_ref(built_repo.root)
+    assert moved_commit != original_commit
+
+    moved = historymod.history(built_repo.id_defined_elsewhere, repo=str(built_repo.root),
+                                view_path=built_repo.view_path, registry_path=built_repo.registry_path,
+                                resolved_view=resolved_view)
+
+    assert moved == baseline, "history() disagreed with itself after the ref moved -- it re-resolved internally"
+    assert {"name": "records", "commit": original_commit, "status": "OK"} in moved["resolved_refs"]
+    commits = _hop_commits([e["edge"] for e in moved["entries"] if e.get("edge") is not None])
+    assert commits <= {original_commit}, commits
+
+
+def _add_definable_record(root: Path) -> str:
+    """``followup_repobuilder``'s own ``ZK-0002`` is only ever MENTIONED (``# ZK-0002 elsewhere``, a level-1
+    heading with trailing text) -- the real config/id-grammar.yaml's own markdown rules all need either a
+    two-column header-table row, a severity-suffixed heading, a bare 1-2-letter/1-2-digit local token, or an
+    EXACT level-2 ``## <ID>`` heading (``DR-MD-LEDGER-HEADING``) to call something a DEFINITION, so
+    ``lifecycle.find_definition``/``cite_identifier``'s own id-grammar branch never resolves it -- confirmed
+    empirically, not assumed, and true regardless of this reopening's own fix (a pre-existing property of this
+    fixture, unrelated to view-pinning). Adds one new commit with a heading THAT DOES match
+    ``DR-MD-LEDGER-HEADING`` (``## ZK-0002`` alone), so the cite/lint tests below have a real definition to
+    resolve. Returns the new HEAD commit."""
+    (root / "area_ledger.md").write_text("## ZK-0002\n\nA definable record for a test.\n")
+    repobuilder._git(root, "add", "-A")
+    repobuilder._git(root, "-c", "user.email=t@example.com", "-c", "user.name=t", "commit", "-q", "-m",
+                      "add a definable record for the view-pinning tests")
+    return repobuilder._git(root, "rev-parse", "HEAD").stdout.strip()
+
+
+def test_cite_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call(built_repo):
+    """Same technique again, for ``cite_identifier()`` -- the id-grammar branch (``KIND_ID`` ->
+    ``lifecycle.find_definition``), the one BR-DAG-AMEND-R1-23 explicitly names ("lifecycle's id_lookup
+    definition_sites use the pinned records commit") as needing this thread."""
+    from govbridge.answers import cite as citemod
+
+    original_commit = _add_definable_record(built_repo.root)
+    resolved_view = viewmod.resolve_view(viewmod.load_view(built_repo.view_path), repo=str(built_repo.root))
+
+    baseline = citemod.cite_identifier(built_repo.id_defined_elsewhere, view_path=built_repo.view_path,
+                                        repo=str(built_repo.root), resolved_view=resolved_view)
+    assert baseline["status"] == citemod.STATUS_RESOLVED, baseline
+
+    moved_commit = _move_records_ref(built_repo.root)
+    assert moved_commit != original_commit
+
+    moved = citemod.cite_identifier(built_repo.id_defined_elsewhere, view_path=built_repo.view_path,
+                                     repo=str(built_repo.root), resolved_view=resolved_view)
+
+    assert moved == baseline, "cite_identifier() disagreed with itself after the ref moved -- it re-resolved internally"
+    assert moved["citation"]["commit"] == original_commit
+    assert {"name": "records", "commit": original_commit, "status": "OK"} in moved["resolved_refs"]
+
+
+def test_answers_lint_uses_one_view_for_every_internal_cite_call_even_if_the_records_ref_moves_mid_run(
+        built_repo, monkeypatch):
+    """``lint_answers`` calls ``cite_identifier`` once per uncited identifier, per claim, per answer -- a
+    gather/compile-shaped "many internal calls in one operation" case, so this test uses the SAME
+    monkeypatched-hook technique those two use (move the ref exactly once, on the first internal call), rather
+    than the explicit-resolved_view technique the three single-call operations above use."""
+    from govbridge.answers import cite as citemod
+    from govbridge.answers import lint as lintmod
+
+    original_commit = _add_definable_record(built_repo.root)
+    doc = {
+        "schema": "govbridge-answers/1", "run_id": "RA-VIEWPIN", "packets_used": [],
+        "answers": [
+            {"query_id": "Q1", "status": "ANSWERED",
+             "answer_text": f"{built_repo.id_defined_elsewhere} is mentioned here without a citation.",
+             "citations": []},
+        ],
+    }
+
+    moved = {"done": False, "new_commit": None}
+    real_cite_identifier = citemod.cite_identifier
+
+    def _cite_and_move_once(*args, **kwargs):
+        if not moved["done"]:
+            moved["done"] = True
+            moved["new_commit"] = _move_records_ref(built_repo.root)
+        return real_cite_identifier(*args, **kwargs)
+
+    monkeypatch.setattr(lintmod.citemod, "cite_identifier", _cite_and_move_once)
+
+    result = lintmod.lint_answers(doc, [], view_path=built_repo.view_path, repo=str(built_repo.root))
+
+    assert moved["done"], "the ref-move hook never fired -- this test would prove nothing"
+    assert moved["new_commit"] != original_commit
+    assert {"name": "records", "commit": original_commit, "status": "OK"} in result["resolved_refs"]
+    assert any(f.get("identifier") == "ZK-0002" for f in result["findings"]), result["findings"]
+
+    # CONTROL: an unmoved run over the identical repo/commit content must be identical.
+    _reset_records_ref(built_repo.root, original_commit)
+    control = lintmod.lint_answers(doc, [], view_path=built_repo.view_path, repo=str(built_repo.root))
+    assert result["findings"] == control["findings"]
+    assert result["open_findings"] == control["open_findings"]
+    assert result["status"] == control["status"]
+
+
+def test_exact_id_lookup_resolves_the_view_exactly_once_per_call(built_repo, monkeypatch):
+    """A second, independent re-audit (pass 5) found this INSIDE govbridge/core/exact.py itself, already in this
+    run's own scope: `id_lookup`'s own `mention_sites` (via `grep`) and `definition_sites` (via `lifecycle.
+    find_definition`) each resolved `config/canonical-view.yaml` independently whenever the caller (a standalone
+    `govbridge exact id` invocation) gave no `resolved_view` -- one `id_lookup` call, two live resolutions of the
+    SAME "records" ref, which could disagree if it moved between them. Counting `resolve_view` calls (the same
+    technique the compile test above uses) proves it directly: one call must make exactly ONE resolution."""
+    from govbridge.core import exact as exactmod
+
+    original_commit = _add_definable_record(built_repo.root)
+
+    resolve_view_calls = {"n": 0}
+    real_resolve_view = viewmod.resolve_view
+
+    def _counting_resolve_view(*args, **kwargs):
+        resolve_view_calls["n"] += 1
+        return real_resolve_view(*args, **kwargs)
+
+    monkeypatch.setattr(viewmod, "resolve_view", _counting_resolve_view)
+
+    result = exactmod.id_lookup(built_repo.id_defined_elsewhere, view_path=built_repo.view_path,
+                                 repo=str(built_repo.root))
+
+    assert resolve_view_calls["n"] == 1, (
+        f"id_lookup made {resolve_view_calls['n']} view resolution(s) for one call, not one -- mention_sites and "
+        f"definition_sites could see different commits if the records ref moved between them"
+    )
+    assert result["mention_sites"], result
+    assert result["definition_sites"], result
+    assert result["commit"] == original_commit
+    assert result["definition_sites"][0]["commit"] == original_commit

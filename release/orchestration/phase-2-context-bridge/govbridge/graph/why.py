@@ -60,16 +60,25 @@ def _class_of_path(path: str, reg: registrymod.Registry) -> Optional[str]:
 
 def why(seed: str, repo: Optional[str] = None, view_path: Optional[str] = None,
         registry_path: Optional[str] = None, code_conn=None,
-        task: Optional[taskctxmod.TaskContext] = None) -> dict:
-    resolved_view = _resolved_view(view_path, repo=repo)
+        task: Optional[taskctxmod.TaskContext] = None,
+        resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
+    # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): a caller already inside a one-resolved-view-per-
+    # operation context (govbridge.compile.packet, calling why() once per seed within ONE compile) passes its own
+    # resolved_view straight through here, so this call never becomes a SEPARATE resolution of that same compile.
+    # A standalone `govbridge why <seed>` invocation (resolved_view=None, the default) still resolves exactly
+    # once, right here, for that one call -- itself the "one resolved view per operation" case, since one CLI
+    # invocation IS the whole operation. Threaded into every callee that touches "records"/config/canonical-
+    # view.yaml below (registrymod.load, lifecyclemod._load_mandatory_items, lifecyclemod.classify) instead of
+    # handing each a bare view_path and letting it re-resolve independently.
+    resolved_view = resolved_view if resolved_view is not None else _resolved_view(view_path, repo=repo)
     commit = resolved_view.ref_commit("records")
     grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
     reg = registrymod.load(registry_path or registrymod._default_registry_path(), verify_commit="records",
-                            view_path=view_path, repo=repo)
-    mandatory_items = lifecyclemod._load_mandatory_items(repo=repo, view_path=view_path)
+                            view_path=view_path, repo=repo, resolved_view=resolved_view)
+    mandatory_items = lifecyclemod._load_mandatory_items(repo=repo, view_path=view_path, resolved_view=resolved_view)
 
     seed_classification = lifecyclemod.classify(seed, reg=reg, mandatory_items=mandatory_items, repo=repo,
-                                                  view_path=view_path)
+                                                  view_path=view_path, resolved_view=resolved_view)
     all_mentions = D.mentions_edges_for_id(seed, commit, repo=repo, grammar=grammar,
                                             exclude_paths=(seed_classification.path,) if seed_classification.path else ())
     defines = D.defines_edges_for_id(seed, commit, repo=repo, grammar=grammar)
@@ -149,7 +158,10 @@ def why(seed: str, repo: Optional[str] = None, view_path: Optional[str] = None,
         chain[stage] = kept
         excluded_hits += dropped
 
-    result = {"seed": seed, "stages": {}, "excluded_hits": excluded_hits}
+    # BR-DAG-AMEND-R1-23 requirement 1: "the recorded view in each output must equal the commits actually used" --
+    # resolved_view.pinned_refs() (govbridge.core.view) is the generic {name, commit, status} list every operation
+    # this amendment touches records its own pin in.
+    result = {"seed": seed, "stages": {}, "excluded_hits": excluded_hits, "resolved_refs": resolved_view.pinned_refs()}
     for stage in STAGES:
         hops = chain.get(stage, [])
         if hops:

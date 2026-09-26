@@ -222,7 +222,8 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, of
           view_path: Optional[str] = None, repo: Optional[str] = None, record_telemetry: bool = True,
           classify: Optional["Callable[[RetrievedItem], tuple]"] = None,
           scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
-          scope_path_globs: Optional[tuple] = None) -> dict:
+          scope_path_globs: Optional[tuple] = None,
+          resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
     """Run ``text`` (an FTS5 MATCH expression -- a phrase, NEAR(), a bareword query, ...) against the lexical
     index and return up to ``k`` RetrievedItems, ranked by BM25 (ascending: SQLite's bm25() is a cost, lower is
     better -- ORDER BY score ASC is the correct direction, matching fts_spike.py), with ``chunk_id`` ASC as a
@@ -278,7 +279,13 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, of
     ).fetchone()[0]
     latency_ms = round((time.monotonic() - t0) * 1000, 3)
 
-    resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
+    # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): reuse the caller's own resolved_view (e.g.
+    # govbridge.route.real_routes.build_real_routes's own ONE resolution, closed over for this route's whole
+    # lifetime) instead of re-resolving config/canonical-view.yaml fresh on every query -- a follow:tip ref
+    # (concretely "records") could otherwise resolve to a different commit between two calls inside the same
+    # operation. resolved_view=None (the default) preserves the exact pre-existing behaviour for a standalone call.
+    resolved = resolved_view if resolved_view is not None else viewmod.resolve_view(viewmod.load_view(view_path),
+                                                                                     repo=repo)
 
     hits: list[RetrievedItem] = []
     consumed = 0
