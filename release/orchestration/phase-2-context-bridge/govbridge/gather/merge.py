@@ -182,6 +182,13 @@ class MergeAccumulator:
                 route=route if route is not None else hit.route, facet=facet, round=round, trigger=trigger,
             ))
 
+    def item_count(self) -> int:
+        """The number of DISTINCT merged items accumulated so far (never rebuilds a :class:`MergedItem` list just
+        to measure it) -- the BR-AR-0024 reopening: a follow-up round's own MARGINAL_GAIN_ONLY_DUPLICATES check
+        compares this before/after the round, so "added nothing genuinely new" is measured against the SAME
+        content-identity dedup this accumulator already applies, never a separate notion."""
+        return len(self._order)
+
     def items(self) -> list:
         out: list = []
         for key in self._order:

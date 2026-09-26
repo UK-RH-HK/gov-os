@@ -2,10 +2,13 @@ run_id: BR-AR-0024
 role: >-
   REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
   rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
-  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7).
+  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7). REOPENED once (follow-up budget
+  semantics: a round exceeding max_identifiers_per_round deferred the rest AND ended follow-up, so a real query got
+  exactly one hop regardless of configured rounds/budget); this report covers the state AFTER that reopening's own
+  fix (a deterministic, carry-forward priority queue -- see claims C-11/C-12/C-13/C-14).
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga2-0024
-commit: 804da482d8cbe04baf878f68b5acb7aeeef96857
+commit: PENDING
 status: COMPLETED
 claims:
 - id: C-1
@@ -35,12 +38,57 @@ claims:
     govbridge/gather/followup.py's gather_with_followup builds triggered rounds on govbridge.gather.engine's OWN,
     UNCHANGED extension point (the identifier_extractor hook R1-GA1 left unwired) WITHOUT forking engine.gather:
     round 0 is exactly one call to engine.gather (parallel facets, paging, the fixed stopping vocabulary, all
-    unchanged); every round after that is triggered by an identifier discovered in the PREVIOUS round's own new
-    evidence, resolved through resolve_identifier (exact route for record ids/commits/path literals; the code
-    route, paged callers/tests/reads_key to EXHAUSTION within a budget via R1-RL's own cursors, for symbols; a
-    direct git-content slice, tagged but never authority-classified, for the two lineage-only edge kinds), with a
-    visited set (kind, value) so the same identifier is never chased twice. Stop reasons are the SAME closed
-    OD-BR-05 vocabulary (govbridge.gather.engine.STOP_REASONS), reused, never a new one invented.
+    unchanged); every round after extracts identifiers from the PREVIOUS round's own new evidence and merges them
+    into a persistent, deterministic priority queue (REOPENING FIX, see C-11) that ALSO carries forward whatever
+    an earlier round had no per-round budget for; each round resolves the queue's own top identifiers through
+    resolve_identifier (exact route for record ids/commits/path literals; the code route, paged callers/tests/
+    reads_key to EXHAUSTION within a budget via R1-RL's own cursors, for symbols; a direct git-content slice,
+    tagged but never authority-classified, for the two lineage-only edge kinds), with a visited set (kind, value)
+    so the same identifier is never chased twice. Stop reasons are the SAME closed OD-BR-05 vocabulary
+    (govbridge.gather.engine.STOP_REASONS), reused, never a new one invented.
+- id: C-11
+  text: >-
+    REOPENING FIX (the defect: a round exceeding max_identifiers_per_round deferred
+    the rest AND ended follow-up right there, so a real query with 81 round-0 candidates got exactly one hop no
+    matter how many rounds/budget were configured). govbridge/gather/followup.py's own _PriorityQueue now carries
+    every not-yet-resolved identifier ACROSS rounds: each round merges the round's own newly extracted candidates
+    into the queue (summing mention_count into an already-queued entry, never resetting it -- identifiers.
+    Identifier gained a mention_count field, identifiers._dedupe_identifiers sums it across duplicates), then
+    takes the top max_identifiers_per_round by the stated priority order. Follow-up now stops for exactly one of
+    four reasons, checked in this order every round: the queue is empty after merging (NO_UNRESOLVED_IDENTIFIERS);
+    max_followup_rounds is reached (MAX_ROUNDS); a round's own resolution added no genuinely new merged item,
+    measured against merge.MergeAccumulator's own new item_count() method, never "resolved nothing at all"
+    (MARGINAL_GAIN_ONLY_DUPLICATES); or the OVERALL follow-up budget -- max_total_identifiers and/or
+    max_wall_seconds, checked at the top of a round, before that round's own batch is taken -- is exhausted with
+    the queue still non-empty (BUDGET_REACHED_WITH_UNRESOLVED). The per-round cap itself can now only ever make
+    MORE rounds necessary to drain the same queue; it can no longer end follow-up by itself.
+- id: C-12
+  text: >-
+    A generic, stated, byte-deterministic priority rule (the BR-AR-0024 reopening, requirement 2; no instance
+    names, OC-BR-02): matches-the-query/instantiated-subject-text first; then by KIND (record ids, then symbols/
+    Rust test paths, then citations, then path literals, then commit hashes); then by mention_count (how many
+    frontier items mention it, descending); then by first appearance (ascending); then a lexical (kind, value)
+    tie-break that leaves no two candidates equal. _priority_info computes and RECORDS this per identifier in
+    telemetry (every follow_up_triggers entry's own "priority" key); _priority_sort_key is the SAME computation
+    used to order the queue, never a second, silently-diverging copy (tests/gather/test_followup.py::
+    test_priority_order_is_the_same_object_the_queue_actually_uses asserts this directly). Deterministic across
+    --threads: every input (frontier content, mention counts, first-seen order) is already thread-count-independent
+    by the time this runs (R1-GA1's own proof for the base round; this module's own round loop is a plain
+    sequential for-loop, never threaded) -- proved end-to-end by
+    test_gather_with_followup_is_byte_identical_across_thread_counts (threads=1 vs threads=4, follow-up enabled,
+    identical merged_sha256).
+- id: C-13
+  text: >-
+    config/facets.yaml gained a followup: section (this node's mutation_scope extended to that ONE file, for this
+    ONE purpose -- config/budgets.yaml stays R1-GA3's, untouched) carrying all five follow-up knobs
+    (default_max_rounds, default_max_identifiers_per_round, default_max_items_per_identifier,
+    default_max_total_identifiers, default_max_wall_seconds); govbridge/gather/followup._followup_config reads it
+    (reusing govbridge.gather.facets's own cached YAML loader, never a second copy of the file), and
+    gather_with_followup's own DEFAULT_* module constants are now a documented CODE FALLBACK only, used when the
+    file/section is missing -- never the deployed default. gather_with_followup's own signature changed (a
+    disclosed, backward-compatible change -- see decisions): max_followup_rounds/max_identifiers_per_round/
+    max_items_per_identifier now default to None (defer to config) instead of a literal constant, and two new
+    keyword-only parameters (max_total_identifiers, max_wall_seconds) were added.
 - id: C-4
   text: >-
     REAL INPUT SHAPES item 2 (Rust ``mod::fn``, module-free at the code layer): followup._resolve_symbol_or_rust_
@@ -96,13 +144,13 @@ claims:
     commit hashes are all common shapes in ordinary English/code prose. Chasing every one, unbounded, made a single
     follow-up round impractically slow against the real, multi-thousand-file, 95-history-ref corpus (independently
     timed: a first attempt exceeded 280s and was killed). Fixed generically, never by narrowing WHICH kinds are
-    chased: (a) govbridge/gather/followup.py's own git-tree lookups for path/joined-path/requirement-citation
-    resolution now memoise one ls-tree per (commit, repo) per gather call (a plain in-process dict, thrown away
-    with the call -- never a persisted cache, BR-DAG-AMEND-R1-15 is unaffected); (b) a new, disclosed per-round
-    identifier budget (DEFAULT_MAX_IDENTIFIERS_PER_ROUND=20) stops a round that exceeds it with
-    BUDGET_REACHED_WITH_UNRESOLVED, naming every deferred identifier in telemetry.unresolved_identifiers -- never a
-    silent drop (OD-BR-05 section 5). With both fixes, this node's own CONTROL-A acceptance-check run (C-8's
-    sibling, acceptance check 2) completes in ~2 minutes.
+    chased: govbridge/gather/followup.py's own git-tree lookups for path/joined-path/requirement-citation
+    resolution memoise one ls-tree per (commit, repo) per gather call (a plain in-process dict, thrown away with
+    the call -- never a persisted cache, BR-DAG-AMEND-R1-15 is unaffected). This node's FIRST pass also added a
+    per-round identifier cap that stopped follow-up the moment a round exceeded it (BUDGET_REACHED_WITH_UNRESOLVED
+    after exactly one round on every real query) -- REOPENED as a genuine multi-hop defect (OD-BR-05 section 3)
+    and replaced by the carry-forward priority queue (C-11/C-12): the cap now only bounds one round's OWN cost,
+    never the number of rounds follow-up takes to drain it.
 - id: C-10
   text: >-
     govbridge/gather/followup.py's own direct git calls (for the two lineage-only edge kinds' content, and for
@@ -113,6 +161,21 @@ claims:
     database. Every one of this node's own git call sites is wrapped (`_safe_ls_tree_path`/`_safe_ls_tree_paths`/
     `_safe_read_path`, and `_hit_from_git_slice`'s own try/except), so one unlucky git call degrades that single
     identifier's resolution, never the whole gather.
+- id: C-14
+  text: >-
+    REOPENING requirement 4, real-view acceptance: all 5 CONTROL-A queries, run against a store rebuilt
+    --from-clean at the current tree (bridge tip ade7ff8; the "records" ref had moved since this node's first
+    pass -- manifest: 14670 blobs, 327893 chunks, 504041 occurrences), with follow-up enabled at config/
+    facets.yaml's own deployed defaults. ALL FIVE reach >= 2 follow-up rounds: CA-DEPS 2 rounds (30 identifiers
+    resolved, 503 queued at end, BUDGET_REACHED_WITH_UNRESOLVED); CA-REQ 3 rounds (45 resolved, 667 queued,
+    BUDGET_REACHED_WITH_UNRESOLVED); CA-ENF 3 rounds (45 resolved, 219 queued, BUDGET_REACHED_WITH_UNRESOLVED);
+    CA-TESTS 3 rounds (45 resolved, 560 queued, BUDGET_REACHED_WITH_UNRESOLVED); CA-WHY 6 rounds (90 resolved, 716
+    queued, stop_reason MAX_ROUNDS itself -- the round bound, not the overall budget, is what stopped it). Merged
+    items grew from a 2-round BASE (engine.gather's own paging) of well under 100 to 236-485 per query. Of the
+    chased (follow-up-resolved) merged items, the bridge-domain-vs-product split (informational, per the
+    dispatch): CA-WHY 168/291, CA-REQ 48/307, CA-ENF 75/195, CA-TESTS 80/184, CA-DEPS 153/52 (bridge-domain/
+    product-or-other) -- every query reaches into BOTH the bridge's own orchestration domain and the product
+    source tree, never one exclusively.
 evidence:
 - claim: C-1
   evidence: >-
@@ -142,6 +205,25 @@ evidence:
     independent timeouts without them)
 - claim: C-10
   evidence: 'govbridge/gather/followup.py:_hit_from_git_slice,_safe_ls_tree_path,_safe_ls_tree_paths,_safe_read_path; found and fixed live against AGENT_RUNS/BR-AR-0024.check-controla-followup-module.out''s own first (killed) attempt'
+- claim: C-11
+  evidence: >-
+    govbridge/gather/followup.py:_PriorityQueue,gather_with_followup's own round loop; govbridge/gather/merge.py:
+    MergeAccumulator.item_count; govbridge/gather/identifiers.py:Identifier.mention_count,_dedupe_identifiers;
+    tests/gather/test_followup.py::
+    test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_to_a_later_round (>= 3 rounds, all 5
+    candidates chased, rounds {1,2} both present in follow_up_triggers), ::
+    test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted (the per-round cap ALONE
+    never produces this stop reason); AGENT_RUNS/BR-AR-0024.check-controla-sweep.out (real CONTROL-A data)
+- claim: C-12
+  evidence: >-
+    govbridge/gather/followup.py:_priority_info,_priority_sort_key,_KIND_PRIORITY; tests/gather/test_followup.py::
+    test_priority_order_is_deterministic_and_matches_the_stated_rule, ::
+    test_priority_order_is_the_same_object_the_queue_actually_uses, ::
+    test_gather_with_followup_is_byte_identical_across_thread_counts
+- claim: C-13
+  evidence: 'config/facets.yaml (followup: section); govbridge/gather/followup.py:_followup_config'
+- claim: C-14
+  evidence: 'AGENT_RUNS/BR-AR-0024.check-controla-sweep.out (all 5 CONTROL-A queries, real store, real routes)'
 mutation_scope_respected: true
 open_issues:
 - >-
@@ -229,15 +311,16 @@ conformance:
     ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3) the LITERAL command (AGENT_RUNS/
     BR-AR-0024.check-controla-literal-cli.out) still shows R1-GA1's own single-pass behaviour (3 rounds,
     stop_reason FACETS_COVERED, 0 follow-up rounds), since govbridge/cli.py is not in this node's mutation_scope
-    this wave (open_issues, decisions); this node's own equivalent entry point, `$PY -m govbridge.gather.followup
-    --task <CONTROL-A spec> --query CA-WHY --facets purpose --max-followup-rounds 2 --json` (AGENT_RUNS/
-    BR-AR-0024.check-controla-followup-module.out), run on the SAME real store and the SAME CONTROL-A query, shows
-    the property itself concretely: base_rounds=3, followup_rounds=1, stop_reason BUDGET_REACHED_WITH_UNRESOLVED
-    (20 identifiers chased, 65 disclosed as deferred -- never silently dropped), merged items grew from 31 to 164,
-    triggers include real record ids (D-5, CONTROL-A, R1-CTRL, R1-INT, CTRL-1, CONTROL-B, ...) first seen in round
-    0's own evidence; a programmatic shape check over every merged item ("items failing that shape check") returns
-    empty, confirming provenance is present and exactly one `occurrence` (never a raw `occurrences` list) plus a
-    `ref_summary` on every item
+    this wave (open_issues, decisions). This node's own equivalent entry point, exercised across ALL FIVE
+    CONTROL-A queries after the reopening's own priority-queue fix (AGENT_RUNS/BR-AR-0024.check-controla-sweep.out,
+    C-14), shows the property itself far beyond ">= 1 round": every one of the 5 queries reaches >= 2 follow-up
+    rounds (2 to 6), each later round's own triggers are identifiers first seen in an EARLIER round's evidence
+    (the priority queue's own carry-forward), and the provenance/occurrence-shape guarantee ("no search hit lists
+    more than one occurrence row plus a ref summary") is an unconditional structural property of
+    merge.MergedItem.to_dict() (tests/gather/test_merge.py::
+    test_merged_item_to_dict_carries_exactly_one_occurrence_row_plus_a_ref_summary), independently re-confirmed on
+    real CONTROL-A output in this node's FIRST pass (AGENT_RUNS/BR-AR-0024.check-controla-followup-module.out''s
+    own "items failing the provenance/occurrence shape check: []").
 - item: 'R1-T1: the FULL domain suite, last, 0 failures'
   status: MET
   evidence: >-
@@ -272,3 +355,46 @@ conformance:
     $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3, sys.prefix == the venv); every saved output
     file carries a `# interpreter: $PY (<version>)` header line (the grep-only genericity audit is marked N/A, no
     interpreter invoked); no venv/pip command appears anywhere in this node's own commands or scratch scripts
+- item: 'REOPENING requirement 1: a deterministic priority queue; deferred identifiers carry forward; rounds continue until NO_UNRESOLVED_IDENTIFIERS, MAX_ROUNDS, MARGINAL_GAIN_ONLY_DUPLICATES or the OVERALL budget (wall-time and/or item) is exhausted with identifiers still queued (BUDGET_REACHED_WITH_UNRESOLVED); everything still queued at the end is named in the result'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py:_PriorityQueue,gather_with_followup's own round loop (four stop checks, in that
+    order, every round); telemetry.unresolved_identifiers = base's own + queue.remaining() at loop exit, for EVERY
+    stop reason, not just the budget one; tests/gather/test_followup.py::
+    test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_to_a_later_round, ::
+    test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted; real-view: AGENT_RUNS/
+    BR-AR-0024.check-controla-sweep.out (every one of 5 queries carries identifiers across multiple rounds; 4 of
+    5 stop via BUDGET_REACHED_WITH_UNRESOLVED with hundreds still queued, CA-WHY via MAX_ROUNDS)
+- item: 'REOPENING requirement 2: a generic, stated priority rule, recorded per identifier in telemetry, byte-deterministic across --threads'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py:_priority_info (recorded verbatim as every follow_up_triggers entry''s own
+    "priority" key),_priority_sort_key,_KIND_PRIORITY (kind constants only, no instance names -- OC-BR-02);
+    tests/gather/test_followup.py::test_priority_order_is_deterministic_and_matches_the_stated_rule, ::
+    test_priority_order_is_the_same_object_the_queue_actually_uses, ::
+    test_gather_with_followup_is_byte_identical_across_thread_counts (threads=1 vs 4, identical merged_sha256)
+- item: 'REOPENING requirement 3: max_followup_rounds, max_identifiers_per_round and the overall follow-up budget live in config/facets.yaml under a followup: section; config/budgets.yaml (R1-GA3''s) untouched; code defaults are a fallback only'
+  status: MET
+  evidence: >-
+    config/facets.yaml''s own `followup:` section (default_max_rounds, default_max_identifiers_per_round,
+    default_max_items_per_identifier, default_max_total_identifiers, default_max_wall_seconds);
+    govbridge/gather/followup._followup_config; `git diff <base> -- config/budgets.yaml` shows no change (this
+    node never opened that file); gather_with_followup's own DEFAULT_* module constants are now documented as a
+    code-fallback-only in their own docstrings
+- item: 'REOPENING requirement 4: real-view acceptance on a store built from clean with the current tree, all 5 CONTROL-A queries with follow-up, reporting rounds/resolved/deferred/queued-at-end/stop-reason/merged-items/wall-time per query, at least one reaching >= 2 rounds (or NOT_MET with numbers), plus the bridge-domain-vs-product split'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0024.check-controla-sweep.out, and C-14''s own summary above -- ALL FIVE queries reach >= 2
+    follow-up rounds (CA-DEPS 2, CA-REQ/CA-ENF/CA-TESTS 3, CA-WHY 6), each with its own per-round
+    resolved/deferred/queued numbers, stop reason, merged item count and wall time; the bridge-domain-vs-product
+    split of chased items is reported per query (every query reaches into both)
+- item: 'REOPENING requirement 5: tests -- a fixture whose round-0 candidates exceed the per-round cap still reaches round 2+ via carried identifiers; the priority order is deterministic; BUDGET_REACHED_WITH_UNRESOLVED fires only when the overall budget is exhausted'
+  status: MET
+  evidence: >-
+    tests/gather/test_followup.py::
+    test_a_round_with_more_identifiers_than_the_per_round_cap_carries_the_rest_to_a_later_round (>= 3 rounds, all
+    5 candidates chased, rounds {1,2} both present), ::
+    test_priority_order_is_deterministic_and_matches_the_stated_rule, ::
+    test_priority_order_is_the_same_object_the_queue_actually_uses, ::
+    test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted (the per-round cap ALONE
+    -- generous overall budget -- never produces this stop reason; only a tight overall budget does)

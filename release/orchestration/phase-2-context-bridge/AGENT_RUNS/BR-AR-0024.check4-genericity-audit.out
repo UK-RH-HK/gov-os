@@ -1,4 +1,5 @@
 # interpreter: N/A -- this check is a plain 'grep', no Python interpreter invoked (BR-DAG-AMEND-R1-18 (R1-T3) note)
 tests/fixtures/gather/followup/followup_repobuilder.py:3:never edits it). Nothing here is Review-8/Phase-2 content, and no id/symbol here is drawn from the Review-8 chains
-tests/gather/test_followup.py:6:run-1 answer (REPAIR-1 rule 2), and nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).
+govbridge/gather/followup.py:91:#: an instance/Review-8 name (OC-BR-02): id-grammar record ids first, then symbols and Rust test paths, then
 tests/gather/test_merge.py:4:(REPAIR-1 rule 2). Nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).
+tests/gather/test_followup.py:6:run-1 answer (REPAIR-1 rule 2), and nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).

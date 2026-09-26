@@ -3,23 +3,39 @@
 R1-GA2; OD-BR-05 sections 3 and 6). Builds on ``govbridge.gather.engine``'s (R1-GA1) extension points -- it never
 forks that loop: one call to :func:`gather_with_followup` runs the base engine ONCE for round 0 (unchanged, with
 every one of R1-GA1's own tested properties -- parallel facets, paging, the fixed stopping vocabulary), then adds
-SEQUENTIAL, TRIGGERED rounds on top: extract identifiers from the round's own evidence
-(:mod:`govbridge.gather.identifiers`), resolve each one through the existing routes or through R1-RL's persisted
-lineage layer, and merge everything with provenance (:mod:`govbridge.gather.merge`). Version reconciliation
+SEQUENTIAL, TRIGGERED rounds on top, chasing identifiers found in the evidence seen so far
+(:mod:`govbridge.gather.identifiers`) through the existing routes or through R1-RL's persisted lineage layer, and
+merging everything with provenance (:mod:`govbridge.gather.merge`). Version reconciliation
 (:mod:`govbridge.gather.versions`) is spliced in as the ``versions`` facet's real content when it was requested,
 replacing ``engine.gather``'s own always-``MISSING`` placeholder for that facet name.
 
+**Multi-hop, not one hop with a cap (the BR-AR-0024 reopening).** OD-BR-05 section 3 requires SEQUENTIAL,
+MULTI-HOP retrieval; a per-round fan-out cap exists to bound one round's own cost, never to bound how many rounds
+run. An identifier a round has no budget for is CARRIED FORWARD in a deterministic priority queue
+(:class:`_PriorityQueue`, :func:`_priority_sort_key`) and chased in a LATER round, in a generic, stated priority
+order (id-grammar ids, then symbols/test paths, then citations, then path literals, then commit hashes; within a
+kind, by how many frontier items mention it, then by first appearance, then lexically) -- never dropped, and never
+itself a reason follow-up stops. Follow-up keeps hopping until the queue empties
+(``NO_UNRESOLVED_IDENTIFIERS``), ``max_followup_rounds`` is reached (``MAX_ROUNDS``), a round adds no genuinely new
+merged item (``MARGINAL_GAIN_ONLY_DUPLICATES``), or the OVERALL follow-up budget -- an item count and/or a
+wall-clock bound, :func:`_followup_config`, config/facets.yaml's own ``followup:`` section -- is exhausted with
+the queue still non-empty (``BUDGET_REACHED_WITH_UNRESOLVED``, the only one of the four that means "there is more,
+we chose to stop here").
+
 **Read-only (BR-DAG-AMEND-R1-15).** Every SELECT this module or :mod:`govbridge.gather.identifiers` issues against
 ``lineage_edge``/``occurrence`` opens its OWN connection via ``govbridge.core.store.open_db_readonly`` -- this
-module adds no cache, index or table of its own, and never opens a read-write connection itself. The underlying
-``RouteSet`` (built by the caller, exactly like every other ``gather`` consumer) is NOT this module's to change:
-the code route's own query-time write (``code/symbols.py``'s lazy ``ensure_indexed``) and hit classification's
-``ensure_schema`` call are BR-DAG-AMEND-R1-17's fix, routed to R1-XC in parallel -- see this module's own
-:func:`gather_with_followup` docstring and this node's checkpoint ``open_issues`` for exactly where that shows up.
+module adds no cache, index or table of its own (the priority queue and the ls-tree memoisation are both plain,
+in-process structures, created fresh and thrown away with each call), and never opens a read-write connection
+itself. The underlying ``RouteSet`` (built by the caller, exactly like every other ``gather`` consumer) is NOT this
+module's to change: the code route's own query-time write (``code/symbols.py``'s lazy ``ensure_indexed``) and hit
+classification's ``ensure_schema`` call are BR-DAG-AMEND-R1-17's fix, routed to R1-XC in parallel -- see this
+module's own :func:`gather_with_followup` docstring and this node's checkpoint ``open_issues`` for exactly where
+that shows up.
 """
 from __future__ import annotations
 
 import dataclasses
+import time
 from typing import Optional
 
 from govbridge.core import gitobj
@@ -35,10 +51,11 @@ from govbridge.gather import versions as versionsmod
 from govbridge.graph import derive as derivemod
 from govbridge.route.router import RouteHit, RouteOccurrence
 
-#: REPAIR_DAG.yaml node R1-GA2 acceptance check 1: "reached within 3 rounds" -- the default follow-up depth. A
-#: caller may still raise/lower it; this is only the configuration-free default (mirroring
-#: govbridge.gather.facets's own "one literal default, everything else configuration" discipline for THIS module's
-#: own new knob, which config/facets.yaml -- out of this node's mutation scope -- does not carry).
+#: Code-default FALLBACKS ONLY (the BR-AR-0024 reopening): the real, deployed defaults live in
+#: config/facets.yaml's own ``followup:`` section (:func:`_followup_config`), the SAME "one place the fallback
+#: integer is allowed to appear at all" discipline govbridge.gather.facets._FALLBACK_BATCH_SIZE already documents
+#: for the base engine's own batch size. These constants are used ONLY when that file is missing/unreadable, or a
+#: caller does not pass a config path at all (e.g. a unit test's synthetic facets.yaml with no ``followup:`` key).
 DEFAULT_MAX_FOLLOWUP_ROUNDS = 3
 #: a bound on how many items one identifier's own resolution may add, so a single pathological identifier (an
 #: extremely common symbol, say) cannot silently balloon a follow-up round -- REPAIR_PLAN.md section 2.5's "a
@@ -47,13 +64,141 @@ DEFAULT_MAX_ITEMS_PER_IDENTIFIER = 50
 #: OD-BR-05 section 5's "explicit task/context budget reached, with unresolved coverage disclosed": real prose
 #: evidence is dense with identifier-shaped tokens (a real-view measurement on this domain's own CONTROL-A found
 #: 81 distinct candidates from just 31 "purpose"-facet items -- record ids, path/joined-path literals, symbols and
-#: commit hashes are all common English/code shapes), and EACH one costs at least one route call. Without a
-#: per-round cap, a single round's own identifier fan-out -- never the number of ROUNDS, which max_followup_rounds
-#: already bounds -- can make one gather call arbitrarily expensive on a real corpus. Capped, never silently
-#: truncated: exceeding it stops with BUDGET_REACHED_WITH_UNRESOLVED and discloses exactly which identifiers were
-#: deferred (telemetry's own unresolved_identifiers).
+#: commit hashes are all common English/code shapes), and EACH one costs at least one route call.
+#:
+#: the BR-AR-0024 reopening (the defect this pass fixes): this is a PER-ROUND FAN-OUT cap, never a round-count
+#: cap and never an excuse to stop chasing. An identifier a round has no budget for THIS round is CARRIED FORWARD
+#: into a deterministic priority queue (:func:`_PriorityQueue`) that persists across rounds, never dropped and
+#: never counted against a later round's own fresh cap. Follow-up keeps hopping (OD-BR-05 section 3: "the next
+#: query may be generated from the evidence returned by the previous query") until the queue empties
+#: (NO_UNRESOLVED_IDENTIFIERS), max_followup_rounds is reached (MAX_ROUNDS), a round adds no genuinely new merged
+#: item (MARGINAL_GAIN_ONLY_DUPLICATES), or the OVERALL follow-up budget (max_total_identifiers and/or
+#: max_wall_seconds, both configurable, checked BEFORE taking a round's own batch) is exhausted with the queue
+#: still non-empty (BUDGET_REACHED_WITH_UNRESOLVED) -- the ONLY one of the four that means "there is more, we
+#: chose to stop", and the only one this per-round cap can ever contribute to (by making MORE rounds necessary to
+#: drain the same queue, never by itself ending follow-up early).
 DEFAULT_MAX_IDENTIFIERS_PER_ROUND = 20
+#: The OVERALL item budget across every follow-up round combined (never per-round -- see above). ``None`` (from
+#: config or here) disables this specific check; at least one of this and DEFAULT_MAX_WALL_SECONDS should stay set
+#: so an adversarial/dense corpus cannot make follow-up unboundedly expensive even across many small rounds.
+DEFAULT_MAX_TOTAL_IDENTIFIERS = 200
+#: The OVERALL wall-clock budget (seconds) across every follow-up round combined. ``None`` disables it. Checked at
+#: the TOP of each round, before that round's own batch is taken -- a round already in flight always finishes.
+DEFAULT_MAX_WALL_SECONDS = 240.0
 _MAX_SLICE_CHARS = 1600
+
+#: The generic, stated priority rule (the BR-AR-0024 reopening, requirement 2), by KIND CONSTANT only -- never
+#: an instance/Review-8 name (OC-BR-02): id-grammar record ids first, then symbols and Rust test paths, then
+#: citations (a requirement citation or a lineage-derived "tested by" edge), then path literals, then commit
+#: hashes. Anything not listed sorts last (defensive; every real kind is listed).
+_KIND_PRIORITY = {
+    "record_id": 0,
+    "symbol": 1,
+    "rust_test_path": 1,
+    "requirement_citation": 2,
+    "tests_of": 2,
+    "path_literal": 3,
+    "joined_path_literal": 3,
+    "commit": 4,
+}
+
+
+def _followup_config(facets_path: Optional[str] = None) -> dict:
+    """The real, deployed follow-up knobs, read from config/facets.yaml's own ``followup:`` section (this node's
+    mutation_scope is extended to that ONE file, for this ONE purpose -- config/budgets.yaml stays R1-GA3's).
+    Reuses ``govbridge.gather.facets``'s own cached YAML loader (the SAME file every other gather config reads,
+    never a second load/cache of it) rather than opening a second copy of the same document. A key ABSENT from the
+    file falls back to this module's own code default; a key present but explicitly ``null`` DISABLES that check
+    (meaningful only for the two overall-budget knobs) -- both are honoured, never conflated."""
+    doc = facetsmod._load_config(facets_path)
+    cfg = doc.get("followup") or {}
+    return {
+        "max_rounds": int(cfg.get("default_max_rounds", DEFAULT_MAX_FOLLOWUP_ROUNDS)),
+        "max_identifiers_per_round": int(cfg.get("default_max_identifiers_per_round",
+                                                  DEFAULT_MAX_IDENTIFIERS_PER_ROUND)),
+        "max_items_per_identifier": int(cfg.get("default_max_items_per_identifier",
+                                                 DEFAULT_MAX_ITEMS_PER_IDENTIFIER)),
+        "max_total_identifiers": cfg.get("default_max_total_identifiers", DEFAULT_MAX_TOTAL_IDENTIFIERS),
+        "max_wall_seconds": cfg.get("default_max_wall_seconds", DEFAULT_MAX_WALL_SECONDS),
+    }
+
+
+def _priority_info(identifier, query_text_lower: str, first_seen_order: dict) -> dict:
+    """Every field the stated, generic priority rule sorts by (the BR-AR-0024 reopening, requirement 2),
+    recorded verbatim in telemetry per identifier -- this IS the sort key computation (never a second, silently
+    diverging copy of it): (1) matches the query/instantiated-subject text; (2) kind, in the stated order;
+    (3) how many frontier items mention it (descending); (4) first appearance (ascending); (5) a lexical
+    tie-break. Byte-deterministic across ``--threads``: every input (the frontier content, mention counts, first-
+    seen order) is already thread-count-independent by the time this runs (R1-GA1's own proof for the base round;
+    this module's own round loop is a plain sequential ``for``, never threaded)."""
+    matches_query = bool(identifier.value) and identifier.value.lower() in query_text_lower
+    return {
+        "matches_query": matches_query,
+        "kind_rank": _KIND_PRIORITY.get(identifier.kind, len(_KIND_PRIORITY)),
+        "mention_count": identifier.mention_count,
+        "first_seen_order": first_seen_order.get(identifier.key(), -1),
+    }
+
+
+def _priority_sort_key(identifier, query_text_lower: str, first_seen_order: dict) -> tuple:
+    info = _priority_info(identifier, query_text_lower, first_seen_order)
+    return (
+        0 if info["matches_query"] else 1,
+        info["kind_rank"],
+        -info["mention_count"],
+        info["first_seen_order"],
+        identifier.kind, identifier.value,  # a total, lexical tie-break -- never leaves two candidates "equal"
+    )
+
+
+class _PriorityQueue:
+    """A deterministic, carry-forward queue of not-yet-resolved identifiers (the BR-AR-0024 reopening,
+    requirement 1) -- the fix for the defect this pass reopens: an identifier a round has no budget for is placed
+    HERE, never dropped and never itself ended the follow-up loop. ``merge_new`` folds a round's freshly extracted
+    candidates in (skipping anything already visited; SUMMING ``mention_count`` into an already-queued entry via
+    ``identifiers._dedupe_identifiers``'s own rule, never resetting it); ``take`` pops the top ``n`` by the stated
+    priority order, leaving the rest queued for the NEXT round. A plain in-process dict + insertion-order list --
+    never a store structure (BR-DAG-AMEND-R1-15 is unaffected)."""
+
+    def __init__(self) -> None:
+        self._queued: dict = {}
+        self._first_seen_order: dict = {}
+        self._next_order = 0
+
+    def __len__(self) -> int:
+        return len(self._queued)
+
+    def merge_new(self, new_identifiers: list, visited: set) -> None:
+        for ident in new_identifiers:
+            key = ident.key()
+            if key in visited:
+                continue
+            if key in self._queued:
+                existing = self._queued[key]
+                self._queued[key] = dataclasses.replace(
+                    existing, mention_count=existing.mention_count + ident.mention_count)
+            else:
+                self._queued[key] = ident
+                self._first_seen_order[key] = self._next_order
+                self._next_order += 1
+
+    def take(self, n: int, query_text_lower: str) -> list:
+        """The top ``n`` queued identifiers, in priority order, REMOVED from the queue and paired with the SAME
+        priority info the sort itself used (:func:`_priority_info` -- never recomputed a second time, and never
+        requiring a caller to reach into this class's own private ``_first_seen_order``): ``[(identifier,
+        priority_info_dict), ...]``. The caller is responsible for re-``merge_new``-ing anything it could not
+        resolve, which this pass never does -- resolution itself never fails loudly, see
+        :func:`resolve_identifier`'s own docstring."""
+        ordered = sorted(self._queued.keys(),
+                          key=lambda k: _priority_sort_key(self._queued[k], query_text_lower, self._first_seen_order))
+        out = []
+        for k in ordered[:max(0, n)]:
+            ident = self._queued.pop(k)
+            out.append((ident, _priority_info(ident, query_text_lower, self._first_seen_order)))
+        return out
+
+    def remaining(self) -> list:
+        return list(self._queued.values())
 
 
 def _hit_from_dict(d: dict) -> RouteHit:
@@ -359,26 +504,52 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
                           exclude: Optional[list] = None, budget_profile: Optional[str] = None,
                           facets_path: Optional[str] = None, budgets_path: Optional[str] = None,
                           resolved_view=None, view_path: Optional[str] = None, repo: Optional[str] = None,
-                          max_followup_rounds: int = DEFAULT_MAX_FOLLOWUP_ROUNDS,
-                          max_items_per_identifier: int = DEFAULT_MAX_ITEMS_PER_IDENTIFIER,
-                          max_identifiers_per_round: int = DEFAULT_MAX_IDENTIFIERS_PER_ROUND, grammar=None,
-                          conn=None) -> dict:
+                          max_followup_rounds: Optional[int] = None,
+                          max_items_per_identifier: Optional[int] = None,
+                          max_identifiers_per_round: Optional[int] = None,
+                          max_total_identifiers: Optional[int] = None, max_wall_seconds: Optional[float] = None,
+                          grammar=None, conn=None) -> dict:
     """OD-BR-05 sections 3 ("sequential/adaptive retrieval... the next query may be generated from the evidence
     returned by the previous query") and 6 ("merge before compilation... across all retrieval rounds"). Round 0 is
     exactly ``govbridge.gather.engine.gather`` (this node's base, never forked); every round after that is
-    triggered by an identifier :mod:`govbridge.gather.identifiers` found in the PREVIOUS round's own new evidence,
-    resolved through :func:`resolve_identifier`, with a visited set (REPAIR_PLAN.md section 2.5) so the same
-    identifier is never chased twice. Returns the SAME shape ``engine.gather`` does (``query``, ``batch_size``,
-    ``max_rounds``, ``threads``, ``facets``, ``stop_reason``, ``merged``, ``merged_sha256``, ``telemetry``,
-    ``excluded_hits``), plus ``versions`` (this facet's real content, when requested) and
-    ``followup_rounds``/``visited_identifiers`` for direct inspection.
+    triggered by identifiers :mod:`govbridge.gather.identifiers` found in the evidence seen SO FAR, resolved
+    through :func:`resolve_identifier`, with a visited set (REPAIR_PLAN.md section 2.5) so the same identifier is
+    never chased twice. Returns the SAME shape ``engine.gather`` does (``query``, ``batch_size``, ``max_rounds``,
+    ``threads``, ``facets``, ``stop_reason``, ``merged``, ``merged_sha256``, ``telemetry``, ``excluded_hits``),
+    plus ``versions`` (this facet's real content, when requested) and ``followup_rounds``/``visited_identifiers``
+    for direct inspection.
+
+    the BR-AR-0024 reopening (multi-hop, not one hop with a cap): identifiers this round has no budget for are
+    CARRIED FORWARD in a deterministic priority queue (:class:`_PriorityQueue`) rather than ending follow-up --
+    every round takes its own ``max_identifiers_per_round`` from (carried plus newly discovered), in the stated
+    priority order (:func:`_priority_sort_key`), and follow-up keeps hopping until the queue empties
+    (``NO_UNRESOLVED_IDENTIFIERS``), ``max_followup_rounds`` is reached (``MAX_ROUNDS``), a round adds no
+    genuinely new merged item (``MARGINAL_GAIN_ONLY_DUPLICATES``), or the OVERALL follow-up budget
+    (``max_total_identifiers`` and/or ``max_wall_seconds``) is exhausted with the queue still non-empty
+    (``BUDGET_REACHED_WITH_UNRESOLVED``) -- the per-round cap can only ever make MORE rounds necessary to drain the
+    same queue, never end follow-up by itself. ``max_followup_rounds``/``max_identifiers_per_round``/
+    ``max_items_per_identifier``/``max_total_identifiers``/``max_wall_seconds``: any left ``None`` (the new
+    default -- a signature change from this node's own first pass, noted in this reopening's checkpoint
+    ``decisions``) falls back to config/facets.yaml's own ``followup:`` section (:func:`_followup_config`), never a
+    hard-coded literal outside that one function.
 
     ``conn``: an already-open store connection to reuse for lineage-edge lookups (tests pass their own); omitted,
     this function opens (and closes) its own via ``store.open_db_readonly()`` -- BR-DAG-AMEND-R1-15, never a
     read-write connection of this module's own making."""
     task = task or taskctxmod.current()
     exclude_merged = task.merge_exclude(exclude)
+    cfg = _followup_config(facets_path)
     batch_size = batch_size if batch_size is not None else facetsmod.default_batch_size(facets_path)
+    max_followup_rounds = max_followup_rounds if max_followup_rounds is not None else cfg["max_rounds"]
+    max_identifiers_per_round = (max_identifiers_per_round if max_identifiers_per_round is not None
+                                  else cfg["max_identifiers_per_round"])
+    max_items_per_identifier = (max_items_per_identifier if max_items_per_identifier is not None
+                                 else cfg["max_items_per_identifier"])
+    # These two ARE allowed to stay None past this point: None here means "defer to config", and config/facets.yaml
+    # itself may set either to an explicit null, which means "this one overall-budget check is disabled" --
+    # config's own None is honoured verbatim, never coerced to a number.
+    max_total_identifiers = max_total_identifiers if max_total_identifiers is not None else cfg["max_total_identifiers"]
+    max_wall_seconds = max_wall_seconds if max_wall_seconds is not None else cfg["max_wall_seconds"]
     grammar = grammar if grammar is not None else identifiersmod._default_grammar()
     resolved_view = resolved_view if resolved_view is not None else _resolve_view_for(task, view_path, repo)
 
@@ -401,6 +572,7 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
 
     telem = telemetrymod.GatherTelemetry(query_id=query.get("id", "?"))
     triggers_log: list = []
+    round_summaries: list = []
     visited: set = set()
     followup_rounds_run = 0
     followup_stop_reason: Optional[str] = None
@@ -409,33 +581,46 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
     # A plain in-process dict, thrown away with this call (see _safe_ls_tree_paths's own docstring) -- never a
     # store cache, never shared across gathers.
     tree_cache: dict = {}
+    query_text_lower = (query.get("text") or "").lower()
+    queue = _PriorityQueue()
+    total_resolved_count = 0
+    started_at = time.monotonic()
 
-    deferred_identifiers: list = []
     try:
         round_idx = 1
-        while round_idx <= max_followup_rounds:
-            candidates = identifiersmod.extract_all(frontier, grammar=grammar, conn=conn, repo=repo)
-            todo = [i for i in candidates if i.key() not in visited]
-            if not todo:
+        while True:
+            if round_idx > max_followup_rounds:
+                followup_stop_reason = enginemod.STOP_MAX_ROUNDS
+                break
+            new_candidates = identifiersmod.extract_all(frontier, grammar=grammar, conn=conn, repo=repo)
+            queue.merge_new(new_candidates, visited)
+            if not len(queue):
                 followup_stop_reason = enginemod.STOP_NO_UNRESOLVED_IDENTIFIERS
                 break
-            budget_exceeded = len(todo) > max_identifiers_per_round
-            if budget_exceeded:
-                # OD-BR-05 section 5: never a silent drop -- every identifier this round found but did not have
-                # budget to chase is named, not merely counted, and the round still fully processes the ones it
-                # DID take (deterministic prefix, extraction order) rather than stopping mid-identifier.
-                deferred_identifiers.extend(i.to_dict() for i in todo[max_identifiers_per_round:])
-                todo = todo[:max_identifiers_per_round]
+            wall_elapsed = time.monotonic() - started_at
+            overall_budget_exhausted = (
+                (max_total_identifiers is not None and total_resolved_count >= max_total_identifiers)
+                or (max_wall_seconds is not None and wall_elapsed >= max_wall_seconds)
+            )
+            if overall_budget_exhausted:
+                followup_stop_reason = enginemod.STOP_BUDGET_REACHED_WITH_UNRESOLVED
+                break
+            queue_before = len(queue)
+            taken = queue.take(max_identifiers_per_round, query_text_lower)
+            items_before = acc.item_count()
             round_new_hits: list = []
             round_candidate_items = 0
-            for ident in todo:
+            for rank, (ident, priority_info) in enumerate(taken):
                 visited.add(ident.key())
+                total_resolved_count += 1
                 resolved = resolve_identifier(ident, routes, resolved_view=resolved_view, repo=repo,
                                                batch_size=batch_size, exclude=exclude_merged,
                                                exclude_counter=followup_exclude_counter, tree_cache=tree_cache)
                 resolved = resolved[:max_items_per_identifier]
                 round_candidate_items += len(resolved)
                 trigger_dict = ident.to_dict()
+                trigger_dict["priority"] = priority_info
+                trigger_dict["priority_rank_in_round"] = rank
                 acc.add(resolved, facet=f"followup:{ident.kind}", round=round_idx, trigger=trigger_dict)
                 triggers_log.append({
                     "round": round_idx, "identifier": trigger_dict, "new_items": [h.unit_id for h in resolved],
@@ -449,16 +634,15 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
                 exhausted=False,
             ))
             followup_rounds_run += 1
-            if budget_exceeded:
-                followup_stop_reason = enginemod.STOP_BUDGET_REACHED_WITH_UNRESOLVED
-                break
-            if not round_new_hits:
+            round_summaries.append({
+                "round": round_idx, "queue_before": queue_before, "taken": len(taken),
+                "queue_after": len(queue), "wall_elapsed_seconds": round(time.monotonic() - started_at, 3),
+            })
+            if acc.item_count() == items_before:
                 followup_stop_reason = enginemod.STOP_MARGINAL_GAIN_ONLY_DUPLICATES
                 break
             frontier = round_new_hits
             round_idx += 1
-        else:
-            followup_stop_reason = enginemod.STOP_MAX_ROUNDS
 
         merged_items = acc.items()
         distinct_paths = sorted({
@@ -478,9 +662,13 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
 
     final_stop_reason = followup_stop_reason if followup_rounds_run > 0 else base_result["stop_reason"]
     total_excluded = base_result.get("excluded_hits", 0) + followup_exclude_counter.count
+    # the BR-AR-0024 reopening, requirement 1's own closing line: "everything still queued at the end is named
+    # in the result" -- whatever is left in the priority queue when the loop exits, for ANY reason, not just a
+    # per-round shortfall.
+    still_queued = [i.to_dict() for i in queue.remaining()]
     telem.stop_reason = final_stop_reason
     telem.follow_up_triggers = triggers_log
-    telem.unresolved_identifiers = base_result["telemetry"].get("unresolved_identifiers", []) + deferred_identifiers
+    telem.unresolved_identifiers = base_result["telemetry"].get("unresolved_identifiers", []) + still_queued
     telem.unresolved_facets = base_result["telemetry"].get("unresolved_facets", [])
     telem.excluded_hits = total_excluded
 
@@ -490,6 +678,15 @@ def gather_with_followup(query: dict, routes, *, task=None, seeds: Optional[list
     telemetry_summary["base_rounds"] = base_result["telemetry"].get("rounds", 0)
     telemetry_summary["base_stop_reason"] = base_result["stop_reason"]
     telemetry_summary["followup_rounds"] = followup_rounds_run
+    telemetry_summary["followup_round_summary"] = round_summaries
+    telemetry_summary["identifiers_resolved_total"] = total_resolved_count
+    telemetry_summary["identifiers_queued_at_end"] = len(still_queued)
+    telemetry_summary["followup_wall_seconds"] = round(time.monotonic() - started_at, 3)
+    telemetry_summary["followup_budget"] = {
+        "max_followup_rounds": max_followup_rounds, "max_identifiers_per_round": max_identifiers_per_round,
+        "max_items_per_identifier": max_items_per_identifier, "max_total_identifiers": max_total_identifiers,
+        "max_wall_seconds": max_wall_seconds,
+    }
 
     result = {
         "query": base_result["query"], "batch_size": base_result["batch_size"],
@@ -527,8 +724,17 @@ def main(argv=None) -> int:
     p.add_argument("--query", required=True)
     p.add_argument("--batch-size", type=int, default=None)
     p.add_argument("--max-rounds", type=int, default=None)
-    p.add_argument("--max-followup-rounds", type=int, default=DEFAULT_MAX_FOLLOWUP_ROUNDS)
-    p.add_argument("--max-identifiers-per-round", type=int, default=DEFAULT_MAX_IDENTIFIERS_PER_ROUND)
+    p.add_argument("--max-followup-rounds", type=int, default=None,
+                    help="default: config/facets.yaml's followup.default_max_rounds")
+    p.add_argument("--max-identifiers-per-round", type=int, default=None,
+                    help="default: config/facets.yaml's followup.default_max_identifiers_per_round -- a PER-ROUND "
+                         "fan-out cap; identifiers over it carry forward, never dropped (the BR-AR-0024 reopening)")
+    p.add_argument("--max-total-identifiers", type=int, default=None,
+                    help="default: config/facets.yaml's followup.default_max_total_identifiers -- the OVERALL "
+                         "item budget across every follow-up round combined")
+    p.add_argument("--max-wall-seconds", type=float, default=None,
+                    help="default: config/facets.yaml's followup.default_max_wall_seconds -- the OVERALL "
+                         "wall-clock budget across every follow-up round combined")
     p.add_argument("--threads", type=int, default=None)
     p.add_argument("--facets", action="append", metavar="NAME")
     p.add_argument("--exclude", action="append", metavar="GLOB")
@@ -563,6 +769,7 @@ def main(argv=None) -> int:
         query, routes, task=ctx, seeds=task_spec.get("seeds"), facet_names=args.facets,
         batch_size=args.batch_size, max_rounds=args.max_rounds, threads=args.threads, exclude=args.exclude,
         max_followup_rounds=args.max_followup_rounds, max_identifiers_per_round=args.max_identifiers_per_round,
+        max_total_identifiers=args.max_total_identifiers, max_wall_seconds=args.max_wall_seconds,
         view_path=view_path,
     )
     if args.json:
