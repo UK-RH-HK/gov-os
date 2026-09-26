@@ -1,5 +1,9 @@
-# interpreter: N/A -- this check is a plain 'grep', no Python interpreter invoked (BR-DAG-AMEND-R1-18 (R1-T3) note)
-tests/fixtures/gather/followup/followup_repobuilder.py:3:never edits it). Nothing here is Review-8/Phase-2 content, and no id/symbol here is drawn from the Review-8 chains
-govbridge/gather/followup.py:91:#: an instance/Review-8 name (OC-BR-02): id-grammar record ids first, then symbols and Rust test paths, then
+# interpreter: N/A -- this check is a plain 'grep', no Python interpreter invoked
+# re-run after BR-DAG-AMEND-R1-22 + git-read-retry addendum, over every file this node touched this pass
+# cmd: grep -nE 'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|phase2/review-8' <files>
+config/facets.yaml:6:  never a path, a file name, a Review-8 item, an F-finding or a symbol from the Review-8 chains (OC-BR-02). Adding,
+config/facets.yaml:108:# (a class id is caller-chosen data, never a Review-8 name baked in here).
 tests/gather/test_merge.py:4:(REPAIR-1 rule 2). Nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).
+govbridge/gather/followup.py:157:#: an instance/Review-8 name (OC-BR-02): id-grammar record ids first, then symbols and Rust test paths, then
 tests/gather/test_followup.py:6:run-1 answer (REPAIR-1 rule 2), and nothing here names a Review-8 item, an F-finding or a query-class id (OC-BR-02).
+tests/fixtures/gather/followup/followup_repobuilder.py:3:never edits it). Nothing here is Review-8/Phase-2 content, and no id/symbol here is drawn from the Review-8 chains

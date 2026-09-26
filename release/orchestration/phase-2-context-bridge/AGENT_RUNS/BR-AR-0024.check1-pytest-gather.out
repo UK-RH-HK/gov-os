@@ -1,3 +1,5 @@
-# interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)  -- BR-DAG-AMEND-R1-18 (R1-T3)
-...................................                                      [100%]
-35 passed in 6.63s
+# interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)
+# cmd: cd $D && $PY -m pytest tests/gather/test_followup.py tests/gather/test_merge.py -q
+# re-run after BR-DAG-AMEND-R1-22 + git-read-retry addendum
+...........................................                              [100%]
+43 passed in 19.11s

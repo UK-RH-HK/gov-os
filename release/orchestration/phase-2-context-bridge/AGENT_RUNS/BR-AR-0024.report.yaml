@@ -2,13 +2,26 @@ run_id: BR-AR-0024
 role: >-
   REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
   rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
-  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7). REOPENED once (follow-up budget
-  semantics: a round exceeding max_identifiers_per_round deferred the rest AND ended follow-up, so a real query got
-  exactly one hop regardless of configured rounds/budget); this report covers the state AFTER that reopening's own
-  fix (a deterministic, carry-forward priority queue -- see claims C-11/C-12/C-13/C-14).
+  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7). REOPENED THREE TIMES, the
+  second reopening carrying two coordinator addenda plus a self-inflicted fourth fix found while addressing them
+  (see item 4 below): (1)
+  follow-up budget semantics (a round exceeding max_identifiers_per_round deferred the rest AND ended follow-up, so
+  a real query got exactly one hop regardless of configured rounds/budget) -- fixed by a deterministic,
+  carry-forward priority queue (C-11/C-12/C-13/C-14); (2) BR-DAG-AMEND-R1-22, content budgets must not depend on
+  wall-clock time (R1-GA3's own CONTROL-A compile-twice check caught two compiles differing in exactly the
+  overflow set derived from gather's merged results, traced to max_wall_seconds being checked alongside the
+  count-based budget) -- fixed by separating wall time into its own, disabled-by-default SAFETY ABORT
+  (STOP_WALL_TIME_ABORT, `deterministic: false`), plus a mid-pass addendum requiring determinism ACROSS PROCESSES
+  (PYTHONHASHSEED) -- see C-15/C-16; (3) a coordinator addendum to (2): a single transient git-read failure (a
+  `cat-file`/`ls-tree` race against this domain's own multi-agent-shared repository) must be RETRIED, bounded,
+  before degrading, and a read that still fails after every attempt must be DISCLOSED (never mistaken for genuine
+  absence) and also mark the result non-deterministic -- see C-17; (4) a further addendum: this node's own pass-2
+  test (byte-identical-across-thread-counts) failed ONCE under heavy system load in a full-suite run -- traced to
+  an id(conn)-keyed cache in identifiers.py vulnerable to CPython id-reuse, fixed by removing the cache, and proved
+  with 20 stress-loop iterations plus two full-suite runs -- see C-18. This report covers the state after all four.
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga2-0024
-commit: ea992f95532da1e9765d38698310fe709f9ff0d8
+commit: 765a3c2
 status: COMPLETED
 claims:
 - id: C-1
@@ -176,6 +189,93 @@ claims:
     dispatch): CA-WHY 168/291, CA-REQ 48/307, CA-ENF 75/195, CA-TESTS 80/184, CA-DEPS 153/52 (bridge-domain/
     product-or-other) -- every query reaches into BOTH the bridge's own orchestration domain and the product
     source tree, never one exclusively.
+- id: C-15
+  text: >-
+    BR-DAG-AMEND-R1-22 FIX (the defect: max_wall_seconds, default 240s, was checked alongside max_total_identifiers
+    in the SAME budget decision, so a round that happened to be slow could produce BUDGET_REACHED_WITH_UNRESOLVED
+    with a DIFFERENT prefix of the queue resolved than a fast run against the identical store/inputs -- R1-GA3's
+    own CONTROL-A compile-twice check caught exactly this). Content budgets (max_rounds, max_identifiers_per_round,
+    max_items_per_identifier, max_total_identifiers) are now COUNT-based only: given the same store and inputs,
+    the merged result is byte-identical regardless of machine speed, load or --threads, because
+    max_total_identifiers is the ONLY knob left that can produce BUDGET_REACHED_WITH_UNRESOLVED, and it counts
+    identifiers RESOLVED, never elapsed time. Wall-clock time is now a SEPARATE safety abort: checked FIRST, before
+    the content budget, at the top of each round; disabled (``None``/``null``) by default both in
+    ``DEFAULT_MAX_WALL_SECONDS`` and config/facets.yaml's own ``followup.default_max_wall_seconds`` (previously
+    240); when an operator explicitly sets it and it trips, the stop reason is a DISTINCT, new constant
+    (``STOP_WALL_TIME_ABORT = "WALL_TIME_ABORT"``, deliberately never added to
+    ``govbridge.gather.engine.STOP_REASONS``' closed vocabulary) and the result carries a new top-level
+    ``deterministic`` field, ``False`` in this one case. Timing values (``followup_wall_seconds``,
+    ``wall_elapsed_seconds`` per round) are diagnostic telemetry only: ``merged_sha256`` is computed from
+    ``merged_dicts`` BEFORE any timing field is even assigned, and the priority sort key
+    (``_priority_sort_key``) takes no timing argument at all -- verified both by code inspection and by a direct
+    test (an artificially slowed resolver, via a monkeypatched per-call sleep, vs. a fast one, same inputs, same
+    count-based budgets, produce an IDENTICAL merged_sha256).
+- id: C-16
+  text: >-
+    CROSS-PROCESS DETERMINISM (a coordinator addendum to the BR-DAG-AMEND-R1-22 pass, mid-task): Python randomises
+    ``str`` hashing per PROCESS (``PYTHONHASHSEED``) unless pinned, so an ordering that even indirectly depends on
+    iterating a bare ``set``/``frozenset`` of strings -- or a sort whose key can tie without a total tie-break --
+    can differ between two real CLI invocations while looking identical within one in-process test run (the
+    existing ``--threads`` test cannot see this at all, since every thread shares the same process's hash seed).
+    Read every module in this reopening's own scope (``govbridge/gather/{followup,identifiers,merge,versions}.py``)
+    line by line for exactly this risk and found NONE: ``identifiers._dedupe_identifiers`` and
+    ``merge.MergeAccumulator`` both key by a plain ``dict`` (insertion-order-preserving, never raw set iteration)
+    plus an explicit ``_order``/insertion list; ``merge.collapse_occurrences`` and ``versions.reconcile_path`` both
+    sort by an explicit, already-deterministic VALUE (a status rank, a ref/path string), never by hash; this node's
+    own ``distinct_paths = sorted({...})`` is a sorted set comprehension of distinct strings (safe: sorting removes
+    any hash-order dependency); and ``_priority_sort_key`` already ends in a total ``(kind, value)`` lexical
+    tie-break, so no two candidates can compare equal and fall back to insertion/hash order. Verified empirically,
+    not just by inspection: a new, hermetic, standalone script
+    (``tests/fixtures/gather/followup/hash_seed_probe.py``, reusing this file's own ``_ResolvableExactRoutes``
+    fixture) is run in TWO SEPARATE SUBPROCESSES with ``PYTHONHASHSEED=0`` and ``PYTHONHASHSEED=1``, and produces
+    an IDENTICAL ``merged_sha256`` both times. The SAME check was independently re-run directly against the real
+    CONTROL-A store/corpus (CA-WHY, two separate process invocations, seeds 0 and 1) -- see the acceptance-check
+    evidence below for both hashes.
+- id: C-17
+  text: >-
+    GIT-READ RETRY AND DISCLOSED DEGRADATION (a second coordinator addendum to the BR-DAG-AMEND-R1-22 pass): this
+    node's FIRST pass (C-10) made every direct git call this module makes degrade to an honest MISSING on ANY
+    exception, closing a crash risk but opening a NEW determinism gap -- a single TRANSIENT failure (the observed
+    shape: a `cat-file`/`ls-tree` call racing another agent's concurrent `git gc`/repack against this domain's own
+    shared repository) now silently changed WHICH items a gather found depending on how the race landed, with the
+    same identifier count and a different hash (R1-GA3 traced exactly one CONTROL-A compile-twice divergence to
+    this). Fixed with a BOUNDED retry (``_retry_transient_git_read``: up to 3 attempts, a short fixed backoff
+    between them) wrapping all three direct-git-read call sites (``_safe_ls_tree_path``, ``_safe_ls_tree_paths``,
+    ``_safe_read_path``) -- a race that clears within the retry budget now changes NOTHING about the merged result
+    (proved against a real, built Git fixture: a monkeypatched ``gitobj.ls_tree_path`` that raises once then
+    delegates to the real function produces a ``merged_sha256`` IDENTICAL to a clean run with no failure injected).
+    If every attempt still fails, the read degrades to an honest MISSING exactly as before, but that degradation is
+    now DISCLOSED: a new, call-scoped list (``degraded_git_reads``, threaded through ``resolve_identifier`` and
+    every resolver exactly like the existing ``tree_cache``, never a module-global) records ``{call, commit, path,
+    error}`` for every read that exhausted its retry, surfaced in ``telemetry.degraded_git_reads``; the top-level
+    ``deterministic`` field is now ``False`` when EITHER the wall-time abort fired (C-15) OR at least one git read
+    degraded -- the same "this run's evidence may not match a luckier run against the identical store" disclosure,
+    for a different root cause. A degraded ``ls_tree_paths`` result is deliberately NEVER written into
+    ``tree_cache``: caching a degraded empty list would make every LATER lookup against the same commit silently
+    reuse the failure (and look exactly like a genuinely empty tree) instead of getting its own fresh retry budget.
+- id: C-18
+  text: >-
+    A THIRD coordinator addendum: this node's own pass-2 test,
+    test_gather_with_followup_is_byte_identical_across_thread_counts, FAILED ONCE in a full-suite run on the bridge
+    tip plus R1-GA3, under system load average ~14 (passed reliably, ~1s each, when run alone). Root cause found
+    in govbridge/gather/identifiers.py:_lineage_table_exists -- it memoised its True/False result in a MODULE-LEVEL
+    dict keyed by ``id(conn)``. govbridge.gather.followup opens and closes its OWN store connection per
+    gather_with_followup call (BR-DAG-AMEND-R1-15); CPython is free to reuse a closed/collected object's memory
+    address for a later, UNRELATED connection, and ``sqlite3.Connection`` supports neither ``weakref`` (verified
+    empirically: ``weakref.ref()`` on a live connection raises TypeError) nor arbitrary instance attributes
+    (verified: assigning one raises AttributeError) -- so there was no sound way to tie a cache entry to the
+    connection object's own lifetime. Under heavy allocation/deallocation churn (more likely exactly when system
+    load is high), a NEW connection could land on a stale, recycled ``id()`` and silently inherit an UNRELATED,
+    long-dead connection's cached result -- in the failing run, one of the test's two same-store calls almost
+    certainly inherited a stale ``False`` from an earlier, different test's connection (a hermetic fixture with no
+    lineage_edge table), silently skipping lineage-edge-derived identifiers for that ONE call and producing a
+    different merged_sha256 than the other call. Fixed by removing the cache entirely: the query it protected
+    (``SELECT 1 FROM lineage_edge LIMIT 1``) is trivial and runs once per :func:`extract_all` call, never per hit,
+    so the caching was never a measurable performance win, only a correctness hazard. Proved, not just reasoned
+    about: the exact failing test was run 20 times in a loop under a SYNTHETIC CPU-burning load (40 busy-loop
+    processes on a 20-core machine, started and stopped by this same check, driving load average from 14.37 up to
+    39.66 -- meeting and exceeding the originally observed ~14) with ZERO failures; the full domain suite was also
+    run twice, in parallel, after the fix, both passing in full.
 evidence:
 - claim: C-1
   evidence: >-
@@ -224,19 +324,65 @@ evidence:
   evidence: 'config/facets.yaml (followup: section); govbridge/gather/followup.py:_followup_config'
 - claim: C-14
   evidence: 'AGENT_RUNS/BR-AR-0024.check-controla-sweep.out (all 5 CONTROL-A queries, real store, real routes)'
+- claim: C-15
+  evidence: >-
+    govbridge/gather/followup.py:DEFAULT_MAX_WALL_SECONDS,STOP_WALL_TIME_ABORT,gather_with_followup's own round
+    loop (wall-time check moved before and separated from the count-based budget check), the `deterministic` result
+    field; config/facets.yaml's own `followup.default_max_wall_seconds: null`; tests/gather/test_followup.py::
+    test_merged_sha256_is_identical_regardless_of_wall_clock_speed_when_wall_time_is_disabled (monkeypatched sleep,
+    fast vs. slow, identical merged_sha256), ::test_a_tripped_wall_time_limit_gives_a_distinct_stop_reason_and_marks_the_result_non_deterministic,
+    ::test_wall_time_disabled_by_default_never_aborts_even_when_slow; AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out
+    (real store, new defaults: rounds/stop_reason/wall_time reported for two runs -- their merged_sha256 values
+    differ, root-caused in that same file to the LIVE "records" ref moving between runs on this session's own
+    actively-committed-to bridge branch, a govbridge.core.exact/govbridge.route.real_routes concern OUTSIDE this
+    claim's own scope, not a failure of the count-based-budget/wall-time separation this claim is actually about)
+- claim: C-16
+  evidence: >-
+    govbridge/gather/identifiers.py:_dedupe_identifiers; govbridge/gather/merge.py:MergeAccumulator,
+    collapse_occurrences; govbridge/gather/versions.py:reconcile_path; govbridge/gather/followup.py:
+    _priority_sort_key (its own total (kind, value) tie-break); tests/fixtures/gather/followup/hash_seed_probe.py
+    (new, hermetic, subprocess-invoked); tests/gather/test_followup.py::
+    test_merged_sha256_is_identical_across_process_hash_seeds (PYTHONHASHSEED 0 vs 1, identical merged_sha256);
+    AGENT_RUNS/BR-AR-0024.check-ca-why-hash-seeds.out (real store, CA-WHY, two separate process invocations, seeds
+    0 and 1, both merged_sha256 values reported)
+- claim: C-17
+  evidence: >-
+    govbridge/gather/followup.py:_retry_transient_git_read,_record_degraded,_safe_ls_tree_path,_safe_ls_tree_paths,
+    _safe_read_path (each now retry-then-degrade-then-disclose); resolve_identifier's own new `degraded` parameter,
+    threaded through _resolve_path_literal/_resolve_requirement_citation/_hit_from_git_slice exactly like
+    tree_cache; gather_with_followup's own `degraded_git_reads` list and the `deterministic` field's second
+    condition; tests/gather/test_followup.py::
+    test_a_transient_git_read_failure_is_retried_and_never_shows_up_in_the_merged_content (a real built-repo
+    fixture, monkeypatched gitobj.ls_tree_path fails once then succeeds, identical merged_sha256 to a clean run),
+    ::test_a_persistently_failing_git_read_marks_the_result_non_deterministic_and_discloses_it (always fails,
+    deterministic False, degraded_git_reads populated with call/commit/path/error), ::
+    test_git_read_retry_is_bounded_never_retrying_forever, ::test_git_read_retry_stops_as_soon_as_an_attempt_succeeds
+- claim: C-18
+  evidence: >-
+    govbridge/gather/identifiers.py:_lineage_table_exists (the id(conn)-keyed cache removed entirely); AGENT_RUNS/
+    BR-AR-0024.check-thread-determinism-stress.out (20/20 passes under a synthetic 40-process CPU load, load
+    average 14.37-39.66); AGENT_RUNS/BR-AR-0024.check-full-suite-post-lineage-cache-fix-run1.out,
+    BR-AR-0024.check-full-suite-post-lineage-cache-fix-run2.out (the full domain suite, twice, both passing, after
+    the fix)
 mutation_scope_respected: true
 open_issues:
 - >-
-  ACTION NEEDED FROM THE ORCHESTRATOR before this run can pass integrate-check: the reopening dispatch message
-  extended this node's mutation_scope to config/facets.yaml (for the `followup:` section only), and this
-  checkpoint's own task_contract.mutation_scope/input_manifest reflect that -- but ORCHESTRATOR_STATE.yaml's own
-  `agent_runs` entry for BR-AR-0024 (the ENFORCED record `check_state.py integrate-check` reads) still lists this
-  run's ORIGINAL mutation_scope, without config/facets.yaml. Self-check run as instructed:
-  `python3 tools/check_state.py integrate-check BR-AR-0024` -> INTEGRATION_REFUSED, "changes .../config/facets.yaml,
-  outside run BR-AR-0024's mutation_scope". ORCHESTRATOR_STATE.yaml is not this node's file to edit. Once the
-  orchestrator records the scope grant there (matching this checkpoint's own task_contract), integrate-check
-  should pass -- every other check already does (see this checkpoint's own commands list, all re-verified against
-  the actual committed files).
+  RESOLVED since first written: ORCHESTRATOR_STATE.yaml's own `agent_runs` entry for BR-AR-0024 now includes
+  config/facets.yaml in its mutation_scope (confirmed by reading that file directly this pass) -- the scope-record
+  gap this item used to describe (`integrate-check` -> INTEGRATION_REFUSED on that one path) is closed. Kept,
+  marked resolved, rather than deleted; re-verified by re-running `integrate-check` this pass.
+- >-
+  NEW, CRITICAL, requires an owner OUTSIDE this node's mutation_scope: re-running BR-DAG-AMEND-R1-22's own
+  requirement 5 ("confirm two consecutive runs give an identical merged_sha256") on the real CA-WHY store found a
+  GENUINE, reproduced divergence between two runs, root-caused (with full evidence, including one single gather
+  call internally observing four different commits for the same ref) to config/canonical-view.yaml's "records"
+  (primary) ref being `follow: tip` against this session's own live, actively-committed-to bridge branch, combined
+  with govbridge/core/exact.py's `grep()`/`id_lookup()` (and govbridge/route/real_routes.py's `exact_route`)
+  re-resolving that ref's live tip fresh on EVERY call rather than pinning it once per gather -- see this node's
+  checkpoint `findings`/`unresolved` and AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out for the complete
+  investigation. This is NOT a defect in govbridge/gather/{followup,identifiers,merge,versions}.py (this node's own
+  determinism guarantee is proven byte-for-byte on every hermetic, static-fixture test); it needs an owner for
+  govbridge/core/exact.py and govbridge/route/real_routes.py.
 - >-
   Template amendment R1-T3 (BR-DAG-AMEND-R1-18) arrived mid-pass, direct from the orchestrator (bridge tip
   2713afd): every command must run through $PY=$HOME/.cache/gov-bridge/venv/bin/python (never a bare python3/pip/
@@ -366,7 +512,7 @@ conformance:
     $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3, sys.prefix == the venv); every saved output
     file carries a `# interpreter: $PY (<version>)` header line (the grep-only genericity audit is marked N/A, no
     interpreter invoked); no venv/pip command appears anywhere in this node's own commands or scratch scripts
-- item: 'REOPENING requirement 1: a deterministic priority queue; deferred identifiers carry forward; rounds continue until NO_UNRESOLVED_IDENTIFIERS, MAX_ROUNDS, MARGINAL_GAIN_ONLY_DUPLICATES or the OVERALL budget (wall-time and/or item) is exhausted with identifiers still queued (BUDGET_REACHED_WITH_UNRESOLVED); everything still queued at the end is named in the result'
+- item: 'REOPENING requirement 1: a deterministic priority queue; deferred identifiers carry forward; rounds continue until NO_UNRESOLVED_IDENTIFIERS, MAX_ROUNDS, MARGINAL_GAIN_ONLY_DUPLICATES or the OVERALL budget is exhausted with identifiers still queued (BUDGET_REACHED_WITH_UNRESOLVED); everything still queued at the end is named in the result. UPDATED by BR-DAG-AMEND-R1-22 (see requirement 1/2 rows below): the OVERALL budget that can produce this stop reason is COUNT-based only (max_total_identifiers) -- wall time was REMOVED from this decision entirely and can never produce it any more, see the dedicated rows below.'
   status: MET
   evidence: >-
     govbridge/gather/followup.py:_PriorityQueue,gather_with_followup's own round loop (four stop checks, in that
@@ -409,3 +555,103 @@ conformance:
     test_priority_order_is_the_same_object_the_queue_actually_uses, ::
     test_budget_reached_with_unresolved_fires_only_when_the_overall_budget_is_exhausted (the per-round cap ALONE
     -- generous overall budget -- never produces this stop reason; only a tight overall budget does)
+- item: 'BR-DAG-AMEND-R1-22 requirement 1: content budgets are COUNT-based only (max_rounds, max_identifiers_per_round, max_items_per_identifier, max_total_identifiers); given the same store and inputs, the merged result is byte-identical regardless of speed, load or --threads'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py's round loop checks max_total_identifiers (a resolved-count comparison) as the
+    ONLY knob that can produce BUDGET_REACHED_WITH_UNRESOLVED, checked strictly AFTER the separate wall-time abort
+    (requirement 2, below); tests/gather/test_followup.py::
+    test_merged_sha256_is_identical_regardless_of_wall_clock_speed_when_wall_time_is_disabled (fast vs. artificially
+    slowed resolver via monkeypatched sleep, identical merged_sha256, identical stop_reason); ::
+    test_gather_with_followup_is_byte_identical_across_thread_counts (pre-existing, threads=1 vs 4, unaffected by
+    this change). "Given the same store and inputs" is the operative qualifier: proven byte-for-byte on every
+    hermetic, static-fixture test above; the real CA-WHY store is NOT held to "the same inputs" between two runs
+    minutes apart, because one of its refs live-tracks an actively-committed-to branch outside this claim's own
+    scope -- see requirement 5's own row and AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out for the full
+    account; that residual is not evidence against THIS requirement, which is specifically about the budget check
+    never itself introducing a speed/load dependency, and it does not.
+- item: 'BR-DAG-AMEND-R1-22 requirement 2: wall time is a SAFETY ABORT only, distinct from content budgets; default disabled (null) in config/facets.yaml; a caller-set limit that trips stops with a DISTINCT reason (WALL_TIME_ABORT, added to the vocabulary with a note) and marks the result deterministic: false; never reported as BUDGET_REACHED_WITH_UNRESOLVED'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py:STOP_WALL_TIME_ABORT (a new constant, deliberately not a member of
+    enginemod.STOP_REASONS, documented as such in its own docstring),DEFAULT_MAX_WALL_SECONDS = None;
+    config/facets.yaml's own followup.default_max_wall_seconds: null (changed from 240); the result's new top-level
+    `deterministic` field; tests/gather/test_followup.py::
+    test_a_tripped_wall_time_limit_gives_a_distinct_stop_reason_and_marks_the_result_non_deterministic (asserts the
+    stop reason is STOP_WALL_TIME_ABORT, is NOT BUDGET_REACHED_WITH_UNRESOLVED, and is not even a member of
+    enginemod.STOP_REASONS; deterministic is False), ::
+    test_wall_time_disabled_by_default_never_aborts_even_when_slow (the deployed default never trips regardless of
+    a slow resolver)
+- item: 'BR-DAG-AMEND-R1-22 requirement 3: timing values (wall_elapsed_seconds and the like) may appear in telemetry but MUST NOT enter merged_sha256 or any content hash; verified, with a test'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py:gather_with_followup -- merged_dicts and merged_sha256 (sha256_text(canonical_json
+    (merged_dicts))) are BOTH computed before followup_wall_seconds/followup_budget/wall_time_aborted/
+    degraded_git_reads are even assigned into telemetry_summary; _priority_sort_key (the only thing that decides
+    WHICH identifiers get chased, hence what ends up in merged_dicts) takes no timing argument at all; tests/gather/
+    test_followup.py::test_merged_sha256_is_identical_regardless_of_wall_clock_speed_when_wall_time_is_disabled is
+    the direct test (a resolver made objectively slower by 0.3s/call changes followup_wall_seconds by >1s but
+    changes merged_sha256 not at all)
+- item: 'BR-DAG-AMEND-R1-22 requirement 4: tests -- the same inputs under an artificially slowed resolver and a fast one give an identical merged_sha256 when wall time is disabled; a set wall limit that trips yields WALL_TIME_ABORT and deterministic false'
+  status: MET
+  evidence: >-
+    tests/gather/test_followup.py::
+    test_merged_sha256_is_identical_regardless_of_wall_clock_speed_when_wall_time_is_disabled, ::
+    test_a_tripped_wall_time_limit_gives_a_distinct_stop_reason_and_marks_the_result_non_deterministic, ::
+    test_wall_time_disabled_by_default_never_aborts_even_when_slow
+- item: 'BR-DAG-AMEND-R1-22 requirement 5: re-run CA-WHY on the real store with the new defaults; report rounds, the stop reason and the wall time; confirm two consecutive runs give an identical merged_sha256'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    AGENT_RUNS/BR-AR-0024.check-ca-why-wall-time-defaults.out ($PY, real store, config/facets.yaml's new defaults --
+    wall time disabled): rounds/stop_reason/wall_time all reported for two runs, both stopping at MAX_ROUNDS with
+    identical counts, but the two runs' own merged_sha256 values DIFFER. Investigated to a root cause OUTSIDE this
+    node's mutation_scope: config/canonical-view.yaml's "records" (primary) ref is `follow: tip` against
+    refs/heads/bridge/p2-context-retrieval, this whole multi-agent session's own live, actively-committed-to
+    orchestration branch; govbridge/core/exact.py's grep()/id_lookup() (called by
+    govbridge/route/real_routes.py's exact_route) re-resolves that ref's live tip fresh on EVERY call rather than
+    pinning it once per RouteSet/gather the way code_route's own product_commit already does -- proven directly by
+    run1's OWN single, uninterrupted gather call containing FOUR different "records"-ref commits internally (the
+    live branch advanced multiple times while that one ~1031s call was still in flight under this session's heavy
+    load). This node's OWN determinism guarantee (byte-identical GIVEN the same store and inputs) is proven, not
+    merely claimed, on every hermetic test (a static, non-"follow: tip" fixture, C-15/C-16/C-17); the residual
+    real-store non-determinism documented here belongs to govbridge/core/exact.py and govbridge/route/
+    real_routes.py, disclosed with concrete evidence for whoever owns those files (see this node's checkpoint
+    findings/unresolved), never something this reopening's own fix introduced or could fix within its own
+    mutation_scope.
+- item: 'Cross-process determinism addendum: a test running gather_with_followup in two subprocesses with PYTHONHASHSEED 0 and 1 on the same fixture asserts an identical merged_sha256; any ordering bug found upstream (followup/identifiers/merge/versions) is fixed as a total order, never set-iteration order; CA-WHY re-run on the real store twice as separate processes with seeds 0 and 1, both merged_sha256 reported'
+  status: MET
+  evidence: >-
+    tests/fixtures/gather/followup/hash_seed_probe.py; tests/gather/test_followup.py::
+    test_merged_sha256_is_identical_across_process_hash_seeds (PYTHONHASHSEED 0 vs 1, identical merged_sha256, a
+    real 64-char sha256 hex digest); line-by-line review of identifiers.py/merge.py/versions.py/followup.py found
+    no set/frozenset-iteration-order dependency and no untied sort key (C-16) -- nothing upstream needed fixing;
+    AGENT_RUNS/BR-AR-0024.check-ca-why-hash-seeds.out (real store, CA-WHY: seed0 and seed1, launched as separate
+    processes at the same time, agree byte-for-byte with EACH OTHER and with a third, randomly-seeded process
+    launched alongside them -- CONFIRMS hash-seed/process identity itself makes no difference; the one CA-WHY run
+    that DID differ was launched several minutes earlier and is root-caused, with evidence, to the live ref moving
+    in the interim -- see the wall-time-defaults check above, not a hash-seed or ordering issue)
+- item: 'Git-read retry addendum: a bounded retry (e.g. 3 attempts with back-off) on transient git read failures before degrading; a read that still fails is marked deterministic: false with the degraded items listed in telemetry with the error, never looking like genuine absence; tests for a fails-once-then-succeeds read (identical merged_sha256 to a clean run) and an always-fails read (deterministic false, degraded list)'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py:_retry_transient_git_read (_GIT_READ_MAX_ATTEMPTS = 3,
+    _GIT_READ_RETRY_BACKOFF_SECONDS),_record_degraded,_safe_ls_tree_path,_safe_ls_tree_paths,_safe_read_path (all
+    three now retry-then-degrade-then-disclose); the result's `telemetry.degraded_git_reads` list and the
+    `deterministic` field's second condition; tests/gather/test_followup.py::
+    test_a_transient_git_read_failure_is_retried_and_never_shows_up_in_the_merged_content (real built-repo fixture,
+    monkeypatched gitobj.ls_tree_path fails once then succeeds, identical merged_sha256 to a clean run,
+    degraded_git_reads == []), ::test_a_persistently_failing_git_read_marks_the_result_non_deterministic_and_discloses_it
+    (always fails, deterministic False, degraded_git_reads populated with call/commit/path/error), ::
+    test_git_read_retry_is_bounded_never_retrying_forever, ::
+    test_git_read_retry_stops_as_soon_as_an_attempt_succeeds
+- item: 'Thread-determinism flake addendum: find and fix the root cause of a one-off failure of test_gather_with_followup_is_byte_identical_across_thread_counts under heavy load (never loosen the assertion); prove it with 20 iterations under a synthetic CPU-burning load and two full-suite runs, both saved'
+  status: MET
+  evidence: >-
+    Root cause: govbridge/gather/identifiers.py:_lineage_table_exists cached its result keyed by id(conn), an
+    id-reuse hazard (sqlite3.Connection supports neither weakref nor arbitrary attributes, verified empirically)
+    that could silently inherit a stale True/False from an unrelated, already-closed connection under heavy
+    allocation churn -- fixed by removing the cache entirely (C-18). The test's own assertion
+    (`assert len(shas) == 1, shas`) is UNCHANGED. Proof: AGENT_RUNS/BR-AR-0024.check-thread-determinism-stress.out
+    (20/20 passes under a self-started/stopped 40-process busy-loop load, load average 14.37 up to 39.66, meeting
+    and exceeding the originally reported ~14); AGENT_RUNS/
+    BR-AR-0024.check-full-suite-post-lineage-cache-fix-run1.out and ...-run2.out (the full domain suite, run twice,
+    both 0 failures, after the fix)
