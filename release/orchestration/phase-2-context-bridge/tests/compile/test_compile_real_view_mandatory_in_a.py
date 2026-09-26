@@ -9,15 +9,76 @@ This is the ONLY place in ``tests/compile/**`` that reads real Review-8/Phase-2 
 verbatim in the real ``ARCHITECTURE/demonstration-task.yaml`` and the bridge's own ``ORCHESTRATOR_STATE.yaml`` --
 nothing here special-cases them: every assertion is the same generic placement rule the fixture tests exercise on
 synthetic CX-* ids (OC-BR-02).
-"""
+
+BR-DAG-AMEND-R1-2 (node R1-RM): this file used to compile against LIVE refs of the shared repository with no
+repo/view pin, and flaked under concurrent agent git activity -- ``config/canonical-view.yaml``'s ``records`` ref
+(``refs/heads/bridge/p2-context-retrieval``, ``follow: tip``) is exactly the branch every parallel builder commits
+to, in the SAME underlying object store this worktree shares with every other worktree of this repository (a git
+worktree's branches are not private to it). A commit landing on that ref between this test's two ``compile_packet``
+calls -- or even between two test RUNS sharing one pytest process -- could change section A's own item set (a new
+mandatory owner record) or the resolved commits recorded in the manifest, which is precisely the "24 expected vs
+20 items... became mandatory after run-1" failure BR-DAG-AMEND-R1-1 separately repairs in ``validate.py``.
+
+The fix here is orthogonal to R1-1: PIN every named, tip-following ref to the exact commit it resolves to ONCE, at
+module import time, and compile against THAT pinned view for both assertions in this file. This tests exactly what
+BR-HO-0013/node B6 always meant to test -- "is the compiler itself deterministic and does it place every mandatory
+item correctly" -- without the confound of a shared branch moving under it mid-test. ``product``/``evidence`` are
+already ``follow: pinned`` in the real config; only ``records`` (and, generically, any other ``follow: tip`` named
+ref a future edit to that config might add) needs pinning here. ``history`` (``ref_glob: refs/heads/phase2/*``,
+the FROZEN phase2 product branches) is left as live tip -- those branches are frozen, and are not this test's own
+mandatory-item content. ``repo=`` is passed explicitly to both compiles, never relying on ``gitobj.repo_root()``'s
+process-global cwd cache (R1-INT's routed fix; a new test must pass ``repo=`` explicitly regardless -- template
+amendment R1-T1)."""
+import os
+import tempfile
 from pathlib import Path
+
+import yaml
 
 from govbridge.compile import packet as packetmod
 from govbridge.compile import validate as validatemod
+from govbridge.core import gitobj
 from govbridge.core.yamlutil import load_yaml_file
 from govbridge.route.router import FAKE_ROUTES
 
 DEMO_TASK_SPEC = Path(__file__).resolve().parents[2] / "ARCHITECTURE" / "demonstration-task.yaml"
+REPO_ROOT = gitobj.repo_root(str(Path(__file__).resolve().parent))
+
+
+def _pinned_view_path(tmp_dir: str) -> str:
+    """Writes a copy of the real ``config/canonical-view.yaml`` with every ``follow: tip`` NAMED ref (``records``,
+    concretely) rewritten to ``follow: pinned`` at the commit it resolves to right now -- resolved exactly ONCE,
+    so every compile in this module sees the identical view regardless of what any other worktree commits to the
+    shared ``records`` branch afterwards. ``ref_glob`` refs (``history``) are left untouched: see the module
+    docstring."""
+    real_task_spec = load_yaml_file(str(DEMO_TASK_SPEC))
+    real_view_path = real_task_spec["view"]
+    if not os.path.isabs(real_view_path):
+        real_view_path = os.path.join(str(DEMO_TASK_SPEC.parents[1]), real_view_path) \
+            if not os.path.exists(real_view_path) else real_view_path
+    doc = load_yaml_file(real_view_path)
+    for ref in doc.get("refs", []):
+        if ref.get("follow") == "tip" and ref.get("ref"):
+            commit = gitobj.resolve_commit(ref["ref"], repo=REPO_ROOT)
+            assert commit, f"canonical-view ref {ref['name']!r} ({ref['ref']!r}) does not resolve at {REPO_ROOT}"
+            ref["follow"] = "pinned"
+            ref["pinned_commit"] = commit
+
+    out_path = os.path.join(tmp_dir, "canonical-view.pinned.yaml")
+    with open(out_path, "w", encoding="utf-8") as fh:
+        yaml.safe_dump(doc, fh, sort_keys=False)
+    return out_path
+
+
+_PIN_DIR = tempfile.mkdtemp(prefix="mf-recorded-view-")
+_PINNED_VIEW_PATH = _pinned_view_path(_PIN_DIR)
+
+
+def _pinned_task_spec() -> dict:
+    task_spec = load_yaml_file(str(DEMO_TASK_SPEC))
+    task_spec = dict(task_spec)
+    task_spec["view"] = _PINNED_VIEW_PATH
+    return task_spec
 
 # the mandatory items the ruling's own trigger names, resolved through the three required_inputs of the real task
 # spec (mandatory_bridge_inputs.items[*], owner_records[*], contract_v3) -- BR-ARCH-RULING-1's governing record.
@@ -64,8 +125,8 @@ def _per_item_section_map(manifest: dict) -> dict:
 
 
 def test_real_demonstration_task_puts_every_a_admissible_mandatory_item_in_a():
-    task_spec = load_yaml_file(str(DEMO_TASK_SPEC))
-    result = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES)
+    task_spec = _pinned_task_spec()
+    result = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES, repo=REPO_ROOT)
     assert result["status"] == packetmod.STATUS_OK
     m = result["manifest"]
     by_section = _every_section_ids(m)
@@ -101,13 +162,13 @@ def test_real_demonstration_task_puts_every_a_admissible_mandatory_item_in_a():
         if letter != "F":
             assert "ORCHESTRATOR-REASONING-ERRORS" not in ids
 
-    assert validatemod.verify_packet(m, task_spec, registry_path=result["registry_path"]) == []
+    assert validatemod.verify_packet(m, task_spec, repo=REPO_ROOT, registry_path=result["registry_path"]) == []
 
 
 def test_real_demonstration_task_compiles_byte_identical_twice():
-    task_spec = load_yaml_file(str(DEMO_TASK_SPEC))
-    r1 = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES)
-    r2 = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES)
+    task_spec = _pinned_task_spec()
+    r1 = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES, repo=REPO_ROOT)
+    r2 = packetmod.compile_packet(task_spec, routes=FAKE_ROUTES, repo=REPO_ROOT)
     assert r1["status"] == packetmod.STATUS_OK
     assert r2["status"] == packetmod.STATUS_OK
     assert r1["rendered"] == r2["rendered"]

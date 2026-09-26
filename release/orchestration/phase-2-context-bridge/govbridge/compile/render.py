@@ -52,6 +52,16 @@ def item_manifest_row(item) -> dict:
         "source": {"ref": item.ref, "commit": item.commit, "path": item.path, "blob": item.blob,
                    "line_start": item.line_start, "line_end": item.line_end},
         "content_sha256": item.content_sha256,
+        # BR-DAG node R1-RM (REPAIR_PLAN.md section 3 rule 4): ``source_sha256`` is the SAME value as
+        # ``content_sha256`` above under its honest name (the resolver's own record, for a MANDATORY item);
+        # ``delivered_sha256`` is the sha256 of what this row's rendered body ACTUALLY contains. They coincide
+        # except for a partially-delivered mandatory item (see the ``MANDATORY_PARTIAL_DELIVERY`` notice) -- a
+        # receipt that acknowledges ``inputs_consumed`` by ``content_sha256``/``source_sha256`` is acknowledging
+        # the SOURCE record's identity, never claiming it read bytes that were never delivered.
+        "source_sha256": getattr(item, "source_sha256", None),
+        "delivered_sha256": getattr(item, "delivered_sha256", None),
+        "is_directory": getattr(item, "is_directory", False),
+        "directory_members": list(getattr(item, "directory_members", ()) or ()),
         "bytes": item.bytes_len(),
         "by_reference": item.by_reference,
         "route": item.route,

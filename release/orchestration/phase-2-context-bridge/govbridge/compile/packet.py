@@ -30,6 +30,7 @@ from govbridge.compile import budgets as budgetsmod
 from govbridge.compile import codeseeds as codeseedsmod
 from govbridge.compile import codesurfaces as codesurfacesmod
 from govbridge.compile import render as rendermod
+from govbridge.compile import sectionmap as sectionmapmod
 from govbridge.core import gitobj, store as storemod, view as viewmod
 from govbridge.core import taskctx as taskctxmod
 from govbridge.core.manifest import bridge_code_tree
@@ -127,6 +128,21 @@ class PacketItem:
     # budget dropping). None outside G.
     tier: Optional[str] = None
     resolution: Optional[str] = None
+    # BR-DAG node R1-RM (REPAIR_PLAN.md section 3 rule 4): ``content_sha256`` above is left UNCHANGED (still the
+    # resolver's own recorded hash for a MANDATORY item, verbatim -- validate.py's independent re-derivation keys
+    # on it staying exactly that, field-for-field). ``source_sha256`` is that SAME value under its honest name;
+    # ``delivered_sha256`` is the sha256 of what ``text`` ACTUALLY contains. For a RETRIEVED/DERIVED item, or a
+    # MANDATORY item delivered in full, the two coincide; for a MANDATORY item delivered as a section map plus a
+    # partial selection (``MANDATORY_PARTIAL_DELIVERY``), they legitimately differ -- which is exactly the
+    # distinction a receipt must be able to draw ("the receipt acknowledges what was delivered", never content
+    # that was never sent). None outside a MANDATORY item that this module has actually resolved.
+    source_sha256: Optional[str] = None
+    delivered_sha256: Optional[str] = None
+    # BR-DAG node R1-RM (REPAIR_PLAN.md section 3 rule 3): a by-reference directory mandatory item's member
+    # manifest, propagated from ``resolver.MandatoryItem.directory_members`` so it is visible in the rendered
+    # manifest too (never guessed at by a downstream reader). Empty/False for everything else.
+    is_directory: bool = False
+    directory_members: tuple = ()
     item_id: str = dataclasses.field(init=False)
 
     def __post_init__(self):
@@ -267,11 +283,18 @@ def _load_queries(task_spec: dict, repo: Optional[str] = None) -> list:
 
 
 def _read_excerpt(path: str, commit: str, l1: Optional[int], l2: Optional[int],
-                   repo: Optional[str] = None, max_chars: int = 4000) -> Optional[str]:
+                   repo: Optional[str] = None, max_chars: Optional[int] = 4000) -> Optional[str]:
     """The text of ``path``@``commit`` (or lines ``l1``-``l2`` of it), or None if there is nothing to read -- a
     directory entry (a MandatoryItem's ``path`` may be a directory: resolver.py's own is_directory case carries
     no text), a missing object, or a decode failure. None is the honest, generic "no excerpt" result; the caller
-    falls back to a reference note, never a crash."""
+    falls back to a reference note, never a crash.
+
+    ``max_chars`` is a DISCLOSED excerpt cap for RETRIEVED/DERIVED callers only (``Compiler.item_from_edge_hop``;
+    ``item_from_hit`` does not call this at all -- a route hit's own text is already bounded upstream). BR-DAG
+    node R1-RM (REPAIR_PLAN.md section 3 rule 1, "no silent truncation"): a MANDATORY item is NEVER read through
+    this default -- ``Compiler._mandatory_text`` always passes ``max_chars=None`` here, so a mandatory item's own
+    excerpt is never silently cut by this function; an oversize mandatory item instead gets a section map plus a
+    disclosed remainder (``Compiler._render_oversize_no_selector``), never a bare truncated string."""
     try:
         raw = gitobj.read_path(commit, path, repo=repo)
     except gitobj.GitError:
@@ -286,6 +309,8 @@ def _read_excerpt(path: str, commit: str, l1: Optional[int], l2: Optional[int],
         lines = text.splitlines(keepends=True)
         l2 = l2 or l1
         text = "".join(lines[max(l1 - 1, 0):l2])
+    if max_chars is None:
+        return text
     return text[:max_chars]
 
 
@@ -295,8 +320,13 @@ class Compiler:
 
     def __init__(self, task_spec: dict, routes: RouteSet, repo: Optional[str], view_path: str,
                  registry_path: Optional[str], rrf_k: int, graph_depth: int, budgets_path: Optional[str] = None,
-                 fanout: Optional[dict] = None):
+                 fanout: Optional[dict] = None, per_item_cap_bytes: Optional[int] = None):
         self.task_spec = task_spec
+        # BR-DAG node R1-RM: the same per-item cap ARCHITECTURE.md section 7.3 already names (24 KB by default,
+        # config/budgets.yaml) decides when a MANDATORY item's own content is "oversize" enough to need a section
+        # map instead of full delivery (REPAIR_PLAN.md section 3 rule 1/5: "a larger cap is not a fix"). Defaulted
+        # so an existing direct ``Compiler(...)`` construction (a pre-reopening test) keeps working unmodified.
+        self.per_item_cap_bytes = per_item_cap_bytes if per_item_cap_bytes is not None else 24 * 1024
         self.routes = routes or FAKE_ROUTES
         self.repo = repo
         self.view_path = view_path
@@ -405,24 +435,140 @@ class Compiler:
             # item_from_hit below). A ladder class never has its own class banner (spec.banner is None for every
             # LADDER row), so this never overwrites one -- it only ever replaces None.
             banner = LIFECYCLE_BANNERS.get(mi.lifecycle, banner)
-        text = None
-        if mi.path is not None and mi.commit is not None:
-            text = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo)
-        if text is None:
-            loc = f"{mi.path}@{mi.commit}"
-            if mi.line_start is not None:
-                loc += f":{mi.line_start}-{mi.line_end}"
-            text = f"[reference only: {loc}]"
-        # content_sha256 is the resolver's OWN recorded hash, verbatim -- never a hash of this module's placeholder
+
+        text = self._mandatory_text(mi)
+        # source_sha256 is the resolver's OWN recorded hash, verbatim -- never a hash of this module's rendered
         # text (a directory-form item legitimately carries sha256=None; validate.py's independent re-derivation
-        # compares this field against the freshly recomputed MandatoryItem field-for-field, so it must never diverge
-        # from what the resolver itself reported).
-        content_sha256 = mi.sha256
+        # compares content_sha256 against the freshly recomputed MandatoryItem field-for-field, so it must never
+        # diverge from what the resolver itself reported). delivered_sha256 is what ``text`` (the bytes actually
+        # placed in the packet) hashes to -- BR-DAG node R1-RM, REPAIR_PLAN.md section 3 rule 4: "the receipt
+        # acknowledges delivered_sha256 separately from source_sha256... must not appear to acknowledge content
+        # that was never delivered."
+        source_sha256 = mi.sha256
+        delivered_sha256 = sha256_text(text) if text else None
         return PacketItem(unit_kind="record", unit_id=mi.id, section=section, delivery=delivery, cls=mi.cls,
                            lifecycle=mi.lifecycle, version_status=None, ref=None, commit=mi.commit, path=mi.path,
                            blob=mi.blob, line_start=mi.line_start, line_end=mi.line_end, text=text,
-                           content_sha256=content_sha256, by_reference=False, route="resolver", raw_score=None,
-                           rank=None, fused_score=None, edge_path=(), reason=mi.reason, banner=banner)
+                           content_sha256=source_sha256, by_reference=False, route="resolver", raw_score=None,
+                           rank=None, fused_score=None, edge_path=(), reason=mi.reason, banner=banner,
+                           source_sha256=source_sha256, delivered_sha256=delivered_sha256,
+                           is_directory=mi.is_directory, directory_members=mi.directory_members)
+
+    # -- mandatory-item TEXT (BR-DAG node R1-RM, REPAIR_PLAN.md section 3): never a silent cut ------------------
+
+    def _mandatory_text(self, mi: resolvermod.MandatoryItem) -> str:
+        """The full text a MANDATORY item delivers. Exactly one of three shapes, and every one of them ends
+        cleanly (never mid-content with no marker):
+
+        * a directory item's member manifest (rule 3) -- always its own complete representation;
+        * a row with resolved ``parts`` (rule 2's ``keys``/``entries``/extra-``paths`` selectors) -- every part
+          delivered in FULL, with a ``MANDATORY_PARTIAL_DELIVERY`` notice for whatever the selectors left out;
+        * the plain occurrence's own text -- delivered whole when it fits the per-item cap, else a section map
+          (rule 1) plus a ``MANDATORY_PARTIAL_DELIVERY`` notice, never a bare truncated string.
+        """
+        if mi.is_directory:
+            return self._render_directory_manifest(mi)
+
+        if mi.parts:
+            return self._render_selected_parts(mi)
+
+        if mi.path is None or mi.commit is None:
+            return f"[reference only: {mi.path}@{mi.commit}]"
+
+        full = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo, max_chars=None)
+        if full is None:
+            loc = f"{mi.path}@{mi.commit}"
+            if mi.line_start is not None:
+                loc += f":{mi.line_start}-{mi.line_end}"
+            return f"[reference only: {loc}]"
+
+        if len(full.encode("utf-8")) <= self.per_item_cap_bytes:
+            return full
+
+        return self._render_oversize_no_selector(mi, full)
+
+    def _render_directory_manifest(self, mi: resolvermod.MandatoryItem) -> str:
+        lines = [f"[directory manifest: {mi.path}@{mi.commit} -- {len(mi.directory_members)} member(s), by "
+                 f"reference (REPAIR_PLAN.md section 3 rule 3); read any member by its exact path@commit/blob]"]
+        for m in mi.directory_members:
+            size = m.get("size")
+            lines.append(f"- {m['path']}  (blob={m['blob']}, size={size if size is not None else 'unknown'}, "
+                          f"class={m['cls']})")
+        if not mi.directory_members:
+            lines.append("(no tracked files under this directory at this commit)")
+        return "\n".join(lines) + "\n"
+
+    def _render_selected_parts(self, mi: resolvermod.MandatoryItem) -> str:
+        # a `keys`/`entries` selector NARROWS the primary occurrence itself (only the matched keys/entries are
+        # "the item"); an extra `paths` entry does not narrow the primary at all -- it is an ADDITIONAL whole file
+        # alongside it. So the primary's own full text is rendered here too, but only when nothing narrowed it.
+        narrowing = any(p["kind"] in ("keys", "entries") for p in mi.parts)
+        pieces = [f"[selected: {len(mi.parts)} part(s) of {mi.path}@{mi.commit}, honouring the declared selector(s) "
+                  f"verbatim (REPAIR_PLAN.md section 3 rule 2)]"]
+        delivered_names = set()
+
+        if not narrowing and mi.path is not None and mi.commit is not None:
+            primary_text = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo,
+                                          max_chars=None)
+            loc = f"{mi.path}@{mi.commit}"
+            if mi.line_start is not None:
+                loc += f":{mi.line_start}-{mi.line_end}"
+            pieces.append(f"--- primary:{mi.path}  ({loc}) ---")
+            pieces.append(primary_text if primary_text is not None else f"[reference only: {loc}]")
+
+        for part in mi.parts:
+            p_path, p_commit = part["path"], part["commit"]
+            loc = p_path
+            if p_commit:
+                loc += f"@{p_commit}"
+            if part["line_start"] is not None:
+                loc += f":{part['line_start']}-{part['line_end']}"
+            p_text = _read_excerpt(p_path, p_commit, part["line_start"], part["line_end"], repo=self.repo,
+                                    max_chars=None)
+            pieces.append(f"--- {part['kind']}:{part['name']}  ({loc}) ---")
+            pieces.append(p_text if p_text is not None else f"[reference only: {loc}]")
+            if part["path"] == mi.path:
+                delivered_names.add(part["name"])
+
+        # disclose the REST of the primary occurrence as undelivered, when a keys/entries selector narrowed it and
+        # it maps structurally -- a selector legitimately narrows delivery, but rule 1's "never end mid-content
+        # without the notice" still applies to whatever the selector left out. A paths-only row narrows nothing
+        # (the primary was just rendered above IN FULL), so there is no "remainder" of the primary to disclose.
+        if narrowing and mi.line_start is None and mi.path is not None and mi.commit is not None:
+            full = _read_excerpt(mi.path, mi.commit, None, None, repo=self.repo, max_chars=None)
+            if full is not None:
+                whole = sectionmapmod.whole_map(full, mi.path)
+                undelivered = [s for s in whole if s.name not in delivered_names]
+                if whole:
+                    self.notices.append({
+                        "type": "MANDATORY_PARTIAL_DELIVERY", "id": mi.id, "path": mi.path, "commit": mi.commit,
+                        "section_map": [s.to_dict() for s in whole],
+                        "delivered": [{"kind": p["kind"], "name": p["name"], "line_start": p["line_start"],
+                                       "line_end": p["line_end"]} for p in mi.parts],
+                        "undelivered_ranges": [{"name": s.name, "line_start": s.line_start,
+                                                 "line_end": s.line_end, "sha256": s.sha256} for s in undelivered],
+                    })
+        return "\n".join(pieces) + "\n"
+
+    def _render_oversize_no_selector(self, mi: resolvermod.MandatoryItem, full: str) -> str:
+        whole = sectionmapmod.whole_map(full, mi.path)
+        lines = [f"[section map: {mi.path}@{mi.commit} exceeds the {self.per_item_cap_bytes}-byte per-item cap; "
+                 f"every section below is delivered BY REFERENCE -- read it by its exact line range and verify "
+                 f"its own sha256 (REPAIR_PLAN.md section 3 rule 1: never a silent, unmarked cut)]"]
+        if whole:
+            undelivered = [{"name": s.name, "line_start": s.line_start, "line_end": s.line_end, "sha256": s.sha256}
+                           for s in whole]
+            for s in whole:
+                lines.append(f"- {s.kind}:{s.name}  lines {s.line_start}-{s.line_end}  sha256={s.sha256}")
+        else:
+            undelivered = [{"name": "(whole item)", "line_start": mi.line_start, "line_end": mi.line_end,
+                            "sha256": mi.sha256}]
+            lines.append("- (no structural map available for this format; read the whole item by exact reference)")
+        self.notices.append({
+            "type": "MANDATORY_PARTIAL_DELIVERY", "id": mi.id, "path": mi.path, "commit": mi.commit,
+            "section_map": [s.to_dict() for s in whole], "delivered": [], "undelivered_ranges": undelivered,
+        })
+        return "\n".join(lines) + "\n"
 
     def reference_item(self, source: PacketItem, section: str) -> PacketItem:
         """A cheap D.1 pointer to an item already fully rendered in A (never a second copy of its content --
@@ -435,7 +581,8 @@ class Compiler:
                            line_end=source.line_end, text=f"[see A: {source.item_id} ({source.unit_id})]",
                            content_sha256=source.content_sha256, by_reference=True, route=source.route,
                            raw_score=None, rank=None, fused_score=None, edge_path=(), reason="already in A",
-                           banner=None)
+                           banner=None, source_sha256=source.source_sha256, delivered_sha256=source.delivered_sha256,
+                           is_directory=source.is_directory, directory_members=source.directory_members)
 
     # -- construction from a route hit (delivery RETRIEVED/DERIVED) -------------------------------------------
 
@@ -445,15 +592,20 @@ class Compiler:
         lifecycle = h.lifecycle or classesmod.LIFECYCLE_UNKNOWN
         banner = LIFECYCLE_BANNERS.get(lifecycle) if lifecycle != classesmod.LIFECYCLE_ACTIVE else None
         text = h.text or ""
+        # a RETRIEVED/DERIVED hit has no separate "source" to diverge from -- content_sha256 already hashes
+        # exactly the bytes delivered, so source_sha256/delivered_sha256 both mirror it (BR-DAG node R1-RM: the
+        # delivered-vs-source distinction only ever BITES for a MANDATORY item; see item_from_mandatory).
+        content_sha256 = sha256_text(text) if text else None
         return PacketItem(unit_kind=h.unit_kind, unit_id=h.unit_id, section=section, delivery=h.delivery,
                            cls=h.authority_class, lifecycle=lifecycle,
                            version_status=occ.version_status if occ else None, ref=occ.ref if occ else None,
                            commit=occ.commit if occ else None, path=occ.path if occ else None, blob=None,
                            line_start=occ.line_start if occ else None, line_end=occ.line_end if occ else None,
-                           text=text, content_sha256=(sha256_text(text) if text else None), by_reference=False,
+                           text=text, content_sha256=content_sha256, by_reference=False,
                            route=h.route, raw_score=None, rank=h.rank, fused_score=fused.fused_score,
                            edge_path=tuple(h.edge_path), reason=None, banner=banner,
-                           tier=getattr(h, "tier", None), resolution=getattr(h, "resolution", None))
+                           tier=getattr(h, "tier", None), resolution=getattr(h, "resolution", None),
+                           source_sha256=content_sha256, delivered_sha256=content_sha256)
 
     # -- construction from a graph.why/history Edge hop (delivery DERIVED) --------------------------------------
 
@@ -465,12 +617,15 @@ class Compiler:
             commit = rest.split(":", 1)[0]
         text = _read_excerpt(path, commit, line, line, repo=self.repo) if (path and commit) else None
         unit_id = f"{edge.get('type')}:{edge.get('dst')}"
+        body = (text or "")[:2000]
+        content_sha256 = sha256_text(body) if body else None
         return PacketItem(unit_kind="occurrence", unit_id=unit_id, section=section, delivery="DERIVED", cls=None,
                            lifecycle=classesmod.LIFECYCLE_UNKNOWN, version_status=None, ref=None, commit=commit,
-                           path=path or None, blob=None, line_start=line, line_end=line, text=(text or "")[:2000],
-                           content_sha256=(sha256_text(text) if text else None), by_reference=False, route="graph",
+                           path=path or None, blob=None, line_start=line, line_end=line, text=body,
+                           content_sha256=content_sha256, by_reference=False, route="graph",
                            raw_score=None, rank=None, fused_score=None, edge_path=(edge,),
-                           reason=f"{stage_or_kind}: {edge.get('derivation')}", banner=None)
+                           reason=f"{stage_or_kind}: {edge.get('derivation')}", banner=None,
+                           source_sha256=content_sha256, delivered_sha256=content_sha256)
 
     # -- placement, with dedup ------------------------------------------------------------------------------------
 
@@ -520,7 +675,7 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     status = STATUS_OK if resolve_result.status == resolvermod.STATUS_OK else STATUS_BLOCKED
 
     c = Compiler(task_spec, routes, repo, view_path, registry_path, profile.rrf_k, profile.graph_neighbour_depth,
-                 budgets_path=budgets_path, fanout=profile.g_fanout)
+                 budgets_path=budgets_path, fanout=profile.g_fanout, per_item_cap_bytes=profile.per_item_cap_bytes)
 
     sections: dict = {k: [] for k in ("A", "B", "C", "D.1", "D.2", "D.3", "E", "F", "G", "H")}
     queries_log: dict = {}

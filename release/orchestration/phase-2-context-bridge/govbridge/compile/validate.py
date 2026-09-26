@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from typing import Optional
 
 from govbridge.authority import classes as classesmod
@@ -31,15 +32,43 @@ def _a_tuple(mi_id, cls, lifecycle, commit, path, blob, l1, l2, sha256) -> tuple
     return (mi_id, cls, lifecycle, commit, path, blob, l1, l2, sha256)
 
 
+def pinned_view_from_manifest(manifest: dict, task_spec: dict, repo: Optional[str] = None):
+    """BR-DAG-AMEND-R1-1: reconstructs the resolved view EXACTLY as this packet's own manifest recorded it --
+    every named ref pinned to the exact commit ``manifest['view']`` lists, never re-resolved at the repository's
+    moving tip. This is what lets a stored packet stay re-verifiable at any LATER time (ARCHITECTURE.md section
+    5.3 rule 4), even after a new mandatory record has since been committed to the same ref -- the exact failure
+    the R1-RG quarantined check hit ("packet verify re-derives section A at the CURRENT tip: 24 expected vs 20 --
+    OD-BR-03..06 became mandatory after run-1").
+
+    ``history`` (a ``ref_glob`` of many equally-historical tips, never one designated ref) is not itemised in
+    ``manifest['view']`` and is left un-pinned here; mandatory-item resolution reaches it only through a
+    partition's fallback chain when a path is absent from every named ref, a rare path this amendment's own
+    regression test does not exercise. Every NAMED ref the manifest recorded is pinned."""
+    from govbridge.core import view as viewmod
+
+    view_path = task_spec["view"]
+    if not os.path.isabs(view_path) and not os.path.exists(view_path):
+        from govbridge import GOV_BRIDGE_DOMAIN
+        view_path = os.path.join(GOV_BRIDGE_DOMAIN, view_path)
+    config = viewmod.load_view(view_path)
+    named = {row["name"]: viewmod.ResolvedRef(name=row["name"], commit=row["commit"], status=viewmod.REF_OK)
+             for row in (manifest.get("view") or []) if row.get("commit")}
+    return viewmod.ResolvedView(view_id=config.view_id, config=config, named=named, history=[], repo=repo)
+
+
 def recompute_section_a(task_spec: dict, repo: Optional[str] = None,
-                         registry_path: Optional[str] = None) -> tuple:
+                         registry_path: Optional[str] = None, resolved_view=None) -> tuple:
     """Recomputes the resolver from scratch and returns ``(expected_a_tuples, resolve_result)``. The tuples are in
     the SAME canonical order ``govbridge.compile.packet`` renders A in (ARCHITECTURE.md section 5.3 rule 5: ordered
-    by authority rank, since every A item shares tier=MANDATORY and lifecycle=ACTIVE by construction)."""
+    by authority rank, since every A item shares tier=MANDATORY and lifecycle=ACTIVE by construction).
+
+    ``resolved_view``, when given, overrides live resolution (BR-DAG-AMEND-R1-1: ``verify_section_a`` below always
+    passes the packet's OWN recorded view; a caller that wants today's live-tip behaviour -- there is none left in
+    this package -- would omit it)."""
     from govbridge.compile import packet as packetmod  # lazy: avoid a module-load-time circular import
 
     grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
-    result = resolvermod.resolve(task_spec, repo=repo, registry_path=registry_path)
+    result = resolvermod.resolve(task_spec, repo=repo, registry_path=registry_path, resolved_view=resolved_view)
     a_items = []
     for mi in result.items:
         if not isinstance(mi, resolvermod.MandatoryItem):
@@ -71,13 +100,41 @@ def _manifest_a_tuples(manifest: dict) -> list:
 
 def verify_section_a(manifest: dict, task_spec: dict, repo: Optional[str] = None,
                       registry_path: Optional[str] = None) -> list:
-    expected, _ = recompute_section_a(task_spec, repo=repo, registry_path=registry_path)
+    """BR-DAG-AMEND-R1-1: re-derives section A at the VIEW RECORDED IN THIS PACKET'S OWN MANIFEST (pinned
+    refs/commits), never at the repository's moving tip -- so a stored packet stays re-verifiable at any later
+    time, even after a new mandatory record has since been committed to the same ref."""
+    pinned_view = pinned_view_from_manifest(manifest, task_spec, repo=repo)
+    expected, _ = recompute_section_a(task_spec, repo=repo, registry_path=registry_path, resolved_view=pinned_view)
     actual = _manifest_a_tuples(manifest)
     if expected != actual:
-        return [f"section A does not equal the freshly recomputed resolver output: "
-                f"expected {len(expected)} item(s), packet has {len(actual)}; "
+        return [f"section A does not equal the freshly recomputed resolver output (at the packet's own recorded "
+                f"view {manifest.get('view')!r}): expected {len(expected)} item(s), packet has {len(actual)}; "
                 f"expected={expected!r} actual={actual!r}"]
     return []
+
+
+def verify_delivered_fidelity(manifest: dict) -> list:
+    """BR-DAG node R1-RM (REPAIR_PLAN.md section 3 rule 4): "the receipt acknowledges delivered_sha256 separately
+    from source_sha256... must not appear to acknowledge content that was never delivered." The concrete
+    historical failure (run-1, ``DEMONSTRATION/run-1/receipt.yaml``): a by-reference A item carried NO recorded
+    hash at all, so a receipt could only acknowledge it as the degenerate ``"ID@None"``. Every A item must
+    therefore carry a non-None ``source_sha256`` (a directory item's is now derived from its own member manifest --
+    ``resolver.py`` -- rather than left ``None`` when the row declares no explicit hash) and a non-None
+    ``delivered_sha256`` for whatever this packet actually placed in that item's body.
+
+    This deliberately does NOT assert ``source_sha256 == delivered_sha256``: an ANCHORED item's source_sha256 is
+    the whole occurrence's file-level integrity hash (ARCHITECTURE.md section 5.3 rule 4's own re-derivation keys
+    on exactly that), while its delivered_sha256 is the hash of its own anchored slice -- the two legitimately
+    differ for every anchored mandatory item, whole-file or not, and that is not a fidelity gap."""
+    problems = []
+    for row in manifest["sections"]["A"]["items"]:
+        if row.get("source_sha256") is None:
+            problems.append(f"A/{row['unit']['id']}: source_sha256 is missing -- inputs_consumed could only "
+                             f"acknowledge this item as '{row['unit']['id']}@None'")
+        if row.get("delivered_sha256") is None:
+            problems.append(f"A/{row['unit']['id']}: delivered_sha256 is missing -- the receipt cannot honestly "
+                             f"acknowledge what this packet actually delivered")
+    return problems
 
 
 def _rows_of(manifest: dict) -> list:
@@ -184,6 +241,7 @@ def verify_packet(manifest: dict, task_spec: dict, repo: Optional[str] = None,
     problems += verify_placement(manifest)
     problems += verify_banners(manifest)
     problems += verify_ordering(manifest)
+    problems += verify_delivered_fidelity(manifest)
     return problems
 
 

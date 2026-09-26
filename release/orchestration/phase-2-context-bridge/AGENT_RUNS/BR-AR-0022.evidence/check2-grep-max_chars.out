@@ -1,0 +1,9 @@
+286:                   repo: Optional[str] = None, max_chars: Optional[int] = 4000) -> Optional[str]:
+292:    ``max_chars`` is a DISCLOSED excerpt cap for RETRIEVED/DERIVED callers only (``Compiler.item_from_edge_hop``;
+295:    this default -- ``Compiler._mandatory_text`` always passes ``max_chars=None`` here, so a mandatory item's own
+312:    if max_chars is None:
+314:    return text[:max_chars]
+478:        full = _read_excerpt(mi.path, mi.commit, mi.line_start, mi.line_end, repo=self.repo, max_chars=None)
+512:                                          max_chars=None)
+527:                                    max_chars=None)
+538:            full = _read_excerpt(mi.path, mi.commit, None, None, repo=self.repo, max_chars=None)
