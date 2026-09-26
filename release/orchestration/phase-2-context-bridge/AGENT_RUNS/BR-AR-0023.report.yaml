@@ -2,12 +2,14 @@ run_id: BR-AR-0023
 role: >-
   REPAIR-1 node R1-GA1 -- govbridge gather, core: query instantiation, facet registry, deterministic parallel
   facet retrieval, paging and continuation with a configurable batch size, stopping reasons, telemetry
-  (OD-BR-05 s1, s2, s4, s5, s9); plus the routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017). REOPENED once
-  (three defects: scoped-facet post-hoc filtering, AC2 graded on a facet subset, AC3 citing an unsaved file); this
-  report covers the reopened, fixed state.
+  (OD-BR-05 s1, s2, s4, s5, s9); plus the routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017). REOPENED
+  TWICE: first on three defects (scoped-facet post-hoc filtering, AC2 graded on a facet subset, AC3 citing an
+  unsaved file); second, on ONE item ("query commands must never write to the store" -- the SQL scope push-down's
+  own supporting structures were being created lazily, at query time, by govbridge.lexical.query/govbridge.
+  semantic.vectors). This report covers the state after BOTH reopenings.
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga1-0023
-commit: 732933c9f5b5665f3ad3cebe3d9113d5e863a7e0
+commit: 9c274200f13da0159bd63caba8f606865b08ff92
 status: COMPLETED
 claims:
 - id: C-1
@@ -84,17 +86,17 @@ claims:
     out_of_scope_dropped (see C-6).
 - id: C-9
   text: >-
-    REOPENING, performance finding and fix: the FIRST version of C-8's SQL push-down measured 4-6 SECONDS PER
-    CALL on the real store (a scoped COUNT/SELECT), because ``occurrence`` has ~503,601 rows for only ~7,909
-    distinct (blob_id, path) pairs -- the same blob/path pair repeats once per historical (ref, commit), up to
-    hundreds of times for a stable file (measured directly: one blob had 21,498 occurrence rows, several others
-    500-900). A correlated EXISTS against the raw table re-walked every one of those repeats per candidate row.
-    Fixed with two query-time-only, idempotent additions to the SHARED store.db, owned by neither this node's nor
-    another node's existing schema: an index on record_def(path), and gather_scope_path_cache(blob_id, path), a
-    DEDUPLICATED copy of occurrence, built once per process (govbridge.lexical.query._ensure_scope_indexes /
-    govbridge.semantic.vectors._ensure_scope_indexes). Measured effect: the same scoped COUNT query fell from
-    4.27s to 0.13s (33x); a full CONTROL-A gather on the query's actual DEFAULT facet set fell from a >115s
-    timeout (with 0 output) to 47-96s per query across all 5 CONTROL-A queries (AGENT_RUNS/BR-AR-0023.
+    REOPENING, performance finding and fix (SUPERSEDED IN PART by the second reopening -- see C-14/C-15 for the
+    current, build-time shape; the measurement below is unchanged and still the basis for the 150s budget): the
+    FIRST version of C-8's SQL push-down measured 4-6 SECONDS PER CALL on the real store (a scoped COUNT/SELECT),
+    because ``occurrence`` has ~503,601 rows for only ~7,909 distinct (blob_id, path) pairs -- the same blob/path
+    pair repeats once per historical (ref, commit), up to hundreds of times for a stable file (measured directly:
+    one blob had 21,498 occurrence rows, several others 500-900). A correlated EXISTS against the raw table
+    re-walked every one of those repeats per candidate row. Fixed with a deduplicated (blob_id, path) table plus an
+    index on record_def(path) -- originally (first version of this fix) built lazily, at query time; now (second
+    reopening) built at BUILD time only, see C-14. Measured effect unchanged: the same scoped COUNT query fell from
+    4.27s to 0.13s (33x); a full CONTROL-A gather on the query's actual DEFAULT facet set fell from a >115s timeout
+    (with 0 output) to 47-96s per query across all 5 CONTROL-A queries (AGENT_RUNS/BR-AR-0023.
     check7-controla-all-5-queries-default-facets.out).
 - id: C-10
   text: >-
@@ -130,6 +132,68 @@ claims:
     (tests/gather/test_engine.py::test_govbridge_notes_help_dispatches_*) proving `govbridge notes --help` reaches
     govbridge.notes.cli.main rather than the top-level "unknown command" path -- kept out of tests/notes/
     test_cli.py (R1-RN's file, not in this node's mutation_scope). Unchanged by the reopening.
+- id: C-14
+  text: >-
+    SECOND REOPENING FIX (the sole item): the deduplicated (blob_id, path) table and the record_def(path) index --
+    C-8/C-9's own SQL scope push-down support structures -- are now built EXCLUSIVELY at BUILD time, never at query
+    time. The table (renamed occurrence_distinct_path, from gather_scope_path_cache) is created and maintained by
+    govbridge/core/store.py (SCHEMA_SQL, put_occurrence, clear_layer_tables) -- the SAME module that already owns
+    and writes `occurrence` itself; the index is added to govbridge/authority/layer.py's own SCHEMA_SQL (the module
+    that already owns and writes `record_def`). Both are covered by the SAME determinism guarantee `occurrence`'s
+    own already-registered manifest-layer digest gives (a pure, deterministic function of occurrence's content),
+    verified directly rather than only by that argument (tests/core/test_scope_path_cache.py::
+    test_two_from_clean_builds_give_identical_distinct_path_content). govbridge/core/freshness.py prunes the table
+    in the SAME transaction as each of its three incremental `DELETE FROM occurrence` sites (govbridge/core/
+    store.py:prune_stale_distinct_paths), so a ref that moves never leaves a stale (blob_id, path) pair behind
+    (tests/core/test_scope_path_cache.py::test_incremental_rebuild_after_a_ref_moves_leaves_no_stale_distinct_path_pair).
+    govbridge/lexical/query.py and govbridge/semantic/vectors.py no longer create or populate either structure --
+    their own `_ensure_scope_indexes()` functions (and the module-level "ensured once per process" flag) are
+    removed entirely, replaced by a READ-ONLY `_check_scope_structures()` (a `sqlite_master` lookup only) that
+    raises a typed, named `StoreNeedsRebuild` (`.CODE == "STORE_NEEDS_REBUILD"`, naming the missing table or index
+    and which module owns it) when a scoped query needs a structure the store does not have -- never a silent,
+    slower fallback to an unscoped query, and never a write, replacing BOTH the old "build it now" behaviour and
+    the (already reopened-away) silent-fallback except-block that preceded it.
+- id: C-15
+  text: >-
+    SECOND REOPENING, coordinator addendum (found by R1-RS): govbridge/core/store.py gained
+    `open_db_readonly()`, opening the store via a `mode=ro&immutable=1` URI connection -- structurally unable to
+    write (no PRAGMA, no `executescript`, no `INSERT` is even attempted, versus `open_db()`'s own, weaker "attempt
+    the write, tolerate the failure" tolerance for a read-only-chmod'd FILE). `immutable=1` specifically (not just
+    `mode=ro`) is required because this store is opened in WAL mode: verified directly (ad hoc script, not
+    committed) that a bare `mode=ro` connection to a WAL-mode database raises "attempt to write a readonly
+    database" on its very first SELECT once the database's DIRECTORY is also read-only (WAL's own reader-side
+    bookkeeping needs to create/consult a `-shm` file), while `mode=ro&immutable=1` -- SQLite's own documented
+    answer for "the database file is stored on read-only media" -- reads it correctly. Every QUERY path this node
+    controls now opens the store this way: govbridge/lexical/query.py's `query()`, and govbridge/semantic/
+    search.py's `search()` (the real semantic-route entry point govbridge.route.real_routes.semantic_route calls;
+    not one of the four files this reopening's own narrow, ONE-purpose extension named, but already part of this
+    node's standing, first-pass mutation_scope -- task_contract.mutation_scope has always listed govbridge/
+    semantic/search.py, since it is gather's own semantic-route dependency -- so this is squarely within scope, a
+    minimal two-line change, named here rather than silently done). `govbridge/route/real_routes.py`'s own shared
+    classification connection
+    (`_conn()`, feeding `authoritylayer.classify_hit`) deliberately stays on `open_db()` -- see C-16/open_issues:
+    switching it broke classification on any store whose authority-layer schema was never separately built, a
+    regression this pass would otherwise have introduced by tightening a connection it does not own the schema
+    lifecycle of.
+- id: C-16
+  text: >-
+    tests/core/test_scope_path_cache.py (new, this pass's own extended-scope file) covers all four scenarios the
+    second reopening named: (a) `govbridge gather` (real lexical route + SQL scope push-down, `purpose`/
+    `requirement` facets) runs to completion, well inside the 150s budget, against a store made read-only AT THE
+    FILE LEVEL (a real `os.chmod(db_path, 0o444)`, not only `open_db_readonly()`'s own `mode=ro` choice), with the
+    store file's sha256 byte-identical before and after; (b) a store missing either structure raises the typed
+    `StoreNeedsRebuild`/`STORE_NEEDS_REBUILD` error, for both govbridge.lexical.query and govbridge.semantic.vectors,
+    for both the table and the index, without writing anything even on that failure path; (c) an incremental
+    rebuild after a ref moves (via govbridge.core.freshness's real incremental path, never from-clean) leaves no
+    stale (blob_id, path) pair, verified against real git commits/branches; (d) two from-clean builds of the same
+    source give identical occurrence_distinct_path content (a direct digest, not an inference from occurrence's own
+    manifest digest) and an identical record_def_by_path index/record_def row count. A ninth test proves
+    `open_db_readonly()` itself, directly: reads real data through a genuinely file-level-read-only store, and any
+    attempted write against that SAME connection raises. CA-WHY (the real CONTROL-A corpus, full default facet set,
+    --threads 4 --batch-size 8) was re-measured against a copy of the store with the new build-time structures:
+    72.78s wall time (elapsed, `/usr/bin/time -v`), 118 merged items, FACETS_COVERED -- inside the 150s budget, and
+    faster than the second reopening's own 93.25s measurement of the same query (AGENT_RUNS/BR-AR-0023.
+    check-pass3-controla-cawhy-remeasure.out).
 evidence:
 - claim: C-1
   evidence: tests/gather/test_instantiate.py (17 tests; file:tests/gather/test_instantiate.py)
@@ -158,8 +222,8 @@ evidence:
   evidence: 'govbridge/cli.py:cmd_gather; cmd: python -m govbridge gather --help (argparse-generated); git diff 08a9fb4..732933c -- govbridge/cli.py is empty'
 - claim: C-8
   evidence: >-
-    govbridge/lexical/query.py:_scope_sql/_ensure_scope_indexes; govbridge/semantic/vectors.py:_scope_sql/
-    _ensure_scope_indexes; govbridge/route/real_routes.py:_path_globs_for_classes,_apply_scope_assertion,
+    govbridge/lexical/query.py:_scope_sql/_check_scope_structures; govbridge/semantic/vectors.py:_scope_sql/
+    _check_scope_structures; govbridge/route/real_routes.py:_path_globs_for_classes,_apply_scope_assertion,
     lexical_route/semantic_route/code_route/exact_route; tests/gather/test_engine.py::
     test_engine_passes_scope_classes_and_lifecycle_scope_to_every_route_call,
     ::test_requirement_facet_finds_the_one_contract_item_via_the_sql_scope_pushdown (1 round, not many, to find
@@ -186,6 +250,34 @@ evidence:
   evidence: >-
     govbridge/cli.py: `if cmd == "notes":` dispatch line; tests/gather/test_engine.py::
     test_govbridge_notes_help_dispatches_to_notes_cli_in_process, ::test_govbridge_notes_help_dispatches_via_python_dash_m
+- claim: C-14
+  evidence: >-
+    govbridge/core/store.py: SCHEMA_SQL's occurrence_distinct_path table, put_occurrence, clear_layer_tables,
+    prune_stale_distinct_paths; govbridge/authority/layer.py: SCHEMA_SQL's record_def_by_path index;
+    govbridge/core/freshness.py: the three prune_stale_distinct_paths call sites (near the three incremental
+    `DELETE FROM occurrence` statements); govbridge/lexical/query.py and govbridge/semantic/vectors.py:
+    StoreNeedsRebuild, _sqlite_object_exists, _check_scope_structures (removed: _ensure_scope_indexes and its
+    module-level flag); tests/core/test_scope_path_cache.py (all 9 tests, see C-16)
+- claim: C-15
+  evidence: >-
+    govbridge/core/store.py:open_db_readonly; govbridge/lexical/query.py:query (conn = store.open_db_readonly());
+    govbridge/semantic/search.py:search (conn = store.open_db_readonly(), vectors.create_table(conn) call removed);
+    govbridge/route/real_routes.py:_conn (unchanged, still store.open_db(), with an inline comment explaining why);
+    tests/core/test_scope_path_cache.py::test_open_db_readonly_reads_correctly_and_cannot_write
+- claim: C-16
+  evidence: >-
+    tests/core/test_scope_path_cache.py (9 tests, all passing):
+    test_gather_runs_full_speed_against_a_file_level_read_only_store_with_sha256_unchanged,
+    test_open_db_readonly_reads_correctly_and_cannot_write,
+    test_lexical_query_raises_store_needs_rebuild_when_the_dedup_table_is_missing,
+    test_lexical_query_raises_store_needs_rebuild_when_the_record_def_index_is_missing,
+    test_lexical_query_never_writes_when_it_raises_store_needs_rebuild,
+    test_semantic_search_raises_store_needs_rebuild_when_the_dedup_table_is_missing,
+    test_semantic_search_raises_store_needs_rebuild_when_the_record_def_index_is_missing,
+    test_incremental_rebuild_after_a_ref_moves_leaves_no_stale_distinct_path_pair,
+    test_two_from_clean_builds_give_identical_distinct_path_content; AGENT_RUNS/BR-AR-0023.
+    check-pass3-controla-cawhy-remeasure.out (72.78s elapsed, 118 merged items, FACETS_COVERED, `/usr/bin/time -v`
+    full output)
 mutation_scope_respected: true
 open_issues:
 - >-
@@ -208,14 +300,55 @@ open_issues:
   mainly through CALLERS and plain definitions, not through TESTS/READS_KEY edges. R1-GA2's adaptive
   identifier-driven seeds are the natural fix; out of this node's scope by the dispatch brief itself.
 - >-
-  gather_scope_path_cache (govbridge/lexical/query.py, govbridge/semantic/vectors.py) is built ONCE PER PROCESS
-  (a module-level flag), refreshed via INSERT OR IGNORE from the current occurrence table at that moment. It can
-  therefore be at most one process-start stale relative to a store rebuilt mid-session by a DIFFERENT process
-  (e.g. a concurrent `index update`), and it is never rebuilt again within one long-lived process. This is a
-  disclosed, bounded staleness window for a PERFORMANCE cache only (never a correctness gap: a stale/missing
-  cache degrades to fewer Tier A/B pre-filter hits, and the real classify_hit-based assertion in every route
-  still catches any wrongly-admitted item). Routed to whoever owns a long-lived gather server process, if one is
-  ever built; the one-shot CLI this node ships is never at risk (one process per invocation).
+  SUPERSEDED by the second reopening: gather_scope_path_cache is no longer built at query time at all (see C-14),
+  so the per-process-staleness concern this open_issue used to describe no longer applies -- the table is now a
+  build-time structure (occurrence_distinct_path), kept in lockstep with `occurrence` by govbridge.core.store/
+  .freshness, never refreshed or guessed at by a query.
+- >-
+  SECOND REOPENING, a migration nuance found while re-measuring CA-WHY: a store already fully built under the
+  PRE-second-reopening code (occurrence/record_def already fully populated, but the table was named
+  gather_scope_path_cache and was never named occurrence_distinct_path) will NOT gain occurrence_distinct_path
+  from an ordinary incremental `freshness.run()`/`index update` if nothing in its tracked refs has actually
+  changed: `put_occurrence()` (the only place that inserts into occurrence_distinct_path) is only called for a row
+  actually (re)written during a build, and an unchanged ref's occurrence rows are never revisited. Only a
+  from-clean rebuild (`index rebuild --from-clean`, which calls clear_layer_tables + put_occurrence for every row)
+  is guaranteed to backfill it for existing, unchanged content -- an ordinary incremental run is NOT sufficient,
+  which makes StoreNeedsRebuild's own suggested remedy ("rebuild it, e.g. `python -m govbridge index rebuild`")
+  potentially misleading without `--from-clean` for this specific migration. Worked around for this pass's own
+  CA-WHY re-measurement (AGENT_RUNS/BR-AR-0023.check-pass3-controla-cawhy-remeasure.out) by backfilling a COPY of
+  the existing real store directly (a one-time, ad hoc `INSERT INTO occurrence_distinct_path SELECT DISTINCT
+  blob_id, path FROM occurrence`, verified byte-for-byte identical in content to the old gather_scope_path_cache
+  table it replaces, and therefore identical to what a genuine from-clean rebuild would have produced -- see
+  tests/core/test_scope_path_cache.py::test_two_from_clean_builds_give_identical_distinct_path_content for the
+  general proof that this content is a pure function of occurrence). Routed to whoever operates the real,
+  long-lived store: a genuine `index rebuild --from-clean` is needed once, migrating past this reopening, before
+  relying on the read-only guarantee against pre-existing content.
+- >-
+  SECOND REOPENING, disclosed and NOT fixed by this pass: govbridge/code/symbols.py's `ensure_indexed`
+  (called from `_open_conn`/`definitions`/`callers`, which `govbridge.route.real_routes.code_route` uses) has the
+  SAME lazy-build-at-query-time shape this reopening moved off of for the scope-index structures -- it commits
+  newly-classified/parsed blobs the first time a commit's code is queried, if any are found. Not in this node's
+  authorized scope for this pass (only govbridge/authority/layer.py, govbridge/core/store.py, govbridge/core/
+  freshness.py and the new test file were extended; govbridge/code/symbols.py was not). Consequence: `code_route`
+  (the `dependencies`/`dependents`/`tests` facets) is NOT guaranteed read-only against a store whose code layer was
+  never fully built ahead of time, and this pass's own read-only test (tests/core/test_scope_path_cache.py::
+  test_gather_runs_full_speed_against_a_file_level_read_only_store_with_sha256_unchanged) deliberately excludes
+  those facets rather than silently relying on them happening to be no-ops. Routed to whoever owns govbridge/code/
+  symbols.py next.
+- >-
+  SECOND REOPENING, disclosed and NOT fixed by this pass: govbridge/authority/layer.py's `classify_hit` calls its
+  own `ensure_schema(conn)` on every call, at query time -- a pre-existing pattern this pass's authorization did
+  not extend to (only the one `record_def_by_path` index line was authorized there). This is why govbridge/route/
+  real_routes.py's shared classification connection (`_conn()`) still opens via `store.open_db()` rather than the
+  new `store.open_db_readonly()`: switching it was tried and reverted in this pass after it broke classification
+  in tests/route/test_real_routes.py's own pre-existing tests (a bare git-repo fixture that never runs
+  govbridge.authority.layer's builder, so its authority-layer schema does not exist until classify_hit's own
+  ensure_schema call creates it) -- exactly the scenario the second reopening's own rule (never build at query
+  time) exists to prevent, just for a module outside this pass's authorized scope. `open_db()` still satisfies the
+  literal, required guarantee (a read-only store FILE, chmod'd, with a directory that remains writable) since
+  every write it attempts is wrapped in try/except -- see govbridge/core/store.py:open_db's own docstring -- but it
+  is the weaker of the two guarantees, kept here only because the stronger one is not safe to apply without also
+  fixing govbridge/authority/layer.py's own schema lifecycle. Routed to whoever owns that module next.
 - >-
   Superseded by the reopening's own re-measurement: the previous report's claim that CONTRACT/decisions_active/
   decisions_history found zero in-scope items on CONTROL-A's CA-WHY was an artefact of the post-hoc-only filter
@@ -309,3 +442,62 @@ conformance:
 - item: 'Amendment R1-T1: the FULL domain suite, run last, 0 failures (tests/compile/test_compile_real_view_mandatory_in_a.py excepted)'
   status: MET
   evidence: AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out (507 passed, 0 failed; the named exception did not fail either)
+- item: 'SECOND REOPENING: the record_def(path) index and the deduplicated (blob_id, path) table are built at BUILD time only (govbridge/authority/layer.py, govbridge/core/store.py, govbridge/core/freshness.py), never by a query'
+  status: MET
+  evidence: >-
+    See C-14. govbridge/authority/layer.py's SCHEMA_SQL (record_def_by_path, built via ensure_schema, which every
+    build already calls); govbridge/core/store.py's SCHEMA_SQL (occurrence_distinct_path) plus put_occurrence/
+    clear_layer_tables/prune_stale_distinct_paths; govbridge/core/freshness.py's three prune call sites.
+    govbridge/lexical/query.py's and govbridge/semantic/vectors.py's own `_ensure_scope_indexes()` (and its
+    module-level "ensured once" flag) are removed entirely -- verified: `grep -n _ensure_scope_indexes
+    govbridge/lexical/query.py govbridge/semantic/vectors.py` matches nothing in either file. (Both files still
+    contain OTHER, pre-existing, unrelated CREATE/INSERT statements of their own -- govbridge.lexical.fts's own
+    lexical_fts/lexical_indexed_blob schema, and govbridge.semantic.vectors's own create_table/put_vector for the
+    `vector` table -- neither is the query-time scope-index pattern this reopening is about, and neither is new
+    to this pass)
+- item: 'SECOND REOPENING: a query whose scoped push-down needs a build-time structure the store lacks fails with a typed, named error -- never a silent slow fallback, never a write'
+  status: MET
+  evidence: >-
+    govbridge/lexical/query.py:StoreNeedsRebuild (CODE="STORE_NEEDS_REBUILD"); govbridge/semantic/
+    vectors.py:StoreNeedsRebuild (same code, separate class, module independence preserved); tests/core/
+    test_scope_path_cache.py::test_lexical_query_raises_store_needs_rebuild_when_the_dedup_table_is_missing,
+    ::test_lexical_query_raises_store_needs_rebuild_when_the_record_def_index_is_missing,
+    ::test_lexical_query_never_writes_when_it_raises_store_needs_rebuild (sha256 unchanged even on the FAILURE
+    path), ::test_semantic_search_raises_store_needs_rebuild_when_the_dedup_table_is_missing,
+    ::test_semantic_search_raises_store_needs_rebuild_when_the_record_def_index_is_missing
+- item: 'SECOND REOPENING, coordinator addendum: a read-only open mode (mode=ro, no write-shaped statements) for every query path this node controls; the required read-only test must pass against a store read-only at the FILE level (chmod), sha256 unchanged'
+  status: MET
+  evidence: >-
+    govbridge/core/store.py:open_db_readonly (mode=ro&immutable=1); wired into govbridge/lexical/query.py:query and
+    govbridge/semantic/search.py:search (see C-15 for why govbridge/route/real_routes.py's classification
+    connection is a disclosed exception, not silently narrowed); tests/core/test_scope_path_cache.py::
+    test_gather_runs_full_speed_against_a_file_level_read_only_store_with_sha256_unchanged (real os.chmod, real
+    lexical route + SQL scope push-down, elapsed < 10s on the fixture, sha256 identical before/after) and ::
+    test_open_db_readonly_reads_correctly_and_cannot_write (the primitive itself, proven directly)
+- item: 'SECOND REOPENING: (c) an incremental rebuild after a ref moves leaves no stale (blob_id, path) pair; (d) two from-clean builds give identical occurrence_distinct_path content'
+  status: MET
+  evidence: >-
+    tests/core/test_scope_path_cache.py::test_incremental_rebuild_after_a_ref_moves_leaves_no_stale_distinct_path_pair
+    (both refs the view resolves moved off the old commit; the old (blob_id, path) pair is confirmed absent, the
+    new one present, and every surviving pair is confirmed still backed by a live occurrence row) and
+    ::test_two_from_clean_builds_give_identical_distinct_path_content (identical manifest_sha256, identical
+    occurrence_distinct_path digest, identical record_def row count, across two independent from-clean builds of
+    the same source)
+- item: 'SECOND REOPENING: re-measure CA-WHY on the full default facet set after the change, against a fresh or rebuilt copy of the store; must meet the 150s budget'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0023.check-pass3-controla-cawhy-remeasure.out: 72.78s elapsed (`/usr/bin/time -v`), 118 merged
+    items, FACETS_COVERED, full default facet set (--threads 4 --batch-size 8), against a copy of store-BR-AR-0023
+    backfilled with the new build-time structures (occurrence_distinct_path content verified byte-identical to the
+    old gather_scope_path_cache table it replaces before the run). Well inside the 150s budget, and faster than the
+    second reopening's own 93.25s baseline for the same query. merged_sha256 differs from that earlier baseline
+    (8f6650ba... vs 1696698f7f...) with the SAME item count (118) and stop_reason -- attributed to the "records"
+    ref's tip (refs/heads/bridge/p2-context-retrieval, this very bridge's own branch, "follow: tip") having moved
+    to a newer commit (f0abe91f, timestamped 09:01:44) since the store copy's base was built (store.db mtime
+    08:12:26) and other repair nodes committing to it concurrently in this same session -- version-status/
+    classification is resolved against the LIVE ref at query time (govbridge.core.view), independent of anything
+    this pass changed, and this specific sha256-vs-sha256 equality was never this check's own requirement (item
+    count, stop reason and wall time are)
+- item: 'Amendment R1-T1 (re-run, second reopening): the FULL domain suite, run LAST, after every other check in this pass'
+  status: MET
+  evidence: AGENT_RUNS/BR-AR-0023.check-pass3-full-domain-suite.out (516 passed, 0 failed)

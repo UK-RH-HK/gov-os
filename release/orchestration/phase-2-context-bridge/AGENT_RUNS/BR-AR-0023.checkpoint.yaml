@@ -1,11 +1,12 @@
 run_id: BR-AR-0023
-commit: 732933c9f5b5665f3ad3cebe3d9113d5e863a7e0
+commit: 9c274200f13da0159bd63caba8f606865b08ff92
 role: >-
   REPAIR-1 node R1-GA1 -- govbridge gather, core: query instantiation, facet registry, deterministic parallel
   facet retrieval, paging and continuation with a configurable batch size, stopping reasons, telemetry; plus the
-  routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017). REOPENED once; this checkpoint covers the reopened,
-  fixed state (three defects: scoped-facet post-hoc filtering, AC2 graded on a facet subset, AC3 citing an unsaved
-  file).
+  routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017). REOPENED TWICE: first on three defects (scoped-facet
+  post-hoc filtering, AC2 graded on a facet subset, AC3 citing an unsaved file); second, on ONE item ("query
+  commands must never write to the store" -- the first reopening's own SQL scope push-down fix had built its
+  supporting index/table lazily, at query time). This checkpoint covers the state after BOTH reopenings.
 model_observed: claude-sonnet-5
 commands:
 - cmd: cd $D && $PY -m pytest tests/gather/test_engine.py tests/gather/test_instantiate.py -q
@@ -70,6 +71,43 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out
   output_sha256: c6b7215f3999eb4e57350e41cb82eb559e4559cb29eaa7ee48e455c13fa211c8
+- cmd: >-
+    SECOND REOPENING: cd $D && $PY -m pytest -q -p no:cacheprovider tests/core/ tests/lexical/ tests/semantic/
+    tests/authority/ tests/route/ tests/gather/ (the scoped suites most exposed to moving _ensure_scope_indexes
+    off query time and adding store.open_db_readonly)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check-pass3-scoped-suites.out
+  output_sha256: b3d28a94f00cfc7890da87a9d93f869030b5c5874ebf4e6d5a692679dd4de38e
+- cmd: >-
+    SECOND REOPENING, new deliverable: cd $D && $PY -m pytest -q -p no:cacheprovider -v
+    tests/core/test_scope_path_cache.py (the four required scenarios plus the open_db_readonly primitive test)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check8-scope-path-cache-buildtime.out
+  output_sha256: 8205ed863bb5ecf727dfc57b7b70a6fe4c9c5e650c251b41539c863ddd6c522c
+- cmd: >-
+    SECOND REOPENING: grep -n _ensure_scope_indexes govbridge/lexical/query.py govbridge/semantic/vectors.py (no
+    match expected -- the query-time index/table builder is fully removed); git diff --stat
+    732933c9f5b5665f3ad3cebe3d9113d5e863a7e0 -- govbridge/cli.py (empty expected -- untouched this pass, R1-RS's
+    file); git status --short (the exact file set this pass touched)
+  exit_code: 0
+  output_path: >-
+    release/orchestration/phase-2-context-bridge/AGENT_RUNS/
+    BR-AR-0023.check9-second-reopening-no-query-time-writes-cli-untouched.out
+  output_sha256: f7c38ada9c5ea00654b2379d674f3fd8f66c7d384f0f5280b21351819c062d22
+- cmd: >-
+    SECOND REOPENING, coordinator addendum: re-measure CA-WHY (real CONTROL-A corpus, full default facet set)
+    against a copy of store-BR-AR-0023 backfilled with the new build-time structures: GOVBRIDGE_STORE=$HOME/
+    .cache/gov-bridge/store-BR-AR-0023-pass3-remeasure /usr/bin/time -v $PY -m govbridge gather --task
+    tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --threads 4 --batch-size 8
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check-pass3-controla-cawhy-remeasure.out
+  output_sha256: e202c66c5d14b8c5756e31d368a968394d4da87dae43d0a5a42907962b74f2b3
+- cmd: >-
+    AMENDMENT R1-T1 (re-run, second reopening, LAST check before integrate-check): cd $D && $PY -m pytest -q
+    -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check-pass3-full-domain-suite.out
+  output_sha256: f5d5b9c9c65ca3b41b09978704cbf72dbf98be810fd28a852d3c3213fafec27b
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
@@ -124,6 +162,14 @@ task_contract:
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
   # Reopening dispatch note constrained this pass further (no cli.py edits; R1-RS is its next editor) -- a
   # NARROWING of what this pass actually touched, not of the node's own standing mutation_scope above.
+  # SECOND REOPENING, ONE-purpose extension (named explicitly in the coordinator's own dispatch, and recorded in
+  # ORCHESTRATOR_STATE.yaml on the bridge tip for this run entry): the record_def(path) index and the deduplicated
+  # (blob_id, path) table must move from query time to build time, inside the layer builders that already own
+  # those tables -- exactly these three files, plus one new test file:
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/store.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_scope_path_cache.py
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/config/budgets.yaml
 - release/orchestration/phase-2-context-bridge/config/facets.yaml
@@ -153,6 +199,15 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check5-notes-dispatch.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check7-controla-all-5-queries-default-facets.out
+- release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+- release/orchestration/phase-2-context-bridge/govbridge/core/store.py
+- release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+- release/orchestration/phase-2-context-bridge/tests/core/test_scope_path_cache.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check-pass3-scoped-suites.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check8-scope-path-cache-buildtime.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check9-second-reopening-no-query-time-writes-cli-untouched.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check-pass3-controla-cawhy-remeasure.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check-pass3-full-domain-suite.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.report.yaml
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.checkpoint.yaml
 findings:
@@ -204,6 +259,41 @@ findings:
   scoped facets once the SQL push-down meant they rarely see out-of-scope pages at all, but the mechanism (and its
   test, test_marginal_gain_only_duplicates_when_a_route_keeps_returning_the_same_item) stays correct and in place
   for any route (a fake/test double, or code/exact's own post-hoc assertion) that still can.
+- >-
+  SECOND REOPENING root cause: the FIRST reopening's own fix for defect 1's performance problem
+  (gather_scope_path_cache, an index on record_def(path)) was built the SAME way the problem it fixed was found --
+  lazily, on first use, inside the query path itself (govbridge.lexical.query._ensure_scope_indexes/
+  govbridge.semantic.vectors._ensure_scope_indexes). That is itself a write from a query command, just a
+  performance-motivated one rather than a correctness-motivated one -- the coordinator's second reopening named
+  three concrete consequences (a frozen demonstration store would be mutated by the demo agent's own queries; a
+  read-only-opened store would silently fall back to the slow path instead of erroring; INSERT OR IGNORE never
+  prunes a stale (blob,path) pair on a path a blob no longer occupies). Fixed by moving BOTH structures to BUILD
+  time, inside the layer builders that already own the tables they extend (govbridge.core.store for occurrence ->
+  occurrence_distinct_path, govbridge.authority.layer for record_def -> record_def_by_path), and replacing the
+  query-time builder with a read-only existence check that raises a typed StoreNeedsRebuild instead of ever
+  building or falling back silently.
+- >-
+  SECOND REOPENING, coordinator addendum finding: removing govbridge.lexical.query's old
+  try/except-around-the-scoped-SELECT (the ALREADY-reopened-away silent fallback) exposed a SEPARATE, real,
+  pre-existing bug in govbridge.semantic.vectors.search: its SQL unconditionally joined `vector v JOIN chunk c ON
+  c.chunk_id = v.chunk_id`, even for an UNSCOPED call, even though `chunk` is not this module's own table and
+  `_scope_sql`'s own fragments (the only thing that ever needed `c.blob_id`/`c.start_line`/`c.end_line`) are
+  referenced only when a scope filter is actually requested. This was previously masked by the very silent
+  fallback the reopening required removing (a caller testing `vector` in isolation, with no `chunk` table at all,
+  silently fell back to the unscoped query on "no such table: chunk" and never noticed the JOIN was wrong for
+  every unscoped call too). Fixed by making the JOIN conditional on `scope_sql` being non-empty -- confirmed via
+  tests/semantic/test_vectors.py's own two pre-existing tests, which exercise exactly this unscoped, no-`chunk`
+  path and both failed before this fix, both pass after.
+- >-
+  SECOND REOPENING, coordinator addendum finding: a bare `mode=ro` SQLite URI connection is NOT sufficient for a
+  WAL-mode database once its DIRECTORY (not just the file) is also read-only -- verified directly with a throwaway
+  script: `mode=ro` alone raised "attempt to write a readonly database" on its very first SELECT in that
+  configuration (WAL readers need to consult/create a `-shm` file even to read), while `mode=ro&immutable=1` (this
+  node's own store.open_db_readonly, actually adopted) read the same file correctly. The REQUIRED test only chmods
+  the store FILE (directory left writable, matching the literal wording "read-only at the file level"), a
+  configuration under which even a PLAIN, non-immutable connection already reads correctly -- `immutable=1` is
+  still the adopted, more defensive choice (SQLite's own documented answer for "read-only media"), and this
+  finding is recorded so a future reader does not assume `mode=ro` alone would have been equivalent.
 failed_approaches:
 - >-
   REOPENING: pushing scope into SQL by joining straight off the raw ``occurrence`` table (no cache). Correct
@@ -225,6 +315,20 @@ failed_approaches:
   `integrate-check` refuse the branch. Corrected before that pass's own return: the one isolation fixture moved
   into test_engine.py, and the notes-dispatch tests moved into test_engine.py too, exercising govbridge.cli
   directly rather than editing R1-RN's file.
+- >-
+  SECOND REOPENING, coordinator addendum: switching govbridge/route/real_routes.py's shared classification
+  connection (`_conn()`) to the new `store.open_db_readonly()`, for consistency with lexical/semantic. Broke
+  tests/route/test_real_routes.py's own two PRE-EXISTING tests
+  (test_code_route_hits_carry_real_classification_and_real_definitions,
+  test_exact_route_hits_carry_real_classification): both build a bare git-repo fixture that never runs
+  govbridge.authority.layer's own builder, so `authoritylayer.classify_hit`'s unwrapped `ensure_schema(conn)` call
+  needs to CREATE the authority-layer schema the first time classification runs against that fixture -- a genuine,
+  first-time write a read-only/immutable connection cannot make, silently swallowed by `classify_occ`'s own
+  try/except into a wrong "UNCLASSIFIED" result instead of the real classification. Reverted: `_conn()` stays on
+  `store.open_db()`, which already satisfies this reopening's actual, literal requirement (a store read-only at
+  the FILE level, directory writable) since every write it attempts is individually wrapped -- see C-15/
+  open_issues for the disclosed, out-of-scope reason this is the weaker of the two guarantees rather than a second
+  fix attempt inside this pass.
 unresolved:
 - >-
   The demonstration's own query-set document schema (query_classes/subjects tables, {class, subject} entries) was
@@ -236,11 +340,37 @@ unresolved:
   narrower, real per-class facet mapping is wanted is an open product question, not something this generic node
   can decide (OC-BR-02 forbids naming an actual class id here). Unchanged by the reopening.
 - >-
-  gather_scope_path_cache is a per-process performance cache (see findings), not rebuilt within a long-lived
-  process if the underlying store is rebuilt mid-session by a different process. Never a correctness gap (the
-  real classify_hit-based assertion in every route still catches any wrongly-admitted item; a stale cache can
-  only under-restrict, i.e. degrade toward the FIRST pass's slower-but-correct behaviour), but worth knowing if a
-  long-lived gather server is ever built on top of this CLI.
+  SUPERSEDED by the second reopening: gather_scope_path_cache's old per-process staleness window (it was rebuilt
+  at most once per process, from whatever `occurrence` held at that moment) no longer exists as a concept --
+  occurrence_distinct_path is now a build-time structure, kept exactly in lockstep with `occurrence` itself by
+  govbridge.core.store/.freshness, and a query never refreshes or guesses at it.
+- >-
+  SECOND REOPENING migration nuance: an EXISTING store built before this reopening (occurrence/record_def already
+  fully populated under the old gather_scope_path_cache name) will NOT gain occurrence_distinct_path from an
+  ordinary incremental `freshness.run()`/`index update` over UNCHANGED refs -- put_occurrence() (the only writer)
+  is only called for a row actually (re)processed during a build. Only a from-clean rebuild (`index rebuild
+  --from-clean`) is guaranteed to backfill it for pre-existing, unchanged content; StoreNeedsRebuild's own
+  suggested remedy text ("rebuild it, e.g. `python -m govbridge index rebuild`") does not itself say
+  `--from-clean`, which could mislead an operator migrating an existing real store. Worked around for this pass's
+  own CA-WHY re-measurement by backfilling a copy of the existing store directly (verified equivalent in content to
+  what a from-clean rebuild produces -- see tests/core/test_scope_path_cache.py's own digest-equality test).
+  Routed to whoever operates the real store: it needs one genuine from-clean rebuild to migrate past this
+  reopening.
+- >-
+  SECOND REOPENING, disclosed, NOT fixed by this pass (govbridge/code/symbols.py is not in this node's authorized
+  scope): `ensure_indexed` (feeding `code_route` via `_open_conn`/`definitions`/`callers`) has the SAME
+  lazy-build-at-query-time shape this reopening moved off of for the scope-index structures -- it commits
+  newly-parsed code the first time a commit's code is queried, if any blob has not been classified/parsed yet. The
+  `dependencies`/`dependents`/`tests` facets are therefore NOT guaranteed read-only against a store whose code
+  layer was never fully built ahead of time; this pass's own required read-only test deliberately excludes them
+  rather than relying on them happening to be no-ops (they ARE no-ops once the code layer is already fully built,
+  as CONTROL-A's own real store is, but that is a property of the fixture/store, not a guarantee this pass adds).
+- >-
+  SECOND REOPENING, disclosed, NOT fixed by this pass (govbridge/authority/layer.py's schema lifecycle is not in
+  this node's authorized scope beyond the one record_def_by_path index line): `classify_hit` calls its own
+  `ensure_schema(conn)` on every call, at query time. This is why govbridge/route/real_routes.py's `_conn()` stays
+  on `store.open_db()` rather than the new, stronger `store.open_db_readonly()` -- see failed_approaches for the
+  regression switching it caused, and C-15/decisions for the reasoning kept in the code's own comment.
 decisions:
 - >-
   D-R1-GA1-1 (within authority, first pass, reconfirmed): a facet's coverage target (target_items) is a FIXED
@@ -265,11 +395,48 @@ decisions:
   classes" as a concept and only ever see plain SQL-facing class/lifecycle/glob values -- preserving B2's own
   "depends only on B1" layering as closely as a cross-cutting SQL filter can.
 - >-
-  D-R1-GA1-7 (within authority, REOPENING): gather_scope_path_cache and the record_def(path) index are added to
-  the SHARED store.db from within this node's own files (lexical/query.py, semantic/vectors.py), never by editing
-  govbridge/authority/layer.py's schema (out of this node's mutation_scope). Both are idempotent
-  (`IF NOT EXISTS`/`INSERT OR IGNORE`), additive, and self-contained -- the same "add your own table to the shared
-  file" pattern every other layer (lexical_fts, vector) already uses.
+  D-R1-GA1-7 (CORRECTED by the second reopening -- the text below replaces this decision's FIRST-reopening text,
+  which said these structures were added "from within this node's own files... at query time"; that is no longer
+  what the code does, and the old text is preserved only in this checkpoint's own git history, not repeated as
+  current fact): the deduplicated (blob_id, path) table (occurrence_distinct_path) and the record_def(path) index
+  (record_def_by_path) are built at BUILD time, inside the layer builders that already own the tables they extend
+  -- exactly the three files the coordinator's own dispatch named, plus one new test file:
+  govbridge/authority/layer.py (creates and writes record_def; the path index is added to its own SCHEMA_SQL,
+  built by its own ensure_schema/build, which every build already calls), govbridge/core/store.py (creates and
+  writes occurrence; the dedup table is built there, in put_occurrence/clear_layer_tables, on a from-clean build),
+  govbridge/core/freshness.py (deletes occurrence rows incrementally at its three existing sites; the dedup table
+  is pruned there, in the SAME transaction, via govbridge.core.store.prune_stale_distinct_paths -- a minimal,
+  three-call-site change, since R1-INT edits this file next for a different purpose), and
+  tests/core/test_scope_path_cache.py (new). govbridge/lexical/query.py and govbridge/semantic/vectors.py now only
+  ever READ these structures (a sqlite_master existence check), never create or populate them.
+- >-
+  D-R1-GA1-9 (within authority, SECOND REOPENING, coordinator addendum): govbridge/core/store.py gained
+  `open_db_readonly()` (a `mode=ro&immutable=1` URI connection, structurally unable to write) rather than adding a
+  `read_only: bool` parameter to the existing `open_db()` -- a SEPARATE function, not a mode flag, so a reader of
+  any call site can tell which guarantee it is getting without reading that call's arguments. `immutable=1`
+  (not just `mode=ro`) because this store is opened in WAL mode, and a bare `mode=ro` connection was verified to
+  fail even a pure SELECT once the store's directory (not just the file) is also read-only -- see findings.
+- >-
+  D-R1-GA1-10 (within authority, SECOND REOPENING, coordinator addendum): `open_db_readonly()` is wired into every
+  query-path connection this node can adopt it for without a regression: govbridge/lexical/query.py's `query()`,
+  and govbridge/semantic/search.py's `search()` (already in this node's standing mutation_scope, not a new
+  expansion). govbridge/route/real_routes.py's shared classification connection (`_conn()`) deliberately keeps
+  `store.open_db()` instead -- see failed_approaches/unresolved for why (govbridge/authority/layer.py's own
+  classify_hit calls ensure_schema at query time, a pattern outside this node's authorized scope to fix), a
+  disclosed exception rather than a silent narrowing of "every query path."
+- >-
+  D-R1-GA1-11 (within authority, SECOND REOPENING): the required read-only-store test
+  (tests/core/test_scope_path_cache.py::
+  test_gather_runs_full_speed_against_a_file_level_read_only_store_with_sha256_unchanged) exercises `govbridge
+  gather` through the lexical-only test facet registry (tests/fixtures/gather/test-facets.yaml, the SAME one
+  tests/gather/test_engine.py's own real-view tests already use), not the real config/facets.yaml's full default
+  facet set -- deliberately: the code-routed facets depend on govbridge/code/symbols.py's own separate, unfixed
+  query-time-write pattern (see unresolved), and the semantic route needs a real, locally-cached embedding model
+  this sandbox does not reliably have. `requirement` in the test registry is still scoped to CONTRACT/
+  FROZEN_GATE_CONTRACT, so the SQL scope push-down this reopening is actually about is still fully exercised, over
+  the lexical route; the semantic route's own read-only wiring is proven separately, directly, without a real
+  embedding call (test_open_db_readonly_reads_correctly_and_cannot_write plus the StoreNeedsRebuild tests). This
+  narrowing is disclosed, not silent (R1-T2).
 - >-
   D-R1-GA1-8 (requested): whether config/facets.yaml's class_facets should carry a real, non-empty per-class
   mapping for the actual demonstration query set is left to the orchestrator/R1-TA2/R1-GA2 -- unchanged by the
@@ -290,12 +457,36 @@ lessons:
   An acceptance check that names a specific real-view query implicitly names that query's OWN default
   configuration (its default facet set, here) unless a narrower one is explicitly agreed -- grading it on a
   hand-picked, faster subset is a narrowing under R1-T2 even when every individual number reported is honest.
+- >-
+  A PERFORMANCE fix and a CORRECTNESS/policy fix can look identical in the diff (both add "an idempotent
+  CREATE/INSERT the first time it's needed") while being opposite in what they should do about a query-time write:
+  the first reopening's own lazy index/table creation was a legitimate, working fix for a real timeout, and it was
+  STILL wrong to build at query time, because "query commands must never write to the store" is a policy
+  independent of whether the write is idempotent, cheap, or fixing a real problem. When a fix's mechanism is
+  "the first caller to need X builds X," ask who else might rely on X never having been built yet (a frozen
+  store, a read-only mount, a demo agent whose own queries must not be observable as writes) before asking whether
+  the mechanism is correct or fast.
+- >-
+  Removing a silent except-block (a fallback OR a swallow-all like classify_occ's own) is itself a form of
+  tightening, and tightening exposes whatever the except-block was quietly covering for -- twice in this pass
+  (the `chunk`-JOIN bug the old fallback masked in govbridge.semantic.vectors, and the authority-layer
+  lazy-schema-creation the old open_db()-based `_conn()` was quietly tolerating). Removing a fallback is the right
+  call when the reopening asks for it, but it should be treated as its own small investigation, not assumed to be
+  a no-op refactor -- re-running the FULL scoped test suite (never just the tests the change was aimed at) right
+  after is what caught both.
 next_consumer: >-
   R1-GA2 (adaptive follow-up via the identifier_extractor hook this node built but left unwired; version
   reconciliation for the `versions` facet slot this node registered) and R1-GA3 (wiring `gather` into
   govbridge.compile, and full code-facet pagination parity for callees_of/reads_key_of consumers if wanted); R1-RS
-  as the next editor of govbridge/cli.py (untouched by this reopening, as instructed); R1-INT for
-  taskctx.ExclusionCounter's thread safety (routed there by this reopening's own dispatch note) and for the
-  generic-rule audit over the two new store tables/index this node added outside any file it edited a schema in
-  (gather_scope_path_cache, record_def_by_path); the orchestrator for the remaining disclosed open_issues.
-final_commit: 732933c9f5b5665f3ad3cebe3d9113d5e863a7e0
+  as the next editor of govbridge/cli.py (untouched by this or the second reopening, as instructed); R1-INT for
+  taskctx.ExclusionCounter's thread safety (routed there by the first reopening's own dispatch note) and for the
+  generic-rule audit over occurrence_distinct_path/record_def_by_path, now built at BUILD time inside the layer
+  builders that own their tables (govbridge.core.store, govbridge.authority.layer -- no longer "outside any file
+  it edited a schema in", as the first reopening's own version of this note said); whoever owns
+  govbridge/code/symbols.py next, for its own separate lazy-build-at-query-time pattern (ensure_indexed), disclosed
+  and NOT fixed by this pass (unresolved); whoever owns govbridge/authority/layer.py next, for classify_hit's own
+  ensure_schema-at-query-time call, the reason govbridge/route/real_routes.py's `_conn()` could not be moved onto
+  the new store.open_db_readonly() in this pass (unresolved); whoever operates the real, long-lived store, for the
+  from-clean-rebuild migration step needed once to backfill occurrence_distinct_path on pre-existing content
+  (unresolved); the orchestrator for the remaining disclosed open_issues.
+final_commit: 9c274200f13da0159bd63caba8f606865b08ff92
