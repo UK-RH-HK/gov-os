@@ -1,0 +1,34 @@
+schema: govbridge-task-spec/1
+task_id: CONTROL-A-RM-PROBE
+role: R1-RM acceptance probe (REPAIR_DAG.yaml node R1-RM acceptance check 3) -- not a demonstration; a
+  CONTROL-A-derived task spec, never CONTROL-A's own committed file (that stays untouched)
+objective: Explain why renaming or removing a certification test breaks gov contract verify, which requirement the
+  governed evidence map serves, where the check is enforced in code, and which tests prove it -- plus prove
+  mandatory-input fidelity end to end on the real view, with one oversize mandatory item (no selector), one real
+  mandatory item narrowed by a declared `keys` selector, and one real mandatory item narrowed by a declared
+  `entries` selector over MARKDOWN (the reopening's point 2).
+view: config/canonical-view.yaml
+required_inputs:
+- state_ref: state:bridge#contract_v3
+  reason: the owner source contract (the evidence-owner requirement) -- CONTROL-A's own required input, unchanged
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml@records
+  reason: 'R1-RM acceptance check 3: a real, ~89KB mandatory item (over the 24KB per-item cap) with a declared
+    `keys` selector -- exactly `schema` and `current_prohibitions` must be delivered in full, every other
+    top-level key disclosed as an undelivered range via MANDATORY_PARTIAL_DELIVERY'
+  keys: [schema, current_prohibitions]
+- path: release/orchestration/phase-2-context-bridge/PHASE_LEDGER.md@records
+  reason: 'R1-RM reopening point 2: `entries` over a real MARKDOWN ledger (not a Review-8 subject, not
+    ORCHESTRATOR_STATE.yaml) -- BR-L-0002 through BR-L-0004 inclusive, in document order, matched by
+    config/id-grammar.yaml mention_patterns against each level-2 heading'
+  entries: {start: BR-L-0002, end: BR-L-0004}
+seeds: []
+queries: tests/fixtures/controls/control-a/queries.yaml
+retrieval_exclusions:
+- release/orchestration/phase-2-context-bridge/ARCHITECTURE/**
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/**
+- release/orchestration/phase-2-context-bridge/DEMONSTRATION/**
+mutation_scope: []
+prohibitions: []
+required_checks: []
+completion_vocabulary: [ANSWERED, PARTIAL, BLOCKED]
+budget_profile: bounded-builder
