@@ -259,7 +259,13 @@ def definitions(name: str, commit: str, repo: Optional[str] = None) -> dict:
     }
 
 
-def callers(name: str, commit: str, repo: Optional[str] = None) -> dict:
+def callers(name: str, commit: str, repo: Optional[str] = None, page_size: Optional[int] = None,
+            cursor: Optional[str] = None) -> dict:
+    """``page_size``/``cursor`` (R1-RL paging): a simple, deterministic offset cursor over the SAME sorted `rows`
+    an unpaged call already computes -- omitted, the result is byte-identical to before (every existing caller);
+    given, ``callers`` holds only that page, plus ``next_cursor`` (``None`` once exhausted) and ``total``, so
+    following ``next_cursor`` to exhaustion yields exactly the union an unpaged call returns (the acceptance
+    check)."""
     commit_full = _resolve_commit(commit, repo)
     conn = _open_conn()
     entries = ensure_indexed(conn, commit_full, repo=repo)
@@ -284,7 +290,18 @@ def callers(name: str, commit: str, repo: Optional[str] = None) -> dict:
                 continue
         rows.append(_row_for_call(c, res, defs_by_id))
     rows.sort(key=lambda r: r["at"])
-    return {"symbol": name, "commit": commit_full, "callers": rows}
+
+    result = {"symbol": name, "commit": commit_full, "callers": rows}
+    if page_size is not None:
+        offset = int(cursor) if cursor else 0
+        page = rows[offset:offset + page_size]
+        next_cursor = str(offset + page_size) if offset + page_size < len(rows) else None
+        result["callers"] = page
+        result["page_size"] = page_size
+        result["cursor"] = cursor
+        result["next_cursor"] = next_cursor
+        result["total"] = len(rows)
+    return result
 
 
 def reads_key(key_name: str, commit: str, repo: Optional[str] = None) -> dict:
@@ -339,6 +356,8 @@ def main(argv=None) -> int:
     sp_callers = sub.add_parser("callers")
     sp_callers.add_argument("name")
     sp_callers.add_argument("--commit", required=True)
+    sp_callers.add_argument("--page-size", type=int, default=None)
+    sp_callers.add_argument("--cursor", default=None)
     sp_callers.add_argument("--json", action="store_true")
 
     sp_reads = sub.add_parser("reads-key")
@@ -351,7 +370,7 @@ def main(argv=None) -> int:
         if args.cmd == "stats":
             result = stats(args.commit)
         elif args.cmd == "callers":
-            result = callers(args.name, args.commit)
+            result = callers(args.name, args.commit, page_size=args.page_size, cursor=args.cursor)
         elif args.cmd == "reads-key":
             result = reads_key(args.name, args.commit)
         else:

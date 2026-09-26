@@ -30,6 +30,10 @@ CHANGED_IN = "CHANGED_IN"
 INTRODUCED_IN = "INTRODUCED_IN"
 DELETED_IN = "DELETED_IN"
 RELATION_CUE = "RELATION_CUE"
+# R1-RL additions (REPAIR_PLAN.md section 4, REPAIR_DAG.yaml node R1-RL): code->data, code->requirement, and the
+# two generic TESTS sources beyond a direct in-test call (a CLI-driven test, a schema/shape-recognised registry).
+DEPENDS_ON_DATA = "DEPENDS_ON_DATA"
+CITES_REQUIREMENT = "CITES_REQUIREMENT"
 
 # derivation labels
 EXACT_DEFINITION = "EXACT_DEFINITION"
@@ -46,6 +50,14 @@ HEURISTIC_NAME = "HEURISTIC_NAME"
 EXACT_GIT = "EXACT_GIT"
 EXACT_PARSE = "EXACT_PARSE"
 HEURISTIC_CUE = "HEURISTIC_CUE"
+# R1-RL additions
+EXACT_LITERAL_PATH = "EXACT_LITERAL_PATH"          # a single string literal that is itself a tracked repo path
+HEURISTIC_JOINED_PATH = "HEURISTIC_JOINED_PATH"    # two or more adjacent string-literal fragments joined by '/'
+EXACT_COMMENT_CITATION = "EXACT_COMMENT_CITATION"  # a <doc path>[:line] citation inside a code comment
+HEURISTIC_COMMENT_SECTION = "HEURISTIC_COMMENT_SECTION"  # a <doc path> section N / §N citation in a comment
+EXACT_CLI_DISPATCH = "EXACT_CLI_DISPATCH"          # a subprocess CLI invocation resolved to its exact handler fn
+HEURISTIC_CLI_DISPATCH = "HEURISTIC_CLI_DISPATCH"  # ... resolved only to the owning module/subcommand pair
+EXACT_TEST_REGISTRY_ROW = "EXACT_TEST_REGISTRY_ROW"  # a row of a schema/shape-recognised test registry
 # code-route labels reused verbatim from ARCHITECTURE.md section 4.6 (B3's vocabulary; B5 uses them only to LABEL
 # edges read from B3's table schema, never to invent a resolution of its own)
 CODE_ROUTE_LABELS = (
