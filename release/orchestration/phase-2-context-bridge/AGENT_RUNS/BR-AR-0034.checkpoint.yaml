@@ -1,5 +1,5 @@
 run_id: BR-AR-0034
-commit: bbe3c3cdf4ea8b8196808906c32d5da88f7df8df
+commit: e73e84858b9a04537b59ee30934dcf7432b116d7
 role: >-
   REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
   repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14), and
@@ -667,4 +667,4 @@ next_consumer: >-
   to be missing tree_sitter_rust/tree_sitter/onnxruntime/tokenizers entirely (see findings) -- this affects EVERY
   concurrent agent's own test suite, not just this run's, and should be escalated to whoever owns the shared
   machine to re-run bootstrap/bootstrap.sh, independently of this node's own disposition.
-final_commit: bbe3c3cdf4ea8b8196808906c32d5da88f7df8df
+final_commit: e73e84858b9a04537b59ee30934dcf7432b116d7
