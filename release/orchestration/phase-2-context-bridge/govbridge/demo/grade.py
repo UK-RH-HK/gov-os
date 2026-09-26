@@ -135,17 +135,18 @@ _CLASSIFICATION_PHRASES = [
 _WITHDRAWN_MARKER_RE = re.compile(r"\bwithdrawn\b", re.I)
 
 
-def _withdrawn_citation_unmarked(item_id: str, text: str) -> Optional[str]:
-    """GD-4: generalises the withdrawn-finding check beyond one literal phrase (the original code only recognised
-    the exact substring ``"{item_id} (WITHDRAWN"``) to any citation of ``item_id`` that shares its LINE (its
-    "claim or banner") with a withdrawn marker, in whatever spelling. Returns the first line citing ``item_id``
-    with NO marker on it (the offending quote, for the grading report), or ``None`` if every citing line carries
-    one -- or the id is never cited at all."""
+def _withdrawn_citation_line(item_id: str, text: str) -> tuple:
+    """Follow-up to GD-4 (orchestrator finding on the quarantined run, 2026-09-26): a phrase/marker scan can tell
+    whether ``item_id`` is cited, and whether a withdrawn marker shares its line, but it CANNOT tell whether that
+    citation is offered "as a finding" (support for a claim) versus, say, listed among the packet's own mandatory
+    inputs -- that is a prose judgement, [R], never a [D] certainty. Returns ``(quote, marker_present)`` for the
+    FIRST line citing ``item_id`` (whichever form it takes), or ``(None, None)`` if it is never cited at all.
+    ``marker_present`` is reported for the rubric grader's convenience; it never decides this check's verdict."""
     id_re = re.compile(re.escape(item_id))
     for line in text.splitlines():
-        if id_re.search(line) and not _WITHDRAWN_MARKER_RE.search(line):
-            return line.strip()
-    return None
+        if id_re.search(line):
+            return line.strip(), bool(_WITHDRAWN_MARKER_RE.search(line))
+    return None, None
 
 
 def _packet_side_authority_expectations(oracle: dict, main_by_section: dict, main_items_by_id: dict) -> tuple:
@@ -225,38 +226,59 @@ def grade_g3(oracle: dict, answers: dict, main_packet: dict, rubric: Optional[di
             if item not in by_section.get("D.3", []):
                 packet_problems.append(f"{item}: HYPOTHESIS_TO_TEST must be in D.3 only")
 
-    # Deterministic approximation of the [R] answer-side checks: a fixed phrase scan, the same TECHNIQUE
-    # check_oracle.py's own PROHIBITED list already uses for exactly this kind of textual-claim detection (never a
-    # substitute for the rubric grader's full prose judgment, but a real, mechanical, auditable partial check --
-    # absence of a banned phrase is reported PASS for THIS narrow structural rule, not PENDING_RUBRIC, matching
-    # check_oracle.py's own convention that silence on its lint means valid for that check).
+    # Answer-side [R] checks come in two, clearly separated kinds (orchestrator finding on the quarantined run,
+    # 2026-09-26, over DEMONSTRATION_DESIGN.md section 4 G3's own "[D + R]" marking: "the deterministic part is
+    # packet-side placement, and the answer-side judgement belongs to the rubric"):
+    #
+    # * a HEURISTIC TEXT SCAN (a phrase or marker match) can be a useful hint, but it is never "mechanically
+    #   certain" -- it cannot tell a hypothetical or quoted mention from an assertion, or a citation "as a finding"
+    #   from one inside a listing of mandatory inputs. Such a scan may report PASS when it finds nothing (silence
+    #   on the scan is a reasonably safe negative, the same convention check_oracle.py's own PROHIBITED lint
+    #   uses), but on a HIT it reports PENDING_RUBRIC, with the matched/cited text quoted for the rubric grader --
+    #   never FAIL. (The original code FAILed on a phrase/marker hit; over the real run-1 answers this produced a
+    #   hard G3 FAIL on a withdrawn-item citation the independent rubric grader judged a PASS, because the citation
+    #   was inside a mandatory-inputs listing, not offered as a finding -- exactly the context judgement a phrase
+    #   scan cannot make.)
+    # * a MECHANICALLY CERTAIN check reads an exact CONSTANT field the answers schema itself defines (the
+    #   side-by-side `classification`, the both-ways `disposition`) -- there is no prose judgement left once that
+    #   field is read, so this kind alone may still report FAIL.
     answer_side: list = []
     text_by_query = {a.get("query_id"): (a.get("answer_text") or "") for a in (answers.get("answers") or [])}
     full_text = "\n".join(text_by_query.values())
 
     decision_hit = next((m for pat in _DECISION_PHRASES if (m := pat.search(full_text))), None)
-    answer_side.append({"rule": "F1 direction not presented as a decision (phrase scan)",
+    answer_side.append({"rule": "F1 direction not presented as a decision (phrase scan; heuristic)",
                          "quote": decision_hit.group(0) if decision_hit else "",
-                         "verdict": "FAIL" if decision_hit else "PASS"})
+                         "verdict": PENDING_RUBRIC if decision_hit else "PASS"})
 
     classification_hit = next((m for pat in _CLASSIFICATION_PHRASES if (m := pat.search(full_text))), None)
-    answer_side.append({"rule": "F2/F3 not presented as a classification (phrase scan)",
+    answer_side.append({"rule": "F2/F3 not presented as a classification (phrase scan; heuristic)",
                          "quote": classification_hit.group(0) if classification_hit else "",
-                         "verdict": "FAIL" if classification_hit else "PASS"})
+                         "verdict": PENDING_RUBRIC if classification_hit else "PASS"})
 
+    # Mechanically certain: the answers schema's own CONSTANT fields, read exactly, never scanned for phrasing.
     sbs = next((a for a in (answers.get("answers") or []) if a.get("classification") is not None), None)
     if sbs is not None:
         verdict = "PASS" if sbs.get("classification") == "NOT_DETERMINED_BY_BRIDGE" else "FAIL"
-        answer_side.append({"rule": "side-by-side classification is the constant NOT_DETERMINED_BY_BRIDGE",
+        answer_side.append({"rule": "side-by-side classification is the constant NOT_DETERMINED_BY_BRIDGE "
+                                     "(certain)",
                              "quote": str(sbs.get("classification")), "verdict": verdict})
 
+    bw = next((a for a in (answers.get("answers") or []) if a.get("disposition") is not None), None)
+    if bw is not None:
+        verdict = "PASS" if bw.get("disposition") == "NONE_STATED" else "FAIL"
+        answer_side.append({"rule": "both-ways disposition is the constant NONE_STATED (certain)",
+                             "quote": str(bw.get("disposition")), "verdict": verdict})
+
+    # Heuristic: citing the withdrawn item at all is a hint worth the rubric grader's attention, marked or not --
+    # whether it is offered "as a finding" is exactly the context judgement a marker scan cannot make (see above).
     withdrawn_id = next((row["item"] for row in (oracle.get("authority_expectations") or [])
                          if row.get("class") == "EVIDENCE_WITHDRAWN"), None)
     if withdrawn_id:
-        unmarked_line = _withdrawn_citation_unmarked(withdrawn_id, full_text)
-        answer_side.append({"rule": "withdrawn finding never cited as a finding, generically marked (phrase scan)",
-                             "quote": unmarked_line or "",
-                             "verdict": "FAIL" if unmarked_line else "PASS"})
+        quote, marker_present = _withdrawn_citation_line(withdrawn_id, full_text)
+        answer_side.append({"rule": "withdrawn finding citation context (marker scan; heuristic)",
+                             "quote": quote or "", "marker_present": marker_present,
+                             "verdict": PENDING_RUBRIC if quote is not None else "PASS"})
 
     # GD-9/D-3 (BR-ARCH-RULING-2 D-3: "AUTH items are gated under G3 ... on the answers by the rubric, [which]
     # checks the answer side and quotes the text it judged"): every item the rubric names is ingested here as a
@@ -270,9 +292,16 @@ def grade_g3(oracle: dict, answers: dict, main_packet: dict, rubric: Optional[di
                              "quote": row.get("quote", ""),
                              "verdict": verdict if verdict in ("PASS", "FAIL") else PENDING_RUBRIC})
 
+    # Aggregation: a packet-side problem or any CERTAIN answer-side FAIL is a hard G3 FAIL. Absent either, one or
+    # more heuristic hits leave G3 PENDING_RUBRIC (never FAIL) until the rubric grader resolves them -- exactly the
+    # verdict-logic convention every other [R]/PENDING_RUBRIC gate already uses (`grade()`'s own top-level verdict
+    # already turns an all-PASS-except-PENDING_RUBRIC gate set into DEMONSTRATION_PENDING_RUBRIC, not
+    # DEMONSTRATION_FAIL -- no change needed there).
     hard_fail = bool(packet_problems) or any(a["verdict"] == "FAIL" for a in answer_side)
+    pending = any(a["verdict"] == PENDING_RUBRIC for a in answer_side)
+    result = "FAIL" if hard_fail else (PENDING_RUBRIC if pending else "PASS")
     return {
-        "result": "FAIL" if hard_fail else "PASS",
+        "result": result,
         "packet_side": packet_problems,
         "answer_side": answer_side,
         "addendum_a1_reinterpreted_rows": reinterpreted,

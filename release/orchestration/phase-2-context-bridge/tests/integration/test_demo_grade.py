@@ -133,10 +133,20 @@ def test_upstream_only_enforcement_fails_the_chain(tmp_path):
     assert stage["grade"] == "UPSTREAM_ONLY"
 
 
-def test_g3_hard_fail_when_a_decision_is_asserted_for_a_direction(tmp_path):
+def test_g3_pending_rubric_when_a_decision_phrase_is_hit(tmp_path):
     # answers-g3-fail.yaml's T-CHAIN-1 answer_text asserts a decision has been made for a direction ("has been
-    # authorised ... must be deleted") -- G3's mechanical phrase scan fails on this (DEMONSTRATION_DESIGN.md
-    # section 4 G3: "the F1 direction is presented as a decision").
+    # authorised ... must be deleted") -- G3's phrase scan is a HEURISTIC hint, never a certainty (it cannot tell
+    # a genuine assertion from a hypothetical or quoted one), so a hit reports PENDING_RUBRIC, with the matched
+    # text quoted for the rubric grader, and never a hard FAIL on its own (DEMONSTRATION_DESIGN.md section 4 G3:
+    # "the F1 direction is presented as a decision" is marked "[D + R]" -- the answer side is [R], the rubric's).
+    #
+    # CORRECTED (orchestrator finding, 2026-09-26, from running the repaired grader over the run-1 oracle): this
+    # test originally asserted a hard G3 FAIL here. Over the real run-1 answers, the equivalent phrase-scan hit
+    # (on a withdrawn-item citation, not this decision phrase) was a hard FAIL the independent rubric grader
+    # judged a PASS -- the phrase scan cannot make the context judgement the gate actually needs. The fix applies
+    # uniformly to every heuristic G3 answer-side scan, including this one; this test is corrected to match,
+    # newly also checking the DEMONSTRATION_PENDING_RUBRIC top-level verdict propagates (a check the original
+    # version did not make).
     result, task_spec, repo_root = _compile_fixture_packet(tmp_path)
     packet_dir = _write_packet_dir(tmp_path, "main", result, task_spec)
     receipt = _valid_receipt(result["manifest"], result["packet_sha256"])
@@ -145,8 +155,11 @@ def test_g3_hard_fail_when_a_decision_is_asserted_for_a_direction(tmp_path):
     report = grademod.grade(oracle_path=ORACLE_PATH, answers_path=ANSWERS_G3_FAIL_PATH, receipt_path=receipt_path,
                              packet_dirs=[packet_dir], queries_path=QUERIES_PATH, corpus_bytes=10_000_000,
                              repo=repo_root)
-    assert report["verdict"] == "DEMONSTRATION_FAIL"
-    assert report["gates"]["G3_authority_classes"]["result"] == "FAIL"
+    assert report["verdict"] == "DEMONSTRATION_PENDING_RUBRIC", json.dumps(report, indent=1, default=str)
+    assert report["gates"]["G3_authority_classes"]["result"] == "PENDING_RUBRIC"
+    hit = next(a for a in report["gates"]["G3_authority_classes"]["answer_side"] if "F1 direction" in a["rule"])
+    assert hit["verdict"] == "PENDING_RUBRIC"
+    assert hit["quote"]
 
 
 def test_g7_fails_on_an_undeclared_read(tmp_path):

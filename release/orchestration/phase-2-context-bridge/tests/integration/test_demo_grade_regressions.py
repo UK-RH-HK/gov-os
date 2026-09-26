@@ -111,16 +111,24 @@ def test_gd3_a_record_section_anchor_matches_a_line_citation_in_that_section():
 # ---------------------------------------------------------------------------------------------------------------
 # GD-4: the withdrawn-finding check was one literal phrase ("{id} (WITHDRAWN"); it must recognise the marker
 # generically, wherever it appears on the SAME line as the citation.
+#
+# CORRECTED (orchestrator finding, 2026-09-26, from running the repaired grader over the run-1 oracle): the
+# marker-recognition fix above was right, but the VERDICT it fed into was not. G3's withdrawn-finding condition is
+# "[D + R]" (DEMONSTRATION_DESIGN.md section 4): the packet-side placement is deterministic, but "cited as a
+# finding" (as opposed to, say, listed among the packet's own mandatory inputs) is a prose judgement the rubric
+# grader alone can make. Over run-1, this exact check FAILed a withdrawn-item citation the independent rubric
+# grader judged a PASS (it was inside a mandatory-inputs listing, not offered as support for a claim). A marker
+# scan therefore never decides this gate: citing the withdrawn item at all -- marked or not -- is PENDING_RUBRIC,
+# with the quoted line and a `marker_present` hint for the rubric grader; only "never cited" is PASS.
 # ---------------------------------------------------------------------------------------------------------------
 
-def _g3_withdrawn_verdict(answer_text: str) -> str:
+def _g3_withdrawn_row(answer_text: str) -> dict:
     oracle = {"authority_expectations": [{"item": "T-REC-W1", "class": "EVIDENCE_WITHDRAWN"}]}
     main_packet = {"manifest": {"sections": {"A": {"items": []}, "D": {"subblocks": {"D.1": {"items": []}}}},
                                  "notices": []}}
     answers = {"answers": [{"query_id": "Q1", "answer_text": answer_text}]}
     result = g.grade_g3(oracle, answers, main_packet)
-    row = next(r for r in result["answer_side"] if "withdrawn" in r["rule"])
-    return row["verdict"]
+    return next(r for r in result["answer_side"] if "withdrawn" in r["rule"])
 
 
 @pytest.mark.parametrize("spelling", [
@@ -130,12 +138,86 @@ def _g3_withdrawn_verdict(answer_text: str) -> str:
     "T-REC-W1 -- WITHDRAWN, not used as a finding.",  # dash form
     "T-REC-W1: WITHDRAWN. Not cited as support.",  # colon form
 ])
-def test_gd4_several_withdrawn_marker_spellings_pass(spelling):
-    assert _g3_withdrawn_verdict(spelling) == "PASS", spelling
+def test_gd4_several_marked_withdrawn_spellings_are_pending_rubric_not_fail(spelling):
+    # a citation WITH its withdrawn marking, in whatever spelling, is still only PENDING_RUBRIC (context -- "as a
+    # finding" vs. "in a listing" -- is a rubric question), never a hard PASS *or* FAIL from this scan alone.
+    row = _g3_withdrawn_row(spelling)
+    assert row["verdict"] == "PENDING_RUBRIC", spelling
+    assert row["marker_present"] is True, spelling
+    assert row["quote"]
 
 
-def test_gd4_an_unmarked_withdrawn_citation_fails():
-    assert _g3_withdrawn_verdict("T-REC-W1 shows the defect clearly.") == "FAIL"
+def test_gd4_an_unmarked_withdrawn_citation_is_pending_rubric_not_fail():
+    row = _g3_withdrawn_row("T-REC-W1 shows the defect clearly.")
+    assert row["verdict"] == "PENDING_RUBRIC"
+    assert row["marker_present"] is False
+
+
+def test_gd4_no_citation_at_all_passes():
+    row = _g3_withdrawn_row("Nothing here mentions the withdrawn item.")
+    assert row["verdict"] == "PASS"
+    assert row["quote"] == ""
+
+
+def test_gd4_marked_citation_inside_a_mandatory_inputs_listing_is_pending_rubric():
+    # the orchestrator's own scenario: the withdrawn item is cited WITH its marking, but inside a listing of the
+    # packet's mandatory inputs, never as support for a claim. A marker scan cannot see that distinction -- it
+    # must defer to the rubric, not silently PASS (the old "marked => PASS" reading) and not FAIL (the old,
+    # over-eager reading this follow-up corrects).
+    listing_text = ("Mandatory inputs consulted: T-REC-1, T-REC-2, T-REC-W1 (WITHDRAWN), T-REC-3. "
+                    "None of these support the claim above.")
+    row = _g3_withdrawn_row(listing_text)
+    assert row["verdict"] == "PENDING_RUBRIC"
+    assert row["marker_present"] is True
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Follow-up requirement 2: a MECHANICALLY CERTAIN answer-side check (an exact constant field, not a phrase scan)
+# may still hard-FAIL G3 on its own.
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_g3_certain_fail_when_side_by_side_classification_is_not_the_constant():
+    oracle = {}
+    main_packet = {"manifest": {"sections": {"A": {"items": []}, "D": {"subblocks": {"D.1": {"items": []}}}},
+                                 "notices": []}}
+    answers = {"answers": [{"query_id": "T-SBS", "classification": "SAME_CLASS"}]}
+    result = g.grade_g3(oracle, answers, main_packet)
+    assert result["result"] == "FAIL", result
+    row = next(r for r in result["answer_side"] if "classification is the constant" in r["rule"])
+    assert row["verdict"] == "FAIL"
+
+
+def test_g3_certain_fail_when_both_ways_disposition_is_not_the_constant():
+    oracle = {}
+    main_packet = {"manifest": {"sections": {"A": {"items": []}, "D": {"subblocks": {"D.1": {"items": []}}}},
+                                 "notices": []}}
+    answers = {"answers": [{"query_id": "T-BOTHWAYS", "disposition": "DELETE"}]}
+    result = g.grade_g3(oracle, answers, main_packet)
+    assert result["result"] == "FAIL", result
+    row = next(r for r in result["answer_side"] if "disposition is the constant" in r["rule"])
+    assert row["verdict"] == "FAIL"
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Follow-up requirement 2 (aggregation): G3 is PENDING_RUBRIC, not FAIL or PASS, when only heuristic answer-side
+# items remain (no packet-side problem, no certain-FAIL constant).
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_g3_result_is_pending_rubric_when_only_heuristic_items_remain():
+    # T-REC-W1 is placed correctly (section E, matching its oracle expectation) so the ONLY thing left to decide
+    # G3's result is the heuristic withdrawn-marker hit -- isolating the aggregation rule from packet-side checks.
+    oracle = {"authority_expectations": [{"item": "T-REC-W1", "class": "EVIDENCE_WITHDRAWN", "sections": ["E"]}]}
+    main_packet = {"manifest": {"sections": {
+        "A": {"items": []}, "D": {"subblocks": {"D.1": {"items": []}}},
+        "E": {"items": [{"unit": {"id": "T-REC-W1", "kind": "record"}, "item_id": "T-REC-W1",
+                          "authority_class": "EVIDENCE_WITHDRAWN"}]},
+    }, "notices": []}}
+    # a heuristic hit (the withdrawn marker scan) and NOTHING else -- no packet problems, no certain-constant
+    # field present at all (no side-by-side/both-ways answer in this set).
+    answers = {"answers": [{"query_id": "Q1", "answer_text": "T-REC-W1 (WITHDRAWN) is background only."}]}
+    result = g.grade_g3(oracle, answers, main_packet)
+    assert result["result"] == "PENDING_RUBRIC", result
+    assert result["packet_side"] == []
 
 
 # ---------------------------------------------------------------------------------------------------------------
