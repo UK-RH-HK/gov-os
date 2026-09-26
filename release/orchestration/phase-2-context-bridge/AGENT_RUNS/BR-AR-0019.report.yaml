@@ -4,7 +4,7 @@ role: 'REPAIR-1 node R1-RL builder -- code/test lineage, data dependencies, requ
   identity, continuation'
 model_observed: claude-sonnet-5 (Sonnet 5)
 branch: bridge/r1-rl-0019
-commit: 89950cb401cf7b93adc5cf7060251a97743b945c
+commit: 1cf38d2076351a23bdadad54022735639be93a32
 status: COMPLETED
 claims:
 - 'CORRECTION of a WRONG claim in this report''s own previous revision: I previously wrote "CITES_REQUIREMENT is 0
@@ -72,11 +72,12 @@ claims:
   GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS), resolved FRESH on every call, never a module-level constant baked in at
   import time. Truncation stays disclosed via bounded_incomplete in every result.'
 - 'BR-DAG-AMEND-R1-4 (full domain suite as the last check; hermetic tests): $PY -m pytest -q -p no:cacheprovider
-  tests, from the domain, passes with 0 failures on the FINAL state of this branch (396 passed -- 385 from the
-  second reopening plus 11 new tests this THIRD reopening round added: 6 in test_rust_cli.py for Defect B''s
-  impl-wrapper-method/receiver-resolution/ambiguous-name mechanism, 5 in test_lineage_layer.py for Defect A''s
-  multi-ref/version-status behaviour and Defect B''s end-to-end wiring). Every new/modified test file also
-  verified standalone. Fixed a real
+  tests, from the domain, passes with 0 failures on the FINAL state of this branch (405 passed -- 396 from the
+  third reopening plus 9 new tests this FOURTH reopening round added: 8 in test_derive.py for the widened
+  registry-shape walk and its three resolution buckets, 1 in test_lineage_layer.py wiring real code-symbol
+  resolution end to end). Every new/modified test file also verified standalone, INCLUDING each individual test
+  method in isolation this round (a stricter bar than "the whole file" -- see the isolation-bug claim above: this
+  is exactly how it was caught). Fixed a real
   hermeticity defect in my OWN first-return test (tests/graph/test_derive.py''s CLI-dispatch test depended on
   gitobj.resolve_commit("HEAD") with repo=None -- the shared repository''s LIVE, other-agents-mutate-it HEAD -- and
   a CWD-relative read); rewritten as a fully synthetic fixture, explicit repo=, GOV_BRIDGE_DOMAIN monkeypatched
@@ -147,6 +148,47 @@ claims:
   definition in the whole product-pinned corpus, verified by raw `git grep -nE "fn <name>(&self"` and manual
   inspection of each hit (a same-named zero-arg `fn ok(&self) -> bool` exists too, correctly excluded by the
   slice-parameter requirement) -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out.'
+- 'FOURTH reopening fix: the TESTS(c) zero count was FALSE, not genuine -- the coordinator''s own git grep
+  (`^\s*(-\s+)?tests:\s*(\[|$)`) finds 158 lines matching a "tests:" list key at EACH of the three eager refs, in
+  30+ files, the rows sitting under an ORDINARY key (release/root-of-trust/4.1.6/decision-register/
+  DECISION_REGISTER.yaml''s own "decisions:"/"procedure_inputs:"/"excluded_inputs:"; a claims.yaml''s own
+  "items:"), at arbitrary nesting depth, never top-level and never rows/entries. Fixed generically: govbridge/
+  graph/derive.py''s _iter_registry_rows now walks the WHOLE parsed document (every dict, every list element, any
+  depth) for a mapping whose OWN "tests" key is a list of strings; _registry_row_identifier uses the first of a
+  small, stated, ordered set of id-like keys (id, item -- "id" is the SAME key config/id-grammar.yaml''s own
+  DR-YAML-LIST-ID rule already privileges), else the row''s own containing key-path + index, never a guess.
+  test_registry_edges_for_id''s git-grep is no longer restricted to tests/. Each entry resolves through three
+  buckets, NEVER dropped: a Rust `a::b::fn`-shaped candidate against the code layer''s real is_test symbols
+  (EXACT_TEST_REGISTRY_ROW on a unique full-string match; HEURISTIC_TEST_REGISTRY_SYMBOL otherwise -- including a
+  match found only by the candidate''s own trailing segment, since this repository''s own tree-sitter adapter
+  gives a plain/mod-nested function''s qualified_name NO module prefix at all, unlike an impl method''s
+  Type::method); an id-grammar-shaped token -> HEURISTIC_TEST_REGISTRY_ID_TOKEN; or raw text ->
+  HEURISTIC_TEST_REGISTRY_RAW_TEXT, ALWAYS counted. Real view (all 3 eager refs, pinned once, two from-clean
+  builds -> identical digest): 558 registry rows recognised (186 per ref, identical across refs -- these
+  registries have not diverged), 1107 new TESTS edges (405 id-token + 351 symbol + 318 raw-text + 0 exact),
+  reconciled against BOTH the coordinator''s own 158-line measurement (mine is HIGHER by 28/ref -- explained: 47
+  real rows in DECISION_REGISTER.yaml are written in YAML FLOW style, e.g. `- {id: PI-01, ..., tests: [...]}`,
+  invisible to a line-anchored regex but not to a parsed-YAML walk) and a second, independent raw SQL query for
+  the EXACT_TEST_REGISTRY_ROW=0 zero count (0 of 928 real is_test code symbols in the whole corpus have a
+  "::"-qualified name -- structurally impossible on this corpus''s own Rust test-authoring convention, not a bug)
+  -- AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out.'
+- 'FOURTH reopening, a real isolation bug found and fixed before this return shipped: the FIRST working version of
+  requirement 3''s code-symbol resolution went through govbridge.code.symbols.ensure_indexed''s own _open_conn(),
+  which opens a SEPARATE sqlite3 connection to whatever GOVBRIDGE_STORE currently names and sets `PRAGMA
+  journal_mode=WAL` on it as a side effect of merely opening -- called during EVERY "lineage" build (every ref),
+  this silently broke tests/core/test_freshness.py''s own
+  test_two_govbridge_store_values_build_independent_stores (a store''s file-change-counter bumps on a redundant,
+  no-op open_db() call too). Found by running the full domain suite as this round''s own required last check
+  (BR-DAG-AMEND-R1-4); confirmed the cause by reverting lineage_layer.py to its pre-fourth-reopening state (test
+  passes) versus the broken version in isolation (test fails standalone, reproducing without needing the whole
+  suite). Fixed by NEVER opening a second connection: the new _test_symbol_counts_for_ref reads code_symbol
+  through a JOIN on the SAME, already-shared connection every build already has open, against the "core" layer''s
+  own occurrence table (always populated first, structurally -- core_layer_builder''s own registration happens as
+  part of importing govbridge.core.freshness itself, which owns ensure_all_layer_packages_imported()). Verified:
+  tests/core/test_freshness.py passes standalone and in the full 405-test suite; the new registry/code-symbol
+  test (tests/code/test_lineage_layer.py) sets up code_symbol on the SAME in-memory connection first
+  (core_layer_builder then code_layer_builder then lineage_layer_builder, mirroring a real freshness.run()''s own
+  layer order), never touching a second connection anywhere.'
 - 'A pre-existing, environment-level defect (found in the first return, orchestrator is routing its repair
   elsewhere, outside this node''s mutation scope): `python -m govbridge.core.freshness rebuild --from-clean`,
   invoked exactly as REPAIR_DAG.yaml''s acceptance-check text names it, silently runs only the "core" layer (a
@@ -159,19 +201,29 @@ conformance:
 - item: 'Deliverable 1: TESTS edges from (a) direct calls, (b) CLI-dispatch subprocess tests, (c) shape-recognised
     test registries, each labelled with its derivation'
   status: MET_WITH_DISCLOSED_LIMIT
-  evidence: 'tests/graph/test_derive.py (a, b-Python, c); tests/code/test_rust_cli.py (20 tests, b-Rust: bare
-    wrapper AND Defect B''s harness-method shape); tests/code/test_lineage_layer.py (end-to-end, all sub-kinds
-    across all 3 eager refs). THIRD reopening (Defect B) closed the previously-disclosed harness-object-method
-    gap: real view (product pin 3c880d8) now finds 576 TESTS edges from that shape alone, reconciled against an
-    independent 636-pair measurement -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out. Real view,
-    all 3 refs: 1635 TESTS rows total (1530 HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD + 86 EXACT_RUST_CLI_DISPATCH
-    + 15 HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM + 4 Python EXACT_CLI_DISPATCH), reproducible. Remaining disclosed
-    bounds, both minor, pre-existing and never separately flagged: a TUPLE-style nested subcommand field
-    (`Variant(NestedEnum)`, no real instance measured) is not attempted, resolving no further than the outer arm;
-    a receiver''s type wrapped in `Box<T>`/`&T`/a generic parameter is not unwrapped by declared-type inference
-    (falls back to the SAME unique-name resolution as an undetermined receiver, never a silent miss -- just less
-    precise than a bare named type); Python''s resolve_cli_handler resolves at most 2 dispatch hops (matches every
-    real shape measured).'
+  evidence: 'tests/graph/test_derive.py (a, b-Python, c: 16 registry tests covering all three resolution buckets,
+    arbitrary nesting depth, the id-key fallback, and the tests/ restriction removal); tests/code/test_rust_cli.py
+    (20 tests, b-Rust); tests/code/test_lineage_layer.py (end-to-end, all sub-kinds across all 3 eager refs,
+    including a real code_symbol resolution test). THIRD reopening (Defect B) closed the harness-object-method
+    gap (576 real TESTS edges, product pin). FOURTH reopening closed sub-kind (c)''s own false zero count: the
+    schema check now recognises a registry at ANY nesting depth, under any key (_iter_registry_rows), not just a
+    top-level list or rows/entries; each entry resolves against real code-layer test symbols (EXACT when a unique
+    full-string match, else a distinct heuristic label), an id-grammar token, or raw text -- never dropped. Real
+    view, all 3 refs: 558 registry rows recognised (186 each, identical across refs), 1107 new TESTS edges (405
+    HEURISTIC_TEST_REGISTRY_ID_TOKEN + 351 HEURISTIC_TEST_REGISTRY_SYMBOL + 318 HEURISTIC_TEST_REGISTRY_RAW_TEXT +
+    0 EXACT_TEST_REGISTRY_ROW), reconciled against the coordinator''s own 158-line measurement (my schema-based
+    count is HIGHER, by 28/ref -- explained: this repository''s own DECISION_REGISTER.yaml writes 47 real rows in
+    YAML FLOW style, invisible to a line-anchored regex but not to a parsed-YAML walk) and against a second,
+    independent SQL query for the EXACT_TEST_REGISTRY_ROW=0 zero count (0 of 928 real is_test symbols have a
+    "::"-qualified name in this corpus -- structural, not a bug) --
+    AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out. TESTS total, all sub-kinds, all 3 refs: 2742
+    rows (up from the third reopening''s 1635), reproducible (identical digest across two from-clean builds of the
+    SAME pinned view). Remaining disclosed bounds, all minor, pre-existing or structural, none separately flagged
+    as inadequate by any ruling: a TUPLE-style nested subcommand field (`Variant(NestedEnum)`) is not attempted; a
+    receiver''s type wrapped in `Box<T>`/`&T`/a generic parameter falls back to unique-name resolution; Python''s
+    resolve_cli_handler resolves at most 2 dispatch hops; sub-kind (c)''s EXACT bucket cannot fire on THIS
+    corpus''s own Rust test-authoring convention (no real #[test] function is defined inside an `impl` block) --
+    the mechanism itself is complete and proven, both on fixtures and the real view.'
 - item: 'Deliverable 2: DEPENDS_ON_DATA edges from string literals and joined path fragments'
   status: MET
   evidence: 'tests/graph/test_derive.py::test_depends_on_data_*. Real view (all 3 eager refs, THIRD reopening
@@ -215,19 +267,22 @@ conformance:
 - item: 'Deliverable 7: every addition registered as a store layer with a digest (ARCHITECTURE.md section 8)'
   status: MET
   evidence: 'New "lineage" layer (govbridge/code/lineage_layer.py), registered from govbridge/code/__init__.py,
-    holds TESTS(b,c)/DEPENDS_ON_DATA/CITES_REQUIREMENT + their unresolved telemetry (now WITH ref_name/commit_id/
-    version_status/canonical_ref/canonical_commit per row -- THIRD reopening, Defect A). tests/code/
-    test_lineage_layer.py (13 tests: registration, all-four-edge-kinds persistence, digest reproducibility,
-    corpus-exclusion honoured, Gap-1 telemetry, Gap-2 dispatch persistence, PLUS Defect A''s multi-ref/
-    version-status tests and Defect B''s harness-method/ambiguous-unresolved tests). Real view: 2830 edges across
-    all 3 eager refs, identical digest AND identical 1,908,736-byte store file across two from-clean builds of
-    the SAME pinned view, then freshness-NOOP -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
-    (superseding check7''s single-ref numbers). Cost: ~326s wall average, ~1.82 MiB -- still well under the
-    semantic/embedding layer''s own ~885s single-layer figure. State records already covered by the existing
-    authority layer (accepted).'
+    holds TESTS(b,c)/DEPENDS_ON_DATA/CITES_REQUIREMENT + their unresolved telemetry (per row ref_name/commit_id/
+    version_status/canonical_ref/canonical_commit -- THIRD reopening, Defect A; a generic edges_by_derivation
+    telemetry dict, and per-ref test_registry_rows -- FOURTH reopening). tests/code/test_lineage_layer.py (14
+    tests: registration, all-four-edge-kinds persistence, digest reproducibility, corpus-exclusion honoured,
+    Gap-1 telemetry, Gap-2 dispatch persistence, Defect A''s multi-ref/version-status tests, Defect B''s
+    harness-method/ambiguous-unresolved tests, PLUS the fourth reopening''s real code-symbol resolution test).
+    Real view: 3937 edges across all 3 eager refs (up from the third reopening''s 2830 -- entirely the widened
+    TESTS(c) registry recognition), identical digest across two from-clean builds of the SAME pinned view, then
+    freshness-NOOP -- AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out (superseding check8''s
+    numbers). Cost: lineage''s own persisted footprint stays small (3904 lineage_edge rows); registry resolution''s
+    real cost is the prerequisite core+code indexing this capability now depends on (~18-19s/build in this
+    measurement, work the real pipeline already does for any code-route consumer). State records already covered
+    by the existing authority layer (accepted).'
 - item: 'Acceptance check 1: cd $D && $PY -m pytest tests/code tests/graph tests/authority/test_state_records.py -q'
   status: MET
-  evidence: '155 passed, 0 failures (was 144 before the third reopening''s 11 new tests) -- AGENT_RUNS/BR-AR-0019.check1-pytest.out.'
+  evidence: '164 passed, 0 failures (was 155 before the fourth reopening''s 9 new tests) -- AGENT_RUNS/BR-AR-0019.check1-pytest.out.'
 - item: 'Acceptance check 2: $PY -m govbridge.core.freshness rebuild --from-clean (twice, into two fresh stores);
     identical digests for every new layer; freshness NOOP afterwards'
   status: MET
@@ -276,6 +331,10 @@ evidence:
     harness-method dispatch resolved; real-view + independent-measurement reconciliation for every zero-count
     sub-kind'
   file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
+- claim: 'FOURTH reopening: test-registry (TESTS-c) recognised at any nesting depth, resolved against real code
+    symbols/the id grammar, reconciled against the coordinator''s own measurement and a second independent one;
+    the store-isolation bug found and fixed'
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out
 - claim: full domain suite passes with 0 failures (BR-DAG-AMEND-R1-4), final state
   file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
 mutation_scope_respected: true
@@ -293,14 +352,18 @@ open_issues:
     wrapped in `Box<T>`/`&T`/a generic parameter falls back to unique-name resolution rather than a verified
     declared type (never a silent miss). See conformance table deliverable 1 and
     AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out.'
-- 'No real test-registry-shaped YAML (TESTS sub-kind c) exists in the corpus today (sampled 32 candidate files
-    using a "tests:" key; none match the required row-shape) -- the mechanism is correct and proven on a fixture,
-    and will start producing real rows the moment matching content is added'
+- 'RESOLVED (was WRONG) by the FOURTH reopening: this report previously claimed no real test-registry-shaped YAML
+    exists in the corpus. That was false -- the schema check was too narrow (top-level/rows/entries only). Fixed:
+    558 real registry rows now recognised across all 3 eager refs (186 each), 1107 real TESTS edges produced,
+    reconciled against the coordinator''s own independent measurement -- see conformance table deliverable 1 and
+    AGENT_RUNS/BR-AR-0019.check9-fourth-reopening-test-registry.out. The one remaining, structurally-explained
+    zero is EXACT_TEST_REGISTRY_ROW specifically (0 of 928 real is_test code symbols in this corpus have a
+    "::"-qualified name at all -- independently confirmed by direct SQL query, not a narrowing)'
 - 'tests/compile/test_compile_real_view_mandatory_in_a.py::test_real_demonstration_task_compiles_byte_identical_twice
     failed ONCE during this session (an earlier full-suite pass, before this reopening''s fixes), with a
     manifest_sha256 mismatch between two in-process compile_packet() calls in the same test -- the exact
     non-hermetic-until-R1-RM-repairs-it test BR-DAG-AMEND-R1-4 names. Passed on the FINAL full-suite run attached
-    to this checkpoint (396 passed, 0 failures). Not this node''s file to fix; reported per the amendment''s
+    to this checkpoint (405 passed, 0 failures). Not this node''s file to fix; reported per the amendment''s
     instruction, not skipped or marked xfail'
 - 'The "records" ref this bridge domain builds against is a LIVE, moving candidate branch other agents in this
     session also commit to (observed moving three times during the second reopening round, and again -- a fourth

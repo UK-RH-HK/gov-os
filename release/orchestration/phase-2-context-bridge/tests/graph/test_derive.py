@@ -417,6 +417,15 @@ def test_cites_requirement_scans_rust_test_files_too(tmp_path):
 
 
 # --- R1-RL additions: TESTS beyond a direct call -- a test registry, and a CLI-dispatch-driven test ---------------
+#
+# BR-AR-0019 reopening (fourth pass): test_registry_edges_generic_shape's own fixture entries
+# ("tests/fx/test_fx_cap.py::test_one", a pytest node id) are NOT a Rust `a::b::fn` path (they carry a '/' and a
+# '.') and are not id-grammar-shaped either, so under the new, resolution-precision-labelled scheme they land in
+# the RAW-TEXT bucket (HEURISTIC_TEST_REGISTRY_RAW_TEXT) rather than the old blanket EXACT_TEST_REGISTRY_ROW --
+# this function is this node's OWN, first introduced in its first return (D-R1-RL-4/5's own precedent: a node may
+# revise a test of code it itself introduced when a reopening ruling changes that code's contract; this is not
+# covered by "never weaken an existing test"). The schema-recognition/edge-production guarantee this test always
+# proved is UNCHANGED and still asserted below; only the derivation label reflects the entry's own real shape now.
 
 def test_registry_edges_generic_shape(tmp_path):
     rb, root = _code_repo(tmp_path)
@@ -433,7 +442,118 @@ def test_registry_edges_generic_shape(tmp_path):
     edges = D.test_registry_edges_for_id("FX-CAP-1", commit, repo=str(root))
     srcs = {e.src for e in edges}
     assert srcs == {"tests/fx/test_fx_cap.py::test_one", "tests/fx/test_fx_cap.py::test_two"}
-    assert all(e.type == E.TESTS and e.derivation == E.EXACT_TEST_REGISTRY_ROW for e in edges)
+    assert all(e.type == E.TESTS and e.derivation == E.HEURISTIC_TEST_REGISTRY_RAW_TEXT for e in edges)
+
+
+def test_registry_edges_for_id_not_restricted_to_tests_dir(tmp_path):
+    """BR-AR-0019 reopening (fourth pass), requirement 2: the per-id function's own git-grep is no longer
+    restricted to tests/ -- a registry can live anywhere a YAML file does."""
+    rb, root = _code_repo(tmp_path)
+    rb.write(
+        root, "spec/registry/demo-registry.yaml",
+        "schema: fx-registry/1\n"
+        "rows:\n"
+        "  - capability: FX-CAP-9\n"
+        "    tests: [some::qualified::path]\n",
+    )
+    commit = rb.commit(root, "c1")
+    edges = D.test_registry_edges_for_id("FX-CAP-9", commit, repo=str(root))
+    assert {e.src for e in edges} == {"some::qualified::path"}
+
+
+def test_registry_edges_recognised_at_arbitrary_nesting_depth_and_key_name(tmp_path):
+    """BR-AR-0019 reopening (fourth pass), requirement 1: a registry under an ORDINARY key (never `rows`/
+    `entries`, never top-level), at arbitrary nesting depth, is still recognised by SHAPE alone -- mirrors the
+    real corpus's own DECISION_REGISTER.yaml (`decisions:`) and claims.yaml (`items:`) shapes."""
+    rb, root = _code_repo(tmp_path)
+    rb.write(
+        root, "release/decision-register/DEMO_REGISTER.yaml",
+        "schema: demo-register/1\n"
+        "section:\n"
+        "  decisions:\n"
+        "    - id: DR-01\n"
+        "      decision: some decision\n"
+        "      tests: [RT-100, RT-101]\n"
+        "    - item: WS-1\n"
+        "      tests: [some::qualified::path]\n"
+        "    - decision: no id or item key at all\n"
+        "      tests: [bare_entry]\n",
+    )
+    commit = rb.commit(root, "c1")
+    raw = (root / "release/decision-register/DEMO_REGISTER.yaml").read_text()
+    from govbridge.core.yamlutil import load_yaml_text
+    doc = load_yaml_text(raw)
+    edges = D.test_registry_edges_in_doc(doc, "release/decision-register/DEMO_REGISTER.yaml", commit)
+    by_dst = {}
+    for e in edges:
+        by_dst.setdefault(e.dst, []).append(e)
+    assert "DR-01" in by_dst and len(by_dst["DR-01"]) == 2  # the "id" key wins
+    assert "WS-1" in by_dst  # no "id" -- falls back to the "item" key
+    # the THIRD row has neither "id" nor "item" -- its dst is the containing key-path + index, never a guess
+    fallback_dsts = [d for d in by_dst if d not in ("DR-01", "WS-1")]
+    assert len(fallback_dsts) == 1
+    assert "section" in fallback_dsts[0] and "decisions" in fallback_dsts[0]
+
+
+def test_registry_edges_rust_path_exact_when_unique_code_symbol():
+    from collections import Counter
+    doc = {"rows": [{"id": "CAP-1", "tests": ["mod_a::my_test"]}]}
+    counts = Counter({"mod_a::my_test": 1})
+    edges = D.test_registry_edges_in_doc(doc, "x.yaml", "deadbeef", test_symbol_counts=counts)
+    assert len(edges) == 1
+    assert edges[0].derivation == E.EXACT_TEST_REGISTRY_ROW
+
+
+def test_registry_edges_rust_path_not_unique_is_a_distinct_heuristic():
+    from collections import Counter
+    doc = {"rows": [
+        {"id": "CAP-1", "tests": ["mod_a::not_found_anywhere"]},
+        {"id": "CAP-2", "tests": ["mod_a::ambiguous_name"]},
+    ]}
+    counts = Counter({"mod_a::ambiguous_name": 2})  # defined twice -- genuinely ambiguous
+    edges = D.test_registry_edges_in_doc(doc, "x.yaml", "deadbeef", test_symbol_counts=counts)
+    by_dst = {e.dst: e for e in edges}
+    assert by_dst["CAP-1"].derivation == E.HEURISTIC_TEST_REGISTRY_SYMBOL  # zero matches
+    assert by_dst["CAP-2"].derivation == E.HEURISTIC_TEST_REGISTRY_SYMBOL  # more than one match
+    assert by_dst["CAP-1"].derivation != E.EXACT_TEST_REGISTRY_ROW
+
+
+def test_registry_edges_id_grammar_token_bucket():
+    grammar = records.load_grammar("config/id-grammar.yaml")
+    doc = {"decisions": [{"id": "DR-01", "tests": ["RT-134", "RT-129"]}]}
+    edges = D.test_registry_edges_in_doc(doc, "x.yaml", "deadbeef", grammar=grammar)
+    assert len(edges) == 2
+    assert all(e.derivation == E.HEURISTIC_TEST_REGISTRY_ID_TOKEN for e in edges)
+    assert {e.src for e in edges} == {"RT-134", "RT-129"}
+
+
+def test_registry_edges_raw_text_bucket_is_never_dropped():
+    doc = {"items": [{"item": "P2-ADJ-0001", "tests": ["a free-text description with no resolvable token at all"]}]}
+    edges = D.test_registry_edges_in_doc(doc, "x.yaml", "deadbeef")
+    assert len(edges) == 1  # counted, never dropped
+    assert edges[0].derivation == E.HEURISTIC_TEST_REGISTRY_RAW_TEXT
+    assert edges[0].src == "a free-text description with no resolvable token at all"
+
+
+def test_registry_edges_free_text_prefixed_rust_path_still_resolves():
+    """The trailing-token extraction reads THROUGH a free-text prefix like "unit " generically (never a
+    hard-coded "unit" check) -- this repository's own claims.yaml uses exactly this shape."""
+    from collections import Counter
+    doc = {"items": [{"item": "P2-ADJ-0001",
+                       "tests": ["unit human_channel::tests::the_kernel_keeps_the_anchor_off"]}]}
+    counts = Counter({"human_channel::tests::the_kernel_keeps_the_anchor_off": 1})
+    edges = D.test_registry_edges_in_doc(doc, "x.yaml", "deadbeef", test_symbol_counts=counts)
+    assert len(edges) == 1
+    assert edges[0].derivation == E.EXACT_TEST_REGISTRY_ROW
+
+
+def test_registry_edges_no_code_route_degrades_to_heuristic_not_a_crash():
+    """test_symbol_counts=None (the code route unavailable/not wired) never crashes -- an honest degrade, like
+    every other code-route-optional function in this module."""
+    doc = {"rows": [{"id": "CAP-1", "tests": ["mod_a::my_test"]}]}
+    edges = D.test_registry_edges_in_doc(doc, "x.yaml", "deadbeef", test_symbol_counts=None)
+    assert len(edges) == 1
+    assert edges[0].derivation == E.HEURISTIC_TEST_REGISTRY_SYMBOL
 
 
 def test_cli_dispatch_tests_edge_resolves_a_subprocess_invoked_subcommand(tmp_path, monkeypatch):
