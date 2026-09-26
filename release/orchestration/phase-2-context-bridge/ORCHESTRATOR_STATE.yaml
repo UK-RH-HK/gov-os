@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T03:11:55Z'
-state_hash: 6ea3fd883bda762a1cc09d5dc7a497c16ff4d342ddaf70a8a7fd51c0fb77777a
+updated_at: '2026-09-26T03:18:56Z'
+state_hash: d01b761f23afae43fdd4d5cf16bf6e2c6ee1bdbbfadd808fa21449110684a3fb
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -818,7 +818,17 @@ agent_runs:
   agent_name: br-r1-rx-0018
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
+  final_commit: 09ec7fc7b44a2cb7ba9c69a25a1ff40d68643f4d
+  merged_at: 8c34f76
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, pass 2)
+  pass_2:
+    fix: d2839b3 -- `cli search --repo` threaded into build_real_routes; the test passes --repo and no longer chdirs
+    root_cause_found: govbridge/core/gitobj.py:22-23 -- repo_root() is lru_cached and keyed on None, so the first bare caller's
+      cwd wins for the whole process (outside RX scope) -> R1-INT (BR-DAG-AMEND-R1-6)
+    orchestrator_verified:
+    - FULL domain suite on the merged tree (RN+TA2+RG+RX) -- 416 passed, 0 failed
+    - secrecy audit over the whole transcript -- 0 hits; claude-sonnet-5 x517
   pass_1:
     final_commit: c11ed0445a4a769e170bf87195262ced5c064112 (report) / 03410b2 (work)
     integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run)
@@ -976,9 +986,43 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment-run-2.yaml
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0021.*
+- run_id: BR-AR-0022
+  role: 'REPAIR-1 node R1-RM -- mandatory-input fidelity (no silent truncation, selectors, directory manifests, delivered vs
+    source sha) + BR-DAG-AMEND-R1-1 (verify at the recorded view) + BR-DAG-AMEND-R1-2 (hermetic real-view compile test)'
+  dag_node: R1-RM
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 1a4edd365b42a270d794c3bfe0432c727a82151ffba730d54efcae851b8ddb20
+  handoff_note: template revision with amendment R1-T1 (full suite; hermetic tests)
+  branch: bridge/r1-rm-0022
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0022
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-rm-0022
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T03:18Z'
+  status: RUNNING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0022
+  dispatch_notes:
+  - implement R1-1 inside compile/validate.py and compile/receipt.py (verify_section_a recomputes A at the manifest's
+    recorded view); govbridge/cli.py is NOT in scope (it is sequenced RX -> GA1 -> RS -> RA and GA1 runs in parallel)
+  - second editor of compile/packet.py (RX -> RM -> GA3)
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/budgets.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/render.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/sectionmap.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_mandatory_fidelity.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/mandatory/**
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_real_view_mandatory_in_a.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_verify_recorded_view.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/recorded_view/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.*
 running_work:
-- run_id: BR-AR-0018
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rx-0018; never inferred from elapsed time
+- run_id: BR-AR-0022
+  liveness_check: subagent transcript mtime + commits on bridge/r1-rm-0022; never inferred from elapsed time
 - run_id: BR-AR-0019
   liveness_check: subagent transcript mtime + commits on bridge/r1-rl-0019; never inferred from elapsed time
 dag:
@@ -1061,6 +1105,14 @@ dag:
       same layer set and digests, BEFORE running its own rebuild-twice acceptance check'
     reason: R1-INT's acceptance command uses exactly this entry point and would pass vacuously; no REPAIR-1 node owns
       core/freshness.py; R1-D2 uses the top-level CLI, which is unaffected
+  - id: BR-DAG-AMEND-R1-6
+    by: orchestrator (routing of a BR-AR-0018 finding outside its scope)
+    rule: 'R1-INT''s mutation_scope is further extended with govbridge/core/gitobj.py and tests/core/test_gitobj_repo_root.py:
+      repo_root() (gitobj.py:22-23) is functools.lru_cache''d and keyed on its argument, so a bare repo_root() -- which every
+      `repo or repo_root()` caller makes -- caches the FIRST caller''s cwd for the whole process. Key the cache on the
+      resolved absolute cwd (or drop it), with a regression test that two chdirs in one process resolve two repositories'
+    reason: a process-global cache makes tests order-dependent and would make a long-lived gather/compile process resolve
+      the wrong repository; R1-T1 already requires new tests to pass repo explicitly, so the fix can wait for R1-INT
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1200,7 +1252,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0018 R1-RX follow-up (order-dependent test) and BR-AR-0019 R1-RL follow-up (digested
-  edge layer); integrate-check each
-  (schema 2) + FULL suite on the trial-merged tree, merge; then wave 2 (R1-RM after RX, R1-GA1 after RX+RL) with template R1-T1;
-  checkpoint after every merge
+next_deterministic_action: await BR-AR-0022 R1-RM (wave 2) and the BR-AR-0019 R1-RL follow-up (digested edge layer);
+  integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; on RL's merge dispatch R1-GA1 (BR-AR-0023,
+  template R1-T1); checkpoint after every merge
