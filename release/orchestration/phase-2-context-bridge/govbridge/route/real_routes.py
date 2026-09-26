@@ -18,6 +18,7 @@ code_conn`` and ``govbridge.graph.impact`` already do.
 from __future__ import annotations
 
 import re
+import threading
 from typing import Optional
 
 from govbridge.authority import layer as authoritylayer
@@ -95,14 +96,29 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
     reg = registrymod.load(registry_path or registrymod._default_registry_path(), verify_commit="records",
                             view_path=view_path, repo=repo)
     mandatory_items = lifecyclemod._load_mandatory_items(repo=repo, view_path=view_path)
-    conn = storemod.open_db()
     product_commit = _product_commit(resolved_view)
+
+    # REPAIR_DAG.yaml node R1-GA1 (OD-BR-05 section 2: "independent facets MAY be retrieved concurrently"): a
+    # sqlite3.Connection may only be used by the thread that created it (this surfaced as a real
+    # "SQLite objects created in a thread can only be used in that same thread" failure once govbridge.gather.engine
+    # started running facets on a thread pool). The single connection this function used to build ONCE and share
+    # across every call is now built ONCE PER THREAD instead -- still never reopened per query or per hit WITHIN one
+    # thread, and every single-threaded caller (govbridge search, govbridge.compile.packet, every existing test)
+    # sees exactly one connection for the RouteSet's whole lifetime, unchanged.
+    _local = threading.local()
+
+    def _conn():
+        c = getattr(_local, "conn", None)
+        if c is None:
+            c = storemod.open_db()
+            _local.conn = c
+        return c
 
     def classify_occ(path: Optional[str], commit: Optional[str], line_start=None, line_end=None) -> tuple:
         if not path:
             return UNCLASSIFIED
         try:
-            c = authoritylayer.classify_hit(conn, path, commit, line_start, line_end, reg=reg,
+            c = authoritylayer.classify_hit(_conn(), path, commit, line_start, line_end, reg=reg,
                                              mandatory_items=mandatory_items, repo=repo, view_path=view_path)
             return (c.cls or "UNCLASSIFIED"), (c.lifecycle or "UNKNOWN")
         except Exception:
@@ -116,24 +132,32 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             return UNCLASSIFIED
         return classify_occ(occ0.path, occ0.commit, item.start_line, item.end_line)
 
-    def lexical_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, exclude_counter=None,
+    def lexical_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None,
+                       exclude_counter=None, offset: int = 0, page_info_out: Optional[dict] = None,
                        **_kw) -> list:
         if not text:
             return []
+        k = lexicalquery.DEFAULT_K if k is None else k
         # R1-RX (OBS-BR-08): the ambient task context's own exclusions are merged in HERE, so this route excludes
         # them even for a caller that passes exclude=None (the CLI default before this repair) -- see
         # govbridge.core.taskctx's module docstring.
         exclude = taskctxmod.current().merge_exclude(exclude)
-        result = lexicalquery.query(_safe_fts_query(text), k=k, exclude=exclude, view_path=view_path, repo=repo,
-                                     classify=_lexical_classify)
+        result = lexicalquery.query(_safe_fts_query(text), k=k, exclude=exclude, offset=offset, view_path=view_path,
+                                     repo=repo, classify=_lexical_classify)
+        # REPAIR_PLAN.md section 2.4 ("lexical and semantic take an offset"): the paging metadata lexicalquery.query
+        # already computes (govbridge.gather.engine's own per-facet cursor) -- an out-param, the SAME idiom
+        # exclude_counter already uses here, since RouteFn's own contract returns a plain list of RouteHit.
+        if page_info_out is not None:
+            page_info_out["next_offset"] = result.get("next_offset")
+            page_info_out["total_matching_chunks"] = result.get("total_matching_chunks")
         if exclude and exclude_counter is not None:
             # govbridge.lexical.query already filtered internally (out of this node's mutation scope, so it
             # exposes no count of its own) -- a second, exclude=None call over the SAME query measures how many
             # candidates would have leaked through by default, the same double-run technique
             # ARCHITECTURE/REPAIR-1/evidence/tools/exclusion_probe.py itself used to first diagnose RC-8. Its
             # result is used only to count; it is never returned or delivered as a hit.
-            raw = lexicalquery.query(_safe_fts_query(text), k=k, exclude=None, view_path=view_path, repo=repo,
-                                      classify=_lexical_classify)
+            raw = lexicalquery.query(_safe_fts_query(text), k=k, exclude=None, offset=offset, view_path=view_path,
+                                      repo=repo, classify=_lexical_classify)
             exclude_counter.bump(sum(
                 1 for h in raw["hits"]
                 if any(pathrules.any_glob_match(o["path"], exclude) is not None for o in h["occurrences"])
@@ -154,17 +178,22 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
     # --- semantic --------------------------------------------------------------------------------------------
 
     def _semantic_classify(blob_id: str) -> tuple:
-        row = conn.execute("SELECT path, commit_id FROM occurrence WHERE blob_id=? LIMIT 1", (blob_id,)).fetchone()
+        row = _conn().execute("SELECT path, commit_id FROM occurrence WHERE blob_id=? LIMIT 1", (blob_id,)).fetchone()
         if row is None:
             return UNCLASSIFIED
         return classify_occ(row[0], row[1])
 
-    def semantic_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, exclude_counter=None,
+    def semantic_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None,
+                        exclude_counter=None, offset: int = 0, page_info_out: Optional[dict] = None,
                         **_kw) -> list:
         if not text:
             return []
+        k = lexicalquery.DEFAULT_K if k is None else k
         exclude = taskctxmod.current().merge_exclude(exclude)
-        result = semanticsearch.search(text, k=k, view_path=view_path, repo=repo, classify=_semantic_classify)
+        result = semanticsearch.search(text, k=k, view_path=view_path, repo=repo, classify=_semantic_classify,
+                                        offset=offset)
+        if page_info_out is not None:
+            page_info_out["next_offset"] = result.get("next_offset")
         hits = []
         for r in result["results"]:
             occ_d = r.get("occurrence")
@@ -187,24 +216,33 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     # The shaped code_conn (govbridge.graph.code_bridge) wires CALLEES/TESTS/READS_KEY against the real B3 tables,
     # exactly the way govbridge.compile.packet.Compiler.code_conn already does for why/impact (routed issue
-    # B5/BR-AR-0007). Built at most once per RouteSet and reused by every code_route call -- the same "shared state
-    # built ONCE" discipline this function's own docstring already applies to the view/registry/mandatory-items.
-    _code_conn_state = {"attempted": False, "conn": None, "blob_to_path": {}}
+    # B5/BR-AR-0007). ``blob_to_path`` is plain, read-only-after-construction Python data, safe to build once and
+    # share; the sqlite3 connection itself is NOT (same thread-affinity issue as ``_conn()`` above), so it is built
+    # once PER THREAD instead -- "shared state built once" now means "once per thread that ever calls the code
+    # route," never reopened per query or per hit within one thread.
+    _blob_to_path_state = {"attempted": False, "map": {}}
+    _code_local = threading.local()
 
     def _shaped_code_conn() -> tuple:
-        if not _code_conn_state["attempted"]:
-            _code_conn_state["attempted"] = True
+        if not _blob_to_path_state["attempted"]:
+            _blob_to_path_state["attempted"] = True
+            if product_commit:
+                try:
+                    raw_conn = codesymbols._open_conn()
+                    entries = codesymbols.ensure_indexed(raw_conn, product_commit, repo=repo)
+                    _blob_to_path_state["map"] = {blob_id: p for p, blob_id in entries}
+                except Exception:
+                    _blob_to_path_state["map"] = {}
+        if not hasattr(_code_local, "conn"):
+            code_conn = None
             if product_commit:
                 try:
                     from govbridge.graph import code_bridge
-                    _code_conn_state["conn"] = code_bridge.build_shaped_code_connection(product_commit, repo=repo)
-                    raw_conn = codesymbols._open_conn()
-                    entries = codesymbols.ensure_indexed(raw_conn, product_commit, repo=repo)
-                    _code_conn_state["blob_to_path"] = {blob_id: p for p, blob_id in entries}
+                    code_conn = code_bridge.build_shaped_code_connection(product_commit, repo=repo)
                 except Exception:
-                    _code_conn_state["conn"] = None
-                    _code_conn_state["blob_to_path"] = {}
-        return _code_conn_state["conn"], _code_conn_state["blob_to_path"]
+                    code_conn = None
+            _code_local.conn = code_conn
+        return _code_local.conn, _blob_to_path_state["map"]
 
     # BR-AR-0015 reopening, defect 2: a fixed, generous fallback when a caller does not pass its own profile
     # fan-out -- used by the query-mode (T3) path, which is not bounded per symbol the way a T1 seed's own
@@ -265,34 +303,27 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         return (edge.evidence_occurrence or "", edge.dst or "")
 
     def _expand_symbol(qname: str, conn, blob_to_path: dict, hits: list, exclude, fanout: dict,
-                        exclude_counter=None) -> None:
+                        exclude_counter=None, include_callees: bool = True, include_tests: bool = True,
+                        include_reads_key: bool = True, page_size: Optional[int] = None,
+                        cursor_in: Optional[dict] = None, cursor_out: Optional[dict] = None,
+                        seed_key: Optional[str] = None) -> None:
         """T2 (ARCHITECTURE.md section 7.2's G row, BR-HO-0015 defect 2): direct callees, TESTS edges, and the
         READS_KEY consumers of any literal key read AT this T1 symbol -- callers are covered by ``codesymbols.
         callers`` in the caller loop below. Every list is sorted into a STABLE, deterministic order (B3's own
         SQL carries no ORDER BY) and then capped to the profile's fan-out limit BEFORE any RouteHit is built --
-        "bound candidate generation per symbol", never just the rendered output after the fact."""
+        "bound candidate generation per symbol", never just the rendered output after the fact.
+
+        ``include_callees``/``include_tests``/``include_reads_key`` (REPAIR_DAG.yaml node R1-GA1's ``dependencies``
+        vs ``dependents`` vs ``tests`` facets, ``config/facets.yaml``): every caller that omits them keeps getting
+        ALL THREE, byte-for-byte as before. ``page_size``/``cursor_in``/``cursor_out`` page the TESTS edges through
+        R1-RL's own ``derivemod.tests_of`` cursor (never re-implemented here); omitted, that edge type keeps its
+        pre-existing fanout-capped, unpaged behaviour too. READS_KEY consumers stay fanout-capped either way (R1-RL
+        did not add paging to the "which keys does this symbol read" half, only to "who else reads key K")."""
         if conn is None:
             return
-        callees = sorted(derivemod.callees_of(conn, qname), key=_edge_sort_key)[:fanout.get("max_callees", 8)]
-        tests = sorted(derivemod.tests_of(conn, qname), key=_edge_sort_key)[:fanout.get("max_tests", 8)]
-        for edge in (callees + tests):
-            h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1, "T2")
-            if h is None:
-                continue
-            if exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude) is not None:
-                if exclude_counter is not None:
-                    exclude_counter.bump()
-                continue
-            hits.append(h)
-        try:
-            key_rows = conn.execute("SELECT DISTINCT value FROM literal WHERE enclosing_symbol=?", (qname,)).fetchall()
-        except Exception:
-            key_rows = []
-        key_values = sorted((v for (v,) in key_rows))[:fanout.get("max_reads_key_values", 8)]
-        for key_value in key_values:
-            consumers = sorted(derivemod.reads_key_of(conn, key_value),
-                                key=_edge_sort_key)[:fanout.get("max_reads_key_consumers", 8)]
-            for edge in consumers:
+        if include_callees:
+            callees = sorted(derivemod.callees_of(conn, qname), key=_edge_sort_key)[:fanout.get("max_callees", 8)]
+            for edge in callees:
                 h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1, "T2")
                 if h is None:
                     continue
@@ -301,6 +332,44 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                         exclude_counter.bump()
                     continue
                 hits.append(h)
+        if include_tests:
+            cursor_key = (seed_key or qname, "tests")
+            cur = (cursor_in or {}).get(cursor_key)
+            if page_size is not None:
+                page = derivemod.tests_of(conn, qname, page_size=page_size, cursor=cur)
+                tests = sorted(page["items"], key=_edge_sort_key)
+                if cursor_out is not None:
+                    cursor_out[cursor_key] = page["next_cursor"]
+            else:
+                tests = sorted(derivemod.tests_of(conn, qname), key=_edge_sort_key)[:fanout.get("max_tests", 8)]
+            for edge in tests:
+                h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1, "T2")
+                if h is None:
+                    continue
+                if exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude) is not None:
+                    if exclude_counter is not None:
+                        exclude_counter.bump()
+                    continue
+                hits.append(h)
+        if include_reads_key:
+            try:
+                key_rows = conn.execute(
+                    "SELECT DISTINCT value FROM literal WHERE enclosing_symbol=?", (qname,)).fetchall()
+            except Exception:
+                key_rows = []
+            key_values = sorted((v for (v,) in key_rows))[:fanout.get("max_reads_key_values", 8)]
+            for key_value in key_values:
+                consumers = sorted(derivemod.reads_key_of(conn, key_value),
+                                    key=_edge_sort_key)[:fanout.get("max_reads_key_consumers", 8)]
+                for edge in consumers:
+                    h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1, "T2")
+                    if h is None:
+                        continue
+                    if exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude) is not None:
+                        if exclude_counter is not None:
+                            exclude_counter.bump()
+                        continue
+                    hits.append(h)
 
     def _code_hit_from_bare_occurrence(occ: dict, rank: int) -> Optional[RouteHit]:
         """T1 (ARCHITECTURE.md section 7.2's G row, BR-HO-0015 defect 3): the CITED LINE ITSELF, always emitted
@@ -318,11 +387,23 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                          occurrences=occs, text=f"[cited line] [{label}]", authority_class=cls, lifecycle=lifecycle,
                          delivery="PINNED", tier="T1", resolution=label)
 
-    def code_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, seed_labels=None,
-                   bare_occurrences=None, fanout=None, exclude_counter=None, **_kw) -> list:
+    def code_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None, seed_labels=None,
+                   bare_occurrences=None, fanout=None, exclude_counter=None, include_callers: bool = True,
+                   include_callees: bool = True, include_tests: bool = True, include_reads_key: bool = True,
+                   page_size: Optional[int] = None, cursor_in: Optional[dict] = None,
+                   cursor_out: Optional[dict] = None, **_kw) -> list:
+        """``include_callers``/``include_callees``/``include_tests``/``include_reads_key`` and
+        ``page_size``/``cursor_in``/``cursor_out`` (REPAIR_DAG.yaml node R1-GA1): every existing caller (``govbridge
+        search``, ``govbridge.compile.packet``) passes none of these, so it sees EXACTLY the pre-existing behaviour
+        -- all four edge kinds, fanout-capped, unpaged. ``govbridge.gather.engine`` is the one caller that narrows
+        the edge kinds per facet (``dependencies`` vs ``dependents`` vs ``tests``, ``config/facets.yaml``'s
+        ``code_mode``) and pages ``callers``/``tests`` round over round through R1-RL's own cursor, keyed by
+        ``(seed name, edge type)`` in ``cursor_in``/``cursor_out`` so a multi-seed call pages every seed
+        independently."""
         if not product_commit:
             return []
         exclude = taskctxmod.current().merge_exclude(exclude)
+        k = lexicalquery.DEFAULT_K if k is None else k
         is_seeded = seeds is not None  # T1/T2 (a task seed's own citations) vs T3 (free-text query retrieval)
         names = list(seeds or []) or _extract_symbol_names(text)
         seed_labels = seed_labels or {}
@@ -349,21 +430,34 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 # callers/callees are themselves at most T3, never T2, so query mode never expands here.
                 if is_seeded and qname not in expanded:
                     expanded.add(qname)
-                    _expand_symbol(qname, conn, blob_to_path, hits, exclude, fanout, exclude_counter=exclude_counter)
-            try:
-                callers_out = codesymbols.callers(name, product_commit, repo=repo)
-            except Exception:
-                callers_out = {"callers": []}
-            caller_rows = callers_out.get("callers", [])
-            if is_seeded:
-                caller_rows = caller_rows[:fanout.get("max_callers", 8)]
-            for row in caller_rows:
-                path = row["at"].split(":", 1)[0]
-                if exclude and pathrules.any_glob_match(path, exclude) is not None:
-                    if exclude_counter is not None:
-                        exclude_counter.bump()
-                    continue
-                hits.append(_code_hit_from_caller(row, len(hits) + 1, caller_tier))
+                    _expand_symbol(qname, conn, blob_to_path, hits, exclude, fanout, exclude_counter=exclude_counter,
+                                    include_callees=include_callees, include_tests=include_tests,
+                                    include_reads_key=include_reads_key, page_size=page_size, cursor_in=cursor_in,
+                                    cursor_out=cursor_out, seed_key=name)
+            if include_callers:
+                cursor_key = (name, "callers")
+                cur = (cursor_in or {}).get(cursor_key)
+                try:
+                    if page_size is not None:
+                        callers_out = codesymbols.callers(name, product_commit, repo=repo, page_size=page_size,
+                                                           cursor=cur)
+                    else:
+                        callers_out = codesymbols.callers(name, product_commit, repo=repo)
+                except Exception:
+                    callers_out = {"callers": []}
+                caller_rows = callers_out.get("callers", [])
+                if page_size is not None:
+                    if cursor_out is not None:
+                        cursor_out[cursor_key] = callers_out.get("next_cursor")
+                elif is_seeded:
+                    caller_rows = caller_rows[:fanout.get("max_callers", 8)]
+                for row in caller_rows:
+                    path = row["at"].split(":", 1)[0]
+                    if exclude and pathrules.any_glob_match(path, exclude) is not None:
+                        if exclude_counter is not None:
+                            exclude_counter.bump()
+                        continue
+                    hits.append(_code_hit_from_caller(row, len(hits) + 1, caller_tier))
         for occ in (bare_occurrences or []):
             if exclude and occ.get("path") and pathrules.any_glob_match(occ["path"], exclude) is not None:
                 if exclude_counter is not None:
@@ -376,10 +470,11 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     # --- exact -----------------------------------------------------------------------------------------------
 
-    def exact_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, exclude_counter=None,
-                     **_kw) -> list:
+    def exact_route(text: Optional[str] = None, seeds=None, k: Optional[int] = None, exclude=None,
+                     exclude_counter=None, **_kw) -> list:
         if not text:
             return []
+        k = lexicalquery.DEFAULT_K if k is None else k
         exclude = taskctxmod.current().merge_exclude(exclude)
         try:
             result = exactmod.id_lookup(text, view_path=view_path, repo=repo)

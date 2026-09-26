@@ -88,11 +88,17 @@ def digest_for_pin(conn: sqlite3.Connection, pin_id: str) -> str:
     return h.hexdigest()
 
 
-def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str):
+def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str, offset: int = 0):
     """Brute-force cosine search (vectors are already L2-normalised at embed time, so dot product == cosine).
-    Returns [(chunk_id, score)], highest score first. O(n) over the pin's vectors -- fine at this corpus's scale
-    (SEMANTIC_ROUTE.md section 3: ~40k x 384 floats, ~61 MB); ARCHITECTURE.md section 9 names the replacement path
-    (e.g. HNSW) once the corpus outgrows brute force."""
+    Returns [(chunk_id, score)], highest score first, ties broken by ``chunk_id`` ASC for full determinism (two
+    vectors can legitimately tie on score, especially in small/synthetic corpora; a fixed tiebreaker is what makes
+    the same query byte-identical across thread counts and repeated runs -- REPAIR_DAG.yaml node R1-GA1). O(n) over
+    the pin's vectors -- fine at this corpus's scale (SEMANTIC_ROUTE.md section 3: ~40k x 384 floats, ~61 MB);
+    ARCHITECTURE.md section 9 names the replacement path (e.g. HNSW) once the corpus outgrows brute force.
+
+    ``offset`` (REPAIR_PLAN.md section 2.4, "lexical and semantic take an offset"): pages through the SAME full,
+    deterministic ranking -- ``search(..., k=k, offset=0)`` then ``search(..., k=k, offset=k)`` etc. returns exactly
+    the same union, one page at a time, as a single unbounded call would."""
     import numpy as np
 
     rows = conn.execute("SELECT chunk_id, dim, vec FROM vector WHERE pin_id=?", (pin_id,)).fetchall()
@@ -103,8 +109,9 @@ def search(conn: sqlite3.Connection, qvec, k: int, pin_id: str):
     mat = np.frombuffer(b"".join(r[2] for r in rows), dtype="<f4").reshape(len(rows), dim)
     q = np.asarray(qvec, dtype="<f4")
     scores = mat @ q
-    order = np.argsort(-scores)[:k]
-    return [(ids[i], float(scores[i])) for i in order]
+    order = sorted(range(len(ids)), key=lambda i: (-scores[i], ids[i]))
+    page = order[offset:offset + k]
+    return [(ids[i], float(scores[i])) for i in page]
 
 
 # ---------------------------------------------------------------------------------------------------------------

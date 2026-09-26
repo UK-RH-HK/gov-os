@@ -37,8 +37,23 @@ from govbridge.core import pathrules, store, telemetry, view as viewmod
 from govbridge.core.yamlutil import canonical_json, sha256_text
 from govbridge.lexical import fts as ftsmod  # noqa: F401  (package import registers this layer, see __init__.py)
 
-#: MEMORY_POLICY.yaml:20 retrieval.default_k
-DEFAULT_K = 8
+def _load_default_k() -> int:
+    """OD-BR-05 section 9 ("do not hard-code 8k as the architecture limit... a configurable per-retrieval batch
+    size only") / REPAIR_DAG.yaml node R1-GA1 ("batch_size from configuration (no hard-coded 8)"). The single
+    configuration-default loader is ``govbridge.gather.facets.default_batch_size`` (``config/facets.yaml``'s own
+    ``default_batch_size``); imported lazily, never at this module's own import time, so this leaf module (B2, no
+    dependency on the gather package) never takes a hard import-time dependency on it, and a caller that uses this
+    module stand-alone (before R1-GA1's config file exists, or with it missing/unreadable) still gets the exact
+    value the architecture always used -- a pure source-of-truth move, never a behaviour change by default."""
+    try:
+        from govbridge.gather.facets import default_batch_size
+        return default_batch_size()
+    except Exception:
+        return 8
+
+
+#: MEMORY_POLICY.yaml:20 retrieval.default_k -- resolved through the ONE configuration-default loader above.
+DEFAULT_K = _load_default_k()
 #: how many candidate rows to pull from FTS5 before exclusion-filtering trims to k; generous enough that excluding
 #: a handful of occurrences rarely starves the caller of k results, without scanning the whole table.
 _OVERFETCH_FLOOR = 50
@@ -104,14 +119,21 @@ def _occurrences_for_blob(conn, blob_id: str, resolved: "viewmod.ResolvedView") 
     return out
 
 
-def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, view_path: Optional[str] = None,
-          repo: Optional[str] = None, record_telemetry: bool = True,
+def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, offset: int = 0,
+          view_path: Optional[str] = None, repo: Optional[str] = None, record_telemetry: bool = True,
           classify: Optional["Callable[[RetrievedItem], tuple]"] = None) -> dict:
     """Run ``text`` (an FTS5 MATCH expression -- a phrase, NEAR(), a bareword query, ...) against the lexical
     index and return up to ``k`` RetrievedItems, ranked by BM25 (ascending: SQLite's bm25() is a cost, lower is
-    better -- ORDER BY score ASC is the correct direction, matching fts_spike.py). ``exclude`` is a list of globs
-    (retrieval_exclusions): an occurrence whose path matches any of them is dropped; a hit left with no surviving
-    occurrence is dropped entirely.
+    better -- ORDER BY score ASC is the correct direction, matching fts_spike.py), with ``chunk_id`` ASC as a
+    second, fully deterministic tiebreaker (two rows can legitimately tie on score; SQL's own tie order is not
+    otherwise guaranteed stable). ``exclude`` is a list of globs (retrieval_exclusions): an occurrence whose path
+    matches any of them is dropped; a hit left with no surviving occurrence is dropped entirely.
+
+    ``offset`` (REPAIR_PLAN.md section 2.4, "every route accepts a cursor... lexical and semantic take an offset"):
+    a caller (``govbridge.gather.engine``) pages by re-issuing the SAME query with an advancing ``offset``. The
+    result's ``next_offset`` is the offset to resume at, or ``None`` once every FTS5-matching row (not just every
+    KEPT, post-exclusion hit) has been consumed -- following it to exhaustion yields exactly the same union an
+    unpaged, unbounded call would.
 
     ``classify``, an optional hook, ``RetrievedItem -> (authority_class, lifecycle)`` -- the SAME extension point
     ``govbridge.semantic.search`` already has (its ``Classifier`` callable), added here for symmetry so a caller
@@ -126,8 +148,8 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, vi
     t0 = time.monotonic()
     rows = conn.execute(
         "SELECT chunk_id, blob_id, start_line, end_line, text, bm25(lexical_fts) AS score "
-        "FROM lexical_fts WHERE lexical_fts MATCH ? ORDER BY score ASC LIMIT ?",
-        (text, fetch_n),
+        "FROM lexical_fts WHERE lexical_fts MATCH ? ORDER BY score ASC, chunk_id ASC LIMIT ? OFFSET ?",
+        (text, fetch_n, offset),
     ).fetchall()
     total_matches = conn.execute(
         "SELECT count(*) FROM lexical_fts WHERE lexical_fts MATCH ?", (text,)
@@ -137,7 +159,9 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, vi
     resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
 
     hits: list[RetrievedItem] = []
+    consumed = 0
     for chunk_id, blob_id, start_line, end_line, chunk_text, score in rows:
+        consumed += 1
         occs = _occurrences_for_blob(conn, blob_id, resolved)
         if exclude:
             occs = [o for o in occs if pathrules.any_glob_match(o.path, exclude) is None]
@@ -157,8 +181,15 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, vi
         if len(hits) >= k:
             break
 
+    # REPAIR_PLAN.md section 2.4: exhausted once the raw (pre-exclusion) SQL page itself came up short of what we
+    # asked for; otherwise resume right after the last raw row this call actually looked at (never after only the
+    # KEPT hits, or a caller would silently skip excluded candidates on the next page).
+    exhausted = (offset + len(rows)) >= total_matches
+    next_offset = None if exhausted else offset + consumed
+
     result = {
         "query": text, "k": k, "exclude": list(exclude) if exclude else [], "route": "lexical",
+        "offset": offset, "next_offset": next_offset,
         "total_matching_chunks": total_matches, "latency_ms": latency_ms,
         "hits": [h.to_dict() for h in hits],
     }
@@ -166,7 +197,8 @@ def query(text: str, k: int = DEFAULT_K, exclude: Optional[list[str]] = None, vi
         try:
             telemetry.write_row("queries", {
                 "route": "lexical", "query_sha256": sha256_text(canonical_json({"q": text, "exclude": result["exclude"]})),
-                "k": k, "hits": len(hits), "total_matching_chunks": total_matches, "latency_ms": latency_ms,
+                "k": k, "offset": offset, "hits": len(hits), "total_matching_chunks": total_matches,
+                "latency_ms": latency_ms,
             })
         except Exception:
             pass  # telemetry is best-effort; a write failure must never fail a query
@@ -179,11 +211,12 @@ def main(argv=None) -> int:
     p.add_argument("--k", type=int, default=DEFAULT_K)
     p.add_argument("--exclude", action="append", default=None, metavar="GLOB",
                     help="retrieval_exclusions glob; repeatable")
+    p.add_argument("--offset", type=int, default=0, help="resume paging at this offset (REPAIR_PLAN.md section 2.4)")
     p.add_argument("--view")
     p.add_argument("--json", action="store_true", help="print the full JSON result (default: a short summary)")
     args = p.parse_args(argv)
 
-    result = query(args.text, k=args.k, exclude=args.exclude, view_path=args.view)
+    result = query(args.text, k=args.k, exclude=args.exclude, offset=args.offset, view_path=args.view)
     if args.json:
         print(json.dumps(result, indent=1, sort_keys=True))
     else:

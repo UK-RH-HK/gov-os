@@ -1,0 +1,13 @@
+=== AC2: govbridge gather --threads 1,4,16 on CONTROL-A (CA-WHY), byte-identical merged_sha256 ===
+
+SUPERSEDED. This first attempt used the query's own FULL, default facet set (all 11 registered facets, including
+the CONTRACT/decision-scoped requirement/decisions_active/decisions_history facets, which on this corpus need many
+rounds -- see check3-controla-batchsize-2-vs-16.out's own note on MAX_ROUNDS for those facets). Against the real
+store this made each of the three --threads runs exceed a 115s per-call timeout with no output at all (no partial
+line -- `timeout` kills the process outright), so this file is empty apart from these headers.
+
+The actual AC2 evidence, run to completion with the same query against the same real view/store, is
+AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out (facets=purpose+failed_approaches+dependencies+
+dependents+enforcement+tests -- still exercising all four route kinds, including the code route's per-thread
+connection fix this node made in govbridge/route/real_routes.py). Kept here, rather than removed (workers never
+`rm`), as an honest record of the attempt and why it was superseded.

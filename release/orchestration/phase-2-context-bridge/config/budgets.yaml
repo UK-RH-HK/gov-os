@@ -56,3 +56,18 @@ code_test_surfaces:
   source_extensions: [".rs", ".py"]
   source_dirs: ["runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/"]
   test_path_globs: ["**/tests/**", "tests/**", "**/test_*.py", "**/*_test.py", "**/*_tests.rs"]
+
+# REPAIR_DAG.yaml node R1-GA1 (OD-BR-05 section 4's stopping criterion, "explicit task/context budget reached, with
+# unresolved coverage disclosed" -> BUDGET_REACHED_WITH_UNRESOLVED): govbridge.gather.engine's own overall retrieval
+# budget for one query, independent of any one facet's batch_size. This is DELIBERATELY separate from
+# profiles.<name>.total_kb above: that number bounds the FINAL, COMPILED packet AFTER facet quotas and content
+# trimming (REPAIR_PLAN.md section 2.8, R1-GA3's job); gather intentionally fetches MORE than that so the compiler
+# has something to select from, so tying gather's own stop condition to a compile profile would make its stopping
+# point (and therefore its merged evidence set) depend on which profile a caller happens to be compiling for later --
+# never desired, and never deterministic across an unrelated setting. A caller that DOES want gather bounded by a
+# named compile profile may still opt in explicitly (govbridge.gather.engine.gather's own `budget_profile` argument);
+# the CLI does not do this by default.
+gather:
+  max_items_per_query: 500
+  max_bytes_per_query: 2000000   # ~2 MB of raw candidate text -- generous headroom well above any one compiled
+                                  # packet profile, so an ordinary gather stops on facet coverage, not on this.

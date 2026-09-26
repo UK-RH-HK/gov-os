@@ -1,0 +1,23 @@
+schema: govbridge-facets/1
+purpose: >-
+  A minimal, lexical-only facet registry for tests/gather/test_engine.py's real-view (hermetic fixture repo) tests
+  -- deliberately excludes "semantic" so these tests never spawn the embedding subprocess (govbridge.semantic.runner)
+  and stay fast. Exercises the SAME govbridge.gather.engine code path config/facets.yaml does.
+default_batch_size: 8
+default_max_rounds: 20
+default_threads: 4
+default_target_items: 16
+facets:
+  purpose:
+    routes: [lexical]
+    scope_classes: null
+    lifecycle_scope: null
+    extra_terms: []
+    min_share: 0.1
+  requirement:
+    routes: [lexical]
+    scope_classes: [CONTRACT, FROZEN_GATE_CONTRACT]
+    lifecycle_scope: null
+    extra_terms: []
+    min_share: 0.1
+class_facets: {}

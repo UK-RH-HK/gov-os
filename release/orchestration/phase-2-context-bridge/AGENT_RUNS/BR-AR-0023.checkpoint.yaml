@@ -1,0 +1,225 @@
+run_id: BR-AR-0023
+commit: 08a9fb4b3fe3f9e81b9766907c71fce506e4e9bd
+role: >-
+  REPAIR-1 node R1-GA1 -- govbridge gather, core: query instantiation, facet registry, deterministic parallel
+  facet retrieval, paging and continuation with a configurable batch size, stopping reasons, telemetry; plus the
+  routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017)
+model_observed: claude-sonnet-5
+commands:
+- cmd: cd $D && $PY -m pytest tests/gather/test_engine.py tests/gather/test_instantiate.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check1-pytest-gather.out
+  output_sha256: a424444ce9f672113d18fd6190437eff10c00b7bf815dd45b4c30a3f2e4b4629
+- cmd: >-
+    (superseded attempt, kept for an honest record) $PY -m govbridge gather --task
+    tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --threads {1,4,16} --batch-size 8 (full,
+    default facet set) -- each --threads call exceeded a 115s timeout against the real store with 0 output
+  exit_code: 124
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism.out
+  output_sha256: ce55c451e93369ff765859681de4316a8ec6bd25442af4f20462195be033f6df
+- cmd: >-
+    $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
+    --threads {1,4,16} --batch-size 8 --facets purpose --facets failed_approaches --facets dependencies
+    --facets dependents --facets enforcement --facets tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out
+  output_sha256: 16d6642c108c9ea57e3f9085cccd9ee51d1b754721668e0ac0a6e30c9cb397a9
+- cmd: >-
+    $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
+    --threads 1 --batch-size {2,16} --facets purpose --facets failed_approaches --json, then compare
+    sorted unit_id sets and round counts
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out
+  output_sha256: ef393a35e9b3caf7b1f7a5b01477a9888bb6dea128a8e95823a8bf90d81a2b60
+- cmd: 'grep -rnE ''k: int = 8|DEFAULT_K = 8|k=8\b'' $D/govbridge/'
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out
+  output_sha256: 85acfd2e79dd47df07d214334642196301332f72d792b52068cdfd8898755409
+- cmd: cd $D && $PY -m pytest tests/notes/ -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check5-notes-dispatch.out
+  output_sha256: 4ec477482b4b81afd67a41d19561a9fa7dce3921b1db450427de1f7237431aeb
+- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out
+  output_sha256: 423a3a6b6a892f4842d81f22b1fc30d5daacc5d98e9abc10e48962b72a20bb38
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+  sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0005-MULTI-BATCH-MULTI-HOP-RETRIEVAL.md
+  sha256: 7c051a1ffeaf2296ca1a225d19f7a173948b8dd72130f86944e8daa952377941
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  sha256: a001745a3362fa969cec3e0d548b76e7fdd4e5a4d47f5e3be3552e2fb453691d
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md
+  sha256: 3c84370c83396277d2ce065be06f0cf45e1cad2584188f753a057254c95bdddd
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/task-spec.yaml
+  sha256: 439b8bf28b86b2ff81330fd0a9231fbf1a3a8e254aeda189a360478a10b24dec
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/queries.yaml
+  sha256: d6375e23848926835eaa80c2ab338464df5cf4d8ddf69147d88931c372a9a4c5
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/SELECTION.md
+  sha256: 700be32c88b36413ecd0ca4d967302dc63e5a7cbf376036dab8a75eb5f54b3fc
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
+  sha256: 75bfca67ab28de7e7024d31a53c07aaf4e6e8cec5d2c866900ce4c3af64bf04f
+- path: release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
+  sha256: aaad038af8fe433c7c407c366342744a5df9851ca1b4f41a0726ab56b3733ee6
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+  sha256: 33f342d524b6722cade35f907fab52748d02f97bd23f54d18ac7a4ae55d6d924
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/classes.py
+  sha256: 021e78f130a508a10f37faf5d4a874395abac46222317b6de742cb3b2f1622df
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/__init__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/instantiate.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/facets.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/engine.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/telemetry.py
+  - release/orchestration/phase-2-context-bridge/config/facets.yaml
+  - release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  - release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  - release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+  - release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/search.py
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/vectors.py
+  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_engine.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
+artifacts_changed:
+- release/orchestration/phase-2-context-bridge/config/budgets.yaml
+- release/orchestration/phase-2-context-bridge/config/facets.yaml
+- release/orchestration/phase-2-context-bridge/govbridge/cli.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/__init__.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/engine.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/facets.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/instantiate.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/telemetry.py
+- release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+- release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+- release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+- release/orchestration/phase-2-context-bridge/govbridge/semantic/search.py
+- release/orchestration/phase-2-context-bridge/govbridge/semantic/vectors.py
+- release/orchestration/phase-2-context-bridge/tests/fixtures/gather/fake_routes.py
+- release/orchestration/phase-2-context-bridge/tests/fixtures/gather/gather_repobuilder.py
+- release/orchestration/phase-2-context-bridge/tests/fixtures/gather/test-facets.yaml
+- release/orchestration/phase-2-context-bridge/tests/gather/test_engine.py
+- release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check1-pytest-gather.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check5-notes-dispatch.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out
+findings:
+- >-
+  A real, pre-existing cross-thread sqlite3 bug in govbridge/route/real_routes.py: build_real_routes()'s classify
+  connection and shaped-code connection were each opened ONCE and closed over by every RouteSet call, so the
+  moment two facets run on different threads (exactly what OD-BR-05 section 2 and this node's own engine ask
+  for), the second thread's sqlite call raised "SQLite objects created in a thread can only be used in that same
+  thread." Fixed with threading.local() per connection kind; every single-threaded caller (govbridge search,
+  govbridge.compile.packet, every pre-existing test in tests/route/, tests/compile/, tests/graph/, tests/code/)
+  is unaffected (full domain suite: 506 passed, 0 failed).
+- >-
+  REPAIR_PLAN.md section 2.6's "FACETS_COVERED: every requested facet has at least one item" is a MINIMAL
+  coverage bar, not full exhaustion -- but stopping the FIRST time a facet reaches 1 item makes the final
+  evidence set depend directly on --batch-size (a facet's one satisfying page can carry anywhere from 1 to
+  batch_size items), which breaks acceptance check 3's own "identical merged evidence set" requirement. The
+  resolution built here: each (facet, route) stream pages to a FIXED, batch-size-independent target_items
+  (config/facets.yaml's default_target_items, distinct from default_batch_size on purpose), requesting only
+  min(batch_size, target - already_have) per call -- so the final per-stream count is always
+  min(target_items, total_available) whatever batch_size was, and only the round count varies. Verified
+  empirically on CONTROL-A (check3) and unit-tested (test_batch_size_changes_round_count_not_the_final_evidence_set).
+- >-
+  MARGINAL_GAIN_ONLY_DUPLICATES must be computed from RAW (pre-scope-filter) content identity, never from the
+  scope-filtered/globally-deduped contribution -- an early implementation stopped a scope-restricted facet
+  (`requirement`) after just 2 rounds because its out-of-scope pages "added nothing new" to the merged set, even
+  though each page was genuinely fresh, unseen raw content that a later page could still turn into an in-scope
+  hit. Fixed by tracking a raw_seen dedupe-key set across the whole gather and basing the marginal-gain check on
+  it, never on the compiled merge (see test_scope_filtering_drops_out_of_scope_hits_and_pages_past_them and
+  test_marginal_gain_only_duplicates_when_a_route_keeps_returning_the_same_item, which specifically distinguish
+  the two).
+failed_approaches:
+- >-
+  Tying gather's own BUDGET_REACHED_WITH_UNRESOLVED threshold to config/budgets.yaml's existing
+  profiles.<name>.total_kb (the compiled-PACKET budget) by default. That number bounds the FINAL packet AFTER
+  R1-GA3's facet quotas; gather is expected to over-fetch relative to it, so tying gather's own stop condition to
+  it made the merged evidence set depend on an unrelated compile-time setting (observed directly: CONTROL-A's
+  bounded-builder 100 KB profile cut gather off after ~3-4 rounds regardless of batch size, at a DIFFERENT byte
+  count each time). Replaced with gather's own, separate, more generous config/budgets.yaml gather.max_bytes_per_query
+  (2 MB default); a caller may still opt in to a named compile profile's cap explicitly via
+  govbridge.gather.engine.gather's own budget_profile argument (never the CLI's default).
+- >-
+  Storing tests/gather/conftest.py and putting the "govbridge notes --help dispatches" test in
+  tests/notes/test_cli.py. Both are outside this node's REPAIR_DAG.yaml mutation_scope (only test_engine.py,
+  test_instantiate.py and tests/fixtures/gather/** are listed) and would have made `integrate-check` refuse the
+  branch (git diff touching paths outside the declared scope). Corrected before return: the one isolation
+  fixture moved into test_engine.py (test_instantiate.py never needed it), and the notes-dispatch tests moved
+  into test_engine.py too, exercising govbridge.cli (which IS in scope) directly rather than editing R1-RN's file.
+unresolved:
+- >-
+  The demonstration's own query-set document schema (query_classes/subjects tables, {class, subject} entries) was
+  inferred from ARCHITECTURE/demonstration-queries.yaml's top-level KEY NAMES and value TYPES only (never its
+  query text, per REPAIR-1 rule 2) -- query_classes/subjects values there are plain strings with no {subject}
+  placeholder, so instantiate.py's composition rule (format() if a placeholder is present, else a fixed
+  "template + subject" join) is a generic, documented, but UNVERIFIED-against-the-real-document design choice.
+  Whoever next feeds instantiate.py a real query-set document with structured (dict-shaped) query_classes/subjects
+  should confirm the composition reads as intended.
+- >-
+  config/facets.yaml's class_facets table is empty (every facet applies to every query by default); whether a
+  narrower, real per-class facet mapping is wanted is an open product question for whoever owns the demonstration
+  query set, not something this generic node can decide (OC-BR-02 forbids naming an actual class id here).
+decisions:
+- >-
+  D-R1-GA1-1 (within authority): a facet's coverage target (target_items, config/facets.yaml's
+  default_target_items) is a FIXED value independent of the caller's --batch-size, so batch_size only changes
+  round count, never the final evidence set (see findings). This is the mechanism that makes acceptance check 3
+  hold; REPAIR_PLAN.md section 2.6 does not specify HOW "at least one item" coverage should interact with an
+  arbitrary batch size, so this is a generic, disclosed design choice, not a narrowing of the literal deliverable.
+- >-
+  D-R1-GA1-2 (within authority): MARGINAL_GAIN_ONLY_DUPLICATES fires when a round's RAW (pre-scope-filter)
+  fetches are ALL already-seen (raw_seen), not merely when the compiled/deduped merge gained nothing -- see
+  findings. This is what lets a scope-restricted facet keep paging past out-of-scope pages instead of stopping
+  early.
+- >-
+  D-R1-GA1-3 (within authority): the `versions` facet is registered but synthetic (no route call at all) and
+  always reported MISSING with a disclosed reason ("version reconciliation is REPAIR_DAG.yaml node R1-GA2, not
+  yet built") -- REPAIR_PLAN.md section 2.7 assigns version reconciliation to R1-GA2 explicitly, and this node's
+  own dispatch brief repeats that it must not implement it.
+- >-
+  D-R1-GA1-4 (within authority): the notes-dispatch tests and the one isolation fixture were moved out of
+  tests/notes/test_cli.py and tests/gather/conftest.py respectively, into tests/gather/test_engine.py, to keep
+  every changed path inside the declared mutation_scope (see failed_approaches). No functional behaviour changed
+  by this move.
+- >-
+  D-R1-GA1-5 (requested): whether config/facets.yaml's class_facets should carry a real, non-empty per-class
+  mapping for the actual demonstration query set is left to the orchestrator/R1-TA2/R1-GA2, since deciding it
+  here would require reading query-set CONTENT this node is not permitted to use as acceptance input.
+lessons:
+- >-
+  Any engine that runs facet/route callables on a real ThreadPoolExecutor against the real store should be
+  checked for shared, cached sqlite3 connections FIRST -- a single-threaded acceptance suite will never catch
+  this (every pre-existing test in this domain used --threads 1 or a single-threaded FakeRouteSet-equivalent),
+  and the failure mode ("SQLite objects created in a thread can only be used in that same thread") only appears
+  once two facets genuinely run concurrently on different threads.
+- >-
+  When a "stop once minimally covered" rule (here, OD-BR-05/REPAIR_PLAN's "at least one item") is combined with a
+  caller-configurable page/batch size, check FIRST whether the two interact to make the final result
+  batch-size-dependent; if so, the fix is usually a second, FIXED (config, not caller-supplied) target that the
+  configurable page size converges toward, never the page size itself as the completion criterion.
+next_consumer: >-
+  R1-GA2 (adaptive follow-up via the identifier_extractor hook this node built but left unwired; version
+  reconciliation for the `versions` facet slot this node registered) and R1-GA3 (wiring `gather` into
+  govbridge.compile, and full code-facet pagination parity for callees_of/reads_key_of consumers if wanted); the
+  orchestrator for the two disclosed open_issues (ExclusionCounter thread-safety in taskctx.py, out of this
+  node's scope; and whether class_facets should be filled in) and for confirming the notes-dispatch test's
+  placement in tests/gather/test_engine.py (rather than tests/notes/test_cli.py) is acceptable.
+final_commit: 08a9fb4b3fe3f9e81b9766907c71fce506e4e9bd

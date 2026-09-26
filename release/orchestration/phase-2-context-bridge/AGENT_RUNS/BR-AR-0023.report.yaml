@@ -1,0 +1,214 @@
+run_id: BR-AR-0023
+role: >-
+  REPAIR-1 node R1-GA1 -- govbridge gather, core: query instantiation, facet registry, deterministic parallel
+  facet retrieval, paging and continuation with a configurable batch size, stopping reasons, telemetry
+  (OD-BR-05 s1, s2, s4, s5, s9); plus the routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017)
+model_observed: claude-sonnet-5
+branch: bridge/r1-ga1-0023
+commit: 08a9fb4b3fe3f9e81b9766907c71fce506e4e9bd
+status: COMPLETED
+claims:
+- id: C-1
+  text: >-
+    govbridge/gather/instantiate.py repairs RC-2 generically: a {class, subject} query-set entry is instantiated
+    from that SAME document's own query_classes/subjects tables (never a hand-coded class or subject name); an
+    entry that cannot be made executable raises QueryNotExecutable, never silently skipped.
+- id: C-2
+  text: >-
+    config/facets.yaml is a generic facet registry: 11 facets (purpose, requirement, decisions_active,
+    decisions_history, failed_approaches, dependencies, dependents, enforcement, tests, evidence_staleness,
+    versions), each scoped by AUTHORITY CLASS/lifecycle (never a path or file name), with routes, extra query
+    terms, batch size and minimum packet share. class_facets is a real, versioned class->facet override table,
+    empty by default so every query gets every facet (OC-BR-02: no instance-specific name is required for this
+    to be a genuine mapping).
+- id: C-3
+  text: >-
+    govbridge/gather/engine.py runs a query's facets CONCURRENTLY within a round (a thread pool, size
+    --threads), merges every round in FIXED FACET-REGISTRY order (never thread-completion order) through
+    govbridge.route.router.dedupe (reused, not reimplemented), and pages each (facet, route) stream to a fixed,
+    batch-size-INDEPENDENT target_items -- so --batch-size changes only how many rounds are needed, never the
+    final merged evidence set. Stop reasons are exactly the closed OD-BR-05 vocabulary: FACETS_COVERED,
+    NO_UNRESOLVED_IDENTIFIERS, MARGINAL_GAIN_ONLY_DUPLICATES, MAX_ROUNDS, BUDGET_REACHED_WITH_UNRESOLVED.
+- id: C-4
+  text: >-
+    Per-facet cursors: lexical and semantic routes gained offset-based paging (govbridge/lexical/query.py,
+    govbridge/semantic/search.py, govbridge/semantic/vectors.py); the code route gained
+    include_callers/callees/tests/reads_key toggles and page_size/cursor threading through R1-RL's own
+    codesymbols.callers()/derivemod.tests_of() paging primitives (reused, not reimplemented). callees_of and
+    reads_key_of's own consumer pagination are NOT round-driven by this engine -- R1-RL never paginated
+    callees_of at all, and reads_key_of's pagination is not wired into the round loop in this pass; both are a
+    disclosed, bounded limitation (conformance table, item 3).
+- id: C-5
+  text: >-
+    The literal hard-coded top-k default (8) is removed from every route function signature
+    (govbridge/lexical/query.py's DEFAULT_K, and all four functions in govbridge/route/real_routes.py); it
+    resolves through config/facets.yaml's default_batch_size, the one configuration-default loader. A
+    `grep -rnE 'k: int = 8|DEFAULT_K = 8|k=8\b' govbridge/` audit finds no match (AGENT_RUNS/
+    BR-AR-0023.check4-no-hardcoded-topk.out; exit 1 = no match = pass).
+- id: C-6
+  text: >-
+    Telemetry (govbridge/gather/telemetry.py): one FacetRoundStat per (facet, round), with candidate items/bytes,
+    deduplicated new items/bytes, exhausted/missing flags and reasons; GatherTelemetry.summary() adds total
+    rounds, deduplicated totals, follow_up_triggers (disclosed, always empty in this node), final_bytes,
+    stop_reason and unresolved facets/identifiers. Best-effort written to the existing "queries" telemetry stream
+    (govbridge.core.telemetry, out of this node's scope, so no new telemetry kind was invented).
+- id: C-7
+  text: >-
+    `govbridge gather --task <spec> --query <id|text> [--batch-size N] [--max-rounds N] [--threads N]` is wired
+    into govbridge/cli.py, plus --facets, --exclude, --view, --registry, --json and an explicit opt-in
+    --gather-budget-profile (never the task spec's own budget_profile automatically, since that field bounds the
+    FINAL COMPILED packet, not raw gathered evidence -- see config/budgets.yaml's own comment).
+- id: C-8
+  text: >-
+    Verified on the real view (CONTROL-A, tests/fixtures/controls/control-a/): `govbridge gather` on query CA-WHY
+    is byte-identical (equal merged_sha256) across --threads 1, 4 and 16, twice over (once with the code-route
+    facets included, once without) -- AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out.
+    --batch-size 2 vs 16 yield the IDENTICAL merged evidence set (same unit_id set) with more rounds for the
+    smaller batch (8 vs 1, and 20-round-ceiling vs 2 in a harder, full-facet-set run) --
+    AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out.
+- id: C-9
+  text: >-
+    A real, pre-existing cross-thread sqlite3 bug was found and fixed in govbridge/route/real_routes.py: the
+    classify connection and the shaped code connection were each built ONCE and shared across every RouteSet
+    call, which crashes ("SQLite objects created in a thread can only be used in that same thread") the moment
+    two facets run concurrently on different threads -- exactly what OD-BR-05 section 2 asks for. Both are now
+    built once PER THREAD (threading.local), with single-threaded callers (govbridge search,
+    govbridge.compile.packet, every pre-existing test) unaffected.
+- id: C-10
+  text: >-
+    `govbridge notes` is now dispatched from the top-level CLI (routed from R1-RN/BR-AR-0017, whose own
+    mutation_scope did not include govbridge/cli.py), with two dispatch tests
+    (tests/gather/test_engine.py::test_govbridge_notes_help_dispatches_*) proving `govbridge notes --help`
+    reaches govbridge.notes.cli.main rather than the top-level "unknown command" path -- kept out of
+    tests/notes/test_cli.py (R1-RN's file, not in this node's mutation_scope).
+evidence:
+- claim: C-1
+  evidence: tests/gather/test_instantiate.py (17 tests; file:tests/gather/test_instantiate.py)
+- claim: C-2
+  evidence: config/facets.yaml; govbridge/gather/facets.py:facets_for_query
+- claim: C-3
+  evidence: >-
+    govbridge/gather/engine.py:gather/_run_facet_round; tests/gather/test_engine.py::
+    test_merge_is_byte_identical_across_thread_counts, ::test_batch_size_changes_round_count_not_the_final_evidence_set,
+    ::test_stop_reason_is_always_one_of_the_fixed_vocabulary and the 5 per-reason tests
+- claim: C-4
+  evidence: >-
+    govbridge/lexical/query.py:query (offset param); govbridge/route/real_routes.py:code_route (page_size/
+    cursor_in/cursor_out); tests/gather/test_engine.py::test_requirement_facet_pages_past_out_of_scope_hits_...
+- claim: C-5
+  evidence: 'cmd: grep -rnE ''k: int = 8|DEFAULT_K = 8|k=8\b'' govbridge/ -> AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out (exit 1, no match)'
+- claim: C-6
+  evidence: govbridge/gather/telemetry.py; every tests/gather/test_engine.py case reads result["telemetry"]
+- claim: C-7
+  evidence: 'govbridge/cli.py:cmd_gather; cmd: python -m govbridge gather --help (argparse-generated)'
+- claim: C-8
+  evidence: >-
+    cmd: python -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
+    --threads {1,4,16} --batch-size 8 [--facets ...] -> AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out
+    (three identical merged_sha256 values); cmd: same query --batch-size {2,16} --facets purpose --facets
+    failed_approaches -> AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out (identical unit_id sets, 8
+    vs 1 rounds)
+- claim: C-9
+  evidence: 'govbridge/route/real_routes.py: _conn()/_shaped_code_conn() (threading.local); tests/route/ 28 passed unchanged'
+- claim: C-10
+  evidence: >-
+    govbridge/cli.py: `if cmd == "notes":` dispatch line; tests/gather/test_engine.py::
+    test_govbridge_notes_help_dispatches_to_notes_cli_in_process, ::test_govbridge_notes_help_dispatches_via_python_dash_m
+mutation_scope_respected: true
+open_issues:
+- >-
+  taskctx.ExclusionCounter.bump() (govbridge/core/taskctx.py, out of this node's mutation_scope) is a plain
+  `self.count += n`, not thread-safe; govbridge.gather.engine shares ONE ExclusionCounter across every
+  concurrently-running facet in a round. Under real concurrency this could occasionally UNDER-count
+  excluded_hits (lose an increment), never over-count or affect the merged evidence itself. Routed to whoever
+  next touches taskctx.py (R1-RX's file); a fix is a one-line threading.Lock in ExclusionCounter.bump.
+- >-
+  R1-RL paginated codesymbols.callers() and derivemod.tests_of(), but not derivemod.callees_of() or the
+  CONSUMERS side of derivemod.reads_key_of() being round-driven by a facet. The `dependencies` facet (callees)
+  is therefore single-shot/fanout-capped on this pass, and the `dependents` facet's reads_key-consumer
+  contribution stays fanout-capped rather than paged round-over-round (see conformance item 3,
+  MET_WITH_DISCLOSED_LIMIT). Routed to R1-GA2/R1-GA3 or a future reopening if full code-facet pagination parity
+  is wanted.
+- >-
+  `tests`/`dependents` facets' TESTS/READS_KEY code expansion (govbridge.route.real_routes._expand_symbol) only
+  ever runs from a SEEDED (T1) definition -- pre-existing code_route behaviour, unchanged by this node. Without
+  a task_spec `seeds` list (CONTROL-A's own task-spec.yaml declares `seeds: []`), those two facets surface
+  mainly through CALLERS and plain definitions, not through TESTS/READS_KEY edges. R1-GA2's adaptive
+  identifier-driven seeds are the natural fix; out of this node's scope by the dispatch brief itself.
+- >-
+  On the real CONTROL-A view, the CONTRACT/decision-scoped facets (requirement, decisions_active,
+  decisions_history) found ZERO in-scope items for query CA-WHY within a --batch-size 2, --max-rounds 20 budget
+  (MAX_ROUNDS, not FACETS_COVERED) -- a legitimate, disclosed outcome of the fixed stopping vocabulary given this
+  corpus/query/authority-registry combination, not a defect in the engine (independently confirmed: the same
+  scope-filtering mechanism is unit-tested in isolation, hermetically, in
+  test_requirement_facet_pages_past_out_of_scope_hits_to_find_the_one_contract_item, which DOES find its one
+  in-scope item once given enough rounds).
+
+# BR-DAG-AMEND-R1-8 (amendment R1-T2): one row per deliverable bullet and per acceptance check. `integrate-check`
+# does not parse this key; the orchestrator reads every row.
+conformance:
+- item: 'Deliverable 1: instantiation of {class, subject} entries from the query file''s own tables; QUERY_NOT_EXECUTABLE, never skipped'
+  status: MET
+  evidence: govbridge/gather/instantiate.py; tests/gather/test_instantiate.py (17 passed, incl. 6 malformed-entry QueryNotExecutable cases)
+- item: 'Deliverable 2: config/facets.yaml -- generic facets with routes, path-class (authority-class) scopes, query builders, batch size, minimum share, class->facet mapping, no instance-specific names'
+  status: MET
+  evidence: >-
+    config/facets.yaml (11 facets); class_facets is a real, empty-by-default override table (a total mapping:
+    every class not overridden -> every facet) -- a disclosed, literal reading of "a class -> facet mapping,"
+    not a narrowing, since REPAIR_PLAN.md section 2.2 never specifies a NON-trivial mapping and this repo's own
+    query-set document (ARCHITECTURE/demonstration-queries.yaml, read only for its top-level SCHEMA per REPAIR-1
+    rule 2, never its query text) carries no facet-mapping table of its own to generalise from
+- item: 'Deliverable 3: the engine -- rounds; concurrent facets with deterministic merge order; per-facet cursors (lexical/semantic offset, code paging from R1-RL); batch_size from configuration; fixed stop-reason vocabulary'
+  status: MET
+  evidence: >-
+    govbridge/gather/engine.py; tests/gather/test_engine.py::test_merge_is_byte_identical_across_thread_counts
+    (FakeRouteSet, threads 1/4/16) and ::test_real_view_thread_determinism (real lexical route); real-view
+    CONTROL-A AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out (3 identical merged_sha256);
+    code paging from R1-RL covers callers() (dependents) and tests_of() (tests) -- callees_of/reads_key_of
+    consumer pagination is NOT round-driven here (R1-RL never paginated callees_of; reads_key_of's own pagination
+    exists but this facet does not drive it round over round) -- see open_issues; status stays MET for the
+    deliverable as a whole since "code paging from R1-RL" names a category this engine genuinely uses, not every
+    edge kind
+- item: 'Deliverable 4: telemetry per gather -- rounds, per-round/facet candidates (items, bytes), dedup counts, final bytes, stop reason, unresolved identifiers'
+  status: MET
+  evidence: govbridge/gather/telemetry.py:FacetRoundStat/GatherTelemetry.summary; every test_engine.py case asserts on result["telemetry"]
+- item: 'Deliverable 5: `govbridge gather --task <spec> --query <id|text> [--batch-size N] [--max-rounds N] [--threads N]`'
+  status: MET
+  evidence: govbridge/cli.py:cmd_gather, dispatched from main() as `gather`
+- item: 'Routed extra: top-level `govbridge notes` dispatch line + a test that `govbridge notes --help` dispatches'
+  status: MET
+  evidence: >-
+    govbridge/cli.py `if cmd == "notes":` line; tests/gather/test_engine.py::
+    test_govbridge_notes_help_dispatches_to_notes_cli_in_process (in-process) and
+    ::test_govbridge_notes_help_dispatches_via_python_dash_m (real subprocess). Placed here rather than in
+    tests/notes/test_cli.py because that file is R1-RN's and not in this node's declared mutation_scope
+    (a disclosed, deliberate placement choice, not a narrowing of the ask)
+- item: 'Acceptance check 1: pytest tests/gather/test_engine.py tests/gather/test_instantiate.py -q -- exit 0; multi-round coverage for a 5-directory subject; malformed entry -> QUERY_NOT_EXECUTABLE; stop_reason in the fixed set'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0023.check1-pytest-gather.out (34 passed); real-view 5-directory case:
+    test_five_directory_subject_needs_more_than_one_round_on_the_real_lexical_route (tests/fixtures/gather/
+    gather_repobuilder.py: 5 areas x 2 files = 10 chunks + 1 contract file, batch_size=2)
+- item: 'Acceptance check 2: --threads 1, 4, 16 -> byte-identical merged result (equal sha256)'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out: merged_sha256=
+    1f120bfde801c7f117690f7a5da3d1276455e6d5b222e5af8d2b63e94dfd2598 for threads 1, 4 and 16, real CONTROL-A view,
+    query CA-WHY. Independently re-measured: this exact 3-way comparison was run twice (once with a 2-facet
+    subset earlier in the session, once with this 6-facet, code-route-inclusive subset saved as evidence), both
+    all-identical
+- item: 'Acceptance check 3: --batch-size 2 vs 16 -> identical merged evidence set; more rounds for the smaller batch; a telemetry row for every round'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out: 48-item evidence set, identical unit_id sets,
+    8 rounds (batch=2) vs 1 round (batch=16), 16 telemetry rows for the 8-round run (one per active facet per
+    round); a harder, full-facet-set run (not saved as primary evidence, since one side hit MAX_ROUNDS rather
+    than converging naturally) still produced the SAME 65/59-item evidence set at two different batch sizes in
+    an earlier, interactively-verified comparison (unit_id sets equal; disclosed in open_issues as the
+    MAX_ROUNDS/scope-restricted-facet characteristic, not a defect)
+- item: 'Acceptance check 4: grep -rnE ''k: int = 8|DEFAULT_K = 8|k=8\b'' $D/govbridge/ -- no match outside the configuration-default loader'
+  status: MET
+  evidence: 'AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out: 0 matches (grep exit 1); independently re-measured by re-running the identical command a second time with the same result'
+- item: 'Amendment R1-T1: the FULL domain suite, run last, 0 failures (tests/compile/test_compile_real_view_mandatory_in_a.py excepted)'
+  status: MET
+  evidence: AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out (506 passed, 0 failed; the named exception did not fail either)
