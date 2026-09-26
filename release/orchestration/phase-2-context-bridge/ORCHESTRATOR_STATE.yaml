@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T08:40:11Z'
-state_hash: a7a754079b2f0e0d1c3b66c7209b37c2534be5117a79c1298d41fddfe861b101
+updated_at: '2026-09-26T08:46:08Z'
+state_hash: ac2f2abd4336e04aa8bb73bfdc6d9bf679011c8bf3ab6bf8774b679ae303281c
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1145,6 +1145,26 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga1-0023
   checkpoint_schema: 2
+  final_commit: 13fef0c612624981cc7254d9d07fe1e4f8bb0268 (source 9c27420)
+  merged_at: cb43abc (final; interim 4114437)
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, pass 3)
+  pass_3:
+    fixed: 'the scope structures are built at BUILD time in their owning layers -- occurrence_distinct_path in core/store.py
+      (pruned at the three incremental DELETE sites in core/freshness.py, same transaction), the record_def_by_path index in
+      authority/layer.py; lexical and semantic query paths open via store.open_db_readonly() (mode=ro&immutable=1) and raise a
+      typed StoreNeedsRebuild when a structure is missing -- never a write, never a silent fallback; a pre-existing
+      unconditional chunk JOIN in vectors.search() fixed; 9 tests (a file-level read-only store unchanged by sha256, the typed
+      error, no stale pair after an incremental rebuild, identical from-clean content); CA-WHY 72.78 s, 118 items,
+      FACETS_COVERED'
+    orchestrator_verified:
+    - FULL domain suite on the merged tree -- 597 passed, 0 failed
+    - secrecy -- no new reads (the same format-only reads recorded in pass 1, plus comments); claude-sonnet-5 x1350; cli.py, the
+      state file (its sync commit was reverted -- net diff zero) and every protected test untouched
+    open_issues_routed:
+    - code/symbols.py ensure_indexed builds at query time; authority/layer.py classify_hit calls ensure_schema() at query time,
+      which keeps real_routes._conn() on the read-write open -> R1-XC (BR-DAG-AMEND-R1-17)
+    - an existing store built before this pass needs a from-clean rebuild to backfill occurrence_distinct_path -> R1-D2 builds
+      from clean; R1-XC and R1-INT must not rely on an old store
   pass_1:
     final_commit: fbeabd2875d3c907e1f1fcea7deb207f6e978d23
     interim_merge: 4114437 (BR-DAG-AMEND-R1-13 -- so R1-RS can start; the node stays OPEN)
@@ -1188,7 +1208,7 @@ agent_runs:
     - callees are not paged, and reads_key_of consumer paging is not round-driven -> R1-GA2's follow-up resolvers page
       callers, tests_of and reads_key_of through their cursors within budget
   dispatched_at: '2026-09-26T04:45Z'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
   store: $HOME/.cache/gov-bridge/store-BR-AR-0023
   dispatch_notes:
   - base contains R1-RX (taskctx, --task, exclusions) and R1-RL's accepted paging primitives (interim merge,
@@ -1282,9 +1302,74 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/supplementary/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.*
   - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_bootstrap.py
+- run_id: BR-AR-0024
+  role: 'REPAIR-1 node R1-GA2 -- gather adaptive follow-up and merge: identifier extraction and resolution, triggered rounds, provenance-preserving dedup, occurrence collapse, version reconciliation, authority and lifecycle filtering'
+  dag_node: R1-GA2
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  handoff_note: template revision with amendments R1-T1 and R1-T2
+  branch: bridge/r1-ga2-0024
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0024
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-ga2-0024
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T08:46Z'
+  status: BR-AR-0024NING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0024
+  dispatch_notes:
+  - builds on R1-GA1 FINAL (engine, scope push-down, read-only lexical/semantic) and R1-RL FINAL (the lineage layer)
+  - follow-up resolvers page callers, tests_of and reads_key_of through their cursors within budget (routed from R1-GA1)
+  - BR-DAG-AMEND-R1-15 applies; the code route's own query-time write is R1-XC's (BR-DAG-AMEND-R1-17)
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/identifiers.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/merge.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/versions.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_followup.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.*
+- run_id: BR-AR-0034
+  role: 'REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17) -- cross-cutting fixes: freshness -m entry point, gitobj repo_root cache, authority import-time config read, thread-safe ExclusionCounter, read-only code and classification query paths'
+  dag_node: R1-XC
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  handoff_note: template revision with amendments R1-T1 and R1-T2
+  branch: bridge/r1-xc-0034
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0034
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-xc-0034
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T08:46Z'
+  status: BR-AR-0034NING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0034
+  dispatch_notes:
+  - authority/classes.py -- the config-read change only; the class table byte-unchanged
+  - runs in parallel with R1-GA2 (disjoint scope); base contains R1-GA1 FINAL's core/store.py and core/freshness.py changes
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/__init__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/classes.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+  - release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+  - release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  - release/orchestration/phase-2-context-bridge/tests/code/conftest.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_freshness_entrypoint.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_gitobj_repo_root.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_taskctx_concurrency.py
+  - release/orchestration/phase-2-context-bridge/tests/authority/test_lazy_config.py
+  - release/orchestration/phase-2-context-bridge/tests/route/test_real_routes.py
+  - release/orchestration/phase-2-context-bridge/tests/code/test_symbols_readonly.py
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0034.*
 running_work:
-- run_id: BR-AR-0023
-  liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
+- run_id: BR-AR-0024
+  liveness_check: subagent transcript mtime + commits on bridge/r1-ga2-0024; never inferred from elapsed time
+- run_id: BR-AR-0034
+  liveness_check: subagent transcript mtime + commits on bridge/r1-xc-0034; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -1464,6 +1549,18 @@ dag:
     reason: an integrator that fixes four cross-cutting defects and then audits the tree would be grading its own work;
       waves 1-3 showed builders repeatedly reporting narrowed deliverables as MET, so the integration audit gets the
       stronger model; the split also lets the fixes run in parallel with PG3/PG4 instead of serialising behind them
+  - id: BR-DAG-AMEND-R1-17
+    by: orchestrator (routing of R1-GA1's final open issues under BR-DAG-AMEND-R1-15)
+    rule: 'R1-XC additionally makes the CODE and CLASSIFICATION query paths read-only -- (5) code/symbols.py ensure_indexed must not
+      build at query time (the code layer is built eagerly at build time since B3R; a missing layer raises the typed
+      StoreNeedsRebuild); (6) authority/layer.py classify_hit must not call ensure_schema() at query time, and
+      route/real_routes.py _conn() moves to store.open_db_readonly(); pre-existing tests that relied on query-time schema
+      creation are corrected to run the builder first (a rule-5 correction, justified). Scope extension:
+      govbridge/code/symbols.py, govbridge/authority/layer.py, govbridge/route/real_routes.py, tests/route/test_real_routes.py,
+      tests/code/test_symbols_readonly.py. Acceptance: gather on a file-level read-only store with every route (lexical,
+      semantic, code, exact) and classification active leaves the store sha256 unchanged'
+    reason: R1-GA1 removed the lexical and semantic query-time writes; the code route and hit classification still write at
+      query time, so gather cannot yet run against the read-only run-2 demonstration store
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1621,6 +1718,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await the BR-AR-0023 R1-GA1 follow-up (build-time scope structures; read-only query paths; open_db
-  ro mode); integrate-check + FULL suite on the trial-merged tree, merge; then dispatch R1-GA2 (BR-AR-0024; draft ready, with
-  BR-DAG-AMEND-R1-15); then PG4 (R1-GA3 after GA2+RS+RN+RM; R1-RA after GA2+RS); checkpoint after every merge
+next_deterministic_action: await BR-AR-0024 R1-GA2 and BR-AR-0034 R1-XC (parallel); integrate-check + FULL suite on the
+  trial-merged tree, merge; on GA2 dispatch PG4 -- R1-GA3 (BR-AR-0026) and R1-RA (BR-AR-0027), drafts ready; after GA3, RA and
+  XC, dispatch R1-INT (BR-AR-0028, OPUS, audit-only); checkpoint after every merge
