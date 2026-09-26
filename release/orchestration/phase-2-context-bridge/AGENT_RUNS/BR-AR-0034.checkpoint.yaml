@@ -1,5 +1,5 @@
 run_id: BR-AR-0034
-commit: PASS5_COMMIT_SHA_PLACEHOLDER
+commit: 30cbb5fa01ce72891bc93d3b36738f831b2d72e2
 role: >-
   REPAIR-1 node R1-XC (BR-DAG-AMEND-R1-16/-17/-23) -- cross-cutting fixes: freshness -m entry point (R1-5), gitobj
   repo_root cache (R1-6), authority import-time config read (R1-12), thread-safe ExclusionCounter (R1-14),
@@ -1263,4 +1263,4 @@ next_consumer: >-
   currently exercised). `tests/authority/conftest.py`/`tests/notes/conftest.py`/`tests/semantic/conftest.py`/
   `tests/core/conftest.py`'s own delenv-only pattern (pass 3's original finding) remains unchanged, still routed
   to R1-INT's own audit.
-final_commit: PASS5_FINAL_COMMIT_SHA_PLACEHOLDER
+final_commit: 30cbb5fa01ce72891bc93d3b36738f831b2d72e2

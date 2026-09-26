@@ -13,7 +13,7 @@ role: >-
   answers/cite.py, answers/lint.py). This report covers all five.
 model_observed: claude-sonnet-5
 branch: bridge/r1-xc-0034
-commit: PASS5_COMMIT_SHA_PLACEHOLDER
+commit: 30cbb5fa01ce72891bc93d3b36738f831b2d72e2
 status: COMPLETED
 claims:
 - id: C-1
