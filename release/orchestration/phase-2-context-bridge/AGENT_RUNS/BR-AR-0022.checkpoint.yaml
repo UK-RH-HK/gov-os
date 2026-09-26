@@ -127,7 +127,6 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out
   output_sha256: ce9ef461e616853cd5ff7a9bbf1437716c1f8c3c803cff23c9bf224cdc6e8695
-role: 'REPAIR-1 node R1-RM builder'
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
 - release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
