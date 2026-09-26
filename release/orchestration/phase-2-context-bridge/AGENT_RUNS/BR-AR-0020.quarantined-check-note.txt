@@ -1,0 +1,9 @@
+R1-RG (BR-AR-0020) acceptance_checks, second entry: "(orchestrator only, quarantined) $PY -m govbridge demo grade
+over run-1 with the run-1 oracle". The node's own text marks this ORCHESTRATOR-ONLY. This builder never read the
+run-1 oracle, DEMONSTRATION/oracle*, DEMONSTRATION/grading/**, bridge/grade-* or any sealed directory (REPAIR-1
+rule 1) and did not run this check. The orchestrator runs it separately against the sealed oracle and compares the
+per-item [D] results to BR-AR-0012's design-rule results, as the node specifies. This builder's own acceptance
+evidence is the first check only (the full pytest run over
+tests/integration/test_demo_grade.py, tests/integration/test_demo_grade_regressions.py and
+tests/integration/test_extract_reads.py), plus a full-repository test run (347 tests, all synthetic/fixture-based)
+confirming no regression outside this node's scope.

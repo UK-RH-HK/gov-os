@@ -28,6 +28,31 @@ _FILE_TOKEN_RE = re.compile(r"[\w./-]+\.(?:rs|md|yaml|yml|json|py|toml|txt|out|s
 _READ_CMD_RE = re.compile(r"\b(cat|sed|head|tail|less|nl)\b")
 _SEARCH_CMD_RE = re.compile(r"\b(grep|rg|find|ls)\b")
 
+# GD-6: a govbridge "selector" argument -- the exact/search/why/impact/history/state query commands' own path
+# syntax (an optional scheme prefix such as ``records:``, an optional ``@commit``, and a MANDATORY
+# ``:start[-end]`` line-range suffix) -- is a QUERY ARGUMENT, never a file read: the content it names is
+# retrieved (and accounted for separately, in the receipt) through govbridge itself, never read directly off
+# disk. The distinguishing, generic signal is the trailing line-range suffix, which a bare path given to a real
+# read command (``cat``/``sed``/...) never carries -- REPAIR_PLAN.md section 8.2 GD-6's own example,
+# ``gq.sh exact ... 'path/to/file.rs:1-5'``, is exactly this shape, whatever the wrapper script around the actual
+# govbridge invocation happens to be named (OC-BR-02: this recognises the SYNTAX, not one particular script name).
+_SELECTOR_RE = re.compile(
+    r"(?:\b[a-z][\w-]*:)?"                                             # optional scheme, e.g. records:
+    r"[\w./-]+\.(?:rs|md|yaml|yml|json|py|toml|txt|out|sh|jsonl|log)"  # the path itself
+    r"(?:@[0-9a-f]{6,40})?"                                             # optional @commit
+    r":\d+(?:-\d+)?"                                                    # the line-range suffix -- what MAKES it a selector
+)
+
+# GD-6: the agent's own OUTPUT -- a shell redirection target (``>``/``>>``) or a ``--out``/``-o`` flag's argument
+# in the SAME command -- is a WRITE, never a read. Without this, re-reading it back later in the same command
+# (``... ; head -c 500 $out``) would be misread as an external read of freshly-produced, non-corpus content.
+_REDIRECT_TARGET_RE = re.compile(r"(?:>{1,2}|--out(?:put)?[= ]|-o\s+)\s*([\w./\"'$-]+)")
+
+# GD-6/D-4 (BR-ARCH-RULING-2 D-4): scratch and the run's own directory are not corpus -- a path here is the
+# agent's own working area, its own already-supplied task input, or its own already-produced output, generically
+# ("No, when the file is under run-<n>/ ..."), never one particular run.
+_SCRATCH_PATH_RE = re.compile(r"(?:^|/)(?:tmp|scratchpad)(?:/|$)|(?:^|/)run-\d+(?:/|$)")
+
 # G7's own sweep list (DEMONSTRATION_DESIGN.md section 4): each entry is (reason, pattern).
 _SWEEP_PATTERNS = [
     ("grep -r at a root-ish path", re.compile(r"\bgrep\s+(?:-\w+\s+)*-\w*r\w*\b")),
@@ -43,8 +68,19 @@ _SWEEP_PATTERNS = [
 _RG_RE = re.compile(r"(?<![\w.-])rg\b(?!\.)")
 
 
-def _files_in_command(cmd: str) -> list:
-    return _FILE_TOKEN_RE.findall(cmd or "")
+def _files_in_command(cmd: str) -> tuple:
+    """GD-6: returns ``(read_files, selector_refs, own_outputs)``. A govbridge selector argument and a
+    redirection/``--out`` target are found and MASKED OUT of the command text before the generic bare-file-token
+    scan runs, so neither is misread as a file the agent read directly off disk; `read_files` additionally drops
+    any token under scratch/``run-<n>/`` (D-4) -- the agent's own working area or already-supplied/produced
+    material, not a corpus read."""
+    cmd = cmd or ""
+    selector_refs = _SELECTOR_RE.findall(cmd)
+    masked = _SELECTOR_RE.sub(" ", cmd)
+    own_outputs = _REDIRECT_TARGET_RE.findall(masked)
+    masked = _REDIRECT_TARGET_RE.sub(" ", masked)
+    read_files = [f for f in _FILE_TOKEN_RE.findall(masked) if not _SCRATCH_PATH_RE.search(f)]
+    return read_files, selector_refs, own_outputs
 
 
 def _looks_path_scoped(cmd: str) -> bool:
@@ -60,7 +96,7 @@ def classify_bash(cmd: Optional[str]) -> tuple:
             return "sweep", reason
     if _RG_RE.search(cmd) and not _looks_path_scoped(cmd):
         return "sweep", "rg with no path restriction"
-    files = _files_in_command(cmd)
+    files, _selectors, _own_outputs = _files_in_command(cmd)
     if _READ_CMD_RE.search(cmd) and files:
         if len(files) > 25:
             return "sweep", f"cat/sed of {len(files)} files in one command"
@@ -79,6 +115,8 @@ def extract(transcript_path: str) -> dict:
     reads: list = []
     sweep_commands: list = []
     tool_calls: dict = {}
+    excluded_selectors: list = []
+    excluded_own_outputs: list = []
 
     with open(transcript_path, "r", encoding="utf-8") as fh:
         for line in fh:
@@ -103,12 +141,22 @@ def extract(transcript_path: str) -> dict:
                     if path:
                         reads.append({"path": path, "tool": "Read"})
                 elif name == "Bash":
-                    kind, detail = classify_bash(inp.get("command"))
+                    command = inp.get("command")
+                    kind, detail = classify_bash(command)
                     if kind == "read":
                         for f in detail:
-                            reads.append({"path": f, "tool": "Bash", "command": inp.get("command")})
+                            reads.append({"path": f, "tool": "Bash", "command": command})
                     elif kind == "sweep":
-                        sweep_commands.append({"command": inp.get("command"), "reason": detail})
+                        sweep_commands.append({"command": command, "reason": detail})
+                    # GD-6: recorded for audit even when the command wasn't classified "read" -- a selector
+                    # argument or a redirection target is never a read, but disclosing what was excluded (and why)
+                    # keeps the exclusion itself checkable, the same way `govbridge.core.corpus` discloses a
+                    # content exclusion rather than a blob simply looking unindexed.
+                    _files, selectors, own_outputs = _files_in_command(command)
+                    for s in selectors:
+                        excluded_selectors.append({"selector": s, "command": command})
+                    for o in own_outputs:
+                        excluded_own_outputs.append({"path": o, "command": command})
 
     distinct_paths = sorted({r["path"] for r in reads})
     return {
@@ -118,6 +166,8 @@ def extract(transcript_path: str) -> dict:
         "reads": reads,
         "distinct_files_read": len(distinct_paths),
         "sweep_commands": sweep_commands,
+        "excluded_selectors": excluded_selectors,
+        "excluded_own_outputs": excluded_own_outputs,
     }
 
 
