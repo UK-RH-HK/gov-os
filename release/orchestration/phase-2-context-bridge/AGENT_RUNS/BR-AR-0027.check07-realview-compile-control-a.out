@@ -1,0 +1,13 @@
+=== real-view compile: CONTROL-A ===
+{
+ "budgets_path": null,
+ "excluded_hits": 27,
+ "manifest_sha256": "5e4c5d1732aa373e37f1863f5540c3afa778e10c8481734b21b578f5360570e9",
+ "out": "/tmp/br-ar-0027-realview/ca-packet",
+ "packet_id": "ac17d27f8bb74a5b",
+ "packet_kind": "main",
+ "packet_sha256": "ac17d27f8bb74a5be7842d4244618ae50261608015f2d7a7e7a291f3e6163d8c",
+ "registry_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0027/release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
+ "status": "OK"
+}
+compile_rc=0
