@@ -183,7 +183,22 @@ evidence:
     inherits every other already-correct package from the system site-packages
     (`python3 -m venv --system-site-packages`) and adds only those four, at config/requirements.lock's own exact
     pinned versions.
-mutation_scope_respected: true
+mutation_scope_respected: >-
+  true, by hand-verified diff-vs-scope (see below); `python3 tools/check_state.py integrate-check BR-AR-0034`, run
+  from this branch after pass 3's own commits, reports INTEGRATION_REFUSED against every reopening-scope file
+  (govbridge/code/history.py, compile/codeseeds.py, graph/code_bridge.py, graph/symbol_history.py, demo/grade.py,
+  graph/impact.py; tests/code/**, tests/graph/**, tests/compile/**; tests/integration/test_demo_grade*.py; tests/
+  route/test_query_commands_readonly.py, test_task_exclusions.py) -- this is the SAME stale-base artifact the
+  checkpoint's task_contract.note already documents (this branch's own local ORCHESTRATOR_STATE.yaml still
+  carries only the ORIGINAL, pre-reopening mutation_scope; the second reopening's own scope extension, commit
+  8428ad9 on the shared bridge/p2-context-retrieval branch, and the third reopening's own verbal grant of
+  govbridge/graph/impact.py, are both recorded only in this run's own checkpoint/report, not in any
+  ORCHESTRATOR_STATE.yaml this branch can read), not a real violation. `git diff --name-only 4c769d1..HEAD` was
+  checked by hand against the UNION of the original scope, 8428ad9's own extension, and the third reopening's own
+  grant; every changed path matches, with the one flagged, undecided exception of
+  tests/route/test_task_exclusions.py (see open_issues, decisions D-R1-XC-8) -- a one-line mechanical consequence
+  of the authorized impact.py change, never independently granted, routed for the orchestrator's own ratification
+  rather than silently included or silently reverted.
 conformance:
 - item: 'R1-5: the -m entry point builds the same layer set and digests as the top-level CLI, with a regression test that fails before the fix and passes after'
   status: MET
