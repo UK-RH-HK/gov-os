@@ -4,7 +4,7 @@ role: 'REPAIR-1 node R1-RL builder -- code/test lineage, data dependencies, requ
   identity, continuation'
 model_observed: claude-sonnet-5 (Sonnet 5)
 branch: bridge/r1-rl-0019
-commit: 5b2f7c09e3dd939de1a28467a7a9b16ecca56819
+commit: 89950cb401cf7b93adc5cf7060251a97743b945c
 status: COMPLETED
 claims:
 - 'CORRECTION of a WRONG claim in this report''s own previous revision: I previously wrote "CITES_REQUIREMENT is 0
@@ -72,8 +72,11 @@ claims:
   GOVBRIDGE_SYMBOL_HISTORY_MAX_COMMITS), resolved FRESH on every call, never a module-level constant baked in at
   import time. Truncation stays disclosed via bounded_incomplete in every result.'
 - 'BR-DAG-AMEND-R1-4 (full domain suite as the last check; hermetic tests): $PY -m pytest -q -p no:cacheprovider
-  tests, from the domain, passes with 0 failures on the FINAL state of this branch (385 passed -- 361 plus the 24
-  new tests this reopening round added). Every new/modified test file also verified standalone. Fixed a real
+  tests, from the domain, passes with 0 failures on the FINAL state of this branch (396 passed -- 385 from the
+  second reopening plus 11 new tests this THIRD reopening round added: 6 in test_rust_cli.py for Defect B''s
+  impl-wrapper-method/receiver-resolution/ambiguous-name mechanism, 5 in test_lineage_layer.py for Defect A''s
+  multi-ref/version-status behaviour and Defect B''s end-to-end wiring). Every new/modified test file also
+  verified standalone. Fixed a real
   hermeticity defect in my OWN first-return test (tests/graph/test_derive.py''s CLI-dispatch test depended on
   gitobj.resolve_commit("HEAD") with repo=None -- the shared repository''s LIVE, other-agents-mutate-it HEAD -- and
   a CWD-relative read); rewritten as a fully synthetic fixture, explicit repo=, GOV_BRIDGE_DOMAIN monkeypatched
@@ -103,6 +106,47 @@ claims:
   EXACT_CLI_DISPATCH, 2 Rust EXACT_RUST_CLI_DISPATCH], 2 CITES_REQUIREMENT), reproduced identically across two
   from-clean builds pinned to the SAME resolved commit, and freshness-NOOP afterwards. Cost: ~96s wall, ~404 KiB
   store size -- not disproportionate (the same box''s semantic/embedding layer alone took ~885s).'
+- 'THIRD reopening, Defect A fix: the lineage layer walked only the "records" ref, but config/canonical-view.yaml
+  assigns product-code paths to the PRODUCT ref (pinned, canonical); records can hold an older, non-canonical copy
+  of that same code (independently confirmed: 31 vs 60 files under tests/certification/** on records vs the
+  product pin 3c880d8 -- exactly the reopening ruling''s own numbers). Fixed generically: lineage_layer_builder now
+  calls govbridge.code.build.eager_ref_names (REUSED, never re-derived -- selection is by RefSpec.role/layers,
+  never by ref name; on the real view this evaluates to {records, product, evidence}) and walks every ref it
+  returns. Every row now carries its own ref_name/commit_id (the PRIMARY KEY gained both, so a stale ref''s TESTS
+  edges -- keyed by bare test name, not occ() -- can never silently overwrite, or be overwritten by, a canonical
+  ref''s same-named edge) and its own version_status/canonical_ref/canonical_commit, computed by a new
+  _version_status function that MIRRORS govbridge.core.view.ResolvedView.classify_occurrence exactly for its two
+  dominant branches (reading this build''s own already-fetched per-ref path->blob maps instead of re-issuing
+  ~3300 extra git subprocess calls) and DELEGATES to the real function for its two rare branches -- proven to
+  agree with it directly (tests/code/test_lineage_layer.py::test_version_status_agrees_with_classify_occurrence).
+  Real view: 2830 total edges across all 3 refs (990 evidence + 982 product + 858 records), reproducible
+  (identical digest across two from-clean builds of the SAME pinned view); 82 real HISTORICAL_VERSION rows on
+  "records" prove a genuinely stale ref''s content is captured and correctly tagged, never silently conflated with
+  product''s 979 CANONICAL rows for the same paths -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out.'
+- 'THIRD reopening, Defect B fix: the dominant real shape of a Rust binary-driving test is a METHOD on a
+  test-harness type (`<receiver>.ok(&["<subcommand>", ...])`/`.err(&[...])`, 58 test files, 2420 literal-prefixed
+  call sites at the product pin -- both numbers independently confirmed by raw git grep, matching the reopening
+  ruling''s own "58 test files" exactly), not the bare-function-wrapper shape alone (4 real sites). Fixed
+  generically in govbridge/code/rust_cli.py: find_impl_wrapper_methods treats an inherent `impl <Type> { fn
+  <method>(&self, args: &[&str]) -> .. }` exactly like a free-function wrapper (same direct/forward text-level
+  classification), living in the SAME flat wrapper dict as a bare function (a self-call `self.<other>(args)`
+  resolves through the identical, already-bounded MAX_WRAPPER_CHAIN machinery). A test-side
+  `<receiver>.<method>(&[...])` call resolves the receiver''s type from a `let <var>[: Type] = Type::ctor(...)`/
+  `Type { .. }` binding in the calling test (_local_var_types) where determinable; otherwise falls back to a
+  method name unique across every harness type this build found (label HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD,
+  a full, distinct precision tier -- never conflated with EXACT/OUTER_ARM); an AMBIGUOUS name (two+ harness types
+  sharing it) is recorded to lineage_unresolved with its own reason, never silently dropped; edges are
+  de-duplicated per (test fn, resolved handler). Real view (product pin 3c880d8): 576 TESTS edges (30
+  EXACT_RUST_CLI_DISPATCH + 5 HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM + 541
+  HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD), reconciled against a SECOND, fully independent measurement (a
+  DIFFERENT, non-tree-sitter regex/text-chunking script, not importing rust_cli.py at all): 636 distinct
+  (test, subcommand-token) pairs across the same 58 files -- same order of magnitude, ~9% higher, gap explained
+  (token aliasing to the same handler; the independent method''s own cruder test-boundary heuristic). The
+  zero-count `rust_harness_method_unresolved_by_reason` is independently confirmed too: the 5 real harness wrapper
+  methods found (gov, active_references_to, run, ok, err) each have EXACTLY ONE real `&[&str]`/`&[String]`-shaped
+  definition in the whole product-pinned corpus, verified by raw `git grep -nE "fn <name>(&self"` and manual
+  inspection of each hit (a same-named zero-arg `fn ok(&self) -> bool` exists too, correctly excluded by the
+  slice-parameter requirement) -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out.'
 - 'A pre-existing, environment-level defect (found in the first return, orchestrator is routing its repair
   elsewhere, outside this node''s mutation scope): `python -m govbridge.core.freshness rebuild --from-clean`,
   invoked exactly as REPAIR_DAG.yaml''s acceptance-check text names it, silently runs only the "core" layer (a
@@ -115,27 +159,38 @@ conformance:
 - item: 'Deliverable 1: TESTS edges from (a) direct calls, (b) CLI-dispatch subprocess tests, (c) shape-recognised
     test registries, each labelled with its derivation'
   status: MET_WITH_DISCLOSED_LIMIT
-  evidence: 'tests/graph/test_derive.py (a, b-Python, c); tests/code/test_rust_cli.py (14 tests, b-Rust);
-    tests/code/test_lineage_layer.py (end-to-end, all sub-kinds). Real-view: 4 TESTS rows (2 Python
-    EXACT_CLI_DISPATCH, 2 Rust EXACT_RUST_CLI_DISPATCH), reproducible -- AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out.
-    Disclosed limit (Rust, sub-shape b only): a harness-object method pattern (`x.run(&[...])`/`.ok(&[...])`),
-    present in this repository''s own test suite, is a different indirection than the ruling''s three named
-    shapes (CARGO_BIN_EXE helper, direct Command::new+args chain, one level of &[&str]-parameter wrapper
-    function) and is not resolved -- every named shape IS implemented and proven, real-view included; not a
-    narrowing of what was asked, since it was never one of the named shapes.'
+  evidence: 'tests/graph/test_derive.py (a, b-Python, c); tests/code/test_rust_cli.py (20 tests, b-Rust: bare
+    wrapper AND Defect B''s harness-method shape); tests/code/test_lineage_layer.py (end-to-end, all sub-kinds
+    across all 3 eager refs). THIRD reopening (Defect B) closed the previously-disclosed harness-object-method
+    gap: real view (product pin 3c880d8) now finds 576 TESTS edges from that shape alone, reconciled against an
+    independent 636-pair measurement -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out. Real view,
+    all 3 refs: 1635 TESTS rows total (1530 HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD + 86 EXACT_RUST_CLI_DISPATCH
+    + 15 HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM + 4 Python EXACT_CLI_DISPATCH), reproducible. Remaining disclosed
+    bounds, both minor, pre-existing and never separately flagged: a TUPLE-style nested subcommand field
+    (`Variant(NestedEnum)`, no real instance measured) is not attempted, resolving no further than the outer arm;
+    a receiver''s type wrapped in `Box<T>`/`&T`/a generic parameter is not unwrapped by declared-type inference
+    (falls back to the SAME unique-name resolution as an undetermined receiver, never a silent miss -- just less
+    precise than a bare named type); Python''s resolve_cli_handler resolves at most 2 dispatch hops (matches every
+    real shape measured).'
 - item: 'Deliverable 2: DEPENDS_ON_DATA edges from string literals and joined path fragments'
   status: MET
-  evidence: 'tests/graph/test_derive.py::test_depends_on_data_*. Real view: 380 rows (360 EXACT_LITERAL_PATH, 20
-    HEURISTIC_JOINED_PATH), reproducible -- AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out.'
+  evidence: 'tests/graph/test_derive.py::test_depends_on_data_*. Real view (all 3 eager refs, THIRD reopening
+    Defect A): 1183 rows total (1115 EXACT_LITERAL_PATH, 68 HEURISTIC_JOINED_PATH: evidence 402, product 401,
+    records 380), reproducible across two from-clean builds of the SAME pinned view -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
+    (superseding check7''s single-ref 380-row figure).'
 - item: 'Deliverable 3: CITES_REQUIREMENT edges from requirement citations in code comments, resolved to the
     cited section'
   status: MET
   evidence: 'tests/graph/test_derive.py::test_cites_requirement_* (7 tests: line form, section form, backtick
     bare name, document-resolves-section-does-not, range, document-unresolved, ambiguous-document,
     rust-test-file-reached). Real (frozen, immutable) commit 3c880d8: 6/6 originally-flagged citations now
-    resolve, 0 dropped, 0 unresolved -- AGENT_RUNS/BR-AR-0019.check6-gap1-cites-requirement.out. Real (live)
-    "records" view: 2 rows resolve to section; a third is correctly corpus-rule-excluded (independently
-    confirmed); reproducible across two from-clean builds of the SAME pinned commit.'
+    resolve, 0 dropped, 0 unresolved -- AGENT_RUNS/BR-AR-0019.check6-gap1-cites-requirement.out. THIRD reopening
+    (Defect A): now measured across all 3 eager refs, not "records" alone -- 12 rows total (6
+    HEURISTIC_COMMENT_SECTION + 6 HEURISTIC_SECTION_UNRESOLVED: evidence 2+3, product 2+3, records 2+0),
+    reproducible across two from-clean builds of the SAME pinned view; the product-ref numbers (5 rows: 2+3)
+    exactly match check6''s own direct-commit measurement (6 real hits minus 1 correctly corpus-rule-excluded);
+    0 EXACT_COMMENT_CITATION/HEURISTIC_SUFFIX rows on any ref, re-confirmed by raw git grep on the current
+    "records" tip too -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out.'
 - item: 'Deliverable 4: record_def rows for the nested YAML keys and id-bearing list items of state files, so
     `exact id` resolves them'
   status: MET
@@ -160,14 +215,19 @@ conformance:
 - item: 'Deliverable 7: every addition registered as a store layer with a digest (ARCHITECTURE.md section 8)'
   status: MET
   evidence: 'New "lineage" layer (govbridge/code/lineage_layer.py), registered from govbridge/code/__init__.py,
-    holds TESTS(b,c)/DEPENDS_ON_DATA/CITES_REQUIREMENT + their unresolved telemetry. tests/code/
-    test_lineage_layer.py (8 tests: registration, all-four-edge-kinds persistence, digest reproducibility,
-    corpus-exclusion honoured, Gap-1 telemetry, Gap-2 dispatch persistence). Real view: identical digest across
-    two from-clean builds of the SAME pinned commit, then freshness-NOOP -- AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out.
-    State records already covered by the existing authority layer (accepted).'
+    holds TESTS(b,c)/DEPENDS_ON_DATA/CITES_REQUIREMENT + their unresolved telemetry (now WITH ref_name/commit_id/
+    version_status/canonical_ref/canonical_commit per row -- THIRD reopening, Defect A). tests/code/
+    test_lineage_layer.py (13 tests: registration, all-four-edge-kinds persistence, digest reproducibility,
+    corpus-exclusion honoured, Gap-1 telemetry, Gap-2 dispatch persistence, PLUS Defect A''s multi-ref/
+    version-status tests and Defect B''s harness-method/ambiguous-unresolved tests). Real view: 2830 edges across
+    all 3 eager refs, identical digest AND identical 1,908,736-byte store file across two from-clean builds of
+    the SAME pinned view, then freshness-NOOP -- AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
+    (superseding check7''s single-ref numbers). Cost: ~326s wall average, ~1.82 MiB -- still well under the
+    semantic/embedding layer''s own ~885s single-layer figure. State records already covered by the existing
+    authority layer (accepted).'
 - item: 'Acceptance check 1: cd $D && $PY -m pytest tests/code tests/graph tests/authority/test_state_records.py -q'
   status: MET
-  evidence: '144 passed, 0 failures -- AGENT_RUNS/BR-AR-0019.check1-pytest.out.'
+  evidence: '155 passed, 0 failures (was 144 before the third reopening''s 11 new tests) -- AGENT_RUNS/BR-AR-0019.check1-pytest.out.'
 - item: 'Acceptance check 2: $PY -m govbridge.core.freshness rebuild --from-clean (twice, into two fresh stores);
     identical digests for every new layer; freshness NOOP afterwards'
   status: MET
@@ -210,8 +270,12 @@ evidence:
 - claim: 'REOPENING Gap 2: Rust clap-derive CLI dispatch, real-view proof, reproducible digest, cost measurement'
   file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out
 - claim: 'REOPENING: the "lineage" layer persists all edge kinds, registered with freshness/manifest, reproducible,
-    NOOP afterward (first-return baseline; superseded numbers in check6/check7 above)'
+    NOOP afterward (first-return baseline; superseded numbers in check6/check7/check8 above)'
   file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out
+- claim: 'THIRD reopening, Defect A + Defect B: every eager ref walked with per-row ref/commit/version_status;
+    harness-method dispatch resolved; real-view + independent-measurement reconciliation for every zero-count
+    sub-kind'
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
 - claim: full domain suite passes with 0 failures (BR-DAG-AMEND-R1-4), final state
   file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
 mutation_scope_respected: true
@@ -221,9 +285,14 @@ open_issues:
 - 'resolve_cli_handler (Python) resolves at most two dispatch hops; a third-level subcommand (none exist in this
     repository today) would resolve only to the coarser HEURISTIC_CLI_DISPATCH module::subcommand form, never
     crashing, but also never more precise'
-- 'rust_cli.py does not resolve a harness-OBJECT method dispatch pattern (`x.run(&[...])`/`.ok(&[...])`), used in
-    several real test files (e.g. tests/certification/brownfield.rs); disclosed as a stated bound in the
-    conformance table (deliverable 1), not a narrowing of any of the ruling''s own three named shapes'
+- 'RESOLVED by the THIRD reopening (Defect B): rust_cli.py now resolves the harness-OBJECT method dispatch
+    pattern (`x.run(&[...])`/`.ok(&[...])`) via find_impl_wrapper_methods/_resolve_harness_receiver -- 576 real
+    edges at the product pin, reconciled against an independent 636-pair measurement. Two narrower, minor bounds
+    remain, both pre-existing and never separately flagged: a TUPLE-style nested subcommand field
+    (`Variant(NestedEnum)`, no real instance measured) resolves no further than the outer arm; a receiver''s type
+    wrapped in `Box<T>`/`&T`/a generic parameter falls back to unique-name resolution rather than a verified
+    declared type (never a silent miss). See conformance table deliverable 1 and
+    AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out.'
 - 'No real test-registry-shaped YAML (TESTS sub-kind c) exists in the corpus today (sampled 32 candidate files
     using a "tests:" key; none match the required row-shape) -- the mechanism is correct and proven on a fixture,
     and will start producing real rows the moment matching content is added'
@@ -231,11 +300,13 @@ open_issues:
     failed ONCE during this session (an earlier full-suite pass, before this reopening''s fixes), with a
     manifest_sha256 mismatch between two in-process compile_packet() calls in the same test -- the exact
     non-hermetic-until-R1-RM-repairs-it test BR-DAG-AMEND-R1-4 names. Passed on the FINAL full-suite run attached
-    to this checkpoint (385 passed, 0 failures). Not this node''s file to fix; reported per the amendment''s
+    to this checkpoint (396 passed, 0 failures). Not this node''s file to fix; reported per the amendment''s
     instruction, not skipped or marked xfail'
 - 'The "records" ref this bridge domain builds against is a LIVE, moving candidate branch other agents in this
-    session also commit to (observed moving three times during this reopening round alone) -- genuinely different
-    content from the FROZEN, immutable 3c880d8 product pin. Every "two from-clean builds -> identical digest"
+    session also commit to (observed moving three times during the second reopening round, and again -- a fourth
+    distinct commit, 000367f4... -- during this THIRD reopening) -- genuinely different content from the FROZEN,
+    immutable 3c880d8 product pin (now itself walked directly, by name, as the "product" eager ref -- Defect A --
+    rather than only ever being cross-checked against separately). Every "two from-clean builds -> identical digest"
     proof in this report resolves the view ONCE and reuses that same resolved snapshot for both builds, so it is
     immune to this; a casual re-run of the same script as two SEPARATE process invocations minutes apart would
     not be, and should not be relied on for this specific property'

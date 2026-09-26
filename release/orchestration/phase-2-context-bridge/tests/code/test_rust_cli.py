@@ -189,8 +189,9 @@ def test_rust_cli_dispatch_tests_edges_direct_and_nested():
     dispatch = _build(MAIN_RS)
     helpers = RC.find_cargo_bin_exe_helpers(TEST_RS_DIRECT)
     wrappers = RC.find_wrapper_functions(TEST_RS_DIRECT, helpers)
-    edges = RC.rust_cli_dispatch_tests_edges(TEST_RS_DIRECT, "tests/fixtures/test_direct.rs", "deadbeef",
-                                              dispatch, helpers, wrappers)
+    edges, unresolved = RC.rust_cli_dispatch_tests_edges(TEST_RS_DIRECT, "tests/fixtures/test_direct.rs",
+                                                          "deadbeef", dispatch, helpers, wrappers)
+    assert unresolved == []
     by_test = {e.src: e for e in edges}
     assert by_test["test_direct_command_new"].dst == "cancel"
     assert by_test["test_direct_command_new"].derivation == E.EXACT_RUST_CLI_DISPATCH
@@ -206,8 +207,9 @@ def test_rust_cli_dispatch_tests_edges_one_level_wrapper_indirection():
     dispatch = _build(MAIN_RS)
     helpers = RC.find_cargo_bin_exe_helpers(TEST_RS_WRAPPER)
     wrappers = RC.find_wrapper_functions(TEST_RS_WRAPPER, helpers)
-    edges = RC.rust_cli_dispatch_tests_edges(TEST_RS_WRAPPER, "tests/fixtures/test_wrapper.rs", "deadbeef",
-                                              dispatch, helpers, wrappers)
+    edges, unresolved = RC.rust_cli_dispatch_tests_edges(TEST_RS_WRAPPER, "tests/fixtures/test_wrapper.rs",
+                                                          "deadbeef", dispatch, helpers, wrappers)
+    assert unresolved == []
     assert len(edges) == 1
     assert edges[0].src == "test_via_one_level_wrapper"
     assert edges[0].dst == "research::show"
@@ -215,9 +217,9 @@ def test_rust_cli_dispatch_tests_edges_one_level_wrapper_indirection():
 
 
 def test_rust_cli_dispatch_tests_edges_empty_without_helpers_or_dispatch():
-    assert RC.rust_cli_dispatch_tests_edges(TEST_RS_DIRECT, "x.rs", "deadbeef", {}, set(), {}) == []
+    assert RC.rust_cli_dispatch_tests_edges(TEST_RS_DIRECT, "x.rs", "deadbeef", {}, set(), {}) == ([], [])
     dispatch = _build(MAIN_RS)
-    assert RC.rust_cli_dispatch_tests_edges(TEST_RS_DIRECT, "x.rs", "deadbeef", dispatch, set(), {}) == []
+    assert RC.rust_cli_dispatch_tests_edges(TEST_RS_DIRECT, "x.rs", "deadbeef", dispatch, set(), {}) == ([], [])
 
 
 def test_resolve_wrapper_chain_bounded():
@@ -235,6 +237,165 @@ def test_resolve_wrapper_chain_bounded():
         "inner": {"param_name": "args", "param_index": 0, "kind": "direct", "target": None},
     }
     assert RC.resolve_wrapper_chain(short, "outer") is not None
+
+
+# --- BR-AR-0019 reopening (third pass), Defect B: the harness-METHOD shape (<receiver>.ok(&[...])) -------------
+
+TEST_RS_HARNESS = """
+use std::process::Command;
+
+fn my_bin() -> std::path::PathBuf {
+    std::path::PathBuf::from(env!("CARGO_BIN_EXE_mybin"))
+}
+
+struct Harness { session: String }
+
+impl Harness {
+    fn new() -> Self { Harness { session: "s".into() } }
+
+    fn ok(&self, args: &[&str]) -> Vec<u8> {
+        Command::new(my_bin()).args(args).output().unwrap().stdout
+    }
+
+    fn ok_via_forward(&self, args: &[&str]) -> Vec<u8> {
+        self.ok(args)
+    }
+}
+
+#[test]
+fn test_harness_declared_type() {
+    let h = Harness::new();
+    let out = h.ok(&["research", "show", "id-1"]);
+}
+
+#[test]
+fn test_harness_forward_method() {
+    let h: Harness = Harness::new();
+    let out = h.ok_via_forward(&["version"]);
+}
+
+#[test]
+fn test_harness_dedup_same_handler_twice() {
+    let h = Harness::new();
+    let a = h.ok(&["version"]);
+    let b = h.ok(&["version"]);
+}
+"""
+
+TEST_RS_HARNESS_UNTYPED = """
+fn my_bin() -> std::path::PathBuf {
+    std::path::PathBuf::from(env!("CARGO_BIN_EXE_mybin"))
+}
+
+fn make_harness() -> Harness2 { Harness2 {} }
+
+struct Harness2;
+
+impl Harness2 {
+    fn ok(&self, args: &[&str]) -> Vec<u8> {
+        Command::new(my_bin()).args(args).output().unwrap().stdout
+    }
+}
+
+#[test]
+fn test_harness_unique_name_fallback() {
+    // `make_harness()` is not a `let <var>: Type = ...`/`let <var> = Type::ctor()` binding this scan follows,
+    // so the receiver's type is undetermined -- resolved only because "ok" is unique across every harness type.
+    let out = make_harness().ok(&["research", "show", "id-2"]);
+}
+"""
+
+TEST_RS_HARNESS_AMBIGUOUS = """
+fn my_bin() -> std::path::PathBuf {
+    std::path::PathBuf::from(env!("CARGO_BIN_EXE_mybin"))
+}
+
+struct Alpha;
+impl Alpha {
+    fn ok(&self, args: &[&str]) -> Vec<u8> {
+        Command::new(my_bin()).args(args).output().unwrap().stdout
+    }
+}
+struct Beta;
+impl Beta {
+    fn ok(&self, args: &[&str]) -> Vec<u8> {
+        Command::new(my_bin()).args(args).output().unwrap().stdout
+    }
+}
+
+#[test]
+fn test_ambiguous_harness_method() {
+    let out = make_either().ok(&["version"]);
+}
+"""
+
+
+def test_find_impl_wrapper_methods_direct_and_forward():
+    helpers = {"my_bin"}
+    wrappers = RC.find_impl_wrapper_methods(TEST_RS_HARNESS, helpers)
+    assert wrappers["Harness::ok"]["kind"] == "direct"
+    assert wrappers["Harness::ok"]["param_index"] == 0
+    assert wrappers["Harness::ok_via_forward"] == {
+        "param_name": "args", "param_index": 0, "kind": "forward", "target": "Harness::ok",
+    }
+
+
+def test_impl_wrapper_candidate_prefilter():
+    assert RC.impl_wrapper_candidate(TEST_RS_HARNESS) is True
+    assert RC.impl_wrapper_candidate("fn plain() {}") is False
+
+
+def test_rust_cli_dispatch_tests_edges_harness_declared_type():
+    dispatch = _build(MAIN_RS)
+    helpers = RC.find_cargo_bin_exe_helpers(TEST_RS_HARNESS)
+    wrappers = RC.find_impl_wrapper_methods(TEST_RS_HARNESS, helpers)
+    edges, unresolved = RC.rust_cli_dispatch_tests_edges(TEST_RS_HARNESS, "tests/fixtures/test_harness.rs",
+                                                          "deadbeef", dispatch, helpers, wrappers)
+    assert unresolved == []
+    by_test = {e.src: e for e in edges}
+    assert by_test["test_harness_declared_type"].dst == "research::show"
+    assert by_test["test_harness_declared_type"].derivation == E.EXACT_RUST_CLI_DISPATCH
+    # a forward through a SECOND harness method (self.ok(args)) resolves too, one level of chaining
+    assert by_test["test_harness_forward_method"].dst == "print_version"
+    assert by_test["test_harness_forward_method"].derivation == E.EXACT_RUST_CLI_DISPATCH
+
+
+def test_rust_cli_dispatch_tests_edges_harness_dedup_per_test_and_handler():
+    dispatch = _build(MAIN_RS)
+    helpers = RC.find_cargo_bin_exe_helpers(TEST_RS_HARNESS)
+    wrappers = RC.find_impl_wrapper_methods(TEST_RS_HARNESS, helpers)
+    edges, _ = RC.rust_cli_dispatch_tests_edges(TEST_RS_HARNESS, "tests/fixtures/test_harness.rs", "deadbeef",
+                                                 dispatch, helpers, wrappers)
+    dedup_edges = [e for e in edges if e.src == "test_harness_dedup_same_handler_twice"]
+    assert len(dedup_edges) == 1  # two identical `h.ok(&["version"])` calls -> ONE edge, not two
+
+
+def test_rust_cli_dispatch_tests_edges_harness_unique_name_fallback():
+    dispatch = _build(MAIN_RS)
+    helpers = RC.find_cargo_bin_exe_helpers(TEST_RS_HARNESS_UNTYPED)
+    wrappers = RC.find_impl_wrapper_methods(TEST_RS_HARNESS_UNTYPED, helpers)
+    edges, unresolved = RC.rust_cli_dispatch_tests_edges(TEST_RS_HARNESS_UNTYPED, "tests/fixtures/test_h2.rs",
+                                                          "deadbeef", dispatch, helpers, wrappers)
+    assert unresolved == []
+    assert len(edges) == 1
+    assert edges[0].dst == "research::show"
+    assert edges[0].derivation == E.HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD
+    assert "unique_name" in edges[0].note
+
+
+def test_rust_cli_dispatch_tests_edges_ambiguous_harness_method_is_recorded_not_dropped():
+    dispatch = _build(MAIN_RS)
+    helpers = RC.find_cargo_bin_exe_helpers(TEST_RS_HARNESS_AMBIGUOUS)
+    wrappers = RC.find_impl_wrapper_methods(TEST_RS_HARNESS_AMBIGUOUS, helpers)
+    assert "Alpha::ok" in wrappers and "Beta::ok" in wrappers
+    edges, unresolved = RC.rust_cli_dispatch_tests_edges(TEST_RS_HARNESS_AMBIGUOUS, "tests/fixtures/test_amb.rs",
+                                                          "deadbeef", dispatch, helpers, wrappers)
+    assert edges == []  # never guess between Alpha::ok and Beta::ok
+    assert len(unresolved) == 1
+    assert unresolved[0]["form"] == "rust_harness_method"
+    assert unresolved[0]["candidate"] == "ok"
+    assert "ambiguous method name" in unresolved[0]["reason"]
+    assert "2 candidates" in unresolved[0]["reason"]
 
 
 def test_resolve_dispatch_bounded_depth():
