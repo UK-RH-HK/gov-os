@@ -1,18 +1,21 @@
 # BR-AR-0019 schema-2 worker checkpoint (OD-BR-04 A). REPAIR-1 node R1-RL. No oracle content.
-# TWICE-REVISED: (1) the orchestrator's first reopening ruling (persist the new edge kinds as a registered,
+# THRICE-REVISED: (1) the orchestrator's first reopening ruling (persist the new edge kinds as a registered,
 # digested store layer) and BR-DAG-AMEND-R1-4 (full domain suite as the last acceptance check; test hermeticity);
 # (2) the orchestrator's SECOND reopening (Gap 1: CITES_REQUIREMENT silently dropped real citations; Gap 2: TESTS
 # edges must also cover the Rust product binary, not only this domain's own Python tooling) plus
-# BR-DAG-AMEND-R1-8 (a `conformance` table in the typed report, one row per deliverable/acceptance check).
+# BR-DAG-AMEND-R1-8 (a `conformance` table in the typed report, one row per deliverable/acceptance check);
+# (3) the orchestrator's THIRD reopening (Defect A: the lineage layer walked only the "records" ref, never the
+# canonical "product"/"evidence" refs; Defect B: TESTS(b)-Rust covered only the bare-function-wrapper shape, not
+# the dominant real harness-METHOD shape) -- see the new claims/conformance rows and check8 output file.
 run_id: BR-AR-0019
-commit: 5b2f7c09e3dd939de1a28467a7a9b16ecca56819
+commit: 89950cb401cf7b93adc5cf7060251a97743b945c
 role: 'REPAIR-1 node R1-RL builder: graph and lineage additions -- code/test lineage, data dependencies,
   requirement lineage, structured-record identity, continuation'
 commands:
 - cmd: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/code tests/graph tests/authority/test_state_records.py -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
-  output_sha256: d4f07f1ff0a7f19efe6f5ff2485798b5d6f5c4e76bdcbf6efb99274ad2132a64
+  output_sha256: 154d1db2f34070c68cc12df5052cc46757f6e1a8b903a038c5eb12c312dbc448
 - cmd: '$PY -m govbridge.core.freshness rebuild --from-clean (twice, into two fresh stores) -- see the output file
     for the pre-existing CLI double-import defect found in this literal form (outside R1-RL''s scope, orchestrator
     is routing its repair elsewhere) and the equivalent, correctly-shared invocations substituted for the real
@@ -36,7 +39,7 @@ commands:
     pytest -q -p no:cacheprovider tests (from the domain, the full suite)'
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check4-full-domain-suite.out
-  output_sha256: 2c58eee7f8f3f1fcc51df55b1564a933ecc4e1991ea99519e86ac1d442c3e05c
+  output_sha256: e3e9977db82cf8b95a6ea37d93b294d965b60992714da6287a66cf0b624fd522
 - cmd: 'SECOND reopening, Gap 1: the orchestrator''s own git grep re-run against the frozen 3c880d8, showing 6
     real hits; cites_requirement_edges_in_text re-run on the SAME 6 files at the SAME frozen commit, showing 6/6
     now resolve (0 dropped, 0 unresolved); the real ("records") view''s corpus-rule-honouring behaviour and a
@@ -52,6 +55,17 @@ commands:
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out
   output_sha256: 41518fa21a661c58e532d773e32a5161bc008317a968a5be79ad418f82fd4d65
+- cmd: 'THIRD reopening, Defect A + Defect B: govbridge.core.view.resolve_view called ONCE against the real
+    config/canonical-view.yaml (records/product/evidence), then lineage_layer_builder called in-process TWICE
+    with that SAME resolved view (immune to the live "records" ref moving between builds) -- identical digest,
+    stats and store-file size; per-ref/per-version-status/per-derivation breakdowns; the 576 real Defect-B
+    harness-method edges at the product pin reconciled against two independent, non-rust_cli.py measurements
+    (a raw git-grep call-site/file count, and a separate regex/text-chunking distinct-pair count); an independent,
+    by-hand git-grep re-derivation of why zero ambiguous harness-method names exist; re-verification of every
+    pre-existing zero-count CITES_REQUIREMENT/TESTS sub-kind on the current (moved) "records" tip'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
+  output_sha256: 4f1fdf327f209ef51a3518588b553897c298395a85ef7ea566a78ba648533a4c
 model_observed: claude-sonnet-5 (Sonnet 5)
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
@@ -91,17 +105,17 @@ input_manifest:
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
   sha256: aaad038af8fe433c7c407c366342744a5df9851ca1b4f41a0726ab56b3733ee6
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
-  sha256: 1bbaf144e74019b540f2597710a930df924f68039fd60a26020882ddfbf4bff0
+  sha256: 8a245b485a07964732608d6652743cff3127eb930604ccb0b23f9c6c536ead47
 - path: release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
   sha256: a15a39292ebc615a3fb09b22143050839e76a66eb5982bce7bdd297cb45ce2e3
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/__init__.py
   sha256: 35b8b0a66013e30f0d668c6ef4e5a68d320c73491d4e9f23338b99ce7623716f
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_layer.py
-  sha256: 4f2f40a98d065543150c79a4510ed81ae0f58c54575de5fd92df64404096e19c
+  sha256: ea3d20d4630f39f543be8b44472f64c41c9b4cc183b7de5a4e7585b232b498c2
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_config.yaml
   sha256: 99fa7344215464dddf136ef341ff22380668535e83f6b39ceac525b2524efe47
 - path: release/orchestration/phase-2-context-bridge/govbridge/code/rust_cli.py
-  sha256: a7d6851b608799ef143fa5dc5d62b8a5b8bb3b799d2ee9101445f8a3df1583ef
+  sha256: f08668691b5e5ac493c23df802f4023d9a6c5d09259dd7c8a84d7a5667917b9a
 - path: release/orchestration/phase-2-context-bridge/govbridge/cli.py
   sha256: c35066d5a3ace8cedf855b87a68d6293e9af5ae8f23fa56e37a7dd6b3c029b56
 - path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/task-spec.yaml
@@ -139,6 +153,7 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check5-lineage-layer-persistence.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check6-gap1-cites-requirement.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check8-third-reopening-defect-a-b.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.checkpoint.yaml
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.report.yaml
 - release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
@@ -220,6 +235,25 @@ findings:
   imported by every ensure_all_layer_packages_imported() walk, so the new "lineage" layer registers there instead,
   with its OWN builder file calling into govbridge/graph/derive.py''s (and now govbridge/code/rust_cli.py''s)
   edge-deriving functions'
+- 'THIRD reopening, Defect A root cause: lineage_layer_builder took `resolved_view.ref_commit("records")` as its
+  ONLY commit, ignoring that govbridge.code.build.eager_ref_names (the SAME function the "code" layer already uses
+  to pick its own eager ref set) would return {records, product, evidence} on the real view -- "lineage" edges are
+  edges ABOUT code, so the natural, generic fix is to reuse that EXACT selection rather than invent a parallel one.
+  Independently confirmed the ruling''s own 31-vs-60 tests/certification/** file-count claim via plain
+  `git ls-tree`, before writing any fix.'
+- 'THIRD reopening, Defect B root cause: the SECOND reopening''s own real-view measurement (4 TESTS edges) undercounted
+  because it only ever looked for a bare CARGO_BIN_EXE-backed FUNCTION wrapper; the dominant real shape
+  (`<harness>.ok(&[...])`/`.err(&[...])`, 58 files, 2420+ literal-prefixed call sites at the product pin -- both
+  numbers independently confirmed by raw git grep BEFORE writing any fix, matching the reopening ruling''s own
+  claims exactly) is a METHOD on a test-harness type. Fixed by treating an inherent impl method exactly like a
+  free-function wrapper (same direct/forward classification), in the SAME flat "wrappers" namespace, so
+  resolve_wrapper_chain needed no change at all to walk a chain mixing methods and free functions.'
+- 'A receiver''s type is resolved from the CALLING test function''s own `let` bindings ONLY (one function, one
+  level, no cross-function/field/return-type inference) -- when that fails, falling back to "a method name unique
+  across every harness type this build found" turned out to be sufficient in practice: only 5 distinct harness wrapper
+  methods (gov, active_references_to, run, ok, err) exist in the whole real corpus at the product pin, and every
+  one of the 5 names has EXACTLY ONE real slice-parameter definition -- independently re-derived by raw
+  `git grep -nE "fn <name>(&self"` and manual inspection, not by trusting the resolver''s own count.'
 failed_approaches:
 - 'Tried addressing nested state keys with a synthetic "state:<alias>#<dotted.path>" id: abandoned because
   govbridge.authority.lifecycle._find_definition resolves by git-grepping the literal token first, and that
@@ -247,13 +281,21 @@ failed_approaches:
   block (a block scored 0, below even an unrelated match elsewhere in the file that happened to be a bare
   call_expression). Added block-tail-expression unwrapping BEFORE scoring, so a block ending in a call/nested
   match is treated as that call/match for both quality-scoring and handler-extraction purposes'
+- 'THIRD reopening: a test fixture for the Defect-B harness shape initially used a UNIT struct (`struct Harness;`
+  ... `let h = Harness;`) -- _constructor_type_name only recognises a `Type::ctor(...)` call or a `Type { .. }`
+  struct-literal initializer, neither of which a bare unit-struct identifier expression is, so the receiver''s
+  type came back undetermined and the edge resolved via the (still correct, but less precise) unique-name
+  fallback instead of the intended declared-type path. Fixed the FIXTURE (a normal struct with a `::new()`
+  constructor, matching every real harness type actually measured in the corpus) rather than widening
+  _constructor_type_name for a shape the real corpus never uses -- a deliberate, bounded choice, not an oversight.'
 unresolved:
 - 'the govbridge/core/freshness.py `-m` double-import defect (found, documented, worked around; not fixed --
   outside mutation scope; orchestrator is routing its repair elsewhere)'
-- 'rust_cli.py does not resolve a harness-OBJECT method dispatch pattern (`x.run(&[...])`/`.ok(&[...])`), used in
-  several real test files (e.g. tests/certification/brownfield.rs) -- disclosed as a stated bound (conformance
-  table, deliverable 1), not a narrowing of any of the reopening ruling''s own three named shapes (CARGO_BIN_EXE
-  helper, direct Command::new+args chain, one level of a &[&str]-parameter wrapper function)'
+- 'RESOLVED by the THIRD reopening (Defect B): rust_cli.py now resolves the harness-OBJECT method dispatch
+  pattern. Two narrower, minor, pre-existing bounds remain (never separately flagged by any ruling): a
+  TUPLE-style nested subcommand field (`Variant(NestedEnum)`, no real instance measured) resolves no further than
+  the outer arm; a receiver''s type wrapped in `Box<T>`/`&T`/a generic parameter is not unwrapped by declared-type
+  inference (falls back to unique-name resolution, never a silent miss).'
 - 'No real test-registry-shaped YAML (TESTS sub-kind c) exists in the corpus today (sampled several of 32
   candidate files using a bare "tests:" key; none match the required row-shape) -- correct and proven on a
   fixture, will start producing real rows the moment matching content is added'
@@ -293,6 +335,30 @@ decisions:
   pure addition, or (twice now: the CLI-dispatch test in the first reopening, and cites_requirement_edges_in_text
   callers in the second) a rewrite of code THIS NODE ITSELF introduced in an earlier return of its own -- never
   an externally-authored, previously-accepted test''s assertion'
+- 'D-R1-RL-7 (THIRD reopening, Defect A): lineage_layer_builder''s eager-ref selection REUSES
+  govbridge.code.build.eager_ref_names verbatim (imported, not re-derived) rather than writing a second selector
+  keyed on "lineage" -- no ref in config/canonical-view.yaml ever lists a layer literally named "lineage" (the
+  concept does not exist in that schema), so the correct generic rule is "wherever the code layer is eager,
+  lineage is eager too", not "add a lineage-specific layers entry to a file outside this node''s mutation scope".
+  The lineage_edge/lineage_unresolved PRIMARY KEYs both gained ref_name/commit_id (breaking no existing row shape,
+  since the table is this node''s own, first introduced in the first reopening).'
+- 'D-R1-RL-8 (THIRD reopening, Defect A): _version_status is a DATA-SOURCE substitution for
+  ResolvedView.classify_occurrence, never a parallel algorithm -- partition_for is called unmodified, and the two
+  rare branches (a "history"-glob fallback; a path absent from every named ref''s own tree) delegate straight to
+  the real function. Chosen over calling classify_occurrence for literally every blob (which would cost ~3300 EXTRA
+  git subprocess calls across 3 refs x ~1100 blobs each) and over writing a fully independent reimplementation
+  (rejected: this programme has twice caught a parallel reimplementation silently diverging from its own source of
+  truth -- Gap 1''s own CITES_REQUIREMENT drop being the most recent example). Proven equivalent by a dedicated
+  test that calls BOTH functions on the same inputs and asserts equality, not by contract alone.'
+- 'D-R1-RL-9 (THIRD reopening, Defect B): an impl method''s wrapper metadata lives in the SAME flat "wrappers"
+  dict a free function''s does, keyed by "Type::method" instead of a bare name -- chosen specifically so
+  resolve_wrapper_chain (already bounded by MAX_WRAPPER_CHAIN, already tested) needed ZERO changes to walk a
+  chain that mixes a harness method forwarding into another harness method, or into a free function, in either
+  order. A new derivation label, HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD, is a FULL, separate precision tier
+  (never an alias of EXACT/OUTER_ARM) because it reflects uncertainty in a DIFFERENT axis (was the receiver''s
+  type verified at all) than what EXACT/OUTER_ARM already encode (was the dispatch arm resolved to the innermost
+  handler) -- when a call is BOTH unverified-receiver and outer-arm, the receiver-uncertainty label takes
+  precedence, documented explicitly rather than silently choosing one.'
 lessons:
 - 'When a new record-addressing scheme must work through an EXISTING, out-of-scope resolver that git-greps the
   literal token first, design the id format to BE that literal text -- check the consumer''s resolution mechanism
@@ -322,6 +388,25 @@ lessons:
 - 'a real-world Rust test corpus mixes literal and dynamically-computed values in the SAME argument list far more
   often than a synthetic fixture suggests -- design a "read the literal PREFIX" extraction from the start for
   this kind of shape, rather than an "all-or-nothing" literal-array check'
+- 'when a sibling layer ALREADY has a correct, generic "which refs am I eager over" answer (govbridge.code.build.
+  eager_ref_names), a new layer that derives edges ABOUT the same content should REUSE that function directly
+  rather than asking "what should MY OWN eager-ref rule be" from scratch -- the two questions have the same
+  answer for a reason (both are about the same underlying code), and a second, parallel selector is a second
+  place for the two to silently drift apart later'
+- 'an expensive per-item classification (here: git-backed version-status lookup, ~2 subprocess calls per blob per
+  ref) can often be safely short-circuited by DATA this build ALREADY computed for another purpose (a per-ref
+  path->blob tree, needed anyway to enumerate what to scan) -- but only when the substitution is proven equivalent
+  to the real function by a DIRECT test that calls both and compares, not merely assumed correct because it "does
+  the same thing" by inspection; this project has been burned twice before by an unverified "equivalent" shortcut
+  quietly diverging from its own source of truth'
+- 'before widening a resolver to cover a new indirection shape (a struct method, here), measure the REAL corpus
+  file/call-site counts for that shape FIRST (a plain git grep, before writing any code) -- it turns both "does
+  this shape actually matter" and "did my fix work" into a comparison against a number obtained independently of
+  the code being judged, rather than a number the same code later reports about itself'
+- 'a synthetic test fixture using a shape the real corpus does not actually use (a unit struct literal, where
+  every real harness type in the corpus uses `Type::new()`) can silently exercise the WRONG code path (a fallback,
+  not the primary path) and still pass -- when a fixture''s result surprises you, check whether the fixture itself
+  matches the real corpus''s own shape before altering the implementation to accommodate it'
 next_consumer: 'R1-GA1/R1-GA2/R1-GA3 (the "govbridge gather" retrieval-loop nodes), which consume these new
   derive.py/rust_cli.py/symbol_history.py/code.symbols/lineage_layer capabilities from within the gather loop
   (they, not this node, wire them into govbridge why/impact); R1-INT for the generic-rule audit and the
@@ -331,4 +416,4 @@ next_consumer: 'R1-GA1/R1-GA2/R1-GA3 (the "govbridge gather" retrieval-loop node
   tests/compile/test_compile_real_view_mandatory_in_a.py flake is R1-RM''s to fix; the conformance table
   (report.yaml) for whoever adjudicates this reopening, with every MET_WITH_DISCLOSED_LIMIT row naming its own
   bound explicitly'
-final_commit: 5b2f7c09e3dd939de1a28467a7a9b16ecca56819
+final_commit: 89950cb401cf7b93adc5cf7060251a97743b945c
