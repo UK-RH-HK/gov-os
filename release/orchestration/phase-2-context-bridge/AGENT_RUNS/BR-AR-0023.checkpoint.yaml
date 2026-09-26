@@ -1,36 +1,55 @@
 run_id: BR-AR-0023
-commit: 08a9fb4b3fe3f9e81b9766907c71fce506e4e9bd
+commit: 732933c9f5b5665f3ad3cebe3d9113d5e863a7e0
 role: >-
   REPAIR-1 node R1-GA1 -- govbridge gather, core: query instantiation, facet registry, deterministic parallel
   facet retrieval, paging and continuation with a configurable batch size, stopping reasons, telemetry; plus the
-  routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017)
+  routed `govbridge notes` dispatch line (R1-RN/BR-AR-0017). REOPENED once; this checkpoint covers the reopened,
+  fixed state (three defects: scoped-facet post-hoc filtering, AC2 graded on a facet subset, AC3 citing an unsaved
+  file).
 model_observed: claude-sonnet-5
 commands:
 - cmd: cd $D && $PY -m pytest tests/gather/test_engine.py tests/gather/test_instantiate.py -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check1-pytest-gather.out
-  output_sha256: a424444ce9f672113d18fd6190437eff10c00b7bf815dd45b4c30a3f2e4b4629
+  output_sha256: f5e33de12f15ac9ea39db0f81795169d8a75aabe729a25dcabff94320b4c4972
 - cmd: >-
-    (superseded attempt, kept for an honest record) $PY -m govbridge gather --task
+    (superseded attempt, kept for an honest record -- see the file's own header) $PY -m govbridge gather --task
     tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --threads {1,4,16} --batch-size 8 (full,
-    default facet set) -- each --threads call exceeded a 115s timeout against the real store with 0 output
+    default facet set, BEFORE the reopening's SQL scope-pushdown performance fix) -- each --threads call exceeded
+    a 115s timeout against the real store with 0 output
   exit_code: 124
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism.out
   output_sha256: ce55c451e93369ff765859681de4316a8ec6bd25442af4f20462195be033f6df
 - cmd: >-
-    $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
-    --threads {1,4,16} --batch-size 8 --facets purpose --facets failed_approaches --facets dependencies
-    --facets dependents --facets enforcement --facets tests
+    (superseded by acceptance check 2's own full-default-facet-set run below -- see the file's own header) $PY -m
+    govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --threads {1,4,16}
+    --batch-size 8 --facets purpose --facets failed_approaches --facets dependencies --facets dependents --facets
+    enforcement --facets tests
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out
-  output_sha256: 16d6642c108c9ea57e3f9085cccd9ee51d1b754721668e0ac0a6e30c9cb397a9
+  output_sha256: ecb8cc651512908f63d1c5accf455847ca90ac1ae2a9e84f75ae93320b94f824
 - cmd: >-
-    $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
-    --threads 1 --batch-size {2,16} --facets purpose --facets failed_approaches --json, then compare
-    sorted unit_id sets and round counts
+    ACCEPTANCE CHECK 2 (REOPENED, defect 2 -- the query's ACTUAL DEFAULT facet set, all 11 registered facets, to
+    completion): $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY
+    --threads {1,4,16} --batch-size 8
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-full-default.out
+  output_sha256: 045037478997a2329f4192ca7d0b76819b4a39ff32e6c3de892d696d9005b694
+- cmd: >-
+    (superseded by acceptance check 3's own full-default-facet-set run below -- see the file's own header, which
+    also corrects a dangling "check3b" citation this command's own original note made) $PY -m govbridge gather
+    --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --threads 1 --batch-size {2,16}
+    --facets purpose --facets failed_approaches --json, then compare sorted unit_id sets and round counts
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out
-  output_sha256: ef393a35e9b3caf7b1f7a5b01477a9888bb6dea128a8e95823a8bf90d81a2b60
+  output_sha256: 682b2b470fa00121644a7d3b88919866b2b3f7ea547e8abb9618a793417e0677
+- cmd: >-
+    ACCEPTANCE CHECK 3 (REOPENED, defect 3 -- the FULL default facet set, saved): $PY -m govbridge gather --task
+    tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --threads 4 --batch-size {2,16} --json, then
+    compare sorted unit_id sets and round counts
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16-full-default.out
+  output_sha256: 8c3525b0c4398bfa039ecf984db94ffaa12910fd5d3477f0e67b9861cd9d14f3
 - cmd: 'grep -rnE ''k: int = 8|DEFAULT_K = 8|k=8\b'' $D/govbridge/'
   exit_code: 1
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out
@@ -38,11 +57,19 @@ commands:
 - cmd: cd $D && $PY -m pytest tests/notes/ -q
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check5-notes-dispatch.out
-  output_sha256: 4ec477482b4b81afd67a41d19561a9fa7dce3921b1db450427de1f7237431aeb
+  output_sha256: 71a60652375d1843bd9ad4e02fa4a6def05a653ff82f706696c203c7a332f265
+- cmd: >-
+    REOPENING task 2 (all 5 CONTROL-A queries, default facets, wall time/rounds/stop reason/merged items, the
+    basis for config/budgets.yaml gather.wall_time_budget_seconds): for q in CA-WHY CA-REQ CA-ENF CA-TESTS
+    CA-DEPS; do /usr/bin/time -v $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml
+    --query $q --threads 4 --batch-size 8; done
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check7-controla-all-5-queries-default-facets.out
+  output_sha256: 446b8859e7022d7a0581c9adb273ded9ce63337e80779d322df9248716d0fe6a
 - cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
   exit_code: 0
   output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out
-  output_sha256: 423a3a6b6a892f4842d81f22b1fc30d5daacc5d98e9abc10e48962b72a20bb38
+  output_sha256: c6b7215f3999eb4e57350e41cb82eb559e4559cb29eaa7ee48e455c13fa211c8
 input_manifest:
 - path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
   sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
@@ -72,6 +99,8 @@ input_manifest:
   sha256: 33f342d524b6722cade35f907fab52748d02f97bd23f54d18ac7a4ae55d6d924
 - path: release/orchestration/phase-2-context-bridge/govbridge/authority/classes.py
   sha256: 021e78f130a508a10f37faf5d4a874395abac46222317b6de742cb3b2f1622df
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/registry.py
+  sha256: 99c6f5d4066d7e50b489852b0f86c4fcb2b40812f4f41a68274101c56a442d02
 task_contract:
   handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
   handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
@@ -93,6 +122,8 @@ task_contract:
   - release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
+  # Reopening dispatch note constrained this pass further (no cli.py edits; R1-RS is its next editor) -- a
+  # NARROWING of what this pass actually touched, not of the node's own standing mutation_scope above.
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/config/budgets.yaml
 - release/orchestration/phase-2-context-bridge/config/facets.yaml
@@ -115,111 +146,156 @@ artifacts_changed:
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check1-pytest-gather.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-fast.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check2-controla-thread-determinism-full-default.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check3-controla-batchsize-2-vs-16-full-default.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check4-no-hardcoded-topk.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check5-notes-dispatch.out
 - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check6-full-domain-suite.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check7-controla-all-5-queries-default-facets.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.report.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.checkpoint.yaml
 findings:
 - >-
-  A real, pre-existing cross-thread sqlite3 bug in govbridge/route/real_routes.py: build_real_routes()'s classify
-  connection and shaped-code connection were each opened ONCE and closed over by every RouteSet call, so the
-  moment two facets run on different threads (exactly what OD-BR-05 section 2 and this node's own engine ask
-  for), the second thread's sqlite call raised "SQLite objects created in a thread can only be used in that same
-  thread." Fixed with threading.local() per connection kind; every single-threaded caller (govbridge search,
-  govbridge.compile.packet, every pre-existing test in tests/route/, tests/compile/, tests/graph/, tests/code/)
-  is unaffected (full domain suite: 506 passed, 0 failed).
+  REOPENING defect 1's root cause: a scoped facet's out-of-scope filtering happened entirely client-side
+  (govbridge.gather.facets.Facet.filter_in_scope), AFTER a route had already paged a corpus-wide, unscoped
+  ranking -- so a scoped facet's cursor advanced on every page while its COUNT advanced only on the rare in-scope
+  hit, driving it to MAX_ROUNDS or a timeout on a real corpus. Fixed by threading scope_classes/lifecycle_scope as
+  a plain keyword argument into every real route (govbridge.route.real_routes), which lexical/semantic push into
+  SQL before top-k/LIMIT (govbridge.lexical.query._scope_sql, govbridge.semantic.vectors._scope_sql) and code/
+  exact apply as a post-hoc assertion (their own result sets are already small/bounded). Verified end to end: the
+  SAME CONTROL-A query (CA-WHY) went from ~65 merged items (post-hoc filtering only, first pass) to 118 merged
+  items (SQL push-down, this reopening) on its default facet set, in 2 rounds either way -- the fix did not just
+  make it faster, it made the requirement/decisions_* facets actually find their real, in-scope evidence.
+- >-
+  REOPENING performance finding: the first working version of the SQL push-down (correct, but naive) measured
+  4-6 SECONDS PER SCOPED QUERY on the real store, entirely from a correlated EXISTS against the raw ``occurrence``
+  table (503,601 rows for only 7,909 distinct (blob_id, path) pairs on this corpus -- the same blob/path pair is
+  repeated once per historical ref/commit, up to hundreds of times: one blob had 21,498 occurrence rows). This
+  alone made a full CONTROL-A gather on the default facet set exceed a 115s timeout with 0 output. Fixed with two
+  query-time-only, idempotent additions to the shared store.db that this node does not otherwise own the schema
+  of: an index on record_def(path), and gather_scope_path_cache(blob_id, path), a deduplicated snapshot of
+  occurrence built once per process. Measured: the same scoped COUNT query fell from 4.27s to 0.13s; the same
+  CONTROL-A query's full default-facet-set gather fell from a >115s timeout to 93s (--threads 4).
+- >-
+  A real, pre-existing cross-thread sqlite3 bug in govbridge/route/real_routes.py (found in the FIRST pass,
+  unchanged by the reopening): build_real_routes()'s classify connection and shaped-code connection were each
+  opened ONCE and closed over by every RouteSet call, so the moment two facets run on different threads (exactly
+  what OD-BR-05 section 2 and this node's own engine ask for), the second thread's sqlite call raised "SQLite
+  objects created in a thread can only be used in that same thread." Fixed with threading.local() per connection
+  kind; every single-threaded caller (govbridge search, govbridge.compile.packet, every pre-existing test) is
+  unaffected (full domain suite: 507 passed, 0 failed).
 - >-
   REPAIR_PLAN.md section 2.6's "FACETS_COVERED: every requested facet has at least one item" is a MINIMAL
   coverage bar, not full exhaustion -- but stopping the FIRST time a facet reaches 1 item makes the final
   evidence set depend directly on --batch-size (a facet's one satisfying page can carry anywhere from 1 to
   batch_size items), which breaks acceptance check 3's own "identical merged evidence set" requirement. The
-  resolution built here: each (facet, route) stream pages to a FIXED, batch-size-independent target_items
-  (config/facets.yaml's default_target_items, distinct from default_batch_size on purpose), requesting only
-  min(batch_size, target - already_have) per call -- so the final per-stream count is always
-  min(target_items, total_available) whatever batch_size was, and only the round count varies. Verified
-  empirically on CONTROL-A (check3) and unit-tested (test_batch_size_changes_round_count_not_the_final_evidence_set).
+  resolution built here (FIRST pass, confirmed still correct after the reopening's SQL push-down): each (facet,
+  route) stream pages to a FIXED, batch-size-independent target_items (config/facets.yaml's default_target_items,
+  distinct from default_batch_size on purpose), requesting only min(batch_size, target - already_have) per call.
+  Re-verified on the full default facet set post-reopening: 118 identical items at batch-size 2 (8 rounds) and 16
+  (1 round).
 - >-
   MARGINAL_GAIN_ONLY_DUPLICATES must be computed from RAW (pre-scope-filter) content identity, never from the
-  scope-filtered/globally-deduped contribution -- an early implementation stopped a scope-restricted facet
-  (`requirement`) after just 2 rounds because its out-of-scope pages "added nothing new" to the merged set, even
-  though each page was genuinely fresh, unseen raw content that a later page could still turn into an in-scope
-  hit. Fixed by tracking a raw_seen dedupe-key set across the whole gather and basing the marginal-gain check on
-  it, never on the compiled merge (see test_scope_filtering_drops_out_of_scope_hits_and_pages_past_them and
-  test_marginal_gain_only_duplicates_when_a_route_keeps_returning_the_same_item, which specifically distinguish
-  the two).
+  scope-filtered/globally-deduped contribution -- an early implementation (FIRST pass) stopped a scope-restricted
+  facet after just 2 rounds because its out-of-scope pages "added nothing new" to the merged set, even though
+  each page was genuinely fresh, unseen raw content a later page could still turn into an in-scope hit. Fixed by
+  tracking a raw_seen dedupe-key set across the whole gather; this reasoning became MOOT for the reopening's own
+  scoped facets once the SQL push-down meant they rarely see out-of-scope pages at all, but the mechanism (and its
+  test, test_marginal_gain_only_duplicates_when_a_route_keeps_returning_the_same_item) stays correct and in place
+  for any route (a fake/test double, or code/exact's own post-hoc assertion) that still can.
 failed_approaches:
 - >-
+  REOPENING: pushing scope into SQL by joining straight off the raw ``occurrence`` table (no cache). Correct
+  results, but 4-6s per scoped query on the real store -- see findings. The fix (gather_scope_path_cache) is
+  described there, not repeated here.
+- >-
   Tying gather's own BUDGET_REACHED_WITH_UNRESOLVED threshold to config/budgets.yaml's existing
-  profiles.<name>.total_kb (the compiled-PACKET budget) by default. That number bounds the FINAL packet AFTER
-  R1-GA3's facet quotas; gather is expected to over-fetch relative to it, so tying gather's own stop condition to
-  it made the merged evidence set depend on an unrelated compile-time setting (observed directly: CONTROL-A's
-  bounded-builder 100 KB profile cut gather off after ~3-4 rounds regardless of batch size, at a DIFFERENT byte
-  count each time). Replaced with gather's own, separate, more generous config/budgets.yaml gather.max_bytes_per_query
-  (2 MB default); a caller may still opt in to a named compile profile's cap explicitly via
-  govbridge.gather.engine.gather's own budget_profile argument (never the CLI's default).
+  profiles.<name>.total_kb (the compiled-PACKET budget) by default (FIRST pass). That number bounds the FINAL
+  packet AFTER R1-GA3's facet quotas; gather is expected to over-fetch relative to it, so tying gather's own stop
+  condition to it made the merged evidence set depend on an unrelated compile-time setting (observed directly:
+  CONTROL-A's bounded-builder 100 KB profile cut gather off after ~3-4 rounds regardless of batch size, at a
+  DIFFERENT byte count each time). Replaced with gather's own, separate, more generous config/budgets.yaml
+  gather.max_bytes_per_query (2 MB default); a caller may still opt in to a named compile profile's cap explicitly
+  via govbridge.gather.engine.gather's own budget_profile argument (never the CLI's default).
 - >-
   Storing tests/gather/conftest.py and putting the "govbridge notes --help dispatches" test in
-  tests/notes/test_cli.py. Both are outside this node's REPAIR_DAG.yaml mutation_scope (only test_engine.py,
-  test_instantiate.py and tests/fixtures/gather/** are listed) and would have made `integrate-check` refuse the
-  branch (git diff touching paths outside the declared scope). Corrected before return: the one isolation
-  fixture moved into test_engine.py (test_instantiate.py never needed it), and the notes-dispatch tests moved
-  into test_engine.py too, exercising govbridge.cli (which IS in scope) directly rather than editing R1-RN's file.
+  tests/notes/test_cli.py (FIRST pass). Both are outside this node's REPAIR_DAG.yaml mutation_scope (only
+  test_engine.py, test_instantiate.py and tests/fixtures/gather/** are listed) and would have made
+  `integrate-check` refuse the branch. Corrected before that pass's own return: the one isolation fixture moved
+  into test_engine.py, and the notes-dispatch tests moved into test_engine.py too, exercising govbridge.cli
+  directly rather than editing R1-RN's file.
 unresolved:
 - >-
   The demonstration's own query-set document schema (query_classes/subjects tables, {class, subject} entries) was
   inferred from ARCHITECTURE/demonstration-queries.yaml's top-level KEY NAMES and value TYPES only (never its
-  query text, per REPAIR-1 rule 2) -- query_classes/subjects values there are plain strings with no {subject}
-  placeholder, so instantiate.py's composition rule (format() if a placeholder is present, else a fixed
-  "template + subject" join) is a generic, documented, but UNVERIFIED-against-the-real-document design choice.
-  Whoever next feeds instantiate.py a real query-set document with structured (dict-shaped) query_classes/subjects
-  should confirm the composition reads as intended.
+  query text, per REPAIR-1 rule 2) -- unchanged by the reopening, still unverified against a real structured
+  (dict-shaped) query_classes/subjects document.
 - >-
   config/facets.yaml's class_facets table is empty (every facet applies to every query by default); whether a
-  narrower, real per-class facet mapping is wanted is an open product question for whoever owns the demonstration
-  query set, not something this generic node can decide (OC-BR-02 forbids naming an actual class id here).
+  narrower, real per-class facet mapping is wanted is an open product question, not something this generic node
+  can decide (OC-BR-02 forbids naming an actual class id here). Unchanged by the reopening.
+- >-
+  gather_scope_path_cache is a per-process performance cache (see findings), not rebuilt within a long-lived
+  process if the underlying store is rebuilt mid-session by a different process. Never a correctness gap (the
+  real classify_hit-based assertion in every route still catches any wrongly-admitted item; a stale cache can
+  only under-restrict, i.e. degrade toward the FIRST pass's slower-but-correct behaviour), but worth knowing if a
+  long-lived gather server is ever built on top of this CLI.
 decisions:
 - >-
-  D-R1-GA1-1 (within authority): a facet's coverage target (target_items, config/facets.yaml's
-  default_target_items) is a FIXED value independent of the caller's --batch-size, so batch_size only changes
-  round count, never the final evidence set (see findings). This is the mechanism that makes acceptance check 3
-  hold; REPAIR_PLAN.md section 2.6 does not specify HOW "at least one item" coverage should interact with an
-  arbitrary batch size, so this is a generic, disclosed design choice, not a narrowing of the literal deliverable.
+  D-R1-GA1-1 (within authority, first pass, reconfirmed): a facet's coverage target (target_items) is a FIXED
+  value independent of the caller's --batch-size -- see findings. Reconfirmed correct after the reopening's SQL
+  push-down: 118 identical items at both batch sizes on the full default facet set.
 - >-
-  D-R1-GA1-2 (within authority): MARGINAL_GAIN_ONLY_DUPLICATES fires when a round's RAW (pre-scope-filter)
-  fetches are ALL already-seen (raw_seen), not merely when the compiled/deduped merge gained nothing -- see
-  findings. This is what lets a scope-restricted facet keep paging past out-of-scope pages instead of stopping
-  early.
+  D-R1-GA1-2 (within authority, first pass, reconfirmed): MARGINAL_GAIN_ONLY_DUPLICATES fires on RAW (pre-scope)
+  content identity, never the compiled merge -- see findings.
 - >-
-  D-R1-GA1-3 (within authority): the `versions` facet is registered but synthetic (no route call at all) and
-  always reported MISSING with a disclosed reason ("version reconciliation is REPAIR_DAG.yaml node R1-GA2, not
-  yet built") -- REPAIR_PLAN.md section 2.7 assigns version reconciliation to R1-GA2 explicitly, and this node's
-  own dispatch brief repeats that it must not implement it.
+  D-R1-GA1-3 (within authority): the `versions` facet stays synthetic/MISSING-disclosed; version reconciliation
+  remains R1-GA2's job (REPAIR_PLAN.md section 2.7). Unchanged by the reopening.
 - >-
-  D-R1-GA1-4 (within authority): the notes-dispatch tests and the one isolation fixture were moved out of
-  tests/notes/test_cli.py and tests/gather/conftest.py respectively, into tests/gather/test_engine.py, to keep
-  every changed path inside the declared mutation_scope (see failed_approaches). No functional behaviour changed
-  by this move.
+  D-R1-GA1-4 (within authority, first pass): the notes-dispatch tests and the one isolation fixture live in
+  tests/gather/test_engine.py, not tests/notes/test_cli.py or a new tests/gather/conftest.py -- kept every changed
+  path inside the declared mutation_scope. Unchanged by the reopening.
 - >-
-  D-R1-GA1-5 (requested): whether config/facets.yaml's class_facets should carry a real, non-empty per-class
-  mapping for the actual demonstration query set is left to the orchestrator/R1-TA2/R1-GA2, since deciding it
-  here would require reading query-set CONTENT this node is not permitted to use as acceptance input.
+  D-R1-GA1-6 (within authority, REOPENING): scope is pushed down via a plain keyword argument
+  (scope_classes/lifecycle_scope/scope_path_globs), never a new abstraction layer between gather and the routes,
+  matching the reopening's own instruction ("generically, through a route keyword argument"). Tier B's path globs
+  are computed by govbridge.route.real_routes (the one place that already loads the authority registry), never by
+  govbridge.lexical.query or govbridge.semantic.vectors themselves, so those two stay ignorant of "authority
+  classes" as a concept and only ever see plain SQL-facing class/lifecycle/glob values -- preserving B2's own
+  "depends only on B1" layering as closely as a cross-cutting SQL filter can.
+- >-
+  D-R1-GA1-7 (within authority, REOPENING): gather_scope_path_cache and the record_def(path) index are added to
+  the SHARED store.db from within this node's own files (lexical/query.py, semantic/vectors.py), never by editing
+  govbridge/authority/layer.py's schema (out of this node's mutation_scope). Both are idempotent
+  (`IF NOT EXISTS`/`INSERT OR IGNORE`), additive, and self-contained -- the same "add your own table to the shared
+  file" pattern every other layer (lexical_fts, vector) already uses.
+- >-
+  D-R1-GA1-8 (requested): whether config/facets.yaml's class_facets should carry a real, non-empty per-class
+  mapping for the actual demonstration query set is left to the orchestrator/R1-TA2/R1-GA2 -- unchanged by the
+  reopening.
 lessons:
 - >-
-  Any engine that runs facet/route callables on a real ThreadPoolExecutor against the real store should be
-  checked for shared, cached sqlite3 connections FIRST -- a single-threaded acceptance suite will never catch
-  this (every pre-existing test in this domain used --threads 1 or a single-threaded FakeRouteSet-equivalent),
-  and the failure mode ("SQLite objects created in a thread can only be used in that same thread") only appears
-  once two facets genuinely run concurrently on different threads.
+  When a client-side post-filter sits between a route and an engine's own paging/round logic, check WHETHER a
+  scoped/restricted caller's CURSOR can advance without its USEFUL COUNT advancing -- that mismatch, not the
+  filter's correctness, is what drives MAX_ROUNDS/timeouts on a real corpus. The fix is not "filter better," it
+  is "push the restriction to where the cursor is decided."
 - >-
-  When a "stop once minimally covered" rule (here, OD-BR-05/REPAIR_PLAN's "at least one item") is combined with a
-  caller-configurable page/batch size, check FIRST whether the two interact to make the final result
-  batch-size-dependent; if so, the fix is usually a second, FIXED (config, not caller-supplied) target that the
-  configurable page size converges toward, never the page size itself as the completion criterion.
+  Before declaring a SQL-level fix complete, TIME it against the real corpus, not just a small synthetic fixture
+  (which this node's own hermetic tests, by design, never expose to this problem at all -- a few dozen rows never
+  reveal a 500,000-row occurrence table's redundancy). A `git grep`-style measurement of table cardinality
+  (`SELECT count(*) FROM t` vs `SELECT count(*) FROM (SELECT DISTINCT ... FROM t)`) is a five-second check that
+  would have caught this before the first, naive SQL push-down was ever timed against the real store.
+- >-
+  An acceptance check that names a specific real-view query implicitly names that query's OWN default
+  configuration (its default facet set, here) unless a narrower one is explicitly agreed -- grading it on a
+  hand-picked, faster subset is a narrowing under R1-T2 even when every individual number reported is honest.
 next_consumer: >-
   R1-GA2 (adaptive follow-up via the identifier_extractor hook this node built but left unwired; version
   reconciliation for the `versions` facet slot this node registered) and R1-GA3 (wiring `gather` into
-  govbridge.compile, and full code-facet pagination parity for callees_of/reads_key_of consumers if wanted); the
-  orchestrator for the two disclosed open_issues (ExclusionCounter thread-safety in taskctx.py, out of this
-  node's scope; and whether class_facets should be filled in) and for confirming the notes-dispatch test's
-  placement in tests/gather/test_engine.py (rather than tests/notes/test_cli.py) is acceptable.
-final_commit: 08a9fb4b3fe3f9e81b9766907c71fce506e4e9bd
+  govbridge.compile, and full code-facet pagination parity for callees_of/reads_key_of consumers if wanted); R1-RS
+  as the next editor of govbridge/cli.py (untouched by this reopening, as instructed); R1-INT for
+  taskctx.ExclusionCounter's thread safety (routed there by this reopening's own dispatch note) and for the
+  generic-rule audit over the two new store tables/index this node added outside any file it edited a schema in
+  (gather_scope_path_cache, record_def_by_path); the orchestrator for the remaining disclosed open_issues.
+final_commit: 732933c9f5b5665f3ad3cebe3d9113d5e863a7e0
