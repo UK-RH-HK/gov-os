@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T11:48:05Z'
-state_hash: 0bc667e4d9accb7b5c13654a25451f5c2aad23bd01dc749ef65eed24f4e68555
+updated_at: '2026-09-26T11:48:40Z'
+state_hash: 70a3a5a0afbfeae4c67430704fc12738fe4966c72428be3b9180044033555065
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1760,6 +1760,10 @@ observations:
   text: 'supply-chain near-miss -- BR-AR-0034 pip-installed an unpinned package (tree-sitter-rust 0.24.2) from the network into a
     private scratch venv and used it for evidence. The shared venv was untouched. The integration audit now greps every
     transcript for pip, venv, ensurepip and --system-site-packages (BR-DAG-AMEND-R1-18).'
+  retroactive_audit: 'every subagent transcript of this session scanned for pip install / -m venv / virtualenv / ensurepip /
+    --system-site-packages -- two matches only: BR-AR-0034 (this breach) and BR-AR-0001, the architect''s sanctioned
+    semantic-route feasibility spike on 2026-09-25 in its own $HOME/.cache/gov-bridge/spike-br-ar-0001 venv, which produced
+    the hash-pinned config/requirements.lock and predates REPAIR-1 rule 6. No other builder installed anything.'
 - id: OBS-BR-19
   text: 'orchestrator error, self-reported -- (1) the state-registration helper for BR-AR-0024/0034 ran .replace("RUN", run),
     which also rewrote "RUNNING", so both entries carried the status BR-AR-00NNNING from 4c769d1 until this correction;
