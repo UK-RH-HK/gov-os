@@ -1,0 +1,125 @@
+# BR-AR-0020 typed report. No oracle content; no Review-8/Phase-2 naming in code, config or tests (OC-BR-02).
+run_id: BR-AR-0020
+role: 'REPAIR-1 node R1-RG -- bounded builder, deterministic grader repair (GD-1..GD-10, OBS-BR-05), each with a
+  regression test on a synthetic fixture, implementing BR-ARCH-RULING-2''s D-1..D-5 exactly as ruled. Did not grade
+  anything itself; never read the run-1 oracle, DEMONSTRATION/oracle*, DEMONSTRATION/grading/**, bridge/grade-* or
+  any sealed directory.'
+model_observed: claude-sonnet-5 (Sonnet 5)
+branch: bridge/r1-rg-0020
+commit: 8b16f33d0e84c945cb058942417a9100a4c470b6
+status: COMPLETED
+claims:
+- 'All ten tool defects (GD-1..GD-10) and OBS-BR-05, as literally described in REPAIR_PLAN.md section 8.2, were
+  confirmed present in the pre-repair govbridge/demo/grade.py (sha256 77284c05...eede4d, unchanged since I1/BR-AR-0009)
+  and govbridge/demo/extract_reads.py (sha256 661f1f58...b391d9d3) by direct, empirical probing before any fix, then
+  repaired, then re-confirmed fixed. Every fix is generic: no Review-8 item, F-finding, Phase-2 file or Review-8-chain
+  symbol appears in any code, config or test (fixture data uses only T-*/CX-* ids).'
+- 'GD-1 (crash on `lines: "START-END"`): a new `_normalise_lines` helper accepts a "START-END" string, a bare int, a
+  single-line-int string, and 1- or 2-element list/tuple forms, applied everywhere a citation''s or anchor''s `lines`
+  field is read.'
+- 'GD-2 (G6 graded the first evidence_for answer): `grade_g6` now selects the both-ways answer by the oracle''s own
+  `f1_both_ways.query_id`, never "whichever answer happens to carry evidence_for/evidence_against/disposition first".'
+- 'GD-3/GD-8/D-1 (a record anchor matched by record id only; whole-document vs sectioned anchor undefined):
+  `anchor_matches`''s record branch previously short-circuited on `anchor.get("record_id")` truthy and NEVER fell
+  through to the path/commit/line-overlap ("section") rule used for every other anchor kind, and `_resolve_citation`
+  never read `record_id` off a raw citation OBJECT at all (only off a string item_id, via `items_by_id`). Both are
+  fixed: a citation resolving to the SAME record id matches an anchor for that record regardless of section
+  (BR-ARCH-RULING-2 D-1, not the analyst''s rejected "delivered coverage" alternative); a citation resolving to a
+  DIFFERENT record id never matches even on a path/commit/line coincidence; and when neither side carries a usable
+  record id, the same path + blob-identical-commit + line-overlap rule already used for code anchors decides it.'
+- 'GD-4 (one literal withdrawn-marker phrase): the withdrawn-finding check is now a generic, same-line marker scan
+  (`\bwithdrawn\b`, case-insensitive) alongside the cited id, recognising `(WITHDRAWN)`, `[WITHDRAWN]`, `-- WITHDRAWN`,
+  `: WITHDRAWN` and lower/mixed case -- not only the one original bracket phrase.'
+- 'GD-5 (side-by-side required both WHOLE CHAINS to PASS): `_grade_chain` now reports each chain''s
+  `enforcement_reached` independently of its overall PASS/FAIL result, and `grade_g4`''s side-by-side condition uses
+  that -- matching DEMONSTRATION_DESIGN.md section 4''s own text ("passes when both enforcement points are reached"),
+  not "both chains fully passed" (which additionally, and wrongly, failed side-by-side whenever an unrelated required
+  stage of either chain was MISSING or WRONG).'
+- 'GD-6/D-4 (undeclared-read false positives on govbridge query arguments): `extract_reads.py` now recognises a
+  govbridge "selector" argument generically -- any token with an optional scheme prefix and a MANDATORY
+  `:start[-end]` line-range suffix (the syntax the exact/search/why/impact/history/state query commands actually
+  use, distinct from a bare path given to a real read command) -- and a shell redirection/`--out` target, masking
+  both out before the bare-file-token scan; `grade_g7`''s undeclared-read computation additionally excludes any path
+  already supplied through a compiled packet, the task spec''s own declared inputs, or the receipt''s own
+  `outputs_produced`/`inputs_consumed`, and any path under a `run-<n>/` directory (D-3''s ruling: not a corpus read).'
+- 'GD-7/D-5 (external bytes counted as whole blobs): `grade_g7` now charges only a DECLARED WINDOW''s bytes (a
+  receipt `external_reads` entry''s `lines` or `line_start`/`line_end`) when one is present, falling back to the
+  whole blob only for a genuine direct/whole-file read.'
+- 'GD-9/D-3 ([R] results never ingested; AUTH ungated): `grade()` accepts an optional `--rubric` file
+  (`govbridge-rubric-results/1`: `must_state` per query id, `auth_gating` entries); `grade_g5`/`grade_g8` now use a
+  supplied `must_state` verdict instead of always reporting (and never acting on) PENDING_RUBRIC, and `grade_g3`
+  ingests every `auth_gating` row as a hard, generic answer-side gate -- gating whatever items the rubric names, never
+  one hard-coded id set.'
+- 'GD-10 (a symbol-qualified anchor never matched by an in-symbol line citation): a new `_enclosing_symbol` helper
+  resolves the function/type enclosing a cited line through the SAME code store the code route already builds
+  (`govbridge.code.symbols`/`govbridge.code.store`, read-only, lazily indexed, never a second symbol table), so a
+  plain line citation inside a function''s body now matches that function''s symbol anchor even outside
+  `line_tolerance`.'
+- 'OBS-BR-05 (the 1%-of-corpus packet-bytes check never fired): `grade()` unconditionally called
+  `grade_g7(..., budget_bytes=None, ...)`, and `grade_g7` required a truthy `budget_bytes` before ever comparing
+  packet bytes to 1% of corpus -- the check was silently disabled for every run. It now runs whenever `corpus_bytes`
+  is known, independent of `budget_bytes`, which is now a genuinely separate, additional bound (the sum of budget
+  profiles used, per DEMONSTRATION_DESIGN.md section 4 G7''s "OR" clause).'
+- 'Every fix has a NAMED regression test (tests/integration/test_demo_grade_regressions.py, 18 tests: one per
+  GD-1..GD-10 plus OBS-BR-05, some with extra positive/negative controls) that was verified, empirically, to FAIL
+  against the pre-repair grade.py/extract_reads.py and PASS after the repair -- by temporarily swapping in the
+  git HEAD (pre-repair) copies of both files and re-running the new test file, then restoring the repaired copies.
+  14 of 18 tests failed pre-repair (the remaining 4 are backward-compatibility/negative-control assertions that were
+  already correct pre-repair and stay correct after).'
+- 'The full pre-existing suite still passes: tests/integration/test_demo_grade.py (4 tests) and
+  tests/integration/test_extract_reads.py (6 tests) are unmodified and green, and the whole repository''s test suite
+  (347 tests) passes with no regression outside this node''s scope.'
+- 'D-2 (must_state fact bound to stage or chain) required NO grader code change: the ruling is "to its stage" --
+  authoring guidance for the run-2 test-author (R1-TA2), not a new field or binding mechanism in `grade.py`. The
+  analyst''s alternative (a per-fact stage/chain binding field, defaulting to chain) was NOT adopted, per this
+  brief''s explicit instruction.'
+evidence:
+- claim: pre-repair defect confirmed empirically for every GD/OBS, then fixed, then re-confirmed (fail pre-repair,
+    pass post-repair) by swapping in the git HEAD copies of grade.py/extract_reads.py
+  path: release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade_regressions.py
+  sha256: 5fc62b7bedf41bdaf73a3dd5d64c8c69784f5088c25ef88078b761c091bdf17a
+- claim: the repaired deterministic grader
+  path: release/orchestration/phase-2-context-bridge/govbridge/demo/grade.py
+  sha256: 367e1d47273e175afe997ac217b86f5bb6bce7d300bae992fe0d653677de0aab
+- claim: the repaired transcript-read extractor (GD-6)
+  path: release/orchestration/phase-2-context-bridge/govbridge/demo/extract_reads.py
+  sha256: bd7fba79ebec9d2ec54d40bd8ae2119cb0f9f873ed790ff850339079734d5536
+- claim: GD-6's transcript fixture (selector argument + own-output + one genuine undeclared read)
+  path: release/orchestration/phase-2-context-bridge/tests/fixtures/demo/transcript-gd6.jsonl
+  sha256: aba76a3ca2ccbf4db97159bdafc18cc7b6fa842112cb94f6b8bd27444675db03
+- claim: GD-9's rubric-results fixture (must_state + auth_gating)
+  path: release/orchestration/phase-2-context-bridge/tests/fixtures/demo/rubric-gd9.yaml
+  sha256: 78e2820c33252d790aeb0513db160ef70cc870e805dd44c2f0d347dce834237f
+- claim: node R1-RG's own acceptance check (pytest over the three named test files), exit 0, 29 passed
+  path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.acceptance-check-1.out
+  sha256: e02454d859bc5a80f75d5bda886ffee05165c743db7d362580eb4086bf4b377e
+- claim: the whole repository's test suite (347 tests) passes with these changes, no collateral regression
+  path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.full-repo-test-run.out
+  sha256: fdab624c29e7bd9053fe370394b67509357974b42df8dc14d2288d845d350713
+- claim: node R1-RG's second acceptance check is orchestrator-only/quarantined and was correctly not run by this
+    builder
+  path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.quarantined-check-note.txt
+  sha256: e6e51e48760f9328bfccb53053492cb80899c1e02275ccc58ad236aabf69cf79
+mutation_scope_respected: true
+mutation_scope_note: 'only govbridge/demo/**, tests/integration/test_demo_grade_regressions.py,
+  tests/fixtures/demo/** and AGENT_RUNS/BR-AR-0020.* changed on the branch (git status/diff confirmed against
+  bridge_base_commit 9258d0a). tests/integration/test_demo_grade.py and tests/integration/test_extract_reads.py
+  are in the declared mutation_scope but were NOT modified -- both already passed unchanged. No rm; no store or venv
+  writes outside $HOME/.cache/gov-bridge/store-BR-AR-0020; no product, Contract v3, release/orchestration/phase-2/**,
+  top-level tools/, capabilities/ or runtime/ touched.'
+open_issues:
+- 'GD-7/D-5''s "task inputs in section I count once" clause (packet-side byte accounting, not the external-read-side
+  windowing this repair fixes) was assessed and deliberately NOT implemented: GD-7''s own regression-test description
+  ("the fixture receipt''s windows are counted as windows") is specifically about external reads, and I found no
+  evidence the main+supplementary packet-byte SUM double-counts section I today. Flagged for R1-INT/the orchestrator
+  to re-check once R1-RS''s supplementary packets exist for real.'
+- 'extract_reads.py''s heuristic file-token scan can still misclassify the INVOKED SCRIPT NAME itself as a "read"
+  when a Bash command runs a wrapper script whose own name ends in a recognised extension (e.g. a scratch `.sh`
+  wrapper) -- this is a residual imprecision of a regex-based classifier, not the GD-6 defect named in
+  REPAIR_PLAN.md section 8.2 (which is specifically about the wrapper''s ARGUMENTS), and was out of this node''s
+  bounded scope to chase further.'
+- 'GD-10''s `_enclosing_symbol` only queries the Rust code store (the only language adapter this repository has);
+  it degrades to `None` (never raises) for any other path, matching the rest of `anchor_matches`''s fail-safe style.'
+- second acceptance check ("(orchestrator only, quarantined) $PY -m govbridge demo grade over run-1 with the run-1
+  oracle") is reserved for the orchestrator per the node's own routing note; not run by this builder (see the
+  quarantined-check-note.txt evidence above)

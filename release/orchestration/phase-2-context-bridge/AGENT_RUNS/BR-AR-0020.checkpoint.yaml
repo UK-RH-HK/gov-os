@@ -1,0 +1,179 @@
+# BR-AR-0020 schema-2 worker checkpoint (OD-BR-04 A). No oracle content.
+run_id: BR-AR-0020
+commit: 8b16f33d0e84c945cb058942417a9100a4c470b6
+role: 'REPAIR-1 node R1-RG -- bounded builder, deterministic grader repair: GD-1..GD-10 and OBS-BR-05, each with a
+  regression test on a synthetic fixture, implementing BR-ARCH-RULING-2''s D-1..D-5 exactly as ruled (not the
+  analyst''s rejected D-2 per-fact/chain binding alternative)'
+model_observed: claude-sonnet-5 (Sonnet 5)
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+  sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  sha256: c3c6da75a08ead0a10ccbe11fd9aeff5451ba3eb7f704ecd580c9cf2473bafd0
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+  note: my node section is R1-RG (id, mutation_scope, deliverables, acceptance_checks, routing sonnet, size M)
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+  note: sections 0, 1, 8 (all), 9 read; section 8.2's table is this node's literal defect/fix/test-shape spec
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/CAUSE_ANALYSIS.md
+  sha256: 72261a14909afe24e838e963aa6b6bae9775004a47a9c143b76914423c7623f3
+  note: read for GD-3/GD-4/GD-5/GD-6/GD-9 context (section 3.5/3.6); no oracle content, run-1 metrics only
+- path: release/orchestration/phase-2-context-bridge/GATES/BR-ARCH-RULING-2-GRADING-INTERPRETATIONS-AND-CONTROL-A.md
+  sha256: 9ea9d472297a93338e13af9ceac6dea464cdd681c3dd6140fed47d3caaeee9ce
+  note: D-1..D-5, implemented exactly as ruled here (not the analyst's rejected D-2/D-3 alternatives)
+- path: release/orchestration/phase-2-context-bridge/GATES/BR-ARCH-RULING-1-MANDATORY-INPUTS-ALWAYS-IN-A.md
+  sha256: 6b7f1cc80b518c1cda5261656d22264e8b152097f388fe9bca8b41067c7622dc
+  note: Addendum A1 -- already implemented in grade_g3 before this node started; read to confirm, not re-implemented
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/DEMONSTRATION_DESIGN.md
+  sha256: 24d91f572397966a18af095e3bd833cd22027c9bf79bccca83cf76e08567116d
+  note: section 4, the grading law G1-G8, quoted throughout the fix comments
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  sha256: 2be042c187f112e82d221440d2c8bf5dda2ed360f49957f1bf8ad4eddac9873f
+  note: confirmed the BR-AR-0020 agent_runs entry's mutation_scope and handoff_sha256 match this brief
+- path: release/orchestration/phase-2-context-bridge/govbridge/demo/grade.py
+  sha256: 77284c0553eb8811fc7163b0b3a10cd7f981e2d58a15ed0b89b8823a00eede4d
+  note: PRE-REPAIR content (git HEAD 9258d0a), the baseline every GD/OBS-BR-05 defect was confirmed against
+- path: release/orchestration/phase-2-context-bridge/govbridge/demo/extract_reads.py
+  sha256: 661f1f58686d16508b680b54c0de06c0169c3486817465f281e653ebb391d9d3
+  note: PRE-REPAIR content (git HEAD 9258d0a), the baseline GD-6 was confirmed against
+- path: release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade.py
+  sha256: 218f6bde24f756d2343f1d245af4af0aaaf4b9a611a0d7d22407869294998203
+  note: unmodified; read to reuse its fixture-building pattern in test_demo_grade_regressions.py
+- path: release/orchestration/phase-2-context-bridge/tests/integration/test_extract_reads.py
+  sha256: a88e8e0a308caf95429e4967e8029bdf930c49da8185c4f47b21034cc1e285e9
+  note: unmodified; existing coverage for extract_reads.py's non-GD-6 behaviour
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/integration/oracle-synthetic.yaml
+  sha256: 721b70d46bc51dde5d2dbbbd894112bb93e05254312e689e9dd525b546c37a45
+  note: reused (read-only) by the GD-9 end-to-end test
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/integration/demo-queries-synthetic.yaml
+  sha256: 81adb1c49eeb27e2b74046e6305d2adb773f299e534135c83fe0031675726faf
+  note: reused (read-only) by the GD-9 end-to-end test
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/integration/answers-passing.yaml
+  sha256: 0dcf2f2d7abae0e50805b135c28ed0a160849ee5272b3f54f877526163486924
+  note: reused (read-only) by the GD-9 end-to-end test
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/compile/compile_repobuilder.py
+  sha256: 0e0452b1ab5dcf0155b49e32f5aeab5ef6205b58bdcbccf1f33aa9b84ffa56ff
+  note: reused (read-only), generic non-Review-8 fixture repo; provides GD-10's real Rust function (cx_rule)
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: c3c6da75a08ead0a10ccbe11fd9aeff5451ba3eb7f704ecd580c9cf2473bafd0
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/demo/**
+  - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade.py
+  - release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade_regressions.py
+  - release/orchestration/phase-2-context-bridge/tests/integration/test_extract_reads.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/demo/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.*
+commands:
+- cmd: cd $D && $PY -m pytest tests/integration/test_demo_grade.py tests/integration/test_demo_grade_regressions.py
+    tests/integration/test_extract_reads.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.acceptance-check-1.out
+  output_sha256: e02454d859bc5a80f75d5bda886ffee05165c743db7d362580eb4086bf4b377e
+  note: 'node R1-RG''s first (and only builder-run) acceptance check, verbatim: 29 passed (4 pre-existing +
+    18 new regressions, one or more per GD-1..GD-10/OBS-BR-05, + others)'
+- cmd: '(orchestrator only, quarantined) $PY -m govbridge demo grade over run-1 with the run-1 oracle'
+  exit_code: null
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.quarantined-check-note.txt
+  output_sha256: e6e51e48760f9328bfccb53053492cb80899c1e02275ccc58ad236aabf69cf79
+  note: 'node R1-RG''s second acceptance check is explicitly marked "orchestrator only, quarantined" in
+    REPAIR_DAG.yaml -- this builder never read the run-1 oracle or any sealed material (REPAIR-1 rule 1) and did
+    not run it; the note explains why and points to the orchestrator as the next actor for this check'
+- cmd: $PY -m pytest tests/ -q   # whole-repository sanity pass, not one of R1-RG's own acceptance checks
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.full-repo-test-run.out
+  output_sha256: fdab624c29e7bd9053fe370394b67509357974b42df8dc14d2288d845d350713
+  note: 347 passed; confirms no collateral regression outside this node's mutation_scope
+artifacts_changed:
+- path: release/orchestration/phase-2-context-bridge/govbridge/demo/grade.py
+  sha256: 367e1d47273e175afe997ac217b86f5bb6bce7d300bae992fe0d653677de0aab
+- path: release/orchestration/phase-2-context-bridge/govbridge/demo/extract_reads.py
+  sha256: bd7fba79ebec9d2ec54d40bd8ae2119cb0f9f873ed790ff850339079734d5536
+- path: release/orchestration/phase-2-context-bridge/tests/integration/test_demo_grade_regressions.py
+  sha256: 5fc62b7bedf41bdaf73a3dd5d64c8c69784f5088c25ef88078b761c091bdf17a
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/demo/transcript-gd6.jsonl
+  sha256: aba76a3ca2ccbf4db97159bdafc18cc7b6fa842112cb94f6b8bd27444675db03
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/demo/rubric-gd9.yaml
+  sha256: 78e2820c33252d790aeb0513db160ef70cc870e805dd44c2f0d347dce834237f
+- path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.acceptance-check-1.out
+  sha256: e02454d859bc5a80f75d5bda886ffee05165c743db7d362580eb4086bf4b377e
+- path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.full-repo-test-run.out
+  sha256: fdab624c29e7bd9053fe370394b67509357974b42df8dc14d2288d845d350713
+- path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0020.quarantined-check-note.txt
+  sha256: e6e51e48760f9328bfccb53053492cb80899c1e02275ccc58ad236aabf69cf79
+findings:
+- 'grade.py already implemented BR-ARCH-RULING-1 Addendum A1 (G3''s lifecycle-UNKNOWN-in-A reading) before this node
+  started -- that logic was NOT touched; only the GD-1..GD-10/OBS-BR-05 defects this node owns were fixed'
+- 'GD-3 and GD-8 are the SAME underlying gap in `anchor_matches`''s record-id branch (it returned on record_id
+  presence alone, never falling through to the section rule, and `_resolve_citation` could not read a record_id
+  off a raw citation object at all) -- one rewrite, two named regression tests, one per REPAIR_PLAN.md''s own
+  defect id'
+- 'GD-9''s AUTH gating is implemented fully generically: `grade_g3` gates whatever item ids a supplied rubric
+  file names under `auth_gating`, never a hard-coded AUTH-1..4 (or any other) id set -- satisfying OC-BR-02 while
+  still implementing D-3''s "AUTH items are gated under G3 ... on the answers by the rubric" rule'
+- 'GD-10 required a real, git-backed repository (the code store is commit-addressed) -- reused
+  tests/fixtures/compile/compile_repobuilder.py''s existing `cx_rule` Rust function (lines 2-4 of
+  runtime/src/cx_module.rs) rather than authoring a new code fixture, since it already exists, is generic and is
+  already depended on by tests/integration/test_demo_grade.py'
+- 'the pre-repair grade.py''s `anchor_matches` line-less-anchor fallback (`return bool(anchor.get("section")) or
+  True`) is dead code that always evaluates True; while fixing GD-10 this was found to ALSO wrongly match a
+  symbol-qualified anchor against every other line in the same file when the anchor carried no lines of its own --
+  fixed as part of GD-10''s rewrite (a symbol-qualified anchor with no line range now requires an actual symbol
+  match, never falls through to "path+commit is enough")'
+failed_approaches:
+- 'first GD-8 regression test used a string item_id citation (`"T-REC-1"`) for the "whole-document citation"
+  case -- this already resolved correctly in the PRE-repair code too (the string-citation branch always read
+  record_id off `items_by_id`), so the test passed both before and after and pinned nothing. Replaced with a raw
+  citation OBJECT naming only `record_id` (no path/commit) -- the actual pre-repair gap
+  (`_resolve_citation`''s dict branch required "path" or "commit" present, so this exact shape resolved to `None`
+  and could never match anything) -- verified to fail pre-repair and pass post-repair'
+- 'first GD-10 regression test''s negative control (a citation OUTSIDE the symbol''s body) unexpectedly passed
+  (returned True) even in the FIRST repaired version, because the anchor had no `lines` of its own and the
+  existing "line-less anchor: path+commit is enough" fallback matched regardless of the symbol check -- fixed by
+  making a symbol-qualified anchor with no line range require an actual symbol match (see findings)'
+- 'first GD-6 test used a scratch wrapper script name (mirroring REPAIR_PLAN.md''s own illustrative
+  `gq.sh exact ...` example) as the Bash command; the wrapper''s own name (ending `.sh`) was itself picked up as a
+  false "read" by the generic bare-file-token scan -- a real, but SEPARATE, residual imprecision from the one
+  GD-6 defect actually names (the wrapper''s ARGUMENTS being parsed as reads). Rewrote the fixture to invoke
+  govbridge directly (no wrapper script name in the command), which cleanly exercises the named defect without
+  tripping the separate, out-of-scope imprecision (recorded in the report''s open_issues, not fixed)'
+unresolved:
+- 'GD-7/D-5''s "task inputs in section I count once" packet-byte-accounting clause (as opposed to the
+  external-read-window accounting this repair fixes) -- see the report''s open_issues for why this was left as a
+  flagged, not fixed, gap'
+- 'extract_reads.py''s residual false-positive on an invoked wrapper script''s own name -- see report open_issues'
+- second acceptance check is orchestrator-only/quarantined by the node's own routing; not run by this builder
+decisions:
+- 'implemented D-1..D-5 exactly as BR-ARCH-RULING-2 rules them, not REPAIR_PLAN.md section 8.1''s pre-ruling
+  analyst recommendations (D-1''s "delivered coverage" and D-2''s "per-fact stage/chain binding" in particular) --
+  per this node''s brief'
+- 'D-2 required no grade.py change: it binds a must_state fact to its STAGE (existing [R] rubric text, unchanged),
+  which is oracle-authoring guidance for R1-TA2, not a grader mechanism; no stage/chain field or logic was added'
+- 'GD-6''s "exclude supplied inputs" was implemented as: any path already present in a compiled packet''s own
+  manifest (any section), in the task spec''s own `required_inputs`, or in the receipt''s own
+  `outputs_produced`/`inputs_consumed` -- rather than requiring a second, separate "supplied inputs" list, since
+  the packet/task-spec/receipt already say exactly what was supplied'
+- 'GD-6''s "agent''s own outputs" was implemented as: a shell redirection (`>`/`>>`) or `--out`/`-o` target within
+  the SAME command, PLUS the D-4 `run-<n>/` path rule (which also covers re-reading that same output back in a
+  LATER command, the shape REPAIR_PLAN.md''s own `gq.sh` example shows) -- rather than tracking write history
+  across the whole transcript, which would need state extract_reads.py does not otherwise keep'
+- 'no existing test file was modified (test_demo_grade.py, test_extract_reads.py both stay byte-identical to
+  HEAD) -- every new assertion lives in the new test_demo_grade_regressions.py file the node names, so REPAIR-1
+  rule 5''s "list and justify every modification" has nothing to list'
+lessons:
+- 'a fixture that only pins the DESCRIBED symptom (e.g. a string item_id citation for "whole-document citation")
+  can silently already pass pre-repair if the pre-repair code happens to handle that particular shape correctly;
+  the fail-before/pass-after check (swap in the git HEAD file, rerun) catches this immediately and should be run
+  for every regression test, not assumed from reading the defect description alone'
+- 'a regex-based transcript classifier (extract_reads.py) cannot fully distinguish "a path argument to a query
+  command" from "a path that is itself being executed" without either parsing the shell properly or hard-coding
+  the invoking program''s name (which would fight OC-BR-02''s genericity rule) -- the selector-syntax signal
+  (a mandatory `:start[-end]` suffix) is a robust, generic way to catch the ARGUMENT case cleanly; the invoked-
+  program-name case is a smaller, separate residual gap, disclosed rather than silently left'
+next_consumer: 'R1-INT (the generic-rule/OC-BR-02 audit and integration node), which depends on R1-RG among others;
+  R1-DEC''s D-1..D-5 are now implemented in code exactly as BR-ARCH-RULING-2 rules them, so any later
+  node/verifier reading grade.py can rely on that. R1-GA3/R1-RS (compiler work) should re-check GD-7/D-5''s
+  packet-byte "task inputs count once" clause once real supplementary packets exist (see open_issues -- not
+  something R1-RG could exercise without those packets)'
+final_commit: 8b16f33d0e84c945cb058942417a9100a4c470b6
