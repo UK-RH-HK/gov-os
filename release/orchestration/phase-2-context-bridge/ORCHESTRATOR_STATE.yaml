@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T02:02:27Z'
-state_hash: 785e5ce0b7a6a1254fcec4cf429b4c24a9f5c08016776243bd751365a5395837
+updated_at: '2026-09-26T02:22:06Z'
+state_hash: 1b8a87135b230f9ff5a39f1b0f35d2a14159a5f4084bc747c6044fdbd913d0fb
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -791,7 +791,15 @@ agent_runs:
   agent_name: br-r1-rn-0017
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: RUNNING
+  status: COMPLETED_INTEGRATED
+  final_commit: 81cd9c430278128a8bfba5265c516b6b73951b07
+  merged_at: 62b19be
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run)
+  orchestrator_verified: tests/notes 35/35 re-run; only added test files; genericity grep clean; claude-sonnet-5 x189
+  open_issues_routed:
+  - the top-level `govbridge notes` dispatch line in govbridge/cli.py -> R1-GA1 (the next cli.py editor after R1-RX)
+  - DERIVED_NOTE placement -> R1-GA3 (named consumer); prefer the existing ladder class DERIVED (rank 7, never admissible in
+    A) over a new class so the near-frozen authority/classes.py and the class-table test need no change
   store: $HOME/.cache/gov-bridge/store-BR-AR-0017
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/notes/**
@@ -893,8 +901,6 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0021.*
 running_work:
-- run_id: BR-AR-0017
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rn-0017; never inferred from elapsed time
 - run_id: BR-AR-0018
   liveness_check: subagent transcript mtime + commits on bridge/r1-rx-0018; never inferred from elapsed time
 - run_id: BR-AR-0019
