@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T08:39:34Z'
-state_hash: fee85e556bdfebbb6f3c0952824cc87994dcc37f3eada07c25496977a2ab3aa8
+updated_at: '2026-09-26T08:40:11Z'
+state_hash: a7a754079b2f0e0d1c3b66c7209b37c2534be5117a79c1298d41fddfe861b101
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1292,7 +1292,7 @@ dag:
     ANALYST: BR-AR-0016, R1-RN: BR-AR-0017, R1-RX: BR-AR-0018, R1-RL: BR-AR-0019, R1-RG: BR-AR-0020, R1-TA2: BR-AR-0021,
     R1-RM: BR-AR-0022, R1-GA1: BR-AR-0023, R1-GA2: BR-AR-0024, R1-RS: BR-AR-0025, R1-GA3: BR-AR-0026, R1-RA: BR-AR-0027,
     R1-INT: BR-AR-0028, R1-MB-DEMO: BR-AR-0029, R1-MB-GRADE: BR-AR-0030, R1-D2: BR-AR-0031, R1-DEMO2: BR-AR-0032,
-    R1-GRADE2: BR-AR-0033}
+    R1-GRADE2: BR-AR-0033, R1-XC: BR-AR-0034}
   repair_1:
     dag: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
     plan: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
@@ -1447,6 +1447,23 @@ dag:
       builder brief from PG3 on states the rule'
     reason: a query-time cache write was found in R1-GA1 pass 2; a demonstration store mutated by the demonstrating agent's
       own queries breaks the frozen-store evidence chain
+  - id: BR-DAG-AMEND-R1-16
+    by: orchestrator (DAG restructuring -- separation of fixing from auditing; model routing)
+    rule: 'R1-INT is SPLIT. (1) A new node R1-XC (run BR-AR-0034, sonnet) carries the cross-cutting CODE fixes previously routed
+      to R1-INT -- BR-DAG-AMEND-R1-5 (the freshness -m entry point), -R1-6 (the gitobj repo_root cache), -R1-12 (the
+      authority import-time config read; remove the tests/code/conftest.py pre-import) and -R1-14 (thread-safe
+      ExclusionCounter) -- each with its regression test. Scope: govbridge/core/freshness.py, govbridge/core/gitobj.py,
+      govbridge/core/taskctx.py, govbridge/authority/__init__.py, govbridge/authority/classes.py (config-read change
+      only; the class table byte-unchanged), tests/code/conftest.py, tests/core/test_freshness_entrypoint.py,
+      tests/core/test_gitobj_repo_root.py, tests/core/test_taskctx_concurrency.py, tests/authority/test_lazy_config.py.
+      depends_on R1-GA1 FINAL (which edits core/freshness.py and core/store.py); may run in parallel with R1-GA2, R1-GA3
+      and R1-RA (disjoint scopes). (2) R1-INT becomes AUDIT-ONLY -- its own scope (tests/integration/test_repair1_integration.py,
+      EVIDENCE/repair-1/**) -- depends additionally on R1-XC, and runs every integration check including
+      BR-DAG-AMEND-R1-3, -R1-7 and -R1-15; defects it finds are routed back to their owners, never fixed by it.
+      (3) R1-INT is routed to OPUS (fresh), not sonnet'
+    reason: an integrator that fixes four cross-cutting defects and then audits the tree would be grading its own work;
+      waves 1-3 showed builders repeatedly reporting narrowed deliverables as MET, so the integration audit gets the
+      stronger model; the split also lets the fixes run in parallel with PG3/PG4 instead of serialising behind them
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
