@@ -17,6 +17,19 @@ and, additionally: required top-level keys and types, why-fields on traps/wrong/
 process/production flags, coverage of every public query id, and a lint that must_state text asserts no F2/F3
 classification and no disposition (the schema's prohibited_content).
 
+Per-fact binding (run BR-AR-0021, REPAIR-1 node R1-TA2; GATES/BR-ARCH-RULING-2 D-2). A must_state entry is either a
+plain string (the run-1 form, still accepted) or a mapping ``{fact: <text>, binding: <scope>}`` naming WHERE the
+rubric grader must find the fact:
+
+  * inside a chain stage, ``binding`` must equal that stage's own name -- D-2: "[R] Each must_state fact is present
+    in the stage's claim"; a chain-wide binding is the reading D-2 did NOT adopt, so ``chain`` is refused here;
+  * inside a query or control row (and in side_by_side / f1_both_ways, should they carry must_state), ``binding``
+    must be ``query`` -- the fact is judged against that query's whole answer (DEMONSTRATION_DESIGN.md section 4 G5).
+
+The oracle is in BOUND mode when any must_state entry is a mapping, or when ``--require-binding`` is given; in bound
+mode every must_state entry must be a well-formed mapping (no mixing). The node R1-TA2 acceptance ("every must_state
+fact carries a binding") is ``--require-binding``.
+
 Output never echoes oracle content: it prints the file's basename (or --display-name), its sha256, counts, and
 structural problems located by key path only. Exit 0 when valid, 1 when invalid, 2 on a usage/IO error.
 """
@@ -37,6 +50,8 @@ DEFAULT_STATE = os.path.join(DOMAIN, "ORCHESTRATOR_STATE.yaml")
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
 ANCHOR_KEYS = {"kind", "commit", "path", "lines", "symbol", "record_id", "section", "why"}
 CONSUMER_EXTRA = {"process", "production"}
+FACT_KEYS = {"fact", "binding"}
+QUERY_BINDING = "query"
 
 # must_state lint: phrases that would assert an F2/F3 classification or an F1 disposition (schema
 # prohibited_content). Deliberately narrow: it must not fire on a statement that something is NOT yet decided.
@@ -75,10 +90,37 @@ def load(path):
     return data, yaml.load(data.decode("utf-8"), Loader=UniqueKeyLoader)
 
 
+def _is_fact_mapping(x):
+    return isinstance(x, dict)
+
+
+def _iter_must_state_lists(doc):
+    """Every must_state list in the oracle, wherever the schema places one (chain stages, query/control rows, and
+    side_by_side / f1_both_ways should they carry one). Used only to decide the binding mode."""
+    if not isinstance(doc, dict):
+        return
+    for ch in doc.get("chains") or []:
+        if isinstance(ch, dict):
+            for st in ch.get("stages") or []:
+                if isinstance(st, dict) and isinstance(st.get("must_state"), list):
+                    yield st["must_state"]
+    for key in ("queries", "controls"):
+        for q in doc.get(key) or []:
+            if isinstance(q, dict) and isinstance(q.get("must_state"), list):
+                yield q["must_state"]
+    for key in ("side_by_side", "f1_both_ways"):
+        blk = doc.get(key)
+        if isinstance(blk, dict) and isinstance(blk.get("must_state"), list):
+            yield blk["must_state"]
+
+
 class Checker:
-    def __init__(self, schema, queries, state):
+    def __init__(self, schema, queries, state, require_binding=False):
         self.problems = []
         self.anchor_count = 0
+        self.require_binding = require_binding
+        self.bound_mode = require_binding
+        self.fact_counts = {"stage": 0, "query": 0, "unbound": 0}
         # anchor kinds, from the schema's own anchor definition
         kinds = str((schema.get("anchor") or {}).get("kind", ""))
         self.kinds = {k.strip() for k in kinds.split("|") if k.strip()} or {"code", "test", "record", "contract", "evidence"}
@@ -159,17 +201,54 @@ class Checker:
             else:
                 self.anchor(x, f"{where}[{i}]", need_why=need_why)
 
-    def str_list(self, lst, where, allow_empty=True):
-        if not isinstance(lst, list) or not all(isinstance(s, str) and s.strip() for s in lst):
-            self.err(where, "must be a list of non-empty strings")
+    def lint(self, text, where):
+        for pat in PROHIBITED:
+            if pat.search(text):
+                self.err(where, "asserts a classification or disposition (prohibited_content)")
+                return
+
+    def must_state(self, lst, where, expected_binding, allow_empty=True):
+        """A must_state list. Each entry is a non-empty string (unbound, run-1 form) or, in bound mode, a mapping
+        {fact, binding} whose binding equals ``expected_binding`` (the containing stage's name, or ``query``)."""
+        if not isinstance(lst, list):
+            self.err(where, "must be a list")
             return
         if not lst and not allow_empty:
             self.err(where, "must not be empty")
+        scope = "query" if expected_binding == QUERY_BINDING else "stage"
         for i, s in enumerate(lst):
-            for pat in PROHIBITED:
-                if pat.search(s):
-                    self.err(f"{where}[{i}]", "asserts a classification or disposition (prohibited_content)")
-                    break
+            w = f"{where}[{i}]"
+            if isinstance(s, str):
+                if not s.strip():
+                    self.err(w, "must be a non-empty string or a {fact, binding} mapping")
+                    continue
+                if self.bound_mode:
+                    self.err(w, "unbound fact: in bound mode every must_state entry is a {fact, binding} mapping "
+                                "(BR-ARCH-RULING-2 D-2)")
+                self.fact_counts["unbound"] += 1
+                self.lint(s, w)
+                continue
+            if not _is_fact_mapping(s):
+                self.err(w, "must be a non-empty string or a {fact, binding} mapping")
+                continue
+            extra = set(s) - FACT_KEYS
+            if extra:
+                self.err(w, f"unknown fact keys {sorted(extra)}")
+            fact, binding = s.get("fact"), s.get("binding")
+            if not (isinstance(fact, str) and fact.strip()):
+                self.err(w, "fact must be a non-empty string")
+            else:
+                self.lint(fact, w)
+            if not (isinstance(binding, str) and binding.strip()):
+                self.err(w, "binding must be a non-empty string")
+            elif binding != expected_binding:
+                if scope == "stage":
+                    self.err(w, "binding must name the containing stage itself (BR-ARCH-RULING-2 D-2: a must_state "
+                                "fact is bound to its stage, never to the chain)")
+                else:
+                    self.err(w, f"binding must be '{QUERY_BINDING}' for a query-level fact")
+            else:
+                self.fact_counts[scope] += 1
 
     # ---------------------------------------------------------------------------------------------- sections
     def top(self, doc):
@@ -239,7 +318,8 @@ class Checker:
                     self.err(f"{sw}.anchors", "must be exactly one of {any_of: [...]} or {all_of: [...]}")
                 else:
                     self.anchor_list(next(iter(an.values())), f"{sw}.anchors.{next(iter(an))}", allow_empty=False)
-                self.str_list(st.get("must_state"), f"{sw}.must_state")
+                self.must_state(st.get("must_state"), f"{sw}.must_state",
+                                st.get("stage") if isinstance(st.get("stage"), str) else "<unnamed stage>")
                 self.anchor_list(st.get("traps", []), f"{sw}.traps", need_why=True)
                 self.anchor_list(st.get("wrong", []), f"{sw}.wrong", need_why=True)
             if enforcement != 1:
@@ -265,6 +345,8 @@ class Checker:
             self.err(f"{w}.query_id", "not the public side-by-side query id")
         self.anchor_list(sbs.get("shared_points"), f"{w}.shared_points", allow_empty=False)
         self.anchor_list(sbs.get("differing_points"), f"{w}.differing_points", allow_empty=False)
+        if "must_state" in sbs:
+            self.must_state(sbs.get("must_state"), f"{w}.must_state", QUERY_BINDING)
         return sbs.get("query_id")
 
     def both_ways(self, bw):
@@ -276,6 +358,8 @@ class Checker:
             self.err(f"{w}.query_id", "not the public both-ways query id")
         self.anchor_list(bw.get("purpose_anchors"), f"{w}.purpose_anchors", allow_empty=False)
         self.anchor_list(bw.get("consumer_anchors"), f"{w}.consumer_anchors", allow_empty=False, consumer=True)
+        if "must_state" in bw:
+            self.must_state(bw.get("must_state"), f"{w}.must_state", QUERY_BINDING)
         return bw.get("query_id")
 
     def query_rows(self, rows, where, kinds):
@@ -299,7 +383,7 @@ class Checker:
                     self.err(w, f"missing {k}")
             self.id_or_anchor_list(q.get("required", []), f"{w}.required", allow_empty=False)
             self.id_or_anchor_list(q.get("forbidden", []), f"{w}.forbidden", need_why=True)
-            self.str_list(q.get("must_state", []), f"{w}.must_state", allow_empty=False)
+            self.must_state(q.get("must_state", []), f"{w}.must_state", QUERY_BINDING, allow_empty=False)
         return seen
 
     def authority(self, rows):
@@ -330,6 +414,9 @@ class Checker:
     def run(self, doc):
         if not self.top(doc):
             return
+        # bound mode: forced by --require-binding, or declared by the oracle itself using any {fact, binding} entry
+        if not self.bound_mode:
+            self.bound_mode = any(_is_fact_mapping(x) for lst in _iter_must_state_lists(doc) for x in lst)
         covered = set()
         covered |= self.chains(doc.get("chains"))
         covered.add(self.side_by_side(doc.get("side_by_side")))
@@ -349,6 +436,8 @@ def main():
     ap.add_argument("--queries", default=DEFAULT_QUERIES)
     ap.add_argument("--state", default=DEFAULT_STATE)
     ap.add_argument("--display-name", default=None, help="name printed for the oracle file (default: its basename)")
+    ap.add_argument("--require-binding", action="store_true",
+                    help="every must_state fact must carry a binding (BR-ARCH-RULING-2 D-2; node R1-TA2 acceptance)")
     args = ap.parse_args()
     try:
         data, doc = load(args.oracle)
@@ -358,7 +447,7 @@ def main():
     except (OSError, yaml.YAMLError) as e:
         print(f"CHECK_ORACLE ERROR: {type(e).__name__}: {str(e).splitlines()[0]}")
         return 2
-    c = Checker(schema, queries, state)
+    c = Checker(schema, queries, state, require_binding=args.require_binding)
     c.run(doc)
     name = args.display_name or os.path.basename(args.oracle)
     print(f"oracle: {name}")
@@ -371,6 +460,10 @@ def main():
         print(f"queries: {len(doc.get('queries') or [])}; controls: {len(doc.get('controls') or [])}")
         print(f"authority_expectations: {len(doc.get('authority_expectations') or [])} rows for "
               f"{len(c.mandatory)} mandatory_bridge_inputs items")
+    print(f"binding mode: {'BOUND' if c.bound_mode else 'UNBOUND'}"
+          f"{' (required by --require-binding)' if c.require_binding else ''}")
+    print(f"must_state facts: bound to their stage {c.fact_counts['stage']}; bound to their query "
+          f"{c.fact_counts['query']}; unbound {c.fact_counts['unbound']}")
     print(f"anchors checked: {c.anchor_count}")
     if c.problems:
         print(f"RESULT: INVALID ({len(c.problems)} problems)")

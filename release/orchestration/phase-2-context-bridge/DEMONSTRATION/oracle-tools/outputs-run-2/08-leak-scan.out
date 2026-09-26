@@ -1,0 +1,6 @@
+files scanned (every changed or new file in this run's diff): 13
+files containing the sealed path: 0
+files containing the sealed dir name: 0
+files containing the sealed parent+name: 0
+oracle must_state facts scanned: 124; verbatim fact occurrences in scanned files: 0
+RESULT: CLEAN

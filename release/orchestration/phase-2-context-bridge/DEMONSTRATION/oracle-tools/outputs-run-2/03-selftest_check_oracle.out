@@ -1,0 +1,24 @@
+binding mode of the base oracle: BOUND; --require-binding: False
+unmodified: expected=VALID got=VALID PASS
+stage removed: expected=INVALID got=INVALID PASS
+stages out of order: expected=INVALID got=INVALID PASS
+second enforcement point: expected=INVALID got=INVALID PASS
+no enforcement point: expected=INVALID got=INVALID PASS
+authority row missing: expected=INVALID got=INVALID PASS
+authority row duplicated: expected=INVALID got=INVALID PASS
+authority class not verbatim: expected=INVALID got=INVALID PASS
+anchor lacks commit: expected=INVALID got=INVALID PASS
+anchor lacks path: expected=INVALID got=INVALID PASS
+anchor commit abbreviated: expected=INVALID got=INVALID PASS
+trap without why: expected=INVALID got=INVALID PASS
+control query uncovered: expected=INVALID got=INVALID PASS
+classification asserted: expected=INVALID got=INVALID PASS
+disposition asserted: expected=INVALID got=INVALID PASS
+bound: every fact unbound (run-1 form): expected=VALID got=VALID PASS
+bound: fact without binding: expected=INVALID got=INVALID PASS
+bound: stage fact bound to another stage: expected=INVALID got=INVALID PASS
+bound: stage fact bound to the chain (D-2 not adopted): expected=INVALID got=INVALID PASS
+bound: query fact bound to a stage: expected=INVALID got=INVALID PASS
+bound: unknown fact key: expected=INVALID got=INVALID PASS
+bound: stage fact asserting a classification: expected=INVALID got=INVALID PASS
+RESULT: ALL PASS
