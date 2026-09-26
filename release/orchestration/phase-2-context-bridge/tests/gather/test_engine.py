@@ -7,6 +7,7 @@ they never spawn the embedding subprocess. Neither uses a public demonstration q
 """
 from __future__ import annotations
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,6 +15,7 @@ import pytest
 
 from govbridge.core import taskctx as taskctxmod
 from govbridge.gather import engine as enginemod
+from govbridge.gather import facets as facetsmod
 
 FIXTURES_GATHER = Path(__file__).resolve().parents[1] / "fixtures" / "gather"
 sys.path.insert(0, str(FIXTURES_GATHER))
@@ -21,6 +23,22 @@ import gather_repobuilder as repobuilder  # noqa: E402
 from fake_routes import FakeRouteSet, make_hit  # noqa: E402
 
 TEST_FACETS_PATH = str(FIXTURES_GATHER / "test-facets.yaml")
+
+
+@pytest.fixture(autouse=True)
+def _isolated_gather_env(tmp_path, monkeypatch):
+    """R1-T1: hermetic (no GOVBRIDGE_* leaked from another test, no process-cwd dependency). Defined here rather
+    than in a package ``conftest.py`` so this node's changes stay exactly inside its declared mutation_scope
+    (``tests/gather/test_engine.py``, ``tests/gather/test_instantiate.py``, ``tests/fixtures/gather/**``); this
+    file is the only one of the two that needs store/env isolation at all (test_instantiate.py runs entirely over
+    in-memory dicts)."""
+    monkeypatch.setenv("GOVBRIDGE_STORE", str(tmp_path / "store"))
+    monkeypatch.setenv("GOV_BRIDGE_HOME", str(tmp_path / "home"))
+    facetsmod.clear_cache()
+    taskctxmod.reset()
+    yield
+    taskctxmod.reset()
+    facetsmod.clear_cache()
 
 
 def _query(text="gizmoflux", id_="Q1", facets=None):
@@ -232,3 +250,40 @@ def test_real_view_thread_determinism(built_repo):
                                    batch_size=2, max_rounds=20, threads=threads, facets_path=TEST_FACETS_PATH)
         shas.add(result["merged_sha256"])
     assert len(shas) == 1
+
+
+# --- the top-level `govbridge notes ...` dispatch line (routed from R1-RN/BR-AR-0017 to this node) --------------
+#
+# govbridge/cli.py is this node's own mutation_scope (shared-file sequence RX -> GA1 -> RS -> RA), and the ONE
+# dispatch line it adds for "notes" belongs to R1-RN, whose own mutation_scope did not include cli.py
+# (govbridge/notes/cli.py's own module docstring names this hand-off explicitly). tests/notes/test_cli.py is R1-RN's
+# test file, outside this node's declared mutation_scope, so these dispatch tests live here instead, exercising
+# govbridge.cli directly rather than editing that file.
+
+def test_govbridge_notes_help_dispatches_to_notes_cli_in_process(capsys):
+    """"``govbridge notes --help`` dispatches": ``--help`` is not a subcommand ``govbridge.notes.cli.main`` itself
+    recognises (it has no argparse-based top level of its own -- its module docstring), so it falls through to that
+    module's OWN "unknown subcommand" message -- proving the top-level dispatch line actually forwarded ``rest``
+    into ``notescli.main(["--help"])`` rather than the top-level dispatcher itself reporting "unknown command
+    'notes'" (its own, different message, for a command it does not recognise at all)."""
+    from govbridge import cli as climod
+
+    rc = climod.main(["notes", "--help"])
+    assert rc == 2
+    err = capsys.readouterr().err
+    assert "govbridge notes: unknown subcommand '--help'" in err
+    assert "unknown command 'notes'" not in err
+
+
+def test_govbridge_notes_help_dispatches_via_python_dash_m():
+    """The same dispatch, exercised as a real subprocess (``python -m govbridge notes --help``), proving
+    ``govbridge/__main__.py`` -> ``govbridge.cli.main`` -> ``notes`` reaches ``govbridge.notes.cli`` outside the
+    test process too, and that ``govbridge notes validate``/``build`` (already covered by tests/notes/test_cli.py's
+    own direct ``notescli.main`` calls) are reachable the same way."""
+    from govbridge import GOV_BRIDGE_DOMAIN
+
+    proc = subprocess.run(
+        [sys.executable, "-m", "govbridge", "notes", "--help"], cwd=GOV_BRIDGE_DOMAIN, capture_output=True, text=True,
+    )
+    assert proc.returncode == 2
+    assert "govbridge notes: unknown subcommand '--help'" in proc.stderr

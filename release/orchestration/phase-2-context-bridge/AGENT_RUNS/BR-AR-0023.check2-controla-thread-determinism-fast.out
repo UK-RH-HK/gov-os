@@ -1,0 +1,7 @@
+=== AC2: govbridge gather --threads 1,4,16 on CONTROL-A (CA-WHY, facets=purpose+failed_approaches+dependencies+dependents+enforcement+tests), byte-identical merged_sha256 ===
+--- threads=1 ---
+query='CA-WHY' facets=['purpose', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests'] rounds=2 stop_reason=FACETS_COVERED merged_items=59 excluded_hits=5 merged_sha256=1f120bfde801c7f117690f7a5da3d1276455e6d5b222e5af8d2b63e94dfd2598
+--- threads=4 ---
+query='CA-WHY' facets=['purpose', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests'] rounds=2 stop_reason=FACETS_COVERED merged_items=59 excluded_hits=5 merged_sha256=1f120bfde801c7f117690f7a5da3d1276455e6d5b222e5af8d2b63e94dfd2598
+--- threads=16 ---
+query='CA-WHY' facets=['purpose', 'failed_approaches', 'dependencies', 'dependents', 'enforcement', 'tests'] rounds=2 stop_reason=FACETS_COVERED merged_items=59 excluded_hits=5 merged_sha256=1f120bfde801c7f117690f7a5da3d1276455e6d5b222e5af8d2b63e94dfd2598
