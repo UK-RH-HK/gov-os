@@ -1,0 +1,198 @@
+run_id: BR-AR-0028
+role: REPAIR-1 node R1-INT -- fresh, independent, AUDIT-ONLY integration audit of the integrated REPAIR-1 tree (15 checks; defects reported with
+  their owner node, never fixed)
+model_observed: claude-opus-5-5
+branch: bridge/r1-int-0028
+commit: 9629bcb58d4dd60bd1a7fb50090716d4466afab5
+status: COMPLETED
+verdict: DEFECTS_FOUND
+claims:
+- id: C-1
+  text: 'INT-VERDICT DEFECTS_FOUND: three HIGH defects (INT-D01 grader crash on supplementary packets; INT-D04 packet bytes exceed the budget
+    profiles used -- G7''s second FAIL condition -- on CONTROL-A; INT-D18 the code facets and the multi-hop follow-up deliver nothing to the compiled
+    packet for natural-language queries), 15 MEDIUM, 7 LOW, each with owner node, file:line and evidence.'
+- id: C-2
+  text: two from-clean stores built with the pinned view via both entry points are identical in every layer digest and every table (independent
+    per-table digest, incl. occurrence_distinct_path); freshness NOOP; coverage unclassified 0 on all 98 refs.
+- id: C-3
+  text: CONTROL-A compiles byte-identically twice across PYTHONHASHSEED 0/1 (main, supplementary/, notes/); packet verify and a synthetic receipt
+    check PASS; no baseline item is lost; every gather resolves the pinned view once.
+- id: C-4
+  text: every query command runs on a file+directory read-only store with the store unchanged and no write error; a seeded compile silently loses
+    section C there (INT-D03).
+- id: C-5
+  text: the full suite is green twice with this node's test file (0 failures; the defects are strict xfails).
+evidence:
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/INT-VERDICT.yaml
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-01-suite-final-run1.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-01-suite-final-run2.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-02a-rebuild-freshness-module.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-02b-rebuild-index-cli.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-02c-compare-stores.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-02d-freshness-noop.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-02e-coverage.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-03-genericity.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-04a-controla-compile-twice.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-04b-controla-verify-receipt.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-04c-corpus-bytes.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-04d-baseline-before-after.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-04e-controla-gather.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-05-budgets.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-06-grader-crosscheck.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-07-zero-count-audit.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-08-readonly-query-commands.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-08b-seeded-compile-readonly.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-09-budget-coherence.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-10-one-view-per-operation.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-11-hermeticity.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-11b-suite-under-audit-hook.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-12-history-refs-verify.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-13a-crosscutting.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-13b-crosscutting.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-14-observation-closure.out
+- release/orchestration/phase-2-context-bridge/EVIDENCE/repair-1/int-15-check-state-verify.out
+conformance:
+- item: 'check 1: full suite twice (+ -p no:randomly if present)'
+  status: PASS
+  evidence:
+  - EVIDENCE/repair-1/int-01-suite-final-run1.out
+  - EVIDENCE/repair-1/int-01-suite-final-run2.out
+  - EVIDENCE/repair-1/int-01-suite-run0-baseline.out
+  summary: final-run1 742 passed, 18 xfailed, 0 failed (350.5 s); final-run2 742 passed, 18 xfailed, 0 failed (336.0 s); the 18 xfails are this
+    node's strict xfails, one per INT defect it encodes; pre-audit baseline run0 731 passed; pytest-randomly absent -> third run skipped (R-08)
+- item: 'check 2: rebuild from clean twice'
+  status: PASS_WITH_DISCLOSED_LIMIT
+  evidence:
+  - EVIDENCE/repair-1/int-02a-rebuild-freshness-module.out
+  - EVIDENCE/repair-1/int-02b-rebuild-index-cli.out
+  - EVIDENCE/repair-1/int-02c-compare-stores.out
+  - EVIDENCE/repair-1/int-02d-freshness-noop.out
+  - EVIDENCE/repair-1/int-02e-coverage.out
+  summary: 'manifest d8b68f40...2bcc identical; all 8 layer digests identical incl. lineage; all 24 tables row-identical by an independent per-table
+    digest incl. occurrence_distinct_path (8,416 rows; not a registered layer); freshness NOOP on both (dry-run first, store sha unchanged); coverage
+    unclassified 0 on all 98 refs. Limit: the fingerprint omits builder config for a pinned view (INT-D11).'
+- item: 'check 3: genericity (OC-BR-02)'
+  status: DEFECTS_FOUND_LOW
+  evidence:
+  - EVIDENCE/repair-1/int-03-genericity.out
+  summary: 59 DAG-grep hits + broader audit (F-findings, Phase-2 files/ids, 51 Review-8 chain symbols); every hit classified; no retrieval special-case;
+    letter violations in comments/test literals (INT-D21).
+- item: 'check 4: CONTROL-A real view'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-04a-controla-compile-twice.out
+  - EVIDENCE/repair-1/int-04b-controla-verify-receipt.out
+  - EVIDENCE/repair-1/int-04c-corpus-bytes.out
+  - EVIDENCE/repair-1/int-04d-baseline-before-after.out
+  - EVIDENCE/repair-1/int-04e-controla-gather.out
+  summary: 'compile twice (PYTHONHASHSEED 0/1, concurrent) byte-identical incl. supplementary/ and notes/; packet verify PASS; receipt check PASS
+    (negative control FAILS as it must); no baseline item lost (22 same unit + 6 same path of 28); stop reasons recorded; bytes 0.997% / 0.536%
+    of corpus. FAILS on facets: code facets empty with a false reason and no handle (INT-D17, INT-D18); wall 570-787 s per query vs the 150 s
+    configured gather budget (INT-D20).'
+- item: 'check 5: budgets section by section'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-05-budgets.out
+  summary: B-H within cap by the compiler's accounting (items <= cap; rendered <= cap + 4,096 allowance); A 21,479 B (never truncated); J 51,096
+    B pinned vs 3,072 cap; I items 4,987 vs 3,072 (added after budgeting); main 143,824 B exceeds total 102,400 (INT-D04).
+- item: 'check 6: grader cross-check (R1-3) and GD-7'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-06-grader-crosscheck.out
+  summary: synthetic bound oracle passes check_oracle.py --require-binding (22 stage-bound, 2 query-bound facts); D-2 stage scoping and PENDING_RUBRIC
+    correct; GD-7 windows correct; the grader CRASHES on any supplementary packet (INT-D01), under-counts D-5 (INT-D02), passes G7 silently without
+    a corpus figure (INT-D13).
+- item: 'check 7: zero-count audit (R1-7)'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-07-zero-count-audit.out
+  summary: 'every zero classified with an independent git grep/SQL: FALSE zeros INT-D12 (path:line L1/L2), INT-D16 (SAME_FILE), INT-D18 (code
+    facets), INT-D19 (why CLI), INT-D23 (SYMBOL_MENTION); the rest confirmed absent or structural by design.'
+- item: 'check 8: read-only query commands (R1-15)'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-08-readonly-query-commands.out
+  - EVIDENCE/repair-1/int-08b-seeded-compile-readonly.out
+  summary: '18 commands on a 0444/0555 store: sha256 unchanged, no -wal/-shm created, no write error; unseeded compile byte-identical to the writable
+    store; a seeded compile silently loses section C (INT-D03); exact grep --ref <view name> crashes (INT-D14).'
+- item: 'check 9: budget coherence (R1-21'
+  status: INCONSISTENCIES_REPORTED
+  evidence:
+  - EVIDENCE/repair-1/int-09-budget-coherence.out
+  summary: 'no content-deciding budget depends on the clock (R1-22 holds for the defaults); inconsistencies reported, config untouched: INT-D20.'
+- item: 'check 10: one view per operation (R1-23)'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-10-one-view-per-operation.out
+  summary: 'compile, gather, cite, answers lint (and search, impact, exact, state): one resolution of the pinned view, no tip re-resolution; why/history
+    cannot take the pinned view (INT-D09); impact/search/supplementary record no view (INT-D15); XC residuals assessed (R-02).'
+- item: 'check 11: test hermeticity'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-11-hermeticity.out
+  - EVIDENCE/repair-1/int-11b-suite-under-audit-hook.out
+  - EVIDENCE/repair-1/int-11-audit-hook.jsonl
+  summary: three tests open (and on a clean HOME create) the machine-wide default store (INT-D07); 8 of 12 packages lack a setenv autouse (INT-D08).
+- item: 'check 12: history refs in packet verify'
+  status: FAIL
+  evidence:
+  - EVIDENCE/repair-1/int-12-history-refs-verify.out
+  summary: 'A items not using history: verify PASS before and after a history ref moves; a history-fallback A item: verify FAILS even unmoved
+    (INT-D05); records-partition fallback dead (INT-D06). Latent on the real view.'
+- item: 'check 13: cross-cutting fixes'
+  status: PASS_WITH_DEFECTS
+  evidence:
+  - EVIDENCE/repair-1/int-13a-crosscutting.out
+  - EVIDENCE/repair-1/int-13b-crosscutting.out
+  summary: 'R1-5 -m entry point CLOSED (identical manifest); R1-6 repo_root CLOSED (two real worktrees in one process); R1-12 CLOSED as scoped
+    (R-04 residual); R1-14 CLOSED (real view CA-DEPS: excluded_hits 1194 and merged_sha256 53c5a44f identical at --threads 1/4/16; hermetic 16-thread
+    exact count); R1-22 retry disclosure present in gather, dropped by compile (INT-D10).'
+- item: 'check 14: observation closure'
+  status: DONE
+  evidence:
+  - EVIDENCE/repair-1/int-14-observation-closure.out
+  summary: CLOSED 06, 07, 08, 10, 18; OPEN 03 (partly), 05, 09, 13/15, 17; not REPAIR-1 subjects 01, 02, 04, 11, 12, 14, 16, 19, 20.
+- item: 'check 15: state consistency'
+  status: PASS_WITH_DISCLOSED_LIMIT
+  evidence:
+  - EVIDENCE/repair-1/int-15-check-state-verify.out
+  summary: STATE_CONSISTENT on bridge/p2-context-retrieval (46cf1e6); on this worker branch the tool's HEAD-branch precondition alone reports
+    ORCHESTRATION_STATE_CONFLICT (as for BR-AR-0009).
+- item: 'deliverable: EVIDENCE/repair-1/int-*.out (suite, rebuild digests, determinism, audit, CONTROL-A compile + gather telemetry, before/after)'
+  status: MET
+  evidence:
+  - EVIDENCE/repair-1/
+  summary: one output per check, each recording $PY and the pinned commits
+- item: 'deliverable: EVIDENCE/repair-1/INT-VERDICT.yaml (verdict, pinned_view, defects, residuals, checks)'
+  status: MET
+  evidence:
+  - EVIDENCE/repair-1/INT-VERDICT.yaml
+  summary: verdict DEFECTS_FOUND; 25 defects (3 HIGH); 8 residuals; 15 check rows
+- item: 'deliverable: tests/integration/test_repair1_integration.py (hermetic checks as tests)'
+  status: MET
+  evidence:
+  - tests/integration/test_repair1_integration.py
+  - EVIDENCE/repair-1/int-01-suite-final-run1.out
+  summary: hermetic encodings of checks 4, 6, 7, 8, 10, 11, 12, 13; every defect the tree has is a strict xfail naming its INT id, so the suite
+    stays green and a repair turns the xfail into a forced-review XPASS
+- item: 'DAG acceptance: grep ... expect: no match'
+  status: NOT_MET
+  evidence:
+  - EVIDENCE/repair-1/int-03-genericity.out
+  summary: 59 hits; all classified, none a logic special case (INT-D21, LOW)
+- item: 'DAG acceptance: compile/verify/gather -- main plus supplementary under 1% of corpus; wall time within the gather budget; no facet lost'
+  status: NOT_MET
+  evidence:
+  - EVIDENCE/repair-1/int-04e-controla-gather.out
+  - EVIDENCE/repair-1/int-05-budgets.out
+  summary: 0.997% (INCLUDE corpus) -- met narrowly; wall 570-787 s vs 150 s -- not met; every requested facet present or disclosed -- not met
+    (code facets empty, false reason, no handle); no baseline item lost -- met
+mutation_scope_respected: true
+open_issues:
+- route INT-D01..INT-D25 to their owner nodes (INT-VERDICT.yaml); R1-MB/R1-D2/R1-DEMO2 should not start before INT-D01, INT-D04 and INT-D18 are
+  dispositioned
+- 'DECISION REQUESTED (R-03): which corpus figure G7 uses -- the build manifest''s coverage field carries none; INCLUDE-only 45,734,493 B vs INCLUDE+LEXICAL_ONLY
+  85,113,132 B'
+- 'DECISION REQUESTED (INT-D04): how G7''s ''sum of the budget profiles used'' treats never-truncated A, pinned J/I and overflow packets'
+- 'stores left for inspection: store-BR-AR-0028-a, -b, and the read-only copy -ro (chmod 0555/0444 -- restore write bits before any cleanup)'
+- 'disclosure: one read-only `$PY -m pip list` (18:39Z) to learn that pytest-randomly is absent; nothing installed; no venv created'
