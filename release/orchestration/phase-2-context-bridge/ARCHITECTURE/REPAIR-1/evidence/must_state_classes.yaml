@@ -1,0 +1,49 @@
+# BR-AR-0016 must_state classification (keys only; no fact text). Basis codes are defined in CAUSE_ANALYSIS.md s2.2.
+# Each row was decided from: the grader's own per-fact note (elsewhere_in_chain / "stated in X"), a presence check of
+# the establishing content in the rendered packet, the agent's saved query outputs and the answers (token probes held
+# privately because the probe tokens are derived from the oracle), and the anchor measurement for the same item.
+items:
+- {key: G4.R8-CHAIN-F2.requirement.M1,           class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-TRUNCATED-MANDATORY}
+- {key: G4.R8-CHAIN-F2.partition_filtering.M2,   class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G4.R8-CHAIN-F2.effective_behaviour.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G4.R8-CHAIN-F2.effective_behaviour.M2,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-DEPENDENCY-DATA}
+- {key: G4.R8-CHAIN-F2.prior_findings.M2,        class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G4.R8-CHAIN-F3.requirement.M1,           class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-TRUNCATED-MANDATORY}
+- {key: G4.R8-CHAIN-F3.source_construction.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G4.R8-CHAIN-F3.composition_union.M1,     class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G4.R8-CHAIN-F3.composition_union.M2,     class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G4.R8-CHAIN-F3.partition_filtering.M1,   class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G4.R8-CHAIN-F3.precedence_ordering.M3,   class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G4.R8-CHAIN-F3.matcher_evaluator.M1,     class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G4.R8-CHAIN-F3.effective_behaviour.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G4.R8-CHAIN-F3.effective_behaviour.M3,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-DEPENDENCY-DATA}
+- {key: G4.R8-CHAIN-F3.tests.M2,                 class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-TESTS-BODY}
+- {key: G4.R8-CHAIN-F3.prior_findings.M1,        class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G4.R8-CHAIN-F3.prior_findings.M2,        class: ORACLE_STRICTNESS,                    basis: MS-STAGE-PLACEMENT}
+- {key: G5.S1-QC2.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S1-QC3.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S1-QC3.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S1-QC4.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S1-QC5.M1,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-IMPACT-CONSUMERS}
+- {key: G5.S1-QC8.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S1-QC9.M1,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-VERSION-RECONCILIATION}
+- {key: G5.S1-QC10.M1,  class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-TRUNCATED-MANDATORY}
+- {key: G5.S2-QC3.M2,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-NOT-RETRIEVED-FOLLOWUP}
+- {key: G5.S2-QC5.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S2-QC8.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S2-QC9.M1,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-VERSION-RECONCILIATION}
+- {key: G5.S2-QC9.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S2-QC10.M2,  class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S3-QC2.M1,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-TRUNCATED-MANDATORY}
+- {key: G5.S3-QC3.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S3-QC3.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S3-QC4.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S3-QC5.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S3-QC5.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S3-QC5.M3,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S3-QC8.M1,   class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}
+- {key: G5.S3-QC9.M2,   class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G5.S3-QC9.M3,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-VERSION-RECONCILIATION}
+- {key: G5.S3-QC10.M2,  class: AGENT_BEHAVIOUR,                      basis: MS-CROSS-ANSWER}
+- {key: G8.CTRL-2.M2,   class: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE, basis: MS-NOT-RETRIEVED-FOLLOWUP}
+- {key: G3i.AUTH-4.M1,  class: AGENT_BEHAVIOUR,                      basis: MS-IN-HAND-NOT-STATED}

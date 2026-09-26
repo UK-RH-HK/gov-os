@@ -1,0 +1,71 @@
+{
+ "all_sections_identical": true,
+ "items_total": 424,
+ "per_section": {
+  "A": {
+   "identical": true,
+   "recompile_items": 20,
+   "run1_items": 20
+  },
+  "B": {
+   "identical": true,
+   "recompile_items": 5,
+   "run1_items": 5
+  },
+  "C": {
+   "identical": true,
+   "recompile_items": 1,
+   "run1_items": 1
+  },
+  "D": {
+   "identical": true,
+   "recompile_items": 0,
+   "run1_items": 0
+  },
+  "D.1": {
+   "identical": true,
+   "recompile_items": 17,
+   "run1_items": 17
+  },
+  "D.2": {
+   "identical": true,
+   "recompile_items": 4,
+   "run1_items": 4
+  },
+  "D.3": {
+   "identical": true,
+   "recompile_items": 1,
+   "run1_items": 1
+  },
+  "E": {
+   "identical": true,
+   "recompile_items": 0,
+   "run1_items": 0
+  },
+  "F": {
+   "identical": true,
+   "recompile_items": 6,
+   "run1_items": 6
+  },
+  "G": {
+   "identical": true,
+   "recompile_items": 325,
+   "run1_items": 325
+  },
+  "H": {
+   "identical": true,
+   "recompile_items": 43,
+   "run1_items": 43
+  },
+  "I": {
+   "identical": true,
+   "recompile_items": 1,
+   "run1_items": 1
+  },
+  "J": {
+   "identical": true,
+   "recompile_items": 1,
+   "run1_items": 1
+  }
+ }
+}
