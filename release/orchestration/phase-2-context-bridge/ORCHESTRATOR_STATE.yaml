@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T07:44:15Z'
-state_hash: f207bd2f45f0f5e5955c5c5c21ac3f694093c009016bafa11037a9136ccb3300
+updated_at: '2026-09-26T07:44:34Z'
+state_hash: 78d14b72502258de54218cbfc2a5cff0553f215c1af4c1241f6ce63e12e668df
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1408,6 +1408,15 @@ dag:
       thread-safe (a lock or per-thread counters merged deterministically), with a concurrency test showing that
       excluded_hits is exact under --threads 16
     reason: gather runs facets concurrently; an under-counted excluded_hits is an under-disclosure of retrieval exclusions
+  - id: BR-DAG-AMEND-R1-15
+    by: orchestrator (generalisation of the R1-GA1 second reopen)
+    rule: 'QUERY COMMANDS ARE READ-ONLY. (a) R1-INT acceptance runs every query command -- search, why, impact, history, exact,
+      state, gather, compile, packet verify, receipt check, notes -- against a store opened read-only (and a read-only file)
+      and shows the store file sha256 unchanged; any write attempt is a defect. (b) R1-D2 makes the run-2 demonstration
+      store read-only (file mode) after its build and records its sha256 before and after R1-DEMO2 and R1-MB. (c) Every
+      builder brief from PG3 on states the rule'
+    reason: a query-time cache write was found in R1-GA1 pass 2; a demonstration store mutated by the demonstrating agent's
+      own queries breaks the frozen-store evidence chain
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
