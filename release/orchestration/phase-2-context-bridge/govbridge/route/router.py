@@ -94,11 +94,21 @@ def empty_route(**_kwargs) -> list:
 class RouteSet:
     """The route callables the compiler was given (ARCHITECTURE.md section 9). An absent slot behaves exactly like
     ``empty_route``. ``FAKE_ROUTES`` (module level, below) is the all-empty set ``--fake-routes`` uses; a test
-    supplies its own fakes that return specific ``RouteHit`` lists."""
+    supplies its own fakes that return specific ``RouteHit`` lists.
+
+    ``resolved_view`` (BR-DAG-AMEND-R1-23, ONE RESOLVED VIEW PER OPERATION): the single
+    ``govbridge.core.view.ResolvedView`` every route slot above was built against and closes over, when the
+    ``RouteSet`` was constructed by something like ``govbridge.route.real_routes.build_real_routes`` -- typed as
+    ``object`` here (never imported) so this module keeps its own existing rule of never depending on a route
+    IMPLEMENTATION package; a caller that already imports ``govbridge.core.view`` (gather, compile, search) can
+    read ``routes.resolved_view.pinned_refs()`` to record, in ITS OWN result, every ref this whole operation's
+    routes were pinned to -- without re-resolving anything itself. ``None`` for ``FAKE_ROUTES`` and any
+    hand-built test ``RouteSet`` that never had a real view to pin."""
     exact: RouteFn = empty_route
     lexical: RouteFn = empty_route
     semantic: RouteFn = empty_route
     code: RouteFn = empty_route
+    resolved_view: Optional[object] = None
 
     def run(self, name: str, **kwargs) -> list:
         fn = getattr(self, name, None) or empty_route
