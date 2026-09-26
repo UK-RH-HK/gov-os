@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T03:09:27Z'
-state_hash: 2b649ce8625d706281652b5acdeb3cf7dec0ca7a768cbb78fab86fdacf10e1e3
+updated_at: '2026-09-26T03:11:55Z'
+state_hash: 6ea3fd883bda762a1cc09d5dc7a497c16ff4d342ddaf70a8a7fd51c0fb77777a
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -861,7 +861,20 @@ agent_runs:
   agent_name: br-r1-rl-0019
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
+  pass_1:
+    final_commit: 98f295da8c7f6b0c1080fd5577b0723d8ce158ce (report) / a799030 (work)
+    integrate_check: INTEGRATION_PERMITTED (its own self-check)
+    orchestrator_verified:
+    - secrecy audit -- 0 pattern hits in its tool calls; claude-sonnet-5 x486, as routed
+    - clean trial merge onto the bridge tip; genericity grep -- one hit, a grammar comment citing bare heading tokens as
+      examples, not special-casing
+    reopen_reason: 'its node deliverable "every addition registered as a store layer with a digest (ARCHITECTURE.md section 8)"
+      was not met -- the new TESTS(b,c) / DEPENDS_ON_DATA / CITES_REQUIREMENT edges are derived on demand and unpersisted, so
+      the rebuild-twice digest check is vacuous for them (the same class as BR-DAG-AMEND-3 and the B3R lazy code layer).
+      Ruling by the orchestrator: the DAG text governs. State records (in the existing authority layer), symbol history and
+      paging (queries) accepted; build cost and store size to be measured.'
+    also_sent_live: amendment R1-T1 (full suite), delivered before the reopen
   store: $HOME/.cache/gov-bridge/store-BR-AR-0019
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/code/**
@@ -1038,6 +1051,16 @@ dag:
       in HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md); applies to every run dispatched after this commit and to every
       reopened pass
     reason: RX's targeted acceptance passed while its own new test failed in the full suite
+  - id: BR-DAG-AMEND-R1-5
+    by: orchestrator (routing of a BR-AR-0019 finding outside its scope; precedent BR-DAG-AMEND-2)
+    rule: 'R1-INT''s mutation_scope is extended with govbridge/core/freshness.py and tests/core/test_freshness_entrypoint.py.
+      `python -m govbridge.core.freshness rebuild --from-clean` runs the module as __main__, a second module object, so the
+      layer builders the sibling packages register against govbridge.core.freshness are invisible and it silently
+      rebuilds only the core layer. R1-INT makes the -m entry point delegate to the canonical module (or otherwise
+      register every layer), with a regression test showing that the -m entry point and the top-level CLI build the
+      same layer set and digests, BEFORE running its own rebuild-twice acceptance check'
+    reason: R1-INT's acceptance command uses exactly this entry point and would pass vacuously; no REPAIR-1 node owns
+      core/freshness.py; R1-D2 uses the top-level CLI, which is unaffected
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1177,6 +1200,7 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0018 R1-RX follow-up (order-dependent test) and BR-AR-0019 R1-RL; integrate-check each
+next_deterministic_action: await BR-AR-0018 R1-RX follow-up (order-dependent test) and BR-AR-0019 R1-RL follow-up (digested
+  edge layer); integrate-check each
   (schema 2) + FULL suite on the trial-merged tree, merge; then wave 2 (R1-RM after RX, R1-GA1 after RX+RL) with template R1-T1;
   checkpoint after every merge
