@@ -73,6 +73,50 @@ branch, to any `phase2/*` branch, to `release/4.1.6-rc1`, or to the frozen produ
 - **Replaceability.** Could the provisional embedder (`BAAI/bge-small-en-v1.5`) be swapped without redesign, per
   ARCHITECTURE.md §9–§10? Is anything outside the adapter coupled to its identity or dimensions?
 
+### 4a. Owner challenge items. Each must be shown to be IMPLEMENTED, not merely documented (OD-BR-03, OD-BR-05, OD-BR-06 §10)
+
+For every item: find the code path, run it, and try to break it. A requirement that exists only in prose is a
+finding.
+
+**OD-BR-03, which carries these challenge items:**
+1. Does the seed-derived code route's failure to honour `retrieval_exclusions` expose content that the security
+   policy excludes, or open an alternate retrieval bypass? Relatedly, OBS-BR-08: the query commands do not apply the
+   task's `retrieval_exclusions` automatically.
+2. Do the formal checkpoint artefacts satisfy "enforced checkpoints"? Test the OD-BR-04 enforcement: `verify` must
+   refuse a sealed state that has no matching checkpoint; `integrate-check` must refuse a schema-2 run with missing
+   fields; the hook must write a checkpoint. Also check that `RETROSPECTIVE_CHECKPOINT_RECONSTRUCTION` is labelled
+   and cites its sources.
+3. The residuals OBS-BR-04, -05, -06 and -07 and the unwired Python-AST route are explicit. Confirm or reclassify
+   each.
+4. Using the run-1 transcript, re-derive the run-1 context size and tokens and which artefacts the agent actually
+   consumed (`run-1/CONSUMPTION-AND-SECRECY.orchestrator.md`).
+5. Was the Review-8 chain **reconstructed from repository evidence verified at `3c880d8`**, or restated from
+   section-A inputs? Did any oracle content reach the agent? Re-run the secrecy audit.
+
+**OD-BR-05 / OD-BR-06 §2–4, retrieval completeness:**
+6. Show that no route treats a top-k or per-query budget as the evidence limit. The per-retrieval batch size must be
+   configurable, never hard-coded.
+7. Show, **by running it**, all of the following: facet decomposition; parallel facet retrieval where it is safe;
+   adaptive follow-up generated from returned evidence; continuation across batches and pages; a recorded stopping
+   reason; a merge before compilation that deduplicates, reconciles versions, filters by authority and lifecycle, and
+   preserves provenance and evidence-to-claim links.
+8. Run a query whose correct answer needs evidence from several distant repository locations and **exceeds one
+   batch**. Check the telemetry for rounds, candidate and deduplicated chunks and tokens, final compiled size, and
+   stopping reason.
+9. Hierarchical synthesis: intermediate notes must be derived, never authority; each must keep its source
+   ids/hashes/citations; and a validator must reject a note whose claims do not trace to evidence.
+
+**OD-BR-06, continuity and architecture:**
+10. Whole-repository coverage (§1): re-derive it from `git ls-tree` at every view ref.
+11. BGE is provisional and replaceable (§5): swap the pinned embedder for a test double, or a second pin. Nothing
+    outside the adapter or profile may break, and the index must rebuild deterministically.
+12. Mandatory authority stays separate (§6): the attacks in §4 above.
+13. Fresh-session continuity (§8): **start from nothing.** Follow the README's seven-step resume order and the
+    latest checkpoint. Can you tell exactly what state the lifecycle is in and what to do next, **without any
+    conversation**? Is the latest checkpoint enough to resume immediately?
+14. The V8.3 carry-forward exists: `V8_3_CARRY_FORWARD_FROM_CONTEXT_BRIDGE.md`. Check that it is labelled
+    non-normative and that its implementation-status column is **true**.
+
 ## 5. Evidence produced by the build stage (FINALISED BY THE ORCHESTRATOR AT BUILD END)
 
 *(to be completed: bridge tip commit; the integration run's reproducibility and equivalence results; the D1 coverage

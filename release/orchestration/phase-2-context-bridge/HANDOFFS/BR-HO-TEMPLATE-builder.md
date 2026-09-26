@@ -59,11 +59,26 @@ Commit on your branch. Include:
   - `evidence`: a list of {claim, command or file:line}
   - `mutation_scope_respected`: must be `true`
   - `open_issues`
-- `AGENT_RUNS/<RUN_ID>.checkpoint.yaml`, with keys:
+- `AGENT_RUNS/<RUN_ID>.checkpoint.yaml`, the **worker completion checkpoint (OD-BR-04 A)**, with keys:
   - `run_id`
   - `commit`
   - `commands`: a list of {cmd, exit_code, output_path, output_sha256}. There must be **one entry per acceptance
     check**. Save each output inside your scope and hash it with sha256.
+  - `role`
+  - `model_observed`: the model you actually are
+  - `input_manifest`: a list of {path, sha256} for your brief and every input you relied on
+  - `task_contract`: {handoff_path, handoff_sha256, mutation_scope}
+  - `artifacts_changed`: every path you created or modified. `integrate-check` compares this list with `git diff`.
+  - `findings`
+  - `failed_approaches`
+  - `unresolved`
+  - `decisions`: those made within your authority, and any you request
+  - `lessons`
+  - `next_consumer`: the exact next role or action that consumes your output
+  - `final_commit`
+
+  A run whose checkpoint lacks any of these is **COMPLETED_PENDING_CHECKPOINT, not complete**. For runs dispatched
+  with `checkpoint_schema: 2`, `integrate-check` refuses them.
 
 The orchestrator runs `tools/check_state.py integrate-check <RUN_ID>` before merging. It **refuses** a missing or
 untyped report, a missing checkpoint, a hash mismatch, or any path outside your scope.
