@@ -1,0 +1,309 @@
+# BR-AR-0016 schema-2 worker checkpoint (OD-BR-04 A). No oracle content.
+run_id: BR-AR-0016
+commit: f85d5f375ff76152f664c4f421aee2bd72cef3a8
+role: fresh run-1 failure analyst (classify failed-gate causes; generic repair plan and DAG; no oracle content; diagnoses,
+  does not repair)
+model_observed: claude-opus-5-5 (Opus 5.5)
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0016-failure-analyst.md
+  sha256: 720a809c71310b02d6c663617a0daea9c343848213e29ab2887bd0fafa61669d
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0006-CONTEXT-RETRIEVAL-AND-CONTINUITY.md
+  sha256: 21967774a2b8d150ef0afa4badbdbe81346796cb15b4a1616fed2f7fb954003e
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0005-MULTI-BATCH-MULTI-HOP-RETRIEVAL.md
+  sha256: 7c051a1ffeaf2296ca1a225d19f7a173948b8dd72130f86944e8daa952377941
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-CLARIFICATION-BR-0002-CORPUS-AND-PURPOSE.md
+  sha256: 44a206eda6d7c8228059115aef4f4bbaef2f8d6cb43eff8b4d4b30deb4154e16
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0003-VERIFIER-CHALLENGE-ITEMS.md
+  sha256: 4afbc78328f6069fb148022dcddf246470a057cac75794efec601d4529ac7c68
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md
+  sha256: 3c84370c83396277d2ce065be06f0cf45e1cad2584188f753a057254c95bdddd
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/DEMONSTRATION_DESIGN.md
+  sha256: 24d91f572397966a18af095e3bd833cd22027c9bf79bccca83cf76e08567116d
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
+  sha256: 95248124a53e096644ec110fc5176548ee1313bbb97737d773fd48f3bd196574
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  sha256: f69fe84ff8611cb16f49d334b1e1f57411e4eeedb1a73a8cb99d12d26677ecea
+- path: release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  sha256: 72dee128f59f0955a1f8cd797fb793954deba003ce7602d64ad3937ea65bd815
+- path: release/orchestration/phase-2-context-bridge/config/canonical-view.yaml
+  sha256: 3184499a276cd93c81025dbae7c8633d9e6c97a9908f646b276db0232a760b03
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/answers.yaml
+  sha256: ff75f16fdb4c582e8dbb78be6664a4d100b38a563b9b9b7dc9ae5a633857e9f5
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/receipt.yaml
+  sha256: ae2721d3e59111f808698660cb17372bbda0741c257730c88486839dd09d65e0
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/packet/packet.md
+  sha256: b5126140f52ea5f1c640935692ec27fb0fcb91db541c59241b790ae52b4e2019
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/packet/manifest.json
+  sha256: 99b9aa9eddf59413bf15657c52951c564ef703b35f11ebe38702b84f23c3eed5
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/packet/task_spec.yaml
+  sha256: fab93762ffaf3f3f39d4d16f3c5b32a57f4ba14efa7ef13dc58e4b0ef4294efc
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/bootstrap.md
+  sha256: e8303f43fb1d88ebe75fd5085ddbd6ffe28aa5c1121d0f302f6978ab4f29d954
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/reads.json
+  sha256: 17b5d999293c3ed225d3ed5a1d78da6b0b73b091435bc4bac101edfe59daebc9
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/PROTOCOL-NOTES.md
+  sha256: d60e63f391d29b8a903a3f71a4c6238b2591a696fe3eb3a9a4fdd2d0330d0745
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/CONSUMPTION-AND-SECRECY.orchestrator.md
+  sha256: 7f0f50fdbece47a0f3cae69caf02ecded182bf67d172c3137f7084701b7a8c1e
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/supplementary/queries/INDEX.md
+  sha256: aef3ffe272bcebb554aa2704419deae5b01e39659b8c3542c28bde0e7b9133c3
+- path: release/orchestration/phase-2-context-bridge/DEMONSTRATION/run-1/task-inputs/demonstration-queries.yaml
+  sha256: 71013e2ca0f811d2b945eef5ead09c479a773d273a16ac8ff29c47fcae9fdf34
+- path: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+  sha256: 890f7ffe6cf76f6c95ce03a7109e2564157e64d3ff759d6ccf080125383da579
+- path: release/orchestration/phase-2-context-bridge/govbridge/compile/budgets.py
+  sha256: 50dcee5c1c62bcf04c59c5f29c6bbad44b8a28b957da101189091b9dd953d2be
+- path: release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  sha256: f61c203f77c97dae2bbe27b196807de2f3739aeea4a5eb712a80fbfffca60e2f
+- path: release/orchestration/phase-2-context-bridge/govbridge/demo/grade.py
+  sha256: 77284c0553eb8811fc7163b0b3a10cd7f981e2d58a15ed0b89b8823a00eede4d
+- path: bridge/grade-0012:release/orchestration/phase-2-context-bridge/DEMONSTRATION/grading/run-1.yaml
+  sha256: 1465f537fa49ac477c266a07c036daa0cb87e0b565b5c9097cdad0cfd79632a6
+  note: QUARANTINED; read by BR-AR-0016 only (brief section 1 item 3); no content committed
+- path: bridge/grade-0012:release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle/oracle.yaml
+  sha256: 3d80a5fda0724e380821f55e3e4e3980b0b53032a14d2ed188e83169888c7e4b
+  note: QUARANTINED; read by BR-AR-0016 only (brief section 1 item 3); no content committed
+- path: bridge/grade-0012:release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0012.report.yaml
+  sha256: 91007c85b64595c4bdda48af5d3ab189afbf984df450d6d9aa7defe2a5e9142a
+  note: QUARANTINED; read by BR-AR-0016 only (brief section 1 item 3); no content committed
+- path: bridge/grade-0012:release/orchestration/phase-2-context-bridge/DEMONSTRATION/grading/run-1.answers.lines-normalised.json
+  sha256: 28d7bdc2a33052b550d5d6589ac0f90738e2c1d1858ac315f5dcfa68ccf340cb
+  note: QUARANTINED; read by BR-AR-0016 only (brief section 1 item 3); no content committed
+- path: release/orchestration/phase-2-context-bridge/govbridge (git tree)
+  sha256: tree 96a8898a453bd9e47e25c07d6b72c85bdaf3ade0
+  note: identical to run-1 packet manifest bridge_code_tree 96a8898a...; code unchanged since 94d0211
+- path: $HOME/.cache/gov-bridge/store-BR-AR-0010/store.db
+  sha256: 569f3ca765cd01f0d933b0ae12224d4bcecef0c17fa25db6abad2f585f6110b4
+  note: READ-ONLY; identical before and after (evidence 01, 10); queries ran on a scratch copy
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-0016-failure-analyst.md
+  handoff_sha256: 720a809c71310b02d6c663617a0daea9c343848213e29ab2887bd0fafa61669d
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0016.*
+commands:
+- cmd: sha256sum $HOME/.cache/gov-bridge/store-BR-AR-0010/store.db $HOME/.cache/gov-bridge/store-BR-AR-0010/manifest.json
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/01-store-sha256-before.out
+  output_sha256: cd323c415fa494ee1bc49cf676bb853c77f9569e651997e10c6493c65a599053
+  note: demonstration store hashed BEFORE any measurement (read-only proof, part 1)
+- cmd: mkdir -p $SCRATCH/store-copy && cmp -s $HOME/.cache/gov-bridge/store-BR-AR-0010/store.db $SCRATCH/store-copy/store.db
+    || cp -p $HOME/.cache/gov-bridge/store-BR-AR-0010/store.db $HOME/.cache/gov-bridge/store-BR-AR-0010/manifest.json $SCRATCH/store-copy/;
+    sha256sum $SCRATCH/store-copy/store.db $SCRATCH/store-copy/manifest.json | sed 's#$SCRATCH#$SCRATCH#'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/02-store-copy-sha256.out
+  output_sha256: d0a2d4590fe90d9a666fcb6d5844367345d8107c002a4fac7522fdfb9058b8f3
+  note: byte-identical scratch copy of the store; every query ran against the copy
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/make_pinned_task.py $SCRATCH/pinned
+    94d02116e770e0c4e99fe62367f89cd915692592 | sed 's#$SCRATCH#$SCRATCH#'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/03-pinned-task.out
+  output_sha256: 6b9cd4bdb6c77b35546973242201fca02a4dd6d73c23ca10d03b0bf41bb16f65
+  note: task spec copy whose view pins records to 94d0211 (the committed view follows the moved tip)
+- cmd: PYTHONPATH=release/orchestration/phase-2-context-bridge GOVBRIDGE_STORE=$SCRATCH/store-copy GOV_BRIDGE_HOME=$SCRATCH/gbhome
+    timeout 900 $HOME/.cache/gov-bridge/venv/bin/python release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/recompile_capture.py
+    $SCRATCH/pinned/task-pinned.yaml $SCRATCH/pinned/capture.json && sha256sum $SCRATCH/pinned/capture.json | sed 's#$SCRATCH#$SCRATCH#'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/04-recompile-capture.out
+  output_sha256: ac8e2f5c4f4899f5f540339cf643413e96b7cfdfda817d246bbf8a28340fda6b
+  note: run-1 compile re-run with pre-budget/post-budget capture (summary; capture sha256 last line)
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/compare_recompile.py $SCRATCH/pinned/capture.json
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/05-recompile-equals-run1.out
+  output_sha256: a04c02d8bca0e33cb515f48a8bd322deaffbfe3f181e763a47feb377fab75d2a
+  note: all 424 items in all 13 sections identical to run-1 (ids + content hashes)
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/packet_facts.py $SCRATCH/pinned/capture.json
+    $SCRATCH/store-copy/store.db
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/06-packet-facts.json
+  output_sha256: 1ee89e569abe3d671a8b4380c291d50e07f082a62bf7c1971f18e3268eda0610
+  note: oracle-free packet/compile/output/store facts (RC-1, RC-2, RC-4, RC-5, RC-6, RC-7, RC-8)
+- cmd: PYTHONPATH=release/orchestration/phase-2-context-bridge GOVBRIDGE_STORE=$SCRATCH/store-copy GOV_BRIDGE_HOME=$SCRATCH/gbhome
+    timeout 900 $HOME/.cache/gov-bridge/venv/bin/python release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/exclusion_probe.py
+    $SCRATCH/pinned/task-pinned.yaml
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/07-exclusion-probe.json
+  output_sha256: 3648b48db058760322cd41b5c8dd18983fbbb69ce4b52e5bde82aefe0d4c2a24
+  note: 'OBS-BR-08: 75 excluded-path hits under the CLI default, 0 with task exclusions'
+- cmd: PYTHONPATH=release/orchestration/phase-2-context-bridge GOVBRIDGE_STORE=$SCRATCH/store-copy GOV_BRIDGE_HOME=$SCRATCH/gbhome
+    timeout 1800 $HOME/.cache/gov-bridge/venv/bin/python release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/measure_anchors.py
+    --capture $SCRATCH/pinned/capture.json --answers-normalised $SCRATCH/q/release/orchestration/phase-2-context-bridge/DEMONSTRATION/grading/run-1.answers.lines-normalised.json
+    --private-out $SCRATCH/pinned/anchors.private.json --public-out release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/08-anchors.public.json
+    && sha256sum release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/08-anchors.public.json
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/08-measure-anchors.out
+  output_sha256: 537f00d31db2b950688761dfa6d9bce78e42e024ace96e291e81f4ba5f508f6c
+  note: per-item measurement; public keys-only JSON written to evidence/08-anchors.public.json (its sha256 is the last line);
+    locator-bearing private file kept in scratch only
+- cmd: PYTHONPATH=release/orchestration/phase-2-context-bridge GOVBRIDGE_STORE=$SCRATCH/store-copy GOV_BRIDGE_HOME=$SCRATCH/gbhome
+    python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/aggregate.py --anchors release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/08-anchors.public.json
+    --must-state release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/must_state_classes.yaml --capture
+    $SCRATCH/pinned/capture.json --out $SCRATCH/pinned/aggregate.json >/dev/null && cat $SCRATCH/pinned/aggregate.json
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/09-aggregate.json
+  output_sha256: 0e65ab5148607ebd3f968fc5f612a06aaa764d62a00efb479f039528d77fb024
+  note: class counts, per gate/class/control tallies, counterfactual recall and class tables
+- cmd: sha256sum $HOME/.cache/gov-bridge/store-BR-AR-0010/store.db $HOME/.cache/gov-bridge/store-BR-AR-0010/manifest.json
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/10-store-sha256-after.out
+  output_sha256: cd323c415fa494ee1bc49cf676bb853c77f9569e651997e10c6493c65a599053
+  note: 'demonstration store hashed AFTER all measurement: identical to 01 (read-only proof, part 2)'
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/selector_sizes.py
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/06b-selector-sizes.json
+  output_sha256: 630474539dd7d29d89ba00ac0f756070c11e5b094b90c4e2ad47b3adbb0bda9d
+  note: declared mandatory selectors vs what run-1 rendered (RC-1)
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/gen_repair_dag.py release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/11-gen-repair-dag.out
+  output_sha256: a7a39eafe25f38e27dd9eba98f7c89b80f9911fcfece62cf1ae09a9bbc3e162c
+  note: REPAIR_DAG.yaml generated from a checked data structure
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/check_repair_dag.py release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/12-check-repair-dag.out
+  output_sha256: 5a314f0bdbf2e271e05cd64bd9221f8cc5dc0513452de98869ac1c66c77e1afd
+  note: 'DAG structure check: 18 nodes, 10 groups, 0 problems'
+- cmd: python3 release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/oracle_overlap_selfcheck.py
+    $(git diff --cached --name-only | grep -v 13-oracle-overlap-selfcheck.out)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/13-oracle-overlap-selfcheck.out
+  output_sha256: 6cbd3050578a7ef96ad99735397ad6c81cd5d384708aba8da5e60e89771a6dfe
+  note: 'no-oracle-content self-check over every committed REPAIR-1 file: 85 overlaps, all PUBLIC (tokens present in the
+    packet/state/design or bridge file paths), 0 SUBSTANTIVE'
+artifacts_changed:
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/CAUSE_ANALYSIS.md
+  sha256: 72261a14909afe24e838e963aa6b6bae9775004a47a9c143b76914423c7623f3
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/01-store-sha256-before.out
+  sha256: cd323c415fa494ee1bc49cf676bb853c77f9569e651997e10c6493c65a599053
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/02-store-copy-sha256.out
+  sha256: d0a2d4590fe90d9a666fcb6d5844367345d8107c002a4fac7522fdfb9058b8f3
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/03-pinned-task.out
+  sha256: 6b9cd4bdb6c77b35546973242201fca02a4dd6d73c23ca10d03b0bf41bb16f65
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/04-recompile-capture.out
+  sha256: ac8e2f5c4f4899f5f540339cf643413e96b7cfdfda817d246bbf8a28340fda6b
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/05-recompile-equals-run1.out
+  sha256: a04c02d8bca0e33cb515f48a8bd322deaffbfe3f181e763a47feb377fab75d2a
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/06-packet-facts.json
+  sha256: 1ee89e569abe3d671a8b4380c291d50e07f082a62bf7c1971f18e3268eda0610
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/06b-selector-sizes.json
+  sha256: 630474539dd7d29d89ba00ac0f756070c11e5b094b90c4e2ad47b3adbb0bda9d
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/07-exclusion-probe.json
+  sha256: 3648b48db058760322cd41b5c8dd18983fbbb69ce4b52e5bde82aefe0d4c2a24
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/08-anchors.public.json
+  sha256: f79a9a1593d04dc6f6cda6f4db098c240a94f1124e264aa3597321783a89ec21
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/08-measure-anchors.out
+  sha256: 537f00d31db2b950688761dfa6d9bce78e42e024ace96e291e81f4ba5f508f6c
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/09-aggregate.json
+  sha256: 0e65ab5148607ebd3f968fc5f612a06aaa764d62a00efb479f039528d77fb024
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/10-store-sha256-after.out
+  sha256: cd323c415fa494ee1bc49cf676bb853c77f9569e651997e10c6493c65a599053
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/11-gen-repair-dag.out
+  sha256: a7a39eafe25f38e27dd9eba98f7c89b80f9911fcfece62cf1ae09a9bbc3e162c
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/12-check-repair-dag.out
+  sha256: 5a314f0bdbf2e271e05cd64bd9221f8cc5dc0513452de98869ac1c66c77e1afd
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/13-oracle-overlap-selfcheck.out
+  sha256: 6cbd3050578a7ef96ad99735397ad6c81cd5d384708aba8da5e60e89771a6dfe
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/must_state_classes.yaml
+  sha256: 33b69d25f7f0bf42a36ced71e6ae596bbc47be922a460e8d21354696ac39ca73
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/aggregate.py
+  sha256: 668cc2369a99ef11b0525069db2b7ca27e9d29dc77520d0a3615af31134dfb88
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/check_repair_dag.py
+  sha256: 922c7431823cea112ecd06a4597090c49175a91ef0ba02f0e52cb8461250937a
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/compare_recompile.py
+  sha256: 353221c772d9b3ed7f76efda076eb485d8ca45ba837b00d07d04928dbbb5605b
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/exclusion_probe.py
+  sha256: 35023c93b23cf78451a2d372f21153a55c30eee8d9da0c540e463e7f569c2c7a
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/gen_repair_dag.py
+  sha256: 1ebee29617b60c556c190cfd322739a04d98d0fbad56c7a64e54f9a75cc38519
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/make_pinned_task.py
+  sha256: 0dd66cbae64fe6d521717dcffe50722b20e9807fe022ce6fa46657e91e9ff970
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/measure_anchors.py
+  sha256: cbf1a0723b80e1a70971bcecc29a1f5c5c15faaae6056d317a2dcf3c0efaf0df
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/oracle_overlap_selfcheck.py
+  sha256: 6172bdee93ce6f1c268db3738e4069c7e44950e2b096b53f0b2b77be81eb75bb
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/packet_facts.py
+  sha256: 67ef4b714b1c7ec22df306defc3e18e1808d4bb193c9075f6666eb49c2daef27
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/recompile_capture.py
+  sha256: 71a66895ba6fc188c571249d590d6ea34032a2ebc085b4f731f3fc5ca08df439
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/evidence/tools/selector_sizes.py
+  sha256: a2a35f0cd404b733f3336b2e9b383b925d7d95d734b9cada021f095a37a4ec9f
+findings:
+- '129 failed gate items classified: BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE 55, AGENT_BEHAVIOUR 53, GRADER_DEFECT 13, ORACLE_STRICTNESS
+  7, BRIDGE_NOT_RETRIEVABLE 1 (83 anchors + 43 must_state facts + 3 G7 conditions); 5 ungated AUTH items reported separately
+  (CAUSE_ANALYSIS.md sections 0, 7)'
+- 88 of 89 measured anchor rows are indexed in the demonstration store; the bridge lost evidence in delivery and retrieval
+  strategy, not in indexing
+- 'RC-1: 15/20 section-A mandatory items silently cut at 4,000 chars (384,595 source bytes rendered as 61,107; no marker)
+  despite ''A is never truncated''; declared selectors (entry range, key list, second path) ignored -- the range/key items
+  rendered their file heads'
+- 'RC-2: 30 of 41 public queries (class x subject templates) have no text and were silently never compiled'
+- 'RC-3: one round, fixed k=8, no facets, no follow-up; 33/63 T1 symbols exceed the caller fan-out cap (1,255 call sites
+  beyond it) with no continuation; discovered identifiers never followed'
+- 'RC-4: G''s budget drop order is resolution-label-lexicographic: 225 READS_KEY kept, all 37 TESTS edges dropped'
+- 'RC-5: pointer-only delivery (G: 22,558 content bytes for 325 items; 24 semantic items with 0 bytes)'
+- 'RC-6: no supplementary packets; 1,063,203 raw output bytes of which 406,501 are per-hit occurrence lists (<= 98 rows
+  per hit); bootstrap inlines the whole packet'
+- 'RC-7: TESTS edges by name heuristic only (17/20 missed test anchors not one hop from any surfaced symbol); no code->data
+  or code->requirement edges; YAML state records largely unaddressable; no symbol history; no version-reconciliation facet
+  although the store holds per-ref blob ids'
+- 'RC-8/OBS-BR-08: CLI routes return 75 excluded-path hits for the 11 public texts by default; two compile call sites pass
+  no exclusions'
+- 'RC-10: grader defects GD-1..GD-9 confirmed and a new GD-10 (symbol-qualified anchor never matched by an exact line citation
+  inside the symbol); 7 ORACLE_STRICTNESS items are all must_state stage placement'
+- 'counterfactuals: grader+oracle fixes rescue 0/29 failing queries; +agent fixes 12/29 (G5 6/10 classes); bridge fixes
+  alone 6/29 (G5 2/10) incl. CTRL-1 and CTRL-2; both families are required; controls fail on the bridge (8/11)'
+- run-1 compile reproduced exactly (424/424 items identical) from a pinned view; demonstration store hash unchanged before/after
+failed_approaches:
+- 'first recompile used the committed view: its records ref follows the moved bridge tip (records resolved to 9de0d79),
+  giving a different packet; fixed by pinning the records ref to 94d0211 (make_pinned_task.py)'
+- first two exploratory recompiles ran before telemetry isolation and appended 26 query-telemetry rows to the shared $HOME/.cache/gov-bridge/telemetry/queries.jsonl
+  (2026-09-26T00:41:42Z..00:45:27Z); not the store; not reverted (no shared-file edits or removals); all later runs used
+  a scratch GOV_BRIDGE_HOME
+- measurement v1 counted evidence possession with the grader's +-3 line tolerance; tolerance-edge overlaps wrongly credited
+  the agent with sections it never saw; replaced by substantive overlap (>= min(3, len) shared lines) for possession, keeping
+  tolerance only for 'citable'
+- code one-hop probe v1 compared caller_symbol with qualified names; the store keeps symbol ids there; fixed to join through
+  code_symbol
+- 'DAG v1 was hand-written YAML with plain scalars containing '': '' and backticks and failed to parse; regenerated from
+  a checked Python data structure (gen_repair_dag.py) and validated (check_repair_dag.py)'
+- overlap self-check v1 counted public tokens (mandatory item ids, class names, bridge file paths) as overlaps; refined
+  to separate PUBLIC (present in packet/state/design or a bridge-domain tracked path) from SUBSTANTIVE
+unresolved:
+- must_state classification rests on the grader's per-fact notes plus private presence probes whose tokens are oracle-derived
+  and were not committed; a verifier with quarantine access can re-derive them
+- the anchor-level private file (locators) exists only in scratch; regenerate with evidence/tools/measure_anchors.py (needs
+  bridge/grade-0012 access, a copy of store-BR-AR-0010 and the recompile capture)
+- 'classification sensitivity: 10 GD-8 items flip to AGENT or BRIDGE-R under a strict D-1 ruling (shown per item); counting
+  grep definition lines as possession for code/test anchors moves 16 test rows between AGENT and BRIDGE-R if reversed; neither
+  changes the counterfactual conclusion'
+- decisions D-1..D-5 (REPAIR_PLAN.md section 8.1) are recommendations for the orchestrator/owner, not decisions
+- CONTROL-A / CONTROL-B subjects are to be chosen by the orchestrator (criteria in REPAIR_DAG.yaml conventions)
+decisions:
+- 'classes assigned by deterministic rules in order: GD-8 whole-document citation > GD-10 symbol-body citation > evidence
+  in packet > evidence in agent outputs > cited elsewhere > bridge signals (budget drop > truncated mandatory > by-reference
+  directory > query not run > follow-up id > follow-up callers > top-k > scoped section) > not retrievable'
+- any-of stage anchors classified by their most favourable alternative; every alternative recorded
+- ORACLE_STRICTNESS used only for must_state stage placement; no required item was found that the public query did not ask
+  for
+- G7 packet-byte breach mapped to BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE (evidence retrievable, delivered only via unbudgeted
+  raw dumps); external-read bytes GD-7; undeclared reads GD-6
+- committed files carry grade-report keys, anchor kinds, measured booleans/ranks and classes only; no locators, facts or
+  per-query expected items
+- 'repair plan kept generic: acceptance on fixtures and orchestrator-chosen unrelated controls; public demonstration query
+  texts and run-1 answers forbidden as builder acceptance input'
+lessons:
+- 'a demonstration failure analysis needs an exact recompile with pre-budget capture: the manifest''s compact drop summary
+  cannot show what the compiler found and discarded'
+- possession must be measured with real overlap, not grading tolerance
+- every tool touching the bridge must isolate GOV_BRIDGE_HOME (telemetry) and GOVBRIDGE_STORE before its first run
+- hand-written YAML with prose values is fragile; generate machine-readable plans from data and validate them
+- the '8k/top-k is only a batch size' rule was violated not by a constant alone but by the absence of continuation everywhere
+  (routes, fan-out caps, budget drops)
+next_consumer: 'the bridge outer orchestrator: run the verbatim oracle-overlap check of REPAIR-1/** and AGENT_RUNS/BR-AR-0016.*
+  against the quarantined oracle, then decide D-1..D-5 (R1-DEC), choose CONTROL-A (R1-CTRL) and dispatch REPAIR_DAG.yaml
+  group R1-PG0'
+final_commit: f85d5f375ff76152f664c4f421aee2bd72cef3a8

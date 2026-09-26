@@ -1,0 +1,1965 @@
+{
+ "totals_gated": {
+  "items": 126,
+  "by_class": {
+   "GRADER_DEFECT": 11,
+   "ORACLE_STRICTNESS": 7,
+   "AGENT_BEHAVIOUR": 53,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 54,
+   "BRIDGE_NOT_RETRIEVABLE": 1
+  },
+  "by_cause": {
+   "AGENT_BEHAVIOUR/A-OUTPUT-NOT-CITED": 19,
+   "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED": 11,
+   "AGENT_BEHAVIOUR/MS-CROSS-ANSWER": 11,
+   "AGENT_BEHAVIOUR/MS-IN-HAND-NOT-STATED": 12,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-BUDGET-DROP": 9,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-BYREF-DIR-UNEXPANDED": 6,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-FOLLOWUP-CALLERS": 2,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-FOLLOWUP-ID": 9,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-QUERY-NOT-RUN": 6,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-SCOPED-SECTION": 1,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-TOPK": 1,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-TRUNCATED-MANDATORY": 7,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/MS-DEPENDENCY-DATA": 2,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/MS-IMPACT-CONSUMERS": 1,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/MS-NOT-RETRIEVED-FOLLOWUP": 2,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/MS-TESTS-BODY": 1,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/MS-TRUNCATED-MANDATORY": 4,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/MS-VERSION-RECONCILIATION": 3,
+   "BRIDGE_NOT_RETRIEVABLE/N-NOT-INDEXED": 1,
+   "GRADER_DEFECT/GD-10": 1,
+   "GRADER_DEFECT/GD-8": 10,
+   "ORACLE_STRICTNESS/MS-STAGE-PLACEMENT": 7
+  }
+ },
+ "totals_gated_anchors": {
+  "GRADER_DEFECT": 11,
+  "ORACLE_STRICTNESS": 0,
+  "AGENT_BEHAVIOUR": 30,
+  "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 41,
+  "BRIDGE_NOT_RETRIEVABLE": 1
+ },
+ "totals_gated_must_state": {
+  "GRADER_DEFECT": 0,
+  "ORACLE_STRICTNESS": 7,
+  "AGENT_BEHAVIOUR": 23,
+  "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 13,
+  "BRIDGE_NOT_RETRIEVABLE": 0
+ },
+ "informational_auth": {
+  "items": 5,
+  "by_class": {
+   "GRADER_DEFECT": 1,
+   "ORACLE_STRICTNESS": 0,
+   "AGENT_BEHAVIOUR": 2,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 2,
+   "BRIDGE_NOT_RETRIEVABLE": 0
+  }
+ },
+ "per_gate": {
+  "G4": {
+   "GRADER_DEFECT": 1,
+   "ORACLE_STRICTNESS": 7,
+   "AGENT_BEHAVIOUR": 6,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 5,
+   "BRIDGE_NOT_RETRIEVABLE": 0
+  },
+  "G5": {
+   "GRADER_DEFECT": 8,
+   "ORACLE_STRICTNESS": 0,
+   "AGENT_BEHAVIOUR": 45,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 41,
+   "BRIDGE_NOT_RETRIEVABLE": 1
+  },
+  "G6": {
+   "GRADER_DEFECT": 0,
+   "ORACLE_STRICTNESS": 0,
+   "AGENT_BEHAVIOUR": 1,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 0,
+   "BRIDGE_NOT_RETRIEVABLE": 0
+  },
+  "G8": {
+   "GRADER_DEFECT": 2,
+   "ORACLE_STRICTNESS": 0,
+   "AGENT_BEHAVIOUR": 1,
+   "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 8,
+   "BRIDGE_NOT_RETRIEVABLE": 0
+  }
+ },
+ "per_query_class": {
+  "QC1": {
+   "items": 4,
+   "by_class": {
+    "GRADER_DEFECT": 1,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 1,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 2,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC10": {
+   "items": 11,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 7,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 3,
+    "BRIDGE_NOT_RETRIEVABLE": 1
+   }
+  },
+  "QC2": {
+   "items": 4,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 1,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 3,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC3": {
+   "items": 10,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 4,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 6,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC4": {
+   "items": 5,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 4,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 1,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC5": {
+   "items": 9,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 5,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 4,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC6": {
+   "items": 8,
+   "by_class": {
+    "GRADER_DEFECT": 2,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 4,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 2,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC7": {
+   "items": 13,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 12,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 1,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC8": {
+   "items": 18,
+   "by_class": {
+    "GRADER_DEFECT": 4,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 4,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 10,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "QC9": {
+   "items": 13,
+   "by_class": {
+    "GRADER_DEFECT": 1,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 3,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 9,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  }
+ },
+ "per_control": {
+  "CTRL-1": {
+   "items": 3,
+   "by_class": {
+    "GRADER_DEFECT": 0,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 0,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 3,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "CTRL-2": {
+   "items": 4,
+   "by_class": {
+    "GRADER_DEFECT": 1,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 0,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 3,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  },
+  "CTRL-3": {
+   "items": 4,
+   "by_class": {
+    "GRADER_DEFECT": 1,
+    "ORACLE_STRICTNESS": 0,
+    "AGENT_BEHAVIOUR": 1,
+    "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE": 2,
+    "BRIDGE_NOT_RETRIEVABLE": 0
+   }
+  }
+ },
+ "counterfactual_d_recall": {
+  "S1-QC2": {
+   "recall": 1.0,
+   "recall_if_grader_fixed": 1.0,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S1-QC3": {
+   "recall": 0.6,
+   "recall_if_grader_fixed": 0.6,
+   "recall_if_agent_fixed": 0.6,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.6,
+   "must_state_missing": 2,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S1-QC4": {
+   "recall": 0.8,
+   "recall_if_grader_fixed": 0.8,
+   "recall_if_agent_fixed": 0.8,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.8,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S1-QC5": {
+   "recall": 0.2,
+   "recall_if_grader_fixed": 0.2,
+   "recall_if_agent_fixed": 0.4,
+   "recall_if_bridge_retrievable_fixed": 0.8,
+   "recall_if_grader_and_agent_fixed": 0.4,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": true
+  },
+  "S1-QC7": {
+   "recall": 0.2,
+   "recall_if_grader_fixed": 0.2,
+   "recall_if_agent_fixed": 0.8,
+   "recall_if_bridge_retrievable_fixed": 0.4,
+   "recall_if_grader_and_agent_fixed": 0.8,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S1-QC8": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.2,
+   "recall_if_agent_fixed": 0.0,
+   "recall_if_bridge_retrievable_fixed": 0.8,
+   "recall_if_grader_and_agent_fixed": 0.2,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S1-QC9": {
+   "recall": 0.75,
+   "recall_if_grader_fixed": 0.75,
+   "recall_if_agent_fixed": 0.75,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.75,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": true
+  },
+  "S1-QC10": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.0,
+   "recall_if_agent_fixed": 0.75,
+   "recall_if_bridge_retrievable_fixed": 0.25,
+   "recall_if_grader_and_agent_fixed": 0.75,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC1": {
+   "recall": 0.2,
+   "recall_if_grader_fixed": 0.4,
+   "recall_if_agent_fixed": 0.4,
+   "recall_if_bridge_retrievable_fixed": 0.6,
+   "recall_if_grader_and_agent_fixed": 0.6,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC3": {
+   "recall": 0.6,
+   "recall_if_grader_fixed": 0.6,
+   "recall_if_agent_fixed": 0.6,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.6,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": true
+  },
+  "S2-QC4": {
+   "recall": 0.6,
+   "recall_if_grader_fixed": 0.6,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 0.6,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC5": {
+   "recall": 1.0,
+   "recall_if_grader_fixed": 1.0,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC6": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.4,
+   "recall_if_agent_fixed": 0.2,
+   "recall_if_bridge_retrievable_fixed": 0.4,
+   "recall_if_grader_and_agent_fixed": 0.6,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC7": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.0,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 0.0,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC8": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.2,
+   "recall_if_agent_fixed": 0.0,
+   "recall_if_bridge_retrievable_fixed": 0.8,
+   "recall_if_grader_and_agent_fixed": 0.2,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC9": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.25,
+   "recall_if_agent_fixed": 0.0,
+   "recall_if_bridge_retrievable_fixed": 0.75,
+   "recall_if_grader_and_agent_fixed": 0.25,
+   "must_state_missing": 2,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S2-QC10": {
+   "recall": 0.667,
+   "recall_if_grader_fixed": 0.667,
+   "recall_if_agent_fixed": 0.667,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.667,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC2": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.0,
+   "recall_if_agent_fixed": 0.0,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.0,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": true
+  },
+  "S3-QC3": {
+   "recall": 0.8,
+   "recall_if_grader_fixed": 0.8,
+   "recall_if_agent_fixed": 0.8,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.8,
+   "must_state_missing": 2,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC4": {
+   "recall": 1.0,
+   "recall_if_grader_fixed": 1.0,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC5": {
+   "recall": 1.0,
+   "recall_if_grader_fixed": 1.0,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 3,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC6": {
+   "recall": 0.4,
+   "recall_if_grader_fixed": 0.4,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 0.4,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC7": {
+   "recall": 0.2,
+   "recall_if_grader_fixed": 0.2,
+   "recall_if_agent_fixed": 1.0,
+   "recall_if_bridge_retrievable_fixed": 0.2,
+   "recall_if_grader_and_agent_fixed": 1.0,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC8": {
+   "recall": 0.0,
+   "recall_if_grader_fixed": 0.4,
+   "recall_if_agent_fixed": 0.2,
+   "recall_if_bridge_retrievable_fixed": 0.4,
+   "recall_if_grader_and_agent_fixed": 0.6,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC9": {
+   "recall": 0.25,
+   "recall_if_grader_fixed": 0.25,
+   "recall_if_agent_fixed": 0.5,
+   "recall_if_bridge_retrievable_fixed": 0.75,
+   "recall_if_grader_and_agent_fixed": 0.5,
+   "must_state_missing": 2,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  },
+  "S3-QC10": {
+   "recall": 0.4,
+   "recall_if_grader_fixed": 0.4,
+   "recall_if_agent_fixed": 0.8,
+   "recall_if_bridge_retrievable_fixed": 0.4,
+   "recall_if_grader_and_agent_fixed": 0.8,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": true,
+   "passes_if_bridge_fixed": false
+  },
+  "CTRL-1": {
+   "recall": 0.4,
+   "recall_if_grader_fixed": 0.4,
+   "recall_if_agent_fixed": 0.4,
+   "recall_if_bridge_retrievable_fixed": 1.0,
+   "recall_if_grader_and_agent_fixed": 0.4,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": true
+  },
+  "CTRL-2": {
+   "recall": 0.4,
+   "recall_if_grader_fixed": 0.6,
+   "recall_if_agent_fixed": 0.4,
+   "recall_if_bridge_retrievable_fixed": 0.8,
+   "recall_if_grader_and_agent_fixed": 0.6,
+   "must_state_missing": 1,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": true
+  },
+  "CTRL-3": {
+   "recall": 0.333,
+   "recall_if_grader_fixed": 0.5,
+   "recall_if_agent_fixed": 0.5,
+   "recall_if_bridge_retrievable_fixed": 0.667,
+   "recall_if_grader_and_agent_fixed": 0.667,
+   "must_state_missing": 0,
+   "passes_if_grader_oracle_fixed": false,
+   "passes_if_grader_oracle_agent_fixed": false,
+   "passes_if_bridge_fixed": false
+  }
+ },
+ "counterfactual_summary": {
+  "failing_queries": 29,
+  "d_recall_ok_now": [
+   "S1-QC2",
+   "S1-QC4",
+   "S2-QC5",
+   "S3-QC3",
+   "S3-QC4",
+   "S3-QC5"
+  ],
+  "d_recall_ok_if_grader_fixed": [
+   "S1-QC2",
+   "S1-QC4",
+   "S2-QC5",
+   "S3-QC3",
+   "S3-QC4",
+   "S3-QC5"
+  ],
+  "d_recall_ok_if_grader_and_agent_fixed": [
+   "S1-QC2",
+   "S1-QC4",
+   "S1-QC7",
+   "S2-QC4",
+   "S2-QC5",
+   "S2-QC7",
+   "S3-QC10",
+   "S3-QC3",
+   "S3-QC4",
+   "S3-QC5",
+   "S3-QC6",
+   "S3-QC7"
+  ],
+  "d_recall_ok_if_bridge_fixed_only": [
+   "CTRL-1",
+   "CTRL-2",
+   "S1-QC2",
+   "S1-QC3",
+   "S1-QC4",
+   "S1-QC5",
+   "S1-QC8",
+   "S1-QC9",
+   "S2-QC10",
+   "S2-QC3",
+   "S2-QC5",
+   "S2-QC8",
+   "S3-QC2",
+   "S3-QC3",
+   "S3-QC4",
+   "S3-QC5"
+  ],
+  "queries_passing_if_grader_oracle_fixed": [],
+  "queries_passing_if_grader_oracle_agent_fixed": [
+   "S1-QC2",
+   "S1-QC4",
+   "S1-QC7",
+   "S2-QC4",
+   "S2-QC5",
+   "S2-QC7",
+   "S3-QC10",
+   "S3-QC3",
+   "S3-QC4",
+   "S3-QC5",
+   "S3-QC6",
+   "S3-QC7"
+  ],
+  "queries_passing_if_bridge_fixed": [
+   "CTRL-1",
+   "CTRL-2",
+   "S1-QC5",
+   "S1-QC9",
+   "S2-QC3",
+   "S3-QC2"
+  ]
+ },
+ "counterfactual_g5_classes": {
+  "now": [
+   "QC1"
+  ],
+  "grader_oracle_fixed": [
+   "QC1"
+  ],
+  "grader_oracle_agent_fixed": [
+   "QC1",
+   "QC2",
+   "QC4",
+   "QC5",
+   "QC6",
+   "QC7"
+  ],
+  "bridge_fixed": [
+   "QC1",
+   "QC2"
+  ],
+  "all_fixed_except_bridge_not_retrievable": [
+   "QC1",
+   "QC10",
+   "QC2",
+   "QC3",
+   "QC4",
+   "QC5",
+   "QC6",
+   "QC7",
+   "QC8",
+   "QC9"
+  ]
+ },
+ "items": [
+  {
+   "key": "G4.R8-CHAIN-F3.prior_findings.D",
+   "gate": "G4",
+   "type": "anchor(any_of)",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "alternatives": {
+    "A1": "AGENT_BEHAVIOUR",
+    "A2": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+    "A3": "GRADER_DEFECT",
+    "A4": "AGENT_BEHAVIOUR",
+    "A5": "AGENT_BEHAVIOUR"
+   }
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.tests.D",
+   "gate": "G4",
+   "type": "anchor(any_of)",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "alternatives": {
+    "A1": "AGENT_BEHAVIOUR",
+    "A2": "AGENT_BEHAVIOUR",
+    "A3": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE"
+   }
+  },
+  {
+   "key": "G5.S1-QC3.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-QUERY-NOT-RUN",
+   "signals": [
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC3.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC4.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC5.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-CALLERS",
+   "signals": [
+    "B-FOLLOWUP-CALLERS"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC5.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-CALLERS",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC5.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC5.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC7.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC7.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC7.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC7.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-CALLERS"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC8.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "contract",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S1-QC8.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC8.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-TRUNCATED-MANDATORY",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC8.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BYREF-DIR-UNEXPANDED",
+   "signals": [
+    "B-BYREF-DIR-UNEXPANDED"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC8.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BYREF-DIR-UNEXPANDED",
+   "signals": [
+    "B-BYREF-DIR-UNEXPANDED"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC9.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC10.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC10.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "contract",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC10.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S1-QC10.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-FOLLOWUP-CALLERS",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC1.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-QUERY-NOT-RUN",
+   "signals": [
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC1.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S2-QC1.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC1.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY",
+    "B-QUERY-NOT-RUN",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC3.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC3.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-QUERY-NOT-RUN",
+   "signals": [
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC4.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC4.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC6.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC6.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S2-QC6.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S2-QC6.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC6.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC7.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC7.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC7.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC7.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC7.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC8.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "contract",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S2-QC8.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BYREF-DIR-UNEXPANDED",
+   "signals": [
+    "B-BYREF-DIR-UNEXPANDED",
+    "B-QUERY-NOT-RUN"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC8.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC8.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BYREF-DIR-UNEXPANDED",
+   "signals": [
+    "B-BYREF-DIR-UNEXPANDED"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC8.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-QUERY-NOT-RUN",
+   "signals": [
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC9.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC9.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-QUERY-NOT-RUN",
+   "signals": [
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC9.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S2-QC9.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S2-QC10.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-QUERY-NOT-RUN",
+   "signals": [
+    "B-QUERY-NOT-RUN",
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC2.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "contract",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC2.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-SCOPED-SECTION",
+   "signals": [
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC3.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-TRUNCATED-MANDATORY",
+    "B-QUERY-NOT-RUN",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC6.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC6.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC6.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC7.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC7.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC7.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC7.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC8.R1",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BYREF-DIR-UNEXPANDED",
+   "signals": [
+    "B-BYREF-DIR-UNEXPANDED"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC8.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BYREF-DIR-UNEXPANDED",
+   "signals": [
+    "B-BYREF-DIR-UNEXPANDED"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC8.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC8.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "contract",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "AGENT_BEHAVIOUR/A-PACKET-NOT-CITED"
+  },
+  {
+   "key": "G5.S3-QC8.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-TRUNCATED-MANDATORY"
+  },
+  {
+   "key": "G5.S3-QC9.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY",
+    "B-QUERY-NOT-RUN",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC9.R3",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-BUDGET-DROP",
+   "signals": [
+    "B-BUDGET-DROP",
+    "B-TRUNCATED-MANDATORY",
+    "B-QUERY-NOT-RUN",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC9.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC10.R2",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC10.R4",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_RETRIEVABLE",
+   "cause": "N-NOT-INDEXED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G5.S3-QC10.R5",
+   "gate": "G5",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-1.R1",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-1.R2",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID",
+    "B-TOPK",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-1.R4",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-CALLERS",
+   "signals": [
+    "B-FOLLOWUP-CALLERS"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-2.R1",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-2.R2",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "code",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TOPK",
+   "signals": [
+    "B-TOPK"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-2.R4",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "code",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-10",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-3.R1",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-TRUNCATED-MANDATORY"
+  },
+  {
+   "key": "G8.CTRL-3.R2",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-3.R3",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G8.CTRL-3.R4",
+   "gate": "G8",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID",
+    "B-SCOPED-SECTION"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G3i.AUTH-3.R1",
+   "gate": "G3i",
+   "type": "anchor",
+   "kind": "evidence",
+   "class": "GRADER_DEFECT",
+   "cause": "GD-8",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE/B-TOPK"
+  },
+  {
+   "key": "G3i.AUTH-3.R2",
+   "gate": "G3i",
+   "type": "anchor",
+   "kind": "record",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-PACKET-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G3i.AUTH-3.R3",
+   "gate": "G3i",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-TRUNCATED-MANDATORY",
+   "signals": [
+    "B-TRUNCATED-MANDATORY"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G3i.AUTH-4.R3",
+   "gate": "G3i",
+   "type": "anchor",
+   "kind": "record",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "B-FOLLOWUP-ID",
+   "signals": [
+    "B-FOLLOWUP-ID",
+    "B-TOPK"
+   ],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G6.R8-F1-BOTHWAYS.C4",
+   "gate": "G6",
+   "type": "anchor",
+   "kind": "test",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "A-OUTPUT-NOT-CITED",
+   "signals": [],
+   "alt_if_gd8_resolved_strict": null
+  },
+  {
+   "key": "G4.R8-CHAIN-F2.requirement.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-TRUNCATED-MANDATORY"
+  },
+  {
+   "key": "G4.R8-CHAIN-F2.partition_filtering.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G4.R8-CHAIN-F2.effective_behaviour.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G4.R8-CHAIN-F2.effective_behaviour.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-DEPENDENCY-DATA"
+  },
+  {
+   "key": "G4.R8-CHAIN-F2.prior_findings.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.requirement.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-TRUNCATED-MANDATORY"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.source_construction.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.composition_union.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.composition_union.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.partition_filtering.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.precedence_ordering.M3",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.matcher_evaluator.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.effective_behaviour.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.effective_behaviour.M3",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-DEPENDENCY-DATA"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.tests.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-TESTS-BODY"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.prior_findings.M1",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G4.R8-CHAIN-F3.prior_findings.M2",
+   "gate": "G4",
+   "type": "must_state",
+   "class": "ORACLE_STRICTNESS",
+   "cause": "MS-STAGE-PLACEMENT"
+  },
+  {
+   "key": "G5.S1-QC2.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S1-QC3.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S1-QC3.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S1-QC4.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S1-QC5.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-IMPACT-CONSUMERS"
+  },
+  {
+   "key": "G5.S1-QC8.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S1-QC9.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-VERSION-RECONCILIATION"
+  },
+  {
+   "key": "G5.S1-QC10.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-TRUNCATED-MANDATORY"
+  },
+  {
+   "key": "G5.S2-QC3.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-NOT-RETRIEVED-FOLLOWUP"
+  },
+  {
+   "key": "G5.S2-QC5.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S2-QC8.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S2-QC9.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-VERSION-RECONCILIATION"
+  },
+  {
+   "key": "G5.S2-QC9.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S2-QC10.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S3-QC2.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-TRUNCATED-MANDATORY"
+  },
+  {
+   "key": "G5.S3-QC3.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S3-QC3.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S3-QC4.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S3-QC5.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S3-QC5.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S3-QC5.M3",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S3-QC8.M1",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  },
+  {
+   "key": "G5.S3-QC9.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G5.S3-QC9.M3",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-VERSION-RECONCILIATION"
+  },
+  {
+   "key": "G5.S3-QC10.M2",
+   "gate": "G5",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-CROSS-ANSWER"
+  },
+  {
+   "key": "G8.CTRL-2.M2",
+   "gate": "G8",
+   "type": "must_state",
+   "class": "BRIDGE_NOT_IN_PACKET_BUT_RETRIEVABLE",
+   "cause": "MS-NOT-RETRIEVED-FOLLOWUP"
+  },
+  {
+   "key": "G3i.AUTH-4.M1",
+   "gate": "G3i",
+   "type": "must_state",
+   "class": "AGENT_BEHAVIOUR",
+   "cause": "MS-IN-HAND-NOT-STATED"
+  }
+ ]
+}

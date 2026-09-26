@@ -1,0 +1,45 @@
+[
+ {
+  "declared_paths": 2,
+  "id": "REVIEW-8-PROBES",
+  "rendered_bytes": 77,
+  "resolved_lines": [
+   null,
+   null
+  ],
+  "resolved_path": "probes/P2-AR-0097/",
+  "resolved_paths": 1,
+  "selector_kinds": [
+   "paths"
+  ]
+ },
+ {
+  "id": "PHASE-2-LEDGER-P2-L-0033-0047",
+  "rendered_bytes": 4051,
+  "rendered_contains_selected_entries": false,
+  "resolved_lines": [
+   null,
+   null
+  ],
+  "resolved_path": "release/orchestration/phase-2/PHASE_LEDGER.md",
+  "selected_bytes": 57583,
+  "selector_kinds": [
+   "entries"
+  ]
+ },
+ {
+  "id": "PHASE-2-STATE",
+  "rendered_bytes": 4006,
+  "resolved_lines": [
+   null,
+   null
+  ],
+  "resolved_path": "release/orchestration/phase-2/ORCHESTRATOR_STATE.yaml",
+  "selected_bytes_yaml_dump": 16102,
+  "selected_keys": 7,
+  "selected_keys_present": 7,
+  "selector_kinds": [
+   "keys"
+  ]
+ }
+]
