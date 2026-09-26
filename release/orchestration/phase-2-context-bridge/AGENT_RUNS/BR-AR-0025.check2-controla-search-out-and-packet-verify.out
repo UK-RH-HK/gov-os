@@ -1,0 +1,19 @@
+{
+ "deduped_count": 0,
+ "dropped_count": 0,
+ "item_count": 15,
+ "manifest_sha256": "8e082ee30a31c36c7a852e82c6798e37d8ffcc2ec892089e277c333f56098876",
+ "out": "/tmp/br-ar-0025-final2/s1",
+ "packet_id": "410acbe9d3592cd5",
+ "packet_kind": "supplementary",
+ "packet_sha256": "410acbe9d3592cd51c96fdd33891920530ed24109c2d87017a990d1572232130",
+ "status": "OK"
+}
+--- search exit=0 ---
+{
+ "problems": [],
+ "status": "OK",
+ "verify": "PASS"
+}
+--- verify exit=0 ---
+--- packet.md bytes: 17278 ---

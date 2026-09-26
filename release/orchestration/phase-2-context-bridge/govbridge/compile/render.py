@@ -14,12 +14,15 @@ the rendered packet -- so a token can never be copied out of the manifest instea
 from __future__ import annotations
 
 import hashlib
+import re
 from typing import Optional
 
 from govbridge.core.manifest import manifest_sha256 as _core_manifest_sha256
 from govbridge.core.yamlutil import canonical_json, sha256_text
 
 SECTION_LETTERS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J")
+
+_SECTION_HEADING_RE = re.compile(r"(?m)^## ([A-J])\. ")
 
 SECTION_TITLES = {
     "A": "MANDATORY AUTHORITATIVE INPUTS",
@@ -77,6 +80,16 @@ def item_manifest_row(item) -> dict:
     }
 
 
+def item_body_marker(unit_kind: str, unit_id: str, tag: str) -> str:
+    """BR-DAG-AMEND-R1-10: the smallest item-delimiting format this module adds -- an exact, unambiguous marker
+    line bracketing ONE item's DELIVERED BODY ONLY (never the metadata lines above it). It embeds only
+    ``unit_kind``/``unit_id`` -- both already printed, verbatim, on the item's own ``- unit: ...`` line one line
+    above -- and never the internal ``item_id`` hash (``govbridge/demo/grade.py`` documents, and relies on, "the
+    ONLY identifier actually printed in the rendered packet text... never the hash"; this stays true). ``tag`` is
+    ``"body-begin"`` or ``"body-end"``."""
+    return f"<!-- govbridge:item {tag} {unit_kind}:{unit_id} -->"
+
+
 def _render_item_body(item) -> str:
     lines = [f"- unit: {item.unit_kind}:{item.unit_id}  (delivery={item.delivery}, route={item.route}, "
              f"class={item.cls}, lifecycle={item.lifecycle})"]
@@ -92,9 +105,64 @@ def _render_item_body(item) -> str:
     if item.reason:
         lines.append(f"  reason: {item.reason}")
     body = (item.text or "").rstrip("\n")
-    if body:
-        lines.append(body)
+    # BR-DAG-AMEND-R1-10 (routed from BR-AR-0022's open issue): bracket the delivered body with an exact,
+    # unambiguous marker pair so `packet verify`/`receipt check` can re-extract precisely this substring from the
+    # RENDERED packet (never the manifest's own claim) and independently recompute its hash -- catching a renderer
+    # that drops or mangles content the compiler already hashed correctly. Always present (even for an empty
+    # body), so extraction never has to guess whether a body line was omitted.
+    lines.append(item_body_marker(item.unit_kind, item.unit_id, "body-begin"))
+    lines.append(body)
+    lines.append(item_body_marker(item.unit_kind, item.unit_id, "body-end"))
     return "\n".join(lines) + "\n"
+
+
+def extract_section_text(rendered: str, letter: str) -> Optional[str]:
+    """The raw text of section ``letter``'s own body -- from its ``"## {letter}. "`` heading up to (but not
+    including) the next section heading, or the end of the packet for the last section. The same boundary rule
+    ``tests/compile/test_compile_outage.py``/``test_compile_budget_pressure.py`` already use via
+    ``rendered.index("## A.")``/``rendered.index("## B.")``, generalised to any letter and to a letter with no
+    following section. ``None`` if this rendered text has no such heading at all."""
+    starts = [(m.group(1), m.start()) for m in _SECTION_HEADING_RE.finditer(rendered)]
+    for i, (found_letter, pos) in enumerate(starts):
+        if found_letter == letter:
+            end = starts[i + 1][1] if i + 1 < len(starts) else len(rendered)
+            return rendered[pos:end]
+    return None
+
+
+def extract_item_delivered_body(rendered: str, letter: str, unit_kind: str, unit_id: str) -> tuple:
+    """BR-DAG-AMEND-R1-10: ``(found, body, ambiguous)``. Locates the UNIQUE ``body-begin``/``body-end`` marker pair
+    ``_render_item_body`` wrote for ``(unit_kind, unit_id)`` inside section ``letter``'s own rendered text (never
+    the whole packet -- the same unit could legitimately be retrieved into a different section too), and returns
+    exactly the bytes between them: the identical string ``_render_item_body`` built as ``body``, so hashing it
+    with the SAME rule the compiler used reproduces the compiler's own value whenever the render was honest.
+
+    ``found=False`` when no marker pair exists at all (the renderer never emitted this item); ``ambiguous=True``
+    when MORE than one marker pair for the same ``(unit_kind, unit_id)`` is found in that section -- re-extraction
+    is then meaningless and the caller must treat it as a verify failure, never silently pick one."""
+    section_text = extract_section_text(rendered, letter)
+    if section_text is None:
+        return False, None, False
+    begin = item_body_marker(unit_kind, unit_id, "body-begin")
+    end = item_body_marker(unit_kind, unit_id, "body-end")
+    begin_positions = [m.start() for m in re.finditer(re.escape(begin), section_text)]
+    if not begin_positions:
+        return False, None, False
+    if len(begin_positions) > 1:
+        return True, None, True
+    b_start = begin_positions[0] + len(begin)
+    e_pos = section_text.find(end, b_start)
+    if e_pos == -1:
+        return False, None, False
+    body = section_text[b_start:e_pos]
+    # `_render_item_body` joins its `lines` list with "\n", so exactly one "\n" separates the begin marker from
+    # the body and the body from the end marker (even when the body itself is the empty string) -- strip exactly
+    # that one leading/trailing newline, never more, so a genuinely blank first/last body line is preserved.
+    if body.startswith("\n"):
+        body = body[1:]
+    if body.endswith("\n"):
+        body = body[:-1]
+    return True, body, False
 
 
 def _drop_footer(d: list) -> Optional[str]:

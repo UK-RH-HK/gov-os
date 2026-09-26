@@ -23,6 +23,9 @@ node owns it:
   format (``manifest.json``, ``packet.md``, ``task_spec.yaml``, ``meta.json``) so a packet compiled once can be
   independently re-verified and receipt-checked later, exactly as the I1 acceptance checks require
   ("compile ... --out /tmp/p && ... packet verify /tmp/p");
+* ``why``/``impact``/``history``/``exact``/``state``: every one of these query commands (like ``search``/
+  ``gather`` already did) additionally accepts ``--out DIR`` (REPAIR_DAG.yaml node R1-RS) to write a budgeted,
+  deduplicated SUPPLEMENTARY packet in that same on-disk shape, instead of dumping raw JSON by default;
 * ``demo``: the grader, the oracle validator and the transcript read-extractor (``govbridge.demo``, this node's
   own new package).
 """
@@ -46,6 +49,78 @@ def _load_receipt(path: str):
         return load_yaml_file(path)
     with open(path, "r", encoding="utf-8") as fh:
         return json.load(fh)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# REPAIR_DAG.yaml node R1-RS: supplementary packets for every query command (search/why/impact/history/exact/
+# state/gather). One shared --out/--raw/--dedup-against surface, used by every cmd_* below, so the flags and
+# their meaning never drift between commands.
+# ---------------------------------------------------------------------------------------------------------------
+
+def _add_supplementary_args(p) -> None:
+    p.add_argument("--out", help="write a supplementary packet directory here (manifest.json/packet.md/"
+                                  "task_spec.yaml/meta.json -- the same shape `govbridge compile --out` writes, "
+                                  "so `packet verify`/`receipt check` need no special case for it). Without "
+                                  "--out, this command's output is unchanged (REPAIR_PLAN.md section 2.9)")
+    p.add_argument("--raw", action="store_true",
+                    help="with --out, ALSO print the full raw JSON result (default: a short packet summary "
+                          "only -- REPAIR_PLAN.md section 2.9: \"raw JSON is available only behind --raw\")")
+    p.add_argument("--dedup-against", action="append", metavar="DIR",
+                    help="repeatable: an earlier packet directory (the main packet, or an earlier supplementary "
+                         "packet from this same run) whose item ids this one must not duplicate -- a duplicate is "
+                         "still listed, but delivered by reference only, never a second full copy")
+
+
+def _packet_item_ids(packet_dir: str) -> set:
+    """Every ``"{unit_kind}:{unit_id}"`` already present in a packet directory's own ``manifest.json`` -- used to
+    build ``dedup_ids`` for a LATER supplementary packet (``--dedup-against``)."""
+    manifest_path = Path(packet_dir) / "manifest.json"
+    if not manifest_path.exists():
+        return set()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    ids = set()
+    for letter, sec in (manifest.get("sections") or {}).items():
+        rows = sec.get("items") or []
+        if letter == "D":
+            rows = [r for sub in (sec.get("subblocks") or {}).values() for r in (sub.get("items") or [])]
+        for row in rows:
+            unit = row.get("unit") or {}
+            ids.add(f"{unit.get('kind')}:{unit.get('id')}")
+    return ids
+
+
+def _load_task_spec_for_supplementary(args) -> dict:
+    """The real task spec when ``--task`` was given (every query command already accepts it --
+    ``taskctxmod.add_cli_arg``); otherwise a minimal, honest placeholder -- a supplementary packet always needs
+    SOME ``task_spec.yaml`` companion file (``packet verify``/``receipt check`` read one unconditionally), and a
+    query command run without ``--task`` genuinely has no task spec of its own to report."""
+    task_path = getattr(args, "task", None)
+    if task_path:
+        return load_yaml_file(task_path)
+    return {"schema": "govbridge-task-spec/1", "task_id": "adhoc", "view": getattr(args, "view", None)}
+
+
+def _handle_query_output(command: str, result: dict, args, subcmd: Optional[str] = None) -> None:
+    """Common ``--out``/``--raw``/``--dedup-against`` handling for every query command. Without ``--out``, prints
+    ``result`` exactly as every command already did (no behaviour change). With ``--out``, builds and writes a
+    supplementary packet (``govbridge.compile.supplementary``) and prints its short summary; the full raw JSON is
+    printed too only when ``--raw`` is also given."""
+    out_dir = getattr(args, "out", None)
+    if not out_dir:
+        print(json.dumps(result, indent=1, sort_keys=True, default=str))
+        return
+
+    from govbridge.compile import supplementary as suppmod
+
+    task_spec = _load_task_spec_for_supplementary(args)
+    dedup_ids: set = set()
+    for d in (getattr(args, "dedup_against", None) or []):
+        dedup_ids |= _packet_item_ids(d)
+    built = suppmod.build_supplementary_packet(command, result, task_spec, subcmd=subcmd, dedup_ids=dedup_ids)
+    meta = suppmod.write_supplementary_packet(out_dir, built, task_spec)
+    print(json.dumps({"out": out_dir, **meta}, indent=1, sort_keys=True))
+    if getattr(args, "raw", False):
+        print(json.dumps(result, indent=1, sort_keys=True, default=str))
 
 
 def cmd_freshness(argv) -> int:
@@ -77,6 +152,7 @@ def cmd_search(argv) -> int:
                                    "time it is called bare, so a caller who changes cwd afterwards would otherwise "
                                    "see a stale resolution shared with any other bare caller in the same process.")
     taskctxmod.add_cli_arg(p)
+    _add_supplementary_args(p)
     args = p.parse_args(argv)
 
     from govbridge.authority import records as recordsmod
@@ -113,7 +189,7 @@ def cmd_search(argv) -> int:
         ],
         "excluded_hits": counter.count,
     }
-    print(json.dumps(result, indent=1, sort_keys=True))
+    _handle_query_output("search", result, args)
     return 0
 
 
@@ -139,6 +215,7 @@ def cmd_gather(argv) -> int:
     p.add_argument("--view")
     p.add_argument("--registry")
     p.add_argument("--json", action="store_true", help="print the full JSON result (default: a short summary)")
+    _add_supplementary_args(p)
     args = p.parse_args(argv)
 
     from govbridge import GOV_BRIDGE_DOMAIN
@@ -174,7 +251,9 @@ def cmd_gather(argv) -> int:
         batch_size=args.batch_size, max_rounds=args.max_rounds, threads=args.threads, exclude=args.exclude,
         budget_profile=args.gather_budget_profile,
     )
-    if args.json:
+    if args.out:
+        _handle_query_output("gather", result, args)
+    elif args.json:
         print(json.dumps(result, indent=1, sort_keys=True))
     else:
         t = result["telemetry"]
@@ -182,6 +261,135 @@ def cmd_gather(argv) -> int:
               f"stop_reason={result['stop_reason']} merged_items={len(result['merged'])} "
               f"excluded_hits={result['excluded_hits']} merged_sha256={result['merged_sha256']}")
     return 0
+
+
+def cmd_why(argv) -> int:
+    """Was a bare ``_DISPATCH`` forward onto ``govbridge.graph.why.main`` before this node -- now calls
+    ``why.why(...)`` directly (mirroring ``cmd_search``/``cmd_gather``'s own existing pattern) so ``--out`` can
+    packetise the result. Every pre-existing flag/behaviour (no ``--out``) is unchanged."""
+    p = argparse.ArgumentParser(prog="govbridge why")
+    p.add_argument("seed")
+    p.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
+    taskctxmod.add_cli_arg(p)
+    _add_supplementary_args(p)
+    args = p.parse_args(argv)
+
+    from govbridge.graph import why as whymod
+    ctx = taskctxmod.from_args(args)
+    result = whymod.why(args.seed, task=ctx)
+    _handle_query_output("why", result, args)
+    return 0
+
+
+def cmd_impact(argv) -> int:
+    p = argparse.ArgumentParser(prog="govbridge impact")
+    p.add_argument("seed")
+    p.add_argument("--depth", type=int, default=2)
+    p.add_argument("--view")
+    p.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
+    taskctxmod.add_cli_arg(p)
+    _add_supplementary_args(p)
+    args = p.parse_args(argv)
+
+    from govbridge.graph import impact as impactmod
+    ctx = taskctxmod.from_args(args)
+    result = impactmod.impact(args.seed, view_path=args.view, max_depth=args.depth, task=ctx)
+    _handle_query_output("impact", result, args)
+    return 0
+
+
+def cmd_history(argv) -> int:
+    p = argparse.ArgumentParser(prog="govbridge history")
+    p.add_argument("seed")
+    p.add_argument("--deleted-from", help="an earlier commit to diff record definitions against for DELETED_IN")
+    p.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
+    taskctxmod.add_cli_arg(p)
+    _add_supplementary_args(p)
+    args = p.parse_args(argv)
+
+    from govbridge.graph import history as historymod
+    ctx = taskctxmod.from_args(args)
+    result = historymod.history(args.seed, deleted_from=args.deleted_from, task=ctx)
+    _handle_query_output("history", result, args)
+    return 0
+
+
+def cmd_exact(argv) -> int:
+    p = argparse.ArgumentParser(prog="govbridge exact")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    sp_show = sub.add_parser("show")
+    sp_show.add_argument("spec")
+    sp_show.add_argument("--view")
+    sp_show.add_argument("--rules")
+    taskctxmod.add_cli_arg(sp_show)
+    _add_supplementary_args(sp_show)
+
+    sp_grep = sub.add_parser("grep")
+    sp_grep.add_argument("-F", dest="literal", required=True)
+    sp_grep.add_argument("--ref")
+    sp_grep.add_argument("--paths", nargs="*")
+    sp_grep.add_argument("--view")
+    sp_grep.add_argument("--rules")
+    taskctxmod.add_cli_arg(sp_grep)
+    _add_supplementary_args(sp_grep)
+
+    sp_id = sub.add_parser("id")
+    sp_id.add_argument("token")
+    sp_id.add_argument("--ref")
+    sp_id.add_argument("--view")
+    taskctxmod.add_cli_arg(sp_id)
+    _add_supplementary_args(sp_id)
+
+    sp_path = sub.add_parser("path")
+    sp_path.add_argument("suffix")
+    sp_path.add_argument("--ref")
+    sp_path.add_argument("--view")
+    _add_supplementary_args(sp_path)  # note: `path` never took --task upstream either (path_resolve has no task=)
+
+    args = p.parse_args(argv)
+    ctx = taskctxmod.from_args(args)
+    from govbridge.core import exact as exactmod
+    if args.cmd == "show":
+        result = exactmod.show(args.spec, view_path=args.view, rules_path=args.rules, task=ctx)
+    elif args.cmd == "grep":
+        result = exactmod.grep(args.literal, ref=args.ref, paths=args.paths, view_path=args.view,
+                                rules_path=args.rules, task=ctx)
+    elif args.cmd == "id":
+        result = exactmod.id_lookup(args.token, ref=args.ref, view_path=args.view, task=ctx)
+    elif args.cmd == "path":
+        result = exactmod.path_resolve(args.suffix, ref=args.ref, view_path=args.view)
+    else:
+        return 2
+    _handle_query_output("exact", result, args, subcmd=args.cmd)
+    return 0 if "error" not in result else 1
+
+
+def cmd_state(argv) -> int:
+    p = argparse.ArgumentParser(prog="govbridge state")
+    sub = p.add_subparsers(dest="cmd", required=True)
+    g = sub.add_parser("get")
+    g.add_argument("alias")
+    g.add_argument("key_path")
+    g.add_argument("--view")
+    g.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see cmd_search's own --repo).")
+    g.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
+    taskctxmod.add_cli_arg(g)
+    _add_supplementary_args(g)
+    args = p.parse_args(argv)
+
+    ctx = taskctxmod.from_args(args)
+    from govbridge.authority import state as statemod
+    if args.cmd == "get":
+        try:
+            result = statemod.get(args.alias, args.key_path, repo=args.repo, view_path=args.view, task=ctx)
+        except (KeyError, ValueError, FileNotFoundError) as e:
+            print(json.dumps({"error": str(e)}, indent=1))
+            return 1
+        _handle_query_output("state", result.to_dict(), args)
+        return 0
+    return 2
 
 
 def cmd_compile(argv) -> int:
@@ -197,12 +405,18 @@ def cmd_compile(argv) -> int:
     args = p.parse_args(argv)
 
     from govbridge.compile import packet as packetmod
+    from govbridge.compile import section_i as section_i_mod
 
     task_spec = load_yaml_file(args.task_spec)
     routes = packetmod.FAKE_ROUTES if args.fake_routes else packetmod.real_routes_for(
         task_spec, registry_path=args.registry)
     result = packetmod.compile_packet(task_spec, routes=routes, registry_path=args.registry,
                                        budgets_path=args.budgets)
+    # OBS-BR-07 (RC-9, node R1-RS): section I additionally carries the task's instantiated query set and the
+    # answers/receipt schemas, verbatim and by hash -- re-finalises manifest_sha256/packet_sha256 around the
+    # exact same sections/queries_log/drops compile_packet already computed (govbridge.compile.packet, this
+    # function's own caller of it, is untouched).
+    result = section_i_mod.with_task_inputs_in_section_i(result, task_spec)
 
     if args.out:
         out_dir = Path(args.out)
@@ -212,9 +426,13 @@ def cmd_compile(argv) -> int:
             json.dumps(result["manifest"], indent=1, sort_keys=True), encoding="utf-8")
         (out_dir / "task_spec.yaml").write_text(yaml.safe_dump(task_spec, sort_keys=False), encoding="utf-8")
         meta = {
-            "status": result["status"], "packet_id": result.get("packet_id"),
+            "packet_kind": "main", "status": result["status"], "packet_id": result.get("packet_id"),
             "packet_sha256": result.get("packet_sha256"), "manifest_sha256": result.get("manifest_sha256"),
             "registry_path": result.get("registry_path"),
+            # BR-DAG-AMEND-R1-10 (reopening): a LATER `packet verify`/`receipt check` needs the same
+            # config/budgets.yaml this compile used to independently recompose an oversize item's expected body
+            # (its per_item_cap_bytes) -- None when the default was used, exactly like registry_path above.
+            "budgets_path": args.budgets,
             # R1-RX (OBS-BR-08): disclosed here too, so a caller of `compile --out` sees it without parsing
             # manifest.json's notices.
             "excluded_hits": result.get("excluded_hits"),
@@ -234,6 +452,13 @@ def cmd_packet(argv) -> int:
     v = sub.add_parser("verify")
     v.add_argument("path", help="a directory written by `govbridge compile --out DIR`")
     v.add_argument("--registry")
+    v.add_argument("--budgets", help="the config/budgets.yaml the packet was compiled with, if not the default -- "
+                                      "needed to independently recompose an oversize item's expected body "
+                                      "(BR-DAG-AMEND-R1-10); defaults to meta.json's own recorded budgets_path.")
+    v.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see cmd_search's own --repo for why this is "
+                                   "worth passing explicitly -- a fixture-repo caller MUST pass it, since cwd-based "
+                                   "resolution would otherwise look for its commits in the wrong repository).")
     args = p.parse_args(argv)
 
     if args.cmd != "verify":
@@ -243,12 +468,27 @@ def cmd_packet(argv) -> int:
 
     d = Path(args.path)
     manifest = json.loads((d / "manifest.json").read_text(encoding="utf-8"))
-    task_spec = load_yaml_file(str(d / "task_spec.yaml"))
     meta = {}
     meta_path = d / "meta.json"
     if meta_path.exists():
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
-    problems = validatemod.verify_packet(manifest, task_spec, registry_path=args.registry or meta.get("registry_path"))
+    # BR-DAG-AMEND-R1-10: read the RENDERED packet too (never just the manifest), so `packet verify` can
+    # re-extract each A item's delivered body from the actual bytes and independently recompute its hash.
+    packet_md_path = d / "packet.md"
+    rendered = packet_md_path.read_text(encoding="utf-8") if packet_md_path.exists() else None
+
+    # node R1-RS: a supplementary packet (meta.json's own `packet_kind`, absent == "main" for back-compat with
+    # every packet `compile --out` wrote before this node) has no section A of its own to re-derive a resolver
+    # against -- verify_supplementary_packet checks placement/banners/ordering and refuses any MANDATORY/PINNED
+    # item instead.
+    if meta.get("packet_kind") == "supplementary":
+        problems = validatemod.verify_supplementary_packet(manifest)
+    else:
+        task_spec = load_yaml_file(str(d / "task_spec.yaml"))
+        problems = validatemod.verify_packet(manifest, task_spec, repo=args.repo,
+                                              registry_path=args.registry or meta.get("registry_path"),
+                                              rendered=rendered,
+                                              budgets_path=args.budgets or meta.get("budgets_path"))
     result = {"status": meta.get("status", "?"), "verify": "PASS" if not problems else "FAIL", "problems": problems}
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0 if not problems else 1
@@ -261,6 +501,14 @@ def cmd_receipt(argv) -> int:
     c.add_argument("--packet", required=True, help="a directory written by `govbridge compile --out DIR`")
     c.add_argument("--receipt", required=True)
     c.add_argument("--registry")
+    c.add_argument("--budgets", help="see cmd_packet verify's own --budgets; defaults to meta.json's own recorded "
+                                      "budgets_path.")
+    c.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see cmd_packet verify's own --repo).")
+    c.add_argument("--supplementary", action="append", metavar="DIR",
+                    help="repeatable: a supplementary packet directory this run also wrote (REPAIR_PLAN.md "
+                         "section 2.9: \"receipt check covers... every supplementary packet\") -- its own "
+                         "packet_sha256/manifest_sha256 must also be acknowledged in the receipt, or this fails")
     args = p.parse_args(argv)
 
     if args.cmd != "check":
@@ -275,20 +523,31 @@ def cmd_receipt(argv) -> int:
     meta_path = d / "meta.json"
     if meta_path.exists():
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    # BR-DAG-AMEND-R1-10: the same rendered-body re-extraction `packet verify` now runs.
+    packet_md_path = d / "packet.md"
+    rendered = packet_md_path.read_text(encoding="utf-8") if packet_md_path.exists() else None
+
+    supplementary = []
+    for supp_dir in (args.supplementary or []):
+        sd = Path(supp_dir)
+        supp_manifest = json.loads((sd / "manifest.json").read_text(encoding="utf-8"))
+        supplementary.append({"label": supp_dir, "manifest": supp_manifest})
+
     receipt = _load_receipt(args.receipt)
-    result = receiptmod.check(manifest, receipt, task_spec, registry_path=args.registry or meta.get("registry_path"))
+    result = receiptmod.check(manifest, receipt, task_spec, repo=args.repo,
+                               registry_path=args.registry or meta.get("registry_path"),
+                               rendered=rendered, supplementary=supplementary,
+                               budgets_path=args.budgets or meta.get("budgets_path"))
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0 if result["status"] == "PASS" else 1
 
 
 _DISPATCH = {
-    # command -> (module path, submodule main() gets the REST of argv verbatim)
+    # command -> (module path, submodule main() gets the REST of argv verbatim). why/impact/history/exact/state
+    # moved OUT of this table at node R1-RS -- each now has its own cmd_* function above (calling the library
+    # function directly, like cmd_search/cmd_gather already did) so `--out` can packetise the result; every other
+    # flag and behaviour is unchanged.
     "index": "govbridge.core.freshness",
-    "exact": "govbridge.core.exact",
-    "state": "govbridge.authority.state",
-    "why": "govbridge.graph.why",
-    "impact": "govbridge.graph.impact",
-    "history": "govbridge.graph.history",
     "resolve": "govbridge.authority.resolver",
     "renew": "govbridge.compile.renewal",
     "bootstrap": "govbridge.compile.bootstrap",
@@ -321,6 +580,16 @@ def main(argv: Optional[list] = None) -> int:
         return cmd_search(rest)
     if cmd == "gather":
         return cmd_gather(rest)
+    if cmd == "why":
+        return cmd_why(rest)
+    if cmd == "impact":
+        return cmd_impact(rest)
+    if cmd == "history":
+        return cmd_history(rest)
+    if cmd == "exact":
+        return cmd_exact(rest)
+    if cmd == "state":
+        return cmd_state(rest)
     if cmd == "notes":
         # REPAIR_DAG.yaml node R1-RN (BR-AR-0017); the dispatch line R1-GA1 (BR-AR-0023) adds, exactly as
         # govbridge/notes/cli.py's own module docstring names it -- govbridge.notes.cli.main is unchanged by it.

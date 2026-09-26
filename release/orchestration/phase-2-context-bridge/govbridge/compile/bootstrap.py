@@ -25,11 +25,16 @@ this same output (the owner rule V8.3 section 2.3 records).
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+from pathlib import Path
 from typing import Optional
+
+import yaml
 
 from govbridge.authority import state as statemod
 from govbridge.compile import packet as packetmod
+from govbridge.compile import section_i as section_i_mod
 from govbridge.core.yamlutil import load_yaml_file
 
 ADAPT_SOURCE = ("release/orchestration/phase-2/tools/worker_bootstrap.py"
@@ -139,11 +144,20 @@ def where_you_are(view_path: Optional[str] = None, repo: Optional[str] = None) -
 
 
 def compile_brief(task_spec: dict, routes=None, repo: Optional[str] = None, registry_path: Optional[str] = None,
-                   budgets_path: Optional[str] = None) -> tuple:
+                   budgets_path: Optional[str] = None, packet_out: Optional[str] = None) -> tuple:
     """Returns ``(brief_text, compile_result)``. ``compile_result`` is ``govbridge.compile.packet.compile_packet``'s
-    own return value -- the caller can inspect ``compile_result["status"]``/``["manifest"]`` without recompiling."""
+    own return value, enriched by ``section_i.with_task_inputs_in_section_i`` (OBS-BR-07) -- the caller can inspect
+    ``compile_result["status"]``/``["manifest"]`` without recompiling.
+
+    ``packet_out`` (REPAIR_PLAN.md section 6, RC-9: "the bootstrap inlines the whole packet -- run-1's bootstrap
+    was 282,782 bytes"): when given, the directory this SAME packet was (or will be) written to by the caller --
+    the brief then REFERENCES it by path/id/hash instead of embedding ``result["rendered"]``. When omitted, the
+    brief still never inlines the packet; it tells the reader to compile it themselves (deterministic: the same
+    task spec always reproduces the identical ``packet_sha256``) and verify what they hold against the hash named
+    here."""
     result = packetmod.compile_packet(task_spec, routes=routes or packetmod.FAKE_ROUTES, repo=repo,
                                        registry_path=registry_path, budgets_path=budgets_path)
+    result = section_i_mod.with_task_inputs_in_section_i(result, task_spec, repo=repo)
 
     out = [f"# Worker bootstrap -- {task_spec.get('task_id', '?')}\n"]
     out.append(
@@ -169,7 +183,24 @@ def compile_brief(task_spec: dict, routes=None, repo: Optional[str] = None, regi
     if picked:
         out.append("## How this repository works\n\n" + "\n\n".join(CONVENTIONS[k] for k in picked) + "\n")
 
-    out.append("## Your context packet (sections A-J)\n\n" + result["rendered"] + "\n")
+    # REPAIR_PLAN.md section 6 (RC-9/OBS-BR-07): reference the packet by id and hash -- NEVER inline it (run-1's
+    # bootstrap was 282,782 bytes and contained the whole packet). Section I of the packet itself now also carries
+    # the instantiated query set and the answers/receipt schemas verbatim and by hash (section_i.py above), so
+    # nothing about the task's own inputs is lost by not embedding the packet text here.
+    packet_ref = [
+        "## Your context packet (sections A-J)\n",
+        f"- packet_id: `{result.get('packet_id')}`",
+        f"- packet_sha256: `{result.get('packet_sha256')}`",
+        f"- manifest_sha256: `{result['manifest'].get('manifest_sha256')}`",
+    ]
+    if packet_out:
+        packet_ref.append(f"- compiled at: `{packet_out}` -- read `packet.md`/`manifest.json` there directly.")
+    else:
+        packet_ref.append(
+            "- NOT inlined here. Compile it yourself with `govbridge compile <task-spec> --out <dir>` "
+            "(compilation is deterministic: the same task spec always reproduces the identical packet_sha256 "
+            "above) and confirm you hold the SAME packet with `govbridge packet verify <dir>`.")
+    out.append("\n".join(packet_ref) + "\n")
 
     out.append(CHECKPOINT_PROTOCOL + "\n")
 
@@ -198,13 +229,36 @@ def main(argv=None) -> int:
                          "govbridge.compile.packet's own CLI default.")
     p.add_argument("--registry")
     p.add_argument("--budgets")
+    p.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see govbridge.cli's own cmd_search for why "
+                                   "this is worth passing explicitly rather than relying on cwd).")
+    p.add_argument("--out", help="also write the compiled packet directory here (manifest.json/packet.md/"
+                                  "task_spec.yaml/meta.json, the same shape `govbridge compile --out` writes) -- "
+                                  "the brief text REFERENCES it by id/hash instead of inlining it (REPAIR_PLAN.md "
+                                  "section 6)")
     args = p.parse_args(argv)
 
     task_spec = load_yaml_file(args.task_spec)
     routes = packetmod.FAKE_ROUTES if args.fake_routes else packetmod.real_routes_for(
-        task_spec, registry_path=args.registry)
-    brief, result = compile_brief(task_spec, routes=routes, registry_path=args.registry,
-                                   budgets_path=args.budgets)
+        task_spec, registry_path=args.registry, repo=args.repo)
+    brief, result = compile_brief(task_spec, routes=routes, repo=args.repo, registry_path=args.registry,
+                                   budgets_path=args.budgets, packet_out=args.out)
+    if args.out:
+        out_dir = Path(args.out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        (out_dir / "packet.md").write_text(result["rendered"], encoding="utf-8")
+        (out_dir / "manifest.json").write_text(json.dumps(result["manifest"], indent=1, sort_keys=True),
+                                                encoding="utf-8")
+        (out_dir / "task_spec.yaml").write_text(yaml.safe_dump(task_spec, sort_keys=False), encoding="utf-8")
+        meta = {
+            "packet_kind": "main", "status": result["status"], "packet_id": result.get("packet_id"),
+            "packet_sha256": result.get("packet_sha256"), "manifest_sha256": result.get("manifest_sha256"),
+            "registry_path": result.get("registry_path"), "excluded_hits": result.get("excluded_hits"),
+            # BR-DAG-AMEND-R1-10 (reopening): mirrors cmd_compile's own meta.json field, so a LATER `packet
+            # verify`/`receipt check` on this directory can recompose an oversize item's expected body exactly.
+            "budgets_path": args.budgets,
+        }
+        (out_dir / "meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True), encoding="utf-8")
     sys.stdout.write(brief)
     return 0 if result["status"] == packetmod.STATUS_OK else 1
 

@@ -30,11 +30,23 @@ def _all_items(manifest: dict) -> dict:
 
 
 def check(manifest: dict, receipt: dict, task_spec: dict, repo: Optional[str] = None,
-          registry_path: Optional[str] = None) -> dict:
+          registry_path: Optional[str] = None, rendered: Optional[str] = None,
+          supplementary: Optional[list] = None, budgets_path: Optional[str] = None) -> dict:
+    """``rendered`` (BR-DAG-AMEND-R1-10): the MAIN packet's own rendered ``packet.md`` text -- threaded straight
+    into ``validate.verify_packet`` so a receipt check gets the same render-inspecting guarantee ``packet verify``
+    does, not a weaker one. ``budgets_path``: the ``config/budgets.yaml`` the original compile used, when not the
+    default one -- needed so the R1-10 recomposition's oversize/no-selector header text matches exactly.
+
+    ``supplementary`` (REPAIR_PLAN.md section 2.9 -- "`receipt check` covers all of them"): an optional list of
+    ``{"label": str, "manifest": dict, "rendered": Optional[str]}``, one entry per supplementary packet this run
+    also produced. Every one of THEIR OWN ``packet_sha256``/``manifest_sha256`` must ALSO be acknowledged in the
+    receipt's own ``context_packet_hash``/``manifest_sha256`` (both already accept a list -- ``schemas/
+    receipt.yaml``), or this check fails, naming the omitted supplementary packet by its label."""
     problems: list = []
 
     problems += [f"packet verify: {p}" for p in
-                 validatemod.verify_packet(manifest, task_spec, repo=repo, registry_path=registry_path)]
+                 validatemod.verify_packet(manifest, task_spec, repo=repo, registry_path=registry_path,
+                                            rendered=rendered, budgets_path=budgets_path)]
 
     packet_hash = receipt.get("context_packet_hash")
     hashes = packet_hash if isinstance(packet_hash, list) else [packet_hash]
@@ -45,6 +57,20 @@ def check(manifest: dict, receipt: dict, task_spec: dict, repo: Optional[str] = 
     m_hashes = manifest_hash if isinstance(manifest_hash, list) else [manifest_hash]
     if manifest.get("manifest_sha256") not in m_hashes:
         problems.append(f"manifest_sha256 {m_hashes!r} does not include this packet's {manifest.get('manifest_sha256')!r}")
+
+    for supp in (supplementary or []):
+        label = supp.get("label") or "?"
+        supp_manifest = supp["manifest"]
+        problems += [f"supplementary[{label}] verify: {p}" for p in
+                     validatemod.verify_supplementary_packet(supp_manifest)]
+        if supp_manifest.get("packet_sha256") not in hashes:
+            problems.append(f"supplementary packet {label!r} (packet_sha256 "
+                             f"{supp_manifest.get('packet_sha256')!r}) is not acknowledged in the receipt's own "
+                             f"context_packet_hash {hashes!r}")
+        if supp_manifest.get("manifest_sha256") not in m_hashes:
+            problems.append(f"supplementary packet {label!r} (manifest_sha256 "
+                             f"{supp_manifest.get('manifest_sha256')!r}) is not acknowledged in the receipt's own "
+                             f"manifest_sha256 {m_hashes!r}")
 
     m_sha = manifest.get("manifest_sha256") or ""
     for letter, token in (receipt.get("read_tokens") or {}).items():
@@ -62,6 +88,8 @@ def check(manifest: dict, receipt: dict, task_spec: dict, repo: Optional[str] = 
             problems.append(f"section A item not acknowledged in inputs_consumed: {tag!r}")
 
     all_items = _all_items(manifest)
+    for supp in (supplementary or []):
+        all_items.update(_all_items(supp["manifest"]))
     for item_id in receipt.get("items_relied_on") or []:
         if item_id not in all_items:
             problems.append(f"items_relied_on cites unknown item_id {item_id!r}")

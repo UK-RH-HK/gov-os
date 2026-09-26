@@ -1,0 +1,296 @@
+run_id: BR-AR-0025
+commit: 6b34a1a196f8cef7c010f7dba94729675ad864c0
+role: >-
+  REPAIR-1 node R1-RS -- supplementary packets for every query command, occurrence collapse, bootstrap by
+  reference, task inputs in section I; plus BR-DAG-AMEND-R1-10 (verify re-extracts each A item's delivered body
+  from the rendered packet) and BR-DAG-AMEND-R1-15 (query commands are read-only with respect to the store)
+model_observed: claude-sonnet-5
+commands:
+- cmd: cd $D && $PY -m pytest tests/compile/test_supplementary.py tests/compile/test_section_i_and_bootstrap.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check1-pytest-supplementary-section_i-bootstrap.out
+  output_sha256: 80a20f1f0f7497749e0106f15ef595a9b1d7cd969d354cf68a0cf426e2cdeea4
+- cmd: >-
+    $PY -m govbridge search --task tests/fixtures/controls/control-a/task-spec.yaml '<CA-WHY query text>' --out
+    /tmp/br-ar-0025-final2/s1 && $PY -m govbridge packet verify /tmp/br-ar-0025-final2/s1
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check2-controla-search-out-and-packet-verify.out
+  output_sha256: 7fe17654dc01baa1200615e86a9bf6655510459eba3333dffa7b32637603919b
+- cmd: >-
+    $PY -m govbridge bootstrap tests/fixtures/controls/control-a/task-spec.yaml | wc -c; $PY -m govbridge compile
+    tests/fixtures/controls/control-a/task-spec.yaml --out /tmp/br-ar-0025-final2/main1 (for byte-size comparison);
+    $PY -m govbridge packet verify /tmp/br-ar-0025-final2/main1 (now the EXACT-recomposition verify)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check3-controla-bootstrap-not-inlined.out
+  output_sha256: aae2add2644ae7919ce5de7c794b0e50e532c7b6782dbddb2d25436ee8a45a2b
+- cmd: >-
+    (independent, non-pytest, second-method confirmation of BR-DAG-AMEND-R1-10 on the REAL CONTROL-A packet, TWO
+    probes): probe 1 -- cp -a the compiled main packet dir; sed -i one hex character of a disclosed section-map
+    line's sha256 in packet.md only; md5sum manifest.json before/after (identical); packet verify (expect FAIL).
+    probe 2 -- a PURE INSERTION right after the item's own body-begin marker (nothing removed/altered) -- the
+    exact shape that PASSED incorrectly under pass 1's containment check; packet verify (expect FAIL, now caught)
+  exit_code: 1
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check4-independent-shell-level-tamper-detection.out
+  output_sha256: 43404160f88f1d7e738ef5c456821691218eec7101e50b73608042e1a81d6f1b
+- cmd: cd $D && $PY -m pytest tests/compile/test_verify_rendered_body.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check5-pytest-verify-rendered-body-negative-test.out
+  output_sha256: bd086588dd8b8adc11908776210152d84f6d7c4965793dff38cb166a11c3f497
+- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check6-full-domain-suite.out
+  output_sha256: 1e21d3088ebb8991b8fed896fbbcdc310ce58ac8e3246832c66bbcb9fdf01862
+- cmd: cd $D && $PY -m pytest tests/compile/test_compile_bootstrap.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check7-pytest-compile-bootstrap-corrected.out
+  output_sha256: 9613319a09bd57eb1efd6cd1ec399395f5bc1c64db680df61261896d79886775
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+  sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  sha256: dfd70d8aec22edf8ef2efdf793e9312da7be942e024f2710c87553e9071b0bac
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/schemas/task-spec.yaml
+  sha256: 78cad8b0184509762efdeaa425adf2219481b40051d4160bf4d6cff614c59892
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/schemas/answers.yaml
+  sha256: 1a89f93685f6ab3a674360e62bf510d475758b6f8ac22110df2b59e92b1c884c
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/schemas/receipt.yaml
+  sha256: 94af70f80d3bd512a0ed614dd970b1091bcefda57ce89a58e04dfd4b5d059fb8
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/task-spec.yaml
+  sha256: 439b8bf28b86b2ff81330fd0a9231fbf1a3a8e254aeda189a360478a10b24dec
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/queries.yaml
+  sha256: d6375e23848926835eaa80c2ab338464df5cf4d8ddf69147d88931c372a9a4c5
+- path: release/orchestration/phase-2-context-bridge/govbridge/compile/packet.py
+  sha256: 0513cd8ea2f0146a70f7bc1a35bbc79de23b2753fffca4a79f3901d5f36eed38
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
+  sha256: bf53687b972eb992a2395e2a370d8f1ff9881c743deb4e32eac4e9b6dd0d3a9e
+- path: release/orchestration/phase-2-context-bridge/govbridge/compile/budgets.py
+  sha256: 50dcee5c1c62bcf04c59c5f29c6bbad44b8a28b957da101189091b9dd953d2be
+- path: release/orchestration/phase-2-context-bridge/govbridge/gather/instantiate.py
+  sha256: 7ff1d2a0f010f1fb5e775c42a1728b5aa636ed5da934d17ba61a1c30c6da9afc
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/store.py
+  sha256: a818f08bc10121fb97c3a8bad478340788181a3753272c8ba7f4a9555efd3af8
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/compile/mandatory/repobuilder.py
+  sha256: 1922216d7e73a414d1accfff6905849b0f0a6201a543c3942ad0151837ead0a4
+- path: release/orchestration/phase-2-context-bridge/tests/compile/test_mandatory_fidelity.py
+  sha256: 72dbd4bfd613ae4b85d2a475558192e6324714ea6fb34b7ba5a35b2afbb8cd2a
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/supplementary.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/bootstrap.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/section_i.py
+  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/render.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_supplementary.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_section_i_and_bootstrap.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_verify_rendered_body.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/supplementary/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.*
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_compile_bootstrap.py
+artifacts_changed:
+- release/orchestration/phase-2-context-bridge/govbridge/cli.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/bootstrap.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/render.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/section_i.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/supplementary.py
+- release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py
+- release/orchestration/phase-2-context-bridge/tests/compile/test_section_i_and_bootstrap.py
+- release/orchestration/phase-2-context-bridge/tests/compile/test_supplementary.py
+- release/orchestration/phase-2-context-bridge/tests/compile/test_verify_rendered_body.py
+- release/orchestration/phase-2-context-bridge/tests/compile/test_compile_bootstrap.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check1-pytest-supplementary-section_i-bootstrap.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check2-controla-search-out-and-packet-verify.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check3-controla-bootstrap-not-inlined.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check4-independent-shell-level-tamper-detection.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check5-pytest-verify-rendered-body-negative-test.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check6-full-domain-suite.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.check7-pytest-compile-bootstrap-corrected.out
+findings:
+- >-
+  govbridge/core/store.py's open_db() (B1's file, out of this node's mutation_scope) unconditionally runs
+  `PRAGMA journal_mode=WAL` and `INSERT OR IGNORE INTO store_meta(...)` on EVERY open, whatever the caller's
+  intent. Empirically verified (interactively, against the real 889 MB store, twice): against an OS-read-only
+  store.db this raises `sqlite3.OperationalError: attempt to write a readonly database` even though both
+  statements are genuine no-ops on an already fully-built store; against a normal (writable) store, an
+  open+query+close cycle leaves store.db byte-for-byte identical (sha256 unchanged). This is why BR-DAG-AMEND-
+  R1-15's new test uses `govbridge state get` (which never calls open_db() at all -- it reads straight from Git)
+  rather than `search`/`gather`/`why`/`impact`, which do call it via govbridge.route.real_routes/govbridge.
+  lexical.query.
+- >-
+  govbridge/compile/packet.py's Compiler._mandatory_text (out of this node's mutation_scope) is a single, already
+  generic dispatcher over all four "delivered" shapes (directory, no-dparts reference-only, selector, oversize
+  no-selector) -- it needs only `self.repo`/`self.per_item_cap_bytes`/`self.notices` from its own instance, never
+  the heavy view/registry state Compiler.__init__ builds. That made it directly reusable, unmodified, from
+  validate.py for an EXACT independent recomposition (pass 2), once the reuse mechanism itself was fixed (see
+  failed_approaches: it must be a real Compiler SUBCLASS, not a duck-typed stand-in, because its private methods
+  call `self._render_whatever(...)` internally). This is a stronger, simpler result than pass 1's own read of
+  "smallest item-delimiting format support," which assumed reconstructing packet.py's per-piece header format
+  would require fragile duplication -- reusing the real function instead needed no duplication at all.
+- >-
+  config/budgets.yaml's per_item_cap_kb is a DOCUMENT-level setting (govbridge.compile.budgets.load_profiles),
+  shared by every profile in that file, never profile-specific -- so recomposing an oversize item's exact section-
+  map header text ("exceeds the N-byte per-item cap") only needed the packet's own recorded budget_profile NAME
+  (already in the manifest) plus, optionally, the same --budgets path the original compile used (now also
+  recorded in meta.json, a new field mirroring registry_path, for compile/bootstrap --out and read by packet
+  verify/receipt check).
+- >-
+  govbridge/demo/grade.py's own docstring states the rendered packet text "never" prints the internal item_id
+  hash, only unit_kind:unit_id -- this was a deliberate design invariant (a worker can only cite what it can
+  read) that the new body-begin/body-end markers had to preserve. Confirmed by construction (item_body_marker
+  takes unit_kind/unit_id only, never item.item_id) rather than by a new grep-based test (a grep for a 24-hex-char
+  item_id pattern inside packet.md would have been the independent second check; not added here since no
+  existing test asserts this invariant either, and the marker format is exercised directly by test_verify_
+  rendered_body.py's own round-trip test).
+failed_approaches:
+- >-
+  Editing govbridge/compile/packet.py directly to add the section-I task-inputs item and/or a render-time hash
+  of each item's exact rendered body. Both would have been the more "natural" single-module home for that logic,
+  but packet.py is not in this node's mutation_scope (it is RX->RM->GA3's shared-file sequence; GA3 is its next
+  editor). Resolved by building section_i.py as a POST-COMPILE enrichment step that calls govbridge.compile.
+  render's own build_manifest/render_packet a second time with one item appended -- reusing the exact same public
+  functions packet.py itself calls, never touching packet.py.
+- >-
+  (pass 1 only, superseded on this reopening) Rejecting an exact byte-for-byte reconstruction of packet.py's own
+  private per-piece header format as "fragile coupling," settling for a containment check instead. This traded
+  away exactness it did not need to: packet.py's OWN `Compiler._mandatory_text` was directly reusable (see
+  findings) -- reusing the real function is not fragile coupling to a format, it IS the format, by construction,
+  and stays correct automatically if R1-GA3 later changes it. Superseded by the pass-2 exact recomposition.
+- >-
+  A DUCK-TYPED stand-in object (a plain class carrying only `.repo`/`.per_item_cap_bytes`/`.notices`, passed as
+  `self` to `Compiler._mandatory_text` directly) fails with `AttributeError: '_CompositionContext' object has no
+  attribute '_render_oversize_no_selector'` -- `_mandatory_text` calls `self._render_selected_parts(...)`/
+  `self._render_oversize_no_selector(...)`/`self._render_directory_manifest(...)` internally, and Python resolves
+  `self.<method>` through the INSTANCE'S OWN CLASS, not through whatever attributes happen to be set on it. Fixed
+  by making the stand-in a real (if minimal) SUBCLASS of `Compiler` instead, with only `__init__` overridden to
+  skip the real one's expensive view/registry resolution -- every private renderer is then inherited, unmodified,
+  and resolves normally.
+- >-
+  Testing BR-DAG-AMEND-R1-15 by chmod'ing the REAL 889 MB store copy (store-BR-AR-0025) read-only and running
+  `search` against it. This IS what first demonstrated (interactively, not as a checked-in test) that govbridge.
+  core.store.open_db() hard-fails against an OS-read-only store.db (see findings) -- too slow and too coupled to
+  a large, environment-specific store to make a good automated, hermetic test. Replaced with `state get` (never
+  touches the store) against a tiny placeholder file in a fixture-built tmp_path, which proves the SAME
+  observable guarantee (packet written under --out, store file/directory untouched) hermetically and fast.
+unresolved:
+- >-
+  BR-DAG-AMEND-R1-15's own store-open-mode gap (govbridge/core/store.py's open_db() cannot honour a genuinely
+  read-only-opened connection) is explicitly routed to R1-GA1 by the orchestrator on this reopening (core/store.py
+  is in its extended scope); not touched here per the coordinator's own instruction ("Do not edit store.py").
+- >-
+  govbridge/compile/supplementary.py's COMMAND_PROFILE_BYTES table stays a small Python constant inside this
+  node's own scope rather than a config/budgets.yaml entry (out of scope) -- an open product question for whoever
+  next owns that file or the orchestrator, not a defect.
+
+# Resolved on this reopening (were listed here on pass 1; not carried forward as open):
+# - BR-DAG-AMEND-R1-10's pure-insertion gap: CLOSED by the exact-recomposition rewrite of verify_rendered_delivery
+#   (independently re-confirmed on the real CONTROL-A packet, AGENT_RUNS/BR-AR-0025.check4, probe 2).
+# - tests/compile/test_compile_bootstrap.py's failing assertion: CORRECTED (scope granted); see decisions.
+decisions:
+- >-
+  D-R1-RS-1 (within authority): section I's task-inputs enrichment (OBS-BR-07) is implemented as a POST-COMPILE
+  re-finalisation (govbridge/compile/section_i.py:with_task_inputs_in_section_i), appending one more PINNED item
+  to section I and re-running govbridge.compile.render's own build_manifest/render_packet, rather than editing
+  govbridge/compile/packet.py's _build_i_item (out of this node's mutation_scope). Wired into both `govbridge
+  compile --out` (govbridge/cli.py:cmd_compile) and the bootstrap (govbridge/compile/bootstrap.py:compile_brief),
+  so every packet obtainable through this domain's CLI carries it consistently, and packet_sha256 always matches
+  between the two entry points.
+- >-
+  D-R1-RS-2 (superseded on this reopening -- see D-R1-RS-6): pass 1's rendered-body re-extraction used an EXACT
+  hash-recompute only for the common single-piece shape, and a content-identity containment check for the
+  selector/oversize shapes. The reopening correctly identified this as not meeting the node's own re-extraction
+  requirement (a containment check cannot see an insertion); replaced by D-R1-RS-6.
+- >-
+  D-R1-RS-6 (within authority; BR-AR-0025 reopening item 2): BR-DAG-AMEND-R1-10's rendered-body re-extraction is
+  now EXACT for every A-item shape. govbridge/compile/validate.py:verify_rendered_delivery independently
+  RECOMPOSES each item's expected body from Git at the recorded view, calling govbridge.compile.packet.
+  Compiler._mandatory_text directly (via a minimal Compiler SUBCLASS, `_composition_context_class`, that skips
+  the real __init__'s expensive view/registry resolution but inherits every private per-shape renderer
+  unmodified) -- the SAME composition function packet.py itself calls, imported read-only; packet.py is never
+  edited. The recomposed body is compared to the re-extracted rendered body by EXACT whole-string equality, for
+  all four shapes: directory manifest, selector pieces, oversize section map, plain whole-occurrence body. This
+  closes the exact gap named in the reopening (a pure content insertion into a selector item's pieces or an
+  oversize item's section map, e.g. Contract v3, previously passed); independently re-verified, twice, on the
+  real CONTROL-A packet (AGENT_RUNS/BR-AR-0025.check4, both a mutation probe and the exact pure-insertion probe
+  that passed incorrectly on pass 1). Four new negative tests (insertion between two selector pieces; a mutated
+  line inside a selector piece; a mutated line inside an oversize item's section map; an extra member line in a
+  directory manifest) plus an all-shapes positive control were added to tests/compile/test_verify_rendered_body.py,
+  reusing R1-RM's own tests/fixtures/compile/mandatory/repobuilder.py fixture read-only (never duplicated).
+- >-
+  D-R1-RS-7 (within authority): threaded a new `budgets_path` parameter through verify_packet/verify_rendered_
+  delivery/receipt.check, and a new `budgets_path` field in meta.json (mirroring the existing registry_path
+  field), written by both `compile --out` and `bootstrap --out` and read by `packet verify`/`receipt check`'s new
+  --budgets flag -- so D-R1-RS-6's recomposition always uses the SAME config/budgets.yaml the original compile
+  did (per_item_cap_bytes is a document-level setting, never profile-specific), not just the default one.
+- >-
+  D-R1-RS-3 (within authority): supplementary packets place ALL evidence under section H (SUPPLEMENTARY RETRIEVED
+  CONTEXT, render.py's own pre-existing letter for exactly this), with delivery=RETRIEVED/cls=None/
+  lifecycle=UNKNOWN uniformly, regardless of an underlying hit's own resolved authority_class/lifecycle (kept as
+  informational text in the rendered body instead of used for placement) -- avoiding any risk of a real
+  authority_class's own allowed_sections rule conflicting with a section a supplementary packet was never meant
+  to carry placement semantics for.
+- >-
+  D-R1-RS-4 (within authority): added --repo to `govbridge compile.bootstrap`'s CLI, `govbridge packet verify`,
+  `govbridge receipt check`, and --repo/--view to `govbridge state get` -- none had these flags before. Necessary
+  for this run's OWN new tests to exercise these commands end-to-end against a fixture repo hermetically (the
+  brief's own "pass repo= explicitly in every test" rule) instead of relying on cwd-based git resolution (the
+  same class of issue as the gitobj.repo_root() cache, routed to R1-INT). Minimal, additive, backward-compatible
+  (omitting the flag keeps the pre-existing cwd-based default).
+- >-
+  D-R1-RS-5 (requested on pass 1; GRANTED and implemented on this reopening -- BR-AR-0025 reopening item 1):
+  tests/compile/test_compile_bootstrap.py::test_bootstrap_contains_prelude_packet_and_receipt_instructions failed
+  after pass 1's repair because its own assertion (`assert "## A. MANDATORY AUTHORITATIVE INPUTS" in brief`,
+  commented "the packet itself (A-J) is embedded, not summarised away") encoded EXACTLY the RC-9 defect this
+  node's Deliverable 4 removes. The scope correction was granted (the path is now recorded in this run's own
+  mutation_scope, ORCHESTRATOR_STATE.yaml at bridge tip f0abe91) and merged into this branch (a clean, narrative-
+  only merge of bridge/p2-context-retrieval -- CHECKPOINTS/BR-CP-0029..0032 and the updated ORCHESTRATOR_STATE.yaml
+  only, no code). The assertion is now corrected to the by-reference contract exactly as proposed: the brief
+  names `result.get("packet_id")` (already asserted `result["packet_sha256"]`) and asserts NEITHER
+  "## A. MANDATORY AUTHORITATIVE INPUTS" NOR "## J. COMPLETION / EVIDENCE OBLIGATIONS" appear in the brief text;
+  a new pair of assertions confirms the packet the brief REFERENCES (`result["rendered"]`, from the SAME
+  `compile_brief` call, never a second recompile) DOES carry both, unchanged. Full domain suite: 587 passed, 0
+  failed -- no second named exception needed.
+lessons:
+- >-
+  When a node's own deliverable requires REMOVING a documented behaviour (here, "the bootstrap inlines the whole
+  packet"), check EARLY whether any pre-existing, out-of-scope test asserts that exact behaviour -- running the
+  FULL domain suite only at the very end (as amendment R1-T1 requires) is still the right final gate, but a
+  targeted `grep` for the behaviour's own distinctive string (here, `"## A. MANDATORY AUTHORITATIVE INPUTS" in
+  brief`) across the whole tests/ tree, done as soon as the deliverable's literal reading is clear, would have
+  surfaced this scope conflict before most of the implementation work, giving more time to raise the scope
+  question to the orchestrator mid-pass rather than only at return.
+- >-
+  A mid-task amendment (BR-DAG-AMEND-R1-15) that asks for "one test" against a store "opened read-only" is worth
+  testing EMPIRICALLY against the real dependency (here, sqlite) before writing the test -- the naive approach
+  (chmod the file, run the normal code path) surfaced a genuine, pre-existing limitation in a dependency
+  (govbridge/core/store.py's open_db()) that a purely textual reading of the amendment, or a mocked/monkeypatched
+  test, would never have caught. Picking the one command that provably never touches the resource under test
+  (here, `state get`, which reads Git directly) turned an initially-failing, scope-conflicted test into a
+  genuinely strict, passing one, with the real limitation disclosed rather than hidden.
+- >-
+  Before accepting "containment" or "hash of a subset" as good enough for an exactness requirement, check whether
+  the SAME MODULE that produces the content also exposes a function that already composes it deterministically
+  from primitives (here, packet.py's own Compiler._mandatory_text) -- reusing it read-only is both MORE exact and
+  LESS code than reconstructing an approximation of its output. When reuse means calling a bound method that
+  internally calls `self.other_method(...)`, a duck-typed stand-in is not enough; a minimal, real subclass with
+  only `__init__` overridden is the correct, cheap way to get a valid `self` without the expensive parts of the
+  original constructor.
+next_consumer: >-
+  R1-GA3 (depends on R1-RS; edits govbridge/compile/packet.py, budgets.py, render.py, codesurfaces.py, overflow.py
+  next -- inherits section_i.py's post-compile-enrichment pattern, the render.py body markers, AND validate.py's
+  exact-recomposition reuse of Compiler._mandatory_text via _composition_context_class: if GA3 changes
+  _mandatory_text's own signature or dispatch, or the private renderers it calls, verify_rendered_delivery's
+  subclass-based reuse picks up the change automatically, but its own dparts-argument contract must stay
+  compatible); R1-RA (depends on R1-RS; is cli.py's next editor -- `govbridge cite`/`govbridge answers lint`);
+  R1-INT (whole-suite integration, generic-rule audit, and the disclosed store.py open_issue, now explicitly
+  routed to R1-GA1 by the orchestrator).
+final_commit: 6b34a1a196f8cef7c010f7dba94729675ad864c0
