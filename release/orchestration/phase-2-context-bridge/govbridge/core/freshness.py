@@ -447,4 +447,21 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # BR-DAG-AMEND-R1-5: `python -m govbridge.core.freshness ...` executes THIS FILE as a second, separate module
+    # object named "__main__" -- distinct from "govbridge.core.freshness", the CANONICAL module every sibling
+    # package (lexical, semantic, code, authority, graph) imports and registers its own layer builder against
+    # (`register_layer_builder`, this module's own extension point, module docstring above). A bare `-m`
+    # invocation's own `_LAYER_BUILDERS` therefore only ever holds "core" (registered by THIS copy's own bottom-
+    # level `register_layer_builder("core", core_layer_builder)` call, above) -- every sibling package's own
+    # registration lands on the OTHER, canonical module object instead, invisibly to this one, so `rebuild
+    # --from-clean` run this way silently rebuilds only the core layer.
+    #
+    # Delegating to the canonical module's own `main()` -- importing it BY ITS DOTTED NAME, exactly the way
+    # govbridge.cli and every other caller already does -- runs the whole command inside THAT module's namespace
+    # instead: its own `ensure_all_layer_packages_imported()` imports lexical/semantic/code/authority/graph, and
+    # each one's `from govbridge.core import freshness` resolves (Python's import cache, keyed by dotted name) to
+    # this SAME canonical module object, so every sibling's `register_layer_builder` call lands in the one
+    # `_LAYER_BUILDERS` dict this delegated `main()` actually reads from -- the `-m` entry point ends up building
+    # exactly the same layer set and digests the top-level CLI already does.
+    import govbridge.core.freshness as _canonical
+    sys.exit(_canonical.main())

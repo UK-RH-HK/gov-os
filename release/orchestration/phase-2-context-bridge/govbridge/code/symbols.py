@@ -55,6 +55,32 @@ def _open_conn():
     return conn
 
 
+def _open_conn_readonly():
+    """The query-time counterpart of :func:`_open_conn` (BR-DAG-AMEND-R1-17 item 5): a connection that CANNOT
+    write, by construction (``store.open_db_readonly()``'s ``mode=ro&immutable=1``), and never calls
+    ``codestore.ensure_schema`` either -- a query never creates the code layer's tables, only the eager builder
+    (``govbridge.code.build.code_layer_builder``, at BUILD time) does. Paired with :func:`ensure_indexed_readonly`,
+    this module's own read-only counterpart to :func:`ensure_indexed`."""
+    return corestore.open_db_readonly()
+
+
+class StoreNeedsRebuild(RuntimeError):
+    """The code-route twin of ``govbridge.lexical.query.StoreNeedsRebuild`` (BR-DAG-AMEND-R1-17 item 5) -- same
+    discipline, same shape: raised by :func:`ensure_indexed_readonly` when a commit's ``.rs`` blobs are not already
+    classified/parsed by the eager code layer (``govbridge.code.build.code_layer_builder``, at BUILD time). A query
+    (``stats``/``definitions``/``callers``/``reads_key``, and ``govbridge.route.real_routes``'s code route) never
+    builds the code layer itself -- never a silent, slower fallback to parsing here, and never a write."""
+    CODE = "STORE_NEEDS_REBUILD"
+
+    def __init__(self, missing: str):
+        self.missing = missing
+        super().__init__(
+            f"{self.CODE}: {missing} is missing from this store -- rebuild it (e.g. "
+            f"`python -m govbridge index rebuild`) before running a code-route query against it; a query path "
+            f"never builds the code layer itself"
+        )
+
+
 def _default_rules_path() -> str:
     return str(Path(GOV_BRIDGE_DOMAIN) / "config" / "corpus-rules.yaml")
 
@@ -130,6 +156,51 @@ def ensure_indexed(conn, commit: str, repo: Optional[str] = None, rules: Optiona
     return [(e.path, e.oid) for e in entries]
 
 
+def _code_schema_exists(conn) -> bool:
+    return conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='code_blob'"
+    ).fetchone() is not None
+
+
+def ensure_indexed_readonly(conn, commit: str, repo: Optional[str] = None) -> list[tuple[str, str]]:
+    """The query-time counterpart of :func:`ensure_indexed` (BR-DAG-AMEND-R1-17 item 5): every ``.rs`` blob
+    reachable at ``commit`` must ALREADY be classified (recorded in ``code_excluded_blob``) or parsed (recorded in
+    ``code_blob``, at the current adapter/grammar version) by the eager code layer
+    (``govbridge.code.build.code_layer_builder``, run at BUILD time by ``govbridge.core.freshness``) -- this
+    function only ever READS ``sqlite_master``/``code_blob``/``code_excluded_blob``, never classifies, parses or
+    persists anything itself. A blob this store has not already indexed raises :class:`StoreNeedsRebuild` (never a
+    silent, slower fallback to building it here, and never a write) -- exactly the discipline
+    ``govbridge.lexical.query.StoreNeedsRebuild``/``govbridge.semantic.vectors.StoreNeedsRebuild`` already use for
+    their own build-time structures. Every existing caller of ``ensure_indexed`` that legitimately needs the LAZY,
+    build-on-demand behaviour (``govbridge.code.build.code_layer_builder`` itself, at build time; ``govbridge.code.
+    history``'s own historical-commit diffs; ``govbridge.graph.code_bridge``) keeps calling ``ensure_indexed``
+    unchanged -- this function is additive, used only by this module's own query surface
+    (``stats``/``definitions``/``callers``/``reads_key``) and by ``govbridge.route.real_routes``'s code route."""
+    entries = _rs_tree_entries(commit, repo=repo)
+    if not entries:
+        return []
+    if not _code_schema_exists(conn):
+        raise StoreNeedsRebuild(
+            f"table 'code_blob' (govbridge.code.build) -- the code layer has never been built on this store"
+        )
+    for entry in entries:
+        if codestore.is_excluded(conn, entry.oid):
+            continue  # already classified excluded, at build time -- never reclassified (module docstring)
+        row = conn.execute(
+            "SELECT adapter_version, grammar_version FROM code_blob WHERE blob_id=?", (entry.oid,)
+        ).fetchone()
+        if row is None:
+            raise StoreNeedsRebuild(
+                f"code_blob row for {entry.path!r} ({entry.oid}) at commit {commit} (govbridge.code.build)"
+            )
+        if row[0] != rust_treesitter.ADAPTER_VERSION or row[1] != rust_treesitter.GRAMMAR_VERSION:
+            raise StoreNeedsRebuild(
+                f"code_blob row for {entry.path!r} ({entry.oid}) is stale -- adapter/grammar version changed "
+                f"(govbridge.code.build)"
+            )
+    return [(e.path, e.oid) for e in entries]
+
+
 def _persist(conn, blob_id: str, path: str, parsed) -> None:
     codestore.put_blob(
         conn, blob_id, path, LANGUAGE, rust_treesitter.ADAPTER_ID, rust_treesitter.ADAPTER_VERSION,
@@ -185,6 +256,13 @@ def _resolve_commit(commit: str, repo: Optional[str]) -> str:
 
 
 def stats(commit: str, repo: Optional[str] = None) -> dict:
+    # NOT converted to the read-only path (BR-DAG-AMEND-R1-17 item 5's own read-only discipline binds the QUERY
+    # surface real_routes.py's code route actually calls -- definitions_readonly/callers_readonly below, and
+    # ensure_indexed_readonly itself); this is a diagnostic/inspection command (govbridge.code.symbols's own CLI,
+    # `python -m govbridge.code.symbols stats`), not one of BR-DAG-AMEND-R1-15's enumerated query commands, and
+    # every existing caller (tests/code/test_symbols_integration.py, tests/code/test_corpus_exclusion.py) already
+    # relies on its lazy, build-on-first-use behaviour against a commit no eager build has ever touched -- keeping
+    # it lazy is "no silent narrowing" for those callers, not an omission of this repair.
     commit_full = _resolve_commit(commit, repo)
     conn = _open_conn()
     entries = ensure_indexed(conn, commit_full, repo=repo)
@@ -236,10 +314,18 @@ def definitions(name: str, commit: str, repo: Optional[str] = None) -> dict:
     matches ``name`` exactly, or whose ``qualified_name`` ends ``::name`` -- the "given symbol names, return each
     definition" half of ARCHITECTURE.md section 4.6's generic chain probe (``callers``/``reads_key`` already exist
     as their own commands; this is the definition-SITE lookup the code route needs to show a symbol's own
-    location, with lines, not only its callers). Generic: takes any name as data, never special-cases one."""
+    location, with lines, not only its callers). Generic: takes any name as data, never special-cases one.
+
+    NOT converted to the read-only path: existing callers (tests/code/test_definitions_lookup.py) rely on its lazy,
+    build-on-first-use behaviour. ``govbridge.route.real_routes``'s code route uses :func:`definitions_readonly`
+    instead (BR-DAG-AMEND-R1-17 item 5)."""
     commit_full = _resolve_commit(commit, repo)
     conn = _open_conn()
     entries = ensure_indexed(conn, commit_full, repo=repo)
+    return _definitions_result(conn, name, commit_full, entries)
+
+
+def _definitions_result(conn, name: str, commit_full: str, entries: list[tuple[str, str]]) -> dict:
     path_by_blob = {b: p for p, b in entries}
     blob_ids = [b for _, b in entries]
     rows = codestore.symbols_for_blobs(conn, blob_ids)
@@ -259,16 +345,20 @@ def definitions(name: str, commit: str, repo: Optional[str] = None) -> dict:
     }
 
 
-def callers(name: str, commit: str, repo: Optional[str] = None, page_size: Optional[int] = None,
-            cursor: Optional[str] = None) -> dict:
-    """``page_size``/``cursor`` (R1-RL paging): a simple, deterministic offset cursor over the SAME sorted `rows`
-    an unpaged call already computes -- omitted, the result is byte-identical to before (every existing caller);
-    given, ``callers`` holds only that page, plus ``next_cursor`` (``None`` once exhausted) and ``total``, so
-    following ``next_cursor`` to exhaustion yields exactly the union an unpaged call returns (the acceptance
-    check)."""
+def definitions_readonly(name: str, commit: str, repo: Optional[str] = None) -> dict:
+    """The query-time counterpart of :func:`definitions` (BR-DAG-AMEND-R1-17 item 5): identical result shape and
+    matching logic (:func:`_definitions_result`, shared by both), but reads the commit's already-indexed ``.rs``
+    blobs via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly` instead of classifying/parsing/persisting
+    them itself. Used by ``govbridge.route.real_routes``'s code route -- the actual query surface this item binds,
+    per its own acceptance check (a gather against a file-level read-only store)."""
     commit_full = _resolve_commit(commit, repo)
-    conn = _open_conn()
-    entries = ensure_indexed(conn, commit_full, repo=repo)
+    conn = _open_conn_readonly()
+    entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
+    return _definitions_result(conn, name, commit_full, entries)
+
+
+def _callers_result(conn, name: str, commit_full: str, entries: list[tuple[str, str]],
+                     page_size: Optional[int], cursor: Optional[str]) -> dict:
     blob_ids = [b for _, b in entries]
     path_by_blob = {b: p for p, b in entries}
     definitions = _definitions(conn, blob_ids, path_by_blob)
@@ -304,11 +394,44 @@ def callers(name: str, commit: str, repo: Optional[str] = None, page_size: Optio
     return result
 
 
+def callers(name: str, commit: str, repo: Optional[str] = None, page_size: Optional[int] = None,
+            cursor: Optional[str] = None) -> dict:
+    """``page_size``/``cursor`` (R1-RL paging): a simple, deterministic offset cursor over the SAME sorted `rows`
+    an unpaged call already computes -- omitted, the result is byte-identical to before (every existing caller);
+    given, ``callers`` holds only that page, plus ``next_cursor`` (``None`` once exhausted) and ``total``, so
+    following ``next_cursor`` to exhaustion yields exactly the union an unpaged call returns (the acceptance
+    check).
+
+    NOT converted to the read-only path: existing callers (tests/code/test_symbols_integration.py) rely on its
+    lazy, build-on-first-use behaviour. ``govbridge.route.real_routes``'s code route uses :func:`callers_readonly`
+    instead (BR-DAG-AMEND-R1-17 item 5)."""
+    commit_full = _resolve_commit(commit, repo)
+    conn = _open_conn()
+    entries = ensure_indexed(conn, commit_full, repo=repo)
+    return _callers_result(conn, name, commit_full, entries, page_size, cursor)
+
+
+def callers_readonly(name: str, commit: str, repo: Optional[str] = None, page_size: Optional[int] = None,
+                      cursor: Optional[str] = None) -> dict:
+    """The query-time counterpart of :func:`callers` (BR-DAG-AMEND-R1-17 item 5): identical result shape and
+    matching logic (:func:`_callers_result`, shared by both), but reads the commit's already-indexed ``.rs`` blobs
+    via :func:`_open_conn_readonly`/:func:`ensure_indexed_readonly` instead of classifying/parsing/persisting them
+    itself. Used by ``govbridge.route.real_routes``'s code route."""
+    commit_full = _resolve_commit(commit, repo)
+    conn = _open_conn_readonly()
+    entries = ensure_indexed_readonly(conn, commit_full, repo=repo)
+    return _callers_result(conn, name, commit_full, entries, page_size, cursor)
+
+
 def reads_key(key_name: str, commit: str, repo: Optional[str] = None) -> dict:
     """Literal-key consumers (ARCHITECTURE.md section 4.6, "Literal-key consumers"): every occurrence of the string
     literal ``key_name`` that is the argument of an accessor call on the same line (``d.str("mutation")``,
     ``r.get("mutation")``) -- a READS_KEY fact. Generic: this answers "who consumes attribute X" for any literal,
-    never one name in particular."""
+    never one name in particular.
+
+    NOT converted to the read-only path (BR-DAG-AMEND-R1-17 item 5): not called by ``govbridge.route.real_routes``
+    at all, and existing callers (tests/code/test_symbols_integration.py) rely on its lazy, build-on-first-use
+    behaviour."""
     commit_full = _resolve_commit(commit, repo)
     conn = _open_conn()
     entries = ensure_indexed(conn, commit_full, repo=repo)

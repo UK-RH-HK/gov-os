@@ -123,7 +123,42 @@ def _load_bridge_state_path() -> str:
     return load_yaml_file(path)["aliases"]["bridge"]
 
 
-BRIDGE_STATE_PATH = _load_bridge_state_path()
+#: BR-DAG-AMEND-R1-12: NOT computed here. ``BRIDGE_STATE_PATH`` used to be a plain top-level statement
+#: (``BRIDGE_STATE_PATH = _load_bridge_state_path()``), so merely IMPORTING this module -- even transitively, for a
+#: caller that never touches ``BRIDGE_STATE_PATH`` at all (``govbridge.code.lineage_layer``/``govbridge.graph.derive``
+#: import ``govbridge.authority`` only for id-grammar resolution) -- read ``config/state-aliases.yaml`` against
+#: whatever ``GOV_BRIDGE_DOMAIN`` happened to be active AT THAT MOMENT, and never again for the rest of the
+#: process: the FIRST importer's environment fixed the result process-wide, a process-global side effect of the
+#: same class as the ``gitobj.repo_root`` cache (BR-DAG-AMEND-R1-6). A test that imports ``govbridge.authority``
+#: for the first time in a process from inside a test function that has ALREADY monkeypatched ``GOV_BRIDGE_DOMAIN``
+#: to a synthetic fixture repo (with no ``config/state-aliases.yaml`` of its own) crashed at import time --
+#: non-hermetically, since it depended on which test file pytest happened to run first. ``tests/code/conftest.py``
+#: used to force the real domain's value to win that race by importing ``govbridge.authority`` at COLLECTION time,
+#: before any fixture ran -- a workaround for the race, not a fix for the process-global dependency it came from.
+#: See ``__getattr__`` below: the read is now deferred to the first ACCESS of ``BRIDGE_STATE_PATH`` itself, so
+#: merely importing this module (or ``govbridge.authority``) never touches the filesystem, and the conftest.py
+#: pre-import is no longer needed (removed).
+_BRIDGE_STATE_PATH_CACHE: Optional[str] = None
+
+
+def _bridge_state_path() -> str:
+    """The lazily-computed, once-cached value of ``BRIDGE_STATE_PATH`` -- every use inside this module goes
+    through this function (never the bare former global) so the read happens on first ACTUAL USE, never at import
+    time. See the comment above ``_BRIDGE_STATE_PATH_CACHE`` for why."""
+    global _BRIDGE_STATE_PATH_CACHE
+    if _BRIDGE_STATE_PATH_CACHE is None:
+        _BRIDGE_STATE_PATH_CACHE = _load_bridge_state_path()
+    return _BRIDGE_STATE_PATH_CACHE
+
+
+def __getattr__(name: str):
+    """PEP 562 lazy module attribute: an external reader -- ``govbridge.authority.lifecycle`` (``classesmod.
+    BRIDGE_STATE_PATH``), or a test's own ``from govbridge.authority.classes import BRIDGE_STATE_PATH`` -- still
+    sees a plain string, computed and cached on first access, exactly as if it were still a top-level constant;
+    only the WHEN of that computation changes (first access, not import)."""
+    if name == "BRIDGE_STATE_PATH":
+        return _bridge_state_path()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 def load_state_authority_classes(ref: str = "records", view_path: Optional[str] = None,
@@ -140,9 +175,10 @@ def load_state_authority_classes(ref: str = "records", view_path: Optional[str] 
     commit = resolved.ref_commit(ref)
     if commit is None:
         raise ValueError(f"canonical-view has no ref named {ref!r}")
-    text = gitobj.read_path(commit, BRIDGE_STATE_PATH, repo=repo)
+    bridge_state_path = _bridge_state_path()
+    text = gitobj.read_path(commit, bridge_state_path, repo=repo)
     if text is None:
-        raise FileNotFoundError(f"{commit}:{BRIDGE_STATE_PATH} not found")
+        raise FileNotFoundError(f"{commit}:{bridge_state_path} not found")
     doc = load_yaml_text(text.decode("utf-8"))
     return dict(doc["mandatory_bridge_inputs"]["authority_classes"])
 

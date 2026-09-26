@@ -6,17 +6,19 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _repobuilder  # noqa: E402
 
-# BR-AR-0019 reopening (fourth pass): govbridge.authority's own package __init__ reads config/state-aliases.yaml
-# EAGERLY, at import time (govbridge/authority/classes.py, outside this node's mutation scope) -- a one-time,
-# process-wide side effect the first time ANYTHING imports govbridge.authority (Python caches a successful module
-# import; the module body never re-runs). govbridge/code/lineage_layer.py and govbridge/graph/derive.py both need
-# govbridge.authority (id-grammar resolution), so a test file here that happens to run FIRST in a given pytest
-# invocation -- with GOV_BRIDGE_DOMAIN already monkeypatched to a synthetic tmp_path repo that has no
-# config/state-aliases.yaml of its own -- would otherwise crash on that import, non-hermetically (BR-DAG-AMEND-
-# R1-4: no test-order/selection dependency). Importing it here, at COLLECTION time, before any fixture or
-# monkeypatch has run, guarantees the successful, cached import happens against the REAL domain's own real
-# config/state-aliases.yaml, once, regardless of which test file or test method pytest happens to run first.
-import govbridge.authority  # noqa: E402,F401
+# BR-DAG-AMEND-R1-12 (R1-XC): the collection-time `import govbridge.authority` this file used to carry (BR-AR-0019
+# reopening, fourth pass) is REMOVED. It existed only to win a race: govbridge.authority.classes used to read
+# config/state-aliases.yaml EAGERLY, at import time, against whatever GOV_BRIDGE_DOMAIN happened to be active then
+# -- a one-time, process-wide side effect the first time ANYTHING imports govbridge.authority. govbridge/code/
+# lineage_layer.py and govbridge/graph/derive.py both need govbridge.authority (id-grammar resolution), so a test
+# file here that happened to run FIRST, with GOV_BRIDGE_DOMAIN already monkeypatched to a synthetic tmp_path repo
+# with no config/state-aliases.yaml of its own, would otherwise have crashed on that import. Importing
+# govbridge.authority here, at COLLECTION time, forced the real domain's value to win the race instead -- a
+# workaround for the race, not a fix for the process-global import-time read that caused it (of the same class as
+# the gitobj.repo_root cache, BR-DAG-AMEND-R1-6). govbridge.authority.classes.BRIDGE_STATE_PATH is now a lazy
+# module attribute (PEP 562 `__getattr__`, computed and cached on first ACCESS, never at import time), so merely
+# importing govbridge.authority no longer touches the filesystem at all -- there is no more race for this
+# collection-time import to win, so it is deleted rather than kept as a no-op.
 
 
 @pytest.fixture(autouse=True)
