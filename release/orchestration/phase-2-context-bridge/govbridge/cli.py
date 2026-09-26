@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """``python -m govbridge <command> ...`` -- node I1's integration CLI (ARCHITECTURE.md, DAG node I1 deliverable):
 
-    index update|rebuild, coverage, freshness, exact, state, search, why, impact, history, resolve, compile,
-    packet verify, receipt check, renew, bootstrap, demo grade|validate-oracle|extract-reads
+    index update|rebuild, coverage, freshness, exact, state, search, gather, why, impact, history, resolve, compile,
+    packet verify, receipt check, renew, bootstrap, notes validate|build, demo grade|validate-oracle|extract-reads
 
 Every subcommand is a thin dispatcher onto the module that already owns that capability (B1-B6's own CLIs, where
 one exists) -- this file adds no retrieval or classification logic of its own. What it DOES add, because no other
@@ -14,6 +14,11 @@ node owns it:
 * ``freshness`` (bare, no subcommand): an incremental check against the committed build manifest, matching the
   DAG's own acceptance line ("NOOP, wall < 2 s, llm_invocations 0");
 * ``search``: a multi-route query, fused, over the REAL routes (``govbridge.route.real_routes``);
+* ``gather``: the OD-BR-05 multi-facet, multi-round retrieval loop (``govbridge.gather``, REPAIR_DAG.yaml node
+  R1-GA1) -- facet decomposition, deterministic parallel retrieval, paging with a configurable batch size, and a
+  recorded stopping reason, for one instantiated task-spec query;
+* ``notes`` (``govbridge.notes.cli``, REPAIR_DAG.yaml node R1-RN): hierarchical evidence note build/validate --
+  dispatched here, owned there;
 * ``compile --out DIR`` / ``packet verify DIR`` / ``receipt check --packet DIR``: a small, stable on-disk packet
   format (``manifest.json``, ``packet.md``, ``task_spec.yaml``, ``meta.json``) so a packet compiled once can be
   independently re-verified and receipt-checked later, exactly as the I1 acceptance checks require
@@ -25,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Optional
@@ -108,6 +114,73 @@ def cmd_search(argv) -> int:
         "excluded_hits": counter.count,
     }
     print(json.dumps(result, indent=1, sort_keys=True))
+    return 0
+
+
+def cmd_gather(argv) -> int:
+    p = argparse.ArgumentParser(prog="govbridge gather")
+    p.add_argument("--task", required=True, help="a task-spec YAML (schemas/task-spec.yaml): its own `queries` "
+                                                   "field is the query set `--query <id>` resolves against, and "
+                                                   "its `retrieval_exclusions`/`seeds`/`budget_profile`/`view` are "
+                                                   "honoured the same way every other query command honours them")
+    p.add_argument("--query", required=True, help="a query id from the task's own query set, or literal ad hoc "
+                                                    "query text (REPAIR_PLAN.md section 2.1)")
+    p.add_argument("--batch-size", type=int, default=None, help="default: config/facets.yaml's default_batch_size")
+    p.add_argument("--max-rounds", type=int, default=None, help="default: config/facets.yaml's default_max_rounds")
+    p.add_argument("--threads", type=int, default=None, help="default: config/facets.yaml's default_threads")
+    p.add_argument("--facets", action="append", metavar="NAME",
+                    help="repeatable; overrides the query's own facet selection (config/facets.yaml)")
+    p.add_argument("--gather-budget-profile", default=None,
+                    help="OPT IN to stopping this gather once a named config/budgets.yaml compile profile's own "
+                         "total_kb is reached, instead of gather's own, separate config/budgets.yaml gather."
+                         "max_bytes_per_query default; never the task spec's own budget_profile automatically "
+                         "(that field bounds the FINAL COMPILED packet, not raw gathered evidence)")
+    p.add_argument("--exclude", action="append", metavar="GLOB")
+    p.add_argument("--view")
+    p.add_argument("--registry")
+    p.add_argument("--json", action="store_true", help="print the full JSON result (default: a short summary)")
+    args = p.parse_args(argv)
+
+    from govbridge import GOV_BRIDGE_DOMAIN
+    from govbridge.gather import engine as enginemod
+    from govbridge.gather import instantiate as instmod
+    from govbridge.route import real_routes as real_routesmod
+
+    def _abs_path(maybe_rel: str) -> str:
+        # The SAME resolution govbridge.compile.packet._abs_path already uses for a task spec's own `view`/`queries`
+        # paths (relative to the process cwd if that already exists, else relative to GOV_BRIDGE_DOMAIN) -- never a
+        # second, diverging convention for the one command that also reads a task spec.
+        if os.path.isabs(maybe_rel):
+            return maybe_rel
+        if os.path.exists(maybe_rel):
+            return maybe_rel
+        return os.path.join(GOV_BRIDGE_DOMAIN, maybe_rel)
+
+    task_spec = load_yaml_file(args.task)
+    ctx = taskctxmod.load(args.task)
+    raw_queries = task_spec.get("queries")
+    doc = instmod.load_query_set(_abs_path(raw_queries) if isinstance(raw_queries, str) else raw_queries)
+    try:
+        query = instmod.resolve_query(doc, args.query)
+    except instmod.QueryNotExecutable as exc:
+        print(json.dumps(exc.to_dict(), indent=1, sort_keys=True), file=sys.stderr)
+        return 1
+
+    view_path = args.view or (_abs_path(task_spec["view"]) if task_spec.get("view") else None)
+    routes = real_routesmod.build_real_routes(view_path=view_path, registry_path=args.registry)
+
+    result = enginemod.gather(
+        query, routes, task=ctx, seeds=task_spec.get("seeds"), facet_names=args.facets,
+        batch_size=args.batch_size, max_rounds=args.max_rounds, threads=args.threads, exclude=args.exclude,
+        budget_profile=args.gather_budget_profile,
+    )
+    if args.json:
+        print(json.dumps(result, indent=1, sort_keys=True))
+    else:
+        t = result["telemetry"]
+        print(f"query={result['query']['id']!r} facets={result['facets']} rounds={t['rounds']} "
+              f"stop_reason={result['stop_reason']} merged_items={len(result['merged'])} "
+              f"excluded_hits={result['excluded_hits']} merged_sha256={result['merged_sha256']}")
     return 0
 
 
@@ -246,6 +319,13 @@ def main(argv: Optional[list] = None) -> int:
         return cmd_freshness(rest)
     if cmd == "search":
         return cmd_search(rest)
+    if cmd == "gather":
+        return cmd_gather(rest)
+    if cmd == "notes":
+        # REPAIR_DAG.yaml node R1-RN (BR-AR-0017); the dispatch line R1-GA1 (BR-AR-0023) adds, exactly as
+        # govbridge/notes/cli.py's own module docstring names it -- govbridge.notes.cli.main is unchanged by it.
+        from govbridge.notes import cli as notescli
+        return notescli.main(rest)
     if cmd == "compile":
         return cmd_compile(rest)
     if cmd == "packet":

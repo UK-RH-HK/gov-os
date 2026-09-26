@@ -1,0 +1,109 @@
+schema: govbridge-facets/1
+purpose: >-
+  The generic facet registry (REPAIR_PLAN.md section 2.2; OD-BR-05 section 1's evidence facets; REPAIR_DAG.yaml node
+  R1-GA1). Read only by govbridge.gather.facets. Every facet's "scope" is an AUTHORITY CLASS set
+  (govbridge.authority.classes.ALL_CLASSES) or a code_mode, and every extra_terms entry is a generic English word --
+  never a path, a file name, a Review-8 item, an F-finding or a symbol from the Review-8 chains (OC-BR-02). Adding,
+  narrowing or widening a facet, or a class_facets row, is a config change here, never a code change in
+  govbridge/gather/**.
+
+# OD-BR-05 section 4 ("a per-query budget such as 8k tokens is a batch/context-control value, NOT an
+# evidence-completeness boundary... configurable batch size only") and section 9 ("do not hard-code 8k as the
+# architecture limit"). This is the ONE place the literal default lives; govbridge.gather.facets.default_batch_size
+# is the configuration-default loader every other module (govbridge.lexical.query, govbridge.route.real_routes)
+# reads instead of spelling out its own literal 8.
+default_batch_size: 8
+# The per-facet, per-route COVERAGE TARGET (REPAIR_PLAN.md section 2.6's "at least one item" read together with
+# REPAIR_DAG.yaml acceptance check 3, "an identical merged evidence set" whatever --batch-size is): a FIXED,
+# batch-size-INDEPENDENT item count. govbridge.gather.engine never requests more than
+# min(batch_size, target - already_have) from any one route call, so a facet/route reaches EXACTLY this many items
+# (or fewer, if it genuinely runs out first) whatever the caller's --batch-size is -- a larger batch size only means
+# fewer, bigger rounds to get there; a smaller one means more, smaller rounds. Distinct from default_batch_size on
+# purpose: batch_size is a caller-chosen page size, this is the registry's own target for "this facet is covered."
+default_target_items: 16
+# OD-BR-05 section 4: MAX_ROUNDS is "configurable" -- generous enough that a small --batch-size still reaches the
+# SAME terminal coverage as a large one on a corpus this size (REPAIR_DAG.yaml acceptance check: "an identical
+# merged evidence set; more rounds for the smaller batch"), never a silent early cutoff.
+default_max_rounds: 20
+# OD-BR-05 section 2 ("independent facets MAY be retrieved concurrently"): how many facets/pages this process runs
+# at once by default when a caller does not pass --threads.
+default_threads: 4
+
+facets:
+  # OD-BR-05 section 1's eight named facets map onto these eleven (decisions and dependencies/dependents are each
+  # split in two so a facet's scope/lifecycle stays a single, simple predicate -- REPAIR_PLAN.md section 2.2's own
+  # list, verbatim).
+  purpose:
+    routes: [lexical, semantic]
+    scope_classes: null
+    lifecycle_scope: null
+    extra_terms: [purpose, why, rationale, motivation]
+    min_share: 0.05
+  requirement:
+    routes: [lexical, semantic]
+    scope_classes: [CONTRACT, FROZEN_GATE_CONTRACT]
+    lifecycle_scope: null
+    extra_terms: [requirement, contract, must, shall, acceptance]
+    min_share: 0.10
+  decisions_active:
+    routes: [lexical, semantic]
+    scope_classes: [OWNER_DECISION, ARCHITECTURE_DECISION]
+    lifecycle_scope: [ACTIVE, PROPOSED]
+    extra_terms: [decision, decided, adopted]
+    min_share: 0.10
+  decisions_history:
+    routes: [lexical, semantic]
+    scope_classes: [OWNER_DECISION, ARCHITECTURE_DECISION]
+    lifecycle_scope: [SUPERSEDED, WITHDRAWN, HISTORICAL]
+    extra_terms: [superseded, withdrawn, retired, historical]
+    min_share: 0.05
+  failed_approaches:
+    routes: [lexical, semantic]
+    scope_classes: null
+    lifecycle_scope: null
+    extra_terms: [failed, rejected, reopened, defect, regression]
+    min_share: 0.05
+  dependencies:
+    routes: [code]
+    code_mode: dependencies   # callees (unpaged fanout) + reads_key VALUES read by the identifier (data/config)
+    extra_terms: []
+    min_share: 0.10
+  dependents:
+    routes: [code]
+    code_mode: dependents     # callers (R1-RL paged) + reads_key CONSUMERS of a value the identifier reads
+    extra_terms: []
+    min_share: 0.10
+  enforcement:
+    routes: [lexical, semantic, code]
+    scope_classes: null
+    lifecycle_scope: null
+    extra_terms: [enforce, enforcement, blocks, fails, rejects, denies]
+    min_share: 0.05
+  tests:
+    routes: [code]
+    code_mode: tests          # TESTS edges (R1-RL paged, derive.tests_of)
+    extra_terms: []
+    min_share: 0.10
+  evidence_staleness:
+    routes: [lexical]
+    scope_classes: null
+    lifecycle_scope: null
+    extra_terms: [stale, freshness, anchor, outdated, drift]
+    min_share: 0.05
+  versions:
+    routes: []
+    synthetic: true
+    # Per-path blob identity across the view's refs (REPAIR_PLAN.md section 2.7's "versions" facet; version
+    # RECONCILIATION is R1-GA2's job -- REPAIR_DAG.yaml node R1-GA1 registers the slot generically so R1-GA2 can
+    # fill it without a registry change). govbridge.gather.engine always reports this facet MISSING with that
+    # reason, never silently omitted from a gather's own facet coverage accounting.
+    missing_reason: "version reconciliation is REPAIR_DAG.yaml node R1-GA2, not yet built"
+    min_share: 0.0
+
+# A query's OWN "facets" list (if it names one) always wins, un-narrowed. Otherwise, if the query carries a "class"
+# key that is ALSO a row here, that row's facet list applies. Empty by default: EVERY query then gets EVERY
+# registered facet above -- REPAIR_PLAN.md section 2.2 ("a chain query maps to all of them"; "controls are ordinary
+# queries") generalised to every query, since no facet is known in advance to be irrelevant to one. A deployer may
+# add a row to narrow one query class, with no code change and no instance-specific name required to satisfy OC-BR-02
+# (a class id is caller-chosen data, never a Review-8 name baked in here).
+class_facets: {}

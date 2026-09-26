@@ -81,7 +81,7 @@ class RouteHit:
         return d
 
 
-RouteFn = Callable[..., list]  # (text=None, seeds=None, k=8, exclude=None) -> list[RouteHit]
+RouteFn = Callable[..., list]  # (text=None, seeds=None, k=<configured batch size>, exclude=None) -> list[RouteHit]
 
 
 def empty_route(**_kwargs) -> list:

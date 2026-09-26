@@ -1,7 +1,8 @@
-"""``govbridge notes validate <file>`` (REPAIR_DAG.yaml node R1-RN deliverable). Not yet wired into the top-level
-``govbridge`` dispatcher (govbridge/cli.py is outside this node's mutation_scope -- see govbridge/notes/cli.py's
-own docstring), so this is exercised as ``python -m govbridge.notes.cli validate <file>`` and via direct
-``main()`` calls, both of which will keep working unchanged once that one dispatch line is added.
+"""``govbridge notes validate <file>`` (REPAIR_DAG.yaml node R1-RN deliverable). Most of this file exercises
+``python -m govbridge.notes.cli validate <file>`` and direct ``notescli.main()`` calls directly, independent of the
+top-level dispatcher. The top-level ``govbridge notes ...`` dispatch line itself (REPAIR_DAG.yaml node R1-GA1,
+BR-AR-0023 -- routed from R1-RN, whose own mutation_scope did not include govbridge/cli.py) is exercised at the
+bottom of this file, through ``govbridge.cli`` and ``python -m govbridge``.
 """
 from __future__ import annotations
 
@@ -101,3 +102,44 @@ def test_cli_build_then_validate_roundtrip(notes_repo, tmp_path, capsys):
     assert rc == 0
     result = json.loads(capsys.readouterr().out)
     assert result["status"] == "PASS"
+
+
+# --- the top-level `govbridge notes ...` dispatch line (REPAIR_DAG.yaml node R1-GA1, routed from R1-RN) ---------
+
+def test_govbridge_notes_dispatches_to_notes_cli_in_process(notes_repo, tmp_path, capsys):
+    """``govbridge.cli.main(["notes", ...])`` must reach ``govbridge.notes.cli.main`` -- proved end to end with a
+    real ``validate`` call through the TOP-LEVEL dispatcher, the same subcommand the tests above already exercise
+    directly against ``notescli.main``."""
+    from govbridge import cli as climod
+
+    note_path = _write_note_yaml(tmp_path, _good_note(notes_repo))
+    rc = climod.main(["notes", "validate", str(note_path), "--repo", str(notes_repo.root)])
+    assert rc == 0
+    out = json.loads(capsys.readouterr().out)
+    assert out["status"] == "PASS"
+
+
+def test_govbridge_notes_help_dispatches_reaches_notes_cli_not_the_top_level_unknown_command(capsys):
+    """"``govbridge notes --help`` dispatches": ``--help`` is not a subcommand ``govbridge.notes.cli.main`` itself
+    recognises (it has no argparse-based top level, module docstring), so it falls through to that module's OWN
+    "unknown subcommand" message -- proving the dispatch line actually forwarded ``rest`` into
+    ``notescli.main(["--help"])`` rather than the top-level dispatcher reporting "unknown command 'notes'" (its own,
+    DIFFERENT message, for a command it does not recognise at all)."""
+    from govbridge import cli as climod
+
+    rc = climod.main(["notes", "--help"])
+    assert rc == 2
+    err = capsys.readouterr().err
+    assert "govbridge notes: unknown subcommand '--help'" in err
+    assert "unknown command 'notes'" not in err
+
+
+def test_govbridge_notes_help_dispatches_via_python_dash_m():
+    """The same dispatch, exercised as a real subprocess (``python -m govbridge notes --help``), so this also
+    proves ``govbridge/__main__.py`` -> ``govbridge.cli.main`` -> ``notes`` reaches ``govbridge.notes.cli`` outside
+    the test process too."""
+    proc = subprocess.run(
+        [sys.executable, "-m", "govbridge", "notes", "--help"], cwd=GOV_BRIDGE_DOMAIN, capture_output=True, text=True,
+    )
+    assert proc.returncode == 2
+    assert "govbridge notes: unknown subcommand '--help'" in proc.stderr
