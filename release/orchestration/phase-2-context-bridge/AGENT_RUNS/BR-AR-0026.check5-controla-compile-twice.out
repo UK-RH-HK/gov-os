@@ -1,0 +1,123 @@
+# interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3) -- $PY throughout
+# GOVBRIDGE_STORE=$HOME/.cache/gov-bridge/store-BR-AR-0026 (this run's own store, built --from-clean;
+# see govbridge index rebuild --from-clean --timings' own recorded wall_seconds=4234.75, trigger=FULL)
+#
+# cmd: $PY -m govbridge compile tests/fixtures/controls/control-a/task-spec.yaml --out /tmp/ga3-ca-seq1
+# cmd: $PY -m govbridge compile tests/fixtures/controls/control-a/task-spec.yaml --out /tmp/ga3-ca-seq2
+# (run sequentially, one after the other, exactly like the acceptance check's own "compile twice")
+
+=== seq1 ===
+{
+ "budgets_path": null,
+ "excluded_hits": 114,
+ "manifest_sha256": "914775dbf285072c1fe89b6c2d5d0fdeb66c2afebf6fdbb845953e36ad182ee3",
+ "out": "/tmp/ga3-ca-seq1",
+ "packet_id": "bce8544e11c6b49d",
+ "packet_kind": "main",
+ "packet_sha256": "bce8544e11c6b49db18292ccf796479fd009161e3f6a4d2b1aca8841d99b86df",
+ "status": "OK"
+}
+real	2m38.902s
+
+=== seq2 ===
+{
+ "budgets_path": null,
+ "excluded_hits": 114,
+ "manifest_sha256": "914775dbf285072c1fe89b6c2d5d0fdeb66c2afebf6fdbb845953e36ad182ee3",
+ "out": "/tmp/ga3-ca-seq2",
+ "packet_id": "bce8544e11c6b49d",
+ "packet_kind": "main",
+ "packet_sha256": "bce8544e11c6b49db18292ccf796479fd009161e3f6a4d2b1aca8841d99b86df",
+ "status": "OK"
+}
+real	2m38.256s
+
+=== byte-identical confirmation ===
+$ diff -q /tmp/ga3-ca-seq1/packet.md /tmp/ga3-ca-seq2/packet.md   -> exit 0 (no output: byte-identical)
+$ diff -q /tmp/ga3-ca-seq1/manifest.json /tmp/ga3-ca-seq2/manifest.json   -> exit 0 (no output: byte-identical)
+packet_sha256 equal: True
+manifest_sha256 equal: True
+
+# ---------------------------------------------------------------------------------------------------------------
+# INVESTIGATION NOTE: an EARLIER pair of CONTROL-A compiles (/tmp/ga3-ca-1, /tmp/ga3-ca-2), run immediately after
+# this store finished its from-clean build and BEFORE this node's section_map-compaction fix, showed a divergence:
+# every section's rendered content was byte-identical, but ONE of five queries' own EVIDENCE_OVERFLOW notice
+# (CA-DEPS: 94 overflow items in both runs, but a different supplementary_packet_sha256) differed, cascading into
+# a different manifest_sha256/packet_sha256/read_tokens. The divergence was investigated exhaustively before
+# concluding it was NOT reproducible with the current code:
+#   1. PYTHONHASHSEED hypothesis: REFUTED. Three concurrent compiles (PYTHONHASHSEED=0, PYTHONHASHSEED=0,
+#      PYTHONHASHSEED=1) all produced the IDENTICAL packet_sha256/manifest_sha256
+#      (f1bd438bea1911413a12d586d53ce73140a9aa05386481c771a0eaa66aef3941 /
+#      f4d5e053b6fdba93dc2e5e28b03f8cde3ac5db7eaec94910b0059e0d5f70f813). A different hash seed did not reproduce
+#      the divergence, and grep over govbridge/gather/{followup,engine}.py and config/facets.yaml found zero
+#      wall-clock-budget code paths in this tree (the coordinator separately confirmed R1-GA2's pass-2, with a
+#      wall budget, is not yet in this tree's base).
+#   2. Drop-record comparison: the main packet's own per-item drop records (unit id + bytes + score + tier) were
+#      100% IDENTICAL between the two original runs -- the SAME items, SAME byte counts, were dropped in both.
+#   3. Semantic-route determinism: confirmed by the coordinator (deterministic embedding compute; fused/sorted by
+#      (-score, id)).
+#   4. Two further in-process compile_packet() calls (same Python process, same hash seed by construction): also
+#      byte-identical.
+#   5. This file's own seq1/seq2 pair (sequential CLI processes, mimicking the ORIGINAL divergent test's exact
+#      methodology): byte-identical, PASS.
+# Net: 6 of 6 clean re-runs with the current code match byte-for-byte; the divergence has not been reproduced.
+#
+# LEADING, UNCONFIRMED EXPLANATION (could not be proven directly): the coordinator's hypothesis that a TRANSIENT
+# git read failure degraded one follow-up-resolved identifier to an honest MISSING in ONE of the two original
+# runs (keeping the item COUNT the same -- exactly the observed symptom -- while changing its content/hash) is
+# CONSISTENT with this tree's own code: govbridge/gather/followup.py's _safe_read_path/_safe_ls_tree_path
+# (lines ~96-100, ~129-157) explicitly document degrading "a concurrent git gc/repack racing this read... observed
+# directly: a `cat-file blob <oid>` failing with 'bad file' moments after `blob_at` resolved that same oid" to an
+# honest MISSING rather than a crash -- exactly the shared, actively multi-agent repository this domain runs in
+# (this session independently observed 2-3 sibling agents' own concurrent `index rebuild --from-clean` processes
+# running AT THE SAME WALL-CLOCK TIME as the original divergent pair). CA-DEPS's own stop_reason
+# (BUDGET_REACHED_WITH_UNRESOLVED after 1 followup round) confirms its follow-up identifier-resolution code path
+# (where these safe-read wrappers live) WAS exercised. This mechanism could NOT be confirmed directly against the
+# two original runs because `govbridge compile --out DIR` never persists a supplementary packet's own rendered
+# content to disk (only its sha256 reaches the main manifest's EVIDENCE_OVERFLOW notice) -- a known, disclosed gap
+# routed to R1-RA (see this node's checkpoint decisions/next_consumer) -- so the original divergent supplementary
+# packets' own text could not be diffed after the fact.
+# CONCLUSION: the compiler itself is deterministic (6/6 clean re-runs, including a same-methodology sequential
+# replay, and a hash-seed cross-check that rules out Python-level nondeterminism). The one prior divergence is
+# best explained by a disclosed ENVIRONMENTAL dependency already documented in R1-GA2's own code (transient git
+# read failures under concurrent repository activity degrading a follow-up item to an honest MISSING), never
+# reproduced with the current code, and outside this node's mutation_scope (govbridge/gather/**) to fix.
+
+# ---------------------------------------------------------------------------------------------------------------
+# Coordinator-requested reporting: main-plus-supplementary bytes vs corpus bytes, and wall time per query.
+# corpus bytes: git ls-tree -r -l refs/heads/bridge/p2-context-retrieval (the canonical "records" ref CONTROL-A
+# resolves at commit 007c9066dc9840f42ddb8d958489e25e41196e26 for this run) -- 822 tracked files, 11,105,922 bytes.
+# main packet (seq1, this node's own fix applied): packet.md 143,688 bytes; manifest.json 248,372 bytes.
+# main-packet-bytes / corpus-bytes = 143688 / 11105922 = 1.29%.
+#
+# Per-query wall time and merged (pre-budget, pre-dedup-against-main) evidence bytes, measured by calling
+# govbridge.gather.followup.gather_with_followup directly (the same call packet.py's own query loop makes, minus
+# the surrounding resolver/budget/render work), against store-BR-AR-0026:
+#   CA-WHY   27.85s  merged_items=118  merged_bytes= 76,812
+#   CA-REQ   20.78s  merged_items= 98  merged_bytes= 69,653
+#   CA-ENF   38.92s  merged_items=108  merged_bytes= 59,946
+#   CA-TESTS 28.47s  merged_items=127  merged_bytes= 86,341
+#   CA-DEPS  32.60s  merged_items=109  merged_bytes= 74,815
+#   sum wall time (if run sequentially): 148.62s;  sum merged_bytes: 367,567 bytes (~359 KB raw evidence
+#   considered across all 5 queries, before dedup-against-main and per-query budget shaping)
+# Every query stopped with BUDGET_REACHED_WITH_UNRESOLVED after exactly 1 follow-up round (the per-round
+# identifier cap, 20 by default -- a count-based, deterministic budget; disclosed, not a wall-clock one).
+#
+# Supplementary-packet bytes: NOT independently re-measured in this pass (would need a fourth full CONTROL-A
+# compile via direct Python compile_packet() to read result["supplementary_packets"][qid]["rendered"], which
+# `govbridge compile --out DIR` does not expose -- see BR-DAG-AMEND-R1-20/next_consumer). Proxy available instead:
+# every EVIDENCE_OVERFLOW notice's own overflow_item_count (seq1, this node's fix applied): CA-WHY 102, CA-REQ 90,
+# CA-ENF 92, CA-TESTS 113, CA-DEPS 94 (460 total overflow items across 5 queries; 0 unresolved in every one --
+# every overflow item was groundable into an R1-RN claim). Each supplementary packet is independently budgeted at
+# 60 KB (govbridge.compile.supplementary.COMMAND_PROFILE_BYTES["gather"]), so main-plus-supplementary bytes are
+# bounded at 143,688 + 5*61,440 (worst case, every supplementary packet fully using its own 60 KB cap) = 450,888
+# bytes, 4.06% of the 11,105,922-byte corpus -- an upper bound, not a measured exact total.
+#
+# Facet coverage disclosure (the acceptance check's own "every requested facet of every query is present, or
+# disclosed as MISSING or BUDGET with a handle"): 20 FACET_MISSING notices fired (4 facets x 5 queries --
+# "dependencies"/"dependents"/"tests", which need a code-route seed CONTROL-A's task spec does not declare
+# (seeds: []), and the synthetic "versions" facet, MISSING whenever no path resolved) -- each with an honest
+# reason, never silently absent. The remaining 7 facets of every query were present (at least one item placed) or
+# else appear as a facet-tagged BUDGET drop record carrying a continuation handle (govbridge.compile.budgets.
+# enforce_section_with_quotas's own "continuation" field) -- both disclosure paths this acceptance check asks for
+# are exercised on the real corpus.
