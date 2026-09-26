@@ -7,7 +7,7 @@ role: >-
   flake, and govbridge/graph/impact.py's own store.open_db() -> open_db_readonly()). This report covers all three.
 model_observed: claude-sonnet-5
 branch: bridge/r1-xc-0034
-commit: REPLACE_WITH_PASS3_COMMIT_SHA
+commit: bbe3c3cdf4ea8b8196808906c32d5da88f7df8df
 status: COMPLETED
 claims:
 - id: C-1
