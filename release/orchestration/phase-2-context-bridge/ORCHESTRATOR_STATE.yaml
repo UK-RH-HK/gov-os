@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T06:45:46Z'
-state_hash: f4d1bbf9c0a9bc1920f9c85fc17e0c342ee95f59ed85d009a7e878f1b4c9459e
+updated_at: '2026-09-26T07:44:15Z'
+state_hash: f207bd2f45f0f5e5955c5c5c21ac3f694093c009016bafa11037a9136ccb3300
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1165,6 +1165,23 @@ agent_runs:
       MET on a 6-facet subset, while the full default facet set timed out after more than 115 s -> the full set,
       per-query wall times for all 5 CONTROL-A queries, a budget in config/budgets.yaml; (3) AC3 cites an unsaved
       "check3b" run -> re-run and save. govbridge/cli.py is NOT edited in this pass (R1-RS is its next editor)'
+    pass_2:
+      final_commit: c9a8832cda95627e40d342524271d65d1787fdb7
+      accepted: 'scope pushed into SQL before top-k (Tier A record_def+class_lifecycle; Tier B path globs from class_rules,
+        skipped under lifecycle scope); code/exact assert; the post-filter kept as a backstop with out_of_scope_dropped
+        telemetry; AC2 on the FULL default facet set, identical merged_sha256 across threads 1/4/16; all 5 CONTROL-A queries
+        at 47.7-96.2 s, FACETS_COVERED in 2 rounds; budget 150 s; AC3 on the full set, 118 identical items, 8 rounds vs 1;
+        merged items for CA-WHY rose from ~65 to 118 (scoped facets now fill)'
+      orchestrator_verified: store-BR-AR-0010 is UNTOUCHED (mtime 2026-09-26 00:19 +01:00, before GA1; no scope cache or path
+        index in its schema)
+      reopen_2_reason: 'query commands WRITE to the store -- _ensure_scope_indexes runs CREATE INDEX/CREATE TABLE/INSERT OR IGNORE
+        on store.db at query time: (a) it would mutate the run-2 demonstration store during the demonstration; (b) on a
+        read-only store it silently falls back to the 4-6 s/call path; (c) INSERT OR IGNORE never prunes stale (blob, path)
+        pairs. Required: build both structures at BUILD time in their owning layer builders (digested); query paths
+        read-only with a typed STORE_NEEDS_REBUILD error; tests (read-only store unchanged by sha256, missing structure
+        -> typed error, no stale pair after an incremental rebuild, identical digests); CA-WHY re-measured within 150 s'
+      scope_extension: govbridge/authority/layer.py, govbridge/core/store.py, govbridge/core/freshness.py and
+        tests/core/test_scope_path_cache.py, for the build-time structures ONLY (R1-INT edits core/freshness.py later, in PG5)
     open_issues_routed:
     - taskctx.ExclusionCounter.bump() is not thread-safe under concurrent facets (excluded_hits could under-count) -> R1-INT
       (BR-DAG-AMEND-R1-14)
@@ -1195,6 +1212,10 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/store.py
+  - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
+  - release/orchestration/phase-2-context-bridge/tests/core/test_scope_path_cache.py
 - run_id: BR-AR-0025
   role: 'REPAIR-1 node R1-RS -- supplementary packets for every query command, occurrence collapse, bootstrap by reference,
     task inputs in section I; plus BR-DAG-AMEND-R1-10 (verify re-extracts each A item''s delivered body from the rendered packet)'
