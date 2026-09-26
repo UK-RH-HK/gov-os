@@ -1,0 +1,14 @@
+# interpreter: /home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3)  -- BR-DAG-AMEND-R1-18 (R1-T3)
+ad hoc probe (not committed): does a code-route-dependent query ALSO leave a read-only store's sha256 unchanged?
+script: /tmp/.../scratchpad/dbg7.py, extended block (the second, code-route query)
+sha before 927bd601b059f8488386b927d7c12a8b19b492b40a501ce09da9d1fb90ae6ca4
+stop_reason NO_UNRESOLVED_IDENTIFIERS followup_rounds 1
+merged count 12
+sha after  927bd601b059f8488386b927d7c12a8b19b492b40a501ce09da9d1fb90ae6ca4
+UNCHANGED
+=== now with a query that needs the CODE route, still read-only ===
+stop_reason MARGINAL_GAIN_ONLY_DUPLICATES followup_rounds 1
+merged count 3
+sha before2 927bd601b059f8488386b927d7c12a8b19b492b40a501ce09da9d1fb90ae6ca4
+sha after2  927bd601b059f8488386b927d7c12a8b19b492b40a501ce09da9d1fb90ae6ca4
+UNCHANGED

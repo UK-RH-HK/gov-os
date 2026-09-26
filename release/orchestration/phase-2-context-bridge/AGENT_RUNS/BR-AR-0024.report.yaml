@@ -1,0 +1,274 @@
+run_id: BR-AR-0024
+role: >-
+  REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
+  rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
+  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7).
+model_observed: claude-sonnet-5
+branch: bridge/r1-ga2-0024
+commit: PENDING (filled in at commit time; see checkpoint.yaml's own commit/final_commit)
+status: COMPLETED
+claims:
+- id: C-1
+  text: >-
+    govbridge/gather/identifiers.py extracts every REAL INPUT SHAPES kind (R1-T2 item 4) from a round's merged
+    evidence, reusing existing grammars rather than inventing new ones: id-grammar record ids (govbridge.authority.
+    records.load_grammar's own mention_patterns, so a heading title or a YAML block/flow-style id is caught the
+    same way govbridge.core.exact/govbridge.graph.derive already catch it); symbol-shaped tokens and Rust
+    ``mod::fn`` qualified paths (govbridge.route.router._SYMBOL_TOKEN_RE, the same pattern select_routes/
+    _extract_symbol_names already use); repository path literals and 2-4-fragment JOINED path literals
+    (govbridge.route.router._PATH_TOKEN_RE, govbridge.graph.derive.STRING_LITERAL_RE -- the identical joining
+    heuristic depends_on_data_edges uses at index time); 40-hex/short commit hashes (derive.HEX_COMMIT_RE); and
+    ``<doc> section N``/``<doc> §N``/``<doc>:<line>`` requirement citations inside ``///``/``//!``/``#`` comments
+    (derive.PATH_CITE_RE/SECTION_CITE_RE/_looks_like_comment, the exact grammar cites_requirement_edges_in_text
+    uses).
+- id: C-2
+  text: >-
+    identifiers.extract_from_lineage reads R1-RL's persisted lineage_edge table DIRECTLY (a read-only SELECT,
+    never a re-derivation) for the three edge kinds no route surfaces: TESTS (CLI dispatch, clap-derive dispatch
+    and schema-shaped test-registry rows, at any nesting depth -- the SAME rows govbridge.code.lineage_layer wrote
+    at build time), DEPENDS_ON_DATA (literal and joined-path dependencies) and CITES_REQUIREMENT (including the
+    document-only HEURISTIC_SECTION_UNRESOLVED label -- never dropped just because the section heading itself did
+    not resolve at index time). Every row's own ref_name/commit_id/version_status is carried through in the
+    resulting Identifier's ``note`` (this node's brief: "per-row ref, commit and version_status").
+- id: C-3
+  text: >-
+    govbridge/gather/followup.py's gather_with_followup builds triggered rounds on govbridge.gather.engine's OWN,
+    UNCHANGED extension point (the identifier_extractor hook R1-GA1 left unwired) WITHOUT forking engine.gather:
+    round 0 is exactly one call to engine.gather (parallel facets, paging, the fixed stopping vocabulary, all
+    unchanged); every round after that is triggered by an identifier discovered in the PREVIOUS round's own new
+    evidence, resolved through resolve_identifier (exact route for record ids/commits/path literals; the code
+    route, paged callers/tests/reads_key to EXHAUSTION within a budget via R1-RL's own cursors, for symbols; a
+    direct git-content slice, tagged but never authority-classified, for the two lineage-only edge kinds), with a
+    visited set (kind, value) so the same identifier is never chased twice. Stop reasons are the SAME closed
+    OD-BR-05 vocabulary (govbridge.gather.engine.STOP_REASONS), reused, never a new one invented.
+- id: C-4
+  text: >-
+    REAL INPUT SHAPES item 2 (Rust ``mod::fn``, module-free at the code layer): followup._resolve_symbol_or_rust_
+    test_path retries an unresolved ``mod::fn``-shaped identifier by its TRAILING segment, tagging the result
+    HEURISTIC_TRAILING_SEGMENT when the bare name resolves to exactly one definition and
+    HEURISTIC_TRAILING_SEGMENT_AMBIGUOUS (every candidate returned, never silently collapsed to the first) when it
+    does not -- proved on a real Rust fixture with two same-named ``test_widget`` symbols in different modules.
+- id: C-5
+  text: >-
+    govbridge/gather/merge.py's MergeAccumulator deduplicates by the SAME identity govbridge.route.router.
+    dedupe_key already uses (blob+line span for a chunk, unit id otherwise -- never a second notion), keeps a
+    provenance list per merged item ({route, facet, round, trigger}, one entry per contribution, so the same item
+    found via three routes across two calls carries three entries), and collapses a hit's own multi-ref
+    occurrences (already computed by the underlying route) to one canonical occurrence plus a compact per-ref
+    summary (identical/different/history-only/absent), so a merged item's own serialised dict never carries more
+    than one occurrence row. Authority/lifecycle is a pure pass-through (REPAIR_PLAN.md section 2.7: "unchanged, A
+    only from the resolver") -- merge.banner_for/allowed_sections_for only DISCLOSE a non-ladder class's already-
+    decided banner/section restriction (e.g. EVIDENCE_WITHDRAWN -> sections ("E","F"), never "A"), never assign or
+    upgrade a class.
+- id: C-6
+  text: >-
+    govbridge/gather/versions.py fills the ``versions`` facet's real content (REPAIR_PLAN.md section 2.7),
+    replacing engine.gather's own always-MISSING synthetic placeholder in gather_with_followup's own returned
+    result: per-path blob identity across every ref the view resolves (the store's own occurrence rows /
+    gitobj.blob_at, never re-derived), with the canonical ref decided GENERICALLY BY ROLE
+    (ResolvedView.partition_for + a role lookup over config/canonical-view.yaml's own refs, exactly like
+    real_routes._product_commit's own role-based lookup) -- never by a hardcoded ref NAME. Proved on a real
+    three-ref fixture (REAL INPUT SHAPES item 6) where one path differs at every ref and is owned by the
+    "product"-role ref specifically.
+- id: C-7
+  text: >-
+    A gather with triggered follow-up rounds runs, unmodified, against a store opened
+    store.open_db_readonly (BR-DAG-AMEND-R1-15): every SELECT this node's own modules issue uses that read-only
+    connection, and the store file's sha256 is verified byte-identical before and after. This test deliberately
+    stays on the lexical/exact path; the code route's own query-time write (code/symbols.py's lazy ensure_indexed)
+    and hit classification's ensure_schema call are BR-DAG-AMEND-R1-17's fix, routed to R1-XC in parallel (see
+    open_issues) -- not fixed here, per this node's own dispatch notes.
+- id: C-8
+  text: >-
+    All five REAL INPUT SHAPES scenarios (R1-T2 item 4) and the acceptance check's own worked examples are proved
+    on ONE real, synthetic, three-ref Git fixture (tests/fixtures/gather/followup/followup_repobuilder.py), through
+    the REAL lexical/exact/code routes (govbridge.route.real_routes) and tests/fixtures/gather/test-facets.yaml's
+    lexical-only registry (never spawning the embedding subprocess): a record citing an id defined elsewhere; a
+    Rust function whose only test lives in a different top-level directory (Python is NOT reachable this way --
+    see open_issues); a joined path literal; a comment requirement citation resolved to its numbered SECTION, not
+    the whole document; a 40-hex and a short commit hash; and the Rust mod::fn trailing-segment case (both
+    unambiguous and ambiguous). Every one is reached within 3 follow-up rounds (all in fact reach it in 1), with
+    its trigger recorded.
+- id: C-9
+  text: >-
+    A real-view measurement on this domain's own CONTROL-A subject (CA-WHY, "purpose" facet, 31 base-round items)
+    found 81 distinct identifier candidates -- id-grammar-shaped tokens, path/joined-path literals, symbols and
+    commit hashes are all common shapes in ordinary English/code prose. Chasing every one, unbounded, made a single
+    follow-up round impractically slow against the real, multi-thousand-file, 95-history-ref corpus (independently
+    timed: a first attempt exceeded 280s and was killed). Fixed generically, never by narrowing WHICH kinds are
+    chased: (a) govbridge/gather/followup.py's own git-tree lookups for path/joined-path/requirement-citation
+    resolution now memoise one ls-tree per (commit, repo) per gather call (a plain in-process dict, thrown away
+    with the call -- never a persisted cache, BR-DAG-AMEND-R1-15 is unaffected); (b) a new, disclosed per-round
+    identifier budget (DEFAULT_MAX_IDENTIFIERS_PER_ROUND=20) stops a round that exceeds it with
+    BUDGET_REACHED_WITH_UNRESOLVED, naming every deferred identifier in telemetry.unresolved_identifiers -- never a
+    silent drop (OD-BR-05 section 5). With both fixes, this node's own CONTROL-A acceptance-check run (C-8's
+    sibling, acceptance check 2) completes in ~2 minutes.
+- id: C-10
+  text: >-
+    govbridge/gather/followup.py's own direct git calls (for the two lineage-only edge kinds' content, and for
+    path-literal/requirement-citation resolution) now degrade to an honest MISSING on ANY exception, not just a
+    resolved-to-None path -- found directly against the real, multi-agent-shared repository this domain lives in:
+    a `git cat-file blob <oid>` failed ("bad file") moments after `blob_at` resolved that exact oid, almost
+    certainly a transient `git gc`/repack race with another agent's own concurrent work in the SAME object
+    database. Every one of this node's own git call sites is wrapped (`_safe_ls_tree_path`/`_safe_ls_tree_paths`/
+    `_safe_read_path`, and `_hit_from_git_slice`'s own try/except), so one unlucky git call degrades that single
+    identifier's resolution, never the whole gather.
+evidence:
+- claim: C-1
+  evidence: >-
+    govbridge/gather/identifiers.py:extract_record_ids,extract_symbols_and_rust_paths,extract_commit_hashes,
+    extract_path_literals,extract_requirement_citations; tests/gather/test_followup.py's five "reached within 3
+    rounds" tests
+- claim: C-2
+  evidence: 'govbridge/gather/identifiers.py:extract_from_lineage; a direct lineage_edge query proved via dbg scripts during development, exercised end-to-end by the requirement-citation and joined-path-literal real-fixture tests'
+- claim: C-3
+  evidence: 'govbridge/gather/followup.py:gather_with_followup,resolve_identifier; tests/gather/test_followup.py (18 tests, incl. test_commit_hashes_40_hex_and_short_are_extracted_and_resolved and test_a_round_with_more_identifiers_than_budget_stops_disclosed_never_silently_dropped)'
+- claim: C-4
+  evidence: 'govbridge/gather/followup.py:_resolve_symbol_or_rust_test_path; tests/gather/test_followup.py::test_rust_mod_fn_test_path_resolves_by_trailing_segment, ::test_rust_mod_fn_ambiguous_trailing_segment_gets_a_distinct_heuristic_label'
+- claim: C-5
+  evidence: 'govbridge/gather/merge.py; tests/gather/test_merge.py (13 tests)'
+- claim: C-6
+  evidence: 'govbridge/gather/versions.py; tests/gather/test_followup.py::test_three_ref_fixture_version_reconciliation_reports_the_product_owned_difference, ::test_a_path_untouched_across_refs_reports_identical_everywhere, ::test_versions_facet_is_honestly_missing_when_nothing_resolved_a_path'
+- claim: C-7
+  evidence: 'tests/gather/test_followup.py::test_gather_with_followup_against_a_read_only_store_leaves_its_sha256_unchanged'
+- claim: C-8
+  evidence: 'tests/fixtures/gather/followup/followup_repobuilder.py; tests/gather/test_followup.py (real-view tests)'
+- claim: C-9
+  evidence: >-
+    govbridge/gather/followup.py:_safe_ls_tree_paths (tree_cache), DEFAULT_MAX_IDENTIFIERS_PER_ROUND and the
+    round-loop's budget_exceeded branch; tests/gather/test_followup.py::
+    test_a_round_with_more_identifiers_than_budget_stops_disclosed_never_silently_dropped; AGENT_RUNS/
+    BR-AR-0024.check-controla-followup-module.out (the real-view timing: ~2 minutes with both fixes, vs. two
+    independent timeouts without them)
+- claim: C-10
+  evidence: 'govbridge/gather/followup.py:_hit_from_git_slice,_safe_ls_tree_path,_safe_ls_tree_paths,_safe_read_path; found and fixed live against AGENT_RUNS/BR-AR-0024.check-controla-followup-module.out''s own first (killed) attempt'
+mutation_scope_respected: true
+open_issues:
+- >-
+  Template amendment R1-T3 (BR-DAG-AMEND-R1-18) arrived mid-pass, direct from the orchestrator (bridge tip
+  2713afd): every command must run through $PY=$HOME/.cache/gov-bridge/venv/bin/python (never a bare python3/pip/
+  pytest), no venv creation or package install, and every check output must record $PY and its version. Already
+  true of every command this pass ran before the amendment arrived (spot-checked: no bare `python3`/`pip `/
+  `pytest ` string appears in this node's own scratch scripts); every `commands` output in this checkpoint now
+  carries an explicit `# interpreter: $PY (<version>)` header line (the grep-only genericity audit is marked N/A).
+- >-
+  R1-T2 item 4 ("real inputs first") disclosure: govbridge.code.symbols.ensure_indexed (the "code" layer's own
+  indexer, out of this node's mutation scope) parses ``.rs`` blobs ONLY (govbridge/code/symbols.py's own
+  _rs_tree_entries/_rs_paths) -- a python_ast.py adapter exists under govbridge/code/adapters/ but is not wired
+  into ensure_indexed in this codebase's current state. "A function whose tests live in another directory" is
+  therefore demonstrated in Rust, not Python, since a Python fn/test pair is invisible to the code route's direct-
+  call TESTS resolution (derive.tests_of) entirely. Independently verified by reading govbridge/code/symbols.py
+  directly (grep -n "_rs_" govbridge/code/symbols.py) and by constructing a Python-only fixture first and
+  observing code route seeds=[<python fn name>] return zero hits before switching the fixture to Rust. Not this
+  node's to fix; routed to whoever owns govbridge/code/symbols.py next.
+- >-
+  Acceptance check 2's literal command, ``$PY -m govbridge gather --task <CONTROL-A> --query <CONTROL-A> --json |
+  jq '.telemetry'``, is run against the ACTUAL ``govbridge gather`` CLI verb, which still calls
+  govbridge.gather.engine directly (govbridge/cli.py's cmd_gather, out of this node's mutation_scope this wave --
+  R1-RS owns cli.py in the SAME parallel group, REPAIR_PLAN.md section 12's shared-file sequence is RX -> GA1 -> RS
+  -> RA, never GA2). That command therefore shows R1-GA1's own single-pass behaviour (0 follow-up rounds), not
+  this node's capability. This node's own equivalent entry point, ``python -m govbridge.gather.followup --task ...
+  --query ... --json``, mirrors cmd_gather's argument shape and IS wired to gather_with_followup -- see the
+  conformance table's row for this check and AGENT_RUNS/BR-AR-0024.check-controla-*.out for both the literal
+  command's actual (unchanged) output and this module's own equivalent run on the SAME CONTROL-A query. Requested
+  in decisions: whichever node next edits govbridge/cli.py (R1-RA, the next in sequence, or R1-GA3/R1-INT) replace
+  cmd_gather's `from govbridge.gather import engine as enginemod` with `from govbridge.gather import followup as
+  enginemod` and call `enginemod.gather_with_followup` in place of `enginemod.gather` -- a drop-in replacement:
+  gather_with_followup returns the identical top-level shape engine.gather does, plus `versions`/`followup_rounds`/
+  `visited_identifiers`.
+- >-
+  Per-item provenance's ``facet`` field is ``None`` for a base-round (engine.gather-produced) item:
+  engine.gather's own return shape (out of this node's mutation scope) does not itemise which facet/round produced
+  which hit, only aggregate per-(facet,round) telemetry counts. This node's own triggered-round items DO carry a
+  real facet-like label (``followup:<identifier kind>``) and an integer round. Disclosed, not a narrowing (R1-T2
+  rule 2): the literal deliverable ("provenance list per item: routes, facets, rounds, triggers") is met for every
+  item this node itself produces, and honestly degraded (route + round="base" + trigger=None) for items it
+  inherits from R1-GA1's own output boundary.
+- >-
+  The read-only test (C-7) happens not to exercise code/symbols.py's own query-time write, because this fixture's
+  "product"-role ref shares config/canonical-view.yaml's ``layers: [..., code]`` and was therefore already eagerly
+  indexed at BUILD time (govbridge.code.build's eager-ref selection covers every ref with the "code" layer, not
+  just "product"); an independent probe (AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out) confirms a
+  code-route-dependent query ALSO leaves the store sha256 unchanged in this fixture, but that is because there was
+  nothing left to lazily build, not because the write path was removed. BR-DAG-AMEND-R1-17 (routed to R1-XC) is
+  the actual fix; this node neither claims nor relies on it being fixed.
+conformance:
+- item: 'Deliverable 1: identifier extractors for id-grammar ids, symbol-shaped tokens, path literals and joined fragments, test names, commit hashes and requirement citations; resolvers via exact id, code definitions, callers and tests, path resolution, and the sections of a known document'
+  status: MET
+  evidence: >-
+    govbridge/gather/identifiers.py (extract_record_ids/extract_symbols_and_rust_paths/extract_commit_hashes/
+    extract_path_literals/extract_requirement_citations/extract_from_lineage); govbridge/gather/followup.py
+    (resolve_identifier and its per-kind helpers); tests/gather/test_followup.py's five real-fixture "reached
+    within 3 rounds" tests (real lexical/exact/code routes, never a public query text)
+- item: 'Deliverable 2: follow-up rounds with a visited set; every follow-up item records its trigger (the identifier and its source item)'
+  status: MET
+  evidence: >-
+    govbridge/gather/followup.py:gather_with_followup (visited set, triggers_log); tests/gather/test_followup.py::
+    test_visited_set_resolves_the_same_identifier_only_once, ::test_followup_stops_at_max_followup_rounds_never_looping_forever
+    (a hermetic fake proving the LOOP itself, not just the base engine, respects a round bound and the fixed stop
+    vocabulary)
+- item: 'Deliverable 3: merge -- dedup by (blob, line span); provenance list per item; occurrence collapse to canonical + per-ref identity summary; a versions facet reporting per-path blob identity across refs; authority/lifecycle filtering unchanged (A only from the resolver)'
+  status: MET
+  evidence: >-
+    govbridge/gather/merge.py (MergeAccumulator, collapse_occurrences, banner_for/allowed_sections_for);
+    govbridge/gather/versions.py (reconcile_path/versions_facet); tests/gather/test_merge.py (13 tests, incl.
+    three-routes-one-item-three-provenance-entries, three-ref occurrence collapse, superseded/EVIDENCE_WITHDRAWN
+    banner preservation); tests/gather/test_followup.py's version-reconciliation and read-only tests
+- item: 'Acceptance check 1: tests/gather/test_followup.py tests/gather/test_merge.py -- exit 0; a record citing an id defined elsewhere, a function whose tests live in another directory, a joined path literal and a comment requirement citation each reached within 3 rounds with the trigger recorded; the same item found by three routes is one merged item with three provenance entries; a 3-ref fixture reports identical or different per ref; a superseded item is filtered to E with its banner'
+  status: MET
+  evidence: >-
+    cmd ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3): cd $D && $PY -m pytest
+    tests/gather/test_followup.py tests/gather/test_merge.py -q -> 31 passed (AGENT_RUNS/
+    BR-AR-0024.check1-pytest-gather.out); "function whose tests live in another directory" is Rust, not Python --
+    disclosed in open_issues, not a narrowing (govbridge.code.symbols indexes .rs only); "filtered to E" is
+    EVIDENCE_WITHDRAWN's own allowed_sections=("E","F"), asserted in
+    test_merge.py::test_superseded_item_keeps_its_evidence_withdrawn_class_and_exposes_its_banner
+- item: 'Acceptance check 2: $PY -m govbridge gather --task <CONTROL-A spec> --query <CONTROL-A query> --json | jq ''.telemetry'' -- >= 1 round whose trigger is an identifier first seen in an earlier round; merged items carry provenance; no search hit lists more than one occurrence row plus a ref summary'
+  status: MET_WITH_DISCLOSED_LIMIT
+  evidence: >-
+    ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3) the LITERAL command (AGENT_RUNS/
+    BR-AR-0024.check-controla-literal-cli.out) still shows R1-GA1's own single-pass behaviour (3 rounds,
+    stop_reason FACETS_COVERED, 0 follow-up rounds), since govbridge/cli.py is not in this node's mutation_scope
+    this wave (open_issues, decisions); this node's own equivalent entry point, `$PY -m govbridge.gather.followup
+    --task <CONTROL-A spec> --query CA-WHY --facets purpose --max-followup-rounds 2 --json` (AGENT_RUNS/
+    BR-AR-0024.check-controla-followup-module.out), run on the SAME real store and the SAME CONTROL-A query, shows
+    the property itself concretely: base_rounds=3, followup_rounds=1, stop_reason BUDGET_REACHED_WITH_UNRESOLVED
+    (20 identifiers chased, 65 disclosed as deferred -- never silently dropped), merged items grew from 31 to 164,
+    triggers include real record ids (D-5, CONTROL-A, R1-CTRL, R1-INT, CTRL-1, CONTROL-B, ...) first seen in round
+    0's own evidence; a programmatic shape check over every merged item ("items failing that shape check") returns
+    empty, confirming provenance is present and exactly one `occurrence` (never a raw `occurrences` list) plus a
+    `ref_summary` on every item
+- item: 'R1-T1: the FULL domain suite, last, 0 failures'
+  status: MET
+  evidence: >-
+    cmd ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3): cd $D && $PY -m pytest -q
+    -p no:cacheprovider tests -> 628 passed (AGENT_RUNS/BR-AR-0024.check2-full-domain-suite.out)
+- item: 'R1-T1: hermetic tests (no cwd/live-ref/env/order dependency)'
+  status: MET
+  evidence: >-
+    tests/gather/test_followup.py's autouse _isolated_gather_env fixture (GOVBRIDGE_STORE/GOV_BRIDGE_HOME
+    monkeypatched per test, facetsmod.clear_cache()/taskctxmod.reset() before and after); every real-view test
+    builds its OWN tmp_path repo and passes repo= explicitly; test_merge.py needs no store at all;
+    AGENT_RUNS/BR-AR-0024.check3-order-independence.out (test_followup.py and test_merge.py run individually, in
+    combination and reversed, byte-identical pass counts: 18/13/31)
+- item: 'REPAIR-1 rule 3 (OC-BR-02): no code, config, facet, scope or test names a Review-8 item, an F-finding, a Phase-2 file or a symbol from the Review-8 chains'
+  status: MET
+  evidence: >-
+    cmd: grep -nE 'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|phase2/review-8' over every file this
+    node added -> only this node's own compliance-statement docstrings match (self-referential, e.g. "nothing here
+    names a Review-8 item"), never a real reference (AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out)
+- item: 'BR-DAG-AMEND-R1-15: query commands are read-only -- this node adds no cache/index/table of its own'
+  status: MET
+  evidence: >-
+    govbridge/gather/identifiers.py:extract_from_lineage and govbridge/gather/followup.py:_read_only_conn both use
+    ONLY store.open_db_readonly; tests/gather/test_followup.py::
+    test_gather_with_followup_against_a_read_only_store_leaves_its_sha256_unchanged (sha256 verified before/after,
+    a real chmod'd store file); AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out (independent probe,
+    disclosed in open_issues)
+- item: 'Template amendment R1-T3 (BR-DAG-AMEND-R1-18): every command run through $PY, never a bare python3/pip/pytest; no venv created, no package installed; every check output records $PY and its version'
+  status: MET
+  evidence: >-
+    every `commands` entry in AGENT_RUNS/BR-AR-0024.checkpoint.yaml was invoked as
+    $PY=/home/usain/.cache/gov-bridge/venv/bin/python (Python 3.12.3, sys.prefix == the venv); every saved output
+    file carries a `# interpreter: $PY (<version>)` header line (the grep-only genericity audit is marked N/A, no
+    interpreter invoked); no venv/pip command appears anywhere in this node's own commands or scratch scripts

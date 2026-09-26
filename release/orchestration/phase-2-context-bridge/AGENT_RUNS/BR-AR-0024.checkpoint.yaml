@@ -1,0 +1,261 @@
+run_id: BR-AR-0024
+commit: PENDING
+role: >-
+  REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
+  rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
+  lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7).
+model_observed: claude-sonnet-5
+commands:
+- cmd: cd $D && $PY -m pytest tests/gather/test_followup.py tests/gather/test_merge.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check1-pytest-gather.out
+  output_sha256: abf611c3c2827357603a9ba2c824763e0369c8471aa1e771eb5d569e3bbb7e3e
+- cmd: >-
+    ACCEPTANCE CHECK 2 ($PY=/home/usain/.cache/gov-bridge/venv/bin/python, Python 3.12.3 -- BR-DAG-AMEND-R1-18):
+    $PY -m govbridge gather --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --json, then
+    $PY -c '...json.load(...)["telemetry"]...' in place of jq (not installed in this environment) (the LITERAL
+    cmd_gather CLI verb, run against the real store built from clean at this run's own GOVBRIDGE_STORE) -- shows
+    R1-GA1's own single-pass behaviour, 3 rounds, stop_reason FACETS_COVERED, 0 follow-up rounds (govbridge/cli.py
+    is not in this node's mutation_scope this wave; see open_issues/decisions)
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-literal-cli.out
+  output_sha256: 4e937bd568557c0abe16a6d7af4b42dd58605892e0ed1297ae65b16053fc1abe
+- cmd: >-
+    ACCEPTANCE CHECK 2, this node's own equivalent entry point ($PY as above): $PY -m govbridge.gather.followup
+    --task tests/fixtures/controls/control-a/task-spec.yaml --query CA-WHY --facets purpose --max-followup-rounds 2
+    --json, then a $PY -c script extracting telemetry and independently checking every merged item's own shape
+    (provenance present; exactly one `occurrence`, never a raw `occurrences` list) -- proves >= 1 follow-up round
+    (round 1, stop_reason BUDGET_REACHED_WITH_UNRESOLVED after 20 identifiers -- disclosed, not silently dropped:
+    65 more are named in telemetry.unresolved_identifiers) whose triggers (D-5, CONTROL-A, R1-CTRL, R1-INT, CTRL-1,
+    CONTROL-B, ...) are identifiers first seen in round 0's own evidence, growing merged items from 31 to 164; the
+    programmatic shape check ("items failing that shape check") returns empty
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-followup-module.out
+  output_sha256: 96a98259b809823198611964fa1969a687a02cf022718f48020735629ea92156
+- cmd: cd $D && $PY -m pytest -q -p no:cacheprovider tests
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check2-full-domain-suite.out
+  output_sha256: 8ccb598c231a722e896ff45c471fcd5192f794182bec41792bfb26363d0fdfec
+- cmd: >-
+    R1-T1 hermeticity: tests/gather/test_followup.py and tests/gather/test_merge.py run alone, then together in
+    each order
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check3-order-independence.out
+  output_sha256: 917d2582181fff1a9a039fe5f74121bee07f0fd4526c3ddb154e12008a6a363a
+- cmd: >-
+    OC-BR-02 generic-rule self-audit: grep -nE 'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|
+    phase2/review-8' over every file this node added
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out
+  output_sha256: a1437348cd6645d17cfd58445132d4050f073e762a750f40a83ad28d888be7a8
+- cmd: >-
+    R1-T2 rule 3 independent re-measurement: an ad hoc script (not committed) re-runs the read-only-store test's
+    OWN query PLUS a second, code-route-dependent query, both against a chmod'd read-only store file, to check
+    whether the sha256-unchanged property depends on which routes a query happens to use
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out
+  output_sha256: 2e026068805724847caed36e4b9e4770a602b37ed97d965ef4cb114a7617923b
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+  sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+- path: release/orchestration/phase-2-context-bridge/GATES/OWNER-DIRECTION-BR-0005-MULTI-BATCH-MULTI-HOP-RETRIEVAL.md
+  sha256: 7c051a1ffeaf2296ca1a225d19f7a173948b8dd72130f86944e8daa952377941
+- path: release/orchestration/phase-2-context-bridge/ORCHESTRATOR_STATE.yaml
+  sha256: ad483a753f717e34fc3ed21f52260fed4e1de95f3a4155d09a1ef6786400027c
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md
+  sha256: 3c84370c83396277d2ce065be06f0cf45e1cad2584188f753a057254c95bdddd
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/task-spec.yaml
+  sha256: 439b8bf28b86b2ff81330fd0a9231fbf1a3a8e254aeda189a360478a10b24dec
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/queries.yaml
+  sha256: d6375e23848926835eaa80c2ab338464df5cf4d8ddf69147d88931c372a9a4c5
+- path: release/orchestration/phase-2-context-bridge/govbridge/gather/engine.py
+  sha256: cbded2200e3824efad38b0a527fe29e82215e941dd9a117aee57ff50db045abb
+- path: release/orchestration/phase-2-context-bridge/govbridge/gather/facets.py
+  sha256: 7e358dbff1bb950785df9e2bd7f728f47bd434a4ddfc72ee028eb364074d8147
+- path: release/orchestration/phase-2-context-bridge/govbridge/gather/telemetry.py
+  sha256: 17e076afcbd05c88cc25c48676d36556048ec1efaa7bfb08efa5971d6bc15d9b
+- path: release/orchestration/phase-2-context-bridge/govbridge/gather/instantiate.py
+  sha256: 7ff1d2a0f010f1fb5e775c42a1728b5aa636ed5da934d17ba61a1c30c6da9afc
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/lineage_layer.py
+  sha256: e19cf4bf503b2decd8c6ce5617bde328e69084df353f205c5c0522331160e9ad
+- path: release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
+  sha256: c55d55d9e025ee972e84e85e50818ebc66f66bbc8e07a21fa943bf9dd4644aaf
+- path: release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
+  sha256: 53dcf9743aa4a0e9ea12b20937b5429c2444dfe58c90d5a0ddc12881a85f1b57
+- path: release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+  sha256: 3aa32b50737b7cf8ea8cb920c57d6d8852c237accd1f5f75acf45b16296b4d03
+- path: release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  sha256: 5eefa00349e4f2b30701bb9dc71eeb080d0b158732921da6bd6c95dccfd492eb
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/view.py
+  sha256: 6cab1991b435d2a4d7f6de8676738ff101bd77d2aa387e1a9b76fae388679c13
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/store.py
+  sha256: 424bd9db609dbe9223bc0ebb220ac6afc605a59b03a381a92608450f058d5b22
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
+  sha256: 4f93738c7fd0e8c53956b94eee182fe386e25bacce808b0069a201bde9f57d05
+- path: release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
+  sha256: 75bfca67ab28de7e7024d31a53c07aaf4e6e8cec5d2c866900ce4c3af64bf04f
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/classes.py
+  sha256: 021e78f130a508a10f37faf5d4a874395abac46222317b6de742cb3b2f1622df
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
+  sha256: 6958afc4a1b4d7848e6b0aba9bd8239184f25043f8121bbbcd0bbed30bb4bc08
+- path: release/orchestration/phase-2-context-bridge/config/facets.yaml
+  sha256: 761dd3b1838d89470e939901c1b78b9eb353c68e224ae93a3caac2744d41c81f
+- path: release/orchestration/phase-2-context-bridge/config/canonical-view.yaml
+  sha256: 3184499a276cd93c81025dbae7c8633d9e6c97a9908f646b276db0232a760b03
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/identifiers.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/merge.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/versions.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_followup.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.*
+artifacts_changed:
+- release/orchestration/phase-2-context-bridge/govbridge/gather/followup.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/identifiers.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/merge.py
+- release/orchestration/phase-2-context-bridge/govbridge/gather/versions.py
+- release/orchestration/phase-2-context-bridge/tests/gather/test_followup.py
+- release/orchestration/phase-2-context-bridge/tests/gather/test_merge.py
+- release/orchestration/phase-2-context-bridge/tests/fixtures/gather/followup/followup_repobuilder.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.report.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.checkpoint.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check1-pytest-gather.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-literal-cli.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-controla-followup-module.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check2-full-domain-suite.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check3-order-independence.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check4-genericity-audit.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0024.check-readonly-with-code-route.out
+findings:
+- >-
+  govbridge.gather.engine's own identifier_extractor hook (R1-GA1's extension point) discloses whatever it returns
+  but never acts on it -- confirmed by tests/gather/test_engine.py::
+  test_identifier_extractor_hook_is_called_and_disclosed_never_acted_on, and by reading engine.gather's own loop
+  body directly (the hook's return value only ever feeds telem.unresolved_identifiers). Triggered rounds therefore
+  have to live in a wrapper OUTSIDE engine.gather (this node's followup.gather_with_followup), never inside it --
+  matching this node's own mutation_scope, which does not include govbridge/gather/engine.py at all.
+- >-
+  govbridge.code.symbols (the "code" layer) indexes ``.rs`` blobs only; a python_ast.py adapter exists under
+  govbridge/code/adapters/ but ensure_indexed never calls it. Confirmed by reading _rs_tree_entries/_rs_paths
+  directly and by an empty-result probe (a Python fn/test pair seeded through the code route returns zero hits;
+  the identical pair in Rust returns both the definition and the caller). This bounds which language this node's
+  "a function whose tests live in another directory" fixture could use (Rust), disclosed in open_issues, not
+  silently substituted.
+- >-
+  A lexical hit's own occurrences tuple (govbridge.route.real_routes.lexical_route) already carries one
+  RouteOccurrence PER REF where the underlying store found that exact content -- the store's own per-ref identity,
+  computed once at build/query time by govbridge.lexical.query, never re-derived by this node. Occurrence collapse
+  (merge.collapse_occurrences) is therefore a read of each occurrence's own, already-computed version_status, never
+  a second cross-ref comparison.
+- >-
+  The code route (govbridge.route.real_routes.code_route) only ever resolves seeds against the ref whose ROLE is
+  "product" (_product_commit); a view with no product-role ref makes every code-route seed lookup silently return
+  empty (an honest MISSING, never an error) -- found while building the "ambiguous trailing segment" fixture (a
+  single-ref repo originally), fixed by giving that fixture a second, product-role ref pointed at the same commit,
+  exactly like config/canonical-view.yaml's real product/records pair.
+failed_approaches:
+- >-
+  Tried resolving a Rust ``mod::fn``-shaped identifier's trailing segment straight through
+  govbridge.code.symbols.definitions without going through the code ROUTE first. Reverted: the route's own
+  classification, exclusion handling and scope assertion are already correct and tested; calling the lower-level
+  function directly would have duplicated that logic in this node's own resolver for no benefit.
+- >-
+  Tried making govbridge.gather.followup call engine.gather ONCE PER REQUESTED FACET (instead of once for the
+  whole set) so that every base-round item could carry an exact facet tag in its provenance. Reverted: this would
+  have silently dropped R1-GA1's own tested cross-facet PARALLEL round behaviour (a facet's own concurrent
+  retrieval within one round), trading a real, tested property for a cosmetic provenance improvement -- kept the
+  single whole-set call instead and disclosed the base-item facet gap explicitly (open_issues, conformance).
+- >-
+  Tried classifying (authority_class/lifecycle) the hits this node builds directly from git content for the
+  lineage-only edge kinds (CITES_REQUIREMENT's resolved section, DEPENDS_ON_DATA's resolved data file) via
+  govbridge.authority.layer.classify_hit. Reverted: classify_hit calls its own ensure_schema(conn) on every call, a
+  query-time schema write (BR-DAG-AMEND-R1-17, routed to R1-XC) -- adding a NEW call site for it from this node's
+  own code would have been this node introducing a write BR-DAG-AMEND-R1-15 forbids, not merely inheriting an
+  existing one. Left these two hit kinds authority_class=None/lifecycle=None, disclosed in the module docstring and
+  in open_issues, rather than add the write.
+unresolved:
+- >-
+  Full CLI wiring of `govbridge gather` to this node's triggered-round capability needs a one-line change to
+  govbridge/cli.py's cmd_gather (replace the engine import with followup and call gather_with_followup) -- outside
+  this node's mutation_scope this wave (R1-RS owns cli.py in the same parallel group). See open_issues/decisions.
+- >-
+  govbridge.code.symbols's Python-adapter gap (python_ast.py exists but is unwired) is not this node's file to
+  edit.
+- >-
+  BR-DAG-AMEND-R1-17 (code route + classify_hit query-time writes) is confirmed still present (findings), routed
+  to R1-XC, not fixed here.
+decisions:
+- >-
+  Acknowledged and applied mid-pass: template amendment R1-T3 (BR-DAG-AMEND-R1-18), received directly from the
+  orchestrator (bridge tip 2713afd). Every command in this checkpoint's own `commands` list, and every ad hoc
+  probe script this pass ran, was already invoked exclusively through $PY=$HOME/.cache/gov-bridge/venv/bin/python
+  (never a bare python3/pip/pytest) from before this amendment arrived; the two checks already recorded were
+  regenerated to prepend an explicit `# interpreter: $PY (<version>)` header line to their own saved output (the
+  grep-only genericity audit is marked N/A -- no interpreter is invoked). No venv was created and no package was
+  installed at any point.
+- >-
+  REQUEST to the orchestrator: route the one-line govbridge/cli.py change described in open_issues/unresolved (swap
+  `govbridge.gather.engine` for `govbridge.gather.followup` in cmd_gather, call gather_with_followup) to whichever
+  node next owns cli.py in the RX -> GA1 -> RS -> RA sequence (R1-RA, unless R1-GA3/R1-INT is judged a better fit).
+  gather_with_followup is a drop-in superset of engine.gather's own return shape, so this is mechanical.
+- >-
+  Made within this node's own authority: the versions facet's real content (govbridge.gather.versions) is computed
+  UNCONDITIONALLY by gather_with_followup whenever at least one path resolved, rather than gated behind
+  config/facets.yaml's own facet-selection machinery (which is a compile-time quota concept, out of this node's
+  mutation_scope to widen) -- so a caller using a minimal/lexical-only facets.yaml (as this node's own real-view
+  tests do, to avoid the embedding subprocess) still gets real version reconciliation, never a silently-skipped
+  facet just because "versions" was not itself a registered facet row in whatever config the caller happened to
+  load.
+- >-
+  Made within this node's own authority: per-identifier resolution is capped at
+  DEFAULT_MAX_ITEMS_PER_IDENTIFIER=50 and follow-up depth defaults to DEFAULT_MAX_FOLLOWUP_ROUNDS=3 (both
+  govbridge/gather/followup.py module constants, overridable by a caller's own keyword argument) -- config/
+  facets.yaml is out of this node's mutation_scope, so these two knobs have no config-file home this pass; a
+  future node that owns that file could promote them there.
+- >-
+  No existing test file was modified (R1-T1's own rule 5 does not apply: this node added test files, and only
+  ever appended to govbridge/gather/telemetry.py's already-existing, DOCUMENTED extension slot --
+  follow_up_triggers -- by constructing NEW GatherTelemetry instances from this node's own code, never editing
+  telemetry.py itself, which stays outside this node's mutation_scope).
+lessons:
+- >-
+  When a DAG node's own mutation_scope excludes the file that would be the "obvious" integration point (here,
+  govbridge/gather/engine.py and govbridge/cli.py), that is usually deliberate sequencing, not an oversight to work
+  around -- the right response is to build the new capability as a clean, drop-in-compatible WRAPPER/superset
+  around the excluded file's existing contract, and disclose the remaining one-line integration step precisely,
+  rather than reach for the excluded file anyway or silently narrow the deliverable to "whatever the CLI already
+  exposes".
+- >-
+  A route's own already-computed data (a lexical hit's multi-ref ``occurrences`` tuple; a route's own
+  classification) is very often already the answer to a "how do I reconcile/collapse this" question that looks,
+  at first glance, like it needs a whole new subsystem -- read the existing data model closely (RouteOccurrence's
+  own version_status field, here) before designing new derivation logic.
+- >-
+  A synthetic fixture's OWN choice of language for "a function and its test" is not a free choice in this
+  domain: govbridge.code's indexer is Rust-only today, so a Python-shaped fixture for a code-route-dependent
+  scenario silently produces zero hits rather than an error -- always independently probe a NEW fixture's
+  assumptions against the real indexing pipeline (a two-line seed lookup) before writing assertions around it.
+- >-
+  Building a real-view store `index rebuild --from-clean` for a whole-repository domain is a multi-minute
+  operation (semantic embeddings dominate); budget for it as a background task with a bounded poll, not a
+  synchronous command with a short timeout.
+next_consumer: >-
+  Whoever next owns govbridge/cli.py in the RX -> GA1 -> RS -> RA sequence (R1-RA, most likely), for the one-line
+  wiring described in decisions/open_issues; R1-GA3, which depends on this node and wires `gather` into
+  govbridge.compile (a natural second integration point for gather_with_followup, alongside or instead of the CLI
+  one); R1-XC, already tracking the code-route/classify_hit query-time writes this node independently reconfirmed
+  (findings) and deliberately did not extend (failed_approaches); whoever owns govbridge/code/symbols.py next, for
+  the Python-adapter gap (findings, unresolved); the orchestrator, for the remaining disclosed open_issues and the
+  cli.py-wiring decision request.
+final_commit: PENDING
