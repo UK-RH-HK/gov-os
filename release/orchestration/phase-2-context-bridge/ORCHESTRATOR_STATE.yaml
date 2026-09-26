@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T03:40:33Z'
-state_hash: 395511a8cab5a41fe344cbd5ba3cc93394cd0881f6ae15e99a6dc44cb498894b
+updated_at: '2026-09-26T04:06:31Z'
+state_hash: e38d70e801e9f9495123a159bd1378de7455adac1fcd95baa14b364112701377
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1015,6 +1015,27 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-rm-0022
   checkpoint_schema: 2
+  pass_1:
+    final_commit: ce971200a16a8f691455d47a56a11cf06ee158b2
+    integrate_check: INTEGRATION_PERMITTED (orchestrator-run)
+    accepted:
+    - no truncation of mandatory items (max_chars=None; oversize -> section map + MANDATORY_PARTIAL_DELIVERY notice)
+    - keys selector, multiple paths, directory member manifests, source/delivered hashes recorded
+    - BR-DAG-AMEND-R1-1 (verify at the recorded view; regression plus two negative controls) and BR-DAG-AMEND-R1-2 (the
+      real-view compile test is pinned; the byte-identical-twice assertion is unchanged)
+    - full domain suite 428 passed, 0 failed; secrecy -- 0 reads (one hit is a code comment); claude-sonnet-5 x332; the
+      invariant, class-table and import-boundary tests are untouched
+    reopen_reason: '(1) verify_delivered_fidelity is presence-only, so packet verify cannot detect a silently truncated
+      A item (RC-1 itself; acceptance check 3 unmet) -> declared_sha256 over the declared span, recomputed at the
+      recorded view; delivered == declared OR a partial-delivery notice whose ranges exactly cover the span; negative
+      tests. (2) `entries` works only on YAML sequences, while the one real row that declares entries points at a
+      Markdown ledger (level-2 headings beginning with an id), so its declared id range is not guaranteed in A ->
+      Markdown entries via config/id-grammar.yaml, start/end resolved in document order and failing closed'
+    open_issues_routed:
+    - pinned_view_from_manifest does not pin history (ref_glob) refs -> R1-INT check (no current A item needs them)
+    - ARCHITECTURE/schemas/task-spec.yaml does not document keys/entries -> the orchestrator documents it at merge
+    - the ledger row's entries is prose -> the orchestrator restates it in the structured form after the merge (same
+      id, same meaning; the prose is kept as a note)
   dispatched_at: '2026-09-26T03:18Z'
   status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0022
@@ -1280,6 +1301,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0022 R1-RM (wave 2) and the BR-AR-0019 R1-RL second follow-up (citations; Rust binary tests);
+next_deterministic_action: await the BR-AR-0022 R1-RM follow-up (fidelity check; Markdown entries) and the BR-AR-0019 R1-RL second follow-up (citations; Rust binary tests);
   integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; on RL's merge dispatch R1-GA1 (BR-AR-0023,
   template R1-T1); checkpoint after every merge
