@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T06:37:29Z'
-state_hash: b1b10e0d6f0cd635971ae0533e6c70024f3488e7c96b3a27db3db1010db854db
+updated_at: '2026-09-26T06:45:46Z'
+state_hash: f4d1bbf9c0a9bc1920f9c85fc17e0c342ee95f59ed85d009a7e878f1b4c9459e
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -1145,8 +1145,33 @@ agent_runs:
   model_observed: PENDING (checked from the transcript at return)
   agent_name: br-r1-ga1-0023
   checkpoint_schema: 2
+  pass_1:
+    final_commit: fbeabd2875d3c907e1f1fcea7deb207f6e978d23
+    interim_merge: 4114437 (BR-DAG-AMEND-R1-13 -- so R1-RS can start; the node stays OPEN)
+    orchestrator_verified:
+    - integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree 543 passed, 0 failed
+    - claude-sonnet-5 x603; invariant, class-table and import-boundary tests untouched; genericity grep -- rule text only
+    - 'secrecy -- it READ ARCHITECTURE/demonstration-queries.yaml four times to learn the query-set FORMAT (instantiation
+      of class x subject entries is its RC-2 deliverable); query texts and query-class texts were masked (lengths only),
+      but the three public SUBJECT descriptions were printed. Its report says "key names and value types only", which
+      is inaccurate on that point. The facet registry equals REPAIR_PLAN section 2.2 name for name and class_facets is
+      empty (every query gets every facet), so no tuning to the demonstration queries. Not an oracle or grading
+      access; recorded for the verifier.'
+    accepted: instantiation (QUERY_NOT_EXECUTABLE), the facet registry, deterministic concurrent merge in registry order,
+      batch-size-independent paging (48 identical unit ids, 8 rounds vs 1), telemetry, closed stop reasons, thread-local
+      sqlite connections (a real crash fixed), no hard-coded 8, the notes dispatch line
+    reopen_reason: '(1) a scoped facet filters AFTER retrieval, so requirement/decisions_* page through corpus-wide
+      rankings and end at MAX_ROUNDS or time out -> push scope down into the routes by class/lifecycle; (2) AC2 graded
+      MET on a 6-facet subset, while the full default facet set timed out after more than 115 s -> the full set,
+      per-query wall times for all 5 CONTROL-A queries, a budget in config/budgets.yaml; (3) AC3 cites an unsaved
+      "check3b" run -> re-run and save. govbridge/cli.py is NOT edited in this pass (R1-RS is its next editor)'
+    open_issues_routed:
+    - taskctx.ExclusionCounter.bump() is not thread-safe under concurrent facets (excluded_hits could under-count) -> R1-INT
+      (BR-DAG-AMEND-R1-14)
+    - callees are not paged, and reads_key_of consumer paging is not round-driven -> R1-GA2's follow-up resolvers page
+      callers, tests_of and reads_key_of through their cursors within budget
   dispatched_at: '2026-09-26T04:45Z'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
   store: $HOME/.cache/gov-bridge/store-BR-AR-0023
   dispatch_notes:
   - base contains R1-RX (taskctx, --task, exclusions) and R1-RL's accepted paging primitives (interim merge,
@@ -1170,7 +1195,43 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
+- run_id: BR-AR-0025
+  role: 'REPAIR-1 node R1-RS -- supplementary packets for every query command, occurrence collapse, bootstrap by reference,
+    task inputs in section I; plus BR-DAG-AMEND-R1-10 (verify re-extracts each A item''s delivered body from the rendered packet)'
+  dag_node: R1-RS
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  handoff_note: template revision with amendments R1-T1 and R1-T2
+  branch: bridge/r1-rs-0025
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0025
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-rs-0025
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T06:45Z'
+  status: RUNNING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0025
+  dispatch_notes:
+  - govbridge/compile/render.py is added for ONE purpose -- the smallest item-delimiting format that makes the R1-10 re-extraction
+    exact (R1-GA3 edits render.py after RS); tests/compile/test_verify_rendered_body.py is added for R1-10's tests
+  - fourth editor of govbridge/cli.py (RX -> GA1 -> RS -> RA); R1-GA1's reopened pass does NOT touch cli.py
+  - second editor of compile/validate.py and receipt.py (RM -> RS)
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/supplementary.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/bootstrap.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/receipt.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/validate.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/section_i.py
+  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - release/orchestration/phase-2-context-bridge/govbridge/compile/render.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_supplementary.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_section_i_and_bootstrap.py
+  - release/orchestration/phase-2-context-bridge/tests/compile/test_verify_rendered_body.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/supplementary/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0025.*
 running_work:
+- run_id: BR-AR-0025
+  liveness_check: subagent transcript mtime + commits on bridge/r1-rs-0025; never inferred from elapsed time
 - run_id: BR-AR-0023
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
 dag:
@@ -1313,6 +1374,19 @@ dag:
       test and the six named invariant tests stay byte-unchanged'
     reason: the pre-import makes the suite order-independent but hides a process-global dependency of the same class as
       the gitobj repo_root cache (BR-DAG-AMEND-R1-6)
+  - id: BR-DAG-AMEND-R1-13
+    by: orchestrator (scheduling; no design change)
+    rule: 'R1-RS''s dependency on R1-GA1 is satisfied by GA1''s accepted `govbridge gather` command and output format, merged as an
+      INTERIM integration at 4114437 (543/0). GA1 stays OPEN on scope push-down and full-facet acceptance, with scope
+      disjoint from RS (no cli.py). R1-GA2 builds on the engine internals and waits for GA1''s FINAL pass'
+    reason: RS needs only the gather command and its result shape; GA1's remaining work is inside routes, lexical, semantic
+      and gather, which RS does not touch
+  - id: BR-DAG-AMEND-R1-14
+    by: orchestrator (routing of a BR-AR-0023 open issue)
+    rule: R1-INT's mutation_scope is further extended with govbridge/core/taskctx.py for ONE change -- ExclusionCounter is made
+      thread-safe (a lock or per-thread counters merged deterministically), with a concurrency test showing that
+      excluded_hits is exact under --threads 16
+    reason: gather runs facets concurrently; an under-counted excluded_hits is an under-disclosure of retrieval exclusions
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1470,6 +1544,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0023 R1-GA1; integrate-check (schema 2) + FULL suite on the trial-merged tree, merge;
-  then PG3 in parallel -- R1-RS (carries BR-DAG-AMEND-R1-10) and R1-GA2 (RL is now final); templates R1-T1 and R1-T2;
-  checkpoint after every merge
+next_deterministic_action: await BR-AR-0025 R1-RS and the BR-AR-0023 R1-GA1 follow-up (scope push-down; full-facet acceptance);
+  integrate-check (schema 2) + FULL suite on the trial-merged tree, merge; on GA1 FINAL dispatch R1-GA2 (BR-AR-0024, draft
+  ready); then PG4 (R1-GA3, R1-RA); checkpoint after every merge
