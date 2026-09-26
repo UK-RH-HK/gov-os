@@ -1,0 +1,86 @@
+# BR-AR-0019 typed report. REPAIR-1 node R1-RL (graph and lineage additions). No oracle content.
+run_id: BR-AR-0019
+role: 'REPAIR-1 node R1-RL builder -- code/test lineage, data dependencies, requirement lineage, structured-record
+  identity, continuation'
+model_observed: claude-sonnet-5 (Sonnet 5)
+branch: bridge/r1-rl-0019
+commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
+status: COMPLETED
+claims:
+- 'TESTS edges beyond a direct in-test call: (b) a test that drives the product through its command-line binary
+  is mapped to its dispatch handler generically, by parsing the invoked module''s OWN argparse structure at the
+  same commit (govbridge.graph.derive.resolve_cli_handler/cli_dispatch_tests_edges) -- no subcommand is ever
+  named in code, only Python-packaging convention (`-m <pkg>` runs `<pkg>/__main__.py`) and shape (`if <x>.cmd ==
+  "<name>":`, `sub.add_parser("<name>")`, a bare `{str: str}` dispatch dict); (c) a test registry is recognised by
+  SHAPE (a row with a `tests:` list field), never by file name (test_registry_edges_for_id), generalising the
+  existing name-bound evidence_map_edges_for_id'
+- 'DEPENDS_ON_DATA edges (depends_on_data_edges): a code file''s own string literal that is itself a tracked repo
+  path (EXACT_LITERAL_PATH), or 2-4 adjacent literals joined by ''/'' that resolve directly or as a unique path
+  suffix (HEURISTIC_JOINED_PATH, covering `os.path.join("config", "id-grammar.yaml")`-shaped calls generically)'
+- 'CITES_REQUIREMENT edges (cites_requirement_edges_in_text): a requirement citation inside a CODE COMMENT (never
+  a string literal or executable code), `<doc>:<line>` (EXACT_COMMENT_CITATION or HEURISTIC_SUFFIX) or `<doc>
+  section N`/`<doc> §N` (HEURISTIC_COMMENT_SECTION, resolved to the first heading whose own numbering starts
+  with N)'
+- 'State records (govbridge/authority/records.py''s new extract_definitions_state_keys, wired into the existing
+  extract_definitions_yaml; config/id-grammar.yaml''s new DR-YAML-STATE-KEY rule): every mapping key -- at every
+  depth reached by walking nested mappings, never a list''s own elements -- of a YAML file config/state-
+  aliases.yaml registers becomes a record_def, keyed by its own bare name so a literal git-grep for that token
+  (govbridge.authority.lifecycle._find_definition''s existing, UNMODIFIED bounded lookup) finds it. Verified
+  end-to-end through the real, unmodified `govbridge.core.exact.id_lookup` (what `govbridge exact id <token>`
+  runs) on the existing tests/authority fixture repo, which already happens to write a synthetic
+  ORCHESTRATOR_STATE.yaml-shaped document at the real "bridge" alias''s exact path -- no change to that fixture
+  or to config/state-aliases.yaml was needed or made. Flows into the EXISTING, already-registered "authority"
+  store layer automatically (govbridge/authority/layer.py, untouched): a direct layer.build() against the REAL
+  current view produced 3580 record_def rows (was measured at 2 for the state-key gap in CAUSE_ANALYSIS.md); a
+  second, independent build (via govbridge.core.freshness.run(), in-process) reproduced the SAME 3580'
+- 'Symbol history (govbridge/graph/symbol_history.py, new): introduced_in/deleted_in find a symbol''s own
+  introducing/removing commit automatically, by walking (git log --follow, bounded by max_commits) its currently-
+  defining path''s own history -- an honest lower bound (bounded_incomplete: true) when the walk is truncated
+  before falsifying presence, never a wrong claim of certainty'
+- 'Paging (cursor, page_size): govbridge.code.symbols.callers (+ its CLI --page-size/--cursor) and
+  govbridge.graph.derive.tests_of/reads_key_of gain an opt-in offset cursor over the SAME sorted result an
+  unpaged call already computes; omitted, every existing caller''s return value is byte-identical to before.
+  Verified on a real CONTROL-A-area symbol (`compile`, runtime/src/contracts.rs, 13 callers) at the frozen
+  product commit: paging at page-size 6 returns the same 13-item union, in the same order, as the unpaged call'
+- 'Every existing test in tests/code, tests/graph and tests/authority still passes (115 in the node''s own
+  three dirs; also verified tests/compile, tests/route, tests/core -- 119 more -- and BR-AR-0014''s corpus-
+  exclusion/eager-build tests specifically); every test-file edit is a pure addition (0 lines removed from any
+  existing test function)'
+- 'A pre-existing, environment-level defect was found and worked around, not fixed (outside this node''s mutation
+  scope): `python -m govbridge.core.freshness rebuild --from-clean`, invoked exactly as REPAIR_DAG.yaml''s
+  acceptance-check text names it, silently runs only the "core" layer (a `-m pkg.submodule` double-import splits
+  govbridge.core.freshness from its own `__main__` copy, so sibling packages'' registrations against the real
+  module are invisible to `main()`''s own copy of _LAYER_BUILDERS) -- reproduced 3x, unaffected by this run.
+  AGENT_RUNS/BR-AR-0019.check2-freshness-determinism.out documents the finding and substitutes the equivalent,
+  correctly-shared invocations (in-process govbridge.core.freshness.run(), and the top-level CLI) for the real
+  determinism proof'
+evidence:
+- claim: TESTS edges beyond a direct in-test call (b, c)
+  command: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/graph/test_derive.py -k "cli_dispatch or registry_edges" -q
+- claim: DEPENDS_ON_DATA / CITES_REQUIREMENT edges
+  command: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/graph/test_derive.py -k "depends_on_data or cites_requirement" -q
+- claim: state records resolved by exact id
+  file: release/orchestration/phase-2-context-bridge/tests/authority/test_state_records.py
+- claim: state records reach 3580 record_def rows on the real current view; reproduced by two independent builds
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check2-freshness-determinism.out
+- claim: symbol history introduced_in/deleted_in
+  file: release/orchestration/phase-2-context-bridge/tests/graph/test_symbol_history.py
+- claim: paging matches the unpaged union, in fixtures and on a real CONTROL-A-area symbol
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-paging.out
+- claim: full node acceptance-check test scope passes
+  file: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
+- claim: CONTROL-A compile + packet verify still PASS on this branch (real-view regression check)
+  command: cd release/orchestration/phase-2-context-bridge && $PY -m govbridge compile tests/fixtures/controls/control-a/task-spec.yaml --out /tmp/ca0019 && $PY -m govbridge packet verify /tmp/ca0019
+mutation_scope_respected: true
+open_issues:
+- 'govbridge/core/freshness.py''s `-m govbridge.core.freshness` double-import defect (see above) is real and
+  reproducible but outside R1-RL''s mutation scope; whichever node/owner is responsible for that file should be
+  told (I1''s original owner, or the orchestrator directly)'
+- 'the DAG''s "every addition registered as a store layer with a digest" is satisfied for the ONE addition that
+  is persisted (state records, via the EXISTING authority layer); TESTS/DEPENDS_ON_DATA/CITES_REQUIREMENT/symbol
+  history stay on-demand and unpersisted, by the SAME precedent govbridge/graph/derive.py''s sibling functions
+  (MENTIONS/CITES_PATH/CODE_CITES/CALLS/READS_KEY/TESTS) and govbridge/code/history.py''s own diff() already
+  set -- flagged for R1-INT/the orchestrator to confirm that reading is correct'
+- 'resolve_cli_handler resolves at most two dispatch hops (a top govbridge dispatch, then one submodule''s own);
+  a third-level subcommand (none exist in this repository today) would resolve only to the coarser
+  HEURISTIC_CLI_DISPATCH module::subcommand form, never crashing, but also never more precise'

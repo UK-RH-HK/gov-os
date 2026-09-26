@@ -1,0 +1,175 @@
+# BR-AR-0019 schema-2 worker checkpoint (OD-BR-04 A). REPAIR-1 node R1-RL. No oracle content.
+run_id: BR-AR-0019
+commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
+role: 'REPAIR-1 node R1-RL builder: graph and lineage additions -- code/test lineage, data dependencies,
+  requirement lineage, structured-record identity, continuation'
+commands:
+- cmd: cd release/orchestration/phase-2-context-bridge && $PY -m pytest tests/code tests/graph tests/authority/test_state_records.py -q
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
+  output_sha256: f54fa10b7e44b03156844c6cc819a770e03ec4107eca4745937ce132ce805875
+- cmd: '$PY -m govbridge.core.freshness rebuild --from-clean (twice, into two fresh stores) -- see the output file
+    for the pre-existing CLI double-import defect found in this literal form (outside R1-RL''s scope) and the
+    equivalent, correctly-shared invocations substituted for the real determinism proof (govbridge.core.freshness.run()
+    in-process, and a dedicated fixture-based pytest test)'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check2-freshness-determinism.out
+  output_sha256: 1ae3bea1b0c95a83dc888c1e38ec18231c654f857de2b008ad6ee2c1a4443ee2
+- cmd: '$PY -m govbridge.code.symbols callers compile --commit 3c880d80f81475f5306bdd5f680f2e004df49391 --page-size
+    6 --json (a CONTROL-A real-view symbol, runtime/src/contracts.rs, 13 callers -- more than the page size),
+    then paged to exhaustion and compared against the unpaged query'
+  exit_code: 0
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-paging.out
+  output_sha256: 00d380fbe5f94c0ff24c0a3fa3feec7618982746223a92463120d70277ff2aaa
+model_observed: claude-sonnet-5 (Sonnet 5)
+input_manifest:
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-TEMPLATE-builder.md
+  sha256: 701a55f5ea97bcdbf72d76df2c7d324c59b2146d44f677d7c3c6b7a24f1310c9
+- path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  sha256: c3c6da75a08ead0a10ccbe11fd9aeff5451ba3eb7f704ecd580c9cf2473bafd0
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_DAG.yaml
+  sha256: 3b297d373e8059659f570df55f55a839107c477c3361e9322fef282d6e6e3ca9
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/REPAIR_PLAN.md
+  sha256: cbdc9a6c2dd24ee643bd85bf85d0984ff5aef25f38cfd69ebc098b3339ed07f8
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/ARCHITECTURE.md
+  sha256: 3c84370c83396277d2ce065be06f0cf45e1cad2584188f753a057254c95bdddd
+- path: release/orchestration/phase-2-context-bridge/ARCHITECTURE/REPAIR-1/CAUSE_ANALYSIS.md
+  sha256: 72261a14909afe24e838e963aa6b6bae9775004a47a9c143b76914423c7623f3
+- path: release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+  sha256: 7a0ad25350e6ea8a926c43f24c0201c57417f8b68ec9767752c08eadd6c0f364
+- path: release/orchestration/phase-2-context-bridge/config/state-aliases.yaml
+  sha256: 6d7af11bdb9804ea3588d1ebbd5a928b859e0ad6c5a5d55a63b721750add0969
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/resolver.py
+  sha256: 43f3cec41c989bab3526f22ad19bdcb8ea66c71872afed3d792572b400953b0d
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/state.py
+  sha256: d5d41f51746d5eae7b380fd7e974866440e3b5271acf327190bd3f31eda51e41
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/lifecycle.py
+  sha256: d47dffd7edda1b0d96c1eebbf891151d3e65a0444af4e94c4f8c7a2acf5393f1
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/layer.py
+  sha256: 0852e69c0a224554fd162f4c4d006c2c4fead3619daa5b708223cb7b90348547
+- path: release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
+  sha256: 6958afc4a1b4d7848e6b0aba9bd8239184f25043f8121bbbcd0bbed30bb4bc08
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+  sha256: 33f342d524b6722cade35f907fab52748d02f97bd23f54d18ac7a4ae55d6d924
+- path: release/orchestration/phase-2-context-bridge/govbridge/code/history.py
+  sha256: 3b966b4e13e957c03fccf6dfab61ce73e92139a456f6a62af60b9267ca121b8d
+- path: release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
+  sha256: c2fdb9d40ad91e92f54765395d5d965cafcd9a1affb7a8cb6924e9c88a3f8757
+- path: release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
+  sha256: b5bbababe6f2a042fe64eed971b3f836cf5eb0206a4d86fddb5d79f95f0569f9
+- path: release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
+  sha256: 8a18651658bfa17941293ac730ed3f4ac00cefae5687e5327987d65cce1c9914
+- path: release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  sha256: c35066d5a3ace8cedf855b87a68d6293e9af5ae8f23fa56e37a7dd6b3c029b56
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/task-spec.yaml
+  sha256: 439b8bf28b86b2ff81330fd0a9231fbf1a3a8e254aeda189a360478a10b24dec
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/controls/control-a/SELECTION.md
+  sha256: 700be32c88b36413ecd0ca4d967302dc63e5a7cbf376036dab8a75eb5f54b3fc
+- path: release/orchestration/phase-2-context-bridge/tests/fixtures/authority/authority_repobuilder.py
+  sha256: e6bc69b3ce57bb9c0ef5563175f96e9b2c82bfc495b16c2f6beee1debd09297c
+- path: release/orchestration/phase-2-context-bridge/tests/code/_repobuilder.py
+  sha256: 19eb4cbe0cd5c24af2d5c6c289d4ab9e7ec281d72547811a87d0d83274de08ca
+task_contract:
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: c3c6da75a08ead0a10ccbe11fd9aeff5451ba3eb7f704ecd580c9cf2473bafd0
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/code/**
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/code_bridge.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
+  - release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
+  - release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
+  - release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+  - release/orchestration/phase-2-context-bridge/tests/code/**
+  - release/orchestration/phase-2-context-bridge/tests/graph/**
+  - release/orchestration/phase-2-context-bridge/tests/authority/test_state_records.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/code/**
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/graph/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.*
+artifacts_changed:
+- release/orchestration/phase-2-context-bridge/config/id-grammar.yaml
+- release/orchestration/phase-2-context-bridge/govbridge/authority/records.py
+- release/orchestration/phase-2-context-bridge/govbridge/code/symbols.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/derive.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/edges.py
+- release/orchestration/phase-2-context-bridge/govbridge/graph/symbol_history.py
+- release/orchestration/phase-2-context-bridge/tests/authority/test_state_records.py
+- release/orchestration/phase-2-context-bridge/tests/code/test_symbols_integration.py
+- release/orchestration/phase-2-context-bridge/tests/graph/test_derive.py
+- release/orchestration/phase-2-context-bridge/tests/graph/test_symbol_history.py
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check1-pytest.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check2-freshness-determinism.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-page1.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-paging.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.check3-controla-callers-unpaged.out
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.report.yaml
+- release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0019.checkpoint.yaml
+findings:
+- 'Confirmed by direct testing that govbridge.authority.lifecycle._find_definition (which govbridge.core.exact.
+  id_lookup / `govbridge exact id` already calls, UNCHANGED) resolves a new state-key record the moment
+  extract_definitions_yaml (records.py, my scope) emits it -- no change needed anywhere outside records.py/
+  id-grammar.yaml for this to work end to end'
+- 'The existing tests/fixtures/authority/authority_repobuilder.py fixture (not owned by this node) already
+  writes its synthetic ORCHESTRATOR_STATE.yaml-shaped content at BRIDGE_STATE_PATH, which is EXACTLY config/
+  state-aliases.yaml''s real "bridge" alias path -- this let tests/authority/test_state_records.py exercise
+  the REAL alias table and REAL exact-id/lifecycle pipeline end to end without any change to a file outside
+  this node''s scope'
+- 'A PyYAML node-mark subtlety: end_mark.column==0 reliably means "start of the next line" only for a TOP-level
+  block; a NESTED sibling''s end_mark can land mid-line, at the following key''s own indentation column, which
+  silently truncates a naive column==0 heuristic by one line for anything below the top level. Fixed by using
+  the deepest START mark reached by any descendant node instead (always precisely placed, at every depth) --
+  see extract_definitions_state_keys''s _max_start_line'
+- 'govbridge/core/freshness.py has a pre-existing double-import defect when invoked as `python -m
+  govbridge.core.freshness ...` directly (see open_issues in the report); `python -m govbridge index rebuild`/
+  `python -m govbridge freshness` (through the top-level CLI) and any in-process govbridge.core.freshness.run()
+  call are unaffected. Not this node''s file to fix; flagged for the orchestrator'
+failed_approaches:
+- 'Tried addressing nested state keys with a synthetic "state:<alias>#<dotted.path>" id (matching the resolver''s
+  own state_ref syntax): abandoned because govbridge.authority.lifecycle._find_definition resolves a token by
+  git-grepping its LITERAL text first, and that compound, synthetic string never appears verbatim in any file --
+  it would never be grep-found. Switched to the key''s own bare name as the id (always literally present in the
+  YAML text at the line that defines it), with the dotted path kept only as Definition.record_path for
+  disambiguating context'
+- 'Tried the SAME end_mark-based span heuristic govbridge.authority.state._compose_and_find uses (end_mark.line,
+  -1 if column==0): produced an off-by-one-line span for any node with more than one child (see findings) --
+  that function is only ever asked to resolve a single caller-given LEAF key path, so the bug was never
+  triggered there; replaced with the start-mark-based approach for this walk-every-depth use case'
+unresolved:
+- 'the govbridge/core/freshness.py `-m` double-import defect (found, documented, worked around; not fixed --
+  outside mutation scope)'
+- 'whether R1-INT''s generic-rule audit is satisfied by this run''s comments/docstrings (they discuss the
+  MECHANISM generically -- CLI dispatch shapes, test-registry shape, state-file registry -- and name no Review-8
+  item, F-finding or Phase-2 file; fixture DATA in the new tests uses synthetic ids like FX-CAP-1, never a real
+  finding id)'
+decisions:
+- 'D-R1-RL-1 (within authority): state-key record ids are the key''s own bare name (not a synthetic
+  "state:alias#path" token), because the existing, unmodified exact-id resolution path is git-grep-first --
+  see findings/failed_approaches above. The full dotted path is still recorded, in Definition.record_path, for
+  precision'
+- 'D-R1-RL-2 (within authority): no new store layer is registered. State records flow into the EXISTING
+  "authority" layer (govbridge/authority/layer.py, untouched) automatically, because extract_definitions_yaml
+  is the function records.scan_ref/layer.build already call for every YAML file. TESTS(b)/(c), DEPENDS_ON_DATA,
+  CITES_REQUIREMENT and symbol history stay on-demand, bounded, git-content functions -- never persisted --
+  exactly like every sibling function already in govbridge/graph/derive.py and govbridge/code/history.py''s own
+  diff(). Flagged in open_issues/unresolved for the orchestrator/R1-INT to confirm this reading of "every
+  addition registered as a store layer with a digest" is correct'
+- 'no modification to any existing test file''s assertions: tests/graph/test_derive.py and
+  tests/code/test_symbols_integration.py were extended by pure addition (git diff shows 0 deletions in either
+  file); no existing test needed correcting'
+lessons:
+- 'When a new record-addressing scheme must work through an EXISTING, out-of-scope resolver that works by
+  git-grepping the literal token first, design the id format to BE that literal text, not a synthetic
+  compound -- check the consumer''s resolution mechanism before inventing a new id shape'
+- 'PyYAML end_mark columns are not uniformly "start of next line" at every nesting depth; prefer walking to the
+  deepest START mark when sizing a multi-child block''s own span'
+- 'A background `python -m govbridge index rebuild --from-clean` against the real corpus is slow (the semantic/
+  embedding layer alone took ~15 minutes on this box) and will happily run at 400%+ CPU per embedding worker
+  process if left unattended -- run it in the true background (nohup, detached) and kill it (and its orphaned
+  onnx_embed.py children specifically -- SIGKILLing the parent does not reap them) rather than block on it
+  when a faster, equally valid, isolated fixture-based proof already exists'
+next_consumer: 'R1-GA1/R1-GA2/R1-GA3 (the "govbridge gather" retrieval-loop nodes), which consume these new
+  derive.py/symbol_history.py/code.symbols capabilities from within the gather loop (they, not this node, wire
+  them into govbridge why/impact -- why.py/impact.py are outside R1-RL''s mutation scope and were not touched);
+  R1-INT for the generic-rule audit and the mutation-scope/overlap check; the orchestrator for the
+  govbridge/core/freshness.py double-import defect'
+final_commit: a7990303f9d09c486a3c3dcdc14b900cd9eac5b0
