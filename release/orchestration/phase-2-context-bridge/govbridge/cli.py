@@ -31,6 +31,7 @@ from typing import Optional
 
 import yaml
 
+from govbridge.core import taskctx as taskctxmod
 from govbridge.core.yamlutil import load_yaml_file
 
 
@@ -63,13 +64,28 @@ def cmd_search(argv) -> int:
     p.add_argument("--exclude", action="append", metavar="GLOB")
     p.add_argument("--view")
     p.add_argument("--registry")
+    p.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (govbridge.core.gitobj.repo_root's own default). "
+                                   "Pass this explicitly rather than relying on cwd: repo_root() is process-cached "
+                                   "(functools.lru_cache, keyed only on the argument actually passed) the first "
+                                   "time it is called bare, so a caller who changes cwd afterwards would otherwise "
+                                   "see a stale resolution shared with any other bare caller in the same process.")
+    taskctxmod.add_cli_arg(p)
     args = p.parse_args(argv)
 
     from govbridge.authority import records as recordsmod
     from govbridge.route import real_routes as real_routesmod
     from govbridge.route import router as routermod
 
-    routes = real_routesmod.build_real_routes(view_path=args.view, registry_path=args.registry)
+    # R1-RX (OBS-BR-08): --task/GOVBRIDGE_TASK's retrieval_exclusions are merged with any explicit --exclude,
+    # applied to every route this command runs, and disclosed as excluded_hits -- never left to the caller to
+    # remember on its own (real_routes.py's own routes also apply the ambient context; this merge is belt-and-
+    # braces so a --exclude-only caller sees its own globs counted too).
+    ctx = taskctxmod.from_args(args)
+    merged_exclude = ctx.merge_exclude(args.exclude)
+    counter = taskctxmod.ExclusionCounter()
+
+    routes = real_routesmod.build_real_routes(view_path=args.view, registry_path=args.registry, repo=args.repo)
     if args.route:
         route_names = tuple(args.route)
     else:
@@ -77,7 +93,8 @@ def cmd_search(argv) -> int:
         route_names = tuple(rn for rn in routermod.select_routes({"text": args.text}, grammar=grammar)
                              if rn != "graph")
 
-    hits_by_route = {rn: routes.run(rn, text=args.text, k=args.k, exclude=args.exclude) for rn in route_names}
+    hits_by_route = {rn: routes.run(rn, text=args.text, k=args.k, exclude=merged_exclude, exclude_counter=counter)
+                      for rn in route_names}
     fused = routermod.fuse(hits_by_route)
     result = {
         "text": args.text,
@@ -88,6 +105,7 @@ def cmd_search(argv) -> int:
              "fused_score": f.fused_score, "authority_class": f.hit.authority_class, "lifecycle": f.hit.lifecycle}
             for f in fused
         ],
+        "excluded_hits": counter.count,
     }
     print(json.dumps(result, indent=1, sort_keys=True))
     return 0
@@ -124,6 +142,9 @@ def cmd_compile(argv) -> int:
             "status": result["status"], "packet_id": result.get("packet_id"),
             "packet_sha256": result.get("packet_sha256"), "manifest_sha256": result.get("manifest_sha256"),
             "registry_path": result.get("registry_path"),
+            # R1-RX (OBS-BR-08): disclosed here too, so a caller of `compile --out` sees it without parsing
+            # manifest.json's notices.
+            "excluded_hits": result.get("excluded_hits"),
         }
         (out_dir / "meta.json").write_text(json.dumps(meta, indent=1, sort_keys=True), encoding="utf-8")
         print(json.dumps({"out": str(out_dir), **meta}, indent=1, sort_keys=True))

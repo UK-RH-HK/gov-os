@@ -27,6 +27,7 @@ from govbridge.code import symbols as codesymbols
 from govbridge.core import exact as exactmod
 from govbridge.core import pathrules
 from govbridge.core import store as storemod
+from govbridge.core import taskctx as taskctxmod
 from govbridge.core import view as viewmod
 from govbridge.graph import derive as derivemod
 from govbridge.lexical import query as lexicalquery
@@ -115,11 +116,28 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             return UNCLASSIFIED
         return classify_occ(occ0.path, occ0.commit, item.start_line, item.end_line)
 
-    def lexical_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, **_kw) -> list:
+    def lexical_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, exclude_counter=None,
+                       **_kw) -> list:
         if not text:
             return []
+        # R1-RX (OBS-BR-08): the ambient task context's own exclusions are merged in HERE, so this route excludes
+        # them even for a caller that passes exclude=None (the CLI default before this repair) -- see
+        # govbridge.core.taskctx's module docstring.
+        exclude = taskctxmod.current().merge_exclude(exclude)
         result = lexicalquery.query(_safe_fts_query(text), k=k, exclude=exclude, view_path=view_path, repo=repo,
                                      classify=_lexical_classify)
+        if exclude and exclude_counter is not None:
+            # govbridge.lexical.query already filtered internally (out of this node's mutation scope, so it
+            # exposes no count of its own) -- a second, exclude=None call over the SAME query measures how many
+            # candidates would have leaked through by default, the same double-run technique
+            # ARCHITECTURE/REPAIR-1/evidence/tools/exclusion_probe.py itself used to first diagnose RC-8. Its
+            # result is used only to count; it is never returned or delivered as a hit.
+            raw = lexicalquery.query(_safe_fts_query(text), k=k, exclude=None, view_path=view_path, repo=repo,
+                                      classify=_lexical_classify)
+            exclude_counter.bump(sum(
+                1 for h in raw["hits"]
+                if any(pathrules.any_glob_match(o["path"], exclude) is not None for o in h["occurrences"])
+            ))
         hits = []
         for h in result["hits"]:
             occs = tuple(
@@ -141,9 +159,11 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             return UNCLASSIFIED
         return classify_occ(row[0], row[1])
 
-    def semantic_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, **_kw) -> list:
+    def semantic_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, exclude_counter=None,
+                        **_kw) -> list:
         if not text:
             return []
+        exclude = taskctxmod.current().merge_exclude(exclude)
         result = semanticsearch.search(text, k=k, view_path=view_path, repo=repo, classify=_semantic_classify)
         hits = []
         for r in result["results"]:
@@ -151,6 +171,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             if occ_d is None:
                 continue
             if exclude and pathrules.any_glob_match(occ_d["path"], exclude) is not None:
+                if exclude_counter is not None:
+                    exclude_counter.bump()
                 continue
             occs = (RouteOccurrence(ref=occ_d["ref"], commit=occ_d["commit"], path=occ_d["path"],
                                      version_status=r.get("version_status") or "ABSENT",
@@ -242,7 +264,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
     def _edge_sort_key(edge) -> tuple:
         return (edge.evidence_occurrence or "", edge.dst or "")
 
-    def _expand_symbol(qname: str, conn, blob_to_path: dict, hits: list, exclude, fanout: dict) -> None:
+    def _expand_symbol(qname: str, conn, blob_to_path: dict, hits: list, exclude, fanout: dict,
+                        exclude_counter=None) -> None:
         """T2 (ARCHITECTURE.md section 7.2's G row, BR-HO-0015 defect 2): direct callees, TESTS edges, and the
         READS_KEY consumers of any literal key read AT this T1 symbol -- callers are covered by ``codesymbols.
         callers`` in the caller loop below. Every list is sorted into a STABLE, deterministic order (B3's own
@@ -254,8 +277,13 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         tests = sorted(derivemod.tests_of(conn, qname), key=_edge_sort_key)[:fanout.get("max_tests", 8)]
         for edge in (callees + tests):
             h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1, "T2")
-            if h is not None and not (exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude)):
-                hits.append(h)
+            if h is None:
+                continue
+            if exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude) is not None:
+                if exclude_counter is not None:
+                    exclude_counter.bump()
+                continue
+            hits.append(h)
         try:
             key_rows = conn.execute("SELECT DISTINCT value FROM literal WHERE enclosing_symbol=?", (qname,)).fetchall()
         except Exception:
@@ -266,8 +294,13 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                                 key=_edge_sort_key)[:fanout.get("max_reads_key_consumers", 8)]
             for edge in consumers:
                 h = _code_hit_from_edge(edge, blob_to_path, len(hits) + 1, "T2")
-                if h is not None and not (exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude)):
-                    hits.append(h)
+                if h is None:
+                    continue
+                if exclude and pathrules.any_glob_match(h.occurrences[0].path, exclude) is not None:
+                    if exclude_counter is not None:
+                        exclude_counter.bump()
+                    continue
+                hits.append(h)
 
     def _code_hit_from_bare_occurrence(occ: dict, rank: int) -> Optional[RouteHit]:
         """T1 (ARCHITECTURE.md section 7.2's G row, BR-HO-0015 defect 3): the CITED LINE ITSELF, always emitted
@@ -286,9 +319,10 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                          delivery="PINNED", tier="T1", resolution=label)
 
     def code_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, seed_labels=None,
-                   bare_occurrences=None, fanout=None, **_kw) -> list:
+                   bare_occurrences=None, fanout=None, exclude_counter=None, **_kw) -> list:
         if not product_commit:
             return []
+        exclude = taskctxmod.current().merge_exclude(exclude)
         is_seeded = seeds is not None  # T1/T2 (a task seed's own citations) vs T3 (free-text query retrieval)
         names = list(seeds or []) or _extract_symbol_names(text)
         seed_labels = seed_labels or {}
@@ -305,6 +339,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 defs_out = {"definitions": []}
             for d in defs_out.get("definitions", []):
                 if exclude and pathrules.any_glob_match(d["path"], exclude) is not None:
+                    if exclude_counter is not None:
+                        exclude_counter.bump()
                     continue
                 hits.append(_code_hit_from_definition(d, len(hits) + 1, def_tier,
                                                         citation_label=seed_labels.get(name)))
@@ -313,7 +349,7 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
                 # callers/callees are themselves at most T3, never T2, so query mode never expands here.
                 if is_seeded and qname not in expanded:
                     expanded.add(qname)
-                    _expand_symbol(qname, conn, blob_to_path, hits, exclude, fanout)
+                    _expand_symbol(qname, conn, blob_to_path, hits, exclude, fanout, exclude_counter=exclude_counter)
             try:
                 callers_out = codesymbols.callers(name, product_commit, repo=repo)
             except Exception:
@@ -324,10 +360,14 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             for row in caller_rows:
                 path = row["at"].split(":", 1)[0]
                 if exclude and pathrules.any_glob_match(path, exclude) is not None:
+                    if exclude_counter is not None:
+                        exclude_counter.bump()
                     continue
                 hits.append(_code_hit_from_caller(row, len(hits) + 1, caller_tier))
         for occ in (bare_occurrences or []):
             if exclude and occ.get("path") and pathrules.any_glob_match(occ["path"], exclude) is not None:
+                if exclude_counter is not None:
+                    exclude_counter.bump()
                 continue
             h = _code_hit_from_bare_occurrence(occ, len(hits) + 1)
             if h is not None:
@@ -336,9 +376,11 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
 
     # --- exact -----------------------------------------------------------------------------------------------
 
-    def exact_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, **_kw) -> list:
+    def exact_route(text: Optional[str] = None, seeds=None, k: int = 8, exclude=None, exclude_counter=None,
+                     **_kw) -> list:
         if not text:
             return []
+        exclude = taskctxmod.current().merge_exclude(exclude)
         try:
             result = exactmod.id_lookup(text, view_path=view_path, repo=repo)
         except Exception:
@@ -348,6 +390,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         for m in result.get("mention_sites", []):
             path, line = m.get("path"), m.get("line")
             if exclude and path and pathrules.any_glob_match(path, exclude) is not None:
+                if exclude_counter is not None:
+                    exclude_counter.bump()
                 continue
             cls, lifecycle = classify_occ(path, commit, line, line)
             vstatus = resolved_view.classify_occurrence(path, commit).status if path and commit else "ABSENT"

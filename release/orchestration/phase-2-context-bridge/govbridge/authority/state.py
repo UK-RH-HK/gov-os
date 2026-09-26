@@ -22,6 +22,7 @@ import yaml
 
 from govbridge.authority.resolver import STATE_ALIASES
 from govbridge.core import gitobj, view as viewmod
+from govbridge.core import taskctx as taskctxmod
 from govbridge.core.yamlutil import UniqueKeyLoader
 
 _STATE_HASH_LINE_RE = re.compile(r"(?m)^state_hash:.*$")
@@ -48,6 +49,11 @@ class StateLookupResult:
     computed_state_hash: str
     last_changed_commit: Optional[str]
     last_changed_date: Optional[str]
+    # R1-RX (OBS-BR-08): the task's own retrieval_exclusions apply here too -- ``excluded`` withholds ``value``
+    # (metadata/provenance stay), the same way govbridge.core.exact's corpus-rule EXCLUDE effect already does;
+    # ``excluded_hits`` is always present (0 or 1) so the exclusion is disclosed even when it never fires.
+    excluded: bool = False
+    excluded_hits: int = 0
 
     def to_dict(self) -> dict:
         return dataclasses.asdict(self)
@@ -91,13 +97,17 @@ def _compose_and_find(text: str, key_path: str) -> tuple:
     return value, start_line, end_line
 
 
-def get(alias: str, key_path: str, repo: Optional[str] = None, view_path: Optional[str] = None) -> StateLookupResult:
+def get(alias: str, key_path: str, repo: Optional[str] = None, view_path: Optional[str] = None,
+        task: Optional[taskctxmod.TaskContext] = None) -> StateLookupResult:
     from govbridge import GOV_BRIDGE_DOMAIN
     import os
 
     if alias not in STATE_ALIASES:
         raise ValueError(f"unknown state alias {alias!r} (known: {sorted(STATE_ALIASES)})")
     path = STATE_ALIASES[alias]
+    # R1-RX (OBS-BR-08): the task's own retrieval_exclusions apply to a state alias's canonical path too.
+    task = task or taskctxmod.current()
+    excluded = task.is_excluded(path)
 
     view_path = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
     vc = viewmod.load_view(view_path)
@@ -127,10 +137,10 @@ def get(alias: str, key_path: str, repo: Optional[str] = None, view_path: Option
     last_changed_commit, last_changed_date = blame if blame else (None, None)
 
     return StateLookupResult(
-        alias=alias, key_path=key_path, value=value, path=path, commit=commit, blob=blob,
+        alias=alias, key_path=key_path, value=(None if excluded else value), path=path, commit=commit, blob=blob,
         line_start=line_start, line_end=line_end, seal_status=seal_status, recorded_state_hash=recorded_hash,
         computed_state_hash=computed_hash, last_changed_commit=last_changed_commit,
-        last_changed_date=last_changed_date,
+        last_changed_date=last_changed_date, excluded=excluded, excluded_hits=(1 if excluded else 0),
     )
 
 
@@ -141,11 +151,13 @@ def main(argv=None) -> int:
     g.add_argument("alias")
     g.add_argument("key_path")
     g.add_argument("--json", action="store_true", help="present regardless (output is always JSON)")
+    taskctxmod.add_cli_arg(g)
     args = p.parse_args(argv)
 
+    ctx = taskctxmod.from_args(args)
     if args.cmd == "get":
         try:
-            result = get(args.alias, args.key_path)
+            result = get(args.alias, args.key_path, task=ctx)
         except (KeyError, ValueError, FileNotFoundError) as e:
             print(json.dumps({"error": str(e)}, indent=1))
             return 1
