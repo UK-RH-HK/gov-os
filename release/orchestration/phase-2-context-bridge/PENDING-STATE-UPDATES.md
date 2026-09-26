@@ -65,3 +65,15 @@ reads this file, `bridge/d1-0010` and `bridge/demo-0011`.**
   * run its demonstration: a multi-location query that exceeds one batch, plus an unrelated control;
   * rebuild the store at the new tip, then emit BUILT.
   * OD-BR-05 is also carried into the verifier handoff.
+
+## OD-BR-06 received during the freeze (durable record of the architecture and continuity requirements)
+* Record: `GATES/OWNER-DIRECTION-BR-0006-CONTEXT-RETRIEVAL-AND-CONTINUITY.md`, sha256 `21967774a2b8d150ef0afa4badbdbe81346796cb15b4a1616fed2f7fb954003e`. It is numbered BR-0006
+  because OD-BR-05 already uses BR-0005.
+* **Apply at merge:** add it to `owner_records` as an active applicable instruction, with this sha256. Also add
+  OD-BR-03, -04 and -05, each with its own sha256.
+* Resume order: README and the checkpoint `resume` text now follow OD-BR-06 §8.
+* V8.3 carry-forward: `V8_3_CARRY_FORWARD_FROM_CONTEXT_BRIDGE.md`, non-normative. It is the companion to the Phase-2
+  `V8_3_EVIDENCE_PACKAGE.md`, which the bridge must not write.
+* Verifier handoff §4a: 14 "implemented, not documented" challenges from OD-BR-03, -05 and -06.
+* The hooks are **not confirmed active in this session**, so checkpoints are written by hand before compaction or
+  close (OD-BR-06 §8).

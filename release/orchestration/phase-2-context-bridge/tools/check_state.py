@@ -477,11 +477,14 @@ def cmd_checkpoint(reason, do_commit, next_override=None):
         "next_action_source": ("orchestrator --next (the sealed state is frozen; see pending_state_updates)"
                                if next_override else "sealed state"),
         "state_next_action_as_sealed": state.get("next_deterministic_action"),
-        "resume": ("A fresh outer session resumes from THIS file: (1) `git worktree list`; (2) in the bridge worktree run "
-                   "`python3 release/orchestration/phase-2-context-bridge/tools/check_state.py show` then `verify`; "
-                   "(3) read ORCHESTRATOR_STATE.yaml, the newest PHASE_LEDGER.md entry, and -- if pending_state_updates "
-                   "is set -- that file on its side branch; (4) for every run in running_work check liveness from its "
-                   "transcript and branch, never from elapsed time; (5) execute next_deterministic_action."),
+        "resume": ("OD-BR-06 section 8 resume order: (1) bridge ORCHESTRATOR_STATE.yaml via `check_state.py show` + "
+                   "`verify` (and, if demonstration_freeze is IN FORCE, PENDING-STATE-UPDATES.md on bridge/orch-pending-*); "
+                   "(2) the latest validated outer checkpoint -- highest BR-CP across the bridge branch and any freeze side "
+                   "branch, content_sha256 round-tripped (this file's next_deterministic_action is current); (3) "
+                   "GATES/OWNER-DIRECTION-BR-0006-CONTEXT-RETRIEVAL-AND-CONTINUITY.md; (4) active owner decisions -- state "
+                   "owner_records + GATES/OWNER-*.md (rulings BR-ARCH-RULING-* are NOT owner decisions); (5) the newest "
+                   "BR-L entry in PHASE_LEDGER.md; (6) running_work + its HANDOFFS, liveness from transcript/branch, never "
+                   "elapsed time; (7) execute next_deterministic_action, checkpointing after every material transition"),
     }
     cp["content_sha256"] = sha256_bytes(yaml.safe_dump({k: v for k, v in cp.items()}, sort_keys=True).encode())
     missing = sorted(OUTER_CP_KEYS - set(cp))
