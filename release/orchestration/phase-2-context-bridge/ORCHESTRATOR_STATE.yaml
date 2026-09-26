@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T04:06:56Z'
-state_hash: cd44fb04a413b6ecd214973255dba3cb81d068af261b641b54ec19a9b4295daa
+updated_at: '2026-09-26T04:45:16Z'
+state_hash: dacb4ebfde1e869933da9739d38903820f0f6f2128097a4a7aaaf09280d64592
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -894,6 +894,22 @@ agent_runs:
     - symbol-history max_commits from configuration; truncation disclosed (bounded_incomplete)
     - a hermeticity defect in its own first-pass test found and fixed; full domain suite 361 passed, 0 failed
     - secrecy audit -- 0 hits; claude-sonnet-5 x727
+    pass_3:
+      final_commit: b4929ca731ce8be96787b4f780a890745d861924
+      interim_merge: cd87f36 (BR-DAG-AMEND-R1-9 -- the accepted work merged so that R1-GA1 can start; the node stays OPEN)
+      orchestrator_verified:
+      - integrate-check INTEGRATION_PERMITTED; FULL domain suite on the trial-merged tree 472 passed, 0 failed
+      - the bridge boundary is intact (no path outside the domain changed since 6e7a2a3); the report's "file gone" claim
+        was a misreading -- tests/certification/ar94_floor.rs exists only at the product pin, never on records
+      accepted: the Gap-1 fixes (tests/ scanned, no silent drops, section-unresolved label, lineage_unresolved table,
+        ranges) with the explicit correction; the rust_cli.py clap dispatch map; the in-process single-snapshot digest method
+      reopen_3_reason: '(A) lineage_layer_builder walks ONLY the records ref, while canonical-view.yaml gives product
+        paths to the product ref (3c880d8); records holds an older, non-canonical product copy (31 certification test
+        files against 60), so the edges are derived from stale code -> build over every ref whose spec admits the layer,
+        as govbridge/code/build.py does. (B) the dominant real binary-driving shape -- harness methods taking the args
+        slice, in 58 files with more than 1,000 literal-prefixed call sites at 3c880d8, against 4 direct Command::new sites
+        -- was left unresolved as a "different indirection"; under R1-T2 item 4 that is a narrowing -> impl methods in
+        the wrapper chain, receiver by type or a unique method name, ambiguity counted'
     reopen_2_reason: 'two measured gaps. (1) CITES_REQUIREMENT = 0 on the real view, reported as "verified genuine", is FALSE:
       a git grep at 3c880d8 finds >= 6 code-comment citations of the form <doc> section-sign N that its own SECTION_CITE_RE
       matches, so a later step drops them silently; fix generically, never drop silently (document-only edges get a
@@ -1057,7 +1073,48 @@ agent_runs:
   - release/orchestration/phase-2-context-bridge/tests/compile/test_verify_recorded_view.py
   - release/orchestration/phase-2-context-bridge/tests/fixtures/compile/recorded_view/**
   - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0022.*
+- run_id: BR-AR-0023
+  role: 'REPAIR-1 node R1-GA1 -- govbridge gather, core: instantiation, facet registry, deterministic parallel facet
+    retrieval, paging and continuation with a configurable batch size, stop reasons, telemetry; plus the routed
+    `govbridge notes` dispatch line'
+  dag_node: R1-GA1
+  handoff_path: release/orchestration/phase-2-context-bridge/HANDOFFS/BR-HO-R1-TEMPLATE-repair-builder.md
+  handoff_sha256: 5f9c5feb7c2d9a0bce9e282cf889bf803fb914dbc65a2e064a33d9ee294092aa
+  handoff_note: template revision with amendments R1-T1 and R1-T2
+  branch: bridge/r1-ga1-0023
+  worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0023
+  model_requested: sonnet
+  model_observed: PENDING (checked from the transcript at return)
+  agent_name: br-r1-ga1-0023
+  checkpoint_schema: 2
+  dispatched_at: '2026-09-26T04:45Z'
+  status: RUNNING
+  store: $HOME/.cache/gov-bridge/store-BR-AR-0023
+  dispatch_notes:
+  - base contains R1-RX (taskctx, --task, exclusions) and R1-RL's accepted paging primitives (interim merge,
+    BR-DAG-AMEND-R1-9); use both, re-implement neither
+  - third editor of govbridge/cli.py (RX -> GA1 -> RS -> RA); carries the routed `govbridge notes` dispatch line (from R1-RN)
+  mutation_scope:
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/__init__.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/instantiate.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/facets.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/engine.py
+  - release/orchestration/phase-2-context-bridge/govbridge/gather/telemetry.py
+  - release/orchestration/phase-2-context-bridge/config/facets.yaml
+  - release/orchestration/phase-2-context-bridge/config/budgets.yaml
+  - release/orchestration/phase-2-context-bridge/govbridge/route/real_routes.py
+  - release/orchestration/phase-2-context-bridge/govbridge/route/router.py
+  - release/orchestration/phase-2-context-bridge/govbridge/lexical/query.py
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/search.py
+  - release/orchestration/phase-2-context-bridge/govbridge/semantic/vectors.py
+  - release/orchestration/phase-2-context-bridge/govbridge/cli.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_engine.py
+  - release/orchestration/phase-2-context-bridge/tests/gather/test_instantiate.py
+  - release/orchestration/phase-2-context-bridge/tests/fixtures/gather/**
+  - release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.*
 running_work:
+- run_id: BR-AR-0023
+  liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
 - run_id: BR-AR-0022
   liveness_check: subagent transcript mtime + commits on bridge/r1-rm-0022; never inferred from elapsed time
 - run_id: BR-AR-0019
@@ -1168,6 +1225,15 @@ dag:
       reopened pass'
     reason: reopen cycles caught every case, but each costs a full builder pass; the conformance table makes the gap
       visible at return instead of at the orchestrator's re-measurement
+  - id: BR-DAG-AMEND-R1-9
+    by: orchestrator (scheduling; no design change)
+    rule: 'R1-GA1''s dependency on R1-RL is satisfied by RL''s accepted paging primitives, merged as an INTERIM integration of
+      bridge/r1-rl-0019 at cd87f36 after integrate-check and a green full suite (472/0). R1-RL stays OPEN (third
+      reopen: multi-ref lineage walk; harness-method binary tests); its final pass merges as a delta. R1-GA2, which
+      consumes lineage edges, still depends on RL''s FINAL pass'
+    reason: GA1 needs only the paging API, accepted since pass 1 and untouched by the reopen; RL's remaining scope
+      (govbridge/code/**, graph/derive.py) is disjoint from GA1's; integrate-check requires only that the listed
+      artifacts cover the diff, so a later delta merge stays checkable
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1311,6 +1377,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await the BR-AR-0022 R1-RM follow-up (fidelity check; Markdown entries) and the BR-AR-0019 R1-RL second follow-up (citations; Rust binary tests);
+next_deterministic_action: await BR-AR-0023 R1-GA1, the BR-AR-0022 R1-RM follow-up (fidelity check; Markdown entries) and the BR-AR-0019 R1-RL third follow-up (multi-ref walk; harness methods);
   integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; on RL's merge dispatch R1-GA1 (BR-AR-0023,
   template R1-T1); checkpoint after every merge
