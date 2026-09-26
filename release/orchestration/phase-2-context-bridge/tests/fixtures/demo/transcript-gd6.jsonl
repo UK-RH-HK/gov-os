@@ -1,0 +1,3 @@
+{"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "t1", "name": "Bash", "input": {"command": "python3 -m govbridge exact show 'fixtures/demo/T-CODE-1.rs:1-5' > run-1/supplementary/queries/01-exact.json"}}]}}
+{"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "t2", "name": "Bash", "input": {"command": "head -c 200 run-1/supplementary/queries/01-exact.json"}}]}}
+{"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "t3", "name": "Bash", "input": {"command": "cat fixtures/demo/T-UNDECLARED.rs"}}]}}

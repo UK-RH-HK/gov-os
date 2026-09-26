@@ -1,0 +1,13 @@
+# GD-9/D-3 synthetic fixture: the fresh rubric grader's [R] results, ingested by `govbridge demo grade --rubric`.
+# Every id is T-* (never Review-8/Phase-2 content -- OC-BR-02), matching tests/integration/test_demo_grade.py's own
+# synthetic oracle/answers/queries fixtures (tests/fixtures/integration/{oracle,demo-queries}-synthetic.yaml,
+# answers-passing.yaml). `must_state` fails T-QC1-S1 and T-QC1-S2 (2 of QC1's 3 subjects), which must flip QC1 --
+# and so G5, and the DEMONSTRATION_PASS verdict -- to FAIL. `auth_gating` fails an arbitrary answer-side authority
+# item, which must flip G3 to FAIL too. Neither field names a real Review-8 AUTH/QC id: T-AUTH-1 here is fixture
+# data, standing in for whatever id a real rubric names.
+schema: govbridge-rubric-results/1
+must_state:
+  T-QC1-S1: {ok: false, quote: "the fixture fact was not stated for T-QC1-S1"}
+  T-QC1-S2: {ok: false, quote: "the fixture fact was not stated for T-QC1-S2"}
+auth_gating:
+  - {item: T-AUTH-1, verdict: FAIL, quote: "the answer asserts more than the packet's own AUTH item supports"}
