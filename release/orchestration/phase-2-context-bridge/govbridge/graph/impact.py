@@ -40,7 +40,16 @@ def impact(seed: str, repo: Optional[str] = None, view_path: Optional[str] = Non
     resolved_view = _resolved_view(view_path, repo)
 
     try:
-        conn = store.open_db()
+        # BR-DAG-AMEND-R1-17 reopening (pass 3): a QUERY, never a build -- moved from store.open_db() (read-write,
+        # "tolerates a read-only FILE by catching each write attempt") to store.open_db_readonly() (cannot write,
+        # by construction), the same discipline this node's other six fixes already apply throughout
+        # govbridge/route/real_routes.py and govbridge/code/symbols.py. govbridge.graph.traverse.persisted_edges_
+        # from/_to still call govbridge.authority.layer.ensure_schema(conn) internally (out of this node's
+        # mutation scope) -- confirmed empirically safe against an immutable connection when the authority
+        # layer's schema already exists (CREATE TABLE IF NOT EXISTS/commit() are both genuine no-ops then, never
+        # attempting a write); if the schema does not exist at all, ensure_schema raises, caught by this
+        # function's own pre-existing except below exactly as before -- graph_hops degrades to {}, never crashes.
+        conn = store.open_db_readonly()
         graph_hops = T.bfs(conn, [seed], max_depth=max_depth)
     except Exception:
         graph_hops = {}

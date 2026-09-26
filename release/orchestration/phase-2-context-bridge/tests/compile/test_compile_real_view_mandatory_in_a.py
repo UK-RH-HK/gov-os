@@ -28,7 +28,32 @@ ref a future edit to that config might add) needs pinning here. ``history`` (``r
 the FROZEN phase2 product branches) is left as live tip -- those branches are frozen, and are not this test's own
 mandatory-item content. ``repo=`` is passed explicitly to both compiles, never relying on ``gitobj.repo_root()``'s
 process-global cwd cache (R1-INT's routed fix; a new test must pass ``repo=`` explicitly regardless -- template
-amendment R1-T1)."""
+amendment R1-T1).
+
+BR-DAG-AMEND-R1-17 reopening (pass 3, coordinator finding): pinning the VIEW (above) closed the git-ref confound,
+but ``compile_packet`` still reached ``govbridge.compile.packet.Compiler.code_conn``/``.code_seeds_for``, which
+read the STORE by its ambient default (``GOVBRIDGE_STORE`` unset -> ``$HOME/.cache/gov-bridge/store/default``) --
+a single, machine-wide store this test shared with every OTHER agent's own concurrent suite run in this session.
+Two compiles in the SAME test could therefore see the code layer change (or be rebuilt) BETWEEN them by a
+completely unrelated process, exactly the kind of external-state confound the view-pinning fix above already
+eliminated for git refs, just not yet for the store.
+
+The fix lives in ``tests/compile/conftest.py``'s own ``_no_env_leak`` fixture (see its docstring), not in this
+file: an EARLIER version of this fix added a module-scoped ``GOVBRIDGE_STORE`` override here directly, using
+``pytest.MonkeyPatch()`` since a module-scoped fixture cannot use the function-scoped ``monkeypatch`` fixture.
+That override was silently undone every test by ``_no_env_leak`` itself, which back then only called
+``monkeypatch.delenv("GOVBRIDGE_STORE")`` -- unconditionally, after this module's own fixture had already run
+(pytest runs function-scoped fixtures' setup AFTER any wider-scoped ones for the same test), deleting the very
+override this module had just set. The test still passed when that was tried, but only because nothing else
+happened to touch the shared default store in that particular ~165s window -- not because the isolation took
+effect. ``_no_env_leak`` now sets ``GOVBRIDGE_STORE`` to a fresh ``tmp_path`` directory itself (instead of
+deleting it), which fixes this for every test in the package including both of this module's, so no local
+override is needed or attempted here any more. The code layer is never built in that private store, so every
+code-route touchpoint (``code_conn``/``code_seeds_for``, and section B/C's own graph BFS) degrades to its own,
+pre-existing, documented "honest MISSING" empty/None result via ``packet.py``'s own out-of-scope exception
+handling -- identically, deterministically, on every compile in this module, which is exactly what the
+byte-identical assertion needs and never weakens it: the two renders are still compared for EXACT equality,
+just no longer confounded by a store neither compile call ever asked to share."""
 import os
 import tempfile
 from pathlib import Path

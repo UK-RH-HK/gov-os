@@ -36,8 +36,14 @@ READS_UNDECLARED_PATH = str(FIXTURES_INTEGRATION / "reads-undeclared.json")
 
 
 @pytest.fixture(autouse=True)
-def _no_env_leak(monkeypatch):
-    monkeypatch.delenv("GOVBRIDGE_STORE", raising=False)
+def _no_env_leak(tmp_path, monkeypatch):
+    """BR-DAG-AMEND-R1-17 reopening (pass 3, coordinator finding, same class of bug as
+    ``tests/compile/conftest.py``'s own fix -- see its docstring for the full root-cause account): this used to
+    only ``delenv``, which does not stop ``_compile_fixture_packet``'s ``compile_packet`` call (and
+    ``grademod.grade``'s own code-layer lookup, ``_enclosing_symbol``) from falling through to
+    ``govbridge.core.store``'s machine-wide default store when neither sets ``GOVBRIDGE_STORE`` itself. Pointing
+    it at a fresh ``tmp_path`` directory instead makes every test in this module hermetic (R1-T1)."""
+    monkeypatch.setenv("GOVBRIDGE_STORE", str(tmp_path / "isolated-govbridge-store"))
 
 
 def _compile_fixture_packet(tmp_path):
