@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T02:01:25Z'
-state_hash: 7de8add038ab366ee99f5b464e3f3dac13e2457c01d27c981397a56dd3a6079f
+updated_at: '2026-09-26T02:02:27Z'
+state_hash: 785e5ce0b7a6a1254fcec4cf429b4c24a9f5c08016776243bd751365a5395837
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -787,10 +787,11 @@ agent_runs:
   branch: bridge/r1-rn-0017
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0017
   model_requested: sonnet
-  model_observed: null
+  model_observed: claude-sonnet-5 (transcript agent-a3ac98ad2ad3361ac.jsonl)
   agent_name: br-r1-rn-0017
   checkpoint_schema: 2
-  status: DISPATCHED
+  dispatched_at: '2026-09-26T02:1xZ'
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0017
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/notes/**
@@ -805,10 +806,11 @@ agent_runs:
   branch: bridge/r1-rx-0018
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0018
   model_requested: sonnet
-  model_observed: null
+  model_observed: claude-sonnet-5 (transcript agent-a07d36baee03df351.jsonl)
   agent_name: br-r1-rx-0018
   checkpoint_schema: 2
-  status: DISPATCHED
+  dispatched_at: '2026-09-26T02:1xZ'
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0018
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/core/taskctx.py
@@ -831,10 +833,11 @@ agent_runs:
   branch: bridge/r1-rl-0019
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0019
   model_requested: sonnet
-  model_observed: null
+  model_observed: claude-sonnet-5 (transcript agent-aaf18568701b48f13.jsonl)
   agent_name: br-r1-rl-0019
   checkpoint_schema: 2
-  status: DISPATCHED
+  dispatched_at: '2026-09-26T02:1xZ'
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0019
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/code/**
@@ -858,10 +861,11 @@ agent_runs:
   branch: bridge/r1-rg-0020
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0020
   model_requested: sonnet
-  model_observed: null
+  model_observed: claude-sonnet-5 (transcript agent-a5f6930c9617f0abd.jsonl)
   agent_name: br-r1-rg-0020
   checkpoint_schema: 2
-  status: DISPATCHED
+  dispatched_at: '2026-09-26T02:1xZ'
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0020
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/demo/**
@@ -878,10 +882,11 @@ agent_runs:
   branch: bridge/r1-ta2-0021
   worktree: /home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0021
   model_requested: opus
-  model_observed: null
+  model_observed: claude-opus-5-5 (transcript agent-a29742ad9430d7576.jsonl)
   agent_name: br-r1-ta2-0021
   checkpoint_schema: 2
-  status: DISPATCHED
+  dispatched_at: '2026-09-26T02:1xZ'
+  status: RUNNING
   store: $HOME/.cache/gov-bridge/store-BR-AR-0021
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-commitment-run-2.yaml
