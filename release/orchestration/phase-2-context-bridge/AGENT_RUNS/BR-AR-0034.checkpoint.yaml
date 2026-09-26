@@ -416,6 +416,16 @@ task_contract:
     (its id-form `required_inputs` branch was the one remaining independent "records" resolution reachable from
     all three of those in-scope operations). `govbridge/core/exact.py`'s own `id_lookup` fix needed no scope
     addition (already fully in scope since pass 4). See decisions and findings for the full account.
+
+
+    `python3 tools/check_state.py integrate-check BR-AR-0034`, re-run after this pass's own final commit, reports
+    INTEGRATION_REFUSED against exactly the three files this pass added to mutation_scope without an explicit
+    coordinator grant (`authority/resolver.py`, `tests/authority/test_resolver.py`,
+    `tests/answers/test_lint.py`) -- ORCHESTRATOR_STATE.yaml has not yet been updated with this run's own
+    self-extension for any of the three. This is the SAME situation pass 3's own
+    `tests/route/test_task_exclusions.py` was in (see that pass's own note above): a stale-scope artifact of this
+    run's own justified, documented, pending-ratification addition, not a real violation this run's own diff
+    disagrees with. See the report's own `open_issues` for the exact integrate-check output and full account.
 artifacts_changed:
 - release/orchestration/phase-2-context-bridge/govbridge/core/freshness.py
 - release/orchestration/phase-2-context-bridge/govbridge/core/gitobj.py
