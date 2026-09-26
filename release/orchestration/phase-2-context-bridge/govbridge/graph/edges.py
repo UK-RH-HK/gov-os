@@ -65,6 +65,15 @@ EXACT_TEST_REGISTRY_ROW = "EXACT_TEST_REGISTRY_ROW"  # a row of a schema/shape-r
 EXACT_RUST_CLI_DISPATCH = "EXACT_RUST_CLI_DISPATCH"  # resolved to the innermost handler call a match arm names
 HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM = "HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM"  # resolved only to the outer
                                                       # enum::variant a nested subcommand could not be walked past
+# BR-AR-0019 reopening (third pass), Defect B: the dominant real shape is a TEST-HARNESS METHOD
+# (`<receiver>.ok(&[...])`), not a bare wrapper function. Once the receiver's own type is known (a `let`-declared
+# local whose constructor/annotation names it), the method resolves with the SAME precision as a bare wrapper --
+# labelled EXACT_RUST_CLI_DISPATCH/HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM exactly as before. This THIRD label is
+# for the weaker link in the chain: the receiver's type could not be determined at all (not a `let`-bound local,
+# or bound via a shape this scan does not follow), so the method was resolved only because its NAME was unique
+# across every harness type this build found -- a real, generic (never per-repository-hardcoded) resolution, but
+# one honestly less certain than a verified receiver type, so it never wears the EXACT label.
+HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD = "HEURISTIC_RUST_CLI_HARNESS_UNIQUE_METHOD"
 # code-route labels reused verbatim from ARCHITECTURE.md section 4.6 (B3's vocabulary; B5 uses them only to LABEL
 # edges read from B3's table schema, never to invent a resolution of its own)
 CODE_ROUTE_LABELS = (
