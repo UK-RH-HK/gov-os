@@ -1,0 +1,266 @@
+run_id: BR-AR-0027
+role: >-
+  REPAIR-1 node R1-RA -- answer-side aids: govbridge cite and govbridge answers lint (RC-11); plus
+  BR-DAG-AMEND-R1-19 (`govbridge gather` wired to gather_with_followup, single-pass kept behind --no-followup)
+model_observed: claude-sonnet-5
+branch: bridge/r1-ra-0027
+commit: c5eaf592401aa22c0769bb41fd1e81da1dd02f9f
+status: COMPLETED
+claims:
+- id: C-1
+  text: >-
+    `govbridge cite <identifier> [--commit C] [--view] [--repo] [--registry]` (govbridge/answers/cite.py, dispatched
+    from govbridge/cli.py's new cmd_cite via govbridge/answers/cli.py) resolves FOUR identifier kinds, dispatched
+    on shape alone (OC-BR-02), and returns `{identifier, kind, status, citation|candidates, label}`: status is
+    RESOLVED (an exact path/commit/lines/symbol), AMBIGUOUS (every candidate listed, never a guessed "best" one),
+    or NOT_FOUND (never an error). Exit code is 0 only for RESOLVED.
+- id: C-2
+  text: >-
+    Rust symbols: a bare `fn_name` resolves through `govbridge.code.symbols.definitions` directly (its own
+    name/qualified_name/`::name`-suffix matching already generic). A `mod::fn`-shaped query first tries that exact
+    qualified string (catches a genuine `Type::method` hit), and only if that finds nothing retries with just the
+    TRAILING segment after the last `::` -- because the tree-sitter adapter (govbridge/code/adapters/
+    rust_treesitter.py:170) stores a free or mod-nested fn's own `qualified_name` as its BARE name, with no module
+    path at all (only an `impl` block's `Type::method` case carries a prefix). More than one surviving candidate
+    (bare-name OR trailing-segment) is AMBIGUOUS, listing every one, labelled distinctly from an exact match
+    (EXACT_QUALIFIED_MATCH vs HEURISTIC_TRAILING_SEGMENT). Proven both on a synthetic fixture (two functions named
+    `ra_shared_fn` in two different `mod` blocks -- tests/answers/test_cite.py::
+    test_rust_mod_qualified_trailing_segment_ambiguous, ::test_rust_bare_shared_name_is_also_ambiguous) AND on the
+    real product view: `cite init::native_layout_rules` resolves via HEURISTIC_TRAILING_SEGMENT to the exact
+    verified span runtime/src/init.rs:90-149 (AGENT_RUNS/BR-AR-0027.check06-realview-cite-rust.out), and
+    `cite PolicySet::load` resolves via EXACT_QUALIFIED_MATCH to runtime/src/policy.rs:121-623 -- both spans match
+    ARCHITECTURE.md section 4.6's own independently-verified table exactly.
+- id: C-3
+  text: >-
+    Python test names: the persisted code layer indexes `.rs` only (ARCHITECTURE.md section 4.6), so a code-shaped
+    identifier that Rust resolution does not find falls back to `govbridge.core.exact.grep` (the exact route,
+    corpus-rule and task-exclusion aware -- never the store) for a literal `"def <name>("` occurrence under
+    `*.py`, labelled PYTHON_DEF_EXACT_GREP -- a distinct heuristic, never confused with a Rust label. Tested for a
+    unique def (exact path/line) and for the SAME name defined in two different files (AMBIGUOUS, both candidates
+    listed) -- tests/answers/test_cite.py::test_python_def_resolves_via_exact_route,
+    ::test_python_def_ambiguous_across_two_files, ::test_python_def_label_is_distinct_from_rust_labels.
+- id: C-4
+  text: >-
+    id-grammar ids: resolved through the EXISTING, already-tested `govbridge.authority.lifecycle.find_definition`
+    (no new id-grammar logic written -- this node reuses it rather than re-implementing definition-site
+    resolution). Proven, on a synthetic fixture, for a YAML top-level `id:` key written in ordinary BLOCK style, the
+    SAME shape written in FLOW style (`{id: ..., ...}` on one line), and a level-2 Markdown ledger heading -- three
+    genuinely different source syntaxes, same resolution path (tests/answers/test_cite.py::
+    test_id_grammar_yaml_block_style, ::test_id_grammar_yaml_flow_style, ::test_id_grammar_markdown_heading). Also
+    proven on the real view: `cite D-0002` resolves to spec/decisions/D-0002.yaml:1-58 (AGENT_RUNS/
+    BR-AR-0027.check05-realview-cite-id-and-doc-anchor.out).
+- id: C-5
+  text: >-
+    Document section anchors (`"<doc> §N"`): the document path is resolved through the exact route's own
+    `path_resolve` (an ambiguous suffix is reported as AMBIGUOUS with every candidate path, exactly like every
+    other exact-route lookup), then the requested numbered heading is located in R1-RM's OWN
+    `govbridge.compile.sectionmap.markdown_sections` (no anchor-finding logic duplicated). Proven for a top-level
+    and a NESTED numbered heading, for two headings sharing the same number (AMBIGUOUS), for a wrong number and an
+    unknown document (both NOT_FOUND) -- tests/answers/test_cite.py (6 tests). Real view: `cite
+    "REPAIR-1/REPAIR_PLAN.md §7"` resolves to lines 281-295, exactly the "## 7. Answer-side aids (R1-RA)" section
+    (independently confirmed by reading that file directly); `cite "ARCHITECTURE.md §5.3"` is correctly AMBIGUOUS
+    (2 same-named-suffix paths reachable from the "records" ref) -- AGENT_RUNS/
+    BR-AR-0027.check05-realview-cite-id-and-doc-anchor.out.
+- id: C-6
+  text: >-
+    `govbridge answers lint <answers> --packet DIR [--supplementary DIR...] [--waive KIND:QUERY_ID[:DETAIL]]`
+    (govbridge/answers/lint.py) reports all FOUR finding kinds the node's deliverable names, machine-readable
+    (JSON), exit 1 on any OPEN (non-waived) finding: NAMED_NOT_CITED (an identifier extracted from a claim's own
+    free text that `cite` resolves RESOLVED/AMBIGUOUS in the index, absent from that SAME claim's own citations),
+    DOC_LEVEL_CITATION (a whole-document citation -- no `lines`, whether via `{exact: {path,commit}}` or via an
+    `item_id` whose packet-manifest row records no `line_start` -- of a document R1-RM's own sectionmap.flat_tiling
+    resolves to more than one section), CROSS_ANSWER_REFERENCE (a generic outward-pointer phrase, or a literal
+    mention of another answer's own query_id, within a claim's text), and NOT_SELF_CONTAINED (an ANSWERED/PARTIAL
+    answer with empty answer_text; an ANSWERED answer with zero citations anywhere in its own record; a chain
+    stage whose claim carries no citations of its own). A waiver is a REPORTED row (`waived: true`), never a
+    silently dropped one; `open_findings`/`status` count only non-waived rows.
+- id: C-7
+  text: >-
+    The acceptance check's literal example is reproduced exactly: an answer naming three tests/identifiers and
+    citing one yields exactly two NAMED_NOT_CITED findings (tests/answers/test_lint.py::
+    test_named_not_cited_two_of_three); a whole-document citation of a sectioned fixture document yields
+    DOC_LEVEL_CITATION with a suggested section anchor, chosen by claim/section-title word overlap, deterministic
+    tie-break to document order (::test_doc_level_citation_suggests_the_nested_section); `cite` resolves a test
+    name to its definition span (test_cite.py, both Rust and Python).
+- id: C-8
+  text: >-
+    A REAL-VIEW regression was found and fixed during this run's own real-view acceptance (not merely disclosed):
+    the first real-view lint run against a from-clean rebuild of the real store, using CONTROL-A's own compiled
+    packet, produced a FALSE-POSITIVE CROSS_ANSWER_REFERENCE on "See the answer-side aids section of REPAIR_PLAN.md
+    for details." -- a bare `\b` word boundary is satisfied at a hyphen too, so "answer-side" (a real section-name
+    compound word) matched the "see (the )?answer" phrase. Fixed with a `(?!-)` negative lookahead after every
+    bare "answer" in the phrase set (govbridge/answers/lint.py), with a dedicated regression test
+    (test_cross_answer_reference_does_not_fire_on_a_compound_word) and re-confirmed clean on the SAME real-view
+    input afterward (AGENT_RUNS/BR-AR-0027.check08-realview-answers-lint.out, second/final run: 2 findings, the
+    two genuine ones, 0 false positives).
+- id: C-9
+  text: >-
+    BR-DAG-AMEND-R1-19: `govbridge gather` (govbridge/cli.py cmd_gather) now calls
+    `govbridge.gather.followup.gather_with_followup` by DEFAULT (round 0 is the unchanged R1-GA1 base engine call,
+    per that module's own docstring, never forked); the single-pass `govbridge.gather.engine.gather` is kept
+    behind an explicit `--no-followup` flag, reproducing this command's EXACT pre-existing output shape (same key
+    set, same non-JSON summary line format) when passed. Every pre-existing flag is unchanged and still honoured
+    in both modes, including `--out`'s R1-RS supplementary-packet behaviour (tested in both modes: manifest.json/
+    packet.md written, meta.json packet_kind=="supplementary", and `packet verify` PASSES on the result). Added
+    `--repo` to `cmd_gather` (it had none before, unlike every sibling query command) so this node's OWN tests
+    could exercise the wiring hermetically against a fixture repo instead of relying on cwd-based git resolution
+    -- decisions D-R1-RA-1 below.
+- id: C-10
+  text: >-
+    govbridge/cli.py is the shared file this node edits last in the RX -> GA1 -> RS -> RA sequence
+    (REPAIR_DAG.yaml conventions.shared_files). The diff is minimal and localised: two new top-level dispatch
+    lines (`cite`, `answers`) delegating to the new govbridge/answers/cli.py; cmd_gather gains one new flag
+    (--no-followup) and one new, previously-absent flag (--repo); the module docstring gains three bullets. No
+    existing cmd_* function's behaviour changes when the new flags are omitted, confirmed by the pre-existing
+    tests/compile/test_supplementary.py::test_search_out_and_packet_verify-style CLI round trips still passing
+    unmodified in the full suite.
+mutation_scope_respected: true
+open_issues:
+- >-
+  `find_definition` (govbridge/authority/lifecycle.py, out of this node's mutation scope) returns only the single
+  BEST-ranked id-grammar definition candidate; it does not itself surface a genuine multi-candidate ambiguity for
+  an id-grammar id (unlike this node's own Rust/Python/doc-anchor resolution, all of which do). `cite` therefore
+  cannot report AMBIGUOUS for an id-grammar id today -- it inherits whatever `find_definition` decides. This is a
+  pre-existing property of a function this node reuses rather than re-implements (deliberately, per C-4); no real
+  or fixture case in this run's own testing exposed a genuine id-grammar ambiguity, so this is disclosed as a
+  known limitation, not a demonstrated defect.
+- >-
+  NAMED_NOT_CITED's identifier-candidate extraction (govbridge/answers/lint.py:_extract_candidate_identifiers) is
+  a generic, regex-based heuristic (snake_case tokens, `mod::fn` paths, id-grammar tokens, doc-section anchors) --
+  by design it can only flag identifiers that are ALSO real code/id-grammar/doc-anchor shapes; a claim that
+  paraphrases a fact without ever naming the underlying identifier is not, and cannot generically be, caught by
+  this check. Lint is advisory (REPAIR_PLAN.md section 7: "Lint is advisory for the agent"), never a substitute for
+  the grader.
+- >-
+  CROSS_ANSWER_REFERENCE's phrase set is a fixed, generic list of English outward-pointer phrases (never
+  Review-8-shaped, OC-BR-02); the real-view run (C-8) already found and fixed one false-positive shape
+  ("answer-side"). Further, currently-unknown phrasings could still slip through either direction (a genuine
+  cross-reference phrased unusually and missed, or an unrelated phrase incidentally matched) -- this is an
+  inherent property of a fixed phrase list, not a defect this node is aware of leaving open, and is flagged here
+  so a future reopening knows where to look first if the run-2 protocol observes either failure mode.
+evidence:
+- claim: C-1
+  command_or_file: govbridge/answers/cite.py:cite_identifier
+- claim: C-2
+  command_or_file: >-
+    tests/answers/test_cite.py::test_rust_mod_qualified_trailing_segment_ambiguous,
+    ::test_rust_bare_shared_name_is_also_ambiguous; AGENT_RUNS/BR-AR-0027.check06-realview-cite-rust.out
+- claim: C-3
+  command_or_file: tests/answers/test_cite.py::test_python_def_ambiguous_across_two_files
+- claim: C-4
+  command_or_file: >-
+    tests/answers/test_cite.py::test_id_grammar_yaml_block_style, ::test_id_grammar_yaml_flow_style,
+    ::test_id_grammar_markdown_heading; AGENT_RUNS/BR-AR-0027.check05-realview-cite-id-and-doc-anchor.out
+- claim: C-5
+  command_or_file: >-
+    tests/answers/test_cite.py::test_doc_section_anchor_resolves_nested_heading,
+    ::test_doc_section_anchor_ambiguous; AGENT_RUNS/BR-AR-0027.check05-realview-cite-id-and-doc-anchor.out
+- claim: C-6
+  command_or_file: govbridge/answers/lint.py:lint_answers
+- claim: C-7
+  command_or_file: >-
+    tests/answers/test_lint.py::test_named_not_cited_two_of_three,
+    ::test_doc_level_citation_suggests_the_nested_section
+- claim: C-8
+  command_or_file: >-
+    AGENT_RUNS/BR-AR-0027.check08-realview-answers-lint.out; tests/answers/test_lint.py::
+    test_cross_answer_reference_does_not_fire_on_a_compound_word
+- claim: C-9
+  command_or_file: >-
+    govbridge/cli.py:cmd_gather; tests/answers/test_gather_wiring.py (4 tests, all passing)
+- claim: C-10
+  command_or_file: 'git diff <merge-base> -- govbridge/cli.py; AGENT_RUNS/BR-AR-0027.check03-full-domain-suite.out'
+- claim: full suite
+  command_or_file: 'cd $D && $PY -m pytest -q -p no:cacheprovider tests -> 687 passed, 0 failed'
+conformance:
+- item: 'Deliverable 1: `govbridge cite <identifier> [--commit C]` returns an exact (path, commit, lines, symbol if any), or AMBIGUOUS with every candidate'
+  status: MET
+  evidence: >-
+    govbridge/answers/cite.py:cite_identifier; tests/answers/test_cite.py (19 tests: RESOLVED/AMBIGUOUS/NOT_FOUND
+    for all four kinds); real-view AGENT_RUNS/BR-AR-0027.check05/check06 (PolicySet::load, init::
+    native_layout_rules, D-0002, two doc anchors -- one RESOLVED, one AMBIGUOUS with 2 real candidates)
+- item: 'Deliverable 2: `govbridge answers lint <answers> --packet DIR [--supplementary DIR...]` reports NAMED_NOT_CITED, DOC_LEVEL_CITATION, CROSS_ANSWER_REFERENCE and NOT_SELF_CONTAINED; machine-readable; exit 1 on findings unless waived'
+  status: MET
+  evidence: >-
+    govbridge/answers/lint.py:lint_answers; tests/answers/test_lint.py (13 tests, one per finding kind's own
+    shape plus waivers/status/exit-code/clean-document); tests/answers/test_lint.py::test_cli_lint_exit_codes
+    (rc==1 with findings, rc==0 clean); real-view AGENT_RUNS/BR-AR-0027.check08 (2 genuine findings, machine-
+    readable JSON, exit 1)
+- item: 'Acceptance check: cd $D && $PY -m pytest tests/answers -q -- exit 0; three tests names one cited yields two NAMED_NOT_CITED; a whole-document citation of a sectioned fixture document yields DOC_LEVEL_CITATION with a suggested anchor; cite resolves a test name to its definition span'
+  status: MET
+  evidence: >-
+    AGENT_RUNS/BR-AR-0027.check02-node-acceptance-tests-answers.out (37 passed, exit 0);
+    test_lint.py::test_named_not_cited_two_of_three (exactly two, by identifier set);
+    test_lint.py::test_doc_level_citation_suggests_the_nested_section (suggested_anchor present and correct);
+    test_cite.py::test_rust_bare_fn_resolves, ::test_python_def_resolves_via_exact_route
+- item: 'REAL INPUT SHAPES item 4a: Rust test names, bare fn_name and mod::fn, with trailing-segment resolution and AMBIGUOUS when not unique'
+  status: MET
+  evidence: >-
+    tests/answers/test_cite.py::test_rust_bare_fn_resolves, ::test_rust_mod_qualified_trailing_segment_unique,
+    ::test_rust_mod_qualified_trailing_segment_ambiguous, ::test_rust_bare_shared_name_is_also_ambiguous;
+    real-view AGENT_RUNS/BR-AR-0027.check06-realview-cite-rust.out (exact spans match ARCHITECTURE.md section 4.6)
+- item: 'REAL INPUT SHAPES item 4b: Python test names, resolved through the exact route (a def test_... definition), a distinct heuristic label'
+  status: MET
+  evidence: >-
+    govbridge/answers/cite.py:_resolve_python (LABEL_PYTHON = PYTHON_DEF_EXACT_GREP, disjoint from
+    LABEL_RUST_EXACT/LABEL_RUST_TRAILING); tests/answers/test_cite.py::test_python_def_label_is_distinct_from_rust_labels
+- item: 'REAL INPUT SHAPES item 4c: id-grammar ids in Markdown headings and in YAML, block and flow style'
+  status: MET
+  evidence: >-
+    tests/answers/test_cite.py::test_id_grammar_yaml_block_style (D-RA-0001.yaml, block),
+    ::test_id_grammar_yaml_flow_style (D-RA-0002.yaml, one-line `{id: ..., ...}` flow syntax),
+    ::test_id_grammar_markdown_heading (docs/RA_LEDGER.md, a level-2 ledger heading); real-view D-0002
+- item: 'REAL INPUT SHAPES item 4d: document section anchors (<doc> §N)'
+  status: MET
+  evidence: >-
+    tests/answers/test_cite.py (6 tests: nested heading, top-level heading, ambiguous same-numbered headings,
+    wrong number, unknown document); real-view AGENT_RUNS/BR-AR-0027.check05 (REPAIR_PLAN.md §7 -> lines 281-295,
+    independently confirmed against the file; ARCHITECTURE.md §5.3 -> AMBIGUOUS, 2 real candidates)
+- item: 'DOC_LEVEL_CITATION must use R1-RM''s sectionmap for the suggested anchor'
+  status: MET
+  evidence: >-
+    govbridge/answers/lint.py imports govbridge.compile.sectionmap and calls flat_tiling (the same function
+    govbridge/compile/packet.py uses for MANDATORY_PARTIAL_DELIVERY's own undelivered-range tiling) -- no
+    anchor-finding logic re-implemented; tests/answers/test_lint.py::test_doc_level_citation_via_item_id_manifest_lookup
+    additionally proves the OTHER schema-legal citation shape ({item_id}, resolved through a packet's manifest.json)
+- item: 'Fixtures reproduce REAL INPUT SHAPES synthetically; no demonstration answer content; answers SCHEMA only'
+  status: MET
+  evidence: >-
+    tests/fixtures/answers/answers_repobuilder.py (every id/name RA-/ra_-prefixed, synthetic); tests/answers/
+    test_lint.py's own ANSWERS_DOC is hand-built strictly to schemas/answers.yaml's own field names (query_id,
+    status, answer_text, citations, stages, evidence_for/against) -- grep audit below confirms no demonstration-
+    queries.yaml or run-1 answers.yaml content was read or copied
+- item: 'BR-DAG-AMEND-R1-15: cite and answers lint are read-only against the store (file+directory chmod 0444/0555, sha256 unchanged)'
+  status: MET
+  evidence: >-
+    tests/answers/test_cite.py::test_cite_command_is_read_only_against_a_read_only_store (6 identifiers, every
+    kind, plus the CLI itself, against a chmod 0444/0555 store; before/after sha256 equal); tests/answers/
+    test_lint_readonly.py::test_answers_lint_is_read_only_against_a_read_only_store (forces the NAMED_NOT_CITED
+    code-route read specifically, plus the CLI itself; before/after sha256 equal)
+- item: 'BR-DAG-AMEND-R1-19: `govbridge gather` wired to gather_with_followup by default; single-pass kept behind --no-followup; every existing flag (including --out) still works; wiring tested'
+  status: MET
+  evidence: >-
+    govbridge/cli.py:cmd_gather; tests/answers/test_gather_wiring.py (4 tests: default result carries
+    followup_rounds/visited_identifiers, --no-followup reproduces the exact pre-existing key set,
+    --out/packet verify pass in both modes, both report a valid stop_reason)
+- item: 'Node-specific: LAST editor of govbridge/cli.py (RX -> GA1 -> RS -> RA); minimal, localised edits'
+  status: MET
+  evidence: >-
+    git diff of govbridge/cli.py: two new top-level dispatch lines, cmd_gather gains --no-followup and --repo
+    (the latter a pre-existing gap this node's own hermetic testing needed to close), module docstring gains
+    three bullets; every pre-existing cmd_* function body is untouched except cmd_gather's own gather-call site;
+    full suite (687 passed) shows no regression in any other command
+- item: 'Generic, not bespoke (OC-BR-02): no code, config, facet, scope or test names a Review-8 item, an F-finding, a Phase-2 file or a Review-8-chain symbol'
+  status: MET
+  evidence: >-
+    grep -rnE 'P2-AR-0097|Review[- ]?8|REVIEW-8|F[1-6][^0-9A-Za-z]' govbridge/answers tests/answers
+    tests/fixtures/answers --include=*.py -- one match, a compliance DISCLAIMER sentence in
+    answers_repobuilder.py's own docstring ("Nothing here is Review-8/Phase-2 content"), never a name/symbol used
+    by code, config or a test assertion (independent, second-method confirmation of the zero claim)
+- item: 'No oracle/sealed/grade-* content read; no public demonstration query texts or run-1 answers used as input'
+  status: MET
+  evidence: >-
+    Transcript-auditable: never read DEMONSTRATION/oracle*, DEMONSTRATION/grading/**, bridge/grade-*,
+    ~/.config/gov-bridge/sealed/**, ARCHITECTURE/demonstration-queries.yaml or DEMONSTRATION/run-1/answers.yaml;
+    every fixture and the real-view answers.yaml (/tmp/br-ar-0027-realview/answers.yaml, a scratch file, not
+    committed) is this run's own synthetic construction against CONTROL-A and the schema only

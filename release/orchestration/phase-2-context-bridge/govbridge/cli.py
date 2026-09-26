@@ -27,7 +27,14 @@ node owns it:
   ``gather`` already did) additionally accepts ``--out DIR`` (REPAIR_DAG.yaml node R1-RS) to write a budgeted,
   deduplicated SUPPLEMENTARY packet in that same on-disk shape, instead of dumping raw JSON by default;
 * ``demo``: the grader, the oracle validator and the transcript read-extractor (``govbridge.demo``, this node's
-  own new package).
+  own new package);
+* ``cite`` / ``answers lint`` (``govbridge.answers``, REPAIR_DAG.yaml node R1-RA): answer-side aids -- resolving a
+  named identifier to an exact citation, and linting a demonstration agent's own answers against the packet(s) it
+  was compiled with -- dispatched here, owned there;
+* ``gather``'s own default engine (node R1-RA, BR-DAG-AMEND-R1-19): calls
+  ``govbridge.gather.followup.gather_with_followup`` (sequential, adaptive follow-up rounds on top of the R1-GA1
+  base engine) unless ``--no-followup`` asks for the single-pass ``govbridge.gather.engine.gather`` this command
+  used before this node.
 """
 from __future__ import annotations
 
@@ -214,12 +221,23 @@ def cmd_gather(argv) -> int:
     p.add_argument("--exclude", action="append", metavar="GLOB")
     p.add_argument("--view")
     p.add_argument("--registry")
+    p.add_argument("--repo", help="the repository to read Git objects from; defaults to the repository containing "
+                                   "the current working directory (see cmd_search's own --repo docstring above for "
+                                   "why a fixture-repo caller MUST pass this explicitly). Not previously a "
+                                   "cmd_gather flag; added by this node so `gather` can be tested hermetically like "
+                                   "every other query command, with every previously-existing flag unchanged.")
     p.add_argument("--json", action="store_true", help="print the full JSON result (default: a short summary)")
+    p.add_argument("--no-followup", action="store_true",
+                    help="BR-DAG-AMEND-R1-19: use the single-pass govbridge.gather.engine loop only (this "
+                         "command's own pre-R1-RA behaviour), instead of the DEFAULT "
+                         "govbridge.gather.followup.gather_with_followup (round 0 is the same base engine call, "
+                         "then sequential rounds triggered by identifiers the evidence exposes)")
     _add_supplementary_args(p)
     args = p.parse_args(argv)
 
     from govbridge import GOV_BRIDGE_DOMAIN
     from govbridge.gather import engine as enginemod
+    from govbridge.gather import followup as followupmod
     from govbridge.gather import instantiate as instmod
     from govbridge.route import real_routes as real_routesmod
 
@@ -244,20 +262,37 @@ def cmd_gather(argv) -> int:
         return 1
 
     view_path = args.view or (_abs_path(task_spec["view"]) if task_spec.get("view") else None)
-    routes = real_routesmod.build_real_routes(view_path=view_path, registry_path=args.registry)
+    routes = real_routesmod.build_real_routes(view_path=view_path, registry_path=args.registry, repo=args.repo)
 
-    result = enginemod.gather(
-        query, routes, task=ctx, seeds=task_spec.get("seeds"), facet_names=args.facets,
-        batch_size=args.batch_size, max_rounds=args.max_rounds, threads=args.threads, exclude=args.exclude,
-        budget_profile=args.gather_budget_profile,
-    )
+    if args.no_followup:
+        result = enginemod.gather(
+            query, routes, task=ctx, seeds=task_spec.get("seeds"), facet_names=args.facets,
+            batch_size=args.batch_size, max_rounds=args.max_rounds, threads=args.threads, exclude=args.exclude,
+            budget_profile=args.gather_budget_profile,
+        )
+    else:
+        # BR-DAG-AMEND-R1-19: round 0 of gather_with_followup IS this same engine.gather call (never forked,
+        # followup.py's own module docstring) -- every existing flag above is honoured identically; `view_path`/
+        # `repo` are additionally threaded through so a follow-up round's own identifier resolution
+        # (versions/lineage) sees the same view/repository this command already resolved.
+        result = followupmod.gather_with_followup(
+            query, routes, task=ctx, seeds=task_spec.get("seeds"), facet_names=args.facets,
+            batch_size=args.batch_size, max_rounds=args.max_rounds, threads=args.threads, exclude=args.exclude,
+            budget_profile=args.gather_budget_profile, view_path=view_path, repo=args.repo,
+        )
     if args.out:
         _handle_query_output("gather", result, args)
     elif args.json:
         print(json.dumps(result, indent=1, sort_keys=True))
-    else:
+    elif args.no_followup:
         t = result["telemetry"]
         print(f"query={result['query']['id']!r} facets={result['facets']} rounds={t['rounds']} "
+              f"stop_reason={result['stop_reason']} merged_items={len(result['merged'])} "
+              f"excluded_hits={result['excluded_hits']} merged_sha256={result['merged_sha256']}")
+    else:
+        t = result["telemetry"]
+        print(f"query={result['query']['id']!r} facets={result['facets']} "
+              f"base_rounds={t['base_rounds']} followup_rounds={t['followup_rounds']} "
               f"stop_reason={result['stop_reason']} merged_items={len(result['merged'])} "
               f"excluded_hits={result['excluded_hits']} merged_sha256={result['merged_sha256']}")
     return 0
@@ -604,6 +639,15 @@ def main(argv: Optional[list] = None) -> int:
     if cmd == "demo":
         from govbridge.demo import cli as democli
         return democli.main(rest)
+    if cmd == "cite":
+        # REPAIR_DAG.yaml node R1-RA (BR-AR-0027): govbridge.answers.cite, dispatched here, owned there.
+        from govbridge.answers import cli as answerscli
+        return answerscli.main(["cite", *rest])
+    if cmd == "answers":
+        # REPAIR_DAG.yaml node R1-RA (BR-AR-0027): govbridge.answers.lint, dispatched here, owned there --
+        # `rest[0]` is the subcommand ("lint"), exactly like cmd_state's/cmd_exact's own sub-parsers above.
+        from govbridge.answers import cli as answerscli
+        return answerscli.main(rest)
 
     mod_path = _DISPATCH.get(cmd)
     if mod_path is None:
