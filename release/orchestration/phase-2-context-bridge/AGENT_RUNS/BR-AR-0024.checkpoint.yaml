@@ -1,5 +1,5 @@
 run_id: BR-AR-0024
-commit: PENDING
+commit: 765a3c2
 role: >-
   REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
   rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
@@ -487,4 +487,4 @@ next_consumer: >-
   product_commit) rather than fresh on every exact_route call, or any long-running gather against this domain's
   own live branch can observe more than one commit for the same ref within a SINGLE call; the orchestrator, for the
   remaining disclosed open_issues and the cli.py-wiring decision request.
-final_commit: PENDING
+final_commit: 765a3c2

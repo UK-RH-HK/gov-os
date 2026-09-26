@@ -21,7 +21,7 @@ role: >-
   with 20 stress-loop iterations plus two full-suite runs -- see C-18. This report covers the state after all four.
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga2-0024
-commit: PENDING
+commit: 765a3c2
 status: COMPLETED
 claims:
 - id: C-1
