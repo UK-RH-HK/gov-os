@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T02:22:06Z'
-state_hash: 1b8a87135b230f9ff5a39f1b0f35d2a14159a5f4084bc747c6044fdbd913d0fb
+updated_at: '2026-09-26T02:39:36Z'
+state_hash: e0cc77be03e58608216c55808d94e54b53e67afc3b4e8c96730e3e8f7994fcab
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -873,7 +873,16 @@ agent_runs:
   agent_name: br-r1-rg-0020
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: RUNNING
+  status: REOPENED_FOLLOW_UP
+  pass_1:
+    final_commit: 9cf4a9c (report) / 8b16f33 (work)
+    integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run)
+    secrecy_audit: 0 accesses to grade/oracle/sealed paths (3 pattern hits are its own notes saying it did not read them); claude-sonnet-5 x296
+    orchestrator_quarantined_check: 'repaired grader over run-1 with the run-1 oracle (oracle extracted to a 0700 scratch dir only) -- no crash;
+      G4-G8 FAIL, agreeing with BR-AR-0012; G1/G2 FAIL because packet verify re-derives section A at the CURRENT tip (24 expected vs 20:
+      OD-BR-03..06 became mandatory after run-1) -> validator issue routed to R1-RM (BR-DAG-AMEND-R1-1); G3 answer-side phrase scan
+      still hard-FAILs the withdrawn-finding item the rubric judged PASS -> RG reopened (heuristic answer-side checks must yield
+      PENDING_RUBRIC). No oracle values recorded.'
   store: $HOME/.cache/gov-bridge/store-BR-AR-0020
   mutation_scope:
   - release/orchestration/phase-2-context-bridge/govbridge/demo/**
@@ -950,6 +959,12 @@ dag:
       (section 5.3 item 6)
     reason: node B5's DAG entry omitted the layer while section 8.1 requires the manifest to digest those rows; without
       it I1's reproducibility and incremental==full proofs would silently exclude authority classification and the graph
+  - id: BR-DAG-AMEND-R1-1
+    by: orchestrator (from the R1-RG quarantined check)
+    rule: R1-RM additionally makes `packet verify` and `receipt check` re-derive section A at the VIEW RECORDED IN THE PACKET'S
+      MANIFEST (pinned refs), never at the moving tip, so a stored packet stays re-verifiable at any time (ARCHITECTURE.md 5.3
+      item 4); regression test -- compile, commit a new mandatory owner record, re-verify the old packet -> PASS
+    reason: the run-1 packet fails verification today only because four owner records were added after it was compiled
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
