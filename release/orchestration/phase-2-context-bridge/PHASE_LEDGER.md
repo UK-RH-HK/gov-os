@@ -497,3 +497,47 @@ oracle (OBS-BR-10).
 
 **Next:** a fresh failure analyst classifies each failed gate and produces a generic repair DAG that contains no
 oracle content.
+
+## BR-L-0019: REPAIR-1 builds and integrates all twelve nodes; the integration audit is dispatched (2026-09-26)
+
+**Every REPAIR-1 build node is integrated, and the full domain suite passes (731 passed, 0 failed).** The nodes, in
+`ORCHESTRATOR_STATE.yaml` → `agent_runs` BR-AR-0017 … 0027 and 0034:
+
+| Node | Run | What it delivered |
+|---|---|---|
+| R1-RN | BR-AR-0017 | Evidence notes |
+| R1-RX | BR-AR-0018 | `retrieval_exclusions` applied automatically |
+| R1-RL | BR-AR-0019 | A lineage layer over every eager ref: TESTS edges including Rust binary and harness-method dispatch and test-registry rows; DEPENDS_ON_DATA; CITES_REQUIREMENT |
+| R1-RG | BR-AR-0020 | The grader repaired: GD-1..10 and D-1..D-5 |
+| R1-TA2 | BR-AR-0021 | The run-2 oracle, sealed; commitment `a2030be9…7a7e` |
+| R1-RM | BR-AR-0022 | Mandatory fidelity: declared-versus-delivered hashes; Markdown and YAML entries in document order |
+| R1-GA1 | BR-AR-0023 | `govbridge gather`: facets, deterministic parallel retrieval, scope pushed down, paging |
+| R1-GA2 | BR-AR-0024 | A multi-hop follow-up priority queue, count-only content budgets, provenance merge, versions by role |
+| R1-RS | BR-AR-0025 | Supplementary packets and exact rendered-body re-extraction |
+| R1-GA3 | BR-AR-0026 | Compile from gather: facet quotas, content slices, overflow to notes and supplementary packets |
+| R1-RA | BR-AR-0027 | `cite`, `answers lint`, `gather` multi-hop by default, `compile --out` persisting the overflow |
+| R1-XC | BR-AR-0034 | Cross-cutting fixes, read-only query paths, and one resolved view per operation |
+
+**Amendments.** The orchestrator recorded BR-DAG-AMEND-R1-1 … R1-23 and template amendments R1-T1 (the full suite
+last), R1-T2 (a conformance table; no silent narrowing) and R1-T3 (the pinned interpreter only).
+
+**What verification caught.** Almost every builder returned at least one narrowed deliverable or false zero at
+first. Each was caught by the orchestrator's re-measurement and reopened.
+
+**Breach.** One rule-6 breach: BR-AR-0034 installed an unpinned package into a private venv. Its evidence was
+rejected (OBS-BR-18); the shared venv was untouched.
+
+**Secrecy.** 0 oracle, sealed or grading accesses in any transcript.
+
+**Now running.** **R1-INT, BR-AR-0028, on Opus**, an audit-only integration audit with 15 checks. Its handoff is
+BR-HO-0028; it pins the view and builds two from-clean stores. It started at 2026-09-26T18:34Z.
+
+**Remaining path to BUILT:**
+1. The R1-INT verdict.
+2. Routed fixes for any of its defects.
+3. R1-MB, the multi-batch demonstration. CONTROL-B is chosen at dispatch.
+4. R1-D2, the frozen-tip store.
+5. R1-DEMO2.
+6. The secrecy audit of DEMO2.
+7. R1-GRADE2, on a quarantined branch.
+8. On DEMONSTRATION_PASS only: finalise the verifier handoff §5, then BUILT.

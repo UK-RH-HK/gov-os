@@ -4,9 +4,9 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T18:34:26Z'
-state_hash: af0407870f41db2511814e072e46ae6fb2a717a4eb5172a280c54a91e298c538
-lifecycle_state: BR_REPAIR_1_WAVE_1
+updated_at: '2026-09-26T19:41:56Z'
+state_hash: be7e0e0c1a4bc1fdf8ec987f214fed6a2ab71490b521b813b0eb663fcb701ccf
+lifecycle_state: BR_REPAIR_1_INTEGRATION_AUDIT
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
 purpose: 'a generic, provider/model-replaceable, whole-repository Governance OS self-memory/context foundation (OC-BR-02);
@@ -2092,6 +2092,27 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: dispatch R1-INT (BR-AR-0028, OPUS, audit-only, handoff BR-HO-0028) -- every build node is integrated; INT
-  runs its real-view checks against a PINNED copy of the canonical view (records pinned at a recorded commit) so that orchestrator
-  commits cannot perturb them; checkpoint after its return
+next_deterministic_action: 'AWAIT R1-INT (BR-AR-0028, opus, audit-only; handoff HANDOFFS/BR-HO-0028-r1-int-audit.md; worktree
+  .claude/worktrees/br-ar-0028; branch bridge/r1-int-0028; stores store-BR-AR-0028-a/-b; started 2026-09-26T18:34Z). LIVENESS -- live if its
+  branch gains commits, or `ps` shows its `govbridge ... rebuild --from-clean --view .../br-ar-0028/...` processes, or its transcript (the
+  newest agent-*.jsonl under ~/.claude/projects/-home-usain-Dynamic-Agentic-Engineering-OS/<session>/subagents/ whose first prompt names
+  BR-AR-0028) was written within 30 min. RETURNED -- bridge/r1-int-0028 carries AGENT_RUNS/BR-AR-0028.{report,checkpoint}.yaml and
+  EVIDENCE/repair-1/INT-VERDICT.yaml. FRESH SESSION, if INT is NOT live and NOT returned (its parent session ended) -- re-dispatch it
+  (model opus, name br-r1-int-0028) on the SAME worktree/branch with the same handoff, telling it to reuse its committed or uncommitted
+  EVIDENCE/repair-1/* and any completed store-BR-AR-0028-a/-b whose build-manifest exists, and to finish the 15 checks. ON RETURN --
+  audit its transcript (0 access to bridge/grade-*, sealed/gbx dirs, ~/.config/gov-bridge, DEMONSTRATION/oracle/, grading, run-1
+  answers/receipt, demonstration-queries.yaml; the permitted exception is DEMONSTRATION/oracle-tools/check_oracle.py and
+  schemas/oracle.yaml; 0 pip/venv; only the venv $PY), run integrate-check BR-AR-0028, merge its evidence, record the verdict.
+  INTEGRATION_ACCEPTED -> dispatch R1-MB (DEMONSTRATION/mb-1/**, a fresh opus demonstration agent and then a fresh opus grader; the
+  orchestrator chooses CONTROL-B AT DISPATCH per REPAIR_DAG conventions.unrelated_controls and never shows it to builders);
+  DEFECTS_FOUND -> route each defect to its owner node (resume that builder with a reopen message), re-integrate, re-run INT or the
+  affected checks. Then R1-D2 (freeze in force; one from-clean store at the frozen tip; the store made read-only; measure the demonstration
+  compile time, BR-DAG-AMEND-R1-21) -> R1-DEMO2 (a fresh opus agent; BR-HO-0011 protocol; lint required) -> the secrecy and consumption
+  audit -> R1-GRADE2 (a quarantined branch, never merged; unseal the run-2 oracle whose location is ONLY in
+  ~/.config/gov-bridge/sealed/RUN2_ORACLE_LOCATION; the sha256 must equal a2030be9...7a7e; the repaired deterministic grader, then a
+  fresh opus rubric grader) -> on DEMONSTRATION_PASS finalise HANDOFFS/BR-HO-VERIFY-independent-bridge-verification.md section 5
+  (OD-BR-03 challenge items, all recorded residuals) and issue P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT; on FAIL, a cause analysis and a
+  repair cycle. CONVENTIONS -- state patches from a scratch script with an assert-unique sub() and yaml.safe_load before writing; patch,
+  seal, checkpoint and commit chained with && under set -euo pipefail; take checkpoint ids from the tool''s output; commit trailer
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>; always pass model explicitly (builders sonnet, independent roles opus);
+  never rm.'
