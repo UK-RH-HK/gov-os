@@ -5,7 +5,7 @@ role: >-
   lifecycle filtering (OD-BR-05 sections 3 and 6; REPAIR_PLAN.md sections 2.5/2.7).
 model_observed: claude-sonnet-5
 branch: bridge/r1-ga2-0024
-commit: PENDING (filled in at commit time; see checkpoint.yaml's own commit/final_commit)
+commit: 804da482d8cbe04baf878f68b5acb7aeeef96857
 status: COMPLETED
 claims:
 - id: C-1

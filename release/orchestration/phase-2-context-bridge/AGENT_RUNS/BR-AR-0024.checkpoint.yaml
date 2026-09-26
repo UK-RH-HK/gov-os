@@ -1,5 +1,5 @@
 run_id: BR-AR-0024
-commit: PENDING
+commit: 804da482d8cbe04baf878f68b5acb7aeeef96857
 role: >-
   REPAIR-1 node R1-GA2 -- gather, adaptive follow-up and merge: identifier extraction and resolution, triggered
   rounds, provenance-preserving deduplication, occurrence collapse, version reconciliation, authority and
@@ -258,4 +258,4 @@ next_consumer: >-
   (findings) and deliberately did not extend (failed_approaches); whoever owns govbridge/code/symbols.py next, for
   the Python-adapter gap (findings, unresolved); the orchestrator, for the remaining disclosed open_issues and the
   cli.py-wiring decision request.
-final_commit: PENDING
+final_commit: 804da482d8cbe04baf878f68b5acb7aeeef96857
