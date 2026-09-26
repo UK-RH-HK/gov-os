@@ -38,3 +38,30 @@ reads this file, `bridge/d1-0010` and `bridge/demo-0011`.**
 ## GRADE dispatched
 * BR-AR-0012 was dispatched at about 01:00 BST on 2026-09-26: agent `br-grade-0012`, spawned `model: opus`, on
   branch `bridge/grade-0012`, cut from `bridge/demo-0011` at `a9fc27b`.
+
+## Owner directions OD-BR-04 and OD-BR-05 received during the freeze
+* **OD-BR-04** (checkpoint discipline) is enforced on this branch:
+  * `check_state.py checkpoint`, a mechanical outer checkpoint;
+  * `verify` refuses any state without a matching checkpoint, once `checkpoint_discipline: OD-BR-04` is set at
+    merge;
+  * `integrate-check` requires the schema-2 worker checkpoint for runs marked `checkpoint_schema: 2`;
+  * PreCompact and SessionEnd hooks are in the project's `.claude/settings.local.json`, locally git-excluded, calling
+    `$HOME/.cache/gov-bridge/hooks/bridge-checkpoint-hook.sh`. The pipe-test wrote BR-CP-0004.
+  * **Live in this session only after `/hooks` is opened or on restart.**
+  * The first contemporaneous outer checkpoint since BR-CP-0002 is BR-CP-0003.
+  * The `RETROSPECTIVE_CHECKPOINT_RECONSTRUCTION` for runs 0001–0015 is labelled as retrospective.
+* **OD-BR-05** (multi-batch / multi-hop retrieval) was assessed **not conforming**. **Plan:**
+  * after GRADE, merge and lift the freeze;
+  * write an orchestrator design addendum derived from OD-BR-05;
+  * dispatch a fresh bounded builder, **B7 `govbridge gather`**, covering:
+    * facet decomposition;
+    * deterministic parallel facet retrieval;
+    * adaptive follow-up;
+    * paging and continuation;
+    * a recorded stopping reason;
+    * merge with provenance and authority;
+    * an evidence-note schema for hierarchical synthesis, with a traceability validator;
+    * telemetry;
+  * run its demonstration: a multi-location query that exceeds one batch, plus an unrelated control;
+  * rebuild the store at the new tip, then emit BUILT.
+  * OD-BR-05 is also carried into the verifier handoff.
