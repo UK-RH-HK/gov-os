@@ -90,9 +90,7 @@ commands:
     732933c9f5b5665f3ad3cebe3d9113d5e863a7e0 -- govbridge/cli.py (empty expected -- untouched this pass, R1-RS's
     file); git status --short (the exact file set this pass touched)
   exit_code: 0
-  output_path: >-
-    release/orchestration/phase-2-context-bridge/AGENT_RUNS/
-    BR-AR-0023.check9-second-reopening-no-query-time-writes-cli-untouched.out
+  output_path: release/orchestration/phase-2-context-bridge/AGENT_RUNS/BR-AR-0023.check9-second-reopening-no-query-time-writes-cli-untouched.out
   output_sha256: f7c38ada9c5ea00654b2379d674f3fd8f66c7d384f0f5280b21351819c062d22
 - cmd: >-
     SECOND REOPENING, coordinator addendum: re-measure CA-WHY (real CONTROL-A corpus, full default facet set)
