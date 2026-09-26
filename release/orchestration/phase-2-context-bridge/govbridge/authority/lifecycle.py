@@ -95,7 +95,8 @@ def classify(unit: str, path: Optional[str] = None, commit: Optional[str] = None
              line_start: Optional[int] = None, line_end: Optional[int] = None,
              reg: Optional[registrymod.Registry] = None, mandatory_items: Optional[dict] = None,
              repo: Optional[str] = None, view_path: Optional[str] = None,
-             pre_text: Optional[str] = None) -> Classification:
+             pre_text: Optional[str] = None,
+             resolved_view: Optional["viewmod.ResolvedView"] = None) -> Classification:
     """Classify ``unit`` (a record id). ``path``/``commit``/``line_start``/``line_end`` narrow the occurrence when
     the caller already knows a definition site (e.g. from ``records.py``); when absent, the classifier still applies
     every id-keyed rule (mandatory items, section_anchors by item_id, supersessions, lifecycle_overrides) and, if a
@@ -106,9 +107,9 @@ def classify(unit: str, path: Optional[str] = None, commit: Optional[str] = None
     identical either way -- this is a caller-side read-reuse, never a different code path."""
     if reg is None:
         reg = registrymod.load(registrymod._default_registry_path(), verify_commit="records", view_path=view_path,
-                                repo=repo)
+                                repo=repo, resolved_view=resolved_view)
     if mandatory_items is None:
-        mandatory_items = _load_mandatory_items(repo=repo, view_path=view_path)
+        mandatory_items = _load_mandatory_items(repo=repo, view_path=view_path, resolved_view=resolved_view)
 
     notes: list = []
     cls: Optional[str] = None
@@ -156,16 +157,22 @@ def classify(unit: str, path: Optional[str] = None, commit: Optional[str] = None
     resolved_path, resolved_commit = path, commit
     doc_for_metadata = None
     if resolved_path is None:
-        found = _find_definition(unit, repo=repo, view_path=view_path)
+        found = _find_definition(unit, repo=repo, view_path=view_path, resolved_view=resolved_view)
         if found is not None:
             resolved_path, resolved_commit, line_start, line_end = found
     if resolved_commit is None and resolved_path is not None:
-        from govbridge import GOV_BRIDGE_DOMAIN
-        import os
-        vp = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
-        vc = viewmod.load_view(vp)
-        rv = viewmod.resolve_view(vc, repo=repo)
-        resolved_commit = rv.ref_commit("records")
+        # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): reuse the caller's own resolved_view instead of a
+        # fresh resolution -- the ONLY change this near-frozen module makes for this amendment (view.py's own
+        # module contract; see this run's checkpoint decisions for the full justification).
+        if resolved_view is not None:
+            resolved_commit = resolved_view.ref_commit("records")
+        else:
+            from govbridge import GOV_BRIDGE_DOMAIN
+            import os
+            vp = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
+            vc = viewmod.load_view(vp)
+            rv = viewmod.resolve_view(vc, repo=repo)
+            resolved_commit = rv.ref_commit("records")
 
     if resolved_path is not None and resolved_commit is not None:
         if pre_text is not None:
@@ -262,18 +269,25 @@ def _lifecycle_from_md_header_table(text: str, unit: str) -> Optional[tuple]:
     return None
 
 
-def _find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[str] = None) -> Optional[tuple]:
+def _find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[str] = None,
+                      resolved_view: Optional["viewmod.ResolvedView"] = None) -> Optional[tuple]:
     """A bounded lookup for one id's definition occurrence, reusing git grep (never a whole-tree census) plus
     records.py's rules to pick the definition among the hits. fixtures/** is never a definition (ARCHITECTURE.md
     section 2). When several files carry a candidate definition, the STRONGEST rule wins (the id-grammar's
-    definition_rules order is itself a precedence order: yaml_top_id is far stronger evidence than file_stem)."""
-    from govbridge.core import pathrules
-    from govbridge import GOV_BRIDGE_DOMAIN
-    import os
+    definition_rules order is itself a precedence order: yaml_top_id is far stronger evidence than file_stem).
 
-    view_path = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
-    vc = viewmod.load_view(view_path)
-    rv = viewmod.resolve_view(vc, repo=repo)
+    ``resolved_view`` (BR-DAG-AMEND-R1-23): reuse the caller's own resolved view instead of a fresh resolution --
+    the only change this near-frozen module makes for this amendment."""
+    from govbridge.core import pathrules
+
+    if resolved_view is not None:
+        rv = resolved_view
+    else:
+        from govbridge import GOV_BRIDGE_DOMAIN
+        import os
+        view_path = view_path or os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
+        vc = viewmod.load_view(view_path)
+        rv = viewmod.resolve_view(vc, repo=repo)
     commit = rv.ref_commit("records")
     grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
     rule_order = [r["id"] for r in grammar.definition_rules]
@@ -315,13 +329,16 @@ def _find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[
     return path, commit, line_start, line_end
 
 
-def find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[str] = None) -> Optional[tuple]:
+def find_definition(unit: str, repo: Optional[str] = None, view_path: Optional[str] = None,
+                     resolved_view: Optional["viewmod.ResolvedView"] = None) -> Optional[tuple]:
     """Public wrapper over ``_find_definition`` (unchanged): a bounded (git-grep, never whole-corpus) id-grammar
     definition-site lookup for one token. Added so ``govbridge.core.exact.id_lookup`` (B1 OI-2: "exact id is a
     mention-only placeholder... resolve definition sites through B5's id grammar") can reuse the SAME bounded
     lookup ``classify()`` already uses internally, rather than re-implementing it. Additive only: no existing
-    behaviour of ``_find_definition``/``classify`` changes."""
-    return _find_definition(unit, repo=repo, view_path=view_path)
+    behaviour of ``_find_definition``/``classify`` changes. ``resolved_view`` (BR-DAG-AMEND-R1-23) is threaded
+    straight through so ``exact.id_lookup``'s own ``definition_sites`` use the SAME pinned "records" commit its
+    own ``mention_sites`` (via ``grep``) already do."""
+    return _find_definition(unit, repo=repo, view_path=view_path, resolved_view=resolved_view)
 
 
 def show_many(unit_ids: list, repo: Optional[str] = None, view_path: Optional[str] = None) -> dict:

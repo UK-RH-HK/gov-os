@@ -10,6 +10,17 @@ authority class and lifecycle (``place_item`` below) -- **never** of which route
 ``validate.py`` (a separate module) recomputes the resolver from scratch and checks every claim this module makes
 about section A and about ordering; it is imported BY this module's ``--verify`` self-check path and by
 ``receipt.py``/a grader, never the reverse.
+
+BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): ``compile_packet`` resolves ``config/canonical-view.yaml``
+exactly ONCE for its whole lifetime (reusing ``routes.resolved_view`` when the caller passed real routes --
+``real_routes_for``'s own one resolution -- or resolving fresh only for a ``--fake-routes``/``FAKE_ROUTES``
+compile, which never had a view of its own to reuse), then threads that ONE view into ``resolver.resolve``,
+``Compiler`` (which threads it into ``registrymod.load``), every per-seed ``why()``/``history()`` call, and every
+per-query ``RouteSet``/``gather_with_followup`` call (the main query loop and D.2's own "both ways" gather alike).
+Previously this module made four-plus INDEPENDENT resolutions per compile; a "records" ref moving between any two
+of them (this whole domain runs on a live, actively-committed-to orchestration branch) could make one compile's
+own section A, its route hits, and its follow-up identifiers disagree about which commit they were even answering
+from.
 """
 from __future__ import annotations
 
@@ -332,7 +343,8 @@ class Compiler:
                  registry_path: Optional[str], rrf_k: int, graph_depth: int, budgets_path: Optional[str] = None,
                  fanout: Optional[dict] = None, per_item_cap_bytes: Optional[int] = None,
                  max_slice_chars: Optional[int] = None, top_n: Optional[int] = None,
-                 facets_path: Optional[str] = None):
+                 facets_path: Optional[str] = None,
+                 resolved_view: Optional["viewmod.ResolvedView"] = None):
         self.task_spec = task_spec
         # BR-DAG node R1-RM: the same per-item cap ARCHITECTURE.md section 7.3 already names (24 KB by default,
         # config/budgets.yaml) decides when a MANDATORY item's own content is "oversize" enough to need a section
@@ -342,9 +354,15 @@ class Compiler:
         self.routes = routes or FAKE_ROUTES
         self.repo = repo
         self.view_path = view_path
-        self.resolved_view = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
+        # BR-DAG-AMEND-R1-23: reuse the caller's own ONE resolution (compile_packet's own top-level
+        # resolved_view, itself often routes.resolved_view) instead of a second, independent one here --
+        # resolved_view=None (the default) preserves this exact fresh-resolution behaviour for a Compiler built
+        # directly (a pre-reopening test, or any caller outside compile_packet's own top-level function).
+        self.resolved_view = resolved_view if resolved_view is not None else \
+            viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
         self.registry_path = registry_path or registrymod._default_registry_path()
-        self.reg = registrymod.load(self.registry_path, verify_commit="records", view_path=view_path, repo=repo)
+        self.reg = registrymod.load(self.registry_path, verify_commit="records", view_path=view_path, repo=repo,
+                                     resolved_view=self.resolved_view)
         self.grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
         self.rrf_k = rrf_k
         self.graph_depth = graph_depth
@@ -792,12 +810,29 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     view_path = _abs_path(task_spec["view"])
     profile = budgetsmod.load_profile(task_spec["budget_profile"], path=budgets_path)
 
-    resolve_result = resolvermod.resolve(task_spec, repo=repo, registry_path=registry_path)
+    # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): this ONE resolution is the whole compile's own view
+    # for its entire lifetime -- reusing `routes.resolved_view` (govbridge.route.router.RouteSet, populated by
+    # real_routes_for/build_real_routes) when the caller passed real routes, since that is ALREADY the exact
+    # resolution those routes' own hits were produced against; a fresh resolution only happens here at all for a
+    # `--fake-routes`/FAKE_ROUTES compile, which never had a view of its own to reuse. Previously this function
+    # made FOUR-PLUS independent resolutions across one compile (resolver.resolve's own, Compiler.__init__'s own,
+    # each per-seed why()/history() call, and each per-query gather_with_followup call) -- a "records" ref that
+    # moved between any two of them could make one compile's own section A, its route hits, and its follow-up
+    # identifiers disagree about which commit they were even answering from. Threaded into resolver.resolve,
+    # Compiler (which threads it into registrymod.load), every why()/history() call, and every per-query
+    # gather_with_followup call (via q_routes.resolved_view, below) instead.
+    resolved_view = getattr(routes, "resolved_view", None)
+    if resolved_view is None:
+        resolved_view = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
+
+    resolve_result = resolvermod.resolve(task_spec, repo=repo, registry_path=registry_path,
+                                          resolved_view=resolved_view)
     status = STATUS_OK if resolve_result.status == resolvermod.STATUS_OK else STATUS_BLOCKED
 
     c = Compiler(task_spec, routes, repo, view_path, registry_path, profile.rrf_k, profile.graph_neighbour_depth,
                  budgets_path=budgets_path, fanout=profile.g_fanout, per_item_cap_bytes=profile.per_item_cap_bytes,
                  max_slice_chars=profile.max_slice_chars, top_n=profile.parent_expansion_top_n,
+                 resolved_view=resolved_view,
                  facets_path=facets_path)
 
     sections: dict = {k: [] for k in ("A", "B", "C", "D.1", "D.2", "D.3", "E", "F", "G", "H")}
@@ -838,7 +873,7 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
     for seed in task_spec.get("seeds", []) or []:
         try:
             why_result = whymod.why(seed, repo=repo, view_path=view_path, registry_path=c.registry_path,
-                                     code_conn=c.code_conn())
+                                     code_conn=c.code_conn(), resolved_view=c.resolved_view)
         except Exception:
             why_result = {"stages": {}}
         for stage, info in why_result.get("stages", {}).items():
@@ -846,7 +881,8 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
                 c.add(sections, "B", c.item_from_edge_hop(f"WHY:{stage}", hop, "B"))
 
         try:
-            hist_result = historymod.history(seed, repo=repo, view_path=view_path, registry_path=c.registry_path)
+            hist_result = historymod.history(seed, repo=repo, view_path=view_path, registry_path=c.registry_path,
+                                              resolved_view=c.resolved_view)
         except Exception:
             hist_result = {"entries": []}
         for entry in hist_result.get("entries", []):
@@ -926,17 +962,21 @@ def compile_packet(task_spec: dict, routes: Optional[RouteSet] = None, repo: Opt
         # reports MISSING, exactly as it would with genuinely no candidates -- never a crash, never a silent
         # widening of what this query was allowed to touch).
         allowed_routes = set(routermod.select_routes(q, grammar=c.grammar))
+        # BR-DAG-AMEND-R1-23: carry c.resolved_view forward on this per-query RouteSet too (see
+        # _attach_evidence_both_ways's own identical comment) -- this is the MAIN query loop's own gather call,
+        # the one most exposed to a "records" ref moving mid-compile across many queries.
         q_routes = routermod.RouteSet(
             exact=c.routes.exact if "exact" in allowed_routes else routermod.empty_route,
             lexical=c.routes.lexical if "lexical" in allowed_routes else routermod.empty_route,
             semantic=c.routes.semantic if "semantic" in allowed_routes else routermod.empty_route,
             code=c.routes.code if "code" in allowed_routes else routermod.empty_route,
+            resolved_view=c.resolved_view,
         )
 
         gather_result = gather_with_followup(
             q, q_routes, task=c.task_ctx, facet_names=(list(requested_names) if requested_names else None),
             exclude=list(c.exclusions), view_path=view_path, repo=repo, facets_path=c.facets_path,
-            budgets_path=budgets_path,
+            budgets_path=budgets_path, resolved_view=c.resolved_view,
         )
         gather_results_by_query[q["id"]] = gather_result
         c.exclusion_counter.bump(gather_result.get("excluded_hits", 0))
@@ -1193,15 +1233,21 @@ def _attach_evidence_both_ways(c: Compiler, sections: dict, queries_log: dict, d
     for label, text in templates:
         q = {"id": f"{subject}#{label}", "text": text}
         allowed_routes = set(routermod.select_routes(q, grammar=c.grammar))
+        # BR-DAG-AMEND-R1-23: this per-query RouteSet used to drop `resolved_view` entirely (the field did not
+        # exist before this amendment) -- carrying it forward means gather_with_followup below reuses THIS
+        # compile's own one resolved view (c.resolved_view) instead of falling through to its own independent
+        # resolution.
         q_routes = routermod.RouteSet(
             exact=c.routes.exact if "exact" in allowed_routes else routermod.empty_route,
             lexical=c.routes.lexical if "lexical" in allowed_routes else routermod.empty_route,
             semantic=c.routes.semantic if "semantic" in allowed_routes else routermod.empty_route,
             code=c.routes.code if "code" in allowed_routes else routermod.empty_route,
+            resolved_view=c.resolved_view,
         )
         result = gather_with_followup(q, q_routes, task=c.task_ctx, exclude=list(c.exclusions),
                                        view_path=view_path, repo=repo, facets_path=c.facets_path,
-                                       budgets_path=budgets_path, max_followup_rounds=1)
+                                       budgets_path=budgets_path, max_followup_rounds=1,
+                                       resolved_view=c.resolved_view)
         c.exclusion_counter.bump(result.get("excluded_hits", 0))
         queries_log.setdefault("D.2", []).append({
             "id": q["id"], "text": text, "facets": result.get("facets"), "stop_reason": result.get("stop_reason"),

@@ -234,7 +234,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         scope_path_globs = _path_globs_for_classes(scope_classes)
         result = lexicalquery.query(_safe_fts_query(text), k=k, exclude=exclude, offset=offset, view_path=view_path,
                                      repo=repo, classify=_lexical_classify, scope_classes=scope_classes,
-                                     lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs)
+                                     lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs,
+                                     resolved_view=resolved_view)
         # REPAIR_PLAN.md section 2.4 ("lexical and semantic take an offset"): the paging metadata lexicalquery.query
         # already computes (govbridge.gather.engine's own per-facet cursor) -- an out-param, the SAME idiom
         # exclude_counter already uses here, since RouteFn's own contract returns a plain list of RouteHit.
@@ -249,7 +250,8 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
             # result is used only to count; it is never returned or delivered as a hit.
             raw = lexicalquery.query(_safe_fts_query(text), k=k, exclude=None, offset=offset, view_path=view_path,
                                       repo=repo, classify=_lexical_classify, scope_classes=scope_classes,
-                                      lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs)
+                                      lifecycle_scope=lifecycle_scope, scope_path_globs=scope_path_globs,
+                                      resolved_view=resolved_view)
             exclude_counter.bump(sum(
                 1 for h in raw["hits"]
                 if any(pathrules.any_glob_match(o["path"], exclude) is not None for o in h["occurrences"])
@@ -296,7 +298,7 @@ def build_real_routes(view_path: Optional[str] = None, repo: Optional[str] = Non
         scope_path_globs = _path_globs_for_classes(scope_classes)
         result = semanticsearch.search(text, k=k, view_path=view_path, repo=repo, classify=_semantic_classify,
                                         offset=offset, scope_classes=scope_classes, lifecycle_scope=lifecycle_scope,
-                                        scope_path_globs=scope_path_globs)
+                                        scope_path_globs=scope_path_globs, resolved_view=resolved_view)
         if page_info_out is not None:
             page_info_out["next_offset"] = result.get("next_offset")
         hits = []

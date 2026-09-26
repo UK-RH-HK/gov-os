@@ -32,12 +32,19 @@ def _resolved_view(view_path: Optional[str] = None, repo: Optional[str] = None) 
 
 def history(seed: str, repo: Optional[str] = None, view_path: Optional[str] = None,
             registry_path: Optional[str] = None, deleted_from: Optional[str] = None,
-            task: Optional[taskctxmod.TaskContext] = None) -> dict:
-    resolved_view = _resolved_view(view_path, repo=repo)
+            task: Optional[taskctxmod.TaskContext] = None,
+            resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
+    # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): a caller already inside a one-resolved-view-per-
+    # operation context (govbridge.compile.packet, calling history() once per seed within ONE compile) passes its
+    # own resolved_view straight through, so this call never becomes a separate resolution of that same compile.
+    # A standalone `govbridge history <seed>` invocation (resolved_view=None) still resolves exactly once, right
+    # here. Threaded into every callee below (registrymod.load, lifecyclemod.classify -- which itself threads it
+    # into lifecyclemod._load_mandatory_items) instead of a bare view_path re-resolved independently by each.
+    resolved_view = resolved_view if resolved_view is not None else _resolved_view(view_path, repo=repo)
     commit = resolved_view.ref_commit("records")
     grammar = recordsmod.load_grammar(recordsmod._default_grammar_path())
     reg = registrymod.load(registry_path or registrymod._default_registry_path(), verify_commit="records",
-                            view_path=view_path, repo=repo)
+                            view_path=view_path, repo=repo, resolved_view=resolved_view)
 
     # R1-RX (OBS-BR-08): the same generic path-exclusion predicate every route/command uses.
     task = task or taskctxmod.current()
@@ -70,7 +77,8 @@ def history(seed: str, repo: Optional[str] = None, view_path: Optional[str] = No
         excluded_hits += dropped
         deleted = [e.to_dict() for e in kept_deleted]
 
-    seed_classification = lifecyclemod.classify(seed, reg=reg, repo=repo, view_path=view_path)
+    seed_classification = lifecyclemod.classify(seed, reg=reg, repo=repo, view_path=view_path,
+                                                  resolved_view=resolved_view)
     if seed_classification.lifecycle in ("WITHDRAWN", "SUPERSEDED"):
         entries.append({
             "edge": None, "path_class": seed_classification.cls, "kind": "withdrawn_or_superseded",
@@ -80,7 +88,9 @@ def history(seed: str, repo: Optional[str] = None, view_path: Optional[str] = No
         })
 
     entries.sort(key=lambda x: x["commit_time"] or "")
-    return {"seed": seed, "entries": entries, "deleted_in": deleted, "excluded_hits": excluded_hits}
+    # BR-DAG-AMEND-R1-23 requirement 1: the recorded view in this output must equal the commits actually used.
+    return {"seed": seed, "entries": entries, "deleted_in": deleted, "excluded_hits": excluded_hits,
+            "resolved_refs": resolved_view.pinned_refs()}
 
 
 def main(argv=None) -> int:

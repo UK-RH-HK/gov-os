@@ -52,7 +52,8 @@ def _representative_occurrence(conn: sqlite3.Connection, blob_id: str, resolved:
 def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path: Optional[str] = None,
            repo: Optional[str] = None, threads: int = 4, classify: Classifier = default_classify,
            offset: int = 0, scope_classes: Optional[tuple] = None, lifecycle_scope: Optional[tuple] = None,
-           scope_path_globs: Optional[tuple] = None) -> dict:
+           scope_path_globs: Optional[tuple] = None,
+           resolved_view: Optional["viewmod.ResolvedView"] = None) -> dict:
     """``offset`` (REPAIR_PLAN.md section 2.4, "lexical and semantic take an offset"): pages through
     ``vectors.search``'s own deterministic, tie-broken ranking. One extra candidate is always requested beyond
     ``k`` (never returned) purely to learn whether a further page exists, without needing a second, separate
@@ -84,9 +85,14 @@ def search(query: str, k: int = 10, store_root: Optional[Path] = None, view_path
     has_more = len(overfetched) > k
     hits = overfetched[:k]
 
-    (default_view,) = _default_paths(repo)
-    view_path = view_path or default_view
-    resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
+    # BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): reuse the caller's own resolved_view when given (see
+    # govbridge.lexical.query.query's own docstring for the identical reasoning) instead of re-resolving fresh.
+    if resolved_view is not None:
+        resolved = resolved_view
+    else:
+        (default_view,) = _default_paths(repo)
+        view_path = view_path or default_view
+        resolved = viewmod.resolve_view(viewmod.load_view(view_path), repo=repo)
 
     results = []
     for rank, (chunk_id, score) in enumerate(hits, start=1):

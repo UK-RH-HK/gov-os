@@ -1,0 +1,199 @@
+.FFFFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_compile_exact_route_items_all_carry_the_records_commit_pinned_once_even_if_the_ref_moves_mid_compile _
+
+built_repo = BuiltRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-709/test_compile_exact_route_items0/repo'), records_commit='8e06...s-rules.yaml', registry_path='/tmp/pytest-of-usain/pytest-709/test_compile_exact_route_items0/authority-registry.yaml')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75c6f933fbc0>
+
+    def test_compile_exact_route_items_all_carry_the_records_commit_pinned_once_even_if_the_ref_moves_mid_compile(
+            built_repo, monkeypatch):
+        """PASS 5: ``compile_packet`` now makes exactly ONE resolution for its whole lifetime, reusing
+        ``routes.resolved_view`` (the one ``real_routes.build_real_routes`` already made, before this test even calls
+        ``compile_packet``) instead of a fresh one -- so this test asserts ``viewmod.resolve_view`` is called ZERO
+        ADDITIONAL times during the ``compile_packet`` call itself. This is the precise, mechanical form of "four-plus
+        resolutions become one": before pass 5, ``resolver.resolve``'s own call, ``Compiler.__init__``'s own call, and
+        every per-query ``gather_with_followup``'s own fallback call would each show up here as a further
+        ``resolve_view`` invocation (this assertion FAILS against that code, not merely a coincidence of this
+        scenario -- verified directly against the pre-pass-5 tree). The per-item and manifest.view checks below are
+        the OBSERVABLE consequence of that one resolution; the count is the mechanism."""
+        from govbridge.compile import packet as packetmod
+    
+        original_commit = built_repo.records_commit
+        routes = real_routesmod.build_real_routes(view_path=built_repo.view_path, repo=str(built_repo.root),
+                                                   registry_path=built_repo.registry_path)
+        assert routes.resolved_view.named["records"].commit == original_commit
+    
+        resolve_view_calls = {"n": 0}
+        real_resolve_view = viewmod.resolve_view
+    
+        def _counting_resolve_view(*args, **kwargs):
+            resolve_view_calls["n"] += 1
+            return real_resolve_view(*args, **kwargs)
+    
+        # Patched on the SHARED govbridge.core.view module object: every caller in this codebase does
+        # `from govbridge.core import view as viewmod` and then `viewmod.resolve_view(...)` (an attribute lookup at
+        # CALL time, never `from ... import resolve_view` directly), so one patch here is visible to every one of
+        # them -- resolver.py, packet.py's own Compiler, followup.py's fallback, lexical/query.py, semantic/search.py,
+        # answers/cite.py, all alike.
+        monkeypatch.setattr(viewmod, "resolve_view", _counting_resolve_view)
+    
+        moved = {"done": False, "new_commit": None}
+        real_exact = routes.exact
+    
+        def _exact_and_move_once(**kwargs):
+            # Fires on the FIRST call to the exact route ANY query in this compile makes -- guaranteed to be AFTER
+            # compile_packet's own upfront resolver.resolve()/Compiler.__init__ resolutions (neither ever calls
+            # routes.exact), so the move lands strictly BETWEEN two queries' own exact-route retrievals, never before
+            # the first one.
+            if not moved["done"]:
+                moved["done"] = True
+                moved["new_commit"] = _move_records_ref(built_repo.root)
+            return real_exact(**kwargs)
+    
+        monkeypatch.setattr(routes, "exact", _exact_and_move_once)
+    
+        # config/facets.yaml (and this fixture's own tests/fixtures/gather/test-facets.yaml) never declare "exact" as
+        # a FACET route -- a query's own `routes` field only RESTRICTS which routes a facet may use, it cannot make a
+        # facet invoke one the facet itself never lists. The only path to the exact route, here as in gather, is
+        # follow-up identifier resolution (KIND_RECORD_ID -> resolve_identifier -> _resolve_via_exact ->
+        # routes.run("exact", ...)) -- the SAME "citing record explains a rule" trigger the gather test above (and
+        # tests/gather/test_followup.py's own test_a_record_citing_an_id_defined_elsewhere_is_reached_within_three_
+        # rounds) already uses, run here as two SEPARATE queries in one compile. Unlike a bare gather_with_followup
+        # call, compile_packet's own per-query loop (packet.py) additionally zeroes any route not in
+        # ``routermod.select_routes(q, grammar)`` -- plain prose like this query's own text contains no id/path/commit
+        # -shaped token, so auto-detection alone would zero "exact" out before follow-up ever gets a chance to use it.
+        # An explicit `routes` list on the query "always wins verbatim" (select_routes's own docstring), so both
+        # queries name lexical (round 0 needs it to surface the citing record at all) and exact (for the follow-up
+        # resolution this test is about) explicitly.
+        task_spec = {
+            "schema": "govbridge-task-spec/1", "task_id": "T-VIEWPIN", "role": "test",
+            "objective": "prove one resolved view per compile operation (BR-DAG-AMEND-R1-23)",
+            "view": built_repo.view_path,
+            "required_inputs": [{"state_ref": "state:bridge#mandatory_bridge_inputs.items[*]", "reason": "test"}],
+            "seeds": [],
+            "queries": [
+                _query("citing record explains a rule", id_="Q1", facets=["purpose"], routes=["lexical", "exact"]),
+                _query("citing record explains a rule", id_="Q2", facets=["purpose"], routes=["lexical", "exact"]),
+            ],
+            "mutation_scope": [], "prohibitions": [], "required_checks": [],
+            "completion_vocabulary": ["ANSWERED", "PARTIAL", "BLOCKED"],
+            "budget_profile": "bounded-builder",
+        }
+        result = packetmod.compile_packet(task_spec, routes=routes, repo=str(built_repo.root),
+                                           registry_path=built_repo.registry_path, facets_path=TEST_FACETS_PATH)
+    
+>       assert resolve_view_calls["n"] == 0, (
+            f"compile_packet made {resolve_view_calls['n']} additional view resolution(s) beyond the one already in "
+            f"routes.resolved_view -- it is not reusing the one view resolved at this operation's own start"
+        )
+E       AssertionError: compile_packet made 13 additional view resolution(s) beyond the one already in routes.resolved_view -- it is not reusing the one view resolved at this operation's own start
+E       assert 13 == 0
+
+tests/route/test_view_pinned_per_operation.py:256: AssertionError
+_ test_why_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call _
+
+built_repo = BuiltRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-709/test_why_uses_the_view_pinned_0/repo'), records_commit='8e06...s-rules.yaml', registry_path='/tmp/pytest-of-usain/pytest-709/test_why_uses_the_view_pinned_0/authority-registry.yaml')
+
+    def test_why_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call(built_repo):
+        """``why()`` is a single call (no internal rounds/queries) -- the way to prove "threaded as a parameter, not
+        re-resolved" for a single-call operation is: resolve once, move the LIVE ref, then call PASSING that already-
+        resolved view explicitly. If ``why()`` still re-resolved internally despite being given one, the second call
+        would see the moved commit and disagree with the first; since it is fixed (BR-DAG-AMEND-R1-23, pass 5), the
+        two calls are byte-identical."""
+        from govbridge.graph import why as whymod
+    
+        original_commit = built_repo.records_commit
+        resolved_view = viewmod.resolve_view(viewmod.load_view(built_repo.view_path), repo=str(built_repo.root))
+        assert resolved_view.named["records"].commit == original_commit
+    
+>       baseline = whymod.why(built_repo.id_defined_elsewhere, repo=str(built_repo.root), view_path=built_repo.view_path,
+                               registry_path=built_repo.registry_path, resolved_view=resolved_view)
+E       TypeError: why() got an unexpected keyword argument 'resolved_view'
+
+tests/route/test_view_pinned_per_operation.py:314: TypeError
+_ test_history_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call _
+
+built_repo = BuiltRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-709/test_history_uses_the_view_pin0/repo'), records_commit='f1af...s-rules.yaml', registry_path='/tmp/pytest-of-usain/pytest-709/test_history_uses_the_view_pin0/authority-registry.yaml')
+
+    def test_history_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call(built_repo):
+        """Same technique as the ``why()`` test above, for ``history()``."""
+        from govbridge.graph import history as historymod
+    
+        original_commit = built_repo.records_commit
+        resolved_view = viewmod.resolve_view(viewmod.load_view(built_repo.view_path), repo=str(built_repo.root))
+    
+>       baseline = historymod.history(built_repo.id_defined_elsewhere, repo=str(built_repo.root),
+                                       view_path=built_repo.view_path, registry_path=built_repo.registry_path,
+                                       resolved_view=resolved_view)
+E       TypeError: history() got an unexpected keyword argument 'resolved_view'
+
+tests/route/test_view_pinned_per_operation.py:338: TypeError
+_ test_cite_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call _
+
+built_repo = BuiltRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-709/test_cite_uses_the_view_pinned0/repo'), records_commit='f1af...s-rules.yaml', registry_path='/tmp/pytest-of-usain/pytest-709/test_cite_uses_the_view_pinned0/authority-registry.yaml')
+
+    def test_cite_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call(built_repo):
+        """Same technique again, for ``cite_identifier()`` -- the id-grammar branch (``KIND_ID`` ->
+        ``lifecycle.find_definition``), the one BR-DAG-AMEND-R1-23 explicitly names ("lifecycle's id_lookup
+        definition_sites use the pinned records commit") as needing this thread."""
+        from govbridge.answers import cite as citemod
+    
+        original_commit = _add_definable_record(built_repo.root)
+        resolved_view = viewmod.resolve_view(viewmod.load_view(built_repo.view_path), repo=str(built_repo.root))
+    
+>       baseline = citemod.cite_identifier(built_repo.id_defined_elsewhere, view_path=built_repo.view_path,
+                                            repo=str(built_repo.root), resolved_view=resolved_view)
+E       TypeError: cite_identifier() got an unexpected keyword argument 'resolved_view'
+
+tests/route/test_view_pinned_per_operation.py:381: TypeError
+_ test_answers_lint_uses_one_view_for_every_internal_cite_call_even_if_the_records_ref_moves_mid_run _
+
+built_repo = BuiltRepo(root=PosixPath('/tmp/pytest-of-usain/pytest-709/test_answers_lint_uses_one_vie0/repo'), records_commit='f1af...s-rules.yaml', registry_path='/tmp/pytest-of-usain/pytest-709/test_answers_lint_uses_one_vie0/authority-registry.yaml')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75c6f8e9a2d0>
+
+    def test_answers_lint_uses_one_view_for_every_internal_cite_call_even_if_the_records_ref_moves_mid_run(
+            built_repo, monkeypatch):
+        """``lint_answers`` calls ``cite_identifier`` once per uncited identifier, per claim, per answer -- a
+        gather/compile-shaped "many internal calls in one operation" case, so this test uses the SAME
+        monkeypatched-hook technique those two use (move the ref exactly once, on the first internal call), rather
+        than the explicit-resolved_view technique the three single-call operations above use."""
+        from govbridge.answers import cite as citemod
+        from govbridge.answers import lint as lintmod
+    
+        original_commit = _add_definable_record(built_repo.root)
+        doc = {
+            "schema": "govbridge-answers/1", "run_id": "RA-VIEWPIN", "packets_used": [],
+            "answers": [
+                {"query_id": "Q1", "status": "ANSWERED",
+                 "answer_text": f"{built_repo.id_defined_elsewhere} is mentioned here without a citation.",
+                 "citations": []},
+            ],
+        }
+    
+        moved = {"done": False, "new_commit": None}
+        real_cite_identifier = citemod.cite_identifier
+    
+        def _cite_and_move_once(*args, **kwargs):
+            if not moved["done"]:
+                moved["done"] = True
+                moved["new_commit"] = _move_records_ref(built_repo.root)
+            return real_cite_identifier(*args, **kwargs)
+    
+        monkeypatch.setattr(lintmod.citemod, "cite_identifier", _cite_and_move_once)
+    
+        result = lintmod.lint_answers(doc, [], view_path=built_repo.view_path, repo=str(built_repo.root))
+    
+        assert moved["done"], "the ref-move hook never fired -- this test would prove nothing"
+        assert moved["new_commit"] != original_commit
+>       assert {"name": "records", "commit": original_commit, "status": "OK"} in result["resolved_refs"]
+                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'resolved_refs'
+
+tests/route/test_view_pinned_per_operation.py:430: KeyError
+=========================== short test summary info ============================
+FAILED tests/route/test_view_pinned_per_operation.py::test_compile_exact_route_items_all_carry_the_records_commit_pinned_once_even_if_the_ref_moves_mid_compile
+FAILED tests/route/test_view_pinned_per_operation.py::test_why_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call
+FAILED tests/route/test_view_pinned_per_operation.py::test_history_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call
+FAILED tests/route/test_view_pinned_per_operation.py::test_cite_uses_the_view_pinned_at_its_own_start_even_if_the_records_ref_moves_before_the_call
+FAILED tests/route/test_view_pinned_per_operation.py::test_answers_lint_uses_one_view_for_every_internal_cite_call_even_if_the_records_ref_moves_mid_run
+5 failed, 1 passed in 2.12s

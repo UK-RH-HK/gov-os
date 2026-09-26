@@ -86,14 +86,20 @@ def _default_view_path() -> str:
     return os.path.join(GOV_BRIDGE_DOMAIN, "config", "canonical-view.yaml")
 
 
-def _default_product_commit(view_path: Optional[str], repo: Optional[str]) -> Optional[str]:
+def _default_product_commit(view_path: Optional[str], repo: Optional[str], resolved_view=None) -> Optional[str]:
     """The canonical view's own ``role: product`` ref, resolved to a commit -- generically, by role, never by a
     hard-coded ref name (OC-BR-02). Falls back to ``role: primary`` when no ``product`` role is declared (a
-    single-ref view collapses every role together, ARCHITECTURE.md section 1.2's "ordinary V8.3 operation" case)."""
+    single-ref view collapses every role together, ARCHITECTURE.md section 1.2's "ordinary V8.3 operation" case).
+
+    ``resolved_view`` (BR-DAG-AMEND-R1-23): reuse the caller's own ONE resolution instead of a fresh one."""
     from govbridge.core import view as viewmod
-    vp = view_path or _default_view_path()
-    vc = viewmod.load_view(vp)
-    resolved = viewmod.resolve_view(vc, repo=repo)
+    if resolved_view is not None:
+        resolved = resolved_view
+        vc = resolved_view.config
+    else:
+        vp = view_path or _default_view_path()
+        vc = viewmod.load_view(vp)
+        resolved = viewmod.resolve_view(vc, repo=repo)
     for role in ("product", "primary"):
         for r in vc.refs:
             if r.role == role:
@@ -142,11 +148,12 @@ def _resolve_rust_safe(identifier: str, commit: Optional[str], repo: Optional[st
 
 
 def _resolve_python(identifier: str, commit: Optional[str], repo: Optional[str],
-                     view_path: Optional[str] = None) -> dict:
+                     view_path: Optional[str] = None, resolved_view=None) -> dict:
     from govbridge.core import exact as exactmod
 
     literal = f"def {identifier}("
-    r = exactmod.grep(literal, ref=commit, paths=["*.py"], view_path=view_path, repo=repo)
+    r = exactmod.grep(literal, ref=commit, paths=["*.py"], view_path=view_path, repo=repo,
+                       resolved_view=resolved_view)
     hits = r.get("hits") or []
     if not hits:
         return {"status": STATUS_NOT_FOUND, "candidates": []}
@@ -160,10 +167,10 @@ def _resolve_python(identifier: str, commit: Optional[str], repo: Optional[str],
     return {"status": STATUS_RESOLVED, "citation": candidates[0], "label": LABEL_PYTHON}
 
 
-def _resolve_id_grammar(identifier: str, repo: Optional[str], view_path: Optional[str]) -> dict:
+def _resolve_id_grammar(identifier: str, repo: Optional[str], view_path: Optional[str], resolved_view=None) -> dict:
     from govbridge.authority import lifecycle as lifecyclemod
 
-    found = lifecyclemod.find_definition(identifier, repo=repo, view_path=view_path)
+    found = lifecyclemod.find_definition(identifier, repo=repo, view_path=view_path, resolved_view=resolved_view)
     if found is None:
         return {"status": STATUS_NOT_FOUND, "candidates": []}
     path, commit, line_start, line_end = found
@@ -172,12 +179,12 @@ def _resolve_id_grammar(identifier: str, repo: Optional[str], view_path: Optiona
 
 
 def _resolve_doc_anchor(doc: str, section: str, commit: Optional[str], repo: Optional[str],
-                         view_path: Optional[str]) -> dict:
+                         view_path: Optional[str], resolved_view=None) -> dict:
     from govbridge.compile import sectionmap as sectionmapmod
     from govbridge.core import exact as exactmod
     from govbridge.core import gitobj
 
-    pr = exactmod.path_resolve(doc, ref=commit, view_path=view_path, repo=repo)
+    pr = exactmod.path_resolve(doc, ref=commit, view_path=view_path, repo=repo, resolved_view=resolved_view)
     if pr.get("ambiguous"):
         candidates = [{"path": p} for p in (pr.get("candidates") or [])]
         if not candidates:
@@ -210,23 +217,38 @@ def _resolve_doc_anchor(doc: str, section: str, commit: Optional[str], repo: Opt
 
 
 def cite_identifier(identifier: str, *, commit: Optional[str] = None, view_path: Optional[str] = None,
-                     repo: Optional[str] = None, registry_path: Optional[str] = None) -> dict:
-    """Resolve ``identifier`` to ``{identifier, kind, status, citation|candidates, label}``. ``registry_path`` is
-    accepted for CLI-signature symmetry with every other query command but unused: none of the four identifier
-    kinds this module resolves needs an authority-registry lookup of its own."""
+                     repo: Optional[str] = None, registry_path: Optional[str] = None, resolved_view=None) -> dict:
+    """Resolve ``identifier`` to ``{identifier, kind, status, citation|candidates, label, resolved_refs}``.
+    ``registry_path`` is accepted for CLI-signature symmetry with every other query command but unused: none of
+    the four identifier kinds this module resolves needs an authority-registry lookup of its own.
+
+    BR-DAG-AMEND-R1-23 (ONE RESOLVED VIEW PER OPERATION): this used to have NO resolution of its own -- each of
+    the four branches below resolved ``config/canonical-view.yaml`` independently (``_default_product_commit``,
+    ``_resolve_id_grammar`` -> ``lifecycle.find_definition``, ``_resolve_doc_anchor``/``_resolve_python`` ->
+    ``exact.path_resolve``/``grep``), and the KIND_CODE branch even resolved TWICE in the same call (once for the
+    Rust attempt's own product commit, once again inside the Python fallback's own ``exact.grep``). One "cite"
+    invocation now resolves ``config/canonical-view.yaml`` exactly ONCE, here, when the caller (this function's
+    own CLI, or ``govbridge.answers.lint``, resolving once for a whole lint run) does not already supply
+    ``resolved_view`` itself."""
     del registry_path
+    if resolved_view is None:
+        from govbridge.core import view as viewmod
+        vp = view_path or _default_view_path()
+        resolved_view = viewmod.resolve_view(viewmod.load_view(vp), repo=repo)
     kind = classify_identifier(identifier)
 
     if kind == KIND_DOC:
         m = DOC_ANCHOR_RE.match(identifier)
-        out = _resolve_doc_anchor(m.group("doc"), m.group("section"), commit, repo, view_path)
+        out = _resolve_doc_anchor(m.group("doc"), m.group("section"), commit, repo, view_path,
+                                   resolved_view=resolved_view)
     elif kind == KIND_ID:
-        out = _resolve_id_grammar(identifier, repo, view_path)
+        out = _resolve_id_grammar(identifier, repo, view_path, resolved_view=resolved_view)
     else:
-        rust_commit = commit if commit is not None else _default_product_commit(view_path, repo)
+        rust_commit = commit if commit is not None else _default_product_commit(view_path, repo,
+                                                                                  resolved_view=resolved_view)
         out = _resolve_rust_safe(identifier, rust_commit, repo)
         if out["status"] == STATUS_NOT_FOUND and "::" not in identifier:
-            py_out = _resolve_python(identifier, commit, repo, view_path=view_path)
+            py_out = _resolve_python(identifier, commit, repo, view_path=view_path, resolved_view=resolved_view)
             if py_out["status"] != STATUS_NOT_FOUND:
                 out = py_out
             else:
@@ -234,7 +256,8 @@ def cite_identifier(identifier: str, *, commit: Optional[str] = None, view_path:
                 out = {"status": STATUS_NOT_FOUND, "candidates": [],
                        "note": combined_note or "no Rust definition and no Python def(...) found"}
 
-    return {"identifier": identifier, "kind": kind, **out}
+    # BR-DAG-AMEND-R1-23 requirement 1: the recorded view in this output must equal the commits actually used.
+    return {"identifier": identifier, "kind": kind, **out, "resolved_refs": resolved_view.pinned_refs()}
 
 
 def main(argv=None) -> int:

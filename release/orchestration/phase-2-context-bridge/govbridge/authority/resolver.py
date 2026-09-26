@@ -572,7 +572,17 @@ def resolve(task_spec: dict, repo: Optional[str] = None, registry_path: Optional
         elif "id" in entry:
             item_id = entry["id"]
             required_status = entry.get("required_status") or classesmod.LIFECYCLE_ACTIVE
-            found = lifecyclemod._find_definition(item_id, repo=repo, view_path=view_path)
+            # BR-DAG-AMEND-R1-23 reopening (pass 5, an independent re-audit's own finding): this call used to omit
+            # `resolved_view`, even though `resolve()`'s own OTHER two branches (state_ref/path-form, just above)
+            # already thread it through correctly -- the one gap left the id-form branch re-resolving "records"
+            # live via `lifecycle.py`'s own `_find_definition`, independently of THIS resolve() call's own pinned
+            # view (a `MandatoryItem` built at whatever the live tip happened to be, not at the view a compile or
+            # `packet verify` had already resolved once). `authority/resolver.py` is not itself in this run's
+            # named mutation_scope, but this one line is a direct, mechanically obvious consequence of the
+            # already-authorized compile.py/packet-verify fix actually working end to end -- see this run's own
+            # checkpoint decisions for the full justification.
+            found = lifecyclemod._find_definition(item_id, repo=repo, view_path=view_path,
+                                                    resolved_view=resolved_view)
             anchor = reg.anchor_by_item_id(item_id)
             if found is None and anchor is None:
                 blocked.append(f"{item_id}: no definition found (id_form required_input)")
@@ -581,7 +591,8 @@ def resolve(task_spec: dict, repo: Optional[str] = None, registry_path: Optional
                                                                         anchor.line_start, anchor.line_end)
             classification = lifecyclemod.classify(item_id, path=path, commit=commit, line_start=line_start,
                                                      line_end=line_end, reg=reg,
-                                                     mandatory_items=mandatory_items_index, repo=repo)
+                                                     mandatory_items=mandatory_items_index, repo=repo,
+                                                     resolved_view=resolved_view)
             if classification.lifecycle != required_status:
                 blocked.append(f"{item_id}: lifecycle {classification.lifecycle} != required_status {required_status}")
                 continue
