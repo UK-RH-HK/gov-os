@@ -1,0 +1,97 @@
+# BR-AR-0022 typed report. No oracle content.
+run_id: BR-AR-0022
+role: 'REPAIR-1 node R1-RM -- mandatory-input fidelity (no silent truncation, declared selectors honoured,
+  directory items expanded, receipt acknowledges what was delivered) + BR-DAG-AMEND-R1-1 (packet verify/receipt
+  check re-derive section A at the packet''s own recorded view) + BR-DAG-AMEND-R1-2 (hermetic real-view compile
+  test). Did not touch govbridge/cli.py (sequenced RX -> GA1 -> RS -> RA; GA1 runs in parallel), grading, the
+  oracle, or any other node''s mutation_scope.'
+model_observed: claude-sonnet-5 (Sonnet 5)
+branch: bridge/r1-rm-0022
+commit: 9790a82a797a4edc5cd18e7e5911f570148d298f
+status: COMPLETED
+claims:
+- 'RC-1 fixed: govbridge/compile/packet.py''s _read_excerpt used to silently cut EVERY mandatory item at 4000
+  characters, with no marker (the exact defect CAUSE_ANALYSIS.md/REPAIR_PLAN.md section 3 names). Every
+  mandatory-item call site now passes max_chars=None; an oversize item (over the per-item cap,
+  config/budgets.yaml''s 24 KB default) is delivered as a full structural section map
+  (govbridge/compile/sectionmap.py: Markdown headings or YAML top-level keys, exact line ranges, sha256 per
+  section) plus any selected parts plus a MANDATORY_PARTIAL_DELIVERY J notice listing every undelivered range --
+  never a bare truncated string. Confirmed on REAL production content: state:bridge#contract_v3 (a real,
+  oversize mandatory item) now triggers this path instead of being silently cut (AGENT_RUNS/BR-AR-0022.evidence/
+  control-a-rm-probe-manifest.json).'
+- 'Selectors honoured: a mandatory-input row (bridge-state item or task-spec path_form entry) may declare `keys`
+  (dotted YAML key paths), `entries` ({under, ids} or {under, start, end} -- an id range/set within a YAML
+  sequence) and multiple `paths`; govbridge/authority/resolver.py resolves each to exact line spans via the new
+  govbridge/compile/sectionmap.py and delivers every matched part in full. An unresolvable selector fails the
+  WHOLE row closed (added to blocked_reasons, a BLOCKED_INPUT J notice), exactly like a missing path already did
+  -- never a silent partial match. A pre-existing, real, non-structured `entries` value
+  (PHASE-2-LEDGER-P2-L-0033-0047''s free-text annotation in ORCHESTRATOR_STATE.yaml) is left completely alone --
+  discovered by running the corrected test_compile_real_view_mandatory_in_a.py, which crashed against it before
+  the fix (`entries` is only ever treated as a selector when it is a dict; `keys` only when it is a list).'
+- 'Multi-path items now deliver every declared path in full (previously: every path was existence-checked but
+  only the first delivered), and a by-reference directory item is expanded into a member manifest (path, blob,
+  size, class per tracked file under it, via a generic Registry.class_for_path glob lookup) -- proven on a
+  synthetic MF-PATHS/MF-DIR fixture (tests/compile/test_mandatory_fidelity.py).'
+- 'Receipt/manifest now carry delivered_sha256 (what the packet''s body actually contains) separately from
+  source_sha256 (the resolver''s own recorded hash, unchanged in meaning from the old content_sha256 field, kept
+  for backward compatibility). The two coincide for a fully-delivered item and legitimately differ only for a
+  partially-delivered mandatory item (disclosed by its own MANDATORY_PARTIAL_DELIVERY notice).
+  validate.verify_delivered_fidelity asserts both are present for every A item -- a directory item with no
+  row-declared hash no longer carries source_sha256=None (the concrete run-1 pain point: "acknowledged as
+  ''ID@None'' because the manifest carries no content_sha256 for this by-reference [item]"); it now gets a real,
+  deterministic hash derived from its own member manifest.'
+- 'BR-DAG-AMEND-R1-1: govbridge.compile.validate.verify_section_a (and therefore receipt.check, which calls into
+  the SAME function) now re-derives section A at the packet''s OWN recorded view (pinned_view_from_manifest,
+  built from manifest[''view''] -- every named ref pinned to its recorded commit), never the repository''s moving
+  tip. Regression test tests/compile/test_verify_recorded_view.py: compile against a fixture repo, commit a NEW
+  mandatory owner record onto the SAME ref, re-verify the OLD packet -> PASS (plus two negative controls proving
+  the fixture genuinely exercises a moving tip and that the pre-repair, live-view re-derivation would have
+  disagreed here).'
+- 'BR-DAG-AMEND-R1-2: tests/compile/test_compile_real_view_mandatory_in_a.py used to compile against LIVE refs of
+  the shared repository with no repo/view pin (config/canonical-view.yaml''s `records` ref, follow: tip, is
+  exactly the branch every parallel builder agent commits to, in the SAME underlying object store every worktree
+  of this repository shares). Made hermetic: every follow:tip NAMED ref is resolved ONCE, at module load, and
+  pinned into a temp copy of the view for both assertions in the file; repo= is now passed explicitly to every
+  compile_packet/verify_packet call (never relying on gitobj.repo_root()''s process-global cwd cache -- R1-INT''s
+  routed fix). The byte-identical-twice assertion is unchanged and unweakened. Verified standalone (2 passed,
+  ~156s, real view) and inside the full domain suite.'
+- 'Full domain suite: 428 passed, 0 failed (tests/compile/test_compile_real_view_mandatory_in_a.py included, now
+  hermetic). AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out.'
+evidence:
+- claim: RC-1 no-truncation
+  command: grep -n 'max_chars' govbridge/compile/packet.py
+  output: AGENT_RUNS/BR-AR-0022.evidence/check2-grep-max_chars.out
+- claim: RC-1/selectors/directory manifest on synthetic fixtures + full compile suite
+  command: $PY -m pytest -q -p no:cacheprovider tests/compile/test_mandatory_fidelity.py tests/compile
+  output: AGENT_RUNS/BR-AR-0022.evidence/check1-pytest-mandatory-fidelity-and-compile.out
+- claim: RC-1/selectors on the real view (state:bridge#contract_v3 oversize; ORCHESTRATOR_STATE.yaml `keys` selector)
+  command: $PY -m govbridge compile AGENT_RUNS/BR-AR-0022.evidence/control-a-rm-probe-task-spec.yaml --out /tmp/rm-probe --fake-routes
+  output: AGENT_RUNS/BR-AR-0022.evidence/check3-compile.out, control-a-rm-probe-manifest.json, control-a-rm-probe-packet.md
+- claim: packet verify PASSes on that real-view packet
+  command: $PY -m govbridge packet verify /tmp/rm-probe
+  output: AGENT_RUNS/BR-AR-0022.evidence/check3-packet-verify.out
+- claim: BR-DAG-AMEND-R1-1 regression
+  command: $PY -m pytest -q -p no:cacheprovider tests/compile/test_verify_recorded_view.py
+  output: AGENT_RUNS/BR-AR-0022.evidence/check-standalone-test_verify_recorded_view.out
+- claim: BR-DAG-AMEND-R1-2 hermeticity (real view)
+  command: $PY -m pytest -q -p no:cacheprovider tests/compile/test_compile_real_view_mandatory_in_a.py
+  output: AGENT_RUNS/BR-AR-0022.evidence/check-standalone-test_compile_real_view_mandatory_in_a.out
+- claim: full domain suite green
+  command: $PY -m pytest -q -p no:cacheprovider tests
+  output: AGENT_RUNS/BR-AR-0022.evidence/check-full-domain-suite.out
+mutation_scope_respected: true
+open_issues:
+- 'pinned_view_from_manifest (validate.py) leaves `history` (a ref_glob of many equally-historical tips) unpinned
+  -- manifest[''view''] does not itemise glob refs (only named refs), so a mandatory item resolved only through a
+  partition''s history fallback is not covered by this amendment''s own regression test. No real
+  mandatory_bridge_inputs item currently resolves through that fallback; flagged for R1-INT''s generic-rule/
+  determinism audit to confirm, not fixed here (out of this node''s scope to extend view.py/render.py''s manifest
+  shape further).'
+- 'Selector support (`keys`/`entries`) is wired into the state_ref/row path (every real mandatory_bridge_inputs
+  item) and into path_form entries; id_form entries do not carry it (no real required_input currently uses
+  id_form with a selector need, and demonstration-task.yaml''s three required_inputs are all state_form). Noted
+  for whichever node next extends id_form, should a future task need it.'
+- 'The `entries`/`keys` selector shape (`{under, start, end}` / `{under, ids}` / a plain list) is new, generic
+  syntax on top of the existing required_inputs/mandatory_bridge_inputs row schema; ARCHITECTURE/schemas/
+  task-spec.yaml (not in this node''s mutation_scope) does not yet document it. Recommend R1-INT or a schema-owning
+  node add the two new optional fields to that schema file.'
