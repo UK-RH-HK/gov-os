@@ -173,3 +173,52 @@ def test_byte_identical_files_share_one_cached_blob_by_design(repo):
     labels = {row["label"] for row in caller_result["callers"]}
     # one cached blob -> one definition -> resolved as unique, not ambiguous (the documented trade-off)
     assert labels == {R.HEURISTIC_UNIQUE_NAME}
+
+
+# --- R1-RL: paging over `callers` -----------------------------------------------------------------------------
+
+def _write_many_callers_fixture(root: Path, n: int) -> None:
+    rb.write(root, "runtime/src/paged_target.rs", "pub fn paged_target() {}\n")
+    lines = "\n".join(f"fn paged_caller_{i}() {{ paged_target(); }}" for i in range(n))
+    rb.write(root, "runtime/src/paged_callers.rs", lines + "\n")
+
+
+def test_callers_paged_matches_the_unpaged_query_50_callers_page_8(repo):
+    """The acceptance check, verbatim: "a 50-caller symbol paged 8 at a time gives the same union as the unpaged
+    query"."""
+    _write_many_callers_fixture(repo, 50)
+    commit = rb.commit(repo, "50 callers of paged_target")
+
+    full = symbols.callers("paged_target", commit, repo=str(repo))
+    assert len(full["callers"]) == 50
+
+    collected = []
+    cursor = None
+    pages = 0
+    while True:
+        page = symbols.callers("paged_target", commit, repo=str(repo), page_size=8, cursor=cursor)
+        pages += 1
+        assert page["total"] == 50
+        collected.extend(page["callers"])
+        cursor = page["next_cursor"]
+        if cursor is None:
+            break
+    assert pages == 7  # ceil(50 / 8)
+    assert collected == full["callers"]
+
+
+def test_cli_callers_page_size_returns_a_continuation_handle(repo):
+    _write_many_callers_fixture(repo, 50)
+    commit = rb.commit(repo, "50 callers of paged_target, via CLI")
+    env = dict(os.environ)
+    env["PYTHONPATH"] = _D
+    proc = subprocess.run(
+        [sys.executable, "-m", "govbridge.code.symbols", "callers", "paged_target", "--commit", commit,
+         "--page-size", "6", "--json"],
+        cwd=str(repo), capture_output=True, text=True, env=env, timeout=60,
+    )
+    assert proc.returncode == 0, proc.stderr
+    payload = json.loads(proc.stdout)
+    assert len(payload["callers"]) == 6
+    assert payload["next_cursor"] == "6"
+    assert payload["total"] == 50

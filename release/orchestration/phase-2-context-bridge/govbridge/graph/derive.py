@@ -7,6 +7,7 @@ connection given, they are simply absent (MISSING), which is the honest state un
 """
 from __future__ import annotations
 
+import ast
 import re
 import sqlite3
 from typing import Optional
@@ -20,8 +21,20 @@ HEX_COMMIT_RE = re.compile(r"\b[0-9a-f]{7,40}\b")
 PATH_CITE_RE = re.compile(
     r"(?<![\w/.-])(?P<path>[A-Za-z0-9_./-]+\.[A-Za-z0-9_]+)(?::(?P<l1>\d+)(?:-(?P<l2>\d+))?)?(?![\w/.-])"
 )
+SECTION_CITE_RE = re.compile(
+    r"(?P<path>[A-Za-z0-9_./-]+\.[A-Za-z0-9_]+)\s+(?:section|§)\s*(?P<sec>\d+(?:\.\d+)*)"
+    r"(?:\s*[-–—]\s*§?\s*(?P<sec2>\d+(?:\.\d+)*))?",  # an optional range: §N-M / §N–M / §N—§M
+    re.IGNORECASE,
+)
+STRING_LITERAL_RE = re.compile(r'"((?:[^"\\]|\\.)*)"')
 COMMENT_PREFIXES = ("//", "///", "//!", "#", "*", "\"\"\"", "'''")
-CODE_DIRS = ("runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/")
+CODE_DIRS = ("runtime/", "cli/", "framework/", "capabilities/", "migrations/", "tools/", "bin/", "scripts/",
+             # BR-AR-0019 reopening (Gap 1): "tests/" carries real Rust SOURCE (tests/certification/*.rs and
+             # friends) with the SAME doc-comment/string-literal shapes as any other code file -- excluding it
+             # silently dropped every CITES_REQUIREMENT/DEPENDS_ON_DATA citation living in a certification test's
+             # own `///`/`//!` header. Generic (a path-class prefix, not a file name); code_cites_edges_for_id
+             # gains the same reach, since it shares this constant.
+             "tests/")
 
 
 def occ(path: str, commit: str, line: Optional[int] = None) -> str:
@@ -194,6 +207,187 @@ def code_cites_edges_for_id(unit: str, commit: str, repo: Optional[str] = None,
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# DEPENDS_ON_DATA -- a code file's own string literal(s) that name a tracked repository path (REPAIR_PLAN.md
+# section 4, RC-7: "no code-to-data edges"). Takes one already-read file's text (never a corpus scan): the caller
+# (a route, a gather loop) already has the occurrence's text for the line it is looking at.
+# ---------------------------------------------------------------------------------------------------------------
+
+def depends_on_data_edges(text: str, path: str, commit: str, repo: Optional[str] = None,
+                           code_dirs: tuple = CODE_DIRS) -> list:
+    """A double-quoted string literal on a code line, generic across languages (the shape is "...", never a
+    language-specific string-literal grammar): (1) the literal itself is a tracked path at ``commit``
+    (EXACT_LITERAL_PATH); or (2) two to four of the line's literals, taken adjacent and IN ORDER and joined with
+    '/', resolve -- directly, or (like ``cites_edges_in_text``'s own HEURISTIC_SUFFIX) as a UNIQUE path suffix --
+    to a tracked path (HEURISTIC_JOINED_PATH; covers ``os.path.join("config", "id-grammar.yaml")``-shaped calls,
+    generically, never one function name in particular)."""
+    if not any(path.startswith(d) for d in code_dirs):
+        return []
+    out: list = []
+    all_paths_cache: Optional[list] = None
+    for i, line in enumerate(text.splitlines(), start=1):
+        literals = [m.group(1) for m in STRING_LITERAL_RE.finditer(line) if m.group(1)]
+        seen_on_line: set = set()
+
+        for lit in literals:
+            if lit in seen_on_line or ("/" not in lit and "." not in lit):
+                continue
+            if gitobj.ls_tree_path(commit, lit, repo=repo) is not None:
+                seen_on_line.add(lit)
+                out.append(E.Edge(src=occ(path, commit, i), type=E.DEPENDS_ON_DATA, dst=lit,
+                                   derivation=E.EXACT_LITERAL_PATH, evidence_occurrence=occ(path, commit),
+                                   evidence_line=i))
+
+        for j in range(len(literals)):
+            for n in range(2, 5):
+                if j + n > len(literals):
+                    break
+                joined = "/".join(literals[j:j + n])
+                if joined in seen_on_line or not joined:
+                    continue
+                resolved = joined
+                derivation = E.HEURISTIC_JOINED_PATH
+                if gitobj.ls_tree_path(commit, joined, repo=repo) is None:
+                    if all_paths_cache is None:
+                        all_paths_cache = gitobj.ls_tree_paths(commit, repo=repo)
+                    matches = [p for p in all_paths_cache if p == joined or p.endswith("/" + joined)]
+                    if len(matches) != 1:
+                        continue
+                    resolved = matches[0]
+                seen_on_line.add(joined)
+                out.append(E.Edge(src=occ(path, commit, i), type=E.DEPENDS_ON_DATA, dst=resolved,
+                                   derivation=derivation, evidence_occurrence=occ(path, commit), evidence_line=i))
+    return out
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# CITES_REQUIREMENT -- a requirement citation inside a CODE FILE's own comment (RC-7: "no code-to-requirement
+# edges"): "<doc>:<line>" (exact, or a unique suffix), or "<doc> section N" / "<doc> §N" (resolved to the
+# first markdown heading at <doc> whose own leading numbering starts with N).
+# ---------------------------------------------------------------------------------------------------------------
+
+def _resolve_cited_path_verbose(candidate: str, commit: str, repo: Optional[str],
+                                 all_paths_cache: list) -> tuple:
+    """(resolved_path, reason): resolved_path is None exactly when reason is set, so a caller can ALWAYS tell
+    unresolved-with-a-reason apart from resolved (BR-AR-0019 reopening, Gap 1: "never drop a citation silently
+    ... resolves ambiguously, is counted ... as unresolved, with its reason")."""
+    if gitobj.ls_tree_path(commit, candidate, repo=repo) is not None:
+        return candidate, None
+    matches = [p for p in all_paths_cache if p == candidate or p.endswith("/" + candidate)]
+    if len(matches) == 1:
+        return matches[0], None
+    if not matches:
+        return None, f"no path matches {candidate!r}"
+    return None, f"ambiguous suffix {candidate!r}: {len(matches)} candidates"
+
+
+def _resolve_cited_path(candidate: str, commit: str, repo: Optional[str],
+                         all_paths_cache: list) -> Optional[str]:
+    resolved, _reason = _resolve_cited_path_verbose(candidate, commit, repo, all_paths_cache)
+    return resolved
+
+
+def _first_heading_for_section(text: str, section_no: str) -> Optional[int]:
+    for i, line in enumerate(text.splitlines(), start=1):
+        m = re.match(r"^#{1,6}\s+(\d+(?:\.\d+)*)\b", line)
+        if m and (m.group(1) == section_no or m.group(1).startswith(section_no + ".")):
+            return i
+    return None
+
+
+def cites_requirement_edges_in_text(text: str, citing_path: str, citing_commit: str,
+                                     repo: Optional[str] = None, code_dirs: tuple = CODE_DIRS) -> tuple:
+    """Returns ``(edges, unresolved)``. ``unresolved`` is a list of
+    ``{"path", "line", "candidate", "form", "reason"}`` dicts -- BR-AR-0019 reopening, Gap 1: a citation is NEVER
+    silently dropped. Three outcomes, all reported:
+
+    * the document AND the cited section/line resolve -> an edge with an EXACT_*/HEURISTIC_SUFFIX/
+      HEURISTIC_COMMENT_SECTION derivation (unchanged from before);
+    * the document resolves but the cited section heading does not -> an edge to the DOCUMENT itself, derivation
+      ``HEURISTIC_SECTION_UNRESOLVED`` (never dropped -- this is the exact case CAUSE_ANALYSIS''s own SYNTHESIS.md
+      §10.4 example hits: the document is real and unique, the cited section number simply is not a heading
+      there);
+    * the document itself does not resolve, or resolves ambiguously -> no edge; recorded in ``unresolved`` with
+      the reason (``_resolve_cited_path_verbose``'s own message).
+
+    A ``§N-M``/``§N–M`` RANGE resolves against its START section ``N`` (the primary anchor); if the END section
+    ``M`` ALSO resolves to its own heading, the edge's ``dst`` extends to cover through that heading's line too,
+    noted as a range; if ``M`` does not resolve, the edge still stands on ``N`` alone (a partially-resolved range
+    is not a wholly-dropped one)."""
+    if not any(citing_path.startswith(d) for d in code_dirs):
+        return [], []
+    out: list = []
+    unresolved: list = []
+    all_paths_cache: Optional[list] = None
+    heading_cache: dict = {}
+
+    def _all_paths() -> list:
+        nonlocal all_paths_cache
+        if all_paths_cache is None:
+            all_paths_cache = gitobj.ls_tree_paths(citing_commit, repo=repo)
+        return all_paths_cache
+
+    def _heading_text(resolved_path: str) -> Optional[str]:
+        if resolved_path not in heading_cache:
+            raw = gitobj.read_path(citing_commit, resolved_path, repo=repo)
+            decoded = None
+            if raw is not None:
+                try:
+                    decoded = raw.decode("utf-8")
+                except UnicodeDecodeError:
+                    decoded = None
+            heading_cache[resolved_path] = decoded
+        return heading_cache[resolved_path]
+
+    for i, line in enumerate(text.splitlines(), start=1):
+        if not _looks_like_comment(line):
+            continue
+        for m in PATH_CITE_RE.finditer(line):
+            candidate = m.group("path")
+            l1 = m.group("l1")
+            if l1 is None or ("/" not in candidate and "." not in candidate):
+                continue  # a bare path mention with no line, in a comment, is not a requirement citation
+            resolved_path, reason = _resolve_cited_path_verbose(candidate, citing_commit, repo, _all_paths())
+            if resolved_path is None:
+                unresolved.append({"path": citing_path, "line": i, "candidate": candidate, "form": "path:line",
+                                    "reason": reason})
+                continue
+            derivation = E.EXACT_COMMENT_CITATION if resolved_path == candidate else E.HEURISTIC_SUFFIX
+            l2 = int(m.group("l2")) if m.group("l2") else int(l1)
+            dst = f"{resolved_path}:{l1}-{l2}"
+            out.append(E.Edge(src=occ(citing_path, citing_commit, i), type=E.CITES_REQUIREMENT, dst=dst,
+                               derivation=derivation, evidence_occurrence=occ(citing_path, citing_commit),
+                               evidence_line=i))
+        for m in SECTION_CITE_RE.finditer(line):
+            candidate, section_no, section_no2 = m.group("path"), m.group("sec"), m.group("sec2")
+            resolved_path, reason = _resolve_cited_path_verbose(candidate, citing_commit, repo, _all_paths())
+            if resolved_path is None:
+                unresolved.append({"path": citing_path, "line": i, "candidate": candidate, "form": "section",
+                                    "reason": reason})
+                continue
+            note = f"section {section_no}" if not section_no2 else f"sections {section_no}-{section_no2}"
+            decoded = _heading_text(resolved_path)
+            found_line = _first_heading_for_section(decoded, section_no) if decoded is not None else None
+            if found_line is None:
+                # the document is real; the numbered heading is not there -- an edge to the DOCUMENT, never a
+                # silent drop (Gap 1's central requirement).
+                out.append(E.Edge(src=occ(citing_path, citing_commit, i), type=E.CITES_REQUIREMENT,
+                                   dst=resolved_path, derivation=E.HEURISTIC_SECTION_UNRESOLVED,
+                                   evidence_occurrence=occ(citing_path, citing_commit), evidence_line=i,
+                                   note=note))
+                continue
+            end_line = found_line
+            if section_no2 and decoded is not None:
+                end_found = _first_heading_for_section(decoded, section_no2)
+                if end_found is not None:
+                    end_line = max(end_line, end_found)
+            dst = f"{resolved_path}:{found_line}" if end_line == found_line else f"{resolved_path}:{found_line}-{end_line}"
+            out.append(E.Edge(src=occ(citing_path, citing_commit, i), type=E.CITES_REQUIREMENT,
+                               dst=dst, derivation=E.HEURISTIC_COMMENT_SECTION,
+                               evidence_occurrence=occ(citing_path, citing_commit), evidence_line=i, note=note))
+    return out, unresolved
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # EVIDENCE_MAP -- tests/governance/capability-evidence-map.yaml rows.
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -258,34 +452,313 @@ def callees_of(conn: Optional[sqlite3.Connection], qualified_name: str) -> list:
     return out
 
 
-def reads_key_of(conn: Optional[sqlite3.Connection], key_literal: str) -> list:
+def _paginate(items: list, page_size: Optional[int], cursor: Optional[str]) -> tuple:
+    """A simple, deterministic offset cursor (an ASCII integer string): ``items`` is already the full, sorted
+    result; a caller with no ``page_size`` gets it back untouched (every EXISTING caller of ``tests_of``/
+    ``reads_key_of`` -- a plain list -- keeps working unchanged). Otherwise a ``(page, next_cursor)`` pair, with
+    ``next_cursor`` ``None`` once the union has been exhausted -- following it to exhaustion returns exactly
+    ``items`` again, one page at a time (the paging acceptance check)."""
+    if page_size is None:
+        return items, None
+    offset = int(cursor) if cursor else 0
+    page = items[offset:offset + page_size]
+    next_cursor = str(offset + page_size) if offset + page_size < len(items) else None
+    return page, next_cursor
+
+
+def reads_key_of(conn: Optional[sqlite3.Connection], key_literal: str, page_size: Optional[int] = None,
+                  cursor: Optional[str] = None):
     if conn is None:
-        return []
+        return [] if page_size is None else {"items": [], "next_cursor": None, "total": 0}
     rows = conn.execute(
-        "SELECT blob, line, enclosing_symbol FROM literal WHERE value = ?", (key_literal,)
+        "SELECT blob, line, enclosing_symbol FROM literal WHERE value = ? ORDER BY blob, line", (key_literal,)
     ).fetchall()
-    return [E.Edge(src=enclosing_symbol or f"{blob}:{line}", type=E.READS_KEY, dst=key_literal,
-                    derivation=E.EXACT_SPAN, evidence_occurrence=f"{blob}:{line}", evidence_line=line)
-            for blob, line, enclosing_symbol in rows]
+    out = [E.Edge(src=enclosing_symbol or f"{blob}:{line}", type=E.READS_KEY, dst=key_literal,
+                   derivation=E.EXACT_SPAN, evidence_occurrence=f"{blob}:{line}", evidence_line=line)
+           for blob, line, enclosing_symbol in rows]
+    page, next_cursor = _paginate(out, page_size, cursor)
+    if page_size is None:
+        return page
+    return {"items": page, "next_cursor": next_cursor, "total": len(out)}
 
 
-def tests_of(conn: Optional[sqlite3.Connection], qualified_name: str) -> list:
+def tests_of(conn: Optional[sqlite3.Connection], qualified_name: str, page_size: Optional[int] = None,
+             cursor: Optional[str] = None):
     """TESTS(test -> symbol): every test-labelled symbol whose CALLS resolution reaches ``qualified_name``,
-    EXACT_PATH when the resolution label itself is EXACT_PATH, HEURISTIC_NAME otherwise."""
+    EXACT_PATH when the resolution label itself is EXACT_PATH, HEURISTIC_NAME otherwise. ``page_size``/``cursor``
+    (R1-RL paging): omitted, this returns the plain list exactly as before; given, a ``{"items", "next_cursor",
+    "total"}`` page over the SAME sorted union."""
     if conn is None:
-        return []
+        return [] if page_size is None else {"items": [], "next_cursor": None, "total": 0}
     rows = conn.execute(
         "SELECT r.label, cs.blob, cs.line, cs.caller_symbol, s.is_test "
         "FROM resolution r JOIN call_site cs ON cs.rowid = r.call_site "
         "JOIN symbol s2 ON s2.symbol_id = r.target_symbol "
         "JOIN symbol s ON s.qualified_name = cs.caller_symbol "
-        "WHERE s2.qualified_name = ? AND s.is_test = 1", (qualified_name,),
+        "WHERE s2.qualified_name = ? AND s.is_test = 1 ORDER BY cs.blob, cs.line", (qualified_name,),
     ).fetchall()
     out = []
     for label, blob, line, caller_symbol, _is_test in rows:
         derivation = E.EXACT_PATH if label == "EXACT_PATH" else E.HEURISTIC_NAME
         out.append(E.Edge(src=caller_symbol, type=E.TESTS, dst=qualified_name, derivation=derivation,
                            evidence_occurrence=f"{blob}:{line}", evidence_line=line))
+    page, next_cursor = _paginate(out, page_size, cursor)
+    if page_size is None:
+        return page
+    return {"items": page, "next_cursor": next_cursor, "total": len(out)}
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# TESTS, beyond a direct in-test call: (b) a test that drives the product through its command-line binary, mapped
+# generically -- by parsing the invoked module's OWN argparse dispatch structure at the same commit, never a
+# hard-coded subcommand table of our own (OC-BR-02) -- through to its handler; (c) a test registry: a YAML file,
+# anywhere, recognised by SHAPE (a row with a `tests:` list field) rather than by name.
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_registry_edges_in_doc(doc, path: str, commit: str, unit: Optional[str] = None) -> list:
+    """Every TESTS edge in an ALREADY-PARSED YAML document recognised as a test registry by SHAPE -- a top-level
+    list (or a `rows`/`entries` key holding one) of mapping rows, each with a `tests` key that is itself a list of
+    test paths/ids -- rather than by a specific file name (OC-BR-02; contrast ``evidence_map_edges_for_id``'s own
+    fixed default path, an EXISTING, narrower capability this one generalises). ``unit``, if given, filters to rows
+    mentioning it (``test_registry_edges_for_id``'s bounded, per-id use); omitted, every row's edges are returned
+    (a whole-corpus layer builder's use, which already has the doc in hand and wants every row in one pass)."""
+    rows = doc if isinstance(doc, list) else ((doc.get("rows") or doc.get("entries")) if isinstance(doc, dict)
+                                                else None)
+    if not isinstance(rows, list):
+        return []
+    out: list = []
+    for row in rows:
+        if not isinstance(row, dict) or not isinstance(row.get("tests"), list):
+            continue
+        if unit is not None and unit not in str(row):
+            continue
+        dst = unit if unit is not None else str(
+            row.get("capability") or row.get("id") or row.get("requirement") or "?")
+        for t in row["tests"]:
+            out.append(E.Edge(src=str(t), type=E.TESTS, dst=dst, derivation=E.EXACT_TEST_REGISTRY_ROW,
+                               evidence_occurrence=occ(path, commit)))
+    return out
+
+
+def test_registry_edges_for_id(unit: str, commit: str, repo: Optional[str] = None) -> list:
+    """Bounded exactly like every other function here: a targeted git-grep for ``unit`` under ``tests/``, then each
+    hit path is read once and checked for the registry shape (``test_registry_edges_in_doc``)."""
+    from govbridge.core.yamlutil import load_yaml_text
+
+    hits = gitobj.git_grep(unit, commit, paths=["tests/"], repo=repo)
+    out: list = []
+    seen_paths: set = set()
+    for path, _line, _text in hits:
+        if path in seen_paths or not path.endswith((".yaml", ".yml")):
+            continue
+        seen_paths.add(path)
+        raw = gitobj.read_path(commit, path, repo=repo)
+        if raw is None:
+            continue
+        try:
+            doc = load_yaml_text(raw.decode("utf-8"))
+        except Exception:
+            continue
+        out += test_registry_edges_in_doc(doc, path, commit, unit=unit)
+    return out
+
+
+def _argv_list_literal(call: ast.Call) -> Optional[list]:
+    """The LITERAL PREFIX of ``call``'s first positional argument, IF it is a list literal: every leading element
+    that is a string constant, or a bare ``sys.executable``/``<name>.executable`` attribute (represented here as
+    the placeholder ``"<python>"``, since it is always the interpreter, never a subcommand). Stops at the first
+    element this function cannot read generically (a variable such as a commit hash computed earlier in the test,
+    an f-string, ...) and returns whatever literal prefix it already collected -- module path and subcommand are
+    always among a real invocation's FIRST few tokens, so a trailing variable (a positional argument's value) never
+    needs to be read to resolve the handler. ``None`` only when the argument is not a list literal at all."""
+    if not call.args or not isinstance(call.args[0], ast.List):
+        return None
+    out = []
+    for elt in call.args[0].elts:
+        if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
+            out.append(elt.value)
+        elif isinstance(elt, ast.Attribute) and elt.attr == "executable":
+            out.append("<python>")
+        else:
+            break
+    return out
+
+
+def _module_path_to_domain_relpath(module_path: str) -> str:
+    if module_path in ("govbridge", "govbridge.__main__"):
+        # `python -m govbridge` runs govbridge/__main__.py, which only imports and calls govbridge.cli.main() (no
+        # dispatch logic of its own to parse) -- a well-known, generic Python packaging convention (`-m <pkg>` runs
+        # `<pkg>/__main__.py`), not a hard-coded subcommand of ours, so the real dispatch source to read is cli.py.
+        return "govbridge/cli.py"
+    return module_path.replace(".", "/") + ".py"
+
+
+def _resolve_import_alias(tree: ast.AST, alias: str) -> Optional[str]:
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            for a in node.names:
+                if (a.asname or a.name) == alias:
+                    return f"{node.module}.{a.name}"
+        elif isinstance(node, ast.Import):
+            for a in node.names:
+                if (a.asname or a.name.split(".")[-1]) == alias:
+                    return a.name
+    return None
+
+
+def _first_call_in_stmts(stmts: list) -> Optional[ast.Call]:
+    for stmt in stmts:
+        for node in ast.walk(stmt):
+            if isinstance(node, ast.Call):
+                return node
+    return None
+
+
+def _if_branch_for_subcommand(tree: ast.AST, subcommand: str) -> Optional[ast.Call]:
+    """The first ``ast.Call`` inside the body of an ``if <name>.cmd == "<subcommand>":`` / ``if <name> ==
+    "<subcommand>":`` branch, anywhere in ``tree`` (an if/elif chain is nested ``If.orelse`` in the AST, which
+    ``ast.walk`` already descends into, so every branch of a chain is reached the same way). Generic over the
+    comparison's left-hand variable name (``cmd``, ``args.cmd``, ...) -- this repository's own CLIs use both
+    shapes (govbridge/cli.py: a bare ``cmd``; govbridge.code.symbols/.demo.cli and others: ``args.cmd``)."""
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.If) or not isinstance(node.test, ast.Compare):
+            continue
+        cmp = node.test
+        if len(cmp.ops) != 1 or not isinstance(cmp.ops[0], ast.Eq) or len(cmp.comparators) != 1:
+            continue
+        left = cmp.left
+        left_is_cmd = isinstance(left, ast.Name) or (isinstance(left, ast.Attribute) and left.attr == "cmd")
+        right = cmp.comparators[0]
+        if left_is_cmd and isinstance(right, ast.Constant) and right.value == subcommand:
+            call = _first_call_in_stmts(node.body)
+            if call is not None:
+                return call
+    return None
+
+
+def _dispatch_dict_target(tree: ast.AST, subcommand: str) -> Optional[str]:
+    """A bare module-level ``{"<cmd>": "<module.path>", ...}`` dispatch table (govbridge/cli.py's own
+    ``_DISPATCH``), found generically by shape (every key and value a string constant), not by the variable's
+    name."""
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Assign) and isinstance(node.value, ast.Dict)):
+            continue
+        keys, values = node.value.keys, node.value.values
+        if not keys or not all(isinstance(k, ast.Constant) and isinstance(k.value, str) for k in keys):
+            continue
+        if not all(isinstance(v, ast.Constant) and isinstance(v.value, str) for v in values):
+            continue
+        mapping = {k.value: v.value for k, v in zip(keys, values)}
+        if subcommand in mapping:
+            return mapping[subcommand]
+    return None
+
+
+def _has_subparser_named(tree: ast.AST, subcommand: str) -> bool:
+    for node in ast.walk(tree):
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "add_parser"
+                and node.args and isinstance(node.args[0], ast.Constant) and node.args[0].value == subcommand):
+            return True
+    return False
+
+
+def resolve_cli_handler(module_path: str, argv_tail: list, commit: str, repo: Optional[str] = None,
+                         _depth: int = 0) -> Optional[tuple]:
+    """Resolve ``module_path``'s ``argv_tail[0]`` subcommand to its dispatch handler, purely by parsing that
+    module's own source AT ``commit`` (never a table of our own) -- returns ``(qualified_target, derivation)`` or
+    ``None``. Two hops deep at most (a top ``govbridge`` dispatch, then one submodule's own dispatch, matching the
+    two-level ``govbridge <top> <sub>`` shapes this repository's own CLIs use, e.g. ``demo grade``)."""
+    if not argv_tail or _depth > 2:
+        return None
+    subcommand = argv_tail[0]
+    if subcommand.startswith("-"):
+        return None
+    # `-m govbridge` reads govbridge/cli.py (see _module_path_to_domain_relpath); its OWN dispatch functions
+    # (cmd_search, cmd_compile, ...) live in that module, "govbridge.cli", not bare "govbridge" -- track the two
+    # separately so a resolved LOCAL function is qualified correctly.
+    read_module = "govbridge.cli" if module_path in ("govbridge", "govbridge.__main__") else module_path
+    rel = _module_path_to_domain_relpath(module_path)
+    from govbridge import GOV_BRIDGE_DOMAIN
+    import os
+    # GOV_BRIDGE_DOMAIN is an absolute filesystem path; a git tree path (what gitobj.read_path needs) is relative
+    # to the REPO ROOT -- the same os.path.relpath(GOV_BRIDGE_DOMAIN, root) conversion
+    # govbridge.core.manifest.bridge_code_tree already uses for exactly this reason.
+    root = repo or gitobj.repo_root()
+    domain_rel = os.path.relpath(GOV_BRIDGE_DOMAIN, root).replace(os.sep, "/")
+    full_path = f"{domain_rel}/{rel}" if domain_rel != "." else rel
+    raw = gitobj.read_path(commit, full_path, repo=repo)
+    if raw is None:
+        return None
+    try:
+        tree = ast.parse(raw.decode("utf-8"))
+    except Exception:
+        return None
+
+    call = _if_branch_for_subcommand(tree, subcommand)
+    if call is not None:
+        func = call.func
+        if isinstance(func, ast.Name):
+            return f"{read_module}.{func.id}", E.EXACT_CLI_DISPATCH
+        if isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):
+            real_module = _resolve_import_alias(tree, func.value.id)
+            if real_module:
+                if len(argv_tail) > 1 and func.attr == "main":
+                    nested = resolve_cli_handler(real_module, argv_tail[1:], commit, repo=repo, _depth=_depth + 1)
+                    if nested:
+                        return nested
+                return f"{real_module}.{func.attr}", E.EXACT_CLI_DISPATCH
+
+    target_module = _dispatch_dict_target(tree, subcommand)
+    if target_module:
+        if len(argv_tail) > 1:
+            nested = resolve_cli_handler(target_module, argv_tail[1:], commit, repo=repo, _depth=_depth + 1)
+            if nested:
+                return nested
+        return f"{target_module}.main", E.HEURISTIC_CLI_DISPATCH
+
+    if _has_subparser_named(tree, subcommand):
+        return f"{module_path}::{subcommand}", E.HEURISTIC_CLI_DISPATCH
+    return None
+
+
+def cli_dispatch_tests_edges(text: str, path: str, commit: str, repo: Optional[str] = None) -> list:
+    """TESTS edges of derivation kind (b): a test that drives the product through its command-line binary
+    (``subprocess.run([sys.executable, "-m", "<module>", "<subcommand>", ...])``), mapped generically -- via
+    ``resolve_cli_handler`` -- to its dispatch handler. ``text``/``path`` are the ALREADY-READ test file (a Python
+    source file); parsed once, here, with ``ast`` (never a regex over Python source)."""
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return []
+    out: list = []
+    test_stack: list = []
+
+    class _Visitor(ast.NodeVisitor):
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            is_test = node.name.startswith("test_")
+            if is_test:
+                test_stack.append(node.name)
+            self.generic_visit(node)
+            if is_test:
+                test_stack.pop()
+
+        def visit_Call(self, node: ast.Call) -> None:
+            if (isinstance(node.func, ast.Attribute) and node.func.attr == "run"
+                    and isinstance(node.func.value, ast.Name) and node.func.value.id == "subprocess"):
+                argv = _argv_list_literal(node)
+                if argv and len(argv) >= 4 and argv[0] == "<python>" and argv[1] == "-m":
+                    module_path = argv[2]
+                    resolved = resolve_cli_handler(module_path, argv[3:], commit, repo=repo)
+                    if resolved is not None:
+                        target, derivation = resolved
+                        test_name = test_stack[-1] if test_stack else "<module>"
+                        out.append(E.Edge(src=test_name, type=E.TESTS, dst=target, derivation=derivation,
+                                           evidence_occurrence=occ(path, commit, node.lineno),
+                                           evidence_line=node.lineno,
+                                           note=f"subprocess -m {module_path} {argv[3]}"))
+            self.generic_visit(node)
+
+    _Visitor().visit(tree)
     return out
 
 

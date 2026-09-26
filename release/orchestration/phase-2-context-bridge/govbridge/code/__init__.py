@@ -24,8 +24,13 @@ lazily, the first time any caller (a query, or now also the eager builder) asks 
 (``govbridge.code.symbols.ensure_indexed``, its own module docstring).
 """
 from govbridge.code import build as build  # noqa: F401  (import triggers the two register_* calls below)
+from govbridge.code import lineage_layer as lineage_layer  # noqa: F401 -- BR-AR-0019 (R1-RL reopening): registers
+                                                            # the "lineage" layer (see its own module docstring for
+                                                            # why it lives here rather than govbridge/graph/)
 from govbridge.core.freshness import register_layer_builder
 from govbridge.core.manifest import register_layer
 
 register_layer_builder("code", build.code_layer_builder)
 register_layer("code", build.code_layer_digest)
+register_layer_builder("lineage", lineage_layer.lineage_layer_builder)
+register_layer("lineage", lineage_layer.lineage_layer_digest)

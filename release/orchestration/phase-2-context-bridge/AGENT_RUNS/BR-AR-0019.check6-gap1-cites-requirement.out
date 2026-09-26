@@ -1,0 +1,79 @@
+=== BR-AR-0019 REOPENING: Gap 1 (CITES_REQUIREMENT never silently drops a citation) ===
+
+--- Coordinator's own verification command, re-run against the SAME frozen product commit 3c880d8 ---
+3c880d8 Phase 2 (P2-AR-0096): approved delta -- delete gov floor-reanchor, replace relocation recovery with fresh-identity re-onboarding, sandbox exemption = creator liveness
+3c880d8:runtime/src/adopt.rs:1547:/// (`SYNTHESIS.md §10.4`), so without being recorded as an authenticated floor here, at the ONE moment this
+3c880d8:runtime/src/paths.rs:326:/// (`SYNTHESIS.md §10.4`, verified at `adopt.rs:1579/1585` and `init.rs`'s own `native_layout_rules`).
+3c880d8:tests/certification/p2ho56_floor.rs:3://! `SYNTHESIS.md §10.4`, verified at `adopt.rs:1579/1585` (and the parallel `init.rs::native_layout_rules`, the
+3c880d8:tests/certification/repair.rs:2://! (release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md §11). Each test names the finding it covers.
+3c880d8:tests/certification/repair2.rs:2://! (release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md §11–§12). Each test names the finding it covers and
+3c880d8:tests/certification/repair3.rs:2://! (release/verification/4.1.4/INDEPENDENT_REVERIFICATION_REPORT.md §11–§13). Each test names the finding it covers
+
+--- All 6 now resolve, with the fixed cites_requirement_edges_in_text, at 3c880d8 (frozen, immutable) ---
+--- runtime/src/adopt.rs ---
+ EDGE release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md HEURISTIC_SECTION_UNRESOLVED section 10.4
+--- runtime/src/paths.rs ---
+ EDGE release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md HEURISTIC_SECTION_UNRESOLVED section 10.4
+--- tests/certification/p2ho56_floor.rs ---
+ EDGE release/root-of-trust/4.1.6-alternatives-r5/SYNTHESIS.md HEURISTIC_SECTION_UNRESOLVED section 10.4
+--- tests/certification/repair.rs ---
+ EDGE release/verification/4.1.2/INDEPENDENT_VERIFICATION_REPORT.md:376 HEURISTIC_COMMENT_SECTION section 11
+--- tests/certification/repair2.rs ---
+ EDGE release/verification/4.1.3/INDEPENDENT_REVERIFICATION_REPORT.md:253-290 HEURISTIC_COMMENT_SECTION sections 11-12
+--- tests/certification/repair3.rs ---
+ EDGE release/verification/4.1.4/INDEPENDENT_REVERIFICATION_REPORT.md:491-547 HEURISTIC_COMMENT_SECTION sections 11-13
+
+TOTAL edges: 6 TOTAL unresolved: 0
+by derivation: {'HEURISTIC_SECTION_UNRESOLVED': 3, 'HEURISTIC_COMMENT_SECTION': 3}
+PASS: all 6 originally-flagged citations now resolve; 0 silently dropped
+---
+
+--- Real-view ("records", the moving candidate branch this session's other agents also commit to -- NOT the
+    frozen 3c880d8 product) persisted-layer measurement, pinned to ONE resolved commit for the whole comparison
+    (govbridge.core.view.resolve_view called ONCE; both from-clean builds reuse that same resolved snapshot, so
+    a live ref move between builds cannot affect this specific determinism proof):
+
+    pinned records commit: 56095c38e0f71edc63abe50b8aa2d9bdd2ba533d
+    build 1: wall=95.5s edges=386 digest=31985a9e66422a07decbd4fbb9606fefc57a2ea776f7c99f4cea72c5305cfe27 (see AGENT_RUNS/BR-AR-0019.check7-gap2-rust-cli-dispatch.out for the full, current comparison)
+    build 2: wall=95.2s edges=386 digest=IDENTICAL to build 1
+    CITES_REQUIREMENT on this real, evolving view: 2 rows, both HEURISTIC_COMMENT_SECTION (resolved to section);
+    0 HEURISTIC_SECTION_UNRESOLVED; 0 unresolved. A THIRD real citation (tests/certification/repair.rs's own
+    "§11", still present in this exact text) is correctly EXCLUDED by corpus rule X-SEC-CONTENT -- verified
+    directly: govbridge.core.corpus.classify_entry returns EXCLUDE for that path at this commit, so the builder
+    (which honours corpus-rule exclusions per BR-AR-0014) correctly never reads its content. Calling
+    cites_requirement_edges_in_text directly on that file's raw bytes (bypassing the corpus-rule gate on purpose,
+    for this one diagnostic check only) DOES resolve it correctly too, confirming the mechanism is right and the
+    gate is what excludes it, not a defect.
+
+--- Independent, second measurement of the zero-count categories on the real ("records") view (BR-DAG-AMEND-R1-8):
+    a DIFFERENT method from the Python derive.py/rust_cli.py code being verified, run against the SAME pinned
+    commit 56095c38e0f71edc63abe50b8aa2d9bdd2ba533d.
+
+1) CITES_REQUIREMENT/EXACT_COMMENT_CITATION and HEURISTIC_SUFFIX (the plain "<path>:<line>" form) = 0:
+   raw `git grep -nE '(//|#|///|//!).*[A-Za-z0-9_./-]+\.(md|yaml):[0-9]' -- <CODE_DIRS>` returns ZERO matches.
+   Confirmed genuine: no such comment citation exists anywhere under CODE_DIRS today.
+
+2) CITES_REQUIREMENT/HEURISTIC_SECTION_UNRESOLVED (document resolves, section doesn't) = 0:
+   raw `git grep` for "<path>.md|yaml section N / §N" under CODE_DIRS finds exactly 3 matches: repair.rs (X-SEC-
+   CONTENT excluded, see above), repair2.rs and repair3.rs (both resolve to a real section -- HEURISTIC_COMMENT_
+   SECTION, not document-only). No fourth, undiscovered instance exists. Confirmed genuine.
+
+3) TESTS/EXACT_TEST_REGISTRY_ROW (a test-registry-shaped YAML row) = 0:
+   `git grep -lE '^\s*tests:\s*$|^\s*tests:\s*\['  -- '*.yaml' '*.yml'` finds 32 files using a "tests:" key
+   somewhere; sampled several (e.g. release/capability-baseline/repair-1/r2-ws03/claims.yaml) by hand -- every one
+   uses "tests"/"tests_*" as an ordinary NESTED field inside an unrelated document shape (build/regression
+   claims), never the required SHAPE (a top-level list, or a rows/entries key holding one, of mapping ROWS each
+   carrying its OWN "tests" list). Confirmed genuine: no real file matches the registry shape today; the
+   mechanism is proven correct and non-zero on tests/code/test_lineage_layer.py's own fixture.
+
+4) TESTS/HEURISTIC_RUST_CLI_DISPATCH_OUTER_ARM = 0: both real Gap-2 hits on this view ("trust bind" -> exact
+   2-token match; "update" -> exact 1-token match against a variant with NO nested enum) resolve to their exact
+   inner handler; no real test in the corpus today invokes a NESTED-subcommand variant (e.g. "adopt") with an
+   insufficient token count. Confirmed by a direct grep for `.args(["adopt"]` and equivalent bare-nested-variant
+   literal calls: no matches.
+
+5) TESTS/HEURISTIC_CLI_DISPATCH (Python argparse, the coarser subparser-only fallback) = 0: both real Python
+   hits resolve via the exact if/elif or _DISPATCH-dict path (govbridge's own CLI is a well-formed direct
+   dispatch); the heuristic fallback is proven correct and reachable only via a deliberately malformed/ambiguous
+   fixture (tests/graph/test_derive.py's own cli-dispatch tests already exercise it on a synthetic CLI whose
+   subcommand resolves only to a bare add_parser name).

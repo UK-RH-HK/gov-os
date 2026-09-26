@@ -16,8 +16,10 @@ import re
 import sys
 from typing import Optional
 
+import yaml
+
 from govbridge.core import corpus, gitobj, pathrules, view as viewmod
-from govbridge.core.yamlutil import load_yaml_file, load_yaml_text
+from govbridge.core.yamlutil import UniqueKeyLoader, load_yaml_file, load_yaml_text
 
 FIXTURES_GLOB = "fixtures/**"
 
@@ -225,6 +227,105 @@ def extract_definitions_yaml(text: str, path: str, grammar: Grammar) -> list:
             if k == "id":
                 continue
             walk(v)
+    out += extract_definitions_state_keys(text, path, grammar)
+    return out
+
+
+_STATE_ALIASES_CACHE: Optional[dict] = None
+
+
+def _state_alias_paths() -> dict:
+    """{path: alias} for every file config/state-aliases.yaml registers (ARCHITECTURE.md section 4.1's closed,
+    generic "YAML state file" registry). Read directly off disk, by the same GOV_BRIDGE_DOMAIN-relative path
+    govbridge.authority.resolver/.state already use for the SAME table -- never imported from resolver.py itself,
+    to avoid a resolver -> lifecycle -> records -> resolver import cycle (resolver and state already import
+    lifecycle/records respectively). Cached for the process (the file is small, closed and does not change during
+    one build); any error (missing file, malformed YAML) yields an empty table -- state-key definitions are then
+    simply absent, the same honest-MISSING discipline this module already documents elsewhere, never a hard failure
+    of the whole scan."""
+    global _STATE_ALIASES_CACHE
+    if _STATE_ALIASES_CACHE is not None:
+        return _STATE_ALIASES_CACHE
+    from govbridge import GOV_BRIDGE_DOMAIN
+    import os
+    path = os.path.join(GOV_BRIDGE_DOMAIN, "config", "state-aliases.yaml")
+    try:
+        doc = load_yaml_file(path)
+        aliases = doc.get("aliases") or {}
+        table = {v: k for k, v in aliases.items() if isinstance(k, str) and isinstance(v, str)}
+    except Exception:
+        table = {}
+    _STATE_ALIASES_CACHE = table
+    return table
+
+
+def extract_definitions_state_keys(text: str, path: str, grammar: Grammar,
+                                    alias_paths: Optional[dict] = None) -> list:
+    """DR-YAML-STATE-KEY: every mapping key of a recognised YAML state file (``alias_paths``, default
+    ``_state_alias_paths()`` -- config/state-aliases.yaml's own table; a test may pass its own synthetic mapping
+    instead, so this is testable without depending on this repository's real state files), at every depth reached
+    by walking nested MAPPINGS -- never a list's own elements, so a list of many rows sharing field names (id, path,
+    content, ...) never explodes into one definition per row. The definition id is the key's own bare name (so a
+    literal git-grep for that token -- ``govbridge.authority.lifecycle._find_definition``'s own bounded lookup --
+    finds the very occurrence this function would re-derive, with no change needed there); for a key nested more
+    than one level deep, ``record_path`` also records the full dotted path from the document root (the SAME
+    ``a.b.c`` notation ``govbridge state get``/the resolver's ``state_ref`` already use), so a caller that wants the
+    precise, disambiguated address still has it. Line spans come from PyYAML's own node marks (composed, never
+    guessed) -- the same technique ``govbridge.authority.state._compose_and_find`` already uses for `state get`."""
+    alias_paths = _state_alias_paths() if alias_paths is None else alias_paths
+    if path not in alias_paths:
+        return []
+    try:
+        node = yaml.compose(text, Loader=UniqueKeyLoader)
+    except Exception:
+        return []
+    if node is None or not isinstance(node, yaml.MappingNode):
+        return []
+
+    rule = next((r["id"] for r in grammar.definition_rules if r.get("kind") == "yaml_state_key"),
+                "DR-YAML-STATE-KEY")
+    out: list = []
+
+    def _max_start_line(node) -> int:
+        """The largest 0-indexed ``start_mark.line`` reached by any node inside ``node`` (inclusive) -- a robust
+        proxy for a block node's own last content line. PyYAML's END marks are NOT reliably placed at a fixed
+        column across nesting depths (observed empirically: a nested sibling's end mark can land at the FOLLOWING
+        key's own indentation column, mid-line, not column 0 -- so a "column==0 means start of next line" rule,
+        correct for a TOP-level key, silently overruns by one line for a deeper one). START marks, by contrast, are
+        always placed exactly where each token begins, at every depth, so the deepest start mark reached is exactly
+        the node's own last content line."""
+        best = node.start_mark.line
+        if isinstance(node, yaml.MappingNode):
+            for k, v in node.value:
+                best = max(best, k.start_mark.line, _max_start_line(v))
+        elif isinstance(node, yaml.SequenceNode):
+            for item in node.value:
+                best = max(best, _max_start_line(item))
+        elif isinstance(node.value, str):
+            best = max(best, node.start_mark.line + node.value.count("\n"))
+        return best
+
+    def walk_map(map_node: "yaml.MappingNode", prefix: str) -> None:
+        for key_node, value_node in map_node.value:
+            if not isinstance(key_node, yaml.ScalarNode) or key_node.tag != "tag:yaml.org,2002:str":
+                continue
+            key = key_node.value
+            if not key:
+                continue
+            dotted = f"{prefix}.{key}" if prefix else key
+            start = key_node.start_mark.line + 1
+            end = max(_max_start_line(value_node) + 1, start)
+            # `local=False`: unlike DR-MD-HEADING-LOCAL's bare tokens (F1, C1 -- meaningless outside their record,
+            # only ever resolved as RECORD#LOCAL), a state key's bare name is intended to resolve directly, exactly
+            # like a top-level yaml_top_id/yaml_list_id definition (govbridge.compile.codeseeds's `not d.local`
+            # lookup path). `record_path` still carries the full dotted address for a nested key, for a caller
+            # that wants the disambiguated form.
+            out.append(Definition(id=key, path=path, rule=rule, line_start=start, line_end=end,
+                                   local=False, record_path=dotted if prefix else None))
+            if isinstance(value_node, yaml.MappingNode):
+                walk_map(value_node, dotted)
+
+    walk_map(node, "")
     return out
 
 

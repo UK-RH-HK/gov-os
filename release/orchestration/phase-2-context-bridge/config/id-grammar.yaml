@@ -87,6 +87,18 @@ definition_rules:
       (ADJ, HO, AR, CP, L, ...) nor a digit run, so a filename's trailing free-text description (SUBJECTLESS-REVIEW-FALLBACK,
       a lowercase node-run suffix such as -b5-0007) is never absorbed into the id.
     regex: '^(?P<id>[A-Z][A-Z0-9]{0,3}(?:-(?:[A-Z]{1,4}|\d{2,6})){1,4})'
+  - id: DR-YAML-STATE-KEY
+    kind: yaml_state_key
+    description: >-
+      a YAML document that config/state-aliases.yaml registers as one of the repository's own orchestrator-state
+      files (ARCHITECTURE.md section 4.1: "a YAML state file") exposes every mapping key -- at every depth reached
+      by walking nested mappings, never a list's own elements, so a list of many rows sharing field names (id, path,
+      content, ...) never explodes into one definition per row -- as an addressable record: the key's own bare name
+      defines it at that key's node span (govbridge.authority.state's own PyYAML-compose technique, reused for the
+      span). Deliberately the only definition rule keyed off a config table rather than the occurrence's own text
+      shape: config/state-aliases.yaml is itself the closed, generic, non-hard-coded registry of which files count
+      (OC-BR-02), the same table govbridge.authority.resolver/state already read for `state:<alias>#<key.path>` and
+      `govbridge state get`.
 
 # -----------------------------------------------------------------------------------------------------------------
 # Id families: a taxonomy over MP-HYPHEN-TOKEN/MP-DOTTED-CODE/MP-VERSION mentions, used by `records census` to
