@@ -4,8 +4,8 @@ lifecycle_name: Phase-2 Context/Retrieval Bridge (Review-8 failure branch)
 build_stage_token: P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT
 acceptance_token: P2_CONTEXT_RETRIEVAL_BRIDGE_READY
 acceptance_token_issuer: a FRESH independent verifier dispatched by the next control-panel stage -- never this orchestrator
-updated_at: '2026-09-26T05:35:07Z'
-state_hash: 925ed594b787922b0be1d51349edcb1739a10fe51bf60eb5ac4567bfb25fb8e9
+updated_at: '2026-09-26T06:37:29Z'
+state_hash: b1b10e0d6f0cd635971ae0533e6c70024f3488e7c96b3a27db3db1010db854db
 lifecycle_state: BR_REPAIR_1_WAVE_1
 checkpoint_discipline: OD-BR-04
 loop_status: RUNNING
@@ -875,7 +875,26 @@ agent_runs:
   agent_name: br-r1-rl-0019
   checkpoint_schema: 2
   dispatched_at: '2026-09-26T02:1xZ'
-  status: REOPENED_FOLLOW_UP
+  status: COMPLETED_INTEGRATED
+  final_commit: 84ca2d6 (work 1cf38d2)
+  merged_at: 6eba56f (final; interim merges cd87f36 and 4b91106)
+  integrate_check: INTEGRATION_PERMITTED (schema 2, orchestrator-run, final pass)
+  pass_5:
+    fixed: registry rows recognised by schema at any depth (a mapping whose own `tests` is a list of strings), identifier from
+      id/item or else the key path; no path prefix; entries resolved to code-layer test symbols, id tokens or raw text,
+      always counted -- 558 rows (186 per ref), 1107 new TESTS edges, digest reproducible
+    orchestrator_verified:
+    - independent count at the product pin -- 158 block-style + 55 flow-style `tests:` lines = 213 against 186 recognised
+      rows; the difference points the right way (a `tests:` key holding a MAPPING, for example a policy's settings block,
+      is correctly not a registry)
+    - FULL domain suite on the merged tree -- 509 passed, 0 failed; secrecy 0 hits over the whole run (claude-sonnet-5 x1758);
+      invariant, class-table and import-boundary tests untouched
+    residuals_carried:
+    - EXACT_TEST_REGISTRY_ROW = 0 is structural -- the tree-sitter adapter gives a free or mod-nested Rust fn a qualified_name
+      without its module path, so a registry entry `mod::fn` can only match heuristically by its trailing segment
+      (HEURISTIC_TEST_REGISTRY_SYMBOL); carried to the verifier handoff as a residual and to R1-INT's zero-count audit
+    - tests/code/conftest.py pre-imports govbridge.authority at collection time to work around an import-time config read
+      -> the root cause is routed to R1-INT (BR-DAG-AMEND-R1-12)
   pass_1:
     final_commit: 98f295da8c7f6b0c1080fd5577b0723d8ce158ce (report) / a799030 (work)
     integrate_check: INTEGRATION_PERMITTED (its own self-check)
@@ -1154,8 +1173,6 @@ agent_runs:
 running_work:
 - run_id: BR-AR-0023
   liveness_check: subagent transcript mtime + commits on bridge/r1-ga1-0023; never inferred from elapsed time
-- run_id: BR-AR-0019
-  liveness_check: subagent transcript mtime + commits on bridge/r1-rl-0019; never inferred from elapsed time
 dag:
   source: release/orchestration/phase-2-context-bridge/ARCHITECTURE/IMPLEMENTATION_DAG.yaml
   run_map: {TA: BR-AR-0002, B1: BR-AR-0003, B2: BR-AR-0004, B3: BR-AR-0005, B4: BR-AR-0006, B5: BR-AR-0007, B6: BR-AR-0008,
@@ -1287,6 +1304,15 @@ dag:
       verify rule stay unchanged'
     reason: RM had no facet system to use (R1-GA1 builds it); GA3 is the node that compiles from gather and edits packet.py
       next (RX -> RM -> GA3)
+  - id: BR-DAG-AMEND-R1-12
+    by: orchestrator (routing of a BR-AR-0019 workaround)
+    rule: 'R1-INT''s mutation_scope is further extended with govbridge/authority/__init__.py and govbridge/authority/classes.py
+      for ONE change: the state-aliases/config read that runs at IMPORT time (resolved against GOV_BRIDGE_DOMAIN at
+      that moment) becomes lazy or path-explicit, so the first importer''s environment can no longer fix the process-wide
+      result; then tests/code/conftest.py''s collection-time pre-import is removed. The class table, the class-table
+      test and the six named invariant tests stay byte-unchanged'
+    reason: the pre-import makes the suite order-independent but hides a process-global dependency of the same class as
+      the gitobj repo_root cache (BR-DAG-AMEND-R1-6)
 sealed_oracle:
   directory: /home/usain/.local/share/govbridge-sealed-6df96c04c916238f
   mode: '0700'
@@ -1444,6 +1470,6 @@ current_prohibitions:
 - claim V8.3 CURRENT; run Phase 3A research; run the final retrieval-model bake-off
 - promote any retrieved/derived content to authority
 - dispatch DeepSeek
-next_deterministic_action: await BR-AR-0023 R1-GA1 and the BR-AR-0019 R1-RL third follow-up (multi-ref walk; harness methods);
-  integrate-check each (schema 2) + FULL suite on the trial-merged tree, merge; then PG3 -- R1-RS (after GA1; RM is merged;
-  carries BR-DAG-AMEND-R1-10) and R1-GA2 (after GA1 and RL FINAL); templates R1-T1 and R1-T2; checkpoint after every merge
+next_deterministic_action: await BR-AR-0023 R1-GA1; integrate-check (schema 2) + FULL suite on the trial-merged tree, merge;
+  then PG3 in parallel -- R1-RS (carries BR-DAG-AMEND-R1-10) and R1-GA2 (RL is now final); templates R1-T1 and R1-T2;
+  checkpoint after every merge
