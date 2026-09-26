@@ -443,3 +443,94 @@ def test_obs_br_05_the_1pct_check_fires_without_a_budget_bytes_argument():
     result = g.grade_g7(packets, {}, corpus_bytes=1_000_000, budget_bytes=None, reads=None, repo=None)
     assert result["result"] == "FAIL", result
     assert any("OBS-BR-05" in p for p in result["problems"]), result
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Follow-up 2 (orchestrator, 2026-09-26): must_state entries as {fact, binding} (BR-ARCH-RULING-2 D-2), alongside
+# the run-1 plain-string form. The grammar was given in plain English in the dispatch message; per REPAIR-1 rule 1
+# DEMONSTRATION/oracle-tools/check_oracle.py (a DEMONSTRATION/oracle* path) was NOT read to confirm it.
+# ---------------------------------------------------------------------------------------------------------------
+
+def _chain_with_must_state(stage1_must_state):
+    return {
+        "query_id": "T-CHAIN-MS",
+        "stages": [
+            {"stage": "s1", "required": True, "is_enforcement_point": True,
+             "anchors": {"any_of": [{"path": "x.py", "commit": "c1", "lines": [1, 2]}]},
+             "must_state": stage1_must_state},
+            {"stage": "s2", "required": False, "is_enforcement_point": False,
+             "anchors": {"any_of": [{"path": "y.py", "commit": "c1", "lines": [1, 2]}]}},
+        ],
+    }
+
+
+_MS_ANSWER = {"query_id": "T-CHAIN-MS", "stages": [
+    {"stage": "s1", "claim": "nothing relevant here", "citations": [{"path": "x.py", "commit": "c1",
+                                                                      "lines": [1, 2]}]},
+    {"stage": "s2", "claim": "the fixture fact is true", "citations": []},
+]}
+
+
+def test_must_state_stage_bound_fact_in_a_neighbour_stage_is_not_counted():
+    chain = _chain_with_must_state([{"fact": "the fixture fact", "binding": "s1"}])
+    result = g._grade_chain(chain, _MS_ANSWER, {}, 3, None)
+    s1 = next(s for s in result["stages"] if s["stage"] == "s1")
+    assert s1["must_state"][0]["present"] is False, s1["must_state"]
+    # never a hard verdict on its own -- must_state stays [R]/PENDING_RUBRIC.
+    assert s1["must_state"][0]["must_state_ok"] == g.PENDING_RUBRIC
+
+
+def test_must_state_query_bound_fact_anywhere_in_the_answer_is_counted():
+    chain = _chain_with_must_state([{"fact": "the fixture fact", "binding": "query"}])
+    result = g._grade_chain(chain, _MS_ANSWER, {}, 3, None)
+    s1 = next(s for s in result["stages"] if s["stage"] == "s1")
+    assert s1["must_state"][0]["present"] is True, s1["must_state"]
+
+
+def test_must_state_plain_string_run1_form_still_grades():
+    chain = _chain_with_must_state(["the fixture fact"])
+    matching_answer = {"query_id": "T-CHAIN-MS", "stages": [
+        {"stage": "s1", "claim": "the fixture fact is true", "citations": [{"path": "x.py", "commit": "c1",
+                                                                             "lines": [1, 2]}]},
+        {"stage": "s2", "claim": "", "citations": []},
+    ]}
+    result = g._grade_chain(chain, matching_answer, {}, 3, None)
+    s1 = next(s for s in result["stages"] if s["stage"] == "s1")
+    # a bare string is implicitly bound to the stage listing it (run-1's own behaviour) -- no crash, no schema
+    # error, and the presence check still runs (True here, since s1's own claim states it).
+    assert s1["must_state"][0] == {"fact": "the fixture fact", "binding": "s1", "present": True,
+                                    "must_state_ok": g.PENDING_RUBRIC}
+    # and the SAME plain string, absent from s1's own claim, is correctly NOT counted (matching the neighbour-
+    # stage test above, but for the backward-compatible string form).
+    result2 = g._grade_chain(chain, _MS_ANSWER, {}, 3, None)
+    s1_absent = next(s for s in result2["stages"] if s["stage"] == "s1")
+    assert s1_absent["must_state"][0]["present"] is False
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Follow-up 2, D-1 matching (BR-ARCH-RULING-2 D-1 / DEMONSTRATION_DESIGN.md section 4 G4: "a record anchor matches
+# by record id or section"). Explicit regression coverage for the three named shapes, independent of GD-3/GD-8's
+# own tests above.
+# ---------------------------------------------------------------------------------------------------------------
+
+def test_d1_record_anchor_matches_by_id_alone():
+    items_by_id = {"T-REC-1": {"item_id": "T-REC-1", "unit": {"id": "T-REC-1", "kind": "record"},
+                                "source": {"path": "notes.md", "commit": "c1"}}}
+    anchor = {"kind": "record", "record_id": "T-REC-1"}
+    assert g.anchor_matches("T-REC-1", anchor, items_by_id) is True
+
+
+def test_d1_record_anchor_matches_by_section_alone():
+    # neither side carries a record_id string -- the anchor identifies a SECTION by path/commit/line-range, and
+    # the citation is a plain line citation into that same section.
+    anchor = {"kind": "record", "path": "notes.md", "commit": "c1", "lines": [45, 50]}
+    citation = {"path": "notes.md", "commit": "c1", "lines": [46, 48]}
+    assert g.anchor_matches(citation, anchor, {}) is True
+
+
+def test_d1_whole_document_citation_carrying_the_id_matches_a_sectioned_anchor():
+    # a WHOLE-DOCUMENT citation -- an object naming only the record's id, no path/commit/lines at all -- matches a
+    # sectioned anchor of that SAME record, by id, regardless of which section the anchor targets.
+    anchor = {"kind": "record", "record_id": "T-REC-1", "path": "notes.md", "commit": "c1", "lines": [45, 50]}
+    whole_doc_citation = {"record_id": "T-REC-1"}
+    assert g.anchor_matches(whole_doc_citation, anchor, {}) is True

@@ -460,12 +460,64 @@ def _citations_for_stage(stage_answer: dict) -> list:
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# must_state format (follow-up, orchestrator, 2026-09-26; BR-ARCH-RULING-2 D-2): the run-2 oracle writes each
+# must_state entry as ``{fact, binding}`` (``binding`` a chain-stage name, or the literal ``"query"``) as well as
+# the run-1 plain string form (implicit binding: the stage listing it). This grader was told the exact grammar in
+# plain English by the orchestrator's own dispatch message; per REPAIR-1 rule 1 it did NOT read
+# ``DEMONSTRATION/oracle-tools/check_oracle.py`` (a ``DEMONSTRATION/oracle*`` path) to confirm it, since the
+# dispatch message's description was itself sufficient to implement this from.
+# ---------------------------------------------------------------------------------------------------------------
+
+def _must_state_entries(raw_list) -> list:
+    """Normalises a must_state list to ``[{"fact": str, "binding": Optional[str]}, ...]``. A plain string (the
+    run-1 form) becomes ``binding: None`` -- "bound to the stage listing it", preserving run-1's own implicit
+    behaviour exactly."""
+    out = []
+    for e in raw_list or []:
+        if isinstance(e, str):
+            out.append({"fact": e, "binding": None})
+        elif isinstance(e, dict):
+            out.append({"fact": e.get("fact"), "binding": e.get("binding")})
+    return out
+
+
+def _must_state_scope_text(binding: Optional[str], own_stage_name: str, stage_claims_by_name: dict,
+                            query_full_text: str) -> str:
+    """Resolves the text a must_state fact is judged against, per D-2: ``binding == "query"`` -> the query's WHOLE
+    answer; ``binding`` naming a stage -> that stage's own claim (even one OTHER than the stage physically listing
+    the fact, if the oracle ever rebinds one); missing/``None``, or the containing stage's own name -> the
+    containing stage's claim (the run-1 plain-string form's own implicit behaviour)."""
+    if binding == "query":
+        return query_full_text
+    if binding and binding in stage_claims_by_name:
+        return stage_claims_by_name[binding]
+    return stage_claims_by_name.get(own_stage_name, "")
+
+
+def _must_state_present(fact: Optional[str], scope_text: str) -> bool:
+    """A generic, HEURISTIC (never mechanically certain) case-insensitive substring check -- a real, auditable
+    partial signal, exposed as data for the rubric grader. must_state facts are [R] (DEMONSTRATION_DESIGN.md
+    section 4 G4: "[R] Each must_state fact is present in the stage's claim"); this never by itself turns a stage
+    REACHED/MISSING or a gate PASS/FAIL -- ``must_state_ok`` stays PENDING_RUBRIC here, exactly like every other
+    heuristic text scan in this module (the G3 follow-up's own discipline)."""
+    if not fact:
+        return False
+    return fact.strip().lower() in (scope_text or "").lower()
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # G4: chain reconstruction.
 # ---------------------------------------------------------------------------------------------------------------
 
 def _grade_chain(oracle_chain: dict, answer: dict, items_by_id: dict, line_tolerance: int, repo) -> dict:
     stage_by_name = {s["stage"]: s for s in oracle_chain["stages"]}
     ans_stage_by_name = {s.get("stage"): s for s in (answer.get("stages") or [])}
+    # D-2 must_state scoping (see the module-level helpers above): the "stage claim" scope for a stage binding,
+    # and the "whole answer" scope for a `query` binding -- every stage's claim, plus the query's own answer_text
+    # if it carries one, concatenated. Computed ONCE per chain since a `query`-bound fact's scope never depends on
+    # which stage lists it.
+    stage_claims_by_name = {nm: (s.get("claim") or "") for nm, s in ans_stage_by_name.items()}
+    query_full_text = "\n".join(filter(None, [answer.get("answer_text") or ""] + list(stage_claims_by_name.values())))
     stage_grades = []
     chain_ok = True
     for stage_def in oracle_chain["stages"]:
@@ -496,8 +548,16 @@ def _grade_chain(oracle_chain: dict, answer: dict, items_by_id: dict, line_toler
             grade = "MISSING" if stage_def.get("required") else "MISSING"
         else:
             grade = "MISSING"
+        must_state_results = []
+        for entry in _must_state_entries(stage_def.get("must_state")):
+            scope_text = _must_state_scope_text(entry["binding"], name, stage_claims_by_name, query_full_text)
+            must_state_results.append({
+                "fact": entry["fact"], "binding": entry["binding"] or name,
+                "present": _must_state_present(entry["fact"], scope_text), "must_state_ok": PENDING_RUBRIC,
+            })
         stage_grades.append({"stage": name, "grade": grade, "required": stage_def.get("required", False),
-                              "is_enforcement_point": stage_def.get("is_enforcement_point", False)})
+                              "is_enforcement_point": stage_def.get("is_enforcement_point", False),
+                              "must_state": must_state_results})
         if stage_def.get("required") and grade not in ("REACHED",):
             chain_ok = False
         if stage_def.get("is_enforcement_point") and grade != "REACHED":
