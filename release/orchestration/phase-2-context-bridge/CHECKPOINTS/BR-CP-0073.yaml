@@ -304,4 +304,22 @@ state_next_action_as_sealed: 'FRESH SESSION -- R1-INT returned DEFECTS_FOUND (3 
   strict xfails in tests/integration/test_repair1_integration.py encode them). No worker is running. STEP 1 (orchestrator rulings, recorded as
   a GATES/BR-ARCH-RULING-3 file before any dispatch) -- (a) R-03, G7''s corpus-bytes definition: take it from DEMONSTRATION_DESIGN.md section
   4 and run-1''s own G7 measurement (80.3 MB) for comparability, never a new reading chosen to pass; (b) INT-D04, G7''s second bound: rule "as
-  written" (every packet byte counts, pinned A and J included) unless the design text itself exempts pinned sections -- the fix
+  written" (every packet byte counts, pinned A and J included) unless the design text itself exempts pinned sections -- the fix is to bring the
+  bytes within profile (compact the J notices, enforce the supplementary caps, budget section I), never to reinterpret the gate. If either ruling
+  would CHANGE a gate''s pass/fail meaning, stop and raise it with the owner. STEP 2 -- build a REPAIR-1b DAG from INT-VERDICT.yaml: group the
+  defects into fix nodes with DISJOINT file scopes (compile -- GA3/RM/RS parts incl. D04, D17, D18; grader -- RG incl. D01, D02; core/query paths
+  -- XC incl. D03, D09, D11, D14; lineage and graph -- RL incl. D12, D16, D19; test hermeticity -- D07, D08; config coherence -- D20), each with
+  its INT xfails turned into passing tests as the acceptance, dispatched to sonnet builders under templates R1-T1..T3 (resume the original builder
+  where it still exists, otherwise fresh). STEP 3 -- re-run the affected R1-INT checks (a fresh opus INT pass, or BR-AR-0028 resumed) until the
+  verdict is INTEGRATION_ACCEPTED. STEP 4 -- R1-MB -> R1-D2 under freeze -> R1-DEMO2 -> secrecy audit -> R1-GRADE2 (quarantined) -> on DEMONSTRATION_PASS
+  finalise the verifier handoff section 5 and issue P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT. CONVENTIONS -- state patches from a scratch script with
+  an assert-unique sub() and yaml.safe_load before writing; patch, seal, checkpoint and commit chained with && under set -euo pipefail; checkpoint
+  ids from the tool''s output; commit trailer Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>; model always explicit (builders sonnet,
+  independent roles opus); audit every returning transcript for secrecy, pip/venv and bare python3; never rm.'
+resume: 'OD-BR-06 section 8 resume order: (1) bridge ORCHESTRATOR_STATE.yaml via `check_state.py show` + `verify` (and, if demonstration_freeze
+  is IN FORCE, PENDING-STATE-UPDATES.md on bridge/orch-pending-*); (2) the latest validated outer checkpoint -- highest BR-CP across the bridge
+  branch and any freeze side branch, content_sha256 round-tripped (this file''s next_deterministic_action is current); (3) GATES/OWNER-DIRECTION-BR-0006-CONTEXT-RETRIEVAL-AND-CONTINUITY.md;
+  (4) active owner decisions -- state owner_records + GATES/OWNER-*.md (rulings BR-ARCH-RULING-* are NOT owner decisions); (5) the newest BR-L
+  entry in PHASE_LEDGER.md; (6) running_work + its HANDOFFS, liveness from transcript/branch, never elapsed time; (7) execute next_deterministic_action,
+  checkpointing after every material transition'
+content_sha256: f8f337b06c36e543f56b5f2757fa0085033ab73d412f3ac7e5d541719b3efcd7
