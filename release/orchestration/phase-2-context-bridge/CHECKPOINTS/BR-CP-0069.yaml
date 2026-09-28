@@ -1,0 +1,325 @@
+id: BR-CP-0069
+kind: CONTEMPORANEOUS
+created_at: '2026-09-28T22:58:22Z'
+reason: session-end
+lifecycle_id: P2X-FAIL-1-BRIDGE
+lifecycle_state: BR_REPAIR_1_INT_DEFECTS_ROUTING
+loop_status: RUNNING
+state_source: working file on bridge/p2-context-retrieval
+state_hash: c5f186f389a223d011be3f723c24b091cb9737e7c7b3f044ae9c3ee7f01d54e5
+bridge_tip: 37f52fa6b4af9bf3aa8da2d0ea1895bd9257b93a
+written_in_worktree_branch: bridge/p2-context-retrieval
+role_branches:
+  bridge/analyst-0016: 23fb716e5e0b4506249ce34f773387b707165050
+  bridge/arch-0001: ae656ef42074ca12c5763c0d1224e4aa7572ff84
+  bridge/b1-0003: 787d3d2b3c01de81ef8c1c25540a4fff228ad28a
+  bridge/b2-0004: f64154bd40452e6f568465afd14f50706b747d51
+  bridge/b3-0005: cebeb5166e224147a34ec06c43362e60e17f7ea7
+  bridge/b3r-0014: f9a97337eed39c11aa0ced37be0f6c451199e523
+  bridge/b4-0006: 793a68c8088d469e653a56c998585b5096c3cadf
+  bridge/b5-0007: b174f6a3ce4d5af279e1db7546941ef7ec5fc98f
+  bridge/b6-0008: 92deb0ca93bdb512d65bfe97c7977ab3d5420e90
+  bridge/b6r-0013: 02b4e67630a3d4bd093cec3068a65a7572ef2f10
+  bridge/b6r2-0015: e15a955134374f231d789aff119f07478305ff8e
+  bridge/d1-0010: aec095ec50780cc3a4b89811c42cb8ad038bed00
+  bridge/demo-0011: a9fc27b238ff02dd3cfe2a03fb1fa61c80395123
+  bridge/grade-0012: bec00f3ff97a76d09842cb935c21bf4ee6fe75b0
+  bridge/i1-0009: 83efe3085bce1cbfa1574276028b0584170195db
+  bridge/orch-pending-0001: 69c171068ce70fe7d7770d3816b5e131c6397405
+  bridge/p2-context-retrieval: 37f52fa6b4af9bf3aa8da2d0ea1895bd9257b93a
+  bridge/r1-ga1-0023: 13fef0c612624981cc7254d9d07fe1e4f8bb0268
+  bridge/r1-ga2-0024: b7bae67874a86a7228e81bdc66ed62bc38faaf98
+  bridge/r1-ga3-0026: 91a53d262c74279bb26694cdc2f8f78966954975
+  bridge/r1-int-0028: 74691fd01740b9e1c99fc45a0bae2fd16aa65901
+  bridge/r1-ra-0027: 3f49f6022920dddbbd6d6d94d1825a7d51947033
+  bridge/r1-rg-0020: b6da60a2a00f332eb990a54e36b29e6f81648440
+  bridge/r1-rl-0019: 84ca2d65c34aa8067668110d3fad53f0c264aad8
+  bridge/r1-rm-0022: 02b010d130426870d852df5c1ae64054e9e760fc
+  bridge/r1-rn-0017: 81cd9c430278128a8bfba5265c516b6b73951b07
+  bridge/r1-rs-0025: 0a8666f2f4176694eb7dad3232e498b09313db99
+  bridge/r1-rx-0018: 09ec7fc7b44a2cb7ba9c69a25a1ff40d68643f4d
+  bridge/r1-ta2-0021: fbfae4d0b8e3bb6915235251975cf000caf9fc1f
+  bridge/r1-xc-0034: 50bc2913630b3005b4eebe99a6085ed91c8e3e6e
+  bridge/ta-0002: 53392945082053d4fefce51ed92412c10ac07bdd
+freeze:
+  status: LIFTED (2026-09-26) after run-1 was graded -- D1, DEMO and the freeze side branch merged at 65cf1e4; the GRADE branch is QUARANTINED
+    (not merged) because it holds the unsealed run-1 oracle
+  frozen_bridge_tip: none (lifted); the third freeze held 94d0211 from 2026-09-25 23:36 to 2026-09-26 01:3x
+  previous_frozen_tips:
+  - cf7efe7 (pass-1 view
+  - lifted -- lazy code layer)
+  - fa25492 (lifted -- empty section G)
+  rule: NO commits to bridge/p2-context-retrieval from this commit until GRADE (BR-AR-0012) returns -- the canonical view's records ref follows
+    this branch's tip and `govbridge compile` takes its view from the task spec, so any commit here would move the demonstration's view mid-run
+    (OBS-BR-03)
+  progress_is_recorded_on:
+  - bridge/d1-0010 (BR-AR-0010 coverage/cost
+  - orchestrator-run)
+  - bridge/demo-0011 (bootstrap
+  - packet
+  - answers
+  - receipt
+  - reads)
+  - bridge/grade-0012 (unsealed oracle copy
+  - grading report)
+  demonstration_store: $HOME/.cache/gov-bridge/store-BR-AR-0010 (built from clean by D1 at the frozen tip)
+  resume_rule: a resumed orchestrator reads those branches' commits as the durable progress record, then merges them in order D1 -> DEMO -> GRADE
+    and lifts the freeze
+pending_state_updates:
+  path: release/orchestration/phase-2-context-bridge/PENDING-STATE-UPDATES.md
+  sha256: 9dc0739ce9c3644aaefb7b4278d4c86ca550307a321026adefe2ad37a1b6716e
+completed_runs:
+- run_id: BR-AR-0001
+  status: COMPLETED_INTEGRATED
+  final_commit: ae656ef42074ca12c5763c0d1224e4aa7572ff84
+  model_observed: claude-opus-5-5 (all 256 assistant turns, transcript agent-a4d1ee656875af81a.jsonl)
+- run_id: BR-AR-0002
+  status: COMPLETED_INTEGRATED
+  final_commit: 53392945082053d4fefce51ed92412c10ac07bdd
+  model_observed: claude-opus-5-5 (all 308 assistant turns, transcript agent-a9df6619314f4a5ea.jsonl)
+- run_id: BR-AR-0003
+  status: COMPLETED_INTEGRATED
+  final_commit: 787d3d2b3c01de81ef8c1c25540a4fff228ad28a
+  model_observed: claude-sonnet-5 (all 269 assistant turns, transcript agent-a6ee18e5256969db1.jsonl)
+- run_id: BR-AR-0004
+  status: COMPLETED_INTEGRATED
+  final_commit: f64154bd40452e6f568465afd14f50706b747d51
+  model_observed: claude-sonnet-5 (all 210 assistant turns, transcript agent-aa11e9bbda10e31c1.jsonl)
+- run_id: BR-AR-0005
+  status: COMPLETED_INTEGRATED
+  final_commit: cebeb5166e224147a34ec06c43362e60e17f7ea7
+  model_observed: claude-sonnet-5 (all 230 assistant turns, transcript agent-a32e9db373ab4fc8a.jsonl)
+- run_id: BR-AR-0006
+  status: COMPLETED_INTEGRATED
+  final_commit: 793a68c8088d469e653a56c998585b5096c3cadf
+  model_observed: claude-sonnet-5 (all 376 assistant turns, transcript agent-adfbb437ecd382bcd.jsonl)
+- run_id: BR-AR-0007
+  status: COMPLETED_INTEGRATED
+  final_commit: b174f6a3ce4d5af279e1db7546941ef7ec5fc98f
+  model_observed: claude-sonnet-5 (all 544 assistant turns, transcript agent-a443a1dd706f259ed.jsonl)
+- run_id: BR-AR-0008
+  status: COMPLETED_INTEGRATED
+  final_commit: 92deb0ca93bdb512d65bfe97c7977ab3d5420e90
+  model_observed: claude-sonnet-5 (all 377 assistant turns, transcript agent-a5c7e30784b318534.jsonl)
+- run_id: BR-AR-0013
+  status: COMPLETED_INTEGRATED
+  final_commit: 02b4e67630a3d4bd093cec3068a65a7572ef2f10
+  model_observed: claude-sonnet-5 (all 224 assistant turns, transcript agent-a19e631d081089271.jsonl)
+- run_id: BR-AR-0009
+  status: COMPLETED_INTEGRATED
+  final_commit: 83efe3085bce1cbfa1574276028b0584170195db
+  model_observed: claude-sonnet-5 (all 777 assistant turns, transcript agent-a3d449278924cc8d1.jsonl)
+- run_id: BR-AR-0010
+  status: COMPLETED_INTEGRATED
+  final_commit: 667f373
+  model_observed: none -- commands run by the orchestrator (claude-opus-5-5)
+- run_id: BR-AR-0014
+  status: COMPLETED_INTEGRATED
+  final_commit: f9a97337eed39c11aa0ced37be0f6c451199e523
+  model_observed: claude-sonnet-5 (all 210 assistant turns of pass 1, transcript agent-abf4e461cbf145547.jsonl)
+- run_id: BR-AR-0011
+  status: COMPLETED_INTEGRATED
+  final_commit: null
+  model_observed: null
+- run_id: BR-AR-0015
+  status: COMPLETED_INTEGRATED
+  final_commit: e15a955134374f231d789aff119f07478305ff8e
+  model_observed: claude-sonnet-5 (530 assistant turns in pass 1, transcript agent-ac67f7b5f16f1151c.jsonl)
+- run_id: BR-AR-0016
+  status: COMPLETED_INTEGRATED
+  final_commit: 23fb716e5e0b4506249ce34f773387b707165050
+  model_observed: claude-opus-5-5 (transcript agent-a07916c036c82a9a9.jsonl)
+- run_id: BR-AR-0017
+  status: COMPLETED_INTEGRATED
+  final_commit: 81cd9c430278128a8bfba5265c516b6b73951b07
+  model_observed: claude-sonnet-5 (transcript agent-a3ac98ad2ad3361ac.jsonl)
+- run_id: BR-AR-0018
+  status: COMPLETED_INTEGRATED
+  final_commit: 09ec7fc7b44a2cb7ba9c69a25a1ff40d68643f4d
+  model_observed: claude-sonnet-5 (transcript agent-a07d36baee03df351.jsonl)
+- run_id: BR-AR-0019
+  status: COMPLETED_INTEGRATED
+  final_commit: 84ca2d6 (work 1cf38d2)
+  model_observed: claude-sonnet-5 (transcript agent-aaf18568701b48f13.jsonl)
+- run_id: BR-AR-0020
+  status: COMPLETED_INTEGRATED
+  final_commit: b6da60a2a00f332eb990a54e36b29e6f81648440
+  model_observed: claude-sonnet-5 (transcript agent-a5f6930c9617f0abd.jsonl)
+- run_id: BR-AR-0021
+  status: COMPLETED_INTEGRATED
+  final_commit: fbfae4d0b8e3bb6915235251975cf000caf9fc1f
+  model_observed: claude-opus-5-5 (transcript agent-a29742ad9430d7576.jsonl)
+- run_id: BR-AR-0022
+  status: COMPLETED_INTEGRATED
+  final_commit: 02b010d130426870d852df5c1ae64054e9e760fc
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0023
+  status: COMPLETED_INTEGRATED
+  final_commit: 13fef0c612624981cc7254d9d07fe1e4f8bb0268 (source 9c27420)
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0025
+  status: COMPLETED_INTEGRATED
+  final_commit: 0a8666f2f4176694eb7dad3232e498b09313db99
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0024
+  status: COMPLETED_INTEGRATED
+  final_commit: 82cb573fac50de9f07e34ad236273df12af975d1
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0034
+  status: COMPLETED_INTEGRATED
+  final_commit: 0eddd3ae106d75151cc7ccd25c62deb00086c720
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0026
+  status: COMPLETED_INTEGRATED
+  final_commit: 91a53d262c74279bb26694cdc2f8f78966954975 (work a0011e6)
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0027
+  status: COMPLETED_INTEGRATED
+  final_commit: 2e8f01388a5786f30826fe4e08dbcc8ede9bb894 (work c5eaf59)
+  model_observed: PENDING (checked from the transcript at return)
+- run_id: BR-AR-0028
+  status: COMPLETED_INTEGRATED
+  final_commit: 74691fd01740b9e1c99fc45a0bae2fd16aa65901 (work 9629bcb)
+  model_observed: PENDING (checked from the transcript at return)
+running_work: null
+live_evidence:
+  python_processes: []
+  recent_subagent_transcripts: []
+index_stores:
+  $HOME/.cache/gov-bridge/store-BR-AR-0003: d83407ef6522c65ae6112f15be89f3abaecb2c497b4e794987031913e518eafc
+  $HOME/.cache/gov-bridge/store-BR-AR-0004: 8821f3a1bba84119c40dd088a454f5a0c181b57e7233be7b7302bf8d382d9e5b
+  $HOME/.cache/gov-bridge/store-BR-AR-0005: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0006: 189d23a81a1057cfd5bd2ea09ad5841a7840055cc848e406da103b2be03a45e0
+  $HOME/.cache/gov-bridge/store-BR-AR-0007: 6586ae8160f996c2ea8ae9e9383a3898f33f4f3f8ac3ab522327ee98b6be5c2f
+  $HOME/.cache/gov-bridge/store-BR-AR-0008: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0013: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0009: 3b68840cd2d377654361e4aba72595307d6debc536b0e89b1037eba4e3371b2c
+  $HOME/.cache/gov-bridge/store-BR-AR-0014: 7db8a0ae84bc0a0483d0d955e0392c37748d23a653cc203eb1832f760e064785
+  $HOME/.cache/gov-bridge/store-BR-AR-0017: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0018: 11372e028e7999d3dace87969638735a9e479f9772e38d1f324855e9f3f0d5b0
+  $HOME/.cache/gov-bridge/store-BR-AR-0019: 11372e028e7999d3dace87969638735a9e479f9772e38d1f324855e9f3f0d5b0
+  $HOME/.cache/gov-bridge/store-BR-AR-0020: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0021: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0022: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0023: 11372e028e7999d3dace87969638735a9e479f9772e38d1f324855e9f3f0d5b0
+  $HOME/.cache/gov-bridge/store-BR-AR-0025: 11372e028e7999d3dace87969638735a9e479f9772e38d1f324855e9f3f0d5b0
+  $HOME/.cache/gov-bridge/store-BR-AR-0024: a3e1a4134f5c7144b9602a2baa1074c36ff689d211b122e8757beb2925f6a607
+  $HOME/.cache/gov-bridge/store-BR-AR-0034: ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0026: ba655f6ff16b9c0addd2ea8217a68b54e35b27283bc3154628d967eb86a179a2
+  $HOME/.cache/gov-bridge/store-BR-AR-0027: ba655f6ff16b9c0addd2ea8217a68b54e35b27283bc3154628d967eb86a179a2
+  $HOME/.cache/gov-bridge/store-BR-AR-0028-a and -b (from clean, pinned view): ABSENT
+  $HOME/.cache/gov-bridge/store-BR-AR-0010: 11372e028e7999d3dace87969638735a9e479f9772e38d1f324855e9f3f0d5b0
+active_decisions:
+  owner_records:
+  - OD-P2-10
+  - OD-P2-10A/B
+  - OD-P2-09
+  - OD-P2-08
+  - OC-P2-04
+  - PHASE-2-FROZEN-GATE-CONTRACT
+  - OWNER-LAUNCHER-BR-0001
+  - OC-BR-02
+  - OD-BR-03
+  - OD-BR-04
+  - OD-BR-05
+  - OD-BR-06
+  rulings:
+  - BR-ARCH-RULING-1
+  dag_amendments:
+  - BR-DAG-AMEND-1
+  - BR-DAG-AMEND-2
+  - BR-DAG-AMEND-3
+  - BR-DAG-AMEND-R1-1
+  - BR-DAG-AMEND-R1-2
+  - BR-DAG-AMEND-R1-3
+  - BR-DAG-AMEND-R1-4
+  - BR-DAG-AMEND-R1-5
+  - BR-DAG-AMEND-R1-6
+  - BR-DAG-AMEND-R1-7
+  - BR-DAG-AMEND-R1-8
+  - BR-DAG-AMEND-R1-9
+  - BR-DAG-AMEND-R1-10
+  - BR-DAG-AMEND-R1-11
+  - BR-DAG-AMEND-R1-12
+  - BR-DAG-AMEND-R1-13
+  - BR-DAG-AMEND-R1-14
+  - BR-DAG-AMEND-R1-15
+  - BR-DAG-AMEND-R1-16
+  - BR-DAG-AMEND-R1-17
+  - BR-DAG-AMEND-R1-18
+  - BR-DAG-AMEND-R1-19
+  - BR-DAG-AMEND-R1-20
+  - BR-DAG-AMEND-R1-21
+  - BR-DAG-AMEND-R1-22
+  - BR-DAG-AMEND-R1-23
+open_findings:
+  observations:
+  - OBS-BR-01
+  - OBS-BR-03
+  - OBS-BR-04
+  - OBS-BR-05
+  - OBS-BR-06
+  - OBS-BR-07
+  - OBS-BR-08
+  - OBS-BR-09
+  - OBS-BR-10
+  - OBS-BR-11
+  - OBS-BR-14
+  - OBS-BR-15
+  - OBS-BR-16
+  - OBS-BR-17
+  - OBS-BR-18
+  - OBS-BR-19
+  - OBS-BR-20
+  - OBS-BR-12
+  - OBS-BR-13
+  - OBS-BR-02
+  unresolved_questions: []
+evidence_status:
+  architecture: 'ARCHITECTURE/ (BR-AR-0001): 7 build nodes + TA/D1/DEMO/GRADE; whole-repo corpus measured at 3c880d8 6,567 files / 6,489 included
+    / 75.4 MB; provisional model BAAI/bge-small-en-v1.5 (MIT, 384-d, ONNX Runtime 1.30.0 CPU, bitwise-deterministic in spike); product memory
+    engine NOT used (running it would mutate the adoption-floor store F3 reads)'
+  builder_evidence: 'integrated tree after B1-B6 + B6R: 280 tests pass together with --import-mode=importlib (plain collection blocked by one
+    basename collision, routed to I1); real-view packet places every mandatory item per BR-ARCH-RULING-1; run by the orchestrator'
+  review_8_demonstration: run-1 DEMONSTRATION_FAIL (G4, G5, G6, G7, G8 fail; G1-G3 pass) -- BR-AR-0012 on quarantined bridge/grade-0012 at bec00f3;
+    a bounded repair cycle and a run-2 with a FRESH oracle are required before BUILT
+next_deterministic_action: 'FRESH SESSION -- R1-INT returned DEFECTS_FOUND (3 HIGH, 15 MEDIUM, 7 LOW; EVIDENCE/repair-1/INT-VERDICT.yaml; 18 strict
+  xfails in tests/integration/test_repair1_integration.py encode them). No worker is running. STEP 1 (orchestrator rulings, recorded as a GATES/BR-ARCH-RULING-3
+  file before any dispatch) -- (a) R-03, G7''s corpus-bytes definition: take it from DEMONSTRATION_DESIGN.md section 4 and run-1''s own G7 measurement
+  (80.3 MB) for comparability, never a new reading chosen to pass; (b) INT-D04, G7''s second bound: rule "as written" (every packet byte counts,
+  pinned A and J included) unless the design text itself exempts pinned sections -- the fix is to bring the bytes within profile (compact the
+  J notices, enforce the supplementary caps, budget section I), never to reinterpret the gate. If either ruling would CHANGE a gate''s pass/fail
+  meaning, stop and raise it with the owner. STEP 2 -- build a REPAIR-1b DAG from INT-VERDICT.yaml: group the defects into fix nodes with DISJOINT
+  file scopes (compile -- GA3/RM/RS parts incl. D04, D17, D18; grader -- RG incl. D01, D02; core/query paths -- XC incl. D03, D09, D11, D14; lineage
+  and graph -- RL incl. D12, D16, D19; test hermeticity -- D07, D08; config coherence -- D20), each with its INT xfails turned into passing tests
+  as the acceptance, dispatched to sonnet builders under templates R1-T1..T3 (resume the original builder where it still exists, otherwise fresh).
+  STEP 3 -- re-run the affected R1-INT checks (a fresh opus INT pass, or BR-AR-0028 resumed) until the verdict is INTEGRATION_ACCEPTED. STEP 4
+  -- R1-MB -> R1-D2 under freeze -> R1-DEMO2 -> secrecy audit -> R1-GRADE2 (quarantined) -> on DEMONSTRATION_PASS finalise the verifier handoff
+  section 5 and issue P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT. CONVENTIONS -- state patches from a scratch script with an assert-unique sub() and yaml.safe_load
+  before writing; patch, seal, checkpoint and commit chained with && under set -euo pipefail; checkpoint ids from the tool''s output; commit trailer
+  Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>; model always explicit (builders sonnet, independent roles opus); audit every returning
+  transcript for secrecy, pip/venv and bare python3; never rm.'
+next_action_source: sealed state
+state_next_action_as_sealed: 'FRESH SESSION -- R1-INT returned DEFECTS_FOUND (3 HIGH, 15 MEDIUM, 7 LOW; EVIDENCE/repair-1/INT-VERDICT.yaml; 18
+  strict xfails in tests/integration/test_repair1_integration.py encode them). No worker is running. STEP 1 (orchestrator rulings, recorded as
+  a GATES/BR-ARCH-RULING-3 file before any dispatch) -- (a) R-03, G7''s corpus-bytes definition: take it from DEMONSTRATION_DESIGN.md section
+  4 and run-1''s own G7 measurement (80.3 MB) for comparability, never a new reading chosen to pass; (b) INT-D04, G7''s second bound: rule "as
+  written" (every packet byte counts, pinned A and J included) unless the design text itself exempts pinned sections -- the fix is to bring the
+  bytes within profile (compact the J notices, enforce the supplementary caps, budget section I), never to reinterpret the gate. If either ruling
+  would CHANGE a gate''s pass/fail meaning, stop and raise it with the owner. STEP 2 -- build a REPAIR-1b DAG from INT-VERDICT.yaml: group the
+  defects into fix nodes with DISJOINT file scopes (compile -- GA3/RM/RS parts incl. D04, D17, D18; grader -- RG incl. D01, D02; core/query paths
+  -- XC incl. D03, D09, D11, D14; lineage and graph -- RL incl. D12, D16, D19; test hermeticity -- D07, D08; config coherence -- D20), each with
+  its INT xfails turned into passing tests as the acceptance, dispatched to sonnet builders under templates R1-T1..T3 (resume the original builder
+  where it still exists, otherwise fresh). STEP 3 -- re-run the affected R1-INT checks (a fresh opus INT pass, or BR-AR-0028 resumed) until the
+  verdict is INTEGRATION_ACCEPTED. STEP 4 -- R1-MB -> R1-D2 under freeze -> R1-DEMO2 -> secrecy audit -> R1-GRADE2 (quarantined) -> on DEMONSTRATION_PASS
+  finalise the verifier handoff section 5 and issue P2_CONTEXT_RETRIEVAL_BRIDGE_BUILT. CONVENTIONS -- state patches from a scratch script with
+  an assert-unique sub() and yaml.safe_load before writing; patch, seal, checkpoint and commit chained with && under set -euo pipefail; checkpoint
+  ids from the tool''s output; commit trailer Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>; model always explicit (builders sonnet,
+  independent roles opus); audit every returning transcript for secrecy, pip/venv and bare python3; never rm.'
+resume: 'OD-BR-06 section 8 resume order: (1) bridge ORCHESTRATOR_STATE.yaml via `check_state.py show` + `verify` (and, if demonstration_freeze
+  is IN FORCE, PENDING-STATE-UPDATES.md on bridge/orch-pending-*); (2) the latest validated outer checkpoint -- highest BR-CP across the bridge
+  branch and any freeze side branch, content_sha256 round-tripped (this file''s next_deterministic_action is current); (3) GATES/OWNER-DIRECTION-BR-0006-CONTEXT-RETRIEVAL-AND-CONTINUITY.md;
+  (4) active owner decisions -- state owner_records + GATES/OWNER-*.md (rulings BR-ARCH-RULING-* are NOT owner decisions); (5) the newest BR-L
+  entry in PHASE_LEDGER.md; (6) running_work + its HANDOFFS, liveness from transcript/branch, never elapsed time; (7) execute next_deterministic_action,
+  checkpointing after every material transition'
+content_sha256: 28ce03ce2e704eb73343a782c887ad591eff78e37b09caece88375d709d3c15b
