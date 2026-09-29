@@ -1,9 +1,0 @@
-U1-file-triple-slash           ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=True health=None/None
-U2-file-localhost              ok=True branch=gated exp=True trig=['new_or_unrestricted_network_trust_boundary'] undet=0 MARKER=False health=None/None
-U3-FILE-upper                  ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=True health=None/None
-U4-file-dotdot                 ok=True branch=gated exp=True trig=['broader_filesystem_or_project_access'] undet=0 MARKER=False health=None/None
-U5-writeout-relative           ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=False health=None/None
-H1-file-url-health             ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=True health=True/True
-NC-CLEAN ok=True branch=not_gated installed=True gates_before=[] gates_after=[]
-NC-CLEAN-net ok=True branch=not_gated installed=True gates_after=[]
-[saved] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-r3-adv/release/orchestration/phase-2/probes/P2-AR-0077/results/f1b.json

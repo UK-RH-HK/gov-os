@@ -1,8 +1,0 @@
---- before
-+++ after
-@@ -56 +56 @@
--  description: recall@k 1.0 mrr 1.0 precision 0.<hex> latency 8.<hex> ms
-+  description: recall@k 1.0 mrr 1.0 precision 0.<hex> latency 1.<hex> ms
-@@ -58 +58 @@
--  description: recall@k 1.0 mrr 1.0 precision 0.<hex> latency 4.<hex> ms
-+  description: recall@k 1.0 mrr 1.0 precision 0.<hex> latency 1.<hex> ms

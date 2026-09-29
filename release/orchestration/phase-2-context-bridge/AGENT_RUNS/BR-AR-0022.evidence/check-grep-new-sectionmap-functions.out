@@ -1,4 +1,0 @@
-112:def markdown_flat_tiling(text: str, id_patterns: Optional[list] = None) -> list:
-289:def flat_tiling(text: str, path: Optional[str], entries_under: Optional[str] = None,
-303:def entries_of(text: str, path: Optional[str], under: Optional[str] = None,
-317:def select_entry_range(entries: list, start, end) -> tuple:

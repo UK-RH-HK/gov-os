@@ -13,3 +13,7 @@ __pycache__/
 .secrets/
 deepseek*.env
 .claude/worktrees/
+.claude/settings.local.json*
+target/
+.gov-runtime/
+*.bak-*

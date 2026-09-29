@@ -1,5 +1,0 @@
-# normalised failure messages (the round-2 integration's failure_messages.py, unedited): base-53897c1 vs final-0393bca
-# base lines: 42; final lines: 42
-# diff base vs final (empty = identical):
-# diff against the round-2 integration's recorded run (integration-2/evidence/r1-heldout/r1-heldout-integrated-7491c5c.out) (empty = identical):
-# (end)

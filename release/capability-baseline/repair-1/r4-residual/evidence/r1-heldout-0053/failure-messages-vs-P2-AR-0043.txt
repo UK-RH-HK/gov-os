@@ -1,5 +1,0 @@
-# normalised failure messages of the unedited R1 suites (failure_messages.py, copied byte-identically from P2-AR-0043's evidence)
-# this run (ab0a075, r1-heldout-0053/r1-heldout-final-ab0a075.out) vs P2-AR-0043 (34e3725, r1-heldout/r1-heldout-final-34e3725.out)
-# lines: now 42, P2-AR-0043 42
-# diff vs P2-AR-0043:
-(empty)

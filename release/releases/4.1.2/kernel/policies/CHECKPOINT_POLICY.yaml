@@ -1,9 +1,0 @@
-policy: CHECKPOINT_POLICY
-version: 1.0.0
-fields: [session, role, task, mode, claim, last_completed_step, next_action, pending_decisions, open_questions, open_transactions, files_changed, tests_status, context_packet_hash, memory_snapshot]
-mandatory_triggers: [task_transition, material_decision, accepted_cit, significant_mutation, before_handoff, before_model_switch, before_session_close, before_compaction]
-watchdog:
-  context_utilisation_threshold: 0.75
-  max_operations_between_checkpoints: 25
-location: spec/reports/checkpoints
-prose_summary_as_checkpoint: prohibited

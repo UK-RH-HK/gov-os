@@ -1,9 +1,0 @@
-policy: ARCHIVE_POLICY
-version: 1.0.0
-archive_root: archive
-archive_subdirs: [governance, spec, research, code-reference]
-archive_when: [historical_governance, superseded_spec_with_reference_value, research_of_lasting_value, deliberate_reference_implementation]
-do_not_archive: [dead_source_files_without_reference_value]
-unused_code_action: remove_from_active_tree   # Git preserves history
-default_retrieval_for_archive: false
-archive_mutation: restricted

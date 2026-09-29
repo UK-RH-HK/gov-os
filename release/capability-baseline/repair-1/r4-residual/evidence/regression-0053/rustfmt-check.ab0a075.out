@@ -1,8 +1,0 @@
-# P2-AR-0053 rustfmt --edition 2021 --check on every Rust file changed since the continuation base 55af199 (each file alone)
-rc=0 runtime/src/capabilities/governance.rs
-rc=0 runtime/src/cit/materiality.rs
-rc=0 runtime/src/cit/mod.rs
-rc=0 runtime/src/tools.rs
-rc=0 tests/certification/r4_residual.rs
-rc=0 tests/certification/ws07.rs
-# note: --check on runtime/src/cit/mod.rs also formats its child modules; each changed file is listed on its own above

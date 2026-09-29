@@ -1,8 +1,0 @@
-{
- "manifest_sha256": "c1fa17f0cd0ce4e152608ab0a50dcc91e61ac14e7129ece20c374867525c63f0",
- "out": "DEMONSTRATION/run-1/packet",
- "packet_id": "18be7e6f1f1bffa0",
- "packet_sha256": "18be7e6f1f1bffa091a8a07fc1ebdae812fbfa043ab159b6ea0250d1e7d42025",
- "registry_path": "/home/usain/Dynamic-Agentic-Engineering-OS/.claude/worktrees/br-ar-0011/release/orchestration/phase-2-context-bridge/config/authority-registry.yaml",
- "status": "OK"
-}

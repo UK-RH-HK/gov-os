@@ -1,8 +1,0 @@
-# normalised diff: release/capability-baseline/repair-1/ws05/evidence/probe-reruns/gamma-r/F2F3-tools.repaired.out
-#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/gamma-r.F2F3-tools.out
-# changed lines: 2
---- recorded (builder branch)
-+++ integrated
-@@ -130 +130 @@
--  capabilities invoke claimsreg as backend-engineer (L1): exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'execute_plugin' (requires L2); AUTHORITY_POLICY.auth
-+  capabilities invoke claimsreg as backend-engineer (L1): exit=1 ok=false code=AUTHORITY_DENIED msg=role 'backend-engineer' (L1) may not perform 'execute_plugin'; 'execute_plugin' requires L2 (AUTHO

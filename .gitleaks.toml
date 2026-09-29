@@ -1,0 +1,15 @@
+title = "Governance OS gitleaks configuration"
+
+[extend]
+useDefault = true
+
+# Only known synthetic fake secrets (INVENTORY.md section 7). Nothing else is allowlisted.
+[[allowlists]]
+description = "Synthetic fake-secret fixtures"
+paths = [
+  '''(^|/)fixtures/brownfield/project/\.env$''',
+  '''(^|/)fixtures/brownfield/project/config/secrets\.yaml$''',
+  '''(^|/)fixtures/brownfield/project/src/app/config\.py$''',
+  '''(^|/)fixtures/brownfield/project/memory/chat_history\.sql$''',
+  '''(^|/)cli/tests/fixtures/core/repobuilder\.py$''',
+]

@@ -1,7 +1,0 @@
-# normalised diff: release/capability-baseline/repair-1/ws01-12/evidence/probes-after/gamma-r.DV-derived-views.out
-#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/gamma-r.DV-derived-views.out
-# changed lines: 1
---- recorded (builder branch)
-+++ integrated
-@@ -31 +30,0 @@
--# exit=0

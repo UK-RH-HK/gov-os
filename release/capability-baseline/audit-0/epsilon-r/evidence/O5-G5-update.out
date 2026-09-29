@@ -1,5 +1,0 @@
-init from previous release 4.1.1: exit=0 {"err": null, "ok": true, "version": "4.1.1"}
-update --apply (no approval): HUMAN_GATE_REQUIRED HDG-0001
-update --apply --approve: exit=0 {"applied": true, "err": null, "ok": true, "post_install_verification": {"details": ["DEGRADED", "HEALTHY"]}, "result_keys": ["applied", "details", "from", "rollback", "to"]}
-installed version now: exit=0 4.1.5
-full suite on the updated project: exit=3 {"findings": [["graph_integrity", "high", "task DAG has cycles: [[\"TASK-0001\", \"TASK-0002\"]]"], ["context_reproducibility", "low", "context packet lacks retrieved field 'semantic_candidates' (CONTEXT_POLICY.retrieved_fields)"]], "ok": false, "verdict": "UNHEALTHY"}

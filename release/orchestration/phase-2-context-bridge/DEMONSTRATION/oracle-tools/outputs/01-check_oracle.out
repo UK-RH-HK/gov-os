@@ -1,9 +1,0 @@
-$ python3 release/orchestration/phase-2-context-bridge/DEMONSTRATION/oracle-tools/check_oracle.py <SEALED>/oracle.yaml --display-name '<SEALED>/oracle.yaml'
-oracle: <SEALED>/oracle.yaml
-sha256: 3d80a5fda0724e380821f55e3e4e3980b0b53032a14d2ed188e83169888c7e4b
-chains: 2 (stages per chain: [11, 11])
-enforcement points per chain: [1, 1]
-queries: 34; controls: 3
-authority_expectations: 16 rows for 16 mandatory_bridge_inputs items
-anchors checked: 458
-RESULT: VALID

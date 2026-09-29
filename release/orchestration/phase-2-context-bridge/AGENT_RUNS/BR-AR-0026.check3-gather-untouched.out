@@ -1,4 +1,0 @@
-# interpreter: N/A (git only, no python needed)
-$ git diff --stat -- govbridge/gather/
-(exit $?: expect empty output -- gather/** untouched, confirming BR-DAG-AMEND-R1-19's 'never edit gather/**' constraint independently of this node's own code)
-$ git status --short govbridge/gather/

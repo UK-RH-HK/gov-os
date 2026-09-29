@@ -1,3 +1,0 @@
-# release build ok=True capability_contract=CONTRACT_SOURCE_BOUND error=None
-CONTROL release verify (as written) ok=True result_ok=True error=None
-CASE S S2 release:release verify tampered=kernel/KERNEL.yaml ok=True result_ok=False error=None -> DETECTED  {"version": "4.1.6", "ok": false, "modified": ["KERNEL.yaml"], "missing": [], "added": [], "release_hash_matches_kernel": true, "certification": {"effective_status": "UNCERTIFIED", "authenticated": false, "basis": "this machine holds no Signed Release Root trust anchor, so no certification claim can

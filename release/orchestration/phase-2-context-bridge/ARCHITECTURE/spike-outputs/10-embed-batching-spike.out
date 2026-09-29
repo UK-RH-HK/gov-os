@@ -1,7 +1,0 @@
- 10:03:40 up 7 days, 12:01,  0 user,  load average: 2.23, 6.86, 5.62
-{"mode": "batch32_unsorted", "chunks": 600, "threads": 16, "embed_s": 38.59, "chunks_per_s": 15.5, "sha256": "827bead70830c26e1991ba91e16e26dff81f3670817561a758c323dc726d5cd5"}
-{"mode": "batch32_length_sorted", "chunks": 600, "threads": 16, "embed_s": 38.8, "chunks_per_s": 15.5, "sha256": "827bead70830c26e1991ba91e16e26dff81f3670817561a758c323dc726d5cd5"}
-{"mode": "batch1", "chunks": 600, "threads": 16, "embed_s": 24.11, "chunks_per_s": 24.9, "sha256": "827bead70830c26e1991ba91e16e26dff81f3670817561a758c323dc726d5cd5"}
-{"compare": "batch32_unsorted vs batch1", "bitwise_equal": true, "max_abs_diff": 0.0, "min_cosine": 0.9999997615814209, "equal_after_round6": true, "equal_after_round4": true}
-{"compare": "batch32_length_sorted vs batch1", "bitwise_equal": true, "max_abs_diff": 0.0, "min_cosine": 0.9999997615814209, "equal_after_round6": true, "equal_after_round4": true}
- 10:05:22 up 7 days, 12:02,  0 user,  load average: 13.94, 9.65, 6.74

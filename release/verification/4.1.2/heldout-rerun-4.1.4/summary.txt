@@ -1,1 +1,0 @@
-first verifier harness (4.1.2) rerun 2026-09-12T16:28:08Z: PASS=36, FAIL=1, INFO=1, ERROR=0 (original: PASS=12, FAIL=25, INFO=1, ERROR=0); harness unchanged; non-PASS: ['HV-08', 'HV-08b']

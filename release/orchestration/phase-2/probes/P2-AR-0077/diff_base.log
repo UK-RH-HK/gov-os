@@ -1,9 +1,0 @@
-[base] gov = /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/p2ar0077/base/target/release/gov
-[base] W1-cp-symlink            ok=False branch=None exp=None trig=None undet=0 MARKER=False
-[base] W4-curl-K                ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=True
-[base] E1-curl-T-file-url       ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=True
-[base] E2-curl-writeout         ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=True
-[base] NC1-conforming           ok=True branch=not_gated exp=False trig=[] undet=0 MARKER=False
-[base] PATHRULE-derived         rule_refused=False design_ok=True err=None
-[base] PATHRULE-evidence        rule_refused=False design_ok=True err=None
-[saved] /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-r3-adv/release/orchestration/phase-2/probes/P2-AR-0077/results/diff_base.json

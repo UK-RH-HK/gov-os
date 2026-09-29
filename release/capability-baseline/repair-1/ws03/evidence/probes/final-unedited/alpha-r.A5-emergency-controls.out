@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-ws03/release/capability-baseline/audit-0/alpha-r/evidence/A5-emergency-controls.py", line 23, in <module>
-    t1 = sb.gov("task", "create", "--objective", "work item one", "--status", "READY", cwd=p, quiet=True)["result"]["id"]
-         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-KeyError: 'result'
-exit=1

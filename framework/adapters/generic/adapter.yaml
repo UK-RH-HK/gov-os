@@ -1,6 +1,0 @@
-id: generic
-version: 1.0.0
-description: Generic harness-neutral system instruction document.
-output: governance/generated/adapters/generic/SYSTEM_INSTRUCTION.md
-format: markdown
-template: template.md

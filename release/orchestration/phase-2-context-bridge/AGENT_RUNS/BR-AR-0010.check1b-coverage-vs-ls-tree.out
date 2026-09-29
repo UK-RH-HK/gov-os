@@ -1,5 +1,0 @@
-refs=98 ok=98 mismatches=[] unclassified_total=0 excluded_without_rule=0
-evidence 58219d5 {'INCLUDED': 3641, 'L-MACHINE-OUTPUT': 2853, 'M-LARGE': 6, 'X-BINARY': 5, 'X-SEC-CONTENT': 65, 'X-SEC-PATH': 2}
-product 3c880d8 {'INCLUDED': 3639, 'L-MACHINE-OUTPUT': 2850, 'M-LARGE': 6, 'X-BINARY': 5, 'X-SEC-CONTENT': 65, 'X-SEC-PATH': 2}
-records cf7efe7 {'INCLUDED': 3901, 'L-MACHINE-OUTPUT': 2879, 'M-LARGE': 6, 'X-BINARY': 5, 'X-SEC-CONTENT': 65, 'X-SEC-PATH': 3, 'X-SELF': 52}
-exit=0

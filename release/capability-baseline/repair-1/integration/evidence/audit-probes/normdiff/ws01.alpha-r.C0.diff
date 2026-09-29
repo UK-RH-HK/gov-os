@@ -1,7 +1,0 @@
-# normalised diff: release/capability-baseline/repair-1/ws01-12/evidence/probes-after/alpha-r.C0-contract-derived-views.out
-#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/alpha-r.C0-contract-derived-views.out
-# changed lines: 1
---- recorded (builder branch)
-+++ integrated
-@@ -24 +23,0 @@
--# exit=0

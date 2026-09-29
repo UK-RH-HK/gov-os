@@ -1,9 +1,0 @@
-{
- "LP-1s_restated_rev6": {
-  "counterexamples": 0,
-  "description": "rows touching governance/trust/ or occupation entries with state_after=COMPLETE and kernel_tampered!=true",
-  "rows_touching_trust_or_occupation": 540,
-  "sample": [],
-  "total_active_rows": 30450
- }
-}

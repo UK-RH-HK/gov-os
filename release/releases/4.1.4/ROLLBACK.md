@@ -1,1 +1,0 @@
-gov update --rollback restores the previous kernel, overlay snapshot and framework.lock from .governance-runtime/update/<version>/ and rebuilds indexes; spec/ and product/ are never modified by an update.

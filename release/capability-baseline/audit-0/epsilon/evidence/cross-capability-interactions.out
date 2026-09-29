@@ -1,9 +1,0 @@
-=== AC-16 Cross-capability: U ↔ O5 (health SLOs observed by scheduler) ===
-The doctor checks (U) are the SLO observations.
-The audit (O5) runs the governance suite which observes check states.
-D021 (doctor) checks governance suite currency (O4 ↔ U interaction).
-
---- Exercise: run audit, check D021 reports it green ---
-Traceback (most recent call last):
-  File "<string>", line 1, in <module>
-KeyError: 'result'

@@ -1,8 +1,0 @@
-mandatory_bridge_inputs:
-  authority_classes:
-    OWNER_DECISION: binding
-  items:
-  - id: CX-0010A
-    class: OWNER_DECISION
-  - id: CX-0010B
-    class: OWNER_DECISION

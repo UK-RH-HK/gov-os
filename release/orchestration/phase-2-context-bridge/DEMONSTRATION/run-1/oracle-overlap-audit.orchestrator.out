@@ -1,4 +1,0 @@
-verbatim oracle-line overlaps with run-1 inputs/outputs, by YAML key: {'path': 73}
-overlaps whose key is NOT an anchor locator: 0
-of those, present in the INPUTS the agent received (bootstrap/packet/query outputs): 0
-key breakdown of non-locator overlaps: {}

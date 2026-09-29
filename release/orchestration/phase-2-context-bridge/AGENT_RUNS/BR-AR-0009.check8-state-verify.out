@@ -1,3 +1,0 @@
-HEAD a1fc62adc88d22fb9cb6a3514d7036d1461372be on bridge/i1-0009; 58 uncommitted entries
-ORCHESTRATION_STATE_CONFLICT
- - HEAD branch 'bridge/i1-0009' != bridge_branch 'bridge/p2-context-retrieval'

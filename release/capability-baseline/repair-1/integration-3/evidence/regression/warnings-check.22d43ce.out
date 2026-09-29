@@ -1,9 +1,0 @@
-# P2-AR-0041 warnings check at 22d43cec7ab7bf87122158e9196464814e94ea2e (product files differing: 0); lib.rs/main.rs touched to force recompilation
-## cargo build (debug)
-   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration/runtime)
-   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration/cli)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.67s
-## cargo test --no-run (all test targets)
-   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration/runtime)
-   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-integration/cli)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.35s

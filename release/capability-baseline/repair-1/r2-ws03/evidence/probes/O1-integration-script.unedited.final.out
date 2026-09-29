@@ -1,9 +1,0 @@
-## P2-AR-0024: the integration builder's O-1 reproduction script, run UNEDITED from its own directory against the final binary c09bd5e5d23561ef2ab7d2b19e1a7e96a400b9fd0fffefed8ab33e96fc5ba9dd at 7dcf2e0bcb1a998c9ce3e71a4266489e1dc00fe2
-## (its human answer provisions a STANDALONE anchor on an unprovisioned machine, which P2-ADJ-0001 now refuses; the provisioned reproduction is R2-WS03-probes.py O1.a-O1.e)
-# gov /tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r2-ws03/target/release/gov
-init from shipped 4.1.4: True
-refused overlay keys on the 4.1.4 kernel: []
-doctor verdict: DEGRADED | D027: [('D027', True, 'info')]
-gate HDG-0001 answered through the owner-signed channel: False
-update 4.1.4 -> shipped 4.1.5: ok | 
-[exit=0]

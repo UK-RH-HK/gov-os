@@ -1,4 +1,0 @@
-clippy: available
-rustfmt: available
-python3: available
-pytest: available

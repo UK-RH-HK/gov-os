@@ -1,7 +1,0 @@
-{
-  "framework": "{{framework}}",
-  "version": "{{version}}",
-  "servers": {{mcp_servers_json}},
-  "role_exposure": {{mcp_role_exposure_json}},
-  "invariants": {{invariants_json}}
-}

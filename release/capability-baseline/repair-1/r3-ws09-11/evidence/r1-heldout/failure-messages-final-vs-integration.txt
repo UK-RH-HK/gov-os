@@ -1,2 +1,0 @@
-# Normalised R1 failure messages: P2-AR-0040 final run at 16e4c0b vs P2-AR-0032 integrated run at 7491c5c (integration-2/evidence/r1-heldout/failure_messages.py)
-# lines: this run 42, integration 42; diff (empty = identical):

@@ -1,7 +1,0 @@
-# normalised diff: release/capability-baseline/repair-1/ws08/evidence/probes-after-63f82ba/A2-08.out
-#   vs release/capability-baseline/repair-1/integration/evidence/audit-probes/shim/alpha-r.A2-08-reinstall-version-change.out
-# changed lines: 1
---- recorded (builder branch)
-+++ integrated
-@@ -25 +24,0 @@
--[A2-08 exit=0]

@@ -1,1 +1,0 @@
-Two independent full runs of harness_v3.py produced identical verdicts and identical failure lists (13 PASS / 3 FAIL): VV-03, VV-04, VV-14.

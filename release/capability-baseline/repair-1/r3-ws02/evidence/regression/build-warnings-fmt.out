@@ -1,7 +1,0 @@
-# HEAD 2e7200728174a0fa27928b17a4d7c681cd46bfd9 — clean rebuild of gov-runtime (dev) to surface warnings
-   Compiling gov-runtime v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/runtime)
-   Compiling gov-cli v4.1.5 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r3-ws02/cli)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 18.70s
-# rustfmt --check (Rust files changed since base 53897c1):
-rustfmt: clean (16 files)
-# release gov sha256 94f9ed9805a2bd6e0026dfd619185c810a23aefc31c918b953e4745bf8978151

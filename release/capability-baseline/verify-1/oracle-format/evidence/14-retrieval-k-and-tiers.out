@@ -1,4 +1,0 @@
-retrieval_metrics.k = 99 while the oracle query top_k = 5      ACCEPTED
-retrieval_metrics.k = 1 while the oracle query top_k = 5       ACCEPTED
-detected_at_tier outside the oracle's expected tiers           ACCEPTED
-detection_signal unrelated to the oracle's signals             ACCEPTED

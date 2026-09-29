@@ -1,6 +1,0 @@
-duration_s	outcome	test
-237.311	ok	ws04r2::checkpoint_and_handoff_continuity
-113.364	ok	ws04r2::upstream_change_reaches_completed_work
-35.149	ok	ws04r2::cit_approval_binds_content_impact_and_transaction
-21.241	ok	ws04r2::materiality_is_derived_not_labelled
-19.567	ok	ws04r2::contradictions_are_blocked_and_routed

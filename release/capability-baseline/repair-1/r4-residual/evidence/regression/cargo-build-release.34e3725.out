@@ -1,7 +1,0 @@
-# P2-AR-0043 cargo build --release at 34e3725 (2026-09-19T19:35:26Z)
-   Compiling gov-runtime v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/runtime)
-   Compiling gov-cli v4.1.6 (/tmp/claude-1000/-home-usain-Dynamic-Agentic-Engineering-OS/1b6c780e-2b37-439f-a969-a8d96b7ad35e/scratchpad/wt/p2-repair1-r4-residual/cli)
-    Finished `release` profile [optimized] target(s) in 1m 11s
-[exit=0]
-warnings: 0
-512913ef3ac53f8d568f48b7cead5f241b2f54ece472a73cdf58decfa3391112  target/release/gov

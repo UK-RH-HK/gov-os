@@ -1,6 +1,0 @@
-duration_s	outcome	test
-166.287	ok	repair3::plugin_descriptors_can_never_authorise_themselves
-58.11	ok	repair3::constitutional_floors_require_a_verified_kernel
-44.152	ok	repair3::policy_exceptions_require_a_real_governing_decision
-24.811	ok	repair3::lower_trust_inputs_cannot_manufacture_higher_trust_facts
-2.409	ok	repair3::current_release_payload_identity_and_hygiene

@@ -1,7 +1,0 @@
-# V1-BETA-06 — an identifier-shaped literal that exists in exactly one chunk of the corpus
-$ gov memory query pyfindbysku_marker_0042 --k 5
-  0.01639  src/app/orders.py            OrderRepository.find_by_sku        contains-the-literal=True
-  0.01613  src/app/orders.py            OrderRepository                    contains-the-literal=True
-  0.01587  src/svc/Ledger.java          LedgerEntry.amountCents            contains-the-literal=False
-  0.01562  src/svc/handler.go           handleLedger                       contains-the-literal=False
-  0.01538  src/web/client.ts            CardPayer.pay                      contains-the-literal=False

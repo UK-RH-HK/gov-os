@@ -1,6 +1,0 @@
-# interpreter: N/A (grep only)
-$ grep -nE 'Review.?8|P2-AR-[0-9]|OD-P2-|F[1-6]\b|phase2/approved-delta|phase2/review-8' over every file this node added/changed
-tests/compile/test_facet_quotas.py:9:Review-8/Phase-2 (OC-BR-02); this file reuses ``tests/compile/conftest.py``'s shared fixture repo/view/registry
-tests/compile/test_content_slices.py:9:id here is CS-* (Content Slices), unrelated to Review-8/Phase-2 (OC-BR-02); this file reuses
-tests/compile/test_overflow_notes.py:9:unrelated to Review-8/Phase-2 (OC-BR-02); this file reuses ``tests/compile/conftest.py``'s shared fixture
-govbridge/compile/overflow.py:153:    file name, a Review-8 item"). A PURE function of the (versioned, sha256'd) config file alone -- the SAME set

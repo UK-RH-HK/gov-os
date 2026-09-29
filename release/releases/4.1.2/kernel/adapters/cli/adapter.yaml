@@ -1,6 +1,0 @@
-id: cli
-version: 1.0.0
-description: Bootstrap packet for CLI agents.
-output: governance/generated/adapters/cli/bootstrap-packet.json
-format: json
-template: template.json
