@@ -17,3 +17,4 @@ deepseek*.env
 target/
 .gov-runtime/
 *.bak-*
+.vscode/
