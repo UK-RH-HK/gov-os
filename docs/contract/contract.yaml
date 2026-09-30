@@ -1,0 +1,1899 @@
+# Contract v4 — machine-readable. Same content as CONTRACT_v4.md.
+id: CONTRACT-v4
+status: PROPOSED
+date: '2026-09-30'
+supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
+precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
+waves:
+  W1: Integrate
+  W2: Strengthen
+  W3: Complete
+  NONE: dropped (non-goal)
+dispositions:
+  KEPT: delivered in full
+  LITE: delivered in the stated lite form (DEC-074 Q11, DEC-083)
+  DROP: non-goal, with its decision
+envelope:
+  scale_envelope:
+    decision: DEC-078
+    statement: Tested up to ≈ 80k nodes / 270k edges of code graph at ≈ 2.2 GB peak RSS for codebase-memory-mcp; larger graphs
+      are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder
+      gets its own index.
+  ram_budget:
+    decision: DEC-078
+    statement: Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare;
+      incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker,
+      VRAM peak ≈ 5.2 of 16 GiB.
+  token_budget:
+    decision:
+    - DEC-004
+    - DEC-086
+    statement: Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance
+      tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance
+      MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads
+      are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md
+      ≤ ~1.5k tokens. A breach is a health finding, never a silent cost.
+  boundary:
+    decision:
+    - DEC-039
+    - DEC-075
+    - DEC-087
+    statement: Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner's machine, GitHub
+      Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and
+      leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and only
+      on green. `main` is not protected; enabling protection later changes no other decision.
+  loop_budget:
+    decision: DEC-044
+    statement: At most two review→repair rounds per surface; then DELETE, NARROW or DEFER unless an owner ADR says otherwise.
+  tool_installs:
+    decision: DEC-083
+    statement: The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
+      source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are
+      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner.
+master_rules:
+- id: MR-1
+  title: Specification comes first
+  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  acceptance: 'A production ticket whose specification has a required readiness cell open for its profile (FULL for a spine)
+    cannot reach READY: `tk ready` does not list it and `gov readiness` names the open cells; an N/A without a reason is rejected.'
+  provider:
+  - W1-12
+  - W1-13
+  - W1-35
+  scenarios:
+    dev:
+    - MR-A-02
+    - MR-B-02
+  sources:
+  - DEC-065
+  - DEC-085
+- id: MR-2
+  title: Closed specifications generate the work
+  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  acceptance: A closed specification produces tickets with class, role, depends_on, allowed_paths, KPIs and profile, and `gov
+    check` fails a ticket missing any of them; from W2 every required open cell yields a ticket.
+  provider:
+  - W1-14
+  - W1-35
+  - 'W2: gov readiness --generate'
+  scenarios:
+    dev:
+    - MR-A-02
+    - MR-A-04
+    - MR-B-02
+    - MR-B-04
+  sources:
+  - DEC-065
+- id: MR-3
+  title: KPIs; the builder never writes its own acceptance tests
+  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  acceptance: An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment
+    check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome.
+  provider:
+  - W1-02
+  - W1-03
+  - W1-09
+  - W1-30
+  - W1-33
+  scenarios:
+    dev:
+    - MR-A-01
+    - MR-B-01
+  sources:
+  - DEC-065
+  - DEC-069
+  - DEC-076
+  - DEC-084
+- id: MR-4
+  title: Audit, discovery and impact are distinct functions
+  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  acceptance: Each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or skill and record; an audit report
+    names an auditor session that authored none of the audited files.
+  provider:
+  - W1-27
+  - W1-13
+  - W1-35
+  - W1-36
+  - W1-33
+  scenarios:
+    dev:
+    - MR-A-05
+    - MR-A-06
+    - MR-B-05
+    - MR-B-06
+  sources:
+  - DEC-065
+  - DEC-066
+  - DEC-070
+- id: MR-5
+  title: The Gov OS works as a software company
+  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  acceptance: Each Wave 1 role exists as a generated subagent definition with purpose, allowed-path pattern, tools, model
+    tier, authority level and handoff format, and a ticket's role field names one of them.
+  provider:
+  - W1-33
+  - W1-38
+  scenarios:
+    dev:
+    - CHAOS-X-02
+  sources:
+  - DEC-065
+  - DEC-066
+- id: MR-6
+  title: The human is the customer and final authority
+  text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
+  acceptance: Every owner question appears in the active chat as a package with all eight fields, ranked; the dependent branch
+    waits while an independent branch proceeds; each answer is committed as a decision record.
+  provider:
+  - W1-34
+  - W1-35
+  scenarios:
+    dev:
+    - MR-A-03
+    - MR-B-03
+  sources:
+  - DEC-065
+capabilities:
+- id: CAP-01
+  title: Authority precedence and hard invariants
+  outcome: An agent can tell which of two conflicting records governs, by a deterministic precedence (Charter → Contract →
+    ADRs → specifications → tasks → retrieval → inference) and by supersession status.
+  acceptance: Given two conflicting records at different precedence levels, `gov context` puts only the higher one in the
+    authority block and marks the lower one superseded.
+  wave: W1
+  provider:
+  - MADR + check-jsonschema 0.38.2
+  - W1-10
+  - W1-11
+  - W1-24
+  sources:
+  - Contract v3 Gate A1
+  - Framework v4.1.2 §2, §21
+  - OWNER-CLARIFICATION-P2-0004
+  - DEC-012
+  - DEC-046
+  - DEC-083
+  scenarios:
+    dev:
+    - MR-A-06
+    - CHAOS-A-13
+    - AUDIT-A-01
+    - MR-B-01
+    - MR-B-06
+    - CHAOS-B-13
+    - AUDIT-B-07
+    qual:
+    - CHAOS-A-Q05
+    - AUDIT-A-Q01
+    - AUDIT-A-Q07
+    - AUDIT-A-Q08
+    - A-Q04
+    - AUDIT-A-Q22
+    - AUDIT-A-Q39
+    - AUDIT-A-Q42
+    - AUDIT-A-Q45
+  disposition:
+    class: KEPT
+- id: CAP-02
+  title: 'Release authenticity (lite: signed git tags)'
+  outcome: The owner can confirm that an installed kernel matches a released version.
+  acceptance: '`gov doctor` reports MATCH when every kernel file hashes to the manifest recorded in `framework.lock`, and
+    DRIFT naming the file after one kernel file is edited; `git tag -v` verifies the release tag.'
+  wave: W1
+  wave_note: manifest check in W1; the signed v1.0.0 tag is made at Release 1
+  provider:
+  - Copier 9.18.2
+  - git SSH-signed tags
+  - W1-39
+  - W1-27
+  sources:
+  - Contract v3 Gate A2
+  - Framework v4.1.2 §75B-75D
+  - Distribution Protocol v1.2 §5-8
+  - OWNER-DIRECTIVE-0004
+  - OWNER-DECISION-0009
+  - OWNER-DECISION-P2-0005
+  - DEC-027
+  - DEC-074
+  - DEC-083
+  scenarios:
+    dev:
+    - CHAOS-X-01
+    qual:
+    - CHAOS-X-Q01
+  disposition:
+    class: LITE
+    lite_form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key
+      rotation, offline envelopes or bootstrap separation.
+- id: CAP-03
+  title: Security and sensitivity classification
+  outcome: 'An agent can rely on secrets never reaching an index, a packet or an export: a content-based filter runs before
+    every indexer, and harness deny rules cover secret files.'
+  acceptance: After indexing a tree with planted secrets (including a token-shaped canary gitleaks defaults miss), no canary
+    string appears in any `.gov-runtime/` store, codebase-memory index, context packet or evidence bundle.
+  wave: W1
+  provider:
+  - gitleaks 8.30.1
+  - W1-15
+  - W1-16
+  - W1-01
+  sources:
+  - Contract v3 Gate A3
+  - Framework v4.1.2 §16, §72
+  - Distribution Protocol v1.2 §14, §17
+  - DEC-074
+  - DEC-076
+  scenarios:
+    dev:
+    - CHAOS-A-14
+    - SEC-A-01
+    - SEC-A-02
+    - SEC-A-03
+    - CHAOS-B-15
+    - SEC-B-01
+    - SEC-B-02
+    - ISO-X-01
+    qual:
+    - CHAOS-A-Q09
+    - RETR-A-Q03
+    - SEC-A-Q01
+    - SEC-A-Q02
+    - SEC-A-Q03
+    - SEC-A-Q04
+    - AUDIT-A-Q49
+    - SEC-A-Q05
+    - SEC-A-Q06
+    - MR-B-Q03
+    - MR-B-Q06
+    - CHAOS-B-Q08
+    qual_unlisted_in_matrix: 9
+  disposition:
+    class: KEPT
+- id: CAP-04
+  title: Budget and resource governance
+  outcome: The owner can set token and cost budgets per task; crossing one raises a decision package instead of continuing
+    silently.
+  acceptance: A task configured with a token budget that its run exceeds stops at the next `gov close` or hook boundary and
+    surfaces a decision package; the breach is recorded in the ticket.
+  wave: W2
+  wave_note: W1 measures the governance share (W1-31); the halting budget gate is W2
+  provider:
+  - ccusage (pinned, DEC-086)
+  - W1-31
+  - 'W2: budget gate in gov close/status'
+  sources:
+  - Contract v3 Gate A4
+  - Framework v4.1.2 §73
+  - OWNER-DIRECTION-P2-0009 §11 (10-15% overhead target)
+  - DEC-004, DEC-031
+  - DEC-083
+  - DEC-086
+  scenarios:
+    dev:
+    - SOAK-X-01
+    qual:
+    - SOAK-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-05
+  title: Emergency controls (pause/freeze/cancel/rollback)
+  outcome: The owner can freeze all agent writes with one command and resume them, and roll back by `git revert`.
+  acceptance: After `gov pause`, the next Edit/Write/Bash write by any role is denied by the guard, and `git status --porcelain`
+    is unchanged; `gov pause --off` restores writes.
+  wave: W1
+  provider:
+  - W1-28
+  - W1-02
+  sources:
+  - Contract v3 Gate A5
+  - Framework v4.1.2 §74
+  - DEC-025
+  scenarios:
+    dev:
+    - CHAOS-A-10
+    - CHAOS-A-15
+    qual:
+    - CHAOS-X-Q04
+  disposition:
+    class: KEPT
+- id: CAP-06
+  title: Repository contract and path map
+  outcome: An agent can find where every kind of artefact lives from the committed path map, and nothing material is unclassified.
+  acceptance: '`gov doctor` reports zero unclassified tracked paths against `governance/project/path-map.yaml`, and names
+    each path when one is added outside the map.'
+  wave: W1
+  provider:
+  - W1-08
+  - W1-27
+  - W1-41
+  sources:
+  - Contract v3 Gate B1, B2
+  - Framework v4.1.2 §8, §9
+  - Adoption Protocol v3.0 §8
+  - OWNER-DECISION-P2-0008 §2 (project-specific floor)
+  - DEC-060
+  - DEC-041
+  scenarios:
+    dev:
+    - B-01
+    - B-02
+    - B-03
+    - B-04
+    - B-05
+    - B-08
+    - B-09
+    - B-11
+    - AUDIT-B-03
+    - AUDIT-B-07
+    - SEC-B-01
+    - SEC-B-02
+    qual:
+    - MR-B-Q06
+    - SEC-B-Q02
+    - B-Q01
+    - B-Q02
+    - B-Q03
+    - AUDIT-B-Q18
+    - AUDIT-B-Q23
+    - AUDIT-B-Q38
+    - ISO-X-Q01
+    - B-X-Q01
+    dev_unlisted_in_matrix: 2
+  disposition:
+    class: KEPT
+- id: CAP-07
+  title: Authoritative vs derived state separation
+  outcome: An agent can delete all derived state without losing anything authoritative.
+  acceptance: Deleting `.gov-runtime/` leaves `git status --porcelain` empty, and `gov rebuild` restores every derived store.
+  wave: W1
+  provider:
+  - W1-17
+  - W1-27
+  sources:
+  - Contract v3 Gate B3
+  - Framework v4.1.2 §10, §12, §19
+  - DEC-057
+  scenarios:
+    dev:
+    - CHAOS-A-02
+    - CHAOS-B-02
+    - CHAOS-B-10
+    - B-03
+    - B-06
+    - ISO-X-01
+    - ISO-X-02
+    qual:
+    - CHAOS-A-Q03
+    - CHAOS-A-Q06
+    - CHAOS-A-Q08
+    - RETR-A-Q04
+    - SOAK-A-Q01
+    - SOAK-A-Q02
+    - SOAK-A-Q03
+    - AUDIT-A-Q33
+    - AUDIT-A-Q34
+    - ISO-X-Q01
+    - ISO-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-08
+  title: Deterministic structured memory (records)
+  outcome: An agent can ask exact structured questions over records (status, type, owner, links) and get exact answers.
+  acceptance: A query for ACTIVE decisions returns exactly the set whose frontmatter status is ACTIVE and that nothing supersedes.
+  wave: W1
+  provider:
+  - W1-10
+  sources:
+  - Contract v3 Gate C1
+  - Framework v4.1.2 §11.1
+  - DEC-012
+  scenarios:
+    dev:
+    - RETR-A-02
+    - ISO-X-01
+    qual:
+    - AUDIT-A-Q01
+    - AUDIT-A-Q03
+    - A-Q04
+    - AUDIT-A-Q10
+    - AUDIT-A-Q45
+    - ISO-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-09
+  title: Relationship/graph memory
+  outcome: An agent can traverse implements, validates, supersedes and depends_on links across all record types, including
+    broken ones.
+  acceptance: For a fixture record set, the graph returns every IMPLEMENTS and VALIDATES edge of a requirement and reports
+    each dangling reference by id.
+  wave: W1
+  provider:
+  - W1-10
+  - W1-20
+  sources:
+  - Contract v3 Gate C2
+  - Framework v4.1.2 §11.2
+  - DEC-012
+  - DEC-080
+  scenarios:
+    dev:
+    - MR-B-05
+    - CHAOS-B-11
+    - CHAOS-B-12
+    - B-09
+    - RETR-B-04
+    - CIT-B-01
+    - AUDIT-B-01
+    - AUDIT-B-02
+    - AUDIT-B-04
+    - A-X-01
+    - RETR-X-05
+    qual:
+    - MR-A-Q06
+    - CHAOS-A-Q11
+    - RETR-A-Q02
+    - AUDIT-A-Q03
+    - AUDIT-A-Q34
+    - RETR-B-Q01
+    - RETR-B-Q02
+    - RETR-B-Q03
+    - RETR-B-Q04
+    - AUDIT-B-Q03
+    - B-Q04
+    - AUDIT-B-Q13
+    qual_unlisted_in_matrix: 9
+  disposition:
+    class: KEPT
+- id: CAP-10
+  title: Semantic memory (vector/embedding retrieval)
+  outcome: An agent can find a record from a paraphrased question.
+  acceptance: On the dev query set, paraphrased questions reach the gold record in the top 5 at least as often as the S0b2
+    R1 baseline (mean hit@5 85).
+  wave: W1
+  wave_note: moved from W2 by DEC-074 R1/Q3 and DEC-080
+  provider:
+  - Ollama 0.35.0 + qwen3-embedding:0.6b
+  - sqlite-vec 0.1.9
+  - W1-19
+  sources:
+  - Contract v3 Gate C3
+  - Framework v4.1.2 §11.3, §14
+  - OWNER-DIRECTION-BR-0006 §1, §5 (provisional BGE, replaceable)
+  - OWNER-CLARIFICATION-BR-0002 (whole-repo corpus)
+  - DEC-016
+  - DEC-017
+  - DEC-074
+  - DEC-080
+  scenarios:
+    dev:
+    - RETR-A-01
+    - RETR-A-02
+    - CHAOS-B-11
+    - B-11
+    - RETR-B-01
+    - RETR-B-02
+    - AUDIT-B-06
+    - ISO-X-01
+    - RETR-X-05
+    qual:
+    - B-Q05
+    - AUDIT-B-Q26
+    - AUDIT-B-Q28
+    - AUDIT-B-Q29
+    - AUDIT-B-Q31
+    - AUDIT-B-Q32
+    - AUDIT-B-Q40
+    - ISO-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-11
+  title: Lexical memory (FTS/BM25)
+  outcome: An agent can find exact strings, identifiers and error messages with file and line.
+  acceptance: An exact error-string query returns the file path and line number of every occurrence in the indexed tree.
+  wave: W1
+  provider:
+  - SQLite FTS5 (carried)
+  - W1-17
+  sources:
+  - Contract v3 Gate C4
+  - Framework v4.1.2 §11.4
+  - DEC-016
+  - DEC-074
+  scenarios:
+    dev:
+    - RETR-A-04
+    - RETR-B-03
+    - RETR-B-04
+    - ISO-X-01
+    - RETR-X-05
+    qual:
+    - CHAOS-A-Q04
+    - CHAOS-A-Q12
+    - AUDIT-A-Q05
+    - A-Q04
+    - AUDIT-A-Q09
+    - AUDIT-A-Q13
+    - AUDIT-A-Q15
+    - RETR-B-Q01
+    - AUDIT-B-Q20
+    - ISO-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-12
+  title: Code-structural memory (AST/LSP/SCIP)
+  outcome: An agent can find definitions, callers and impact across languages from a code graph, without reading whole files.
+  acceptance: '"References to function X" returns every call site across Rust, Python and TypeScript in the dev tier, before
+    and after a rename.'
+  wave: W1
+  provider:
+  - codebase-memory-mcp 0.11.0
+  - W1-16
+  sources:
+  - Contract v3 Gate C5
+  - Framework v4.1.2 §11.5
+  - DEC-014
+  - DEC-074
+  - DEC-076
+  scenarios:
+    dev:
+    - MR-A-06
+    - RETR-A-03
+    - AUDIT-A-01
+    - MR-B-06
+    - B-08
+    - RETR-B-02
+    - RETR-B-03
+    - RETR-X-05
+    qual:
+    - RETR-A-Q01
+    - AUDIT-A-Q04
+    - AUDIT-A-Q05
+    - AUDIT-A-Q07
+    - AUDIT-A-Q16
+    - MR-B-Q01
+    - B-Q01
+    - B-Q03
+    - ISO-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-13
+  title: Temporal and episodic memory
+  outcome: An agent can see how a file or decision changed over time and which decision or task caused each change.
+  acceptance: For a changed file, the graph returns its commits with their `Implements:` and `Task:` trailers resolved to
+    the decision and ticket records.
+  wave: W1
+  provider:
+  - git log + commit trailers
+  - W1-10
+  - W1-30
+  - W1-25
+  sources:
+  - Contract v3 Gate C6, C7
+  - Framework v4.1.2 §11.6, §11.7
+  - DEC-012
+  scenarios:
+    dev:
+    - CHAOS-A-03
+    - CHAOS-B-03
+    - B-07
+    qual:
+    - CHAOS-A-Q04
+    - CHAOS-A-Q08
+    - AUDIT-A-Q04
+    - AUDIT-A-Q11
+    - AUDIT-A-Q12
+    - AUDIT-A-Q13
+    - AUDIT-A-Q14
+    - AUDIT-A-Q15
+    - AUDIT-A-Q16
+    - AUDIT-A-Q17
+    - AUDIT-A-Q18
+    - AUDIT-A-Q19
+  disposition:
+    class: KEPT
+- id: CAP-14
+  title: Failure memory
+  outcome: An agent can see a previously failed approach before it retries it.
+  acceptance: A retrieval for a task whose scope matches a committed failure record returns that record in the evidence bundle
+    before any implementation step.
+  wave: W1
+  provider:
+  - W1-08
+  - W1-21
+  sources:
+  - Contract v3 Gate C8
+  - Framework v4.1.2 §11.8
+  - OWNER-DIRECTION-BR-0006 §1 (lessons/failed approaches)
+  - DEC-080
+  scenarios:
+    dev:
+    - CHAOS-B-01
+    - CHAOS-B-04
+    - RETR-X-04
+    - B-X-02
+    qual:
+    - AUDIT-A-Q02
+    - AUDIT-A-Q20
+    - AUDIT-A-Q22
+    - AUDIT-A-Q23
+    - AUDIT-A-Q25
+    - CHAOS-B-Q13
+    - B-Q02
+    - SEC-B-Q03
+    - RETR-X-Q04
+  disposition:
+    class: KEPT
+- id: CAP-15
+  title: Context packet compilation
+  outcome: 'An agent starts every task with a compiled context packet: mandatory inputs by id and hash, an authority block
+    first, under a ceiling.'
+  acceptance: '`gov context <ticket>` writes a packet that contains every mandatory input by id and sha256, stays under the
+    configured ceiling (default ~6k tokens), carries its own hash, and is delivered as a file path plus a summary of at most
+    ~2.5k tokens.'
+  wave: W1
+  wave_note: DEC-080
+  provider:
+  - W1-24
+  - W1-29
+  sources:
+  - Contract v3 Gate C9
+  - Framework v4.1.2 §15
+  - Contract v3 Gate W4, W9, W10
+  - OWNER-DIRECTION-BR-0005 (multi-batch retrieval)
+  - OWNER-DIRECTION-BR-0006 §4 (hierarchical synthesis)
+  - DEC-030, DEC-031, DEC-032
+  - DEC-003
+  - DEC-004
+  - DEC-080
+  scenarios:
+    dev:
+    - CHAOS-A-11
+    - ISO-X-01
+    - RETR-X-04
+    qual:
+    - ISO-X-Q01
+    - RETR-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-16
+  title: Multi-batch, multi-hop, paginated retrieval
+  outcome: An agent can gather evidence that spans many locations and hops, in batches, until a stated stopping reason.
+  acceptance: On RETR-A-04 and RETR-X-02, the evidence bundle shows more than one batch, the merge, and a stopping reason
+    from the fixed list; a batch-size limit is never reported as completeness.
+  wave: W1
+  wave_note: DEC-080
+  provider:
+  - W1-21
+  - W1-36
+  sources:
+  - OWNER-DIRECTION-BR-0005 (full)
+  - OWNER-DIRECTION-BR-0006 §2, §3
+  - DEC-030, DEC-033, DEC-034, DEC-035
+  - DEC-080
+  scenarios:
+    dev:
+    - RETR-A-04
+    - RETR-X-02
+    qual:
+    - RETR-A-Q01
+    - RETR-A-Q02
+    - RETR-A-Q03
+    - RETR-A-Q04
+    - RETR-X-Q02
+    - RETR-X-Q05
+  disposition:
+    class: KEPT
+- id: CAP-17
+  title: Incremental indexing and freshness
+  outcome: 'An agent never receives stale evidence silently: changed files are re-indexed before the next retrieval, or the
+    facet is reported unavailable.'
+  acceptance: After one decision file is edited, the next `gov retrieve` returns the edited content, or reports the facet
+    FACET_UNAVAILABLE; it never returns the old text as current.
+  wave: W1
+  wave_note: commit-time re-index hook (G-23) is W2
+  provider:
+  - W1-17
+  - W1-22
+  - 'W2: G-23 re-index hook'
+  sources:
+  - Contract v3 Gate D1
+  - Framework v4.1.2 §13
+  - DEC-037 (zero-result canaries)
+  - DEC-080
+  scenarios:
+    dev:
+    - CHAOS-A-02
+    - CHAOS-A-03
+    - CHAOS-A-12
+    - CHAOS-B-02
+    - CHAOS-B-03
+    - CHAOS-B-09
+    - CHAOS-B-12
+    - B-06
+    - B-10
+    - RETR-X-01
+    qual:
+    - RETR-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-18
+  title: Retrieval router (multi-route fusion)
+  outcome: An agent can answer a complex question through several retrieval routes, fused, deduplicated and reranked once.
+  acceptance: A question that needs lexical, semantic and graph routes returns one fused list with duplicates removed by chunk
+    hash and one rerank over the merged set; the bundle names the routes used.
+  wave: W1
+  wave_note: DEC-080
+  provider:
+  - W1-19
+  - W1-21
+  sources:
+  - Contract v3 Gate D2, D3
+  - Framework v4.1.2 §14, §14.1
+  - DEC-016
+  - DEC-074
+  - DEC-080
+  scenarios:
+    dev:
+    - RETR-A-01
+    - RETR-X-01
+    - RETR-X-05
+    qual:
+    - RETR-X-Q05
+  disposition:
+    class: KEPT
+- id: CAP-19
+  title: Retrieval component separation and model selection
+  outcome: The owner can swap an embedding or reranking model through configuration, with a pinned revision and a regression
+    check.
+  acceptance: Changing the embedder pin in configuration triggers a full re-embed, the dev-tier retrieval regression passes,
+    and an unpinned or mismatched model makes retrieval fail closed with a named error.
+  wave: W2
+  wave_note: fail-closed model pin and lighter reranker spike W2; per-repository benchmark W3
+  provider:
+  - 'W2: embedder/reranker adapters under the fail-closed pin'
+  - 'W3: per-repository retrieval benchmark'
+  sources:
+  - Contract v3 Gate D4, D5
+  - Framework v4.1.2 §14.2, §14.3
+  - OWNER-DIRECTION-BR-0006 §5 (provisional BGE, replaceable)
+  - DEC-017
+  - DEC-046
+  - DEC-074
+  scenarios:
+    dev:
+    - RETR-X-01
+    qual:
+    - RETR-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-20
+  title: Rebuild guarantee (delete derived, rebuild from git)
+  outcome: A fresh agent on a fresh clone can rebuild all derived state from git and continue.
+  acceptance: '`gov rebuild` twice from the same commit yields the same chunk-SHA-256 digest, and a fresh agent resumes the
+    active ticket from the rebuilt state and the latest checkpoint.'
+  wave: W1
+  provider:
+  - W1-27
+  sources:
+  - Contract v3 Gate D6
+  - Framework v4.1.2 §19
+  - Distribution Protocol v1.2 §7.5
+  - DEC-016
+  scenarios:
+    dev:
+    - CHAOS-A-01
+    - CHAOS-A-02
+    - CHAOS-A-09
+    - CHAOS-B-01
+    - CHAOS-B-02
+    - CHAOS-B-09
+    - CHAOS-B-10
+    - B-06
+    - ISO-X-01
+    - ISO-X-02
+    qual:
+    - CHAOS-A-Q03
+    - CHAOS-B-Q02
+    - SOAK-B-Q01
+    - B-Q04
+    - AUDIT-B-Q17
+    - AUDIT-B-Q19
+    - AUDIT-B-Q21
+    - AUDIT-B-Q22
+    - AUDIT-B-Q24
+    - AUDIT-B-Q33
+    - SOAK-B-Q02
+    - ISO-X-Q01
+    qual_unlisted_in_matrix: 1
+  disposition:
+    class: KEPT
+- id: CAP-21
+  title: Owner-only approval facts (lite of L0-L5 authority levels)
+  outcome: The owner can trust that no agent makes a decision ACTIVE on its own.
+  acceptance: '`gov check` (and CI) fails a change that sets a decision ACTIVE unless the change carries an owner approval
+    fact from git.'
+  wave: W1
+  provider:
+  - W1-11
+  sources:
+  - Contract v3 Gate E1
+  - Framework v4.1.2 §23
+  - OWNER-DECISION-P2-0001 (role identity binding)
+  - DEC-039
+  - DEC-046
+  - DEC-074
+  scenarios:
+    dev:
+    - MR-A-01
+    qual:
+    - MR-A-Q01
+    - CHAOS-A-Q10
+    - AUDIT-A-Q27
+  disposition:
+    class: LITE
+    lite_form: An approval is a fact only when it comes from the owner's git account (owner commit, signed tag or PR approval);
+      no in-process L0–L5 machinery.
+- id: CAP-22
+  title: Agent roles and typed A2A handoffs
+  outcome: An agent can hand work to a fresh agent in a typed record the receiver can act on without the sender's chat.
+  acceptance: A fresh agent B, given only the handoff record and the repository, states the task, inputs, open questions and
+    next step identically to agent A's record.
+  wave: W2
+  wave_note: W1 hands off through checkpoints; typed handoff records and specialist roles are W2
+  provider:
+  - W1-25
+  - 'W2: typed handoff records'
+  sources:
+  - Contract v3 Gate E2, E3
+  - Framework v4.1.2 §24, §25
+  - DEC-066
+  scenarios:
+    dev:
+    - CHAOS-X-02
+    qual:
+    - CHAOS-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-23
+  title: Concurrency and task claims
+  outcome: Two agents cannot both take the same task.
+  acceptance: A second agent claiming a ticket already claimed by another gets a collision error naming the holder, and the
+    ticket is absent from its ready queue.
+  wave: W3
+  wave_note: the exclusive claim lock (G-03) is delivered in W1-09; parallel-agent concurrency and the claims role are W3
+  provider:
+  - ticket v0.3.2
+  - W1-09
+  - 'W3: gov claim + claims/concurrency role'
+  sources:
+  - Contract v3 Gate E4
+  - Framework v4.1.2 §44
+  - DEC-066
+  - DEC-074
+  - DEC-076
+  scenarios:
+    dev:
+    - CHAOS-X-03
+    qual:
+    - CHAOS-X-Q03
+  disposition:
+    class: KEPT
+- id: CAP-24
+  title: Skill lifecycle and versioning
+  outcome: An agent can tell which version of each skill produced a piece of work.
+  acceptance: Every skill file carries a version in frontmatter, and the `gov close` record of a ticket lists the skill ids
+    and versions used.
+  wave: W1
+  provider:
+  - W1-35
+  - W1-36
+  - W1-37
+  - W1-30
+  sources:
+  - Contract v3 Gate F1
+  - Framework v4.1.2 §26, §27
+  - DEC-024
+  - DEC-074
+  scenarios:
+    dev:
+    - CHAOS-A-05
+    qual:
+    - CHAOS-X-Q05
+  disposition:
+    class: KEPT
+- id: CAP-25
+  title: Tool registry and capability memory (lite)
+  outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
+  acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; an install command from
+    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied.'
+  wave: W1
+  provider:
+  - W1-04
+  - W1-06
+  - W1-27
+  sources:
+  - Contract v3 Gate F2, F3
+  - Framework v4.1.2 §28-30
+  - OWNER-DECISION-P2-0003 (gate only elevated installs)
+  - Contract v3 Gate C10
+  - Framework v4.1.2 §11.10
+  - DEC-040
+  - DEC-074
+  - DEC-083
+  scenarios:
+    dev:
+    - CHAOS-A-05
+    - CHAOS-B-04
+    - CHAOS-B-05
+    - CHAOS-B-14
+    - B-10
+    - AUDIT-B-03
+    qual:
+    - CHAOS-X-Q05
+  disposition:
+    class: LITE
+    lite_form: Tool registry with pins; the orchestrator installs a tool only after the owner approves a decision package
+      in chat, and records version, sha256, install and uninstall commands, date and approving decision; `gov doctor` checks
+      the pins. No automated install classification (DEC-083).
+- id: CAP-26
+  title: Plugin trust boundary (hash-binding, descriptor security)
+  outcome: (none — non-goal)
+  acceptance: No kernel file implements plugin hash-binding or descriptor trust; the wave-exit audit finds none (DEC-070).
+  wave: NONE
+  wave_note: dropped
+  provider:
+  - none (non-goal)
+  sources:
+  - Contract v3 Gate F4
+  - OWNER-DECISION-P2-0005 (bind the bytes)
+  - OWNER-CLARIFICATION-P2-0004 (project files cannot manufacture authority)
+  - DEC-039
+  - DEC-075
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: DROP
+    non_goal: 'Non-goal: plugin trust boundary (hash-binding, descriptor security, self-attestation prevention) defends against
+      a same-privilege adversary (ADR-0001).'
+    decisions:
+    - DEC-039
+    - DEC-075
+- id: CAP-27
+  title: Read/act separation of commands (lite of MCP/A2A/knowledge layers)
+  outcome: An agent can run any read command without changing the repository.
+  acceptance: Every `gov` read command (status, check, readiness, doctor, context --dry-run, closure, retrieve) leaves `git
+    status --porcelain` empty.
+  wave: W1
+  provider:
+  - W1-07
+  sources:
+  - Contract v3 Gate F5
+  - Framework v4.1.2 §31
+  - DEC-074
+  scenarios:
+    dev:
+    - MR-X-01
+    qual:
+    - MR-X-Q01
+  disposition:
+    class: LITE
+    lite_form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric.
+- id: CAP-28
+  title: Natural-language intent routing and small command surface
+  outcome: The owner can ask in natural language and get a structured governance answer; a small command set covers the rest.
+  acceptance: A status question in chat is answered from `gov status --json` (tickets, gates, readiness, share, pause state)
+    rather than from free recall.
+  wave: W1
+  provider:
+  - Claude Code (harness)
+  - W1-07
+  - W1-32
+  sources:
+  - Contract v3 Gate G1, G2
+  - Framework v4.1.2 §33, §34
+  - DEC-003
+  scenarios:
+    dev:
+    - MR-X-01
+    qual:
+    - MR-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-29
+  title: Specification lineage (idea to live evidence)
+  outcome: An agent can follow a feature from idea through scenarios, requirements, decisions, tasks and tests to live evidence.
+  acceptance: For a feature, `gov closure` returns its linked mission, scenario, requirement, decision, ticket and acceptance-test
+    ids, and reports each missing link.
+  wave: W3
+  wave_note: links from OpenSpec and frontmatter in W1; full idea→live-evidence lineage W3
+  provider:
+  - OpenSpec 1.13.2
+  - W1-08
+  - W1-10
+  - 'W3: full lineage'
+  sources:
+  - Contract v3 Gate H1
+  - Framework v4.1.2 §36
+  - DEC-011
+  - DEC-064
+  scenarios:
+    dev:
+    - A-X-01
+    qual:
+    - A-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-30
+  title: Feature readiness contract (26-dimension checklist)
+  outcome: An agent can see, per feature, which of the 26 readiness rows are open for its profile, and each gap becomes work.
+  acceptance: A specification with the test-data row MISSING keeps its production tickets out of READY, and `gov readiness
+    --generate` creates one ticket per required open row with its dependencies.
+  wave: W2
+  wave_note: schema, checker and the READY gate are W1 (W1-12, W1-13); generating work from gaps is W2
+  provider:
+  - OpenSpec custom schema
+  - W1-12
+  - W1-13
+  - 'W2: gov readiness --generate'
+  sources:
+  - Contract v3 Gate H2, H3, H4
+  - Framework v4.1.2 §37, §38, §39
+  - DEC-005
+  - DEC-064
+  - DEC-085
+  scenarios:
+    dev:
+    - MR-A-02
+    - MR-A-04
+    - A-01
+    qual:
+    - MR-A-Q02
+    - MR-A-Q04
+    - CHAOS-A-Q07
+    - A-Q01
+    - A-Q02
+    - A-Q05
+    - AUDIT-A-Q32
+    - AUDIT-A-Q35
+    - AUDIT-A-Q37
+    - AUDIT-A-Q43
+    - AUDIT-A-Q44
+    - AUDIT-A-Q47
+    qual_unlisted_in_matrix: 9
+  disposition:
+    class: KEPT
+- id: CAP-31
+  title: Unified task DAG with dynamic generation
+  outcome: An agent works from one task DAG in git, and failures generate their own repair tasks.
+  acceptance: A failed `gov close` creates a repair ticket that depends on the failed one, and `tk ready` shows it only after
+    its dependencies are closed.
+  wave: W1
+  provider:
+  - ticket v0.3.2
+  - W1-09
+  - W1-14
+  - W1-30
+  sources:
+  - Contract v3 Gate I1, I2, I3, I4
+  - Framework v4.1.2 §41-44
+  - DEC-074
+  scenarios:
+    dev:
+    - MR-A-02
+    - MR-A-03
+    - MR-A-04
+    - A-03
+    - A-04
+    - MR-B-02
+    - MR-B-03
+    - MR-B-04
+    - CHAOS-B-05
+    - CHAOS-B-06
+    - GATE-B-01
+    - AUDIT-B-05
+    qual:
+    - MR-A-Q02
+    - MR-A-Q03
+    - MR-A-Q04
+    - GATE-A-Q04
+    - A-Q01
+    - A-Q02
+    - AUDIT-A-Q28
+    - AUDIT-A-Q29
+    - AUDIT-A-Q30
+    - AUDIT-A-Q31
+    - AUDIT-A-Q32
+    - MR-B-Q04
+    dev_unlisted_in_matrix: 2
+    qual_unlisted_in_matrix: 2
+  disposition:
+    class: KEPT
+- id: CAP-32
+  title: Research and experiment lifecycle
+  outcome: An agent keeps research as evidence records separate from authority, and experimental results cannot reach production
+    unreviewed.
+  acceptance: A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes
+    it.
+  wave: W3
+  provider:
+  - Docling (pinned)
+  - MarkItDown
+  - 'W3: gov research sync + research records'
+  sources:
+  - Contract v3 Gate J1, J2
+  - Framework v4.1.2 §45, §46
+  - DEC-019
+  - DEC-020
+  scenarios:
+    dev:
+    - A-X-02
+    qual:
+    - AUDIT-A-Q02
+    - AUDIT-A-Q06
+    - AUDIT-A-Q20
+    - AUDIT-A-Q21
+    - AUDIT-A-Q23
+    - AUDIT-A-Q24
+    - AUDIT-A-Q38
+    - AUDIT-A-Q43
+    - CIT-B-Q01
+  disposition:
+    class: KEPT
+- id: CAP-33
+  title: Change-impact transactions (CIT-P simulation, CIT-E execution)
+  outcome: An agent can simulate a change before making it (CIT-P) and record what it changed (CIT-E).
+  acceptance: A decision change raises a CIT-P listing the affected specs, decisions, tickets, tests and code from both graphs,
+    with a radius; after apply/archive the CIT-E record matches the proposal or lists the differences.
+  wave: W2
+  wave_note: OpenSpec proposal and apply/archive in W1; computed impact W2
+  provider:
+  - OpenSpec 1.13.2
+  - W1-35
+  - 'W2: gov impact'
+  sources:
+  - Contract v3 Gate K1, K2, K3, K4
+  - Framework v4.1.2 §47-49
+  - DEC-005 (proportionality profiles LITE/STANDARD/FULL)
+  - DEC-035 (radius-scaled budgets/facets)
+  - DEC-011
+  - DEC-066
+  scenarios:
+    dev:
+    - MR-A-05
+    - CIT-A-01
+    - CIT-A-02
+    - MR-B-05
+    - CIT-B-01
+    qual:
+    - MR-A-Q05
+    - CHAOS-A-Q01
+    - CHAOS-A-Q02
+    - CHAOS-A-Q05
+    - CIT-A-Q01
+    - CIT-A-Q02
+    - CIT-A-Q03
+    - A-Q03
+    - AUDIT-A-Q26
+    - AUDIT-A-Q27
+    - AUDIT-A-Q39
+    - SOAK-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-34
+  title: Human decision gates and contradiction resolution
+  outcome: The owner receives every question that matters as a ranked decision package in the active chat, and independent
+    branches keep going.
+  acceptance: A high-impact contradiction produces a package with all eight fields in chat; the dependent ticket is blocked;
+    an independent ticket still reaches close; the answer lands as a register entry in git.
+  wave: W1
+  provider:
+  - W1-34
+  - W1-35
+  sources:
+  - Contract v3 Gate L1, L2, L3, L4
+  - Framework v4.1.2 §50-54
+  - DEC-044 (at most two review-repair rounds then DELETE/NARROW/DEFER)
+  - DEC-065
+  scenarios:
+    dev:
+    - MR-A-03
+    - CHAOS-A-06
+    - CHAOS-A-07
+    - CHAOS-A-08
+    - CHAOS-A-15
+    - GATE-A-01
+    - MR-B-03
+    - CHAOS-B-06
+    - CHAOS-B-07
+    - CHAOS-B-08
+    - GATE-B-01
+    - GATE-B-02
+    qual:
+    - MR-A-Q03
+    - CHAOS-A-Q13
+    - GATE-A-Q01
+    - GATE-A-Q02
+    - GATE-A-Q03
+    - GATE-A-Q04
+    - A-Q01
+    - MR-B-Q05
+    - AUDIT-B-Q01
+    - AUDIT-B-Q05
+    - AUDIT-B-Q08
+    - AUDIT-B-Q14
+    dev_unlisted_in_matrix: 2
+    qual_unlisted_in_matrix: 6
+  disposition:
+    class: KEPT
+- id: CAP-35
+  title: Model routing (T0-T3 tiers, reasoning levels)
+  outcome: The owner can route each role and task class to a model tier.
+  acceptance: With the routing configuration set, an orchestration task runs on the T3 tier and a documentation task on T1,
+    as recorded in telemetry.
+  wave: W3
+  provider:
+  - 'W3: role model tiers + routing config'
+  sources:
+  - Contract v3 Gate M1, M2, M3
+  - Framework v4.1.2 §55-57
+  - DEC-010
+  - DEC-018
+  - DEC-083
+  scenarios:
+    dev:
+    - CHAOS-A-04
+    - ISO-X-03
+    qual:
+    - CHAOS-X-Q06
+  disposition:
+    class: KEPT
+- id: CAP-36
+  title: Empirical model routing telemetry
+  outcome: The owner can compare cost and pass/fail per model per task class from real runs.
+  acceptance: A report lists tokens, cost and pass/fail per model per task class over the recorded tickets.
+  wave: W3
+  provider:
+  - 'W3: OTel evidence per role and model'
+  sources:
+  - Contract v3 Gate M4
+  - Framework v4.1.2 §58
+  - DEC-026
+  scenarios:
+    dev:
+    - SOAK-X-01
+    qual:
+    - SOAK-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-37
+  title: Structured checkpoints and mandatory triggers
+  outcome: An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
+  acceptance: After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes
+    the ticket at the recorded next step.
+  wave: W1
+  wave_note: model-switch continuity tested in W2
+  provider:
+  - W1-25
+  - W1-29
+  sources:
+  - Contract v3 Gate N1, N2, N3, N4
+  - Framework v4.1.2 §59-61
+  - OWNER-DIRECTION-BR-0004 (checkpoint discipline)
+  - OWNER-DIRECTION-BR-0006 §7, §8
+  - DEC-025
+  scenarios:
+    dev:
+    - CHAOS-A-01
+    - CHAOS-A-04
+    - ISO-X-01
+    - ISO-X-03
+    - CHAOS-X-02
+    qual:
+    - CHAOS-A-Q01
+    - CIT-A-Q02
+    - CIT-A-Q04
+    - SOAK-A-Q01
+    - A-Q03
+    - AUDIT-A-Q36
+    - CHAOS-B-Q01
+    - CHAOS-B-Q03
+    - CHAOS-B-Q04
+    - CHAOS-B-Q05
+    - CHAOS-B-Q10
+    - CHAOS-B-Q11
+    qual_unlisted_in_matrix: 6
+  disposition:
+    class: KEPT
+- id: CAP-38
+  title: Verification test families (product and governance)
+  outcome: The owner can see product and governance verification results, with builder tests counted as regression evidence
+    only.
+  acceptance: '`gov check` reports each governance test family RED/YELLOW/GREEN, and `gov close` runs the independent acceptance
+    tests separately from builder tests.'
+  wave: W1
+  provider:
+  - W1-26
+  - W1-30
+  - W1-37
+  sources:
+  - Contract v3 Gate O1, O2, O3, O4
+  - Framework v4.1.2 §62-64
+  - DEC-042 (builder tests are regression evidence only)
+  - DEC-083
+  scenarios:
+    dev:
+    - MR-A-06
+    - A-02
+    - MR-B-02
+    - MR-B-04
+    - MR-B-06
+    - AUDIT-B-04
+    - AUDIT-X-01
+    qual:
+    - AUDIT-A-Q08
+    - A-Q05
+    - AUDIT-A-Q40
+    - AUDIT-A-Q41
+    - AUDIT-A-Q46
+    - AUDIT-B-Q02
+    - AUDIT-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-39
+  title: Governance health scheduler (G0-G6 tiers)
+  outcome: Governance checks run at the right tier automatically, and a stale required index blocks close.
+  acceptance: '`gov close` fails when a required index is stale; the scheduler runs the configured tiers on schedule and records
+    results.'
+  wave: W3
+  wave_note: G0–G5 tiers in W1 (W1-40); the health scheduler and G6 (in qualification) are W3
+  provider:
+  - lefthook 2.1.15
+  - GitHub Actions
+  - W1-40
+  - 'W3: health scheduler'
+  sources:
+  - Contract v3 Gate O5
+  - Framework v4.1.2 §62-64
+  - DEC-007
+  - DEC-075
+  - DEC-087
+  scenarios:
+    dev:
+    - ISO-X-02
+    - SOAK-X-02
+    - MR-X-02
+    qual:
+    - ISO-X-Q02
+    - SOAK-X-Q02
+    - MR-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-40
+  title: Execution telemetry and organisational questions
+  outcome: The owner can see tokens, model, cost and outcome per ticket.
+  acceptance: Each closed ticket has a telemetry record with fresh input/output tokens, cache reads, model, governance tokens
+    and pass/fail.
+  wave: W1
+  wave_note: OTel dashboards W3
+  provider:
+  - ccusage (pinned)
+  - W1-31
+  sources:
+  - Contract v3 Gate P1, P2
+  - Framework v4.1.2 §65, §66
+  - DEC-026
+  - DEC-086
+  scenarios:
+    dev:
+    - CHAOS-A-12
+    - ISO-X-03
+    - SOAK-X-01
+    qual:
+    - GATE-B-Q01
+    - GATE-B-Q03
+    - GATE-B-Q04
+    - SOAK-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-41
+  title: Lesson records with scope
+  outcome: An agent receives the lessons that apply to its task, scoped, and lessons stay in the repository.
+  acceptance: A committed lesson whose scope matches a ticket is returned by `gov retrieve` for that ticket and not for an
+    out-of-scope ticket.
+  wave: W1
+  wave_note: upstream export excluded (DEC-053 Q7)
+  provider:
+  - W1-08
+  - W1-21
+  sources:
+  - Contract v3 Gate Q1, Q2, Q3, Q4
+  - Framework v4.1.2 §67, §68, §75E-75G
+  - Distribution Protocol v1.2 §13-15
+  - DEC-053
+  scenarios:
+    dev:
+    - RETR-X-04
+    - B-X-02
+    qual:
+    - GATE-B-Q01
+    - GATE-B-Q02
+    - AUDIT-B-Q16
+    - AUDIT-B-Q27
+    - RETR-X-Q04
+  disposition:
+    class: KEPT
+- id: CAP-42
+  title: Legacy governance retirement and archive policy
+  outcome: An agent can retire a repository's legacy governance (rules files, memory, indexes) into archived, inactive state.
+  acceptance: After adoption, the retired system contributes zero ACTIVE decisions and zero loaded instructions; its files
+    are archived or imported into `.rulesync/`.
+  wave: W1
+  provider:
+  - rulesync 24.0.0 (import)
+  - W1-41
+  sources:
+  - Contract v3 Gate R1, R2, R3
+  - Framework v4.1.2 §69-71
+  - DEC-022
+  - DEC-074
+  scenarios:
+    dev:
+    - CHAOS-B-07
+    - B-01
+    - B-04
+    - B-07
+    - B-11
+    - GATE-B-02
+    qual:
+    - B-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-43
+  title: Canonical OS repo separation and immutable releases
+  outcome: The owner can tell exactly which Gov OS version a repository runs; releases never change once tagged.
+  acceptance: '`framework.lock` records the template tag, commit and file-hash manifest, and `gov doctor` fails when any of
+    them disagrees with the installed kernel.'
+  wave: W1
+  wave_note: Release 1 tag at the end of qualification
+  provider:
+  - Copier 9.18.2
+  - W1-39
+  sources:
+  - Contract v3 Gate S1, S2
+  - Framework v4.1.2 §75A-75D
+  - Distribution Protocol v1.2 §1-8
+  - DEC-023
+  - DEC-027
+  - DEC-064
+  scenarios:
+    dev:
+    - CHAOS-X-01
+    qual:
+    - CHAOS-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-44
+  title: gov init and gov adopt lifecycle
+  outcome: The owner can install the Gov OS into a new or existing repository with one command sequence.
+  acceptance: '`copier copy` plus the post-copy tasks create `governance/`, the overlay, `.rulesync/`, hooks and `framework.lock`,
+    and `gov doctor` passes on the result.'
+  wave: W1
+  provider:
+  - Copier 9.18.2
+  - W1-39
+  - W1-41
+  sources:
+  - Contract v3 Gate S3, S4
+  - Framework v4.1.2 §77-79
+  - Adoption Protocol v3.0 §2-16
+  - Distribution Protocol v1.2 §9, §10
+  - DEC-006
+  - DEC-023
+  scenarios:
+    dev:
+    - B-01
+    - B-04
+    - B-05
+    - B-X-01
+    qual:
+    - B-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-45
+  title: gov update lifecycle
+  outcome: The owner can update the Gov OS in a repository without losing overlay configuration.
+  acceptance: '`gov update --check` reports the version change and migrations; `copier update` applies them with the overlay
+    files unchanged and `gov doctor` green.'
+  wave: W2
+  wave_note: first real `copier update` in W2
+  provider:
+  - Copier 9.18.2
+  - 'W2: gov update --check'
+  sources:
+  - Contract v3 Gate S5
+  - Framework v4.1.2 §82
+  - Distribution Protocol v1.2 §12
+  - DEC-023
+  scenarios:
+    dev:
+    - CHAOS-A-10
+    - CHAOS-X-01
+    qual:
+    - CHAOS-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-46
+  title: Cross-machine sync via git
+  outcome: The owner can move to another machine with git alone.
+  acceptance: A fresh clone followed by `gov doctor` and `gov rebuild` gives a working environment whose derived digest equals
+    the source machine's.
+  wave: W1
+  provider:
+  - W1-27
+  sources:
+  - Contract v3 Gate S6
+  - Framework v4.1.2 §83
+  - Distribution Protocol v1.2 §16
+  - DEC-057
+  scenarios:
+    dev:
+    - CHAOS-A-09
+    - ISO-X-01
+    - CHAOS-X-01
+    qual:
+    - ISO-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-47
+  title: Independent adoption/audit roles and fresh-session independence
+  outcome: The owner gets independent verification from fresh sessions that did not build what they check.
+  acceptance: A fresh verifier session with only the bounded context pack runs held-out tests and reports; its transcript
+    contains no builder chat.
+  wave: W3
+  wave_note: Independent Test Designer and Independent Auditor roles in W1 (W1-33); full independent adoption/audit roles
+    W3
+  provider:
+  - W1-33
+  - 'W3: independent adoption/audit roles'
+  sources:
+  - Contract v3 Gate T1, T2, T3
+  - Adoption Protocol v3.0 §3
+  - DEC-042 (builder tests are regression, not certification)
+  - DEC-066
+  - DEC-070
+  scenarios:
+    dev:
+    - AUDIT-X-01
+    qual:
+    - AUDIT-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-48
+  title: Framework health SLOs and healthy-repo definition
+  outcome: The owner can see the Gov OS's health against SLOs.
+  acceptance: '`gov health` shows index freshness, test status and governance share as G/Y/R against configured SLOs.'
+  wave: W3
+  wave_note: subset in `gov doctor` from W1
+  provider:
+  - W1-27
+  - 'W3: health SLOs'
+  sources:
+  - Contract v3 Gate U
+  - Framework v4.1.2 §75, §76
+  - DEC-004
+  scenarios:
+    dev:
+    - SOAK-X-02
+    qual:
+    - SOAK-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-49
+  title: Qualification oracle (synthetic repos, fault injection, hidden tests)
+  outcome: The owner can qualify the Gov OS on two synthetic programmes against a held-out oracle before Release 1.
+  acceptance: A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any
+    forbidden outcome fails; the builder sessions had no read access to the oracle.
+  wave: W3
+  wave_note: the pack exists (S0b1); executed as qualification after W3 (DEC-067)
+  provider:
+  - synthetic Programmes A and B
+  - held-out oracle
+  - qualification executor
+  sources:
+  - Contract v3 Gate V1, V2, V3, V4
+  - DEC-067
+  - DEC-071
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+    note: DROP in S0a; KEPT as qualification by DEC-067
+- id: CAP-50
+  title: Artifact flow, dependency consumption and end-to-end traceability
+  outcome: An agent can tell which evidence becomes stale when a requirement changes.
+  acceptance: Changing a requirement marks every dependent test result, packet and synthesis note stale, listed by id.
+  wave: W3
+  wave_note: trailers and graph in W1; full W1–W12 in W3
+  provider:
+  - W1-10
+  - W1-30
+  - 'W3: Gate W traceability'
+  sources:
+  - Contract v3 Gate W1-W12
+  - Framework v4.1.2 §36-38
+  - DEC-036
+  - DEC-064
+  scenarios:
+    dev:
+    - A-X-01
+    qual:
+    - CHAOS-X-Q02
+    - A-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-51
+  title: Decisions register (structured, versioned, authoritative)
+  outcome: An agent can rely on one structured, versioned register of decisions with supersession.
+  acceptance: Superseding a decision updates both records' status and links, and the checker flags an ACTIVE record that is
+    superseded, a duplicate id or a cycle.
+  wave: W1
+  provider:
+  - MADR + check-jsonschema 0.38.2
+  - W1-11
+  sources:
+  - Framework v4.1.2 §2, §68
+  - Contract v3 Gate C1 (decisions)
+  - Contract v3 Gate L1 (contradiction resolution)
+  - DEC-030 (authority/current/superseded filtering)
+  - DEC-012
+  - DEC-074
+  scenarios:
+    dev:
+    - CHAOS-B-08
+    - B-02
+    - RETR-B-01
+    - AUDIT-B-01
+    - AUDIT-B-02
+    - AUDIT-B-05
+    - AUDIT-B-06
+    qual:
+    - MR-A-Q06
+    - AUDIT-A-Q03
+    - AUDIT-A-Q06
+    - AUDIT-A-Q10
+    - AUDIT-A-Q21
+    - AUDIT-A-Q24
+    - MR-B-Q05
+    - GATE-B-Q03
+    - AUDIT-B-Q01
+    - AUDIT-B-Q04
+    - AUDIT-B-Q05
+    - AUDIT-B-Q06
+    qual_unlisted_in_matrix: 7
+  disposition:
+    class: KEPT
+- id: CAP-52
+  title: Model-agnostic adapters (provider, IDE, CLI)
+  outcome: The owner can use Claude Code or an AGENTS.md-reading harness with the same rules, generated from one source.
+  acceptance: '`rulesync generate` produces CLAUDE.md, AGENTS.md and `.claude/`; CI fails when a generated file differs from
+    its source; the Claude Code adapter carries every hook and deny rule.'
+  wave: W1
+  provider:
+  - rulesync 24.0.0
+  - W1-38
+  sources:
+  - Contract v3 Gate A1 (model-agnostic)
+  - Framework v4.1.2 §4, §22
+  - OWNER-LAUNCHER-BR-0001 (Claude Code first, others later)
+  - DEC-022
+  - DEC-074
+  scenarios:
+    dev:
+    - ISO-X-03
+    qual:
+    - CHAOS-X-Q06
+  disposition:
+    class: KEPT
+- id: CAP-53
+  title: Proportionality profiles (LITE/STANDARD/FULL)
+  outcome: 'The owner gets ceremony in proportion to impact: LITE, STANDARD or FULL.'
+  acceptance: An R0 change runs only the LITE checks and an R3 change raises the FULL gate and readiness rows, with the profile
+    computed by `gov impact`.
+  wave: W2
+  wave_note: declared per ticket in W1 (W1-09); computed from impact in W2
+  provider:
+  - W1-09
+  - 'W2: gov impact profile'
+  sources:
+  - DEC-005 (proportionality profiles)
+  - DEC-035 (radius-scaled budgets/facets)
+  - DEC-004 (governance overhead budget 10-15%)
+  - OWNER-DIRECTION-P2-0009 §11
+  - DEC-085
+  scenarios:
+    dev:
+    - MR-X-02
+    qual:
+    - MR-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-54
+  title: Progressive adoption (day-one to maturity)
+  outcome: The owner can govern a repository from day one while its full migration continues in batches.
+  acceptance: A repository with only the kernel installed passes `gov doctor` at the minimal level, and later adoption batches
+    raise its level without reinstalling.
+  wave: W1
+  provider:
+  - W1-39
+  - W1-41
+  - W1-27
+  sources:
+  - DEC-006 (progressive adoption)
+  - OWNER-DIRECTION-P2-0009 §2 (simplification principle)
+  - Framework v4.1.2 §7 (every mature repo should identify systems, even minimally)
+  scenarios:
+    dev:
+    - B-X-01
+    qual:
+    - B-X-Q01
+  disposition:
+    class: KEPT
+- id: CAP-55
+  title: Retrieval stopping reasons
+  outcome: An agent always knows why retrieval stopped, and an empty result is never taken as absence.
+  acceptance: Every evidence bundle carries one stopping reason from the fixed list; a canary miss on an index yields FACET_UNAVAILABLE,
+    and the validator rejects a bundle without a stopping reason.
+  wave: W1
+  wave_note: DEC-080
+  provider:
+  - W1-21
+  - W1-22
+  sources:
+  - DEC-034 (stopping reasons)
+  - DEC-037 (zero-result canaries)
+  - OWNER-DIRECTION-BR-0005 §5
+  - DEC-080
+  scenarios:
+    dev:
+    - RETR-X-02
+    qual:
+    - RETR-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-56
+  title: Retrieval in disposable subagent context
+  outcome: 'An agent keeps retrieval out of its own context: facet retrieval runs in disposable subagents and only the cited
+    bundle returns.'
+  acceptance: On RETR-X-02 the main session's transcript contains the bundle and none of the intermediate retrieval batches.
+  wave: W1
+  wave_note: DEC-080
+  provider:
+  - W1-36
+  sources:
+  - DEC-032 (retrieval loop in disposable subagent)
+  - 'DEC-031 (two budgets: retrieval spend vs final packet)'
+  - DEC-080
+  scenarios:
+    dev:
+    - CHAOS-A-11
+    - RETR-X-02
+    qual:
+    - CHAOS-B-Q06
+    - CHAOS-B-Q07
+    - CHAOS-B-Q08
+    - CHAOS-B-Q09
+    - RETR-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-57
+  title: Deterministic worklist closure for facets
+  outcome: An agent gets the same dependency closure for referenced ids every time, with no model involved.
+  acceptance: '`gov closure` over the same commit and depth returns byte-identical output on repeated runs and reports DEPTH_LIMIT_REACHED
+    with the gap list when the depth is hit.'
+  wave: W1
+  wave_note: DEC-080
+  provider:
+  - W1-20
+  sources:
+  - DEC-033 (deterministic worklist closure over referenced IDs)
+  - DEC-036 (synthesis notes with deterministic citation check)
+  - DEC-080
+  scenarios:
+    dev:
+    - RETR-X-03
+    qual:
+    - RETR-X-Q03
+  disposition:
+    class: KEPT
+- id: CAP-58
+  title: Path guards as default-deny allow-lists
+  outcome: An agent can write only inside its task's declared paths; everything else is denied.
+  acceptance: An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard; a Bash form the guard
+    cannot parse is caught by the post-command containment check.
+  wave: W1
+  provider:
+  - W1-02
+  - W1-03
+  sources:
+  - DEC-041 (default-deny allow-lists, derived not enumerated)
+  - DEC-076
+  scenarios:
+    dev:
+    - MR-A-01
+    - CHAOS-A-13
+    - CHAOS-A-14
+    - MR-B-01
+    - CHAOS-B-13
+    - CHAOS-B-14
+    - CHAOS-B-15
+    - A-X-02
+    qual:
+    - MR-A-Q01
+    - SEC-A-Q02
+    - AUDIT-A-Q49
+    - SEC-A-Q06
+    - MR-B-Q02
+    - SOAK-X-Q02
+  disposition:
+    class: KEPT
+- id: CAP-59
+  title: Review-repair loop budget
+  outcome: 'The owner never sees a surface loop: after two review→repair rounds the default is DELETE, NARROW or DEFER.'
+  acceptance: A third review round on the same surface is refused by `gov close` unless an owner ADR authorises it, and the
+    ticket shows the DELETE/NARROW/DEFER proposal.
+  wave: W1
+  provider:
+  - W1-30
+  sources:
+  - DEC-044 (at most two rounds then DELETE/NARROW/DEFER)
+  - OWNER-DIRECTION-P2-0009 §2 (simplification principle)
+  scenarios:
+    dev:
+    - MR-X-03
+    qual:
+    - MR-X-Q03
+  disposition:
+    class: KEPT
+- id: CAP-60
+  title: Below-floor recovery (break-glass)
+  outcome: (none — non-goal)
+  acceptance: No kernel file implements break-glass or DEGRADED-mode recovery; the wave-exit audit finds none (DEC-070).
+  wave: NONE
+  wave_note: dropped
+  provider:
+  - none (non-goal)
+  sources:
+  - OWNER-DECISION-0006
+  - OWNER-DECISION-0007
+  - DEC-039
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: DROP
+    non_goal: 'Non-goal: below-floor recovery, break-glass and DEGRADED mode rest on the signed-release-root chain, which
+      is not built (ADR-0001).'
+    decisions:
+    - DEC-039

@@ -1,0 +1,215 @@
+# Readiness dimensions — the definition Wave 1's OpenSpec feature-readiness schema implements.
+id: READINESS-DIMENSIONS
+version: 1
+status: PROPOSED
+source: Framework v4.1.2 §37 (names verbatim, order kept)
+decisions:
+- DEC-064
+- DEC-065
+- DEC-085
+cell_states:
+- state: PRESENT
+  meaning: settled; cites its evidence (decision id or document section)
+  satisfies: true
+- state: MISSING
+  meaning: no answer yet
+  satisfies: false
+- state: PROVISIONAL
+  meaning: an answer exists but rests on an unaccepted source
+  satisfies: false
+- state: BLOCKED
+  meaning: cannot be answered until a named dependency resolves
+  satisfies: false
+- state: N/A_WITH_REASON
+  meaning: does not apply; the reason is written by an agent and must be non-empty
+  satisfies: true
+  requires:
+  - reason
+rules:
+  silent_na: invalid — a cell may not be empty, and N/A is only N/A_WITH_REASON with a non-empty reason (MR-1)
+  defaulted_na: forbidden — no cell is filled automatically (DEC-085)
+  evidence: every PRESENT cell cites at least one decision id or document section
+  not_required_rows: a row a profile does not require may stay MISSING without blocking closure
+  spine: a spine specification always closes at FULL, whatever the profile of the change that opens it (DEC-085)
+  closed: a specification is closed when every row its profile requires is PRESENT or N/A_WITH_REASON (MR-1)
+  ready_gate: no production ticket is READY while its specification is not closed (MR-2)
+dimensions:
+- n: 1
+  key: intent
+  name: intent/outcome
+  mandatory: true
+- n: 2
+  key: actor
+  name: user/actor
+  mandatory: true
+- n: 3
+  key: journey
+  name: journey/workflow
+  mandatory: false
+- n: 4
+  key: scenarios
+  name: scenarios
+  mandatory: true
+- n: 5
+  key: inputs
+  name: inputs
+  mandatory: true
+- n: 6
+  key: data_model
+  name: data model/schema
+  mandatory: true
+- n: 7
+  key: test_data
+  name: representative test data
+  mandatory: false
+- n: 8
+  key: processing
+  name: processing/algorithm
+  mandatory: false
+- n: 9
+  key: outputs
+  name: expected outputs
+  mandatory: true
+- n: 10
+  key: functional
+  name: functional requirements
+  mandatory: false
+- n: 11
+  key: nfr
+  name: non-functional requirements
+  mandatory: false
+- n: 12
+  key: ux
+  name: UX/interactions where applicable
+  mandatory: false
+- n: 13
+  key: backend
+  name: backend/service behaviour
+  mandatory: false
+- n: 14
+  key: state
+  name: database/state requirements
+  mandatory: false
+- n: 15
+  key: interfaces
+  name: interface/API/event contracts
+  mandatory: false
+- n: 16
+  key: security
+  name: security/privacy
+  mandatory: true
+- n: 17
+  key: integrations
+  name: integrations
+  mandatory: false
+- n: 18
+  key: devops
+  name: DevOps/runtime
+  mandatory: false
+- n: 19
+  key: observability
+  name: observability
+  mandatory: false
+- n: 20
+  key: performance
+  name: performance/capacity
+  mandatory: false
+- n: 21
+  key: cost
+  name: cost constraints
+  mandatory: false
+- n: 22
+  key: recovery
+  name: recovery/fallback
+  mandatory: false
+- n: 23
+  key: success
+  name: measurable success criteria
+  mandatory: true
+- n: 24
+  key: failure
+  name: measurable failure criteria
+  mandatory: true
+- n: 25
+  key: acceptance_tests
+  name: independent acceptance/system tests
+  mandatory: true
+- n: 26
+  key: docs_ops
+  name: documentation/operations needs
+  mandatory: false
+profiles:
+  LITE:
+    radius: R0-R1
+    requires: mandatory
+  STANDARD:
+    radius: R2
+    requires: mandatory + rows marked for each capability type the specification declares (capability_types)
+  FULL:
+    radius: R3+
+    requires: all
+mandatory_rows:
+- 1
+- 2
+- 4
+- 5
+- 6
+- 9
+- 16
+- 23
+- 24
+- 25
+capability_types:
+  source: Framework v4.1.2 §40 taxonomy
+  extra_rows_for_standard:
+    product-outcome:
+    - 3
+    - 10
+    - 26
+    ux:
+    - 3
+    - 12
+    frontend:
+    - 12
+    - 15
+    backend:
+    - 8
+    - 10
+    - 13
+    - 15
+    database-storage:
+    - 14
+    - 22
+    integration-api:
+    - 15
+    - 17
+    devops-infrastructure:
+    - 18
+    - 21
+    - 22
+    security-privacy:
+    - 22
+    testing-quality:
+    - 7
+    data-engineering:
+    - 7
+    - 14
+    ai-ml-model:
+    - 7
+    - 8
+    - 20
+    - 21
+    evaluation:
+    - 7
+    - 20
+    observability-sre:
+    - 19
+    performance-capacity:
+    - 11
+    - 20
+    operations-recovery:
+    - 22
+    - 26
+    scientific-rnd:
+    - 7
+    - 8
