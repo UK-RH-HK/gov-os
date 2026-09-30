@@ -1,0 +1,44 @@
+---
+id: DAEO-7nne
+status: open
+deps: [DAEO-drvn]
+links: []
+created: 2026-09-30T22:49:58Z
+type: task
+priority: 2
+assignee: engineer
+external-ref: W1-15
+tags: [wave-1, implementation, full]
+wbs_id: W1-15
+title: Secret rules and pre-index filter
+class: implementation
+role: engineer
+depends_on:
+- W1-07
+allowed_paths:
+- src/gov/secrets/**
+- template/.gitleaks.toml
+- .gitleaks.toml
+- tests/unit/secrets/**
+kpis:
+  success:
+  - .gitleaks.toml extends the defaults with token and canary rules; ARGUS_TOKEN_CANARY_4WM8 is detected
+  - Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store
+  failure:
+  - Any planted secret appears in a derived store, packet or bundle
+  - The filter relies on a hard-coded path list
+profile: FULL
+sources:
+- G-12
+- G-18
+- DEC-074 Q8
+- CAP-03
+est_loc: 60
+acceptance_tests:
+  path: tests/acceptance/W1-15/
+  author: independent-test-designer (MR-3, DEC-069); to be written before implementation
+---
+# W1-15 Secret rules and pre-index filter
+
+Content-based secret exclusion before every indexer (W1 gate).
+
