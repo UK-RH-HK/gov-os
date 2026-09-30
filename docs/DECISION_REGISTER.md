@@ -733,3 +733,75 @@ gov rebuild       # derived state
 | 0.3 | 2026-09-28 | DEC-048 (bundle-only archive, delete working copy; supersedes DEC-038), DEC-049 (originals out of repo; amends DEC-045), DEC-050 (workstation hygiene, WSL compaction). |
 | 0.2 | 2026-09-28 | Added §4A (DEC-038…DEC-047) from the Rust repository review: archive-not-delete, threat model, no executed installs, default-deny path guards, evidence classes, products-first, loop budget, originals preserved, carried assets, new control panel. DEC-025 path guard clarified as allow-list. Date corrected. |
 | 0.1 | 2026-09-26 (date recorded in error; actual 2026-09-28) | Initial register from design session: strategy, tool selection, RAGFlow deep evaluation, retrieval-completeness guidance, Solo Core profile, amendments. `bd` → `br` change recorded in DEC-013. |
+
+---
+
+## 13. S1 decisions (register v0.13, appended by S1 on branch `s1/spec`)
+
+Entries above this line are register v0.12, copied verbatim. The entries below record the owner's answers to S1's
+decision packages (round 1, asked 2026-09-30). They are the only changes to this file in S1.
+
+### DEC-083 — PROPOSED decisions ratified for Charter v5 and Contract v4; DEC-040 amended (tool installs)
+- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P1-A option (a) with one amendment
+- **Accepted as written:** DEC-003, DEC-004, DEC-005 (readiness part as settled by DEC-085), DEC-006, DEC-010, DEC-011,
+  DEC-012, DEC-014, DEC-015 (native LSP; Serena not adopted), DEC-022, DEC-023, DEC-025, DEC-026 (as settled by DEC-086),
+  DEC-027, DEC-041, DEC-044, DEC-046, DEC-050, DEC-062.
+- **Accepted as realised by later decisions:** DEC-007 as amended by DEC-075; DEC-016 and DEC-017 as realised by DEC-074
+  R1; DEC-024 as amended by DEC-074 Q5; DEC-031…DEC-037 as realised by DEC-080 (DEC-035's numbers stay placeholders tuned
+  from telemetry); DEC-042 amended: MR-3 test independence applies to every task, and the fresh independent-verifier
+  review remains FULL-profile only.
+- **Superseded:** DEC-002 (by DEC-058, DEC-064); DEC-043 (by DEC-064); DEC-045 (by DEC-058); DEC-047 (by DEC-058).
+- **Deferred:** DEC-018 (local gpt-oss T1 model) to Wave 3 model routing.
+- **DEC-001 and OQ-05:** "assemble first" stands; a Rust kernel replacing the `gov` internals is a non-goal for Release 1.
+- **Closed:** OQ-02 (host is WSL2 Linux x86_64); OQ-03 (no second model-family subscription: Balanced stack, DEC-074 Q1);
+  OQ-06 (Contract v4 replaces amendments to Contract v3; AMD-01…AMD-08 are carried as Contract v4 clauses).
+- **DEC-040 amended (tool installs):** Installing a tool is the orchestrator's job when a task needs it, and never
+  automatic. The orchestrator presents a decision package — tool, exact version, source and checksum, why it is needed,
+  disk and RAM, uninstall command — and installs only after the owner's explicit approval in chat. Every install is
+  recorded in the tool registry (version, sha256, install and uninstall commands, date, approving decision), and
+  `gov doctor` checks the pins. Install commands are an `ask` permission for the orchestrator role only and are denied
+  for every other role; `sudo` stays with the owner. No automated install classification or authority envelope is
+  reintroduced (ADR-0001). This updates the CAP-25 LITE form (DEC-074 Q11).
+- **Wave 1 KPI added:** the install approval prompt appears even when the harness runs in Auto mode.
+
+### DEC-084 — MR-3 on the Gov OS's own Wave 1: bootstrap, then dogfood
+- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P1-B option (a)
+- **Decision:** The PreToolUse guard (G-01) and the post-command containment check (G-02) are the first implementation
+  tickets on Wave 1's critical path. Until both pass their own acceptance tests, every implementer session runs with a
+  harness settings deny rule on `tests/acceptance/**`, and the operator checks `git diff --name-only` against the
+  ticket's `allowed_paths` at every ticket close. From then on every later Wave 1 ticket runs under the real guard and
+  containment check. The Independent Test Designer is a fresh session per ticket batch that reads only Contract v4 and
+  the tickets' KPIs and writes only `tests/acceptance/<ticket-id>/`.
+
+### DEC-085 — Readiness: profile → required cells; no defaulted N/A; spines close at FULL
+- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P1-C option (a) with one addition ·
+  **Amends:** DEC-005 (readiness reduction)
+- **Decision:** The mandatory set is ten rows of Framework §37: 1 intent/outcome, 2 user/actor, 4 scenarios, 5 inputs,
+  6 data model/schema, 9 expected outputs, 16 security/privacy, 23 success criteria, 24 failure criteria, 25 independent
+  acceptance tests. LITE requires the mandatory set. STANDARD requires the mandatory set plus the rows a fixed
+  capability-type table in `readiness-dimensions.yaml` marks. FULL requires all 26. A row a profile does not require may
+  stay MISSING without blocking. There is no defaulted N/A: every N/A is written by an agent as N/A_WITH_REASON, and the
+  checker rejects an empty reason.
+- **Addition:** a spine specification always closes at the FULL profile, whatever the profile of the change that
+  opens it.
+
+### DEC-086 — Governance share: definition and Wave 1 measurement
+- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P2-D option (a) · **Settles:** DEC-004
+  measurement, DEC-026 for Wave 1
+- **Decision:** Governance tokens are the tokens of text the Gov OS injects or returns: instruction files, the
+  SessionStart packet, hook output, `gov` output, governance MCP tool definitions, and checkpoint and close records,
+  counted deterministically per ticket by the `gov` CLI. The denominator is the ticket's fresh input plus output tokens,
+  read from the harness's local session logs by ccusage. Cache reads are reported separately and are not in the share.
+- **ccusage** is installed and pinned by the orchestrator under DEC-083's install rule and is a Wave 1 prerequisite.
+
+### DEC-087 — CI scope on the hosted runner
+- **Status:** ACCEPTED (owner, 2026-09-30) · **Basis:** OWNER, on S1 package P2-E option (a) · **Refines:** DEC-075
+- **Decision:** GitHub Actions (G4–G5, advisory) runs the deterministic checks only: schemas, `gov check` G0–G2,
+  readiness, the decision checker, the ticket DAG, `openspec validate --strict`, gitleaks, rulesync drift, and tests that
+  need no local models (lexical fallback; codebase-memory is a static binary). Tests that need local models run in the
+  pre-push gate (G3) and produce an evidence record bound to the head commit; CI checks that it exists and matches the
+  head commit. The carrier of that record (for example a git note or a commit) is left to the CI ticket's design.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.13 | 2026-09-30 | S1 round 1: DEC-083 (ratification; DEC-040 amended), DEC-084 (MR-3 bootstrap), DEC-085 (readiness profiles; spines at FULL), DEC-086 (governance share), DEC-087 (CI scope). |
