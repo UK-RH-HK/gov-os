@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 import w1_01_support as support
@@ -47,6 +49,39 @@ def test_only_the_test_designer_commits_to_acceptance_tests(repo_root, deny_rule
     assert not offenders, (
         "commits touch tests/acceptance/** without the trailer "
         f"`Role: {support.TEST_DESIGNER_ROLE}`: {', '.join(offenders)}"
+    )
+
+
+def test_implementer_commits_stay_inside_allowed_paths(bootstrap_text, repo_root):
+    """KPI success 2 (KD-1): the diff procedure is "used" — git history is the record.
+
+    Until W1-05 lands, a commit that names a ticket in a ``Task:`` trailer, and is
+    not a test-designer commit, touches only that ticket's ``allowed_paths`` and
+    the ticket's own file in ``.tickets/``.
+    """
+    offenders = []
+    for sha, message in support.interim_commits(repo_root):
+        tasks = support.trailer_values(message, "Task")
+        if not tasks or support.TEST_DESIGNER_ROLE in support.trailer_values(message, "Role"):
+            continue
+        allowed, unknown = [], []
+        for task in tasks:
+            found = support.ticket_file(task, repo_root)
+            if found:
+                allowed.append(found[0])
+                allowed.extend(found[1].get("allowed_paths", []))
+            elif re.fullmatch(r"W1-\d+", task):
+                unknown.append(task)
+        if unknown:
+            offenders.append(f"{sha[:12]}: Task {', '.join(unknown)} names no ticket")
+        if not allowed:
+            continue
+        outside = [p for p in support.changed_paths(sha, repo_root)
+                   if not support.path_in_globs(p, allowed)]
+        if outside:
+            offenders.append(f"{sha[:12]} (Task {', '.join(tasks)}): {', '.join(outside)}")
+    assert not offenders, "commits touch paths outside their ticket's allowed_paths:\n" + "\n".join(
+        offenders
     )
 
 

@@ -216,6 +216,29 @@ def commits_touching(path, root=REPO_ROOT):
     return git("rev-list", "--full-history", "HEAD", "--", path, root=root).split()
 
 
+def changed_paths(sha, root=REPO_ROOT):
+    """Repository-relative paths a commit adds, changes or deletes."""
+    out = git(
+        "-c", "core.quotePath=false",
+        "diff-tree", "--no-commit-id", "--name-only", "-r", "--root", sha,
+        root=root,
+    )
+    return [line for line in out.splitlines() if line]
+
+
+def path_in_globs(relpath, globs):
+    """True when ``relpath`` matches one of a ticket's ``allowed_paths`` globs."""
+    for glob in globs:
+        glob = glob.strip().strip("'\"")
+        if glob.startswith("./"):
+            glob = glob[2:]
+        if glob.endswith("/"):
+            glob += "**"
+        if re.fullmatch(_glob_regex(glob.lstrip("/")), relpath):
+            return True
+    return False
+
+
 # --------------------------------------------------------------------------
 # Ticket frontmatter
 # --------------------------------------------------------------------------
@@ -244,16 +267,63 @@ def _frontmatter(path):
     return fields
 
 
-def ticket(wbs_id, root=REPO_ROOT):
-    """Frontmatter of the ticket whose ``wbs_id`` is ``wbs_id``, or None."""
+def ticket_file(ref, root=REPO_ROOT):
+    """(repository-relative path, frontmatter) of the ticket named by a W1 id or ticket id."""
     for path in sorted((Path(root) / ".tickets").glob("*.md")):
         fields = _frontmatter(path)
-        if fields.get("wbs_id") == wbs_id:
-            return fields
+        if ref in (fields.get("wbs_id"), fields.get("id")):
+            return path.relative_to(root).as_posix(), fields
     return None
+
+
+def ticket(wbs_id, root=REPO_ROOT):
+    """Frontmatter of the ticket whose ``wbs_id`` is ``wbs_id``, or None."""
+    found = ticket_file(wbs_id, root)
+    return found[1] if found else None
 
 
 def w1_05_has_landed(root=REPO_ROOT):
     """W1-05 (dogfood switch-over) retires the interim guardrails when it closes."""
     fields = ticket("W1-05", root)
     return bool(fields) and fields.get("status") == "closed"
+
+
+def w1_05_landing_commit(root=REPO_ROOT):
+    """The first commit in which the W1-05 ticket is closed, or None."""
+    found = ticket_file("W1-05", root)
+    if not found:
+        return None
+    relpath = found[0]
+    for sha in git("log", "--reverse", "--format=%H", "--", relpath, root=root).split():
+        proc = subprocess.run(
+            ["git", "-C", str(root), "show", f"{sha}:{relpath}"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if proc.returncode == 0 and re.search(r"(?m)^status:\s*closed\s*$", proc.stdout):
+            return sha
+    return None
+
+
+def trailer_values(message, key):
+    """Values of the ``<key>:`` trailer lines of a commit message."""
+    return [
+        m.group(1).strip()
+        for m in re.finditer(rf"(?mi)^{re.escape(key)}:[ \t]*(.+)$", message)
+    ]
+
+
+def interim_commits(root=REPO_ROOT):
+    """(sha, message) of each commit on HEAD's history up to the one that lands W1-05.
+
+    While W1-05 is open that is every commit reachable from HEAD.
+    """
+    tip = w1_05_landing_commit(root) or "HEAD"
+    out = git("log", "--format=%H%x1f%B%x1e", tip, root=root)
+    commits = []
+    for record in out.split("\x1e"):
+        if "\x1f" in record:
+            sha, message = record.strip("\n").split("\x1f", 1)
+            commits.append((sha, message))
+    return commits

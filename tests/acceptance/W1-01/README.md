@@ -14,13 +14,13 @@ Standard library and `pytest` only. No network, no dev tiers, no `local_only` te
 
 ## KPI → tests → red reason today
 
-Red run on `w1/integrate` at `8f458d8`: 42 failed, 2 errors, 0 passed (44 cases, 11 test functions).
+Red run on `w1/integrate` at `b4d7ede`: 49 failed, 10 errors, 0 passed (59 cases, 16 test functions).
 
 | KPI line | Test function(s) | Expected red reason today |
 |---|---|---|
-| **Success 1.** Implementer sessions deny Edit/Write on `tests/acceptance/**` and on `.env*`, `*.pem`, `*.key`, `config/secrets*` (one denied attempt each) | `test_implementer_write_to_acceptance_tests_is_denied` · `test_acceptance_test_deny_covers_every_depth` · `test_write_to_secret_file_is_denied` · `test_guardrails_leave_ordinary_implementer_work_alone` · `test_interim_rule_stays_in_force_once_introduced[acceptance-tests]` | `.claude/settings.json` holds only the two `docs/source` rules, so every attempt is "not denied" |
-| **Success 2.** The operator diff procedure (`git diff --name-only` vs `allowed_paths` at each ticket close) is written and used from the first implementation ticket | `test_operator_diff_procedure_is_written` — covers "written". "Used" has no test: KPI dispute KD-1 | Error in the fixture: `governance/project/bootstrap.md` does not exist |
-| **Success 3.** Interim install rule recorded and in force until W1-05; install commands denied in every session settings file | `test_install_command_is_denied` · `test_interim_install_rule_is_recorded` · `test_interim_rule_stays_in_force_once_introduced[installs]` | No `Bash(...)` deny rule exists; `bootstrap.md` does not exist |
+| **Success 1.** Implementer sessions deny Edit/Write on `tests/acceptance/**` and on `.env*`, `*.pem`, `*.key`, `config/secrets*` (one denied attempt each) | `test_implementer_write_to_acceptance_tests_is_denied` · `test_acceptance_test_deny_covers_every_depth` · `test_write_to_secret_file_is_denied` · `test_guardrails_leave_ordinary_implementer_work_alone` · `test_interim_rule_stays_in_force_once_introduced[acceptance-tests]` · `test_a_denied_attempt_is_recorded_for_each_path_class` (KD-4) | `.claude/settings.json` holds only the two `docs/source` rules, so every attempt is "not denied"; `bootstrap.md` does not exist, so no attempt is on record |
+| **Success 2.** The operator diff procedure (`git diff --name-only` vs `allowed_paths` at each ticket close) is written and used from the first implementation ticket | `test_operator_diff_procedure_is_written` ("written") · `test_implementer_commits_stay_inside_allowed_paths` ("used", KD-1) | Error in the fixture: `governance/project/bootstrap.md` does not exist |
+| **Success 3.** Interim install rule recorded and in force until W1-05; install commands denied in every session settings file | `test_install_command_is_denied` · `test_pipe_to_shell_and_sudo_are_denied` (KD-3) · `test_interim_install_rule_is_recorded` · `test_install_rule_lists_every_agent_session_settings_file` (KD-2) · `test_a_denied_install_attempt_is_recorded` (KD-4) · `test_interim_rule_stays_in_force_once_introduced[installs]` | No `Bash(...)` deny rule exists; `bootstrap.md` does not exist |
 | **Failure 1.** Any implementer commit touching `tests/acceptance/**` before W1-05 lands | `test_only_the_test_designer_commits_to_acceptance_tests` | The guardrail is not in force: Edit on `tests/acceptance/**` is not denied |
 | **Failure 2.** An existing `docs/source` deny rule is lost | `test_docs_source_deny_rules_survive_the_change` | W1-01's rules are not in place: Edit on `.env` is not denied |
 | **Failure 3.** Any install runs before W1-05 | `test_no_install_is_recorded_before_w1_05` | The interim install rule is not in force: `pip install` is not denied |
@@ -48,7 +48,9 @@ every reading:
   and in a subdirectory. `config/secrets*` is attempted at the root only.
 - **Install commands** are the package-manager installs of the pinned stack (ADR-0002 §2): `pip`, `pip3`,
   `python -m pip`, `python3 -m pip`, `uv pip`, `uv tool`, `npm install` (bare, with a package, global, and after `cd`),
-  `cargo install`, `apt` and `apt-get`. `curl | sh`, binary downloads, `sudo` and aliases are in KD-3.
+  `cargo install`, `apt` and `apt-get`. By KD-3 the rule also denies `curl` or `wget` piped to `sh` or `bash`, and
+  `sudo`. Plain `curl` and `wget` may be denied or allowed. Shell aliases and functions are W1-03's and are not
+  attempted here.
 - **Not over-blocking.** With the rules in place, an Edit under `src/gov/guard/`, a Write under `tests/unit/guard/`,
   `python3 -m pytest tests/unit/guard -q` and `git diff --name-only` must stay allowed.
 - **`docs/source`** is checked by behaviour: Read and Edit under `docs/source/**` stay denied. The rule text may change.
@@ -57,19 +59,42 @@ every reading:
 - **Failure 3** checks what the repository can show: the deny rule is in force, W1-06 still depends on W1-05 and is
   `open`, and `governance/project/tool-registry.yaml` does not exist. An install that leaves no record in the
   repository is beyond a deterministic test.
-- **Gates.** The three failure-KPI tests and the over-blocking test first assert that W1-01's rules are in place. A
-  check that only says "nothing bad has happened yet" would pass before implementation.
+- **Gates.** The three failure-KPI tests and the over-blocking test first assert that W1-01's rules are in place, and
+  the commit-history test for KD-1 first needs `bootstrap.md`. A check that only says "nothing bad has happened yet"
+  would pass before implementation.
 - **After W1-05.** The checks on `tests/acceptance/**` and on installs are interim (DEC-084). They skip once the ticket
-  with `wbs_id: W1-05` has `status: closed`. The secret-file, `docs/source` and commit-history checks keep running.
+  with `wbs_id: W1-05` has `status: closed`. The secret-file, `docs/source`, record and commit-history checks keep
+  running.
 
-## Open KPI disputes
+## What `bootstrap.md` must hold
 
-Sent to the owner as decision packages (`~/gov-os-workbench/w1-tests/decision-packages/W1-01-kpi-disputes.md`). The
-tests for these clauses are left out until they are answered.
+The tests read the record by section (a heading and the text under it) and by line. They prescribe no other layout.
 
-| Id | KPI | Question |
-|---|---|---|
-| KD-1 | Success 2 | Which record shows the diff procedure was "used from the first implementation ticket"? |
-| KD-2 | Success 3 | Does "every session settings file" include the session settings outside the repository? |
-| KD-3 | Success 3 | Does the interim rule also cover `curl \| sh`, binary downloads, `sudo` and install aliases? |
-| KD-4 | Success 1 | Is a recorded live denied attempt required, and where is it recorded? |
+- **Diff procedure:** one section with `git diff --name-only`, `allowed_paths` and ticket close.
+- **Install rule:** one section that says install commands are denied until W1-05.
+- **Session list (KD-2):** a section that says installs are denied and names every agent session folder — `w1-build`,
+  `w1-tests`, `s1`, `s1a` — and the repository's own `.claude/settings.json`. The operator console acts as the owner
+  and is not listed.
+- **Denied attempts (KD-4):** one line per class, each holding an ISO date, the tool, the concrete path or command
+  attempted, and the denial ("denied", "deny", "denial"). A table row is one line.
+  - Five path classes with `Edit` or `Write`: a path under `tests/acceptance/`, a `.env*` file, a `*.pem` file, a
+    `*.key` file, a `config/secrets*` file. The pattern itself (`*.pem`) does not count as a path.
+  - One install command with `Bash`: a package-manager install such as `pip install requests`.
+
+## Commit history as the record of the diff check (KD-1)
+
+`test_implementer_commits_stay_inside_allowed_paths` reads every commit on HEAD's history up to the commit that closes
+W1-05. A commit with a `Task:` trailer naming a ticket (`W1-02` or `DAEO-emkd`), and without
+`Role: independent-test-designer`, may touch only that ticket's `allowed_paths` and the ticket's own file in
+`.tickets/`. A `Task: W1-nn` that names no ticket fails. A commit without a `Task:` trailer is not checked.
+
+## Owner answers to the KPI disputes (2026-10-01)
+
+| Id | KPI | Answer | Test |
+|---|---|---|---|
+| KD-1 | Success 2 | "Used" is shown by git history through `Task:` trailers | `test_implementer_commits_stay_inside_allowed_paths` |
+| KD-2 | Success 3 | The record lists every agent session folder and the repository's settings; not the operator console | `test_install_rule_lists_every_agent_session_settings_file` |
+| KD-3 | Success 3 | Deny `curl`/`wget` piped to a shell, `sudo` and package managers until W1-05; aliases and functions are W1-03's | `test_pipe_to_shell_and_sudo_are_denied` |
+| KD-4 | Success 1 | One recorded denied attempt per class in `bootstrap.md` | `test_a_denied_attempt_is_recorded_for_each_path_class` · `test_a_denied_install_attempt_is_recorded` |
+
+No dispute is open.
