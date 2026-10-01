@@ -5,7 +5,7 @@ deps: [DAEO-topz, DAEO-wk2v, DAEO-rrxp]
 links: []
 created: 2026-09-30T22:49:59Z
 type: task
-priority: 1
+priority: 2
 assignee: engineer
 external-ref: W1-29
 tags: [wave-1, implementation, standard]

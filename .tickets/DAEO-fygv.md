@@ -20,6 +20,7 @@ depends_on:
 allowed_paths:
 - src/gov/check/**
 - tests/unit/check/**
+- template/governance/kernel/checks/core-*
 kpis:
   success:
   - Runs schema, id grammar, orphans, path map, adapter drift, openspec validate --strict, decision checker, readiness, ticket DAG acyclicity and field completeness, and the rule that no implementer allowed_paths
@@ -30,8 +31,9 @@ kpis:
   - Fails a skill file whose content changed without a version change and a linked decision [CAP-24.c]
   - The check registry names all 17 governance test families of Contract v3 O2 (schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map
     compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product
-    traceability, audit reproducibility), and each has at least one executable Wave 1 check; skill regression validates every skill file (frontmatter, version, size, referenced commands exist), and audit
-    reproducibility resolves an audit report's cited commit, rows and evidence paths [CAP-38.b]
+    traceability, audit reproducibility) and runs every check declared for them; this ticket registers the checks whose subjects it depends on (schema/invariants, graph integrity, authority/role limits,
+    mutation scope, path-map compliance, concurrency/claims, command-contract consistency) and provides the generic validators for skill files and audit reports; each other family's check is registered
+    by the ticket that builds its subject; a family with no registered check is reported by name, never silently absent [CAP-38.b]
   - 'Fails a record that changes authority class without a decision: a research or lesson record cited as a decision or policy, or a superseded record used to satisfy a current requirement [CAP-01.c]'
   failure:
   - A planted defect of any listed family passes
@@ -50,7 +52,7 @@ sources:
 - CAP-30
 - CAP-39
 - CAP-58
-est_loc: 310
+est_loc: 290
 acceptance_tests:
   path: tests/acceptance/W1-26/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

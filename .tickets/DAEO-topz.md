@@ -1,7 +1,7 @@
 ---
 id: DAEO-topz
 status: open
-deps: [DAEO-drvn, DAEO-uudf]
+deps: [DAEO-drvn, DAEO-uudf, DAEO-4yyl]
 links: []
 created: 2026-09-30T22:49:58Z
 type: task
@@ -16,6 +16,7 @@ role: engineer
 depends_on:
 - W1-07
 - W1-08
+- W1-10
 allowed_paths:
 - template/governance/kernel/bin/tk
 - src/gov/tasks/**

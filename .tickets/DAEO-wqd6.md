@@ -1,7 +1,7 @@
 ---
 id: DAEO-wqd6
 status: open
-deps: [DAEO-uudf]
+deps: [DAEO-uudf, DAEO-5x4l]
 links: []
 created: 2026-10-01T00:47:37Z
 type: task
@@ -15,6 +15,7 @@ class: documentation
 role: product-spec
 depends_on:
 - W1-08
+- W1-21
 allowed_paths:
 - docs/lessons/**
 kpis:
@@ -22,7 +23,7 @@ kpis:
   - 'docs/lessons/ holds scoped, schema-valid lesson records for L-0074 (enumerated universal negatives fail silently), the anti-stall rule (OWNER-DECISION-P2-0008 §9: every wait bounded), no manufactured
     history (OWNER-DIRECTION-BR-0004 §2D: reconstructions labelled), the anti-snowball rule (OWNER-AMENDMENT-P2-0010 §7: finding -> whole-system context -> one disposition before code) and the Phase-2 root
     causes (DEC-046) [CAP-41.d]'
-  - gov retrieve returns each lesson for a ticket in its scope (checked once W1-21 lands)
+  - gov retrieve returns each lesson for a ticket in its scope
   - The anti-snowball lesson states the one-disposition rule that gov close applies [CAP-59.c]
   failure:
   - A lesson lacks a scope or a source reference

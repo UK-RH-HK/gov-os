@@ -273,7 +273,7 @@ Distribution Protocol v1.2,10. `gov adopt`,OK,"Contract v4 CAP-44 (KEPT, wave W3
 Distribution Protocol v1.2,Stage A0 — Safety baseline,OK,Contract v4 CAP-44 covers A0 (W1-41 KPI: clean tree and backup ref) + CAP-05
 Distribution Protocol v1.2,Stage A1 — Cold inventory,OK,"Contract v4 CAP-06, CAP-44 (W1-41 inventory)"
 Distribution Protocol v1.2,Stage A2 — Classification,OK,Contract v4 CAP-06 (W1-41 classification)
-Distribution Protocol v1.2,Stage A3 — Target path map,OK,"Contract v4 CAP-06 (path map, W1-08, W1-41)"
+Distribution Protocol v1.2,Stage A3 — Target path map,OK,"Contract v4 CAP-06 (path map, W1-08, W1-41) + CAP-44.j: healthy native layouts are kept unless the target is materially better (W1-41)"
 Distribution Protocol v1.2,Stage A4 — Migration plan,OK,Contract v4 CAP-44 covers A4 (W1-41 KPI: batched plan with a rollback point per batch)
 Distribution Protocol v1.2,Stage A5 — Independent migration review and test authoring,OK,Contract v4 CAP-44 covers A5: independent path-map review before any move by the W1 Independent Auditor (W1-41; DEC-090)
 Distribution Protocol v1.2,Stage A6 — Controlled migration,OK,Contract v4 CAP-44 covers A6 (W1-41: batched git mv; failed batch rolls back)

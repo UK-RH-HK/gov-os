@@ -1,7 +1,7 @@
 ---
 id: DAEO-be7u
 status: open
-deps: [DAEO-uudf, DAEO-4yyl]
+deps: [DAEO-uudf, DAEO-4yyl, DAEO-egm9]
 links: []
 created: 2026-09-30T22:49:58Z
 type: task
@@ -16,6 +16,7 @@ role: engineer
 depends_on:
 - W1-08
 - W1-10
+- W1-34
 allowed_paths:
 - src/gov/decisions/**
 - template/governance/kernel/schemas/madr*

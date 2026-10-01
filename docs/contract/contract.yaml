@@ -280,7 +280,7 @@ capabilities:
       rotation, offline envelopes or bootstrap separation.
   covers:
   - id: CAP-02.a
-    item: SSH-signed release tag; file-hash manifest in framework.lock; gov doctor MATCH/DRIFT
+    item: File-hash manifest in framework.lock; gov doctor MATCH/DRIFT
     source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D
     wave: W1
     provider:
@@ -291,6 +291,10 @@ capabilities:
       trust anchors'
     source: DEC-027, DEC-039, OWNER-DECISION-P2-0002
     wave: NONE
+  - id: CAP-02.c
+    item: SSH-signed release tag, verified by `git tag -v`
+    source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027
+    wave: W3
 - id: CAP-03
   title: Security and sensitivity classification
   outcome: 'An agent can rely on secrets never reaching an index, a packet or an export: a content-based filter runs before
@@ -1508,6 +1512,7 @@ capabilities:
   - Claude Code (harness)
   - W1-07
   - W1-32
+  - W1-42
   sources:
   - Contract v3 Gate G1, G2
   - Framework v4.1.2 §33, §34
@@ -1532,6 +1537,7 @@ capabilities:
     wave: W1
     provider:
     - W1-07
+    - W1-42
 - id: CAP-29
   title: Specification lineage (idea to live evidence)
   outcome: An agent can follow a feature from idea through scenarios, requirements, decisions, tasks and tests to live evidence.
@@ -2045,6 +2051,16 @@ capabilities:
   - W1-30
   - W1-37
   - W1-02
+  - W1-15
+  - W1-17
+  - W1-21
+  - W1-24
+  - W1-25
+  - W1-27
+  - W1-35
+  - W1-36
+  - W1-38
+  - W1-42
   sources:
   - Contract v3 Gate O1, O2, O3, O4
   - Framework v4.1.2 §62-64
@@ -2085,6 +2101,17 @@ capabilities:
     wave: W1
     provider:
     - W1-26
+    - W1-15
+    - W1-17
+    - W1-21
+    - W1-24
+    - W1-25
+    - W1-27
+    - W1-30
+    - W1-35
+    - W1-36
+    - W1-38
+    - W1-42
   - id: CAP-38.c
     item: Independent test authorship; builder tests are regression evidence only
     source: Contract v3 O3; DEC-042

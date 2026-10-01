@@ -15,7 +15,8 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 a
 - **Installs:** no tool is installed before W1-05. Until then the interim rule of W1-01 holds: install commands are denied in every session's settings. From W1-05, the DEC-083 rule is enforced by W1-04: `ask` for the orchestrator, also in Auto mode, and `deny` for every other role. W1-06, the first install, depends on W1-05.
 - **Paths:** no implementer ticket's `allowed_paths` covers `tests/acceptance/**`.
 - **Gap tickets:** every required open readiness row has a linked gap ticket (DEC-089).
-- **Covers items:** every Wave 1 `covers` item of Contract v4 is named by a KPI line of the ticket that delivers it. The line ends with the item id in brackets, for example `[CAP-03.b]`, and the contract item names that ticket as its `provider`. `validate_s1.py` checks this both ways.
+- **Covers items:** every Wave 1 `covers` item of Contract v4 is named by a KPI line of the ticket that delivers it. The line ends with the item id in brackets, for example `[CAP-03.b]`, and the contract item names that ticket as its `provider`. `docs/plan/tools/validate_s1.py` checks this both ways.
+- **Dependencies carry the KPIs:** a ticket depends on every ticket whose output its KPIs need. Each governance test family's check is registered by the ticket that builds its subject, and W1-42 asserts that 17 of 17 families have an executable check.
 - **Audits:** closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor (DEC-088).
 - **Loop policy** (DEC-096, amending DEC-044). Every review→repair, audit→repair, test→fix or verification loop runs until it converges, or until three consecutive iterations fail to converge. The third failure goes to the owner as an escalation package. The orchestrator or `gov` holds the count and never discloses it to the sessions inside the loop.
 
@@ -29,44 +30,44 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 a
 | W1-04 | `DAEO-78bn` | Install-approval rule | implementation | engineer | FULL | W1-02 | 60 | DEC-083, DEC-040, CAP-25 |
 | **W1-05** | `DAEO-m7u4` | Dogfood switch-over | config | orchestrator | LITE | W1-02, W1-03, W1-04 | 20 | DEC-084, MR-3 |
 | W1-06 | `DAEO-ipqy` | Wave 1 tool prerequisites | ops | orchestrator | STANDARD | W1-05 | 60 | DEC-083, DEC-086, DEC-074, CAP-25, CAP-40 |
-| **W1-07** | `DAEO-drvn` | gov CLI skeleton | implementation | engineer | STANDARD | W1-05 | 200 | S0a-G-01, API-0002, DEC-046, CAP-27, CAP-28 |
+| **W1-07** | `DAEO-drvn` | gov CLI skeleton | implementation | engineer | STANDARD | W1-05 | 220 | S0a-G-01, API-0002, DEC-046, CAP-27, CAP-28 |
 | W1-08 | `DAEO-uudf` | Record schemas and templates | schema | product-spec | STANDARD | W1-05 | 200 | DEC-012, G-04, CAP-06, CAP-08, CAP-14, CAP-41, CAP-03, CAP-07, CAP-29, CAP-31, CAP-50, CAP-53, CAP-54 |
-| W1-09 | `DAEO-topz` | Ticket vendoring, claims and READY rule | implementation | engineer | FULL | W1-07, W1-08 | 100 | G-03, DEC-074, DEC-069, CAP-23, CAP-31, CAP-53, MR-2, MR-3, CAP-34 |
+| W1-09 | `DAEO-topz` | Ticket vendoring, claims and READY rule | implementation | engineer | FULL | W1-07, W1-08, W1-10 | 100 | G-03, DEC-074, DEC-069, CAP-23, CAP-31, CAP-53, MR-2, MR-3, CAP-34 |
 | **W1-10** | `DAEO-4yyl` | Store and record graph | implementation | engineer | STANDARD | W1-07, W1-08 | 260 | S0a-G-03, G-20, DEC-012, CAP-01, CAP-08, CAP-09, CAP-13, CAP-29, CAP-50 |
-| W1-11 | `DAEO-be7u` | Decision checker and owner-approval facts | implementation | engineer | FULL | W1-08, W1-10 | 310 | G-04, DEC-074 D2, DEC-046, CAP-21, CAP-51, CAP-01, CAP-34 |
+| W1-11 | `DAEO-be7u` | Decision checker and owner-approval facts | implementation | engineer | FULL | W1-08, W1-10, W1-34 | 310 | G-04, DEC-074 D2, DEC-046, CAP-21, CAP-51, CAP-01, CAP-34 |
 | W1-12 | `DAEO-lc4q` | Readiness schema and proposal templates | schema | product-spec | STANDARD | W1-08 | 110 | G-07, G-09, DEC-085, CAP-30, MR-1 |
 | W1-13 | `DAEO-w616` | gov readiness | implementation | engineer | FULL | W1-09, W1-12 | 170 | G-08, DEC-085, DEC-088, DEC-089, CAP-30, MR-1, MR-2, MR-4, CAP-47, CAP-53 |
 | W1-14 | `DAEO-w9l3` | Proposal-to-ticket bridge | implementation | engineer | STANDARD | W1-09, W1-12 | 120 | G-05, CAP-31, MR-2 |
-| W1-15 | `DAEO-7nne` | Secret rules and pre-index filter | implementation | engineer | FULL | W1-07 | 70 | G-12, G-18, DEC-074 Q8, CAP-03 |
+| W1-15 | `DAEO-7nne` | Secret rules and pre-index filter | implementation | engineer | FULL | W1-07, W1-08 | 70 | G-12, G-18, DEC-074 Q8, CAP-03, CAP-38 |
 | W1-16 | `DAEO-lkeb` | codebase-memory wrapper | implementation | engineer | FULL | W1-15 | 50 | G-06, DEC-074 Q10, DEC-076, CAP-12, CAP-03 |
-| **W1-17** | `DAEO-rxln` | Lexical index and shared store | implementation | engineer | STANDARD | W1-10, W1-15 | 240 | G-17, G-20, G-21, DEC-091, CAP-07, CAP-11, CAP-17, CAP-18, CAP-03 |
+| **W1-17** | `DAEO-rxln` | Lexical index and shared store | implementation | engineer | STANDARD | W1-10, W1-15 | 240 | G-17, G-20, G-21, DEC-091, CAP-07, CAP-11, CAP-17, CAP-18, CAP-03, CAP-38 |
 | W1-18 | `DAEO-1ve2` | Ollama on-demand lifecycle and fallback | implementation | engineer | STANDARD | W1-07 | 40 | G-22, DEC-074 Q4 |
 | **W1-19** | `DAEO-t6hf` | Semantic retrieval, RRF and rerank | implementation | engineer | STANDARD | W1-17, W1-18 | 280 | G-17, DEC-074 R1, DEC-080, CAP-10, CAP-18 |
 | W1-20 | `DAEO-jozo` | gov closure | implementation | engineer | STANDARD | W1-10, W1-16 | 100 | DEC-080, DEC-033, S0a-G-03, CAP-09, CAP-57 |
-| **W1-21** | `DAEO-5x4l` | gov retrieve with completeness | implementation | engineer | FULL | W1-19, W1-20 | 300 | DEC-080, DEC-091, G-19, S0a-G-06, CAP-14, CAP-16, CAP-18, CAP-41, CAP-55, CAP-04, CAP-51 |
+| **W1-21** | `DAEO-5x4l` | gov retrieve with completeness | implementation | engineer | FULL | W1-19, W1-20 | 300 | DEC-080, DEC-091, G-19, S0a-G-06, CAP-14, CAP-16, CAP-18, CAP-41, CAP-55, CAP-04, CAP-38, CAP-51 |
 | W1-22 | `DAEO-8nue` | Evidence validator and zero-result canaries | implementation | engineer | FULL | W1-21 | 120 | DEC-080, DEC-036, DEC-037, CAP-17, CAP-55, CAP-57 |
 | W1-23 | `DAEO-9i8e` | Hierarchical synthesis notes | implementation | engineer | STANDARD | W1-22 | 100 | DEC-080, DEC-030, DEC-036, CAP-15 |
-| **W1-24** | `DAEO-wk2v` | gov context | implementation | engineer | FULL | W1-10, W1-21 | 350 | S0a-G-07, DEC-003, DEC-004, CAP-01, CAP-15 |
-| W1-25 | `DAEO-rrxp` | gov checkpoint | implementation | engineer | STANDARD | W1-07, W1-08 | 180 | S0a-G-09, CAP-13, CAP-22, CAP-37, CAP-20 |
-| W1-26 | `DAEO-fygv` | gov check G0-G2 | implementation | engineer | FULL | W1-09, W1-11, W1-13 | 310 | S0a-G-02, DEC-041, DEC-046, DEC-089, CAP-38, MR-2, MR-3, CAP-01, CAP-24, CAP-30, CAP-39, CAP-58 |
-| W1-27 | `DAEO-xw3k` | gov doctor and gov rebuild | implementation | engineer | STANDARD | W1-04, W1-16, W1-17, W1-22 | 230 | S0a-G-04, DEC-083, CAP-02, CAP-06, CAP-07, CAP-20, CAP-25, CAP-46, CAP-48, CAP-54, MR-4 |
-| W1-28 | `DAEO-9279` | gov pause | implementation | engineer | STANDARD | W1-02, W1-07 | 80 | S0a-G-10, CAP-05 |
-| **W1-29** | `DAEO-zsvl` | Session hooks | implementation | engineer | STANDARD | W1-09, W1-24, W1-25 | 180 | DEC-025, S0a-G-09, CAP-15, CAP-37 |
-| W1-30 | `DAEO-2lwj` | gov close | implementation | engineer | FULL | W1-03, W1-09, W1-25, W1-26 | 200 | S0a-G-12, DEC-044, DEC-096, DEC-069, CAP-13, CAP-24, CAP-31, CAP-38, CAP-59, CAP-50, MR-3 |
+| **W1-24** | `DAEO-wk2v` | gov context | implementation | engineer | FULL | W1-09, W1-10, W1-21, W1-34 | 350 | S0a-G-07, DEC-003, DEC-004, CAP-01, CAP-15, CAP-38 |
+| W1-25 | `DAEO-rrxp` | gov checkpoint | implementation | engineer | STANDARD | W1-07, W1-08 | 180 | S0a-G-09, CAP-13, CAP-22, CAP-37, CAP-20, CAP-38 |
+| W1-26 | `DAEO-fygv` | gov check G0-G2 | implementation | engineer | FULL | W1-09, W1-11, W1-13 | 290 | S0a-G-02, DEC-041, DEC-046, DEC-089, CAP-38, MR-2, MR-3, CAP-01, CAP-24, CAP-30, CAP-39, CAP-58 |
+| W1-27 | `DAEO-xw3k` | gov doctor and gov rebuild | implementation | engineer | STANDARD | W1-04, W1-16, W1-17, W1-22 | 230 | S0a-G-04, DEC-083, CAP-02, CAP-06, CAP-07, CAP-20, CAP-25, CAP-46, CAP-48, CAP-54, CAP-38, MR-4 |
+| W1-28 | `DAEO-9279` | gov pause | implementation | engineer | STANDARD | W1-02, W1-07, W1-09 | 80 | S0a-G-10, CAP-05 |
+| W1-29 | `DAEO-zsvl` | Session hooks | implementation | engineer | STANDARD | W1-09, W1-24, W1-25 | 180 | DEC-025, S0a-G-09, CAP-15, CAP-37 |
+| W1-30 | `DAEO-2lwj` | gov close | implementation | engineer | FULL | W1-03, W1-09, W1-24, W1-25, W1-26 | 200 | S0a-G-12, DEC-044, DEC-096, DEC-069, CAP-13, CAP-24, CAP-31, CAP-38, CAP-59, CAP-50, MR-3 |
 | W1-31 | `DAEO-6mk8` | Governance share counter | implementation | engineer | STANDARD | W1-06, W1-29, W1-30 | 120 | DEC-086, DEC-004, CAP-04, CAP-40, CAP-53 |
 | W1-32 | `DAEO-8goq` | gov status | implementation | engineer | STANDARD | W1-13, W1-28, W1-31 | 80 | S0a-G-01, CAP-28, CAP-27 |
 | W1-33 | `DAEO-xog0` | Wave 1 role definitions | role-definition | product-spec | STANDARD | W1-05 | 300 | DEC-066, DEC-083, MR-5, CAP-47, CAP-22, CAP-58, MR-3, MR-4 |
 | W1-34 | `DAEO-egm9` | Decision-package template | template | product-spec | LITE | W1-08 | 60 | DEC-065, DEC-093, MR-6, CAP-34 |
-| W1-35 | `DAEO-0i6h` | Skills: discovery, planning, independent test design, change | skill | product-spec | STANDARD | W1-12, W1-13, W1-14, W1-33, W1-34 | 480 | DEC-066, DEC-088, DEC-089, DEC-093, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-24, CAP-30, CAP-33, CAP-34, CAP-47 |
-| W1-36 | `DAEO-skiy` | Skills: retrieval, audit, checkpoint/resume, adopt | skill | product-spec | STANDARD | W1-21, W1-25, W1-33 | 480 | DEC-080, DEC-032, DEC-070, DEC-088, CAP-16, CAP-24, CAP-56, MR-4, CAP-47 |
+| W1-35 | `DAEO-0i6h` | Skills: discovery, planning, independent test design, change | skill | product-spec | STANDARD | W1-12, W1-13, W1-14, W1-21, W1-26, W1-33, W1-34 | 480 | DEC-066, DEC-088, DEC-089, DEC-093, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-24, CAP-30, CAP-33, CAP-34, CAP-38, CAP-47 |
+| **W1-36** | `DAEO-skiy` | Skills: retrieval, audit, checkpoint/resume, adopt | skill | product-spec | STANDARD | W1-21, W1-24, W1-25, W1-26, W1-33 | 480 | DEC-080, DEC-032, DEC-070, DEC-088, CAP-16, CAP-24, CAP-56, MR-4, CAP-38, CAP-47 |
 | W1-37 | `DAEO-yvzh` | Superpowers three-skill vendoring | config | engineer | LITE | W1-06 | 20 | G-25, DEC-074 Q5, DEC-076, CAP-24, CAP-38 |
-| **W1-38** | `DAEO-3ef2` | rulesync adapters and .claude ownership | config | engineer | STANDARD | W1-04, W1-29, W1-33, W1-35, W1-36, W1-37 | 50 | G-11, G-15, DEC-022, DEC-074 Q6, DEC-074 Q7, CAP-52, MR-5 |
+| **W1-38** | `DAEO-3ef2` | rulesync adapters and .claude ownership | config | engineer | STANDARD | W1-04, W1-29, W1-33, W1-35, W1-36, W1-37 | 50 | G-11, G-15, DEC-022, DEC-074 Q6, DEC-074 Q7, CAP-52, CAP-38, MR-5 |
 | **W1-39** | `DAEO-5ylr` | Copier kernel template and lock | implementation | engineer | STANDARD | W1-27, W1-38 | 100 | G-14, S0a-G-15, DEC-023, DEC-027, CAP-02, CAP-43, CAP-44, CAP-54 |
 | W1-40 | `DAEO-fdkq` | lefthook and CI workflow | config | engineer | STANDARD | W1-22, W1-26, W1-30 | 80 | S0a-G-11, DEC-075, DEC-087, CAP-39 |
 | **W1-41** | `DAEO-cdoi` | gov adopt --lite and legacy importer | implementation | engineer | FULL | W1-27, W1-33, W1-38, W1-39 | 440 | S0a-G-13, G-10, DEC-006, DEC-090, CAP-06, CAP-42, CAP-44, CAP-54 |
-| **W1-42** | `DAEO-gjjf` | Wave 1 exit run on the dev tiers | integration | orchestrator | FULL | W1-23, W1-32, W1-35, W1-36, W1-40, W1-41, W1-44 | 0 | DEC-080, DEC-086, DEC-088, DEC-089, DEC-091, MR-1, MR-2, MR-3, MR-4, MR-6 |
+| **W1-42** | `DAEO-gjjf` | Wave 1 exit run on the dev tiers | integration | orchestrator | FULL | W1-23, W1-32, W1-35, W1-36, W1-40, W1-41, W1-44 | 0 | DEC-080, DEC-086, DEC-088, DEC-089, DEC-091, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-28, CAP-38 |
 | **W1-43** | `DAEO-03pw` | Wave 1 exit audit | audit | independent-auditor | FULL | W1-42 | 0 | DEC-070, DEC-088, DEC-092, DEC-096, MR-4, CAP-47, CAP-59 |
-| W1-44 | `DAEO-wqd6` | Phase-2 lessons as lesson records | documentation | product-spec | LITE | W1-08 | 150 | DEC-046, OWNER-DECISION-P2-0008, OWNER-DIRECTION-BR-0004, OWNER-AMENDMENT-P2-0010, CAP-14, CAP-41, CAP-59 |
+| W1-44 | `DAEO-wqd6` | Phase-2 lessons as lesson records | documentation | product-spec | LITE | W1-08, W1-21 | 150 | DEC-046, OWNER-DECISION-P2-0008, OWNER-DIRECTION-BR-0004, OWNER-AMENDMENT-P2-0010, CAP-14, CAP-41, CAP-59 |
 
 Bold rows are on the critical path. KPIs (success and failure criteria), `allowed_paths` and the acceptance-test path are in each ticket file.
 
@@ -81,24 +82,24 @@ Layers: a ticket depends only on tickets in earlier layers, so the tickets withi
 | 3 | W1-03, W1-04 |
 | 4 | W1-05 |
 | 5 | W1-06, W1-07, W1-08, W1-33 |
-| 6 | W1-09, W1-10, W1-12, W1-15, W1-18, W1-25, W1-28, W1-34, W1-37, W1-44 |
-| 7 | W1-11, W1-13, W1-14, W1-16, W1-17 |
-| 8 | W1-19, W1-20, W1-26, W1-35 |
-| 9 | W1-21, W1-30 |
-| 10 | W1-22, W1-24, W1-36 |
-| 11 | W1-23, W1-27, W1-29, W1-40 |
-| 12 | W1-31, W1-38 |
+| 6 | W1-10, W1-12, W1-15, W1-18, W1-25, W1-34, W1-37 |
+| 7 | W1-09, W1-11, W1-16, W1-17 |
+| 8 | W1-13, W1-14, W1-19, W1-20, W1-28 |
+| 9 | W1-21, W1-26 |
+| 10 | W1-22, W1-24, W1-35, W1-44 |
+| 11 | W1-23, W1-27, W1-29, W1-30, W1-36 |
+| 12 | W1-31, W1-38, W1-40 |
 | 13 | W1-32, W1-39 |
 | 14 | W1-41 |
 | 15 | W1-42 |
 | 16 | W1-43 |
 
-**Critical path** (weighted by est. LOC; a ticket with no code counts as 50): W1-01 → W1-02 → W1-03 → W1-05 → W1-07 → W1-10 → W1-17 → W1-19 → W1-21 → W1-24 → W1-29 → W1-38 → W1-39 → W1-41 → W1-42 → W1-43.
+**Critical path** (weighted by est. LOC; a ticket with no code counts as 50): W1-01 → W1-02 → W1-03 → W1-05 → W1-07 → W1-10 → W1-17 → W1-19 → W1-21 → W1-24 → W1-36 → W1-38 → W1-39 → W1-41 → W1-42 → W1-43.
 
 Why this path:
 - the guard and containment come first (DEC-084);
 - then the CLI, the record graph and the R1 retrieval chain (lexical with parent ids → semantic → `gov retrieve` with parent expansion);
-- then `gov context`, the session hooks, the adapters, the Copier template and adoption (now with the A5 review, DEC-090);
+- then `gov context`, the audit and retrieval skills (which need the context pack), the adapters, the Copier template and adoption (with the A5 review, DEC-090);
 - then the exit run and the audit.
 
 ## 3. Size
@@ -150,7 +151,12 @@ Wave 1 exits when **all** of these hold. W1-42 runs the checks, and W1-43 is the
 4. **Governance share is ≤ 15 %** on each programme's run, measured as in DEC-086. Cache reads are reported separately.
 5. **An independent wave-exit audit against Contract v4** (DEC-070, DEC-088). A fresh, read-only Independent Auditor gives a finding row to every W1 contract item, every W1 `covers` item (DEC-092) and every MR clause. Contested and owner-level findings come to the owner as decision packages, and agreed fixes become tickets. The audit→repair loop follows DEC-096.
 
-Also required: `gov doctor` is green on this repository, the dev tiers' canaries hit, and no dev canary secret appears in any derived store.
+Also required:
+- `gov doctor` is green on this repository;
+- the dev tiers' canaries hit, and no dev canary secret appears in any derived store;
+- `gov check` reports 17 of 17 governance test families with an executable check, and all twelve Wave 1 `gov` commands are implemented.
+
+The plan itself is checked by `docs/plan/tools/validate_s1.py` (run it from the repository root).
 
 ## 5. Source merge (DEC-076)
 

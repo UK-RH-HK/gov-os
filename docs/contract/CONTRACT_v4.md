@@ -73,8 +73,9 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Disposition:** LITE — lite form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key rotation, offline envelopes or bootstrap separation.
 - **Sources:** Contract v3 Gate A2; Framework v4.1.2 §75B-75D; Distribution Protocol v1.2 §5-8; OWNER-DIRECTIVE-0004; OWNER-DECISION-0009; OWNER-DECISION-P2-0005; DEC-027; DEC-074; DEC-083
 - **Covers:**
-  - `CAP-02.a` [W1] SSH-signed release tag; file-hash manifest in framework.lock; gov doctor MATCH/DRIFT — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D · delivered by W1-39, W1-27
+  - `CAP-02.a` [W1] File-hash manifest in framework.lock; gov doctor MATCH/DRIFT — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D · delivered by W1-39, W1-27
   - `CAP-02.b` [NONE] Non-goal: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation, unprovisioned-machine trust anchors — DEC-027, DEC-039, OWNER-DECISION-P2-0002
+  - `CAP-02.c` [W3] SSH-signed release tag, verified by `git tag -v` — Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D; DEC-027
 - **Scenarios:** dev CHAOS-X-01 · qual CHAOS-X-Q01
 
 ### CAP-03 — Security and sensitivity classification
@@ -423,12 +424,12 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Outcome:** The owner can ask in natural language and get a structured governance answer; a small command set covers the rest.
 - **Acceptance:** A status question in chat is answered from `gov status --json` (tickets, gates, readiness, share, pause state) rather than from free recall.
 - **Wave:** W1
-- **Provider:** Claude Code (harness), W1-07, W1-32
+- **Provider:** Claude Code (harness), W1-07, W1-32, W1-42
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate G1, G2; Framework v4.1.2 §33, §34; DEC-003
 - **Covers:**
   - `CAP-28.a` [W1] Natural-language intent first; small explicit command set — Contract v3 G1, G2; Framework v4.1.2 §33, §34 · delivered by W1-32
-  - `CAP-28.b` [W1] Internal governance operations exposed as gov commands — Framework v4.1.2 §35 · delivered by W1-07
+  - `CAP-28.b` [W1] Internal governance operations exposed as gov commands — Framework v4.1.2 §35 · delivered by W1-07, W1-42
 - **Scenarios:** dev MR-X-01 · qual MR-X-Q01
 
 ### CAP-29 — Specification lineage (idea to live evidence)
@@ -567,12 +568,12 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Outcome:** The owner can see product and governance verification results, with builder tests counted as regression evidence only.
 - **Acceptance:** `gov check` reports each governance test family RED/YELLOW/GREEN, and `gov close` runs the independent acceptance tests separately from builder tests.
 - **Wave:** W1
-- **Provider:** W1-26, W1-30, W1-37, W1-02
+- **Provider:** W1-26, W1-30, W1-37, W1-02, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-35, W1-36, W1-38, W1-42
 - **Disposition:** KEPT
 - **Sources:** Contract v3 Gate O1, O2, O3, O4; Framework v4.1.2 §62-64; DEC-042 (builder tests are regression evidence only); DEC-083
 - **Covers:**
   - `CAP-38.a` [W1] Product test families — Contract v3 O1; Framework v4.1.2 §62 · delivered by W1-30
-  - `CAP-38.b` [W1] Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility — Contract v3 O2; Framework v4.1.2 §63 · delivered by W1-26
+  - `CAP-38.b` [W1] Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility — Contract v3 O2; Framework v4.1.2 §63 · delivered by W1-26, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-30, W1-35, W1-36, W1-38, W1-42
   - `CAP-38.c` [W1] Independent test authorship; builder tests are regression evidence only — Contract v3 O3; DEC-042 · delivered by W1-30, W1-02
   - `CAP-38.d` [W1] Governance suite currency — Contract v3 O4; Framework v4.1.2 §64 · delivered by W1-30
 - **Scenarios:** dev MR-A-06, A-02, MR-B-02, MR-B-04, MR-B-06, AUDIT-B-04, AUDIT-X-01 · qual AUDIT-A-Q08, A-Q05, AUDIT-A-Q40, AUDIT-A-Q41, AUDIT-A-Q46, AUDIT-B-Q02, AUDIT-X-Q01

@@ -1,7 +1,7 @@
 ---
 id: DAEO-wk2v
 status: open
-deps: [DAEO-4yyl, DAEO-5x4l]
+deps: [DAEO-4yyl, DAEO-5x4l, DAEO-topz, DAEO-egm9]
 links: []
 created: 2026-09-30T22:49:59Z
 type: task
@@ -14,11 +14,14 @@ title: gov context
 class: implementation
 role: engineer
 depends_on:
+- W1-09
 - W1-10
 - W1-21
+- W1-34
 allowed_paths:
 - src/gov/context/**
 - tests/unit/context/**
+- template/governance/kernel/checks/context-reproducibility*
 kpis:
   success:
   - The packet holds every mandatory input by id and sha256, the authority block first, stays under the ceiling (default ~6k tokens) and carries its hash [CAP-15.a, CAP-15.e]
@@ -28,6 +31,7 @@ kpis:
     it is required [CAP-15.b, CAP-01.d]
   - A missing mandatory input makes gov context refuse with an explicit BLOCKED state; a superseded record cannot satisfy a current requirement; conflicting mandatory inputs raise a contradiction (decision
     package or repair ticket) [CAP-15.c]
+  - 'Registers the context-reproducibility family check: the same ticket and commit give the same packet hash [CAP-38.b]'
   - Given two conflicting records, the authority block holds only the one with higher precedence (Charter → Contract → ADRs → specifications → tasks → retrieval → inference) and marks the other superseded
     [CAP-01.a]
   failure:
@@ -40,6 +44,7 @@ sources:
 - DEC-004
 - CAP-01
 - CAP-15
+- CAP-38
 est_loc: 350
 acceptance_tests:
   path: tests/acceptance/W1-24/

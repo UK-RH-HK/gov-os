@@ -22,12 +22,14 @@ allowed_paths:
 - src/gov/doctor/**
 - src/gov/rebuild/**
 - tests/unit/doctor/**
+- template/governance/kernel/checks/recovery-rebuild*
 kpis:
   success:
   - doctor reports pinned vs found tool versions, hooks wired, path map with zero unclassified paths, index freshness, canaries, framework.lock MATCH/DRIFT, per-repository isolation; non-zero on any failure
     [CAP-02.a, CAP-06.a, CAP-25.a]
   - rebuild recreates every derived store; two rebuilds give the same digest; a fresh clone plus doctor plus rebuild works [CAP-07.a, CAP-20.a, CAP-46.a]
   - 'Path-map compliance is checked by doctor: every tracked path matches a path-map entry, and a recorded reference to a moved path is reported [CAP-06.d]'
+  - 'Registers the recovery/rebuild family check: derived state deleted and rebuilt gives the same digest [CAP-38.b]'
   - 'doctor reports an adoption level: a repository with only the kernel installed passes at the minimal level, and each completed adoption stage raises it toward ADOPTED_HEALTHY [CAP-54.a]'
   failure:
   - doctor passes with a tool at the wrong version
@@ -44,6 +46,7 @@ sources:
 - CAP-46
 - CAP-48
 - CAP-54
+- CAP-38
 - MR-4
 est_loc: 230
 acceptance_tests:

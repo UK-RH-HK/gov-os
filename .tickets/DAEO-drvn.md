@@ -26,7 +26,9 @@ kpis:
   - Every command returns the API-0002 JSON envelope with exit codes 0-4
   - Commands are classed read or act; read commands leave git status --porcelain empty [CAP-27.a]
   - Overlay and path-map config load with schema validation; gov --help < 300 ms
-  - Each Wave 1 governance operation (status, check, readiness, doctor, rebuild, context, closure, retrieve, checkpoint, close, adopt, pause) is a registered gov command [CAP-28.b]
+  - The check-declaration format (family, tier, hard-block or warning, command) is defined and loaded by the CLI, so any ticket can register a check for the component it builds
+  - The command registry reserves each Wave 1 governance operation (status, check, readiness, doctor, rebuild, context, closure, retrieve, checkpoint, close, adopt, pause) as a gov command; a reserved command
+    that is not yet built returns a NOT_IMPLEMENTED envelope [CAP-28.b]
   failure:
   - A command writes outside its declared act paths
   - Envelope fields drift from docs/interfaces/API-0002.yaml
@@ -37,7 +39,7 @@ sources:
 - DEC-046
 - CAP-27
 - CAP-28
-est_loc: 200
+est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W1-07/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

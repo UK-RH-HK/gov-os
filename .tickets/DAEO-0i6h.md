@@ -1,7 +1,7 @@
 ---
 id: DAEO-0i6h
 status: open
-deps: [DAEO-lc4q, DAEO-w616, DAEO-w9l3, DAEO-xog0, DAEO-egm9]
+deps: [DAEO-lc4q, DAEO-w616, DAEO-w9l3, DAEO-xog0, DAEO-egm9, DAEO-5x4l, DAEO-fygv]
 links: []
 created: 2026-09-30T22:49:59Z
 type: task
@@ -17,6 +17,8 @@ depends_on:
 - W1-12
 - W1-13
 - W1-14
+- W1-21
+- W1-26
 - W1-33
 - W1-34
 allowed_paths:
@@ -24,6 +26,7 @@ allowed_paths:
 - template/governance/kernel/skills/planning/**
 - template/governance/kernel/skills/test-design/**
 - template/governance/kernel/skills/change/**
+- template/governance/kernel/checks/skill-regression-a*
 kpis:
   success:
   - Each skill has a versioned frontmatter, a description <= 60 tokens and a body <= 2.5k tokens [CAP-24.a]
@@ -35,6 +38,7 @@ kpis:
   - The change skill takes a skill change through evidence → proposal → independent review → owner approval → a new version in the skill frontmatter [CAP-24.c]
   - A change to the Gov OS kernel, policy or skills passes evidence → corroboration → proposal (CIT-P) → independent review → owner approval → versioned promotion; the change skill refuses to archive (CIT-E)
     a kernel change that lacks any of these records [CAP-33.d]
+  - 'Registers the skill-regression family check over its four skills, using the generic validator from W1-26: frontmatter, version, size, and every referenced command exists [CAP-38.b]'
   failure:
   - A skill body exceeds 2.5k tokens
   - The test-design skill reads implementation files
@@ -54,6 +58,7 @@ sources:
 - CAP-30
 - CAP-33
 - CAP-34
+- CAP-38
 - CAP-47
 est_loc: 480
 acceptance_tests:

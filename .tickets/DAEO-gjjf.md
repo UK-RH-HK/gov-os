@@ -28,6 +28,8 @@ kpis:
   - On a-dev and b-dev clones one feature runs discovery -> closed spec -> independent specification audit (DEC-088) -> WBS with linked gap tickets -> independent tests -> implementation -> close -> CI
     -> merge
   - RETR-A-04 and RETR-X-02 run with bundles, parent expansions, synthesis notes where evidence exceeds the ceiling, and stopping reasons; governance share <= 15 %; zero MR-3 breaches
+  - gov check reports 17 of 17 governance test families with at least one executable check [CAP-38.b]
+  - 'All twelve Wave 1 gov commands are implemented: none returns NOT_IMPLEMENTED [CAP-28.b]'
   failure:
   - Any forbidden outcome
   - Governance share > 15 % on either programme
@@ -43,6 +45,8 @@ sources:
 - MR-3
 - MR-4
 - MR-6
+- CAP-28
+- CAP-38
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W1-42/
