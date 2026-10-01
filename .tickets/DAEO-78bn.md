@@ -17,6 +17,7 @@ depends_on:
 - W1-02
 allowed_paths:
 - src/gov/guard/install*
+- template/governance/kernel/hooks/pretooluse*
 - template/governance/kernel/schemas/tool-registry*
 - tests/unit/install/**
 kpis:
