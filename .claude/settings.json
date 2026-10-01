@@ -1,1 +1,25 @@
-{"permissions": {"deny": ["Read(./docs/source/**)", "Edit(./docs/source/**)"]}}
+{
+  "permissions": {
+    "deny": [
+      "Read(./docs/source/**)",
+      "Edit(./docs/source/**)",
+      "Edit(tests/acceptance/**)",
+      "Edit(**/.env*)",
+      "Edit(**/*.pem)",
+      "Edit(**/*.key)",
+      "Edit(config/secrets*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(python -m pip:*)",
+      "Bash(python3 -m pip:*)",
+      "Bash(uv:*)",
+      "Bash(npm install:*)",
+      "Bash(cargo install:*)",
+      "Bash(apt:*)",
+      "Bash(apt-get:*)",
+      "Bash(sudo:*)",
+      "Bash(curl:*)",
+      "Bash(wget:*)"
+    ]
+  }
+}

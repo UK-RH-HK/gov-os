@@ -1,6 +1,6 @@
 ---
 id: DAEO-dtv3
-status: open
+status: closed
 deps: []
 links: []
 created: 2026-09-30T22:49:58Z
