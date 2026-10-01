@@ -873,3 +873,36 @@ round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
 | Version | Date | Change |
 |---|---|---|
 | 0.14 (cont.) | 2026-10-01 | DEC-096 (loop policy; amends DEC-044, DEC-070, DEC-082). |
+
+## 15. Wave 1 build decisions (register v0.15, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers to the W1-01 KPI disputes KD-1…KD-4, raised by the Independent Test Designer on ticket `DAEO-dtv3`
+(recorded in `tests/acceptance/W1-01/README.md`, commit `71100b5`). They settle how W1-01's KPI lines are read; the
+ticket's KPI text is unchanged.
+
+### DEC-097 — W1-01 KD-1: git history is the record that the operator diff procedure was used
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-01 KPI dispute KD-1 (accept) · **Implements:** DEC-084
+- **Decision:** For W1-01's KPI "the operator diff procedure … is written and used from the first implementation
+  ticket", the record that the procedure was used is git history, through `Task:` trailers: until W1-05 lands, a commit
+  with a `Task:` trailer stays inside that ticket's `allowed_paths`.
+- **Known limit:** a commit without a `Task:` trailer is not checked.
+
+### DEC-098 — W1-01 KD-2: which session settings the interim install rule lists
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-01 KPI dispute KD-2 (accept) · **Implements:** DEC-083
+- **Decision:** For "install commands are denied in every session settings file", `governance/project/bootstrap.md`
+  lists every agent session folder (`w1-build`, `w1-tests`, `s1`, `s1a`) and the repository's own settings. The
+  operator console is not listed; it acts as the owner.
+
+### DEC-099 — W1-01 KD-3: what the interim install rule denies until W1-05
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-01 KPI dispute KD-3 (accept) · **Implements:** DEC-083
+- **Decision:** Until W1-05, the interim install rule denies `curl` or `wget` piped to a shell, `sudo`, and package
+  managers. Shell aliases and functions are left to W1-03's containment check.
+
+### DEC-100 — W1-01 KD-4: one dated denied attempt per class in `bootstrap.md`
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-01 KPI dispute KD-4 (accept)
+- **Decision:** For "verified by one denied attempt each", `governance/project/bootstrap.md` records one dated denied
+  attempt per class.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.15 | 2026-10-01 | W1-01 KPI disputes: DEC-097 (KD-1, diff procedure shown by `Task:` trailers), DEC-098 (KD-2, session list), DEC-099 (KD-3, interim install denials), DEC-100 (KD-4, dated denied attempts). |
