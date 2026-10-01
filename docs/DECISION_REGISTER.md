@@ -1083,3 +1083,61 @@ first. The KPI text of W1-02 is unchanged. W1-05's ticket changes under DEC-119 
 | Version | Date | Change |
 |---|---|---|
 | 0.18 | 2026-10-01 | Owner answers at the W1-02 diff check: DEC-115 (Bash target resolution; unresolvable targets denied), DEC-116 (three readings of DEC-114 confirmed), DEC-117 (amends DEC-107: the subagent's role governs inside a role subagent), DEC-118 (sessions start in the repository root from the switch-over), DEC-119 (W1-05 delivers minimal role subagent definitions; provider change noted for the spec change). |
+
+## 19. Wave 1 build decisions, round 5 (register v0.19, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers of 2026-10-01 to KPI disputes raised by the Independent Test Designer on three tickets:
+
+- W1-04 (`DAEO-78bn`), KD-1 and KD-2. The package is with the test designer and is not readable from the build
+  session; W1-04 has no acceptance tests yet.
+- W1-03 (`DAEO-8qvp`), KD-1…KD-3, recorded in `tests/acceptance/W1-03/README.md` (commit `a389ebc`).
+- W1-02 (`DAEO-emkd`), KD-9, recorded in `tests/acceptance/W1-02/README.md` (commit `a4e6691`). W1-BUILD asked the same
+  question as DP-2.
+
+The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change under DEC-120 only.
+
+### DEC-120 — W1-04 KD-1: the install rule reaches the harness through the PreToolUse guard
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-04 KPI dispute KD-1 · **Implements:** DEC-083
+- **Decision:** The install rule reaches the harness through the PreToolUse guard. For a Bash call it classifies as an
+  install, the guard returns the permission decision `ask` when the acting role is orchestrator, and `deny` for every
+  other role, and for no role. The classifier only ever escalates: a match never allows something the harness would
+  otherwise ask about (DEC-083). Settings rules for install commands remain as a second line.
+- **Ticket change:** under this decision the orchestrator extends W1-04's `allowed_paths` to the guard's install module
+  and the hook entry it uses, in a separate commit with the trailers `Task: DAEO-78bn` and `Implements: DEC-120`.
+- **Verification:** the Auto-mode KPI is verified by driving the hook, and by one live headless attempt.
+
+### DEC-121 — W1-04 KD-2: the tool-registry schema
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-04 KPI dispute KD-2
+- **Decision:** The test designer's recommended registry schema is accepted. If the test designer proposed none: one
+  file, `governance/project/tool-registry.yaml`, listing entries with `id`, `version`, `source`, `sha256`,
+  `install_command`, `uninstall_command`, `installed_at` and `decision` (the approving DEC), validated by a JSON Schema
+  in `schemas/`.
+- Which of the two applies is shown by W1-04's acceptance tests; the build session cannot read the package.
+
+### DEC-122 — W1-03 KD-1: the containment finding record
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-1 · **Extends:** DEC-110
+- **Decision:** A containment finding is one JSON line in `.gov-runtime/findings.jsonl`, the same file as guard
+  failures, with: `time`, `session_id`, `agent_type`, `role`, `ticket`, `tool`, `command`, `paths`, `action`
+  (`reverted` or `flagged`) and `reason`.
+
+### DEC-123 — W1-03 KD-2: the nine I-06 forms are tested by their effect; one accepted residual
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-2 · **Under:** ADR-0001
+- **Decision:** All nine I-06 forms are tested by their effect inside the repository. A write outside the repository
+  through an opaque form (for example `perl -e` or `$(…)`) is seen by neither the guard nor the containment check.
+  That is an accepted residual under ADR-0001.
+- **Record:** `governance/project/bootstrap.md`, section "Accepted residual".
+
+### DEC-124 — W1-03 KD-3: containment acts only on changes made by the current call
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-3
+- **Decision:** Containment acts only on changes made by the current call. It snapshots the changed-path set before the
+  call (PreToolUse) and compares it after (PostToolUse). Paths already changed before the call are never touched. When
+  attribution is uncertain, it flags and doesn't revert.
+
+### DEC-125 — W1-02 KD-9: a role subagent's role applies only in a session with a declared role
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-9 and W1-BUILD DP-2 option (a) · **Refines:** DEC-117
+- **Decision:** A role subagent's own role applies only when the session itself has a declared role. In a session with
+  no role, everything, subagents included, is read-only.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.19 | 2026-10-01 | KPI disputes: DEC-120 (W1-04 KD-1, install rule through the PreToolUse guard; `ask` for the orchestrator, `deny` otherwise), DEC-121 (W1-04 KD-2, tool-registry schema), DEC-122 (W1-03 KD-1, containment finding record), DEC-123 (W1-03 KD-2, nine I-06 forms by effect; residual outside the repository accepted), DEC-124 (W1-03 KD-3, only the current call's changes), DEC-125 (W1-02 KD-9, role subagent only in a session with a declared role). |
