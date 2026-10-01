@@ -2,12 +2,11 @@
 
 KPI success 1 names the guard as the G0 tier [CAP-39.a]: a check that runs
 before the tool does. KPI success 3 bounds its cost: "decision in < 100 ms p95".
-
-The allow-list part of success 1 and the other two clauses of success 3 (freeze
-flag, ticket frontmatter) wait for KPI disputes KD-1, KD-2 and KD-3.
 """
 
 from __future__ import annotations
+
+import pytest
 
 import w1_02_support as support
 
@@ -15,6 +14,18 @@ LATENCY_BOUND_S = 0.100
 LATENCY_SAMPLES = 40
 LATENCY_WARM_UP = 3
 LATENCY_ROUNDS = 3
+
+# name: (GOV_ROLE, GOV_TICKET, repository-relative path, freeze flag set, expected decision)
+TIMED_DECISIONS = {
+    "no-role-deny": (None, None, "src/gov/guard/decide.py", False, "deny"),
+    "engineer-allow-from-ticket-frontmatter": (
+        support.ENGINEER, support.TICKET_ID, "src/gov/guard/decide.py", False, "allow"),
+    "engineer-deny-outside-the-ticket": (support.ENGINEER, support.TICKET_ID, "README.md", False, "deny"),
+    "test-designer-allow": (
+        support.TEST_DESIGNER, support.TICKET_ID,
+        f"tests/acceptance/{support.TICKET_WBS_ID}/test_fixture.py", False, "allow"),
+    "frozen-deny": (support.ENGINEER, support.TICKET_ID, "src/gov/guard/decide.py", True, "deny"),
+}
 
 
 def test_guard_hook_ships_in_the_kernel_template(hook):
@@ -35,21 +46,26 @@ def test_guard_decides_before_the_tool_runs(project, call):
     )
 
 
-def test_decision_p95_is_under_100_ms(project, call):
+@pytest.mark.parametrize("name", sorted(TIMED_DECISIONS), ids=sorted(TIMED_DECISIONS))
+def test_decision_p95_is_under_100_ms(project, write, name):
     """Wall-clock time of the hook process, start to exit, as the harness waits for it.
 
     p95 over 40 calls after a warm-up. A round that misses the bound is repeated,
     up to three rounds, so a single stall of the machine does not fail the KPI.
     """
-    tool_input = support.edit_tool_input("Write", project / "src/gov/guard/decide.py")
+    role, ticket, relpath, frozen, expected = TIMED_DECISIONS[name]
+    if frozen:
+        support.set_freeze(project)
     for _ in range(LATENCY_WARM_UP):
-        call(project, "Write", tool_input)
+        write(project, relpath, role, ticket)
     rounds = []
     for _ in range(LATENCY_ROUNDS):
         samples = []
         for _ in range(LATENCY_SAMPLES):
-            result = call(project, "Write", tool_input)
-            assert result.decision == "deny", f"the timed call was not decided as expected: {result.describe()}"
+            result = write(project, relpath, role, ticket)
+            assert result.decision == expected, (
+                f"the timed call was not decided as expected ({expected}): {result.describe()}"
+            )
             samples.append(result.seconds)
         rounds.append(support.p95(samples))
         if rounds[-1] < LATENCY_BOUND_S:

@@ -4,12 +4,14 @@ KPI success 4: "A session with no declared role, or an unknown role, is
 read-only: every write is denied [CAP-58.c]".
 KPI failure 3: "A session with no or an unknown role can write anywhere".
 
-Only the "no declared role" half is tested here. The "unknown role" half needs
-the channel through which a role is declared (KPI dispute KD-1).
+This file holds the session that declares nothing: neither ``GOV_ROLE`` nor
+``GOV_TICKET`` is set, and the hook input names no subagent. The unknown role is
+in ``test_w1_02_unknown_role.py``; the closed scratch set is in
+``test_w1_02_scratch.py``.
 
-Every call runs in a project whose one ticket is in progress for the engineer
-role, so each write below would be inside or outside a live ticket's
-``allowed_paths``. The session declares no role, and that decides.
+Every call runs in a project with tickets in progress, so each write below would
+be inside or outside a live ticket's ``allowed_paths``. The session declares no
+role, and that decides.
 """
 
 from __future__ import annotations
@@ -77,9 +79,7 @@ TICKET_STATES = {
 
 
 def _assert_denied(result, what):
-    assert result.decision == "deny", (
-        f"{what} by a session with no declared role was not denied: {result.describe()}"
-    )
+    support.assert_denied(result, f"{what} by a session with no declared role")
 
 
 @pytest.mark.parametrize("tool_name", ["Edit", "Write"])
@@ -114,6 +114,19 @@ def test_no_ticket_state_gives_a_role_less_session_write_access(hook, tmp_path, 
         _assert_denied(result, f"{tool_name} on {relpath} with {state}")
     command = f"echo changed > {relpath}"
     _assert_denied(call(project, "Bash", support.bash_tool_input(command)), f"Bash `{command}` with {state}")
+
+
+def test_a_ticket_alone_declares_no_role(project, call):
+    """``GOV_TICKET`` without ``GOV_ROLE``: still read-only."""
+    for relpath in ("src/gov/guard/decide.py", f"tests/acceptance/{WBS}/test_fixture.py", "README.md"):
+        for tool_name in ("Edit", "Write"):
+            result = call(project, tool_name, support.edit_tool_input(tool_name, project / relpath),
+                          ticket=support.TICKET_ID)
+            _assert_denied(result, f"{tool_name} on {relpath} with GOV_TICKET set")
+    for role in ("", " "):
+        result = call(project, "Write", support.edit_tool_input("Write", project / "src/gov/guard/decide.py"),
+                      role=role, ticket=support.TICKET_ID)
+        _assert_denied(result, f"Write with GOV_ROLE={role!r}")
 
 
 def test_role_less_session_can_still_read_with_file_tools(project, call):
