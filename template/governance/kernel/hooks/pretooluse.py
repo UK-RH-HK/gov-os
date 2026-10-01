@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+"""
+PreToolUse default-deny guard hook (W1-02).
+
+Reads a JSON object from stdin, decides whether the tool call is allowed,
+and either allows (exit 0, no deny on stdout) or denies (exit 0 with
+permissionDecision: deny, or exit 2 on internal failure).
+
+Fail-closed: any internal error exits with code 2 and appends a finding
+to .gov-runtime/findings.jsonl (DEC-110).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import select
+import sys
+import time
+
+STDIN_DEADLINE_S = 3.0
+FINDINGS_REL = ".gov-runtime/findings.jsonl"
+
+
+def _append_finding(project_root: str, finding: dict) -> None:
+    try:
+        path = os.path.join(project_root, FINDINGS_REL)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(finding, separators=(",", ":")) + "\n")
+    except Exception:
+        pass
+
+
+def _fail(project_root: str, kind: str, reason: str,
+          session_id: str = "", tool_name: str = "") -> None:
+    _append_finding(project_root, {
+        "source": "guard",
+        "kind": kind,
+        "reason": reason,
+        "session_id": session_id,
+        "tool_name": tool_name,
+    })
+    sys.exit(2)
+
+
+def _read_stdin_with_deadline(deadline_s: float) -> str:
+    deadline = time.monotonic() + deadline_s
+    chunks: list[str] = []
+    fd = sys.stdin.fileno()
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return ""
+        ready = select.select([fd], [], [], min(remaining, 0.5))
+        if ready[0]:
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                break
+            chunks.append(chunk.decode("utf-8", errors="replace"))
+        elif chunks:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+    return "".join(chunks)
+
+
+def _deny(reason: str = "") -> None:
+    output = {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": reason,
+        }
+    }
+    sys.stdout.write(json.dumps(output))
+    sys.exit(0)
+
+
+def _allow() -> None:
+    sys.exit(0)
+
+
+def main() -> None:
+    project_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+
+    try:
+        raw = _read_stdin_with_deadline(STDIN_DEADLINE_S)
+    except Exception as exc:
+        _fail(project_root, "stdin_error", f"failed to read stdin: {exc}")
+
+    if not raw or not raw.strip():
+        _fail(project_root, "empty_input", "stdin was empty")
+
+    try:
+        data = json.loads(raw)
+    except (json.JSONDecodeError, ValueError) as exc:
+        _fail(project_root, "invalid_json", f"stdin is not valid JSON: {exc}")
+
+    if not isinstance(data, dict):
+        _fail(project_root, "invalid_input", "stdin is not a JSON object")
+
+    tool_name = data.get("tool_name")
+    if not tool_name or not isinstance(tool_name, str):
+        session_id = data.get("session_id", "")
+        _fail(project_root, "missing_field", "no tool_name in input",
+              session_id=session_id, tool_name="")
+
+    tool_input = data.get("tool_input")
+    if tool_input is None or not isinstance(tool_input, dict):
+        session_id = data.get("session_id", "")
+        _fail(project_root, "missing_field", "no usable tool_input in input",
+              session_id=session_id, tool_name=tool_name)
+
+    try:
+        from gov.guard.decide import decide
+    except Exception as exc:
+        session_id = data.get("session_id", "")
+        _fail(project_root, "import_error", f"cannot import guard logic: {exc}",
+              session_id=session_id, tool_name=tool_name)
+
+    role = os.environ.get("GOV_ROLE")
+    ticket_id = os.environ.get("GOV_TICKET")
+    cwd = data.get("cwd", project_root)
+    subagent_type = data.get("agent_type")
+
+    try:
+        decision, reason = decide(
+            tool_name=tool_name,
+            tool_input=tool_input,
+            project_root=project_root,
+            role=role,
+            ticket_id=ticket_id,
+            subagent_type=subagent_type,
+            cwd=cwd,
+        )
+    except Exception as exc:
+        session_id = data.get("session_id", "")
+        _fail(project_root, "decide_error", f"decision failed: {exc}",
+              session_id=session_id, tool_name=tool_name)
+
+    if decision == "deny":
+        _deny(reason)
+    else:
+        _allow()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as exc:
+        project_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+        _fail(project_root, "uncaught_error", f"uncaught: {exc}")
