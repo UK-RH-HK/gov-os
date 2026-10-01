@@ -250,8 +250,8 @@ capabilities:
 - id: CAP-02
   title: 'Release authenticity (lite: signed git tags)'
   outcome: The owner can confirm that an installed kernel matches a released version.
-  acceptance: '`gov doctor` reports MATCH when every kernel file hashes to the manifest recorded in `framework.lock`, and
-    DRIFT naming the file after one kernel file is edited; `git tag -v` verifies the release tag.'
+  acceptance: '`gov doctor` reports MATCH for the pinned `framework.lock` manifest and DRIFT after a one-byte edit; at Release
+    1, `git tag -v` verifies the release tag (CAP-02.c, W3).'
   wave: W1
   wave_note: manifest check in W1; the signed v1.0.0 tag is made at Release 1
   provider:
