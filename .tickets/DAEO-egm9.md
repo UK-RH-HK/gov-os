@@ -21,9 +21,11 @@ allowed_paths:
 kpis:
   success:
   - The template has the ten fields of Framework §52 / Contract v3 L2 (question, why now, current state, options, impact, reversibility, cost of rework, recommendation, confidence, exact permitted next
-    actions) plus rank P1-P3
-  - Batching allows at most five open packages at a time, and a P1 package may bypass the cap (DEC-093)
+    actions) plus rank P1-P3 [CAP-34.b]
+  - Batching allows at most five open packages at a time, and a P1 package may bypass the cap (DEC-093) [CAP-34.c]
   - An answer maps to a decision record appended with ACCEPTED (owner, date)
+  - The gate record carries a state (open, answered, declined, revoked, stale) and the CIT it belongs to [CAP-34.d]
+  - The template's routing rule classes a contradiction as agent-resolvable (settled by precedence and recorded) or human-resolvable (raised as a package) [CAP-34.a]
   failure:
   - A package can be rendered without a recommendation or confidence
   - An answer can be recorded without a date

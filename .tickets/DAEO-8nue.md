@@ -22,8 +22,8 @@ allowed_paths:
 - tests/unit/validate/**
 kpis:
   success:
-  - The validator rejects a bundle without a stopping reason, with an unresolvable citation, a stale hash or a quoted span absent from its source
-  - Each index has canaries run after reindex and in doctor; a canary miss sets FACET_UNAVAILABLE
+  - The validator rejects a bundle without a stopping reason, with an unresolvable citation, a stale hash or a quoted span absent from its source [CAP-57.a]
+  - Each index has canaries run after reindex and in doctor; a canary miss sets FACET_UNAVAILABLE [CAP-17.c, CAP-55.a]
   failure:
   - A bundle with an unresolvable citation passes
   - An empty index answers NOT_FOUND as absence
@@ -34,6 +34,7 @@ sources:
 - DEC-037
 - CAP-17
 - CAP-55
+- CAP-57
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W1-22/

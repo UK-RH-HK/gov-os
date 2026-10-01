@@ -20,8 +20,9 @@ allowed_paths:
 - template/governance/kernel/templates/openspec/**
 kpis:
   success:
-  - The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml
+  - The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml [CAP-30.a]
   - Proposal templates pass openspec validate --strict on first use
+  - The schema carries the capability-type table for STANDARD rows; a change to the taxonomy or to readiness-dimensions.yaml is accepted only with a linked CIT-E record [CAP-30.e]
   failure:
   - A row name or state differs from readiness-dimensions.yaml
   - A template fails validate --strict

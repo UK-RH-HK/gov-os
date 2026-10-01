@@ -20,8 +20,8 @@ allowed_paths:
 - tests/unit/synthesis/**
 kpis:
   success:
-  - When evidence exceeds the packet budget, notes are derived under .gov-runtime/, cite source ids and hashes, and disclose unresolved evidence
-  - A note is invalidated when any cited source hash changes; notes are rebuildable
+  - When evidence exceeds the packet budget, notes are derived under .gov-runtime/, cite source ids and hashes, and disclose unresolved evidence [CAP-15.f]
+  - A note is invalidated when any cited source hash changes; notes are rebuildable [CAP-15.f]
   failure:
   - A note survives a change to a cited source
   - A note cites a span not in its source

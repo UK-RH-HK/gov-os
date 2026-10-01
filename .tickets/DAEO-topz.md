@@ -23,8 +23,10 @@ allowed_paths:
 kpis:
   success:
   - tk v0.3.2 is vendored with sha256 408f2c11... verified by gov doctor
-  - A second claim on a held ticket fails with the holder named (O_EXCL lock in .tickets/.claims/)
-  - The ready queue excludes tickets that are claimed, whose acceptance tests directory is missing, or whose specification is not closed
+  - A second claim on a held ticket fails with the holder named (O_EXCL lock in .tickets/.claims/) [CAP-23.a]
+  - The ready queue excludes tickets that are claimed, whose acceptance tests directory is missing, or whose specification is not closed [CAP-31.c]
+  - A ticket whose mandatory input is absent or superseded is not READY [CAP-31.d]
+  - A ticket waiting on an open decision package is blocked, and tickets that do not depend on it stay READY [CAP-34.e]
   failure:
   - Two agents hold the same claim
   - A ticket without tests/acceptance/<id>/ appears as READY
@@ -38,7 +40,8 @@ sources:
 - CAP-53
 - MR-2
 - MR-3
-est_loc: 80
+- CAP-34
+est_loc: 100
 acceptance_tests:
   path: tests/acceptance/W1-09/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

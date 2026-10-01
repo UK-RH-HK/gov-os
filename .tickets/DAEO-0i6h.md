@@ -26,11 +26,15 @@ allowed_paths:
 - template/governance/kernel/skills/change/**
 kpis:
   success:
-  - Each skill has a versioned frontmatter, a description <= 60 tokens and a body <= 2.5k tokens
-  - On the MR-A-02 and MR-B-02 dev scenarios, 0 of the decision packages discovery asks are answerable from files its retrieval bundle cites; at most five open packages, P1 may bypass (DEC-093)
-  - Planning emits schema-valid tickets and one linked gap ticket (class discovery, data, research or test-design) per required open readiness row (DEC-089)
+  - Each skill has a versioned frontmatter, a description <= 60 tokens and a body <= 2.5k tokens [CAP-24.a]
+  - On the MR-A-02 and MR-B-02 dev scenarios, 0 of the decision packages discovery asks are answerable from files its retrieval bundle cites; at most five open packages, P1 may bypass (DEC-093) [CAP-34.c]
+  - Planning emits schema-valid tickets and one linked gap ticket (class discovery, data, research or test-design) per required open readiness row (DEC-089) [CAP-30.b]
   - Test design reads only the specification and KPIs (its transcript reads no file outside them); change covers CIT-P and CIT-E, and an accepted CIT-E that changes a closed spine creates an audit ticket
-    (DEC-088)
+    (DEC-088) [CAP-33.a, CAP-47.d]
+  - 'No skill file grants a permission or states a rule as its own authority: a skill is a method, holds no tool permissions, and cites the policy or decision it follows [CAP-24.b]'
+  - The change skill takes a skill change through evidence → proposal → independent review → owner approval → a new version in the skill frontmatter [CAP-24.c]
+  - A change to the Gov OS kernel, policy or skills passes evidence → corroboration → proposal (CIT-P) → independent review → owner approval → versioned promotion; the change skill refuses to archive (CIT-E)
+    a kernel change that lacks any of these records [CAP-33.d]
   failure:
   - A skill body exceeds 2.5k tokens
   - The test-design skill reads implementation files
@@ -50,6 +54,7 @@ sources:
 - CAP-30
 - CAP-33
 - CAP-34
+- CAP-47
 est_loc: 480
 acceptance_tests:
   path: tests/acceptance/W1-35/

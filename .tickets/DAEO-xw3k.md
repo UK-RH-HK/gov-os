@@ -25,7 +25,10 @@ allowed_paths:
 kpis:
   success:
   - doctor reports pinned vs found tool versions, hooks wired, path map with zero unclassified paths, index freshness, canaries, framework.lock MATCH/DRIFT, per-repository isolation; non-zero on any failure
-  - rebuild recreates every derived store; two rebuilds give the same digest; a fresh clone plus doctor plus rebuild works
+    [CAP-02.a, CAP-06.a, CAP-25.a]
+  - rebuild recreates every derived store; two rebuilds give the same digest; a fresh clone plus doctor plus rebuild works [CAP-07.a, CAP-20.a, CAP-46.a]
+  - 'Path-map compliance is checked by doctor: every tracked path matches a path-map entry, and a recorded reference to a moved path is reported [CAP-06.d]'
+  - 'doctor reports an adoption level: a repository with only the kernel installed passes at the minimal level, and each completed adoption stage raises it toward ADOPTED_HEALTHY [CAP-54.a]'
   failure:
   - doctor passes with a tool at the wrong version
   - rebuild needs anything not in git
@@ -42,7 +45,7 @@ sources:
 - CAP-48
 - CAP-54
 - MR-4
-est_loc: 200
+est_loc: 230
 acceptance_tests:
   path: tests/acceptance/W1-27/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

@@ -27,7 +27,7 @@ allowed_paths:
 - tests/unit/adapters/**
 kpis:
   success:
-  - rulesync 24.0.0 generates CLAUDE.md, AGENTS.md (<= 1.5k tokens) and .claude/ with hooks, deny rules, roles and skills; OpenSpec commands and vendored skills are registered sources
+  - rulesync 24.0.0 generates CLAUDE.md, AGENTS.md (<= 1.5k tokens) and .claude/ with hooks, deny rules, roles and skills; OpenSpec commands and vendored skills are registered sources [CAP-52.a, CAP-52.b]
   - Hook-script stubs referenced by generated settings exist; rulesync generate --check is clean in CI
   failure:
   - generate --delete removes OpenSpec or vendored skills

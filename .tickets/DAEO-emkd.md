@@ -21,10 +21,10 @@ allowed_paths:
 - tests/unit/guard/**
 kpis:
   success:
-  - Edit/Write/Bash writes are allowed only inside the active ticket allowed_paths plus the kernel scratch set, per role
-  - The engineer role is denied every write under tests/acceptance/**; the independent-test-designer role is allowed only there
+  - Edit/Write/Bash writes are allowed only inside the active ticket allowed_paths plus the kernel scratch set, per role [CAP-39.a, CAP-58.a]
+  - The engineer role is denied every write under tests/acceptance/**; the independent-test-designer role is allowed only there [CAP-38.c]
   - The freeze flag (gov pause) denies every write; the guard reads ticket frontmatter directly; decision in < 100 ms p95
-  - 'A session with no declared role, or an unknown role, is read-only: every write is denied'
+  - 'A session with no declared role, or an unknown role, is read-only: every write is denied [CAP-58.c]'
   failure:
   - Any write outside allowed_paths is allowed
   - Guard crash or timeout lets the call through without a recorded finding
@@ -38,6 +38,8 @@ sources:
 - DEC-041
 - DEC-069
 - OWNER-DECISION-P2-0001 BC-P2-08
+- CAP-38
+- CAP-39
 - MR-3
 est_loc: 200
 acceptance_tests:

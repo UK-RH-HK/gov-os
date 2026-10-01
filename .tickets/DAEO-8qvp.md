@@ -21,7 +21,7 @@ allowed_paths:
 - tests/unit/containment/**
 kpis:
   success:
-  - After every Bash call and at gov close, git status --porcelain is compared with allowed_paths; a change outside them is reported to the agent and recorded as a containment finding
+  - After every Bash call and at gov close, git status --porcelain is compared with allowed_paths; a change outside them is reported to the agent and recorded as a containment finding [CAP-58.a]
   - Changes under tests/acceptance/** by a non-test-designer role are restored from HEAD and the breach is recorded
   - All nine Bash write forms from S0b2 I-06 are caught
   failure:

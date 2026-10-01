@@ -21,9 +21,9 @@ allowed_paths:
 - tests/unit/install/**
 kpis:
   success:
-  - Install commands (package managers, curl|sh, binary downloads into PATH) from the orchestrator return an ask decision; from any other role they are denied
-  - The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI)
-  - The tool-registry schema requires version, sha256, install and uninstall commands, date and approving decision id
+  - Install commands (package managers, curl|sh, binary downloads into PATH) from the orchestrator return an ask decision; from any other role they are denied [CAP-25.b]
+  - The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI) [CAP-25.b]
+  - The tool-registry schema requires version, sha256, install and uninstall commands, date and approving decision id [CAP-25.a]
   failure:
   - Any install executes without an owner approval in chat
   - sudo is ever allowed to an agent role

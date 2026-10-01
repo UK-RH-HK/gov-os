@@ -22,7 +22,7 @@ kpis:
   - A fresh read-only auditor compares the Wave 1 output with every Contract v4 W1 item, its covers list and the MR clauses, and issues a verdict; contested and owner-level findings reach the owner in chat
     as decision packages, agreed fixes become tickets
   - The audit→repair loop runs to convergence or to three consecutive non-converging iterations, then an escalation package goes to the owner; the orchestrator holds the count and never discloses it to
-    the auditor or repair sessions (DEC-096)
+    the auditor or repair sessions (DEC-096) [CAP-59.a, CAP-59.b]
   failure:
   - The auditor authored any audited file
   - A W1 contract item has no finding row
@@ -34,6 +34,7 @@ sources:
 - DEC-096
 - MR-4
 - CAP-47
+- CAP-59
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W1-43/

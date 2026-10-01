@@ -192,6 +192,7 @@ capabilities:
   - W1-10
   - W1-11
   - W1-24
+  - W1-26
   sources:
   - Contract v3 Gate A1
   - Framework v4.1.2 §2, §21
@@ -221,19 +222,31 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Machine-readable precedence: Charter → Contract → ADRs → specifications → tasks → retrieval → inference'
+  - id: CAP-01.a
+    item: 'Machine-readable precedence: Charter → Contract → ADRs → specifications → tasks → retrieval → inference'
     source: Contract v3 A1; Framework v4.1.2 §2, §21
     wave: W1
-  - item: Project files cannot manufacture authority; approvals are owner git facts
+    provider:
+    - W1-24
+  - id: CAP-01.b
+    item: Project files cannot manufacture authority; approvals are owner git facts
     source: OWNER-CLARIFICATION-P2-0004; DEC-046
     wave: W1
-  - item: 'Authority semantics preserved across stages: research cannot silently become a decision, lessons cannot silently
+    provider:
+    - W1-11
+  - id: CAP-01.c
+    item: 'Authority semantics preserved across stages: research cannot silently become a decision, lessons cannot silently
       become policy, historical material cannot replace current input'
     source: Contract v3 W2
     wave: W1
-  - item: Mandatory authoritative inputs outrank retrieval and are resolved deterministically
+    provider:
+    - W1-26
+  - id: CAP-01.d
+    item: Mandatory authoritative inputs outrank retrieval and are resolved deterministically
     source: Contract v3 W10
     wave: W1
+    provider:
+    - W1-24
 - id: CAP-02
   title: 'Release authenticity (lite: signed git tags)'
   outcome: The owner can confirm that an installed kernel matches a released version.
@@ -266,10 +279,15 @@ capabilities:
     lite_form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key
       rotation, offline envelopes or bootstrap separation.
   covers:
-  - item: SSH-signed release tag; file-hash manifest in framework.lock; gov doctor MATCH/DRIFT
+  - id: CAP-02.a
+    item: SSH-signed release tag; file-hash manifest in framework.lock; gov doctor MATCH/DRIFT
     source: Contract v3 A2 (LITE); Framework v4.1.2 §75B–75D
     wave: W1
-  - item: 'Non-goal: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation, unprovisioned-machine
+    provider:
+    - W1-39
+    - W1-27
+  - id: CAP-02.b
+    item: 'Non-goal: TUF metadata, key rotation and revocation, offline envelopes, bootstrap-mode separation, unprovisioned-machine
       trust anchors'
     source: DEC-027, DEC-039, OWNER-DECISION-P2-0002
     wave: NONE
@@ -285,6 +303,8 @@ capabilities:
   - W1-15
   - W1-16
   - W1-01
+  - W1-08
+  - W1-17
   sources:
   - Contract v3 Gate A3
   - Framework v4.1.2 §16, §72
@@ -318,23 +338,41 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Sensitivity class per path/dataset/namespace before read, index or export; secrets excluded by default-deny content
+  - id: CAP-03.a
+    item: Sensitivity class per path/dataset/namespace before read, index or export; secrets excluded by default-deny content
       filter
     source: Contract v3 A3; Framework v4.1.2 §16, §72
     wave: W1
-  - item: Development/governance memory separated from customer/runtime product data
+    provider:
+    - W1-15
+    - W1-08
+  - id: CAP-03.b
+    item: Development/governance memory separated from customer/runtime product data
     source: Framework v4.1.2 §16
     wave: W1
-  - item: Each namespace declares sensitivity class, permitted roles, retention, export policy, embedding policy, provenance
+    provider:
+    - W1-15
+    - W1-08
+  - id: CAP-03.c
+    item: Each namespace declares sensitivity class, permitted roles, retention, export policy, embedding policy, provenance
       and deletion/rebuild behaviour (path-map namespace fields)
     source: Framework v4.1.2 §16
     wave: W1
-  - item: Whole-repository corpus minus secrets
+    provider:
+    - W1-08
+  - id: CAP-03.d
+    item: Whole-repository corpus minus secrets
     source: OWNER-CLARIFICATION-BR-0002
     wave: W1
-  - item: Secret exclusion holds on every retrieval route, including the code route
+    provider:
+    - W1-17
+  - id: CAP-03.e
+    item: Secret exclusion holds on every retrieval route, including the code route
     source: OWNER-DIRECTION-BR-0003; DEC-076
     wave: W1
+    provider:
+    - W1-16
+    - W1-15
 - id: CAP-04
   title: Budget and resource governance
   outcome: The owner can set token and cost budgets per task; crossing one raises a decision package instead of continuing
@@ -347,6 +385,7 @@ capabilities:
   - ccusage (pinned, DEC-086)
   - W1-31
   - 'W2: budget gate in gov close/status'
+  - W1-21
   sources:
   - Contract v3 Gate A4
   - Framework v4.1.2 §73
@@ -362,16 +401,24 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Token/cost budgets per task with executable thresholds
+  - id: CAP-04.a
+    item: Token/cost budgets per task with executable thresholds
     source: Contract v3 A4; Framework v4.1.2 §73
     wave: W2
-  - item: Governance share ≤ 10–15 % measured per ticket (DEC-086)
+  - id: CAP-04.b
+    item: Governance share ≤ 10–15 % measured per ticket (DEC-086)
     source: OWNER-DIRECTION-P2-0009 §11; DEC-004
     wave: W1
-  - item: 'Two budgets: retrieval spend vs final packet; hitting the spend budget is a governed event'
+    provider:
+    - W1-31
+  - id: CAP-04.c
+    item: 'Two budgets: retrieval spend vs final packet; hitting the spend budget is a governed event'
     source: DEC-031
     wave: W1
-  - item: Exceeding a delegated limit raises a decision package
+    provider:
+    - W1-21
+  - id: CAP-04.d
+    item: Exceeding a delegated limit raises a decision package
     source: Contract v3 A4
     wave: W2
 - id: CAP-05
@@ -396,18 +443,30 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: PAUSE and FREEZE_WRITES (gov pause)
+  - id: CAP-05.a
+    item: PAUSE and FREEZE_WRITES (gov pause)
     source: Contract v3 A5; Framework v4.1.2 §74
     wave: W1
-  - item: 'CANCEL_AGENTS: stop running subagents and release their claims'
+    provider:
+    - W1-28
+  - id: CAP-05.b
+    item: 'CANCEL_AGENTS: stop running subagents and release their claims'
     source: Contract v3 A5; Framework v4.1.2 §74
     wave: W1
-  - item: 'ROLLBACK_TRANSACTION: git revert of the ticket''s commits, recorded'
+    provider:
+    - W1-28
+  - id: CAP-05.c
+    item: 'ROLLBACK_TRANSACTION: git revert of the ticket''s commits, recorded'
     source: Contract v3 A5; Framework v4.1.2 §74
     wave: W1
-  - item: Emergency commands deterministic and owner-gated; recovery auditable (recorded in the ticket)
+    provider:
+    - W1-28
+  - id: CAP-05.d
+    item: Emergency commands deterministic and owner-gated; recovery auditable (recorded in the ticket)
     source: Contract v3 A5
     wave: W1
+    provider:
+    - W1-28
 - id: CAP-06
   title: Repository contract and path map
   outcome: An agent can find where every kind of artefact lives from the committed path map, and nothing material is unclassified.
@@ -454,21 +513,38 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Every material artefact classified by current path, class, authority and intended target
+  - id: CAP-06.a
+    item: Every material artefact classified by current path, class, authority and intended target
     source: Contract v3 B1, B2; Framework v4.1.2 §8, §9
     wave: W1
-  - item: Target actions KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE
+    provider:
+    - W1-27
+    - W1-08
+  - id: CAP-06.b
+    item: Target actions KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE
     source: Contract v3 B2
     wave: W1
-  - item: Unknown material artefacts block destructive migration
+    provider:
+    - W1-41
+  - id: CAP-06.c
+    item: Unknown material artefacts block destructive migration
     source: Contract v3 B2
     wave: W1
-  - item: Imports/references/consumers represented; path-map compliance machine-checkable
+    provider:
+    - W1-41
+  - id: CAP-06.d
+    item: Imports/references/consumers represented; path-map compliance machine-checkable
     source: Contract v3 B2
     wave: W1
-  - item: Project-specific floor in the overlay
+    provider:
+    - W1-41
+    - W1-27
+  - id: CAP-06.e
+    item: Project-specific floor in the overlay
     source: OWNER-DECISION-P2-0008 §2
     wave: W1
+    provider:
+    - W1-08
 - id: CAP-07
   title: Authoritative vs derived state separation
   outcome: An agent can delete all derived state without losing anything authoritative.
@@ -477,6 +553,7 @@ capabilities:
   provider:
   - W1-17
   - W1-27
+  - W1-08
   sources:
   - Contract v3 Gate B3
   - Framework v4.1.2 §10, §12, §19
@@ -505,12 +582,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Authoritative state in git; derived state rebuildable and gitignored
+  - id: CAP-07.a
+    item: Authoritative state in git; derived state rebuildable and gitignored
     source: Contract v3 B3; Framework v4.1.2 §10, §12, §81
     wave: W1
-  - item: State classes recorded per record (state_class convention)
+    provider:
+    - W1-27
+  - id: CAP-07.b
+    item: State classes recorded per record (state_class convention)
     source: Framework v4.1.2 §3; DEC-046
     wave: W1
+    provider:
+    - W1-08
 - id: CAP-08
   title: Deterministic structured memory (records)
   outcome: An agent can ask exact structured questions over records (status, type, owner, links) and get exact answers.
@@ -537,9 +620,12 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Exact structured queries over records (status, type, owner, links)
+  - id: CAP-08.a
+    item: Exact structured queries over records (status, type, owner, links)
     source: Contract v3 C1; Framework v4.1.2 §11.1
     wave: W1
+    provider:
+    - W1-10
 - id: CAP-09
   title: Relationship/graph memory
   outcome: An agent can traverse implements, validates, supersedes and depends_on links across all record types, including
@@ -585,12 +671,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Typed edges EVIDENCE_FOR, CONSTRAINS, IMPLEMENTS, TESTS, GENERATES, VALIDATES, SUPERSEDES, DEPENDS_ON
+  - id: CAP-09.a
+    item: Typed edges EVIDENCE_FOR, CONSTRAINS, IMPLEMENTS, TESTS, GENERATES, VALIDATES, SUPERSEDES, DEPENDS_ON
     source: Contract v3 C2, W2; Framework v4.1.2 §11.2
     wave: W1
-  - item: Dangling references reported by id
+    provider:
+    - W1-10
+  - id: CAP-09.b
+    item: Dangling references reported by id
     source: Contract v3 C2
     wave: W1
+    provider:
+    - W1-10
 - id: CAP-10
   title: Semantic memory (vector/embedding retrieval)
   outcome: An agent can find a record from a paraphrased question.
@@ -634,10 +726,14 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Paraphrase retrieval with pinned embedder (Qwen3-Embedding-0.6B via Ollama)
+  - id: CAP-10.a
+    item: Paraphrase retrieval with pinned embedder (Qwen3-Embedding-0.6B via Ollama)
     source: Contract v3 C3; Framework v4.1.2 §11.3, §14; DEC-074
     wave: W1
-  - item: Embedder replaceable (provisional choice)
+    provider:
+    - W1-19
+  - id: CAP-10.b
+    item: Embedder replaceable (provisional choice)
     source: OWNER-DIRECTION-BR-0006 §5
     wave: W2
 - id: CAP-11
@@ -674,9 +770,12 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Exact strings, identifiers and error messages with file and line
+  - id: CAP-11.a
+    item: Exact strings, identifiers and error messages with file and line
     source: Contract v3 C4; Framework v4.1.2 §11.4
     wave: W1
+    provider:
+    - W1-17
 - id: CAP-12
   title: Code-structural memory (AST/LSP/SCIP)
   outcome: An agent can find definitions, callers and impact across languages from a code graph, without reading whole files.
@@ -715,12 +814,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Definitions, references, callers, impact, dead code across languages
+  - id: CAP-12.a
+    item: Definitions, references, callers, impact, dead code across languages
     source: Contract v3 C5; Framework v4.1.2 §11.5; DEC-014
     wave: W1
-  - item: Per-repository index home; secrets excluded from the code graph
+    provider:
+    - W1-16
+  - id: CAP-12.b
+    item: Per-repository index home; secrets excluded from the code graph
     source: DEC-074 Q10; DEC-076
     wave: W1
+    provider:
+    - W1-16
 - id: CAP-13
   title: Temporal and episodic memory
   outcome: An agent can see how a file or decision changed over time and which decision or task caused each change.
@@ -757,12 +862,19 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Temporal memory: change history with causal decision/task links (trailers)'
+  - id: CAP-13.a
+    item: 'Temporal memory: change history with causal decision/task links (trailers)'
     source: Contract v3 C6; Framework v4.1.2 §11.6
     wave: W1
-  - item: 'Episodic execution memory: checkpoints and close records per ticket'
+    provider:
+    - W1-10
+    - W1-30
+  - id: CAP-13.b
+    item: 'Episodic execution memory: checkpoints and close records per ticket'
     source: Contract v3 C7; Framework v4.1.2 §11.7
     wave: W1
+    provider:
+    - W1-25
 - id: CAP-14
   title: Failure memory
   outcome: An agent can see a previously failed approach before it retries it.
@@ -797,9 +909,12 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Failed approaches recorded and surfaced before a retry
+  - id: CAP-14.a
+    item: Failed approaches recorded and surfaced before a retry
     source: Contract v3 C8; Framework v4.1.2 §11.8; OWNER-DIRECTION-BR-0006 §1
     wave: W1
+    provider:
+    - W1-21
 - id: CAP-15
   title: Context packet compilation
   outcome: 'An agent starts every task with a compiled context packet: mandatory inputs by id and hash, an authority block
@@ -836,28 +951,50 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate'
+  - id: CAP-15.a
+    item: 'Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate'
     source: Contract v3 C9, W3, W4, W10; Framework v4.1.2 §15
     wave: W1
-  - item: 'Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency'
+    provider:
+    - W1-24
+  - id: CAP-15.b
+    item: 'Required inputs: id, authority/lifecycle state, version/hash constraint, reason per dependency'
     source: Contract v3 W3
     wave: W1
-  - item: Missing mandatory input → refusal or explicit BLOCKED; superseded input cannot satisfy a current requirement; conflicting
+    provider:
+    - W1-24
+  - id: CAP-15.c
+    item: Missing mandatory input → refusal or explicit BLOCKED; superseded input cannot satisfy a current requirement; conflicting
       inputs → contradiction handling
     source: Contract v3 W3, W4
     wave: W1
-  - item: Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
+    provider:
+    - W1-24
+  - id: CAP-15.d
+    item: Token pressure drops supplementary context before mandatory inputs; index outage does not erase deterministic dependencies
     source: Contract v3 W10
     wave: W1
-  - item: Packet hash/provenance proves what the worker received
+    provider:
+    - W1-24
+  - id: CAP-15.e
+    item: Packet hash/provenance proves what the worker received
     source: Contract v3 W4
     wave: W1
-  - item: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable'
+    provider:
+    - W1-24
+  - id: CAP-15.f
+    item: 'Hierarchical synthesis notes: derived, cited, hash-checked, disclose unresolved evidence, rebuildable'
     source: DEC-080; DEC-030; DEC-036; OWNER-DIRECTION-BR-0006 §4
     wave: W1
-  - item: File path + summary ≤ ~2.5k tokens (harness output caps)
+    provider:
+    - W1-23
+  - id: CAP-15.g
+    item: File path + summary ≤ ~2.5k tokens (harness output caps)
     source: DEC-025; architecture v0.3 §2.3
     wave: W1
+    provider:
+    - W1-24
+    - W1-29
 - id: CAP-16
   title: Multi-batch, multi-hop, paginated retrieval
   outcome: An agent can gather evidence that spans many locations and hops, in batches, until a stated stopping reason.
@@ -887,15 +1024,25 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Batches with continuation; batch size never a completeness limit
+  - id: CAP-16.a
+    item: Batches with continuation; batch size never a completeness limit
     source: DEC-030; DEC-080; OWNER-DIRECTION-BR-0005
     wave: W1
-  - item: Parallel facet retrieval → merge/filter → unresolved dependencies → sequential follow-up → bounded compilation
+    provider:
+    - W1-21
+  - id: CAP-16.b
+    item: Parallel facet retrieval → merge/filter → unresolved dependencies → sequential follow-up → bounded compilation
     source: DEC-030; OWNER-DIRECTION-BR-0006 §2, §3
     wave: W1
-  - item: Radius-scaled rounds (placeholders tuned from telemetry)
+    provider:
+    - W1-36
+    - W1-21
+  - id: CAP-16.c
+    item: Radius-scaled rounds (placeholders tuned from telemetry)
     source: DEC-035
     wave: W1
+    provider:
+    - W1-21
 - id: CAP-17
   title: Incremental indexing and freshness
   outcome: 'An agent never receives stale evidence silently: changed files are re-indexed before the next retrieval, or the
@@ -930,15 +1077,22 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Changed content re-indexed before the next retrieval, or facet reported unavailable
+  - id: CAP-17.a
+    item: Changed content re-indexed before the next retrieval, or facet reported unavailable
     source: Contract v3 D1; Framework v4.1.2 §13
     wave: W1
-  - item: Commit-time re-index hook
+    provider:
+    - W1-17
+  - id: CAP-17.b
+    item: Commit-time re-index hook
     source: G-23
     wave: W2
-  - item: Zero-result canaries after reindex
+  - id: CAP-17.c
+    item: Zero-result canaries after reindex
     source: DEC-037; DEC-080
     wave: W1
+    provider:
+    - W1-22
 - id: CAP-18
   title: Retrieval router (multi-route fusion)
   outcome: An agent can answer a complex question through several retrieval routes, fused, deduplicated and reranked once.
@@ -968,13 +1122,21 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Multi-route router with fusion (RRF), dedup by chunk hash, one rerank
+  - id: CAP-18.a
+    item: Multi-route router with fusion (RRF), dedup by chunk hash, one rerank
     source: Contract v3 D2; Framework v4.1.2 §14; DEC-080
     wave: W1
-  - item: 'Hierarchical retrieval: document→section→chunk, code file→module→function; child first; parent/neighbour expansion
+    provider:
+    - W1-19
+    - W1-21
+  - id: CAP-18.b
+    item: 'Hierarchical retrieval: document→section→chunk, code file→module→function; child first; parent/neighbour expansion
       only as needed, named in the bundle'
     source: Contract v3 D3; Framework v4.1.2 §14.1; DEC-091
     wave: W1
+    provider:
+    - W1-17
+    - W1-21
 - id: CAP-19
   title: Retrieval component separation and model selection
   outcome: The owner can swap an embedding or reranking model through configuration, with a pinned revision and a regression
@@ -1001,13 +1163,16 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Components separable; model swap by configuration under a fail-closed pin
+  - id: CAP-19.a
+    item: Components separable; model swap by configuration under a fail-closed pin
     source: Contract v3 D4; Framework v4.1.2 §14.2; DEC-046 (D-0005/6)
     wave: W2
-  - item: Evidence-driven model selection (bake-off, per-repository benchmark)
+  - id: CAP-19.b
+    item: Evidence-driven model selection (bake-off, per-repository benchmark)
     source: Contract v3 D5; Framework v4.1.2 §14.3
     wave: W3
-  - item: 'Retrieval learning loop: a miss is a memory-quality event → root cause → repair → held-out regression test'
+  - id: CAP-19.c
+    item: 'Retrieval learning loop: a miss is a memory-quality event → root cause → repair → held-out regression test'
     source: Framework v4.1.2 §18
     wave: W2
 - id: CAP-20
@@ -1018,6 +1183,7 @@ capabilities:
   wave: W1
   provider:
   - W1-27
+  - W1-25
   sources:
   - Contract v3 Gate D6
   - Framework v4.1.2 §19
@@ -1052,9 +1218,13 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Delete derived state, rebuild from git, identical digest; fresh agent reconstructs
+  - id: CAP-20.a
+    item: Delete derived state, rebuild from git, identical digest; fresh agent reconstructs
     source: Contract v3 D6; Framework v4.1.2 §19; Distribution Protocol v1.2 §7.5
     wave: W1
+    provider:
+    - W1-27
+    - W1-25
 - id: CAP-21
   title: Owner-only approval facts (lite of L0-L5 authority levels)
   outcome: The owner can trust that no agent makes a decision ACTIVE on its own.
@@ -1082,10 +1252,14 @@ capabilities:
     lite_form: An approval is a fact only when it comes from the owner's git account (owner commit, signed tag or PR approval);
       no in-process L0–L5 machinery.
   covers:
-  - item: Approval facts only from the owner's git account
+  - id: CAP-21.a
+    item: Approval facts only from the owner's git account
     source: Contract v3 E1 (LITE); Framework v4.1.2 §23
     wave: W1
-  - item: 'Non-goal: in-process L0–L5 levels, acting-role resolution, sealed human channel'
+    provider:
+    - W1-11
+  - id: CAP-21.b
+    item: 'Non-goal: in-process L0–L5 levels, acting-role resolution, sealed human channel'
     source: DEC-039; OWNER-DECISION-P2-0001
     wave: NONE
 - id: CAP-22
@@ -1099,6 +1273,7 @@ capabilities:
   provider:
   - W1-25
   - 'W2: typed handoff records'
+  - W1-33
   sources:
   - Contract v3 Gate E2, E3
   - Framework v4.1.2 §24, §25
@@ -1112,13 +1287,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Representative roles as subagent definitions
+  - id: CAP-22.a
+    item: Representative roles as subagent definitions
     source: Contract v3 E2; Framework v4.1.2 §24
     wave: W1
-  - item: Typed handoff records readable by a fresh agent
+    provider:
+    - W1-33
+  - id: CAP-22.b
+    item: Typed handoff records readable by a fresh agent
     source: Contract v3 E3; Framework v4.1.2 §25
     wave: W2
-  - item: Distinct test execution and integration roles
+  - id: CAP-22.c
+    item: Distinct test execution and integration roles
     source: MR-5; DEC-094
     wave: W2
 - id: CAP-23
@@ -1146,10 +1326,14 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Exclusive claim lock with holder named
+  - id: CAP-23.a
+    item: Exclusive claim lock with holder named
     source: Contract v3 E4; G-03
     wave: W1
-  - item: Parallel-agent concurrency and the claims role
+    provider:
+    - W1-09
+  - id: CAP-23.b
+    item: Parallel-agent concurrency and the claims role
     source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
     wave: W3
 - id: CAP-24
@@ -1163,6 +1347,7 @@ capabilities:
   - W1-36
   - W1-37
   - W1-30
+  - W1-26
   sources:
   - Contract v3 Gate F1
   - Framework v4.1.2 §26, §27
@@ -1176,15 +1361,27 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Skills versioned; versions recorded against the work
+  - id: CAP-24.a
+    item: Skills versioned; versions recorded against the work
     source: Contract v3 F1; Framework v4.1.2 §26, §27
     wave: W1
-  - item: 'A skill is a method: not a tool and not a policy (skills hold no permissions and no authority)'
+    provider:
+    - W1-35
+    - W1-30
+  - id: CAP-24.b
+    item: 'A skill is a method: not a tool and not a policy (skills hold no permissions and no authority)'
     source: Framework v4.1.2 §26
     wave: W1
-  - item: Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
+    provider:
+    - W1-35
+    - W1-36
+  - id: CAP-24.c
+    item: Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
     source: Framework v4.1.2 §5, §27
     wave: W1
+    provider:
+    - W1-35
+    - W1-26
 - id: CAP-25
   title: Tool registry and capability memory (lite)
   outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
@@ -1220,14 +1417,23 @@ capabilities:
       in chat, and records version, sha256, install and uninstall commands, date and approving decision; `gov doctor` checks
       the pins. No automated install classification (DEC-083).
   covers:
-  - item: Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks
+  - id: CAP-25.a
+    item: Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks
     source: Contract v3 F2, C10 (LITE); Framework v4.1.2 §28–29, §11.10
     wave: W1
-  - item: Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the
+    provider:
+    - W1-04
+    - W1-06
+    - W1-27
+  - id: CAP-25.b
+    item: Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the
       owner
     source: Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083
     wave: W1
-  - item: 'Non-goal: automated install classification, argv analysis, authority envelopes'
+    provider:
+    - W1-04
+  - id: CAP-25.c
+    item: 'Non-goal: automated install classification, argv analysis, authority envelopes'
     source: DEC-083; OWNER-DECISION-P2-0003
     wave: NONE
 - id: CAP-26
@@ -1255,7 +1461,8 @@ capabilities:
     - DEC-039
     - DEC-075
   covers:
-  - item: 'Non-goal: plugin hash-binding, descriptor security, self-attestation prevention'
+  - id: CAP-26.a
+    item: 'Non-goal: plugin hash-binding, descriptor security, self-attestation prevention'
     source: Contract v3 F4; OWNER-DECISION-P2-0005
     wave: NONE
 - id: CAP-27
@@ -1280,10 +1487,15 @@ capabilities:
     class: LITE
     lite_form: Read commands never mutate; no separate A2A layer or three-layer knowledge fabric.
   covers:
-  - item: Read commands never mutate
+  - id: CAP-27.a
+    item: Read commands never mutate
     source: Contract v3 F5 (LITE); Framework v4.1.2 §31
     wave: W1
-  - item: 'Non-goal: separate A2A layer and three-layer knowledge fabric'
+    provider:
+    - W1-07
+    - W1-32
+  - id: CAP-27.b
+    item: 'Non-goal: separate A2A layer and three-layer knowledge fabric'
     source: DEC-074 Q11
     wave: NONE
 - id: CAP-28
@@ -1308,12 +1520,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Natural-language intent first; small explicit command set
+  - id: CAP-28.a
+    item: Natural-language intent first; small explicit command set
     source: Contract v3 G1, G2; Framework v4.1.2 §33, §34
     wave: W1
-  - item: Internal governance operations exposed as gov commands
+    provider:
+    - W1-32
+  - id: CAP-28.b
+    item: Internal governance operations exposed as gov commands
     source: Framework v4.1.2 §35
     wave: W1
+    provider:
+    - W1-07
 - id: CAP-29
   title: Specification lineage (idea to live evidence)
   outcome: An agent can follow a feature from idea through scenarios, requirements, decisions, tasks and tests to live evidence.
@@ -1339,11 +1557,13 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions →
+  - id: CAP-29.a
+    item: Lineage idea → mission → actors → journeys → scenarios → features → data → requirements → research → decisions →
       algorithms → architecture → interfaces → security/performance/operations → WBS → tests → live evidence
     source: Contract v3 H1; Framework v4.1.2 §36
     wave: W3
-  - item: Forward and reverse lineage; missing and stale links detected
+  - id: CAP-29.b
+    item: Forward and reverse lineage; missing and stale links detected
     source: Contract v3 W8
     wave: W3
 - id: CAP-30
@@ -1359,6 +1579,7 @@ capabilities:
   - W1-12
   - W1-13
   - 'W2: gov readiness --generate'
+  - W1-26
   - W1-35
   sources:
   - Contract v3 Gate H2, H3, H4
@@ -1389,21 +1610,35 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 26-row readiness checklist, five states, silent N/A invalid, no defaulted N/A
+  - id: CAP-30.a
+    item: 26-row readiness checklist, five states, silent N/A invalid, no defaulted N/A
     source: Contract v3 H2; Framework v4.1.2 §37; DEC-085
     wave: W1
-  - item: Readiness gaps generate linked tickets (W1 planning skill + gov check)
+    provider:
+    - W1-12
+    - W1-13
+  - id: CAP-30.b
+    item: Readiness gaps generate linked tickets (W1 planning skill + gov check)
     source: Contract v3 H3; Framework v4.1.2 §38; DEC-089
     wave: W1
-  - item: Automatic generation (gov readiness --generate)
+    provider:
+    - W1-13
+    - W1-26
+    - W1-35
+  - id: CAP-30.c
+    item: Automatic generation (gov readiness --generate)
     source: Contract v3 H3; DEC-089
     wave: W2
-  - item: Scenarios drive data and tests; data provenance recorded; data author independent where practical
+  - id: CAP-30.d
+    item: Scenarios drive data and tests; data provenance recorded; data author independent where practical
     source: Contract v3 H4; Framework v4.1.2 §39
     wave: W3
-  - item: Capability taxonomy for STANDARD rows; extended only through a governed change
+  - id: CAP-30.e
+    item: Capability taxonomy for STANDARD rows; extended only through a governed change
     source: Framework v4.1.2 §40
     wave: W1
+    provider:
+    - W1-12
 - id: CAP-31
   title: Unified task DAG with dynamic generation
   outcome: An agent works from one task DAG in git, and failures generate their own repair tasks.
@@ -1415,6 +1650,7 @@ capabilities:
   - W1-09
   - W1-14
   - W1-30
+  - W1-08
   sources:
   - Contract v3 Gate I1, I2, I3, I4
   - Framework v4.1.2 §41-44
@@ -1451,18 +1687,31 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: One task DAG; task contract with class, role, inputs, allowed paths, KPIs, profile
+  - id: CAP-31.a
+    item: One task DAG; task contract with class, role, inputs, allowed paths, KPIs, profile
     source: Contract v3 I1, I2; Framework v4.1.2 §41, §42
     wave: W1
-  - item: Dynamic generation of repair/revalidation tasks
+    provider:
+    - W1-08
+    - W1-14
+  - id: CAP-31.b
+    item: Dynamic generation of repair/revalidation tasks
     source: Contract v3 I3; Framework v4.1.2 §43
     wave: W1
-  - item: Parallel and serial execution by dependency
+    provider:
+    - W1-30
+  - id: CAP-31.c
+    item: Parallel and serial execution by dependency
     source: Contract v3 I4; Framework v4.1.2 §44
     wave: W1
-  - item: A task cannot be READY if a mandatory input is absent
+    provider:
+    - W1-09
+  - id: CAP-31.d
+    item: A task cannot be READY if a mandatory input is absent
     source: Contract v3 W3
     wave: W1
+    provider:
+    - W1-09
 - id: CAP-32
   title: Research and experiment lifecycle
   outcome: An agent keeps research as evidence records separate from authority, and experimental results cannot reach production
@@ -1495,10 +1744,12 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Research becomes evidence records separate from authority
+  - id: CAP-32.a
+    item: Research becomes evidence records separate from authority
     source: Contract v3 J1; Framework v4.1.2 §45
     wave: W3
-  - item: Experiment lifecycle; discovery flow
+  - id: CAP-32.b
+    item: Experiment lifecycle; discovery flow
     source: Contract v3 J2; Framework v4.1.2 §46
     wave: W3
 - id: CAP-33
@@ -1542,19 +1793,27 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: CIT-P proposal and CIT-E apply/archive records
+  - id: CAP-33.a
+    item: CIT-P proposal and CIT-E apply/archive records
     source: Contract v3 K1, K2; Framework v4.1.2 §47
     wave: W1
-  - item: Automatic impact simulation over record and code graphs; impact radius → profile
+    provider:
+    - W1-35
+  - id: CAP-33.b
+    item: Automatic impact simulation over record and code graphs; impact radius → profile
     source: Contract v3 K3, K4; Framework v4.1.2 §48, §49
     wave: W2
-  - item: Upstream change propagates staleness and generates revalidation tasks
+  - id: CAP-33.c
+    item: Upstream change propagates staleness and generates revalidation tasks
     source: Contract v3 W6
     wave: W3
-  - item: Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned
+  - id: CAP-33.d
+    item: Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned
       promotion
     source: Framework v4.1.2 §5
     wave: W1
+    provider:
+    - W1-35
 - id: CAP-34
   title: Human decision gates and contradiction resolution
   outcome: The owner receives every question that matters as a ranked decision package in the active chat, and independent
@@ -1566,6 +1825,8 @@ capabilities:
   provider:
   - W1-34
   - W1-35
+  - W1-09
+  - W1-11
   sources:
   - Contract v3 Gate L1, L2, L3, L4
   - Framework v4.1.2 §50-54
@@ -1604,21 +1865,38 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Agent- vs human-resolvable contradictions
+  - id: CAP-34.a
+    item: Agent- vs human-resolvable contradictions
     source: Contract v3 L1; Framework v4.1.2 §50
     wave: W1
-  - item: Decision package with ten fields
+    provider:
+    - W1-34
+  - id: CAP-34.b
+    item: Decision package with ten fields
     source: Contract v3 L2; Framework v4.1.2 §52
     wave: W1
-  - item: Presented in the active chat; ranked P1–P3; at most five at a time, P1 may bypass
+    provider:
+    - W1-34
+  - id: CAP-34.c
+    item: Presented in the active chat; ranked P1–P3; at most five at a time, P1 may bypass
     source: Contract v3 L3; Framework v4.1.2 §52, §54; DEC-093
     wave: W1
-  - item: Declined, revoked, stale or other-CIT gates cannot authorise execution
+    provider:
+    - W1-34
+    - W1-35
+  - id: CAP-34.d
+    item: Declined, revoked, stale or other-CIT gates cannot authorise execution
     source: Contract v3 L3
     wave: W1
-  - item: Non-global blocking
+    provider:
+    - W1-11
+    - W1-34
+  - id: CAP-34.e
+    item: Non-global blocking
     source: Contract v3 L4; Framework v4.1.2 §53
     wave: W1
+    provider:
+    - W1-09
 - id: CAP-35
   title: Model routing (T0-T3 tiers, reasoning levels)
   outcome: The owner can route each role and task class to a model tier.
@@ -1642,13 +1920,16 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Capability tiers T0–T3
+  - id: CAP-35.a
+    item: Capability tiers T0–T3
     source: Contract v3 M1; Framework v4.1.2 §55
     wave: W3
-  - item: Task reasoning requirement low/medium/high/extra-high declared and enforced
+  - id: CAP-35.b
+    item: Task reasoning requirement low/medium/high/extra-high declared and enforced
     source: Contract v3 M2; Framework v4.1.2 §56
     wave: W3
-  - item: 'Role defaults: minimum tier and default reasoning per role'
+  - id: CAP-35.c
+    item: 'Role defaults: minimum tier and default reasoning per role'
     source: Contract v3 M3; Framework v4.1.2 §57
     wave: W3
 - id: CAP-36
@@ -1670,7 +1951,8 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings'
+  - id: CAP-36.a
+    item: 'Per run: model/provider, task class, reasoning effort, cost, latency, pass/fail, repair count, reviewer findings'
     source: Contract v3 M4; Framework v4.1.2 §58
     wave: W3
 - id: CAP-37
@@ -1713,26 +1995,44 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Structured checkpoint in the repository with input ids/versions/hashes
+  - id: CAP-37.a
+    item: Structured checkpoint in the repository with input ids/versions/hashes
     source: Contract v3 N1, W9; Framework v4.1.2 §59
     wave: W1
-  - item: Mandatory triggers incl. ticket transition, compaction, stop
+    provider:
+    - W1-25
+  - id: CAP-37.b
+    item: Mandatory triggers incl. ticket transition, compaction, stop
     source: Contract v3 N2; Framework v4.1.2 §60
     wave: W1
-  - item: 'Provider-independent watchdog: not only proprietary hooks; marks stale; checkpoints on context utilisation; blocks
+    provider:
+    - W1-25
+    - W1-29
+  - id: CAP-37.c
+    item: 'Provider-independent watchdog: not only proprietary hooks; marks stale; checkpoints on context utilisation; blocks
       handoff/close when freshness violates policy'
     source: Contract v3 N3; Framework v4.1.2 §60
     wave: W1
-  - item: 'Worker return contract: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons,
+    provider:
+    - W1-25
+    - W1-29
+  - id: CAP-37.d
+    item: 'Worker return contract: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons,
       proposed_decisions, unresolved, recommended_next_action'
     source: Contract v3 N4; Framework v4.1.2 §61
     wave: W1
-  - item: Model/provider switch reconstructs the same inputs
+    provider:
+    - W1-29
+  - id: CAP-37.e
+    item: Model/provider switch reconstructs the same inputs
     source: Contract v3 W9
     wave: W2
-  - item: Checkpoint discipline; resume after crash
+  - id: CAP-37.f
+    item: Checkpoint discipline; resume after crash
     source: OWNER-DIRECTION-BR-0004; OWNER-DIRECTION-BR-0006 §7, §8
     wave: W1
+    provider:
+    - W1-25
 - id: CAP-38
   title: Verification test families (product and governance)
   outcome: The owner can see product and governance verification results, with builder tests counted as regression evidence
@@ -1744,6 +2044,7 @@ capabilities:
   - W1-26
   - W1-30
   - W1-37
+  - W1-02
   sources:
   - Contract v3 Gate O1, O2, O3, O4
   - Framework v4.1.2 §62-64
@@ -1769,21 +2070,34 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Product test families
+  - id: CAP-38.a
+    item: Product test families
     source: Contract v3 O1; Framework v4.1.2 §62
     wave: W1
-  - item: 'Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role
+    provider:
+    - W1-30
+  - id: CAP-38.b
+    item: 'Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role
       limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability,
       skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product
       traceability, audit reproducibility'
     source: Contract v3 O2; Framework v4.1.2 §63
     wave: W1
-  - item: Independent test authorship; builder tests are regression evidence only
+    provider:
+    - W1-26
+  - id: CAP-38.c
+    item: Independent test authorship; builder tests are regression evidence only
     source: Contract v3 O3; DEC-042
     wave: W1
-  - item: Governance suite currency
+    provider:
+    - W1-30
+    - W1-02
+  - id: CAP-38.d
+    item: Governance suite currency
     source: Contract v3 O4; Framework v4.1.2 §64
     wave: W1
+    provider:
+    - W1-30
 - id: CAP-39
   title: Governance health scheduler (G0-G6 tiers)
   outcome: Governance checks run at the right tier automatically, and a stale required index blocks close.
@@ -1796,6 +2110,8 @@ capabilities:
   - GitHub Actions
   - W1-40
   - 'W3: health scheduler'
+  - W1-02
+  - W1-26
   sources:
   - Contract v3 Gate O5
   - Framework v4.1.2 §62-64
@@ -1814,19 +2130,28 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite
+  - id: CAP-39.a
+    item: Tiers G0 guard, G1 mutation, G2 task close, G3 checkpoint/handoff, G4 milestone, G5 full suite
     source: Contract v3 O5
     wave: W1
-  - item: G6 qualification (synthetic repos, chaos, soak, hidden tests)
+    provider:
+    - W1-40
+    - W1-02
+  - id: CAP-39.b
+    item: G6 qualification (synthetic repos, chaos, soak, hidden tests)
     source: Contract v3 O5; DEC-067
     wave: W3
-  - item: 'Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes;
+  - id: CAP-39.c
+    item: 'Scheduler: dependency-aware impacted-test selection; parallel independent checks; isolated worktrees/processes;
       cache keyed by content/policy/framework hashes'
     source: Contract v3 O5
     wave: W3
-  - item: RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded
+  - id: CAP-39.d
+    item: RED/YELLOW/GREEN state; explicit hard-block vs warning; health result provenance recorded
     source: Contract v3 O5
     wave: W1
+    provider:
+    - W1-26
 - id: CAP-40
   title: Execution telemetry and organisational questions
   outcome: The owner can see tokens, model, cost and outcome per ticket.
@@ -1856,11 +2181,15 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens
+  - id: CAP-40.a
+    item: 'Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens
       in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions'
     source: Contract v3 P1; Framework v4.1.2 §65
     wave: W1
-  - item: 'Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate,
+    provider:
+    - W1-31
+  - id: CAP-40.b
+    item: 'Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate,
       human-gate concentration, retrieval misses, cost by task/feature, first-pass completion'
     source: Contract v3 P2; Framework v4.1.2 §66
     wave: W3
@@ -1893,20 +2222,33 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Lesson lifecycle: report → candidate → corroboration → scope → rule/skill/retrieval/tool proposal → independent
+  - id: CAP-41.a
+    item: 'Lesson lifecycle: report → candidate → corroboration → scope → rule/skill/retrieval/tool proposal → independent
       validation → owner approval → versioned'
     source: Contract v3 Q1; Framework v4.1.2 §67
     wave: W1
-  - item: Decision vs lesson distinction; lessons cannot silently become policy
+    provider:
+    - W1-08
+  - id: CAP-41.b
+    item: Decision vs lesson distinction; lessons cannot silently become policy
     source: Contract v3 Q2, W2; Framework v4.1.2 §68
     wave: W1
-  - item: PROJECT/PRODUCT/FRAMEWORK scope
+    provider:
+    - W1-44
+  - id: CAP-41.c
+    item: PROJECT/PRODUCT/FRAMEWORK scope
     source: Contract v3 Q3
     wave: W1
-  - item: Phase-2 lessons carried (L-0074, anti-stall, no manufactured history, anti-snowball)
+    provider:
+    - W1-08
+  - id: CAP-41.d
+    item: Phase-2 lessons carried (L-0074, anti-stall, no manufactured history, anti-snowball)
     source: DEC-046; OWNER-DECISION-P2-0008 §9; OWNER-DIRECTION-BR-0004 §2D; OWNER-AMENDMENT-P2-0010 §7
     wave: W1
-  - item: 'Non-goal: upstream export gate, lesson packets, FCP loop'
+    provider:
+    - W1-44
+  - id: CAP-41.e
+    item: 'Non-goal: upstream export gate, lesson packets, FCP loop'
     source: Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7
     wave: NONE
 - id: CAP-42
@@ -1936,16 +2278,25 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Legacy governance retirement: rules imported or archived, zero active authority'
+  - id: CAP-42.a
+    item: 'Legacy governance retirement: rules imported or archived, zero active authority'
     source: Contract v3 R1; Framework v4.1.2 §69
     wave: W1
-  - item: 'Chat-memory retirement: raw chat DB not active truth; unique knowledge extracted; dependency proof before retirement;
+    provider:
+    - W1-41
+  - id: CAP-42.b
+    item: 'Chat-memory retirement: raw chat DB not active truth; unique knowledge extracted; dependency proof before retirement;
       CIT-E and index refresh on retirement'
     source: Contract v3 R2; Framework v4.1.2 §70
     wave: W1
-  - item: Archive policy
+    provider:
+    - W1-41
+  - id: CAP-42.c
+    item: Archive policy
     source: Contract v3 R3; Framework v4.1.2 §71
     wave: W1
+    provider:
+    - W1-41
 - id: CAP-43
   title: Canonical OS repo separation and immutable releases
   outcome: The owner can tell exactly which Gov OS version a repository runs; releases never change once tagged.
@@ -1971,14 +2322,19 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Canonical OS repository separation; developed once
+  - id: CAP-43.a
+    item: Canonical OS repository separation; developed once
     source: Contract v3 S1; Framework v4.1.2 §75A, §75B
     wave: W1
-  - item: 'Release contents: semantic version, manifest, file hashes, supported migrations, schema versions, CLI/runtime versions,
+    provider:
+    - W1-39
+  - id: CAP-43.b
+    item: 'Release contents: semantic version, manifest, file hashes, supported migrations, schema versions, CLI/runtime versions,
       adapter/capability versions, release notes, affected indexes, required human decisions, rollback procedure'
     source: Contract v3 S2; Framework v4.1.2 §75D
     wave: W3
-  - item: Release certification by qualification
+  - id: CAP-43.c
+    item: Release certification by qualification
     source: Framework v4.1.2 §75C; DEC-067
     wave: W3
 - id: CAP-44
@@ -2016,35 +2372,61 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'gov init: kernel, overlay, repository contract, initial state, health checks'
+  - id: CAP-44.a
+    item: 'gov init: kernel, overlay, repository contract, initial state, health checks'
     source: Contract v3 S3; Framework v4.1.2 §77, §78; Distribution Protocol v1.2 §9
     wave: W1
-  - item: A0 safety baseline (clean tree, backup ref); A1 cold inventory; A2 classification; A3 target path map; A4 batched
+    provider:
+    - W1-39
+  - id: CAP-44.b
+    item: A0 safety baseline (clean tree, backup ref); A1 cold inventory; A2 classification; A3 target path map; A4 batched
       plan with rollback points
     source: Contract v3 S4; Adoption Protocol v3.0 §2, §6–§9; Distribution Protocol v1.2 §10
     wave: W1
-  - item: A5 independent review of the path map before any move (Independent Auditor)
+    provider:
+    - W1-41
+  - id: CAP-44.c
+    item: A5 independent review of the path map before any move (Independent Auditor)
     source: Contract v3 S4; Adoption Protocol v3.0 §10; DEC-090
     wave: W1
-  - item: A6 controlled migration; failed batch rolls back; moves precede new indexing
+    provider:
+    - W1-41
+  - id: CAP-44.d
+    item: A6 controlled migration; failed batch rolls back; moves precede new indexing
     source: Adoption Protocol v3.0 §11; Distribution Protocol v1.2 §10, §11
     wave: W1
-  - item: A8 legacy memory extraction/retirement
+    provider:
+    - W1-41
+  - id: CAP-44.e
+    item: A8 legacy memory extraction/retirement
     source: Adoption Protocol v3.0 §13; Distribution Protocol v1.2 §10
     wave: W1
-  - item: A7 independent migration verification; A9 new knowledge fabric; A10 independent memory verification; A11 full audit
+    provider:
+    - W1-41
+  - id: CAP-44.f
+    item: A7 independent migration verification; A9 new knowledge fabric; A10 independent memory verification; A11 full audit
     source: Adoption Protocol v3.0 §12, §14–§16; Distribution Protocol v1.2 §10
     wave: W3
-  - item: Remediation, finding states, human gates during adoption
+  - id: CAP-44.g
+    item: Remediation, finding states, human gates during adoption
     source: Adoption Protocol v3.0 §17–§19
     wave: W3
-  - item: Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY
+  - id: CAP-44.h
+    item: Final verdict ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY with the ten ADOPTED_HEALTHY
       conditions
     source: Adoption Protocol v3.0 §20; Distribution Protocol v1.2 §18; DEC-006
     wave: W3
-  - item: Interrupted-session recovery and freeze during adoption
+  - id: CAP-44.i
+    item: Interrupted-session recovery and freeze during adoption
     source: Adoption Protocol v3.0 §4
     wave: W3
+  - id: CAP-44.j
+    item: The path map keeps a healthy native framework/package layout unless the target structure is materially better and
+      the migration risk is justified
+    source: Framework v4.1.2 §79.3; Distribution Protocol v1.2 §10 A3
+    wave: W1
+    provider:
+    - W1-41
 - id: CAP-45
   title: gov update lifecycle
   outcome: The owner can update the Gov OS in a repository without losing overlay configuration.
@@ -2069,7 +2451,8 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'gov update: check/impact, authenticated source (signed tag), compatibility/migration, overlay preserved, adapters
+  - id: CAP-45.a
+    item: 'gov update: check/impact, authenticated source (signed tag), compatibility/migration, overlay preserved, adapters
       regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance'
     source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12
     wave: W2
@@ -2096,9 +2479,12 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Clone + doctor + rebuild reproduces the environment
+  - id: CAP-46.a
+    item: Clone + doctor + rebuild reproduces the environment
     source: Contract v3 S6; Framework v4.1.2 §83; Distribution Protocol v1.2 §16
     wave: W1
+    provider:
+    - W1-27
 - id: CAP-47
   title: Independent adoption/audit roles and fresh-session independence
   outcome: The owner gets independent verification from fresh sessions that did not build what they check.
@@ -2110,6 +2496,9 @@ capabilities:
   provider:
   - W1-33
   - 'W3: independent adoption/audit roles'
+  - W1-13
+  - W1-35
+  - W1-36
   - W1-43
   sources:
   - Contract v3 Gate T1, T2, T3
@@ -2127,18 +2516,28 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Role separation for adoption and audit
+  - id: CAP-47.a
+    item: Role separation for adoption and audit
     source: Contract v3 T1; Adoption Protocol v3.0 §3
     wave: W3
-  - item: Fresh-session independence with a bounded context pack
+  - id: CAP-47.b
+    item: Fresh-session independence with a bounded context pack
     source: Contract v3 T2; DEC-042; OWNER-AMENDMENT-P2-0010
     wave: W1
-  - item: Adoption evidence tree
+    provider:
+    - W1-36
+  - id: CAP-47.c
+    item: Adoption evidence tree
     source: Contract v3 T3; Adoption Protocol v3.0 §5
     wave: W3
-  - item: 'Audit triggers: spine, STANDARD/FULL feature closure, CIT-E on a closed spine, wave and release exits'
+  - id: CAP-47.d
+    item: 'Audit triggers: spine, STANDARD/FULL feature closure, CIT-E on a closed spine, wave and release exits'
     source: MR-4; DEC-088
     wave: W1
+    provider:
+    - W1-13
+    - W1-35
+    - W1-36
 - id: CAP-48
   title: Framework health SLOs and healthy-repo definition
   outcome: The owner can see the Gov OS's health against SLOs.
@@ -2160,12 +2559,14 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'SLOs tracked with thresholds: suite freshness, product-test health, retrieval Recall@K, stale-index count, orphan-graph
+  - id: CAP-48.a
+    item: 'SLOs tracked with thresholds: suite freshness, product-test health, retrieval Recall@K, stale-index count, orphan-graph
       count, unresolved contradictions, unresolved human gates, task traceability %, readiness coverage, packet size, tokens
       per completed task, first-pass completion, handoff failure, memory rebuild success, fresh-agent reconstruction success'
     source: Contract v3 U; Framework v4.1.2 §75
     wave: W3
-  - item: 'HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness
+  - id: CAP-48.b
+    item: 'HEALTHY only when: authority unambiguous; no accidental legacy authority; deterministic state consistent; freshness
       passes; retrieval meets thresholds; sensitive material isolated; readiness explicit; task states correct; tests/traceability
       satisfy policy; suite current/green; no unresolved critical finding; fresh agent reconstructs within budget; derived
       memory rebuildable'
@@ -2193,7 +2594,8 @@ capabilities:
     class: KEPT
     note: DROP in S0a; KEPT as qualification by DEC-067
   covers:
-  - item: Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail
+  - id: CAP-49.a
+    item: Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail
     source: Contract v3 V1–V4; DEC-067
     wave: W3
 - id: CAP-50
@@ -2206,6 +2608,7 @@ capabilities:
   - W1-10
   - W1-30
   - 'W3: Gate W traceability'
+  - W1-08
   sources:
   - Contract v3 Gate W1-W12
   - Framework v4.1.2 §36-38
@@ -2220,27 +2623,38 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: 'Stable artefact identity: id, type, canonical path, status, lifecycle, version/hash, provenance, lineage, expected
+  - id: CAP-50.a
+    item: 'Stable artefact identity: id, type, canonical path, status, lifecycle, version/hash, provenance, lineage, expected
       consumers'
     source: Contract v3 W1
     wave: W1
-  - item: Typed output→input contracts with required/optional dependencies and output schemas
+    provider:
+    - W1-08
+  - id: CAP-50.b
+    item: Typed output→input contracts with required/optional dependencies and output schemas
     source: Contract v3 W2
     wave: W3
-  - item: Consumption receipt and implementation traceability
+  - id: CAP-50.c
+    item: Consumption receipt and implementation traceability
     source: Contract v3 W5
     wave: W1
-  - item: Upstream-change staleness propagation; COMPLETE is not permanently valid
+    provider:
+    - W1-30
+  - id: CAP-50.d
+    item: Upstream-change staleness propagation; COMPLETE is not permanently valid
     source: Contract v3 W6
     wave: W3
-  - item: Orphan/dead-output detection with governed remediation
+  - id: CAP-50.e
+    item: Orphan/dead-output detection with governed remediation
     source: Contract v3 W7
     wave: W3
-  - item: 'Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection,
+  - id: CAP-50.f
+    item: 'Artifact-flow health metrics: delivery accuracy, current-version accuracy, superseded leakage, missing-input detection,
       staleness accuracy, requirement→code and →test coverage, orphan recall, reconstruction correctness'
     source: Contract v3 W11
     wave: W3
-  - item: Health-scheduler integration
+  - id: CAP-50.g
+    item: Health-scheduler integration
     source: Contract v3 W12
     wave: W3
 - id: CAP-51
@@ -2252,6 +2666,7 @@ capabilities:
   provider:
   - MADR + check-jsonschema 0.38.2
   - W1-11
+  - W1-21
   sources:
   - Framework v4.1.2 §2, §68
   - Contract v3 Gate C1 (decisions)
@@ -2285,12 +2700,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Structured, versioned decisions with supersession; contradiction resolution
+  - id: CAP-51.a
+    item: Structured, versioned decisions with supersession; contradiction resolution
     source: Framework v4.1.2 §2, §68; Contract v3 C1, L1
     wave: W1
-  - item: Authority/current/superseded filtering in retrieval
+    provider:
+    - W1-11
+  - id: CAP-51.b
+    item: Authority/current/superseded filtering in retrieval
     source: DEC-030
     wave: W1
+    provider:
+    - W1-21
 - id: CAP-52
   title: Model-agnostic adapters (provider, IDE, CLI)
   outcome: The owner can use Claude Code or an AGENTS.md-reading harness with the same rules, generated from one source.
@@ -2314,12 +2735,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Model-agnostic adapters for Claude Code and AGENTS.md from one source
+  - id: CAP-52.a
+    item: Model-agnostic adapters for Claude Code and AGENTS.md from one source
     source: Contract v3 A1; Framework v4.1.2 §4, §22; DEC-074 Q6
     wave: W1
-  - item: Claude Code first, others later
+    provider:
+    - W1-38
+  - id: CAP-52.b
+    item: Claude Code first, others later
     source: OWNER-LAUNCHER-BR-0001
     wave: W1
+    provider:
+    - W1-38
 - id: CAP-53
   title: Proportionality profiles (LITE/STANDARD/FULL)
   outcome: 'The owner gets ceremony in proportion to impact: LITE, STANDARD or FULL.'
@@ -2330,6 +2757,9 @@ capabilities:
   provider:
   - W1-09
   - 'W2: gov impact profile'
+  - W1-08
+  - W1-13
+  - W1-31
   sources:
   - DEC-005 (proportionality profiles)
   - DEC-035 (radius-scaled budgets/facets)
@@ -2344,15 +2774,23 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Profiles LITE/STANDARD/FULL by radius; readiness rows per profile
+  - id: CAP-53.a
+    item: Profiles LITE/STANDARD/FULL by radius; readiness rows per profile
     source: DEC-005; DEC-085
     wave: W1
-  - item: Profile computed from impact
+    provider:
+    - W1-13
+    - W1-08
+  - id: CAP-53.b
+    item: Profile computed from impact
     source: DEC-035; architecture v0.3 §2.3
     wave: W2
-  - item: Governance budget within profile
+  - id: CAP-53.c
+    item: Governance budget within profile
     source: DEC-004; OWNER-DIRECTION-P2-0009 §11
     wave: W1
+    provider:
+    - W1-31
 - id: CAP-54
   title: Progressive adoption (day-one to maturity)
   outcome: The owner can govern a repository from day one while its full migration continues in batches.
@@ -2363,6 +2801,7 @@ capabilities:
   - W1-39
   - W1-41
   - W1-27
+  - W1-08
   sources:
   - DEC-006 (progressive adoption)
   - OWNER-DIRECTION-P2-0009 §2 (simplification principle)
@@ -2375,12 +2814,18 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Governable from day one; A0–A11 remains the target for ADOPTED_HEALTHY
+  - id: CAP-54.a
+    item: Governable from day one; A0–A11 remains the target for ADOPTED_HEALTHY
     source: DEC-006
     wave: W1
-  - item: Simplification principle; minimal system identification
+    provider:
+    - W1-27
+  - id: CAP-54.b
+    item: Simplification principle; minimal system identification
     source: OWNER-DIRECTION-P2-0009 §2; Framework v4.1.2 §7
     wave: W1
+    provider:
+    - W1-08
 - id: CAP-55
   title: Retrieval stopping reasons
   outcome: An agent always knows why retrieval stopped, and an empty result is never taken as absence.
@@ -2404,9 +2849,13 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Fixed stopping reasons; NOT_FOUND never proof of absence; canaries per index
+  - id: CAP-55.a
+    item: Fixed stopping reasons; NOT_FOUND never proof of absence; canaries per index
     source: DEC-034; DEC-037; OWNER-DIRECTION-BR-0005 §5
     wave: W1
+    provider:
+    - W1-21
+    - W1-22
 - id: CAP-56
   title: Retrieval in disposable subagent context
   outcome: 'An agent keeps retrieval out of its own context: facet retrieval runs in disposable subagents and only the cited
@@ -2433,9 +2882,12 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Retrieval in a disposable subagent; only the cited bundle returns
+  - id: CAP-56.a
+    item: Retrieval in a disposable subagent; only the cited bundle returns
     source: DEC-032
     wave: W1
+    provider:
+    - W1-36
 - id: CAP-57
   title: Deterministic worklist closure for facets
   outcome: An agent gets the same dependency closure for referenced ids every time, with no model involved.
@@ -2445,6 +2897,7 @@ capabilities:
   wave_note: DEC-080
   provider:
   - W1-20
+  - W1-22
   sources:
   - DEC-033 (deterministic worklist closure over referenced IDs)
   - DEC-036 (synthesis notes with deterministic citation check)
@@ -2457,9 +2910,13 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Deterministic closure over referenced ids to radius-scaled depth; synthesis citation check
+  - id: CAP-57.a
+    item: Deterministic closure over referenced ids to radius-scaled depth; synthesis citation check
     source: DEC-033; DEC-036
     wave: W1
+    provider:
+    - W1-20
+    - W1-22
 - id: CAP-58
   title: Path guards as default-deny allow-lists
   outcome: An agent can write only inside its task's declared paths; everything else is denied.
@@ -2470,6 +2927,8 @@ capabilities:
   - W1-02
   - W1-03
   - W1-01
+  - W1-26
+  - W1-33
   sources:
   - DEC-041 (default-deny allow-lists, derived not enumerated)
   - DEC-076
@@ -2493,17 +2952,28 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Default-deny write allow-lists per role and ticket; checks derived, not enumerated
+  - id: CAP-58.a
+    item: Default-deny write allow-lists per role and ticket; checks derived, not enumerated
     source: DEC-041; DEC-076
     wave: W1
-  - item: 'Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL
+    provider:
+    - W1-02
+    - W1-03
+    - W1-26
+  - id: CAP-58.b
+    item: 'Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL
       per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_*
       denied unless the role definition grants them'
     source: Framework v4.1.2 §32
     wave: W1
-  - item: A session with no or an unknown role has no write privilege
+    provider:
+    - W1-33
+  - id: CAP-58.c
+    item: A session with no or an unknown role has no write privilege
     source: OWNER-DECISION-P2-0001 BC-P2-08
     wave: W1
+    provider:
+    - W1-02
 - id: CAP-59
   title: Review-repair loop budget
   outcome: 'The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop continues
@@ -2515,6 +2985,8 @@ capabilities:
   wave: W1
   provider:
   - W1-30
+  - W1-43
+  - W1-44
   sources:
   - DEC-044 as amended by DEC-096 (loop policy)
   - OWNER-DIRECTION-P2-0009 §2 (simplification principle)
@@ -2526,17 +2998,29 @@ capabilities:
   disposition:
     class: KEPT
   covers:
-  - item: Loops (review→repair, audit→repair, test→fix, verification) run to convergence or to three consecutive non-converging
+  - id: CAP-59.a
+    item: Loops (review→repair, audit→repair, test→fix, verification) run to convergence or to three consecutive non-converging
       iterations, then an escalation package with each iteration's outcome, the reason it is not converging and the options
       fix differently / narrow / split / defer / delete / continue; the owner decides
     source: DEC-044 as amended by DEC-096; OWNER-DIRECTIVE-0003; OWNER-AUTHORISATION-P2-0006
     wave: W1
-  - item: Iteration count and budget held by the orchestrator or gov, never disclosed to sessions inside the loop
+    provider:
+    - W1-30
+    - W1-43
+  - id: CAP-59.b
+    item: Iteration count and budget held by the orchestrator or gov, never disclosed to sessions inside the loop
     source: DEC-096
     wave: W1
-  - item: 'Anti-snowball: finding → whole-system context → one disposition before code'
+    provider:
+    - W1-30
+    - W1-43
+  - id: CAP-59.c
+    item: 'Anti-snowball: finding → whole-system context → one disposition before code'
     source: OWNER-AMENDMENT-P2-0010 §7
     wave: W1
+    provider:
+    - W1-30
+    - W1-44
 - id: CAP-60
   title: Below-floor recovery (break-glass)
   outcome: (none — non-goal)
@@ -2559,6 +3043,7 @@ capabilities:
     decisions:
     - DEC-039
   covers:
-  - item: 'Non-goal: below-floor recovery, break-glass, DEGRADED mode'
+  - id: CAP-60.a
+    item: 'Non-goal: below-floor recovery, break-glass, DEGRADED mode'
     source: OWNER-DECISION-0006; OWNER-DECISION-0007; DEC-039
     wave: NONE

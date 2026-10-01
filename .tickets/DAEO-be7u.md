@@ -22,9 +22,10 @@ allowed_paths:
 - tests/unit/decisions/**
 kpis:
   success:
-  - Flags ACTIVE-while-superseded, duplicate or overlapping ids across directories, and supersession cycles on the b-dev fixtures (HZ-B-03, HZ-B-04, HZ-B-06)
-  - A change that sets a decision ACTIVE without an owner approval fact from git fails
+  - Flags ACTIVE-while-superseded, duplicate or overlapping ids across directories, and supersession cycles on the b-dev fixtures (HZ-B-03, HZ-B-04, HZ-B-06) [CAP-51.a]
+  - A change that sets a decision ACTIVE without an owner approval fact from git fails [CAP-01.b, CAP-21.a]
   - Files stay byte-identical
+  - 'A declined, revoked or stale gate, or a gate answered for another CIT, does not authorise execution: the checker fails a ticket or change that cites one as its approval [CAP-34.d]'
   failure:
   - Any planted decision hazard is missed
   - The checker rewrites a decision file
@@ -36,7 +37,8 @@ sources:
 - CAP-21
 - CAP-51
 - CAP-01
-est_loc: 290
+- CAP-34
+est_loc: 310
 acceptance_tests:
   path: tests/acceptance/W1-11/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

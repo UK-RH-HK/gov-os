@@ -21,11 +21,11 @@ allowed_paths:
 - tests/unit/readiness/**
 kpis:
   success:
-  - Reports every row open for the profile (FULL for spines) and rejects N/A_WITH_REASON with an empty reason
+  - Reports every row open for the profile (FULL for spines) and rejects N/A_WITH_REASON with an empty reason [CAP-30.a, CAP-53.a]
   - Blocks OpenSpec apply/archive and ticket READY while required rows are open
   - Output is identical on repeated runs
-  - Lists every required open row with its linked gap ticket id, or UNLINKED (DEC-089)
-  - Closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor naming the milestone (DEC-088)
+  - Lists every required open row with its linked gap ticket id, or UNLINKED (DEC-089) [CAP-30.b]
+  - Closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor naming the milestone (DEC-088) [CAP-47.d]
   failure:
   - A spec with a required MISSING row is reported closed
   - A defaulted N/A passes
@@ -40,6 +40,8 @@ sources:
 - MR-1
 - MR-2
 - MR-4
+- CAP-47
+- CAP-53
 est_loc: 170
 acceptance_tests:
   path: tests/acceptance/W1-13/

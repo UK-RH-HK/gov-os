@@ -26,8 +26,8 @@ allowed_paths:
 - tests/unit/ci/**
 kpis:
   success:
-  - pre-commit runs G1-G2; pre-push runs G3 including model-dependent tests and writes an evidence record bound to the head commit
-  - GitHub Actions runs the deterministic checks and fails when the evidence record is missing or for another commit; carrier (git note or commit) chosen and documented
+  - pre-commit runs G1-G2; pre-push runs G3 including model-dependent tests and writes an evidence record bound to the head commit [CAP-39.a]
+  - GitHub Actions runs the deterministic checks and fails when the evidence record is missing or for another commit; carrier (git note or commit) chosen and documented [CAP-39.a]
   failure:
   - CI downloads models or needs a GPU
   - A push with a failing G3 check leaves CI green

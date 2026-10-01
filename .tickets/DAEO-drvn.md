@@ -24,8 +24,9 @@ allowed_paths:
 kpis:
   success:
   - Every command returns the API-0002 JSON envelope with exit codes 0-4
-  - Commands are classed read or act; read commands leave git status --porcelain empty
+  - Commands are classed read or act; read commands leave git status --porcelain empty [CAP-27.a]
   - Overlay and path-map config load with schema validation; gov --help < 300 ms
+  - Each Wave 1 governance operation (status, check, readiness, doctor, rebuild, context, closure, retrieve, checkpoint, close, adopt, pause) is a registered gov command [CAP-28.b]
   failure:
   - A command writes outside its declared act paths
   - Envelope fields drift from docs/interfaces/API-0002.yaml

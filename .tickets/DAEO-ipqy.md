@@ -21,7 +21,7 @@ allowed_paths:
 kpis:
   success:
   - ccusage installed and pinned through a DEC-083 decision package and recorded in the registry
-  - The Superpowers v6.4.2 source is available for vendoring; every DEC-074 pin is recorded in governance/project/tool-registry.yaml with sha256
+  - The Superpowers v6.4.2 source is available for vendoring; every DEC-074 pin is recorded in governance/project/tool-registry.yaml with sha256 [CAP-25.a]
   failure:
   - Any tool installed without a recorded owner approval
   - A registry entry lacks an uninstall command

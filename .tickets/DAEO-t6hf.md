@@ -23,9 +23,9 @@ allowed_paths:
 - tests/unit/semantic/**
 kpis:
   success:
-  - sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set
+  - sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a]
   - Dev query set mean hit@5 >= 85 (S0b2 R1 baseline); warm p95 <= 0.5 s
-  - Model ids and revisions are recorded in the index manifest
+  - Model ids and revisions are recorded in the index manifest [CAP-10.a]
   failure:
   - Mean hit@5 falls below 80
   - Peak RAM of the rerank process exceeds 2.5 GB

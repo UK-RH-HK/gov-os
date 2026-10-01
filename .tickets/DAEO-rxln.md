@@ -24,8 +24,10 @@ allowed_paths:
 - tests/unit/retrieval/**
 kpis:
   success:
-  - Carried FTS5 and chunking ported into src/gov; blob-hash incremental index in the shared store; every chunk record carries parent_id (section for documents, function/module for code) (DEC-091)
-  - Changed blobs re-index before the next retrieval (2.8 s scale on a-dev); an empty or stale index is reported, never returned as absent
+  - Carried FTS5 and chunking ported into src/gov; blob-hash incremental index in the shared store; every chunk record carries parent_id (section for documents, function/module for code) (DEC-091) [CAP-18.b]
+  - Changed blobs re-index before the next retrieval (2.8 s scale on a-dev); an empty or stale index is reported, never returned as absent [CAP-17.a]
+  - The corpus is the whole tracked repository minus what the secret filter and the path map exclude; there is no hand-kept include list [CAP-03.d]
+  - An exact string, identifier or error-message query returns every occurrence with file path and line [CAP-11.a]
   failure:
   - A retrieval returns pre-edit text as current
   - Rebuild digest differs between two runs
@@ -39,6 +41,7 @@ sources:
 - CAP-11
 - CAP-17
 - CAP-18
+- CAP-03
 est_loc: 240
 acceptance_tests:
   path: tests/acceptance/W1-17/

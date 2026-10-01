@@ -24,8 +24,9 @@ allowed_paths:
 - tests/unit/lock/**
 kpis:
   success:
-  - copier copy creates governance/, the overlay (_skip_if_exists), .rulesync/, hooks and framework.lock with a file-hash manifest; gov doctor passes on the result
-  - Editing one kernel file makes doctor report DRIFT naming it; the update procedure is documented
+  - copier copy creates governance/, the overlay (_skip_if_exists), .rulesync/, hooks and framework.lock with a file-hash manifest; gov doctor passes on the result [CAP-44.a]
+  - Editing one kernel file makes doctor report DRIFT naming it; the update procedure is documented [CAP-02.a]
+  - The Gov OS repository keeps kernel template, CLI, tests, fixtures, lessons, plan and docs in separate trees (ADR-0002 §5); a product repository holds only the installed kernel and its overlay [CAP-43.a]
   failure:
   - An overlay file is overwritten by copier update
   - framework.lock lacks the template tag or commit

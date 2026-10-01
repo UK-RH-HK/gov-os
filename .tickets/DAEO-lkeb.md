@@ -20,8 +20,9 @@ allowed_paths:
 - tests/unit/codeintel/**
 kpis:
   success:
-  - The index lives in a per-repository home under .gov-runtime/; list_projects in one repository shows only its own project
-  - A secret-exclusion test proves no planted secret enters the codebase-memory index
+  - The index lives in a per-repository home under .gov-runtime/; list_projects in one repository shows only its own project [CAP-12.b]
+  - A secret-exclusion test proves no planted secret enters the codebase-memory index [CAP-03.e, CAP-12.b]
+  - 'Definitions, references, callers, impact and dead code are answered across Rust, Python and TypeScript on the dev tiers, before and after a rename: callers/impact hit@5 >= 60 % (S0b2 C1 baseline) [CAP-12.a]'
   failure:
   - An index file of this repository exists outside .gov-runtime/ after a run
   - A planted secret is found in the code graph

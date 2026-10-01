@@ -23,7 +23,8 @@ allowed_paths:
 kpis:
   success:
   - .gitleaks.toml extends the defaults with token and canary rules; ARGUS_TOKEN_CANARY_4WM8 is detected
-  - Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store
+  - Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store [CAP-03.a, CAP-03.e]
+  - 'Indexers skip every namespace the path map classes as customer/runtime product data: a planted product-data file is absent from every governance store, packet and bundle [CAP-03.b]'
   failure:
   - Any planted secret appears in a derived store, packet or bundle
   - The filter relies on a hard-coded path list
@@ -33,7 +34,7 @@ sources:
 - G-18
 - DEC-074 Q8
 - CAP-03
-est_loc: 60
+est_loc: 70
 acceptance_tests:
   path: tests/acceptance/W1-15/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

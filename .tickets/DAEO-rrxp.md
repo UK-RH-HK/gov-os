@@ -21,8 +21,9 @@ allowed_paths:
 - tests/unit/checkpoint/**
 kpis:
   success:
-  - A checkpoint conforming to the carried schema is written at every ticket transition, compaction and stop
-  - A fresh session resumes the ticket at the recorded next step from the checkpoint alone
+  - A checkpoint conforming to the carried schema is written at every ticket transition, compaction and stop [CAP-13.b, CAP-37.a, CAP-37.b]
+  - A fresh session resumes the ticket at the recorded next step from the checkpoint alone [CAP-20.a, CAP-37.f]
+  - gov checkpoint --watch marks the latest checkpoint stale by policy (age, commits since, context utilisation) without relying on harness hooks; lefthook and the orchestrator can run it [CAP-37.c]
   failure:
   - A ticket transition leaves no checkpoint
   - A checkpoint references an input by id without its hash
@@ -32,7 +33,8 @@ sources:
 - CAP-13
 - CAP-22
 - CAP-37
-est_loc: 150
+- CAP-20
+est_loc: 180
 acceptance_tests:
   path: tests/acceptance/W1-25/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

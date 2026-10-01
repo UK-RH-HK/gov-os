@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: [ADR-0001]
-decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-093, DEC-094, DEC-095, DEC-096]
+decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096]
 supersedes: []
 implements: [CHARTER-v5, CONTRACT-v4]
 ---
@@ -199,8 +199,9 @@ audit→repair, test→fix or verification loop follows DEC-096:
   - All of retrieval completeness is available to Wave 1's own dogfooding.
   - The five functions stay separate.
 - **Bad:**
-  - Wave 1 glue grows to ≈ 4,710 LOC (the figure in `docs/plan/WAVE_1_WBS.md` §3), against architecture v0.3's ≈ 2.4k.
-    This is the effect of DEC-080, DEC-074 R1, DEC-076, DEC-083, DEC-086 and the S1-A repairs (DEC-089…DEC-092). DEC-064 turns DEC-001's size trigger into a per-wave review.
+  - Wave 1 glue grows to ≈ 5,090 LOC (the figure in `docs/plan/WAVE_1_WBS.md` §3), against architecture v0.3's ≈ 2.4k.
+    This is the effect of DEC-080, DEC-074 R1, DEC-076, DEC-083, DEC-086 and the S1-A repairs: DEC-089…DEC-092, and
+    a ticket KPI for every Wave 1 `covers` item. DEC-064 turns DEC-001's size trigger into a per-wave review.
   - `ticket` is unmaintained upstream; it is vendored by hash.
   - The reranker venv is 5.6 GB; a lighter replacement spike is Wave 2 (DEC-074 Q3).
 
@@ -212,7 +213,7 @@ audit→repair, test→fix or verification loop follows DEC-096:
 ## More Information
 
 - **Sources:** architecture v0.3; S0a `STACK_OPTIONS.md`, `CAPABILITY_CATALOGUE.md`; S0b2 `RESULTS.md`,
-  `GLUE_REQUIREMENTS.md`, `TOOL_REGISTRY.yaml`, `INTEGRATION_REPORT.md`; register DEC-064…DEC-087.
+  `GLUE_REQUIREMENTS.md`, `TOOL_REGISTRY.yaml`, `INTEGRATION_REPORT.md`; register DEC-064…DEC-096.
 - **Revisit triggers:**
   - a code graph above the tested envelope;
   - vectors above ~100k (move to LanceDB, DEC-016);

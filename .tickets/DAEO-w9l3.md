@@ -21,7 +21,7 @@ allowed_paths:
 - tests/unit/bridge/**
 kpis:
   success:
-  - Tickets derived from an OpenSpec change tasks.md carry kpis, role, allowed_paths, profile and a back-reference to the change
+  - Tickets derived from an OpenSpec change tasks.md carry kpis, role, allowed_paths, profile and a back-reference to the change [CAP-31.a]
   - Derived tickets pass the ticket schema and the DAG is acyclic
   failure:
   - A derived ticket lacks KPIs or allowed_paths

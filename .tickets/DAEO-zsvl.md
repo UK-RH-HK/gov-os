@@ -23,8 +23,10 @@ allowed_paths:
 - tests/unit/hooks/**
 kpis:
   success:
-  - SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_active
+  - SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_active [CAP-15.g, CAP-37.b]
   - SubagentStop enforces the 12-field return contract of Framework §61 (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action)
+    [CAP-37.d]
+  - A checkpoint is written when the session's context utilisation passes the configured threshold, not only at PreCompact [CAP-37.c]
   failure:
   - A Stop hook loops
   - SessionStart injects more than the cap

@@ -21,8 +21,8 @@ allowed_paths:
 - tests/unit/closure/**
 kpis:
   success:
-  - Resolves referenced ids through the record graph and codebase-memory callers/callees to a radius-scaled depth, with no model
-  - Byte-identical output on repeated runs; DEPTH_LIMIT_REACHED lists the gaps
+  - Resolves referenced ids through the record graph and codebase-memory callers/callees to a radius-scaled depth, with no model [CAP-57.a]
+  - Byte-identical output on repeated runs; DEPTH_LIMIT_REACHED lists the gaps [CAP-57.a]
   failure:
   - Output differs between runs on the same commit
   - An unresolved id is omitted from the gap list

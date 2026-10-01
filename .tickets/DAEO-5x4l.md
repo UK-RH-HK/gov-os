@@ -22,10 +22,13 @@ allowed_paths:
 - tests/unit/retrieve/**
 kpis:
   success:
-  - Paging with continuation; facets; dedup by chunk hash; authority/current filter drops superseded and must-not-cite records; one rerank over the merged set
-  - Every bundle cites by id and sha256 and carries one stopping reason from the fixed list
-  - RETR-A-04 and RETR-X-02 dev runs produce multi-batch bundles
-  - A child hit is expanded to its parent span only within the bundle budget, and the bundle names each expansion (DEC-091)
+  - Paging with continuation; facets; dedup by chunk hash; authority/current filter drops superseded and must-not-cite records; one rerank over the merged set [CAP-16.a, CAP-18.a, CAP-51.b]
+  - Every bundle cites by id and sha256 and carries one stopping reason from the fixed list [CAP-55.a]
+  - RETR-A-04 and RETR-X-02 dev runs produce multi-batch bundles [CAP-16.b]
+  - A child hit is expanded to its parent span only within the bundle budget, and the bundle names each expansion (DEC-091) [CAP-18.b]
+  - Retrieval spend has its own radius-scaled budget (follow-up rounds by profile), separate from the packet ceiling; reaching it ends with BUDGET_EXHAUSTED_WITH_GAPS and the gap list, never silent truncation
+    [CAP-04.c, CAP-16.c]
+  - For a ticket whose scope matches a committed failure or lesson record, the bundle returns that record ahead of implementation evidence [CAP-14.a]
   failure:
   - A batch-size limit is reported as completeness
   - A superseded record is cited as current
@@ -40,7 +43,9 @@ sources:
 - CAP-18
 - CAP-41
 - CAP-55
-est_loc: 280
+- CAP-04
+- CAP-51
+est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W1-21/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

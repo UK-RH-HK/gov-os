@@ -20,10 +20,10 @@ allowed_paths:
 - governance/project/roster.yaml
 kpis:
   success:
-  - Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tools, model tier, authority level and handoff format
+  - Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tools, model tier, authority level and handoff format [CAP-22.a]
   - Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner approval in chat (DEC-083)
   - 'Each role maps the Framework §32 permission classes: WRITE_REPO_SCOPED via allowed_paths; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied; network, database, cloud, CI-trigger and deploy
-    classes denied unless granted'
+    classes denied unless granted [CAP-58.b]'
   failure:
   - A role lacks any required field
   - An implementer role pattern covers tests/acceptance/**
@@ -33,6 +33,8 @@ sources:
 - DEC-083
 - MR-5
 - CAP-47
+- CAP-22
+- CAP-58
 - MR-3
 - MR-4
 est_loc: 300
