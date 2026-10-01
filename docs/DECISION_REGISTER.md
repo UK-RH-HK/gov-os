@@ -906,3 +906,69 @@ ticket's KPI text is unchanged.
 | Version | Date | Change |
 |---|---|---|
 | 0.15 | 2026-10-01 | W1-01 KPI disputes: DEC-097 (KD-1, diff procedure shown by `Task:` trailers), DEC-098 (KD-2, session list), DEC-099 (KD-3, interim install denials), DEC-100 (KD-4, dated denied attempts). |
+
+## 16. Wave 1 build decisions, round 2 (register v0.16, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answer to W1-BUILD decision package DP-1 (asked 2026-10-01 at the W1-01 bootstrap diff check), and five
+owner decisions given to W1-BUILD in chat on 2026-10-01 without a package. From this section on, a commit that records
+owner decisions touches only `docs/DECISION_REGISTER.md` and `governance/project/bootstrap.md`, and carries the trailer
+`Task: decision-record` (owner rule, 2026-10-01). Commit `0aa1428` (DEC-097…DEC-100) predates the rule and is accepted
+as it is.
+
+### DEC-101 — Secret-file deny rules in the session-folder settings; `s1` and `s1a` retired
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-1 option (b) · **Refines:** DEC-098
+- **Decision:** The owner has added Read and Edit deny rules for `.env*`, `*.pem`, `*.key` and `config/secrets*` to the
+  `w1-build` and `w1-tests` session settings, and has retired the `s1` and `s1a` session folders. The install forms
+  those two files did not name are closed by the retirement.
+- **Record:** the session table in `governance/project/bootstrap.md`. The `w1-build` rules were read by the
+  orchestrator on 2026-10-01; the `w1-tests` file is not readable from the build session and is recorded as the owner
+  states it.
+
+### DEC-102 — Experiments are part of discovery
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package)
+- **Decision:** Research and experiment tasks (spikes, and tool compatibility and performance trials like S0a and
+  S0b2) are a normal part of discovery and can run at any point in development. They run in sandboxes outside
+  production paths and produce an evidence record: what was tested, how, the results and a verdict. Their code is never
+  promoted except through the normal cycle. Their results change a closed specification only through CIT-P.
+- To be carried into Contract v4 by a Gov OS spec change before the affected tickets' acceptance tests are written. The
+  orchestrator does not change the Contract or any ticket now.
+
+### DEC-103 — The order of specification work
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package)
+- **Decision:** Specification work runs in this order: discovery and research, then scenarios, then representative
+  data, then UX for any feature with a user interface, then acceptance tests, then implementation. The owner reviews
+  scenarios and UX designs, not test code.
+- To be carried into Contract v4 by a Gov OS spec change before the affected tickets' acceptance tests are written. The
+  orchestrator does not change the Contract or any ticket now.
+
+### DEC-104 — UX before build, with visual testing
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package)
+- **Decision:** For a feature with a user interface, the UX readiness dimension closes only with scenario-derived
+  wireframes or mockups the owner has approved. Its acceptance tests include visual checks against those designs
+  (screenshot comparison and scenario walk-throughs). The UX role (Wave 2) owns this; visual-testing tools are
+  installed under DEC-083 when first needed.
+- To be carried into Contract v4 by a Gov OS spec change before the affected tickets' acceptance tests are written. The
+  orchestrator does not change the Contract or any ticket now.
+
+### DEC-105 — Evidence-triggered change
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package)
+- **Decision:** When an experiment or finding contradicts a closed specification, a CIT-P opens. The impact assessment
+  shows the affected specifications, decisions, tickets, tests and code, with three options and the cost of each: apply
+  now; defer (record it and continue); or re-baseline (reopen the affected specification, re-plan from it, and retire
+  the work it invalidates). The owner chooses; CIT-E records what was done. A closed specification means "ready to
+  build", not "frozen", and every version is kept.
+- To be carried into Contract v4 by a Gov OS spec change before the affected tickets' acceptance tests are written. The
+  orchestrator does not change the Contract or any ticket now.
+
+### DEC-106 — Wave 1 learning metrics
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, in chat to W1-BUILD (no package) · **Extends:** DEC-086
+- **Decision:** Per ticket, measure: KPI disputes raised by the test designer; acceptance tests rewritten after
+  implementation began, with the reason; and governance share. Report all three at the Wave 1 exit. Only governance
+  share has a threshold (≤ 15%, DEC-086). The other two show whether specifications are being locked too early or are
+  too vague.
+- To be carried into Contract v4 by a Gov OS spec change before the affected tickets' acceptance tests are written. The
+  orchestrator does not change the Contract or any ticket now.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.16 | 2026-10-01 | W1-BUILD DP-1: DEC-101 (secret-file deny rules in `w1-build` and `w1-tests`; `s1`, `s1a` retired). Owner decisions: DEC-102 (experiments are part of discovery), DEC-103 (order of specification work), DEC-104 (UX before build, visual testing), DEC-105 (evidence-triggered change), DEC-106 (Wave 1 learning metrics). |
