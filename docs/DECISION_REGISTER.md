@@ -972,3 +972,65 @@ as it is.
 | Version | Date | Change |
 |---|---|---|
 | 0.16 | 2026-10-01 | W1-BUILD DP-1: DEC-101 (secret-file deny rules in `w1-build` and `w1-tests`; `s1`, `s1a` retired). Owner decisions: DEC-102 (experiments are part of discovery), DEC-103 (order of specification work), DEC-104 (UX before build, visual testing), DEC-105 (evidence-triggered change), DEC-106 (Wave 1 learning metrics). |
+
+## 17. Wave 1 build decisions, round 3 (register v0.17, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers of 2026-10-01 to the W1-02 KPI disputes KD-1…KD-7, raised by the Independent Test Designer on
+ticket `DAEO-emkd` (recorded in `tests/acceptance/W1-02/README.md`, commits `5d65ba7` and `43fdf41`), and the owner's
+defaults for the edge cases that README lists as left open (KD-8). They settle how W1-02's KPI lines are read; the
+ticket's KPI text is unchanged. The acceptance tests at `43fdf41` cover KD-1…KD-5 and take no side on KD-6…KD-8.
+
+### DEC-107 — W1-02 KD-1: how a session declares its role and ticket; the stricter of session and subagent applies
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-1 · **Implements:** CAP-58.a, CAP-58.c
+- **Decision:** A session declares its role and its active ticket through the environment variables `GOV_ROLE` and
+  `GOV_TICKET`, set at session start. Inside a subagent, the hook input's `agent_type` identifies the subagent's role,
+  and the guard applies the stricter of the session's role and the subagent's. A missing or unknown role means
+  read-only.
+- **Evidence:** the test designer verified that in this harness (Claude Code 2.1.286) the hook input inside a subagent
+  carries `agent_id` and `agent_type`.
+- **Follow-up:** W1-05's switch-over report confirms this on the live guard.
+
+### DEC-108 — W1-02 KD-2: the kernel scratch set
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-2 · **Implements:** CAP-58.a
+- **Decision:** The kernel scratch set is `.gov-runtime/scratch/**` plus the directory returned by
+  `tempfile.gettempdir()`.
+
+### DEC-109 — W1-02 KD-3: the freeze flag until `gov pause` exists
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-3
+- **Decision:** Until `gov pause` exists, the freeze flag is the file `.gov-runtime/freeze`.
+
+### DEC-110 — W1-02 KD-4: the guard fails closed
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-4 · **Refines:** DEC-025
+- **Decision:** The guard catches every internal error, exits with code 2 and appends one line to
+  `.gov-runtime/findings.jsonl`.
+- **Why exit code 2:** exit code 1 and timeouts don't block in Claude Code. W1-03 covers the timeout case.
+
+### DEC-111 — W1-02 KD-5: which Bash forms the guard judges
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-5
+- **Decision:** The guard judges plain Bash forms. All other forms stay with W1-03.
+
+### DEC-112 — W1-02 KD-6: the auditor's one write path
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-6
+- **Decision:** The auditor is read-only everywhere except the report path its own ticket allows (for example
+  `docs/audit/wave-1/**`).
+
+### DEC-113 — W1-02 KD-7: a subagent whose type is not a defined role is read-only
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-02 KPI dispute KD-7 · **Implements:** CAP-58.c
+- **Decision:** A subagent whose `agent_type` is not a defined role is read-only.
+- **Consequence for W1-05:** the role definitions (W1-33) land after the switch-over, so W1-05 must ensure the Wave 1
+  roles (orchestrator, engineer, product-spec, independent test designer, independent auditor) exist as subagent types
+  when the guard goes live. If that needs a change to W1-05's or W1-33's KPIs, the orchestrator raises a decision
+  package before implementing W1-05.
+
+### DEC-114 — W1-02 KD-8: owner defaults for the open edge cases
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, defaults for the cases `tests/acceptance/W1-02/README.md` leaves open
+- **Decision:**
+  - `GOV_TICKET` accepts both the ticket id and the W1 id.
+  - Writes require the ticket to be claimed.
+  - A test designer with no ticket is read-only.
+  - A repository located inside the temp dir gets no temp-dir allowance.
+  - Redirects to `/dev/null` are allowed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.17 | 2026-10-01 | W1-02 KPI disputes: DEC-107 (KD-1, `GOV_ROLE` and `GOV_TICKET`; stricter of session and subagent role), DEC-108 (KD-2, scratch set), DEC-109 (KD-3, freeze flag), DEC-110 (KD-4, fail-closed with exit code 2 and a finding), DEC-111 (KD-5, plain Bash forms), DEC-112 (KD-6, auditor report path), DEC-113 (KD-7, non-role subagent is read-only; W1-05 consequence), DEC-114 (KD-8, edge-case defaults). |
