@@ -2,6 +2,8 @@
 
 This tree was rebuilt from the Governance OS v4 line. Nothing was deleted from history.
 
+`docs/source/` was removed from the working tree after S1-A acceptance (DEC-058, DEC-082). Read any original with `git show bb6ec3a8d8242fda7a76f86f0f0eff46813bc65f:docs/source/<path>`.
+
 - Archive tag: `archive/gov-os-v4-final` (annotated), at BASE
 - BASE: `1ab6782fa4e8f490c8b97ac6959cdd77a29350f9` (tip of `bridge/p2-context-retrieval` at restructure)
 - Pre-restructure bundle: `~/gov-os-inventory/restructure/pre-restructure.bundle`, sha256 `efafe460af693d4159ba4549067309c20c5a2def2aabc0284527aacfc0532434`
