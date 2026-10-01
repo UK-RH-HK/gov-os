@@ -67,7 +67,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 ### CAP-02 — Release authenticity (lite: signed git tags)
 
 - **Outcome:** The owner can confirm that an installed kernel matches a released version.
-- **Acceptance:** `gov doctor` reports MATCH for the pinned `framework.lock` manifest and DRIFT after a one-byte edit; at Release 1, `git tag -v` verifies the release tag (CAP-02.c, W3).
+- **Acceptance:** `gov doctor` reports MATCH for the pinned `framework.lock` manifest, and DRIFT naming the edited file after a one-byte edit; at Release 1, `git tag -v` verifies the release tag (CAP-02.c, W3).
 - **Wave:** W1 (manifest check in W1; the signed v1.0.0 tag is made at Release 1)
 - **Provider:** Copier 9.18.2, git SSH-signed tags, W1-39, W1-27
 - **Disposition:** LITE — lite form: SSH-signed release tag plus a file-hash manifest in `framework.lock`, verified by `gov doctor`; no TUF, key rotation, offline envelopes or bootstrap separation.
