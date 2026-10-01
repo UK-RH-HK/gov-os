@@ -1,6 +1,6 @@
 ---
 id: DAEO-emkd
-status: closed
+status: open
 deps: [DAEO-dtv3]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -49,3 +49,9 @@ acceptance_tests:
 # W1-02 PreToolUse default-deny guard
 
 Default-deny allow-list per role and per ticket (G-01), reading the ticket file frontmatter; honours the freeze flag.
+
+## Notes
+
+**2026-10-01T22:11:15Z**
+
+Reopened 2026-10-01 as a repair for DEC-115 (Bash target resolution) and DEC-117 (inside a role subagent, the subagent's role governs). The acceptance tests in tests/acceptance/W1-02/ are revised first; implementation waits for TESTS READY. KPIs unchanged.
