@@ -805,3 +805,71 @@ decision packages (round 1, asked 2026-09-30). They are the only changes to this
 | Version | Date | Change |
 |---|---|---|
 | 0.13 | 2026-09-30 | S1 round 1: DEC-083 (ratification; DEC-040 amended), DEC-084 (MR-3 bootstrap), DEC-085 (readiness profiles; spines at FULL), DEC-086 (governance share), DEC-087 (CI scope). |
+
+## 14. S1-A round-1 decisions (register v0.14, appended by S1 on branch `s1/spec`)
+
+The owner's answers to the S1-A round-1 decision packages DP-1…DP-8 (`~/gov-os-workbench/s1a/DECISION_PACKAGES.md`;
+round-1 files fingerprinted in `~/gov-os-workbench/s1a-round1.sha256`).
+
+### DEC-088 — MR-4: what triggers an independent audit
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-1 (owner's own option) · **Implements:** MR-4, DEC-070
+- **Decision:** A fresh, independent audit runs when a spine specification closes, when a STANDARD or FULL feature
+  specification closes, when an accepted CIT-E changes a closed spine specification, and at every wave and release
+  exit. LITE feature specifications are audited at the wave exit. Contested and owner-level findings reach the owner in
+  chat as decision packages; agreed fixes become tickets.
+
+### DEC-089 — MR-2 holds from Wave 1: every required open readiness cell has a linked gap ticket
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-2 option (a)
+- **Decision:** In Wave 1 the planning skill creates one linked ticket (class discovery, data, research or test-design)
+  per required open cell, and `gov check` fails a specification with an unlinked required open cell. Wave 2 automates
+  the generation with `gov readiness --generate`.
+
+### DEC-090 — The adoption transaction A0–A11 in Contract v4
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-3 option (b) · **Refines:** DEC-006
+- **Decision:** CAP-44 states A0–A11 with one evidence record per stage and the three final verdicts
+  (ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS, NOT_ADOPTED_HEALTHY). Wave 1 (`gov adopt --lite`) delivers A0–A4,
+  A6 and A8 with a safety baseline and a rollback point per batch, **and A5**: an independent review of the path map
+  before any move, by the Wave 1 Independent Auditor role. The independent gates A7, A10 and A11 are Wave 3 with CAP-47;
+  the verdict is issued from Wave 3.
+
+### DEC-091 — Hierarchical (parent-child) retrieval in Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-4 option (a) · **Consistent with:** DEC-080
+- **Decision:** Chunk records carry `parent_id` (section level for documents, function/module level for code), and
+  `gov retrieve` expands a child hit to its parent within the bundle budget and names the expansion. Both are Wave 1.
+
+### DEC-092 — One acceptance check per capability, plus a `covers` list
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-5 option (a) · **Refines:** DEC-058
+- **Decision:** Each Contract v4 capability keeps one observable acceptance check and adds a `covers` list naming every
+  carried sub-requirement with its source reference and wave. Wave-exit audits check each covered item. Nothing is
+  dropped by the compression.
+
+### DEC-093 — Decision packages: at most five at a time; P1 may bypass the cap
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-6 option (a) with an addition
+- **Decision:** Decision packages are ranked P1–P3 and asked at most five at a time. A P1 package may bypass the cap.
+
+### DEC-094 — Test execution and integration are distinct roles, added in Wave 2
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-7 option (b) · **Amends:** DEC-066 (Wave 2 roster)
+- **Decision:** MR-5's "test execution" and "integration" roles are distinct role definitions in Wave 2, alongside
+  integration/API.
+
+### DEC-095 — DEC-040 status
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on S1-A DP-8 option (a)
+- **Decision:** DEC-040 is ACCEPTED as amended by DEC-083. Its v0.12 text above stays verbatim; this entry is the status
+  change.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.14 | 2026-10-01 | S1-A round 1: DEC-088 (audit triggers), DEC-089 (gap tickets in W1), DEC-090 (A0–A11), DEC-091 (parent-child retrieval W1), DEC-092 (covers lists), DEC-093 (five-package cap, P1 bypass), DEC-094 (test execution, integration roles W2), DEC-095 (DEC-040: ACCEPTED as amended by DEC-083). |
+
+### DEC-096 — Loop policy: iterate to convergence; escalate after three consecutive non-converging iterations
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Amends:** DEC-044, DEC-070, DEC-082
+- **Decision:** Any iterative loop that runs until convergence (review→repair, audit→repair, test→fix, verification)
+  continues until it converges, or until three consecutive iterations fail to converge. The third consecutive failure
+  produces an escalation package for the owner: each iteration's outcome, why it is not converging, and the options
+  (fix differently, narrow, split, defer, delete, or continue). The owner decides. The iteration count and budget are
+  held by the orchestrator or `gov`, and are never disclosed to the sessions inside the loop.
+- **Unchanged:** the retrieval stopping rules (DEC-034, DEC-080).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.14 (cont.) | 2026-10-01 | DEC-096 (loop policy; amends DEC-044, DEC-070, DEC-082). |
