@@ -14,7 +14,8 @@ and stdout carry the decision.
 - The environment is built from scratch. Nothing of the calling session leaks
   in, and ``HOME`` is an empty temporary directory. A role and an active ticket
   are declared only when a test passes them: ``GOV_ROLE`` and ``GOV_TICKET``
-  (owner answer to KD-1).
+  (owner answer to KD-1). A test may add variables of its own, which the guard
+  expands in a Bash write target (DEC-115).
 - ``TMPDIR`` points at a directory of its own next to the project, so
   ``tempfile.gettempdir()`` inside the hook returns that directory (owner
   answer to KD-2) and the project is not inside it.
@@ -358,8 +359,12 @@ def classify(returncode, stdout):
     return "allow"
 
 
-def hook_environment(project, sandbox, role=None, ticket=None):
-    """A minimal environment: no variable of the calling session is inherited."""
+def hook_environment(project, sandbox, role=None, ticket=None, extra_env=None):
+    """A minimal environment: no variable of the calling session is inherited.
+
+    ``extra_env`` adds or replaces variables. The target-resolution tests use it
+    to give the hook a variable to expand, or another ``HOME`` (DEC-115).
+    """
     env = {
         "PATH": os.environ.get("PATH", "/usr/local/bin:/usr/bin:/bin"),
         "HOME": str(sandbox.home),
@@ -375,6 +380,8 @@ def hook_environment(project, sandbox, role=None, ticket=None):
         env[ROLE_ENV] = role
     if ticket is not None:
         env[TICKET_ENV] = ticket
+    if extra_env:
+        env.update({name: str(value) for name, value in extra_env.items()})
     return env
 
 
@@ -405,7 +412,7 @@ def _installed_entry(project):
     return Path(project) / PRODUCT_HOOK_DIR_REL / hook_entry().name
 
 
-def run_hook_raw(project, stdin_text, sandbox, role=None, ticket=None):
+def run_hook_raw(project, stdin_text, sandbox, role=None, ticket=None, extra_env=None):
     """Run the installed hook once with ``stdin_text`` exactly as given."""
     project = Path(project)
     started = time.perf_counter()
@@ -416,7 +423,7 @@ def run_hook_raw(project, stdin_text, sandbox, role=None, ticket=None):
             capture_output=True,
             text=True,
             cwd=str(project),
-            env=hook_environment(project, sandbox, role, ticket),
+            env=hook_environment(project, sandbox, role, ticket, extra_env),
             timeout=HOOK_TIMEOUT_S,
             check=False,
         )
@@ -427,10 +434,10 @@ def run_hook_raw(project, stdin_text, sandbox, role=None, ticket=None):
     return HookResult(classify(proc.returncode, proc.stdout), proc.returncode, proc.stdout, proc.stderr, seconds)
 
 
-def run_hook(project, tool_name, tool_input, sandbox, role=None, ticket=None, subagent=None):
+def run_hook(project, tool_name, tool_input, sandbox, role=None, ticket=None, subagent=None, extra_env=None):
     """Run the installed hook once on a well-formed call and classify the decision."""
     stdin = json.dumps(payload(project, tool_name, tool_input, sandbox, subagent))
-    return run_hook_raw(project, stdin, sandbox, role, ticket)
+    return run_hook_raw(project, stdin, sandbox, role, ticket, extra_env)
 
 
 def run_hook_with_open_stdin(project, sandbox, limit_s, role=None, ticket=None):

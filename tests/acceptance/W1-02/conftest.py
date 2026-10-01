@@ -36,14 +36,15 @@ def project(hook, tmp_path):
 
 @pytest.fixture()
 def call(sandbox):
-    """``call(project, tool_name, tool_input, role=None, ticket=None, subagent=None)`` runs the hook once.
+    """``call(project, tool_name, tool_input, role=None, ticket=None, subagent=None, env=None)`` runs the hook once.
 
     ``role`` and ``ticket`` become ``GOV_ROLE`` and ``GOV_TICKET``; left out, the
-    session declares nothing.
+    session declares nothing. ``env`` adds variables to the hook's environment.
     """
 
-    def _call(project, tool_name, tool_input, role=None, ticket=None, subagent=None):
-        return support.run_hook(project, tool_name, tool_input, sandbox, role=role, ticket=ticket, subagent=subagent)
+    def _call(project, tool_name, tool_input, role=None, ticket=None, subagent=None, env=None):
+        return support.run_hook(project, tool_name, tool_input, sandbox, role=role, ticket=ticket,
+                                subagent=subagent, extra_env=env)
 
     return _call
 
@@ -64,10 +65,15 @@ def write(call):
 
 @pytest.fixture()
 def bash(call):
-    """``bash(project, command, role, ticket)`` attempts one Bash call; ``{root}`` is the project path."""
+    """``bash(project, command, role, ticket)`` attempts one Bash call; ``{root}`` is the project path.
 
-    def _bash(project, command, role=None, ticket=None, subagent=None, **paths):
+    The command is a ``str.format`` template, so a literal brace is doubled:
+    ``${{HOME}}`` reaches the guard as ``${HOME}``.
+    """
+
+    def _bash(project, command, role=None, ticket=None, subagent=None, env=None, **paths):
         command = command.format(root=project, **paths)
-        return call(project, "Bash", support.bash_tool_input(command), role=role, ticket=ticket, subagent=subagent)
+        return call(project, "Bash", support.bash_tool_input(command), role=role, ticket=ticket,
+                    subagent=subagent, env=env)
 
     return _bash
