@@ -40,6 +40,8 @@ The install deny rules and the secret-file deny rules (`.env*`, `*.pem`, `*.key`
 
 The operator console is not listed; it acts as the owner.
 
+From the switch-over (W1-05), every Gov OS session starts in the repository root, and the `w1-build` and `w1-tests` session folders end with the bootstrap (DEC-118).
+
 ## Denied attempts
 
 One attempt per class (DEC-100), made in a headless session started in the repository root, where `.claude/settings.json` applies. The session ran in `acceptEdits` mode with `Write` and `pip install` allowed, so each refusal comes from a deny rule. No file was created.

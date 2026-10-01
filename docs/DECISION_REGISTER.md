@@ -1034,3 +1034,52 @@ ticket's KPI text is unchanged. The acceptance tests at `43fdf41` cover KD-1…K
 | Version | Date | Change |
 |---|---|---|
 | 0.17 | 2026-10-01 | W1-02 KPI disputes: DEC-107 (KD-1, `GOV_ROLE` and `GOV_TICKET`; stricter of session and subagent role), DEC-108 (KD-2, scratch set), DEC-109 (KD-3, freeze flag), DEC-110 (KD-4, fail-closed with exit code 2 and a finding), DEC-111 (KD-5, plain Bash forms), DEC-112 (KD-6, auditor report path), DEC-113 (KD-7, non-role subagent is read-only; W1-05 consequence), DEC-114 (KD-8, edge-case defaults). |
+
+## 18. Wave 1 build decisions, round 4 (register v0.18, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers of 2026-10-01 to the points W1-BUILD reported at the W1-02 bootstrap diff check (commit `7d9ab30`;
+the owner gave `DIFF OK`): one known limit of the guard, three readings of DEC-114, and three points on the W1-05
+switch-over. W1-02 (`DAEO-emkd`) is reopened as a repair for DEC-115 and DEC-117; its acceptance tests are revised
+first. The KPI text of W1-02 is unchanged. W1-05's ticket changes under DEC-119 only.
+
+### DEC-115 — The guard resolves a Bash write target before judging it
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limit reported at the W1-02 diff check · **Refines:** DEC-111
+- **Decision:** Before judging a Bash write target, the guard expands `~`, `~user` and environment variables from the
+  hook's own environment. Any target it still can't resolve (command substitution, an unset or unknown variable, a glob
+  it can't expand) is denied. W1-03 stays the second line.
+
+### DEC-116 — Three readings of DEC-114 confirmed
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings reported at the W1-02 diff check · **Refines:** DEC-114
+- **Decision:**
+  - "Claimed" means `status: in_progress`.
+  - A test designer without a claimed ticket has no write, scratch included.
+  - `/dev/null` is the only device target that isn't a write, for any session, also when frozen.
+
+### DEC-117 — Amendment of DEC-107: inside a role subagent, the subagent's role governs
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (owner correction) · **Amends:** DEC-107
+- **Decision:** Inside a subagent with a defined role, that subagent's role governs its tool calls. The session's role
+  governs the main thread only. There is no "stricter of the two". A subagent whose type isn't a defined role stays
+  read-only (DEC-113).
+- The rest of DEC-107 stands. Its text above stays as written; this entry is the amendment.
+
+### DEC-118 — Project root: from the switch-over, every Gov OS session starts in the repository root
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the W1-05 points reported at the W1-02 diff check
+- **Decision:** From the switch-over, every Gov OS session starts in the repository root, so `CLAUDE_PROJECT_DIR` is
+  the repository. A write target outside the project directory is denied unless it's in the scratch set. The `w1-build`
+  and `w1-tests` folders end with the bootstrap.
+
+### DEC-119 — W1-05 delivers minimal subagent definitions for the five Wave 1 roles
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the W1-05 points reported at the W1-02 diff check · **Implements:** DEC-113
+- **Decision:** W1-05 delivers minimal subagent definitions for the five Wave 1 roles (orchestrator, engineer,
+  product-spec, independent-test-designer, independent-auditor) under `.claude/agents/`. W1-33 later replaces them with
+  full definitions.
+- **Ticket change:** under this decision the orchestrator updates W1-05's ticket (`DAEO-m7u4`): `.claude/agents/**` is
+  added to its `allowed_paths`, with one KPI line per role definition. That is a separate commit with the trailers
+  `Task: DAEO-m7u4` and `Implements: DEC-119`.
+- **For the post-bootstrap spec change (provider change):** Contract v4 names W1-33 as the only provider of CAP-22.a
+  (roles as subagent definitions). W1-05 now provides the minimal definitions first. Until the Contract names W1-05,
+  the new KPI lines of W1-05 cite no covers id, and the W1-05 row of `docs/plan/WAVE_1_WBS.md` is unchanged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.18 | 2026-10-01 | Owner answers at the W1-02 diff check: DEC-115 (Bash target resolution; unresolvable targets denied), DEC-116 (three readings of DEC-114 confirmed), DEC-117 (amends DEC-107: the subagent's role governs inside a role subagent), DEC-118 (sessions start in the repository root from the switch-over), DEC-119 (W1-05 delivers minimal role subagent definitions; provider change noted for the spec change). |
