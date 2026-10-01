@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: []
-decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083]
+decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096]
 supersedes: []
 constrains: [CHARTER-v5, CONTRACT-v4, ADR-0002]
 ---
@@ -26,7 +26,8 @@ What must the Gov OS defend against, and where is the hard boundary?
 
 - Keep agents accurate, bounded and traceable at low token cost (Charter v5 §1, DEC-004).
 - One solo owner, one workstation, and a private GitHub repository without GitHub Pro (DEC-074 Q13).
-- Machinery against an adversary the design cannot stop produces endless review loops (DEC-044).
+- Machinery against an adversary the design cannot stop produces endless review loops. Loops therefore escalate to the
+  owner after three consecutive non-converging iterations (DEC-044 as amended by DEC-096).
 
 ## Considered Options
 

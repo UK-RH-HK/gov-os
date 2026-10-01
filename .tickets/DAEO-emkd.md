@@ -24,9 +24,11 @@ kpis:
   - Edit/Write/Bash writes are allowed only inside the active ticket allowed_paths plus the kernel scratch set, per role
   - The engineer role is denied every write under tests/acceptance/**; the independent-test-designer role is allowed only there
   - The freeze flag (gov pause) denies every write; the guard reads ticket frontmatter directly; decision in < 100 ms p95
+  - 'A session with no declared role, or an unknown role, is read-only: every write is denied'
   failure:
   - Any write outside allowed_paths is allowed
   - Guard crash or timeout lets the call through without a recorded finding
+  - A session with no or an unknown role can write anywhere
 profile: FULL
 sources:
 - G-01
@@ -35,6 +37,8 @@ sources:
 - CAP-05
 - DEC-041
 - DEC-069
+- OWNER-DECISION-P2-0001 BC-P2-08
+- MR-3
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W1-02/
@@ -43,4 +47,3 @@ acceptance_tests:
 # W1-02 PreToolUse default-deny guard
 
 Default-deny allow-list per role and per ticket (G-01), reading the ticket file frontmatter; honours the freeze flag.
-

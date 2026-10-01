@@ -44,4 +44,3 @@ acceptance_tests:
 # W1-07 gov CLI skeleton
 
 Python package, command registry, API-0002 envelope and exit codes, read/act classes, overlay loader, minimal status.
-

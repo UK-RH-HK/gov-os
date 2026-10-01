@@ -41,6 +41,7 @@ sources:
 - CAP-46
 - CAP-48
 - CAP-54
+- MR-4
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W1-27/
@@ -49,4 +50,3 @@ acceptance_tests:
 # W1-27 gov doctor and gov rebuild
 
 Installation health (MR-4) and the rebuild guarantee.
-

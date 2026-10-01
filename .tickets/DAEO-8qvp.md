@@ -41,4 +41,3 @@ acceptance_tests:
 # W1-03 Post-command containment check
 
 Second line of defence for Bash writes the guard cannot parse (G-02, moved to W1 by DEC-076).
-

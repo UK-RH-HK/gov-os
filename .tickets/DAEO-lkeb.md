@@ -31,6 +31,7 @@ sources:
 - DEC-074 Q10
 - DEC-076
 - CAP-12
+- CAP-03
 est_loc: 50
 acceptance_tests:
   path: tests/acceptance/W1-16/
@@ -39,4 +40,3 @@ acceptance_tests:
 # W1-16 codebase-memory wrapper
 
 Per-repository home and secret exclusion for codebase-memory-mcp 0.11.0 (DEC-076).
-

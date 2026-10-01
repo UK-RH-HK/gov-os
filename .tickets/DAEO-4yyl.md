@@ -47,4 +47,3 @@ acceptance_tests:
 # W1-10 Store and record graph
 
 The deterministic frontmatter and commit-trailer graph in the shared SQLite store.
-

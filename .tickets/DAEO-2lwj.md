@@ -24,20 +24,25 @@ allowed_paths:
 kpis:
   success:
   - 'Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpoint and the close record with skill versions'
-  - Counts review rounds and refuses a third round without an owner ADR, proposing DELETE/NARROW/DEFER; a failure opens a dependent repair ticket
+  - Holds the iteration count of every review→repair, test→fix and verification loop on the ticket; after three consecutive non-converging iterations it stops the loop and puts an escalation package in
+    chat (outcomes, why not converging, options fix differently / narrow / split / defer / delete / continue) for the owner (DEC-096); a failure opens a dependent repair ticket
   failure:
   - A ticket closes with a failing acceptance test
-  - A third review round proceeds silently
+  - A fourth consecutive non-converging iteration starts without an owner decision
+  - The iteration count or budget appears in any output seen by the looping session
 profile: FULL
 sources:
 - S0a-G-12
 - DEC-044
+- DEC-096
 - DEC-069
 - CAP-13
 - CAP-24
 - CAP-31
 - CAP-38
 - CAP-59
+- CAP-50
+- MR-3
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W1-30/
@@ -46,4 +51,3 @@ acceptance_tests:
 # W1-30 gov close
 
 CIT-E closure with the loop budget.
-

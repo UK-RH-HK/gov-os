@@ -25,6 +25,8 @@ kpis:
   - Runs schema, id grammar, orphans, path map, adapter drift, openspec validate --strict, decision checker, readiness, ticket DAG acyclicity and field completeness, and the rule that no implementer allowed_paths
     covers tests/acceptance/**
   - Every policy key maps to a check or is declared informational (D-0003); each family is reported RED/YELLOW/GREEN
+  - Fails a specification with a required open readiness row that has no linked gap ticket (DEC-089)
+  - Each check declares hard-block or warning, and every result records its provenance (commit, check version, inputs hash)
   failure:
   - A planted defect of any listed family passes
   - The scope of a check is a hand-maintained list
@@ -33,10 +35,11 @@ sources:
 - S0a-G-02
 - DEC-041
 - DEC-046
+- DEC-089
 - CAP-38
 - MR-2
 - MR-3
-est_loc: 200
+est_loc: 240
 acceptance_tests:
   path: tests/acceptance/W1-26/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation
@@ -44,4 +47,3 @@ acceptance_tests:
 # W1-26 gov check G0-G2
 
 Deterministic governance checks, derived from the repository.
-

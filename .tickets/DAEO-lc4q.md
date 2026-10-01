@@ -40,4 +40,3 @@ acceptance_tests:
 # W1-12 Readiness schema and proposal templates
 
 The feature-readiness artefact (G-07) and the proposal templates (G-09).
-

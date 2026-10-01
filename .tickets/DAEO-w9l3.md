@@ -39,4 +39,3 @@ acceptance_tests:
 # W1-14 Proposal-to-ticket bridge
 
 Closed specifications generate the work (MR-2).
-

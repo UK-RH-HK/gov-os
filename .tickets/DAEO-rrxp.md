@@ -40,4 +40,3 @@ acceptance_tests:
 # W1-25 gov checkpoint
 
 Structured checkpoints in the repository.
-

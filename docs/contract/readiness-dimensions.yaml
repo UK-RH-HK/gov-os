@@ -33,6 +33,10 @@ rules:
   spine: a spine specification always closes at FULL, whatever the profile of the change that opens it (DEC-085)
   closed: a specification is closed when every row its profile requires is PRESENT or N/A_WITH_REASON (MR-1)
   ready_gate: no production ticket is READY while its specification is not closed (MR-2)
+  gap_tickets: every required open row has a linked gap ticket (discovery, data, research or test-design); gov check fails
+    an unlinked one (DEC-089)
+  audit_on_close: closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent
+    Auditor; LITE feature specifications are audited at the wave exit (DEC-088)
 dimensions:
 - n: 1
   key: intent
@@ -161,6 +165,7 @@ mandatory_rows:
 - 25
 capability_types:
   source: Framework v4.1.2 §40 taxonomy
+  extension: a project may extend the taxonomy only through a governed change (CIT-P → CIT-E, Framework §40)
   extra_rows_for_standard:
     product-outcome:
     - 3

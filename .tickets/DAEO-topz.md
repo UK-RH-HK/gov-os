@@ -46,4 +46,3 @@ acceptance_tests:
 # W1-09 Ticket vendoring, claims and READY rule
 
 Vendored ticket script plus the claim convention and the READY filter (DEC-069, MR-2).
-

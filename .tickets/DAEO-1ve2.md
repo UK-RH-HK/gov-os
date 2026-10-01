@@ -37,4 +37,3 @@ acceptance_tests:
 # W1-18 Ollama on-demand lifecycle and fallback
 
 On-demand start and stop of the stack only daemon, with lexical fallback.
-

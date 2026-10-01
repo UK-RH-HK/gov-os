@@ -27,19 +27,27 @@ allowed_paths:
 kpis:
   success:
   - Each skill has a versioned frontmatter, a description <= 60 tokens and a body <= 2.5k tokens
-  - Discovery never asks what the repository answers and batches at most five packages; planning emits schema-valid tickets; test design reads only the spec and KPIs; change covers CIT-P and CIT-E
+  - On the MR-A-02 and MR-B-02 dev scenarios, 0 of the decision packages discovery asks are answerable from files its retrieval bundle cites; at most five open packages, P1 may bypass (DEC-093)
+  - Planning emits schema-valid tickets and one linked gap ticket (class discovery, data, research or test-design) per required open readiness row (DEC-089)
+  - Test design reads only the specification and KPIs (its transcript reads no file outside them); change covers CIT-P and CIT-E, and an accepted CIT-E that changes a closed spine creates an audit ticket
+    (DEC-088)
   failure:
   - A skill body exceeds 2.5k tokens
   - The test-design skill reads implementation files
+  - A required open readiness row has no linked gap ticket after planning
 profile: STANDARD
 sources:
 - DEC-066
+- DEC-088
+- DEC-089
+- DEC-093
 - MR-1
 - MR-2
 - MR-3
 - MR-4
 - MR-6
 - CAP-24
+- CAP-30
 - CAP-33
 - CAP-34
 est_loc: 480
@@ -50,4 +58,3 @@ acceptance_tests:
 # W1-35 Skills: discovery, planning, independent test design, change
 
 Four Gov OS method skills (markdown).
-

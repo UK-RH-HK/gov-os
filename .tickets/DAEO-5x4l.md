@@ -25,19 +25,22 @@ kpis:
   - Paging with continuation; facets; dedup by chunk hash; authority/current filter drops superseded and must-not-cite records; one rerank over the merged set
   - Every bundle cites by id and sha256 and carries one stopping reason from the fixed list
   - RETR-A-04 and RETR-X-02 dev runs produce multi-batch bundles
+  - A child hit is expanded to its parent span only within the bundle budget, and the bundle names each expansion (DEC-091)
   failure:
   - A batch-size limit is reported as completeness
   - A superseded record is cited as current
 profile: FULL
 sources:
 - DEC-080
+- DEC-091
 - G-19
 - S0a-G-06
 - CAP-14
 - CAP-16
+- CAP-18
 - CAP-41
 - CAP-55
-est_loc: 220
+est_loc: 280
 acceptance_tests:
   path: tests/acceptance/W1-21/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation
@@ -45,4 +48,3 @@ acceptance_tests:
 # W1-21 gov retrieve with completeness
 
 The retrieval-completeness engine behind the retrieval skill (DEC-080).
-

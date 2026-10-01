@@ -1,7 +1,7 @@
 ---
 id: DAEO-ipqy
 status: open
-deps: [DAEO-dtv3]
+deps: [DAEO-m7u4]
 links: []
 created: 2026-09-30T22:49:58Z
 type: task
@@ -14,7 +14,7 @@ title: Wave 1 tool prerequisites
 class: ops
 role: orchestrator
 depends_on:
-- W1-01
+- W1-05
 allowed_paths:
 - governance/project/tool-registry.yaml
 - template/governance/kernel/vendor/superpowers/**
@@ -40,4 +40,3 @@ acceptance_tests:
 # W1-06 Wave 1 tool prerequisites
 
 Owner-approved installs and the registry for this repository: ccusage (DEC-086), Superpowers source, existing pins.
-

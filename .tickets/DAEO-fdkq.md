@@ -45,4 +45,3 @@ acceptance_tests:
 # W1-40 lefthook and CI workflow
 
 G1-G5 tiers (DEC-075, DEC-087).
-

@@ -2,7 +2,7 @@
 id: CHARTER-v5
 status: PROPOSED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
-decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085]
+decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096]
 ---
 
 # Governance OS — Charter v5
@@ -68,8 +68,9 @@ Full statement: [ADR-0001](../adr/ADR-0001-threat-model.md) (DEC-039 as amended 
    repository, never from a hand-kept list (DEC-041).
 8. **Assemble, then glue.** Mature tools do the heavy lifting. The `gov` CLI is thin glue behind the API-0002
    envelope. The owner approves every tool install (DEC-001, DEC-083).
-9. **Delete before you wrap.** A surface that keeps producing blocking findings is deleted, narrowed or deferred, not
-   defended with more machinery (DEC-044).
+9. **Delete before you wrap.** A loop that does not converge goes to the owner, who may have it fixed differently,
+   narrowed, split, deferred, deleted or continued. It is never defended with more machinery (DEC-044 as amended by
+   DEC-096).
 
 ## 4. Master rules (verbatim from architecture v0.3 §1A)
 
@@ -113,7 +114,7 @@ These rules apply to every session in every Gov OS, including the Gov OS's own d
   - A branch waiting on the human does not stop independent branches.
   - Answers are recorded as decisions in git.
 
-## 5. Proportionality and the loop budget
+## 5. Proportionality and the loop policy
 
 **Profiles** (DEC-005, DEC-085). Ceremony scales with impact radius.
 
@@ -128,9 +129,17 @@ These rules apply to every session in every Gov OS, including the Gov OS's own d
 - **A spine specification always closes at FULL**, whatever the profile of the change that opens it (DEC-085).
 - The round counts are placeholders, tuned from telemetry (DEC-035).
 
-**Loop budget** (DEC-044). Any one surface gets at most **two review→repair rounds**. If the second round still finds
-a blocking defect, the default disposition is **DELETE, NARROW or DEFER**. Continuing needs an explicit owner
-decision, recorded as an ADR. `gov close` counts the rounds. The same limit applies to audits (DEC-070).
+**Loop policy** (DEC-096, amending DEC-044, DEC-070 and DEC-082). This applies to every loop that runs until
+convergence: review→repair, audit→repair, test→fix and verification.
+- The loop continues until it converges, or until **three consecutive iterations fail to converge**.
+- The third consecutive failure produces an **escalation package** for the owner. It gives:
+  - each iteration's outcome;
+  - why the loop is not converging;
+  - the options: fix differently, narrow, split, defer, delete, or continue.
+- The owner decides.
+- The orchestrator or `gov` holds the iteration count and the budget. **They are never disclosed to the sessions inside
+  the loop.**
+- Retrieval stopping rules are a separate thing and are unchanged (DEC-034, DEC-080).
 
 ## 6. Operating model
 
@@ -146,19 +155,22 @@ from kernel role files plus the project roster. It carries:
 | Wave | Roles |
 |---|---|
 | 1 | orchestrator · product/specification · independent test designer · engineer · independent auditor |
-| 2 | architecture · frontend · backend · database/data · integration/API · DevOps/SRE · security · performance · UX; typed handoffs |
+| 2 | architecture · frontend · backend · database/data · integration/API · test execution · integration · DevOps/SRE · security · performance · UX; typed handoffs (DEC-094) |
 | 3 | research · AI/ML · data author · change controller · memory/knowledge · tooling · release · claims/concurrency |
 
 **Authority.** The owner is L5: the customer and the final authority (MR-6). Agents hold no approval authority.
 - A decision becomes ACTIVE only with an approval fact from the owner's git account: an owner commit, a signed tag or
   a PR approval (DEC-046, CAP-21).
-- Only the orchestrator may *propose* a tool install. It installs only after the owner approves in chat, and the
-  install is recorded in the tool registry. `sudo` stays with the owner (DEC-083).
+- Only the orchestrator installs tools, and only after the owner approves a decision package in chat. The install is
+  recorded in the tool registry. Install commands are `ask` for the orchestrator, also in Auto mode, and denied for
+  every other role. `sudo` stays with the owner (DEC-083, DEC-095).
 
 **The human as customer** (MR-6).
 - The questions that matter arrive as decision packages in the active chat: question, why now, options, impact,
-  reversibility, cost, recommendation, confidence.
-- They are ranked P1–P3 by critical path and irreversibility, and asked at most five at a time.
+  reversibility, cost, recommendation, confidence. The template also carries current state and exact permitted next
+  actions (Framework §52).
+- They are ranked P1–P3 by critical path and irreversibility, and asked at most five at a time. A P1 package may
+  bypass the cap (DEC-093).
 - A branch that waits on the owner never stops independent branches.
 - Every answer is recorded as a decision in git.
 
@@ -167,7 +179,16 @@ from kernel role files plus the project roster. It carries:
 - discovery: the discovery skill plus `gov readiness`;
 - impact (CIT-P): an OpenSpec proposal, plus `gov impact` from Wave 2;
 - execution (CIT-E): OpenSpec apply/archive plus `gov close`;
-- audit: a fresh, read-only Independent Auditor.
+- audit: a fresh, read-only Independent Auditor. It runs (DEC-088):
+  - when a spine specification closes;
+  - when a STANDARD or FULL feature specification closes;
+  - when an accepted CIT-E changes a closed spine specification;
+  - at every wave and release exit.
+
+  LITE feature specifications are audited at the wave exit. Contested and owner-level findings come to the owner as
+  decision packages, and agreed fixes become tickets.
+
+Readiness gaps generate linked tickets from Wave 1 (DEC-089).
 
 **Until Release 1** (DEC-073). An operator console session acts for the owner at the terminal. Each repository has its
 own session. The Gov OS's own Wave 1 bootstraps MR-3 with settings deny rules and an operator diff check, then runs

@@ -20,7 +20,9 @@ allowed_paths:
 - template/governance/kernel/templates/decision-record*
 kpis:
   success:
-  - The template has the eight fields (question, why now, options, impact, reversibility, cost, recommendation, confidence) plus rank P1-P3
+  - The template has the ten fields of Framework §52 / Contract v3 L2 (question, why now, current state, options, impact, reversibility, cost of rework, recommendation, confidence, exact permitted next
+    actions) plus rank P1-P3
+  - Batching allows at most five open packages at a time, and a P1 package may bypass the cap (DEC-093)
   - An answer maps to a decision record appended with ACCEPTED (owner, date)
   failure:
   - A package can be rendered without a recommendation or confidence
@@ -28,6 +30,7 @@ kpis:
 profile: LITE
 sources:
 - DEC-065
+- DEC-093
 - MR-6
 - CAP-34
 est_loc: 60
@@ -38,4 +41,3 @@ acceptance_tests:
 # W1-34 Decision-package template
 
 The customer interface (MR-6).
-

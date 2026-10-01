@@ -24,7 +24,8 @@ kpis:
   success:
   - gov counts governance tokens per ticket (instruction files, SessionStart packet, hook output, gov output, governance MCP definitions, checkpoint and close records) and joins ccusage fresh input+output
     tokens per ticket
-  - The close record carries the share; cache reads are reported separately
+  - The close record carries the share and the locally observable Contract v3 P1 fields (session, model, role, ticket, skill/tool versions, packet id, retrieval queries and hits, tokens in/out, cost, files
+    written, tests, retries, handoffs, decisions, owner interventions); cache reads are reported separately
   failure:
   - A ticket closes without a share figure
   - Cache reads are counted in the share
@@ -42,4 +43,3 @@ acceptance_tests:
 # W1-31 Governance share counter
 
 The DEC-086 measurement for the Wave 1 exit.
-

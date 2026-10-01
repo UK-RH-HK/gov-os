@@ -44,4 +44,3 @@ acceptance_tests:
 # W1-19 Semantic retrieval, RRF and rerank
 
 Semantic route and fusion of R1 (moved to W1 by DEC-074 and DEC-080).
-

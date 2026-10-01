@@ -40,4 +40,3 @@ acceptance_tests:
 # W1-05 Dogfood switch-over
 
 Wire the guard, containment and install rule into this repository once their acceptance tests pass (DEC-084).
-

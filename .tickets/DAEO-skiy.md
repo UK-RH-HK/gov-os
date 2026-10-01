@@ -5,7 +5,7 @@ deps: [DAEO-5x4l, DAEO-rrxp, DAEO-xog0]
 links: []
 created: 2026-09-30T22:49:59Z
 type: task
-priority: 1
+priority: 2
 assignee: product-spec
 external-ref: W1-36
 tags: [wave-1, skill, standard]
@@ -25,15 +25,19 @@ allowed_paths:
 kpis:
   success:
   - Retrieval runs facets in disposable subagents and returns only the validated bundle
-  - Audit compares actual state with spec, contract and decisions and writes findings as tickets; each skill versioned, body <= 2.5k tokens
+  - Audit produces a report naming its milestone (DEC-088) with one row per contract item and decision in scope, each classed OK/MISSING/WEAKENED/CONTRADICTS/UNJUSTIFIED_DROP/SCOPE_CREEP; on the MR-A-06
+    and MR-B-06 dev scenarios it reports the planted divergence
+  - Contested and owner-level findings appear in chat as decision packages; agreed fixes become tickets; each skill versioned, body <= 2.5k tokens
   failure:
   - Intermediate retrieval batches appear in the main context
   - The audit skill edits audited files
+  - An owner-level finding becomes a ticket without a decision package
 profile: STANDARD
 sources:
 - DEC-080
 - DEC-032
 - DEC-070
+- DEC-088
 - CAP-16
 - CAP-24
 - CAP-56
@@ -46,4 +50,3 @@ acceptance_tests:
 # W1-36 Skills: retrieval, audit, checkpoint/resume, adopt
 
 Four Gov OS method skills (markdown).
-

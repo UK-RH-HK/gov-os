@@ -21,7 +21,9 @@ allowed_paths:
 kpis:
   success:
   - Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tools, model tier, authority level and handoff format
-  - Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may propose installs
+  - Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner approval in chat (DEC-083)
+  - 'Each role maps the Framework §32 permission classes: WRITE_REPO_SCOPED via allowed_paths; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied; network, database, cloud, CI-trigger and deploy
+    classes denied unless granted'
   failure:
   - A role lacks any required field
   - An implementer role pattern covers tests/acceptance/**
@@ -31,6 +33,8 @@ sources:
 - DEC-083
 - MR-5
 - CAP-47
+- MR-3
+- MR-4
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W1-33/
@@ -39,4 +43,3 @@ acceptance_tests:
 # W1-33 Wave 1 role definitions
 
 The virtual software company, Wave 1 roster.
-

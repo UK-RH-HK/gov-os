@@ -21,9 +21,11 @@ kpis:
   success:
   - Implementer sessions deny Edit/Write on tests/acceptance/** and on .env*, *.pem, *.key, config/secrets* (verified by one denied attempt each)
   - The operator diff procedure (git diff --name-only vs allowed_paths at each ticket close) is written and used from the first implementation ticket
+  - 'Interim install rule recorded and in force until W1-05: install commands are denied in every session settings file; no tool is installed before W1-05 (W1-06 depends on W1-05)'
   failure:
   - Any implementer commit touching tests/acceptance/** before W1-05 lands
   - An existing docs/source deny rule is lost
+  - Any install runs before W1-05
 profile: LITE
 sources:
 - DEC-084
@@ -38,4 +40,3 @@ acceptance_tests:
 # W1-01 Interim bootstrap guardrails
 
 Settings-level guardrails that hold MR-3 until the guard and containment tickets pass their acceptance tests (DEC-084).
-

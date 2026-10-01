@@ -47,4 +47,3 @@ acceptance_tests:
 # W1-39 Copier kernel template and lock
 
 Distribution: template, answers, overlay list, lock and manifest.
-

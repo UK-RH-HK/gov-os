@@ -24,7 +24,7 @@ allowed_paths:
 - tests/unit/retrieval/**
 kpis:
   success:
-  - Carried FTS5 and chunking ported into src/gov; blob-hash incremental index in the shared store
+  - Carried FTS5 and chunking ported into src/gov; blob-hash incremental index in the shared store; every chunk record carries parent_id (section for documents, function/module for code) (DEC-091)
   - Changed blobs re-index before the next retrieval (2.8 s scale on a-dev); an empty or stale index is reported, never returned as absent
   failure:
   - A retrieval returns pre-edit text as current
@@ -34,10 +34,12 @@ sources:
 - G-17
 - G-20
 - G-21
+- DEC-091
 - CAP-07
 - CAP-11
 - CAP-17
-est_loc: 220
+- CAP-18
+est_loc: 240
 acceptance_tests:
   path: tests/acceptance/W1-17/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation
@@ -45,4 +47,3 @@ acceptance_tests:
 # W1-17 Lexical index and shared store
 
 Lexical part of R1 in the shared store with zero-result semantics.
-

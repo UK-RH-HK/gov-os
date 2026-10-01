@@ -40,6 +40,7 @@ sources:
 - DEC-074 Q6
 - DEC-074 Q7
 - CAP-52
+- MR-5
 est_loc: 50
 acceptance_tests:
   path: tests/acceptance/W1-38/
@@ -48,4 +49,3 @@ acceptance_tests:
 # W1-38 rulesync adapters and .claude ownership
 
 One adapter source for Claude Code and AGENTS.md.
-

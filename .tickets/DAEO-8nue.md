@@ -42,4 +42,3 @@ acceptance_tests:
 # W1-22 Evidence validator and zero-result canaries
 
 Citation validator and canaries (moved to W1 by DEC-080).
-

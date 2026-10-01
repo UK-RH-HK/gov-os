@@ -39,4 +39,3 @@ acceptance_tests:
 # W1-37 Superpowers three-skill vendoring
 
 Selected method skills (DEC-074 Q5).
-

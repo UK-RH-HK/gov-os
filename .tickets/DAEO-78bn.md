@@ -27,6 +27,7 @@ kpis:
   failure:
   - Any install executes without an owner approval in chat
   - sudo is ever allowed to an agent role
+  - A matcher result ever allows a command that the harness would otherwise ask about (matching only escalates to ask or deny)
 profile: FULL
 sources:
 - DEC-083
@@ -40,4 +41,3 @@ acceptance_tests:
 # W1-04 Install-approval rule
 
 DEC-040 as amended by DEC-083: orchestrator-only install proposals, owner approval in chat, registry record.
-

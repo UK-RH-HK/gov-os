@@ -6,7 +6,7 @@
 **Cell states:** PRESENT · MISSING · PROVISIONAL · BLOCKED · N/A_WITH_REASON. A silent N/A is invalid.
 **Authority:** `docs/DECISION_REGISTER.md` (register v0.12 plus the S1 entries). Only ACCEPTED and DONE entries count
 as evidence of a settled cell (DEC-082); a cell that rests on a PROPOSED entry is PROVISIONAL.
-**Round:** 2 (2026-09-30). Status: **CLOSED at FULL** — every cell PRESENT; round-1 answers recorded as DEC-083…DEC-087.
+**Round:** 3 (2026-10-01). Status: **CLOSED at FULL** — every cell PRESENT. Round-1 answers are DEC-083…DEC-087; the S1-A round-1 answers are DEC-088…DEC-095; the loop policy is DEC-096.
 
 ## 1. Readiness table
 
@@ -22,7 +22,7 @@ as evidence of a settled cell (DEC-082); a cell that rests on a PROPOSED entry i
 | 8 | processing/algorithm | PRESENT | Settled: DEC-080 (paging with continuation, facet subagents, deterministic closure, dedup by chunk hash, authority filter, one rerank, validator, canaries, hierarchical synthesis); DEC-074 R1 (FTS5 + sqlite-vec + RRF + Qwen3 rerank); DEC-030. Open: two separate budgets (DEC-031), radius-scaled budgets (DEC-035), impact radius → profile mapping (DEC-005) are PROPOSED | closed by DEC-083 (DEC-005, DEC-031…037 accepted) |
 | 9 | expected outputs | PRESENT | DEC-080 (cited evidence bundle, fixed stopping reasons); DEC-065 MR-2 (WBS), MR-6 (decision packages, answers in git); architecture v0.3 §2.3 (context packet as file path + ≤ 2.5k-token summary; checkpoints; trailers); `docs/interfaces/API-0002.yaml` (JSON envelope, exit codes 0–4, kept in tree by DEC-054) | — |
 | 10 | functional requirements | PRESENT | DEC-064 (every Contract v3 capability that survives ADR-0001); `s0a/out/capabilities.yaml` (CAP-01…CAP-60); DEC-074 Q11 (the four LITE forms); DEC-067 (CAP-49 KEPT as qualification); DEC-053 Q7 (no upstream export) | — |
-| 11 | non-functional requirements | PRESENT | Settled: DEC-078 (scale envelope ≈ 80k nodes / 270k edges; worst-case RAM ≈ 12.5 GB of 15.5 GiB); DEC-074 facts (≈ 11.9 GB disk, one on-demand daemon, VRAM ≈ 5.2 GiB peak). Open: the governance token budget (DEC-004, ≤ 10–15 %, packet ≤ ~6k tokens) and the loop budget (DEC-044, two rounds) are PROPOSED | closed by DEC-083 (DEC-004, DEC-044 accepted) |
+| 11 | non-functional requirements | PRESENT | Settled: DEC-078 (scale envelope ≈ 80k nodes / 270k edges; worst-case RAM ≈ 12.5 GB of 15.5 GiB); DEC-074 facts (≈ 11.9 GB disk, one on-demand daemon, VRAM ≈ 5.2 GiB peak). Open: the governance token budget (DEC-004, ≤ 10–15 %, packet ≤ ~6k tokens) and the loop budget (DEC-044) are PROPOSED | closed by DEC-083 (DEC-004, DEC-044 accepted); loop policy amended by DEC-096 |
 | 12 | UX/interactions where applicable | PRESENT | DEC-065 MR-6 (decision packages in the active chat, ranked and batched); Framework §33–34 (natural language first, small command set); architecture v0.3 §2.4; DEC-058 (stage state in a committed file; any panel only reads and writes it — no panel is required) | — |
 | 13 | backend/service behaviour | PRESENT | Architecture v0.3 §2.1 L3–L4 (hooks; `gov` commands); DEC-076 (post-command containment in W1); DEC-080; DEC-074 Q4 (Ollama on demand, 5-min idle unload); `s0b2/out/GLUE_REQUIREMENTS.md` | — |
 | 14 | database/state requirements | PRESENT | Architecture v0.3 §1 principle 1 and §2.1 L5–L6 (git is the only truth; `.gov-runtime/` derived and rebuildable); DEC-057; DEC-074 R1 + GLUE G-20 (one SQLite store for frontmatter graph, FTS5 and vectors); DEC-074 Q10 (codebase-memory home per repository) | — |
@@ -35,7 +35,7 @@ as evidence of a settled cell (DEC-082); a cell that rests on a PROPOSED entry i
 | 21 | cost constraints | PRESENT | DEC-074 Q1 (Balanced stack: ≈ $100–104 a month, no Docker; no second-family verifier subscription, which settles OQ-03); DEC-074 Q13 and DEC-075 (no GitHub Pro); register §7 | — |
 | 22 | recovery/fallback | PRESENT | GLUE G-22 (Ollama health check, FTS-only fallback); DEC-080 + DEC-034 list (`FACET_UNAVAILABLE`; NOT_FOUND ≠ absent); DEC-051/DEC-056 (archive tag); architecture v0.3 §4 (checkpoints; `gov rebuild`); Framework §74 (freeze flag, revert) | — |
 | 23 | measurable success criteria | PRESENT | Settled: Wave 1 exit (architecture v0.3 §6.1; DEC-080 RETR-A-04, RETR-X-02; DEC-070 wave-exit audit); Wave 2/3 exits (§6.1); qualification scorecard (SCORECARD_FORMAT M1–M18; thresholds held out, DEC-067). Open: "governance share ≤ 15 %" has no accepted definition or instrument | closed by DEC-086 |
-| 24 | measurable failure criteria | PRESENT | SCORECARD_FORMAT M15 (any forbidden outcome fails qualification), M14 (any MR-3 breach is forbidden); DEC-069; DEC-070 (at most two audit→repair rounds). The general loop budget (DEC-044) rides P1-A | closed by DEC-083 |
+| 24 | measurable failure criteria | PRESENT | SCORECARD_FORMAT M15 (any forbidden outcome fails qualification), M14 (any MR-3 breach is forbidden); DEC-069; DEC-096 (any loop that fails to converge three consecutive times escalates to the owner; amends DEC-044, DEC-070). The general loop rule rode P1-A | closed by DEC-083 |
 | 25 | independent acceptance/system tests | PRESENT | Settled: MR-3, DEC-069 (Independent Test Designer; implementer's allowed paths exclude `tests/acceptance/`), DEC-076 (G-02 containment in W1), DEC-067 (qualification by a fresh executor), DEC-070. Open: how MR-3 is held on the Gov OS's **own** Wave 1 tickets before the guard (G-01) and containment (G-02) exist, and which session plays the Independent Test Designer for them | closed by DEC-084 (bootstrap, then dogfood) |
 | 26 | documentation/operations needs | PRESENT | DEC-058 (Charter v5, Contract v4; `docs/source/` archived after S1-A); DEC-081, DEC-082; DEC-073 (operating model until Release 1); DEC-053 Q7 (lessons in `docs/lessons/`) | — |
 
@@ -87,3 +87,4 @@ deferred to adoption); control panel (DEC-058); AMD-01…AMD-08 / OQ-06 (Contrac
 |---|---|---|---|---|
 | 1 | 2026-09-30 | P1-A, P1-B, P1-C, P2-D, P2-E | — | 7 |
 | 2 | 2026-09-30 | — | P1-A → DEC-083 (a + DEC-040 amendment); P1-B → DEC-084 (a); P1-C → DEC-085 (a + spines at FULL); P2-D → DEC-086 (a + ccusage W1 prerequisite); P2-E → DEC-087 (a) | 0 |
+| 3 | 2026-10-01 | S1-A round-1 packages DP-1…DP-8 (asked by the auditor) | DEC-088…DEC-095; plus the owner's loop policy DEC-096. No cell changes state; rows 3, 15, 24, 25 gain evidence (DEC-088, DEC-089, DEC-091, DEC-096) | 0 |

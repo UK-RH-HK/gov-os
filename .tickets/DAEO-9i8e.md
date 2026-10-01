@@ -39,4 +39,3 @@ acceptance_tests:
 # W1-23 Hierarchical synthesis notes
 
 Derived, cited, hash-checked synthesis (DEC-080).
-

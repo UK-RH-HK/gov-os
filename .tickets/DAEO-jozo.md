@@ -41,4 +41,3 @@ acceptance_tests:
 # W1-20 gov closure
 
 Deterministic worklist closure (DEC-080).
-

@@ -41,4 +41,3 @@ acceptance_tests:
 # W1-15 Secret rules and pre-index filter
 
 Content-based secret exclusion before every indexer (W1 gate).
-

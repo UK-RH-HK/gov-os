@@ -5,7 +5,7 @@ deps: [DAEO-4yyl, DAEO-5x4l]
 links: []
 created: 2026-09-30T22:49:59Z
 type: task
-priority: 2
+priority: 1
 assignee: engineer
 external-ref: W1-24
 tags: [wave-1, implementation, full]
@@ -41,4 +41,3 @@ acceptance_tests:
 # W1-24 gov context
 
 Compiled, budgeted, hashed context packets.
-

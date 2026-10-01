@@ -35,6 +35,7 @@ sources:
 - DEC-046
 - CAP-21
 - CAP-51
+- CAP-01
 est_loc: 290
 acceptance_tests:
   path: tests/acceptance/W1-11/
@@ -43,4 +44,3 @@ acceptance_tests:
 # W1-11 Decision checker and owner-approval facts
 
 D2 checker with the MADR schema and the simplified D-0007 approval rule.
-
