@@ -33,6 +33,18 @@ parses today or later. The check judges a call by its effect inside the
 repository (DEC-123), so it needs nothing more. ``literal_call`` passes a
 command to the hooks word for word instead.
 
+**A hook run that lies in the past.** ``run_guard_earlier`` runs the PreToolUse
+hook as if it had run some seconds ago, without waiting:
+
+- the hook's Python clock reads that much behind the machine's: ``time.time()``,
+  ``time.time_ns()`` and ``datetime.now()``. This is a ``sitecustomize`` module
+  put first on the hook's ``PYTHONPATH`` (``clock``);
+- every file the run wrote gets its modification time moved back by as much.
+  The files are found by comparing the project (outside ``.git``), ``HOME`` and
+  the temp directory before and after the run; no file is known by name.
+
+Every other hook run happens at the machine's time.
+
 What reaches the agent from a PostToolUse or PostToolUseFailure hook (harness
 2.1.284, hook reference):
 
@@ -81,6 +93,8 @@ KNOWN_ROLES = (ORCHESTRATOR, PRODUCT_SPEC, TEST_DESIGNER, ENGINEER, AUDITOR)
 HOOK_TIMEOUT_S = 30.0
 BASH_TIMEOUT_S = 30.0
 SESSION_ID = "w1-03-acceptance-session"
+OTHER_SESSION_ID = "w1-03-acceptance-session-two"   # a second session in the same working tree
+CLOCK_ENV = "W1_03_CLOCK_SHIFT_S"
 
 # The fields of a containment finding (DEC-122) and the two values of ``action``.
 FINDING_FIELDS = ("time", "session_id", "agent_type", "role", "ticket", "tool", "command", "paths", "action",
@@ -427,19 +441,64 @@ def hook_environment(project, sandbox, role=None, ticket=None):
     return env
 
 
+_CLOCK_MODULE = '''"""The hook's Python clock is W1_03_CLOCK_SHIFT_S seconds off the machine's (negative: behind)."""
+import datetime as _datetime
+import os as _os
+import time as _time
+
+_SHIFT = float(_os.environ.get("W1_03_CLOCK_SHIFT_S") or 0)
+
+if _SHIFT:
+    _real_time, _real_time_ns = _time.time, _time.time_ns
+    _time.time = lambda: _real_time() + _SHIFT
+    _time.time_ns = lambda: _real_time_ns() + int(_SHIFT * 1_000_000_000)
+
+    class _Shifted(_datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls.fromtimestamp(_time.time(), tz)
+
+        @classmethod
+        def utcnow(cls):
+            return cls.fromtimestamp(_time.time(), _datetime.timezone.utc).replace(tzinfo=None)
+
+        @classmethod
+        def today(cls):
+            return cls.fromtimestamp(_time.time())
+
+    _Shifted.__name__ = _Shifted.__qualname__ = "datetime"
+    _datetime.datetime = _Shifted
+'''
+
+
+def clock(sandbox, seconds):
+    """An environment in which a hook's Python clock is ``seconds`` off the machine's (negative: behind)."""
+    directory = sandbox.elsewhere / "clock"
+    directory.mkdir(exist_ok=True)
+    module = directory / "sitecustomize.py"
+    if not module.is_file():
+        module.write_text(_CLOCK_MODULE, encoding="utf-8")
+    return {
+        "PYTHONPATH": os.pathsep.join([str(directory), str(REPO_ROOT / GOV_PACKAGE_PARENT_REL)]),
+        CLOCK_ENV: str(seconds),
+    }
+
+
 SUBAGENT_ID = "agent-w1-03-acceptance"
 
 
-def payload(project, call, sandbox, event, bash=None, subagent=None, agent_id=None):
+def payload(project, call, sandbox, event, bash=None, subagent=None, agent_id=None, session_id=None):
     """The stdin object of the harness for one of the three events around a Bash call.
 
     ``PreToolUse`` before the call; ``PostToolUse`` after it; ``PostToolUseFailure``
     instead, when the call failed, timed out or was interrupted. ``agent_id``
     tells two subagents apart; left out, every subagent has the same id.
+    ``session_id`` tells two sessions apart; left out, it is ``SESSION_ID``.
     """
+    session_id = session_id or SESSION_ID
     data = {
-        "session_id": SESSION_ID,
-        "transcript_path": str(sandbox.home / ".claude" / "projects" / "fixture" / f"{SESSION_ID}.jsonl"),
+        "session_id": session_id,
+        "transcript_path": str(sandbox.home / ".claude" / "projects" / "fixture" / f"{session_id}.jsonl"),
         "cwd": str(project),
         "permission_mode": "default",
         "hook_event_name": event,
@@ -504,17 +563,49 @@ def _guard_decision(returncode, stdout):
     return decision if decision in ("deny", "ask") else "allow"
 
 
-def run_guard(project, call, sandbox, role=None, ticket=None, subagent=None, agent_id=None):
+def run_guard(project, call, sandbox, role=None, ticket=None, subagent=None, agent_id=None, session_id=None,
+              environment=None):
     """Run the installed PreToolUse hook once, as the harness does before a Bash call."""
     project = Path(project)
     entry = project / PRODUCT_HOOK_DIR_REL / guard_entry().name
-    stdin = json.dumps(payload(project, call, sandbox, "PreToolUse", subagent=subagent, agent_id=agent_id))
-    returncode, stdout, stderr, _ = _run(entry, stdin, project, sandbox, role, ticket)
+    stdin = json.dumps(payload(project, call, sandbox, "PreToolUse", subagent=subagent, agent_id=agent_id,
+                               session_id=session_id))
+    returncode, stdout, stderr, _ = _run(entry, stdin, project, sandbox, role, ticket, environment)
     return GuardResult(_guard_decision(returncode, stdout), returncode, stdout, stderr)
 
 
+def _file_times(project, sandbox):
+    """The modification time of every file and directory a hook may write: project (not ``.git``), HOME, temp."""
+    times = {}
+    for top in (Path(project), sandbox.home, sandbox.tmpdir):
+        for directory, names, files in os.walk(top):
+            if directory == str(project) and ".git" in names:
+                names.remove(".git")
+            for name in (*names, *files):
+                path = os.path.join(directory, name)
+                if not os.path.islink(path):
+                    times[path] = os.stat(path).st_mtime_ns
+    return times
+
+
+def run_guard_earlier(project, call, sandbox, seconds, **who):
+    """Run the PreToolUse hook once as if it had run ``seconds`` ago.
+
+    The hook's Python clock is that much behind, and every file the run wrote
+    gets its modification time moved back by as much. ``who`` is passed to
+    ``run_guard``.
+    """
+    before = _file_times(project, sandbox)
+    guard = run_guard(project, call, sandbox, environment=clock(sandbox, -seconds), **who)
+    for path, written in _file_times(project, sandbox).items():
+        if before.get(path) != written:
+            earlier = written - int(seconds * 1_000_000_000)
+            os.utime(path, ns=(earlier, earlier))
+    return guard
+
+
 def run_guard_for_file_tool(project, sandbox, tool_name, tool_input, role=None, ticket=None, subagent=None,
-                            agent_id=None):
+                            agent_id=None, session_id=None, environment=None):
     """Run the installed PreToolUse hook once for a file-tool call (``Write`` or ``Edit``).
 
     The harness runs the guard before every write tool. The containment check
@@ -523,10 +614,10 @@ def run_guard_for_file_tool(project, sandbox, tool_name, tool_input, role=None, 
     project = Path(project)
     entry = project / PRODUCT_HOOK_DIR_REL / guard_entry().name
     data = payload(project, Call("", f"toolu_w1_03_{next(_CALL_NUMBERS):04d}"), sandbox, "PreToolUse",
-                   subagent=subagent, agent_id=agent_id)
+                   subagent=subagent, agent_id=agent_id, session_id=session_id)
     data["tool_name"] = tool_name
     data["tool_input"] = tool_input
-    returncode, stdout, stderr, _ = _run(entry, json.dumps(data), project, sandbox, role, ticket)
+    returncode, stdout, stderr, _ = _run(entry, json.dumps(data), project, sandbox, role, ticket, environment)
     return GuardResult(_guard_decision(returncode, stdout), returncode, stdout, stderr)
 
 
@@ -549,6 +640,7 @@ class HookResult:
     project: Path
     command: str           # the command both hooks were told about
     new_lines: tuple       # the lines added to findings.jsonl since the call began
+    session_id: str = SESSION_ID   # the session both hooks were told about
 
     def describe(self):
         return (
@@ -588,7 +680,7 @@ def classify(returncode, stdout, stderr):
 
 
 def run_check(project, call, sandbox, role=None, ticket=None, subagent=None, bash=None, failed=False,
-              seen=None, agent_id=None, environment=None):
+              seen=None, agent_id=None, environment=None, session_id=None):
     """Run the installed containment hook once, as the harness does after a Bash call.
 
     ``seen`` is the number of lines the findings file held when the call began;
@@ -597,13 +689,14 @@ def run_check(project, call, sandbox, role=None, ticket=None, subagent=None, bas
     """
     project = Path(project)
     event = "PostToolUseFailure" if failed else "PostToolUse"
-    stdin = json.dumps(payload(project, call, sandbox, event, bash=bash, subagent=subagent, agent_id=agent_id))
+    stdin = json.dumps(payload(project, call, sandbox, event, bash=bash, subagent=subagent, agent_id=agent_id,
+                               session_id=session_id))
     return run_check_with_stdin(project, stdin, sandbox, role=role, ticket=ticket, seen=seen,
-                                environment=environment, command=call.command)
+                                environment=environment, command=call.command, session_id=session_id)
 
 
 def run_check_with_stdin(project, stdin, sandbox, role=None, ticket=None, seen=None, environment=None,
-                         command=""):
+                         command="", session_id=None):
     """Run the installed containment hook once with ``stdin`` exactly as given."""
     project = Path(project)
     entry = project / PRODUCT_HOOK_DIR_REL / hook_entry().name
@@ -612,7 +705,7 @@ def run_check_with_stdin(project, stdin, sandbox, role=None, ticket=None, seen=N
     returncode, stdout, stderr, seconds = _run(entry, stdin, project, sandbox, role, ticket, environment)
     outcome, report = classify(returncode, stdout, stderr)
     return HookResult(outcome, report, returncode, stdout, stderr, seconds, project, command,
-                      tuple(finding_lines(project)[seen:]))
+                      tuple(finding_lines(project)[seen:]), session_id or SESSION_ID)
 
 
 # --------------------------------------------------------------------------
@@ -642,8 +735,8 @@ def new_findings(result, what):
         )
         assert data["time"], f"{what}: `time` of the finding is empty: {data['time']!r}"
         assert data["tool"] == "Bash", f"{what}: `tool` of the finding is {data['tool']!r}, not 'Bash'"
-        assert data["session_id"] == SESSION_ID, (
-            f"{what}: `session_id` of the finding is {data['session_id']!r}, not the session's {SESSION_ID!r}"
+        assert data["session_id"] == result.session_id, (
+            f"{what}: `session_id` of the finding is {data['session_id']!r}, not the session's {result.session_id!r}"
         )
         assert data["command"] == result.command, (
             f"{what}: `command` of the finding is {data['command']!r}, not the call's {result.command!r}"
@@ -746,3 +839,41 @@ def assert_changed(project, *names, command):
         assert name in status, (
             f"the fixture command `{command}` did not change {name}; git status --porcelain is:\n{status}"
         )
+
+
+# --------------------------------------------------------------------------
+# What a call left behind, and what the check made of it
+# --------------------------------------------------------------------------
+
+WATCHED = ("README.md", ACCEPTANCE_FILE, SOURCE_FILE, "docs/notes.md", "docs/spec/feature.md")
+
+
+def state(project, watched=WATCHED):
+    """Where HEAD is, ``git status`` with every file listed, and the content of the watched files."""
+    return head(project), porcelain_all(project), {path: read(project, path) for path in watched}
+
+
+def assert_left_as_the_call_left_it(project, left, what):
+    """The check moved nothing: ``left`` is ``state(project)`` taken between the command and the check."""
+    was_head, status, contents = left
+    assert head(project) == was_head, (
+        f"{what}: the check moved HEAD; it was {was_head} after the call and is {head(project)}"
+    )
+    assert porcelain_all(project) == status, (
+        f"{what}: the check changed the working tree or the index:\n"
+        f"after the call:\n{status}after the check:\n{porcelain_all(project)}"
+    )
+    for path, text in contents.items():
+        assert read(project, path) == text, f"{what}: the check changed {path}"
+
+
+def assert_flagged_and_nothing_reverted(project, result, left, what):
+    """Reported to the agent, recorded as ``flagged`` with no ``reverted`` next to it, and the tree left alone."""
+    assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+    findings = new_findings(result, what)
+    assert findings, f"{what}: no finding was added to {FINDINGS_REL}"
+    actions = [finding["action"] for finding in findings]
+    assert FLAGGED in actions and REVERTED not in actions, (
+        f"{what}: the findings have the actions {actions}; the call is flagged and nothing is reverted"
+    )
+    assert_left_as_the_call_left_it(project, left, what)
