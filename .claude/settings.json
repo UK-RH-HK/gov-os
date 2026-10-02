@@ -3,11 +3,13 @@
     "deny": [
       "Read(./docs/source/**)",
       "Edit(./docs/source/**)",
-      "Edit(tests/acceptance/**)",
       "Edit(**/.env*)",
       "Edit(**/*.pem)",
       "Edit(**/*.key)",
       "Edit(config/secrets*)",
+      "Bash(sudo:*)"
+    ],
+    "ask": [
       "Bash(pip:*)",
       "Bash(pip3:*)",
       "Bash(python -m pip:*)",
@@ -17,9 +19,42 @@
       "Bash(cargo install:*)",
       "Bash(apt:*)",
       "Bash(apt-get:*)",
-      "Bash(sudo:*)",
       "Bash(curl:*)",
       "Bash(wget:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\""
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\""
+          }
+        ]
+      }
     ]
   }
 }

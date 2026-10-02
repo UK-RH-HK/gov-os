@@ -1,6 +1,6 @@
 ---
 id: DAEO-m7u4
-status: in_progress
+status: closed
 deps: [DAEO-emkd, DAEO-8qvp, DAEO-78bn]
 links: []
 created: 2026-09-30T22:49:58Z
