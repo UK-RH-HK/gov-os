@@ -57,6 +57,16 @@ Four residuals of the post-command containment check (W1-03), accepted by the ow
 
 Under the proportion rule (DEC-135), an edge case of the guard or the containment check that can neither lose work nor let an implementer change acceptance tests is recorded here instead of being closed with more code.
 
+Edge cases of the install rule (W1-04), recorded by the orchestrator under DEC-135 and Contract item CAP-25.c (automated install classification is a non-goal) at the close of W1-04:
+
+- A prefix command (`env`, `command`, `nohup`, `time`, `xargs`) hides `sudo` or an install from the rule.
+- A download piped to a shell inside a subshell (`curl … | (sh)`) is not seen.
+- `yarn add`, `pnpm add`, `make install` and package managers the rule does not list are not seen.
+- Evasive spellings (an alias, a variable holding the command, `bash -c`, `eval`, `base64`) are not seen.
+- The rule asks about some commands that install nothing: a line that reads like an install inside a here-document, and the word `install` among a listed package manager's arguments.
+
+The settings rules for install commands remain as the second line (DEC-120).
+
 ## Denied attempts
 
 One attempt per class (DEC-100), made in a headless session started in the repository root, where `.claude/settings.json` applies. The session ran in `acceptEdits` mode with `Write` and `pip install` allowed, so each refusal comes from a deny rule. No file was created.
