@@ -1267,3 +1267,43 @@ Contract nor any ticket for them now.
 | Version | Date | Change |
 |---|---|---|
 | 0.22 | 2026-10-01 | Owner answers at the W1-03 diff check: DEC-133 (DP-5: claim before test design), DEC-134 (four W1-03 residuals accepted), DEC-135 (proportion rule for enforcement code; LOC against estimate at close), DEC-136 (probe findings go to the test designer as described behaviours), DEC-137 (independent post-green probe for FULL tickets), DEC-138 (sandbox spike after the bootstrap, launched by the owner). |
+
+## 23. Wave 1 build decisions, round 9 (register v0.23, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers at the bootstrap diff check of W1-04 (commit `48ccac7`; the owner gave `DIFF OK` for
+`7143034..5e14561`), given together with the test designer's acceptance tests for the review's probe findings
+(commits `e10a3b3` for W1-03 and `17ef3ae` for W1-04). KD-5 and KD-6 are KPI disputes of the Independent Test Designer
+on W1-03 (`DAEO-8qvp`); their package is with the test designer and is not readable from the build session. No KPI
+text changes.
+
+### DEC-139 — While frozen, an install is denied to every role
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the reading reported at the W1-04 diff check · **Refines:** DEC-109, DEC-120
+- **Decision:** `pip install` is denied while frozen. While frozen, an install by any role, the orchestrator included,
+  is denied. Only the owner acts while frozen.
+
+### DEC-140 — Residual entries in `bootstrap.md` use the trailer `Task: decision-record`
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the question at the W1-04 diff check · **Refines:** DEC-135
+- **Decision:** A commit that records residuals in `governance/project/bootstrap.md` carries the trailer
+  `Task: decision-record`.
+
+### DEC-141 — Sandbox prerequisites installed by the owner
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (record of an owner action) · **For:** DEC-138
+- **Record:** For the sandbox spike, the owner installed bubblewrap 0.9.0 and socat 1.8.0.0 with `sudo apt-get`. The
+  `bwrap` smoke test printed OK. This is an owner install; it goes into the tool registry when W1-06 creates it.
+- The orchestrator does not start the spike.
+
+### DEC-142 — W1-03 KD-5: a snapshot of a call that is known to be over no longer blocks restoration
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-5 (fix it; proportion rule, DEC-135) · **Refines:** DEC-124, DEC-130
+- **Decision:** A snapshot of another actor's call that never ended (for example, a declined prompt) no longer blocks
+  restoration once that call is known to be over: its session has issued a later tool call, or the hook timeout has
+  passed. Restoration still requires certain attribution; otherwise flag.
+
+### DEC-143 — W1-03 KD-6: an acceptance test changed in a call that also moves `HEAD` is restored from the pre-call `HEAD`
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-6 (fix it; proportion rule, DEC-135) · **Refines:** DEC-129
+- **Decision:** When a non-designer changes an acceptance test in the same call as a non-forward `HEAD` move, the test
+  is restored from the pre-call `HEAD` recorded in the snapshot, when attribution is certain. The `HEAD` move itself
+  is still flagged and never reverted.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.23 | 2026-10-01 | Owner answers at the W1-04 diff check: DEC-139 (an install is denied to every role while frozen), DEC-140 (residual commits use `Task: decision-record`), DEC-141 (owner install of bubblewrap 0.9.0 and socat 1.8.0.0 for the sandbox spike), DEC-142 (W1-03 KD-5: a snapshot of a call known to be over no longer blocks restoration), DEC-143 (W1-03 KD-6: restore from the pre-call `HEAD` after a non-forward move). |
