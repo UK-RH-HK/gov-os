@@ -1170,3 +1170,39 @@ W1-03's `allowed_paths` change under DEC-126 only.
 | Version | Date | Change |
 |---|---|---|
 | 0.20 | 2026-10-01 | W1-BUILD DP-3: DEC-126 (W1-03 may change the PreToolUse hook entry). DP-4: DEC-127 (schema in the kernel template, registry at `governance/project/tool-registry.yaml`, created by W1-06; amends DEC-121). DEC-128 (quoted or escaped `$NAME` in a target: accepted residual). |
+
+## 21. Wave 1 build decisions, round 7 (register v0.21, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers on a call that moves `HEAD`, to the Independent Test Designer's KPI dispute KD-4 on W1-03
+(`DAEO-8qvp`) and to the readings and open cases recorded in `tests/acceptance/W1-03/README.md` (commits `5aeb62a` and
+`e31e11d`). That README dates the answer to KD-4 2026-10-02; the status date below is the one the owner gave. The
+KPI text of W1-03 is unchanged.
+
+### DEC-129 — W1-03 KD-4: containment also snapshots `HEAD`
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-4 · **Extends:** DEC-124
+- **Decision:** Containment also snapshots `HEAD` before the call. A forward move on the same branch has its new
+  commits' paths checked against the allowed paths, with anything outside flagged. Any other `HEAD` move (reset,
+  checkout of another branch, rebase, amend) is flagged and never reverted.
+
+### DEC-130 — The test designer's readings of DEC-124 confirmed
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-124
+- **Decision:** No before-snapshot or overlapping calls means flag and never revert. A path changed before the call is
+  never restored. Uncommitted work discarded by `git reset --hard` is reported.
+
+### DEC-131 — The test designer's readings of KD-4 confirmed
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the readings in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-129
+- **Decision:** Any other `HEAD` move is flagged whoever makes it, even when it only undoes the caller's own in-scope
+  commit. A `git commit -a` that sweeps up another role's uncommitted work is flagged for those paths.
+
+### DEC-132 — Owner defaults for the open `HEAD` cases
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, defaults for the cases `tests/acceptance/W1-03/README.md` leaves open · **Refines:** DEC-129
+- **Decision:**
+  - Checking out a branch that points at the same commit isn't a `HEAD` move.
+  - Creating a new branch and committing on it in one call is flagged.
+  - A merge that isn't a fast-forward is flagged.
+  - A `HEAD` move with no before-snapshot is flagged.
+- **Tests:** these four are covered by builder tests until the test designer adds acceptance tests.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.21 | 2026-10-01 | W1-03 and `HEAD`: DEC-129 (KD-4, `HEAD` in the before-snapshot; forward commits checked, any other move flagged and never reverted), DEC-130 (readings of DEC-124 confirmed), DEC-131 (readings of KD-4 confirmed), DEC-132 (defaults for four open `HEAD` cases; builder tests until acceptance tests exist). |
