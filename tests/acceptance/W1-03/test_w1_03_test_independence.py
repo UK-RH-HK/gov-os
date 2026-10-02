@@ -9,9 +9,12 @@ MR-3: the builder never writes its own acceptance tests.
 HEAD. A changed or deleted file has its HEAD content again, a file HEAD does
 not hold is gone, and nothing under ``tests/acceptance`` is left staged.
 
-The record of the breach is not tested yet: where it is recorded is with the
-owner (decision package of 2026-10-01, KD-1). Each test starts from a clean
-tree; a tree that was already dirty before the call is KD-3.
+"The breach is recorded" is tested as: the call added a finding with action
+``reverted`` that names the path (DEC-122).
+
+Each test makes one whole Bash call (PreToolUse hook, command, PostToolUse hook)
+in a project with a clean tree, so every change is the call's own (DEC-124). A
+tree that was already dirty before the call is in ``test_w1_03_dirty_tree.py``.
 """
 
 from __future__ import annotations
@@ -80,7 +83,7 @@ def test_an_engineer_s_change_under_acceptance_tests_is_restored_from_head(proje
     result = after_bash(project, command, ENGINEER, TICKET, changed=[changed])
     what = f"`{command}` by the engineer on {TICKET}"
     _assert_acceptance_equals_head(project, what)
-    support.assert_reported(result, ACCEPTANCE, what=what)
+    support.assert_caught(result, ACCEPTANCE, what=what, action=support.REVERTED)
 
 
 @pytest.mark.parametrize("case", sorted(NOT_THE_DESIGNER), ids=sorted(NOT_THE_DESIGNER))
@@ -91,7 +94,7 @@ def test_every_session_but_the_test_designer_s_is_restored(project, after_bash, 
                         changed=[ACCEPTANCE_FILE, f"{ACCEPTANCE}/{WBS}/test_added.py"])
     what = f"`{command}` with GOV_ROLE={role!r} GOV_TICKET={ticket!r}"
     _assert_acceptance_equals_head(project, what)
-    support.assert_reported(result, ACCEPTANCE, what=what)
+    support.assert_caught(result, ACCEPTANCE, what=what, action=support.REVERTED)
 
 
 def test_the_restore_leaves_the_engineer_s_own_work_alone(project, after_bash):
@@ -101,7 +104,8 @@ def test_the_restore_leaves_the_engineer_s_own_work_alone(project, after_bash):
     result = after_bash(project, command, ENGINEER, TICKET, changed=[SOURCE, ACCEPTANCE_FILE])
     what = f"`{command}` by the engineer on {TICKET}"
     _assert_acceptance_equals_head(project, what)
-    support.assert_reported(result, ACCEPTANCE_FILE, what=what)
+    support.assert_caught(result, ACCEPTANCE_FILE, what=what, action=support.REVERTED)
+    support.assert_not_recorded(result, SOURCE, "src/gov/guard/new_module.py", what=what)
     assert (project / SOURCE).read_text(encoding="utf-8").endswith("changed\n"), (
         f"{what}: the in-scope change to {SOURCE} was reverted"
     )
@@ -151,19 +155,25 @@ SUBAGENTS = {
     "auditor-in-designer-session": (DESIGNER, AUDITOR, True),
     "general-purpose-in-designer-session": (DESIGNER, "general-purpose", True),
     "explore-in-designer-session": (DESIGNER, "Explore", True),
+    "designer-in-a-session-without-a-role": (None, DESIGNER, True),
+    "designer-in-a-session-with-an-unknown-role": ("developer", DESIGNER, True),
 }
 
 
 @pytest.mark.parametrize("case", sorted(SUBAGENTS), ids=sorted(SUBAGENTS))
 def test_inside_a_subagent_the_subagent_s_role_decides_the_restore(project, after_bash, case):
-    """DEC-117: the subagent's role governs. DEC-113: a subagent that is not a role has no write."""
+    """DEC-117: the subagent's role governs. DEC-113: a subagent that is not a role has no write.
+
+    DEC-125: in a session with no declared role, a role subagent has no write
+    either, the test designer's included.
+    """
     session_role, agent_type, restored = SUBAGENTS[case]
     command = f"echo changed >> {ACCEPTANCE_FILE}"
     result = after_bash(project, command, session_role, TICKET, changed=[ACCEPTANCE_FILE], subagent=agent_type)
     what = f"`{command}` by subagent {agent_type} in a session with GOV_ROLE={session_role!r}"
     if restored:
         _assert_acceptance_equals_head(project, what)
-        support.assert_reported(result, ACCEPTANCE_FILE, what=what)
+        support.assert_caught(result, ACCEPTANCE_FILE, what=what, action=support.REVERTED)
     else:
         support.assert_silent(result, what)
         assert (project / ACCEPTANCE_FILE).read_text(encoding="utf-8").endswith("changed\n"), (

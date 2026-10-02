@@ -5,14 +5,13 @@ cannot parse is caught by the post-command containment check". DEC-099 leaves
 shell aliases and functions to this check; DEC-111 and DEC-115 leave every form
 the guard does not judge, and DEC-110 leaves the case of a guard that timed out.
 
-The check does not read the command. It looks at what the call left behind, so
-each form is run for real and must then be reported. None of these commands
-holds a plain ``> file``, ``touch``, ``rm``, ``mv``, ``cp``, ``mkdir`` or
-``sed -i`` aimed at the path it changes.
+The check does not read the command. It judges a call by what it left behind in
+the repository (DEC-123), so each form is run for real and must then be reported
+and recorded. None of these commands holds a plain ``> file``, ``touch``,
+``rm``, ``mv``, ``cp``, ``mkdir`` or ``sed -i`` aimed at the path it changes.
 
-This is the test designer's own list. KPI success 3 names "nine Bash write forms
-from S0b2 I-06"; that list is not in the repository and is with the owner
-(decision package of 2026-10-01, KD-2).
+This is the test designer's own list. The nine forms of S0b2 I-06, which KPI
+success 3 names, are in ``test_w1_03_i06_forms.py``.
 
 Every command is a ``str.format`` template: a literal brace is doubled.
 """
@@ -67,7 +66,7 @@ def test_a_write_the_guard_cannot_see_is_reported(project, after_bash, form):
     command, changed = FORMS[form]
     result = after_bash(project, command, ENGINEER, TICKET, changed=[changed])
     name = changed if not changed.startswith("docs/src/") else "docs/src"
-    support.assert_reported(result, name, what=f"`{command}` by the engineer on {TICKET}")
+    support.assert_caught(result, name, what=f"`{command}` by the engineer on {TICKET}")
 
 
 # The same routes into the acceptance tests. name: command
@@ -93,7 +92,7 @@ def test_an_unseen_write_to_an_acceptance_test_is_reported_and_restored(project,
     command = INTO_ACCEPTANCE[form]
     result = after_bash(project, command, ENGINEER, TICKET, changed=[ACCEPTANCE_FILE])
     what = f"`{command}` by the engineer on {TICKET}"
-    support.assert_reported(result, ACCEPTANCE_FILE, what=what)
+    support.assert_caught(result, ACCEPTANCE_FILE, what=what, action=support.REVERTED)
     path = project / ACCEPTANCE_FILE
     assert path.is_file() and path.read_text(encoding="utf-8") == support.head_text(project, ACCEPTANCE_FILE), (
         f"{what}: {ACCEPTANCE_FILE} was not restored from HEAD"

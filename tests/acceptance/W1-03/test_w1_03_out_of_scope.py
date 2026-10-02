@@ -1,18 +1,22 @@
-"""W1-03 — after a Bash call, a change outside ``allowed_paths`` is reported to the agent.
+"""W1-03 — after a Bash call, a change outside ``allowed_paths`` is reported and recorded.
 
 KPI success 1: "After every Bash call …, git status --porcelain is compared with
-allowed_paths; a change outside them is reported to the agent …" [CAP-58.a].
+allowed_paths; a change outside them is reported to the agent and recorded as a
+containment finding" [CAP-58.a].
 KPI failure 1: "Any out-of-scope change survives without a finding".
 KPI failure 2: "A legitimate in-scope change is reverted".
 
-Each test runs a real Bash command in a clean project and then runs the hook the
-way the harness does after the call. The commands here are ordinary; the forms
-the guard cannot see are in ``test_w1_03_bash_forms.py``.
+Each test makes one whole Bash call in a project with a clean tree: the
+PreToolUse hook, the command for real, the PostToolUse hook (DEC-124). The
+commands here are ordinary; the forms the guard cannot see are in
+``test_w1_03_bash_forms.py`` and ``test_w1_03_i06_forms.py``. A tree that was
+already dirty before the call is in ``test_w1_03_dirty_tree.py``.
 
-The record of the finding ("recorded as a containment finding") is not tested
-yet: where it is recorded is with the owner (decision package of 2026-10-01,
-KD-1). Whether an out-of-scope change outside ``tests/acceptance/**`` is also
-undone is left to the implementer; the tests take no side.
+"Caught" is both halves of the KPI: the report to the agent names the path, and
+the call added a finding for it to ``.gov-runtime/findings.jsonl`` (DEC-122).
+The fields of the finding are tested in ``test_w1_03_finding_record.py``.
+Whether an out-of-scope change outside ``tests/acceptance/**`` is also undone is
+left to the implementer; the tests take no side.
 """
 
 from __future__ import annotations
@@ -83,7 +87,7 @@ def _state(project, relpath):
 def test_a_change_outside_the_ticket_paths_is_reported(project, after_bash, case):
     command, changed, names = OUTSIDE[case]
     result = after_bash(project, command, ENGINEER, TICKET, changed=changed)
-    support.assert_reported(result, *names, what=f"`{command}` by the engineer on {TICKET}")
+    support.assert_caught(result, *names, what=f"`{command}` by the engineer on {TICKET}")
 
 
 @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
@@ -115,8 +119,9 @@ def test_one_call_with_both_kinds_reports_only_the_outside_change(project, after
     command = "echo changed >> src/gov/guard/decide.py && echo changed >> README.md"
     result = after_bash(project, command, ENGINEER, TICKET, changed=[SOURCE, "README.md"])
     what = f"`{command}` by the engineer on {TICKET}"
-    support.assert_reported(result, "README.md", what=what)
+    support.assert_caught(result, "README.md", what=what)
     assert SOURCE not in result.report, f"{what}: the report names the in-scope file {SOURCE}: {result.report!r}"
+    support.assert_not_recorded(result, SOURCE, what=what)
     assert _state(project, SOURCE).endswith("changed\n"), f"{what}: the in-scope change to {SOURCE} was reverted"
 
 
@@ -131,8 +136,9 @@ def test_a_new_directory_is_judged_file_by_file(project, after_bash):
     command = "mkdir -p tools/other && echo new > tools/other/b.py"
     result = after_bash(project, command, ENGINEER, ticket, changed=["tools/other/b.py"])
     what = f"`{command}` by the engineer on {ticket}"
-    support.assert_reported(result, "tools/other", what=what)
+    support.assert_caught(result, "tools/other", what=what)
     assert "tools/guard" not in result.report, f"{what}: the report names the in-scope directory: {result.report!r}"
+    support.assert_not_recorded(result, "tools/guard/a.py", what=what)
     assert _state(project, "tools/guard/a.py") == "new\n", "the in-scope file tools/guard/a.py was removed"
 
 
@@ -145,7 +151,7 @@ def test_the_comparison_follows_the_active_ticket(project, after_bash):
 
     command = "echo changed >> src/gov/guard/decide.py"
     result = after_bash(project, command, ENGINEER, docs_ticket, changed=[SOURCE])
-    support.assert_reported(result, SOURCE, what=f"`{command}` by the engineer on {docs_ticket}")
+    support.assert_caught(result, SOURCE, what=f"`{command}` by the engineer on {docs_ticket}")
 
 
 @pytest.mark.parametrize("role, ticket, relpath", [
@@ -161,7 +167,7 @@ def test_each_ticket_role_is_compared_with_its_own_ticket(project, after_bash, r
     command = "echo changed >> README.md"
     result = after_bash(project, command, role, ticket, changed=["README.md"])
     what = f"`{command}` by {role} on {ticket}"
-    support.assert_reported(result, "README.md", what=what)
+    support.assert_caught(result, "README.md", what=what)
     assert relpath not in result.report, f"{what}: the report names the in-scope file {relpath}: {result.report!r}"
 
 
@@ -185,13 +191,13 @@ def test_a_session_without_ticket_paths_has_every_change_reported(project, after
     for relpath in (SOURCE, ".claude/settings.json"):
         command = f"echo changed >> {relpath}"
         result = after_bash(project, command, role, ticket, changed=[relpath])
-        support.assert_reported(result, relpath, what=f"`{command}` with GOV_ROLE={role!r} GOV_TICKET={ticket!r}")
+        support.assert_caught(result, relpath, what=f"`{command}` with GOV_ROLE={role!r} GOV_TICKET={ticket!r}")
 
 
 def test_the_test_designer_is_reported_outside_acceptance_tests(project, after_bash):
     command = "echo changed >> src/gov/guard/decide.py"
     result = after_bash(project, command, DESIGNER, TICKET, changed=[SOURCE])
-    support.assert_reported(result, SOURCE, what=f"`{command}` by the test designer on {TICKET}")
+    support.assert_caught(result, SOURCE, what=f"`{command}` by the test designer on {TICKET}")
 
 
 def test_scratch_writes_are_not_reported(project, after_bash):
@@ -215,7 +221,7 @@ def test_a_failed_call_is_checked_too(project, after_bash):
     command = "echo changed >> README.md; exit 3"
     result = after_bash(project, command, ENGINEER, TICKET, changed=["README.md"], failed=True)
     what = f"`{command}` (failed call) by the engineer on {TICKET}"
-    support.assert_reported(result, "README.md", what=what)
+    support.assert_caught(result, "README.md", what=what)
     assert SOURCE not in result.report, f"{what}: the report names the in-scope file {SOURCE}: {result.report!r}"
 
 
@@ -230,18 +236,23 @@ SUBAGENTS = {
     "auditor-in-engineer-session-inside-the-engineer-s-paths": (ENGINEER, AUDITOR, TICKET, SOURCE, True),
     "general-purpose-in-engineer-session": (ENGINEER, "general-purpose", TICKET, SOURCE, True),
     "explore-in-engineer-session": (ENGINEER, "Explore", TICKET, SOURCE, True),
+    "engineer-in-a-session-without-a-role": (None, ENGINEER, TICKET, SOURCE, True),
+    "engineer-in-a-session-with-an-unknown-role": ("developer", ENGINEER, TICKET, SOURCE, True),
 }
 
 
 @pytest.mark.parametrize("case", sorted(SUBAGENTS), ids=sorted(SUBAGENTS))
 def test_inside_a_subagent_the_subagent_s_role_is_compared(project, after_bash, case):
-    """DEC-117: the subagent's role governs its calls. DEC-113: a subagent that is not a role has no write."""
+    """DEC-117: the subagent's role governs its calls. DEC-113: a subagent that is not a role has no write.
+
+    DEC-125: in a session with no declared role, a role subagent has no write either.
+    """
     session_role, agent_type, ticket, relpath, reported = SUBAGENTS[case]
     command = f"echo changed >> {relpath}"
     result = after_bash(project, command, session_role, ticket, changed=[relpath], subagent=agent_type)
     what = f"`{command}` by subagent {agent_type} in a session with GOV_ROLE={session_role!r} on {ticket}"
     if reported:
-        support.assert_reported(result, relpath, what=what)
+        support.assert_caught(result, relpath, what=what)
     else:
         support.assert_silent(result, what)
         assert _state(project, relpath).endswith("changed\n"), f"{what}: the in-scope change was reverted"
