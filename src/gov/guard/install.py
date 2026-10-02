@@ -94,7 +94,7 @@ def _download_target(nm, args):
         if len(a) > 2 and a[0] == "-" and a[1] != "-":
             if a.startswith(sf):
                 return a[len(sf):]
-            if nm == "curl" and a[-1] == "o":
+            if a[-1] == sf[1]:
                 return args[i + 1] if i + 1 < len(args) else None
     return None
 
@@ -114,10 +114,13 @@ def has_install(command):
                 return True
         for pcmd in cs:
             nm, args = _head(pcmd)
-            # Strip version suffix (pip3.11 -> pip3)
-            dot = nm.rfind(".")
-            if dot > 0 and nm[dot + 1:].isdigit():
-                nm = nm[:dot]
+            # Strip version suffix (pip3.11 -> pip, pip2 -> pip,
+            # python2.7 -> python): any trailing digits-and-dots.
+            j = len(nm)
+            while j > 0 and (nm[j - 1].isdigit() or nm[j - 1] == '.'):
+                j -= 1
+            if 0 < j < len(nm) and nm[j].isdigit():
+                nm = nm[:j]
             # Package-manager install
             if nm in _PKG:
                 if "install" in args:
@@ -131,8 +134,9 @@ def has_install(command):
                         and args[1] == "pip" and "install" in args[2:]):
                     return True
             elif nm == "uv":
-                if (len(args) >= 2 and args[0] in ("pip", "tool")
-                        and args[1] == "install"):
+                nopt = [a for a in args if not a.startswith("-")]
+                if (len(nopt) >= 2 and nopt[0] in ("pip", "tool")
+                        and nopt[1] == "install"):
                     return True
             # Binary download into a PATH directory
             if nm in ("curl", "wget"):

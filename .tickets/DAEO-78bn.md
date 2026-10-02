@@ -42,3 +42,9 @@ acceptance_tests:
 # W1-04 Install-approval rule
 
 DEC-040 as amended by DEC-083: orchestrator-only install proposals, owner approval in chat, registry record.
+
+## Notes
+
+**2026-10-02T18:20:34Z**
+
+Reopened 2026-10-02 as a repair for three defects shown by the acceptance tests added in 17ef3ae (probe findings, DEC-136): uv with an option before the subcommand, pip2 and python2.7 -m pip, wget -qO FILE into a PATH directory. KPIs unchanged.

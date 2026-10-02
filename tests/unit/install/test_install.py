@@ -559,3 +559,63 @@ def test_curl_combined_option_ask_for_orchestrator(tmp_path):
 def test_no_decision_for_ordinary_commands(cmd):
     assert not has_install(cmd), f"false install: {cmd}"
     assert not has_sudo(cmd), f"false sudo: {cmd}"
+
+
+# ===================================================================
+# 17. Repair: uv with options before the subcommand (D-1)
+# ===================================================================
+
+@pytest.mark.parametrize("cmd", [
+    "uv --quiet pip install requests",
+    "uv --quiet tool install ruff",
+])
+def test_uv_option_before_subcommand(cmd):
+    assert has_install(cmd), f"not detected: {cmd}"
+
+
+@pytest.mark.parametrize("cmd", [
+    "uv --version",
+    "uv run pytest",
+    "uv pip list",
+])
+def test_uv_non_install_not_detected(cmd):
+    assert not has_install(cmd), f"false positive: {cmd}"
+
+
+# ===================================================================
+# 18. Repair: version-suffixed program names (D-2)
+# ===================================================================
+
+@pytest.mark.parametrize("cmd", [
+    "pip2 install requests",
+    "python2.7 -m pip install requests",
+])
+def test_version_suffix_python2(cmd):
+    assert has_install(cmd), f"not detected: {cmd}"
+
+
+@pytest.mark.parametrize("cmd", [
+    "pip2 list",
+    "python2.7 -m pytest",
+])
+def test_version_suffix_non_install_not_detected(cmd):
+    assert not has_install(cmd), f"false positive: {cmd}"
+
+
+# ===================================================================
+# 19. Repair: wget combined short options ending in O (D-3)
+# ===================================================================
+
+@pytest.mark.parametrize("cmd", [
+    "wget -qO /usr/local/bin/tool https://example.invalid/t",
+])
+def test_wget_combined_option_into_path(cmd):
+    assert has_install(cmd), f"not detected: {cmd}"
+
+
+@pytest.mark.parametrize("cmd", [
+    "wget -q https://example.invalid/x",
+    "wget -qO docs/file https://example.invalid/x",
+])
+def test_wget_combined_option_not_into_path(cmd):
+    assert not has_install(cmd), f"false positive: {cmd}"
