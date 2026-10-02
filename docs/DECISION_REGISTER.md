@@ -1307,3 +1307,42 @@ text changes.
 | Version | Date | Change |
 |---|---|---|
 | 0.23 | 2026-10-01 | Owner answers at the W1-04 diff check: DEC-139 (an install is denied to every role while frozen), DEC-140 (residual commits use `Task: decision-record`), DEC-141 (owner install of bubblewrap 0.9.0 and socat 1.8.0.0 for the sandbox spike), DEC-142 (W1-03 KD-5: a snapshot of a call known to be over no longer blocks restoration), DEC-143 (W1-03 KD-6: restore from the pre-call `HEAD` after a non-forward move). |
+
+## 24. Wave 1 build decisions, round 10 (register v0.24, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers given with `DIFF OK` for `5e14561..fd9972d` and with the test designer's acceptance tests for the
+W1-03 repair (commit `95df6c5`): the answer to W1-BUILD decision package DP-6, one more KPI dispute on W1-03
+(`DAEO-8qvp`, KD-7), a reading of DEC-142, and two working rules. No KPI text changes.
+
+### DEC-144 — When another actor's unfinished call is known to be over
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-6 option (a) · **Refines:** DEC-142
+- **Decision:** In DEC-142, "call known to be over" means either the same actor's session has issued a later tool
+  call, or ten minutes have passed.
+- **Accepted residual:** background commands keep running after their call returns, so their later writes may be
+  attributed to whichever call is active then. Recorded in `governance/project/bootstrap.md`.
+
+### DEC-145 — W1-03 KD-7: the ten minutes is a named, overridable constant
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-03 KPI dispute KD-7 · **Refines:** DEC-144
+- **Decision:** The ten minutes is a named constant, `PENDING_SNAPSHOT_TIMEOUT_S = 600`, in the containment module,
+  overridable by the environment variable `GOV_PENDING_SNAPSHOT_TIMEOUT_S`.
+
+### DEC-146 — "Its session" in DEC-142 means the same actor
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the test designer's reading in `tests/acceptance/W1-03/README.md` · **Refines:** DEC-142
+- **Decision:** "Its session" means the same actor (session and agent id). Another actor's later call doesn't clear a
+  snapshot.
+
+### DEC-147 — The install rule's two misses and two false asks stay residuals; the sandbox spike tests installs
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the residuals reported at the W1-04 repair diff check · **Under:** DEC-135 · **Extends:** DEC-138
+- **Decision:** The two install misses (`python3 -u -m pip …`, `uv --directory … pip …`) and the two harmless false
+  asks stay as residuals. The sandbox spike (DEC-138) must test whether the sandbox blocks installs, meaning writes
+  outside the repository, whatever the command form.
+
+### DEC-148 — How a ticket is reopened for a repair
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Refines:** DEC-133
+- **Decision:** Repairs follow W1-03's pattern: reopening sets the status to `in_progress` and claims the ticket, and
+  closing sets it back to `closed`. W1-04's repair kept its status unchanged in history; no fix is needed, and the
+  pattern holds from here on.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.24 | 2026-10-01 | W1-BUILD DP-6: DEC-144 (a call is known to be over after the same actor's later tool call or ten minutes; background commands are an accepted residual). DEC-145 (W1-03 KD-7: `PENDING_SNAPSHOT_TIMEOUT_S = 600`, overridable by `GOV_PENDING_SNAPSHOT_TIMEOUT_S`). DEC-146 ("its session" is the same actor). DEC-147 (install-rule residuals stay; the sandbox spike tests installs). DEC-148 (a repair reopens to `in_progress` and closes to `closed`). |

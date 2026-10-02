@@ -57,6 +57,8 @@ Four residuals of the post-command containment check (W1-03), accepted by the ow
 - While the repository is frozen, an acceptance test changed through an opaque Bash form is restored whoever changed it.
 - The before-snapshot adds about 28 ms to the PreToolUse hook of every Bash call.
 
+A fifth, accepted with DEC-144: a background command keeps running after its Bash call returns, so its later writes may be attributed to whichever call is active then.
+
 Under the proportion rule (DEC-135), an edge case of the guard or the containment check that can neither lose work nor let an implementer change acceptance tests is recorded here instead of being closed with more code.
 
 Edge cases of the install rule (W1-04), recorded by the orchestrator under DEC-135 and Contract item CAP-25.c (automated install classification is a non-goal) at the close of W1-04:
