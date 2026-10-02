@@ -123,6 +123,23 @@ def _take_snapshot(project_root: str, data: dict) -> None:
         })
 
 
+def _note_tool_call(project_root: str, data: dict) -> None:
+    """Clear pending snapshots of this actor (DEC-142, DEC-146).
+
+    Called for every tool call the PreToolUse hook sees, before the
+    guard decides.  A later tool call of the same actor proves any
+    earlier call of that actor is over; its snapshot no longer blocks
+    restoration for other actors.  Must not add latency or block a call.
+    """
+    try:
+        from gov.guard.containment import clear_actor_snapshots
+        session_id = data.get("session_id", "")
+        agent_id = data.get("agent_id", "")
+        clear_actor_snapshots(project_root, session_id, agent_id or "")
+    except Exception:
+        pass  # must not block any call
+
+
 def _note_write_tool(project_root: str) -> None:
     """Increment the sequence counter for a write-tool call (DEC-124).
 
@@ -155,6 +172,10 @@ def main() -> None:
 
     if not isinstance(data, dict):
         _fail(project_root, "invalid_input", "stdin is not a JSON object")
+
+    # DEC-142, DEC-146: every tool call clears pending snapshots of the
+    # same actor, proving any earlier call of that actor is over.
+    _note_tool_call(project_root, data)
 
     tool_name = data.get("tool_name")
     if not tool_name or not isinstance(tool_name, str):

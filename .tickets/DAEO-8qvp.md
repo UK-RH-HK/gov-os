@@ -1,6 +1,6 @@
 ---
 id: DAEO-8qvp
-status: in_progress
+status: closed
 deps: [DAEO-emkd]
 links: []
 created: 2026-09-30T22:49:58Z

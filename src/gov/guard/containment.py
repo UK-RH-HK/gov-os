@@ -27,6 +27,29 @@ ACCEPTANCE = "tests/acceptance"
 _GIT_TIMEOUT = 10
 _CLEANUP_AGE_S = 3600.0
 
+# DEC-144, DEC-145: a pending snapshot of another actor's call that never
+# ended no longer blocks restoration once ten minutes have passed.
+PENDING_SNAPSHOT_TIMEOUT_S = 600
+
+
+def _get_pending_timeout() -> float:
+    """Return the pending-snapshot timeout in seconds (DEC-145).
+
+    The override is used only when it is a finite number greater than
+    zero.  Anything else (empty, not a number, zero, negative, ``nan``,
+    ``inf``) falls back to the default.
+    """
+    import math
+    try:
+        v = os.environ.get("GOV_PENDING_SNAPSHOT_TIMEOUT_S")
+        if v is not None:
+            fv = float(v)
+            if math.isfinite(fv) and fv > 0:
+                return fv
+    except (ValueError, TypeError):
+        pass
+    return float(PENDING_SNAPSHOT_TIMEOUT_S)
+
 
 # ---- git helper --------------------------------------------------
 
@@ -206,6 +229,39 @@ def _increment_seq(root: str) -> int:
     return _read_seq(root)
 
 
+# ---- clear actor snapshots (DEC-142, DEC-146) ---------------------
+
+def clear_actor_snapshots(root: str, session_id: str,
+                          agent_id: str) -> None:
+    """Remove pending snapshots of this actor.
+
+    Called when the PreToolUse hook sees a later tool call of the same
+    actor (same ``session_id`` and ``agent_id``).  A later call proves
+    the earlier one is over (DEC-142); its snapshot no longer blocks
+    restoration for other actors.
+    """
+    sdir = os.path.join(root, SNAPSHOT_DIR_REL)
+    try:
+        entries = os.listdir(sdir)
+    except OSError:
+        return
+    for name in entries:
+        if not name.endswith(".json"):
+            continue
+        p = os.path.join(sdir, name)
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError, ValueError):
+            continue
+        if (data.get("session_id", ""),
+                data.get("agent_id", "")) == (session_id, agent_id):
+            try:
+                os.unlink(p)
+            except OSError:
+                pass
+
+
 # ---- last-HEAD tracking (DEC-132 default 4) ----------------------
 
 def _save_last_head(root: str, commit: str, branch: str) -> None:
@@ -254,10 +310,12 @@ def _check_pending_snapshots(root: str, own_id: str,
     An actor is the pair ``(session_id, agent_id)``.  A pending snapshot
     of the **same** actor is a leftover (its call was refused or never
     ended); it is silently removed and does not cause overlap.  Snapshots
-    older than ``_CLEANUP_AGE_S`` are ignored.
+    older than ``PENDING_SNAPSHOT_TIMEOUT_S`` (DEC-142, DEC-144) are
+    known to be over and do not block.
     """
     sdir = os.path.join(root, SNAPSHOT_DIR_REL)
     now = time.time()
+    timeout = _get_pending_timeout()
     other_pending = False
     try:
         entries = os.listdir(sdir)
@@ -274,8 +332,8 @@ def _check_pending_snapshots(root: str, own_id: str,
             age = now - os.path.getmtime(p)
         except OSError:
             continue
-        if age > _CLEANUP_AGE_S:
-            continue  # too old, not pending
+        if age > timeout:
+            continue  # known to be over by time (DEC-142, DEC-144)
         try:
             with open(p, encoding="utf-8") as f:
                 data = json.load(f)
@@ -393,11 +451,15 @@ def _record_findings(root: str, findings: list) -> None:
 
 # ---- acceptance-test restoration ----------------------------------
 
-def _restore_from_head(root: str, paths: list) -> tuple:
-    """Restore acceptance-test paths to HEAD.
+def _restore_from_head(root: str, paths: list,
+                       commit: str = "HEAD") -> tuple:
+    """Restore acceptance-test paths to *commit* (default ``HEAD``).
 
-    Returns ``(restored, failed)`` -- lists of paths.  After the
-    restore, git status is checked to verify success (repair 10).
+    Returns ``(restored, failed)`` -- lists of paths.  When restoring
+    from ``HEAD``, git status is checked to verify success (repair 10).
+    When restoring from a specific commit (DEC-143), the file may
+    still appear in git status because it differs from the current
+    ``HEAD``; the verification is skipped.
     """
     rr = os.path.realpath(root)
     checkout: list = []
@@ -405,14 +467,14 @@ def _restore_from_head(root: str, paths: list) -> tuple:
 
     for rel in paths:
         try:
-            _git(root, "cat-file", "-e", f"HEAD:{rel}")
+            _git(root, "cat-file", "-e", f"{commit}:{rel}")
             checkout.append(rel)
         except (_GitError, _NotARepo):
             remove.append(rel)
 
     if checkout:
         try:
-            _git(root, "checkout", "HEAD", "--", *checkout)
+            _git(root, "checkout", commit, "--", *checkout)
         except _GitError:
             pass
 
@@ -432,6 +494,16 @@ def _restore_from_head(root: str, paths: list) -> tuple:
         except _GitError:
             pass
         _remove_empty_parents(os.path.dirname(full), rr)
+
+    # When restoring from a specific commit that differs from the
+    # current HEAD (DEC-143), the restored paths may stay in git status
+    # because their content differs from the current HEAD.  Verification
+    # against git status is not meaningful here; instead, verify each
+    # path against the target commit's content.
+    if commit != "HEAD":
+        ok = [p for p in paths if _file_matches_commit(root, p, commit)]
+        bad = [p for p in paths if not _file_matches_commit(root, p, commit)]
+        return ok, bad
 
     # Verify (repair 10): a path still in git status was not restored.
     try:
@@ -456,6 +528,33 @@ def _remove_empty_parents(d: str, stop: str) -> None:
                 break
         except OSError:
             break
+
+
+# ---- file-content comparison (DEC-143 reading 3) -----------------
+
+def _file_matches_commit(root: str, rel: str, commit: str) -> bool:
+    """True when the working-tree file already has *commit*'s content.
+
+    Used to tell whether a path was explicitly written to by the
+    command or only appears changed because the HEAD move shifted the
+    reference point.  A missing file matches a missing blob.
+    """
+    rr = os.path.realpath(root)
+    full = os.path.join(rr, rel)
+    try:
+        committed = _git(root, "show", f"{commit}:{rel}")
+    except (_GitError, _NotARepo):
+        committed = None
+    try:
+        if os.path.isfile(full) and not os.path.islink(full):
+            with open(full, encoding="utf-8",
+                      errors="surrogateescape") as f:
+                current = f.read()
+        else:
+            current = None
+    except OSError:
+        current = None
+    return current == committed
 
 
 # ---- HEAD-move helpers (DEC-129) ----------------------------------
@@ -710,7 +809,12 @@ def check_containment(
 
     # Acceptance-test breaches.
     if acc_breach:
-        can_revert = has_snap and not overlapping and not non_fwd
+        certain = has_snap and not overlapping
+        can_revert = certain and not non_fwd
+        # DEC-143: after a non-forward HEAD move with certain
+        # attribution, restore from the pre-call HEAD.
+        can_revert_from_snap = (certain and non_fwd
+                                and bool(old_head))
         # Never restore paths dirty at the snapshot (repair 2).
         restorable = [p for p in acc_breach if p not in dirty_at_snap]
         dirty_b = [p for p in acc_breach if p in dirty_at_snap]
@@ -736,6 +840,39 @@ def check_containment(
                     bad, "flagged",
                     "acceptance test restore failed"))
                 all_failed.extend(bad)
+        elif restorable and can_revert_from_snap:
+            # DEC-143 reading 3: a change the move itself made is
+            # part of the move and is never reverted.  Only restore
+            # paths whose working-tree content actually differs from
+            # the pre-call HEAD.
+            written = []
+            move_only = []
+            for p in restorable:
+                if _file_matches_commit(project_root, p, old_head):
+                    move_only.append(p)
+                else:
+                    written.append(p)
+            if written:
+                ok, bad = _restore_from_head(project_root, written,
+                                             commit=old_head)
+                if ok:
+                    findings.append(_make_finding(
+                        session_id, agent_type, role, ticket_id,
+                        command, ok, "reverted",
+                        "acceptance test restored from pre-call HEAD"))
+                    all_reverted.extend(ok)
+                if bad:
+                    findings.append(_make_finding(
+                        session_id, agent_type, role, ticket_id,
+                        command, bad, "flagged",
+                        "acceptance test restore failed"))
+                    all_failed.extend(bad)
+            if move_only:
+                findings.append(_make_finding(
+                    session_id, agent_type, role, ticket_id, command,
+                    move_only, "flagged",
+                    "acceptance test change (part of HEAD move)"))
+                all_flagged.extend(move_only)
         elif restorable:
             findings.append(_make_finding(
                 session_id, agent_type, role, ticket_id, command,
