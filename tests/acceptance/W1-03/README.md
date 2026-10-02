@@ -6,9 +6,14 @@ item it cites (CAP-58.a) and the decisions that bind the check. Written before i
 - batch 1 (commit `a389ebc`): the report to the agent, the restore of `tests/acceptance/**`, in-scope work left alone;
 - batch 2 (commit `5aeb62a`): the finding record (DEC-122), the nine I-06 forms (DEC-123), a tree that was already
   dirty before the call (DEC-124, DEC-126), and role subagents in a session with no role (DEC-125);
-- batch 3 (this one, on `w1/integrate` at `aa649af`): a call that moves `HEAD`, after the owner's answer of
-  2026-10-02 to KD-4. That answer is not in `docs/DECISION_REGISTER.md` at `aa649af`; it is quoted under
+- batch 3 (commit `e31e11d`, on `w1/integrate` at `aa649af`): a call that moves `HEAD`, after the owner's answer of
+  2026-10-02 to KD-4. The register now holds that answer as DEC-129; it is quoted under
   [A call that moves HEAD](#a-call-that-moves-head-kd-4).
+
+One batch was written **after** implementation:
+
+- batch 4 (this one, on `w1/integrate` at `5e14561`): the thirteen cases of the W1-03 review, passed on as described
+  behaviours (DEC-136). See [Probe findings](#probe-findings-dec-136-batch-4).
 
 ## Run
 
@@ -18,16 +23,21 @@ python3 -m pytest tests/acceptance/W1-03 -q
 
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. Each test builds a small git project
 in a temporary directory and makes whole Bash calls in it: the PreToolUse hook, the command for real, the PostToolUse
-hook. Nothing in the repository is written. The run takes about 45 seconds once the hook exists.
+hook. Nothing in the repository is written. The run takes about 80 seconds.
 
 Sixteen cases need a program that a machine may lack (`perl` four cases; `ruby`, `node`, `curl`, `base64` three
 each); a case is skipped where its program is missing. All five are present on the owner's machine.
 
 ## KPI → tests → red reason today
 
-Red run on `w1/integrate` at `aa649af`: **240 errors, 0 passed** (240 cases, 66 test functions). Every case errors in
-the `hook` fixture with the same reason: **no file matches `template/governance/kernel/hooks/posttooluse*`** — the
-containment hook does not exist. That is the red reason for every row below.
+Red run on `w1/integrate` at `aa649af`, before implementation: **240 errors, 0 passed** (240 cases, 66 test
+functions). Every case errored in the `hook` fixture with the same reason: **no file matches
+`template/governance/kernel/hooks/posttooluse*`** — the containment hook did not exist. That was the red reason for
+every row below except the `test_w1_03_probe_findings.py` rows.
+
+Run on `w1/integrate` at `5e14561`, after implementation: **296 passed** (296 cases, 85 test functions). The 56 cases
+of batch 4 are in `test_w1_03_probe_findings.py`. They were written against the finished check and are green; none has
+a red reason.
 
 | KPI line or covers id | Test file | Test functions |
 |---|---|---|
@@ -37,18 +47,23 @@ containment hook does not exist. That is the red reason for every row below.
 | | `test_w1_03_head_moves.py` | `test_a_commit_of_a_path_outside_the_ticket_paths_is_flagged` (8 cases) · `test_the_commit_is_judged_by_the_caller_s_own_paths` · `test_a_commit_and_an_uncommitted_change_in_one_call_are_both_caught` · `test_a_commit_made_by_a_failed_call_is_flagged_too` · `test_committing_another_role_s_uncommitted_work_is_flagged` |
 | | `test_w1_03_bash_forms.py` | `test_a_write_the_guard_cannot_see_is_reported` (24 forms) |
 | | `test_w1_03_hook.py` | `test_the_check_works_from_what_the_call_left_behind` |
+| | `test_w1_03_probe_findings.py` | `test_a_path_changed_before_the_call_and_again_by_it_is_flagged_and_not_put_back` (5 cases) · `test_only_the_path_changed_again_is_named` · `test_a_commit_that_moves_a_file_has_both_ends_checked` (5 cases) · `test_a_name_that_is_not_ascii_is_reported_and_recorded_as_written` (4 cases) · `test_a_call_whose_hook_input_has_no_tool_use_id_is_checked_all_the_same` (2 cases) |
 | **Success 2.** Changes under `tests/acceptance/**` by a non-test-designer role are restored from HEAD and the breach is recorded | `test_w1_03_test_independence.py` | `test_an_engineer_s_change_under_acceptance_tests_is_restored_from_head` · `test_every_session_but_the_test_designer_s_is_restored` · `test_inside_a_subagent_the_subagent_s_role_decides_the_restore` |
 | | `test_w1_03_finding_record.py` | `test_a_breach_of_the_acceptance_tests_is_recorded_as_reverted` · `test_a_failed_call_is_recorded_too` |
 | | `test_w1_03_dirty_tree.py` | `test_the_restore_takes_back_only_what_this_call_changed` |
 | | `test_w1_03_bash_forms.py` | `test_an_unseen_write_to_an_acceptance_test_is_reported_and_restored` (10 forms) |
 | | `test_w1_03_i06_forms.py` | `test_an_i06_form_into_the_acceptance_tests_is_restored_and_recorded` · `test_git_checkout_of_an_older_acceptance_test_is_restored_from_head` |
+| | `test_w1_03_probe_findings.py` | `test_a_link_the_engineer_makes_under_acceptance_tests_is_removed_and_its_target_stays` (4 cases) · `test_a_link_put_in_the_place_of_an_acceptance_test_is_replaced_by_the_test` · `test_a_link_put_in_the_place_of_an_acceptance_directory_is_replaced_by_the_directory` · `test_an_acceptance_test_with_a_name_that_is_not_ascii_is_restored` (2 cases) · `test_a_call_of_the_same_actor_that_never_ended_does_not_switch_the_restore_off` (4 cases) |
 | **Success 3.** All nine Bash write forms from S0b2 I-06 are caught | `test_w1_03_i06_forms.py` | `test_an_i06_form_outside_the_ticket_paths_is_caught` · `test_an_i06_form_into_the_acceptance_tests_is_restored_and_recorded` · `test_an_i06_form_given_word_for_word_passes_neither_line_unseen` (13 cases each, forms 1 to 7 and 9) · `test_git_checkout_of_an_older_revision_outside_the_ticket_paths_is_caught` · `test_git_checkout_of_an_older_acceptance_test_is_restored_from_head` · `test_a_git_command_that_discards_another_role_s_uncommitted_work_is_caught` · `test_discarding_one_s_own_uncommitted_work_is_no_finding` (form 8) |
 | | `test_w1_03_head_moves.py` | Form 8 when it moves `HEAD`: `test_any_other_head_move_is_flagged_and_never_reverted` (8 moves) · `test_a_head_move_is_flagged_whoever_makes_it` · `test_a_reset_that_undoes_only_one_s_own_commit_is_flagged_too` · `test_a_mixed_reset_does_not_cost_an_acceptance_test_its_content` |
+| | `test_w1_03_probe_findings.py` | `test_a_head_move_in_a_call_with_no_before_snapshot_is_flagged` (3 cases) · `test_a_change_next_to_a_head_move_that_is_not_forward_is_named_and_nothing_is_reverted` (5 cases) |
 | **Failure 1.** Any out-of-scope change survives without a finding | every file | Every Success 1, 2 and 3 test: each one now requires the finding next to the report (`assert_caught`). Sharpest: `test_the_finding_names_every_out_of_scope_path_and_no_other` · `test_a_git_command_that_discards_another_role_s_uncommitted_work_is_caught` · `test_a_new_directory_is_judged_file_by_file` · `test_a_commit_of_a_path_outside_the_ticket_paths_is_flagged` (the tree is clean after the call) |
+| | `test_w1_03_probe_findings.py` | The hook's own failure: `test_stdin_the_check_cannot_read_is_reported_and_recorded` (4 cases) · `test_a_check_that_cannot_run_is_reported_and_recorded_with_the_call_s_own_fields` (2 cases) |
 | **Failure 2.** A legitimate in-scope change is reverted | `test_w1_03_out_of_scope.py` | `test_a_change_inside_the_ticket_paths_is_left_alone` · `test_one_call_with_both_kinds_reports_only_the_outside_change` · `test_a_new_directory_is_judged_file_by_file` · `test_scratch_writes_are_not_reported` · `test_the_check_adds_nothing_to_git_status` |
 | | `test_w1_03_test_independence.py` | `test_the_restore_leaves_the_engineer_s_own_work_alone` · `test_the_test_designer_s_changes_stay` · `test_the_test_designer_s_scope_does_not_depend_on_the_ticket_paths` |
 | | `test_w1_03_dirty_tree.py` | `test_the_test_designer_s_uncommitted_tests_survive_another_role_s_call` · `test_the_caller_s_own_change_is_judged_and_the_earlier_work_is_not` · `test_an_engineer_s_uncommitted_work_is_not_reported_after_another_role_s_call` · `test_a_path_already_changed_before_the_call_is_never_put_back_to_head` · `test_without_a_before_snapshot_another_role_s_uncommitted_tests_are_not_restored` · `test_without_a_before_snapshot_an_in_scope_change_is_still_silent` · `test_the_snapshot_of_an_earlier_call_is_not_used_for_a_later_one` · `test_a_change_made_by_an_overlapping_call_is_not_reverted` |
 | | `test_w1_03_head_moves.py` | `test_a_commit_inside_the_caller_s_paths_is_silent` (6 cases) · `test_committing_only_one_s_own_paths_on_a_dirty_tree_is_silent` · the "never reverted" half of every HEAD-move test |
+| | `test_w1_03_probe_findings.py` | `test_staging_everything_leaves_the_test_designer_s_uncommitted_tests_intact` (4 cases) · `test_a_write_through_such_a_link_stays_where_it_really_is` · `test_a_file_tool_write_by_the_test_designer_during_another_actor_s_bash_call_survives` (2 cases) · `test_a_test_written_by_the_designer_s_running_bash_call_survives_another_actor_s_check` (4 cases) · `test_a_call_without_tool_use_id_does_not_cost_the_test_designer_its_uncommitted_tests` (2 cases) |
 | **CAP-58.a** default-deny allow-lists per role and ticket; checks derived, not enumerated | `test_w1_03_hook.py` and the Success 1 files | `test_containment_hook_ships_in_the_kernel_template` · the Success 1 and Failure 2 tests |
 
 **Count.** KPI lines with tests: 5 of 5. Covers ids with tests: 1 of 1. One clause inside those lines has no test:
@@ -61,8 +76,12 @@ containment hook does not exist. That is the red reason for every row below.
 | DEC-122 | A finding is one JSON line in `.gov-runtime/findings.jsonl`, the guard's file, with `time`, `session_id`, `agent_type`, `role`, `ticket`, `tool`, `command`, `paths`, `action` (`reverted` or `flagged`) and `reason` |
 | DEC-123 | The nine I-06 forms are tested by their effect inside the repository. A write outside it is not tested (accepted residual) |
 | DEC-124 | Only the current call's changes are acted on. The before-snapshot is taken in PreToolUse and compared in PostToolUse. A path already changed before the call is never touched. Uncertain attribution: flag, no revert |
-| Owner answer to KD-4 (2026-10-02) | The before-snapshot also holds `HEAD`. Forward on the same branch: the paths of the new commits are checked, and anything outside is flagged. Any other move: flagged, never reverted |
-| Owner confirmation (2026-10-02) | The readings of DEC-124 listed under "A tree that was already dirty" stand |
+| DEC-129 (owner answer to KD-4) | The before-snapshot also holds `HEAD`. Forward on the same branch: the paths of the new commits are checked, and anything outside is flagged. Any other move: flagged, never reverted |
+| DEC-130 | The readings of DEC-124 listed under "A tree that was already dirty" stand: no before-snapshot or overlapping calls means flag and never revert; a path changed before the call is never restored |
+| DEC-131 | The readings of KD-4 stand: a `HEAD` move is flagged whoever makes it; `git commit -a` of another role's work is flagged |
+| DEC-132 | A `HEAD` move with no before-snapshot is flagged (batch 4). Its three other defaults have builder tests only, see [Not tested](#not-tested) |
+| DEC-134 | Accepted residuals. Two shape the tests of batch 4: a change by someone the hooks do not see is attributed to the running call, and a `HEAD` move with no snapshot is checked against the last `HEAD` the hooks saw |
+| DEC-136 | Probe findings reach the test designer as described behaviours; the designer decides from the specification |
 | DEC-126 | The before-snapshot is taken by the kernel's PreToolUse hook, the guard's. The tests run that hook before every call |
 | DEC-125 | In a session with no declared role, a role subagent has no write either |
 | DEC-107 | Role and active ticket come from `GOV_ROLE` and `GOV_TICKET`. Missing or unknown role: no paths |
@@ -95,7 +114,12 @@ another role has no ticket paths.
   `test_an_i06_form_given_word_for_word_passes_neither_line_unseen` and
   `test_the_check_works_from_what_the_call_left_behind`.
 - **Earlier work.** A dirty tree is made by running a command in the project with no hook, before the call under test.
-- **No before-snapshot.** Four tests leave the PreToolUse hook out, as when it never ran or timed out.
+- **No before-snapshot.** Four tests of batch 2 and one of batch 4 leave the PreToolUse hook out, as when it never ran
+  or timed out.
+- **Batch 4 adds four ways to drive the hooks:** a hook input with no `tool_use_id`; a PreToolUse run with no command
+  and no PostToolUse run after it (a call that never ended); a PreToolUse run for `Write` or `Edit` followed by the
+  write itself (the containment check is registered for Bash only, so no PostToolUse run follows a file tool); and a
+  PostToolUse run with stdin as given, or with `PATH` or `PYTHONPATH` changed.
 - **Stdin** is the harness's object: `session_id`, `transcript_path`, `cwd`, `permission_mode`, `hook_event_name`,
   `tool_name` (`Bash`), `tool_input`, `tool_use_id`, and
   - for `PostToolUse`: `tool_response` with `stdout`, `stderr`, `interrupted`, `isImage`;
@@ -144,7 +168,7 @@ What the tests require of each line the check adds:
   not empty. `action` is `reverted` or `flagged`.
 - `paths` is a list of path names. The tests accept a path relative to the repository or absolute inside it. A new
   directory may be recorded as the directory or as the files in it. The list may be empty only for a `HEAD` move that
-  is not a move forward.
+  is not a move forward, and for the hook's own failure.
 - `role` and `ticket` are what the session declared in `GOV_ROLE` and `GOV_TICKET`, tested on a call outside any
   subagent; both are empty when the session declared none. `agent_type` is the subagent's type inside a subagent and
   empty outside one.
@@ -174,8 +198,9 @@ reading 1):
    (DEC-110). Every out-of-scope change in the tree is reported and recorded as `flagged`, and none is reverted, an
    acceptance test included. An in-scope change is silent as always.
 2. **A snapshot belongs to one call.** A later call without one does not fall back on an earlier call's.
-3. **A path already changed before the call, and changed again by it, is never put back to HEAD.** The tests take no
-   side on whether it is reported.
+3. **A path already changed before the call, and changed again by it, is never put back to HEAD.** Batches 1 to 3
+   took no side on whether it is reported. Batch 4 does: outside the caller's paths it is reported and recorded as
+   `flagged` (KPI failure 1), and the file is as the call left it.
 4. **Overlapping calls mean attribution is uncertain.** The orchestrator's call begins, a subagent's whole call runs,
    the first one ends: the first call's check does not undo the subagent's work. The tests take no side on what it
    reports.
@@ -223,6 +248,86 @@ branch, and `git commit --amend`.
   role and an engineer subagent are flagged like the engineer, and so is a reset that undoes only the engineer's own
   in-scope commit. The answer names no role and no path that makes such a move acceptable.
 - The tests take no side on what `paths` holds for such a move, or on the wording of the report.
+
+## Probe findings (DEC-136, batch 4)
+
+The orchestrator's review of W1-03 passed thirteen cases to the test designer as described behaviours. All thirteen
+became acceptance tests, in `test_w1_03_probe_findings.py`. Two of them also show a case the specification does not
+settle; those cases have no test, see [Specification gaps](#specification-gaps).
+
+| # | Finding, as passed on | Held to | Tests (cases) | Today |
+|---|---|---|---|---|
+| 1 | An out-of-scope file already changed before the call, and changed again by it, is reported and flagged | Failure 1; DEC-124, DEC-130 | `test_a_path_changed_before_the_call_and_again_by_it_is_flagged_and_not_put_back` (2 of 5) · `test_only_the_path_changed_again_is_named` | green |
+| 2 | Another role's uncommitted acceptance test, changed again by an engineer's call, is flagged and not put back to HEAD | Success 2 "the breach is recorded"; DEC-124, DEC-130 | `test_a_path_changed_before_the_call_and_again_by_it_is_flagged_and_not_put_back` (3 of 5) | green |
+| 3 | `git add -A` by an engineer leaves the test designer's uncommitted tests intact | Failure 2; DEC-124 | `test_staging_everything_leaves_the_test_designer_s_uncommitted_tests_intact` (4) | green |
+| 4 | A symlink a non-designer creates under `tests/acceptance/`, pointing into its own paths, is caught and removed | Success 2; Failure 2 for the link's target | `test_a_link_the_engineer_makes_under_acceptance_tests_is_removed_and_its_target_stays` (4) · `test_a_write_through_such_a_link_stays_where_it_really_is` · `test_a_link_put_in_the_place_of_an_acceptance_test_is_replaced_by_the_test` · `test_a_link_put_in_the_place_of_an_acceptance_directory_is_replaced_by_the_directory` | green |
+| 5 | A `HEAD` move with no before-snapshot is flagged | DEC-132, DEC-130 | `test_a_head_move_in_a_call_with_no_before_snapshot_is_flagged` (3) | green |
+| 6 | A designer subagent's file-tool write during another actor's Bash call survives that call's check | Failure 2; DEC-130 | `test_a_file_tool_write_by_the_test_designer_during_another_actor_s_bash_call_survives` (2) | green |
+| 7 | A non-ASCII out-of-scope name is reported as written | Success 1; Success 2 | `test_a_name_that_is_not_ascii_is_reported_and_recorded_as_written` (4) · `test_an_acceptance_test_with_a_name_that_is_not_ascii_is_restored` (2) | green |
+| 8 | A commit that moves a file out of an out-of-scope path has the old path flagged | DEC-129 | `test_a_commit_that_moves_a_file_has_both_ends_checked` (5) | green |
+| 9 | A PostToolUse input without `tool_use_id` still gets the check | Success 1 "after every Bash call" | `test_a_call_whose_hook_input_has_no_tool_use_id_is_checked_all_the_same` (2) · `test_a_call_without_tool_use_id_does_not_cost_the_test_designer_its_uncommitted_tests` (2) | green |
+| 10 | A non-forward `HEAD` move plus a new out-of-scope file: the file is named, and nothing is reverted | Failure 1; DEC-129 | `test_a_change_next_to_a_head_move_that_is_not_forward_is_named_and_nothing_is_reverted` (5) | green. Gap G-2 |
+| 11 | The hook's own failure is reported and recorded with DEC-122's fields | Failure 1; DEC-122 extending DEC-110 | `test_stdin_the_check_cannot_read_is_reported_and_recorded` (4) · `test_a_check_that_cannot_run_is_reported_and_recorded_with_the_call_s_own_fields` (2) | green |
+| 12 | A designer subagent's Bash call that began earlier and is still running: its new test survives another actor's check | Failure 2; DEC-130 | `test_a_test_written_by_the_designer_s_running_bash_call_survives_another_actor_s_check` (4) | green |
+| 13 | A leftover snapshot of the same actor doesn't switch the restore off | Success 2; MR-3 | `test_a_call_of_the_same_actor_that_never_ended_does_not_switch_the_restore_off` (4) | green. Gap G-1 |
+
+What the tests require, finding by finding:
+
+- **1, 2. Changed again.** The finding names the path and says `flagged`. The file holds the earlier work and the
+  call's change. Other paths changed before the call are neither named nor touched. Tested on a tracked file, a new
+  file, a changed acceptance test, a new staged acceptance test, and a test in a new directory git does not track.
+- **3. Staging.** After `git add -A`, `git add .` or `git add -u` by the engineer, each of the test designer's
+  uncommitted tests holds its content and still shows as a change. No finding says a path under `tests/acceptance`
+  was reverted. The tests take no side on whether the staging is reported or undone.
+- **4. Links.** A link under `tests/acceptance` is judged by where it is. It is removed, recorded as `reverted`, and
+  the directory it pointed into keeps every file. A file written through the link lies in the engineer's own
+  directory and stays. A link put in the place of an acceptance test, or of the ticket's whole test directory, is
+  replaced by the real file or directory with its HEAD content; nothing is written through the link.
+- **5. No snapshot.** One call with both hooks runs first, so the hooks have seen `HEAD` (DEC-134). Then a call with
+  no PreToolUse run resets, checks out another branch, or commits an out-of-scope path: reported, recorded as
+  `flagged`, nothing reverted. A commit of the caller's own paths in such a call is not tested.
+- **6, 12. Overlap.** The session is the orchestrator's; the other actor is its main thread or an engineer subagent.
+  Two subagents have different `agent_id`s. In 6 the designer subagent's Write and Edit pass the PreToolUse hook and
+  the files are written while the other actor's Bash call is open. In 12 the designer subagent's Bash call has begun
+  (in either order with the other call) and writes its tests before the other call ends. The other call's check
+  leaves the tests and `git status` as they were. The tests take no side on what that check reports. In 12 the
+  designer's own call then ends with nothing to report.
+- **7. Names.** `docs/über-uns.md`, `docs/résumé.md` (tracked), `docs/設計メモ.md` and `docs/señal de prueba.md` are in
+  the report and are the one entry of `paths`, as written, not in git's octal spelling. An acceptance test named
+  `test_prüfung.py` is restored like any other.
+- **8. Moved by a commit.** Both ends of a move are checked: the path a file left and the path it now has. An end
+  outside the caller's paths is flagged, an end inside is not recorded. Tested out of `docs/` into the ticket's
+  paths (also with a change in the same commit), an acceptance test into the ticket's paths, out of the ticket's
+  paths, and between two out-of-scope paths.
+- **9. No `tool_use_id`.** Tested with the key missing from both hook inputs, and from the PostToolUse input alone. An
+  out-of-scope change is caught, an in-scope change is silent and stays. A changed acceptance test is caught; the
+  tests take no side on whether it is restored, and `action` must say which. The test designer's earlier uncommitted
+  tests are untouched.
+- **10. Move and change.** After `git reset --hard`, a checkout of another branch, an amended commit, or a soft
+  reset, a new or changed file outside the caller's paths is named in the report and in a `flagged` finding, and the
+  tree is as the call left it.
+- **11. Failure.** Stdin that is not JSON, empty, a JSON list, or cut off; and a valid input when `git` is not on the
+  hook's `PATH` or the `gov` package cannot be imported. Each is reported to the agent and recorded as a line with
+  all ten fields: `action` is `flagged`, `reason` and `time` are not empty, `paths` is a list (it may be empty),
+  `role` and `ticket` are the session's. With a valid input, `session_id`, `tool` and `command` are the call's. The
+  working tree is not changed.
+- **13. Leftover.** The PreToolUse hook ran for one or three calls of an actor and no PostToolUse run followed. The
+  same actor's next whole call changes an acceptance test: restored and recorded as `reverted`. Tested for the
+  engineer's main thread and for an engineer subagent. The same actor is: the same `session_id` and the same
+  `agent_id`, or none.
+
+### Specification gaps
+
+Both are with the owner as `W1-03-kpi-disputes-round-3.md`. Neither has a test.
+
+- **G-1. A call of another actor that never ended.** DEC-130 says overlapping calls are flagged and never reverted.
+  Nothing says when a call that began and never ended stops counting as overlapping. At `5e14561` it counts for one
+  hour, or until that actor completes a later Bash call, also across sessions. Until then an engineer's change to an
+  acceptance test is flagged and stays. Such a call is left behind whenever a permission prompt is declined; the
+  install rule's `ask` (W1-04) takes the snapshot before the owner answers.
+- **G-2. A `HEAD` move that is not forward, and a change to an acceptance test in the same call.** KPI success 2 says
+  the change is restored from HEAD. DEC-129 says such a move is flagged and never reverted. At `5e14561` the change
+  is flagged and stays, for example after `git commit --amend --no-edit && echo … >> tests/acceptance/…`.
 
 ## The nine I-06 forms (DEC-123)
 
@@ -312,21 +417,34 @@ registered PreToolUse hooks first; see the README of W1-05.
 Batch 3 changed one thing in the tests of batch 2: `paths` of a finding may be an empty list, for a `HEAD` move
 between two commits that hold the same files. No expectation of batch 1 or 2 changed.
 
+## Additions after implementation
+
+For the DEC-106 metric. Batch 4 changed no existing test and no existing expectation.
+
+| What | Change | Reason |
+|---|---|---|
+| `test_w1_03_probe_findings.py`: 19 test functions, 56 cases, listed under [Probe findings](#probe-findings-dec-136-batch-4) | Added | probe finding |
+| `w1_03_support.py` | A hook input may leave out `tool_use_id`; two subagents may have different `agent_id`s; the PreToolUse hook can be run for a file tool; the PostToolUse hook can be run with stdin as given or a changed environment. Defaults are as before | probe finding |
+
 ## Not tested
 
-Nothing is with the owner. Left open on purpose; the tests take no side:
+With the owner: G-1 and G-2 under [Specification gaps](#specification-gaps). Left open on purpose; the tests take no
+side:
 
-- **A `HEAD` move in a call with no before-snapshot.** The check does not know where `HEAD` was.
-- **Moves between the two cases of the KD-4 answer:** a checkout of another branch that points at the same commit, a
-  new branch made and committed on in one call, and a merge that is not a fast-forward.
+- **Three defaults of DEC-132:** a checkout of another branch that points at the same commit is no `HEAD` move; a new
+  branch made and committed on in one call is flagged; a merge that is not a fast-forward is flagged. DEC-132 leaves
+  them to builder tests until the test designer adds acceptance tests. They were not among the findings of batch 4.
+- **A commit of the caller's own paths in a call with no before-snapshot,** and a `HEAD` move with no snapshot when
+  the hooks have never seen `HEAD` (DEC-134).
+- **What the check of an overlapping call reports.** It must not revert; whether it flags is open.
 
 - **"At gov close".** `gov close` is W1-30, and its KPI says it "runs the containment check". The run at close is left
   to W1-30's acceptance tests.
 - **A write outside the repository** through an opaque form: accepted residual (DEC-123).
 - **`role` of a finding inside a subagent:** the session's role or the subagent's. `agent_type` is tested.
 - **The format of `time`,** and the wording of `reason`.
-- **A snapshot that is never used** (the guard denied the call, or the call never ended): how long it is kept.
+- **A snapshot of another actor that is never used** (the call never ended): gap G-1. The same actor's is tested.
 - **A ticket that is not `in_progress`** (DEC-114 and DEC-116 are decisions on the guard).
 - **An ignored path** outside the ticket paths; git does not show it.
-- **Unusable stdin, a missing `git`, a directory that is not a repository,** and the time the two hooks take. No KPI
-  names them.
+- **A directory that is not a repository,** a failure of the PreToolUse hook (DEC-110, W1-02's), and the time the two
+  hooks take. No KPI names them.

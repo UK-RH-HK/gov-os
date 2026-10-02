@@ -368,7 +368,7 @@ def make_sandbox(base):
 class Call:
     """One Bash call of the agent, as both hooks are told about it."""
     command: str        # ``tool_input.command``, and what is run
-    tool_use_id: str
+    tool_use_id: str | None   # ``None``: the hook input carries no ``tool_use_id``
 
 
 _CALL_NUMBERS = itertools.count(1)
@@ -427,11 +427,15 @@ def hook_environment(project, sandbox, role=None, ticket=None):
     return env
 
 
-def payload(project, call, sandbox, event, bash=None, subagent=None):
+SUBAGENT_ID = "agent-w1-03-acceptance"
+
+
+def payload(project, call, sandbox, event, bash=None, subagent=None, agent_id=None):
     """The stdin object of the harness for one of the three events around a Bash call.
 
     ``PreToolUse`` before the call; ``PostToolUse`` after it; ``PostToolUseFailure``
-    instead, when the call failed, timed out or was interrupted.
+    instead, when the call failed, timed out or was interrupted. ``agent_id``
+    tells two subagents apart; left out, every subagent has the same id.
     """
     data = {
         "session_id": SESSION_ID,
@@ -441,8 +445,9 @@ def payload(project, call, sandbox, event, bash=None, subagent=None):
         "hook_event_name": event,
         "tool_name": "Bash",
         "tool_input": {"command": call.command, "description": "W1-03 acceptance call"},
-        "tool_use_id": call.tool_use_id,
     }
+    if call.tool_use_id is not None:
+        data["tool_use_id"] = call.tool_use_id
     stdout = bash.stdout if bash is not None else ""
     stderr = bash.stderr if bash is not None else ""
     if event == "PostToolUseFailure":
@@ -452,17 +457,18 @@ def payload(project, call, sandbox, event, bash=None, subagent=None):
     elif event == "PostToolUse":
         data["tool_response"] = {"stdout": stdout, "stderr": stderr, "interrupted": False, "isImage": False}
     if subagent is not None:
-        data["agent_id"] = "agent-w1-03-acceptance"
+        data["agent_id"] = agent_id or SUBAGENT_ID
         data["agent_type"] = subagent
     return data
 
 
-def _run(entry, stdin, project, sandbox, role, ticket):
+def _run(entry, stdin, project, sandbox, role, ticket, environment=None):
     started = time.perf_counter()
+    env = hook_environment(project, sandbox, role, ticket)
+    env.update(environment or {})
     try:
         proc = subprocess.run(_argv(entry), input=stdin, capture_output=True, text=True, cwd=str(project),
-                              env=hook_environment(project, sandbox, role, ticket),
-                              timeout=HOOK_TIMEOUT_S, check=False)
+                              env=env, timeout=HOOK_TIMEOUT_S, check=False)
     except subprocess.TimeoutExpired as exc:
         return None, str(exc.stdout or ""), str(exc.stderr or ""), time.perf_counter() - started
     return proc.returncode, proc.stdout, proc.stderr, time.perf_counter() - started
@@ -498,12 +504,29 @@ def _guard_decision(returncode, stdout):
     return decision if decision in ("deny", "ask") else "allow"
 
 
-def run_guard(project, call, sandbox, role=None, ticket=None, subagent=None):
+def run_guard(project, call, sandbox, role=None, ticket=None, subagent=None, agent_id=None):
     """Run the installed PreToolUse hook once, as the harness does before a Bash call."""
     project = Path(project)
     entry = project / PRODUCT_HOOK_DIR_REL / guard_entry().name
-    stdin = json.dumps(payload(project, call, sandbox, "PreToolUse", subagent=subagent))
+    stdin = json.dumps(payload(project, call, sandbox, "PreToolUse", subagent=subagent, agent_id=agent_id))
     returncode, stdout, stderr, _ = _run(entry, stdin, project, sandbox, role, ticket)
+    return GuardResult(_guard_decision(returncode, stdout), returncode, stdout, stderr)
+
+
+def run_guard_for_file_tool(project, sandbox, tool_name, tool_input, role=None, ticket=None, subagent=None,
+                            agent_id=None):
+    """Run the installed PreToolUse hook once for a file-tool call (``Write`` or ``Edit``).
+
+    The harness runs the guard before every write tool. The containment check
+    is registered for Bash only, so no PostToolUse run follows a file-tool call.
+    """
+    project = Path(project)
+    entry = project / PRODUCT_HOOK_DIR_REL / guard_entry().name
+    data = payload(project, Call("", f"toolu_w1_03_{next(_CALL_NUMBERS):04d}"), sandbox, "PreToolUse",
+                   subagent=subagent, agent_id=agent_id)
+    data["tool_name"] = tool_name
+    data["tool_input"] = tool_input
+    returncode, stdout, stderr, _ = _run(entry, json.dumps(data), project, sandbox, role, ticket)
     return GuardResult(_guard_decision(returncode, stdout), returncode, stdout, stderr)
 
 
@@ -565,21 +588,30 @@ def classify(returncode, stdout, stderr):
 
 
 def run_check(project, call, sandbox, role=None, ticket=None, subagent=None, bash=None, failed=False,
-              seen=None):
+              seen=None, agent_id=None, environment=None):
     """Run the installed containment hook once, as the harness does after a Bash call.
 
     ``seen`` is the number of lines the findings file held when the call began;
-    left out, the lines added by this run alone are returned.
+    left out, the lines added by this run alone are returned. ``environment``
+    replaces variables of the hook's environment.
     """
     project = Path(project)
-    entry = project / PRODUCT_HOOK_DIR_REL / hook_entry().name
     event = "PostToolUseFailure" if failed else "PostToolUse"
-    stdin = json.dumps(payload(project, call, sandbox, event, bash=bash, subagent=subagent))
+    stdin = json.dumps(payload(project, call, sandbox, event, bash=bash, subagent=subagent, agent_id=agent_id))
+    return run_check_with_stdin(project, stdin, sandbox, role=role, ticket=ticket, seen=seen,
+                                environment=environment, command=call.command)
+
+
+def run_check_with_stdin(project, stdin, sandbox, role=None, ticket=None, seen=None, environment=None,
+                         command=""):
+    """Run the installed containment hook once with ``stdin`` exactly as given."""
+    project = Path(project)
+    entry = project / PRODUCT_HOOK_DIR_REL / hook_entry().name
     if seen is None:
         seen = len(finding_lines(project))
-    returncode, stdout, stderr, seconds = _run(entry, stdin, project, sandbox, role, ticket)
+    returncode, stdout, stderr, seconds = _run(entry, stdin, project, sandbox, role, ticket, environment)
     outcome, report = classify(returncode, stdout, stderr)
-    return HookResult(outcome, report, returncode, stdout, stderr, seconds, project, call.command,
+    return HookResult(outcome, report, returncode, stdout, stderr, seconds, project, command,
                       tuple(finding_lines(project)[seen:]))
 
 
