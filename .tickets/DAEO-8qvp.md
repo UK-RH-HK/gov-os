@@ -18,6 +18,7 @@ depends_on:
 allowed_paths:
 - src/gov/guard/containment*
 - template/governance/kernel/hooks/posttooluse*
+- template/governance/kernel/hooks/pretooluse*
 - tests/unit/containment/**
 kpis:
   success:
