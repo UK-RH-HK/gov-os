@@ -1,7 +1,8 @@
 # W1-05 — Dogfood switch-over: acceptance tests
 
 Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-m7u4` (W1-05) as updated under
-DEC-119, and from DEC-084, DEC-113, DEC-117 and DEC-118. Written before implementation.
+DEC-119, and from DEC-084, DEC-113, DEC-117 and DEC-118. Written before implementation; one test was rewritten on
+2026-10-02, see [Rewritten tests](#rewritten-tests).
 
 ## Run
 
@@ -19,7 +20,8 @@ directory takes about two minutes.
 
 ## KPI → tests → red reason today
 
-Red run on `w1/integrate` at `d6bb6d5`: 12 failed, 41 errors, 0 passed (53 cases, 22 test functions).
+Red run on `w1/integrate` at `aa649af`, with the rewritten test: 12 failed, 41 errors, 0 passed (53 cases, 22 test
+functions), as at `d6bb6d5`.
 
 | KPI line | Test file | Test functions | Red reason today |
 |---|---|---|---|
@@ -46,6 +48,11 @@ A pytest run cannot open a harness session. Instead:
    ignore. The copy gets one extra ticket, `DAEO-zz90` (engineer, `in_progress`, `src/gov/guard/**` and
    `tests/unit/guard/**`), and is committed.
 3. **Each registered command is run** with `sh -c`, in the copy, with the hook's JSON object on stdin.
+   - **A whole Bash call** is the registered PreToolUse commands, then the command for real, then the registered
+     PostToolUse commands, all with the same `session_id` and `tool_use_id`. The command is saved as a script outside
+     the copy and the call is `bash <script>`, as in W1-03's tests; the PreToolUse commands must let it through. The
+     restore test runs a whole call. The three other containment tests run the command and then the PostToolUse
+     commands; what they expect holds with or without a before-snapshot.
    - Environment, built from scratch: `PATH`, an empty temporary `HOME`, `TMPDIR`, locale, `CLAUDE_PROJECT_DIR` (the
      copy) and `PYTHONDONTWRITEBYTECODE`, plus `GOV_ROLE` and `GOV_TICKET` when the test declares them.
    - **There is no `PYTHONPATH`.** The command must find the `gov` package from the repository as it stands. Nothing is
@@ -88,6 +95,22 @@ A pytest run cannot open a harness session. Instead:
   This check reads the settings file of each commit; it does not run the commands.
 - **Failure 2.** With the hooks wired, `tests/acceptance/W1-02`, `W1-03` and `W1-04` must each hold test files, and
   `python3 -m pytest` on the three directories must pass.
+
+- **The before-snapshot must be wired.** The containment check restores an acceptance test only when the PreToolUse
+  command for Bash took its snapshot before the call (DEC-124, DEC-126). The restore test fails if the PreToolUse
+  wiring for Bash does not reach W1-03's snapshot.
+
+## Rewritten tests
+
+| Test | Change | Kind | Reason |
+|---|---|---|---|
+| `test_the_containment_check_restores_an_acceptance_test` (`test_w1_05_live_hooks.py`) | It ran the PostToolUse commands alone and expected the acceptance test to be restored. It now makes a whole call: the registered PreToolUse commands first, then the command, then the PostToolUse commands (`bash_call` in `w1_05_support.py`). The expectation is the same: the file holds its HEAD content again and the report names it | Rewrite after implementation | Conflicted with DEC-124: with no before-snapshot the check flags and does not revert, so the old test could not pass together with W1-03's `test_without_a_before_snapshot_a_change_is_flagged_and_not_reverted` |
+
+The other tests were checked against DEC-124 and stand as written. Three of them run the PostToolUse commands with no
+PreToolUse run before: `test_the_containment_check_reports_a_change_outside_the_ticket_paths` and
+`test_the_containment_check_runs_after_a_failed_call` expect a report, which a flagged change gives, and
+`test_the_containment_check_leaves_in_scope_work_alone` expects silence, which an in-scope change gives either way.
+None of them moves `HEAD`.
 
 ## Not tested
 

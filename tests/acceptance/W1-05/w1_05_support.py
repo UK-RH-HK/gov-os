@@ -29,6 +29,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -424,6 +425,36 @@ def run_bash(project, command, sandbox):
     env.update({"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull})
     return subprocess.run(["bash", "-c", command], cwd=str(project), env=env, capture_output=True,
                           text=True, timeout=COMMAND_TIMEOUT_S, check=False)
+
+
+def bash_call(project, settings, sandbox, command, role=None, ticket=None, subagent=None, event="PostToolUse",
+              changed=()):
+    """One whole Bash call through the wiring: PreToolUse commands, the command for real, then ``event``.
+
+    The containment check takes its before-snapshot in PreToolUse and acts only
+    on what the call changed (DEC-124, DEC-126). With no PreToolUse run before
+    it, the check cannot tell whose a change is, and it flags without restoring.
+
+    ``command`` is saved as a script outside the copy and the call is
+    ``bash <script>``: a call the guard has no way to judge, so it lets it
+    through and the snapshot exists. ``changed`` names paths the command must
+    have changed. Returns what ``post_bash`` returns.
+    """
+    directory = sandbox.home.parent / "calls"
+    directory.mkdir(exist_ok=True)
+    script = directory / f"call-{len(list(directory.iterdir())) + 1:04d}.sh"
+    script.write_text(command + "\n", encoding="utf-8")
+    call = f"bash {shlex.quote(str(script))}"
+    before = pre_tool_use(project, settings, sandbox, "Bash", bash_input(call), role, ticket, subagent)
+    assert before.decision == "allow", (
+        f"the registered PreToolUse commands did not let the fixture call `{call}` through, "
+        f"so no Bash call would follow: {before.describe()}"
+    )
+    run_bash(project, call, sandbox)
+    status = git(project, "status", "--porcelain", "--untracked-files=all")
+    for relpath in changed:
+        assert relpath in status, f"the fixture command `{command}` did not change {relpath}:\n{status}"
+    return post_bash(project, settings, sandbox, call, role, ticket, subagent, event)
 
 
 def write_input(tool_name, path):

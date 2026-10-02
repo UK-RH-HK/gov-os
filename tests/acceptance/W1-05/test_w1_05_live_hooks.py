@@ -165,11 +165,17 @@ def test_the_containment_check_reports_a_change_outside_the_ticket_paths(scratch
 
 
 def test_the_containment_check_restores_an_acceptance_test(scratch_copy, switched_over, sandbox):
+    """One whole call through the wiring: the PreToolUse commands, the command, the PostToolUse commands.
+
+    The check restores only what the call changed, and it knows that from the
+    before-snapshot it takes in PreToolUse (DEC-124, DEC-126). So this test also
+    shows that the snapshot is wired: with the PostToolUse commands alone, the
+    check flags the change and leaves it.
+    """
     before = (scratch_copy / ACCEPTANCE_FILE).read_text(encoding="utf-8")
     command = f"python3 -c \"open('{ACCEPTANCE_FILE}', 'a').write('changed')\""
-    support.run_bash(scratch_copy, command, sandbox)
-    assert (scratch_copy / ACCEPTANCE_FILE).read_text(encoding="utf-8") != before, "the fixture command changed nothing"
-    report, results = support.post_bash(scratch_copy, switched_over, sandbox, command, ENGINEER, TICKET)
+    report, results = support.bash_call(scratch_copy, switched_over, sandbox, command, ENGINEER, TICKET,
+                                        changed=[ACCEPTANCE_FILE])
     detail = "; ".join(result.describe() for result in results)
     assert (scratch_copy / ACCEPTANCE_FILE).read_text(encoding="utf-8") == before, (
         f"{ACCEPTANCE_FILE} was not restored from HEAD after an engineer's change: {detail}"
