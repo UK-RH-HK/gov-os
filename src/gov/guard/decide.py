@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import glob
 import os
 import re
 import shlex
@@ -19,6 +20,7 @@ ACCEPTANCE = "tests/acceptance"
 _PUNCT = frozenset("();<>|&\n")
 _WRITE_CMDS = frozenset({"touch", "rm", "mv", "cp", "mkdir"})
 _ASSIGN_RE = re.compile(r"^[A-Za-z_]\w*=")
+_UNRESOLVABLE = "/<guard-unresolvable>"
 
 
 # -- frontmatter --------------------------------------------------------------
@@ -145,6 +147,79 @@ def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
     return any(_match_pattern(rel, p) for p in patterns)
 
 
+# -- Bash target resolution (DEC-115) -----------------------------------------
+
+def _expand_token(token: str) -> str | None:
+    """Expand ``~`` and environment variables in a Bash write target.
+
+    Returns the expanded string, or ``None`` when the target is unresolvable.
+    Uses ``os.environ`` (the hook process's own environment).
+    """
+    if not token:
+        return None
+    if '`' in token:
+        return None
+    if '$(' in token:
+        return None
+    if token.endswith('$'):
+        return None
+
+    # Tilde at the start.
+    if token.startswith('~'):
+        expanded = os.path.expanduser(token)
+        if expanded.startswith('~'):
+            return None
+        token = expanded
+
+    # Environment variables.
+    if '$' not in token:
+        return token
+
+    parts: list[str] = []
+    i = 0
+    while i < len(token):
+        if token[i] != '$':
+            parts.append(token[i])
+            i += 1
+            continue
+        if i + 1 >= len(token):
+            return None
+        nxt = token[i + 1]
+        if nxt == '{':
+            close = token.find('}', i + 2)
+            if close == -1:
+                return None
+            name = token[i + 2:close]
+            if (not name
+                    or not all(c.isalnum() or c == '_' for c in name)
+                    or name[0].isdigit()):
+                return None
+            val = os.environ.get(name)
+            if val is None:
+                return None
+            parts.append(val)
+            i = close + 1
+        elif nxt.isalpha() or nxt == '_':
+            j = i + 1
+            while j < len(token) and (token[j].isalnum() or token[j] == '_'):
+                j += 1
+            name = token[i + 1:j]
+            val = os.environ.get(name)
+            if val is None:
+                return None
+            parts.append(val)
+            i = j
+        else:
+            return None
+
+    return ''.join(parts)
+
+
+def _has_glob(s: str) -> bool:
+    """True when *s* contains shell glob characters."""
+    return '*' in s or '?' in s or '[' in s
+
+
 # -- Bash write analysis -------------------------------------------------------
 
 def _is_punct(tok: str) -> bool:
@@ -156,7 +231,11 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
 
     Tokenises with shlex (newline as punctuation, ``#`` not a comment),
     splits on non-redirect punctuation, then inspects each simple command
-    for redirects and the plain write commands (DEC-111).
+    for redirects and the plain write commands (DEC-111).  Each write target
+    is resolved first (DEC-115): ``~``, ``~user`` and environment variables
+    are expanded from the hook's own environment; globs are matched against
+    the file system; anything still unresolvable maps to a sentinel that
+    fails every allow-list check.
     """
     try:
         lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n")
@@ -165,18 +244,37 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
         lex.commenters = ""
         tokens = list(lex)
     except ValueError:
-        return ["<unparseable>"]
+        return [_UNRESOLVABLE]
 
     ecwd = cwd
+    ecwd_ok = True
     targets: list[str] = []
 
-    def res(p: str) -> str:
-        return os.path.realpath(p if os.path.isabs(p) else os.path.join(ecwd, p))
-
-    def redir(p: str) -> None:
-        if os.path.isabs(p) and os.path.realpath(p) == "/dev/null":
+    def _resolve(raw: str) -> None:
+        """Expand, glob-expand and resolve *raw* into *targets*."""
+        exp = _expand_token(raw)
+        if exp is None:
+            targets.append(_UNRESOLVABLE)
             return
-        targets.append(res(p))
+        if '{' in exp or '}' in exp:
+            targets.append(_UNRESOLVABLE)
+            return
+        if os.path.isabs(exp) and os.path.realpath(exp) == "/dev/null":
+            return
+        if not os.path.isabs(exp) and not ecwd_ok:
+            targets.append(_UNRESOLVABLE)
+            return
+        if _has_glob(exp):
+            pat = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+            matches = glob.glob(pat)
+            if not matches:
+                targets.append(_UNRESOLVABLE)
+                return
+            for m in matches:
+                targets.append(os.path.realpath(m))
+            return
+        p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+        targets.append(os.path.realpath(p))
 
     # Split on non-redirect punctuation into simple commands.
     # A punctuation token containing '>' stays with its command (redirect).
@@ -210,7 +308,7 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                     continue
                 # Otherwise the next word-token is the target file.
                 if i + 1 < len(scmd) and not _is_punct(scmd[i + 1]):
-                    redir(scmd[i + 1])
+                    _resolve(scmd[i + 1])
                     i += 2
                     continue
                 i += 1
@@ -234,14 +332,35 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
         name = os.path.basename(words[idx])
         args = words[idx + 1:]
 
-        if name == "cd" and args:
+        if name in ("pushd", "popd"):
+            ecwd_ok = False
+            continue
+        if name == "cd":
+            if not args:
+                h = os.environ.get("HOME")
+                if h is None:
+                    ecwd_ok = False
+                else:
+                    ecwd = h
+                    ecwd_ok = True
+                continue
             d = args[0]
-            ecwd = d if os.path.isabs(d) else os.path.join(ecwd, d)
+            if d.startswith("-"):
+                ecwd_ok = False
+                continue
+            exp = _expand_token(d)
+            if exp is None or _has_glob(exp) or '{' in exp or '}' in exp:
+                ecwd_ok = False
+            elif not os.path.isabs(exp) and not ecwd_ok:
+                pass  # ecwd stays invalid
+            else:
+                ecwd = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+                ecwd_ok = True
             continue
         if name == "tee":
             for a in args:
                 if not a.startswith("-"):
-                    redir(a)
+                    _resolve(a)
             continue
         if name == "sed":
             if any(a in ("-i", "--in-place")
@@ -255,22 +374,22 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                     if not seen_expr:
                         seen_expr = True
                         continue
-                    targets.append(res(a))
+                    _resolve(a)
             continue
         if name in ("touch", "rm", "mkdir"):
             for a in args:
                 if not a.startswith("-"):
-                    targets.append(res(a))
+                    _resolve(a)
             continue
         if name == "mv":
             for a in args:
                 if not a.startswith("-"):
-                    targets.append(res(a))
+                    _resolve(a)
             continue
         if name == "cp":
             nf = [a for a in args if not a.startswith("-")]
             if len(nf) >= 2:
-                targets.append(res(nf[-1]))
+                _resolve(nf[-1])
 
     return targets or None
 
@@ -317,20 +436,23 @@ def decide(
     # Frozen: deny all writes.
     if frozen:
         return "deny", "frozen: all writes denied"
-    if erole not in KNOWN_ROLES:
-        return "deny", f"role '{erole}' is not a known role"
-    if subagent_type is not None and subagent_type not in KNOWN_ROLES:
-        return "deny", f"subagent type '{subagent_type}' is not a known role"
 
-    roles = [erole]
-    if subagent_type is not None and subagent_type != erole:
-        roles.append(subagent_type)
+    # Determine the acting role (DEC-117, DEC-125, DEC-113).
+    if subagent_type is not None:
+        if subagent_type not in KNOWN_ROLES:
+            return "deny", f"subagent type '{subagent_type}' is not a known role"
+        if erole not in KNOWN_ROLES:
+            return "deny", f"role '{erole}' is not a known role"
+        acting_role = subagent_type
+    else:
+        if erole not in KNOWN_ROLES:
+            return "deny", f"role '{erole}' is not a known role"
+        acting_role = erole
 
-    for r in roles:
-        pats = _get_allowed_paths(r, ticket_id, project_root)
-        for tgt in write_targets:
-            if not _path_allowed(tgt, project_root, pats, r):
-                lbl = "Bash write" if tool_name == "Bash" else tool_name
-                return "deny", f"{lbl} to '{tgt}' denied for role '{r}'"
+    pats = _get_allowed_paths(acting_role, ticket_id, project_root)
+    for tgt in write_targets:
+        if not _path_allowed(tgt, project_root, pats, acting_role):
+            lbl = "Bash write" if tool_name == "Bash" else tool_name
+            return "deny", f"{lbl} to '{tgt}' denied for role '{acting_role}'"
 
     return "allow", ""

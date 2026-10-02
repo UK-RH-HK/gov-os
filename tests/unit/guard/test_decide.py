@@ -941,3 +941,693 @@ class TestProbe2Frozen:
             project_root=project, role=None, ticket_id=None,
         )
         assert d == "allow"
+
+
+# ---------------------------------------------------------------------------
+# DEC-125: a role subagent in a session with no role is read-only
+# ---------------------------------------------------------------------------
+
+class TestRoleSubagentNoSessionRole:
+    """DEC-125: a role subagent's role applies only when the session has a role."""
+
+    def test_engineer_subagent_no_session_role_write_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role=None, ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_engineer_subagent_blank_session_role_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_engineer_subagent_unknown_session_role_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="developer", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_designer_subagent_no_session_role_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        (Path(project) / "tests/acceptance").mkdir(parents=True, exist_ok=True)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "tests/acceptance/t.py"), "content": "x"},
+            project_root=project, role=None, ticket_id=TID,
+            subagent_type="independent-test-designer",
+        )
+        assert d == "deny"
+
+    def test_role_subagent_no_session_role_scratch_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".gov-runtime/scratch/n.txt"), "content": "x"},
+            project_root=project, role=None, ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_role_subagent_no_session_role_reads_allowed(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Read",
+            tool_input={"file_path": os.path.join(project, "README.md")},
+            project_root=project, role=None, ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "allow"
+
+
+# ---------------------------------------------------------------------------
+# DEC-117: inside a role subagent, the subagent's role governs
+# ---------------------------------------------------------------------------
+
+class TestRoleSubagentGoverns:
+    """DEC-117: the subagent's role governs; the session's role plays no part."""
+
+    def test_engineer_subagent_in_orchestrator_session_allowed(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "allow"
+
+    def test_engineer_subagent_denied_outside_own_ticket(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_engineer_subagent_denied_acceptance_tests(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        (Path(project) / "tests/acceptance/W1-99").mkdir(parents=True, exist_ok=True)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "tests/acceptance/W1-99/t.py"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_non_role_subagent_in_engineer_session_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+            subagent_type="claude",
+        )
+        assert d == "deny"
+
+    def test_frozen_role_subagent_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        freeze = Path(project) / ".gov-runtime" / "freeze"
+        freeze.parent.mkdir(parents=True, exist_ok=True)
+        freeze.write_text("")
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "deny"
+
+    def test_engineer_subagent_bash_write_allowed(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "echo x > src/foo.py"},
+            project_root=project, role="orchestrator", ticket_id=TID,
+            subagent_type="engineer",
+        )
+        assert d == "allow"
+
+
+# ---------------------------------------------------------------------------
+# DEC-115: Bash target resolution
+# ---------------------------------------------------------------------------
+
+from gov.guard.decide import _expand_token, _has_glob  # noqa: E402
+
+
+class TestExpandToken:
+    """Unit tests for _expand_token: tilde, env vars, unresolvable forms."""
+
+    def test_plain_path(self):
+        assert _expand_token("src/gov/guard/decide.py") == "src/gov/guard/decide.py"
+
+    def test_tilde(self, monkeypatch):
+        monkeypatch.setenv("HOME", "/test/home")
+        assert _expand_token("~/file.py") == "/test/home/file.py"
+
+    def test_tilde_alone(self, monkeypatch):
+        monkeypatch.setenv("HOME", "/test/home")
+        assert _expand_token("~") == "/test/home"
+
+    def test_env_var(self, monkeypatch):
+        monkeypatch.setenv("MY_DIR", "/some/dir")
+        assert _expand_token("$MY_DIR/file.py") == "/some/dir/file.py"
+
+    def test_braced_env_var(self, monkeypatch):
+        monkeypatch.setenv("MY_DIR", "/some/dir")
+        assert _expand_token("${MY_DIR}/file.py") == "/some/dir/file.py"
+
+    def test_command_substitution_dollar_paren(self):
+        assert _expand_token("$(echo hi)") is None
+
+    def test_backtick(self):
+        assert _expand_token("`echo hi`") is None
+
+    def test_trailing_dollar(self):
+        assert _expand_token("src/gov/guard/$") is None
+
+    def test_bare_dollar(self):
+        assert _expand_token("$") is None
+
+    def test_unset_variable(self):
+        assert _expand_token("$UNSET_VAR_THAT_DOES_NOT_EXIST_W102") is None
+
+    def test_unset_braced(self):
+        assert _expand_token("${UNSET_VAR_THAT_DOES_NOT_EXIST_W102}") is None
+
+    def test_complex_brace_form(self, monkeypatch):
+        monkeypatch.setenv("X", "val")
+        assert _expand_token("${X:-default}") is None
+
+    def test_positional_parameter(self):
+        assert _expand_token("${1}") is None
+
+    def test_special_dollar_question(self):
+        assert _expand_token("$?") is None
+
+    def test_special_dollar_dollar(self):
+        assert _expand_token("$$") is None
+
+    def test_empty_token(self):
+        assert _expand_token("") is None
+
+    def test_tilde_unknown_user(self):
+        assert _expand_token("~no_such_user_w102/file") is None
+
+
+class TestTargetResolutionDecide:
+    """DEC-115 through decide(): each unresolvable form is denied."""
+
+    def _project(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        for d in ("src/gov/guard", "docs"):
+            os.makedirs(os.path.join(project, d), exist_ok=True)
+        Path(os.path.join(project, "README.md")).write_text("x")
+        # Set up env vars the guard process would see.
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", project)
+        monkeypatch.setenv("HOME", os.path.join(str(tmp_path), "home"))
+        os.makedirs(os.path.join(str(tmp_path), "home"), exist_ok=True)
+        return project
+
+    # -- redirect targets that are unresolvable → denied --
+
+    @pytest.mark.parametrize("cmd", [
+        "echo changed > $(echo decide.py)",
+        "echo changed > `echo decide.py`",
+        'echo changed > "$(echo decide.py)"',
+        "echo changed > $UNSET_W102_VAR",
+        "echo changed > ${UNSET_W102_VAR}",
+        "echo changed > $UNSET_W102_VAR/notes.py",
+    ])
+    def test_unresolvable_redirect_denied(self, tmp_path, monkeypatch, cmd):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash", tool_input={"command": cmd},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny", f"expected deny for: {cmd}"
+
+    # -- write command arguments that are unresolvable → denied --
+
+    @pytest.mark.parametrize("cmd", [
+        "touch src/gov/guard/$(date +%s).py",
+        "rm src/gov/guard/$UNSET_W102_VAR",
+        "touch src/gov/guard/$UNSET_W102_VAR/file.py",
+    ])
+    def test_unresolvable_write_cmd_denied(self, tmp_path, monkeypatch, cmd):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash", tool_input={"command": cmd},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny", f"expected deny for: {cmd}"
+
+    # -- reads with ~, $, globs must still be allowed (role-less session) --
+
+    @pytest.mark.parametrize("cmd", [
+        "ls ~",
+        "cat $HOME/.profile",
+        "echo $(date)",
+        "ls *.py",
+        "grep -r x src/*",
+    ])
+    def test_reads_with_special_chars_allowed_roleless(self, tmp_path, monkeypatch, cmd):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash", tool_input={"command": cmd},
+            project_root=project, role=None, ticket_id=None, cwd=project,
+        )
+        assert d == "allow", f"expected allow for read: {cmd}"
+
+    # -- cd to unresolvable → relative write denied, reads allowed --
+
+    def test_cd_unresolvable_then_relative_write_denied(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd $UNSET_W102_VAR && echo changed > file.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_cd_unresolvable_then_reads_allowed(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd $UNSET_W102_VAR && ls -la"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    # -- variable with a relative path --
+
+    def test_variable_relative_path_inside(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        monkeypatch.setenv("GUARD_DIR", "src/gov/guard")
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch $GUARD_DIR/new.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_variable_relative_path_outside(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        monkeypatch.setenv("UP", "../../..")
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "echo changed > src/gov/guard/$UP/README.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    # -- glob matching --
+
+    def test_glob_inside_allowed(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        (Path(project) / "src/gov/guard/a.py").write_text("x")
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "rm src/gov/guard/*.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_glob_matching_nothing_denied(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "rm src/gov/guard/*.nomatch"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_glob_with_symlink_outside_denied(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        # Create a symlink from inside guard/ to docs/
+        link = Path(project) / "src/gov/guard/docs_link"
+        link.symlink_to("../../../docs", target_is_directory=True)
+        (Path(project) / "docs/notes.md").write_text("x")
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "rm src/gov/guard/*/notes.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    # -- variable set inside the command → denied --
+
+    def test_variable_set_inside_command_denied(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd src/gov/guard && D=../../.. && echo changed > $D/README.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_variable_exported_inside_command_denied(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "export D=../../..; echo changed > src/gov/guard/$D/README.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    # -- tilde resolved from HOME --
+
+    def test_tilde_redirect_outside_denied(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd src/gov/guard && echo changed > ~/notes.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_tilde_as_project_home_allowed(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        monkeypatch.setenv("HOME", project)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "echo changed > ~/src/gov/guard/new.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    # -- env var expanding to allowed path --
+
+    def test_project_var_inside_allowed(self, tmp_path, monkeypatch):
+        project = self._project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"echo changed > $CLAUDE_PROJECT_DIR/src/gov/guard/new.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    # -- hook-level: target resolution via the hook process --
+
+    def test_hook_tilde_redirect_outside_denied(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        tmpdir = tmp_path / "systmp"
+        tmpdir.mkdir()
+        home = tmp_path / "home"
+        home.mkdir()
+        decision, _, rc = _run_hook(
+            project, "Bash",
+            {"command": "cd src && echo changed > ~/file.py"},
+            role=E, ticket=TID, tmpdir=str(tmpdir),
+        )
+        assert decision == "deny"
+
+    def test_hook_project_var_allowed(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        tmpdir = tmp_path / "systmp"
+        tmpdir.mkdir()
+        env = {"CLAUDE_PROJECT_DIR": str(project)}
+        decision, _, rc = _run_hook(
+            project, "Bash",
+            {"command": "echo changed > $CLAUDE_PROJECT_DIR/src/foo.py"},
+            role=E, ticket=TID, tmpdir=str(tmpdir),
+        )
+        assert decision == "allow"
+
+
+# ---------------------------------------------------------------------------
+# DEC-115 repair: bracket glob, brace expansion, cd-no-arg, pushd/popd
+# ---------------------------------------------------------------------------
+
+def _probe3_project(tmp_path, monkeypatch):
+    """Set up a project matching probe_guard3.py's fixture with a symlink."""
+    tickets = {
+        f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",)),
+    }
+    project = _make_project(tmp_path, tickets)
+    for d in ("src/gov/guard", "docs", "tests/acceptance/W1-90"):
+        os.makedirs(os.path.join(project, d), exist_ok=True)
+    Path(os.path.join(project, "README.md")).write_text("x")
+    Path(os.path.join(project, "docs/notes.md")).write_text("x")
+    Path(os.path.join(project, "src/gov/guard/a.py")).write_text("x")
+    Path(os.path.join(project, "src/gov/guard/b.py")).write_text("x")
+    # Symlink: src/gov/guard/docs_link -> ../../../docs (outside ticket paths)
+    os.symlink(
+        os.path.join(project, "docs"),
+        os.path.join(project, "src/gov/guard/docs_link"),
+    )
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", project)
+    return project
+
+
+class TestProbe3SymlinkGlobBrace:
+    """The four probe-3 mismatches: bracket glob through symlink, brace
+    expansion, cd-no-arg and pushd."""
+
+    def test_bracket_glob_through_symlink_denied(self, tmp_path, monkeypatch):
+        project = _probe3_project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch src/gov/guard/docs_lin[k]/x.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_brace_expansion_through_symlink_denied(self, tmp_path, monkeypatch):
+        project = _probe3_project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch src/gov/guard/docs_lin{k,k}/x.md"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_cd_no_arg_then_relative_write_denied(self, tmp_path, monkeypatch):
+        project = _probe3_project(tmp_path, monkeypatch)
+        monkeypatch.setenv("HOME", os.path.join(str(tmp_path), "home"))
+        os.makedirs(os.path.join(str(tmp_path), "home"), exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd && touch src/gov/guard/a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_pushd_then_relative_write_denied(self, tmp_path, monkeypatch):
+        project = _probe3_project(tmp_path, monkeypatch)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "pushd docs && touch src/gov/guard/a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+
+class TestBracketGlob:
+    """[`-glob: matches inside ticket paths allowed; no match denied."""
+
+    def test_bracket_glob_matching_inside_allowed(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        Path(os.path.join(project, "src/gov/guard/file.py")).write_text("x")
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", project)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch src/gov/guard/fil[e].py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_bracket_glob_matching_nothing_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", project)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch src/gov/guard/nonexisten[t].py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+
+class TestBraceExpansion:
+    """Brace expansion without symlinks: always denied."""
+
+    def test_brace_no_link_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        monkeypatch.setenv("CLAUDE_PROJECT_DIR", project)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "touch src/gov/guard/{a,b}.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+
+class TestCdNoArg:
+    """cd with no argument: goes to HOME."""
+
+    def test_cd_no_arg_home_is_guard_dir_allowed(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        guard = os.path.join(project, "src/gov/guard")
+        os.makedirs(guard, exist_ok=True)
+        monkeypatch.setenv("HOME", guard)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd && touch a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_cd_no_arg_home_is_elsewhere_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        home = tmp_path / "home"
+        home.mkdir()
+        monkeypatch.setenv("HOME", str(home))
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd && touch a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+
+class TestCdDashAndDoubleDash:
+    """cd -, cd -- x, pushd, popd followed by relative/absolute writes."""
+
+    def test_cd_dash_then_relative_write_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "cd - && touch a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_cd_doubledash_then_relative_write_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        guard = os.path.join(project, "src/gov/guard")
+        os.makedirs(guard, exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"cd -- {guard} && touch a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_pushd_then_relative_write_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "pushd src && touch a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_popd_then_relative_write_denied(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        os.makedirs(os.path.join(project, "src/gov/guard"), exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "popd && touch a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "deny"
+
+    def test_cd_dash_then_absolute_write_inside_allowed(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        guard = os.path.join(project, "src/gov/guard")
+        os.makedirs(guard, exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"cd - && touch {guard}/a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_cd_doubledash_then_absolute_write_inside_allowed(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        guard = os.path.join(project, "src/gov/guard")
+        os.makedirs(guard, exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"cd -- {guard} && touch {guard}/a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_pushd_then_absolute_write_inside_allowed(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        guard = os.path.join(project, "src/gov/guard")
+        os.makedirs(guard, exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"pushd src && touch {guard}/a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+    def test_popd_then_absolute_write_inside_allowed(self, tmp_path, monkeypatch):
+        tickets = {f"{TID}.md": _ticket(allowed_paths=("src/gov/guard/**",))}
+        project = _make_project(tmp_path, tickets)
+        guard = os.path.join(project, "src/gov/guard")
+        os.makedirs(guard, exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"popd && touch {guard}/a.py"},
+            project_root=project, role=E, ticket_id=TID, cwd=project,
+        )
+        assert d == "allow"
+
+
+class TestReadsWithGlobBraceCdPushdRoleless:
+    """Reads with glob, brace, cd-no-arg, pushd stay allowed in role-less sessions."""
+
+    @pytest.mark.parametrize("cmd", [
+        "ls [a-z]*",
+        "echo {a,b}",
+        "cd && ls",
+        "pushd docs && ls",
+    ])
+    def test_roleless_reads_allowed(self, tmp_path, cmd):
+        project = _make_project(tmp_path)
+        os.makedirs(os.path.join(project, "docs"), exist_ok=True)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": cmd},
+            project_root=project, role=None, ticket_id=None, cwd=project,
+        )
+        assert d == "allow", f"expected allow for role-less read: {cmd}"
