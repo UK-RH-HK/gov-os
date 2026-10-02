@@ -66,6 +66,8 @@ Edge cases of the install rule (W1-04), recorded by the orchestrator under DEC-1
 - `yarn add`, `pnpm add`, `make install` and package managers the rule does not list are not seen.
 - Evasive spellings (an alias, a variable holding the command, `bash -c`, `eval`, `base64`) are not seen.
 - The rule asks about some commands that install nothing: a line that reads like an install inside a here-document, and the word `install` among a listed package manager's arguments.
+- An option before `-m` (`python3 -u -m pip install …`), or an option with a value before `uv`'s subcommand (`uv --directory <path> pip install …`), hides the install. Found by the reviewer's probe of the W1-04 repair.
+- A program name that is a listed package manager followed by digits, where no such program exists (`gem2 install …`), is asked about; so is `uv` with an option whose value is the word `pip` or `tool`.
 
 The settings rules for install commands remain as the second line (DEC-120).
 
