@@ -81,6 +81,18 @@ def _deny(reason: str = "") -> None:
     sys.exit(0)
 
 
+def _ask(reason: str = "") -> None:
+    output = {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "ask",
+            "permissionDecisionReason": reason,
+        }
+    }
+    sys.stdout.write(json.dumps(output))
+    sys.exit(0)
+
+
 def _allow() -> None:
     sys.exit(0)
 
@@ -157,7 +169,7 @@ def main() -> None:
               session_id=session_id, tool_name=tool_name)
 
     try:
-        from gov.guard.decide import decide
+        from gov.guard.decide import decide, FREEZE_FLAG
     except Exception as exc:
         session_id = data.get("session_id", "")
         _fail(project_root, "import_error", f"cannot import guard logic: {exc}",
@@ -186,14 +198,44 @@ def main() -> None:
     if decision == "deny":
         _deny(reason)
     else:
-        # For Bash calls that are not denied, take the before-snapshot
-        # (DEC-126).  The snapshot runs for any non-deny decision
-        # (allow and future 'ask').
         if tool_name == "Bash":
-            _take_snapshot(project_root, data)
+            # Install rule (W1-04, DEC-120): after the guard allows a
+            # Bash call, check for sudo and install commands.
+            command = tool_input.get("command", "")
+            try:
+                from gov.guard.install import has_sudo, has_install, acting_role
+            except Exception as exc:
+                session_id = data.get("session_id", "")
+                _fail(project_root, "import_error",
+                      f"cannot import install rule: {exc}",
+                      session_id=session_id, tool_name=tool_name)
+            if has_sudo(command):
+                _deny("sudo is denied to all agent roles (DEC-083)")
+            elif has_install(command):
+                if os.path.exists(os.path.join(project_root, FREEZE_FLAG)):
+                    _deny("frozen: install denied")
+                ar = acting_role(role, subagent_type)
+                if ar == "orchestrator":
+                    # The owner may approve; take the before-snapshot
+                    # so containment can run if the command executes.
+                    _take_snapshot(project_root, data)
+                    _ask(f"install command requires owner approval "
+                         f"(tool registry record required): {command}")
+                else:
+                    _deny(
+                        f"install by role "
+                        f"'{ar or 'none'}' denied: only the "
+                        f"orchestrator may propose installs")
+            else:
+                # Non-install Bash: take the before-snapshot (DEC-126)
+                # and allow.
+                _take_snapshot(project_root, data)
+                _allow()
         elif tool_name in ("Write", "Edit", "NotebookEdit"):
             _note_write_tool(project_root)
-        _allow()
+            _allow()
+        else:
+            _allow()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "tool-registry",
+  "description": "Registry of tools approved for use in a governed project (CAP-25.a).",
+  "type": "object",
+  "required": ["tools"],
+  "properties": {
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "sha256",
+          "install",
+          "uninstall",
+          "date",
+          "approved_by"
+        ],
+        "properties": {
+          "name": { "type": "string" },
+          "version": { "type": "string" },
+          "sha256": { "type": "string" },
+          "install": { "type": "string" },
+          "uninstall": { "type": "string" },
+          "date": { "type": "string" },
+          "approved_by": { "type": "string" }
+        }
+      }
+    }
+  }
+}
