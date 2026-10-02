@@ -1,6 +1,6 @@
 ---
 id: DAEO-8qvp
-status: closed
+status: in_progress
 deps: [DAEO-emkd]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -42,3 +42,9 @@ acceptance_tests:
 # W1-03 Post-command containment check
 
 Second line of defence for Bash writes the guard cannot parse (G-02, moved to W1 by DEC-076).
+
+## Notes
+
+**2026-10-02T18:46:34Z**
+
+Reopened and claimed 2026-10-02 as a repair for DEC-142 (W1-03 KD-5: a snapshot of another actor's call known to be over no longer blocks restoration) and DEC-143 (W1-03 KD-6: an acceptance test changed in a call that also moves HEAD non-forward is restored from the pre-call HEAD when attribution is certain). Claimed before the test design request (DEC-133); implementation waits for TESTS READY. KPIs unchanged.
