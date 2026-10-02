@@ -32,6 +32,7 @@ import re
 import shlex
 import shutil
 import subprocess
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -51,10 +52,19 @@ ROLES = (ORCHESTRATOR, ENGINEER, PRODUCT_SPEC, TEST_DESIGNER, AUDITOR)
 
 WRITE_TOOLS = ("Edit", "Write", "NotebookEdit", "Bash")
 FILE_TOOLS = ("Edit", "Write", "NotebookEdit")
+READ_ONLY_TOOLS = ("Read", "Grep", "Glob")
+# "Every tool" cannot be listed, so the tests ask for these names: the write and
+# read-only tools, other tools of the harness, a tool of an MCP server, and a
+# name that no list written today can hold.
+OTHER_TOOLS = ("Agent", "Task", "TodoWrite", "WebFetch", "WebSearch", "mcp__github__create_issue",
+               "ToolAddedAfterTheSwitchOver")
+EVERY_TOOL = WRITE_TOOLS + READ_ONLY_TOOLS + OTHER_TOOLS
 DEPENDENCIES = ("W1-02", "W1-03", "W1-04")
 
 COMMAND_TIMEOUT_S = 30.0
 SESSION_ID = "w1-05-acceptance-session"
+TOOL_USE_ID = "toolu_w1_05_acceptance"
+SUBAGENT_ID = "agent-w1-05-acceptance"
 
 # A ticket added to the copy only, so that a role has something to work on.
 FIXTURE_TICKET_ID = "DAEO-zz90"
@@ -113,6 +123,11 @@ def is_switched_over(settings):
     """The guard is wired before every write tool and the containment check after Bash."""
     return (all(hook_commands(settings, "PreToolUse", tool) for tool in WRITE_TOOLS)
             and bool(hook_commands(settings, "PostToolUse", "Bash")))
+
+
+def is_wired_for_every_tool(settings):
+    """Switched over, and a PreToolUse command runs for every tool, not for the write tools alone (DEC-142, DEC-144)."""
+    return is_switched_over(settings) and all(hook_commands(settings, "PreToolUse", tool) for tool in EVERY_TOOL)
 
 
 # --------------------------------------------------------------------------
@@ -307,7 +322,14 @@ def command_environment(project, sandbox, role=None, ticket=None):
     return env
 
 
-def hook_input(project, sandbox, event, tool_name, tool_input, subagent=None, permission_mode="default"):
+def hook_input(project, sandbox, event, tool_name, tool_input, subagent=None, permission_mode="default",
+               agent_id=None, tool_use_id=TOOL_USE_ID):
+    """The JSON object of one hook run.
+
+    The actor is the session and, inside a subagent, its ``agent_id``. A call is
+    its ``tool_use_id``: the PreToolUse and PostToolUse runs of one call share
+    it, and two calls of one test that must be told apart get different ones.
+    """
     data = {
         "session_id": SESSION_ID,
         "transcript_path": str(sandbox.home / ".claude" / "projects" / "gov-os" / f"{SESSION_ID}.jsonl"),
@@ -316,14 +338,14 @@ def hook_input(project, sandbox, event, tool_name, tool_input, subagent=None, pe
         "hook_event_name": event,
         "tool_name": tool_name,
         "tool_input": tool_input,
-        "tool_use_id": "toolu_w1_05_acceptance",
+        "tool_use_id": tool_use_id,
     }
     if event == "PostToolUse":
         data["tool_response"] = {"stdout": "", "stderr": "", "interrupted": False, "isImage": False}
     if event == "PostToolUseFailure":
         data.update({"error": "Exit code 1", "error_type": "tool_error", "is_interrupt": False, "is_timeout": False})
     if subagent is not None:
-        data["agent_id"] = "agent-w1-05-acceptance"
+        data["agent_id"] = agent_id or SUBAGENT_ID
         data["agent_type"] = subagent
     return data
 
@@ -373,33 +395,81 @@ def _permission_decision(result):
 class Decision:
     decision: str          # deny | ask | allow | error
     detail: str
+    ran: int = 0           # how many registered PreToolUse commands the call reached
 
     def describe(self):
         return f"decision={self.decision} ({self.detail})"
 
 
+def _combined(results):
+    decisions = [_permission_decision(result) for result in results]
+    detail = "; ".join(result.describe() for result in results) or "no PreToolUse hook is registered for the tool"
+    for outcome in ("deny", "error", "ask"):
+        if outcome in decisions:
+            return Decision(outcome, detail, len(results))
+    return Decision("allow", detail, len(results))
+
+
 def pre_tool_use(project, settings, sandbox, tool_name, tool_input, role=None, ticket=None, subagent=None,
-                 permission_mode="default"):
+                 permission_mode="default", agent_id=None, tool_use_id=TOOL_USE_ID):
     """What the settings file and its PreToolUse hooks decide about one call."""
     rule = denied_by_settings(settings, tool_name, tool_input, project)
     if rule is not None:
         return Decision("deny", f"permissions.deny rule {rule}")
     commands = hook_commands(settings, "PreToolUse", tool_name)
-    stdin_object = hook_input(project, sandbox, "PreToolUse", tool_name, tool_input, subagent, permission_mode)
-    results = run_commands(project, commands, stdin_object, sandbox, role, ticket)
-    decisions = [_permission_decision(result) for result in results]
-    detail = "; ".join(result.describe() for result in results) or "no PreToolUse hook is registered for the tool"
-    for outcome in ("deny", "error", "ask"):
-        if outcome in decisions:
-            return Decision(outcome, detail)
-    return Decision("allow", detail)
+    stdin_object = hook_input(project, sandbox, "PreToolUse", tool_name, tool_input, subagent, permission_mode,
+                              agent_id, tool_use_id)
+    return _combined(run_commands(project, commands, stdin_object, sandbox, role, ticket))
 
 
-def post_bash(project, settings, sandbox, command, role=None, ticket=None, subagent=None, event="PostToolUse"):
+def timed_pre_tool_use(project, settings, sandbox, tool_name, tool_input, role=None, ticket=None, subagent=None):
+    """One call's wait for its PreToolUse hooks, as the harness makes it. Returns ``(Decision, seconds)``.
+
+    The harness starts every command registered for the tool at once and waits
+    for all of them. The time is the wall-clock time from the first start to the
+    last exit, with the shell that runs each command.
+    """
+    commands = hook_commands(settings, "PreToolUse", tool_name)
+    payload = json.dumps(hook_input(project, sandbox, "PreToolUse", tool_name, tool_input, subagent))
+    env = command_environment(project, sandbox, role, ticket)
+    started = time.perf_counter()
+    running = []
+    for command in commands:
+        proc = subprocess.Popen(["sh", "-c", command], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True, cwd=str(project), env=env)
+        try:
+            proc.stdin.write(payload)
+            proc.stdin.close()
+        except OSError:
+            pass   # the command ended without reading its input
+        proc.stdin = None
+        running.append(proc)
+    results = []
+    for command, proc in zip(commands, running):
+        # communicate() returns when the command closes its output; wait(timeout=...) would poll, up to 50 ms late.
+        try:
+            stdout, stderr = proc.communicate(timeout=COMMAND_TIMEOUT_S)
+            results.append(CommandResult(command, proc.returncode, stdout, stderr))
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.communicate()
+            results.append(CommandResult(command, None, "", "timed out"))
+    return _combined(results), time.perf_counter() - started
+
+
+def p95(samples):
+    """The 95th percentile by nearest rank, as in W1-02's tests."""
+    ordered = sorted(samples)
+    return ordered[max(0, -(-95 * len(ordered) // 100) - 1)]
+
+
+def post_bash(project, settings, sandbox, command, role=None, ticket=None, subagent=None, event="PostToolUse",
+              agent_id=None, tool_use_id=TOOL_USE_ID):
     """Run the commands registered after a Bash call. Returns the text that reaches the agent."""
     commands = hook_commands(settings, event, "Bash")
     stdin_object = hook_input(project, sandbox, event, "Bash",
-                              {"command": command, "description": "W1-05 acceptance call"}, subagent)
+                              {"command": command, "description": "W1-05 acceptance call"}, subagent,
+                              agent_id=agent_id, tool_use_id=tool_use_id)
     results = run_commands(project, commands, stdin_object, sandbox, role, ticket)
     texts = []
     for result in results:
@@ -428,7 +498,7 @@ def run_bash(project, command, sandbox):
 
 
 def bash_call(project, settings, sandbox, command, role=None, ticket=None, subagent=None, event="PostToolUse",
-              changed=()):
+              changed=(), agent_id=None, tool_use_id=TOOL_USE_ID):
     """One whole Bash call through the wiring: PreToolUse commands, the command for real, then ``event``.
 
     The containment check takes its before-snapshot in PreToolUse and acts only
@@ -445,7 +515,8 @@ def bash_call(project, settings, sandbox, command, role=None, ticket=None, subag
     script = directory / f"call-{len(list(directory.iterdir())) + 1:04d}.sh"
     script.write_text(command + "\n", encoding="utf-8")
     call = f"bash {shlex.quote(str(script))}"
-    before = pre_tool_use(project, settings, sandbox, "Bash", bash_input(call), role, ticket, subagent)
+    before = pre_tool_use(project, settings, sandbox, "Bash", bash_input(call), role, ticket, subagent,
+                          agent_id=agent_id, tool_use_id=tool_use_id)
     assert before.decision == "allow", (
         f"the registered PreToolUse commands did not let the fixture call `{call}` through, "
         f"so no Bash call would follow: {before.describe()}"
@@ -454,7 +525,7 @@ def bash_call(project, settings, sandbox, command, role=None, ticket=None, subag
     status = git(project, "status", "--porcelain", "--untracked-files=all")
     for relpath in changed:
         assert relpath in status, f"the fixture command `{command}` did not change {relpath}:\n{status}"
-    return post_bash(project, settings, sandbox, call, role, ticket, subagent, event)
+    return post_bash(project, settings, sandbox, call, role, ticket, subagent, event, agent_id, tool_use_id)
 
 
 def write_input(tool_name, path):
@@ -470,6 +541,17 @@ def write_input(tool_name, path):
 
 def bash_input(command):
     return {"command": command, "description": "W1-05 acceptance attempt"}
+
+
+def read_input(tool_name, project):
+    """The input of a read-only tool that looks at the copy."""
+    if tool_name == "Read":
+        return {"file_path": str(Path(project) / "README.md")}
+    if tool_name == "Grep":
+        return {"pattern": "guard", "path": str(project)}
+    if tool_name == "Glob":
+        return {"pattern": "**/*.py", "path": str(project)}
+    raise ValueError(tool_name)
 
 
 # --------------------------------------------------------------------------
