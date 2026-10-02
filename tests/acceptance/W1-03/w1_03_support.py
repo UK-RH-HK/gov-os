@@ -4,7 +4,8 @@ The containment check is driven the way the harness drives it around one Bash
 call (DEC-124):
 
 1. the kernel's PreToolUse hook runs with the call on stdin; this is where the
-   check takes its before-snapshot (DEC-126);
+   check takes its before-snapshot of the changed paths and of ``HEAD``
+   (DEC-126; owner answer to KD-4);
 2. the command runs for real in a throw-away project;
 3. the PostToolUse hook runs with the same call on stdin, and the test reads its
    exit code, stdout and stderr, the working tree, and
@@ -328,6 +329,14 @@ def head_text(project, relpath):
     return git(project, "show", f"HEAD:{relpath}")
 
 
+def head(project):
+    """Where ``HEAD`` is: (commit id, branch name), the branch name empty when ``HEAD`` is detached."""
+    commit = git(project, "rev-parse", "HEAD").strip()
+    proc = subprocess.run(["git", "-C", str(project), "symbolic-ref", "-q", "--short", "HEAD"],
+                          capture_output=True, text=True, check=False)
+    return commit, proc.stdout.strip()
+
+
 def read(project, relpath):
     """Text of a file in the working tree; ``None`` when it does not exist."""
     path = Path(project) / relpath
@@ -589,8 +598,8 @@ def new_findings(result, what):
         assert isinstance(data, dict), f"{what}: a line of {FINDINGS_REL} is not a JSON object: {line[:300]!r}"
         missing = [name for name in FINDING_FIELDS if name not in data]
         assert not missing, f"{what}: the finding lacks {', '.join(missing)}: {line[:400]!r}"
-        paths = data["paths"]
-        assert isinstance(paths, list) and paths and all(isinstance(p, str) and p.strip() for p in paths), (
+        paths = data["paths"]   # may be empty for a HEAD move between two commits that hold the same files
+        assert isinstance(paths, list) and all(isinstance(p, str) and p.strip() for p in paths), (
             f"{what}: `paths` of the finding is not a list of path names: {paths!r}"
         )
         assert data["action"] in ACTIONS, (

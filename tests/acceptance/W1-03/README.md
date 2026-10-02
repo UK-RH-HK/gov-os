@@ -1,14 +1,14 @@
 # W1-03 — Post-command containment check: acceptance tests
 
 Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-8qvp` (W1-03), the Contract v4
-item it cites (CAP-58.a) and the decisions that bind the check. Written before implementation, in two batches:
+item it cites (CAP-58.a) and the decisions that bind the check. Written before implementation, in three batches:
 
 - batch 1 (commit `a389ebc`): the report to the agent, the restore of `tests/acceptance/**`, in-scope work left alone;
-- batch 2 (this one, on `w1/integrate` at `01ff589`): the finding record (DEC-122), the nine I-06 forms (DEC-123), a
-  tree that was already dirty before the call (DEC-124, DEC-126), and role subagents in a session with no role
-  (DEC-125).
-
-One effect of one form is not tested and is with the owner as KD-4; see [Not tested](#not-tested).
+- batch 2 (commit `5aeb62a`): the finding record (DEC-122), the nine I-06 forms (DEC-123), a tree that was already
+  dirty before the call (DEC-124, DEC-126), and role subagents in a session with no role (DEC-125);
+- batch 3 (this one, on `w1/integrate` at `aa649af`): a call that moves `HEAD`, after the owner's answer of
+  2026-10-02 to KD-4. That answer is not in `docs/DECISION_REGISTER.md` at `aa649af`; it is quoted under
+  [A call that moves HEAD](#a-call-that-moves-head-kd-4).
 
 ## Run
 
@@ -18,14 +18,14 @@ python3 -m pytest tests/acceptance/W1-03 -q
 
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. Each test builds a small git project
 in a temporary directory and makes whole Bash calls in it: the PreToolUse hook, the command for real, the PostToolUse
-hook. Nothing in the repository is written. The run takes about 40 seconds once the hook exists.
+hook. Nothing in the repository is written. The run takes about 45 seconds once the hook exists.
 
-Fifteen cases need a program that a machine may lack (`perl`, `ruby`, `node`, `curl`, `base64`, three cases each); a
-case is skipped where its program is missing. All five are present on the owner's machine.
+Sixteen cases need a program that a machine may lack (`perl` four cases; `ruby`, `node`, `curl`, `base64` three
+each); a case is skipped where its program is missing. All five are present on the owner's machine.
 
 ## KPI → tests → red reason today
 
-Red run on `w1/integrate` at `01ff589`: **202 errors, 0 passed** (202 cases, 55 test functions). Every case errors in
+Red run on `w1/integrate` at `aa649af`: **240 errors, 0 passed** (240 cases, 66 test functions). Every case errors in
 the `hook` fixture with the same reason: **no file matches `template/governance/kernel/hooks/posttooluse*`** — the
 containment hook does not exist. That is the red reason for every row below.
 
@@ -34,6 +34,7 @@ containment hook does not exist. That is the red reason for every row below.
 | **Success 1.** After every Bash call and at gov close, `git status --porcelain` is compared with `allowed_paths`; a change outside them is reported to the agent and recorded as a containment finding [CAP-58.a] — *the run at `gov close` is left to W1-30, see [Not tested](#not-tested)* | `test_w1_03_out_of_scope.py` | `test_a_change_outside_the_ticket_paths_is_reported` · `test_one_call_with_both_kinds_reports_only_the_outside_change` · `test_a_new_directory_is_judged_file_by_file` · `test_the_comparison_follows_the_active_ticket` · `test_each_ticket_role_is_compared_with_its_own_ticket` · `test_a_session_without_ticket_paths_has_every_change_reported` · `test_the_test_designer_is_reported_outside_acceptance_tests` · `test_a_failed_call_is_checked_too` · `test_inside_a_subagent_the_subagent_s_role_is_compared` · `test_nothing_is_reported_on_a_clean_tree` · `test_scratch_writes_are_not_reported` |
 | | `test_w1_03_finding_record.py` | `test_an_out_of_scope_change_is_recorded_as_one_finding` · `test_the_findings_file_is_one_json_object_per_line` · `test_the_finding_names_every_out_of_scope_path_and_no_other` · `test_the_recorded_action_tells_what_happened_to_the_change` · `test_one_call_with_both_kinds_records_what_was_done_with_each` · `test_a_run_that_finds_nothing_records_nothing` · `test_earlier_lines_of_the_findings_file_stay` · `test_a_finding_inside_a_subagent_names_the_subagent_type` · `test_a_session_without_role_and_ticket_is_recorded_without_them` · `test_a_failed_call_is_recorded_too` · `test_the_findings_file_does_not_show_in_git_status` |
 | | `test_w1_03_dirty_tree.py` | `test_an_out_of_scope_change_is_reported_once` · `test_only_the_new_change_is_reported_on_a_dirty_tree` · `test_without_a_before_snapshot_a_change_is_flagged_and_not_reverted` · `test_the_before_snapshot_leaves_no_trace_in_git_status` |
+| | `test_w1_03_head_moves.py` | `test_a_commit_of_a_path_outside_the_ticket_paths_is_flagged` (8 cases) · `test_the_commit_is_judged_by_the_caller_s_own_paths` · `test_a_commit_and_an_uncommitted_change_in_one_call_are_both_caught` · `test_a_commit_made_by_a_failed_call_is_flagged_too` · `test_committing_another_role_s_uncommitted_work_is_flagged` |
 | | `test_w1_03_bash_forms.py` | `test_a_write_the_guard_cannot_see_is_reported` (24 forms) |
 | | `test_w1_03_hook.py` | `test_the_check_works_from_what_the_call_left_behind` |
 | **Success 2.** Changes under `tests/acceptance/**` by a non-test-designer role are restored from HEAD and the breach is recorded | `test_w1_03_test_independence.py` | `test_an_engineer_s_change_under_acceptance_tests_is_restored_from_head` · `test_every_session_but_the_test_designer_s_is_restored` · `test_inside_a_subagent_the_subagent_s_role_decides_the_restore` |
@@ -41,16 +42,17 @@ containment hook does not exist. That is the red reason for every row below.
 | | `test_w1_03_dirty_tree.py` | `test_the_restore_takes_back_only_what_this_call_changed` |
 | | `test_w1_03_bash_forms.py` | `test_an_unseen_write_to_an_acceptance_test_is_reported_and_restored` (10 forms) |
 | | `test_w1_03_i06_forms.py` | `test_an_i06_form_into_the_acceptance_tests_is_restored_and_recorded` · `test_git_checkout_of_an_older_acceptance_test_is_restored_from_head` |
-| **Success 3.** All nine Bash write forms from S0b2 I-06 are caught — *one effect of form 8 is not tested: KD-4* | `test_w1_03_i06_forms.py` | `test_an_i06_form_outside_the_ticket_paths_is_caught` · `test_an_i06_form_into_the_acceptance_tests_is_restored_and_recorded` · `test_an_i06_form_given_word_for_word_passes_neither_line_unseen` (13 cases each, forms 1 to 7 and 9) · `test_git_checkout_of_an_older_revision_outside_the_ticket_paths_is_caught` · `test_git_checkout_of_an_older_acceptance_test_is_restored_from_head` · `test_a_git_command_that_discards_another_role_s_uncommitted_work_is_caught` · `test_discarding_one_s_own_uncommitted_work_is_no_finding` (form 8) |
-| **Failure 1.** Any out-of-scope change survives without a finding | every file | Every Success 1, 2 and 3 test: each one now requires the finding next to the report (`assert_caught`). Sharpest: `test_the_finding_names_every_out_of_scope_path_and_no_other` · `test_a_git_command_that_discards_another_role_s_uncommitted_work_is_caught` · `test_a_new_directory_is_judged_file_by_file` |
+| **Success 3.** All nine Bash write forms from S0b2 I-06 are caught | `test_w1_03_i06_forms.py` | `test_an_i06_form_outside_the_ticket_paths_is_caught` · `test_an_i06_form_into_the_acceptance_tests_is_restored_and_recorded` · `test_an_i06_form_given_word_for_word_passes_neither_line_unseen` (13 cases each, forms 1 to 7 and 9) · `test_git_checkout_of_an_older_revision_outside_the_ticket_paths_is_caught` · `test_git_checkout_of_an_older_acceptance_test_is_restored_from_head` · `test_a_git_command_that_discards_another_role_s_uncommitted_work_is_caught` · `test_discarding_one_s_own_uncommitted_work_is_no_finding` (form 8) |
+| | `test_w1_03_head_moves.py` | Form 8 when it moves `HEAD`: `test_any_other_head_move_is_flagged_and_never_reverted` (8 moves) · `test_a_head_move_is_flagged_whoever_makes_it` · `test_a_reset_that_undoes_only_one_s_own_commit_is_flagged_too` · `test_a_mixed_reset_does_not_cost_an_acceptance_test_its_content` |
+| **Failure 1.** Any out-of-scope change survives without a finding | every file | Every Success 1, 2 and 3 test: each one now requires the finding next to the report (`assert_caught`). Sharpest: `test_the_finding_names_every_out_of_scope_path_and_no_other` · `test_a_git_command_that_discards_another_role_s_uncommitted_work_is_caught` · `test_a_new_directory_is_judged_file_by_file` · `test_a_commit_of_a_path_outside_the_ticket_paths_is_flagged` (the tree is clean after the call) |
 | **Failure 2.** A legitimate in-scope change is reverted | `test_w1_03_out_of_scope.py` | `test_a_change_inside_the_ticket_paths_is_left_alone` · `test_one_call_with_both_kinds_reports_only_the_outside_change` · `test_a_new_directory_is_judged_file_by_file` · `test_scratch_writes_are_not_reported` · `test_the_check_adds_nothing_to_git_status` |
 | | `test_w1_03_test_independence.py` | `test_the_restore_leaves_the_engineer_s_own_work_alone` · `test_the_test_designer_s_changes_stay` · `test_the_test_designer_s_scope_does_not_depend_on_the_ticket_paths` |
 | | `test_w1_03_dirty_tree.py` | `test_the_test_designer_s_uncommitted_tests_survive_another_role_s_call` · `test_the_caller_s_own_change_is_judged_and_the_earlier_work_is_not` · `test_an_engineer_s_uncommitted_work_is_not_reported_after_another_role_s_call` · `test_a_path_already_changed_before_the_call_is_never_put_back_to_head` · `test_without_a_before_snapshot_another_role_s_uncommitted_tests_are_not_restored` · `test_without_a_before_snapshot_an_in_scope_change_is_still_silent` · `test_the_snapshot_of_an_earlier_call_is_not_used_for_a_later_one` · `test_a_change_made_by_an_overlapping_call_is_not_reverted` |
+| | `test_w1_03_head_moves.py` | `test_a_commit_inside_the_caller_s_paths_is_silent` (6 cases) · `test_committing_only_one_s_own_paths_on_a_dirty_tree_is_silent` · the "never reverted" half of every HEAD-move test |
 | **CAP-58.a** default-deny allow-lists per role and ticket; checks derived, not enumerated | `test_w1_03_hook.py` and the Success 1 files | `test_containment_hook_ships_in_the_kernel_template` · the Success 1 and Failure 2 tests |
 
-**Count.** KPI lines with tests: 5 of 5. Covers ids with tests: 1 of 1. Two clauses inside those lines have no test:
-"at gov close" (Success 1, left to W1-30) and a `git reset --hard` or `git checkout` that moves `HEAD` (Success 3,
-KD-4).
+**Count.** KPI lines with tests: 5 of 5. Covers ids with tests: 1 of 1. One clause inside those lines has no test:
+"at gov close" (Success 1, left to W1-30).
 
 ## Decisions the tests rely on
 
@@ -59,6 +61,8 @@ KD-4).
 | DEC-122 | A finding is one JSON line in `.gov-runtime/findings.jsonl`, the guard's file, with `time`, `session_id`, `agent_type`, `role`, `ticket`, `tool`, `command`, `paths`, `action` (`reverted` or `flagged`) and `reason` |
 | DEC-123 | The nine I-06 forms are tested by their effect inside the repository. A write outside it is not tested (accepted residual) |
 | DEC-124 | Only the current call's changes are acted on. The before-snapshot is taken in PreToolUse and compared in PostToolUse. A path already changed before the call is never touched. Uncertain attribution: flag, no revert |
+| Owner answer to KD-4 (2026-10-02) | The before-snapshot also holds `HEAD`. Forward on the same branch: the paths of the new commits are checked, and anything outside is flagged. Any other move: flagged, never reverted |
+| Owner confirmation (2026-10-02) | The readings of DEC-124 listed under "A tree that was already dirty" stand |
 | DEC-126 | The before-snapshot is taken by the kernel's PreToolUse hook, the guard's. The tests run that hook before every call |
 | DEC-125 | In a session with no declared role, a role subagent has no write either |
 | DEC-107 | Role and active ticket come from `GOV_ROLE` and `GOV_TICKET`. Missing or unknown role: no paths |
@@ -139,7 +143,8 @@ What the tests require of each line the check adds:
 - It holds all ten fields. `tool` is `Bash`. `session_id` and `command` are the hook input's. `time` and `reason` are
   not empty. `action` is `reverted` or `flagged`.
 - `paths` is a list of path names. The tests accept a path relative to the repository or absolute inside it. A new
-  directory may be recorded as the directory or as the files in it.
+  directory may be recorded as the directory or as the files in it. The list may be empty only for a `HEAD` move that
+  is not a move forward.
 - `role` and `ticket` are what the session declared in `GOV_ROLE` and `GOV_TICKET`, tested on a call outside any
   subagent; both are empty when the session declared none. `agent_type` is the subagent's type inside a subagent and
   empty outside one.
@@ -162,8 +167,8 @@ What the tests require of each line the check adds:
   is as it was before the call. The engineer's new file inside the test designer's new, untracked directory is removed
   and the designer's file next to it stays; this needs every untracked file compared by itself.
 
-Readings of DEC-124 that the tests hold the check to. Each follows from the decision's text; the owner can overrule
-any of them:
+Readings of DEC-124 that the tests hold the check to. The owner confirmed them on 2026-10-02 (reading 2 as part of
+reading 1):
 
 1. **No before-snapshot for the call means attribution is uncertain.** The PreToolUse hook did not run or timed out
    (DEC-110). Every out-of-scope change in the tree is reported and recorded as `flagged`, and none is reverted, an
@@ -177,6 +182,47 @@ any of them:
 5. **A path that was changed before the call and no longer is, was changed by the call.** This is the effect of
    `git reset --hard` and `git checkout -- .` (I-06 form 8). Outside the caller's paths it is reported and recorded;
    the tests take no side on `action`. Discarding one's own in-scope work is no finding.
+
+## A call that moves HEAD (KD-4)
+
+The owner's answer of 2026-10-02, quoted: *"Containment also snapshots `HEAD` before the call. If `HEAD` moves forward
+on the same branch (a normal commit), the paths in the new commits are checked against the allowed paths, and anything
+outside is flagged. Any other `HEAD` move (`git reset`, a checkout of another branch, a rebase) is flagged and never
+reverted."*
+
+After such a call `git status --porcelain` is clean, or shows changes the call did not write. The tests are in
+`test_w1_03_head_moves.py`; each makes one whole call and checks that `HEAD` moved.
+
+**Forward on the same branch.**
+
+- A commit that holds a path outside the caller's paths is reported and recorded with action `flagged`, for each such
+  path: one file, several commits in one call, a new file, a deleted file, an acceptance test, a write through
+  `perl -e` committed in the same call, and a fast-forward merge of a branch that is ahead.
+- **A committed acceptance test is flagged, not restored.** HEAD now holds the change, so "restored from HEAD" has
+  nothing to restore; the check does not rewrite history.
+- A path inside the caller's paths in the same commit is neither reported nor recorded.
+- **An ordinary commit of one's own work is silent:** the engineer's source, the test designer's acceptance tests, the
+  orchestrator's file on its own ticket, an engineer subagent's source.
+- The caller's own paths decide, as everywhere: no role, a role without a ticket, a role on another role's ticket, a
+  subagent that is not a role, and a role subagent in a session with no role have no paths, so their commit is flagged.
+- **`git commit -a` that sweeps up another role's uncommitted work is flagged** for those paths. The work stays, now
+  committed. Committing only one's own paths on the same dirty tree is silent.
+- A commit and an uncommitted out-of-scope change in one call are both caught. A commit made by a failed call is
+  flagged too.
+
+**Any other move.** Tested with `git reset --hard`, `git reset` (mixed) and `git reset --soft` to an older revision,
+`git checkout` and `git switch` to another branch, `git checkout` of an older revision, `git rebase` onto another
+branch, and `git commit --amend`.
+
+- The move is reported to the agent and at least one finding with action `flagged` is added. No finding says
+  `reverted`.
+- **Never reverted:** after the check, `HEAD`, the branch, `git status` and the files are as the call left them.
+- **This holds for an acceptance test too.** After `git reset HEAD~1` the committed content of an acceptance test
+  shows as an uncommitted change. It is not put back to the new HEAD; that would delete committed content.
+- **Whoever makes the move, and whatever the commits hold.** The orchestrator, the test designer, a session with no
+  role and an engineer subagent are flagged like the engineer, and so is a reset that undoes only the engineer's own
+  in-scope commit. The answer names no role and no path that makes such a move acceptable.
+- The tests take no side on what `paths` holds for such a move, or on the wording of the report.
 
 ## The nine I-06 forms (DEC-123)
 
@@ -195,7 +241,7 @@ detected: writes inside `$(…)`/backticks, `perl/ruby/node -e`, unknown binarie
 | 5 | `base64 -d \| bash` | the write, encoded |
 | 6 | `$VAR` commands | `c="tee -a file"; … \| $c` |
 | 7 | aliases and functions | one each |
-| 8 | `git checkout`, `git reset --hard` | `git checkout HEAD~1 -- file` · `git reset --hard` and `git checkout -- .` on a dirty tree |
+| 8 | `git checkout`, `git reset --hard` | `git checkout HEAD~1 -- file` · `git reset --hard` and `git checkout -- .` on a dirty tree · the moves of `HEAD` in `test_w1_03_head_moves.py` |
 | 9 | `curl -o`, `wget -O` | `curl -s -o file file://…` (no network) |
 
 - Forms 1 to 7 and 9 are each run against `README.md` (reported and recorded), against an acceptance test (restored
@@ -204,7 +250,7 @@ detected: writes inside `$(…)`/backticks, `perl/ruby/node -e`, unknown binarie
   the command runs and the check must catch it.
 - Form 8 writes nothing new. `git checkout <older revision> -- file` stages older content: caught like any change, and
   an acceptance test is put back to HEAD, index included. `git reset --hard` and `git checkout -- .` discard
-  uncommitted work: see reading 5 above. The third effect, a moved `HEAD`, is KD-4.
+  uncommitted work: see reading 5 above. The third effect, a moved `HEAD`, is in the section above.
 - `wget -O` is not run: it needs a server. Its effect in the repository is the same file write as `curl -o`.
 
 The test designer's own 24 forms from batch 1 stay, in `test_w1_03_bash_forms.py`: `python3 -c` · `python3 -` with a
@@ -258,20 +304,21 @@ are also run against `tests/acceptance/**`.
 One expectation changed in kind: a PostToolUse run with no PreToolUse run before it was expected to restore an
 acceptance test in batch 1. Under DEC-124 it flags and does not revert (reading 1).
 
-**W1-05's tests need the same change.** `tests/acceptance/W1-05/test_w1_05_live_hooks.py` was written before DEC-124.
-Its `test_the_containment_check_restores_an_acceptance_test` runs the PostToolUse hooks alone and expects a restore, so
-it cannot pass together with `test_without_a_before_snapshot_a_change_is_flagged_and_not_reverted` here. W1-05 is
-outside this batch; its tests have to run the registered PreToolUse hooks before the call, in a W1-05 revision batch.
+**W1-05's tests got the same change** in batch 3. `test_the_containment_check_restores_an_acceptance_test` in
+`tests/acceptance/W1-05/test_w1_05_live_hooks.py` ran the PostToolUse hooks alone and expected a restore, so it could
+not pass together with `test_without_a_before_snapshot_a_change_is_flagged_and_not_reverted` here. It now runs the
+registered PreToolUse hooks first; see the README of W1-05.
+
+Batch 3 changed one thing in the tests of batch 2: `paths` of a finding may be an empty list, for a `HEAD` move
+between two commits that hold the same files. No expectation of batch 1 or 2 changed.
 
 ## Not tested
 
-With the owner (`~/gov-os-workbench/w1-tests/decision-packages/W1-03-kpi-disputes-round-2.md`):
+Nothing is with the owner. Left open on purpose; the tests take no side:
 
-- **KD-4.** A call that moves `HEAD`: `git reset --hard <revision>`, `git checkout <branch>`, and a call that commits
-  its own change. Afterwards `git status --porcelain` is clean, so the comparison the KPI names sees nothing. For
-  `git reset --hard` and `git checkout` this is a part of I-06 form 8 with no test.
-
-Left open on purpose; the tests take no side:
+- **A `HEAD` move in a call with no before-snapshot.** The check does not know where `HEAD` was.
+- **Moves between the two cases of the KD-4 answer:** a checkout of another branch that points at the same commit, a
+  new branch made and committed on in one call, and a merge that is not a fast-forward.
 
 - **"At gov close".** `gov close` is W1-30, and its KPI says it "runs the containment check". The run at close is left
   to W1-30's acceptance tests.
