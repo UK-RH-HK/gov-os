@@ -1,6 +1,6 @@
 ---
 id: DAEO-m7u4
-status: open
+status: in_progress
 deps: [DAEO-emkd, DAEO-8qvp, DAEO-78bn]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -46,3 +46,9 @@ acceptance_tests:
 # W1-05 Dogfood switch-over
 
 Wire the guard, containment and install rule into this repository once their acceptance tests pass (DEC-084).
+
+## Notes
+
+**2026-10-02T21:17:41Z**
+
+Claimed 2026-10-02 before a test design request (DEC-133). The acceptance tests of 7b7d01b and 2cdabc9 predate DEC-142 and DEC-144: they require the PreToolUse hook for Edit, Write, NotebookEdit and Bash only, while a later tool call of any tool by the same actor must reach the hook. Implementation waits for TESTS READY. KPIs unchanged.
