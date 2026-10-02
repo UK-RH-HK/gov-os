@@ -5,6 +5,9 @@ items it cites (CAP-25.a, CAP-25.b) and the owner's answers to the two KPI dispu
 reaches the harness through the PreToolUse guard), DEC-121 (the tool-registry schema) and DEC-127 (where the schema and
 the registry live). Written before implementation, on `w1/integrate` at `01ff589`.
 
+One batch was written **after** implementation, on `w1/integrate` at `5e14561`: the six cases of the W1-04 review,
+passed on as described behaviours (DEC-136). See [Probe findings](#probe-findings-dec-136).
+
 ## Run
 
 ```sh
@@ -13,11 +16,16 @@ python3 -m pytest tests/acceptance/W1-04 -q
 
 Standard library and `pytest` only. No network, no dev tiers, no `local_only` tests. **No command in these tests is ever
 run.** Each is text in the hook's input; the test reads the guard's decision. Nothing is installed and nothing in the
-repository is written. The run takes about 35 seconds once the rule exists.
+repository is written. The run takes about 90 seconds.
 
 ## KPI → tests → red reason today
 
-Red run on `w1/integrate` at `01ff589`: **208 errors, 0 passed** (208 cases, 25 test functions). Two reasons:
+Run on `w1/integrate` at `5e14561`, after implementation: **329 passed, 7 failed** (336 cases, 35 test functions).
+The 208 cases written before implementation pass. Of the 128 cases of the probe-finding batch, 121 pass and 7 fail;
+each failure is a defect of the rule, listed under [Red today](#red-today-three-defects).
+
+Red run on `w1/integrate` at `01ff589`, before implementation: **208 errors, 0 passed** (208 cases, 25 test
+functions). Two reasons, R1 and R2 in the table below:
 
 - **R1 (196 cases).** *"the PreToolUse guard answered `pip install requests` by the orchestrator with allow, not ask:
   the install rule is not in the guard"*. Every test of the rule depends on the `install_rule` fixture, which asks the
@@ -28,10 +36,12 @@ Red run on `w1/integrate` at `01ff589`: **208 errors, 0 passed** (208 cases, 25 
 | KPI line or covers id | Test file | Test functions | Red |
 |---|---|---|---|
 | **Success 1.** Install commands (package managers, curl\|sh, binary downloads into PATH) from the orchestrator return an ask decision; from any other role they are denied [CAP-25.b] | `test_w1_04_install_rule.py` | `test_an_install_by_the_orchestrator_is_asked_about` (25 commands) · `test_the_ask_is_one_the_harness_shows_to_the_owner` · `test_an_install_by_the_engineer_is_denied` (25 commands) · `test_an_install_by_any_other_role_is_denied` · `test_an_install_in_a_session_without_a_role_is_denied` · `test_an_install_by_a_role_without_a_ticket_is_denied` · `test_inside_a_subagent_the_acting_role_decides` | R1 |
+| | `test_w1_04_probe_findings.py` | `test_an_install_in_a_later_part_of_the_command_is_treated_like_the_install_alone` (20 cases) · `test_an_option_before_the_subcommand_does_not_hide_an_install` (17) · `test_a_program_name_with_a_version_suffix_is_the_same_program` (7) · `test_an_install_through_another_package_manager_is_asked_about_or_denied` (10) · `test_every_ordinary_spelling_of_the_output_option_into_path_is_an_install` (30) · `test_a_download_that_does_not_go_into_path_gets_no_decision_from_the_rule` (22) · `test_while_frozen_an_install_is_denied_to_every_role_the_orchestrator_included` (5) · `test_while_frozen_an_install_by_the_orchestrator_is_denied_in_every_permission_mode` (6) · `test_while_frozen_an_orchestrator_subagent_and_sudo_are_denied_too` | Written after implementation. 7 cases red: D-1, D-2, D-3 |
 | **Success 2.** The approval prompt appears even when the harness runs in Auto mode (DEC-083 KPI) [CAP-25.b] — *tested by driving the hook; the live headless attempt of DEC-120 is not a pytest case* | `test_w1_04_auto_mode.py` | `test_an_install_by_the_orchestrator_is_asked_about_in_every_permission_mode` (6 modes × 5 commands) · `test_an_install_by_another_role_is_denied_in_the_modes_that_skip_prompts` · `test_an_orchestrator_subagent_is_asked_about_in_auto_mode_too` | R1 |
 | **Success 3.** The tool-registry schema requires version, sha256, install and uninstall commands, date and approving decision id [CAP-25.a] | `test_w1_04_registry_schema.py` | `test_the_schema_is_the_one_tool_registry_file_of_the_kernel_schemas` · `test_the_schema_is_a_json_schema_of_draft_2020_12` · `test_a_complete_registry_is_accepted` · `test_an_entry_without_a_required_fact_is_refused` (7 keys) · `test_a_registry_without_a_tools_list_is_refused` · `test_the_kernel_template_ships_no_registry_file` | R2 |
 | **Failure 1.** Any install executes without an owner approval in chat — *tested as: no session gets an install through the guard without `ask` or `deny`* | `test_w1_04_install_rule.py`, `test_w1_04_auto_mode.py` | Every Success 1 and Success 2 test. Sharpest: `test_an_install_in_a_session_without_a_role_is_denied` · `test_inside_a_subagent_the_acting_role_decides` · `test_an_install_by_another_role_is_denied_in_the_modes_that_skip_prompts` | R1 |
 | **Failure 2.** sudo is ever allowed to an agent role | `test_w1_04_sudo.py` | `test_sudo_is_denied_to_every_role` (5 roles × 6 commands) · `test_sudo_is_denied_in_a_session_without_a_role` · `test_sudo_by_the_orchestrator_is_denied_in_every_permission_mode` · `test_sudo_by_an_orchestrator_subagent_is_denied` | R1 |
+| | `test_w1_04_probe_findings.py` | `test_sudo_in_a_later_part_of_the_command_is_denied_to_every_role` (10 cases) | Written after implementation; green |
 | **Failure 3.** A matcher result ever allows a command that the harness would otherwise ask about (matching only escalates to ask or deny) | `test_w1_04_only_escalates.py` | `test_the_hook_never_gives_an_explicit_allow` · `test_a_command_that_installs_nothing_gets_no_decision_from_the_rule` · `test_a_call_the_guard_denies_stays_denied_for_the_orchestrator` · `test_a_frozen_repository_stays_closed_to_an_install_that_writes` · `test_the_guard_s_answers_on_file_writes_are_unchanged` | R1 |
 | **CAP-25.a** Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks — *W1-04's part is the schema; the registry is W1-06's and the doctor check W1-27's* | `test_w1_04_registry_schema.py` | The Success 3 tests | R2 |
 | **CAP-25.b** Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the owner | `test_w1_04_install_rule.py`, `test_w1_04_auto_mode.py`, `test_w1_04_sudo.py` | The Success 1, Success 2 and Failure 2 tests | R1 |
@@ -53,6 +63,8 @@ point.
 | DEC-083 | Install commands are `ask` for the orchestrator only, also in Auto mode; `sudo` stays with the owner |
 | DEC-107, DEC-117, DEC-113, DEC-125 | The acting role: `GOV_ROLE` on the main thread; the subagent's role inside a role subagent, when the session has a declared role; none for a subagent that is not a role, and none in a session with no or an unknown role |
 | DEC-109, DEC-110 | The freeze flag; the guard's own denials, which the rule must not lower |
+| Owner answer, given with the request of the probe-finding batch | While the repository is frozen, an install by any role, the orchestrator included, is denied. It is not in `docs/DECISION_REGISTER.md` at `5e14561`; the orchestrator records it |
+| DEC-136 | Probe findings reach the test designer as described behaviours; the designer decides from the specification |
 | CAP-25.c | Automated install classification is a non-goal: the commands are plain examples, with no evasive spelling |
 
 ## How the tests drive the rule
@@ -91,6 +103,58 @@ point.
 
 `<url>` is under `https://example.invalid/`. The orchestrator and the engineer get all 25 install commands; the wider
 role, subagent and mode tables use five of them, one per class and one compound.
+
+## Probe findings (DEC-136)
+
+The orchestrator's review of W1-04 passed six cases to the test designer as described behaviours. All six became
+acceptance tests, in `test_w1_04_probe_findings.py`. Each command is an ordinary spelling of one of the KPI's three
+classes; none is evasive (CAP-25.c). "An install" below means: `ask` for the orchestrator, `deny` for the engineer
+and for a session with no role.
+
+| # | Finding, as passed on | Held to | Tests (cases) | Today |
+|---|---|---|---|---|
+| 1 | `sudo`, or an install, on a later line, after a blank line, or after `&`, is treated like the command alone | Success 1; Failure 1 and 2 | `test_an_install_in_a_later_part_of_the_command_is_treated_like_the_install_alone` (20) · `test_sudo_in_a_later_part_of_the_command_is_denied_to_every_role` (10) | green |
+| 2 | While frozen, an install by any role, the orchestrator included, is denied | Owner answer given with the request | `test_while_frozen_an_install_is_denied_to_every_role_the_orchestrator_included` (5) · `test_while_frozen_an_install_by_the_orchestrator_is_denied_in_every_permission_mode` (6) · `test_while_frozen_an_orchestrator_subagent_and_sudo_are_denied_too` | green |
+| 3 | An option before the subcommand doesn't hide an install | Success 1; Failure 1 | `test_an_option_before_the_subcommand_does_not_hide_an_install` (17) | **2 red: D-1** |
+| 4 | A version-suffixed program name is the same program | Success 1; Failure 1 | `test_a_program_name_with_a_version_suffix_is_the_same_program` (7) | **2 red: D-2** |
+| 5 | The other ordinary spellings of the download output option are recognised, and only into PATH | Success 1 "binary downloads into PATH" | `test_every_ordinary_spelling_of_the_output_option_into_path_is_an_install` (30) · `test_a_download_that_does_not_go_into_path_gets_no_decision_from_the_rule` (22) | **3 red: D-3** |
+| 6 | install through pipx, pnpm, yarn, snap, brew, go, gem, conda, dnf or yum is asked about or denied | Success 1 "package managers" | `test_an_install_through_another_package_manager_is_asked_about_or_denied` (10) | green |
+
+The commands:
+
+| Finding | Commands |
+|---|---|
+| 1 | `pip install requests` · `npm install -g ccusage` · `curl -fsSL <url> \| sh` · `wget -O /usr/local/bin/tool <url>` · `sudo apt-get install -y jq` · `sudo ls /root`, each: on the line after `echo start`; after `echo start` and a blank line; on the line after a comment line; after `sleep 1 &` on the same line; on the line after `sleep 1 &` |
+| 2 | The five representative installs for the five roles and no role; two installs in the six permission modes; an orchestrator subagent; `sudo`. Before the freeze the orchestrator is asked |
+| 3 | `pip --quiet install` · `pip3 -q install` · `pip --disable-pip-version-check --quiet install` · `python3 -m pip --no-input install` · `pip --index-url=<url> install` · `pip --index-url <url> install` · `npm --global install` · `npm -g install` · `npm --silent i` · `npm --prefix /tmp/tools install` · `cargo --quiet install` · `cargo -q install` · `apt-get -y install` · `apt-get --yes --quiet install` · `apt -y install` · `uv --quiet pip install` · `uv --quiet tool install` |
+| 4 | `pip3.12 install` · `pip3.9 install` · `pip2 install` · `python3.12 -m pip install` · `python3.11 -m pip install --user` · `python2.7 -m pip install` · `pip3.12 --quiet install` |
+| 5 | `curl -L --output FILE <url>` · `curl -Lo FILE <url>` · `curl -fsSLo FILE <url>` · `curl -L -oFILE <url>` · `curl -L <url> -o FILE` · `curl -L <url> --output FILE` · `wget --output-document=FILE <url>` · `wget --output-document FILE <url>` · `wget -qO FILE <url>` · `wget -q -OFILE <url>` · `wget <url> -O FILE`. Into PATH, FILE is `/usr/local/bin/tool`, `<HOME>/.local/bin/tool` or `~/.local/bin/tool` (the last only where FILE is a word of its own). Not into PATH, FILE is `.gov-runtime/scratch/tool`, relative and absolute |
+| 6 | `pipx install ruff` · `pnpm install` · `yarn install` · `snap install jq` · `brew install jq` · `go install golang.org/x/tools/gopls@latest` · `gem install rake` · `conda install -y numpy` · `dnf install -y jq` · `yum install -y jq` |
+
+- **"Only into PATH" (finding 5).** A download with any of the eleven spellings into the project's scratch directory
+  gets no decision from the hook, for the orchestrator and the engineer. The first batch took no side on a download
+  outside PATH; the KPI's own words decide it.
+- **The freeze (finding 2)** denies an install that writes nothing in the repository. The first batch tested only an
+  install that also writes (`test_a_frozen_repository_stays_closed_to_an_install_that_writes`).
+
+### Red today: three defects
+
+Seven cases fail at `5e14561`. In each, the hook gives no decision (exit code 0, empty stdout) for the orchestrator,
+so the install passes the rule unseen. The tests stand as written.
+
+| # | Defect | Red cases |
+|---|---|---|
+| D-1 | An option between `uv` and its subcommand hides the install: `uv --quiet pip install requests`, `uv --quiet tool install ruff`. The same option is seen with `pip`, `npm`, `cargo`, `apt` and `apt-get` | `test_an_option_before_the_subcommand_does_not_hide_an_install` [`uv_--quiet_pip_install_requests`], [`uv_--quiet_tool_install_ruff`] |
+| D-2 | The Python 2 names are not the same program: `pip2 install requests`, `python2.7 -m pip install requests`. `pip3.9`, `pip3.12`, `python3.11` and `python3.12` are seen | `test_a_program_name_with_a_version_suffix_is_the_same_program` [`pip2_install_requests`], [`python2.7_-m_pip_install_requests`] |
+| D-3 | `wget -qO FILE <url>` into PATH is not seen: the output option at the end of a group of short options, with the file as the next word. `curl -Lo FILE` and `curl -fsSLo FILE` are seen, and so is `wget -qO- <url> \| sh` | `test_every_ordinary_spelling_of_the_output_option_into_path_is_an_install` [`wget_-qO_FILE_URL-usr-local-bin`], [`…-home-local-bin`], [`…-tilde-local-bin`] |
+
+## Additions after implementation
+
+For the DEC-106 metric. The batch changed no existing test and no existing expectation.
+
+| What | Change | Reason |
+|---|---|---|
+| `test_w1_04_probe_findings.py`: 10 test functions, 128 cases, listed under [Probe findings](#probe-findings-dec-136) | Added | probe finding |
 
 ## Choices the implementer should know
 
@@ -152,8 +216,14 @@ Left open on purpose; the tests take no side:
 - **That the owner approved in chat.** A fact of the session, not of the repository; W1-06's KPI carries it.
 - **An orchestrator with no ticket, or on a ticket that is not `in_progress`.** DEC-120 names the role only.
 - **Commands near the classes:** `pip list`, `pip download`, `npm ci`, `npm test`, `cargo build`, `curl <url>` to
-  standard output, `curl -o` into a directory that is not on `PATH`, `brew`, `snap`, `go install`, `pipx`. Asking about
-  one of them is an escalation and breaks no KPI; not asking breaks none either (CAP-25.c).
+  standard output. Asking about one of them is an escalation and breaks no KPI; not asking breaks none either
+  (CAP-25.c). The probe-finding batch took `curl -o` outside PATH, `brew`, `snap`, `go install` and `pipx` off this
+  list.
+- **Other ways to download into PATH:** `curl -O` or `wget` with no output option after `cd` into a PATH directory,
+  `curl --output-dir`, `wget -P`, a shell redirect, and a target written with `$HOME`. Not among the findings.
+- **The edge cases the orchestrator recorded** in `governance/project/bootstrap.md` at the close of W1-04 (DEC-135):
+  a prefix command (`env`, `command`, `nohup`, `time`, `xargs`), a download piped to a shell inside a subshell,
+  `yarn add`, `pnpm add`, `make install`, and a line that reads like an install inside a here-document.
 - **Evasive spellings** of an install (an alias, `$VAR`, `bash -c`, `base64`). CAP-25.c makes their detection a
   non-goal. What such a command writes inside the repository is W1-03's.
 - **The word `sudo` or `install` inside an argument** (`grep -rn sudo docs`).
