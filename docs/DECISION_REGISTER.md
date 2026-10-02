@@ -1346,3 +1346,18 @@ W1-03 repair (commit `95df6c5`): the answer to W1-BUILD decision package DP-6, o
 | Version | Date | Change |
 |---|---|---|
 | 0.24 | 2026-10-01 | W1-BUILD DP-6: DEC-144 (a call is known to be over after the same actor's later tool call or ten minutes; background commands are an accepted residual). DEC-145 (W1-03 KD-7: `PENDING_SNAPSHOT_TIMEOUT_S = 600`, overridable by `GOV_PENDING_SNAPSHOT_TIMEOUT_S`). DEC-146 ("its session" is the same actor). DEC-147 (install-rule residuals stay; the sandbox spike tests installs). DEC-148 (a repair reopens to `in_progress` and closes to `closed`). |
+
+## 25. Wave 1 build decisions, round 11 (register v0.25, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answer to the Independent Test Designer's KPI dispute KD-1 on W1-05 (`DAEO-m7u4`), given with the revised
+acceptance tests of W1-05 (commit `2b2944a`, recorded in `tests/acceptance/W1-05/README.md`). No KPI text changes.
+
+### DEC-149 — W1-05 KD-1: what the 100 ms hook budget covers
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-05 KPI dispute KD-1 · **Refines:** DEC-134 (the snapshot's cost)
+- **Decision:** The 100 ms p95 hook budget covers the guard's decision, for every tool. For Bash, the total wait
+  including W1-03's before-snapshot (observed 115–119 ms p95) is measured and reported in W1-05's record, and isn't a
+  failure.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.25 | 2026-10-01 | W1-05 KD-1: DEC-149 (the 100 ms p95 budget is the guard's decision for every tool; the Bash wait with the before-snapshot is measured and reported, not a failure). |
