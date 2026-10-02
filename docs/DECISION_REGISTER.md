@@ -1141,3 +1141,32 @@ The KPI text of the three tickets is unchanged. W1-04's `allowed_paths` change u
 | Version | Date | Change |
 |---|---|---|
 | 0.19 | 2026-10-01 | KPI disputes: DEC-120 (W1-04 KD-1, install rule through the PreToolUse guard; `ask` for the orchestrator, `deny` otherwise), DEC-121 (W1-04 KD-2, tool-registry schema), DEC-122 (W1-03 KD-1, containment finding record), DEC-123 (W1-03 KD-2, nine I-06 forms by effect; residual outside the repository accepted), DEC-124 (W1-03 KD-3, only the current call's changes), DEC-125 (W1-02 KD-9, role subagent only in a session with a declared role). |
+
+## 20. Wave 1 build decisions, round 6 (register v0.20, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers to W1-BUILD decision packages DP-3 and DP-4 and to the known limit reported at the bootstrap diff
+check of the W1-02 repair (commit `cd23357`; the owner gave `DIFF OK` for `7d9ab30..cd23357`). No KPI text changes.
+W1-03's `allowed_paths` change under DEC-126 only.
+
+### DEC-126 — W1-03 may change the PreToolUse hook entry
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-3 option (a) · **Implements:** DEC-124
+- **Decision:** `template/governance/kernel/hooks/pretooluse*` is added to W1-03's `allowed_paths`, so containment can
+  take its before-snapshot in PreToolUse (DEC-124). W1-02's acceptance tests must still pass after W1-03's change.
+- **Ticket change:** the orchestrator commits it separately, with the trailers `Task: DAEO-8qvp` and
+  `Implements: DEC-126`.
+
+### DEC-127 — Where the tool-registry schema and the registry live
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-4 option (a) · **Amends:** DEC-121 (its fallback)
+- **Decision:** The registry schema stays in the kernel template at the path W1-04's ticket names
+  (`template/governance/kernel/schemas/tool-registry*`). The registry itself is per-repository project data at
+  `governance/project/tool-registry.yaml`. W1-04 ships no registry file; W1-06 creates it at the first install.
+
+### DEC-128 — The guard's quoting limit is an accepted residual
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limit reported at the W1-02 repair diff check · **Refines:** DEC-115
+- **Decision:** In a Bash write target, a single-quoted or escaped `$NAME` is expanded by the guard although the shell
+  keeps it literal. That is accepted as a residual.
+- **Record:** `governance/project/bootstrap.md`, section "Accepted residual".
+
+| Version | Date | Change |
+|---|---|---|
+| 0.20 | 2026-10-01 | W1-BUILD DP-3: DEC-126 (W1-03 may change the PreToolUse hook entry). DP-4: DEC-127 (schema in the kernel template, registry at `governance/project/tool-registry.yaml`, created by W1-06; amends DEC-121). DEC-128 (quoted or escaped `$NAME` in a target: accepted residual). |
