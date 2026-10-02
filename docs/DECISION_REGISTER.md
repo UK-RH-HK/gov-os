@@ -1206,3 +1206,64 @@ KPI text of W1-03 is unchanged.
 | Version | Date | Change |
 |---|---|---|
 | 0.21 | 2026-10-01 | W1-03 and `HEAD`: DEC-129 (KD-4, `HEAD` in the before-snapshot; forward commits checked, any other move flagged and never reverted), DEC-130 (readings of DEC-124 confirmed), DEC-131 (readings of KD-4 confirmed), DEC-132 (defaults for four open `HEAD` cases; builder tests until acceptance tests exist). |
+
+## 22. Wave 1 build decisions, round 8 (register v0.22, appended by W1-BUILD on branch `w1/integrate`)
+
+The owner's answers at the bootstrap diff check of W1-03 (commit `7143034`; the owner gave `DIFF OK`): the answer to
+W1-BUILD decision package DP-5, the known limits W1-BUILD reported, and four working rules. DEC-136, DEC-137 and
+DEC-138 will be carried into Contract v4 by the post-bootstrap spec change; the orchestrator changes neither the
+Contract nor any ticket for them now.
+
+### DEC-133 — The orchestrator claims a ticket before its test design
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on W1-BUILD DP-5 option (a) · **Refines:** DEC-114, DEC-116
+- **Decision:** The orchestrator claims a ticket (`tk start`) before sending its `TEST_DESIGN_REQUEST`; claim and test
+  design swap order in the loop. Engineer writes on a claimed ticket remain subject to the READY rule: no
+  implementation before its acceptance tests exist (enforced from W1-09).
+
+### DEC-134 — W1-03's four known limits are accepted residuals
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER, on the known limits reported at the W1-03 diff check
+- **Decision:** These are accepted residuals of the containment check:
+  - an unseen change during a Bash call is attributed to that call;
+  - a `HEAD` move with no snapshot is checked only against the last `HEAD` seen;
+  - while frozen, an acceptance test changed through an opaque form is restored whoever changed it;
+  - the snapshot adds about 28 ms per Bash call.
+- **Record:** `governance/project/bootstrap.md`, section "Accepted residual".
+
+### DEC-135 — Proportion rule for enforcement code
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER (Charter principle 9)
+- **Decision:** In guard and containment work, fix every probe finding that could lose work or let an implementer
+  change acceptance tests. Record every other edge case as a residual in `governance/project/bootstrap.md` instead of
+  adding code. Report the ticket's actual LOC against its estimate when closing it.
+
+### DEC-136 — Probe findings feed the independent suite
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Refines:** DEC-069
+- **Decision:** When the orchestrator's review finds a case the acceptance tests miss, it passes the case to the next
+  test design batch as a described behaviour, never as code. The test designer decides from the specification whether
+  it becomes an acceptance test, and reports when a finding reveals a specification gap. Builder tests stay regression
+  evidence only.
+- **First use:** the twelve cases of the W1-03 review go, described as behaviours, into the orchestrator's next
+  `TEST_DESIGN_REQUEST`.
+- To be carried into Contract v4 by the post-bootstrap spec change.
+
+### DEC-137 — Independent post-green probe for FULL tickets
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER
+- **Decision:** For a FULL-profile ticket, the adversarial probe after the acceptance tests go green is done by a fresh
+  reviewer subagent, not by the engineer who wrote the code. The orchestrator commissions and judges the probe; the
+  reviewer writes nothing to the repository.
+- To be carried into Contract v4 by the post-bootstrap spec change.
+
+### DEC-138 — Sandbox spike after the bootstrap
+- **Status:** ACCEPTED (owner, 2026-10-01) · **Basis:** OWNER · **Under:** DEC-102
+- **Decision:** Right after `SWITCH_OVER_READY`, an experiment tests Claude Code's sandbox on this WSL2 machine:
+  - whether it blocks writes outside the repository through opaque Bash forms;
+  - whether it can hide the qualification oracle;
+  - whether per-role headless sessions can each get their own write scope;
+  - what it costs in tokens and time.
+
+  The result decides whether Wave 1 adds the sandbox as the outer layer under the guard. The owner launches the spike;
+  the orchestrator does not start it.
+- To be carried into Contract v4 by the post-bootstrap spec change.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.22 | 2026-10-01 | Owner answers at the W1-03 diff check: DEC-133 (DP-5: claim before test design), DEC-134 (four W1-03 residuals accepted), DEC-135 (proportion rule for enforcement code; LOC against estimate at close), DEC-136 (probe findings go to the test designer as described behaviours), DEC-137 (independent post-green probe for FULL tickets), DEC-138 (sandbox spike after the bootstrap, launched by the owner). |
