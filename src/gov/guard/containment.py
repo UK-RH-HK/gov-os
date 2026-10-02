@@ -1,0 +1,763 @@
+"""Post-command containment check (W1-03).
+
+Public entry points, one per hook (DEC-126):
+
+- ``take_snapshot`` -- PreToolUse: captures ``git status --porcelain -z``
+  with per-dirty-path fingerprints and ``HEAD``.
+- ``check_containment`` -- PostToolUse: compares current tree and HEAD
+  with the snapshot; flags / restores; records findings (DEC-122).
+- ``mark_concurrent_write`` -- PreToolUse: increments the sequence
+  counter when a Write/Edit/NotebookEdit is allowed (DEC-124).
+
+Scope is derived from the guard's ``decide()`` (CAP-58.a).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import time
+
+FINDINGS_REL = ".gov-runtime/findings.jsonl"
+SNAPSHOT_DIR_REL = ".gov-runtime/snapshots"
+LAST_HEAD_REL = ".gov-runtime/last_head.json"
+SEQ_FILE = ".seq"
+ACCEPTANCE = "tests/acceptance"
+_GIT_TIMEOUT = 10
+_CLEANUP_AGE_S = 3600.0
+
+
+# ---- git helper --------------------------------------------------
+
+class _NotARepo(Exception):
+    pass
+
+
+class _GitError(Exception):
+    pass
+
+
+def _git(root: str, *args: str) -> str:
+    """Run a git command and return stdout.  Raises on failure."""
+    try:
+        p = subprocess.run(
+            ["git", "-C", root, *args],
+            capture_output=True, text=True,
+            timeout=_GIT_TIMEOUT, check=False,
+        )
+    except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+        raise _GitError(str(e)) from e
+    if p.returncode == 128 and "not a git repository" in p.stderr.lower():
+        raise _NotARepo(p.stderr.strip())
+    if p.returncode != 0:
+        raise _GitError(p.stderr.strip())
+    return p.stdout
+
+
+# ---- NUL-separated status parsing (repair 6) --------------------
+
+def _parse_status_z(raw: str) -> dict:
+    """Parse ``git status --porcelain -z -uall`` into {path: XY}.
+
+    NUL-separated output has no quoting, so non-ASCII and names with
+    spaces come through as-is.  Renames produce entries for both the
+    old and the new path.
+    """
+    if not raw:
+        return {}
+    result: dict = {}
+    parts = raw.split("\0")
+    i = 0
+    while i < len(parts):
+        e = parts[i]
+        if len(e) < 3:
+            i += 1
+            continue
+        code, path = e[:2], e[3:]
+        if code[0] in "RC" and i + 1 < len(parts) and parts[i + 1]:
+            result[path] = code
+            result[parts[i + 1]] = code
+            i += 2
+        else:
+            result[path] = code
+            i += 1
+    return result
+
+
+def _is_under_acceptance(rel: str) -> bool:
+    return rel == ACCEPTANCE or rel.startswith(ACCEPTANCE + "/")
+
+
+def _list_files(root: str, dirpath: str) -> list:
+    """Expand a directory entry to individual files."""
+    full = os.path.join(root, dirpath)
+    out: list = []
+    try:
+        for dp, _, fnames in os.walk(full):
+            for n in fnames:
+                out.append(os.path.relpath(os.path.join(dp, n), root))
+    except OSError:
+        pass
+    return out
+
+
+# ---- fingerprinting dirty paths (repairs 1, 2) ------------------
+
+def _fingerprints(root: str, dirty: dict) -> dict:
+    """(size, mtime_ns, staged_blob) per dirty path -- cheap enough
+    to run at every snapshot; detects a second change to an
+    already-dirty path."""
+    blobs: dict = {}
+    try:
+        raw = _git(root, "ls-files", "-s", "-z")
+        for entry in raw.split("\0"):
+            tab = entry.find("\t")
+            if tab < 0:
+                continue
+            ps = entry[:tab].split()
+            if len(ps) >= 2:
+                blobs[entry[tab + 1:]] = ps[1]
+    except (_GitError, _NotARepo):
+        pass
+    rr = os.path.realpath(root)
+    fps: dict = {}
+    for path in dirty:
+        try:
+            st = os.lstat(os.path.join(rr, path))
+            fps[path] = [st.st_size, st.st_mtime_ns, blobs.get(path, "")]
+        except OSError:
+            fps[path] = [-1, -1, blobs.get(path, "")]
+    return fps
+
+
+def _fp_changed_batch(root: str, paths_fps: dict) -> set:
+    """Return the subset of *paths_fps* whose fingerprint changed.
+
+    *paths_fps* maps ``{path: [size, mtime_ns, staged_blob]}``.
+    Stat + one ``git ls-files`` call for all paths (fix 3).
+    """
+    if not paths_fps:
+        return set()
+    rr = os.path.realpath(root)
+    changed: set = set()
+    need_blob: list = []
+    for path, old in paths_fps.items():
+        try:
+            st = os.lstat(os.path.join(rr, path))
+            sz, mt = st.st_size, st.st_mtime_ns
+        except OSError:
+            sz, mt = -1, -1
+        if sz != old[0] or mt != old[1]:
+            changed.add(path)
+        else:
+            need_blob.append(path)
+    if not need_blob:
+        return changed
+    # One git ls-files call for all paths that need blob comparison.
+    blobs: dict = {}
+    try:
+        raw = _git(root, "ls-files", "-s", "-z", "--", *need_blob)
+        for entry in raw.split("\0"):
+            tab = entry.find("\t")
+            if tab < 0:
+                continue
+            ps = entry[:tab].split()
+            if len(ps) >= 2:
+                blobs[entry[tab + 1:]] = ps[1]
+    except (_GitError, _NotARepo):
+        # On failure, treat all as changed.
+        changed.update(need_blob)
+        return changed
+    for path in need_blob:
+        if blobs.get(path, "") != paths_fps[path][2]:
+            changed.add(path)
+    return changed
+
+
+# ---- sequence counter (overlap, DEC-124 reading 4) ---------------
+
+def _seq_path(root: str) -> str:
+    return os.path.join(root, SNAPSHOT_DIR_REL, SEQ_FILE)
+
+
+def _read_seq(root: str) -> int:
+    """Counter value = file size (one byte per event)."""
+    p = _seq_path(root)
+    try:
+        return os.path.getsize(p)
+    except OSError:
+        return 0
+
+
+def _increment_seq(root: str) -> int:
+    """Append one byte atomically (``O_APPEND``).
+
+    Two hooks running at the same instant each append their own byte,
+    so no increment is lost.  The counter is the file size.
+    """
+    p = _seq_path(root)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    fd = os.open(p, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o644)
+    try:
+        os.write(fd, b".")
+    finally:
+        os.close(fd)
+    return _read_seq(root)
+
+
+# ---- last-HEAD tracking (DEC-132 default 4) ----------------------
+
+def _save_last_head(root: str, commit: str, branch: str) -> None:
+    p = os.path.join(root, LAST_HEAD_REL)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    try:
+        with open(p, "w") as f:
+            json.dump({"commit": commit, "branch": branch}, f)
+    except OSError:
+        pass
+
+
+def _load_last_head(root: str):
+    try:
+        with open(os.path.join(root, LAST_HEAD_REL)) as f:
+            d = json.load(f)
+        return d.get("commit", ""), d.get("branch", "")
+    except (OSError, json.JSONDecodeError, ValueError):
+        return None, None
+
+
+# ---- cleanup ------------------------------------------------------
+
+def _cleanup_old(snapshot_dir: str) -> None:
+    try:
+        now = time.time()
+        for name in os.listdir(snapshot_dir):
+            if not name.endswith(".json"):
+                continue
+            p = os.path.join(snapshot_dir, name)
+            try:
+                if now - os.path.getmtime(p) > _CLEANUP_AGE_S:
+                    os.unlink(p)
+            except OSError:
+                pass
+    except OSError:
+        pass
+
+
+# ---- pending-snapshot overlap (fix 1) -----------------------------
+
+def _check_pending_snapshots(root: str, own_id: str,
+                             own_session: str, own_agent: str) -> bool:
+    """True when another actor has a pending (not yet consumed) snapshot.
+
+    An actor is the pair ``(session_id, agent_id)``.  A pending snapshot
+    of the **same** actor is a leftover (its call was refused or never
+    ended); it is silently removed and does not cause overlap.  Snapshots
+    older than ``_CLEANUP_AGE_S`` are ignored.
+    """
+    sdir = os.path.join(root, SNAPSHOT_DIR_REL)
+    now = time.time()
+    other_pending = False
+    try:
+        entries = os.listdir(sdir)
+    except OSError:
+        return False
+    for name in entries:
+        if not name.endswith(".json"):
+            continue
+        stem = name[:-5]
+        if stem == own_id:
+            continue  # our own snapshot (already consumed by caller)
+        p = os.path.join(sdir, name)
+        try:
+            age = now - os.path.getmtime(p)
+        except OSError:
+            continue
+        if age > _CLEANUP_AGE_S:
+            continue  # too old, not pending
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError, ValueError):
+            continue
+        snap_session = data.get("session_id", "")
+        snap_agent = data.get("agent_id", "")
+        if (snap_session, snap_agent) == (own_session, own_agent):
+            # Same actor leftover -- remove it silently.
+            try:
+                os.unlink(p)
+            except OSError:
+                pass
+        else:
+            other_pending = True
+    return other_pending
+
+
+# ---- before-snapshot (PreToolUse) ---------------------------------
+
+def take_snapshot(root: str, tool_use_id: str,
+                  session_id: str = "", agent_id: str = "") -> bool:
+    """Capture git status + fingerprints + HEAD.  False = not a repo."""
+    sdir = os.path.join(root, SNAPSHOT_DIR_REL)
+    os.makedirs(sdir, exist_ok=True)
+    _cleanup_old(sdir)
+
+    try:
+        raw = _git(root, "status", "--porcelain", "-z",
+                   "--untracked-files=all")
+    except _NotARepo:
+        return False
+
+    dirty = _parse_status_z(raw)
+    fps = _fingerprints(root, dirty)
+
+    hc = hb = ""
+    try:
+        hc = _git(root, "rev-parse", "HEAD").strip()
+    except (_GitError, _NotARepo):
+        pass
+    try:
+        hb = _git(root, "symbolic-ref", "-q", "--short", "HEAD").strip()
+    except (_GitError, _NotARepo):
+        pass
+
+    seq = _increment_seq(root)
+    snap = {
+        "tool_use_id": tool_use_id,
+        "status": raw,
+        "fingerprints": fps,
+        "head_commit": hc,
+        "head_branch": hb,
+        "seq": seq,
+        "ts": time.time(),
+        "session_id": session_id,
+        "agent_id": agent_id,
+    }
+    with open(os.path.join(sdir, f"{tool_use_id}.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(snap, f, separators=(",", ":"))
+
+    _save_last_head(root, hc, hb)
+    return True
+
+
+def _load_snapshot(root: str, tool_use_id: str):
+    if not tool_use_id:
+        return None
+    p = os.path.join(root, SNAPSHOT_DIR_REL, f"{tool_use_id}.json")
+    try:
+        with open(p, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError, ValueError):
+        return None
+    try:
+        os.unlink(p)
+    except OSError:
+        pass
+    return data
+
+
+# ---- write-tool overlap marker (repair 5) -------------------------
+
+def mark_concurrent_write(root: str) -> None:
+    """Increment seq when a Write/Edit/NotebookEdit is allowed."""
+    _increment_seq(root)
+
+
+# ---- findings (DEC-122) -------------------------------------------
+
+def _make_finding(sid, agent_type, role, ticket, cmd,
+                  paths, action, reason):
+    return {
+        "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "session_id": sid,
+        "agent_type": agent_type or "",
+        "role": role or "",
+        "ticket": ticket or "",
+        "tool": "Bash",
+        "command": cmd,
+        "paths": list(paths),
+        "action": action,
+        "reason": reason,
+    }
+
+
+def _record_findings(root: str, findings: list) -> None:
+    p = os.path.join(root, FINDINGS_REL)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    with open(p, "a", encoding="utf-8") as f:
+        for fi in findings:
+            f.write(json.dumps(fi, separators=(",", ":")) + "\n")
+
+
+# ---- acceptance-test restoration ----------------------------------
+
+def _restore_from_head(root: str, paths: list) -> tuple:
+    """Restore acceptance-test paths to HEAD.
+
+    Returns ``(restored, failed)`` -- lists of paths.  After the
+    restore, git status is checked to verify success (repair 10).
+    """
+    rr = os.path.realpath(root)
+    checkout: list = []
+    remove: list = []
+
+    for rel in paths:
+        try:
+            _git(root, "cat-file", "-e", f"HEAD:{rel}")
+            checkout.append(rel)
+        except (_GitError, _NotARepo):
+            remove.append(rel)
+
+    if checkout:
+        try:
+            _git(root, "checkout", "HEAD", "--", *checkout)
+        except _GitError:
+            pass
+
+    for rel in remove:
+        full = os.path.join(rr, rel)
+        try:
+            if os.path.isfile(full) or os.path.islink(full):
+                os.unlink(full)
+            elif os.path.isdir(full):
+                import shutil
+                shutil.rmtree(full)
+        except OSError:
+            pass
+        try:
+            _git(root, "rm", "--cached", "-f",
+                 "--ignore-unmatch", "--", rel)
+        except _GitError:
+            pass
+        _remove_empty_parents(os.path.dirname(full), rr)
+
+    # Verify (repair 10): a path still in git status was not restored.
+    try:
+        raw = _git(root, "status", "--porcelain", "-z",
+                   "--untracked-files=all")
+        still = set(_parse_status_z(raw))
+    except (_GitError, _NotARepo):
+        return [], list(paths)
+
+    return ([p for p in paths if p not in still],
+            [p for p in paths if p in still])
+
+
+def _remove_empty_parents(d: str, stop: str) -> None:
+    rs = os.path.realpath(stop)
+    while d and os.path.realpath(d) != rs:
+        try:
+            if os.path.isdir(d) and not os.listdir(d):
+                os.rmdir(d)
+                d = os.path.dirname(d)
+            else:
+                break
+        except OSError:
+            break
+
+
+# ---- HEAD-move helpers (DEC-129) ----------------------------------
+
+def _is_ancestor(root: str, old: str, new: str) -> bool:
+    """True when *old* is an ancestor of *new*.  Raises on failure."""
+    try:
+        p = subprocess.run(
+            ["git", "-C", root, "merge-base", "--is-ancestor", old, new],
+            capture_output=True, timeout=_GIT_TIMEOUT, check=False,
+        )
+    except (subprocess.TimeoutExpired, FileNotFoundError) as e:
+        raise _GitError(str(e)) from e
+    return p.returncode == 0
+
+
+def _committed_files(root: str, old: str, new: str) -> list:
+    """Paths changed between two commits, without rename detection
+    so that both ends of a rename are listed (repair 7)."""
+    out = _git(root, "diff", "--name-only", "--no-renames", old, new)
+    return [f for f in out.strip().splitlines() if f.strip()]
+
+
+# ---- scope check (handles symlinks -- repair 3) -------------------
+
+def _in_scope(abs_p, root, role, tid, sub, decide_fn):
+    """True when *abs_p* is inside the caller's allowed paths.
+
+    A symbolic link is judged by its own location (the directory it
+    sits in), not by where it points.  We ask ``decide`` about a
+    stand-in path in the same directory that is not a link.
+    """
+    if os.path.islink(abs_p):
+        parent = os.path.realpath(os.path.dirname(abs_p))
+        stand = os.path.join(
+            parent, os.path.basename(abs_p) + ".__containment__")
+        d, _ = decide_fn("Write", {"file_path": stand},
+                         root, role, tid, sub)
+    else:
+        d, _ = decide_fn("Write", {"file_path": abs_p},
+                         root, role, tid, sub)
+    return d == "allow"
+
+
+# ---- report formatting (repair 11) --------------------------------
+
+def _format_report(flagged, reverted, failed, head_msg):
+    """Build a readable report for the agent.
+
+    Paths appear as ``git status`` spells them so the agent can act
+    on them.
+    """
+    parts: list = []
+    if head_msg:
+        parts.append(head_msg)
+    if reverted:
+        ps = ", ".join(sorted(reverted))
+        parts.append(f"Acceptance test restored from HEAD: {ps}.")
+    if failed:
+        ps = ", ".join(sorted(failed))
+        parts.append(f"Restore failed, left in place: {ps}.")
+    if flagged:
+        ps = ", ".join(sorted(flagged))
+        parts.append(
+            f"Outside allowed paths, left in place: {ps}.")
+    return ("Containment: " + " ".join(parts)) if parts else ""
+
+
+# ---- main entry ---------------------------------------------------
+
+def check_containment(
+    project_root: str,
+    role: str | None,
+    ticket_id: str | None,
+    subagent_type: str | None,
+    session_id: str,
+    agent_type: str | None,
+    command: str,
+    tool_use_id: str,
+) -> str:
+    """Compare the current tree + HEAD with the before-snapshot.
+
+    Returns report text (empty = nothing to report).
+    Raises ``_GitError`` on hard git failures so the hook can record
+    them as findings.
+    """
+    from gov.guard.decide import decide  # noqa: E402
+
+    snap = _load_snapshot(project_root, tool_use_id)
+    has_snap = snap is not None
+
+    # Overlap detection (DEC-124 reading 4).
+    overlapping = False
+    if has_snap:
+        overlapping = _read_seq(project_root) != snap.get("seq")
+        # A pending snapshot of a different actor also means overlap.
+        if not overlapping:
+            snap_session = snap.get("session_id", "")
+            snap_agent = snap.get("agent_id", "")
+            overlapping = _check_pending_snapshots(
+                project_root, tool_use_id,
+                snap_session, snap_agent)
+
+    # Current status -- NUL-separated, no quoting (repair 6).
+    try:
+        cur_raw = _git(project_root, "status", "--porcelain", "-z",
+                       "--untracked-files=all")
+    except _NotARepo:
+        _increment_seq(project_root)
+        return ""
+    # _GitError propagates intentionally (repair 8).
+
+    cur_head = cur_branch = ""
+    try:
+        cur_head = _git(project_root, "rev-parse", "HEAD").strip()
+    except (_GitError, _NotARepo):
+        pass
+    try:
+        cur_branch = _git(
+            project_root, "symbolic-ref", "-q", "--short", "HEAD"
+        ).strip()
+    except (_GitError, _NotARepo):
+        pass
+
+    before = _parse_status_z(snap["status"]) if has_snap else {}
+    after = _parse_status_z(cur_raw)
+    before_fps = snap.get("fingerprints", {}) if has_snap else {}
+    dirty_at_snap = set(before.keys())
+
+    # ---- what THIS call changed (DEC-124) ----
+    if has_snap:
+        changed: set = set()
+        fp_check: dict = {}
+        for path, code in after.items():
+            if path not in before:
+                changed.add(path)
+            elif before[path] != code:
+                changed.add(path)
+            elif path in before_fps:
+                fp = before_fps[path]
+                if isinstance(fp, list) and len(fp) >= 3:
+                    fp_check[path] = fp
+        # Batch fingerprint comparison (fix 3: one git call).
+        if fp_check:
+            changed.update(_fp_changed_batch(project_root, fp_check))
+        # Paths dirty before but clean now (reading 5).
+        for path in before:
+            if path not in after:
+                changed.add(path)
+    else:
+        changed = set(after.keys())
+
+    # Expand directory entries to individual files.
+    expanded: set = set()
+    for path in changed:
+        if path.endswith("/"):
+            files = _list_files(project_root, path)
+            if files:
+                expanded.update(files)
+            else:
+                expanded.add(path.rstrip("/"))
+        else:
+            expanded.add(path)
+    changed = expanded
+
+    # ---- HEAD-move detection (DEC-129, DEC-132) ----
+    head_findings: list = []
+    committed_out: set = set()
+    non_fwd = False
+    head_msg = ""
+
+    old_head = snap.get("head_commit", "") if has_snap else None
+    old_branch = snap.get("head_branch", "") if has_snap else None
+
+    # DEC-132 default 4: HEAD move with no before-snapshot.
+    if not has_snap and cur_head:
+        lh_commit, _ = _load_last_head(project_root)
+        if lh_commit and lh_commit != cur_head:
+            head_findings.append(_make_finding(
+                session_id, agent_type, role, ticket_id, command,
+                [], "flagged",
+                "HEAD moved with no before-snapshot"))
+            non_fwd = True
+            head_msg = "HEAD moved with no before-snapshot (flagged)."
+
+    if has_snap and cur_head and old_head and cur_head != old_head:
+        # Determine whether the move is a clean forward on the same
+        # branch.  Any git failure => treat as non-forward (repair 8).
+        try:
+            is_anc = _is_ancestor(project_root, old_head, cur_head)
+            has_merge = bool(_git(
+                project_root, "rev-list", "--merges",
+                f"{old_head}..{cur_head}").strip())
+            fwd = (bool(cur_branch) and cur_branch == old_branch
+                   and is_anc and not has_merge)
+        except _GitError:
+            fwd = False
+
+        if fwd:
+            try:
+                committed = _committed_files(
+                    project_root, old_head, cur_head)
+            except _GitError:
+                committed = []
+                fwd = False
+
+        if fwd:
+            rr = os.path.realpath(project_root)
+            out_c: list = []
+            for f in committed:
+                if not _in_scope(os.path.join(rr, f), project_root,
+                                 role, ticket_id, subagent_type, decide):
+                    out_c.append(f)
+                    committed_out.add(f)
+            if out_c:
+                head_findings.append(_make_finding(
+                    session_id, agent_type, role, ticket_id, command,
+                    out_c, "flagged",
+                    "committed path(s) outside allowed paths"))
+                head_msg = (
+                    "Committed paths outside allowed paths: "
+                    + ", ".join(sorted(out_c)) + ".")
+
+        if not fwd:
+            head_findings.append(_make_finding(
+                session_id, agent_type, role, ticket_id, command,
+                [], "flagged",
+                "HEAD moved (not a forward move on the same branch)"))
+            non_fwd = True
+            head_msg = "HEAD moved (not a forward move, flagged)."
+
+    # ---- classify by scope (repair 9: also after non-forward) ----
+    rr = os.path.realpath(project_root)
+    oos: list = []
+    acc_breach: list = []
+
+    for path in sorted(changed):
+        if path in committed_out:
+            continue
+        if not _in_scope(os.path.join(rr, path), project_root,
+                         role, ticket_id, subagent_type, decide):
+            if _is_under_acceptance(path):
+                acc_breach.append(path)
+            else:
+                oos.append(path)
+
+    # ---- act on findings ----
+    findings: list = list(head_findings)
+    all_flagged: list = []
+    all_reverted: list = []
+    all_failed: list = []
+
+    # Acceptance-test breaches.
+    if acc_breach:
+        can_revert = has_snap and not overlapping and not non_fwd
+        # Never restore paths dirty at the snapshot (repair 2).
+        restorable = [p for p in acc_breach if p not in dirty_at_snap]
+        dirty_b = [p for p in acc_breach if p in dirty_at_snap]
+
+        if dirty_b:
+            findings.append(_make_finding(
+                session_id, agent_type, role, ticket_id, command,
+                dirty_b, "flagged",
+                "acceptance test was already dirty, not restored"))
+            all_flagged.extend(dirty_b)
+
+        if restorable and can_revert:
+            ok, bad = _restore_from_head(project_root, restorable)
+            if ok:
+                findings.append(_make_finding(
+                    session_id, agent_type, role, ticket_id, command,
+                    ok, "reverted",
+                    "acceptance test restored from HEAD"))
+                all_reverted.extend(ok)
+            if bad:
+                findings.append(_make_finding(
+                    session_id, agent_type, role, ticket_id, command,
+                    bad, "flagged",
+                    "acceptance test restore failed"))
+                all_failed.extend(bad)
+        elif restorable:
+            findings.append(_make_finding(
+                session_id, agent_type, role, ticket_id, command,
+                restorable, "flagged",
+                "acceptance test change (attribution uncertain)"))
+            all_flagged.extend(restorable)
+
+    # Other out-of-scope changes.
+    if oos:
+        findings.append(_make_finding(
+            session_id, agent_type, role, ticket_id, command,
+            oos, "flagged",
+            "change outside allowed paths"))
+        all_flagged.extend(oos)
+
+    if findings:
+        _record_findings(project_root, findings)
+
+    # Save last HEAD and advance sequence.
+    if cur_head:
+        _save_last_head(project_root, cur_head, cur_branch)
+    _increment_seq(project_root)
+
+    return _format_report(all_flagged, all_reverted, all_failed,
+                          head_msg)

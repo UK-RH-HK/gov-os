@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """
-PreToolUse default-deny guard hook (W1-02).
+PreToolUse default-deny guard hook (W1-02, W1-03).
 
 Reads a JSON object from stdin, decides whether the tool call is allowed,
 and either allows (exit 0, no deny on stdout) or denies (exit 0 with
 permissionDecision: deny, or exit 2 on internal failure).
+
+When the guard lets a Bash call through, takes a before-snapshot of
+``git status`` and ``HEAD`` for the post-command containment check
+(DEC-126).
 
 Fail-closed: any internal error exits with code 2 and appends a finding
 to .gov-runtime/findings.jsonl (DEC-110).
@@ -81,6 +85,46 @@ def _allow() -> None:
     sys.exit(0)
 
 
+def _take_snapshot(project_root: str, data: dict) -> None:
+    """Take a before-snapshot for the containment check (DEC-126).
+
+    Called when the guard lets a Bash call through.  Snapshot failure
+    in a non-git directory does not block the call.  Any other failure
+    is appended as a finding but also does not block the call.
+    """
+    tool_use_id = data.get("tool_use_id", "")
+    if not tool_use_id:
+        return
+    try:
+        from gov.guard.containment import take_snapshot
+        take_snapshot(project_root, tool_use_id,
+                      session_id=data.get("session_id", ""),
+                      agent_id=data.get("agent_id", ""))
+    except Exception as exc:
+        # Snapshot failure must not go unnoticed (but does not block).
+        _append_finding(project_root, {
+            "source": "guard",
+            "kind": "snapshot_error",
+            "reason": f"before-snapshot failed: {exc}",
+            "session_id": data.get("session_id", ""),
+            "tool_name": data.get("tool_name", ""),
+        })
+
+
+def _note_write_tool(project_root: str) -> None:
+    """Increment the sequence counter for a write-tool call (DEC-124).
+
+    When a Write/Edit/NotebookEdit is allowed, the seq counter
+    advances so that any running Bash call's check sees overlap and
+    does not revert the write-tool's work.
+    """
+    try:
+        from gov.guard.containment import mark_concurrent_write
+        mark_concurrent_write(project_root)
+    except Exception:
+        pass  # must not add latency to write-tool calls
+
+
 def main() -> None:
     project_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
 
@@ -142,6 +186,13 @@ def main() -> None:
     if decision == "deny":
         _deny(reason)
     else:
+        # For Bash calls that are not denied, take the before-snapshot
+        # (DEC-126).  The snapshot runs for any non-deny decision
+        # (allow and future 'ask').
+        if tool_name == "Bash":
+            _take_snapshot(project_root, data)
+        elif tool_name in ("Write", "Edit", "NotebookEdit"):
+            _note_write_tool(project_root)
         _allow()
 
 
