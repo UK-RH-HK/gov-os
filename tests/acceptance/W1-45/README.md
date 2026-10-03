@@ -29,6 +29,18 @@ Ticket: DAEO-6cc2.  Sources: DEC-150, DEC-156, DEC-171, DEC-112, DEC-106, MR-3.
 | **Success 5 / Failure 2.** Engineer containment unchanged | `test_engineer_change_outside_ticket_paths_is_still_caught` | Already passes |
 | **Failure 1.** Orchestrator change under acceptance is caught | `test_orchestrator_change_under_acceptance_stays_a_finding`, `test_orchestrator_commit_touching_acceptance_is_caught` | Already passes |
 
+### Subagent scope (PreToolUse + PostToolUse) -- `test_w1_45_subagent_scope.py`
+
+| KPI | Tests | Red reason (before implementation) |
+|-----|-------|-------------------------------------|
+| **Failure 2.** Another role gains a write through an orchestrator subagent | `test_orchestrator_subagent_denied_outside_scope_in_non_orchestrator_session` (6 cases), `test_orchestrator_subagent_denied_outside_orchestrator_ticket_paths`, `test_orchestrator_subagent_bash_denied_in_non_orchestrator_session` (3 cases), `test_orchestrator_subagent_without_ticket_denied` (4 cases) | The orchestrator subagent may get the wide DEC-156 scope in a non-orchestrator session |
+| **Failure 2 (positive).** Orchestrator subagent on its own ticket gets ticket paths | `test_orchestrator_subagent_allowed_on_orchestrator_ticket_paths` (2 cases), `test_orchestrator_subagent_can_write_to_scratch` | Already passes (ticket-path match, scratch) |
+| **Failure 3.** No-role or unknown-role session orchestrator subagent is read-only | `test_no_role_session_orchestrator_subagent_is_read_only`, `test_unknown_role_session_orchestrator_subagent_is_read_only` | Already passes (DEC-125) |
+| **Success 1.** In an orchestrator session the orchestrator subagent keeps the wide scope | `test_orchestrator_subagent_wide_scope_in_orchestrator_session` (8 cases), `test_orchestrator_subagent_bash_wide_scope_in_orchestrator_session` | The subagent may not get the wide scope at all (if the implementation is session-scoped both ways) |
+| **Success 2.** Even the orchestrator subagent is denied under `tests/acceptance/**` | `test_orchestrator_subagent_acceptance_denied_in_orchestrator_session` | Already passes (MR-3 exclusion) |
+| **Containment.** Orchestrator subagent in non-orchestrator session: change is a finding | `test_containment_catches_orchestrator_subagent_in_non_orchestrator_session` | The containment check may treat it as a DEC-171 record |
+| **Containment (DEC-171).** Orchestrator subagent in orchestrator session: change is a record | `test_containment_silent_for_orchestrator_subagent_in_orchestrator_session` | Already passes (DEC-171) |
+
 ### Process KPIs
 
 | KPI | Verification |
@@ -54,7 +66,7 @@ Each revision is a rewrite after implementation with reason: **owner correction,
 
 | Case | Old expectation | New expectation | Reason |
 |------|----------------|-----------------|--------|
-| `"orchestrator-in-engineer-session-on-the-engineer-s-ticket"` | `ROLE_DENIES` (denied) | `ROLE_ALLOWS` (allowed) | DEC-156: the orchestrator subagent may write source regardless of ticket |
+| `"orchestrator-in-engineer-session-on-the-engineer-s-ticket"` | `ROLE_ALLOWS` (batch 2 revision) | `ROLE_DENIES` (denied) | DEC-136 batch 3: the wide DEC-156 scope does not reach an orchestrator subagent in a non-orchestrator session; batch 2 revision was incorrect |
 
 ### W1-03 `test_w1_03_out_of_scope.py`
 
