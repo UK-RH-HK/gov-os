@@ -255,7 +255,8 @@ def T(n): return tk[n][1]
 shape = {'W1-45': ('engineer', 'FULL', ['W1-05']), 'W1-46': ('engineer', 'FULL', ['W1-07', 'W1-47', 'W1-48']), 'W1-47': ('engineer', 'FULL', ['W1-45']), 'W1-48': ('orchestrator', 'LITE', ['W1-06'])}
 bad = [n for n, (r_, p_, d_) in shape.items() if (T(n)['role'], T(n)['profile'], sorted(T(n)['depends_on'])) != (r_, p_, d_) or T(n)['acceptance_tests']['path'] != f'tests/acceptance/{n}/']
 check('S2 tickets W1-45..W1-48 have the agreed role, profile, dependencies and acceptance-test path', not bad, str(bad))
-check('W1-45 (orchestrator write scope) is in_progress (DEC-150)', T('W1-45')['status'] == 'in_progress')
+check('W1-45 (orchestrator write scope) is in_progress, or closed by the owner (DEC-150, DEC-188)',
+      T('W1-45')['status'] in ('in_progress', 'closed'))
 k46 = kp('W1-46')
 check('W1-46 KPIs carry the three tests DEC-161 requires, the network profiles, the temp directory and the start refusal',
       all(x in k46 for x in ('a launched worker is sandboxed', 'accepting the research domains', 'GOV_ROLE and GOV_TICKET', 'empty allowlist', 'per-session temp directory', 'refuses to start', 'Edit deny rules')))
