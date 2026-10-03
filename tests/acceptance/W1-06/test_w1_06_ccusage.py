@@ -11,6 +11,12 @@ uninstall commands, date and approving decision.
 The two tests of what is on this machine are ``local_only``. They read the
 version from the installed package's own ``package.json``; nothing is installed,
 downloaded or removed.
+
+Revised in the second batch (before implementation): DEC-192 approves the
+install with the npm of Node v22.23.3, whose ``bin`` is not on ``PATH`` (the
+nvm default stays v18.20.8, ADR-0002 §2). The two ``local_only`` tests looked
+for ``ccusage`` on ``PATH``; they now look under ``~/.nvm/versions/node/v22.23.3``.
+What DEC-192 and DEC-197 add is in ``test_w1_06_install_approvals.py``.
 """
 
 from __future__ import annotations
@@ -87,16 +93,24 @@ def test_ccusage_was_not_installed_before_its_approval(registry, decisions):
     )
 
 
+NOT_INSTALLED = (
+    f"ccusage is not a global package of ~/{support.NODE_22_REL}: it is not installed where DEC-192 installs it"
+)
+
+
 @pytest.mark.local_only
 def test_ccusage_is_installed_on_this_machine(registry):
-    path, _ = support.installed_version("ccusage", "ccusage")
-    assert path is not None, "there is no `ccusage` on PATH: ccusage is not installed on this machine"
+    """Revised for DEC-192: the approved install is under Node v22.23.3, which is not the ``node`` on PATH."""
+    path, _ = support.node_22_package("ccusage", "ccusage")
+    assert path is not None, NOT_INSTALLED
 
 
 @pytest.mark.local_only
 def test_the_installed_ccusage_is_the_pinned_version(registry):
+    """Revised for DEC-192: the version is read from the package under Node v22.23.3."""
     pinned = support.norm_version(_entry(registry).get("version", ""))
-    path, found = support.installed_version("ccusage", "ccusage")
-    assert path is not None, "there is no `ccusage` on PATH: ccusage is not installed on this machine"
-    versions = [support.norm_version(token) for token in re.findall(r"v?\d+(?:\.\d+)+[0-9A-Za-z.+-]*", found or "")]
-    assert pinned in versions, f"{path} is ccusage {found!r}; the registry pins {pinned!r}"
+    path, found = support.node_22_package("ccusage", "ccusage")
+    assert path is not None, NOT_INSTALLED
+    assert found is not None and support.norm_version(found) == pinned, (
+        f"{path} is ccusage {found!r}; the registry pins {pinned!r}"
+    )

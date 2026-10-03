@@ -37,6 +37,12 @@ def schema():
 
 
 @pytest.fixture(scope="session")
+def vendor():
+    """The files under ``template/governance/kernel/vendor/superpowers/`` (DEC-194), relative to that folder."""
+    return _load(support.load_vendor)
+
+
+@pytest.fixture(scope="session")
 def decisions():
     """The entries of ``docs/DECISION_REGISTER.md``, by id."""
     return _load(support.load_decisions)

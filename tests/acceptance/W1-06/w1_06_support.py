@@ -1,13 +1,14 @@
 """Helpers for the W1-06 acceptance tests: the registry, the schema and the decision register.
 
 Nothing here installs, downloads, uninstalls or writes anything. The registry,
-the schema and the register are read from the working tree; the one look at the
-machine (``installed_version``) reads a file next to an executable that is
-already there.
+the schema, the register and the vendor folder are read from the working tree;
+the looks at the machine (``installed_version``, ``file_sha256``) read a file
+that is already there.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -179,3 +180,97 @@ def installed_version(command, package):
             return path, str(data["version"])
     result = subprocess.run([path, "--version"], capture_output=True, text=True, timeout=20, check=False)
     return path, (result.stdout + result.stderr).strip()
+
+
+# --------------------------------------------------------------------------
+# Second batch (DEC-192 … DEC-197)
+# --------------------------------------------------------------------------
+
+VENDOR_REL = "template/governance/kernel/vendor/superpowers"
+SKILLS = ("test-driven-development", "systematic-debugging", "verification-before-completion")
+SCRATCH_CLONE_REL = ".gov-runtime/scratch/orchestrator/vendor-src/superpowers"
+
+# DEC-192: ccusage is installed with the npm of ADR-0002's Node 22, so it lands under that Node's prefix.
+NODE_22_REL = ".nvm/versions/node/v22.23.3"
+NODE_22_PREFIX = Path.home() / NODE_22_REL
+
+
+def node_22_package(command, package):
+    """``(path, version)`` of a global npm package of Node v22.23.3; ``(None, None)`` when it is not installed there.
+
+    ``path`` is the command npm links into that Node's ``bin``; the version is
+    read from the package's own ``package.json``. Nothing is run.
+    """
+    link = NODE_22_PREFIX / "bin" / command
+    manifest = NODE_22_PREFIX / "lib" / "node_modules" / package / "package.json"
+    if not (link.exists() and manifest.is_file()):
+        return None, None
+    try:
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+    except ValueError:
+        return str(link), None
+    return str(link), str(data.get("version")) if isinstance(data, dict) and data.get("version") else None
+
+
+def file_sha256(path):
+    """The sha256 of the file at ``path`` (symbolic links followed), read in pieces."""
+    digest = hashlib.sha256()
+    with open(os.path.realpath(path), "rb") as handle:
+        for piece in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(piece)
+    return digest.hexdigest()
+
+
+def own_text(decision):
+    """The heading and the entry's own lines: the text stops at the next section heading or change-log table.
+
+    ``Decision.body`` runs to the next ``### DEC`` heading, so the last entry of a
+    register section also holds that section's change-log row, which names every
+    tool of the section. That row is not part of the decision.
+    """
+    body = re.split(r"^(?:## |\|)", decision.body, maxsplit=1, flags=re.MULTILINE)[0]
+    return f"{decision.title}\n{body}"
+
+
+def names_tool(text, name):
+    """Whether ``text`` holds ``name`` as a word of its own (compared without case)."""
+    return re.search(rf"(?<![0-9a-z-]){re.escape(norm_name(name))}(?![0-9a-z-])", text.lower()) is not None
+
+
+def names_version(text, version):
+    """Whether ``text`` holds exactly ``version`` (with or without a leading ``v``), not a longer one."""
+    return re.search(rf"(?<![0-9.]){re.escape(norm_version(version))}(?![0-9]|\.[0-9])", text) is not None
+
+
+def approved_by(entry):
+    return str(entry.get("approved_by", "")).strip()
+
+
+def tracked_files(rel=None):
+    """The paths git tracks (under ``rel`` when given), relative to the repository root."""
+    command = ["git", "ls-files", "-z"] + (["--", rel] if rel else [])
+    result = subprocess.run(command, cwd=REPO_ROOT, capture_output=True, text=True, check=False)
+    return sorted(path for path in result.stdout.split("\0") if path)
+
+
+def load_vendor():
+    """The files on disk under the Superpowers vendor folder, relative to that folder (posix paths)."""
+    root = REPO_ROOT / VENDOR_REL
+    if not root.is_dir():
+        raise Missing(f"{VENDOR_REL}/ does not exist: W1-06 has not committed the Superpowers source")
+    return sorted(path.relative_to(root).as_posix() for path in root.rglob("*")
+                  if path.is_file() or path.is_symlink())
+
+
+def skill_of(rel):
+    """The one of the three skills whose folder holds ``rel``; None when it is in none of them."""
+    for part in rel.split("/")[:-1]:
+        if part in SKILLS:
+            return part
+    return None
+
+
+def is_licence(rel):
+    """A licence file outside the skill folders: ``LICENSE``, ``LICENCE`` or ``COPYING``, with any extension."""
+    name = rel.split("/")[-1].upper()
+    return skill_of(rel) is None and name.split(".")[0] in ("LICENSE", "LICENCE", "COPYING")

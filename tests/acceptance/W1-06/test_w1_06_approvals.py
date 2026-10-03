@@ -7,8 +7,9 @@ decision"; the schema's ``approved_by`` holds that decision's id (DEC-121). The
 approval is recorded when that id is an entry of ``docs/DECISION_REGISTER.md``
 whose status is ``ACCEPTED (owner…)``.
 
-Whether the approving decision must also name the tool and its version is a
-decision package in the README, not a test.
+Whether the approving decision must also name the tool and its version was
+DP-4; the owner answered it (DEC-197) and ``test_w1_06_install_approvals.py``
+tests the answer.
 """
 
 from __future__ import annotations

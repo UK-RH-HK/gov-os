@@ -10,8 +10,9 @@ and a sha256: the tests ask for exactly what the table states. The table
 abbreviates most digests (``ca136f0e…32e797c6``); the registry must hold the
 full digest, which begins and ends as the table says.
 
-Rows of the table without a sha256, and where the Superpowers source must be,
-are not tested here: see the decision packages in the README.
+Rows of the table without a sha256 are not pins of this ticket (DEC-195), but
+for gitleaks 8.30.1, which ``test_w1_06_digests.py`` tests. Where the
+Superpowers source must be (DEC-194) is tested in ``test_w1_06_vendor.py``.
 
 DEC-191: PyYAML 6.0.1 "is recorded in the tool registry when W1-06 creates it".
 """
