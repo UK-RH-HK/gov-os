@@ -11,7 +11,8 @@ point at the workbench (default: ~/gov-os-workbench).
 
 Section 3e checks what the S2 change added (Contract v4.1, tickets W1-45…W1-48, DEC-150…DEC-162). Section 3f checks the
 repair after the S2-A round-1 audit (S2A-F-01…F-10, DEC-163…DEC-171). Section 3g checks the repair after the round-2 audit
-(S2A-F-11…F-16, DEC-172, DEC-173). The write-scope check of S1 (section 9) applies on branch
+(S2A-F-11…F-16, DEC-172, DEC-173). Section 3h checks the fixes at the round-3 closure check (S2A-F-17, F-18, DEC-174).
+The write-scope check of S1 (section 9) applies on branch
 `s1/spec` only; on `s2/spec` the S2 write scope is checked instead.
 """
 import glob, os, re, sys, fnmatch, csv, yaml
@@ -318,7 +319,7 @@ check('F-08: the fingerprint rename fallback applies to PROMPT.md only, and the 
 def cv_(i): return cov[i][1]
 check('DEC-163: a minimal research role in the Wave 1 roster, delivered by W1-46; installs only inside its experiment folder',
       cv_('CAP-22.d')['wave'] == 'W1' and cv_('CAP-22.d')['provider'] == ['W1-46'] and cv_('CAP-25.e')['provider'] == ['W1-46'] and 'write fence' in cv_('CAP-25.e')['item'] and 'DEC-158' in cv_('CAP-22.d')['item']
-      and all(x in k46 for x in ('minimal research role', "sandbox's write fence", 'A research session installs or writes outside its experiment folder')) and '.claude/agents/research.md' in T('W1-46')['allowed_paths']
+      and all(x in k46 for x in ('minimal research role', "sandbox's write fence", 'A research session installs system-wide, or writes to a path that existed at launch outside its experiment folder')) and '.claude/agents/research.md' in T('W1-46')['allowed_paths']
       and 'DEC-163' in c['envelope']['tool_installs']['statement'] and 'full research lifecycle (CAP-32) stays W3' in cv_('CAP-22.d')['item'] and cap['CAP-32']['wave'] == 'W3')
 check('DEC-164: subagents in a sandboxed worker and excludedCommands are open residuals in EXP-002 (W2); the launcher sets no excludedCommands',
       all(x in cv_('CAP-61.f')['item'] for x in ('subagents inside a sandboxed worker session', '`excludedCommands`', 'EXP-002')) and cv_('CAP-61.f')['wave'] == 'W2'
@@ -348,7 +349,7 @@ check('DEC-168: scope and severity are in the Wave 1 lesson schema (CAP-41.f, W1
 ch = open(f'{R}/docs/charter/CHARTER_v5.md').read()
 check('Charter v5 carries the two changes the decisions require: the research role in the Wave 1 roster (DEC-163) and the lesson-loop non-goal row (DEC-165)',
       'research, in a minimal form (DEC-163)' in ch and 'reversed for framework lessons only by DEC-165' in ch and {'DEC-163', 'DEC-165'} <= set(fms[f'{R}/docs/charter/CHARTER_v5.md']['decisions']))
-check('ADR-0002 carries the research role, EXP-002, gov discover and the lesson loop', all(x in adr2 for x in ('DEC-163', 'EXP-002', 'gov discover', '~/gov-os-lessons-inbox/', 'DEC-138…DEC-173')) and 'DEC-167' in adr2fm['decisions'])
+check('ADR-0002 carries the research role, EXP-002, gov discover and the lesson loop', all(x in adr2 for x in ('DEC-163', 'EXP-002', 'gov discover', '~/gov-os-lessons-inbox/', 'DEC-138…DEC-174')) and 'DEC-167' in adr2fm['decisions'])
 
 # 3g. Repair after the S2-A round-2 audit (S2A-F-11..F-16; DEC-172, DEC-173; docs/changes/S2-CIT-E.md §7)
 check('DEC-172, DEC-173 ACCEPTED (owner, 2026-10-03)', all(re.search(rf'### DEC-{n} .*\n- \*\*Status:\*\* ACCEPTED \(owner, 2026-10-03\)', reg) for n in (172, 173)))
@@ -379,9 +380,22 @@ check('F-14: the oracle path is held in held-out.yaml and in the committed deny 
       and 'the owner confirms at close' in k47)
 check('F-15: DEC-170 is a Wave 1 covers item of the telemetry capability (CAP-40.d), delivered by W1-31',
       cv_('CAP-40.d')['wave'] == 'W1' and cv_('CAP-40.d')['provider'] == ['W1-31'] and 'DEC-170' in cv_('CAP-40.d')['source'] and 'DEC-170' in cap['CAP-40']['sources'] and '[CAP-40.d]' in k31 and 'separate line' in cv_('CAP-40.d')['item'])
-check('F-16: S2-CIT-P §6 lists DEC-170 and DEC-171, and §7 the round-2 repair; the WBS header cites DEC-102…DEC-172; S2-CIT-E §7 records DEC-172 and DEC-173',
-      all(f'| {d_} ' in citp_t for d_ in ('DEC-170', 'DEC-171', 'DEC-172 (DP-3, S2A-F-11)', 'DEC-173 (DP-4, S2A-F-12)')) and 'DEC-102…DEC-172' in wbs and 'DEC-172' in fms[f'{R}/docs/plan/WAVE_1_WBS.md']['decisions']
+check('F-16: S2-CIT-P §6 lists DEC-170 and DEC-171, and §7 the round-2 repair; the WBS header cites DEC-102…DEC-174; S2-CIT-E §7 records DEC-172 and DEC-173',
+      all(f'| {d_} ' in citp_t for d_ in ('DEC-170', 'DEC-171', 'DEC-172 (DP-3, S2A-F-11)', 'DEC-173 (DP-4, S2A-F-12)')) and 'DEC-102…DEC-174' in wbs and 'DEC-172' in fms[f'{R}/docs/plan/WAVE_1_WBS.md']['decisions']
       and '## 7. Repair after the S2-A round-2 audit' in cite_t and {'DEC-172', 'DEC-173'} <= set(frontmatter(cite)['decisions_recorded']) and 'Five lines' in cite_t)
+
+# 3h. Fixes at the S2-A round-3 closure check (S2A-F-17, F-18, O-12; DEC-174; docs/changes/S2-CIT-E.md §8)
+UVF = ('uv add', 'uv sync', 'uv run --with', 'uvx')
+f46 = T('W1-46')['kpis']['failure']
+check('DEC-174: ACCEPTED; W1-47 extends the guard\'s install rule to uv add, uv sync, uv run --with and uvx (CAP-25.g); the research exception still applies',
+      re.search(r'### DEC-174 .*\n- \*\*Status:\*\* ACCEPTED \(owner, 2026-10-03\)', reg) and cv_('CAP-25.g')['wave'] == 'W1' and cv_('CAP-25.g')['provider'] == ['W1-47'] and 'DEC-174' in cv_('CAP-25.g')['source']
+      and all(f'`{x}`' in cv_('CAP-25.g')['item'] for x in UVF) and any('[CAP-25.g]' in l and all(x in l for x in UVF) and 'DEC-163' in l for l in T('W1-47')['kpis']['success'])
+      and 'DEC-174' in T('W1-47')['sources'] and 'tests/unit/install/**' in T('W1-47')['allowed_paths'] and 'DEC-174' in k46 and all(x in t_ for t_ in (adr2, wbs, boot) for x in ('DEC-174', '`uvx`')))
+check('F-18: W1-46 failure KPI 4 covers a system-wide install and a path that existed at launch; the later-path case is failure KPI 5',
+      f46[3] == 'A research session installs system-wide, or writes to a path that existed at launch outside its experiment folder' and 'created after launch' in f46[4] and 'neither refused by the guard nor reported' in f46[4])
+check('F-17, O-12: bootstrap.md and S2-CIT-E record the commands that lose their settings prompt from a run of the classifier; .git/hooks and .git/config stay protected by the sandbox',
+      all('201 commands' in t_ and '159' in t_ and 'run --with-requirements' in t_ and 'round3-classifier-run' in t_ for t_ in (boot, cite_t)) and 'from a run of the classifier' in boot and 'not a reading' in cite_t
+      and '`.git/hooks` and `.git/config` stay protected' in boot and "aren't seen by the containment check" in boot and '## 8. Fixes at the S2-A round-3 closure check' in cite_t and 'DEC-174' in frontmatter(cite)['decisions_recorded'])
 
 # 9. write scope, per branch (DEC-155)
 def changed(base):

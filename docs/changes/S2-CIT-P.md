@@ -10,7 +10,7 @@ author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162]
-repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), DEC-163…DEC-171, see S2-CIT-E §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), DEC-172 and DEC-173, see §7 and S2-CIT-E §7
+repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), DEC-163…DEC-171, see S2-CIT-E §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), DEC-172 and DEC-173, see §7 and S2-CIT-E §7; at the round-3 closure check, DEC-174, see §7 and S2-CIT-E §8
 ---
 
 # S2 — Change-impact proposal (CIT-P) on the Gov OS specification
@@ -231,5 +231,7 @@ packages. The impact is listed here; the execution is in `S2-CIT-E.md` §7.
 | S2A-F-14 | Where the oracle path is held | `CAP-49.c`; W1-47 (KPI, body); ADR-0002 §6; `bootstrap.md` |
 | S2A-F-15 | DEC-170 had no Contract item | New `CAP-40.d` (W1, W1-31), CAP-40 sources; the W1-31 KPI cites it |
 | S2A-F-16 | This record and the WBS header stopped short | §6 above (DEC-170, DEC-171); WBS opening paragraph and frontmatter |
+| DEC-174 (round-3 closure check, S2A-F-17) | W1-47 extends the guard's install rule to `uv add`, `uv sync`, `uv run --with` and `uvx` | New `CAP-25.g` (W1, W1-47), CAP-25 sources; W1-47 (one KPI, one failure KPI, sources, `tests/unit/install/**` in `allowed_paths`, body); W1-46 (the install KPI names the four forms); ADR-0002 §6; WBS rules, §1, §3, §5; `bootstrap.md` |
+| S2A-F-17, S2A-F-18, O-12 (round-3 closure check) | The full list of commands that lose their settings prompt, from a run of the classifier; W1-46 failure KPI 4 narrowed; `.git/hooks` and `.git/config` | `bootstrap.md`; S2-CIT-E §7.4 point 3 and §8; W1-46 |
 
 The three options of DEC-105 were not re-asked: the owner gave both answers as decisions to apply in this change.

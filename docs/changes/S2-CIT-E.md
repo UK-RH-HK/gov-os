@@ -8,8 +8,8 @@ base: w1/integrate @ 442e9c3
 proposal: S2-CIT-P
 author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
-decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173]
-repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), §7
+decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174]
+repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), §7; the round-3 closure check, §8
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 ---
 
@@ -374,12 +374,35 @@ Tickets edited:
    one remains.
 2. **DEC-172 has a Contract item, `CAP-25.f`.** The owner's answer names W1-47, W1-46 and `bootstrap.md`. The item was
    added so that the new W1-47 KPI cites a `covers` item, as S2A-F-15 asked of DEC-170.
-3. **What the settings rules caught that the guard's rule does not.** This is S2's reading of `bootstrap.md`'s list of
-   W1-04 edge cases against the rule patterns; nothing was run. Three kinds of command meet no prompt in the
-   orchestrator's own session once the rules are gone: a download piped to a shell inside a subshell, an option with
-   a value before `uv`'s subcommand, and a `curl` or `wget` download that is not an install. `bootstrap.md` states
-   this under "Still open for the orchestrator's own session". The owner decided DP-3 unconditionally; the list is
-   recorded, not reopened.
+3. **What the settings rules caught that the guard's rule does not.** Corrected at the round-3 closure check
+   (S2A-F-17): the first version of this point was a reading, named three kinds of command, and was incomplete. The
+   list now comes from a run. S2 ran the guard's install classifier (`has_install` and `has_sudo` in
+   `src/gov/guard/install.py`, last changed by `0c149f7`) over 201 commands, executing none. 198 are matched by one of
+   the eleven ask rules; the guard's rule still catches 39; 159 lose their prompt in the orchestrator's own session:
+   - `pip`, `pip3`, `python -m pip`, `python3 -m pip`: every subcommand but `install` (`download`, `wheel`,
+     `uninstall`, `list`, `freeze`, `show`, `check`, `config`, `cache`, `index`, `inspect`, `hash`, `search`,
+     `debug`, `--version`, `help`);
+   - `uv`: everything but `pip install` and `tool install`: `add`, `sync`, `run`, `run --with`,
+     `run --with-requirements`, `pip sync`, `pip uninstall`, `pip compile`, `pip list`, `pip freeze`, `pip show`,
+     `pip check`, `pip tree`, `remove`, `lock`, `tool run`, `tool upgrade`, `tool uninstall`, `tool list`,
+     `tool update-shell`, `python install`, `python uninstall`, `python list`, `python pin`, `venv`, `init`, `build`,
+     `publish`, `export`, `tree`, `cache clean`, `self update`, `version`, `--version`, `help`; and `pip install` or
+     `tool install` after an option with a value (`--directory`, `--project`);
+   - `apt`, `apt-get`: every subcommand but `install` (`update`, `upgrade`, `full-upgrade`, `dist-upgrade`, `remove`,
+     `purge`, `autoremove`, `download`, `source`, `build-dep`, `clean`; `apt list`, `search`, `show`,
+     `edit-sources`); those that change the system fail without `sudo`, which stays denied;
+   - `curl`: a fetch to standard output; `-O`; `-o` to a relative path; `--output-dir` with `-O`, also into a `PATH`
+     directory; a shell redirect into a `PATH` directory; uploads (`-d @file`, `-T`, `-F`); a pipe to `(sh)`, `zsh`,
+     `dash`, `env sh`, `python3` or `tar`; a download followed by a run;
+   - `wget`: a plain download; `-O` to a relative path; `-P` or `--directory-prefix`, also into a `PATH` directory;
+     `--post-file`; `-r`; a pipe to `(sh)`, `zsh`, `python3` or `tar`; a download followed by a run;
+   - `npm install`, `cargo install`: none; every form tried is still caught.
+
+   `uvx` is matched by no settings rule and had no prompt before. `bootstrap.md` carries the same list as a table,
+   with the "still asked" side. The script and its output are at `~/gov-os-workbench/s2/round3-classifier-run/`.
+   Limits: the settings rules are taken as prefix matches; no Claude Code session was run; the 201 commands are the
+   subcommands S2 knows, so a command with one of the eleven prefixes that the classifier does not call an install
+   loses its prompt whether or not it is listed. DEC-174 gives four of these forms the guard's `ask` (§8).
 4. **The exceptions to the deny list are two, and S2 chose them.** `.git/` comes from the audit. The glob-character
    entry comes from EXP-001 §1. W1-46's test asserts that the generated list leaves out exactly these.
 5. **A later path is "covered", not "stopped".** The guard sees the forms it can parse; for the rest the containment
@@ -399,3 +422,51 @@ Tickets edited:
 
 `python3 docs/plan/tools/validate_s1.py`, run from the repository root on `s2/spec` after this repair: 96 PASS, 2 SKIP,
 0 FAIL. The two skipped are the same as in §5.
+
+## 8. Fixes at the S2-A round-3 closure check (2026-10-03)
+
+S2-A's round-3 closure check was ACCEPT_WITH_FINDINGS: no BLOCKER, no MAJOR, 2 MINOR (S2A-F-17, S2A-F-18). All six
+round-2 findings were found repaired. The owner directed the fixes, added one decision, and closed the audit: there
+is no further round. The audit files were read from `~/gov-os-workbench/s2/round3-audit/`.
+
+### 8.1 What was fixed
+
+| Item | Fix | Files |
+|---|---|---|
+| S2A-F-17 | The list of commands that lose their settings prompt under DEC-172 is recorded in full, from a run of the classifier, not a reading: 201 commands, 198 matched by an ask rule, 39 still caught, 159 without a prompt | `bootstrap.md` (table, limits, what stays open); §7.4 point 3 above |
+| DEC-174 (owner, on S2A-F-17) | W1-47 extends the guard's install rule to `uv add`, `uv sync`, `uv run --with` and `uvx`: `ask` for the orchestrator (DEC-083), denied for engineer, test designer and auditor; the research exception (DEC-163) still lets them through inside the experiment folder | Register v0.31; new `CAP-25.g` (W1, W1-47), CAP-25 sources; `DAEO-o4fg` (KPI, failure KPI, sources, `tests/unit/install/**` in `allowed_paths`, body); `DAEO-jdqr` (install KPI, source); ADR-0002 §6; WBS rules, §1, §3, §5; `bootstrap.md` |
+| S2A-F-18 | W1-46 failure KPI 4 is narrowed to "A research session installs system-wide, or writes to a path that existed at launch outside its experiment folder". The later-path case stays with failure KPI 5 | `DAEO-jdqr` |
+| O-12 | `bootstrap.md` says that `.git/hooks` and `.git/config` stay protected by the sandbox although `.git/` is left out of the deny list, and that other changes inside `.git/` aren't seen by the containment check | `bootstrap.md` |
+
+O-13, O-14 and O-15 needed no change. On O-15: the WBS header range now ends at DEC-174, which a W1-47 KPI cites;
+DEC-173 stays out of the WBS frontmatter, having no ticket.
+
+### 8.2 Figures
+
+| Item | After the round-2 repair | Now |
+|---|---|---|
+| Register | v0.30, DEC-150…DEC-173 (24) | v0.31, DEC-150…DEC-174 (25) |
+| `covers` items | 207 | 208: `CAP-25.g` (W1, W1-47) added; none removed or reworded |
+| Wave 1 tickets | 48 | 48. W1-47 gains `tests/unit/install/**` in `allowed_paths`. No estimate, dependency, role or profile changed |
+| Wave 1 glue, layers, critical path | ≈ 5,460 LOC; unchanged | Unchanged |
+| Charter v5 | Five lines | Unchanged |
+
+### 8.3 Points to know
+
+1. **`tests/unit/install/**` joins W1-47's `allowed_paths`.** The unit tests of the install rule live there, and
+   DEC-174 makes W1-47 change that rule. It is not an acceptance-test path. The owner's instruction does not name
+   this change.
+2. **DEC-174 names four forms; the run shows more that fetch or install.** `uv run` without `--with`,
+   `uv run --with-requirements`, `uv pip sync`, `uv tool run`, `uv tool upgrade`, `uv python install` and
+   `uv self update` stay without a prompt in the orchestrator's own session, as do the `pip`, `curl` and `wget` forms
+   listed. `bootstrap.md` says so. The W1-47 KPI states that `uv run` without `--with` is not classified by this
+   change.
+3. **For engineer, test designer and auditor the four forms become denied**, as every install is for them (DEC-083).
+   An engineer session that runs its tests through `uv run --with …` is then refused by the guard.
+4. **W1-47 stays at 60 LOC.** The four forms are a few lines in the `uv` branch of the classifier. WBS §3 says so.
+5. **The classifier run is S2's own, on the code at `0c149f7`.** It read `src/` and wrote nothing in the repository.
+
+### 8.4 Validation
+
+`python3 docs/plan/tools/validate_s1.py`, run from the repository root on `s2/spec` after these fixes: 99 PASS, 2 SKIP,
+0 FAIL. Section 3h has three checks for these fixes. The two skipped are the same as in §5.
