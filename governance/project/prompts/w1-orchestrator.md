@@ -50,7 +50,7 @@ W1-06 and W1-48 are installs: under DEC-083 you present a decision package, the 
 Stop, with one short block (the owner reads on a phone), for:
 - DECISION_PACKAGES;
 - ESCALATION;
-- CONTEXT_CHECKPOINT, when you're above about 100k tokens at a ticket close. The owner resumes you with: "Read governance/project/prompts/w1-orchestrator.md and resume from .gov-runtime/scratch/orchestrator/CHECKPOINT.md";
+- CONTEXT_CHECKPOINT, when you're above about 300k tokens at a ticket close. The owner resumes you with: "Read governance/project/prompts/w1-orchestrator.md and resume from .gov-runtime/scratch/orchestrator/CHECKPOINT.md";
 - WAVE_1_EXIT_READY, after W1-42 and before W1-43. The exit audit runs as a fresh session the owner starts.
 
 ## 8. Commits and trailers
