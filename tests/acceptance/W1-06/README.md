@@ -9,6 +9,9 @@ rewritten.
 below (DEC-192 … DEC-197). This batch adds 49 cases in three files for those answers and revises two cases of this
 suite; see "Second batch" below.
 
+**Third batch (2026-10-03, a fresh designer, after implementation).** The owner answered DP-5 (DEC-199). This batch
+adds 2 cases in one file and changes no existing test; see "Third batch" below.
+
 ## Run
 
 ```sh
@@ -52,9 +55,33 @@ The last column gives what each group fails on first once the file exists.
 | **Success 1 and failure 1, as answered (DEC-192, DEC-193, DEC-197).** Each install has its own register entry, which `approved_by` cites | `test_w1_06_install_approvals.py` | `test_an_install_of_this_ticket_is_recorded_at_the_approved_version[2]` · `test_an_install_of_this_ticket_cites_a_decision_that_names_the_tool_and_its_version[2]` · `test_an_install_of_this_ticket_has_its_own_register_entry[2]` · `test_the_approval_of_an_install_of_this_ticket_is_made_under_dec_083[2]` · `test_an_install_of_this_ticket_is_not_dated_before_its_approval[2]` · `test_the_ccusage_install_command_is_the_approved_one` · `test_the_ccusage_uninstall_command_uses_the_same_npm` · `test_the_superpowers_install_command_fetches_the_approved_source` · `test_a_stack_pin_cites_dec_074[10]` · `test_pyyaml_cites_dec_191` · `test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool` | No ccusage or Superpowers entry; then an `approved_by` that is the rule (DEC-083) and not the approval |
 | **Success 2, second half, as answered (DEC-195, DEC-196).** gitleaks 8.30.1 is a pin; a single-file tool's sha256 is its binary's | `test_w1_06_digests.py` | `test_gitleaks_is_recorded_at_8_30_1` · `test_gitleaks_is_recorded_with_a_sha256_digest` · `test_a_single_file_tool_is_recorded_with_the_sha256_of_its_binary[7]` (`local_only`) · `test_the_gitleaks_on_this_machine_is_the_pinned_version` (`local_only`) | No gitleaks entry |
 | **Success 2, first half, as answered (DEC-194).** The three skills and the licence are committed; nothing else of Superpowers is | `test_w1_06_vendor.py` | `test_the_vendor_folder_is_committed` · `test_a_skill_folder_is_there_with_its_skill_md[3]` · `test_a_skill_md_declares_the_skill_of_its_folder[3]` · `test_the_upstream_licence_is_there` · `test_no_other_skill_is_there` · `test_no_plugin_is_there` · `test_no_hook_is_there` · `test_nothing_but_the_three_skills_and_the_licence_is_there` · `test_the_excluded_parts_are_nowhere_in_the_repository` · `test_the_scratch_clone_is_deleted` (`local_only`) | The vendor folder does not exist |
+| **Success 2, first half, as answered (DEC-199).** The Superpowers entry's sha256 is the digest of the committed vendor folder | `test_w1_06_vendor_digest.py` | `test_the_superpowers_sha256_is_the_digest_of_the_committed_vendor_folder` · `test_the_digest_rule_gives_the_value_worked_out_by_hand` | Red at `58113a8a`: the registry holds the sha256 of `git archive --format=tar HEAD` of the deleted clone |
 
 **Count.** KPI lines with tests: 4 of 4 (2 success, 2 failure). Covers ids with tests: 1 of 1 (CAP-25.a). Owner
-answers with tests: 6 of 6 (DEC-192 … DEC-197); the part of DEC-196 that is not tested is DP-5.
+answers with tests: 7 of 7 (DEC-192 … DEC-197, DEC-199). The suite has 96 cases.
+
+## Third batch: what was added
+
+Written after the implementation was committed (`5faec8cb`), against `w1/integrate` at `58113a8a`.
+
+- **Added:** `test_w1_06_vendor_digest.py` (2 cases, 2 functions, neither `local_only`); the helpers `folder_digest`
+  and `committed_files` at the end of `w1_06_support.py`.
+- **Result at `58113a8a`: 95 passed, 1 failed.**
+  - `test_the_superpowers_sha256_is_the_digest_of_the_committed_vendor_folder` is **red**: the registry records
+    `fb46c877…1ac94ef1` (by its own note, the sha256 of `git archive --format=tar HEAD` of the clone); the digest of
+    the 15 committed files by DEC-199's rule is
+    `f2a95244bc977742ee2cf6e5228fd1c24c276d63e7c1e732b3fcf9b2e8c0b90a`.
+  - `test_the_digest_rule_gives_the_value_worked_out_by_hand` is **green**: it fixes the rule on two files against a
+    value computed with `sha256sum` alone, and does not read the registry.
+- **Rewritten: nothing.** DEC-200, DEC-201 and DEC-202 were read against every existing case; none contradicts one.
+  - DEC-200 (openspec, check-jsonschema, copier may carry the digest of their installed entry script where ADR-0002
+    pins it): those three are tested against ADR-0002 §2's digests (`test_w1_06_pins.py`), which is that value. Reading
+    22's reason for not recomputing them ("their artefact is not on this machine") is superseded: the entry script is
+    there, and `gov doctor` re-checks it. No recomputing case is added in this batch.
+  - DEC-201 (gitleaks and PyYAML dated 2026-10-03, PyYAML by `sudo apt-get`): no case fixes their dates or commands.
+  - DEC-202 (the ccusage commands carry `PATH=~/.nvm/versions/node/v22.23.3/bin:$PATH`): the cases of reading 18 ask
+    for the npm of Node v22.23.3 by its path and do not refuse a prefix. **No case requires the prefix**: a command
+    without it would still pass. That is a gap, left as it is because this batch's brief is DEC-199.
 
 ## Second batch: what was added and what was revised
 
@@ -137,7 +164,8 @@ Readings of the second batch:
     `gitleaks` as found on `PATH`, and Node at `~/.nvm/versions/node/v22.23.3/bin/node`. The test hashes the file the
     command resolves to and requires the registry's digest to equal it. OpenSpec, check-jsonschema, Copier (packages),
     Ollama (not on `PATH`), ccusage, Superpowers and PyYAML keep the form test only: their artefact is not on this
-    machine, so recomputing would need a download.
+    machine, so recomputing would need a download. (Since then: DEC-199 gives Superpowers a digest the third batch
+    recomputes, and DEC-200 lets the three packages carry their entry script's digest.)
 23. **The vendor folder's layout is not fixed.** A skill folder may sit directly in
     `template/governance/kernel/vendor/superpowers/` or under `skills/` as upstream has it; each must appear once, with
     a non-empty `SKILL.md` directly in it.
@@ -154,9 +182,32 @@ Readings of the second batch:
 28. **"The scratch clone is deleted afterwards"** is tested (`local_only`) as: once the vendor folder exists,
     `.gov-runtime/scratch/orchestrator/vendor-src/superpowers/` (DEC-193) does not.
 
+Readings of the third batch (DEC-199: "the sha256 of the sorted lines `<sha256 of the file>  <relative path>` over
+every file under `template/governance/kernel/vendor/superpowers/`"). Each keeps to the sentence's letter; together
+they are the rule the test computes:
+
+29. **"Every file"** is every file `HEAD` holds under the vendor folder (git blobs at any depth), with its committed
+    bytes, unconverted. A file's mode is not part of the digest. A symbolic link would count as a file whose bytes
+    are its target path, as git stores it; there is none today. In a clean checkout this is the folder on disk, which
+    `test_the_vendor_folder_is_committed` already requires.
+30. **"`<sha256 of the file>`"** is the sha256 of those bytes, as 64 lowercase hexadecimal characters.
+31. **"`<relative path>`"** is the path relative to the vendor folder, as DP-5 option (a) worded it: components joined
+    by `/`, no leading `./` or `/`, the name as git records it, encoded as UTF-8 (`LICENSE`,
+    `skills/systematic-debugging/SKILL.md`). No escaping is applied; no name there has a line feed or a backslash.
+32. **A line** is the digest, exactly two spaces (as the sentence prints them), the path, and one line feed (`\n`).
+    Every line ends with the line feed, the last one too; there is no carriage return and no header or trailer.
+33. **"Sorted lines"** means the lines themselves are sorted, as bytes (`LC_ALL=C sort`), not the paths. A line starts
+    with the file's digest, so the order is by digest: `LICENSE` is the tenth of the fifteen lines today.
+34. **"The sha256 of"** those lines is the sha256 of the sorted lines concatenated, in lowercase hexadecimal; the
+    registry's value is compared without case. In a clean checkout it is what this prints:
+    `cd template/governance/kernel/vendor/superpowers && git ls-files -z | xargs -0 sha256sum | LC_ALL=C sort | sha256sum`.
+    For the folder as committed at `58113a8a` (15 files) it is
+    `f2a95244bc977742ee2cf6e5228fd1c24c276d63e7c1e732b3fcf9b2e8c0b90a`. The test recomputes it and holds no fixed
+    value, so a later change of the vendor folder (W1-37) needs the registry's digest re-recorded, not the test.
+
 ## Decision packages
 
-DP-1 to DP-4 are **answered** (owner, 2026-10-03). They are kept as asked, for the record. DP-5 is **open**.
+DP-1 to DP-5 are **answered** (owner, 2026-10-03). They are kept as asked, for the record. None is open.
 
 | Package | Answer | Recorded as | Tested in |
 |---|---|---|---|
@@ -164,8 +215,9 @@ DP-1 to DP-4 are **answered** (owner, 2026-10-03). They are kept as asked, for t
 | DP-2 | Option (a), with a clarification: the one downloaded artefact, or the binary itself for a single-file tool | DEC-196 | `test_w1_06_digests.py` (recomputed where the binary is on this machine; the form elsewhere) |
 | DP-3 | Option (a): only the three skill folders and the upstream licence are committed | DEC-194 | `test_w1_06_vendor.py` |
 | DP-4 | Option (a): each install has its own register entry, cited by `approved_by`; older pins cite the decision that names them | DEC-197 (with DEC-192, DEC-193) | `test_w1_06_install_approvals.py` |
+| DP-5 | Option (a): a digest of the committed vendor folder, which a test and `gov doctor` recompute offline | DEC-199 | `test_w1_06_vendor_digest.py` (readings 29 to 34) |
 
-### DP-5 — What the Superpowers entry's `sha256` covers when the source is fetched by `git clone` (OPEN)
+### DP-5 — What the Superpowers entry's `sha256` covers when the source is fetched by `git clone` (ANSWERED: DEC-199)
 
 - **Question.** DEC-196 says `sha256` covers "the one downloaded artefact (npm tarball, release tarball, distribution
   package)". DEC-193 approves `git clone --depth 1 --branch v6.4.2`, which downloads no single artefact, and DEC-194

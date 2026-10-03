@@ -274,3 +274,42 @@ def is_licence(rel):
     """A licence file outside the skill folders: ``LICENSE``, ``LICENCE`` or ``COPYING``, with any extension."""
     name = rel.split("/")[-1].upper()
     return skill_of(rel) is None and name.split(".")[0] in ("LICENSE", "LICENCE", "COPYING")
+
+
+# --------------------------------------------------------------------------
+# Third batch (DEC-199)
+# --------------------------------------------------------------------------
+
+def folder_digest(files):
+    """DEC-199's digest of a folder, given as ``{relative posix path: the file's bytes}``.
+
+    One line per file: the file's sha256 in lowercase hexadecimal, two spaces,
+    the path, one line feed. The lines are encoded as UTF-8, sorted as bytes,
+    concatenated, and hashed with sha256.
+    """
+    lines = sorted(f"{hashlib.sha256(content).hexdigest()}  {rel}\n".encode("utf-8")
+                   for rel, content in files.items())
+    return hashlib.sha256(b"".join(lines)).hexdigest()
+
+
+def committed_files(rel):
+    """``{path relative to rel: bytes}`` of every file ``HEAD`` holds under the folder ``rel``, as committed."""
+    listed = subprocess.run(["git", "ls-tree", "-r", "-z", "HEAD", "--", f"{rel}/"], cwd=REPO_ROOT,
+                            capture_output=True, check=False)
+    if listed.returncode != 0:
+        raise Missing(f"git cannot list {rel}/ in HEAD: {listed.stderr.decode('utf-8', 'replace').strip()}")
+    found = {}
+    for record in listed.stdout.split(b"\0"):
+        if not record:
+            continue
+        meta, path = record.split(b"\t", 1)
+        _, kind, blob = meta.decode("ascii").split()
+        if kind != "blob":
+            continue
+        content = subprocess.run(["git", "cat-file", "blob", blob], cwd=REPO_ROOT, capture_output=True, check=False)
+        if content.returncode != 0:
+            raise Missing(f"git cannot read the committed {path.decode('utf-8', 'replace')}")
+        found[path.decode("utf-8")[len(rel) + 1:]] = content.stdout
+    if not found:
+        raise Missing(f"HEAD holds no file under {rel}/: W1-06 has not committed the Superpowers source")
+    return found
