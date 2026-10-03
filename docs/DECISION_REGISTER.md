@@ -1937,3 +1937,21 @@ reported at W1-06's close, and on the orchestrator's context limit.
 | Version | Date | Change |
 |---|---|---|
 | 0.38 | 2026-10-03 | Owner answers on W1-48's install package, W1-06's close and the context limit: DEC-203 (Claude Code 2.1.288 installed by the owner, option (b); the approval the registry cites; bubblewrap and socat as owner installs under DEC-141), DEC-204 (the stale npm copy 2.1.59 is removed), DEC-205 (headless workers start with `~/.local/bin/claude`; the Windows copy is noted, not removed), DEC-206 (the W1-06 finding stays as written; workers always run in the background), DEC-207 (the PATH-prefix check goes into W1-48's test design), DEC-208 (context limit of about 300k tokens, automatic from W1-29, with a KPI line). |
+
+## 39. Owner answer on W1-48's KPI wording (register v0.39, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answer of 2026-10-03 to the orchestrator's report that W1-48's KPI line and Contract item CAP-25.d still said
+the upgrade "is installed by the orchestrator", after DEC-203 made it an owner install.
+
+### DEC-209 — W1-48's KPI line and CAP-25.d are reworded to match DEC-203
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-203, DEC-083 · **Amends:** the wording of DEC-153 ticket 3 and DEC-157 as carried by W1-48 and CAP-25.d
+- **Decision:**
+  - The Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, and in both cases
+    recorded with its owner approval.
+  - W1-48's KPI line (`DAEO-0qs5`) is reworded so, in its own commit with the trailer `Task: DAEO-0qs5`.
+  - Contract item CAP-25.d is reworded so, in its own commit with the trailer `Task: decision-record`.
+  - The plan validator is re-run after both.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.39 | 2026-10-03 | Owner answer on W1-48's KPI wording: DEC-209 (W1-48's KPI line and CAP-25.d reworded to match DEC-203: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, and in both cases recorded with its owner approval). |
