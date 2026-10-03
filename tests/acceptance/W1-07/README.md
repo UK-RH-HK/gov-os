@@ -37,6 +37,7 @@ The column below gives what each group will fail on first once `pyproject.toml` 
 | **Success 1.** Every command returns the API-0002 JSON envelope with exit codes 0-4 | `test_w1_07_envelope.py` | `test_every_command_returns_the_envelope[13]` · `test_status_succeeds_with_exit_code_0` · `test_a_governance_error_has_exit_code_1_and_its_code_in_the_json` · `test_an_unknown_command_is_a_usage_error` · `test_an_unknown_option_is_a_usage_error` · `test_the_exit_code_is_the_same_without_json[3]` · `test_the_envelope_carries_the_session_given` · `test_an_error_envelope_carries_the_session_given` · `test_root_names_the_project_from_another_directory` | No `gov` command (`pyproject.toml` missing); then no `gov.cli` code to print an envelope |
 | **Success 2.** Commands are classed read or act; read commands leave `git status --porcelain` empty **[CAP-27.a]** | `test_w1_07_read_act.py` | `test_a_read_command_leaves_git_status_empty[16]` · `test_a_read_command_changes_no_file_and_no_ref[8]` · `test_a_read_command_leaves_uncommitted_work_as_it_was[8]` · `test_a_read_command_with_root_writes_neither_in_the_project_nor_where_it_runs` · `test_a_read_command_leaves_a_dev_tier_clone_clean[8]` (`local_only`) | No `gov` command; the read commands cannot be run |
 | **Success 3a.** Overlay and path-map config load with schema validation (DEC-185) | `test_w1_07_config.py` | `test_a_missing_path_map_is_not_an_error[13]` · `test_status_succeeds_without_a_path_map` · `test_status_succeeds_without_a_governance_project_folder` · `test_an_invalid_path_map_gives_config_invalid_on_every_command[39]` · `test_an_invalid_path_map_gives_exit_code_1_without_json` · `test_root_decides_which_path_map_is_loaded` · `test_repairing_the_path_map_clears_the_error` | No `gov` command; no loader, so no `CONFIG_INVALID` |
+| **Success 3a, second batch.** `CONFIG_INVALID` carries `file` and `key` in `error.details`; the provisional minimal path-map shape (DEC-189) | `test_w1_07_config_details.py` | see "Second batch" below | Written after implementation; green at `aff0b956` |
 | **Success 3b.** `gov --help` < 300 ms | `test_w1_07_help.py` | `test_help_prints_usage_and_ends_with_exit_code_0` · `test_help_answers_in_under_300_ms` | No `gov` command |
 | **Success 4.** The check-declaration format (family, tier, hard-block or warning, command) is defined and loaded by the CLI, so any ticket can register a check (DEC-186) | `test_w1_07_check_declarations.py` | `test_check_list_succeeds` · `test_a_declared_check_is_listed_with_its_five_fields[2]` · `test_the_list_follows_the_declaration_files` · `test_every_declaration_in_the_kernel_template_is_listed` · `test_listing_does_not_run_a_check` · `test_running_checks_stays_not_implemented_with_declarations_present` · `test_an_uncommitted_declaration_is_listed_and_left_alone` | No `gov` command; no `check --list` |
 | **Success 5.** The registry reserves each Wave 1 operation as a `gov` command; a reserved command not yet built returns a `NOT_IMPLEMENTED` envelope **[CAP-28.b]** | `test_w1_07_registry.py` | `test_help_names_every_reserved_command` · `test_each_wave_1_operation_is_a_gov_command[12]` · `test_a_reserved_command_not_yet_built_returns_not_implemented[11]` · `test_a_name_outside_the_registry_is_not_answered_as_not_implemented` | No `gov` command; no registry |
@@ -107,14 +108,55 @@ decision package below.
 ## Not tested, and why
 
 - **`CONFIG_INVALID` naming the key, and a valid `path-map.yaml` loading** — decision package DP-1 below.
+  *Answered by DEC-189 and now tested: see "Second batch".*
 - **An invalid check declaration** (a missing field, a severity outside the two words, two files with one `id`). No
   source says what `gov check --list` does with it. W1-26, which runs the checks, is the natural place; raise it
   there or answer it with DP-1.
 - **The other overlay files** (roster, profiles, tool registry): DEC-185 leaves them to the tickets that add them.
 
+## Second batch (DEC-189): `error.details`, and the provisional path-map shape
+
+Written after implementation, once the owner answered DP-1 (DEC-189). File: `test_w1_07_config_details.py`, 8 test
+functions, 32 cases. No existing test was changed or removed.
+
+**Stable contract** (the tests rely on it; DEC-189): an invalid `governance/project/` file gives exit code 1 with
+`CONFIG_INVALID`, and `error.details` carries `file` and `key`.
+
+- `test_a_file_level_error_carries_file_and_key_in_details[3]` — not YAML, a list, a scalar: `details` is an object
+  with both `file` and `key`; `file` names `path-map.yaml`. The value of `key` is not asserted (see reading 18).
+- `test_details_file_names_the_path_map_of_the_root_given` — with `--root`, run from another directory.
+
+**Provisional shape — until W1-08 replaces the minimal schema.** The top level is a map; `namespaces` is required and
+maps a name to a map (DEC-189). These cases depend on that shape. **If W1-08 changes the keys, revisions of these
+cases are expected** (DEC-189), and W1-08's test design makes them:
+
+- `test_a_valid_path_map_loads` — `namespaces: {core: {}}`; `gov status --json` succeeds with exit code 0.
+- `test_a_valid_path_map_is_not_reported_as_invalid_by_any_command[13]` — no invocation answers `CONFIG_INVALID`.
+- `test_namespaces_of_the_wrong_type_names_the_key[9]` — `namespaces` as a number, a list, a string; on `status`,
+  `doctor` and `check --list`; `error.details.key == "namespaces"`.
+- `test_a_missing_namespaces_names_the_key[3]` — the document `{}`; `error.details.key == "namespaces"`.
+- `test_a_namespace_that_is_not_a_map_is_invalid` — `namespaces: {core: 42}` (see reading 19).
+- `test_repairing_the_key_clears_the_error` — the same file with a valid `namespaces` loads again.
+
+Readings the sources do not spell out, for this batch:
+
+17. **`error.details.file`** is a string that ends with `path-map.yaml`. Whether it is relative to the root or
+    absolute is not stated and not checked.
+18. **`key` for a file-level error** (not YAML, top level not a map): DEC-189 says `details` carries `key`; it does
+    not say what it holds when no key is at fault. Only its presence is asserted.
+19. **`error.details.key` for `namespaces`** is exactly the string `namespaces`. **For a key below it**
+    (`namespaces: {core: 42}`) the notation is not stated (`namespaces.core`, a list, a pointer): the test asserts
+    `CONFIG_INVALID`, `file`, and that `key` mentions `namespaces`.
+20. **A valid document** is the smallest the sentence allows: one name mapped to an empty map. An empty
+    `namespaces: {}`, an empty file, keys inside a namespace and top-level keys other than `namespaces` are not
+    stated either way and are not tested; they are for W1-08's schema.
+21. **The documents are written from DEC-189's sentence**, not from the schema under `src/gov/config/`.
+
 ## Decision package
 
 ### DP-1 — What does a minimal valid `path-map.yaml` look like, so that "naming the key" can be tested?
+
+**Answered by DEC-189** (option (a), with the shape provisional until W1-08). Kept here as the record.
 
 - **Question.** DEC-185 says an invalid `governance/project/path-map.yaml` gives `CONFIG_INVALID`, "naming the file
   and the key", against "a minimal path-map schema" under `src/gov/config/`. No source states one key of that
