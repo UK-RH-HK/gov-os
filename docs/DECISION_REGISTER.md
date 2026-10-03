@@ -1620,3 +1620,41 @@ further audit round). The fixes are recorded in `docs/changes/S2-CIT-E.md` §8.
 | Version | Date | Change |
 |---|---|---|
 | 0.31 | 2026-10-03 | Round-3 closure check: DEC-174 (W1-47 extends the guard's install rule to `uv add`, `uv sync`, `uv run --with` and `uvx`; `ask` for the orchestrator under DEC-083; the research exception of DEC-163 still applies). |
+
+## 32. Owner answers on W1-45's decision packages (register v0.32, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-03 to the four packages the W1 orchestrator raised while building W1-45 (`DAEO-6cc2`), from
+its verification and from the reviewer's probe (DEC-137).
+
+### DEC-175 — DP-1: the Independent Test Designer revises W1-04's two cases; `tests/unit/install/**` joins W1-45's paths
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-1 option (a) · **Under:** DEC-156, DEC-106
+- **Decision:**
+  - The Independent Test Designer revises the two W1-04 acceptance cases that assert the old orchestrator rule
+    (`write-outside-the-ticket-paths` and `redirect-outside-the-ticket-paths` in `test_w1_04_only_escalates.py`) in
+    a W1-45 test design batch. Each is recorded as a rewrite after implementation, with the reason "owner
+    correction, DEC-156".
+  - `tests/unit/install/**` joins W1-45's `allowed_paths`, so the engineer can update the builder test. The ticket
+    change is its own commit, with the trailer `Task: DAEO-6cc2`.
+
+### DEC-176 — DP-2: `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-2 option (a) · **Amends:** DEC-156
+- **Decision:**
+  - Everything under `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator: the freeze flag, the
+    snapshots, the findings and the records.
+  - Setting or lifting a freeze is the owner's action.
+  - The W1-02 freeze test stays as it is.
+
+### DEC-177 — DP-3: the record of DEC-171 is one JSON line per call in `.gov-runtime/records.jsonl`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-3 option (a) · **Extends:** DEC-171 · **Under:** DEC-122
+- **Decision:** An orchestrator change outside its ticket's paths writes one JSON line per call to
+  `.gov-runtime/records.jsonl`, with DEC-122's fields and `action: "recorded"`. `findings.jsonl` and its action list
+  are unchanged.
+
+### DEC-178 — DP-4: the orchestrator's wide scope holds only when the session's own role is orchestrator
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-45 package DP-4 option (a) · **Extends:** DEC-156 · **Under:** DEC-117
+- **Decision:** The wide scope of DEC-156 holds only when the session's own role is orchestrator. An `orchestrator`
+  subagent in another role's session keeps the ticket-paths rule.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.32 | 2026-10-03 | Owner answers on W1-45's packages: DEC-175 (DP-1: the test designer revises two W1-04 cases; `tests/unit/install/**` joins W1-45's `allowed_paths`), DEC-176 (DP-2, amends DEC-156: `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator; a freeze is the owner's action), DEC-177 (DP-3: the DEC-171 record is one JSON line per call in `.gov-runtime/records.jsonl`, `action: "recorded"`), DEC-178 (DP-4: the wide scope holds only in a session whose own role is orchestrator). |
