@@ -14,7 +14,7 @@ change_log:
     the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
     MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
     the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
-    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171.'
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only.'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -1439,6 +1439,7 @@ capabilities:
   - W1-27
   - W1-48
   - W1-46
+  - W1-47
   sources:
   - Contract v3 Gate F2, F3
   - Framework v4.1.2 §28-30
@@ -1451,6 +1452,7 @@ capabilities:
   - DEC-153
   - DEC-157
   - DEC-163
+  - DEC-172
   scenarios:
     dev:
     - CHAOS-A-05
@@ -1494,11 +1496,17 @@ capabilities:
     provider:
     - W1-48
   - id: CAP-25.e
-    item: 'The research role may install only inside its own experiment folder (a venv or local prefix within its ticket''s `allowed_paths`); a system-wide install is denied to it; the sandbox''s write fence enforces this: the sandbox stops a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one elsewhere inside it. It is the one exception to the denial in CAP-25.b'
+    item: 'The research role may install only inside its own experiment folder (a venv or local prefix within its ticket''s `allowed_paths`); a system-wide install is denied to it; the sandbox''s write fence enforces this: the sandbox stops a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one to a path that existed at launch elsewhere inside it; a path created later is covered by the guard''s per-ticket allow-list. It is the one exception to the denial in CAP-25.b'
     source: 'DEC-163; DEC-157'
     wave: W1
     provider:
     - W1-46
+  - id: CAP-25.f
+    item: 'The committed `.claude/settings.json` carries no install or download ask rule; the guard''s install rule decides install commands alone, and in a launched worker session the sandbox backs it'
+    source: DEC-172
+    wave: W1
+    provider:
+    - W1-47
 - id: CAP-26
   title: Plugin trust boundary (hash-binding, descriptor security)
   outcome: (none — non-goal)
@@ -2329,6 +2337,7 @@ capabilities:
   - DEC-026
   - DEC-086
   - DEC-106
+  - DEC-170
   scenarios:
     dev:
     - CHAOS-A-12
@@ -2363,6 +2372,12 @@ capabilities:
     provider:
     - W1-31
     - W1-42
+  - id: CAP-40.d
+    item: 'For a launched worker session the sandbox''s instruction tokens in the system prompt are reported as a separate line of the ticket''s telemetry record, not inside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures'
+    source: DEC-170; DEC-086; EXP-001 §3.6
+    wave: W1
+    provider:
+    - W1-31
 - id: CAP-41
   title: Lesson records with scope
   outcome: An agent receives the lessons that apply to its task, scoped, and lessons stay in the repository.
@@ -2816,7 +2831,7 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-49.c
-    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s own session is an accepted residual; the path is held in one file, `governance/project/held-out.yaml`, from which the committed rule, the guard and the launcher take it, and no acceptance test names it'
+    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s own session is an accepted residual; the oracle path is held in `governance/project/held-out.yaml` and in the committed deny rule built from it; register entry DEC-067 names the directory historically; the guard and the launcher take the path from `held-out.yaml`, and no acceptance test names it'
     source: 'DEC-162'
     wave: W1
     provider:
@@ -3354,8 +3369,8 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-61.c
-    item: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox'
-    source: 'DEC-158; DEC-161; DEC-163; EXP-001 §3.4, §5.3'
+    item: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the deny list is computed at launch, so a path created later is covered by the guard''s per-ticket allow-list, not by the list; the list''s exceptions are `.git/` and any entry whose name contains `*`, `?` or `[`, which the sandbox skips on Linux; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox'
+    source: 'DEC-158; DEC-161; DEC-163; EXP-001 §1, §3.4, §5.3'
     wave: W1
     provider:
     - W1-46
