@@ -26,11 +26,11 @@ kpis:
   success:
   - The Gov OS repository runs W1-02, W1-03 and W1-04 as live hooks for every later ticket
   - The interim operator diff check is retired and recorded as such
-  - A minimal subagent definition for the orchestrator role exists under .claude/agents/, with the subagent type name orchestrator (DEC-119)
-  - A minimal subagent definition for the engineer role exists under .claude/agents/, with the subagent type name engineer (DEC-119)
-  - A minimal subagent definition for the product-spec role exists under .claude/agents/, with the subagent type name product-spec (DEC-119)
-  - A minimal subagent definition for the independent-test-designer role exists under .claude/agents/, with the subagent type name independent-test-designer (DEC-119)
-  - A minimal subagent definition for the independent-auditor role exists under .claude/agents/, with the subagent type name independent-auditor (DEC-119)
+  - A minimal subagent definition for the orchestrator role exists under .claude/agents/, with the subagent type name orchestrator (DEC-119) [CAP-22.a]
+  - A minimal subagent definition for the engineer role exists under .claude/agents/, with the subagent type name engineer (DEC-119) [CAP-22.a]
+  - A minimal subagent definition for the product-spec role exists under .claude/agents/, with the subagent type name product-spec (DEC-119) [CAP-22.a]
+  - A minimal subagent definition for the independent-test-designer role exists under .claude/agents/, with the subagent type name independent-test-designer (DEC-119) [CAP-22.a]
+  - A minimal subagent definition for the independent-auditor role exists under .claude/agents/, with the subagent type name independent-auditor (DEC-119) [CAP-22.a]
   failure:
   - A later ticket runs without the guard active
   - The switch-over happens before W1-02..04 acceptance tests pass
@@ -38,6 +38,8 @@ profile: LITE
 sources:
 - DEC-084
 - MR-3
+- CAP-22
+- DEC-119
 est_loc: 20
 acceptance_tests:
   path: tests/acceptance/W1-05/

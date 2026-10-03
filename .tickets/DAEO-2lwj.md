@@ -34,6 +34,8 @@ kpis:
   - 'The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented, decisions applied, tests produced, and deviations [CAP-50.c]'
   - A finding raised at close is classed into exactly one disposition (repair, reuse, delete, narrow, defer or owner) with whole-system context from gov context before any code change, and the repair ticket
     records it [CAP-59.c]
+  - A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer, commissioned and judged by the orchestrator; the reviewer wrote nothing
+    to the repository (DEC-137) [CAP-38.f]
   failure:
   - A ticket closes with a failing acceptance test
   - A fourth consecutive non-converging iteration starts without an owner decision
@@ -51,6 +53,7 @@ sources:
 - CAP-59
 - CAP-50
 - MR-3
+- DEC-137
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W1-30/

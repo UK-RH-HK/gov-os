@@ -48,3 +48,7 @@ DEC-040 as amended by DEC-083: orchestrator-only install proposals, owner approv
 **2026-10-02T18:20:34Z**
 
 Reopened 2026-10-02 as a repair for three defects shown by the acceptance tests added in 17ef3ae (probe findings, DEC-136): uv with an option before the subcommand, pip2 and python2.7 -m pip, wget -qO FILE into a PATH directory. KPIs unchanged.
+
+**2026-10-03T13:06:19Z**
+
+S2 (2026-10-03): no KPI change. Under DEC-152 and DEC-161 the OS sandbox backs this rule's misses in launched worker sessions (write wall and network wall); in the orchestrator's own session the rule and the settings ask rules stand alone. Worker roles never install system-wide (DEC-157).

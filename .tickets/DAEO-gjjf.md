@@ -1,7 +1,7 @@
 ---
 id: DAEO-gjjf
 status: open
-deps: [DAEO-9i8e, DAEO-8goq, DAEO-0i6h, DAEO-skiy, DAEO-fdkq, DAEO-cdoi, DAEO-wqd6]
+deps: [DAEO-9i8e, DAEO-8goq, DAEO-0i6h, DAEO-skiy, DAEO-fdkq, DAEO-cdoi, DAEO-wqd6, DAEO-jdqr, DAEO-o4fg]
 links: []
 created: 2026-09-30T22:49:59Z
 type: task
@@ -21,6 +21,8 @@ depends_on:
 - W1-40
 - W1-41
 - W1-44
+- W1-46
+- W1-47
 allowed_paths:
 - docs/plan/wave-1-exit/**
 kpis:
@@ -30,6 +32,8 @@ kpis:
   - RETR-A-04 and RETR-X-02 run with bundles, parent expansions, synthesis notes where evidence exceeds the ceiling, and stopping reasons; governance share <= 15 %; zero MR-3 breaches
   - gov check reports 17 of 17 governance test families with at least one executable check [CAP-38.b]
   - 'All twelve Wave 1 gov commands are implemented: none returns NOT_IMPLEMENTED [CAP-28.b]'
+  - The exit run starts its engineer, test designer and auditor sessions as worker sessions through gov launch, sandboxed with their network profiles (DEC-161)
+  - 'The exit report gives, per ticket, the three Wave 1 learning metrics: KPI disputes, acceptance tests rewritten after implementation began with their reasons, and governance share (DEC-106) [CAP-40.c]'
   failure:
   - Any forbidden outcome
   - Governance share > 15 % on either programme
@@ -47,6 +51,9 @@ sources:
 - MR-6
 - CAP-28
 - CAP-38
+- DEC-106
+- DEC-161
+- CAP-40
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W1-42/

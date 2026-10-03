@@ -28,6 +28,8 @@ kpis:
     written, tests, retries, handoffs, decisions, owner interventions); cache reads are reported separately
   - The close record also carries agent, provider, latency and files read, taken from the harness session log [CAP-40.a]
   - The share is reported per profile (LITE, STANDARD, FULL), so the budget is judged against the ceremony applied [CAP-53.c]
+  - 'The close record carries the three Wave 1 learning metrics: KPI disputes raised by the test designer, acceptance tests rewritten after implementation began with the reason for each, and governance
+    share; only governance share has a threshold (DEC-106) [CAP-40.c]'
   failure:
   - A ticket closes without a share figure
   - Cache reads are counted in the share
@@ -38,6 +40,7 @@ sources:
 - CAP-04
 - CAP-40
 - CAP-53
+- DEC-106
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W1-31/

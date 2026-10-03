@@ -39,6 +39,14 @@ kpis:
   - A change to the Gov OS kernel, policy or skills passes evidence → corroboration → proposal (CIT-P) → independent review → owner approval → versioned promotion; the change skill refuses to archive (CIT-E)
     a kernel change that lacks any of these records [CAP-33.d]
   - 'Registers the skill-regression family check over its four skills, using the generic validator from W1-26: frontmatter, version, size, and every referenced command exists [CAP-38.b]'
+  - 'Discovery treats experiments (spikes, tool compatibility and performance trials) as a normal step that can run at any point: each runs in a sandbox outside production paths and leaves an evidence record
+    (what was tested, how, results, verdict); its code is promoted only through the normal cycle, and its results change a closed specification only through CIT-P (DEC-102) [CAP-32.c]'
+  - 'Discovery and planning follow the order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation; the
+    owner is asked to review scenarios and UX designs, not test code (DEC-103) [CAP-30.f]'
+  - When an experiment or finding contradicts a closed specification, the change skill opens a CIT-P whose impact assessment lists the affected specifications, decisions, tickets, tests and code and gives
+    three costed options (apply now, defer, re-baseline); the owner chooses, CIT-E records what was done, and every version of the specification is kept (DEC-105) [CAP-33.e]
+  - Test design takes probe findings from the orchestrator's review as described behaviours, never as code; it decides from the specification whether each becomes an acceptance test and reports a finding
+    that reveals a specification gap (DEC-136) [CAP-38.e]
   failure:
   - A skill body exceeds 2.5k tokens
   - The test-design skill reads implementation files
@@ -60,6 +68,11 @@ sources:
 - CAP-34
 - CAP-38
 - CAP-47
+- DEC-102
+- DEC-103
+- DEC-105
+- DEC-136
+- CAP-32
 est_loc: 480
 acceptance_tests:
   path: tests/acceptance/W1-35/

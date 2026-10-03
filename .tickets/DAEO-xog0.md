@@ -18,12 +18,15 @@ depends_on:
 allowed_paths:
 - template/governance/kernel/roles/**
 - governance/project/roster.yaml
+- .claude/agents/**
 kpis:
   success:
   - Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tools, model tier, authority level and handoff format [CAP-22.a]
   - Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner approval in chat (DEC-083)
   - 'Each role maps the Framework §32 permission classes: WRITE_REPO_SCOPED via allowed_paths; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied; network, database, cloud, CI-trigger and deploy
     classes denied unless granted [CAP-58.b]'
+  - The generated definitions replace the minimal definitions W1-05 placed under .claude/agents/ (DEC-119, DEC-154); the orchestrator definition states its write scope, anywhere in the repository except
+    tests/acceptance/** (DEC-156) [CAP-22.a]
   failure:
   - A role lacks any required field
   - An implementer role pattern covers tests/acceptance/**
@@ -37,6 +40,9 @@ sources:
 - CAP-58
 - MR-3
 - MR-4
+- DEC-119
+- DEC-154
+- DEC-156
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W1-33/
