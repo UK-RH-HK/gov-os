@@ -1361,3 +1361,116 @@ acceptance tests of W1-05 (commit `2b2944a`, recorded in `tests/acceptance/W1-05
 | Version | Date | Change |
 |---|---|---|
 | 0.25 | 2026-10-01 | W1-05 KD-1: DEC-149 (the 100 ms p95 budget is the guard's decision for every tool; the Bash wait with the before-snapshot is measured and reported, not a failure). |
+
+## 26. S2 specification-change decisions (register v0.26, appended by S2 on branch `s2/spec`)
+
+Owner decisions given in the S2 brief (DEC-150…DEC-155), and the owner's answers of 2026-10-03 to the S2 decision
+packages P-1…P-5 and to DP-7 (DEC-156…DEC-161). The impact is listed in `docs/changes/S2-CIT-P.md` and the execution
+in `docs/changes/S2-CIT-E.md`.
+
+### DEC-150 — DP-7: the orchestrator's standing rights, option (b) extended
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on DP-7 option (b) extended · **Amended by:** DEC-156
+- **Decision as given in the brief:** whatever its active ticket, the orchestrator role may write `.tickets/**`,
+  `docs/DECISION_REGISTER.md`, `governance/project/bootstrap.md` and `.gov-runtime/scratch/**`. A commit made by the
+  orchestrator is judged against these standing paths plus the active ticket's `allowed_paths`. DEC-156 replaces both
+  of these rules.
+- **Still in force:**
+  - The orchestrator's checkpoint moves to `.gov-runtime/scratch/orchestrator/` until W1-25's `gov checkpoint`
+    replaces it.
+  - `tests/acceptance/**` is never covered, unless the committing actor is the Independent Test Designer.
+  - This is a guard change and needs a new ticket (W1-45).
+  - Bootstrap of that ticket: S2 creates it and sets it `in_progress`. Under the live guard, the test designer writes
+    its tests with the ticket in its `GOV_TICKET`; an `engineer` subagent implements it and commits its own work; the
+    owner, through the operator console outside the guard, closes it.
+
+### DEC-151 — Two confirmations from W1-05
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief · **Confirms:** DEC-120
+- **Decision:** Moving the install settings rules from `deny` to `ask` at the switch-over is correct; it keeps the
+  second line of DEC-120. W1-01's interim acceptance tests skipping after the switch-over is by design.
+
+### DEC-152 — EXP-001 is accepted as ADOPT-PARTIAL
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on `spike-sandbox/EVIDENCE.md` · **Outcome of:** DEC-138, DEC-147 · **Scoped by:** DEC-161
+- **Decision:**
+  - The OS sandbox is the outer wall for everything a Bash command does: writes outside the repository, installs,
+    network, and reads of hidden paths. Its configuration comes from the launcher through `--settings`, never from the
+    repository: enabled, `failIfUnavailable: true`, `allowUnsandboxedCommands: false`, and network `strictAllowlist`.
+  - The guard stays the wall for the file tools: Read, Edit and Write run outside the sandbox. `Edit(...)` and
+    `Read(...)` deny rules bind both layers.
+  - The qualification oracle is hidden from Bash by the sandbox, and from the file tools by a `Read` deny rule. Hiding
+    is silent: the directory looks empty.
+  - Residuals closed for Bash: outside-repository writes through opaque forms (DEC-123), and the install misses
+    (DEC-147).
+  - Residuals restated: file-tool reads and writes (guard only); anything a hook or MCP server does; the shared
+    `$TMPDIR` (see DEC-159).
+- DEC-161 limits which sessions are sandboxed; the closures hold for those sessions.
+
+### DEC-153 — New Wave 1 tickets from EXP-001
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief, on EVIDENCE §5.5 · **Under:** DEC-152
+- **Decision:** Wave 1 gains three tickets:
+  1. **The launcher** (`gov launch`, or equivalent). It builds per-role `--settings` (sandbox block plus role `Edit`
+     deny rules), sets `GOV_ROLE` and `GOV_TICKET`, and refuses to start unless the sandbox is on, strict and
+     fail-closed.
+  2. **Guard hardening.** Deny any Bash call carrying `dangerouslyDisableSandbox: true`; register the containment
+     check on `PostToolUseFailure` as well, because a failed command may still have written files before failing.
+  3. **Claude Code version.** Pin it at 2.1.285 or later, and align the CLI used for headless runs with the VS Code
+     extension's bundled version. The spike saw 2.1.284 on the CLI; the test designer saw 2.1.286.
+
+### DEC-154 — The W1-05 provider change
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief · **Implements:** DEC-119
+- **Decision:** W1-05 delivered minimal role subagent definitions in `.claude/agents/`; W1-33 replaces them. The
+  providers in Contract v4 are updated to match.
+
+### DEC-155 — The plan validator after S1
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, S2 brief
+- **Decision:** `docs/plan/tools/validate_s1.py` scopes its "writes only under docs/ and .tickets/" check to the S1
+  branch, or retires it, and is extended to check everything the S2 change adds. It stays runnable from the
+  repository root.
+
+### DEC-156 — DP-7 corrected: the orchestrator may write anywhere except `tests/acceptance/**`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to S2 · **Amends:** DEC-150 (replaces its standing paths and commit rule)
+- **Decision:** The orchestrator role may write anywhere in the repository except `tests/acceptance/**` (MR-3). The
+  guard enforces only that exclusion for the orchestrator. Containment still records its changes. Its checkpoint goes
+  to `.gov-runtime/scratch/orchestrator/` until W1-25. The orchestrator's interactive session (VS Code or terminal)
+  is not sandboxed.
+
+### DEC-157 — P-1: installs stay as DEC-083 decided
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-1, option (d), the owner's own · **Confirms:** DEC-083
+- **Decision:** The orchestrator installs tools under DEC-083 as decided: the guard asks, and the owner approves in
+  chat. Worker roles never install system-wide.
+
+### DEC-158 — P-2: network profiles per role
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-2 (the owner's own answer)
+- **Decision:**
+  - The orchestrator is unrestricted, being unsandboxed.
+  - Research and experiment work (discovery spikes, bake-offs, and product-spec when it runs experiments) gets a
+    broad allowlist of research and development domains, which the owner can extend: GitHub, PyPI, npm, Hugging Face,
+    arXiv and documentation sites. Its writes and installs stay inside its own experiment folder (a venv or local
+    prefix).
+  - Engineer, independent test designer and independent auditor get an empty allowlist.
+  - WebSearch and WebFetch run outside the sandbox (EXP-001), so web research stays available to every role.
+
+### DEC-159 — P-3: a per-session temp directory for worker sessions
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-3 option (a), with a fallback
+- **Decision:** The launcher sets a per-session temp directory for worker sessions. If the launcher's acceptance test
+  shows the temp directory can't be overridden, the shared `$TMPDIR` is recorded as a residual.
+
+### DEC-160 — P-4: the untested sandbox cases go to a Wave 2 experiment
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-4 option (a) · **Under:** DEC-102
+- **Decision:** `denyWrite` on a path that doesn't exist yet, symlink and hard-link tricks, the seccomp filter and
+  `bypassPermissions` mode are tested by a Wave 2 experiment. Until then they are residuals.
+
+### DEC-161 — P-5: the sandbox applies to launched worker sessions only
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2 package P-5 (the owner's own answer) · **Scopes:** DEC-152, DEC-153
+- **Decision:** The launcher applies the sandbox to worker sessions only: engineer, independent test designer,
+  independent auditor, and research or experiment work, each with its network profile from DEC-158. Work that needs
+  the sandbox runs as a worker session the orchestrator launches. In-session subagents remain for read-only work,
+  such as review, exploration and web research. The repository's settings carry no sandbox block.
+- **The launcher's acceptance tests must show:**
+  - that a launched worker is sandboxed;
+  - that its network profile applies, including that the domain allowlist accepts the research domains (EXP-001
+    tested only an empty list);
+  - that its `GOV_ROLE` and `GOV_TICKET` reach the guard.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.26 | 2026-10-03 | S2 brief: DEC-150 (DP-7 orchestrator standing rights; amended by DEC-156), DEC-151 (two W1-05 confirmations), DEC-152 (EXP-001 accepted as ADOPT-PARTIAL), DEC-153 (launcher, guard hardening and Claude Code pin tickets), DEC-154 (W1-05 provider change), DEC-155 (plan validator scope). Owner answers to S2: DEC-156 (DP-7 corrected: the orchestrator writes anywhere except `tests/acceptance/**`, unsandboxed), DEC-157 (P-1: installs stay as DEC-083), DEC-158 (P-2: network profiles per role), DEC-159 (P-3: per-session temp directory for workers, residual as fallback), DEC-160 (P-4: Wave 2 experiment), DEC-161 (P-5: sandbox for launched worker sessions only). |
