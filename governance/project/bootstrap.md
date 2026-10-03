@@ -141,7 +141,8 @@ allowlist of DEC-158. Every other worker role's install commands stay denied. A 
 as `GOV_ROLE=research`.
 
 **The sandbox's cost (EXP-001 §3.6).** About +65 ms per Bash command and about +3,250 input tokens per session (+7 %).
-The tokens are harness text and are reported apart from governance share (W1-31).
+The tokens are reported as a separate line in W1-31, not inside the governance share; whether they count toward it is
+decided at the Wave 1 exit, using measured figures (DEC-170).
 
 **Hiding is silent.** A hidden directory looks empty from a worker's Bash; no error is raised.
 

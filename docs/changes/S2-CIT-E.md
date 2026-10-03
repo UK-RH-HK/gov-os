@@ -8,7 +8,7 @@ base: w1/integrate @ 442e9c3
 proposal: S2-CIT-P
 author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
-decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169]
+decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171]
 repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), §6
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 ---
@@ -220,7 +220,7 @@ from the copy the owner placed in `~/gov-os-workbench/s2/round1-audit/`.
 | S2A-F-04 | MAJOR | The oracle path is held in one file, `governance/project/held-out.yaml`, added to W1-47's `allowed_paths`. The committed rule is tested statically: the test reads the configured value and asserts that the rule in `.claude/settings.json` is present and built from it, so no test carries a literal path. The guard is tested against a stand-in. W1-47's failure KPIs: any allowed tool call naming the oracle path, whatever the tool; a missing or wrong committed rule; a test that reads or names the oracle. The launcher takes the path from the same file, and W1-46 depends on W1-47. The validator checks both stand-in sentences | `DAEO-o4fg`, `DAEO-jdqr`; `CAP-49.c`; ADR-0002 §6; `bootstrap.md`; `validate_s1.py` |
 | S2A-F-05 | MAJOR | Answered by DEC-164 (DP-2), option (b) with one addition: both cases are open residuals in EXP-002, and the launcher sets no `excludedCommands` | `CAP-61.a`, `CAP-61.f`; `DAEO-jdqr`; ADR-0002 §6; WBS §6; `bootstrap.md` "Open for every session" |
 | S2A-F-06 | MINOR | `bootstrap.md` restates the closure with EXP-001's qualifier: installs that write outside the repository are closed; for engineer, test designer and auditor the empty allowlist also blocks downloads; a research session can install inside the repository from an allowlisted index, confined to its experiment folder by DEC-163 | `bootstrap.md` |
-| S2A-F-07 | MINOR | The two measured figures (about +65 ms per command; about +3,250 input tokens per session, +7 %) are in ADR-0002 "Consequences" and `bootstrap.md`. W1-31 reports the sandbox tokens as a separate line; they are not governance tokens (point 3 below) | ADR-0002; `bootstrap.md`; `DAEO-6mk8` |
+| S2A-F-07 | MINOR | The two measured figures (about +65 ms per command; about +3,250 input tokens per session, +7 %) are in ADR-0002 "Consequences" and `bootstrap.md`. W1-31 reports the sandbox tokens as a separate line, outside the governance share; whether they count toward it is decided at the Wave 1 exit (DEC-170) | ADR-0002; `bootstrap.md`; `DAEO-6mk8` |
 | S2A-F-08 | MINOR | The rename fallback applies to `PROMPT.md` only. The S2 write-scope check excludes `docs/SOURCES.md`. Recorded as DEC-169, extending DEC-155 | `validate_s1.py`; register |
 | S2A-F-09 | MINOR | W1-30 200 → 220 and W1-31 120 → 150. WBS §3 states that the KPIs added to W1-33 and W1-35 fit their estimates, and why | `DAEO-2lwj`, `DAEO-6mk8`; WBS §1, §3; ADR-0002 |
 | S2A-F-10 | MINOR | W1-48 has a KPI recording bubblewrap 0.9.0 and socat 1.8.0.0 in the tool registry as owner installs (DEC-141), and a failure KPI | `DAEO-0qs5`; WBS §1, §5 |
@@ -230,7 +230,7 @@ the oracle path; DEC-162's list (Read, Grep, Glob, Bash) is kept in the text as 
 
 ### 6.2 Decisions recorded and carried
 
-Register v0.27 (section 27) and v0.28 (section 28). No entry made before this repair was edited.
+Register v0.27 (section 27), v0.28 (section 28) and v0.29 (section 29). No entry made before this repair was edited.
 
 | Decision | Subject | Carried into |
 |---|---|---|
@@ -240,7 +240,9 @@ Register v0.27 (section 27) and v0.28 (section 28). No entry made before this re
 | DEC-166 | `gov discover`, Wave 2 | `CAP-32.d`; ADR-0002 §1 L4 and §6; WBS §5 and §6 |
 | DEC-167 | A plain-language impact question triggers the impact assessment | `CAP-33.f` (W1, W1-35), `CAP-33.g` (W2), CAP-33 wave note; W1-35; ADR-0002 §6; WBS rules, §5 and §6 |
 | DEC-168 | Scope and severity are in W1-08's lesson schema in Wave 1; the loop stays Wave 3 | `CAP-41.f` (W1, W1-08), CAP-41 wave note; W1-08 (one KPI), W1-44 (failure KPI); ADR-0002 §6; WBS §5 and §7 |
-| DEC-169 | The validator: fingerprint fallback for `PROMPT.md` only; `docs/SOURCES.md` excluded from the S2 scope check | `validate_s1.py` |
+| DEC-169 | The validator: fingerprint fallback for `PROMPT.md` only; `docs/SOURCES.md` excluded from the S2 scope check. Confirmed by the owner as the owner's decision | `validate_s1.py` |
+| DEC-170 | Sandbox instruction tokens are a separate line in W1-31, outside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures | W1-31 (KPI, source); ADR-0002 "Consequences"; `bootstrap.md`; WBS §1, §3 |
+| DEC-171 | An orchestrator change outside its ticket's paths is a record, not a containment finding | `CAP-58.e`, CAP-58 sources; W1-45 (KPI, source, body); ADR-0002 §6; WBS rules, §1 |
 
 The owner also confirmed, without a new decision: the Charter change, limited to the lines DEC-163 and DEC-165
 require; DEC-158 as the citation in DEC-163; W1-46's size and its dependency on W1-47.
@@ -249,7 +251,7 @@ require; DEC-158 as the citation in DEC-163; W1-46's size and its dependency on 
 
 | Item | After the first application | After the repair |
 |---|---|---|
-| Register | v0.26, DEC-150…DEC-162 (13) | v0.28, DEC-150…DEC-169 (20) |
+| Register | v0.26, DEC-150…DEC-162 (13) | v0.29, DEC-150…DEC-171 (22) |
 | Contract | v4.1, 62 capabilities | v4.1, 62 capabilities; the 4.1 change-log line names the repair |
 | Contract items changed in the repair | — | Envelope "Tool installs"; CAP-22, 25, 32, 33, 41, 45, 49, 58, 61 |
 | `covers` items | 20 added, 1 reworded | 12 more added: 4 in Wave 1 (`CAP-22.d` and `CAP-25.e` on W1-46, `CAP-33.f` on W1-35, `CAP-41.f` on W1-08), 2 in Wave 2, 6 in Wave 3. 8 more reworded: `CAP-41.e`, `CAP-49.c`, `CAP-58.a`, `CAP-58.b`, `CAP-58.e`, `CAP-61.a`, `CAP-61.c`, `CAP-61.f` |
@@ -287,13 +289,11 @@ Charter's four changed lines and nothing else there.
 2. **The DP-2 answer is option (b), not the recommended (a).** No subagent test was added to W1-46. Until EXP-002,
    the wall claim of Contract §2 and `CAP-58.d` is not shown for a subagent of a launched worker; `bootstrap.md` says
    so under "Open for every session".
-3. **Sandbox tokens and governance share (F-07).** This record reads DEC-086 as written: governance tokens are text
-   the Gov OS injects or returns, and the sandbox's instructions are harness text. They are therefore reported apart
-   and stay in the denominator. This is a reading, not an owner decision. If the owner wants them counted, W1-31's
-   KPI and ADR-0002 change.
-4. **"Record, not a finding" (F-01).** DEC-156 says containment "still records" the orchestrator's changes. The
-   repair states that such a change outside the ticket's paths is a record and not a containment finding. This too
-   is a reading of DEC-156.
+3. **Sandbox tokens and governance share (F-07).** Now an owner decision, DEC-170: the tokens are reported as a
+   separate line in W1-31, not inside the governance share. Whether they count toward the 15 % is decided at the
+   Wave 1 exit, using measured figures. W1-31 and ADR-0002 say this and no more.
+4. **"Record, not a finding" (F-01).** Now an owner decision, DEC-171: a change the orchestrator makes outside its
+   ticket's paths is a record, not a containment finding. `CAP-58.e` and W1-45 cite it.
 5. **`governance/project/held-out.yaml` is a new file name chosen here** (F-04). It holds the real path, as the
    committed deny rule must. No test may name the path; the two files that carry it are named in W1-47's failure KPI.
 6. **`CAP-25.b` still says "denied for other roles".** It is delivered by the closed W1-04 and was left as written.

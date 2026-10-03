@@ -26,7 +26,7 @@ kpis:
     with no active ticket (DEC-156) [CAP-58.e]
   - 'With GOV_ROLE=orchestrator, a write to tests/acceptance/** is refused by the guard and caught by the containment check: only the Independent Test Designer writes there (MR-3) [CAP-58.e]'
   - A commit made by the orchestrator that carries an engineer's verified work passes the guard unless it touches tests/acceptance/** [CAP-58.e]
-  - 'The containment check still records the files the orchestrator changed after each command; a change outside the active ticket''s allowed_paths is a record, not a containment finding, and a change under tests/acceptance/** stays a finding (DEC-156) [CAP-58.e]'
+  - 'The containment check still records the files the orchestrator changed after each command; a change outside the active ticket''s allowed_paths is a record, not a containment finding, and a change under tests/acceptance/** stays a finding (DEC-156, DEC-171) [CAP-58.e]'
   - 'Every other role keeps the allowed_paths rule unchanged (DEC-112): the acceptance tests of W1-02 and W1-03 still pass unchanged for every role other than the orchestrator'
   - 'The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule (the orchestrator held to its active ticket''s allowed_paths) are revised by the Independent Test Designer in this ticket''s test design batch; each revision is recorded as a rewrite after implementation, with the reason: owner correction, DEC-156 (DEC-106)'
   - The orchestrator can write its checkpoint under .gov-runtime/scratch/orchestrator/ (DEC-150)
@@ -41,6 +41,7 @@ sources:
 - DEC-156
 - DEC-112
 - DEC-106
+- DEC-171
 - MR-3
 - CAP-58
 est_loc: 40
@@ -63,5 +64,5 @@ this ticket replaces: the orchestrator held to its active ticket's `allowed_path
 Independent Test Designer, in `tests/acceptance/W1-02/` and `tests/acceptance/W1-03/`, in this ticket's test design
 batch. The cases the audit found: `test_w1_02_allow_list.py` (the orchestrator denied outside its ticket) and
 `test_w1_03_out_of_scope.py` (an orchestrator change outside its ticket treated as a containment finding). Under
-DEC-156 such a change is recorded, and is not a finding. Each revision counts as an acceptance test rewritten after implementation (DEC-106), with
+DEC-156 such a change is recorded, and is not a finding (DEC-171). Each revision counts as an acceptance test rewritten after implementation (DEC-106), with
 the reason "owner correction, DEC-156". The KPIs of W1-02 and W1-03 are unchanged for every other role.

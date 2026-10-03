@@ -14,7 +14,7 @@ change_log:
     the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
     MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
     the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
-    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04.'
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171.'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -3167,6 +3167,7 @@ capabilities:
   - DEC-161
   - EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
   - DEC-165
+  - DEC-171
   scenarios:
     dev:
     - MR-A-01
@@ -3216,8 +3217,8 @@ capabilities:
     provider:
     - W1-46
   - id: CAP-58.e
-    item: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket''s `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding'
-    source: 'DEC-150; DEC-156'
+    item: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket''s `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding (DEC-171)'
+    source: 'DEC-150; DEC-156; DEC-171'
     wave: W1
     provider:
     - W1-45

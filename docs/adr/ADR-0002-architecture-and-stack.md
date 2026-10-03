@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: [ADR-0001]
-decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168]
+decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-170, DEC-171]
 supersedes: []
 implements: [CHARTER-v5, CONTRACT-v4]
 ---
@@ -183,7 +183,8 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
   - the Gov OS's own Wave 1 bootstraps MR-3 with settings deny rules and an operator diff check;
   - once the guard and containment tickets pass their acceptance tests, the Gov OS runs under its own guard.
 - **Orchestrator write scope** (DEC-150, DEC-156; W1-45). The orchestrator may write anywhere in the repository except
-  `tests/acceptance/**`. The guard enforces only that exclusion for it, and containment still records its changes.
+  `tests/acceptance/**`. The guard enforces only that exclusion for it, and containment still records its changes: a
+  change outside its ticket's paths is a record, not a containment finding (DEC-171).
   Its interactive session (VS Code or terminal) is not sandboxed. Until W1-25's `gov checkpoint`, its checkpoint lives
   in `.gov-runtime/scratch/orchestrator/`. Every other role keeps the `allowed_paths` rule.
 - **Worker sessions and the sandbox** (DEC-152, DEC-153, DEC-161; W1-46):
@@ -254,7 +255,8 @@ audit→repair, test→fix or verification loop follows DEC-096:
     DEC-001's size trigger into a per-wave review.
   - The sandbox has a measured cost (EXP-001 §3.6): about +65 ms per Bash command, and about +3,250 input tokens per
     session (+7 %), which are sandbox instructions in the system prompt. Every launched worker session carries them.
-    They are harness text, so they are not governance tokens under DEC-086; W1-31 reports them as a separate line.
+    W1-31 reports them as a separate line, not inside the governance share. Whether they count toward the governance
+    share is decided at the Wave 1 exit, using measured figures (DEC-170).
   - Two containment layers must be kept in step: the sandbox covers a worker's Bash, the guard covers the file tools
     and the orchestrator's session. The orchestrator's own Bash stays under the guard alone.
   - `ticket` is unmaintained upstream; it is vendored by hash.
@@ -269,7 +271,7 @@ audit→repair, test→fix or verification loop follows DEC-096:
 
 - **Sources:** architecture v0.3; S0a `STACK_OPTIONS.md`, `CAPABILITY_CATALOGUE.md`; S0b2 `RESULTS.md`,
   `GLUE_REQUIREMENTS.md`, `TOOL_REGISTRY.yaml`, `INTEGRATION_REPORT.md`; register DEC-064…DEC-096, and
-  DEC-138…DEC-167 for the sandbox layer, the launcher, the research role and the lesson loop; `spike-sandbox/EVIDENCE.md` (EXP-001, ADOPT-PARTIAL).
+  DEC-138…DEC-171 for the sandbox layer, the launcher, the research role and the lesson loop; `spike-sandbox/EVIDENCE.md` (EXP-001, ADOPT-PARTIAL).
 - **Revisit triggers:**
   - a code graph above the tested envelope;
   - vectors above ~100k (move to LanceDB, DEC-016);
