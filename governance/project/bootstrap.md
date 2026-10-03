@@ -83,6 +83,54 @@ Edge cases of the install rule (W1-04), recorded by the orchestrator under DEC-1
 
 The settings rules for install commands remain as the second line (DEC-120): as deny rules until the switch-over, as ask rules since 2026-10-02.
 
+## After the sandbox experiment (S2, 2026-10-03)
+
+The owner accepted the sandbox experiment EXP-001 as ADOPT-PARTIAL (DEC-152) and limited the sandbox to worker sessions
+started by the launcher (DEC-161). The orchestrator's own session is not sandboxed (DEC-156). This section states which
+residuals above are closed, for which sessions, and which stay open. It takes effect when W1-46 (launcher) and W1-47
+(guard hardening) close; until then every residual above stands as written.
+
+**Closed for Bash in launched worker sessions** (engineer, independent test designer, independent auditor, research or
+experiment):
+
+- A write outside the repository through an opaque Bash form (DEC-123). The OS sandbox stops it without parsing the
+  command.
+- The install misses of W1-04 (DEC-147): prefix commands, a download piped to a shell in a subshell, package managers
+  the rule does not list, evasive spellings, and an option before `-m` or before `uv`'s subcommand. The sandbox's write
+  wall and network wall stop them. The false asks stay as they are. Worker roles never install system-wide (DEC-157).
+
+**Still open for the orchestrator's own session**, which runs under the guard and the settings rules alone:
+
+- Both residuals above: outside-repository writes through opaque Bash forms, and the install misses.
+- An opaque Bash read of the qualification oracle (DEC-162). The oracle is hidden from every session started in the
+  repository root by a `Read` deny rule with its absolute path in the committed `.claude/settings.json` and by the
+  guard denying any Read, Grep, Glob or Bash call whose input names the path (both from W1-47). A Bash command that
+  reaches the oracle without naming its path is seen by neither layer. The owner accepted this residual (DEC-162).
+
+**Open for every session:**
+
+- File-tool reads and writes (Read, Edit, Write). They run outside the sandbox; the guard and the permission rules
+  are the only wall.
+- Anything a hook or an MCP server does. Both run outside the sandbox.
+- The untested sandbox cases: `denyWrite` on a path that doesn't exist yet, symlink and hard-link tricks, the seccomp
+  filter, and `bypassPermissions` mode. They go to a Wave 2 experiment (DEC-160).
+
+**The shared `$TMPDIR`.** The launcher sets a per-session temp directory for each worker session (DEC-159). If
+W1-46's acceptance test shows the temp directory can't be overridden, the shared `$TMPDIR` is recorded here as a
+residual. The orchestrator's own session keeps the shared temp directory.
+
+**Unchanged:** the guard's quoting limit (DEC-128), the residuals of the containment check (DEC-134, DEC-144) and the
+DEC-135 edge cases. They concern writes inside the repository.
+
+**Hiding is silent.** A hidden directory looks empty from a worker's Bash; no error is raised.
+
+**Confirmed by the owner (DEC-151):** moving the install settings rules from `deny` to `ask` at the switch-over was
+correct, and keeps the second line of DEC-120; W1-01's interim acceptance tests skip after the switch-over by design.
+
+**Orchestrator write scope and checkpoint (DEC-150, DEC-156).** From W1-45, the orchestrator may write anywhere in the
+repository except `tests/acceptance/**`. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25's
+`gov checkpoint` replaces it.
+
 ## Denied attempts
 
 One attempt per class (DEC-100), made in a headless session started in the repository root, where `.claude/settings.json` applies. The session ran in `acceptEdits` mode with `Write` and `pip install` allowed, so each refusal comes from a deny rule. No file was created.
