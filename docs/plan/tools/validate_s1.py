@@ -1,4 +1,4 @@
-"""Self-check of the Gov OS specification and Wave 1 plan (S1 stage 6).
+"""Self-check of the Gov OS specification and Wave 1 plan (S1 stage 6, extended by the S2 specification change, DEC-155).
 
 Read-only. Prints PASS, FAIL or SKIP per check and exits non-zero on any FAIL.
 
@@ -8,6 +8,9 @@ Inputs inside the repository are always checked. Four checks compare against fil
 coverage matrix, architecture v0.3, register v0.12, the S1-A round-1 fingerprints) and one against `docs/source/`,
 which is archived after S1-A closes. Those checks are SKIPped when their input is absent. Set GOV_OS_WORKBENCH to
 point at the workbench (default: ~/gov-os-workbench).
+
+Section 3e checks what the S2 change added (Contract v4.1, tickets W1-45…W1-48, DEC-150…DEC-162). The write-scope
+check of S1 (section 9) applies on branch `s1/spec` only; on `s2/spec` the S2 write scope is checked instead.
 """
 import glob, os, re, sys, fnmatch, csv, yaml
 R = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -43,7 +46,7 @@ c = yaml.safe_load(open(f'{R}/docs/contract/contract.yaml'))
 caps = c['capabilities']
 req = ['outcome', 'acceptance', 'wave', 'provider', 'sources', 'disposition']
 miss = [(e['id'], f) for e in caps for f in req if not e.get(f)]
-check('60 capabilities, CAP-01..CAP-60', [e['id'] for e in caps] == [f'CAP-{i:02d}' for i in range(1, 61)])
+check('62 capabilities, CAP-01..CAP-62', [e['id'] for e in caps] == [f'CAP-{i:02d}' for i in range(1, 63)])
 check('every capability has outcome/acceptance/wave/provider/sources/disposition', not miss, str(miss) if miss else '')
 check('waves valid', all(e['wave'] in ('W1', 'W2', 'W3') or (e['wave'] == 'NONE' and e['disposition']['class'] == 'DROP') for e in caps))
 check('DEC-080 W1 set', all(e['wave'] == 'W1' for e in caps if e['id'] in {'CAP-15', 'CAP-16', 'CAP-18', 'CAP-55', 'CAP-56', 'CAP-57'}))
@@ -59,7 +62,7 @@ else: skip('scenario ids exist in COVERAGE_MATRIX', _p)
 
 # 3. tickets
 tk = {v['wbs_id']: (p, v) for p, v in fms.items() if '/.tickets/' in p}
-check('44 W1 tickets', sorted(tk) == [f'W1-{i:02d}' for i in range(1, 45)], str(len(tk)))
+check('48 W1 tickets', sorted(tk) == [f'W1-{i:02d}' for i in range(1, 49)], str(len(tk)))
 bad = [i for i, (p, v) in tk.items() if not (v.get('role') and v.get('allowed_paths') and v.get('kpis', {}).get('success') and v.get('kpis', {}).get('failure'))]
 check('every W1 ticket has role, allowed_paths, success and failure KPIs', not bad, str(bad))
 fields = ['title', 'class', 'role', 'depends_on', 'allowed_paths', 'kpis', 'profile', 'sources', 'est_loc', 'acceptance_tests']
@@ -151,6 +154,8 @@ if os.path.exists(_p):
     for line in open(_p):
         h, rel = line.strip().split('  ', 1)
         fp = os.path.join(W, 's1a', rel)
+        ret = fp[:-3] + '.retired.md'   # the owner retired the s1a session (DEC-101): its prompt was renamed, content unchanged
+        if not os.path.exists(fp) and os.path.exists(ret): fp = ret
         if not os.path.exists(fp) or hashlib.sha256(open(fp, 'rb').read()).hexdigest() != h: bad_h.append(rel)
     check('s1a round-1 files unchanged (fingerprints)', not bad_h, str(bad_h))
 else: skip('s1a round-1 files unchanged (fingerprints)', _p)
@@ -212,12 +217,94 @@ with open(f'{R}/docs/contract/SOURCE_MAP.csv') as f: sm = list(csv.DictReader(f)
 check('SOURCE_MAP rows all carried or disposed', sm and all(r['carried_by_or_disposition'].strip() for r in sm), f'{len(sm)} rows')
 check('SOURCE_MAP has a class column with DEC-070 classes', all(r.get('class') in ('OK', 'MISSING', 'WEAKENED', 'CONTRADICTS', 'UNJUSTIFIED_DROP', 'SCOPE_CREEP') for r in sm))
 
-# 9. write scope: only docs/ (not docs/source, SOURCES.md) and .tickets/ changed vs main
-import subprocess
-ch = subprocess.run(['git', '-C', R, 'diff', '--name-only', 'main...HEAD'], capture_output=True, text=True).stdout.split()
-ch += subprocess.run(['git', '-C', R, 'status', '--porcelain'], capture_output=True, text=True).stdout.split('\n')
-ch = [x.strip().split()[-1] for x in ch if x.strip()]
-out = [x for x in ch if not ((x.startswith('docs/') and not x.startswith('docs/source/') and x != 'docs/SOURCES.md') or x.startswith('.tickets/'))]
-check('writes only under docs/ and .tickets/', not out, str(out))
+# 3e. S2 specification change (DEC-150..DEC-162; docs/changes/S2-CIT-P.md, S2-CIT-E.md)
+import json, subprocess, collections
+cmd = open(f'{R}/docs/contract/CONTRACT_v4.md').read()
+cap = {e['id']: e for e in caps}
+def kp(t): return ' '.join(tk[t][1]['kpis']['success'] + tk[t][1]['kpis']['failure'])
+check('Contract is version 4.1 in both files, with a change log', str(c.get('version')) == '4.1' and [x['version'] for x in c.get('change_log', [])] == ['4.0', '4.1']
+      and str(fms[f'{R}/docs/contract/CONTRACT_v4.md'].get('version')) == '4.1' and '| 4.1 | 2026-10-03 |' in cmd)
+gone = [e['id'] for e in caps if f"### {e['id']} — {e['title']}\n" not in cmd] + [cv['id'] for e in caps for cv in e['covers'] if f"`{cv['id']}` [{cv['wave']}] {cv['item']} — {cv['source']}" not in cmd]
+gone += [e['id'] + ':' + f for e in caps for f in ('outcome', 'acceptance') if e[f] not in cmd] + [m['id'] for m in c['master_rules'] if m['acceptance'] not in cmd]
+check('CONTRACT_v4.md and contract.yaml carry the same capabilities, outcomes, acceptance checks and covers items', not gone, str(gone[:6]))
+cnt = collections.Counter((e['wave'], e['disposition']['class']) for e in caps)
+rows_ok = all(f"| {w} | {cnt[(w, 'KEPT')]} | {cnt[(w, 'LITE')]} | {cnt[(w, 'DROP')]} | {sum(v for (ww, _), v in cnt.items() if ww == w)} |" in cmd for w in ('W1', 'W2', 'W3', 'NONE'))
+check('Contract §1 counts match contract.yaml (W1 KEPT 38, 62 in all)', rows_ok and cnt[('W1', 'KEPT')] == 38 and f'| **All** | 56 | 4 | 2 | 62 |' in cmd)
+check('DEC-150..DEC-162 ACCEPTED (owner, 2026-10-03)', all(re.search(rf'### DEC-{n} .*\n- \*\*Status:\*\* ACCEPTED \(owner, 2026-10-03\)', reg) for n in range(150, 163)))
+check('CAP-61 and CAP-62 are W1 KEPT, provided by W1-46/W1-48 and W1-47', all(cap[i]['wave'] == 'W1' and cap[i]['disposition']['class'] == 'KEPT' for i in ('CAP-61', 'CAP-62'))
+      and {'W1-46', 'W1-48'} <= set(cap['CAP-61']['provider']) and cap['CAP-62']['provider'] == ['W1-47'] and 'dangerouslyDisableSandbox' in cap['CAP-62']['acceptance'])
+check('CAP-58 claim split between the sandbox (worker Bash) and the guard (file tools); providers W1-45, W1-46, W1-47', 'OS sandbox' in cap['CAP-58']['acceptance'] and 'guard' in cap['CAP-58']['acceptance']
+      and {'W1-45', 'W1-46', 'W1-47'} <= set(cap['CAP-58']['provider']) and cov['CAP-58.d'][1]['provider'] == ['W1-46'] and cov['CAP-58.e'][1]['provider'] == ['W1-45'] and cov['CAP-58.f'][1]['provider'] == ['W1-47'] and 'PostToolUseFailure' in cov['CAP-58.f'][1]['item'])
+check('MR-3 carries the orchestrator exception (DEC-156) and names W1-45', 'orchestrator may write anywhere in the repository except `tests/acceptance/**`' in mr['MR-3']['acceptance'] and 'W1-45' in mr['MR-3']['provider'])
+c49 = cov['CAP-49.c'][1]['item']
+check('CAP-49: oracle hidden by the sandbox for workers (W1-46) and by the committed Read deny rule plus the guard for every root session (W1-47, DEC-162)',
+      cov['CAP-49.b'][1]['provider'] == ['W1-46'] and cov['CAP-49.c'][1]['provider'] == ['W1-47'] and '.claude/settings.json' in c49 and all(x in c49 for x in ('Read, Grep, Glob, Bash', 'accepted residual')) and cap['CAP-49']['wave'] == 'W3')
+check('CAP-22.a is delivered by W1-05, then W1-33 (DEC-154)', cov['CAP-22.a'][1]['provider'] == ['W1-05', 'W1-33'] and 'W1-05' in cap['CAP-22']['provider'])
+carried = {'DEC-102': 'W1', 'DEC-103': 'W1', 'DEC-104': 'W2', 'DEC-105': 'W1', 'DEC-106': 'W1', 'DEC-136': 'W1', 'DEC-137': 'W1', 'DEC-158': 'W1', 'DEC-159': 'W1', 'DEC-160': 'W2'}
+lost = [d_ for d_, w_ in carried.items() if not any(d_ in cv['source'] and cv['wave'] == w_ for e, cv in cov.values())]
+check('every carried decision (DEC-102..106, 136, 137, 158..160) is the source of a covers item in its wave', not lost, str(lost))
+check('installs unchanged (DEC-157): envelope keeps the DEC-083 sentence, CAP-25.b is untouched, worker roles never install system-wide',
+      c['envelope']['tool_installs']['statement'].startswith('The orchestrator installs a tool only after the owner approves a decision package in chat') and 'Worker roles never install system-wide' in c['envelope']['tool_installs']['statement']
+      and cov['CAP-25.b'][1]['item'].startswith('Orchestrator-only install on owner approval in chat') and cov['CAP-25.d'][1]['provider'] == ['W1-48'])
+def T(n): return tk[n][1]
+shape = {'W1-45': ('engineer', 'FULL', ['W1-05']), 'W1-46': ('engineer', 'FULL', ['W1-07', 'W1-48']), 'W1-47': ('engineer', 'FULL', ['W1-45']), 'W1-48': ('orchestrator', 'LITE', ['W1-06'])}
+bad = [n for n, (r_, p_, d_) in shape.items() if (T(n)['role'], T(n)['profile'], sorted(T(n)['depends_on'])) != (r_, p_, d_) or T(n)['acceptance_tests']['path'] != f'tests/acceptance/{n}/']
+check('S2 tickets W1-45..W1-48 have the agreed role, profile, dependencies and acceptance-test path', not bad, str(bad))
+check('W1-45 (orchestrator write scope) is in_progress (DEC-150)', T('W1-45')['status'] == 'in_progress')
+k46 = kp('W1-46')
+check('W1-46 KPIs carry the three tests DEC-161 requires, the network profiles, the temp directory and the start refusal',
+      all(x in k46 for x in ('a launched worker is sandboxed', 'accepting the research domains', 'GOV_ROLE and GOV_TICKET', 'empty allowlist', 'per-session temp directory', 'refuses to start', 'Edit deny rules')))
+k47 = kp('W1-47')
+check('W1-47 delivers the escape-hatch denial, PostToolUseFailure and both oracle layers; it may edit .claude/settings.json',
+      all(x in k47 for x in ('dangerouslyDisableSandbox', 'PostToolUseFailure', 'Read deny rule', 'Read, Grep, Glob or Bash')) and '.claude/settings.json' in T('W1-47')['allowed_paths'])
+check('W1-48 pins Claude Code at 2.1.285 or later', '2.1.285' in kp('W1-48'))
+check('W1-42 depends on the launcher and the guard hardening, and reports the learning metrics', {'W1-46', 'W1-47'} <= set(T('W1-42')['depends_on']) and 'learning metrics' in kp('W1-42') and 'learning metrics' in kp('W1-31'))
+check('W1-30 requires the post-green probe record for FULL tickets (DEC-137)', 'post-green probe record' in kp('W1-30'))
+layer = {}
+def lay(n):
+    if n not in layer: layer[n] = 1 + max([lay(d_) for d_ in T(n)['depends_on']], default=0)
+    return layer[n]
+for n in tk: lay(n)
+bylayer = collections.defaultdict(list)
+for n, l_ in layer.items(): bylayer[l_].append(n)
+check('WBS §2 layers match the ticket DAG', all(f"| {l_} | {', '.join(sorted(ns))} |" in wbs for l_, ns in bylayer.items()))
+best = {}
+def longest(n):
+    if n not in best:
+        m = max([longest(d_) for d_ in T(n)['depends_on']], key=lambda x: x[0], default=(0, []))
+        best[n] = (m[0] + (T(n)['est_loc'] or 50), m[1] + [n])
+    return best[n]
+cpath = max((longest(n) for n in tk), key=lambda x: x[0])[1]
+check('WBS critical path is the LOC-weighted longest path of the ticket DAG', '**Critical path** (weighted by est. LOC; a ticket with no code counts as 50): ' + ' → '.join(cpath) + '.' in wbs, ' → '.join(cpath))
+sizes = collections.Counter()
+for n in tk: sizes[T(n)['class']] += T(n)['est_loc']
+check('WBS §1 rows and §3 sizes match the tickets', all(f"| {k_} | {v_} |" in wbs for k_, v_ in sizes.items()) and f"| **Total** | **{sum(sizes.values())}** |" in wbs
+      and all(re.search(rf"\| (\*\*)?{n}(\*\*)? \| `{T(n)['id']}` \| {re.escape(T(n)['title'])} \| {T(n)['class']} \| {T(n)['role']} \| {T(n)['profile']} \| {', '.join(T(n)['depends_on']) or '—'} \| {T(n)['est_loc']} \|", wbs) for n in tk))
+check('WBS Wave 2 outline names the sandbox experiment (DEC-160) and UX before build (DEC-104)', 'DEC-160' in wbs[wbs.index('## 6. Wave 2'):] and 'DEC-104' in wbs[wbs.index('## 6. Wave 2'):])
+adr1 = open(f'{R}/docs/adr/ADR-0001-threat-model.md').read()
+check('ADR-0002 has the sandbox layer, the launcher and the Claude Code pin; ADR-0001 keeps "guardrail, not a boundary" for the sandbox',
+      all(x in adr2 for x in ('**the OS sandbox**', '`launch`', '2.1.285', 'gov launch', 'DEC-162')) and 'DEC-161' in adr2fm['decisions'] and 'stronger guardrail' in adr1)
+boot = open(f'{R}/governance/project/bootstrap.md').read()
+check('bootstrap.md marks the residuals closed for worker sessions and restates the open ones, the oracle residual included',
+      all(x in boot for x in ('Closed for Bash in launched worker sessions', "Still open for the orchestrator's own session", 'DEC-123', 'DEC-147', 'DEC-159', 'DEC-160', 'DEC-162', 'An opaque Bash read of the qualification oracle', 'MCP server')))
+_p = f'{R}/.claude/settings.json'
+check('the repository settings carry no sandbox block (DEC-161)', 'sandbox' not in json.load(open(_p)))
+citp, cite = f'{R}/docs/changes/S2-CIT-P.md', f'{R}/docs/changes/S2-CIT-E.md'
+check('S2-CIT-P is ACCEPTED and S2-CIT-E exists', os.path.exists(citp) and frontmatter(citp)['status'] == 'ACCEPTED' and os.path.exists(cite) and frontmatter(cite)['id'] == 'S2-CIT-E')
+
+# 9. write scope, per branch (DEC-155)
+def changed(base):
+    ch = subprocess.run(['git', '-C', R, 'diff', '--name-only', f'{base}...HEAD'], capture_output=True, text=True).stdout.split('\n')
+    ch += [x[3:] for x in subprocess.run(['git', '-C', R, 'status', '--porcelain'], capture_output=True, text=True).stdout.split('\n')]
+    return [x.strip().split(' -> ')[-1] for x in ch if x.strip()]
+branch = subprocess.run(['git', '-C', R, 'branch', '--show-current'], capture_output=True, text=True).stdout.strip()
+if branch == 's1/spec':
+    out = [x for x in changed('main') if not ((x.startswith('docs/') and not x.startswith('docs/source/') and x != 'docs/SOURCES.md') or x.startswith('.tickets/'))]
+    check('writes only under docs/ and .tickets/', not out, str(out))
+else: print(f'SKIP writes only under docs/ and .tickets/ — applies to branch s1/spec only (DEC-155); this is {branch or "a detached HEAD"}')
+if branch == 's2/spec':
+    out = [x for x in changed('w1/integrate') if not ((x.startswith('docs/') and not x.startswith('docs/source/')) or x.startswith('.tickets/') or x == 'governance/project/bootstrap.md')]
+    check('S2 writes only docs/**, .tickets/** and governance/project/bootstrap.md; the Charter is unchanged', not out and 'docs/charter/CHARTER_v5.md' not in changed('w1/integrate'), str(out))
+else: print(f'SKIP S2 write scope — applies to branch s2/spec only; this is {branch or "a detached HEAD"}')
 print('\nRESULT:', 'ALL PASS' if not fails else f'{len(fails)} FAIL')
 sys.exit(1 if fails else 0)
