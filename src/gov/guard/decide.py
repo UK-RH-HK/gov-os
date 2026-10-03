@@ -97,6 +97,8 @@ def _load_ticket(root: str, tid: str) -> dict | None:
 
 
 def _get_allowed_paths(role: str, tid: str | None, root: str) -> list[str]:
+    if role == "orchestrator":
+        return ["**"]
     if role not in KNOWN_ROLES or not tid:
         return []
     t = _load_ticket(root, tid)

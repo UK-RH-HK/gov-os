@@ -1631,3 +1631,63 @@ class TestReadsWithGlobBraceCdPushdRoleless:
             project_root=project, role=None, ticket_id=None, cwd=project,
         )
         assert d == "allow", f"expected allow for role-less read: {cmd}"
+
+
+# ---------------------------------------------------------------------------
+# DEC-156: orchestrator writes anywhere except tests/acceptance/**
+# ---------------------------------------------------------------------------
+
+class TestOrchestratorScope:
+    """DEC-156: the orchestrator may write anywhere in the repository
+    except ``tests/acceptance/**``, whatever the ticket or with no ticket."""
+
+    def test_orchestrator_allowed_outside_ticket_paths(self, tmp_path):
+        project = _make_project(tmp_path, {
+            "DAEO-orch.md": _ticket(
+                ticket_id="DAEO-orch", role="orchestrator",
+                allowed_paths=(".claude/settings.json",),
+            ),
+        })
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id="DAEO-orch",
+        )
+        assert d == "allow"
+
+    def test_orchestrator_allowed_without_ticket(self, tmp_path):
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "allow"
+
+    def test_orchestrator_denied_under_acceptance(self, tmp_path):
+        project = _make_project(tmp_path)
+        (Path(project) / "tests/acceptance/W1-99").mkdir(parents=True, exist_ok=True)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "tests/acceptance/W1-99/t.py"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "deny"
+
+    def test_orchestrator_bash_write_allowed(self, tmp_path):
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": "echo changed > README.md"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "allow"
+
+    def test_engineer_still_denied_outside_paths(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+        )
+        assert d == "deny"
