@@ -14,7 +14,7 @@ change_log:
     the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
     MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
     the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
-    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities.'
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role.'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -75,10 +75,10 @@ envelope:
     decision:
     - DEC-083
     - DEC-157
+    - DEC-163
     statement: 'The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
       source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are
-      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install
-      system-wide: an experiment''s installs stay in a venv or local prefix inside its own experiment folder (DEC-157, DEC-158).'
+      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide. The research role is the one exception to the denial: it may install only into a venv or local prefix inside its own experiment folder, within its ticket''s `allowed_paths`, and the sandbox''s write fence enforces this (DEC-157, DEC-158, DEC-163).'
 master_rules:
 - id: MR-1
   title: Specification comes first
@@ -1307,6 +1307,7 @@ capabilities:
   - 'W2: typed handoff records'
   - W1-33
   - W1-05
+  - W1-46
   sources:
   - Contract v3 Gate E2, E3
   - Framework v4.1.2 §24, §25
@@ -1314,6 +1315,7 @@ capabilities:
   - DEC-094
   - DEC-119
   - DEC-154
+  - DEC-163
   scenarios:
     dev:
     - CHAOS-X-02
@@ -1338,6 +1340,12 @@ capabilities:
     item: Distinct test execution and integration roles
     source: MR-5; DEC-094
     wave: W2
+  - id: CAP-22.d
+    item: 'A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: the guard knows the role, its writes are held to its ticket''s `allowed_paths` (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32) stays W3'
+    source: 'DEC-163; DEC-158'
+    wave: W1
+    provider:
+    - W1-46
 - id: CAP-23
   title: Concurrency and task claims
   outcome: Two agents cannot both take the same task.
@@ -1423,13 +1431,14 @@ capabilities:
   title: Tool registry and capability memory (lite)
   outcome: The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
   acceptance: '`gov doctor --json` lists pinned versus found versions and exits non-zero on drift; an install command from
-    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied.'
+    the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied, except a research session''s install inside its own experiment folder (DEC-163).'
   wave: W1
   provider:
   - W1-04
   - W1-06
   - W1-27
   - W1-48
+  - W1-46
   sources:
   - Contract v3 Gate F2, F3
   - Framework v4.1.2 §28-30
@@ -1441,6 +1450,7 @@ capabilities:
   - DEC-083
   - DEC-153
   - DEC-157
+  - DEC-163
   scenarios:
     dev:
     - CHAOS-A-05
@@ -1483,6 +1493,12 @@ capabilities:
     wave: W1
     provider:
     - W1-48
+  - id: CAP-25.e
+    item: 'The research role may install only inside its own experiment folder (a venv or local prefix within its ticket''s `allowed_paths`); a system-wide install is denied to it; the sandbox''s write fence enforces this. It is the one exception to the denial in CAP-25.b'
+    source: 'DEC-163; DEC-157'
+    wave: W1
+    provider:
+    - W1-46
 - id: CAP-26
   title: Plugin trust boundary (hash-binding, descriptor security)
   outcome: (none — non-goal)
@@ -1783,18 +1799,21 @@ capabilities:
   acceptance: A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes
     it.
   wave: W3
-  wave_note: experiments as part of discovery, with an evidence record, are W1 (DEC-102); the full research lifecycle is W3
+  wave_note: 'experiments as part of discovery, with an evidence record, are W1 (DEC-102); a minimal research role is W1 (DEC-163, CAP-22.d); `gov discover` is W2 (DEC-166); the full research lifecycle is W3'
   provider:
   - Docling (pinned)
   - MarkItDown
   - 'W3: gov research sync + research records'
   - W1-35
+  - 'W2: gov discover'
   sources:
   - Contract v3 Gate J1, J2
   - Framework v4.1.2 §45, §46
   - DEC-019
   - DEC-020
   - DEC-102
+  - DEC-163
+  - DEC-166
   scenarios:
     dev:
     - A-X-02
@@ -1827,13 +1846,17 @@ capabilities:
     wave: W1
     provider:
     - W1-35
+  - id: CAP-32.d
+    item: '`gov discover <question or feature>` is the entry point to discovery: it opens a discovery ticket, runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose evidence records, with measured numbers, back the answer; the same request in plain language works the same way'
+    source: 'DEC-166'
+    wave: W2
 - id: CAP-33
   title: Change-impact transactions (CIT-P simulation, CIT-E execution)
   outcome: An agent can simulate a change before making it (CIT-P) and record what it changed (CIT-E).
   acceptance: A decision change raises a CIT-P listing the affected specs, decisions, tickets, tests and code from both graphs,
     with a radius; after apply/archive the CIT-E record matches the proposal or lists the differences.
   wave: W2
-  wave_note: OpenSpec proposal and apply/archive in W1; computed impact W2
+  wave_note: 'OpenSpec proposal and apply/archive in W1, where a plain-language impact question runs an OpenSpec proposal plus `gov closure` (DEC-167); computed impact W2'
   provider:
   - OpenSpec 1.13.2
   - W1-35
@@ -1846,6 +1869,7 @@ capabilities:
   - DEC-011
   - DEC-066
   - DEC-105
+  - DEC-167
   scenarios:
     dev:
     - MR-A-05
@@ -1898,6 +1922,16 @@ capabilities:
     wave: W1
     provider:
     - W1-35
+  - id: CAP-33.f
+    item: 'The question "what is the impact of X?", asked in plain language, triggers the impact assessment; in Wave 1 that is an OpenSpec proposal plus `gov closure`'
+    source: 'DEC-167'
+    wave: W1
+    provider:
+    - W1-35
+  - id: CAP-33.g
+    item: 'From Wave 2 the same plain-language question runs `gov impact`'
+    source: 'DEC-167'
+    wave: W2
 - id: CAP-34
   title: Human decision gates and contradiction resolution
   outcome: The owner receives every question that matters as a ranked decision package in the active chat, and independent
@@ -2335,16 +2369,18 @@ capabilities:
   acceptance: A committed lesson whose scope matches a ticket is returned by `gov retrieve` for that ticket and not for an
     out-of-scope ticket.
   wave: W1
-  wave_note: upstream export excluded (DEC-053 Q7)
+  wave_note: 'upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165)'
   provider:
   - W1-08
   - W1-21
   - W1-44
+  - 'W3: lesson packets, shared inbox and triage (lite)'
   sources:
   - Contract v3 Gate Q1, Q2, Q3, Q4
   - Framework v4.1.2 §67, §68, §75E-75G
   - Distribution Protocol v1.2 §13-15
   - DEC-053
+  - DEC-165
   scenarios:
     dev:
     - RETR-X-04
@@ -2384,9 +2420,29 @@ capabilities:
     provider:
     - W1-44
   - id: CAP-41.e
-    item: 'Non-goal: upstream export gate, lesson packets, FCP loop'
-    source: Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7
+    item: 'Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j)'
+    source: Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7; DEC-165
     wave: NONE
+  - id: CAP-41.f
+    item: 'Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical)'
+    source: 'DEC-165'
+    wave: W3
+  - id: CAP-41.g
+    item: 'A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets, scanned by gitleaks; the product''s orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/`'
+    source: 'DEC-165'
+    wave: W3
+  - id: CAP-41.h
+    item: 'A high or critical lesson is raised to the owner immediately, as a decision package'
+    source: 'DEC-165'
+    wave: W3
+  - id: CAP-41.i
+    item: 'The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release''s notes list the lessons fixed, with their severity'
+    source: 'DEC-165'
+    wave: W3
+  - id: CAP-41.j
+    item: 'Product decisions, specifications and lessons never leave their repository; only lesson packets reach the inbox'
+    source: 'DEC-165'
+    wave: W3
 - id: CAP-42
   title: Legacy governance retirement and archive policy
   outcome: An agent can retire a repository's legacy governance (rules files, memory, indexes) into archived, inactive state.
@@ -2569,15 +2625,17 @@ capabilities:
   acceptance: '`gov update --check` reports the version change and migrations; `copier update` applies them with the overlay
     files unchanged and `gov doctor` green.'
   wave: W2
-  wave_note: first real `copier update` in W2
+  wave_note: 'first real `copier update` in W2; the pending-update report of `gov doctor` is W3 (DEC-165)'
   provider:
   - Copier 9.18.2
   - 'W2: gov update --check'
+  - 'W3: gov doctor pending-update report'
   sources:
   - Contract v3 Gate S5
   - Framework v4.1.2 §82
   - Distribution Protocol v1.2 §12
   - DEC-023
+  - DEC-165
   scenarios:
     dev:
     - CHAOS-A-10
@@ -2592,6 +2650,10 @@ capabilities:
       regenerated, affected indexes rebuilt, verify, rollback, ledger/provenance'
     source: Contract v3 S5; Framework v4.1.2 §82; Distribution Protocol v1.2 §12
     wave: W2
+  - id: CAP-45.b
+    item: 'In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and their highest lesson severity at session start; the owner decides when to run `gov update`'
+    source: 'DEC-165'
+    wave: W3
 - id: CAP-46
   title: Cross-machine sync via git
   outcome: The owner can move to another machine with git alone.
@@ -3095,6 +3157,7 @@ capabilities:
   - W1-45
   - W1-46
   - W1-47
+  - 'W3: lessons-inbox guard exception'
   sources:
   - DEC-041 (default-deny allow-lists, derived not enumerated)
   - DEC-076
@@ -3103,6 +3166,7 @@ capabilities:
   - DEC-156
   - DEC-161
   - EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
+  - DEC-165
   scenarios:
     dev:
     - MR-A-01
@@ -3167,6 +3231,10 @@ capabilities:
     wave: W1
     provider:
     - W1-47
+  - id: CAP-58.g
+    item: 'The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write, as a guard exception'
+    source: 'DEC-165'
+    wave: W3
 - id: CAP-59
   title: Review-repair loop budget
   outcome: 'The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop continues
@@ -3248,7 +3316,7 @@ capabilities:
     false`, network `strictAllowlist`) and fail-closed (`failIfUnavailable: true`); a launched worker''s Bash command cannot
     write outside the repository, its network profile applies, and its `GOV_ROLE` and `GOV_TICKET` reach the guard.'
   wave: W1
-  wave_note: the untested sandbox cases are a W2 experiment (DEC-160)
+  wave_note: 'the untested sandbox cases are a W2 experiment, EXP-002 (DEC-160, DEC-164)'
   provider:
   - Claude Code sandbox (bubblewrap 0.9.0, socat 1.8.0.0)
   - W1-46
@@ -3263,6 +3331,8 @@ capabilities:
   - DEC-160
   - DEC-161
   - EXP-001 (spike-sandbox/EVIDENCE.md §5.2–5.5)
+  - DEC-163
+  - DEC-164
   scenarios:
     dev: []
     qual: []
@@ -3272,8 +3342,8 @@ capabilities:
   - id: CAP-61.a
     item: 'The launcher refuses to start a worker session unless the sandbox is on, strict and fail-closed: enabled, `failIfUnavailable:
       true`, `allowUnsandboxedCommands: false`, network `strictAllowlist`; the configuration is passed through `--settings`,
-      never read from the repository, whose settings carry no sandbox block'
-    source: DEC-152; DEC-153; DEC-161; EXP-001 §5.2
+      never read from the repository, whose settings carry no sandbox block; the launcher sets no `excludedCommands`'
+    source: DEC-152; DEC-153; DEC-161; DEC-164; EXP-001 §5.2
     wave: W1
     provider:
     - W1-46
@@ -3309,9 +3379,8 @@ capabilities:
     provider:
     - W1-48
   - id: CAP-61.f
-    item: The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp
-      filter, `bypassPermissions` mode) are tested by an experiment; until then they are residuals
-    source: DEC-160; EXP-001 §4
+    item: 'The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals'
+    source: DEC-160; DEC-164; EXP-001 §4
     wave: W2
 - id: CAP-62
   title: Sandbox escape hatch denied

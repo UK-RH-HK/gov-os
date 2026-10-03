@@ -2,7 +2,7 @@
 id: CHARTER-v5
 status: PROPOSED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
-decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096]
+decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165]
 ---
 
 # Governance OS — Charter v5
@@ -154,9 +154,9 @@ from kernel role files plus the project roster. It carries:
 
 | Wave | Roles |
 |---|---|
-| 1 | orchestrator · product/specification · independent test designer · engineer · independent auditor |
+| 1 | orchestrator · product/specification · independent test designer · engineer · independent auditor · research, in a minimal form (DEC-163) |
 | 2 | architecture · frontend · backend · database/data · integration/API · test execution · integration · DevOps/SRE · security · performance · UX; typed handoffs (DEC-094) |
-| 3 | research · AI/ML · data author · change controller · memory/knowledge · tooling · release · claims/concurrency |
+| 3 | research, with the full research lifecycle · AI/ML · data author · change controller · memory/knowledge · tooling · release · claims/concurrency |
 
 **Authority.** The owner is L5: the customer and the final authority (MR-6). Agents hold no approval authority.
 - A decision becomes ACTIVE only with an approval fact from the owner's git account: an owner commit, a signed tag or
@@ -204,7 +204,7 @@ under its own guard (DEC-084).
 | In-process authority levels L0–L5, acting-role resolution, sealed human channel (CAP-21 beyond its LITE form) | Same-privilege adversary; approvals come only from the owner's git account | DEC-039, DEC-074 Q11 |
 | Automated tool-install gate, argv classification, install-authority envelopes (CAP-25 beyond its LITE form) | Reading argv cannot determine what executes; the owner approves each install | DEC-040 as amended by DEC-083 |
 | Separate A2A communication layer and three-layer knowledge fabric (CAP-27 beyond its LITE form) | One owner, one harness at a time; kept as "read commands never mutate" | DEC-074 Q11 |
-| Upstream lesson export gate, FCP loop, inbox (Contract v3 Q4) | No upstream loop; lessons stay in `docs/lessons/` | DEC-053 Q7 |
+| The full upstream lesson export gate and FCP loop (Contract v3 Q4) | Lessons stay in `docs/lessons/`. Only a lite loop for framework lessons is built, in Wave 3: a lesson packet with no product code, data or secrets goes to a shared inbox (CAP-41) | DEC-053 Q7, reversed for framework lessons only by DEC-165 |
 | LLM-extracted knowledge graphs for authority (Graphiti, LightRAG, GraphRAG, Cognee) and BMAD | Non-deterministic and token-heavy | DEC-021 |
 | RAGFlow, until its adoption trigger fires | Heavy, and a second truth store; the default is Docling → markdown in git | DEC-020 (CONDITIONAL) |
 | beads / beads_rust as the task tracker | Licence rider; superseded by `ticket` | DEC-072, DEC-074 |
