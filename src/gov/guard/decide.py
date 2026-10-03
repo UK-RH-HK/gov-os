@@ -96,9 +96,17 @@ def _load_ticket(root: str, tid: str) -> dict | None:
     return None
 
 
-def _get_allowed_paths(role: str, tid: str | None, root: str) -> list[str]:
+def _get_allowed_paths(role: str, tid: str | None, root: str,
+                       *, session_role: str | None = None) -> list[str]:
     if role == "orchestrator":
-        return ["**"]
+        # DEC-156: the wide scope applies only in an orchestrator session.
+        # An orchestrator subagent in a non-orchestrator session falls
+        # through to the ticket-path rule (DEC-136 batch 3).
+        if session_role is None or session_role == "orchestrator":
+            return ["**"]
+        # Fall through: use the ticket's allowed_paths when the ticket's
+        # role is orchestrator; otherwise the orchestrator subagent gets
+        # nothing beyond the scratch set.
     if role not in KNOWN_ROLES or not tid:
         return []
     t = _load_ticket(root, tid)
@@ -451,7 +459,8 @@ def decide(
             return "deny", f"role '{erole}' is not a known role"
         acting_role = erole
 
-    pats = _get_allowed_paths(acting_role, ticket_id, project_root)
+    pats = _get_allowed_paths(acting_role, ticket_id, project_root,
+                              session_role=erole)
     for tgt in write_targets:
         if not _path_allowed(tgt, project_root, pats, acting_role):
             lbl = "Bash write" if tool_name == "Bash" else tool_name

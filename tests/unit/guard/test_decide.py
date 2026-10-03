@@ -1691,3 +1691,124 @@ class TestOrchestratorScope:
             project_root=project, role="engineer", ticket_id=TID,
         )
         assert d == "deny"
+
+
+# ---------------------------------------------------------------------------
+# DEC-156 + DEC-136 batch 3: the wide orchestrator scope does not reach
+# an orchestrator subagent in a non-orchestrator session
+# ---------------------------------------------------------------------------
+
+class TestOrchestratorSubagentScope:
+    """The wide DEC-156 scope applies only in an orchestrator session.
+    An orchestrator subagent in a non-orchestrator session falls through
+    to the ticket-path rule."""
+
+    def test_orchestrator_subagent_denied_in_engineer_session(self, tmp_path):
+        """The orchestrator subagent in an engineer session cannot write
+        outside the ticket's paths, even though a main-thread orchestrator
+        could."""
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+            subagent_type="orchestrator",
+        )
+        assert d == "deny"
+
+    def test_orchestrator_subagent_denied_in_engineer_session_on_source(self, tmp_path):
+        """The subagent gets nothing from the engineer's own ticket paths:
+        the ticket's role is engineer, not orchestrator."""
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+            subagent_type="orchestrator",
+        )
+        assert d == "deny"
+
+    def test_orchestrator_subagent_allowed_on_orchestrator_ticket(self, tmp_path):
+        """On a ticket whose role IS orchestrator, the subagent gets that
+        ticket's allowed_paths."""
+        project = _make_project(tmp_path, {
+            "DAEO-orch.md": _ticket(
+                ticket_id="DAEO-orch", role="orchestrator",
+                allowed_paths=(".claude/settings.json",),
+            ),
+        })
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".claude/settings.json"), "content": "x"},
+            project_root=project, role="engineer", ticket_id="DAEO-orch",
+            subagent_type="orchestrator",
+        )
+        assert d == "allow"
+
+    def test_orchestrator_subagent_denied_outside_orchestrator_ticket_paths(self, tmp_path):
+        """Even on the orchestrator ticket, paths outside the ticket's
+        allowed_paths are denied in a non-orchestrator session."""
+        project = _make_project(tmp_path, {
+            "DAEO-orch.md": _ticket(
+                ticket_id="DAEO-orch", role="orchestrator",
+                allowed_paths=(".claude/settings.json",),
+            ),
+        })
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="engineer", ticket_id="DAEO-orch",
+            subagent_type="orchestrator",
+        )
+        assert d == "deny"
+
+    def test_orchestrator_subagent_wide_in_orchestrator_session(self, tmp_path):
+        """In an orchestrator session, the orchestrator subagent keeps the
+        wide DEC-156 scope."""
+        project = _make_project(tmp_path, {
+            "DAEO-orch.md": _ticket(
+                ticket_id="DAEO-orch", role="orchestrator",
+                allowed_paths=(".claude/settings.json",),
+            ),
+        })
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id="DAEO-orch",
+            subagent_type="orchestrator",
+        )
+        assert d == "allow"
+
+    def test_orchestrator_subagent_without_ticket_denied(self, tmp_path):
+        """Without a ticket the orchestrator subagent in a non-orchestrator
+        session has no paths."""
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=None,
+            subagent_type="orchestrator",
+        )
+        assert d == "deny"
+
+    def test_orchestrator_subagent_scratch_in_non_orchestrator_session(self, tmp_path):
+        """Scratch is still available to a known-role subagent."""
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".gov-runtime/scratch/note.txt"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+            subagent_type="orchestrator",
+        )
+        assert d == "allow"
+
+    def test_orchestrator_main_thread_still_wide(self, tmp_path):
+        """The main thread of an orchestrator session still has the wide scope
+        (no regression from the subagent fix)."""
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, "README.md"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "allow"
