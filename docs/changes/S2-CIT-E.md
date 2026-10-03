@@ -8,8 +8,8 @@ base: w1/integrate @ 442e9c3
 proposal: S2-CIT-P
 author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
-decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171]
-repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), §6
+decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173]
+repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), §7
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 ---
 
@@ -259,7 +259,7 @@ require; DEC-158 as the citation in DEC-163; W1-46's size and its dependency on 
 | Wave 1 glue (class implementation) | ≈ 5,370 LOC | ≈ 5,460 LOC (+370 for the whole S2 change) |
 | Layers | W1-46 in layer 7 | Unchanged |
 | Critical path | Unchanged | Unchanged |
-| Charter v5 | Not changed | Four lines: frontmatter decisions; §6 roster rows for Wave 1 and Wave 3; §7 non-goal row on the upstream lesson loop |
+| Charter v5 | Not changed | Five lines: frontmatter decisions; §6 roster rows for Wave 1 and Wave 3; §6 install sentence, which names the research exception (DEC-173, added in the round-2 repair, §7); §7 non-goal row on the upstream lesson loop |
 
 Tickets edited in the repair:
 
@@ -278,7 +278,8 @@ Tickets edited in the repair:
 | W1-02 `DAEO-emkd`, W1-03 `DAEO-8qvp`, W1-04 `DAEO-78bn` | closed | A note each. No KPI or status change |
 
 `validate_s1.py`: the F-08 changes; section 3f, fourteen checks for the repair; the S2 write-scope check allows the
-Charter's four changed lines and nothing else there.
+Charter's five changed lines and nothing else there (four until the round-2 repair; five with DEC-173, and the check
+now names each line).
 
 ### 6.4 Points for the auditor
 
@@ -310,4 +311,91 @@ Charter's four changed lines and nothing else there.
 ### 6.5 Validation
 
 `python3 docs/plan/tools/validate_s1.py`, run from the repository root on `s2/spec` after the repair: 89 PASS, 2 SKIP,
+0 FAIL. The two skipped are the same as in §5.
+
+## 7. Repair after the S2-A round-2 audit (2026-10-03)
+
+S2-A's round-2 verdict was ACCEPT_WITH_FINDINGS: no BLOCKER, 1 MAJOR, 5 MINOR, all new (S2A-F-11…F-16). All ten
+round-1 findings were found repaired. The owner answered the audit's packages DP-3 and DP-4 and directed the repair
+of the other findings by their recommended fixes. The audit files were read from the copy the owner placed in
+`~/gov-os-workbench/s2/round2-audit/`.
+
+### 7.1 Findings repaired
+
+| Finding | Severity | Repair | Files |
+|---|---|---|---|
+| S2A-F-11 | MAJOR | Answered by DEC-172 (DP-3), option (b), unconditionally: no test run. W1-47 removes the install and download ask rules from the committed `.claude/settings.json` and keeps the `Bash(sudo:*)` deny rule; the guard's install rule decides alone, and the sandbox backs it in launched worker sessions. W1-46's install KPI says the session meets no settings ask rule, and its install test runs with the committed settings loaded | New `CAP-25.f`; `DAEO-o4fg`, `DAEO-jdqr`, a note on `DAEO-78bn`; ADR-0002 §6; WBS rules, §1, §3, §5; `bootstrap.md` |
+| S2A-F-12 | MINOR | The Charter sentence is answered by DEC-173 (DP-4), option (a). ADR-0001, the ADR-0002 §6 orchestrator bullet and W1-33 KPI 2 name the same exception | Charter §6; ADR-0001; ADR-0002 §6; `DAEO-xog0` |
+| S2A-F-13 | MINOR | The launcher's deny list is computed at launch, from the paths that exist then. A path created later outside the experiment folder is covered by the guard's per-ticket allow-list, and the containment check reports a change the guard did not see. The exceptions are listed: `.git/`, and an entry whose name contains `*`, `?` or `[`. W1-46's acceptance test gains the later-path case and a check of the exceptions | `CAP-61.c`, `CAP-25.e`; `DAEO-jdqr`; ADR-0002 §6; WBS rules; `bootstrap.md` |
+| S2A-F-14 | MINOR | Reworded: the oracle path is held in `held-out.yaml` and in the committed deny rule built from it; register entry DEC-067 names the directory historically. The owner confirms the value in `held-out.yaml` when W1-47 closes | `CAP-49.c`; `DAEO-o4fg`; ADR-0002 §6; `bootstrap.md` |
+| S2A-F-15 | MINOR | DEC-170 has a covers item under the telemetry capability: `CAP-40.d`, Wave 1, provider W1-31. The W1-31 KPI cites it | CAP-40; `DAEO-6mk8` |
+| S2A-F-16 | MINOR | S2-CIT-P §6 lists DEC-170 and DEC-171 and has a §7 for this repair. The WBS header cites DEC-102…DEC-172, and its frontmatter and §5 name the new entries | `S2-CIT-P.md`; WBS |
+
+On the audit's observations: O-10 is closed, because the validator now checks which five Charter lines changed.
+O-7, O-8, O-9 and O-11 needed no change.
+
+### 7.2 Decisions recorded and carried
+
+Register v0.30 (section 30). No earlier entry was edited.
+
+| Decision | Subject | Carried into |
+|---|---|---|
+| DEC-172 (DP-3) | The install and download ask rules are removed from the committed `.claude/settings.json`; the guard's install rule stands alone; the sandbox backs it in launched worker sessions. Withdraws the settings second line of DEC-120 and DEC-151. W1-47 makes the change | `CAP-25.f` (W1, W1-47), CAP-25 provider and sources; W1-47, W1-46, W1-04 (note); ADR-0002 §6; WBS rules, §1, §3, §5; `bootstrap.md` |
+| DEC-173 (DP-4) | Charter §6's install sentence gains "except the research role, inside its experiment folder (DEC-163)" | Charter §6 and frontmatter; `validate_s1.py`; §6.3 above |
+
+### 7.3 Figures after the round-2 repair
+
+| Item | After the round-1 repair | After the round-2 repair |
+|---|---|---|
+| Register | v0.29, DEC-150…DEC-171 (22) | v0.30, DEC-150…DEC-173 (24) |
+| Contract | v4.1, 62 capabilities | Unchanged; the 4.1 change-log line names this repair |
+| `covers` items | 205 | 207: `CAP-25.f` (W1, W1-47) and `CAP-40.d` (W1, W1-31) added; `CAP-25.e`, `CAP-49.c` and `CAP-61.c` reworded by adding or replacing text; none removed, no wave re-tagged |
+| Wave 1 tickets | 48 | 48. No estimate, dependency, role or profile changed |
+| Wave 1 glue | ≈ 5,460 LOC | Unchanged |
+| Layers and critical path | Unchanged | Unchanged |
+| Charter v5 | Four lines | Five lines: the §6 install sentence is the fifth; the frontmatter line, already changed, also gains DEC-173 |
+
+Tickets edited:
+
+| Ticket | Status | Change |
+|---|---|---|
+| W1-46 `DAEO-jdqr` | open | DEC-172, F-13: the fence KPI and the install KPI, two failure KPIs, source DEC-172, body |
+| W1-47 `DAEO-o4fg` | open | DEC-172, F-14: one new KPI [`CAP-25.f`], the oracle-rule KPI reworded, one failure KPI, sources DEC-172 and CAP-25, body |
+| W1-31 `DAEO-6mk8` | open | F-15: the sandbox-token KPI cites `CAP-40.d` |
+| W1-33 `DAEO-xog0` | open | F-12: KPI 2 names the research exception |
+| W1-04 `DAEO-78bn` | closed | A note. No KPI or status change |
+
+`validate_s1.py`: section 3g, seven checks for this repair; the Charter check counts five lines and names each one.
+
+### 7.4 Points for the auditor
+
+1. **S2 did not edit `.claude/settings.json`.** It is outside S2's write paths. The ask rules are still in the file
+   and leave it when W1-47 is implemented. The validator accepts them until W1-47 is closed and fails afterwards if
+   one remains.
+2. **DEC-172 has a Contract item, `CAP-25.f`.** The owner's answer names W1-47, W1-46 and `bootstrap.md`. The item was
+   added so that the new W1-47 KPI cites a `covers` item, as S2A-F-15 asked of DEC-170.
+3. **What the settings rules caught that the guard's rule does not.** This is S2's reading of `bootstrap.md`'s list of
+   W1-04 edge cases against the rule patterns; nothing was run. Three kinds of command meet no prompt in the
+   orchestrator's own session once the rules are gone: a download piped to a shell inside a subshell, an option with
+   a value before `uv`'s subcommand, and a `curl` or `wget` download that is not an install. `bootstrap.md` states
+   this under "Still open for the orchestrator's own session". The owner decided DP-3 unconditionally; the list is
+   recorded, not reopened.
+4. **The exceptions to the deny list are two, and S2 chose them.** `.git/` comes from the audit. The glob-character
+   entry comes from EXP-001 §1. W1-46's test asserts that the generated list leaves out exactly these.
+5. **A later path is "covered", not "stopped".** The guard sees the forms it can parse; for the rest the containment
+   check reports the change after the command. W1-46's test accepts either result. `denyWrite` on a path that does
+   not exist yet stays in EXP-002.
+6. **"The owner confirms at close" (F-14)** is the only check of the value in `held-out.yaml`. No automatic check can
+   name the path.
+7. **`CAP-25.b` and the W1-04 KPI still say "denied for other roles"**, as in §6.4 point 6. Both belong to the
+   closed W1-04.
+8. **Register section 28 says the Charter change is limited to the lines DEC-163 and DEC-165 require.** The register
+   is append-only; DEC-173 adds the fifth line.
+9. **`CAP-40.d` gives no token figure.** The measured 3,250 stays in the W1-31 KPI, ADR-0002 and `bootstrap.md`. The
+   envelope's "Token budget" sentence was not changed: whether the tokens count toward the share is open until the
+   Wave 1 exit (DEC-170).
+
+### 7.5 Validation
+
+`python3 docs/plan/tools/validate_s1.py`, run from the repository root on `s2/spec` after this repair: 96 PASS, 2 SKIP,
 0 FAIL. The two skipped are the same as in §5.

@@ -10,7 +10,7 @@ author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162]
-repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS); DEC-163…DEC-169; see S2-CIT-E §6
+repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), DEC-163…DEC-171, see S2-CIT-E §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), DEC-172 and DEC-173, see §7 and S2-CIT-E §7
 ---
 
 # S2 — Change-impact proposal (CIT-P) on the Gov OS specification
@@ -208,9 +208,28 @@ decisions in the same message. The impact of each is listed here; the execution 
 | DEC-167 | A plain-language impact question triggers the impact assessment | `CAP-33.f` (W1, W1-35), `CAP-33.g` (W2); one KPI on W1-35; WBS rules and §6 |
 | DEC-168 | Scope and severity in the Wave 1 lesson schema | `CAP-41.f` moves to W1 on W1-08; one KPI on W1-08, the failure KPI of W1-44; WBS §5 and §7 |
 | DEC-169 | The validator's fingerprint fallback and S2 scope check (S2A-F-08) | `validate_s1.py` only |
+| DEC-170 | Sandbox instruction tokens are reported apart from the governance share (S2A-F-07) | One KPI on W1-31, with `CAP-40.d` (added in the round-2 repair); ADR-0002 "Consequences"; WBS §1, §3; `bootstrap.md` |
+| DEC-171 | An orchestrator change outside its ticket's paths is a record, not a containment finding (S2A-F-01) | `CAP-58.e`; W1-45 (KPI, source, body); ADR-0002 §6; WBS rules; `bootstrap.md` |
 
-The audit's other findings (S2A-F-01, F-03, F-04, F-06, F-07, F-09, F-10) change ticket KPIs, estimates (W1-30, W1-31:
+DEC-170 and DEC-171 are the owner's confirmations on S2A-F-07 and S2A-F-01. The audit's other findings (S2A-F-01, F-03, F-04, F-06, F-07, F-09, F-10) change ticket KPIs, estimates (W1-30, W1-31:
 +50 LOC), `CAP-49.c`, `CAP-58.a`, `CAP-58.b`, `CAP-58.e`, `CAP-61.c`, ADR-0002 and `bootstrap.md`; S2-CIT-E §6.1 lists
 them one by one.
 
 The three options of DEC-105 were not re-asked: the owner gave these as decisions to apply in this change.
+
+## 7. Repair after the S2-A round-2 audit
+
+S2-A's round-2 verdict was ACCEPT_WITH_FINDINGS: no BLOCKER, 1 MAJOR, 5 MINOR. The owner answered its two decision
+packages. The impact is listed here; the execution is in `S2-CIT-E.md` §7.
+
+| Decision or finding | Subject | Impact |
+|---|---|---|
+| DEC-172 (DP-3, S2A-F-11) | The install and download ask rules leave the committed `.claude/settings.json`; the guard's install rule stands alone. Withdraws the settings second line of DEC-120 and DEC-151 | New `CAP-25.f` (W1, W1-47), CAP-25 provider and sources; W1-47 (one KPI, one failure KPI, sources, body); W1-46 (the install KPI, one failure KPI, source, body); a note on W1-04; ADR-0002 §6; WBS rules, §1, §3, §5; `bootstrap.md` |
+| DEC-173 (DP-4, S2A-F-12) | Charter §6's install sentence names the research exception | Charter v5 §6, one line, and its frontmatter; `validate_s1.py` (five Charter lines); S2-CIT-E §6.3 |
+| S2A-F-12 | Three more sentences said that only the orchestrator installs | ADR-0001 "Tool installs"; ADR-0002 §6 orchestrator bullet; W1-33 KPI 2 |
+| S2A-F-13 | The launcher's deny list is computed at launch; later paths; exceptions | `CAP-61.c`, `CAP-25.e`; W1-46 (KPI, failure KPI, body); ADR-0002 §6; WBS rules; `bootstrap.md` |
+| S2A-F-14 | Where the oracle path is held | `CAP-49.c`; W1-47 (KPI, body); ADR-0002 §6; `bootstrap.md` |
+| S2A-F-15 | DEC-170 had no Contract item | New `CAP-40.d` (W1, W1-31), CAP-40 sources; the W1-31 KPI cites it |
+| S2A-F-16 | This record and the WBS header stopped short | §6 above (DEC-170, DEC-171); WBS opening paragraph and frontmatter |
+
+The three options of DEC-105 were not re-asked: the owner gave both answers as decisions to apply in this change.
