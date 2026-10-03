@@ -1700,3 +1700,54 @@ reviewer's probe left (DEC-137) and on commit trailers.
 | Version | Date | Change |
 |---|---|---|
 | 0.33 | 2026-10-03 | Owner decisions at W1-45's close: DEC-179 (a fail-open guard default is a defect; W1-47 makes it fail closed), DEC-180 (the launcher's worker settings deny `Edit` on `.gov-runtime/**` except `scratch/**`; W1-46), DEC-181 (opaque Bash writes and `ln` into `.gov-runtime/` stay a residual in the orchestrator's own session), DEC-182 (trailers in the final block with `git commit --trailer`; checks fall back to the body for commits before 2026-10-03). |
+
+## 34. Owner answers on W1-07's decision packages (register v0.34, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-03 to the packages raised at W1-07's test design (`DAEO-drvn`): the test designer's three
+KPI disputes (KD-1…KD-3), the orchestrator's DP-5, and two items the orchestrator reported.
+
+### DEC-183 — Worker identity and headless flags until the launcher exists
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-161, DEC-107
+- **Decision:**
+  - Until W1-46 closes, every headless worker session is started with
+    `--settings '{"env":{"GOV_ROLE":"<role>","GOV_TICKET":"<id>"}}'`, which overrides the `env` block in
+    `.claude/settings.local.json`.
+  - The headless flags are approved: `--permission-mode acceptEdits`, with Bash and the file tools allowed. The
+    guard decides every call.
+  - Both are added to the orchestrator's checkpoint and to the rules of `docs/plan/WAVE_1_WBS.md`.
+
+### DEC-184 — DP-5: the W1-07 drafts written under the wrong identity are discarded
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package DP-5 option (b) · **Under:** MR-3
+- **Decision:** The drafts in `.gov-runtime/scratch/independent-test-designer/W1-07/` are discarded and the folder
+  deleted. A fresh, correctly identified test designer starts from the ticket and these decisions alone.
+
+### DEC-185 — KD-1: every `gov` command loads the `governance/project/` files it knows; an invalid one is `CONFIG_INVALID`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package KD-1 option (a), without a new `overlay.yaml`
+- **Decision:**
+  - Every `gov` command loads the `governance/project/` files it knows: `path-map.yaml` now, the other overlay
+    files as their tickets add them. There is no new `overlay.yaml`.
+  - A missing file is not an error. An invalid one gives exit 1 with `CONFIG_INVALID`, naming the file and the key.
+  - A minimal path-map schema lives under `src/gov/config/` until W1-08 supplies the real one and replaces it.
+
+### DEC-186 — KD-2: check declarations are YAML in the kernel template; `gov check --list --json` is built at W1-07
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package KD-2 option (a), in the kernel template
+- **Decision:**
+  - Check declarations are YAML files under `template/governance/kernel/checks/*.yaml`, with `id`, `family`,
+    `tier`, `severity` and `command`.
+  - `gov check --list --json` is built at W1-07. Running checks stays `NOT_IMPLEMENTED` until W1-26.
+  - `template/governance/kernel/checks/**` joins W1-07's `allowed_paths`, in its own commit with the trailer
+    `Task: DAEO-drvn`.
+
+### DEC-187 — KD-3: no public surface for the read/act class at W1-07
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package KD-3 option (b)
+- **Decision:** W1-07 gives the read/act class no public surface. It is tested by behaviour only, and revisited at
+  W1-26.
+
+### DEC-188 — The plan validator accepts the owner's close of W1-45
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-150, DEC-169
+- **Decision:** `docs/plan/tools/validate_s1.py` is updated so that its W1-45 check accepts the owner's close (W1-45
+  closed under DEC-150), in its own commit with the trailer `Task: decision-record`. The validator must then pass.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.34 | 2026-10-03 | Owner answers on W1-07's packages: DEC-183 (worker identity through `--settings` env, and the headless flags, until W1-46), DEC-184 (DP-5: the W1-07 drafts are discarded), DEC-185 (KD-1: commands load the `governance/project/` files they know; invalid gives `CONFIG_INVALID`; a minimal path-map schema until W1-08), DEC-186 (KD-2: check declarations under `template/governance/kernel/checks/`; `gov check --list --json` at W1-07), DEC-187 (KD-3: no public surface for the read/act class at W1-07), DEC-188 (the validator accepts W1-45's close). |
