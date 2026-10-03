@@ -1874,3 +1874,66 @@ orchestrator reported about the registry.
 | Version | Date | Change |
 |---|---|---|
 | 0.37 | 2026-10-03 | Owner answers at W1-06's implementation: DEC-199 (DP-5: a vendored folder's sha256 is the digest of its committed files, by a written rule; widens DEC-196), DEC-200 (DEC-196 clarified: an installed entry script's digest where ADR-0002 pins it), DEC-201 (gitleaks and PyYAML carry their date of record), DEC-202 (Node 22 installs carry the PATH prefix; the ccusage correction is confirmed). |
+
+## 38. Owner answers on W1-48's install package, W1-06's close and the context limit (register v0.38, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-03 to the orchestrator's install package for W1-48 (`DAEO-0qs5`, DEC-083), to the points
+reported at W1-06's close, and on the orchestrator's context limit.
+
+### DEC-203 — Install approved and made by the owner: Claude Code 2.1.288
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package option (b) · **Under:** DEC-083, DEC-153, DEC-196, DEC-197
+- **Decision:**
+  - The owner updated the Claude Code CLI from 2.1.284 to 2.1.288 with `claude install 2.1.288`, through the
+    operator console, outside every agent session, as an owner action. No agent session installed it.
+  - Facts: `claude --version` prints `2.1.288 (Claude Code)`; `~/.local/bin/claude` resolves to
+    `/home/usain/.local/share/claude/versions/2.1.288`; the sha256 of that binary is
+    `0298068b686e7fdbaf9402a7a587bb7f49c0b0e084de09f69145a0719207640c`.
+  - The registry entry for Claude Code 2.1.288 is recorded from these facts, with the binary's sha256 (DEC-196).
+    This entry is the owner approval its `approved_by` cites.
+  - bubblewrap 0.9.0 and socat 1.8.0.0 enter the registry as owner installs under DEC-141.
+
+### DEC-204 — The stale npm copy of Claude Code 2.1.59 is removed
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package
+- **Decision:** The owner removed the npm global `@anthropic-ai/claude-code` 2.1.59 under Node v18.20.8. The removal
+  is noted in `governance/project/bootstrap.md`.
+
+### DEC-205 — Headless workers start with the absolute path `~/.local/bin/claude`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-48 install package · **Amends:** DEC-183 (the command's first word)
+- **Decision:**
+  - A second `claude` is on `PATH`: `/mnt/c/Users/usain/AppData/Roaming/npm/claude`, a Windows-side npm install
+    reached through WSL's `PATH`, listed after `~/.local/bin/claude`.
+  - Every headless worker is started with the absolute path `~/.local/bin/claude`, never a bare `claude`, so that a
+    changed `PATH` can never start the Windows copy.
+  - The Windows copy is recorded in `governance/project/bootstrap.md` as noted, not removed. It is outside WSL and
+    the owner's choice.
+  - W1-48's test designer adds a check that the pinned CLI is the one at `~/.local/bin/claude`.
+
+### DEC-206 — The W1-06 containment finding stays as written; workers always run in the background
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report at W1-06's close · **Under:** DEC-134
+- **Decision:**
+  - The finding of 2026-10-03 in `.gov-runtime/findings.jsonl` (a test designer's commit attributed to the
+    orchestrator's foreground call) stays as written. The findings file is append-only evidence.
+  - The orchestrator's record in `governance/project/bootstrap.md` explains it, and the exit audit reads both.
+  - The orchestrator's rule is confirmed: worker sessions always run in the background.
+
+### DEC-207 — The DEC-202 PATH-prefix gap is closed in W1-48's test design batch
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-202, DEC-136
+- **Decision:** W1-48's test designer adds a check that every Node 22 install command in the registry carries the
+  prefix `PATH=~/.nvm/versions/node/v22.23.3/bin:$PATH`.
+
+### DEC-208 — The orchestrator's context limit: about 300k tokens, automatic from W1-29
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER · **Under:** DEC-025, CAP-37
+- **Decision:**
+  - The orchestrator checkpoints and stops with `CONTEXT_CHECKPOINT` at about 300k tokens used, of a 1M window. Its
+    prompt says so since commit `66e09aa1`.
+  - From W1-29 this becomes automatic: the PreCompact hook writes the checkpoint; the SessionStart hook (on compact,
+    clear and resume) re-injects the context packet and the checkpoint; the auto-compact threshold is set to about
+    300k tokens if Claude Code allows it.
+  - W1-29's test designer adds a test that a compaction preserves the open decisions, the active ticket and the
+    loop counts.
+  - If the threshold can't be configured, the `CONTEXT_CHECKPOINT` stop stays.
+  - W1-29 (`DAEO-zsvl`) gets a matching KPI line, in its own commit with the trailer `Task: DAEO-zsvl`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.38 | 2026-10-03 | Owner answers on W1-48's install package, W1-06's close and the context limit: DEC-203 (Claude Code 2.1.288 installed by the owner, option (b); the approval the registry cites; bubblewrap and socat as owner installs under DEC-141), DEC-204 (the stale npm copy 2.1.59 is removed), DEC-205 (headless workers start with `~/.local/bin/claude`; the Windows copy is noted, not removed), DEC-206 (the W1-06 finding stays as written; workers always run in the background), DEC-207 (the PATH-prefix check goes into W1-48's test design), DEC-208 (context limit of about 300k tokens, automatic from W1-29, with a KPI line). |
