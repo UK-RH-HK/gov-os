@@ -1579,3 +1579,28 @@ confirmed DEC-169 as the owner's decision; its entry is unchanged.
 | Version | Date | Change |
 |---|---|---|
 | 0.29 | 2026-10-03 | Owner confirmations: DEC-169 confirmed as the owner's decision; DEC-170 (sandbox instruction tokens are a separate line in W1-31, outside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit); DEC-171 (an orchestrator change outside its ticket's paths is a record, not a containment finding). |
+
+## 30. Owner answers after the S2-A round-2 audit (register v0.30, appended by S2 on branch `s2/spec`)
+
+Owner answers of 2026-10-03 to the two decision packages of the S2-A round-2 audit (ACCEPT_WITH_FINDINGS). The repair
+is recorded in `docs/changes/S2-CIT-E.md` §7.
+
+### DEC-172 — DP-3: the settings ask rules for installs and downloads are removed; the guard's install rule stands alone
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-3 option (b), unconditionally · **Withdraws:** the settings "second line" of DEC-120 and DEC-151 · **Under:** DEC-083, DEC-163
+- **Decision:**
+  - The install and download ask rules are removed from the committed `.claude/settings.json`. The guard's install
+    rule is relied on alone.
+  - No test run is needed first. W1-05's live attempts showed that the guard's rule suffices alone: an install that
+    no settings rule matched still got the hook's `ask`.
+  - In launched worker sessions, the sandbox backs the guard.
+  - W1-47, which already holds `.claude/settings.json` in its `allowed_paths`, makes the settings change. W1-46's
+    KPI and `governance/project/bootstrap.md` are updated to match.
+
+### DEC-173 — DP-4: Charter §6's install sentence names the research exception
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-4 option (a) · **Extends:** DEC-163 · **Amends:** Charter v5 §6 (install sentence)
+- **Decision:** Charter §6's install sentence gains "except the research role, inside its experiment folder
+  (DEC-163)". The plan validator's Charter line count and `docs/changes/S2-CIT-E.md` §6.3 are updated to match.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.30 | 2026-10-03 | Owner answers after the S2-A round-2 audit: DEC-172 (DP-3: the install and download ask rules leave the committed `.claude/settings.json`, in W1-47; the guard's install rule stands alone, backed by the sandbox in launched worker sessions; withdraws the settings second line of DEC-120 and DEC-151), DEC-173 (DP-4: Charter §6's install sentence names the research exception of DEC-163). |
