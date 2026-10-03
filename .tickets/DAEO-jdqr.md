@@ -38,7 +38,7 @@ kpis:
     PyPI, npm, Hugging Face, arXiv, documentation sites); an acceptance test shows the profile applies, the empty list refusing a connection and the research allowlist accepting the research domains [CAP-61.c]'
   - 'A research or experiment session''s writes and installs stay inside its own experiment folder (a venv or local prefix): because the working directory is always writable inside the sandbox, the launcher generates at launch an Edit deny rule for every other path of the repository, from its top-level entries and the siblings along the path to the folder; the deny list is computed at launch, from the paths that exist then, with two exceptions: .git/, so that the session can commit its evidence record, and an entry whose name contains *, ? or [, which the sandbox skips on Linux (EXP-001 §1); a path created after launch outside the experiment folder is not in the list and is covered by the guard''s per-ticket allow-list, with the containment check reporting a change the guard did not see; an acceptance test shows that a research session''s Bash write to a sibling directory inside the repository fails, that a write to a new path created after launch outside the experiment folder is refused by the guard or reported as a containment finding, and that the generated list leaves out exactly the named exceptions; no worker role installs system-wide (DEC-157, EXP-001 §1, §3.4, §5.3) [CAP-61.c]'
   - 'A minimal research role is in the Wave 1 roster: a role file with purpose, allowed-path pattern, tools, model tier, authority level and handoff format, plus its roster entry; a research or experiment session runs as GOV_ROLE=research; the guard knows the role and holds its writes to its ticket''s allowed_paths (its experiment folder); its network grant comes from the launcher''s profile, the research allowlist of DEC-158, not from the guard (DEC-163) [CAP-22.d]'
-  - 'In a launched research session an install command is not denied by the install rule and meets no settings ask rule, because the committed .claude/settings.json carries none once W1-47 has removed them (DEC-172): it succeeds into a venv or local prefix inside the experiment folder, within the ticket''s allowed_paths, and a system-wide install fails at the sandbox''s write fence (the sandbox stops a write outside the repository, and the generated Edit deny rules stop one to a path that existed at launch elsewhere inside it); the acceptance test of the install runs with the repository''s committed settings loaded; install commands stay denied for engineer, independent test designer and independent auditor, and the acceptance tests of W1-04 still pass (DEC-163, DEC-172) [CAP-25.e]'
+  - 'In a launched research session an install command, the uv forms of DEC-174 included (uv add, uv sync, uv run --with, uvx), is not denied by the install rule and meets no settings ask rule, because the committed .claude/settings.json carries none once W1-47 has removed them (DEC-172): it succeeds into a venv or local prefix inside the experiment folder, within the ticket''s allowed_paths, and a system-wide install fails at the sandbox''s write fence (the sandbox stops a write outside the repository, and the generated Edit deny rules stop one to a path that existed at launch elsewhere inside it); the acceptance test of the install runs with the repository''s committed settings loaded; install commands stay denied for engineer, independent test designer and independent auditor, and the acceptance tests of W1-04 still pass (DEC-163, DEC-172, DEC-174) [CAP-25.e]'
   - It sets a per-session temp directory for each worker session, and an acceptance test shows whether the session uses it; if it cannot be overridden, the shared $TMPDIR is recorded as a residual in governance/project/bootstrap.md
     by the orchestrator (DEC-159) [CAP-61.d]
   - In a launched worker session a Bash write outside the repository through an opaque form (interpreter one-liner, command substitution) fails at the OS level, and a file-tool write outside it is refused
@@ -48,7 +48,7 @@ kpis:
   - A worker session starts with the sandbox off, not strict or not fail-closed
   - A sandbox setting is read from the repository's settings
   - A worker role installs system-wide
-  - A research session installs or writes outside its experiment folder
+  - A research session installs system-wide, or writes to a path that existed at launch outside its experiment folder
   - A research session's write to a path created after launch outside its experiment folder is neither refused by the guard nor reported by the containment check
   - A launched research session's install inside its experiment folder is stopped by a settings ask rule
   - A role other than research and the orchestrator gets an install command through
@@ -64,6 +64,7 @@ sources:
 - DEC-163
 - DEC-164
 - DEC-172
+- DEC-174
 - EXP-001
 - CAP-49
 - CAP-58

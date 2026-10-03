@@ -110,15 +110,15 @@ experiment):
   `allowed_paths`; a change the guard did not see is reported by the containment check. The list has two exceptions:
   `.git/`, so that the session can commit its evidence record, and an entry whose name contains `*`, `?` or `[`,
   which the sandbox skips on Linux (EXP-001 §1). Both are left to the guard and the containment check. `denyWrite` on
-  a path that doesn't exist yet is one of the untested cases of EXP-002.
+  a path that doesn't exist yet is one of the untested cases of EXP-002. `.git/hooks` and `.git/config` stay protected
+  by the sandbox even though `.git/` is left out of the deny list (EXP-001 §1, protected paths), while other changes
+  inside `.git/` aren't seen by the containment check.
 
 **Still open for the orchestrator's own session**, which runs under the guard and the settings rules alone:
 
 - Both residuals above: outside-repository writes through opaque Bash forms, and the install misses.
-- Once W1-47 has removed the settings ask rules (DEC-172), three kinds of command that a settings rule asked about
-  meet no prompt in this session, because the guard's install rule does not see them: a download piped to a shell
-  inside a subshell (`Bash(curl:*)`, `Bash(wget:*)`), an option with a value before `uv`'s subcommand (`Bash(uv:*)`),
-  and a `curl` or `wget` download that is not an install. The first two are among the install misses above.
+- Once W1-47 has removed the settings ask rules (DEC-172), the commands listed under "Commands that lose their
+  settings prompt" below meet no prompt in this session. Four of them get the guard's `ask` back (DEC-174).
 - An opaque Bash read of the qualification oracle (DEC-162). The oracle is hidden from every session started in the
   repository root by a `Read` deny rule with its absolute path in the committed `.claude/settings.json` and by the
   guard denying any tool call whose input names the path, Read, Grep, Glob or Bash included (both from W1-47). The
@@ -175,6 +175,37 @@ committed `.claude/settings.json`. The `Bash(sudo:*)` deny rule and the other de
   stands alone.
 - A launched research session therefore meets no settings prompt on `pip`, `uv`, `npm install`, `curl` or `wget`.
   W1-46's install test runs with the repository's committed settings loaded.
+
+**Commands that lose their settings prompt (DEC-172), from a run of the classifier.** On 2026-10-03, S2 ran the
+guard's install classifier (`has_install` and `has_sudo` in `src/gov/guard/install.py`, last changed by `0c149f7`)
+over 201 commands, without executing any of them. 198 are matched by one of the eleven ask rules that W1-47 removes,
+taken as prefix matches on each simple command of the line. The guard's rule still catches 39 of them. The other 159
+lose their prompt in the orchestrator's own session. The script and its output are kept at
+`~/gov-os-workbench/s2/round3-classifier-run/`.
+
+| Ask rule removed | Still asked by the guard's rule | Loses its prompt |
+|---|---|---|
+| `pip`, `pip3`, `python -m pip`, `python3 -m pip` | `install` | `download`, `wheel`, `uninstall`, `list`, `freeze`, `show`, `check`, `config`, `cache`, `index`, `inspect`, `hash`, `search`, `debug`, `--version`, `help` |
+| `uv` | `pip install` and `tool install`, also after an option that takes no value (`-q`, `--no-cache`) | `add`, `sync`, `run`, `run --with`, `run --with-requirements`, `pip sync`, `pip uninstall`, `pip compile`, `pip list`, `pip freeze`, `pip show`, `pip check`, `pip tree`, `remove`, `lock`, `tool run`, `tool upgrade`, `tool uninstall`, `tool list`, `tool update-shell`, `python install`, `python uninstall`, `python list`, `python pin`, `venv`, `init`, `build`, `publish`, `export`, `tree`, `cache clean`, `self update`, `version`, `--version`, `help`; and `pip install` or `tool install` after an option with a value (`--directory <path>`, `--project <path>`) |
+| `npm install` | every form tried | none |
+| `cargo install` | every form tried | none |
+| `apt`, `apt-get` | `install` | `update`, `upgrade`, `full-upgrade`, `dist-upgrade`, `remove`, `purge`, `autoremove`, `download`, `source`, `build-dep`, `clean`; for `apt` also `list`, `search`, `show`, `edit-sources`. The ones that change the system fail without `sudo`, which stays denied |
+| `curl` | `-o` into a `PATH` directory; a pipe to `sh` or `bash`, also through `tee`; a pipe to `sudo sh` (the `sudo` rule) | a fetch to standard output; `-O`; `-o` to a relative path; `--output-dir <PATH directory> -O`; a shell redirect (`>`) into a `PATH` directory; uploads (`-d @file`, `-T`, `-F`); a pipe to `(sh)`, `zsh`, `dash`, `env sh`, `python3` or `tar` (also `tar -C <PATH directory>`); a download followed by a run (`&& sh i.sh`, `; bash i.sh`) |
+| `wget` | `-O` or `-qO` into a `PATH` directory; a pipe to `sh` or `bash`; a pipe to `sudo sh` (the `sudo` rule) | a plain download; `-O` to a relative path; `-P` or `--directory-prefix` into a `PATH` directory; `--post-file`; `-r`; a pipe to `(sh)`, `zsh`, `python3` or `tar`; a download followed by `sh i.sh` |
+
+- **Limits of the run.** The 201 commands are every subcommand S2 knows of each tool, plus the download forms above.
+  No Claude Code session was run. A command that starts with one of the eleven prefixes and is not on the "still
+  asked" side loses its prompt, whether or not it is listed.
+- **`uvx`** was matched by no settings rule (`Bash(uv:*)` does not match it) and is not seen by the guard's rule. It
+  had no prompt before DEC-172 either.
+- **Four forms get the guard's `ask` (DEC-174).** W1-47 extends the guard's install rule to recognise `uv add`,
+  `uv sync`, `uv run --with` and `uvx` as installs. They are then `ask` for the orchestrator (DEC-083) and denied for
+  engineer, independent test designer and independent auditor. The research role's exception (DEC-163) still lets
+  them through inside its experiment folder.
+- **What stays without a prompt** in the orchestrator's own session after W1-47: every other entry of the right-hand
+  column. Those that fetch or install are `uv run` without `--with`, `uv run --with-requirements`, `uv pip sync`,
+  `uv tool run`, `uv tool upgrade`, `uv python install`, `uv self update`, `pip download`, `pip wheel`, and the `curl`
+  and `wget` forms listed. In a launched worker session the sandbox's write wall and network profile back the guard.
 
 **Orchestrator write scope and checkpoint (DEC-150, DEC-156).** From W1-45, the orchestrator may write anywhere in the
 repository except `tests/acceptance/**`. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule

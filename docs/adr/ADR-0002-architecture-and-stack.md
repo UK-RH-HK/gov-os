@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: [ADR-0001]
-decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-170, DEC-171, DEC-172, DEC-173]
+decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174]
 supersedes: []
 implements: [CHARTER-v5, CONTRACT-v4]
 ---
@@ -209,7 +209,7 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
     research role's installs inside its experiment folder are its one exception (DEC-163);
   - the guard's install rule decides install commands alone. The committed `.claude/settings.json` carries no
     install or download ask rule once W1-47 has removed them; in a launched worker session the sandbox backs the
-    guard (DEC-172);
+    guard (DEC-172). W1-47 also extends the rule to `uv add`, `uv sync`, `uv run --with` and `uvx` (DEC-174);
   - the launcher sets no `excludedCommands` (DEC-164).
 - **The qualification oracle** is hidden from a worker's Bash by the sandbox (silently: the directory looks empty),
   and from every session started in the repository root by a `Read` deny rule in the committed `.claude/settings.json`
@@ -281,7 +281,7 @@ audit→repair, test→fix or verification loop follows DEC-096:
 
 - **Sources:** architecture v0.3; S0a `STACK_OPTIONS.md`, `CAPABILITY_CATALOGUE.md`; S0b2 `RESULTS.md`,
   `GLUE_REQUIREMENTS.md`, `TOOL_REGISTRY.yaml`, `INTEGRATION_REPORT.md`; register DEC-064…DEC-096, and
-  DEC-138…DEC-173 for the sandbox layer, the launcher, the research role and the lesson loop; `spike-sandbox/EVIDENCE.md` (EXP-001, ADOPT-PARTIAL).
+  DEC-138…DEC-174 for the sandbox layer, the launcher, the research role and the lesson loop; `spike-sandbox/EVIDENCE.md` (EXP-001, ADOPT-PARTIAL).
 - **Revisit triggers:**
   - a code graph above the tested envelope;
   - vectors above ~100k (move to LanceDB, DEC-016);
