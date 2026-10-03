@@ -34,6 +34,14 @@ Install commands are denied in all agent sessions until W1-05 closes (DEC-083, D
 
 Owner install (DEC-141): for the sandbox spike (DEC-138) the owner installed bubblewrap 0.9.0 and socat 1.8.0.0 with `sudo apt-get`, outside every agent session; the `bwrap` smoke test printed OK. Both go into the tool registry when W1-06 creates it.
 
+Owner install (DEC-203): on 2026-10-03 the owner updated the Claude Code CLI from 2.1.284 to 2.1.288 with `claude install 2.1.288`, through the operator console, outside every agent session. `~/.local/bin/claude` resolves to `~/.local/share/claude/versions/2.1.288`. W1-48 records it in the tool registry.
+
+Other copies of Claude Code on this machine, recorded on 2026-10-03:
+
+- **Removed (DEC-204):** the npm global `@anthropic-ai/claude-code` 2.1.59 under Node v18.20.8 was stale, and the owner removed it.
+- **Noted, not removed (DEC-205):** a second `claude` is on `PATH` at `/mnt/c/Users/usain/AppData/Roaming/npm/claude`. It is a Windows-side npm install reached through WSL's `PATH`, listed after `~/.local/bin/claude`. It is outside WSL and the owner's choice. Every headless worker is therefore started with the absolute path `~/.local/bin/claude`, never a bare `claude`, so that a changed `PATH` can never start the Windows copy.
+- Older versions kept by the native installer under `~/.local/share/claude/versions/` (2.1.59, 2.1.236, 2.1.284) are not linked from `~/.local/bin/claude`.
+
 The install deny rules and the secret-file deny rules (`.env*`, `*.pem`, `*.key`, `config/secrets*`) are carried in each session's `.claude/settings.json`:
 
 | Session | Install deny rules | Secret-file deny rules | Verified |
@@ -68,7 +76,9 @@ while that call was still running, so the containment check attributed the commi
 wrote a finding to `.gov-runtime/findings.jsonl` ("committed path(s) outside allowed paths", three paths under
 `tests/acceptance/W1-06/`, action `flagged`). The orchestrator wrote none of those files; nothing was reverted. The
 orchestrator starts worker sessions as background commands, whose Bash call returns at once, so that a worker's
-commit is not attributed to it.
+commit is not attributed to it. The owner confirmed this on 2026-10-03 (DEC-206): the finding stays in
+`.gov-runtime/findings.jsonl` as written, because that file is append-only evidence; this paragraph explains it, and
+the exit audit reads both. Worker sessions always run in the background.
 
 A fifth, accepted with DEC-144: a background command keeps running after its Bash call returns, so its later writes may be attributed to whichever call is active then.
 
