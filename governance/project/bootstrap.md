@@ -95,16 +95,24 @@ experiment):
 
 - A write outside the repository through an opaque Bash form (DEC-123). The OS sandbox stops it without parsing the
   command.
-- The install misses of W1-04 (DEC-147): prefix commands, a download piped to a shell in a subshell, package managers
-  the rule does not list, evasive spellings, and an option before `-m` or before `uv`'s subcommand. The sandbox's write
-  wall and network wall stop them. The false asks stay as they are. Worker roles never install system-wide (DEC-157).
+- The install misses of W1-04 (DEC-147), **for installs that write outside the repository**: prefix commands, a
+  download piped to a shell in a subshell, package managers the rule does not list, evasive spellings, and an option
+  before `-m` or before `uv`'s subcommand. The sandbox's write wall stops them (EXP-001 §3.2, §5.1). For engineer,
+  independent test designer and independent auditor the empty network allowlist also blocks the download. The false
+  asks stay as they are. Worker roles never install system-wide (DEC-157).
+- **Not closed:** an install that writes inside the repository. The write wall does not stop it. For engineer, test
+  designer and auditor the guard's install rule and the empty allowlist still apply. A research session can install
+  inside the repository from an allowlisted index (PyPI, npm; DEC-158); DEC-163 confines that to its experiment
+  folder, through the `Edit` deny rules the launcher generates.
 
 **Still open for the orchestrator's own session**, which runs under the guard and the settings rules alone:
 
 - Both residuals above: outside-repository writes through opaque Bash forms, and the install misses.
 - An opaque Bash read of the qualification oracle (DEC-162). The oracle is hidden from every session started in the
   repository root by a `Read` deny rule with its absolute path in the committed `.claude/settings.json` and by the
-  guard denying any Read, Grep, Glob or Bash call whose input names the path (both from W1-47). A Bash command that
+  guard denying any tool call whose input names the path, Read, Grep, Glob or Bash included (both from W1-47). The path
+  is held in one file, `governance/project/held-out.yaml`; the committed rule, the guard and the launcher take it from
+  there, and no acceptance test names it. A Bash command that
   reaches the oracle without naming its path is seen by neither layer. The owner accepted this residual (DEC-162).
 
 **Open for every session:**
@@ -129,7 +137,11 @@ DEC-135 edge cases. They concern writes inside the repository.
 **The research role's installs (DEC-163).** From W1-46, the Wave 1 roster has a minimal research role. It may install
 only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`. A system-wide
 install is denied to it, and the sandbox's write fence is what enforces that. Its network profile is the research
-allowlist of DEC-158. Every other worker role's install commands stay denied.
+allowlist of DEC-158. Every other worker role's install commands stay denied. A research or experiment session runs
+as `GOV_ROLE=research`.
+
+**The sandbox's cost (EXP-001 §3.6).** About +65 ms per Bash command and about +3,250 input tokens per session (+7 %).
+The tokens are harness text and are reported apart from governance share (W1-31).
 
 **Hiding is silent.** A hidden directory looks empty from a worker's Bash; no error is raised.
 
@@ -138,7 +150,8 @@ correct, and keeps the second line of DEC-120; W1-01's interim acceptance tests 
 
 **Orchestrator write scope and checkpoint (DEC-150, DEC-156).** From W1-45, the orchestrator may write anywhere in the
 repository except `tests/acceptance/**`. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule
-are revised by the Independent Test Designer under W1-45 (reason: owner correction, DEC-156). Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25's
+are revised by the Independent Test Designer in W1-45's test design batch (reason: owner correction, DEC-156). An
+orchestrator change outside its ticket's paths is then a record, not a containment finding. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25's
 `gov checkpoint` replaces it.
 
 ## Denied attempts
