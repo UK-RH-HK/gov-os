@@ -1560,3 +1560,22 @@ on W1-47.
 | Version | Date | Change |
 |---|---|---|
 | 0.28 | 2026-10-03 | S2 repair, second pass: DEC-168 (scope and severity in W1-08's lesson schema in Wave 1; the loop stays Wave 3), DEC-169 (the fingerprint rename fallback is for `PROMPT.md` only; the S2 write-scope check excludes `docs/SOURCES.md`). |
+
+## 29. Owner confirmations after the S2 repair (register v0.29, appended by S2 on branch `s2/spec`)
+
+Owner confirmations of 2026-10-03 on three points the S2 repair raised (`docs/changes/S2-CIT-E.md` §6.4). The owner
+confirmed DEC-169 as the owner's decision; its entry is unchanged.
+
+### DEC-170 — Sandbox instruction tokens are reported apart from the governance share
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-07 · **Under:** DEC-086
+- **Decision:** Sandbox instruction tokens are reported as a separate line in W1-31, not inside the governance share.
+  Whether they count toward the 15 % is decided at the Wave 1 exit, using measured figures.
+
+### DEC-171 — An orchestrator change outside its ticket's paths is a record, not a containment finding
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-01 · **Confirms:** DEC-156
+- **Decision:** A change the orchestrator makes outside its ticket's paths is a record, not a containment finding
+  (DEC-156).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.29 | 2026-10-03 | Owner confirmations: DEC-169 confirmed as the owner's decision; DEC-170 (sandbox instruction tokens are a separate line in W1-31, outside the governance share; whether they count toward the 15 % is decided at the Wave 1 exit); DEC-171 (an orchestrator change outside its ticket's paths is a record, not a containment finding). |
