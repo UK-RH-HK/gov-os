@@ -1837,3 +1837,40 @@ designer's four packages (DP-1…DP-4).
 | Version | Date | Change |
 |---|---|---|
 | 0.36 | 2026-10-03 | Owner answers on W1-06's packages: DEC-192 (install approved: ccusage 20.0.26 under Node v22.23.3), DEC-193 (download approved: Superpowers v6.4.2 source into the orchestrator's scratch), DEC-194 (DP-3: only the three skills and the licence are committed), DEC-195 (DP-1: the ten pins with a sha256, plus gitleaks 8.30.1), DEC-196 (DP-2: sha256 covers the downloaded artefact, or the binary of a single-file tool), DEC-197 (DP-4: each install has its own register entry, cited by `approved_by`), DEC-198 (the S0b2 registry is read for full digests; workbench files by exact path). |
+
+## 37. Owner answers at W1-06's implementation (register v0.37, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-03 to the test designer's package DP-5 on W1-06 (`DAEO-ipqy`) and to three points the
+orchestrator reported about the registry.
+
+### DEC-199 — W1-06 DP-5: the sha256 of a vendored folder is a digest of its committed files
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-5 option (a) · **Extends:** DEC-196
+- **Decision:**
+  - The Superpowers entry's `sha256` is a digest of the committed vendor folder: the sha256 of the sorted lines
+    `<sha256 of the file>  <relative path>` over every file under `template/governance/kernel/vendor/superpowers/`.
+  - A test and `gov doctor` recompute it offline.
+  - This widens DEC-196 to vendored folders.
+
+### DEC-200 — DEC-196 clarified: an installed entry script's digest where ADR-0002 already pins it
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Clarifies:** DEC-196
+- **Decision:** For a tool installed through a package manager, the registry may carry the digest of its installed
+  entry script where ADR-0002 already pins that value (openspec, check-jsonschema, copier). `gov doctor` re-checks it
+  locally.
+
+### DEC-201 — gitleaks and PyYAML carry their date of record
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-195, DEC-191
+- **Decision:** gitleaks 8.30.1 and PyYAML 6.0.1 carry 2026-10-03 as their date of record, with a note that the
+  original install dates were not recorded. PyYAML's install and uninstall are `sudo apt-get` owner actions.
+
+### DEC-202 — Node 22 installs carry the PATH prefix
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Corrects:** DEC-192 (the command's form)
+- **Decision:**
+  - The ccusage commands carry the prefix `PATH=~/.nvm/versions/node/v22.23.3/bin:$PATH`, because npm's script runs
+    the first `node` on `PATH`. The command approved in DEC-192 lacked it; the orchestrator's correction (the copy
+    that landed under Node v18.20.8 was uninstalled, and ccusage 20.0.26 reinstalled under Node v22.23.3) is
+    confirmed.
+  - Every future Node 22 install uses the prefix.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.37 | 2026-10-03 | Owner answers at W1-06's implementation: DEC-199 (DP-5: a vendored folder's sha256 is the digest of its committed files, by a written rule; widens DEC-196), DEC-200 (DEC-196 clarified: an installed entry script's digest where ADR-0002 pins it), DEC-201 (gitleaks and PyYAML carry their date of record), DEC-202 (Node 22 installs carry the PATH prefix; the ccusage correction is confirmed). |
