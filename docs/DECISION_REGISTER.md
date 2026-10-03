@@ -1538,3 +1538,25 @@ decision packages DP-1 and DP-2, and three additions the owner made in the same 
 | Version | Date | Change |
 |---|---|---|
 | 0.27 | 2026-10-03 | S2 repair after the S2-A round-1 audit: DEC-163 (DP-1: a minimal research role in the Wave 1 roster, delivered with W1-46; installs only inside its experiment folder, enforced by the sandbox's write fence; research allowlist of DEC-158), DEC-164 (DP-2: subagents inside a sandboxed worker session and `excludedCommands` are open residuals, added to EXP-002; the launcher sets no `excludedCommands`), DEC-165 (the lite upstream lesson loop, Wave 3; reverses DEC-053 Q7 for framework lessons only), DEC-166 (`gov discover`, Wave 2), DEC-167 (a plain-language impact question triggers the impact assessment). |
+
+## 28. S2 repair decisions, second pass (register v0.28, appended by S2 on branch `s2/spec`)
+
+Owner answers of 2026-10-03 to the points S2 raised after the first repair pass. The owner also confirmed, without a
+new decision: the Charter change, limited to the lines DEC-163 and DEC-165 require; DEC-158 as the citation in
+DEC-163 (the "DEC-159" in the owner's message was a numbering slip); and W1-46's growth to 220 LOC with its dependency
+on W1-47.
+
+### DEC-168 — Scope and severity are in the Wave 1 lesson schema
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to S2 · **Refines:** DEC-165
+- **Decision:** W1-08's lesson schema carries scope and severity now, in Wave 1, so that no migration is needed later.
+  The lesson loop itself stays in Wave 3.
+
+### DEC-169 — The plan validator: the fingerprint fallback and the S2 write-scope check
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, repair instruction on S2-A finding S2A-F-08 · **Extends:** DEC-155 · **Under:** DEC-101
+- **Decision:** The S1-A fingerprint check accepts a renamed file for `PROMPT.md` only (`PROMPT.retired.md`, same
+  hash, DEC-101). Every other listed file must exist under its own name. The S2 write-scope check excludes
+  `docs/SOURCES.md`, as the S1 check did.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.28 | 2026-10-03 | S2 repair, second pass: DEC-168 (scope and severity in W1-08's lesson schema in Wave 1; the loop stays Wave 3), DEC-169 (the fingerprint rename fallback is for `PROMPT.md` only; the S2 write-scope check excludes `docs/SOURCES.md`). |
