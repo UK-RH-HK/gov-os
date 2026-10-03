@@ -1,6 +1,6 @@
 ---
 id: DAEO-6cc2
-status: in_progress
+status: closed
 deps: [DAEO-m7u4]
 links: []
 created: 2026-10-03T13:05:33Z
