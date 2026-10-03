@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: []
-decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096]
+decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096, DEC-152, DEC-156, DEC-161]
 supersedes: []
 constrains: [CHARTER-v5, CONTRACT-v4, ADR-0002]
 ---
@@ -45,7 +45,9 @@ Chosen: **option 1**, as DEC-039 states it and DEC-075 amends it.
   process running with the owner's OS privileges.
 - **Guardrails, not a boundary.** The harness hooks, the default-deny path guard (DEC-041) and the post-command
   containment check (DEC-076) exist to catch mistakes. A stalled or bypassed hook is not a breach of the model, because
-  the boundary sits downstream of it (DEC-007).
+  the boundary sits downstream of it (DEC-007). The OS sandbox that the launcher puts around a worker session's Bash
+  commands (DEC-152, DEC-161) is a stronger guardrail, and still not a boundary against the owner's own privileges:
+  hooks, MCP servers, the file tools and the orchestrator's own session all run outside it.
 - **The hard boundary (DEC-075):**
   1. git history, which is never rewritten;
   2. the lefthook **pre-push gate (G3)** on the owner's machine;
@@ -90,6 +92,6 @@ Chosen: **option 1**, as DEC-039 states it and DEC-075 amends it.
 
 ## More Information
 
-- **Sources:** register DEC-039, DEC-075, DEC-007, DEC-046, DEC-083; the Phase-2 owner records (OWNER-DECISION-P2-0003,
+- **Sources:** register DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-152, DEC-156, DEC-161; the Phase-2 owner records (OWNER-DECISION-P2-0003,
   P2-0005, OWNER-CLARIFICATION-P2-0004), which are superseded where they assume a same-privilege adversary.
 - **Revisit trigger:** multiple humans with different authority, or a hosted multi-tenant deployment.
