@@ -50,10 +50,13 @@ def test_a_command_that_installs_nothing_gets_no_decision_from_the_rule(project,
             assert not result.explicit_allow(), f"{what}: explicit allow: {result.describe()}"
 
 
-# name: command. Each is an install and also a write the guard denies the orchestrator on its ticket.
+# name: command. Each is an install and also a write the guard denies the orchestrator.
+# Under DEC-156 the orchestrator writes anywhere except tests/acceptance/** and (DEC-176)
+# .gov-runtime/ other than scratch/**. Each command combines an install with a write
+# to one of those denied paths.
 DENIED_BY_THE_GUARD = {
-    "write-outside-the-ticket-paths": "pip install requests && touch src/app/main.py",
-    "redirect-outside-the-ticket-paths": "npm install -g ccusage > README.md",
+    "write-into-gov-runtime": "pip install requests && touch .gov-runtime/findings.jsonl",
+    "redirect-into-gov-runtime": "npm install -g ccusage > .gov-runtime/records.jsonl",
     "write-into-the-acceptance-tests": "pip install requests && touch tests/acceptance/W1-90/test_new.py",
 }
 

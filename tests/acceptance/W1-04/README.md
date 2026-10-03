@@ -156,6 +156,15 @@ For the DEC-106 metric. The batch changed no existing test and no existing expec
 |---|---|---|
 | `test_w1_04_probe_findings.py`: 10 test functions, 128 cases, listed under [Probe findings](#probe-findings-dec-136) | Added | probe finding |
 
+## Rewrites after implementation
+
+For the DEC-106 metric. Each revision is a rewrite after implementation with reason: **owner correction, DEC-156**.
+
+| What | Change | Reason |
+|---|---|---|
+| `DENIED_BY_THE_GUARD["write-outside-the-ticket-paths"]` in `test_w1_04_only_escalates.py` | Replaced `"pip install requests && touch src/app/main.py"` with `"pip install requests && touch .gov-runtime/findings.jsonl"`; case renamed to `"write-into-gov-runtime"`. Under DEC-156 the orchestrator is no longer denied `src/app/main.py`; under DEC-176 `.gov-runtime/findings.jsonl` stays denied | owner correction, DEC-156 |
+| `DENIED_BY_THE_GUARD["redirect-outside-the-ticket-paths"]` in `test_w1_04_only_escalates.py` | Replaced `"npm install -g ccusage > README.md"` with `"npm install -g ccusage > .gov-runtime/records.jsonl"`; case renamed to `"redirect-into-gov-runtime"`. Under DEC-156 the orchestrator is no longer denied `README.md`; under DEC-176 `.gov-runtime/records.jsonl` stays denied | owner correction, DEC-156 |
+
 ## Choices the implementer should know
 
 - **Orchestrator: `ask`** for every install command, in every permission mode the harness has: `default`,
