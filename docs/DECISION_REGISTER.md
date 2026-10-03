@@ -1604,3 +1604,19 @@ is recorded in `docs/changes/S2-CIT-E.md` §7.
 | Version | Date | Change |
 |---|---|---|
 | 0.30 | 2026-10-03 | Owner answers after the S2-A round-2 audit: DEC-172 (DP-3: the install and download ask rules leave the committed `.claude/settings.json`, in W1-47; the guard's install rule stands alone, backed by the sandbox in launched worker sessions; withdraws the settings second line of DEC-120 and DEC-151), DEC-173 (DP-4: Charter §6's install sentence names the research exception of DEC-163). |
+
+## 31. Owner decision at the S2-A round-3 closure check (register v0.31, appended by S2 on branch `s2/spec`)
+
+Owner decision of 2026-10-03, given with the round-3 closure check (ACCEPT_WITH_FINDINGS, two minor findings; no
+further audit round). The fixes are recorded in `docs/changes/S2-CIT-E.md` §8.
+
+### DEC-174 — The guard's install rule recognises `uv add`, `uv sync`, `uv run --with` and `uvx` as installs
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A finding S2A-F-17 · **Extends:** DEC-172 · **Under:** DEC-083, DEC-163
+- **Decision:**
+  - W1-47 extends the guard's install rule to recognise `uv add`, `uv sync`, `uv run --with` and `uvx` as installs,
+    so they keep their `ask` for the orchestrator (DEC-083).
+  - The research role's exception (DEC-163) still lets them through inside its experiment folder.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.31 | 2026-10-03 | Round-3 closure check: DEC-174 (W1-47 extends the guard's install rule to `uv add`, `uv sync`, `uv run --with` and `uvx`; `ask` for the orchestrator under DEC-083; the research exception of DEC-163 still applies). |
