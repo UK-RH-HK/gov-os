@@ -1751,3 +1751,34 @@ KPI disputes (KD-1…KD-3), the orchestrator's DP-5, and two items the orchestra
 | Version | Date | Change |
 |---|---|---|
 | 0.34 | 2026-10-03 | Owner answers on W1-07's packages: DEC-183 (worker identity through `--settings` env, and the headless flags, until W1-46), DEC-184 (DP-5: the W1-07 drafts are discarded), DEC-185 (KD-1: commands load the `governance/project/` files they know; invalid gives `CONFIG_INVALID`; a minimal path-map schema until W1-08), DEC-186 (KD-2: check declarations under `template/governance/kernel/checks/`; `gov check --list --json` at W1-07), DEC-187 (KD-3: no public surface for the read/act class at W1-07), DEC-188 (the validator accepts W1-45's close). |
+
+## 35. Owner answers during W1-07's build (register v0.35, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-03 to the test designer's package DP-1 on W1-07 (`DAEO-drvn`) and to two points the
+orchestrator reported.
+
+### DEC-189 — W1-07 DP-1: `CONFIG_INVALID` carries `file` and `key` in `error.details`; the minimal path-map shape is provisional
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-07 package DP-1 option (a), with a clarification · **Extends:** DEC-185
+- **Decision:**
+  - The stable contract: an invalid `governance/project/` file gives exit 1 with `CONFIG_INVALID`, and
+    `error.details` carries `file` and `key`. The acceptance tests rely on that.
+  - The minimal path-map shape (the top level is a map; `namespaces` is required and maps a name to a map) is
+    provisional until W1-08 replaces the minimal schema.
+  - If W1-08 changes the keys, the matching test revisions are expected.
+
+### DEC-190 — Planned test revisions are counted apart from rewrites
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Extends:** DEC-106
+- **Decision:**
+  - When a later ticket implements a `gov` command and revises its `NOT_IMPLEMENTED` case in
+    `tests/acceptance/W1-07/test_w1_07_registry.py`, the revision is recorded with the reason "planned: command
+    implemented".
+  - The learning metric counts planned revisions apart from rewrites that correct a test or a specification.
+
+### DEC-191 — PyYAML goes into the tool registry when W1-06 creates it
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-083, DEC-127
+- **Decision:** PyYAML 6.0.1, already on this machine and declared in `pyproject.toml`, is recorded in the tool
+  registry when W1-06 creates it, like every other dependency.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.35 | 2026-10-03 | Owner answers during W1-07's build: DEC-189 (DP-1: `CONFIG_INVALID` with `file` and `key` in `error.details` is the stable contract; the minimal path-map shape is provisional until W1-08), DEC-190 (planned test revisions, reason "planned: command implemented", counted apart from rewrites), DEC-191 (PyYAML 6.0.1 enters the tool registry at W1-06). |
