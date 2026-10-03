@@ -22,7 +22,7 @@ allowed_paths:
 kpis:
   success:
   - Five roles (orchestrator, product/spec, independent test designer, engineer, independent auditor) each with purpose, allowed-path pattern, tools, model tier, authority level and handoff format [CAP-22.a]
-  - Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner approval in chat (DEC-083)
+  - Only the test designer pattern includes tests/acceptance/**; the auditor is read-only; only the orchestrator may install, and only after owner approval in chat (DEC-083), except the research role inside its experiment folder (DEC-163)
   - 'Each role maps the Framework §32 permission classes: WRITE_REPO_SCOPED via allowed_paths; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied; network, database, cloud, CI-trigger and deploy
     classes denied unless granted; a launched worker session''s network grant comes from the launcher''s network profile, which the role definition names (empty for engineer, test designer and auditor; the research allowlist for research, DEC-158, DEC-163) [CAP-58.b]'
   - The generated definitions replace the minimal definitions W1-05 placed under .claude/agents/ (DEC-119, DEC-154); the orchestrator definition states its write scope, anywhere in the repository except

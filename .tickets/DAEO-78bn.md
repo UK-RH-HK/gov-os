@@ -56,3 +56,7 @@ S2 (2026-10-03): no KPI change. Under DEC-152 and DEC-161 the OS sandbox backs t
 **2026-10-03T13:41:57Z**
 
 S2 repair 2026-10-03 (DEC-163). W1-46 adds a minimal research role that may install inside its own experiment folder only; the sandbox's write fence denies a system-wide install. Install commands stay denied for every other worker role. KPIs and status unchanged.
+
+**2026-10-03T14:16:48Z**
+
+S2 round-2 repair (2026-10-03): no KPI change. DEC-172 withdraws the settings ask rules for installs and downloads; W1-47 removes them from the committed .claude/settings.json. From then this rule decides install commands alone, in the orchestrator's own session too; in launched worker sessions the sandbox backs it.

@@ -30,7 +30,7 @@ kpis:
   - The share is reported per profile (LITE, STANDARD, FULL), so the budget is judged against the ceremony applied [CAP-53.c]
   - 'The close record carries the three Wave 1 learning metrics: KPI disputes raised by the test designer, acceptance tests rewritten after implementation began with the reason for each, and governance
     share; only governance share has a threshold (DEC-106) [CAP-40.c]'
-  - 'For a launched worker session the close record reports the sandbox''s added system-prompt tokens (about 3,250 input tokens per session, EXP-001 §3.6) as a separate line, not inside the governance share; whether they count toward the governance share is decided at the Wave 1 exit, using measured figures (DEC-170)'
+  - 'For a launched worker session the close record reports the sandbox''s added system-prompt tokens (about 3,250 input tokens per session, EXP-001 §3.6) as a separate line, not inside the governance share; whether they count toward the governance share is decided at the Wave 1 exit, using measured figures (DEC-170) [CAP-40.d]'
   failure:
   - A ticket closes without a share figure
   - Cache reads are counted in the share

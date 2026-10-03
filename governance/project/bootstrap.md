@@ -38,7 +38,7 @@ The install deny rules and the secret-file deny rules (`.env*`, `*.pem`, `*.key`
 
 | Session | Install deny rules | Secret-file deny rules | Verified |
 |---|---|---|---|
-| Repository `.claude/settings.json` | `sudo` as a deny rule. Since the switch-over of 2026-10-02 the other install rules (`pip`, `pip3`, `python -m pip`, `python3 -m pip`, `uv`, `npm install`, `cargo install`, `apt`, `apt-get`, `curl`, `wget`) are ask rules, behind the guard's install rule (W1-04) | Edit on all four patterns | Written by W1-01, 2026-10-01; changed by W1-05, 2026-10-02 |
+| Repository `.claude/settings.json` | `sudo` as a deny rule. Since the switch-over of 2026-10-02 the other install rules (`pip`, `pip3`, `python -m pip`, `python3 -m pip`, `uv`, `npm install`, `cargo install`, `apt`, `apt-get`, `curl`, `wget`) are ask rules, behind the guard's install rule (W1-04). W1-47 removes these ask rules (DEC-172) | Edit on all four patterns | Written by W1-01, 2026-10-01; changed by W1-05, 2026-10-02 |
 | `w1-build` | `sudo`, `apt`, `apt-get`, `snap`, `npm install\|i\|add`, `npx`, `pip install`, `pip3 install`, `python3 -m pip`, `uv pip\|tool\|add`, `cargo install`, `curl`, `wget`, `docker` | Read and Edit on all four patterns, added by the owner (DEC-101) | Read 2026-10-01 |
 | `w1-tests` | Owner-maintained (DEC-098); not readable from the build session | Read and Edit, added by the owner (DEC-101) | Stated by owner (DEC-098, DEC-101) |
 | `s1` | Retired by the owner (DEC-101); no agent session runs there | Retired | Stated by owner 2026-10-01. The install-form gap reported on 2026-10-01 is closed by the retirement |
@@ -81,7 +81,7 @@ Edge cases of the install rule (W1-04), recorded by the orchestrator under DEC-1
 - An option before `-m` (`python3 -u -m pip install …`), or an option with a value before `uv`'s subcommand (`uv --directory <path> pip install …`), hides the install. Found by the reviewer's probe of the W1-04 repair.
 - A program name that is a listed package manager followed by digits, where no such program exists (`gem2 install …`), is asked about; so is `uv` with an option whose value is the word `pip` or `tool`.
 
-The settings rules for install commands remain as the second line (DEC-120): as deny rules until the switch-over, as ask rules since 2026-10-02.
+The settings rules for install commands remain as the second line (DEC-120): as deny rules until the switch-over, as ask rules since 2026-10-02. The owner has withdrawn that second line (DEC-172): W1-47 removes the ask rules, and from then the guard's install rule stands alone. See "The settings ask rules are withdrawn" below.
 
 ## After the sandbox experiment (S2, 2026-10-03)
 
@@ -104,15 +104,27 @@ experiment):
   designer and auditor the guard's install rule and the empty allowlist still apply. A research session can install
   inside the repository from an allowlisted index (PyPI, npm; DEC-158); DEC-163 confines that to its experiment
   folder, through the `Edit` deny rules the launcher generates.
+- **The limits of that deny list.** The launcher's deny list is computed at launch, from the paths that exist then. A path
+  created later outside the experiment folder is not in the list, and the sandbox does not stop a Bash write to it.
+  That path is covered by the guard's per-ticket allow-list, which holds the research role's writes to its ticket's
+  `allowed_paths`; a change the guard did not see is reported by the containment check. The list has two exceptions:
+  `.git/`, so that the session can commit its evidence record, and an entry whose name contains `*`, `?` or `[`,
+  which the sandbox skips on Linux (EXP-001 §1). Both are left to the guard and the containment check. `denyWrite` on
+  a path that doesn't exist yet is one of the untested cases of EXP-002.
 
 **Still open for the orchestrator's own session**, which runs under the guard and the settings rules alone:
 
 - Both residuals above: outside-repository writes through opaque Bash forms, and the install misses.
+- Once W1-47 has removed the settings ask rules (DEC-172), three kinds of command that a settings rule asked about
+  meet no prompt in this session, because the guard's install rule does not see them: a download piped to a shell
+  inside a subshell (`Bash(curl:*)`, `Bash(wget:*)`), an option with a value before `uv`'s subcommand (`Bash(uv:*)`),
+  and a `curl` or `wget` download that is not an install. The first two are among the install misses above.
 - An opaque Bash read of the qualification oracle (DEC-162). The oracle is hidden from every session started in the
   repository root by a `Read` deny rule with its absolute path in the committed `.claude/settings.json` and by the
-  guard denying any tool call whose input names the path, Read, Grep, Glob or Bash included (both from W1-47). The path
-  is held in one file, `governance/project/held-out.yaml`; the committed rule, the guard and the launcher take it from
-  there, and no acceptance test names it. A Bash command that
+  guard denying any tool call whose input names the path, Read, Grep, Glob or Bash included (both from W1-47). The
+  oracle path is held in `governance/project/held-out.yaml` and in the committed deny rule built from it; register
+  entry DEC-067 names the directory historically. The guard and the launcher take the path from `held-out.yaml`, and
+  no acceptance test names it. The owner confirms the value in `held-out.yaml` when W1-47 closes. A Bash command that
   reaches the oracle without naming its path is seen by neither layer. The owner accepted this residual (DEC-162).
 
 **Open for every session:**
@@ -148,6 +160,21 @@ decided at the Wave 1 exit, using measured figures (DEC-170).
 
 **Confirmed by the owner (DEC-151):** moving the install settings rules from `deny` to `ask` at the switch-over was
 correct, and keeps the second line of DEC-120; W1-01's interim acceptance tests skip after the switch-over by design.
+DEC-172 has since withdrawn that second line.
+
+**The settings ask rules are withdrawn (DEC-172).** W1-47 removes the install and download ask rules (`pip`, `pip3`,
+`python -m pip`, `python3 -m pip`, `uv`, `npm install`, `cargo install`, `apt`, `apt-get`, `curl`, `wget`) from the
+committed `.claude/settings.json`. The `Bash(sudo:*)` deny rule and the other deny rules stay. From then:
+
+- The guard's install rule decides install commands alone: `ask` for the orchestrator, `deny` for engineer,
+  independent test designer and independent auditor, and let through for the research role inside its experiment
+  folder (DEC-163).
+- The owner asked for no test run. W1-05's live attempts (the "Switch-over" table below) showed that the guard's rule
+  suffices alone: `pipx install --help`, which no settings rule matches, still got the hook's `ask`.
+- In a launched worker session the sandbox backs the guard. In the orchestrator's own session the guard's rule
+  stands alone.
+- A launched research session therefore meets no settings prompt on `pip`, `uv`, `npm install`, `curl` or `wget`.
+  W1-46's install test runs with the repository's committed settings loaded.
 
 **Orchestrator write scope and checkpoint (DEC-150, DEC-156).** From W1-45, the orchestrator may write anywhere in the
 repository except `tests/acceptance/**`. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule

@@ -36,9 +36,9 @@ kpis:
     and GOV_TICKET; an acceptance test shows that a launched worker is sandboxed and that both variables reach the guard (DEC-161) [CAP-61.b]
   - 'Network profiles (DEC-158): engineer, independent test designer and independent auditor get an empty allowlist; research or experiment work gets an allowlist built from an owner-extensible list (GitHub,
     PyPI, npm, Hugging Face, arXiv, documentation sites); an acceptance test shows the profile applies, the empty list refusing a connection and the research allowlist accepting the research domains [CAP-61.c]'
-  - 'A research or experiment session''s writes and installs stay inside its own experiment folder (a venv or local prefix): because the working directory is always writable inside the sandbox, the launcher generates at launch an Edit deny rule for every other path of the repository, from its top-level entries and the siblings along the path to the folder; an acceptance test shows that a research session''s Bash write to a sibling directory inside the repository fails; no worker role installs system-wide (DEC-157, EXP-001 §3.4, §5.3) [CAP-61.c]'
+  - 'A research or experiment session''s writes and installs stay inside its own experiment folder (a venv or local prefix): because the working directory is always writable inside the sandbox, the launcher generates at launch an Edit deny rule for every other path of the repository, from its top-level entries and the siblings along the path to the folder; the deny list is computed at launch, from the paths that exist then, with two exceptions: .git/, so that the session can commit its evidence record, and an entry whose name contains *, ? or [, which the sandbox skips on Linux (EXP-001 §1); a path created after launch outside the experiment folder is not in the list and is covered by the guard''s per-ticket allow-list, with the containment check reporting a change the guard did not see; an acceptance test shows that a research session''s Bash write to a sibling directory inside the repository fails, that a write to a new path created after launch outside the experiment folder is refused by the guard or reported as a containment finding, and that the generated list leaves out exactly the named exceptions; no worker role installs system-wide (DEC-157, EXP-001 §1, §3.4, §5.3) [CAP-61.c]'
   - 'A minimal research role is in the Wave 1 roster: a role file with purpose, allowed-path pattern, tools, model tier, authority level and handoff format, plus its roster entry; a research or experiment session runs as GOV_ROLE=research; the guard knows the role and holds its writes to its ticket''s allowed_paths (its experiment folder); its network grant comes from the launcher''s profile, the research allowlist of DEC-158, not from the guard (DEC-163) [CAP-22.d]'
-  - 'In a launched research session an install command is not denied by the install rule: it succeeds into a venv or local prefix inside the experiment folder, within the ticket''s allowed_paths, and a system-wide install fails at the sandbox''s write fence (the sandbox stops a write outside the repository, and the generated Edit deny rules stop one elsewhere inside it); install commands stay denied for engineer, independent test designer and independent auditor, and the acceptance tests of W1-04 still pass (DEC-163) [CAP-25.e]'
+  - 'In a launched research session an install command is not denied by the install rule and meets no settings ask rule, because the committed .claude/settings.json carries none once W1-47 has removed them (DEC-172): it succeeds into a venv or local prefix inside the experiment folder, within the ticket''s allowed_paths, and a system-wide install fails at the sandbox''s write fence (the sandbox stops a write outside the repository, and the generated Edit deny rules stop one to a path that existed at launch elsewhere inside it); the acceptance test of the install runs with the repository''s committed settings loaded; install commands stay denied for engineer, independent test designer and independent auditor, and the acceptance tests of W1-04 still pass (DEC-163, DEC-172) [CAP-25.e]'
   - It sets a per-session temp directory for each worker session, and an acceptance test shows whether the session uses it; if it cannot be overridden, the shared $TMPDIR is recorded as a residual in governance/project/bootstrap.md
     by the orchestrator (DEC-159) [CAP-61.d]
   - In a launched worker session a Bash write outside the repository through an opaque form (interpreter one-liner, command substitution) fails at the OS level, and a file-tool write outside it is refused
@@ -49,6 +49,8 @@ kpis:
   - A sandbox setting is read from the repository's settings
   - A worker role installs system-wide
   - A research session installs or writes outside its experiment folder
+  - A research session's write to a path created after launch outside its experiment folder is neither refused by the guard nor reported by the containment check
+  - A launched research session's install inside its experiment folder is stopped by a settings ask rule
   - A role other than research and the orchestrator gets an install command through
   - The settings the launcher builds carry an excludedCommands entry
   - An acceptance test or implementation file of this ticket reads or names the qualification oracle
@@ -61,6 +63,7 @@ sources:
 - DEC-161
 - DEC-163
 - DEC-164
+- DEC-172
 - EXP-001
 - CAP-49
 - CAP-58
@@ -85,9 +88,18 @@ reserved by W1-07 (CAP-28.b), whose count is unchanged.
 **The research role (DEC-163).** This ticket also delivers a minimal research role for the Wave 1 roster: the role
 file, its roster entry, and the guard change that lets the role exist and install inside its experiment folder. The
 sandbox's write fence, limited to the ticket's `allowed_paths`, is what denies a system-wide install. Inside the repository the fence is a generated list of `Edit` deny rules, because
-the sandbox always leaves the working directory writable (EXP-001 §3.4, §5.3; S2A-F-03). The full research
+the sandbox always leaves the working directory writable (EXP-001 §3.4, §5.3; S2A-F-03). The list is computed at
+launch, so it names only paths that exist then. A path created later outside the experiment folder is covered by the
+guard's per-ticket allow-list, and the containment check reports a change the guard did not see. The list leaves out
+`.git/`, so that the session can commit its evidence record, and any entry whose name contains `*`, `?` or `[`, which
+the sandbox skips on Linux (EXP-001 §1); both are left to the guard and the containment check (S2A-F-13). The full research
 lifecycle (CAP-32) stays in Wave 3. Follows W1-47 because both change the guard files, and because the launcher reads
 the held-out path from `governance/project/held-out.yaml`, which W1-47 creates (S2A-F-04).
+
+**No settings ask rule on installs (DEC-172).** The committed `.claude/settings.json` asked before every `pip`, `uv`,
+`npm install`, `curl` and `wget` command, and a later settings file cannot lift an ask rule (S2A-F-11). The owner
+withdrew those rules: W1-47 removes them, and the guard's install rule decides alone. This ticket follows W1-47, and
+its install test runs with the committed settings loaded.
 
 **No `excludedCommands` (DEC-164).** The launcher sets none. Subagents inside a sandboxed worker session, and
 `excludedCommands`, are open residuals until experiment EXP-002 (Wave 2).
