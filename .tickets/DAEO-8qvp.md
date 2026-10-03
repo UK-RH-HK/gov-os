@@ -48,3 +48,7 @@ Second line of defence for Bash writes the guard cannot parse (G-02, moved to W1
 **2026-10-02T18:46:34Z**
 
 Reopened and claimed 2026-10-02 as a repair for DEC-142 (W1-03 KD-5: a snapshot of another actor's call known to be over no longer blocks restoration) and DEC-143 (W1-03 KD-6: an acceptance test changed in a call that also moves HEAD non-forward is restored from the pre-call HEAD when attribution is certain). Claimed before the test design request (DEC-133); implementation waits for TESTS READY. KPIs unchanged.
+
+**2026-10-03T13:41:57Z**
+
+S2 repair 2026-10-03 (S2-A round 1, F-01). W1-45 replaces the orchestrator rule (DEC-156). The acceptance tests in tests/acceptance/W1-03/ that assert the old orchestrator rule are revised by the Independent Test Designer under W1-45, as rewrites after implementation (reason: owner correction, DEC-156). KPIs unchanged for every other role; no status change.

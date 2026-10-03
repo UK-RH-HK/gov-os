@@ -47,6 +47,7 @@ kpis:
     three costed options (apply now, defer, re-baseline); the owner chooses, CIT-E records what was done, and every version of the specification is kept (DEC-105) [CAP-33.e]
   - Test design takes probe findings from the orchestrator's review as described behaviours, never as code; it decides from the specification whether each becomes an acceptance test and reports a finding
     that reveals a specification gap (DEC-136) [CAP-38.e]
+  - 'A question of the form "what is the impact of X?", asked in plain language, makes the change skill run the impact assessment: an OpenSpec proposal plus gov closure over the affected records (DEC-167) [CAP-33.f]'
   failure:
   - A skill body exceeds 2.5k tokens
   - The test-design skill reads implementation files
@@ -73,6 +74,7 @@ sources:
 - DEC-105
 - DEC-136
 - CAP-32
+- DEC-167
 est_loc: 480
 acceptance_tests:
   path: tests/acceptance/W1-35/

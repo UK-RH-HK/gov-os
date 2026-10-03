@@ -55,3 +55,7 @@ Default-deny allow-list per role and per ticket (G-01), reading the ticket file 
 **2026-10-01T22:11:15Z**
 
 Reopened 2026-10-01 as a repair for DEC-115 (Bash target resolution) and DEC-117 (inside a role subagent, the subagent's role governs). The acceptance tests in tests/acceptance/W1-02/ are revised first; implementation waits for TESTS READY. KPIs unchanged.
+
+**2026-10-03T13:41:57Z**
+
+S2 repair 2026-10-03 (S2-A round 1, F-01). W1-45 replaces the orchestrator rule (DEC-156): the orchestrator may write anywhere in the repository except tests/acceptance/**. The acceptance tests in tests/acceptance/W1-02/ that assert the old orchestrator rule are revised by the Independent Test Designer under W1-45, as rewrites after implementation (reason: owner correction, DEC-156). KPIs unchanged for every other role; no status change.

@@ -27,6 +27,7 @@ kpis:
     classes denied unless granted [CAP-58.b]'
   - The generated definitions replace the minimal definitions W1-05 placed under .claude/agents/ (DEC-119, DEC-154); the orchestrator definition states its write scope, anywhere in the repository except
     tests/acceptance/** (DEC-156) [CAP-22.a]
+  - The generated definitions leave the minimal research role of W1-46 in place where it exists; W1-33 does not redefine it (DEC-163)
   failure:
   - A role lacks any required field
   - An implementer role pattern covers tests/acceptance/**
@@ -43,6 +44,7 @@ sources:
 - DEC-119
 - DEC-154
 - DEC-156
+- DEC-163
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W1-33/

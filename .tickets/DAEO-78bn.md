@@ -52,3 +52,7 @@ Reopened 2026-10-02 as a repair for three defects shown by the acceptance tests 
 **2026-10-03T13:06:19Z**
 
 S2 (2026-10-03): no KPI change. Under DEC-152 and DEC-161 the OS sandbox backs this rule's misses in launched worker sessions (write wall and network wall); in the orchestrator's own session the rule and the settings ask rules stand alone. Worker roles never install system-wide (DEC-157).
+
+**2026-10-03T13:41:57Z**
+
+S2 repair 2026-10-03 (DEC-163). W1-46 adds a minimal research role that may install inside its own experiment folder only; the sandbox's write fence denies a system-wide install. Install commands stay denied for every other worker role. KPIs and status unchanged.
