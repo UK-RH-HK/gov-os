@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: [ADR-0001]
-decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167]
+decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168]
 supersedes: []
 implements: [CHARTER-v5, CONTRACT-v4]
 ---
@@ -168,7 +168,10 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
   - research, minimal (DEC-163): a role file delivered with the launcher (W1-46). It runs as a launched worker
     session, writes only inside its ticket's `allowed_paths` (its experiment folder), and uses the research network
     allowlist of DEC-158. It may install only into a venv or local prefix inside that folder; the sandbox's write
-    fence denies a system-wide install. The full research lifecycle (CAP-32) stays in Wave 3.
+    fence denies a system-wide install. Inside the repository the fence is a list of `Edit` deny rules the launcher
+    generates at launch, because the sandbox always leaves the working directory writable (EXP-001 §3.4, §5.3). A
+    research or experiment session runs as `GOV_ROLE=research`. The full research lifecycle (CAP-32) stays in
+    Wave 3.
 
   Wave 2 and Wave 3 roles follow Charter v5 §6, with test execution and integration as distinct Wave 2 roles
   (DEC-094).
@@ -200,7 +203,8 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
   - the launcher sets no `excludedCommands` (DEC-164).
 - **The qualification oracle** is hidden from a worker's Bash by the sandbox (silently: the directory looks empty),
   and from every session started in the repository root by a `Read` deny rule in the committed `.claude/settings.json`
-  and by the guard (DEC-162; W1-47). An opaque Bash read in the orchestrator's own session is an accepted residual.
+  and by the guard (DEC-162; W1-47). The path is held in one file, `governance/project/held-out.yaml`, from which the
+  committed rule, the guard and the launcher take it; no acceptance test names it. An opaque Bash read in the orchestrator's own session is an accepted residual.
 - **Untested sandbox cases** (`denyWrite` on a path that doesn't exist yet, symlink and hard-link tricks, the seccomp
   filter, `bypassPermissions` mode) go to a Wave 2 experiment, EXP-002 (DEC-160). Two more open residuals go to the
   same experiment: subagents inside a sandboxed worker session, and `excludedCommands` (DEC-164).
@@ -208,7 +212,8 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
   is the entry point to discovery: it opens a discovery ticket, runs the discovery skill, and schedules research and
   experiment tasks whose evidence records back the answer. "What's the impact of X?" triggers the impact assessment:
   an OpenSpec proposal plus `gov closure` in Wave 1, `gov impact` from Wave 2.
-- **The upstream lesson loop, lite** (DEC-165; Wave 3). Every lesson record carries a scope and a severity. A
+- **The upstream lesson loop, lite** (DEC-165; Wave 3). Every lesson record carries a scope and a severity; both
+  fields are in the Wave 1 lesson schema (DEC-168). A
   framework lesson becomes a lesson packet (failure pattern, evidence, suggested change; no product code, data or
   secrets; gitleaks-scanned), which the product's orchestrator writes to the shared inbox `~/gov-os-lessons-inbox/`,
   the one path outside its repository it may write. A high or critical lesson goes to the owner at once as a decision
@@ -243,10 +248,13 @@ audit→repair, test→fix or verification loop follows DEC-096:
   - In worker sessions, the opaque-write and install-miss residuals of the guard are closed for Bash at the OS level,
     without parsing the command (EXP-001).
 - **Bad:**
-  - Wave 1 glue grows to ≈ 5,410 LOC (the figure in `docs/plan/WAVE_1_WBS.md` §3), against architecture v0.3's ≈ 2.4k.
+  - Wave 1 glue grows to ≈ 5,460 LOC (the figure in `docs/plan/WAVE_1_WBS.md` §3), against architecture v0.3's ≈ 2.4k.
     This is the effect of DEC-080, DEC-074 R1, DEC-076, DEC-083, DEC-086, the S1-A repairs (DEC-089…DEC-092, and
-    a ticket KPI for every Wave 1 `covers` item), and the S2 change (+320 LOC: W1-45, W1-46, W1-47). DEC-064 turns
+    a ticket KPI for every Wave 1 `covers` item), and the S2 change (+370 LOC: W1-45, W1-46 and W1-47, +320; KPIs added to W1-30 and W1-31, +50). DEC-064 turns
     DEC-001's size trigger into a per-wave review.
+  - The sandbox has a measured cost (EXP-001 §3.6): about +65 ms per Bash command, and about +3,250 input tokens per
+    session (+7 %), which are sandbox instructions in the system prompt. Every launched worker session carries them.
+    They are harness text, so they are not governance tokens under DEC-086; W1-31 reports them as a separate line.
   - Two containment layers must be kept in step: the sandbox covers a worker's Bash, the guard covers the file tools
     and the orchestrator's session. The orchestrator's own Bash stays under the guard alone.
   - `ticket` is unmaintained upstream; it is vendored by hash.
