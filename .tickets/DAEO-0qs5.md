@@ -19,8 +19,8 @@ allowed_paths:
 - governance/project/tool-registry.yaml
 kpis:
   success:
-  - Claude Code is recorded in governance/project/tool-registry.yaml pinned at 2.1.285 or later, with install and uninstall commands, date and approving decision; the upgrade is installed by the orchestrator
-    through a DEC-083 decision package (DEC-157) [CAP-25.d]
+  - Claude Code is recorded in governance/project/tool-registry.yaml pinned at 2.1.285 or later, with install and uninstall commands, date and approving decision; the upgrade is installed by the owner,
+    or by the orchestrator under DEC-083, and in both cases recorded with its owner approval (DEC-157, DEC-203, DEC-209) [CAP-25.d]
   - The CLI used for headless runs and the VS Code extension's bundled version are the same version, at or above the pin, and the registry record states both [CAP-61.e]
   - The sandbox prerequisites bubblewrap 0.9.0 and socat 1.8.0.0 are recorded in governance/project/tool-registry.yaml as owner installs, with version, install and uninstall commands, date and approving decision (DEC-141)
   failure:
