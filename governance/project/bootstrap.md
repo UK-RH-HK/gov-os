@@ -61,6 +61,15 @@ Four residuals of the post-command containment check (W1-03), accepted by the ow
 - While the repository is frozen, an acceptance test changed through an opaque Bash form is restored whoever changed it.
 - The before-snapshot adds about 28 ms to the PreToolUse hook of every Bash call.
 
+One occurrence of the first of these, recorded by the orchestrator on 2026-10-03 (W1-06, DAEO-ipqy): the
+orchestrator started a headless test designer session inside a foreground Bash call and waited for it. The test
+designer committed its own tests (`e27633ae`, trailers `Task: DAEO-ipqy` and `Role: independent-test-designer`)
+while that call was still running, so the containment check attributed the commit to the orchestrator's call and
+wrote a finding to `.gov-runtime/findings.jsonl` ("committed path(s) outside allowed paths", three paths under
+`tests/acceptance/W1-06/`, action `flagged`). The orchestrator wrote none of those files; nothing was reverted. The
+orchestrator starts worker sessions as background commands, whose Bash call returns at once, so that a worker's
+commit is not attributed to it.
+
 A fifth, accepted with DEC-144: a background command keeps running after its Bash call returns, so its later writes may be attributed to whichever call is active then.
 
 Under the proportion rule (DEC-135), an edge case of the guard or the containment check that can neither lose work nor let an implementer change acceptance tests is recorded here instead of being closed with more code.
