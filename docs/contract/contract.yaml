@@ -1,7 +1,20 @@
 # Contract v4 — machine-readable. Same content as CONTRACT_v4.md.
 id: CONTRACT-v4
 status: PROPOSED
+version: '4.1'
 date: '2026-09-30'
+revised: '2026-10-03'
+change_log:
+- version: '4.0'
+  date: '2026-09-30'
+  change: Contract v4 as closed by S1 and audited by S1-A (DEC-083…DEC-096).
+- version: '4.1'
+  date: '2026-10-03'
+  change: 'S2 specification change (docs/changes/S2-CIT-P.md, S2-CIT-E.md). Carries DEC-102…DEC-106, DEC-136, DEC-137 and
+    the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
+    MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
+    the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities.'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -38,10 +51,17 @@ envelope:
     - DEC-039
     - DEC-075
     - DEC-087
-    statement: Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner's machine, GitHub
-      Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and
-      leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and only
-      on green. `main` is not protected; enabling protection later changes no other decision.
+    - DEC-152
+    - DEC-156
+    - DEC-161
+    statement: 'Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner''s machine,
+      GitHub Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at
+      G3 and leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and
+      only on green. `main` is not protected; enabling protection later changes no other decision. Containment has two guardrail
+      layers, neither of them a security boundary: in a worker session started by the launcher the OS sandbox is the outer
+      wall for everything a Bash command does (writes outside the repository, installs, network, reads of hidden paths), and
+      the guard with the permission rules is the wall for the file tools (Read, Edit, Write), which run outside the sandbox;
+      the orchestrator''s own session is not sandboxed and runs under the guard alone (DEC-152, DEC-156, DEC-161).'
   loop_budget:
     decision:
     - DEC-044
@@ -52,10 +72,13 @@ envelope:
       delete, continue), and the owner decides. The iteration count and budget are held by the orchestrator or gov and never
       disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).'
   tool_installs:
-    decision: DEC-083
-    statement: The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
+    decision:
+    - DEC-083
+    - DEC-157
+    statement: 'The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version,
       source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are
-      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner.
+      `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install
+      system-wide: an experiment''s installs stay in a venv or local prefix inside its own experiment folder (DEC-157, DEC-158).'
 master_rules:
 - id: MR-1
   title: Specification comes first
@@ -103,6 +126,8 @@ master_rules:
   text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
   acceptance: An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment
     check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome.
+    The orchestrator may write anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it as to
+    every role but the Independent Test Designer (DEC-156).
   provider:
   - W1-02
   - W1-03
@@ -113,6 +138,7 @@ master_rules:
   - W1-26
   - W1-35
   - W1-42
+  - W1-45
   scenarios:
     dev:
     - MR-A-01
@@ -122,6 +148,8 @@ master_rules:
   - DEC-069
   - DEC-076
   - DEC-084
+  - DEC-150
+  - DEC-156
 - id: MR-4
   title: Audit, discovery and impact are distinct functions
   text_source: architecture v0.3 §1A (verbatim in Charter v5 §4)
@@ -1278,11 +1306,14 @@ capabilities:
   - W1-25
   - 'W2: typed handoff records'
   - W1-33
+  - W1-05
   sources:
   - Contract v3 Gate E2, E3
   - Framework v4.1.2 §24, §25
   - DEC-066
   - DEC-094
+  - DEC-119
+  - DEC-154
   scenarios:
     dev:
     - CHAOS-X-02
@@ -1292,10 +1323,12 @@ capabilities:
     class: KEPT
   covers:
   - id: CAP-22.a
-    item: Representative roles as subagent definitions
-    source: Contract v3 E2; Framework v4.1.2 §24
+    item: 'Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced
+      by W1-33''s generated definitions'
+    source: Contract v3 E2; Framework v4.1.2 §24; DEC-119; DEC-154
     wave: W1
     provider:
+    - W1-05
     - W1-33
   - id: CAP-22.b
     item: Typed handoff records readable by a fresh agent
@@ -1396,6 +1429,7 @@ capabilities:
   - W1-04
   - W1-06
   - W1-27
+  - W1-48
   sources:
   - Contract v3 Gate F2, F3
   - Framework v4.1.2 §28-30
@@ -1405,6 +1439,8 @@ capabilities:
   - DEC-040
   - DEC-074
   - DEC-083
+  - DEC-153
+  - DEC-157
   scenarios:
     dev:
     - CHAOS-A-05
@@ -1440,6 +1476,13 @@ capabilities:
     item: 'Non-goal: automated install classification, argv analysis, authority envelopes'
     source: DEC-083; OWNER-DECISION-P2-0003
     wave: NONE
+  - id: CAP-25.d
+    item: Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an orchestrator install under
+      DEC-083; worker roles never install system-wide
+    source: DEC-153; DEC-157
+    wave: W1
+    provider:
+    - W1-48
 - id: CAP-26
   title: Plugin trust boundary (hash-binding, descriptor security)
   outcome: (none — non-goal)
@@ -1594,6 +1637,8 @@ capabilities:
   - DEC-064
   - DEC-085
   - DEC-089
+  - DEC-103
+  - DEC-104
   scenarios:
     dev:
     - MR-A-02
@@ -1645,6 +1690,19 @@ capabilities:
     wave: W1
     provider:
     - W1-12
+  - id: CAP-30.f
+    item: 'Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user
+      interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code'
+    source: DEC-103
+    wave: W1
+    provider:
+    - W1-35
+  - id: CAP-30.g
+    item: For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner
+      has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs);
+      owned by the UX role
+    source: DEC-104
+    wave: W2
 - id: CAP-31
   title: Unified task DAG with dynamic generation
   outcome: An agent works from one task DAG in git, and failures generate their own repair tasks.
@@ -1725,15 +1783,18 @@ capabilities:
   acceptance: A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes
     it.
   wave: W3
+  wave_note: experiments as part of discovery, with an evidence record, are W1 (DEC-102); the full research lifecycle is W3
   provider:
   - Docling (pinned)
   - MarkItDown
   - 'W3: gov research sync + research records'
+  - W1-35
   sources:
   - Contract v3 Gate J1, J2
   - Framework v4.1.2 §45, §46
   - DEC-019
   - DEC-020
+  - DEC-102
   scenarios:
     dev:
     - A-X-02
@@ -1758,6 +1819,14 @@ capabilities:
     item: Experiment lifecycle; discovery flow
     source: Contract v3 J2; Framework v4.1.2 §46
     wave: W3
+  - id: CAP-32.c
+    item: Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point;
+      they run in sandboxes outside production paths and leave an evidence record (what was tested, how, results, verdict);
+      their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P
+    source: DEC-102
+    wave: W1
+    provider:
+    - W1-35
 - id: CAP-33
   title: Change-impact transactions (CIT-P simulation, CIT-E execution)
   outcome: An agent can simulate a change before making it (CIT-P) and record what it changed (CIT-E).
@@ -1776,6 +1845,7 @@ capabilities:
   - DEC-035 (radius-scaled budgets/facets)
   - DEC-011
   - DEC-066
+  - DEC-105
   scenarios:
     dev:
     - MR-A-05
@@ -1817,6 +1887,14 @@ capabilities:
     item: Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned
       promotion
     source: Framework v4.1.2 §5
+    wave: W1
+    provider:
+    - W1-35
+  - id: CAP-33.e
+    item: An experiment or finding that contradicts a closed specification opens a CIT-P whose impact assessment gives three
+      costed options (apply now, defer, re-baseline); the owner chooses; CIT-E records what was done; every version of the
+      specification is kept
+    source: DEC-105
     wave: W1
     provider:
     - W1-35
@@ -1967,7 +2045,8 @@ capabilities:
   acceptance: After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes
     the ticket at the recorded next step.
   wave: W1
-  wave_note: model-switch continuity tested in W2
+  wave_note: model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in
+    `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156)
   provider:
   - W1-25
   - W1-29
@@ -1977,6 +2056,8 @@ capabilities:
   - OWNER-DIRECTION-BR-0004 (checkpoint discipline)
   - OWNER-DIRECTION-BR-0006 §7, §8
   - DEC-025
+  - DEC-150
+  - DEC-156
   scenarios:
     dev:
     - CHAOS-A-01
@@ -2066,6 +2147,8 @@ capabilities:
   - Framework v4.1.2 §62-64
   - DEC-042 (builder tests are regression evidence only)
   - DEC-083
+  - DEC-136
+  - DEC-137
   scenarios:
     dev:
     - MR-A-06
@@ -2122,6 +2205,21 @@ capabilities:
   - id: CAP-38.d
     item: Governance suite currency
     source: Contract v3 O4; Framework v4.1.2 §64
+    wave: W1
+    provider:
+    - W1-30
+  - id: CAP-38.e
+    item: A case the orchestrator's review finds that the acceptance tests miss goes to the next test design batch as a described
+      behaviour, never as code; the test designer decides from the specification whether it becomes an acceptance test and
+      reports a specification gap
+    source: DEC-136
+    wave: W1
+    provider:
+    - W1-35
+  - id: CAP-38.f
+    item: For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the
+      orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record
+    source: DEC-137
     wave: W1
     provider:
     - W1-30
@@ -2190,11 +2288,13 @@ capabilities:
   - ccusage (pinned)
   - W1-31
   - W1-06
+  - W1-42
   sources:
   - Contract v3 Gate P1, P2
   - Framework v4.1.2 §65, §66
   - DEC-026
   - DEC-086
+  - DEC-106
   scenarios:
     dev:
     - CHAOS-A-12
@@ -2220,6 +2320,15 @@ capabilities:
       human-gate concentration, retrieval misses, cost by task/feature, first-pass completion'
     source: Contract v3 P2; Framework v4.1.2 §66
     wave: W3
+  - id: CAP-40.c
+    item: 'Wave 1 learning metrics per ticket: KPI disputes raised by the test designer, acceptance tests rewritten after
+      implementation began (with the reason), and governance share; all three reported at the Wave 1 exit; only governance
+      share has a threshold (≤ 15 %)'
+    source: DEC-106; DEC-086
+    wave: W1
+    provider:
+    - W1-31
+    - W1-42
 - id: CAP-41
   title: Lesson records with scope
   outcome: An agent receives the lessons that apply to its task, scoped, and lessons stay in the repository.
@@ -2603,17 +2712,26 @@ capabilities:
   title: Qualification oracle (synthetic repos, fault injection, hidden tests)
   outcome: The owner can qualify the Gov OS on two synthetic programmes against a held-out oracle before Release 1.
   acceptance: A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any
-    forbidden outcome fails; the builder sessions had no read access to the oracle.
+    forbidden outcome fails; the builder sessions had no read access to the oracle. The oracle is hidden from a launched worker's
+    Bash by the sandbox, and from every session started in the repository root by a `Read` deny rule and by the guard refusing
+    any tool call that names its path.
   wave: W3
-  wave_note: the pack exists (S0b1); executed as qualification after W3 (DEC-067)
+  wave_note: the pack exists (S0b1); executed as qualification after W3 (DEC-067); the hiding of the oracle is W1 (DEC-152,
+    DEC-162)
   provider:
   - synthetic Programmes A and B
   - held-out oracle
   - qualification executor
+  - W1-46
+  - W1-47
   sources:
   - Contract v3 Gate V1, V2, V3, V4
   - DEC-067
   - DEC-071
+  - DEC-152
+  - DEC-161
+  - DEC-162
+  - EXP-001 (spike-sandbox/EVIDENCE.md §3.3, §5.4)
   scenarios:
     dev: []
     qual: []
@@ -2625,6 +2743,22 @@ capabilities:
     item: Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail
     source: Contract v3 V1–V4; DEC-067
     wave: W3
+  - id: CAP-49.b
+    item: 'In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher
+      passes; hiding is silent: the directory looks empty'
+    source: DEC-152; DEC-161; EXP-001 §3.3, §5.4
+    wave: W1
+    provider:
+    - W1-46
+  - id: CAP-49.c
+    item: 'The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included,
+      by two layers: a `Read` deny rule with the oracle''s absolute path in the committed `.claude/settings.json`, and the
+      guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator''s
+      own session is an accepted residual'
+    source: DEC-162
+    wave: W1
+    provider:
+    - W1-47
 - id: CAP-50
   title: Artifact flow, dependency consumption and end-to-end traceability
   outcome: An agent can tell which evidence becomes stale when a requirement changes.
@@ -2946,9 +3080,11 @@ capabilities:
     - W1-22
 - id: CAP-58
   title: Path guards as default-deny allow-lists
-  outcome: An agent can write only inside its task's declared paths; everything else is denied.
-  acceptance: An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard; a Bash form the guard
-    cannot parse is caught by the post-command containment check.
+  outcome: 'An agent can write only inside its task''s declared paths; everything else is denied. The orchestrator is the
+    one exception: it may write anywhere in the repository except `tests/acceptance/**`.'
+  acceptance: An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard, and a Bash form the
+    guard cannot parse is caught by the post-command containment check; in a launched worker session a Bash write outside
+    the repository is stopped by the OS sandbox, and a file-tool write outside it by the permission rules and the guard.
   wave: W1
   provider:
   - W1-02
@@ -2956,9 +3092,17 @@ capabilities:
   - W1-01
   - W1-26
   - W1-33
+  - W1-45
+  - W1-46
+  - W1-47
   sources:
   - DEC-041 (default-deny allow-lists, derived not enumerated)
   - DEC-076
+  - DEC-152
+  - DEC-153
+  - DEC-156
+  - DEC-161
+  - EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
   scenarios:
     dev:
     - MR-A-01
@@ -3001,6 +3145,28 @@ capabilities:
     wave: W1
     provider:
     - W1-02
+  - id: CAP-58.d
+    item: 'Claim split by tool: in a launched worker session the OS sandbox stops a Bash write outside the repository without
+      parsing the command; the file tools (Read, Edit, Write) run outside the sandbox and are held by the permission rules
+      and the guard; `Edit(...)` and `Read(...)` deny rules bind both layers'
+    source: DEC-152; DEC-161; EXP-001 §5.4
+    wave: W1
+    provider:
+    - W1-46
+  - id: CAP-58.e
+    item: 'Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the
+      guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed'
+    source: DEC-150; DEC-156
+    wave: W1
+    provider:
+    - W1-45
+  - id: CAP-58.f
+    item: The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written
+      files before failing; a call refused by a deny rule reaches no hook
+    source: DEC-153; EXP-001 §5.4
+    wave: W1
+    provider:
+    - W1-47
 - id: CAP-59
   title: Review-repair loop budget
   outcome: 'The owner never sees an endless loop: any review→repair, audit→repair, test→fix or verification loop continues
@@ -3074,3 +3240,100 @@ capabilities:
     item: 'Non-goal: below-floor recovery, break-glass, DEGRADED mode'
     source: OWNER-DECISION-0006; OWNER-DECISION-0007; DEC-039
     wave: NONE
+- id: CAP-61
+  title: Worker session launcher and OS sandbox
+  outcome: The orchestrator can start a worker session (engineer, independent test designer, independent auditor, research
+    or experiment) that runs inside the OS sandbox with its role's network profile, and cannot start one without it.
+  acceptance: '`gov launch` refuses to start a worker session unless the sandbox is enabled, strict (`allowUnsandboxedCommands:
+    false`, network `strictAllowlist`) and fail-closed (`failIfUnavailable: true`); a launched worker''s Bash command cannot
+    write outside the repository, its network profile applies, and its `GOV_ROLE` and `GOV_TICKET` reach the guard.'
+  wave: W1
+  wave_note: the untested sandbox cases are a W2 experiment (DEC-160)
+  provider:
+  - Claude Code sandbox (bubblewrap 0.9.0, socat 1.8.0.0)
+  - W1-46
+  - W1-48
+  sources:
+  - DEC-138
+  - DEC-141
+  - DEC-152
+  - DEC-153
+  - DEC-158
+  - DEC-159
+  - DEC-160
+  - DEC-161
+  - EXP-001 (spike-sandbox/EVIDENCE.md §5.2–5.5)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-61.a
+    item: 'The launcher refuses to start a worker session unless the sandbox is on, strict and fail-closed: enabled, `failIfUnavailable:
+      true`, `allowUnsandboxedCommands: false`, network `strictAllowlist`; the configuration is passed through `--settings`,
+      never read from the repository, whose settings carry no sandbox block'
+    source: DEC-152; DEC-153; DEC-161; EXP-001 §5.2
+    wave: W1
+    provider:
+    - W1-46
+  - id: CAP-61.b
+    item: 'Per-role `--settings`: the sandbox block plus the role''s `Edit` deny rules; the launcher sets `GOV_ROLE` and `GOV_TICKET`,
+      and both reach the guard; a launched worker is shown to be sandboxed. The sandbox applies to launched worker sessions
+      only; in-session subagents remain for read-only work (review, exploration, web research)'
+    source: DEC-153; DEC-161; EXP-001 §5.3
+    wave: W1
+    provider:
+    - W1-46
+  - id: CAP-61.c
+    item: 'Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research
+      and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation
+      sites), with its writes and installs inside its own experiment folder; the allowlist is shown to accept the research
+      domains; WebSearch and WebFetch run outside the sandbox'
+    source: DEC-158; DEC-161
+    wave: W1
+    provider:
+    - W1-46
+  - id: CAP-61.d
+    item: The launcher sets a per-session temp directory for each worker session; if the acceptance test shows it cannot be
+      overridden, the shared `$TMPDIR` is recorded as a residual
+    source: DEC-159
+    wave: W1
+    provider:
+    - W1-46
+  - id: CAP-61.e
+    item: Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs is aligned with the VS Code extension's
+      bundled version
+    source: DEC-153; EXP-001 §5.5
+    wave: W1
+    provider:
+    - W1-48
+  - id: CAP-61.f
+    item: The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp
+      filter, `bypassPermissions` mode) are tested by an experiment; until then they are residuals
+    source: DEC-160; EXP-001 §4
+    wave: W2
+- id: CAP-62
+  title: Sandbox escape hatch denied
+  outcome: A session cannot run a Bash command outside the sandbox by asking for it.
+  acceptance: 'A Bash call carrying `dangerouslyDisableSandbox: true` is denied by the guard''s PreToolUse hook, whatever
+    the role.'
+  wave: W1
+  provider:
+  - W1-47
+  sources:
+  - DEC-152
+  - DEC-153
+  - EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
+  scenarios:
+    dev: []
+    qual: []
+  disposition:
+    class: KEPT
+  covers:
+  - id: CAP-62.a
+    item: 'The guard denies any Bash call carrying `dangerouslyDisableSandbox: true`, as defence in depth behind strict mode'
+    source: DEC-153; EXP-001 §5.4
+    wave: W1
+    provider:
+    - W1-47

@@ -1,13 +1,22 @@
 ---
 id: CONTRACT-v4
 status: PROPOSED
+version: "4.1"
+revised: 2026-10-03
 depends_on: [CHARTER-v5, ADR-0001, ADR-0002]
-decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096]
+decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162]
 ---
 
-# Governance OS — Capability Acceptance Contract v4
+# Governance OS — Capability Acceptance Contract v4 (version 4.1)
 
 Contract v4 states what the Gov OS must do, as outcomes with **one observable acceptance check each**. It replaces Contract v3 as the working text (DEC-058). `contract.yaml` holds the same content in machine-readable form; `readiness-dimensions.yaml` defines the 26 readiness rows that Wave 1's OpenSpec schema implements.
+
+**Version 4.1** (2026-10-03). The file names and the id `CONTRACT-v4` are unchanged.
+
+| Version | Date | Change |
+|---|---|---|
+| 4.0 | 2026-09-30 | Contract v4 as closed by S1 and audited by S1-A (DEC-083…DEC-096). |
+| 4.1 | 2026-10-03 | S2 specification change (docs/changes/S2-CIT-P.md, S2-CIT-E.md). Carries DEC-102…DEC-106, DEC-136, DEC-137 and the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended. MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session's Bash) and the guard (file tools, the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied). New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. |
 
 **Precedence:** Charter v5 → Contract v4 → ADRs → everything else. The ADRs supersede the originals where they conflict.
 
@@ -17,22 +26,22 @@ Contract v4 states what the Gov OS must do, as outcomes with **one observable ac
 
 | Wave | KEPT | LITE | DROP | Total |
 |---|---|---|---|---|
-| W1 | 36 | 4 | 0 | 40 |
+| W1 | 38 | 4 | 0 | 42 |
 | W2 | 7 | 0 | 0 | 7 |
 | W3 | 11 | 0 | 0 | 11 |
 | NONE | 0 | 0 | 2 | 2 |
-| **All** | 54 | 4 | 2 | 60 |
+| **All** | 56 | 4 | 2 | 62 |
 
-DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1.
+DEC-080 places CAP-15, 16, 18, 55, 56 and 57 in Wave 1, with the citation validator and hierarchical synthesis. DEC-074 R1/Q3 places semantic retrieval and the reranker (CAP-10) in Wave 1. Version 4.1 adds CAP-61 and CAP-62 to Wave 1 (DEC-152, DEC-153).
 
 ## 2. Envelope and boundary
 
 - **Scale envelope** (DEC-078). Tested up to ≈ 80k nodes / 270k edges of code graph at ≈ 2.2 GB peak RSS for codebase-memory-mcp; larger graphs are measured before adoption. Memory scales with graph edges, not file count. Each project in a multi-project folder gets its own index.
 - **RAM budget** (DEC-078). Worst case ≈ 12.5 GB of the 15.5 GiB host (IDE + local models + a full index run), leaving ≈ 2.5 GiB spare; incremental updates are far smaller. The stack runs with one on-demand daemon (Ollama, 5-min idle unload), no Docker, VRAM peak ≈ 5.2 of 16 GiB.
 - **Token budget** (DEC-004, DEC-086). Governance tokens ≤ 10–15 % of a ticket's fresh input + output tokens (the Wave 1 exit bound is 15 %). Governance tokens = text the Gov OS injects or returns (instruction files, SessionStart packet, hook output, `gov` output, governance MCP tool definitions, checkpoint and close records), counted by `gov`; the denominator comes from ccusage. Cache reads are reported separately. Context packet ≤ ~6k tokens; SessionStart injection ≤ ~2.5k tokens plus a file path; AGENTS.md ≤ ~1.5k tokens. A breach is a health finding, never a silent cost.
-- **Boundary** (DEC-039, DEC-075, DEC-087). Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner's machine, GitHub Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and only on green. `main` is not protected; enabling protection later changes no other decision.
+- **Boundary** (DEC-039, DEC-075, DEC-087, DEC-152, DEC-156, DEC-161). Hooks are guardrails. The boundary is git history, the lefthook pre-push gate G3 on the owner's machine, GitHub Actions CI G4–G5 as an advisory result on every push (deterministic checks only; model-dependent tests run at G3 and leave an evidence record bound to the head commit that CI checks), and the rule that only the owner merges, and only on green. `main` is not protected; enabling protection later changes no other decision. Containment has two guardrail layers, neither of them a security boundary: in a worker session started by the launcher the OS sandbox is the outer wall for everything a Bash command does (writes outside the repository, installs, network, reads of hidden paths), and the guard with the permission rules is the wall for the file tools (Read, Edit, Write), which run outside the sandbox; the orchestrator's own session is not sandboxed and runs under the guard alone (DEC-152, DEC-156, DEC-161).
 - **Loop budget** (DEC-044, DEC-096). Any loop that runs until convergence (review→repair, audit→repair, test→fix, verification) continues until it converges or until three consecutive iterations fail to converge; the third failure produces an escalation package for the owner (each iteration's outcome, why it is not converging, options: fix differently, narrow, split, defer, delete, continue), and the owner decides. The iteration count and budget are held by the orchestrator or gov and never disclosed to the sessions inside the loop. Retrieval stopping rules are unchanged (DEC-034, DEC-080).
-- **Tool installs** (DEC-083). The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version, source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner.
+- **Tool installs** (DEC-083, DEC-157). The orchestrator installs a tool only after the owner approves a decision package in chat (tool, exact version, source and checksum, need, disk and RAM, uninstall command), and records it in the tool registry; install commands are `ask` for the orchestrator and denied for every other role; `sudo` stays with the owner. Worker roles never install system-wide: an experiment's installs stay in a venv or local prefix inside its own experiment folder (DEC-157, DEC-158).
 
 ## 3. Master-rule clauses
 
@@ -42,7 +51,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 |---|---|---|---|---|---|
 | MR-1 | Specification comes first | A production ticket whose specification has a required readiness cell open for its profile (FULL for a spine) cannot reach READY: `tk ready` does not list it and `gov readiness` names the open cells; an N/A without a reason is rejected. | W1-12, W1-13, W1-35, W1-42 | MR-A-02, MR-B-02 | DEC-065, DEC-085 |
 | MR-2 | Closed specifications generate the work | A closed specification produces tickets with class, role, depends_on, allowed_paths, KPIs and profile, and `gov check` fails a ticket missing any of them; every required open readiness cell has a linked gap ticket (discovery, data, research or test-design) and `gov check` fails an unlinked one — created by the planning skill in W1, generated by `gov readiness --generate` from W2. | W1-14, W1-35, W1-13, W1-26, W2: gov readiness --generate, W1-09, W1-42 | MR-A-02, MR-A-04, MR-B-02, MR-B-04 | DEC-065, DEC-089 |
-| MR-3 | KPIs; the builder never writes its own acceptance tests | An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome. | W1-02, W1-03, W1-09, W1-30, W1-33, W1-05, W1-26, W1-35, W1-42 | MR-A-01, MR-B-01 | DEC-065, DEC-069, DEC-076, DEC-084 |
+| MR-3 | KPIs; the builder never writes its own acceptance tests | An implementer write to `tests/acceptance/**` is refused by the guard and caught by the post-command containment check; an implementation ticket is not READY until `tests/acceptance/<ticket-id>/` exists; a breach is a forbidden outcome. The orchestrator may write anywhere in the repository except `tests/acceptance/**`, which the guard refuses to it as to every role but the Independent Test Designer (DEC-156). | W1-02, W1-03, W1-09, W1-30, W1-33, W1-05, W1-26, W1-35, W1-42, W1-45 | MR-A-01, MR-B-01 | DEC-065, DEC-069, DEC-076, DEC-084, DEC-150, DEC-156 |
 | MR-4 | Audit, discovery and impact are distinct functions | Each of `gov doctor`, discovery, CIT-P, CIT-E and audit has its own command or skill and record; closing a spine, STANDARD or FULL feature specification, an accepted CIT-E that changes a closed spine, and every wave or release exit each create an audit ticket for a fresh auditor that authored none of the audited files; its report names the milestone, and contested or owner-level findings appear in chat as decision packages. | W1-27, W1-13, W1-35, W1-36, W1-33, W1-43, W1-42 | MR-A-05, MR-A-06, MR-B-05, MR-B-06 | DEC-065, DEC-066, DEC-070, DEC-088 |
 | MR-5 | The Gov OS works as a software company | Each Wave 1 role exists as a generated subagent definition with purpose, allowed-path pattern, tools, model tier, authority level and handoff format, and a ticket's role field names one of them. | W1-33, W1-38 | CHAOS-X-02 | DEC-065, DEC-066 |
 | MR-6 | The human is the customer and final authority | Every owner question appears in the active chat as a package with all eight MR-6 fields (the template carries ten), ranked P1–P3 and batched at most five at a time, P1 allowed to bypass; the dependent branch waits while an independent branch proceeds; each answer is committed as a decision record. | W1-34, W1-35, W1-42 | MR-A-03, MR-B-03 | DEC-065, DEC-093 |
@@ -344,11 +353,11 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Outcome:** An agent can hand work to a fresh agent in a typed record the receiver can act on without the sender's chat.
 - **Acceptance:** A fresh agent B, given only the handoff record and the repository, states the task, inputs, open questions and next step identically to agent A's record.
 - **Wave:** W2 (W1 hands off through checkpoints; typed handoff records and specialist roles, including test execution and integration (DEC-094), are W2)
-- **Provider:** W1-25, W2: typed handoff records, W1-33
+- **Provider:** W1-25, W2: typed handoff records, W1-33, W1-05
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate E2, E3; Framework v4.1.2 §24, §25; DEC-066; DEC-094
+- **Sources:** Contract v3 Gate E2, E3; Framework v4.1.2 §24, §25; DEC-066; DEC-094; DEC-119; DEC-154
 - **Covers:**
-  - `CAP-22.a` [W1] Representative roles as subagent definitions — Contract v3 E2; Framework v4.1.2 §24 · delivered by W1-33
+  - `CAP-22.a` [W1] Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced by W1-33's generated definitions — Contract v3 E2; Framework v4.1.2 §24; DEC-119; DEC-154 · delivered by W1-05, W1-33
   - `CAP-22.b` [W2] Typed handoff records readable by a fresh agent — Contract v3 E3; Framework v4.1.2 §25
   - `CAP-22.c` [W2] Distinct test execution and integration roles — MR-5; DEC-094
 - **Scenarios:** dev CHAOS-X-02 · qual CHAOS-X-Q02
@@ -385,13 +394,14 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Outcome:** The owner can see every tool the Gov OS relies on, at which pinned version, and approve every install.
 - **Acceptance:** `gov doctor --json` lists pinned versus found versions and exits non-zero on drift; an install command from the orchestrator raises an approval prompt (also in Auto mode), and from any other role is denied.
 - **Wave:** W1
-- **Provider:** W1-04, W1-06, W1-27
+- **Provider:** W1-04, W1-06, W1-27, W1-48
 - **Disposition:** LITE — lite form: Tool registry with pins; the orchestrator installs a tool only after the owner approves a decision package in chat, and records version, sha256, install and uninstall commands, date and approving decision; `gov doctor` checks the pins. No automated install classification (DEC-083).
-- **Sources:** Contract v3 Gate F2, F3; Framework v4.1.2 §28-30; OWNER-DECISION-P2-0003 (gate only elevated installs); Contract v3 Gate C10; Framework v4.1.2 §11.10; DEC-040; DEC-074; DEC-083
+- **Sources:** Contract v3 Gate F2, F3; Framework v4.1.2 §28-30; OWNER-DECISION-P2-0003 (gate only elevated installs); Contract v3 Gate C10; Framework v4.1.2 §11.10; DEC-040; DEC-074; DEC-083; DEC-153; DEC-157
 - **Covers:**
   - `CAP-25.a` [W1] Tool registry with pins, sha256, install/uninstall commands, date, approving decision; gov doctor checks — Contract v3 F2, C10 (LITE); Framework v4.1.2 §28–29, §11.10 · delivered by W1-04, W1-06, W1-27
   - `CAP-25.b` [W1] Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the owner — Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083 · delivered by W1-04
   - `CAP-25.c` [NONE] Non-goal: automated install classification, argv analysis, authority envelopes — DEC-083; OWNER-DECISION-P2-0003
+  - `CAP-25.d` [W1] Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an orchestrator install under DEC-083; worker roles never install system-wide — DEC-153; DEC-157 · delivered by W1-48
 - **Scenarios:** dev CHAOS-A-05, CHAOS-B-04, CHAOS-B-05, CHAOS-B-14, B-10, AUDIT-B-03 · qual CHAOS-X-Q05
 
 ### CAP-26 — Plugin trust boundary (hash-binding, descriptor security)
@@ -452,13 +462,15 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Wave:** W2 (schema, checker, the READY gate and linked gap tickets (planning skill + gov check, DEC-089) are W1; automatic generation is W2)
 - **Provider:** OpenSpec custom schema, W1-12, W1-13, W2: gov readiness --generate, W1-26, W1-35
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate H2, H3, H4; Framework v4.1.2 §37, §38, §39; DEC-005; DEC-064; DEC-085; DEC-089
+- **Sources:** Contract v3 Gate H2, H3, H4; Framework v4.1.2 §37, §38, §39; DEC-005; DEC-064; DEC-085; DEC-089; DEC-103; DEC-104
 - **Covers:**
   - `CAP-30.a` [W1] 26-row readiness checklist, five states, silent N/A invalid, no defaulted N/A — Contract v3 H2; Framework v4.1.2 §37; DEC-085 · delivered by W1-12, W1-13
   - `CAP-30.b` [W1] Readiness gaps generate linked tickets (W1 planning skill + gov check) — Contract v3 H3; Framework v4.1.2 §38; DEC-089 · delivered by W1-13, W1-26, W1-35
   - `CAP-30.c` [W2] Automatic generation (gov readiness --generate) — Contract v3 H3; DEC-089
   - `CAP-30.d` [W3] Scenarios drive data and tests; data provenance recorded; data author independent where practical — Contract v3 H4; Framework v4.1.2 §39
   - `CAP-30.e` [W1] Capability taxonomy for STANDARD rows; extended only through a governed change — Framework v4.1.2 §40 · delivered by W1-12
+  - `CAP-30.f` [W1] Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code — DEC-103 · delivered by W1-35
+  - `CAP-30.g` [W2] For a feature with a user interface, the UX row closes only on scenario-derived wireframes or mockups the owner has approved; its acceptance tests include visual checks against them (screenshot comparison, scenario walk-throughs); owned by the UX role — DEC-104
 - **Scenarios:** dev MR-A-02, MR-A-04, A-01 · qual MR-A-Q02, MR-A-Q04, CHAOS-A-Q07, A-Q01, A-Q02, A-Q05, AUDIT-A-Q32, AUDIT-A-Q35, AUDIT-A-Q37, AUDIT-A-Q43, AUDIT-A-Q44, AUDIT-A-Q47 (+9 not listed in the matrix row)
 
 ### CAP-31 — Unified task DAG with dynamic generation
@@ -480,13 +492,14 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** An agent keeps research as evidence records separate from authority, and experimental results cannot reach production unreviewed.
 - **Acceptance:** A research record marked EXPERIMENTAL cited by a production change makes `gov check` fail until a decision promotes it.
-- **Wave:** W3
-- **Provider:** Docling (pinned), MarkItDown, W3: gov research sync + research records
+- **Wave:** W3 (experiments as part of discovery, with an evidence record, are W1 (DEC-102); the full research lifecycle is W3)
+- **Provider:** Docling (pinned), MarkItDown, W3: gov research sync + research records, W1-35
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate J1, J2; Framework v4.1.2 §45, §46; DEC-019; DEC-020
+- **Sources:** Contract v3 Gate J1, J2; Framework v4.1.2 §45, §46; DEC-019; DEC-020; DEC-102
 - **Covers:**
   - `CAP-32.a` [W3] Research becomes evidence records separate from authority — Contract v3 J1; Framework v4.1.2 §45
   - `CAP-32.b` [W3] Experiment lifecycle; discovery flow — Contract v3 J2; Framework v4.1.2 §46
+  - `CAP-32.c` [W1] Experiments (spikes, tool compatibility and performance trials) are part of discovery and can run at any point; they run in sandboxes outside production paths and leave an evidence record (what was tested, how, results, verdict); their code is promoted only through the normal cycle; their results change a closed specification only through CIT-P — DEC-102 · delivered by W1-35
 - **Scenarios:** dev A-X-02 · qual AUDIT-A-Q02, AUDIT-A-Q06, AUDIT-A-Q20, AUDIT-A-Q21, AUDIT-A-Q23, AUDIT-A-Q24, AUDIT-A-Q38, AUDIT-A-Q43, CIT-B-Q01
 
 ### CAP-33 — Change-impact transactions (CIT-P simulation, CIT-E execution)
@@ -496,12 +509,13 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Wave:** W2 (OpenSpec proposal and apply/archive in W1; computed impact W2)
 - **Provider:** OpenSpec 1.13.2, W1-35, W2: gov impact
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate K1, K2, K3, K4; Framework v4.1.2 §47-49; DEC-005 (proportionality profiles LITE/STANDARD/FULL); DEC-035 (radius-scaled budgets/facets); DEC-011; DEC-066
+- **Sources:** Contract v3 Gate K1, K2, K3, K4; Framework v4.1.2 §47-49; DEC-005 (proportionality profiles LITE/STANDARD/FULL); DEC-035 (radius-scaled budgets/facets); DEC-011; DEC-066; DEC-105
 - **Covers:**
   - `CAP-33.a` [W1] CIT-P proposal and CIT-E apply/archive records — Contract v3 K1, K2; Framework v4.1.2 §47 · delivered by W1-35
   - `CAP-33.b` [W2] Automatic impact simulation over record and code graphs; impact radius → profile — Contract v3 K3, K4; Framework v4.1.2 §48, §49
   - `CAP-33.c` [W3] Upstream change propagates staleness and generates revalidation tasks — Contract v3 W6
   - `CAP-33.d` [W1] Changes to the Gov OS itself pass evidence → corroboration → proposal → independent review → owner approval → versioned promotion — Framework v4.1.2 §5 · delivered by W1-35
+  - `CAP-33.e` [W1] An experiment or finding that contradicts a closed specification opens a CIT-P whose impact assessment gives three costed options (apply now, defer, re-baseline); the owner chooses; CIT-E records what was done; every version of the specification is kept — DEC-105 · delivered by W1-35
 - **Scenarios:** dev MR-A-05, CIT-A-01, CIT-A-02, MR-B-05, CIT-B-01 · qual MR-A-Q05, CHAOS-A-Q01, CHAOS-A-Q02, CHAOS-A-Q05, CIT-A-Q01, CIT-A-Q02, CIT-A-Q03, A-Q03, AUDIT-A-Q26, AUDIT-A-Q27, AUDIT-A-Q39, SOAK-X-Q01
 
 ### CAP-34 — Human decision gates and contradiction resolution
@@ -550,10 +564,10 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** An agent can resume after compaction, a crash or a model switch from a structured checkpoint in the repository.
 - **Acceptance:** After every ticket transition a checkpoint file exists; a fresh session with only SessionStart output resumes the ticket at the recorded next step.
-- **Wave:** W1 (model-switch continuity tested in W2)
+- **Wave:** W1 (model-switch continuity tested in W2; until W1-25's `gov checkpoint`, the orchestrator's checkpoint lives in `.gov-runtime/scratch/orchestrator/` (DEC-150, DEC-156))
 - **Provider:** W1-25, W1-29
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate N1, N2, N3, N4; Framework v4.1.2 §59-61; OWNER-DIRECTION-BR-0004 (checkpoint discipline); OWNER-DIRECTION-BR-0006 §7, §8; DEC-025
+- **Sources:** Contract v3 Gate N1, N2, N3, N4; Framework v4.1.2 §59-61; OWNER-DIRECTION-BR-0004 (checkpoint discipline); OWNER-DIRECTION-BR-0006 §7, §8; DEC-025; DEC-150; DEC-156
 - **Covers:**
   - `CAP-37.a` [W1] Structured checkpoint in the repository with input ids/versions/hashes — Contract v3 N1, W9; Framework v4.1.2 §59 · delivered by W1-25
   - `CAP-37.b` [W1] Mandatory triggers incl. ticket transition, compaction, stop — Contract v3 N2; Framework v4.1.2 §60 · delivered by W1-25, W1-29
@@ -570,12 +584,14 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Wave:** W1
 - **Provider:** W1-26, W1-30, W1-37, W1-02, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-35, W1-36, W1-38, W1-42
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate O1, O2, O3, O4; Framework v4.1.2 §62-64; DEC-042 (builder tests are regression evidence only); DEC-083
+- **Sources:** Contract v3 Gate O1, O2, O3, O4; Framework v4.1.2 §62-64; DEC-042 (builder tests are regression evidence only); DEC-083; DEC-136; DEC-137
 - **Covers:**
   - `CAP-38.a` [W1] Product test families — Contract v3 O1; Framework v4.1.2 §62 · delivered by W1-30
   - `CAP-38.b` [W1] Governance test families: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, skill regression, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, product traceability, audit reproducibility — Contract v3 O2; Framework v4.1.2 §63 · delivered by W1-26, W1-15, W1-17, W1-21, W1-24, W1-25, W1-27, W1-30, W1-35, W1-36, W1-38, W1-42
   - `CAP-38.c` [W1] Independent test authorship; builder tests are regression evidence only — Contract v3 O3; DEC-042 · delivered by W1-30, W1-02
   - `CAP-38.d` [W1] Governance suite currency — Contract v3 O4; Framework v4.1.2 §64 · delivered by W1-30
+  - `CAP-38.e` [W1] A case the orchestrator's review finds that the acceptance tests miss goes to the next test design batch as a described behaviour, never as code; the test designer decides from the specification whether it becomes an acceptance test and reports a specification gap — DEC-136 · delivered by W1-35
+  - `CAP-38.f` [W1] For a FULL-profile ticket the adversarial probe after green is done by a fresh reviewer, not the implementer; the orchestrator commissions and judges it; the reviewer writes nothing to the repository; the close needs the probe record — DEC-137 · delivered by W1-30
 - **Scenarios:** dev MR-A-06, A-02, MR-B-02, MR-B-04, MR-B-06, AUDIT-B-04, AUDIT-X-01 · qual AUDIT-A-Q08, A-Q05, AUDIT-A-Q40, AUDIT-A-Q41, AUDIT-A-Q46, AUDIT-B-Q02, AUDIT-X-Q01
 
 ### CAP-39 — Governance health scheduler (G0-G6 tiers)
@@ -598,12 +614,13 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Outcome:** The owner can see tokens, model, cost and outcome per ticket.
 - **Acceptance:** Each closed ticket has a telemetry record with fresh input/output tokens, cache reads, model, governance tokens and pass/fail.
 - **Wave:** W1 (OTel dashboards W3)
-- **Provider:** ccusage (pinned), W1-31, W1-06
+- **Provider:** ccusage (pinned), W1-31, W1-06, W1-42
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate P1, P2; Framework v4.1.2 §65, §66; DEC-026; DEC-086
+- **Sources:** Contract v3 Gate P1, P2; Framework v4.1.2 §65, §66; DEC-026; DEC-086; DEC-106
 - **Covers:**
   - `CAP-40.a` [W1] Per ticket: agent/session/model/provider, role/task, skill/tool versions, packet id, retrieval queries/hits, tokens in/out, latency/cost, files read/written, tests, retries/failures, handoffs, decisions, human interventions — Contract v3 P1; Framework v4.1.2 §65 · delivered by W1-31
   - `CAP-40.b` [W3] Organisational questions: rework by role, retrieval effect on tokens, model over/under-power, skill repair rate, human-gate concentration, retrieval misses, cost by task/feature, first-pass completion — Contract v3 P2; Framework v4.1.2 §66
+  - `CAP-40.c` [W1] Wave 1 learning metrics per ticket: KPI disputes raised by the test designer, acceptance tests rewritten after implementation began (with the reason), and governance share; all three reported at the Wave 1 exit; only governance share has a threshold (≤ 15 %) — DEC-106; DEC-086 · delivered by W1-31, W1-42
 - **Scenarios:** dev CHAOS-A-12, ISO-X-03, SOAK-X-01 · qual GATE-B-Q01, GATE-B-Q03, GATE-B-Q04, SOAK-X-Q01
 
 ### CAP-41 — Lesson records with scope
@@ -726,13 +743,15 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 ### CAP-49 — Qualification oracle (synthetic repos, fault injection, hidden tests)
 
 - **Outcome:** The owner can qualify the Gov OS on two synthetic programmes against a held-out oracle before Release 1.
-- **Acceptance:** A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any forbidden outcome fails; the builder sessions had no read access to the oracle.
-- **Wave:** W3 (the pack exists (S0b1); executed as qualification after W3 (DEC-067))
-- **Provider:** synthetic Programmes A and B, held-out oracle, qualification executor
+- **Acceptance:** A fresh qualification executor runs both qualification tiers and produces a scorecard in SCORECARD_FORMAT; any forbidden outcome fails; the builder sessions had no read access to the oracle. The oracle is hidden from a launched worker's Bash by the sandbox, and from every session started in the repository root by a `Read` deny rule and by the guard refusing any tool call that names its path.
+- **Wave:** W3 (the pack exists (S0b1); executed as qualification after W3 (DEC-067); the hiding of the oracle is W1 (DEC-152, DEC-162))
+- **Provider:** synthetic Programmes A and B, held-out oracle, qualification executor, W1-46, W1-47
 - **Disposition:** KEPT (DROP in S0a; KEPT as qualification by DEC-067)
-- **Sources:** Contract v3 Gate V1, V2, V3, V4; DEC-067; DEC-071
+- **Sources:** Contract v3 Gate V1, V2, V3, V4; DEC-067; DEC-071; DEC-152; DEC-161; DEC-162; EXP-001 (spike-sandbox/EVIDENCE.md §3.3, §5.4)
 - **Covers:**
   - `CAP-49.a` [W3] Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail — Contract v3 V1–V4; DEC-067
+  - `CAP-49.b` [W1] In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher passes; hiding is silent: the directory looks empty — DEC-152; DEC-161; EXP-001 §3.3, §5.4 · delivered by W1-46
+  - `CAP-49.c` [W1] The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle's absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator's own session is an accepted residual — DEC-162 · delivered by W1-47
 - **Scenarios:** dev — · qual —
 
 ### CAP-50 — Artifact flow, dependency consumption and end-to-end traceability
@@ -844,16 +863,19 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 ### CAP-58 — Path guards as default-deny allow-lists
 
-- **Outcome:** An agent can write only inside its task's declared paths; everything else is denied.
-- **Acceptance:** An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard; a Bash form the guard cannot parse is caught by the post-command containment check.
+- **Outcome:** An agent can write only inside its task's declared paths; everything else is denied. The orchestrator is the one exception: it may write anywhere in the repository except `tests/acceptance/**`.
+- **Acceptance:** An Edit, Write or Bash write outside the ticket's `allowed_paths` is refused by the guard, and a Bash form the guard cannot parse is caught by the post-command containment check; in a launched worker session a Bash write outside the repository is stopped by the OS sandbox, and a file-tool write outside it by the permission rules and the guard.
 - **Wave:** W1
-- **Provider:** W1-02, W1-03, W1-01, W1-26, W1-33
+- **Provider:** W1-02, W1-03, W1-01, W1-26, W1-33, W1-45, W1-46, W1-47
 - **Disposition:** KEPT
-- **Sources:** DEC-041 (default-deny allow-lists, derived not enumerated); DEC-076
+- **Sources:** DEC-041 (default-deny allow-lists, derived not enumerated); DEC-076; DEC-152; DEC-153; DEC-156; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
 - **Covers:**
   - `CAP-58.a` [W1] Default-deny write allow-lists per role and ticket; checks derived, not enumerated — DEC-041; DEC-076 · delivered by W1-02, W1-03, W1-26
   - `CAP-58.b` [W1] Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them — Framework v4.1.2 §32 · delivered by W1-33
   - `CAP-58.c` [W1] A session with no or an unknown role has no write privilege — OWNER-DECISION-P2-0001 BC-P2-08 · delivered by W1-02
+  - `CAP-58.d` [W1] Claim split by tool: in a launched worker session the OS sandbox stops a Bash write outside the repository without parsing the command; the file tools (Read, Edit, Write) run outside the sandbox and are held by the permission rules and the guard; `Edit(...)` and `Read(...)` deny rules bind both layers — DEC-152; DEC-161; EXP-001 §5.4 · delivered by W1-46
+  - `CAP-58.e` [W1] Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed — DEC-150; DEC-156 · delivered by W1-45
+  - `CAP-58.f` [W1] The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook — DEC-153; EXP-001 §5.4 · delivered by W1-47
 - **Scenarios:** dev MR-A-01, CHAOS-A-13, CHAOS-A-14, MR-B-01, CHAOS-B-13, CHAOS-B-14, CHAOS-B-15, A-X-02 · qual MR-A-Q01, SEC-A-Q02, AUDIT-A-Q49, SEC-A-Q06, MR-B-Q02, SOAK-X-Q02
 
 ### CAP-59 — Review-repair loop budget
@@ -880,4 +902,33 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Sources:** OWNER-DECISION-0006; OWNER-DECISION-0007; DEC-039
 - **Covers:**
   - `CAP-60.a` [NONE] Non-goal: below-floor recovery, break-glass, DEGRADED mode — OWNER-DECISION-0006; OWNER-DECISION-0007; DEC-039
+- **Scenarios:** dev — · qual —
+
+### CAP-61 — Worker session launcher and OS sandbox
+
+- **Outcome:** The orchestrator can start a worker session (engineer, independent test designer, independent auditor, research or experiment) that runs inside the OS sandbox with its role's network profile, and cannot start one without it.
+- **Acceptance:** `gov launch` refuses to start a worker session unless the sandbox is enabled, strict (`allowUnsandboxedCommands: false`, network `strictAllowlist`) and fail-closed (`failIfUnavailable: true`); a launched worker's Bash command cannot write outside the repository, its network profile applies, and its `GOV_ROLE` and `GOV_TICKET` reach the guard.
+- **Wave:** W1 (the untested sandbox cases are a W2 experiment (DEC-160))
+- **Provider:** Claude Code sandbox (bubblewrap 0.9.0, socat 1.8.0.0), W1-46, W1-48
+- **Disposition:** KEPT
+- **Sources:** DEC-138; DEC-141; DEC-152; DEC-153; DEC-158; DEC-159; DEC-160; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.2–5.5)
+- **Covers:**
+  - `CAP-61.a` [W1] The launcher refuses to start a worker session unless the sandbox is on, strict and fail-closed: enabled, `failIfUnavailable: true`, `allowUnsandboxedCommands: false`, network `strictAllowlist`; the configuration is passed through `--settings`, never read from the repository, whose settings carry no sandbox block — DEC-152; DEC-153; DEC-161; EXP-001 §5.2 · delivered by W1-46
+  - `CAP-61.b` [W1] Per-role `--settings`: the sandbox block plus the role's `Edit` deny rules; the launcher sets `GOV_ROLE` and `GOV_TICKET`, and both reach the guard; a launched worker is shown to be sandboxed. The sandbox applies to launched worker sessions only; in-session subagents remain for read-only work (review, exploration, web research) — DEC-153; DEC-161; EXP-001 §5.3 · delivered by W1-46
+  - `CAP-61.c` [W1] Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox — DEC-158; DEC-161 · delivered by W1-46
+  - `CAP-61.d` [W1] The launcher sets a per-session temp directory for each worker session; if the acceptance test shows it cannot be overridden, the shared `$TMPDIR` is recorded as a residual — DEC-159 · delivered by W1-46
+  - `CAP-61.e` [W1] Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs is aligned with the VS Code extension's bundled version — DEC-153; EXP-001 §5.5 · delivered by W1-48
+  - `CAP-61.f` [W2] The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode) are tested by an experiment; until then they are residuals — DEC-160; EXP-001 §4
+- **Scenarios:** dev — · qual —
+
+### CAP-62 — Sandbox escape hatch denied
+
+- **Outcome:** A session cannot run a Bash command outside the sandbox by asking for it.
+- **Acceptance:** A Bash call carrying `dangerouslyDisableSandbox: true` is denied by the guard's PreToolUse hook, whatever the role.
+- **Wave:** W1
+- **Provider:** W1-47
+- **Disposition:** KEPT
+- **Sources:** DEC-152; DEC-153; EXP-001 (spike-sandbox/EVIDENCE.md §5.4)
+- **Covers:**
+  - `CAP-62.a` [W1] The guard denies any Bash call carrying `dangerouslyDisableSandbox: true`, as defence in depth behind strict mode — DEC-153; EXP-001 §5.4 · delivered by W1-47
 - **Scenarios:** dev — · qual —
