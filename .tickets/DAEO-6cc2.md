@@ -20,6 +20,7 @@ allowed_paths:
 - template/governance/kernel/hooks/pretooluse*
 - template/governance/kernel/hooks/posttooluse*
 - tests/unit/guard/**
+- tests/unit/install/**
 kpis:
   success:
   - With GOV_ROLE=orchestrator, an Edit, Write or Bash write to any path inside the repository other than tests/acceptance/** is allowed by the guard, whatever the active ticket's allowed_paths, and also
@@ -66,3 +67,14 @@ batch. The cases the audit found: `test_w1_02_allow_list.py` (the orchestrator d
 `test_w1_03_out_of_scope.py` (an orchestrator change outside its ticket treated as a containment finding). Under
 DEC-156 such a change is recorded, and is not a finding (DEC-171). Each revision counts as an acceptance test rewritten after implementation (DEC-106), with
 the reason "owner correction, DEC-156". The KPIs of W1-02 and W1-03 are unchanged for every other role.
+
+**Owner answers during the build (2026-10-03, DEC-175…DEC-178).**
+- Two W1-04 acceptance cases in `test_w1_04_only_escalates.py` also assert the old rule. The Independent Test
+  Designer revises them in this ticket's test design batch, as rewrites after implementation with the same reason;
+  `tests/unit/install/**` is in `allowed_paths` for the builder test (DEC-175).
+- Everything under `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator; setting or lifting a
+  freeze is the owner's action (DEC-176, amending DEC-156).
+- The record of DEC-171 is one JSON line per call in `.gov-runtime/records.jsonl`, with DEC-122's fields and
+  `action: "recorded"`; `findings.jsonl` and its action list are unchanged (DEC-177).
+- The wide scope holds only when the session's own role is orchestrator; an `orchestrator` subagent in another
+  role's session keeps the ticket-paths rule (DEC-178).
