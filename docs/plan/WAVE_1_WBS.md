@@ -2,19 +2,19 @@
 id: WAVE-1-WBS
 status: PROPOSED
 depends_on: [CHARTER-v5, CONTRACT-v4, ADR-0002]
-decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167]
+decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169]
 ---
 
 # Wave 1 (Integrate) — work breakdown
 
-Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (version 4.1) and ADR-0002. Tickets W1-45…W1-48 and the KPI lines that cite DEC-102…DEC-167 were added by the S2 specification change and its repair after the S2-A round-1 audit (`docs/changes/S2-CIT-P.md`, `docs/changes/S2-CIT-E.md`). Every item is a `ticket` in `.tickets/`; the `wbs_id` field (and `external-ref`) carries the W1 number, and the old G-numbers are kept as `sources` (`G-xx` = S0b2 GLUE_REQUIREMENTS; `S0a-G-xx` = S0a STACK_OPTIONS §3).
+Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (version 4.1) and ADR-0002. Tickets W1-45…W1-48 and the KPI lines that cite DEC-102…DEC-168 were added by the S2 specification change and its repair after the S2-A round-1 audit (`docs/changes/S2-CIT-P.md`, `docs/changes/S2-CIT-E.md`). Every item is a `ticket` in `.tickets/`; the `wbs_id` field (and `external-ref`) carries the W1 number, and the old G-numbers are kept as `sources` (`G-xx` = S0b2 GLUE_REQUIREMENTS; `S0a-G-xx` = S0a STACK_OPTIONS §3).
 
 **Rules for every ticket.**
 - **READY rule:** an implementation ticket is READY only when `tests/acceptance/<ticket-id>/` exists. The Independent Test Designer writes those tests from the ticket's KPIs and Contract v4 before implementation starts (MR-3, DEC-069).
 - **Bootstrap:** until W1-02, W1-03 and W1-04 pass their acceptance tests, MR-3 is held by the settings deny rules of W1-01 and the operator's diff check. From W1-05 on, every ticket runs under the live guard (DEC-084).
-- **Installs:** no tool is installed before W1-05. Until then the interim rule of W1-01 holds: install commands are denied in every session's settings. From W1-05, the DEC-083 rule is enforced by W1-04: `ask` for the orchestrator, also in Auto mode, and `deny` for every other role. W1-06, the first install, depends on W1-05. Worker roles never install system-wide (DEC-157). The research role may install only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`; the sandbox's write fence enforces this (DEC-163). Raising the Claude Code pin (W1-48) is an orchestrator install under DEC-083.
+- **Installs:** no tool is installed before W1-05. Until then the interim rule of W1-01 holds: install commands are denied in every session's settings. From W1-05, the DEC-083 rule is enforced by W1-04: `ask` for the orchestrator, also in Auto mode, and `deny` for every other role. W1-06, the first install, depends on W1-05. Worker roles never install system-wide (DEC-157). The research role may install only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`; the sandbox's write fence enforces this (DEC-163). Inside the repository the fence is a list of `Edit` deny rules the launcher generates at launch, because the sandbox always leaves the working directory writable (EXP-001 §3.4, §5.3). Raising the Claude Code pin (W1-48) is an orchestrator install under DEC-083.
 - **Paths:** no implementer ticket's `allowed_paths` covers `tests/acceptance/**`.
-- **Orchestrator write scope** (DEC-156, W1-45). The orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it, and containment still records its changes. Its session is not sandboxed. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule are revised by the Independent Test Designer under W1-45, as rewrites after implementation (reason: owner correction, DEC-156). W1-45 is `in_progress` and is bootstrapped as DEC-150 states: the test designer writes its tests with the ticket in its `GOV_TICKET`, an `engineer` subagent implements it and commits its own work, and the owner closes it from the operator console.
+- **Orchestrator write scope** (DEC-156, W1-45). The orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it, and containment still records its changes. Its session is not sandboxed. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25. An orchestrator change outside the active ticket's `allowed_paths` is a record, not a containment finding; a change under `tests/acceptance/**` stays a finding. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule are revised by the Independent Test Designer in W1-45's test design batch, as rewrites after implementation (reason: owner correction, DEC-156). W1-45 is `in_progress` and is bootstrapped as DEC-150 states: the test designer writes its tests with the ticket in its `GOV_TICKET`, an `engineer` subagent implements it and commits its own work, and the owner closes it from the operator console.
 - **Worker sessions** (DEC-161, W1-46). Once W1-46 is closed, engineer, test designer, auditor and research or experiment work runs as worker sessions started by `gov launch`, inside the OS sandbox with the role's network profile (DEC-158). In-session subagents remain for read-only work (review, exploration, web research). The launcher sets no `excludedCommands` (DEC-164).
 - **Research role** (DEC-163, W1-46). The Wave 1 roster has a minimal research role, a role file delivered with the launcher. Its network profile is the research allowlist of DEC-158. The full research lifecycle (CAP-32) stays in Wave 3.
 - **Impact questions** (DEC-167). "What's the impact of X?" in plain language triggers the impact assessment: in Wave 1, an OpenSpec proposal plus `gov closure` (W1-35); from Wave 2, `gov impact`.
@@ -39,7 +39,7 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 | **W1-05** | `DAEO-m7u4` | Dogfood switch-over | config | orchestrator | LITE | W1-02, W1-03, W1-04 | 20 | DEC-084, MR-3, CAP-22, DEC-119 |
 | W1-06 | `DAEO-ipqy` | Wave 1 tool prerequisites | ops | orchestrator | STANDARD | W1-05 | 60 | DEC-083, DEC-086, DEC-074, CAP-25, CAP-40 |
 | **W1-07** | `DAEO-drvn` | gov CLI skeleton | implementation | engineer | STANDARD | W1-05 | 220 | S0a-G-01, API-0002, DEC-046, CAP-27, CAP-28 |
-| W1-08 | `DAEO-uudf` | Record schemas and templates | schema | product-spec | STANDARD | W1-05 | 200 | DEC-012, G-04, CAP-06, CAP-08, CAP-14, CAP-41, CAP-03, CAP-07, CAP-29, CAP-31, CAP-50, CAP-53, CAP-54 |
+| W1-08 | `DAEO-uudf` | Record schemas and templates | schema | product-spec | STANDARD | W1-05 | 200 | DEC-012, G-04, CAP-06, CAP-08, CAP-14, CAP-41, CAP-03, CAP-07, CAP-29, CAP-31, CAP-50, CAP-53, CAP-54, DEC-168 |
 | W1-09 | `DAEO-topz` | Ticket vendoring, claims and READY rule | implementation | engineer | FULL | W1-07, W1-08, W1-10 | 100 | G-03, DEC-074, DEC-069, CAP-23, CAP-31, CAP-53, MR-2, MR-3, CAP-34 |
 | **W1-10** | `DAEO-4yyl` | Store and record graph | implementation | engineer | STANDARD | W1-07, W1-08 | 260 | S0a-G-03, G-20, DEC-012, CAP-01, CAP-08, CAP-09, CAP-13, CAP-29, CAP-50 |
 | W1-11 | `DAEO-be7u` | Decision checker and owner-approval facts | implementation | engineer | FULL | W1-08, W1-10, W1-34 | 310 | G-04, DEC-074 D2, DEC-046, CAP-21, CAP-51, CAP-01, CAP-34 |
@@ -61,10 +61,10 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 | W1-27 | `DAEO-xw3k` | gov doctor and gov rebuild | implementation | engineer | STANDARD | W1-04, W1-16, W1-17, W1-22 | 230 | S0a-G-04, DEC-083, CAP-02, CAP-06, CAP-07, CAP-20, CAP-25, CAP-46, CAP-48, CAP-54, CAP-38, MR-4 |
 | W1-28 | `DAEO-9279` | gov pause | implementation | engineer | STANDARD | W1-02, W1-07, W1-09 | 80 | S0a-G-10, CAP-05 |
 | W1-29 | `DAEO-zsvl` | Session hooks | implementation | engineer | STANDARD | W1-09, W1-24, W1-25 | 180 | DEC-025, S0a-G-09, CAP-15, CAP-37 |
-| W1-30 | `DAEO-2lwj` | gov close | implementation | engineer | FULL | W1-03, W1-09, W1-24, W1-25, W1-26 | 200 | S0a-G-12, DEC-044, DEC-096, DEC-069, CAP-13, CAP-24, CAP-31, CAP-38, CAP-59, CAP-50, MR-3, DEC-137 |
-| W1-31 | `DAEO-6mk8` | Governance share counter | implementation | engineer | STANDARD | W1-06, W1-29, W1-30 | 120 | DEC-086, DEC-004, CAP-04, CAP-40, CAP-53, DEC-106 |
+| W1-30 | `DAEO-2lwj` | gov close | implementation | engineer | FULL | W1-03, W1-09, W1-24, W1-25, W1-26 | 220 | S0a-G-12, DEC-044, DEC-096, DEC-069, CAP-13, CAP-24, CAP-31, CAP-38, CAP-59, CAP-50, MR-3, DEC-137 |
+| W1-31 | `DAEO-6mk8` | Governance share counter | implementation | engineer | STANDARD | W1-06, W1-29, W1-30 | 150 | DEC-086, DEC-004, CAP-04, CAP-40, CAP-53, DEC-106, DEC-138 |
 | W1-32 | `DAEO-8goq` | gov status | implementation | engineer | STANDARD | W1-13, W1-28, W1-31 | 80 | S0a-G-01, CAP-28, CAP-27 |
-| W1-33 | `DAEO-xog0` | Wave 1 role definitions | role-definition | product-spec | STANDARD | W1-05 | 300 | DEC-066, DEC-083, MR-5, CAP-47, CAP-22, CAP-58, MR-3, MR-4, DEC-119, DEC-154, DEC-156, DEC-163 |
+| W1-33 | `DAEO-xog0` | Wave 1 role definitions | role-definition | product-spec | STANDARD | W1-05 | 300 | DEC-066, DEC-083, MR-5, CAP-47, CAP-22, CAP-58, MR-3, MR-4, DEC-119, DEC-154, DEC-156, DEC-163, DEC-158 |
 | W1-34 | `DAEO-egm9` | Decision-package template | template | product-spec | LITE | W1-08 | 60 | DEC-065, DEC-093, MR-6, CAP-34 |
 | W1-35 | `DAEO-0i6h` | Skills: discovery, planning, independent test design, change | skill | product-spec | STANDARD | W1-12, W1-13, W1-14, W1-21, W1-26, W1-33, W1-34 | 480 | DEC-066, DEC-088, DEC-089, DEC-093, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-24, CAP-30, CAP-33, CAP-34, CAP-38, CAP-47, DEC-102, DEC-103, DEC-105, DEC-136, CAP-32, DEC-167 |
 | **W1-36** | `DAEO-skiy` | Skills: retrieval, audit, checkpoint/resume, adopt | skill | product-spec | STANDARD | W1-21, W1-24, W1-25, W1-26, W1-33 | 480 | DEC-080, DEC-032, DEC-070, DEC-088, CAP-16, CAP-24, CAP-56, MR-4, CAP-38, CAP-47 |
@@ -75,11 +75,11 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 | **W1-41** | `DAEO-cdoi` | gov adopt --lite and legacy importer | implementation | engineer | FULL | W1-27, W1-33, W1-38, W1-39 | 440 | S0a-G-13, G-10, DEC-006, DEC-090, CAP-06, CAP-42, CAP-44, CAP-54 |
 | **W1-42** | `DAEO-gjjf` | Wave 1 exit run on the dev tiers | integration | orchestrator | FULL | W1-23, W1-32, W1-35, W1-36, W1-40, W1-41, W1-44, W1-46, W1-47 | 0 | DEC-080, DEC-086, DEC-088, DEC-089, DEC-091, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-28, CAP-38, DEC-106, DEC-161, CAP-40 |
 | **W1-43** | `DAEO-03pw` | Wave 1 exit audit | audit | independent-auditor | FULL | W1-42 | 0 | DEC-070, DEC-088, DEC-092, DEC-096, MR-4, CAP-47, CAP-59 |
-| W1-44 | `DAEO-wqd6` | Phase-2 lessons as lesson records | documentation | product-spec | LITE | W1-08, W1-21 | 150 | DEC-046, OWNER-DECISION-P2-0008, OWNER-DIRECTION-BR-0004, OWNER-AMENDMENT-P2-0010, CAP-14, CAP-41, CAP-59 |
+| W1-44 | `DAEO-wqd6` | Phase-2 lessons as lesson records | documentation | product-spec | LITE | W1-08, W1-21 | 150 | DEC-046, OWNER-DECISION-P2-0008, OWNER-DIRECTION-BR-0004, OWNER-AMENDMENT-P2-0010, CAP-14, CAP-41, CAP-59, DEC-168 |
 | W1-45 | `DAEO-6cc2` | Orchestrator write scope | implementation | engineer | FULL | W1-05 | 40 | DEC-150, DEC-156, DEC-112, DEC-106, MR-3, CAP-58 |
 | W1-46 | `DAEO-jdqr` | Worker session launcher (gov launch) | implementation | engineer | FULL | W1-07, W1-47, W1-48 | 220 | DEC-152, DEC-153, DEC-158, DEC-159, DEC-161, DEC-163, DEC-164, EXP-001, CAP-49, CAP-58, CAP-61, CAP-22, CAP-25 |
 | W1-47 | `DAEO-o4fg` | Guard hardening: escape hatch, failed commands, oracle path | implementation | engineer | FULL | W1-45 | 60 | DEC-152, DEC-153, DEC-162, EXP-001, CAP-49, CAP-58, CAP-62 |
-| W1-48 | `DAEO-0qs5` | Claude Code version pin | ops | orchestrator | LITE | W1-06 | 10 | DEC-153, DEC-157, DEC-083, CAP-25, CAP-61 |
+| W1-48 | `DAEO-0qs5` | Claude Code version pin | ops | orchestrator | LITE | W1-06 | 10 | DEC-153, DEC-141, DEC-157, DEC-083, CAP-25, CAP-61 |
 
 Bold rows are on the critical path. KPIs (success and failure criteria), `allowed_paths` and the acceptance-test path are in each ticket file.
 
@@ -120,7 +120,7 @@ Why this path:
 
 | Class | est. LOC |
 |---|---|
-| implementation | 5410 |
+| implementation | 5460 |
 | skill | 960 |
 | schema | 310 |
 | role-definition | 300 |
@@ -130,9 +130,9 @@ Why this path:
 | template | 60 |
 | integration | 0 |
 | audit | 0 |
-| **Total** | **7460** |
+| **Total** | **7510** |
 
-- **Glue code** (class implementation, Python): **≈ 5,410 LOC**.
+- **Glue code** (class implementation, Python): **≈ 5,460 LOC**.
 - **Everything else** (markdown skills and roles, schemas, templates, YAML): ≈ 2,050 lines.
 - **The one figure:** ADR-0002 quotes this total.
 - **Why the code estimate is higher than earlier ones.** Architecture v0.3 put Wave 1 at ≈ 2,400 LOC, and S0b2's W1 glue list at ≈ 1,830 LOC. Wave 1 is now larger because:
@@ -142,7 +142,8 @@ Why this path:
   - DEC-083 and DEC-086 added the install rule and the share counter;
   - the S1-A round-1 repairs added gap-ticket checks (DEC-089), parent-child retrieval (DEC-091), the A5 review and rollback in adoption (DEC-090), and the CANCEL_AGENTS, rollback and watchdog items from the covers lists (DEC-092);
   - the S1-A round-2 repair gave every Wave 1 `covers` item a ticket KPI (F-21), which added about 380 LOC across 13 tickets;
-  - the S2 specification change added the orchestrator write scope (W1-45, 40), the worker session launcher with the minimal research role (W1-46, 220) and the guard hardening (W1-47, 60): +320 LOC (DEC-152, DEC-153, DEC-156, DEC-162, DEC-163).
+  - the S2 specification change added the orchestrator write scope (W1-45, 40), the worker session launcher with the minimal research role (W1-46, 220) and the guard hardening (W1-47, 60): +320 LOC (DEC-152, DEC-153, DEC-156, DEC-162, DEC-163);
+  - the KPIs the S2 change added to existing tickets were re-estimated (S2A-F-09): W1-30 200 → 220 (the post-green probe record check) and W1-31 120 → 150 (the learning metrics and the sandbox token line), +50 LOC. The KPIs added to W1-33 (role definitions) and W1-35 (skills) fit their existing estimates: both are markdown, and W1-35's skill bodies are capped at 2.5k tokens each. W1-08's two lesson fields and W1-48's two registry entries also fit.
 - DEC-064 makes the size check a per-wave review, not a stop.
 - **Calibration:** the S0b2 prototypes (guard 174 LOC, decision checker 249 LOC, R1 retrieval 549 LOC) and the carried `cli/govbridge` FTS5 and chunking code.
 
@@ -184,7 +185,7 @@ Every source item is carried by a W1 ticket:
 | S0b2 GLUE, W2 (stay W2) | G-13 framing-tolerant MCP client · G-16 id mapping · G-23 incremental re-index hook · G-24 deletable-class join |
 | DEC-080 (retrieval completeness) | paging/continuation, facets, dedup, authority filter, one rerank, evidence bundle → W1-21 · `gov closure` → W1-20 · validator, canaries → W1-22 · hierarchical synthesis → W1-23 · parallel facet subagents → W1-36 |
 | Architecture components | `gov` skeleton + API-0002 → W1-07 · status → W1-32 · check → W1-26 · readiness → W1-13 · doctor, rebuild → W1-27 · context → W1-24 · closure → W1-20 · checkpoint → W1-25 · close → W1-30 · adopt --lite → W1-41 · pause → W1-28 · hooks: PreToolUse → W1-02, SessionStart/PreCompact/Stop/SubagentStop → W1-29 · lefthook + CI → W1-40 · Copier + lock + manifest → W1-39 · roles → W1-33 · 8 skills → W1-35, W1-36 · decision package → W1-34 · codebase-memory wrapper → W1-16 · Superpowers → W1-37 · ticket vendoring + claims → W1-09 · Ollama on demand → W1-18 |
-| Register decisions | DEC-074 Q9 deny rules → W1-01 · DEC-083 install rule → W1-04 (interim rule W1-01), registry → W1-06 · DEC-084 bootstrap → W1-01, W1-05 · DEC-086 ccusage → W1-06, counter → W1-31 · DEC-087 CI evidence record → W1-40 · DEC-070 exit audit → W1-43 · DEC-088 audit triggers → W1-13, W1-35, W1-36, W1-43 · DEC-089 gap tickets → W1-13, W1-26, W1-35 · DEC-090 A0–A6, A8 → W1-41 · DEC-091 parent-child → W1-17, W1-21 · DEC-093 package cap → W1-34, W1-35 · DEC-046 lessons → W1-44 · DEC-102 experiments, DEC-103 order of specification work, DEC-105 three-option CIT-P, DEC-136 probe findings → W1-35 · DEC-104 UX and visual testing → Wave 2 · DEC-106 learning metrics → W1-31, W1-42 · DEC-137 post-green probe → W1-30 · DEC-119, DEC-154 role definitions → W1-05, then W1-33 · DEC-150, DEC-156 orchestrator write scope → W1-45 · DEC-152, DEC-153, DEC-158, DEC-159, DEC-161 launcher and sandbox → W1-46 · DEC-153 escape hatch and failed commands, DEC-162 oracle hiding → W1-47 · DEC-153 Claude Code pin → W1-48 · DEC-160 untested sandbox cases → Wave 2 · DEC-163 minimal research role → W1-46 · DEC-164 no `excludedCommands` → W1-46; subagents in a sandboxed worker and `excludedCommands` → EXP-002, Wave 2 · DEC-165 lite upstream lesson loop → Wave 3 · DEC-166 `gov discover` → Wave 2 · DEC-167 plain-language impact question → W1-35, then `gov impact` in Wave 2 |
+| Register decisions | DEC-074 Q9 deny rules → W1-01 · DEC-083 install rule → W1-04 (interim rule W1-01), registry → W1-06 · DEC-084 bootstrap → W1-01, W1-05 · DEC-086 ccusage → W1-06, counter → W1-31 · DEC-087 CI evidence record → W1-40 · DEC-070 exit audit → W1-43 · DEC-088 audit triggers → W1-13, W1-35, W1-36, W1-43 · DEC-089 gap tickets → W1-13, W1-26, W1-35 · DEC-090 A0–A6, A8 → W1-41 · DEC-091 parent-child → W1-17, W1-21 · DEC-093 package cap → W1-34, W1-35 · DEC-046 lessons → W1-44 · DEC-102 experiments, DEC-103 order of specification work, DEC-105 three-option CIT-P, DEC-136 probe findings → W1-35 · DEC-104 UX and visual testing → Wave 2 · DEC-106 learning metrics → W1-31, W1-42 · DEC-137 post-green probe → W1-30 · DEC-119, DEC-154 role definitions → W1-05, then W1-33 · DEC-150, DEC-156 orchestrator write scope → W1-45 · DEC-152, DEC-153, DEC-158, DEC-159, DEC-161 launcher and sandbox → W1-46 · DEC-153 escape hatch and failed commands, DEC-162 oracle hiding → W1-47 · DEC-153 Claude Code pin → W1-48 · DEC-160 untested sandbox cases → Wave 2 · DEC-163 minimal research role → W1-46 · DEC-164 no `excludedCommands` → W1-46; subagents in a sandboxed worker and `excludedCommands` → EXP-002, Wave 2 · DEC-165 lite upstream lesson loop → Wave 3 · DEC-166 `gov discover` → Wave 2 · DEC-167 plain-language impact question → W1-35, then `gov impact` in Wave 2 · DEC-168 lesson scope and severity in the schema → W1-08 (records: W1-44) · DEC-141 sandbox prerequisites in the registry → W1-48 · DEC-169 validator → `docs/plan/tools/validate_s1.py` |
 | EXP-001 (`spike-sandbox/EVIDENCE.md` §5.5) | 1 launcher → W1-46 · 2 guard → W1-47 · 3 network allowlist and installs → DEC-157, DEC-158 (W1-46) · 4 `$TMPDIR` → DEC-159 (W1-46) · 5 untested cases → Wave 2 (DEC-160) · 6 pin → W1-48 |
 | S0a STACK_OPTIONS §3 | S0a-G-01 → W1-07, W1-32 · S0a-G-02 → W1-26 · S0a-G-03 → W1-10, W1-20 · S0a-G-04 → W1-27 · S0a-G-05 → W1-17, W1-19 · S0a-G-06 → W1-21 · S0a-G-07 → W1-24 · S0a-G-08 → Wave 2 (`gov impact`) · S0a-G-09 → W1-25, W1-29 · S0a-G-10 → W1-02, W1-28 · S0a-G-11 → W1-40 · S0a-G-12 → W1-30 · S0a-G-13 → W1-41 · S0a-G-14 → Wave 3 (`gov research sync`) · S0a-G-15 → W1-39 |
 
@@ -207,7 +208,7 @@ Every source item is carried by a W1 ticket:
 
 - **Research lifecycle:** Docling and MarkItDown, `gov research sync`, research records; RAGFlow only on its trigger (CAP-32). The minimal research role of Wave 1 (DEC-163) grows into the full role here.
 - **Upstream lesson loop, lite** (DEC-165; reverses DEC-053 Q7 for framework lessons only):
-  - every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical);
+  - every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical). Both fields are already in the Wave 1 lesson schema (W1-08, DEC-168), so no migration is needed;
   - a framework lesson becomes a lesson packet (failure pattern, evidence, suggested change; no product code, data or secrets; gitleaks-scanned), written by the product's orchestrator to the shared inbox `~/gov-os-lessons-inbox/`, the one path outside its repository it may write (a guard exception, CAP-58);
   - a high or critical lesson is raised to the owner immediately, as a decision package;
   - the Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle, and each release's notes list the lessons fixed, with their severity;

@@ -54,7 +54,7 @@ sources:
 - CAP-50
 - MR-3
 - DEC-137
-est_loc: 200
+est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W1-30/
   author: independent-test-designer (MR-3, DEC-069); to be written before implementation

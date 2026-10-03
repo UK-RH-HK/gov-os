@@ -26,7 +26,7 @@ kpis:
   - gov retrieve returns each lesson for a ticket in its scope
   - The anti-snowball lesson states the one-disposition rule that gov close applies [CAP-59.c]
   failure:
-  - A lesson lacks a scope or a source reference
+  - A lesson lacks a scope, a severity or a source reference (DEC-168)
   - A lesson restates policy as authority (lessons cannot become policy, Contract v3 W2) [CAP-41.b]
 profile: LITE
 sources:
@@ -37,6 +37,7 @@ sources:
 - CAP-14
 - CAP-41
 - CAP-59
+- DEC-168
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W1-44/

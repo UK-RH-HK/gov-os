@@ -22,12 +22,15 @@ kpis:
   - Claude Code is recorded in governance/project/tool-registry.yaml pinned at 2.1.285 or later, with install and uninstall commands, date and approving decision; the upgrade is installed by the orchestrator
     through a DEC-083 decision package (DEC-157) [CAP-25.d]
   - The CLI used for headless runs and the VS Code extension's bundled version are the same version, at or above the pin, and the registry record states both [CAP-61.e]
+  - The sandbox prerequisites bubblewrap 0.9.0 and socat 1.8.0.0 are recorded in governance/project/tool-registry.yaml as owner installs, with version, install and uninstall commands, date and approving decision (DEC-141)
   failure:
   - A headless run uses a CLI below 2.1.285
+  - bubblewrap or socat is missing from the registry while gov launch depends on it
   - The pin is raised without a recorded owner approval
 profile: LITE
 sources:
 - DEC-153
+- DEC-141
 - DEC-157
 - DEC-083
 - CAP-25

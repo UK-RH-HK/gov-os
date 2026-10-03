@@ -31,6 +31,7 @@ kpis:
     [CAP-06.e, CAP-54.b]
   - The shared frontmatter records state_class for every record type [CAP-07.b]
   - Lesson records carry a scope of PROJECT, PRODUCT or FRAMEWORK [CAP-41.c]
+  - 'The lesson schema requires both a scope (project, product or framework) and a severity (low, medium, high or critical), so the Wave 3 lesson loop needs no migration (DEC-168) [CAP-41.f]'
   failure:
   - A schema accepts a ticket without kpis, role or allowed_paths
   - Two schemas define the same id grammar differently
@@ -49,6 +50,7 @@ sources:
 - CAP-50
 - CAP-53
 - CAP-54
+- DEC-168
 est_loc: 200
 acceptance_tests:
   path: tests/acceptance/W1-08/
