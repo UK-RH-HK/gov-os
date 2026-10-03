@@ -10,6 +10,7 @@ author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162]
+repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS); DEC-163…DEC-167; see S2-CIT-E §6
 ---
 
 # S2 — Change-impact proposal (CIT-P) on the Gov OS specification
@@ -45,7 +46,7 @@ answer changed the impact first listed, the row now states the answered impact.
 
 | Option | What it means here | Cost |
 |---|---|---|
-| **Apply now** (chosen by the owner in the S2 brief) | Contract v4 becomes v4.1; four new Wave 1 tickets; 39 open tickets keep their KPIs except the five named in §3.4 | This change, one audit (S2-A), about 280 LOC of new Wave 1 glue. No closed ticket's code is invalidated |
+| **Apply now** (chosen by the owner in the S2 brief) | Contract v4 becomes v4.1; four new Wave 1 tickets; 39 open tickets keep their KPIs except the five named in §3.4 | This change, one audit (S2-A), about 280 LOC of new Wave 1 glue (320 after the repair, §6). W1-45 changes the guard code of W1-02 and W1-03, and the acceptance tests of those two closed tickets that assert the old orchestrator rule are revised by the Independent Test Designer (§3.7) |
 | Defer | Record EXP-001 and continue Wave 1 on the guard alone | No work now. The opaque-write and install residuals stay open; DEC-102…DEC-106, DEC-136 and DEC-137 stay outside the Contract while acceptance tests are written against it |
 | Re-baseline | Reopen the enforcement part of the specification and re-plan W1-02…W1-05 around the sandbox | Retires working, tested guard code that EXP-001 shows is still needed for the file tools. Not justified by the evidence |
 
@@ -163,7 +164,8 @@ repository root.
 |---|---|
 | Code | None in this change. W1-45, W1-46 and W1-47 will change `src/gov/guard/**`, the hook entries, the committed `.claude/settings.json` (the oracle `Read` deny rule, W1-47) and add `src/gov/launch/**` |
 | `tests/acceptance/W1-01` | Skips after the switch-over, by design (B2). No change |
-| `tests/acceptance/W1-02…W1-05` | No KPI of a closed ticket changes, so no existing acceptance test is invalidated |
+| `tests/acceptance/W1-02`, `W1-03` | **Affected** (corrected after S2-A round 1, F-01). DEC-156 replaces the orchestrator rule these tests assert (the orchestrator held to its active ticket's `allowed_paths`). Those tests are revised by the Independent Test Designer under W1-45, as rewrites after implementation (reason: owner correction, DEC-156; counted under DEC-106). The KPI text of W1-02 and W1-03 is unchanged, and holds as written for every other role |
+| `tests/acceptance/W1-04`, `W1-05` | Not affected by DEC-156. W1-04's tests still pass after W1-46 adds the research role's install exception (DEC-163); W1-46 carries that as a KPI |
 | New acceptance tests | `tests/acceptance/W1-45/` … `W1-48/`, written by the Independent Test Designer before each implementation |
 
 ## 4. Findings made while listing the impact
@@ -191,3 +193,18 @@ Asked in chat as decision packages P-1…P-5 (MR-6, DEC-093). All are answered; 
 | P-4 | The untested sandbox cases | A Wave 2 experiment | As recommended | DEC-160 |
 | P-5 | How the interactive orchestrator session gets the sandbox configuration | Start it through the launcher from a terminal | The sandbox applies to launched worker sessions only | DEC-161 |
 | — | Where the oracle's `Read` deny rule lives for the unsandboxed orchestrator | (none given) | The committed `.claude/settings.json` plus a guard rule on the oracle path, both from W1-47; an opaque Bash read in the orchestrator's session is an accepted residual | DEC-162 |
+
+## 6. Repair after the S2-A round-1 audit
+
+S2-A's round-1 verdict was ACCEPT_WITH_FINDINGS. The owner answered its two decision packages and added three
+decisions in the same message. The impact of each is listed here; the execution is in `S2-CIT-E.md` §6.
+
+| Decision | Subject | Impact |
+|---|---|---|
+| DEC-163 (DP-1) | A minimal research role in the Wave 1 roster | Charter v5 §6 roster row; Contract envelope "Tool installs", CAP-22 (`CAP-22.d`), CAP-25 (acceptance, `CAP-25.e`), CAP-32 wave note; W1-46 (role file, guard change, +40 LOC, now depends also on W1-47); W1-33 and W1-04 (a KPI and a note); ADR-0002 §1 and §6; WBS; `bootstrap.md` |
+| DEC-164 (DP-2) | Subagents in a sandboxed worker and `excludedCommands` are open residuals, in EXP-002; the launcher sets no `excludedCommands` | `CAP-61.a`, `CAP-61.f`; W1-46 KPIs; ADR-0002 §6; WBS §6; `bootstrap.md` |
+| DEC-165 | The lite upstream lesson loop (Wave 3) | Charter v5 §7 non-goal row; CAP-41 (wave note, `CAP-41.e` reworded, `CAP-41.f`…`CAP-41.j`), `CAP-45.b`, `CAP-58.g`; ADR-0002 §6; WBS §7. No Wave 1 ticket changes |
+| DEC-166 | `gov discover` (Wave 2) | `CAP-32.d`; ADR-0002 §1 L4 and §6; WBS §6. No Wave 1 ticket changes |
+| DEC-167 | A plain-language impact question triggers the impact assessment | `CAP-33.f` (W1, W1-35), `CAP-33.g` (W2); one KPI on W1-35; WBS rules and §6 |
+
+The three options of DEC-105 were not re-asked: the owner gave these as decisions to apply in this change.
