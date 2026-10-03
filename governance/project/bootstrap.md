@@ -113,7 +113,11 @@ experiment):
   are the only wall.
 - Anything a hook or an MCP server does. Both run outside the sandbox.
 - The untested sandbox cases: `denyWrite` on a path that doesn't exist yet, symlink and hard-link tricks, the seccomp
-  filter, and `bypassPermissions` mode. They go to a Wave 2 experiment (DEC-160).
+  filter, and `bypassPermissions` mode. They go to a Wave 2 experiment, EXP-002 (DEC-160).
+- Subagents inside a sandboxed worker session. Whether a subagent started inside a launched worker runs inside the
+  same sandbox is not tested. It goes to EXP-002 (DEC-164).
+- `excludedCommands`. A command listed there runs outside the sandbox. The launcher sets none (DEC-164); what the
+  setting does when present is not tested, and goes to EXP-002.
 
 **The shared `$TMPDIR`.** The launcher sets a per-session temp directory for each worker session (DEC-159). If
 W1-46's acceptance test shows the temp directory can't be overridden, the shared `$TMPDIR` is recorded here as a
@@ -122,13 +126,19 @@ residual. The orchestrator's own session keeps the shared temp directory.
 **Unchanged:** the guard's quoting limit (DEC-128), the residuals of the containment check (DEC-134, DEC-144) and the
 DEC-135 edge cases. They concern writes inside the repository.
 
+**The research role's installs (DEC-163).** From W1-46, the Wave 1 roster has a minimal research role. It may install
+only into a venv or local prefix inside its own experiment folder, within its ticket's `allowed_paths`. A system-wide
+install is denied to it, and the sandbox's write fence is what enforces that. Its network profile is the research
+allowlist of DEC-158. Every other worker role's install commands stay denied.
+
 **Hiding is silent.** A hidden directory looks empty from a worker's Bash; no error is raised.
 
 **Confirmed by the owner (DEC-151):** moving the install settings rules from `deny` to `ask` at the switch-over was
 correct, and keeps the second line of DEC-120; W1-01's interim acceptance tests skip after the switch-over by design.
 
 **Orchestrator write scope and checkpoint (DEC-150, DEC-156).** From W1-45, the orchestrator may write anywhere in the
-repository except `tests/acceptance/**`. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25's
+repository except `tests/acceptance/**`. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule
+are revised by the Independent Test Designer under W1-45 (reason: owner correction, DEC-156). Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25's
 `gov checkpoint` replaces it.
 
 ## Denied attempts
