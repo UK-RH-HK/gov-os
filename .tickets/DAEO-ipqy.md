@@ -1,6 +1,6 @@
 ---
 id: DAEO-ipqy
-status: in_progress
+status: closed
 deps: [DAEO-m7u4]
 links: []
 created: 2026-09-30T22:49:58Z
