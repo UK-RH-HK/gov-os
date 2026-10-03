@@ -4,7 +4,7 @@ status: PROPOSED
 version: "4.1"
 revised: 2026-10-03
 depends_on: [CHARTER-v5, ADR-0001, ADR-0002]
-decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167]
+decisions: [DEC-064, DEC-065, DEC-074, DEC-075, DEC-078, DEC-080, DEC-083, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169]
 ---
 
 # Governance OS — Capability Acceptance Contract v4 (version 4.1)
@@ -16,7 +16,7 @@ Contract v4 states what the Gov OS must do, as outcomes with **one observable ac
 | Version | Date | Change |
 |---|---|---|
 | 4.0 | 2026-09-30 | Contract v4 as closed by S1 and audited by S1-A (DEC-083…DEC-096). |
-| 4.1 | 2026-10-03 | S2 specification change (docs/changes/S2-CIT-P.md, S2-CIT-E.md). Carries DEC-102…DEC-106, DEC-136, DEC-137 and the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended. MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session's Bash) and the guard (file tools, the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied). New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. |
+| 4.1 | 2026-10-03 | S2 specification change (docs/changes/S2-CIT-P.md, S2-CIT-E.md). Carries DEC-102…DEC-106, DEC-136, DEC-137 and the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended. MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session's Bash) and the guard (file tools, the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied). New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04. |
 
 **Precedence:** Charter v5 → Contract v4 → ADRs → everything else. The ADRs supersede the originals where they conflict.
 
@@ -360,7 +360,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-22.a` [W1] Representative roles as subagent definitions: minimal definitions first from W1-05 at the switch-over, replaced by W1-33's generated definitions — Contract v3 E2; Framework v4.1.2 §24; DEC-119; DEC-154 · delivered by W1-05, W1-33
   - `CAP-22.b` [W2] Typed handoff records readable by a fresh agent — Contract v3 E3; Framework v4.1.2 §25
   - `CAP-22.c` [W2] Distinct test execution and integration roles — MR-5; DEC-094
-  - `CAP-22.d` [W1] A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: the guard knows the role, its writes are held to its ticket's `allowed_paths` (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32) stays W3 — DEC-163; DEC-158 · delivered by W1-46
+  - `CAP-22.d` [W1] A minimal research role in the Wave 1 roster, as a role file delivered with the launcher: a research or experiment session runs as `GOV_ROLE=research`, the guard knows the role, its writes are held to its ticket's `allowed_paths` (its experiment folder), and its network profile is the research allowlist of DEC-158; the full research lifecycle (CAP-32) stays W3 — DEC-163; DEC-158 · delivered by W1-46
 - **Scenarios:** dev CHAOS-X-02 · qual CHAOS-X-Q02
 
 ### CAP-23 — Concurrency and task claims
@@ -403,7 +403,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
   - `CAP-25.b` [W1] Orchestrator-only install on owner approval in chat; ask also in Auto mode; denied for other roles; sudo with the owner — Contract v3 F3 (LITE); Framework v4.1.2 §30; DEC-083 · delivered by W1-04
   - `CAP-25.c` [NONE] Non-goal: automated install classification, argv analysis, authority envelopes — DEC-083; OWNER-DECISION-P2-0003
   - `CAP-25.d` [W1] Claude Code is a tool registry entry pinned at 2.1.285 or later; raising the pin is an orchestrator install under DEC-083; worker roles never install system-wide — DEC-153; DEC-157 · delivered by W1-48
-  - `CAP-25.e` [W1] The research role may install only inside its own experiment folder (a venv or local prefix within its ticket's `allowed_paths`); a system-wide install is denied to it; the sandbox's write fence enforces this. It is the one exception to the denial in CAP-25.b — DEC-163; DEC-157 · delivered by W1-46
+  - `CAP-25.e` [W1] The research role may install only inside its own experiment folder (a venv or local prefix within its ticket's `allowed_paths`); a system-wide install is denied to it; the sandbox's write fence enforces this: the sandbox stops a write outside the repository, and the generated `Edit` deny rules of `CAP-61.c` stop one elsewhere inside it. It is the one exception to the denial in CAP-25.b — DEC-163; DEC-157 · delivered by W1-46
 - **Scenarios:** dev CHAOS-A-05, CHAOS-B-04, CHAOS-B-05, CHAOS-B-14, B-10, AUDIT-B-03 · qual CHAOS-X-Q05
 
 ### CAP-26 — Plugin trust boundary (hash-binding, descriptor security)
@@ -632,17 +632,17 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 
 - **Outcome:** An agent receives the lessons that apply to its task, scoped, and lessons stay in the repository.
 - **Acceptance:** A committed lesson whose scope matches a ticket is returned by `gov retrieve` for that ticket and not for an out-of-scope ticket.
-- **Wave:** W1 (upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165))
+- **Wave:** W1 (upstream export excluded (DEC-053 Q7), except the lite lesson loop for framework lessons, which is W3 (DEC-165); scope and severity are in the W1 lesson schema (DEC-168))
 - **Provider:** W1-08, W1-21, W1-44, W3: lesson packets, shared inbox and triage (lite)
 - **Disposition:** KEPT
-- **Sources:** Contract v3 Gate Q1, Q2, Q3, Q4; Framework v4.1.2 §67, §68, §75E-75G; Distribution Protocol v1.2 §13-15; DEC-053; DEC-165
+- **Sources:** Contract v3 Gate Q1, Q2, Q3, Q4; Framework v4.1.2 §67, §68, §75E-75G; Distribution Protocol v1.2 §13-15; DEC-053; DEC-165; DEC-168
 - **Covers:**
   - `CAP-41.a` [W1] Lesson lifecycle: report → candidate → corroboration → scope → rule/skill/retrieval/tool proposal → independent validation → owner approval → versioned — Contract v3 Q1; Framework v4.1.2 §67 · delivered by W1-08
   - `CAP-41.b` [W1] Decision vs lesson distinction; lessons cannot silently become policy — Contract v3 Q2, W2; Framework v4.1.2 §68 · delivered by W1-44
   - `CAP-41.c` [W1] PROJECT/PRODUCT/FRAMEWORK scope — Contract v3 Q3 · delivered by W1-08
   - `CAP-41.d` [W1] Phase-2 lessons carried (L-0074, anti-stall, no manufactured history, anti-snowball) — DEC-046; OWNER-DECISION-P2-0008 §9; OWNER-DIRECTION-BR-0004 §2D; OWNER-AMENDMENT-P2-0010 §7 · delivered by W1-44
   - `CAP-41.e` [NONE] Non-goal: the full upstream export gate and FCP loop of Contract v3 Q4; only the lite loop for framework lessons is built (CAP-41.f to CAP-41.j) — Contract v3 Q4; Framework v4.1.2 §75E–75G; DEC-053 Q7; DEC-165
-  - `CAP-41.f` [W3] Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical) — DEC-165
+  - `CAP-41.f` [W1] Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or critical); both fields are in the Wave 1 lesson schema, so the Wave 3 loop needs no migration — DEC-165; DEC-168 · delivered by W1-08
   - `CAP-41.g` [W3] A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change, with no product code, data or secrets, scanned by gitleaks; the product's orchestrator writes it to the shared inbox `~/gov-os-lessons-inbox/` — DEC-165
   - `CAP-41.h` [W3] A high or critical lesson is raised to the owner immediately, as a decision package — DEC-165
   - `CAP-41.i` [W3] The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle; each release's notes list the lessons fixed, with their severity — DEC-165
@@ -762,7 +762,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Covers:**
   - `CAP-49.a` [W3] Fault manifest; hidden path-map and memory oracles; quantitative scoring; forbidden outcomes fail — Contract v3 V1–V4; DEC-067
   - `CAP-49.b` [W1] In a launched worker session the oracle is hidden from Bash by the sandbox, through the `Read` deny rule the launcher passes; hiding is silent: the directory looks empty — DEC-152; DEC-161; EXP-001 §3.3, §5.4 · delivered by W1-46
-  - `CAP-49.c` [W1] The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle's absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator's own session is an accepted residual — DEC-162 · delivered by W1-47
+  - `CAP-49.c` [W1] The oracle is hidden from every session started in the repository root, the unsandboxed orchestrator included, by two layers: a `Read` deny rule with the oracle's absolute path in the committed `.claude/settings.json`, and the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash); an opaque Bash read in the orchestrator's own session is an accepted residual; the path is held in one file, `governance/project/held-out.yaml`, from which the committed rule, the guard and the launcher take it, and no acceptance test names it — DEC-162 · delivered by W1-47
 - **Scenarios:** dev — · qual —
 
 ### CAP-50 — Artifact flow, dependency consumption and end-to-end traceability
@@ -881,11 +881,11 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Disposition:** KEPT
 - **Sources:** DEC-041 (default-deny allow-lists, derived not enumerated); DEC-076; DEC-152; DEC-153; DEC-156; DEC-161; EXP-001 (spike-sandbox/EVIDENCE.md §5.4); DEC-165
 - **Covers:**
-  - `CAP-58.a` [W1] Default-deny write allow-lists per role and ticket; checks derived, not enumerated — DEC-041; DEC-076 · delivered by W1-02, W1-03, W1-26
-  - `CAP-58.b` [W1] Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them — Framework v4.1.2 §32 · delivered by W1-33
+  - `CAP-58.a` [W1] Default-deny write allow-lists per role and ticket, except the orchestrator (`CAP-58.e`); checks derived, not enumerated — DEC-041; DEC-076; DEC-156 · delivered by W1-02, W1-03, W1-26
+  - `CAP-58.b` [W1] Permission classes of Framework §32 as role permissions: WRITE_REPO_SCOPED = allowed_paths guard; PACKAGE_INSTALL/SYSTEM_INSTALL per DEC-083; SECRET_READ denied (DEC-074 Q9); READ_REPO, RUN_TESTS allowed; NETWORK_*, DB_*, CLOUD_*, CI_TRIGGER, DEPLOY_* denied unless the role definition grants them; a launched worker session's network grant comes from the launcher's network profile (`CAP-61.c`), which the role definition names — Framework v4.1.2 §32; DEC-158; DEC-163 · delivered by W1-33
   - `CAP-58.c` [W1] A session with no or an unknown role has no write privilege — OWNER-DECISION-P2-0001 BC-P2-08 · delivered by W1-02
   - `CAP-58.d` [W1] Claim split by tool: in a launched worker session the OS sandbox stops a Bash write outside the repository without parsing the command; the file tools (Read, Edit, Write) run outside the sandbox and are held by the permission rules and the guard; `Edit(...)` and `Read(...)` deny rules bind both layers — DEC-152; DEC-161; EXP-001 §5.4 · delivered by W1-46
-  - `CAP-58.e` [W1] Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed — DEC-150; DEC-156 · delivered by W1-45
+  - `CAP-58.e` [W1] Orchestrator write scope: the orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it; the containment check still records its changes; its session is not sandboxed; an orchestrator change outside the active ticket's `allowed_paths` is a record, not a containment finding, while a change under `tests/acceptance/**` stays a finding — DEC-150; DEC-156 · delivered by W1-45
   - `CAP-58.f` [W1] The containment check runs on `PostToolUseFailure` as well as `PostToolUse`, because a failed command may have written files before failing; a call refused by a deny rule reaches no hook — DEC-153; EXP-001 §5.4 · delivered by W1-47
   - `CAP-58.g` [W3] The shared lessons inbox `~/gov-os-lessons-inbox/` is the one path outside its repository the orchestrator may write, as a guard exception — DEC-165
 - **Scenarios:** dev MR-A-01, CHAOS-A-13, CHAOS-A-14, MR-B-01, CHAOS-B-13, CHAOS-B-14, CHAOS-B-15, A-X-02 · qual MR-A-Q01, SEC-A-Q02, AUDIT-A-Q49, SEC-A-Q06, MR-B-Q02, SOAK-X-Q02
@@ -927,7 +927,7 @@ The rule texts are in Charter v5 §4, verbatim from architecture v0.3 §1A. Each
 - **Covers:**
   - `CAP-61.a` [W1] The launcher refuses to start a worker session unless the sandbox is on, strict and fail-closed: enabled, `failIfUnavailable: true`, `allowUnsandboxedCommands: false`, network `strictAllowlist`; the configuration is passed through `--settings`, never read from the repository, whose settings carry no sandbox block; the launcher sets no `excludedCommands` — DEC-152; DEC-153; DEC-161; DEC-164; EXP-001 §5.2 · delivered by W1-46
   - `CAP-61.b` [W1] Per-role `--settings`: the sandbox block plus the role's `Edit` deny rules; the launcher sets `GOV_ROLE` and `GOV_TICKET`, and both reach the guard; a launched worker is shown to be sandboxed. The sandbox applies to launched worker sessions only; in-session subagents remain for read-only work (review, exploration, web research) — DEC-153; DEC-161; EXP-001 §5.3 · delivered by W1-46
-  - `CAP-61.c` [W1] Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox — DEC-158; DEC-161 · delivered by W1-46
+  - `CAP-61.c` [W1] Network profile per role: engineer, independent test designer and independent auditor get an empty allowlist; research and experiment work gets a broad, owner-extensible allowlist (GitHub, PyPI, npm, Hugging Face, arXiv, documentation sites), with its writes and installs inside its own experiment folder, held there by `Edit` deny rules the launcher generates at launch for every other path of the repository; the allowlist is shown to accept the research domains; WebSearch and WebFetch run outside the sandbox — DEC-158; DEC-161; DEC-163; EXP-001 §3.4, §5.3 · delivered by W1-46
   - `CAP-61.d` [W1] The launcher sets a per-session temp directory for each worker session; if the acceptance test shows it cannot be overridden, the shared `$TMPDIR` is recorded as a residual — DEC-159 · delivered by W1-46
   - `CAP-61.e` [W1] Sessions run on Claude Code 2.1.285 or later, and the CLI used for headless runs is aligned with the VS Code extension's bundled version — DEC-153; EXP-001 §5.5 · delivered by W1-48
   - `CAP-61.f` [W2] The untested sandbox cases (`denyWrite` on a path that does not exist yet, symlink and hard-link tricks, the seccomp filter, `bypassPermissions` mode, subagents inside a sandboxed worker session, and `excludedCommands`) are tested by experiment EXP-002; until then they are open residuals — DEC-160; DEC-164; EXP-001 §4
