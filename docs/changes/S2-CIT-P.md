@@ -10,7 +10,7 @@ author: product-spec (S2, single author)
 audit: S2-A, a fresh Independent Auditor (DEC-088)
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
 decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162]
-repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS); DEC-163…DEC-167; see S2-CIT-E §6
+repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS); DEC-163…DEC-169; see S2-CIT-E §6
 ---
 
 # S2 — Change-impact proposal (CIT-P) on the Gov OS specification
@@ -46,7 +46,7 @@ answer changed the impact first listed, the row now states the answered impact.
 
 | Option | What it means here | Cost |
 |---|---|---|
-| **Apply now** (chosen by the owner in the S2 brief) | Contract v4 becomes v4.1; four new Wave 1 tickets; 39 open tickets keep their KPIs except the five named in §3.4 | This change, one audit (S2-A), about 280 LOC of new Wave 1 glue (320 after the repair, §6). W1-45 changes the guard code of W1-02 and W1-03, and the acceptance tests of those two closed tickets that assert the old orchestrator rule are revised by the Independent Test Designer (§3.7) |
+| **Apply now** (chosen by the owner in the S2 brief) | Contract v4 becomes v4.1; four new Wave 1 tickets; 39 open tickets keep their KPIs except the five named in §3.4 | This change, one audit (S2-A), about 280 LOC of new Wave 1 glue (370 after the repair, §6). W1-45 changes the guard code of W1-02 and W1-03, and the acceptance tests of those two closed tickets that assert the old orchestrator rule are revised by the Independent Test Designer (§3.7) |
 | Defer | Record EXP-001 and continue Wave 1 on the guard alone | No work now. The opaque-write and install residuals stay open; DEC-102…DEC-106, DEC-136 and DEC-137 stay outside the Contract while acceptance tests are written against it |
 | Re-baseline | Reopen the enforcement part of the specification and re-plan W1-02…W1-05 around the sandbox | Retires working, tested guard code that EXP-001 shows is still needed for the file tools. Not justified by the evidence |
 
@@ -206,5 +206,11 @@ decisions in the same message. The impact of each is listed here; the execution 
 | DEC-165 | The lite upstream lesson loop (Wave 3) | Charter v5 §7 non-goal row; CAP-41 (wave note, `CAP-41.e` reworded, `CAP-41.f`…`CAP-41.j`), `CAP-45.b`, `CAP-58.g`; ADR-0002 §6; WBS §7. No Wave 1 ticket changes |
 | DEC-166 | `gov discover` (Wave 2) | `CAP-32.d`; ADR-0002 §1 L4 and §6; WBS §6. No Wave 1 ticket changes |
 | DEC-167 | A plain-language impact question triggers the impact assessment | `CAP-33.f` (W1, W1-35), `CAP-33.g` (W2); one KPI on W1-35; WBS rules and §6 |
+| DEC-168 | Scope and severity in the Wave 1 lesson schema | `CAP-41.f` moves to W1 on W1-08; one KPI on W1-08, the failure KPI of W1-44; WBS §5 and §7 |
+| DEC-169 | The validator's fingerprint fallback and S2 scope check (S2A-F-08) | `validate_s1.py` only |
+
+The audit's other findings (S2A-F-01, F-03, F-04, F-06, F-07, F-09, F-10) change ticket KPIs, estimates (W1-30, W1-31:
++50 LOC), `CAP-49.c`, `CAP-58.a`, `CAP-58.b`, `CAP-58.e`, `CAP-61.c`, ADR-0002 and `bootstrap.md`; S2-CIT-E §6.1 lists
+them one by one.
 
 The three options of DEC-105 were not re-asked: the owner gave these as decisions to apply in this change.

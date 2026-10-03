@@ -10,7 +10,7 @@ which is archived after S1-A closes. Those checks are SKIPped when their input i
 point at the workbench (default: ~/gov-os-workbench).
 
 Section 3e checks what the S2 change added (Contract v4.1, tickets W1-45…W1-48, DEC-150…DEC-162). Section 3f checks the
-repair after the S2-A round-1 audit (DEC-163…DEC-167). The write-scope check of S1 (section 9) applies on branch
+repair after the S2-A round-1 audit (S2A-F-01…F-10, DEC-163…DEC-169). The write-scope check of S1 (section 9) applies on branch
 `s1/spec` only; on `s2/spec` the S2 write scope is checked instead.
 """
 import glob, os, re, sys, fnmatch, csv, yaml
@@ -155,7 +155,7 @@ if os.path.exists(_p):
     for line in open(_p):
         h, rel = line.strip().split('  ', 1)
         fp = os.path.join(W, 's1a', rel)
-        # the owner retired the s1a session (DEC-101): its PROMPT.md was renamed, content unchanged. The fallback is for that one file only.
+        # the owner retired the s1a session (DEC-101): its PROMPT.md was renamed, content unchanged. The fallback is for that one file only (DEC-169).
         ret = os.path.join(W, 's1a', 'PROMPT.retired.md')
         if os.path.normpath(rel) == 'PROMPT.md' and not os.path.exists(fp) and os.path.exists(ret): fp = ret
         if not os.path.exists(fp) or hashlib.sha256(open(fp, 'rb').read()).hexdigest() != h: bad_h.append(rel)
@@ -243,9 +243,9 @@ check('CAP-49: oracle hidden by the sandbox for workers (W1-46) and by the commi
       cov['CAP-49.b'][1]['provider'] == ['W1-46'] and cov['CAP-49.c'][1]['provider'] == ['W1-47'] and '.claude/settings.json' in c49 and all(x in c49 for x in ('Read, Grep, Glob, Bash', 'accepted residual')) and cap['CAP-49']['wave'] == 'W3')
 check('CAP-22.a is delivered by W1-05, then W1-33 (DEC-154)', cov['CAP-22.a'][1]['provider'] == ['W1-05', 'W1-33'] and 'W1-05' in cap['CAP-22']['provider'])
 carried = {'DEC-102': 'W1', 'DEC-103': 'W1', 'DEC-104': 'W2', 'DEC-105': 'W1', 'DEC-106': 'W1', 'DEC-136': 'W1', 'DEC-137': 'W1', 'DEC-158': 'W1', 'DEC-159': 'W1', 'DEC-160': 'W2',
-           'DEC-163': 'W1', 'DEC-164': 'W2', 'DEC-165': 'W3', 'DEC-166': 'W2', 'DEC-167': 'W1'}
+           'DEC-163': 'W1', 'DEC-164': 'W2', 'DEC-165': 'W3', 'DEC-166': 'W2', 'DEC-167': 'W1', 'DEC-168': 'W1'}
 lost = [d_ for d_, w_ in carried.items() if not any(d_ in cv['source'] and cv['wave'] == w_ for e, cv in cov.values())]
-check('every carried decision (DEC-102..106, 136, 137, 158..160, 163..167) is the source of a covers item in its wave', not lost, str(lost))
+check('every carried decision (DEC-102..106, 136, 137, 158..160, 163..168) is the source of a covers item in its wave', not lost, str(lost))
 check('installs unchanged (DEC-157): envelope keeps the DEC-083 sentence, CAP-25.b is untouched, worker roles never install system-wide',
       c['envelope']['tool_installs']['statement'].startswith('The orchestrator installs a tool only after the owner approves a decision package in chat') and 'Worker roles never install system-wide' in c['envelope']['tool_installs']['statement']
       and cov['CAP-25.b'][1]['item'].startswith('Orchestrator-only install on owner approval in chat') and cov['CAP-25.d'][1]['provider'] == ['W1-48'])
@@ -295,18 +295,25 @@ check('the repository settings carry no sandbox block (DEC-161)', 'sandbox' not 
 citp, cite = f'{R}/docs/changes/S2-CIT-P.md', f'{R}/docs/changes/S2-CIT-E.md'
 check('S2-CIT-P is ACCEPTED and S2-CIT-E exists', os.path.exists(citp) and frontmatter(citp)['status'] == 'ACCEPTED' and os.path.exists(cite) and frontmatter(cite)['id'] == 'S2-CIT-E')
 
-# 3f. Repair after the S2-A round-1 audit (F-01, F-04, F-08; DEC-163..DEC-167; docs/changes/S2-CIT-E.md §6)
-check('DEC-163..DEC-167 ACCEPTED (owner, 2026-10-03)', all(re.search(rf'### DEC-{n} .*\n- \*\*Status:\*\* ACCEPTED \(owner, 2026-10-03\)', reg) for n in range(163, 168)))
+# 3f. Repair after the S2-A round-1 audit (S2A-F-01..F-10; DEC-163..DEC-169; docs/changes/S2-CIT-E.md §6)
+check('DEC-163..DEC-169 ACCEPTED (owner, 2026-10-03)', all(re.search(rf'### DEC-{n} .*\n- \*\*Status:\*\* ACCEPTED \(owner, 2026-10-03\)', reg) for n in range(163, 170)))
 k45 = kp('W1-45')
 citp_t, cite_t = open(citp).read(), open(cite).read()
 check('F-01: W1-45 states that the W1-02 and W1-03 tests of the old orchestrator rule are revised by the test designer; both CIT records say so',
       'revised by the Independent Test Designer' in k45 and 'rewrite after implementation' in k45 and 'owner correction, DEC-156' in k45 and 'DEC-106' in T('W1-45')['sources']
-      and all('no existing acceptance test is invalidated' not in t_ and 'revised by the Independent Test Designer' in t_ for t_ in (citp_t, cite_t)))
+      and all('no existing acceptance test is invalidated' not in t_ and 'revised by the Independent Test Designer' in t_ for t_ in (citp_t, cite_t))
+      and 'for every role other than the orchestrator' in k45 and 'test design batch' in k45 and 'a record, not a containment finding' in k45
+      and 'except the orchestrator (`CAP-58.e`)' in cov['CAP-58.a'][1]['item'] and 'a record, not a containment finding' in cov['CAP-58.e'][1]['item']
+      and all('DEC-156' in open(tk[t_][0]).read() for t_ in ('W1-02', 'W1-03')))
 f47 = ' '.join(T('W1-47')['kpis']['failure'])
-check('F-04: W1-47 tests the committed deny rule statically and the guard against a stand-in; its failure KPI covers any allowed tool call naming the oracle path',
-      all(x in k47 for x in ('checks the committed rule statically', 'its presence and its exact path', 'tested against a stand-in path')) and 'Any tool call whose input names the oracle path is allowed, whatever the tool' in f47)
+HO = 'governance/project/held-out.yaml'
+check('F-04: W1-47 tests the committed deny rule statically, from the one file that holds the path, and the guard against a stand-in; no test names the oracle; the launcher takes the path from the same file',
+      all(x in k47 for x in ('checks the committed rule statically', 'its presence and its exact path', 'the test file carries no literal path', 'tested against a stand-in path, never the qualification oracle', HO))
+      and 'Any tool call whose input names the oracle path is allowed, whatever the tool' in f47 and 'An acceptance test of this ticket reads or names the qualification oracle' in f47 and HO in T('W1-47')['allowed_paths']
+      and all(x in k46 for x in ('the test uses a stand-in directory, never the qualification oracle', 'reads or names the qualification oracle', HO)) and 'W1-47' in T('W1-46')['depends_on'] and HO in c49)
 src_self = open(os.path.abspath(__file__)).read()
-check('F-08: the fingerprint rename fallback applies to PROMPT.md only', "os.path.normpath(rel) == 'PROMPT.md' and not os.path.exists(fp)" in src_self and "fp[:-3] + '.retired" + ".md'" not in src_self)
+check('F-08: the fingerprint rename fallback applies to PROMPT.md only, and the S2 write-scope check excludes docs/SOURCES.md (DEC-169)',
+      "os.path.normpath(rel) == 'PROMPT.md' and not os.path.exists(fp)" in src_self and "fp[:-3] + '.retired" + ".md'" not in src_self and src_self.count("x != 'docs/SOURCES.md'") >= 3)
 def cv_(i): return cov[i][1]
 check('DEC-163: a minimal research role in the Wave 1 roster, delivered by W1-46; installs only inside its experiment folder',
       cv_('CAP-22.d')['wave'] == 'W1' and cv_('CAP-22.d')['provider'] == ['W1-46'] and cv_('CAP-25.e')['provider'] == ['W1-46'] and 'write fence' in cv_('CAP-25.e')['item'] and 'DEC-158' in cv_('CAP-22.d')['item']
@@ -317,8 +324,8 @@ check('DEC-164: subagents in a sandboxed worker and excludedCommands are open re
       and 'sets no `excludedCommands`' in cv_('CAP-61.a')['item'] and 'carry no excludedCommands' in k46 and 'carry an excludedCommands entry' in k46
       and all(x in boot for x in ('Subagents inside a sandboxed worker session', '`excludedCommands`', 'EXP-002', 'DEC-164')) and 'EXP-002' in wbs[wbs.index('## 6. Wave 2'):])
 c41 = {i: cv_(i) for i in cov if i.startswith('CAP-41.')}
-check('DEC-165: the lite upstream lesson loop is Wave 3 (CAP-41.f..j, CAP-45.b, CAP-58.g); CAP-41.e keeps the full loop a non-goal',
-      all(c41[f'CAP-41.{x}']['wave'] == 'W3' and 'DEC-165' in c41[f'CAP-41.{x}']['source'] for x in 'fghij') and c41['CAP-41.e']['wave'] == 'NONE'
+check('DEC-165: the lite upstream lesson loop is Wave 3 (CAP-41.g..j, CAP-45.b, CAP-58.g); CAP-41.e keeps the full loop a non-goal',
+      all(c41[f'CAP-41.{x}']['wave'] == 'W3' and 'DEC-165' in c41[f'CAP-41.{x}']['source'] for x in 'ghij') and c41['CAP-41.e']['wave'] == 'NONE'
       and 'severity (low, medium, high or critical)' in c41['CAP-41.f']['item'] and all(x in c41['CAP-41.g']['item'] for x in ('~/gov-os-lessons-inbox/', 'gitleaks', 'no product code, data or secrets'))
       and 'decision package' in c41['CAP-41.h']['item'] and 'release' in c41['CAP-41.i']['item'] and 'never leave their repository' in c41['CAP-41.j']['item']
       and cv_('CAP-45.b')['wave'] == 'W3' and 'gov doctor' in cv_('CAP-45.b')['item'] and cv_('CAP-58.g')['wave'] == 'W3' and '~/gov-os-lessons-inbox/' in cv_('CAP-58.g')['item']
@@ -326,6 +333,16 @@ check('DEC-165: the lite upstream lesson loop is Wave 3 (CAP-41.f..j, CAP-45.b, 
 check('DEC-166, DEC-167: gov discover is W2; a plain-language impact question runs a proposal plus gov closure in W1 (W1-35) and gov impact in W2',
       cv_('CAP-32.d')['wave'] == 'W2' and 'gov discover' in cv_('CAP-32.d')['item'] and cv_('CAP-33.f')['provider'] == ['W1-35'] and 'gov closure' in cv_('CAP-33.f')['item']
       and cv_('CAP-33.g')['wave'] == 'W2' and 'gov impact' in cv_('CAP-33.g')['item'] and 'DEC-166' in wbs[wbs.index('## 6. Wave 2'):] and 'W1-20' in anc('W1-35'))
+k31 = kp('W1-31')
+check('F-02, F-03: a research session runs as GOV_ROLE=research; its network grant comes from the launcher profile; its write fence inside the repository is a generated deny list, with a sibling-directory test',
+      'GOV_ROLE=research' in k46 and 'GOV_ROLE=research' in cv_('CAP-22.d')['item'] and "launcher's network profile" in cv_('CAP-58.b')['item'] and "launcher's network profile" in kp('W1-33')
+      and all(x in k46 for x in ('generates at launch an Edit deny rule for every other path of the repository', 'Bash write to a sibling directory inside the repository fails')) and 'generates at launch' in cv_('CAP-61.c')['item'])
+check('F-06, F-07: bootstrap.md keeps the outside-the-repository qualifier on the install misses; the sandbox cost is in ADR-0002 and W1-31',
+      all(x in boot for x in ('for installs that write outside the repository', 'A research session can install', '+3,250 input tokens')) and all(x in adr2 for x in ('+65 ms per Bash command', '+3,250 input tokens')) and '3,250 input tokens' in k31 and 'not governance tokens under DEC-086' in k31)
+check('F-09, F-10: W1-30 and W1-31 are re-estimated and the WBS says the other new KPIs fit; W1-48 records bubblewrap and socat',
+      (T('W1-30')['est_loc'], T('W1-31')['est_loc']) == (220, 150) and 'fit their existing estimates' in wbs and 'bubblewrap 0.9.0 and socat 1.8.0.0' in kp('W1-48') and 'DEC-141' in T('W1-48')['sources'])
+check('DEC-168: scope and severity are in the Wave 1 lesson schema (CAP-41.f, W1-08); the loop stays Wave 3',
+      cv_('CAP-41.f')['wave'] == 'W1' and cv_('CAP-41.f')['provider'] == ['W1-08'] and 'severity (low, medium, high or critical)' in kp('W1-08') and 'severity' in kp('W1-44'))
 ch = open(f'{R}/docs/charter/CHARTER_v5.md').read()
 check('Charter v5 carries the two changes the decisions require: the research role in the Wave 1 roster (DEC-163) and the lesson-loop non-goal row (DEC-165)',
       'research, in a minimal form (DEC-163)' in ch and 'reversed for framework lessons only by DEC-165' in ch and {'DEC-163', 'DEC-165'} <= set(fms[f'{R}/docs/charter/CHARTER_v5.md']['decisions']))
@@ -342,7 +359,7 @@ if branch == 's1/spec':
     check('writes only under docs/ and .tickets/', not out, str(out))
 else: print(f'SKIP writes only under docs/ and .tickets/ — applies to branch s1/spec only (DEC-155); this is {branch or "a detached HEAD"}')
 if branch == 's2/spec':
-    out = [x for x in changed('w1/integrate') if not ((x.startswith('docs/') and not x.startswith('docs/source/')) or x.startswith('.tickets/') or x == 'governance/project/bootstrap.md')]
+    out = [x for x in changed('w1/integrate') if not ((x.startswith('docs/') and not x.startswith('docs/source/') and x != 'docs/SOURCES.md') or x.startswith('.tickets/') or x == 'governance/project/bootstrap.md')]
     num = subprocess.run(['git', '-C', R, 'diff', '--numstat', 'w1/integrate', '--', 'docs/charter/CHARTER_v5.md'], capture_output=True, text=True).stdout.split()
     check('S2 writes only docs/**, .tickets/** and governance/project/bootstrap.md; the Charter changes four lines only (DEC-163, DEC-165)', not out and num[:2] == ['4', '4'], str(out) + ' ' + str(num[:2]))
 else: print(f'SKIP S2 write scope — applies to branch s2/spec only; this is {branch or "a detached HEAD"}')
