@@ -5,8 +5,8 @@
 #
 # sha256 (DEC-196): the one downloaded artefact (npm tarball, release tarball, distribution package), or the binary
 # itself for a single-file tool. The ten stack pins of ADR-0002 §2 (DEC-074, DEC-195) carry the digests S0b2
-# recorded on 2026-09-30: the binary for a single-file tool, and the resolved entry script for openspec,
-# check-jsonschema and copier.
+# recorded on 2026-09-30: the binary for a single-file tool, and the installed entry script for openspec,
+# check-jsonschema and copier (DEC-200). A vendored folder carries the digest of its committed files (DEC-199).
 #
 # Tools under Node v22.23.3 are not on the default PATH (the nvm default stays v18.20.8). Run them with
 # PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH.
@@ -122,9 +122,9 @@ tools:
     note: "npm package under Node v22.23.3 (5.1 MB with its platform package @ccusage/ccusage-linux-x64); sha256 of the npm tarball ccusage-20.0.26.tgz. The PATH prefix is needed: npm's script runs under whichever node is first on PATH, and without it the package lands in the Node v18.20.8 prefix."
   - name: superpowers
     version: "v6.4.2"
-    sha256: "fb46c8771f2ad3ac8cd4e43065c486fc8e4b36442fe137b1689f61231ac94ef1"
+    sha256: "f2a95244bc977742ee2cf6e5228fd1c24c276d63e7c1e732b3fcf9b2e8c0b90a"
     install: "git clone --depth 1 --branch v6.4.2 https://github.com/obra/superpowers .gov-runtime/scratch/orchestrator/vendor-src/superpowers && mkdir -p template/governance/kernel/vendor/superpowers/skills && cp -r .gov-runtime/scratch/orchestrator/vendor-src/superpowers/skills/test-driven-development .gov-runtime/scratch/orchestrator/vendor-src/superpowers/skills/systematic-debugging .gov-runtime/scratch/orchestrator/vendor-src/superpowers/skills/verification-before-completion template/governance/kernel/vendor/superpowers/skills/ && cp .gov-runtime/scratch/orchestrator/vendor-src/superpowers/LICENSE template/governance/kernel/vendor/superpowers/ && rm -rf .gov-runtime/scratch/orchestrator/vendor-src/superpowers"
     uninstall: "git rm -r template/governance/kernel/vendor/superpowers"
     date: "2026-10-03"
     approved_by: "DEC-193"
-    note: "Source of github.com/obra/superpowers at tag v6.4.2, commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Only three skill folders (test-driven-development, systematic-debugging, verification-before-completion) and the upstream licence are committed, unchanged, under template/governance/kernel/vendor/superpowers/ (DEC-194). sha256 of `git archive --format=tar HEAD` of the clone at that commit; what this digest should cover is with the owner (W1-06 test design package DP-5)."
+    note: "Source of github.com/obra/superpowers at tag v6.4.2, commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Only three skill folders (test-driven-development, systematic-debugging, verification-before-completion) and the upstream licence are committed, unchanged, under template/governance/kernel/vendor/superpowers/ (DEC-194). sha256 is the digest of the committed vendor folder (DEC-199): the sha256 of the sorted lines '<sha256 of the file>  <relative path>' over its committed files; from that folder, `git ls-files -z | xargs -0 sha256sum | LC_ALL=C sort | sha256sum` prints it. Re-record it whenever the folder changes."
