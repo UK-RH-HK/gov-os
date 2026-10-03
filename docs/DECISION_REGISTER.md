@@ -1658,3 +1658,45 @@ its verification and from the reviewer's probe (DEC-137).
 | Version | Date | Change |
 |---|---|---|
 | 0.32 | 2026-10-03 | Owner answers on W1-45's packages: DEC-175 (DP-1: the test designer revises two W1-04 cases; `tests/unit/install/**` joins W1-45's `allowed_paths`), DEC-176 (DP-2, amends DEC-156: `.gov-runtime/` other than `scratch/**` stays denied to the orchestrator; a freeze is the owner's action), DEC-177 (DP-3: the DEC-171 record is one JSON line per call in `.gov-runtime/records.jsonl`, `action: "recorded"`), DEC-178 (DP-4: the wide scope holds only in a session whose own role is orchestrator). |
+
+## 33. Owner decisions at W1-45's close (register v0.33, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner decisions of 2026-10-03, given when the owner closed W1-45 (`DAEO-6cc2`), on the three items the final
+reviewer's probe left (DEC-137) and on commit trailers.
+
+### DEC-179 — A guard function that fails open is a defect: W1-47 makes the session-role default fail closed
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-178, DEC-135
+- **Decision:**
+  - The guard function that gives the orchestrator's wide scope when its session-role argument is missing
+    (`_get_allowed_paths` in `src/gov/guard/decide.py`) is a defect, not a residual.
+  - W1-47's engineer makes it fail closed when the session-role argument is missing, with a builder test. W1-47
+    gains a matching KPI line, in its own commit with the trailer `Task: DAEO-o4fg`.
+  - In general, a finding that makes the guard fail open is a defect, not a residual.
+
+### DEC-180 — `.gov-runtime/` is protected in worker sessions by an `Edit` deny rule the launcher sets
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Extends:** DEC-176 · **Under:** DEC-152, DEC-161, EXP-001
+- **Decision:**
+  - The settings the launcher builds for every worker role carry an `Edit` deny rule for `.gov-runtime/**` except
+    `.gov-runtime/scratch/**`.
+  - That closes opaque Bash writes and `ln` there at OS level: one `Edit` rule binds the file tools and Bash
+    (EXP-001).
+  - W1-46 gains a matching KPI line, in its own commit with the trailer `Task: DAEO-jdqr`.
+
+### DEC-181 — In the orchestrator's own session, opaque Bash writes and `ln` into `.gov-runtime/` stay a residual
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-156, DEC-176
+- **Decision:** The orchestrator's own session is not sandboxed (DEC-156). An opaque Bash write or an `ln` into
+  `.gov-runtime/` in that session is seen by neither the guard nor the containment check, and stays an accepted
+  residual, recorded in `governance/project/bootstrap.md`.
+
+### DEC-182 — Commit trailers go in the final trailer block, with `git commit --trailer`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, at W1-45's close · **Under:** DEC-097
+- **Decision:**
+  - From now on every commit puts `Task:`, `Implements:` and `Role:` in the final trailer block, using
+    `git commit --trailer`. Git reads trailers only from the last paragraph of a commit message.
+  - Checks that read trailers fall back to the message body for commits made before 2026-10-03.
+  - History is not rewritten.
+  - The rule is added to the rules of `docs/plan/WAVE_1_WBS.md`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.33 | 2026-10-03 | Owner decisions at W1-45's close: DEC-179 (a fail-open guard default is a defect; W1-47 makes it fail closed), DEC-180 (the launcher's worker settings deny `Edit` on `.gov-runtime/**` except `scratch/**`; W1-46), DEC-181 (opaque Bash writes and `ln` into `.gov-runtime/` stay a residual in the orchestrator's own session), DEC-182 (trailers in the final block with `git commit --trailer`; checks fall back to the body for commits before 2026-10-03). |

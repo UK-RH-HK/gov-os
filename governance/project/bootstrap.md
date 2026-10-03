@@ -213,6 +213,32 @@ are revised by the Independent Test Designer in W1-45's test design batch (reaso
 orchestrator change outside its ticket's paths is then a record, not a containment finding. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25's
 `gov checkpoint` replaces it.
 
+**As built and closed (W1-45, 2026-10-03; DEC-175…DEC-178).**
+
+- The wide scope holds only in a session whose own role is orchestrator. An `orchestrator` subagent in another
+  role's session keeps the ticket-paths rule (DEC-178).
+- Everything under `.gov-runtime/` other than `scratch/**` is denied to the orchestrator by the guard: the freeze
+  flag, the snapshots, the findings and the records. Setting or lifting a freeze is the owner's action (DEC-176).
+- An orchestrator change outside its ticket's paths writes one line per call to `.gov-runtime/records.jsonl`, with
+  the fields of a finding and `action: "recorded"` (DEC-177).
+
+**What the reviewer's probe left at W1-45's close (DEC-137), and the owner's decisions on it (DEC-179…DEC-181).**
+
+- **Opaque Bash writes into `.gov-runtime/`.** The folder is ignored by git, so the containment check never sees a
+  change there; DEC-176's protection is the guard alone. An opaque Bash form (an interpreter one-liner, for example)
+  that writes the freeze flag, the findings, the records or a snapshot is seen by neither layer. This is the class
+  of DEC-123, and it held for every role before W1-45.
+- **`ln`.** The guard does not judge `ln`, so a link created under `tests/acceptance/**` or `.gov-runtime/` passes
+  it. Under `tests/acceptance/**` the containment check catches the link. Under `.gov-runtime/` nothing does.
+- **Closed for launched worker sessions by W1-46 (DEC-180):** the launcher's settings for every worker role carry an
+  `Edit` deny rule for `.gov-runtime/**` except `.gov-runtime/scratch/**`, which stops both at OS level (EXP-001: one
+  `Edit` rule binds the file tools and Bash). Until W1-46 closes, headless worker sessions run without it.
+- **Accepted residual in the orchestrator's own session (DEC-181):** both stay open there, because that session is
+  not sandboxed (DEC-156). The orchestrator doesn't use them.
+- **A defect, not a residual (DEC-179):** the guard function `_get_allowed_paths` gives the orchestrator's wide scope
+  when its session-role argument is left out. Its only caller passes the argument, so no session gains a write
+  today. W1-47 makes it fail closed, with a builder test. A finding that makes the guard fail open is a defect.
+
 ## Denied attempts
 
 One attempt per class (DEC-100), made in a headless session started in the repository root, where `.claude/settings.json` applies. The session ran in `acceptEdits` mode with `Write` and `pip install` allowed, so each refusal comes from a deny rule. No file was created.
