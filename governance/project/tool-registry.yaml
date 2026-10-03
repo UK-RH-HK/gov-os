@@ -128,3 +128,29 @@ tools:
     date: "2026-10-03"
     approved_by: "DEC-193"
     note: "Source of github.com/obra/superpowers at tag v6.4.2, commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Only three skill folders (test-driven-development, systematic-debugging, verification-before-completion) and the upstream licence are committed, unchanged, under template/governance/kernel/vendor/superpowers/ (DEC-194). sha256 is the digest of the committed vendor folder (DEC-199): the sha256 of the sorted lines '<sha256 of the file>  <relative path>' over its committed files; from that folder, `git ls-files -z | xargs -0 sha256sum | LC_ALL=C sort | sha256sum` prints it. Re-record it whenever the folder changes."
+
+  # --- Recorded by W1-48 (DAEO-0qs5): the Claude Code pin and the sandbox prerequisites, all owner installs ---
+  - name: claude code
+    version: "2.1.288"
+    sha256: "0298068b686e7fdbaf9402a7a587bb7f49c0b0e084de09f69145a0719207640c"
+    install: "$HOME/.local/bin/claude install 2.1.288"
+    uninstall: "ln -sfn $HOME/.local/share/claude/versions/2.1.284 $HOME/.local/bin/claude && rm -f $HOME/.local/share/claude/versions/2.1.288"
+    date: "2026-10-03"
+    approved_by: "DEC-203"
+    note: "The CLI used for headless runs is the single-file binary ~/.local/bin/claude, a link to ~/.local/share/claude/versions/2.1.288; sha256 of that binary. The VS Code extension anthropic.claude-code bundles the same binary at version 2.1.288, under resources/native-binary/claude in its folder. Installed by the owner from the operator console, outside every agent session (DEC-203). The uninstall command goes back to the version before it. Headless workers are started with the absolute path, never a bare claude, because a Windows-side copy is later on PATH (DEC-205). Raising the pin needs a new register entry that names the new version (DEC-197)."
+  - name: bubblewrap
+    version: "0.9.0"
+    sha256: "2461f1beee9cb04c8942739fe1a2b37e7b7c2a3d518f0779dc75f9245baa3094"
+    install: "sudo apt-get install bubblewrap=0.9.0-1ubuntu0.3"
+    uninstall: "sudo apt-get remove bubblewrap"
+    date: "2026-10-01"
+    approved_by: "DEC-141"
+    note: "Sandbox prerequisite (bwrap), the system package bubblewrap 0.9.0-1ubuntu0.3 (Ubuntu); sha256 of the distribution package, from the apt package index. Installed by the owner for the sandbox spike (DEC-141). Both commands are owner actions: no agent session runs sudo."
+  - name: socat
+    version: "1.8.0.0"
+    sha256: "46e854289b6b1c97e28be5d9293bea61e8633d00d6a65d9513f019c7232696fe"
+    install: "sudo apt-get install socat=1.8.0.0-4ubuntu0.1"
+    uninstall: "sudo apt-get remove socat"
+    date: "2026-10-01"
+    approved_by: "DEC-141"
+    note: "Sandbox prerequisite, the system package socat 1.8.0.0-4ubuntu0.1 (Ubuntu); sha256 of the distribution package, from the apt package index. Installed by the owner for the sandbox spike (DEC-141). Both commands are owner actions: no agent session runs sudo."
