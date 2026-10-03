@@ -1782,3 +1782,58 @@ orchestrator reported.
 | Version | Date | Change |
 |---|---|---|
 | 0.35 | 2026-10-03 | Owner answers during W1-07's build: DEC-189 (DP-1: `CONFIG_INVALID` with `file` and `key` in `error.details` is the stable contract; the minimal path-map shape is provisional until W1-08), DEC-190 (planned test revisions, reason "planned: command implemented", counted apart from rewrites), DEC-191 (PyYAML 6.0.1 enters the tool registry at W1-06). |
+
+## 36. Owner answers on W1-06's packages (register v0.36, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-03 to the orchestrator's install package for W1-06 (`DAEO-ipqy`, DEC-083) and to the test
+designer's four packages (DP-1…DP-4).
+
+### DEC-192 — Install approved: ccusage 20.0.26
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-06 install package · **Under:** DEC-083, DEC-086
+- **Decision:** The orchestrator installs ccusage 20.0.26 with
+  `~/.nvm/versions/node/v22.23.3/bin/npm install -g ccusage@20.0.26` (ADR-0002's Node 22). It is uninstalled with
+  the same npm. This entry is the owner approval the registry cites.
+
+### DEC-193 — Download approved: the Superpowers v6.4.2 source
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1-06 install package · **Under:** DEC-083, DEC-074 Q5
+- **Decision:** The orchestrator runs `git clone --depth 1 --branch v6.4.2 https://github.com/obra/superpowers` into
+  `.gov-runtime/scratch/orchestrator/vendor-src/superpowers/`. This entry is the owner approval the registry cites
+  for Superpowers v6.4.2.
+
+### DEC-194 — W1-06 DP-3: only the three skills and the licence are committed
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-3 option (a) · **Under:** DEC-074 Q5, DEC-076
+- **Decision:**
+  - Only the three skill folders (test-driven-development, systematic-debugging, verification-before-completion)
+    and the upstream licence are committed, unchanged, under `template/governance/kernel/vendor/superpowers/`.
+  - The plugin, its hook and every other skill never enter the repository.
+  - The scratch clone is deleted afterwards.
+
+### DEC-195 — W1-06 DP-1: the ten pins with a sha256, plus gitleaks 8.30.1
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-1 option (a), with an addition · **Under:** DEC-074, DEC-056
+- **Decision:**
+  - "Every DEC-074 pin" in W1-06 means the ten rows of ADR-0002 §2 that give a version and a sha256.
+  - gitleaks 8.30.1 is added now (already installed; W1-15 uses it), with the sha256 of its binary.
+  - The other stack rows without a sha256 enter the registry when the ticket that installs them runs.
+
+### DEC-196 — W1-06 DP-2: what the registry's sha256 covers
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-2 option (a), with a clarification
+- **Decision:**
+  - `sha256` covers the one downloaded artefact (npm tarball, release tarball, distribution package), or the binary
+    itself for a single-file tool.
+  - `gov doctor` re-checks the hash for single-file binaries and the version for multi-file tools.
+
+### DEC-197 — W1-06 DP-4: each install has its own register entry, which `approved_by` cites
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on W1-06 package DP-4 option (a) · **Under:** DEC-083
+- **Decision:**
+  - Each install has its own register entry naming the tool and its exact version, and the registry's `approved_by`
+    cites it.
+  - Older pins cite the decision that names them (DEC-074, DEC-191, DEC-141).
+
+### DEC-198 — The S0b2 tool registry is read for the full digests
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on the W1 orchestrator's report
+- **Decision:** The orchestrator reads `~/gov-os-workbench/s0b2/out/TOOL_REGISTRY.yaml` for the full digests of the
+  pins. It reads workbench files by exact path, and does not list the workbench's top level.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.36 | 2026-10-03 | Owner answers on W1-06's packages: DEC-192 (install approved: ccusage 20.0.26 under Node v22.23.3), DEC-193 (download approved: Superpowers v6.4.2 source into the orchestrator's scratch), DEC-194 (DP-3: only the three skills and the licence are committed), DEC-195 (DP-1: the ten pins with a sha256, plus gitleaks 8.30.1), DEC-196 (DP-2: sha256 covers the downloaded artefact, or the binary of a single-file tool), DEC-197 (DP-4: each install has its own register entry, cited by `approved_by`), DEC-198 (the S0b2 registry is read for full digests; workbench files by exact path). |
