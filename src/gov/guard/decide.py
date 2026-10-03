@@ -17,6 +17,7 @@ WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
 FREEZE_FLAG = ".gov-runtime/freeze"
 ACCEPTANCE = "tests/acceptance"
+_GOV_RUNTIME = ".gov-runtime"
 _PUNCT = frozenset("();<>|&\n")
 _WRITE_CMDS = frozenset({"touch", "rm", "mv", "cp", "mkdir"})
 _ASSIGN_RE = re.compile(r"^[A-Za-z_]\w*=")
@@ -126,6 +127,18 @@ def _is_under_acceptance(relpath: str) -> bool:
     return relpath == ACCEPTANCE or relpath.startswith(ACCEPTANCE + "/")
 
 
+def _is_gov_runtime_protected(relpath: str) -> bool:
+    """True when *relpath* is under ``.gov-runtime/`` but NOT under ``scratch/``.
+
+    DEC-176: the freeze flag, snapshots, findings and records are denied
+    to the orchestrator.  ``scratch/**`` stays writable.
+    """
+    if relpath != _GOV_RUNTIME and not relpath.startswith(_GOV_RUNTIME + "/"):
+        return False
+    scratch = _GOV_RUNTIME + "/scratch"
+    return relpath != scratch and not relpath.startswith(scratch + "/")
+
+
 def _is_in_scratch(path: str, root: str) -> bool:
     real = os.path.realpath(path)
     rr = os.path.realpath(root)
@@ -153,6 +166,10 @@ def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
         return False
     rel = real[len(rr) + 1:]
     if role != "independent-test-designer" and _is_under_acceptance(rel):
+        return False
+    # DEC-176: .gov-runtime/ other than scratch/** is denied to the
+    # orchestrator (the freeze flag, snapshots, findings and records).
+    if role == "orchestrator" and _is_gov_runtime_protected(rel):
         return False
     return any(_match_pattern(rel, p) for p in patterns)
 

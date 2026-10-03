@@ -20,6 +20,7 @@ import subprocess
 import time
 
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
+RECORDS_REL = ".gov-runtime/records.jsonl"
 SNAPSHOT_DIR_REL = ".gov-runtime/snapshots"
 LAST_HEAD_REL = ".gov-runtime/last_head.json"
 SEQ_FILE = ".seq"
@@ -449,6 +450,15 @@ def _record_findings(root: str, findings: list) -> None:
             f.write(json.dumps(fi, separators=(",", ":")) + "\n")
 
 
+def _write_records(root: str, records: list) -> None:
+    """Write JSON lines to ``records.jsonl`` (DEC-177)."""
+    p = os.path.join(root, RECORDS_REL)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    with open(p, "a", encoding="utf-8") as f:
+        for rec in records:
+            f.write(json.dumps(rec, separators=(",", ":")) + "\n")
+
+
 # ---- acceptance-test restoration ----------------------------------
 
 def _restore_from_head(root: str, paths: list,
@@ -800,6 +810,39 @@ def check_containment(
                 acc_breach.append(path)
             else:
                 oos.append(path)
+
+    # ---- orchestrator records (DEC-177) ----
+    # When the orchestrator (in its own session) changes a path outside
+    # the ticket's specific allowed_paths, that change is a record in
+    # records.jsonl, not a containment finding.  Acceptance paths stay
+    # findings; paths denied by the guard (DEC-176) are in oos above.
+    _acting = subagent_type if subagent_type else role
+    _srole = (role or "").strip()
+    if _acting == "orchestrator" and _srole == "orchestrator":
+        from gov.guard.decide import _load_ticket, _match_pattern
+        ticket_pats: list = []
+        if ticket_id:
+            t = _load_ticket(project_root, ticket_id)
+            if t:
+                ticket_pats = [p for p in t.get("allowed_paths", []) if p]
+
+        skip = set(committed_out) | set(oos) | set(acc_breach)
+        record_set: list = []
+        for path in sorted(changed):
+            if path in skip:
+                continue
+            if _is_under_acceptance(path):
+                continue
+            if ticket_pats and any(_match_pattern(path, p)
+                                   for p in ticket_pats):
+                continue
+            record_set.append(path)
+
+        if record_set:
+            _write_records(project_root, [_make_finding(
+                session_id, agent_type, role, ticket_id, command,
+                record_set, "recorded",
+                "change outside ticket paths")])
 
     # ---- act on findings ----
     findings: list = list(head_findings)

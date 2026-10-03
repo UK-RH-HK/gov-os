@@ -1812,3 +1812,81 @@ class TestOrchestratorSubagentScope:
             project_root=project, role="orchestrator", ticket_id=None,
         )
         assert d == "allow"
+
+
+# ---------------------------------------------------------------------------
+# DEC-176: .gov-runtime/ other than scratch/** denied to the orchestrator
+# ---------------------------------------------------------------------------
+
+class TestGovRuntimeProtected:
+    """DEC-176: the freeze flag, snapshots, findings and records under
+    .gov-runtime/ are denied to the orchestrator. scratch/** stays writable."""
+
+    @pytest.mark.parametrize("rel", [
+        ".gov-runtime/freeze",
+        ".gov-runtime/findings.jsonl",
+        ".gov-runtime/records.jsonl",
+        ".gov-runtime/snapshots/snap.json",
+    ])
+    def test_orchestrator_denied_gov_runtime_file_tool(self, tmp_path, rel):
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, rel), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "deny", f"orchestrator was not denied {rel}"
+
+    @pytest.mark.parametrize("rel", [
+        ".gov-runtime/freeze",
+        ".gov-runtime/findings.jsonl",
+    ])
+    def test_orchestrator_denied_gov_runtime_bash(self, tmp_path, rel):
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Bash",
+            tool_input={"command": f"echo x >> {rel}"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "deny", f"orchestrator Bash was not denied {rel}"
+
+    def test_orchestrator_scratch_still_allowed(self, tmp_path):
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".gov-runtime/scratch/note.txt"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "allow"
+
+    def test_orchestrator_scratch_orchestrator_still_allowed(self, tmp_path):
+        project = _make_project(tmp_path)
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".gov-runtime/scratch/orchestrator/cp.json"),
+                         "content": "x"},
+            project_root=project, role="orchestrator", ticket_id=None,
+        )
+        assert d == "allow"
+
+    def test_engineer_gov_runtime_still_denied(self, tmp_path):
+        """Other roles were already denied .gov-runtime/ paths (no regression)."""
+        project = _make_project(tmp_path, _std_tickets())
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".gov-runtime/freeze"), "content": "x"},
+            project_root=project, role="engineer", ticket_id=TID,
+        )
+        assert d == "deny"
+
+    def test_orchestrator_denied_gov_runtime_with_ticket(self, tmp_path):
+        """DEC-176 holds regardless of the ticket."""
+        project = _make_project(tmp_path, {
+            "DAEO-orch.md": _ticket(ticket_id="DAEO-orch", role="orchestrator"),
+        })
+        d, _ = decide(
+            tool_name="Write",
+            tool_input={"file_path": os.path.join(project, ".gov-runtime/freeze"), "content": "x"},
+            project_root=project, role="orchestrator", ticket_id="DAEO-orch",
+        )
+        assert d == "deny"

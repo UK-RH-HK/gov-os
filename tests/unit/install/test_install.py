@@ -345,9 +345,10 @@ def test_non_install_gives_empty_stdout(tmp_path):
 # ===================================================================
 
 def test_guard_deny_stays_deny_for_orchestrator_install(tmp_path):
-    """An install that also writes outside the ticket paths stays denied."""
+    """An install that also writes to .gov-runtime/ stays denied (DEC-176)."""
     project = _make_project(tmp_path)
-    proc = _run_hook(project, "pip install requests && touch README.md",
+    proc = _run_hook(project,
+                     "pip install requests && touch .gov-runtime/findings.jsonl",
                      role="orchestrator", ticket="T-01", tmp_path=tmp_path)
     assert _decision(proc) == "deny"
 
