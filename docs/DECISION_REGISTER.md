@@ -1484,3 +1484,57 @@ in `docs/changes/S2-CIT-E.md`.
 | Version | Date | Change |
 |---|---|---|
 | 0.26 | 2026-10-03 | S2 brief: DEC-150 (DP-7 orchestrator standing rights; amended by DEC-156), DEC-151 (two W1-05 confirmations), DEC-152 (EXP-001 accepted as ADOPT-PARTIAL), DEC-153 (launcher, guard hardening and Claude Code pin tickets), DEC-154 (W1-05 provider change), DEC-155 (plan validator scope). Owner answers to S2: DEC-156 (DP-7 corrected: the orchestrator writes anywhere except `tests/acceptance/**`, unsandboxed), DEC-157 (P-1: installs stay as DEC-083), DEC-158 (P-2: network profiles per role), DEC-159 (P-3: per-session temp directory for workers, residual as fallback), DEC-160 (P-4: Wave 2 experiment), DEC-161 (P-5: sandbox for launched worker sessions only), DEC-162 (the qualification oracle is hidden from every session started in the repository root by a committed `Read` deny rule and a guard rule, both from W1-47; an opaque Bash read in the orchestrator session stays a residual). |
+
+## 27. S2 repair decisions after the S2-A round-1 audit (register v0.27, appended by S2 on branch `s2/spec`)
+
+Owner decisions of 2026-10-03, given with the S2-A round-1 verdict (ACCEPT_WITH_FINDINGS): the answers to the audit's
+decision packages DP-1 and DP-2, and three additions the owner made in the same message. The repair is recorded in
+`docs/changes/S2-CIT-E.md` §6.
+
+### DEC-163 — DP-1: a minimal research role in the Wave 1 roster
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-1 · **Refines:** DEC-157, DEC-158 · **Amends:** DEC-083 (for the research role only), Charter v5 §6 (roster)
+- **Decision:**
+  - The Wave 1 roster gains a minimal research role: a role file delivered with the launcher (W1-46).
+  - It may install only inside its own experiment folder: a venv or local prefix within its ticket's `allowed_paths`.
+    System-wide installs are denied to it. The sandbox's write fence enforces this.
+  - Its network profile is the research allowlist of DEC-158.
+  - The full research lifecycle (CAP-32) stays in Wave 3.
+- **Note:** the owner's message names "DEC-159's research allowlist". The research allowlist is in DEC-158; DEC-159
+  is the per-session temp directory, which a research session also gets. The decision is carried against DEC-158.
+
+### DEC-164 — DP-2: two more sandbox residuals, and no `excludedCommands`
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, on S2-A package DP-2 · **Extends:** DEC-160 · **Under:** DEC-152, DEC-161
+- **Decision:**
+  - Two points are open residuals: subagents inside a sandboxed worker session, and `excludedCommands`.
+  - Both are added to EXP-002, the Wave 2 sandbox experiment of DEC-160.
+  - The launcher sets no `excludedCommands`.
+
+### DEC-165 — The upstream lesson loop, in a lite form (Wave 3)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER · **Reverses:** DEC-053 Q7, for framework lessons only · **Amends:** DEC-156 (one path outside the repository), Charter v5 §7 (non-goal row)
+- **Decision:** A lite form of CAP-41 and of the former Contract v3 Q4, built in Wave 3:
+  - Every lesson record carries a scope (project, product or framework) and a severity (low, medium, high or
+    critical).
+  - A framework lesson becomes a lesson packet: failure pattern, evidence and suggested change. It carries no product
+    code, data or secrets, and is scanned by gitleaks. The product's orchestrator writes it to the shared inbox
+    `~/gov-os-lessons-inbox/`, the one path outside its repository the orchestrator may write (a guard exception).
+  - A high or critical lesson is raised to the owner immediately, as a decision package.
+  - The Gov OS orchestrator triages the inbox (deduplicate, rank) into change proposals under the normal cycle. Each
+    release's notes list the lessons fixed, with their severity.
+  - In every repository, `gov doctor` compares the installed release with the latest and reports pending updates and
+    their highest severity at session start. The owner decides when to run `gov update`.
+  - Product decisions, specifications and lessons never leave their repository.
+
+### DEC-166 — `gov discover`, the entry point to discovery (Wave 2)
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER · **Under:** DEC-102, DEC-103
+- **Decision:** `gov discover <question or feature>` is the entry point to discovery. It opens a discovery ticket,
+  runs the discovery skill (readiness gaps, owner questions), and schedules research and experiment tasks whose
+  evidence records, with measured numbers, back the answer. Plain language works the same way.
+
+### DEC-167 — "What's the impact of X?" triggers the impact assessment
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER · **Under:** DEC-105
+- **Decision:** "What's the impact of X?" asked in plain language triggers the impact assessment: `gov impact` from
+  Wave 2; in Wave 1, an OpenSpec proposal plus `gov closure`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.27 | 2026-10-03 | S2 repair after the S2-A round-1 audit: DEC-163 (DP-1: a minimal research role in the Wave 1 roster, delivered with W1-46; installs only inside its experiment folder, enforced by the sandbox's write fence; research allowlist of DEC-158), DEC-164 (DP-2: subagents inside a sandboxed worker session and `excludedCommands` are open residuals, added to EXP-002; the launcher sets no `excludedCommands`), DEC-165 (the lite upstream lesson loop, Wave 3; reverses DEC-053 Q7 for framework lessons only), DEC-166 (`gov discover`, Wave 2), DEC-167 (a plain-language impact question triggers the impact assessment). |
