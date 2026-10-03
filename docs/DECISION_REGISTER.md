@@ -1365,7 +1365,7 @@ acceptance tests of W1-05 (commit `2b2944a`, recorded in `tests/acceptance/W1-05
 ## 26. S2 specification-change decisions (register v0.26, appended by S2 on branch `s2/spec`)
 
 Owner decisions given in the S2 brief (DEC-150…DEC-155), and the owner's answers of 2026-10-03 to the S2 decision
-packages P-1…P-5 and to DP-7 (DEC-156…DEC-161). The impact is listed in `docs/changes/S2-CIT-P.md` and the execution
+packages P-1…P-5, to DP-7 and to the open point on the oracle (DEC-156…DEC-162). The impact is listed in `docs/changes/S2-CIT-P.md` and the execution
 in `docs/changes/S2-CIT-E.md`.
 
 ### DEC-150 — DP-7: the orchestrator's standing rights, option (b) extended
@@ -1471,6 +1471,16 @@ in `docs/changes/S2-CIT-E.md`.
     tested only an empty list);
   - that its `GOV_ROLE` and `GOV_TICKET` reach the guard.
 
+### DEC-162 — The qualification oracle is hidden from every session started in the repository root
+- **Status:** ACCEPTED (owner, 2026-10-03) · **Basis:** OWNER, answer to the S2 open point on DEC-161 · **Refines:** DEC-152 (oracle hiding), DEC-161
+- **Decision:** The qualification oracle is hidden from every session started in the repository root, the unsandboxed
+  orchestrator included, by two layers:
+  - a `Read` deny rule with the oracle's absolute path in the repository's committed `.claude/settings.json`;
+  - the guard denying any tool call whose input names the oracle path (Read, Grep, Glob, Bash).
+- Both are delivered by the guard-hardening ticket (W1-47).
+- **Residual:** an opaque Bash read in the orchestrator's own session remains an accepted residual, restated in
+  `governance/project/bootstrap.md`.
+
 | Version | Date | Change |
 |---|---|---|
-| 0.26 | 2026-10-03 | S2 brief: DEC-150 (DP-7 orchestrator standing rights; amended by DEC-156), DEC-151 (two W1-05 confirmations), DEC-152 (EXP-001 accepted as ADOPT-PARTIAL), DEC-153 (launcher, guard hardening and Claude Code pin tickets), DEC-154 (W1-05 provider change), DEC-155 (plan validator scope). Owner answers to S2: DEC-156 (DP-7 corrected: the orchestrator writes anywhere except `tests/acceptance/**`, unsandboxed), DEC-157 (P-1: installs stay as DEC-083), DEC-158 (P-2: network profiles per role), DEC-159 (P-3: per-session temp directory for workers, residual as fallback), DEC-160 (P-4: Wave 2 experiment), DEC-161 (P-5: sandbox for launched worker sessions only). |
+| 0.26 | 2026-10-03 | S2 brief: DEC-150 (DP-7 orchestrator standing rights; amended by DEC-156), DEC-151 (two W1-05 confirmations), DEC-152 (EXP-001 accepted as ADOPT-PARTIAL), DEC-153 (launcher, guard hardening and Claude Code pin tickets), DEC-154 (W1-05 provider change), DEC-155 (plan validator scope). Owner answers to S2: DEC-156 (DP-7 corrected: the orchestrator writes anywhere except `tests/acceptance/**`, unsandboxed), DEC-157 (P-1: installs stay as DEC-083), DEC-158 (P-2: network profiles per role), DEC-159 (P-3: per-session temp directory for workers, residual as fallback), DEC-160 (P-4: Wave 2 experiment), DEC-161 (P-5: sandbox for launched worker sessions only), DEC-162 (the qualification oracle is hidden from every session started in the repository root by a committed `Read` deny rule and a guard rule, both from W1-47; an opaque Bash read in the orchestrator session stays a residual). |
