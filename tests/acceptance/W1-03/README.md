@@ -601,6 +601,18 @@ For the DEC-106 metric. Batch 4 changed no existing test and no existing expecta
 
 Batch 5 changed no existing test and no existing expectation.
 
+### W1-45 (DEC-156, DEC-171): orchestrator write scope
+
+Reason: **owner correction, DEC-156**. The orchestrator may write anywhere except `tests/acceptance/**`; a change
+outside the ticket's `allowed_paths` is a record, not a containment finding (DEC-171). Revised by the Independent
+Test Designer in the W1-45 test design batch (DEC-106). No test for another role was changed; no test was weakened.
+
+| Test | Change | Reason |
+|---|---|---|
+| `test_w1_03_out_of_scope.py` `test_each_ticket_role_is_compared_with_its_own_ticket` | Orchestrator case removed from parametrize (README.md write is now a record, not a finding) | DEC-156, DEC-171 |
+| `test_w1_03_out_of_scope.py` `NO_TICKET_PATHS`: `orchestrator-on-the-engineer-s-ticket` | Removed (the orchestrator has paths regardless of the active ticket) | DEC-156 |
+| `test_w1_03_head_moves.py` `NOT_THEIR_PATH`: `orchestrator-on-the-engineer-s-ticket` | Moved to `COMMITS_INSIDE` (the commit is a record, not a finding) | DEC-156, DEC-171 |
+
 ## Not tested
 
 With the owner: KD-7 in `W1-03-kpi-disputes-round-4.md`, the name of the ten-minute setting and the place it is read

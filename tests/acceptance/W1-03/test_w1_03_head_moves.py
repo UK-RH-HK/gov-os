@@ -145,6 +145,11 @@ COMMITS_INSIDE = {
         ORCHESTRATOR, ORCHESTRATOR_TICKET, None, "echo changed >> .claude/settings.json && git commit -qam work"),
     "engineer-subagent-in-orchestrator-session": (
         ORCHESTRATOR, TICKET, ENGINEER, f"echo changed >> {SOURCE} && git commit -qam work"),
+    # DEC-156 / DEC-171 (W1-45): moved from NOT_THEIR_PATH; the orchestrator may
+    # write README.md (not under tests/acceptance/**) and the commit is a record,
+    # not a finding.  Rewrite: owner correction, DEC-156.
+    "orchestrator-on-the-engineer-s-ticket": (
+        ORCHESTRATOR, TICKET, None, "echo changed >> README.md && git commit -qam work"),
 }
 
 
@@ -162,7 +167,9 @@ def test_a_commit_inside_the_caller_s_paths_is_silent(project, call, case):
 NOT_THEIR_PATH = {
     "no-role": (None, None, None),
     "engineer-without-a-ticket": (ENGINEER, None, None),
-    "orchestrator-on-the-engineer-s-ticket": (ORCHESTRATOR, TICKET, None),
+    # DEC-156 / DEC-171 (W1-45): the orchestrator case is moved to COMMITS_INSIDE;
+    # the orchestrator may write README.md (not under tests/acceptance/**).
+    # Rewrite: owner correction, DEC-156.
     "test-designer": (DESIGNER, TICKET, None),
     "general-purpose-subagent-in-engineer-session": (ENGINEER, TICKET, "general-purpose"),
     "engineer-subagent-in-a-session-without-a-role": (None, TICKET, ENGINEER),

@@ -68,9 +68,11 @@ OUTSIDE = {
 OTHER_ROLES = {
     "orchestrator-settings": (ORCHESTRATOR, ORCHESTRATOR_TICKET, ".claude/settings.json", True),
     "orchestrator-bootstrap": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "governance/project/bootstrap.md", True),
-    "orchestrator-neighbour-file": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "governance/project/roster.yaml", False),
-    "orchestrator-source": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "src/gov/guard/decide.py", False),
-    "orchestrator-root-file": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "README.md", False),
+    # DEC-156 (W1-45): the orchestrator may write anywhere except tests/acceptance/**.
+    # Rewrite: owner correction, DEC-156. Previously False (denied outside ticket paths).
+    "orchestrator-neighbour-file": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "governance/project/roster.yaml", True),
+    "orchestrator-source": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "src/gov/guard/decide.py", True),
+    "orchestrator-root-file": (ORCHESTRATOR, ORCHESTRATOR_TICKET, "README.md", True),
     "product-spec-role-file": (PRODUCT_SPEC, PRODUCT_SPEC_TICKET, "template/governance/kernel/roles/engineer.md", True),
     "product-spec-spec": (PRODUCT_SPEC, PRODUCT_SPEC_TICKET, "docs/spec/feature.md", True),
     "product-spec-new-spec": (PRODUCT_SPEC, PRODUCT_SPEC_TICKET, "docs/spec/new/readiness.md", True),
@@ -83,9 +85,9 @@ OTHER_ROLES = {
 MISMATCHED = {
     "engineer-on-orchestrator-ticket": (ENGINEER, ORCHESTRATOR_TICKET, ".claude/settings.json"),
     "engineer-on-product-spec-ticket": (ENGINEER, PRODUCT_SPEC_TICKET, "docs/spec/feature.md"),
-    "orchestrator-on-engineer-ticket": (ORCHESTRATOR, TICKET, "src/gov/guard/decide.py"),
+    # DEC-156 (W1-45): the orchestrator cases are removed; the orchestrator may write
+    # regardless of the active ticket.  Rewrite: owner correction, DEC-156.
     "product-spec-on-engineer-ticket": (PRODUCT_SPEC, TICKET, "src/gov/guard/decide.py"),
-    "orchestrator-on-product-spec-ticket": (ORCHESTRATOR, PRODUCT_SPEC_TICKET, "docs/spec/feature.md"),
     "product-spec-on-orchestrator-ticket": (PRODUCT_SPEC, ORCHESTRATOR_TICKET, ".claude/settings.json"),
 }
 

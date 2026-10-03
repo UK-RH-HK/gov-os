@@ -154,10 +154,12 @@ def test_the_comparison_follows_the_active_ticket(project, after_bash):
     support.assert_caught(result, SOURCE, what=f"`{command}` by the engineer on {docs_ticket}")
 
 
+# DEC-156 / DEC-171 (W1-45): the orchestrator case is removed; an orchestrator change
+# outside its ticket's allowed_paths is a record, not a finding.
+# Rewrite: owner correction, DEC-156.
 @pytest.mark.parametrize("role, ticket, relpath", [
-    (ORCHESTRATOR, support.ORCHESTRATOR_TICKET_ID, ".claude/settings.json"),
     (PRODUCT_SPEC, support.PRODUCT_SPEC_TICKET_ID, "docs/spec/feature.md"),
-], ids=["orchestrator", "product-spec"])
+], ids=["product-spec"])
 def test_each_ticket_role_is_compared_with_its_own_ticket(project, after_bash, role, ticket, relpath):
     command = f"echo changed >> {relpath}"
     result = after_bash(project, command, role, ticket, changed=[relpath])
@@ -181,7 +183,8 @@ NO_TICKET_PATHS = {
     "engineer-on-a-ticket-that-does-not-exist": (ENGINEER, "DAEO-none"),
     "engineer-on-the-orchestrator-s-ticket": (ENGINEER, support.ORCHESTRATOR_TICKET_ID),
     "auditor-on-the-engineer-s-ticket": (AUDITOR, TICKET),
-    "orchestrator-on-the-engineer-s-ticket": (ORCHESTRATOR, TICKET),
+    # DEC-156 (W1-45): the orchestrator case is removed; the orchestrator has
+    # paths regardless of the active ticket.  Rewrite: owner correction, DEC-156.
 }
 
 

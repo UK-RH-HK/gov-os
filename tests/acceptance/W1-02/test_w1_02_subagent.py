@@ -61,6 +61,9 @@ ROLE_ALLOWS = {
     "orchestrator-in-engineer-session-own-ticket": (ENGINEER, ORCHESTRATOR, ORCHESTRATOR_TICKET, SETTINGS),
     "product-spec-in-orchestrator-session-own-ticket": (ORCHESTRATOR, PRODUCT_SPEC, PRODUCT_SPEC_TICKET, SPEC),
     "auditor-in-engineer-session-scratch": (ENGINEER, AUDITOR, ENGINEER_TICKET, SCRATCH),
+    # DEC-156 (W1-45): moved from ROLE_DENIES; the orchestrator may write SOURCE
+    # regardless of the active ticket.  Rewrite: owner correction, DEC-156.
+    "orchestrator-in-engineer-session-on-the-engineer-s-ticket": (ENGINEER, ORCHESTRATOR, ENGINEER_TICKET, SOURCE),
 }
 
 # The subagent's role does not allow the write, whatever the session's role allows.
@@ -73,7 +76,8 @@ ROLE_DENIES = {
     "designer-in-engineer-session-source": (ENGINEER, DESIGNER, ENGINEER_TICKET, SOURCE),
     "designer-in-designer-session-source": (DESIGNER, DESIGNER, ENGINEER_TICKET, SOURCE),
     "auditor-in-engineer-session-source": (ENGINEER, AUDITOR, ENGINEER_TICKET, SOURCE),
-    "orchestrator-in-engineer-session-on-the-engineer-s-ticket": (ENGINEER, ORCHESTRATOR, ENGINEER_TICKET, SOURCE),
+    # DEC-156 (W1-45): the orchestrator-in-engineer-session case is moved to ROLE_ALLOWS.
+    # Rewrite: owner correction, DEC-156.
     "product-spec-in-engineer-session-source": (ENGINEER, PRODUCT_SPEC, ENGINEER_TICKET, SOURCE),
 }
 

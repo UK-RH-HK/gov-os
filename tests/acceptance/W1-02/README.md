@@ -207,6 +207,18 @@ decisions of 2026-10-01 (register v0.18). No other test was touched.
 | `test_w1_02_target_resolution.py`, 7 test functions (46 cases) | Added. No earlier test changed its expectation: the plain forms of `test_w1_02_bash_writes.py` hold no `~`, variable, substitution or glob | New target-resolution rule |
 | `w1_02_support.py`, `conftest.py` | `run_hook`, `call` and `bash` accept extra environment variables for the hook process | New target-resolution rule |
 
+### W1-45 (DEC-156): orchestrator write scope
+
+Reason: **owner correction, DEC-156**. The orchestrator may write anywhere in the repository except
+`tests/acceptance/**`; the guard enforces only that exclusion. Revised by the Independent Test Designer in the
+W1-45 test design batch (DEC-106). No test for another role was changed; no test was weakened.
+
+| Test | Change | Reason |
+|---|---|---|
+| `test_w1_02_allow_list.py` `OTHER_ROLES`: `orchestrator-neighbour-file`, `orchestrator-source`, `orchestrator-root-file` | Expected result changed from denied (False) to allowed (True) | DEC-156: the orchestrator is not confined to its ticket's `allowed_paths` |
+| `test_w1_02_allow_list.py` `MISMATCHED`: `orchestrator-on-engineer-ticket`, `orchestrator-on-product-spec-ticket` | Removed | DEC-156: the orchestrator writes regardless of the active ticket's role |
+| `test_w1_02_subagent.py` `ROLE_DENIES`: `orchestrator-in-engineer-session-on-the-engineer-s-ticket` | Moved to `ROLE_ALLOWS` | DEC-156: the orchestrator subagent may write source regardless of ticket |
+
 ## Not tested
 
 With the owner (`~/gov-os-workbench/w1-tests/decision-packages/W1-02-kpi-disputes.md`):
