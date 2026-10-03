@@ -215,7 +215,20 @@ ACTORS = {
 }
 
 SCRATCH_NOTE = f"{support.SCRATCH_REL}/note.md"        # every role may write the scratch set (DEC-108)
-NOT_THEIR_FILE = "src/app/main.py"                     # neither actor of ACTORS may write it
+
+
+def _denied_path(actor):
+    """A path the guard denies for this actor.
+
+    DEC-156 (W1-45): the orchestrator may write anywhere except
+    tests/acceptance/**. For the orchestrator the denied path is under
+    tests/acceptance/; for every other actor of ACTORS it is a source file
+    outside the active ticket's allowed_paths.
+    Rewrite: owner correction, DEC-156.
+    """
+    if actor.role == ORCHESTRATOR and actor.subagent is None:
+        return ACCEPTANCE_FILE
+    return "src/app/main.py"
 
 
 def _a_bash_call_that_ended(project, sandbox, actor):
@@ -224,7 +237,8 @@ def _a_bash_call_that_ended(project, sandbox, actor):
 
 
 def _a_bash_call_the_guard_denied(project, sandbox, actor):
-    _begin(project, sandbox, actor, f"echo changed > {NOT_THEIR_FILE}", literal=True, decision="deny")
+    path = _denied_path(actor)
+    _begin(project, sandbox, actor, f"echo changed > {path}", literal=True, decision="deny")
 
 
 def _a_file_tool_call_the_guard_let_through(project, sandbox, actor):
@@ -232,7 +246,7 @@ def _a_file_tool_call_the_guard_let_through(project, sandbox, actor):
 
 
 def _a_file_tool_call_the_guard_denied(project, sandbox, actor):
-    _file_tool(project, sandbox, actor, NOT_THEIR_FILE, "deny")
+    _file_tool(project, sandbox, actor, _denied_path(actor), "deny")
 
 
 LATER_CALLS = {

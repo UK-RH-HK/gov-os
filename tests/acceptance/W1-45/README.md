@@ -69,6 +69,12 @@ Each revision is a rewrite after implementation with reason: **owner correction,
 |------|----------------|-----------------|--------|
 | `"orchestrator-on-the-engineer-s-ticket"` | `NOT_THEIR_PATH` (commit flagged) | `COMMITS_INSIDE` (commit silent) | DEC-156, DEC-171: the commit is a record, not a finding |
 
+### W1-03 `test_w1_03_calls_known_to_be_over.py`
+
+| Case | Old expectation | New expectation | Reason |
+|------|----------------|-----------------|--------|
+| `test_a_later_tool_call_of_its_actor_shows_the_call_is_over` ids `orchestrator-main-thread-then-an-engineer-subagent-bash-call-the-guard-denied` and `...-file-tool-call-the-guard-denied` | The denied later call writes `src/app/main.py` (denied under the old ticket-paths rule) | The denied later call writes `tests/acceptance/W1-90/test_fixture.py` (still denied: MR-3 exclusion) | DEC-156: `src/app/main.py` is no longer denied for the orchestrator |
+
 ## W1-04 and W1-05 findings (not revised)
 
 ### W1-04 `test_w1_04_only_escalates.py`

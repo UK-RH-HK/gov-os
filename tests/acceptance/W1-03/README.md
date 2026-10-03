@@ -612,6 +612,7 @@ Test Designer in the W1-45 test design batch (DEC-106). No test for another role
 | `test_w1_03_out_of_scope.py` `test_each_ticket_role_is_compared_with_its_own_ticket` | Orchestrator case removed from parametrize (README.md write is now a record, not a finding) | DEC-156, DEC-171 |
 | `test_w1_03_out_of_scope.py` `NO_TICKET_PATHS`: `orchestrator-on-the-engineer-s-ticket` | Removed (the orchestrator has paths regardless of the active ticket) | DEC-156 |
 | `test_w1_03_head_moves.py` `NOT_THEIR_PATH`: `orchestrator-on-the-engineer-s-ticket` | Moved to `COMMITS_INSIDE` (the commit is a record, not a finding) | DEC-156, DEC-171 |
+| `test_w1_03_calls_known_to_be_over.py` `_a_bash_call_the_guard_denied` and `_a_file_tool_call_the_guard_denied` | The denied path is now actor-specific: for the orchestrator it is under `tests/acceptance/` (still denied); for every other actor it stays `src/app/main.py`. Affects test ids `orchestrator-main-thread-then-an-engineer-subagent-bash-call-the-guard-denied` and `...-file-tool-call-the-guard-denied` | DEC-156: `src/app/main.py` is no longer denied for the orchestrator |
 
 ## Not tested
 
