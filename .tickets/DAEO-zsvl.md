@@ -27,6 +27,8 @@ kpis:
   - SubagentStop enforces the 12-field return contract of Framework §61 (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action)
     [CAP-37.d]
   - A checkpoint is written when the session's context utilisation passes the configured threshold, not only at PreCompact [CAP-37.c]
+  - A compaction preserves the open decisions, the active ticket and the loop counts; PreCompact writes the checkpoint, and SessionStart (on compact, clear and resume) re-injects the context packet and the checkpoint; the
+    auto-compact threshold is set to about 300k tokens if Claude Code allows it, and if it can't be configured the orchestrator's CONTEXT_CHECKPOINT stop stays (DEC-208)
   failure:
   - A Stop hook loops
   - SessionStart injects more than the cap
