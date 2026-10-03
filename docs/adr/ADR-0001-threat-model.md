@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: []
-decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096, DEC-152, DEC-156, DEC-161]
+decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096, DEC-152, DEC-156, DEC-161, DEC-163]
 supersedes: []
 constrains: [CHARTER-v5, CONTRACT-v4, ADR-0002]
 ---
@@ -61,8 +61,8 @@ Chosen: **option 1**, as DEC-039 states it and DEC-075 amends it.
   are no in-process trust classes.
 - **Tool installs.** The Gov OS runs no automated install gate and no argv classification. The orchestrator installs
   a tool only after the owner approves a decision package in chat, and records the install in the tool registry.
-  Install commands are `ask` for the orchestrator and denied for every other role. `sudo` stays with the owner
-  (DEC-083, amending DEC-040).
+  Install commands are `ask` for the orchestrator and denied for every other role, except the research role inside
+  its experiment folder (DEC-163). `sudo` stays with the owner (DEC-083, amending DEC-040).
 - **Mistake scenarios.** Qualification scenarios phrased as attacks become mistake scenarios. For example, "policy
   tampering" becomes "an agent edits a policy file by mistake, and CI must catch it" (DEC-067).
 

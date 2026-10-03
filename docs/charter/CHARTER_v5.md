@@ -2,7 +2,7 @@
 id: CHARTER-v5
 status: PROPOSED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
-decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165]
+decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173]
 ---
 
 # Governance OS — Charter v5
@@ -163,7 +163,7 @@ from kernel role files plus the project roster. It carries:
   a PR approval (DEC-046, CAP-21).
 - Only the orchestrator installs tools, and only after the owner approves a decision package in chat. The install is
   recorded in the tool registry. Install commands are `ask` for the orchestrator, also in Auto mode, and denied for
-  every other role. `sudo` stays with the owner (DEC-083, DEC-095).
+  every other role, except the research role, inside its experiment folder (DEC-163). `sudo` stays with the owner (DEC-083, DEC-095).
 
 **The human as customer** (MR-6).
 - The questions that matter arrive as decision packages in the active chat: question, why now, options, impact,

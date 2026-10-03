@@ -5,7 +5,7 @@ type: decision
 status: PROPOSED
 date: 2026-09-30
 depends_on: [ADR-0001]
-decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-170, DEC-171]
+decisions: [DEC-064, DEC-065, DEC-066, DEC-067, DEC-073, DEC-074, DEC-075, DEC-076, DEC-078, DEC-080, DEC-083, DEC-084, DEC-085, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-095, DEC-096, DEC-138, DEC-141, DEC-150, DEC-152, DEC-153, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-170, DEC-171, DEC-172, DEC-173]
 supersedes: []
 implements: [CHARTER-v5, CONTRACT-v4]
 ---
@@ -157,7 +157,8 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
 ### 6. Operating model
 
 - **Roles** (DEC-066, DEC-163). Wave 1 has five roles, and a sixth in a minimal form:
-  - orchestrator: the only role that installs tools, and only after the owner approves a decision package in chat that
+  - orchestrator: the only role that installs tools, except the research role inside its experiment folder
+    (DEC-163), and only after the owner approves a decision package in chat that
     gives the tool, exact version, source and checksum, need, disk and RAM, and uninstall command. Every install is
     recorded in the tool registry (version, sha256, install and uninstall commands, date, approving decision), and
     `gov doctor` checks the pins (DEC-083, which amends DEC-040; DEC-095);
@@ -169,8 +170,13 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
     session, writes only inside its ticket's `allowed_paths` (its experiment folder), and uses the research network
     allowlist of DEC-158. It may install only into a venv or local prefix inside that folder; the sandbox's write
     fence denies a system-wide install. Inside the repository the fence is a list of `Edit` deny rules the launcher
-    generates at launch, because the sandbox always leaves the working directory writable (EXP-001 §3.4, §5.3). A
-    research or experiment session runs as `GOV_ROLE=research`. The full research lifecycle (CAP-32) stays in
+    generates at launch, because the sandbox always leaves the working directory writable (EXP-001 §3.4, §5.3). The
+    list is computed at launch, from the paths that exist then. A path created later outside the experiment folder is
+    not in it; that path is covered by the guard's per-ticket allow-list, which holds the role's writes to its
+    ticket's `allowed_paths`, and the containment check reports a change the guard did not see. The list has two
+    exceptions: `.git/`, so that the session can commit its evidence record, and an entry whose name contains `*`,
+    `?` or `[`, which the sandbox skips on Linux (EXP-001 §1). Both are left to the guard and the containment check.
+    A research or experiment session runs as `GOV_ROLE=research`. The full research lifecycle (CAP-32) stays in
     Wave 3.
 
   Wave 2 and Wave 3 roles follow Charter v5 §6, with test execution and integration as distinct Wave 2 roles
@@ -201,11 +207,15 @@ cli/govbridge/                  carried code; ported into src/gov/ by the ticket
     WebSearch and WebFetch run outside the sandbox;
   - worker roles never install system-wide (DEC-157). The install rule above is unchanged for the orchestrator; the
     research role's installs inside its experiment folder are its one exception (DEC-163);
+  - the guard's install rule decides install commands alone. The committed `.claude/settings.json` carries no
+    install or download ask rule once W1-47 has removed them; in a launched worker session the sandbox backs the
+    guard (DEC-172);
   - the launcher sets no `excludedCommands` (DEC-164).
 - **The qualification oracle** is hidden from a worker's Bash by the sandbox (silently: the directory looks empty),
   and from every session started in the repository root by a `Read` deny rule in the committed `.claude/settings.json`
-  and by the guard (DEC-162; W1-47). The path is held in one file, `governance/project/held-out.yaml`, from which the
-  committed rule, the guard and the launcher take it; no acceptance test names it. An opaque Bash read in the orchestrator's own session is an accepted residual.
+  and by the guard (DEC-162; W1-47). The oracle path is held in `governance/project/held-out.yaml` and in the
+  committed deny rule built from it; register entry DEC-067 names the directory historically. The guard and the
+  launcher take the path from `held-out.yaml`; no acceptance test names it. An opaque Bash read in the orchestrator's own session is an accepted residual.
 - **Untested sandbox cases** (`denyWrite` on a path that doesn't exist yet, symlink and hard-link tricks, the seccomp
   filter, `bypassPermissions` mode) go to a Wave 2 experiment, EXP-002 (DEC-160). Two more open residuals go to the
   same experiment: subagents inside a sandboxed worker session, and `excludedCommands` (DEC-164).
@@ -271,7 +281,7 @@ audit→repair, test→fix or verification loop follows DEC-096:
 
 - **Sources:** architecture v0.3; S0a `STACK_OPTIONS.md`, `CAPABILITY_CATALOGUE.md`; S0b2 `RESULTS.md`,
   `GLUE_REQUIREMENTS.md`, `TOOL_REGISTRY.yaml`, `INTEGRATION_REPORT.md`; register DEC-064…DEC-096, and
-  DEC-138…DEC-171 for the sandbox layer, the launcher, the research role and the lesson loop; `spike-sandbox/EVIDENCE.md` (EXP-001, ADOPT-PARTIAL).
+  DEC-138…DEC-173 for the sandbox layer, the launcher, the research role and the lesson loop; `spike-sandbox/EVIDENCE.md` (EXP-001, ADOPT-PARTIAL).
 - **Revisit triggers:**
   - a code graph above the tested envelope;
   - vectors above ~100k (move to LanceDB, DEC-016);
