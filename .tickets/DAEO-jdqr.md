@@ -44,6 +44,7 @@ kpis:
   - In a launched worker session a Bash write outside the repository through an opaque form (interpreter one-liner, command substitution) fails at the OS level, and a file-tool write outside it is refused
     by the permission rules and the guard [CAP-58.d]
   - 'The settings it builds carry the Read deny rule for the held-out directory, whose path the launcher takes from governance/project/held-out.yaml, the file W1-47 creates; from a launched worker''s Bash that directory looks empty; the test uses a stand-in directory, never the qualification oracle [CAP-49.b]'
+  - 'The settings it builds for every worker role carry an Edit deny rule for .gov-runtime/** except .gov-runtime/scratch/**: in a launched worker session a write to the freeze flag, the snapshots, the findings or the records fails, through a file tool, through an opaque Bash form and through ln, while .gov-runtime/scratch/** stays writable (DEC-180, DEC-176)'
   failure:
   - A worker session starts with the sandbox off, not strict or not fail-closed
   - A sandbox setting is read from the repository's settings
@@ -65,6 +66,7 @@ sources:
 - DEC-164
 - DEC-172
 - DEC-174
+- DEC-180
 - EXP-001
 - CAP-49
 - CAP-58
