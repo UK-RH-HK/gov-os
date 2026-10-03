@@ -1,0 +1,130 @@
+# Tool registry of this repository (CAP-25.a, DEC-083, DEC-127). Created by W1-06 (DAEO-ipqy), 2026-10-03.
+#
+# One entry per tool: name, version, sha256, install, uninstall, date, approved_by (the schema is
+# template/governance/kernel/schemas/tool-registry.schema.json). `note` is free text.
+#
+# sha256 (DEC-196): the one downloaded artefact (npm tarball, release tarball, distribution package), or the binary
+# itself for a single-file tool. The ten stack pins of ADR-0002 §2 (DEC-074, DEC-195) carry the digests S0b2
+# recorded on 2026-09-30: the binary for a single-file tool, and the resolved entry script for openspec,
+# check-jsonschema and copier.
+#
+# Tools under Node v22.23.3 are not on the default PATH (the nvm default stays v18.20.8). Run them with
+# PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH.
+tools:
+  # --- The stack pins of ADR-0002 §2 (DEC-074), installed by S0b2 on 2026-09-30 ---
+  - name: node
+    version: "v22.23.3"
+    sha256: "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48"
+    install: "bash -c '. ~/.nvm/nvm.sh && nvm install 22.23.3'"
+    uninstall: "bash -c '. ~/.nvm/nvm.sh && nvm uninstall v22.23.3'"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "Node LTS for tools only, at ~/.nvm/versions/node/v22.23.3/bin/node; sha256 of that binary. Uninstalling it removes every npm global below."
+  - name: uv
+    version: "0.12.21"
+    sha256: "e8a4e7b4fd6283892fccfc4f335fb16cdf01064bb135172e4e2e73b478eb2076"
+    install: "curl -LsSf https://astral.sh/uv/0.12.21/install.sh | env UV_NO_MODIFY_PATH=1 sh"
+    uninstall: "uv cache clean && rm -rf ~/.local/share/uv && rm -f ~/.local/bin/uv ~/.local/bin/uvx"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "sha256 of the binary ~/.local/bin/uv."
+  - name: rulesync
+    version: "24.0.0"
+    sha256: "64e8ad323ad4ef991b21c6a54548e6a2bb02f9facaf9c6cfe9e0782ac3297c71"
+    install: "gh release download v24.0.0 -R dyoshikawa/rulesync -p rulesync-linux-x64 -p SHA256SUMS && sha256sum -c SHA256SUMS --ignore-missing && install -m755 rulesync-linux-x64 ~/.local/bin/rulesync"
+    uninstall: "rm -f ~/.local/bin/rulesync"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "Standalone binary ~/.local/bin/rulesync; sha256 of that binary."
+  - name: openspec
+    version: "1.13.2"
+    sha256: "ca136f0e9fd4951dcf93d8ed729ebc97b2d97d3980cd9dc9d42fc80e32e797c6"
+    install: "PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH npm install -g @fission-ai/openspec@1.13.2"
+    uninstall: "PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH npm uninstall -g @fission-ai/openspec"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "npm package @fission-ai/openspec under Node v22.23.3; sha256 of its entry script bin/openspec.js, as S0b2 recorded it."
+  - name: codebase-memory-mcp
+    version: "0.11.0"
+    sha256: "a831cdcafaed7b1f7c23ce996a72a035f2188d7e20e9a18f39ec4b2d4e3302a6"
+    install: "gh release download v0.11.0 -R DeusData/codebase-memory-mcp -p codebase-memory-mcp-linux-amd64.tar.gz -p checksums.txt && sha256sum -c checksums.txt --ignore-missing && tar -xzf codebase-memory-mcp-linux-amd64.tar.gz && install -m755 codebase-memory-mcp ~/.local/bin/codebase-memory-mcp"
+    uninstall: "rm -f ~/.local/bin/codebase-memory-mcp && rm -rf ~/.cache/codebase-memory-mcp"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "Static binary ~/.local/bin/codebase-memory-mcp; sha256 of that binary. The bundled install.sh is deliberately not run (it rewrites agent MCP configs)."
+  - name: copier
+    version: "9.18.2"
+    sha256: "2343959ad8511d4c10824a856adf20262e59f725841021e59ae6434b16a98ac3"
+    install: "uv tool install copier==9.18.2"
+    uninstall: "uv tool uninstall copier"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "uv tool; sha256 of its entry script ~/.local/bin/copier, as S0b2 recorded it."
+  - name: lefthook
+    version: "2.1.15"
+    sha256: "df981b477c236546435047fb8c8ee1f6f902e17faebb1b07b6bf2165832e8fe3"
+    install: "gh release download v2.1.15 -R evilmartians/lefthook -p lefthook_2.1.15_Linux_x86_64 -p lefthook_checksums.txt && sha256sum -c lefthook_checksums.txt --ignore-missing && install -m755 lefthook_2.1.15_Linux_x86_64 ~/.local/bin/lefthook"
+    uninstall: "rm -f ~/.local/bin/lefthook"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "Single binary ~/.local/bin/lefthook; sha256 of that binary."
+  - name: check-jsonschema
+    version: "0.38.2"
+    sha256: "9341d73160eb696980e921c6d8ba4aa947735a5a810b8dcc4f684c0a12aedd34"
+    install: "uv tool install check-jsonschema==0.38.2"
+    uninstall: "uv tool uninstall check-jsonschema"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "uv tool; sha256 of its entry script ~/.local/bin/check-jsonschema, as S0b2 recorded it."
+  - name: ollama
+    version: "0.35.0"
+    sha256: "0b0650a962dda61ec0598141ea11e3b688d225e926c9c00bc2c299d0ed34c4f8"
+    install: "gh release download v0.35.0 -R ollama/ollama -p ollama-linux-amd64.tar.zst -p sha256sum.txt && sha256sum -c sha256sum.txt --ignore-missing && mkdir -p ~/.local/ollama && zstd -dc ollama-linux-amd64.tar.zst | tar -x -C ~/.local/ollama"
+    uninstall: "pkill -f 'ollama serve'; rm -rf ~/.local/ollama ~/.ollama"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "At ~/.local/ollama/bin/ollama, run on demand, no systemd unit; sha256 as S0b2 recorded it. The host has no zstd: S0b2 decompressed with python zstandard. The embedding model enters the registry with W1-18."
+  - name: ticket
+    version: "v0.3.2"
+    sha256: "408f2c113ecc3bc071507593a78386f1b4cc743be6491c9e9f2627efd4d9902b"
+    install: "curl -sSfL https://raw.githubusercontent.com/wedow/ticket/v0.3.2/ticket -o ticket-v0.3.2 && install -m755 ticket-v0.3.2 ~/.local/bin/tk"
+    uninstall: "rm -f ~/.local/bin/tk"
+    date: "2026-09-30"
+    approved_by: "DEC-074"
+    note: "wedow/ticket, the single bash script ~/.local/bin/tk; sha256 of that script."
+
+  # --- Present on the machine before the registry existed ---
+  - name: gitleaks
+    version: "8.30.1"
+    sha256: "88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509"
+    install: "gh release download v8.30.1 -R gitleaks/gitleaks -p gitleaks_8.30.1_linux_x64.tar.gz -p gitleaks_8.30.1_checksums.txt && sha256sum -c gitleaks_8.30.1_checksums.txt --ignore-missing && tar -xzf gitleaks_8.30.1_linux_x64.tar.gz gitleaks && install -m755 gitleaks ~/.local/bin/gitleaks"
+    uninstall: "rm -f ~/.local/bin/gitleaks"
+    date: "2026-10-03"
+    approved_by: "DEC-195"
+    note: "Single binary ~/.local/bin/gitleaks, on the machine before S0b2; sha256 of that binary, taken 2026-10-03. The date is the date of this record; how it was first installed is not recorded, so the install command is the way to put the same release back."
+  - name: pyyaml
+    version: "6.0.1"
+    sha256: "315e59500af855f23ee4e95525b99009bd798c4d2658af8eb4b2d66a8a91ec23"
+    install: "sudo apt-get install python3-yaml=6.0.1-2build2"
+    uninstall: "sudo apt-get remove python3-yaml"
+    date: "2026-10-03"
+    approved_by: "DEC-191"
+    note: "The system package python3-yaml 6.0.1-2build2 (Ubuntu), under /usr/lib/python3/dist-packages; declared in pyproject.toml. sha256 of the distribution package python3-yaml_6.0.1-2build2_amd64.deb, from the apt package index. The date is the date of this record. Both commands are owner actions: no agent session runs sudo."
+
+  # --- Installed by W1-06, each on its own owner approval (DEC-083, DEC-197) ---
+  - name: ccusage
+    version: "20.0.26"
+    sha256: "b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2"
+    install: "PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH $HOME/.nvm/versions/node/v22.23.3/bin/npm install -g ccusage@20.0.26"
+    uninstall: "PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH $HOME/.nvm/versions/node/v22.23.3/bin/npm uninstall -g ccusage"
+    date: "2026-10-03"
+    approved_by: "DEC-192"
+    note: "npm package under Node v22.23.3 (5.1 MB with its platform package @ccusage/ccusage-linux-x64); sha256 of the npm tarball ccusage-20.0.26.tgz. The PATH prefix is needed: npm's script runs under whichever node is first on PATH, and without it the package lands in the Node v18.20.8 prefix."
+  - name: superpowers
+    version: "v6.4.2"
+    sha256: "fb46c8771f2ad3ac8cd4e43065c486fc8e4b36442fe137b1689f61231ac94ef1"
+    install: "git clone --depth 1 --branch v6.4.2 https://github.com/obra/superpowers .gov-runtime/scratch/orchestrator/vendor-src/superpowers && mkdir -p template/governance/kernel/vendor/superpowers/skills && cp -r .gov-runtime/scratch/orchestrator/vendor-src/superpowers/skills/test-driven-development .gov-runtime/scratch/orchestrator/vendor-src/superpowers/skills/systematic-debugging .gov-runtime/scratch/orchestrator/vendor-src/superpowers/skills/verification-before-completion template/governance/kernel/vendor/superpowers/skills/ && cp .gov-runtime/scratch/orchestrator/vendor-src/superpowers/LICENSE template/governance/kernel/vendor/superpowers/ && rm -rf .gov-runtime/scratch/orchestrator/vendor-src/superpowers"
+    uninstall: "git rm -r template/governance/kernel/vendor/superpowers"
+    date: "2026-10-03"
+    approved_by: "DEC-193"
+    note: "Source of github.com/obra/superpowers at tag v6.4.2, commit 8ca22dba9a94f28898bbce59f2537ff4d87c747d. Only three skill folders (test-driven-development, systematic-debugging, verification-before-completion) and the upstream licence are committed, unchanged, under template/governance/kernel/vendor/superpowers/ (DEC-194). sha256 of `git archive --format=tar HEAD` of the clone at that commit; what this digest should cover is with the owner (W1-06 test design package DP-5)."
