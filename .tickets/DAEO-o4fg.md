@@ -32,6 +32,7 @@ kpis:
   - 'The guard denies any tool call whose input names the oracle path (a Read, Grep, Glob or Bash call, or any other tool), for every role, the orchestrator included; the guard takes the path from governance/project/held-out.yaml, and the guard''s behaviour is tested against a stand-in path, never the qualification oracle (DEC-162) [CAP-49.c]'
   - 'The committed .claude/settings.json carries no install or download ask rule: this ticket removes the Bash ask rules for pip, pip3, python -m pip, python3 -m pip, uv, npm install, cargo install, apt, apt-get, curl and wget, and leaves the Bash(sudo:*) deny rule and the other deny rules in place; the guard''s install rule then decides install commands alone, and in a launched worker session the sandbox backs it; an acceptance test checks the committed file statically, and the acceptance tests of W1-04 still pass (DEC-172) [CAP-25.f]'
   - 'The guard''s install rule recognises uv add, uv sync, uv run --with and uvx as installs, with or without options before the subcommand: from the orchestrator they return an ask decision, from engineer, independent test designer and independent auditor they are denied, and a uv run without --with is not classified by this change; the research role''s exception (DEC-163, W1-46) still lets them through inside its experiment folder; the acceptance tests of W1-04 still pass (DEC-174) [CAP-25.g]'
+  - 'The guard function that resolves a role''s allowed paths fails closed when its session-role argument is missing: without that argument the orchestrator gets no wide scope (DEC-178), and a builder test in tests/unit/guard/ shows it (DEC-179)'
   failure:
   - 'A Bash call carrying dangerouslyDisableSandbox: true reaches execution'
   - Any tool call whose input names the oracle path is allowed, whatever the tool and whatever the call does (a read, a listing, a search, a write or a command), in a session started in the repository root
@@ -47,6 +48,7 @@ sources:
 - DEC-162
 - DEC-172
 - DEC-174
+- DEC-179
 - DEC-083
 - EXP-001
 - CAP-25
