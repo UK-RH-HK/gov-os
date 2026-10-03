@@ -2,7 +2,7 @@
 id: WAVE-1-WBS
 status: PROPOSED
 depends_on: [CHARTER-v5, CONTRACT-v4, ADR-0002]
-decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-174]
+decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-174, DEC-179, DEC-180, DEC-182]
 ---
 
 # Wave 1 (Integrate) — work breakdown
@@ -22,6 +22,7 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 - **Order of specification work** (DEC-103): discovery and research, scenarios, representative data, UX for a feature with a user interface, acceptance tests, implementation.
 - **Probes** (DEC-136, DEC-137). A case the orchestrator's review finds goes to the next test design batch as a described behaviour, never as code. A FULL ticket's post-green probe is done by a fresh reviewer that writes nothing.
 - **Learning metrics** (DEC-106). Per ticket: KPI disputes raised by the test designer; acceptance tests rewritten after implementation began, with the reason; governance share. W1-31 records them at close and W1-42 reports them at the exit. Only governance share has a threshold (≤ 15 %).
+- **Commit trailers** (DEC-182). Every commit puts `Task:`, `Implements:` and `Role:` in the final trailer block, using `git commit --trailer`, because git reads trailers only from the last paragraph of a commit message. Checks that read trailers fall back to the message body for commits made before 2026-10-03. History is not rewritten.
 - **Gap tickets:** every required open readiness row has a linked gap ticket (DEC-089).
 - **Covers items:** every Wave 1 `covers` item of Contract v4 is named by a KPI line of the ticket that delivers it. The line ends with the item id in brackets, for example `[CAP-03.b]`, and the contract item names that ticket as its `provider`. `docs/plan/tools/validate_s1.py` checks this both ways.
 - **Dependencies carry the KPIs:** a ticket depends on every ticket whose output its KPIs need. Each governance test family's check is registered by the ticket that builds its subject, and W1-42 asserts that 17 of 17 families have an executable check.
@@ -77,8 +78,8 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 | **W1-43** | `DAEO-03pw` | Wave 1 exit audit | audit | independent-auditor | FULL | W1-42 | 0 | DEC-070, DEC-088, DEC-092, DEC-096, MR-4, CAP-47, CAP-59 |
 | W1-44 | `DAEO-wqd6` | Phase-2 lessons as lesson records | documentation | product-spec | LITE | W1-08, W1-21 | 150 | DEC-046, OWNER-DECISION-P2-0008, OWNER-DIRECTION-BR-0004, OWNER-AMENDMENT-P2-0010, CAP-14, CAP-41, CAP-59, DEC-168 |
 | W1-45 | `DAEO-6cc2` | Orchestrator write scope | implementation | engineer | FULL | W1-05 | 40 | DEC-150, DEC-156, DEC-112, DEC-106, DEC-171, MR-3, CAP-58 |
-| W1-46 | `DAEO-jdqr` | Worker session launcher (gov launch) | implementation | engineer | FULL | W1-07, W1-47, W1-48 | 220 | DEC-152, DEC-153, DEC-158, DEC-159, DEC-161, DEC-163, DEC-164, DEC-172, DEC-174, EXP-001, CAP-49, CAP-58, CAP-61, CAP-22, CAP-25 |
-| W1-47 | `DAEO-o4fg` | Guard hardening: escape hatch, failed commands, oracle path | implementation | engineer | FULL | W1-45 | 60 | DEC-152, DEC-153, DEC-162, DEC-172, DEC-174, DEC-083, EXP-001, CAP-25, CAP-49, CAP-58, CAP-62 |
+| W1-46 | `DAEO-jdqr` | Worker session launcher (gov launch) | implementation | engineer | FULL | W1-07, W1-47, W1-48 | 220 | DEC-152, DEC-153, DEC-158, DEC-159, DEC-161, DEC-163, DEC-164, DEC-172, DEC-174, DEC-180, EXP-001, CAP-49, CAP-58, CAP-61, CAP-22, CAP-25 |
+| W1-47 | `DAEO-o4fg` | Guard hardening: escape hatch, failed commands, oracle path | implementation | engineer | FULL | W1-45 | 60 | DEC-152, DEC-153, DEC-162, DEC-172, DEC-174, DEC-179, DEC-083, EXP-001, CAP-25, CAP-49, CAP-58, CAP-62 |
 | W1-48 | `DAEO-0qs5` | Claude Code version pin | ops | orchestrator | LITE | W1-06 | 10 | DEC-153, DEC-141, DEC-157, DEC-083, CAP-25, CAP-61 |
 
 Bold rows are on the critical path. KPIs (success and failure criteria), `allowed_paths` and the acceptance-test path are in each ticket file.
