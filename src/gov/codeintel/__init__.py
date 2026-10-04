@@ -3,8 +3,11 @@
 Each repository has its own home for the tool, under its ``.gov-runtime/``. The tool
 never reads the repository: ``index(root)`` copies the files ``gov.secrets.indexable``
 returns into a folder next to that home and the tool indexes the copy, so a file the
-filter leaves out is not in the index at all. Every index is built anew; if the filter
+filter leaves out is not in the index at all. Neither is a file whose path holds a secret
+by the same rules: the index stores paths. Every index is built anew; if the filter
 cannot decide, there is no index. The answers are read from the graph the tool built.
+The root must be the top level of a git repository whose ``.gov-runtime/`` is no link:
+any other root is refused before anything is written or deleted.
 """
 
 from __future__ import annotations
@@ -15,9 +18,10 @@ import os
 import shutil
 import subprocess
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from gov.secrets import indexable
+from gov.secrets import _holds_secret, _rules, indexable
 
 TOOL = "codebase-memory-mcp"
 BASE_REL = ".gov-runtime/codeintel"
@@ -36,8 +40,20 @@ def home(root: Path) -> Path:
     return Path(root).resolve() / BASE_REL / "home"
 
 
+def _checked(root: Path) -> Path:
+    """``root`` resolved. Raises unless it is the top level of a git repository and its home is under it."""
+    root = Path(root).resolve()
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    if top.returncode != 0 or Path(top.stdout.removesuffix("\n")).resolve() != root:
+        raise RuntimeError(f"{root} is not the top level of a git repository: no code index there")
+    if home(root).resolve() != root / BASE_REL / "home":  # a link on the way would put the index somewhere else
+        raise RuntimeError(f"{BASE_REL} of {root} is reached through a link: no code index there")
+    return root
+
+
 def _tool(root: Path, tool: str, **args) -> dict:
     """Run one tool of the binary in the repository's home. The rest of the caller's environment is passed on."""
+    root = _checked(root)
     done = subprocess.run([TOOL, "cli", "--quiet", "--json", tool, json.dumps(args)], capture_output=True, text=True,
                           stdin=subprocess.DEVNULL, env={**os.environ, "CBM_CACHE_DIR": str(home(root))})
     try:
@@ -51,14 +67,21 @@ def _tool(root: Path, tool: str, **args) -> dict:
 
 def index(root: Path) -> None:
     """Build the code index of the repository anew, from the files the pre-index filter returns and no other."""
-    root = Path(root).resolve()
+    root = _checked(root)  # first of all: a refused root loses nothing
     base, staged = root / BASE_REL, root / BASE_REL / "files"
     if base.exists():  # first, so that a filter that cannot decide leaves no index behind
         shutil.rmtree(base)
     _graph.cache_clear()
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
                             capture_output=True, text=True, check=True).stdout
-    for rel in indexable(root, [rel for rel in listed.split("\0") if rel]):
+    allowed, rules = indexable(root, [rel for rel in listed.split("\0") if rel]), _rules(root)
+
+    def secret_name(rel: str) -> bool:  # the path and each of its names, judged as content is (DEC-287, DEC-298)
+        return _holds_secret(rules, os.fsencode("\n".join([rel, *Path(rel).parts])))
+
+    with ThreadPoolExecutor() as pool:
+        named = list(pool.map(secret_name, allowed))
+    for rel in (rel for rel, secret in zip(allowed, named) if not secret):
         (staged / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(root / rel, staged / rel)
     home(root).mkdir(parents=True, exist_ok=True)

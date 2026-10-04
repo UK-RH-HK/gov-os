@@ -3,8 +3,10 @@
 Regression evidence only (DEC-136). They cover what the acceptance tests leave
 to the builder: when the filter cannot decide, the earlier index is gone and
 none is built; the tool is given the staged folder, the repository's home and
-the caller's own runtime directory; and a tool that reports an error is not an
-empty answer. The codebase-memory binary is not run: a stand-in script on
+the caller's own runtime directory; a file whose path holds a secret is not
+staged; a root that is no top level of a git repository, or whose
+``.gov-runtime`` is a link, is refused with nothing written or deleted; and a
+tool that reports an error is not an empty answer. The codebase-memory binary is not run: a stand-in script on
 ``PATH`` records how it is called. Every repository is a temporary directory.
 """
 from __future__ import annotations
@@ -74,6 +76,46 @@ def test_the_tool_is_given_the_staged_files_the_home_and_the_callers_runtime_dir
     assert cache == str(codeintel.home(root)) and runtime == str(tmp_path / "runtime")
     files = sorted(path.relative_to(staged).as_posix() for path in staged.rglob("*") if path.is_file())
     assert files == [".gitignore", ".gitleaks.toml", "app/clean.py", "governance/project/path-map.yaml"]
+
+
+@pytest.mark.skipif(shutil.which("gitleaks") is None, reason="gitleaks is not on PATH")
+def test_a_file_whose_path_holds_a_secret_is_not_staged(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    shutil.copy2(REPO / "template/.gitleaks.toml", root / ".gitleaks.toml")
+    for rel in (f"app/{PLANTED}.py", f"web/{PLANTED}/panel.py", "web/beside.py"):  # clean content, all three
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text("def other():\n    return 3\n", encoding="utf-8")
+    _stand_in(tmp_path, monkeypatch, {"isError": False, "content": [{"type": "text", "text": "{}"}]})
+    codeintel.index(root)
+    staged = root / codeintel.BASE_REL / "files"
+    assert not [path for path in staged.rglob("*") if PLANTED in path.name]
+    assert (staged / "web/beside.py").is_file() and (staged / "app/clean.py").is_file()
+
+
+def test_a_root_that_is_no_top_level_of_a_repository_is_refused_and_nothing_changes(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    plain = tmp_path / "plain"
+    earlier = codeintel.home(plain) / "code.db"
+    earlier.parent.mkdir(parents=True)
+    earlier.write_text("an earlier index", encoding="utf-8")
+    call = _stand_in(tmp_path, monkeypatch, {"isError": False, "content": [{"type": "text", "text": "{}"}]})
+    for refused in (root / "app", plain):
+        with pytest.raises(RuntimeError):
+            codeintel.index(refused)
+        with pytest.raises(RuntimeError):
+            codeintel.projects(refused)
+    assert not (root / "app/.gov-runtime").exists() and earlier.read_text(encoding="utf-8") == "an earlier index"
+    assert not call.exists()  # the tool was never run
+
+
+def test_a_gov_runtime_that_is_a_link_is_refused(tmp_path):
+    root = _repository(tmp_path / "repo")
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    (root / ".gov-runtime").symlink_to(outside, target_is_directory=True)
+    with pytest.raises(RuntimeError):
+        codeintel.index(root)
+    assert not list(outside.iterdir()) and (root / ".gov-runtime").is_symlink()
 
 
 def test_an_error_of_the_tool_is_not_an_empty_answer(tmp_path, monkeypatch):
