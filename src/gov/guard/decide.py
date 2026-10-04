@@ -12,6 +12,7 @@ from pathlib import Path
 KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
     "engineer", "independent-auditor",
+    "research",  # DEC-163: held to its ticket's allowed_paths, like engineer
 })
 WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})

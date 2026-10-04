@@ -1,0 +1,23 @@
+# This project's research network allowlist (DEC-241). It extends the kernel
+# default; the owner extends the list. `gov launch` reads it at each launch of a
+# research session. An entry is a host name, or `*.<name>` for the subdomains
+# of a name. Starting hosts: DEC-241.
+hosts:
+  - github.com
+  - api.github.com
+  - raw.githubusercontent.com
+  - objects.githubusercontent.com
+  - codeload.github.com
+  - pypi.org
+  - files.pythonhosted.org
+  - registry.npmjs.org
+  - huggingface.co
+  - cdn-lfs.huggingface.co
+  - arxiv.org
+  - export.arxiv.org
+  - docs.python.org
+  - docs.rs
+  - crates.io
+  - static.crates.io
+  - developer.mozilla.org
+  - "*.readthedocs.io"

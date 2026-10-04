@@ -1,0 +1,23 @@
+# The kernel default of the research network allowlist (DEC-158, DEC-241).
+# `gov launch research <ticket>` gives a research session these hosts, plus the
+# hosts of the project's governance/project/research-allowlist.yaml.
+# An entry is a host name, or `*.<name>` for the subdomains of a name.
+hosts:
+  - github.com
+  - api.github.com
+  - raw.githubusercontent.com
+  - objects.githubusercontent.com
+  - codeload.github.com
+  - pypi.org
+  - files.pythonhosted.org
+  - registry.npmjs.org
+  - huggingface.co
+  - cdn-lfs.huggingface.co
+  - arxiv.org
+  - export.arxiv.org
+  - docs.python.org
+  - docs.rs
+  - crates.io
+  - static.crates.io
+  - developer.mozilla.org
+  - "*.readthedocs.io"

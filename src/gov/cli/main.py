@@ -74,6 +74,12 @@ def _parser() -> argparse.ArgumentParser:
         sub = commands.add_parser(command.name, help=command.help, parents=[shared], allow_abbrev=False)
         if command.name == "check":
             sub.add_argument("--list", action="store_true", help="list the declared checks, without running them")
+    # A start command, not one of the governance operations above (W1-46, DEC-231).
+    launch = commands.add_parser("launch", help="start a sandboxed worker session", parents=[shared],
+                                 allow_abbrev=False, usage="gov launch <role> <ticket> [-- <CLI arguments>]")
+    launch.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
+                        "independent-auditor or research")
+    launch.add_argument("ticket", metavar="<ticket>", help="an in_progress ticket")
     return parser
 
 
@@ -91,14 +97,23 @@ def _emit(args, ok: bool, result: dict, error: GovError | None) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = _parser()
+    argv = list(sys.argv[1:] if argv is None else argv)
+    passed = None  # what follows "--" goes to the CLI unchanged (gov launch only)
+    if "--" in argv:
+        argv, passed = argv[:argv.index("--")], argv[argv.index("--") + 1:]
     args, extra = parser.parse_known_args(argv)
-    command = REGISTRY[args.command]
-    if extra and command.handler is not None:  # a command not built yet has no arguments to check against
+    command = REGISTRY.get(args.command)
+    if command is not None and passed is not None:
+        extra += ["--", *passed]
+    if extra and (command is None or command.handler is not None):  # a command not built yet has no arguments to check against
         parser.error(f"unrecognized arguments: {' '.join(extra)}")
     root = Path(args.root) if args.root else Path.cwd()
     try:
         from gov.config.loader import load_config
         config = load_config(root)  # every command loads the configuration first (DEC-185)
+        if command is None:
+            from gov.launch.launcher import launch
+            return launch(root, args.worker_role, args.ticket, passed or [])
         if command.handler is None:
             raise _not_implemented(command.name)
         result = command.handler(root, args, config)
