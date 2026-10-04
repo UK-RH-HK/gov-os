@@ -43,6 +43,30 @@
           }
         ]
       }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact|clear|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\""
+          }
+        ]
+      }
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "300000"
   }
 }
