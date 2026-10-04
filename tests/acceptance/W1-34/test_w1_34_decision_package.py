@@ -65,6 +65,27 @@ def test_the_gate_record_carries_a_state_and_its_cit(form, package_text):
                       f"(keys: { {name: sorted(frontmatter) for name, frontmatter in gates.items()} })")
 
 
+def test_the_gate_state_lives_in_status_alone_and_the_cit_key_is_cit(form, package_text):
+    """Success 4 [CAP-34.d], as DEC-328 decides it: `status` alone holds the state, and the CIT key is `cit`."""
+    unpaired = support.unpaired_statuses(package_text)
+    assert not unpaired, (
+        "the template does not state which gate state each `status` value stands for; no paragraph puts "
+        f"these side by side: {[f'{value} with {state}' for value, state in unpaired]}")
+    values = [value for value, _ in support.STATUS_STATES]
+    gates = support.gate_frontmatters()
+    for name, frontmatter in gates.items():
+        assert frontmatter.get(support.STATE_KEY) in values, (
+            f"{name}: status is {frontmatter.get(support.STATE_KEY)!r}, not one of {values}")
+        second = support.second_state_keys(frontmatter)
+        assert not second, f"{name}: the state lives in `status` alone, but the frontmatter also has {second}"
+        other = [key for key in frontmatter
+                 if key != support.CIT_KEY and "cit" in support.key_tokens(key)]
+        assert not other, f"{name}: the key for the CIT is `cit`, but the frontmatter has {other}"
+    assert form.frontmatter.get(support.CIT_KEY), (
+        f"{form.name}: the frontmatter has no `cit` for the CIT the package belongs to "
+        f"(keys: {sorted(form.frontmatter)})")
+
+
 def test_the_routing_rule_classes_a_contradiction(package_text):
     """Success 5 [CAP-34.a]: agent-resolvable (settled by precedence and recorded) or human-resolvable (a package)."""
     agent = support.paragraphs_with(package_text, r"\bagent[- ]resolvable\b")

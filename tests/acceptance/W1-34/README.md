@@ -2,8 +2,14 @@
 
 Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-egm9` (W1-34), the Contract
 v4.1 items its KPI lines name (CAP-34.a, CAP-34.b, CAP-34.c, CAP-34.d), Charter v5 §MR-6, and DEC-065, DEC-093,
-DEC-220, DEC-221 and DEC-308. Written before implementation. Profile LITE: one test per KPI line, seven tests, no
-parametrised cases. No earlier ticket's test was rewritten. One decision package is open (DP-1, below).
+DEC-220, DEC-221, DEC-308 and DEC-328. Profile LITE: one test per KPI line, no parametrised cases. No earlier
+ticket's test was rewritten, and no test of this suite was changed or removed.
+
+- **Batch 1:** seven tests, written before implementation.
+- **Batch 2:** one test, added after implementation, reason "delegated decision". DEC-328 decides DP-1, and the
+  test pins what it decides. Success 4 now has two tests: the first as far as DP-1 left it, the second for DEC-328.
+
+No decision package is open: DP-1 is decided by DEC-328 (below).
 
 ## Run
 
@@ -33,6 +39,18 @@ All in `test_w1_34_decision_package.py`. Run on `w1/W1-34` at `168397f6`: **7 fa
 
 The suite was also run against a throwaway reference template outside the tracked tree: 7 passed.
 
+### Batch 2 (added after implementation, reason "delegated decision")
+
+Run on `w1/W1-34` at `e4f04019`, with the template as implemented: **7 passed, 1 failed**.
+
+| KPI line | Covers | Test | Red today because |
+|---|---|---|---|
+| Success 4: the gate record carries a state and its CIT, as DEC-328 decides it | CAP-34.d | `test_the_gate_state_lives_in_status_alone_and_the_cit_key_is_cit` | ``the template does not state which gate state each `status` value stands for; no paragraph puts these side by side: ['ACCEPTED with answered', 'DECLINED with declined', 'REVOKED with revoked', 'STALE with stale']``; the template says only that open is `status: PROPOSED` |
+
+The frontmatter half of the test already holds on the template as implemented: no second state key, and the CIT
+key is `cit`. The pairing was checked on sample wordings held in memory, with nothing written: a sentence, the
+reverse order and a table pass; swapped pairs, two separate lists and the values alone fail.
+
 ## What each test asks of the template
 
 - **The form.** Exactly one `decision-package*` file has the frontmatter `type: decision-package`; a package is
@@ -51,6 +69,19 @@ The suite was also run against a throwaway reference template outside the tracke
 - **Success 4.** The form keeps `status: PROPOSED` and a `constrains` list (DEC-308). The template names the five
   states open, answered, declined, revoked and stale. The frontmatter of a `decision-package*` file of type `gate`
   or `decision-package` has a key for the CIT: a key with the word `cit` in it (`cit`, `cit_id`, …).
+- **Success 4, as DEC-328 decides it (batch 2).** Three things.
+  - The mapping. For each of the five pairs (`PROPOSED` open, `ACCEPTED` answered, `DECLINED` declined, `REVOKED`
+    revoked, `STALE` stale), some paragraph of a `decision-package*` file puts the value and its state word side
+    by side, with no other value or state word between them. The value is in upper case; the state word is in
+    lower case or capitalised. The wording is the implementer's. One line is enough: "`PROPOSED` is open,
+    `ACCEPTED` is answered, `DECLINED` is declined, `REVOKED` is revoked and `STALE` is stale." A table with one
+    row per pair also passes. Two separate lists ("PROPOSED, ACCEPTED, … are open, answered, …") do not.
+  - `status` alone. In the frontmatter of every `decision-package*` file of type `gate` or `decision-package`,
+    `status` is one of the five values, and no other key holds a state: no key with the word `state` or `status`
+    in its name, and no key whose value is one of the five state words or the five values. `state_class` is the
+    shared record frontmatter of W1-08 and is not counted.
+  - The CIT key. The form has a non-empty `cit`, and no such frontmatter has another key with the word `cit` in
+    it (`cit_id`, `gate_cit`, …).
 - **Success 5.** One paragraph says "agent-resolvable" with "precedence" and "record…"; one says "human-resolvable"
   with "package"; one of them says "contradiction".
 - **Failure 1.** The Recommendation and Confidence sections are not blank and each says it is required ("required",
@@ -76,18 +107,27 @@ The suite was also run against a throwaway reference template outside the tracke
    place in the brackets is who decided, and it is not pinned to the word "owner": DEC-220 records delegated
    answers as `ACCEPTED (orchestrator, …)`. Where the form stands in the decision-record template (frontmatter,
    body or a comment) is the implementer's.
-6. **Success 4 is tested only as far as DP-1 leaves it** (below): `status` and `constrains` as DEC-308 fixes them,
-   the five state words named, and a key for the CIT. The test does not say which key holds the state or how the
-   five words are spelled as values.
+6. **Success 4 has two tests.** The batch 1 test goes only as far as DP-1 left it: `status` and `constrains` as
+   DEC-308 fixes them, the five state words named, and a key for the CIT. It does not say which key holds the
+   state or how the five words are spelled as values. The batch 2 test pins both, from DEC-328.
 7. **The W1-08 suite stays green.** It validates every templates file with "package", "gate" or "decision" in its
    name. Nothing here asks for a file or a key its schemas refuse: record frontmatter accepts extra keys, `status`
    is any non-empty string, and a new `decision-package*` or `decision-record*` file needs the shared frontmatter.
    Run before and after this suite was written: 209 passed.
+8. **The mapping is read as a pairing, not a sentence** (batch 2). DEC-328 says the template states the mapping
+   and leaves the wording free. The values are matched in upper case, as DEC-328 and DEC-308 write them, so the
+   value `STALE` and the state word "stale" are told apart by case.
+9. **A second state key is read from the frontmatter only** (batch 2). The template's prose may speak of a
+   "state"; what DEC-328 rules out is a second key. Batch 2 asks for nothing outside the two template patterns
+   and no key a schema refuses. The W1-08 and W1-09 suites were run with batch 2 in place: 286 passed.
 
-## Open decision package
+## Decision package (decided)
 
 ### DP-1 — How the gate state sits beside `status`
 
+- **Decided:** DEC-328, ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04): option (a). The state lives
+  in `status` alone, and the CIT key is `cit`. The package is closed; the text below is kept as it was raised.
+  The batch 2 test is the assertion its last field promised.
 - **Rank:** P2.
 - **Question:** Where does a gate record hold its state (open, answered, declined, revoked, stale): in `status`
   alone, or in a second key beside `status`?

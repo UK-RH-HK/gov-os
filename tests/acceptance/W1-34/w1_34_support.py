@@ -35,6 +35,18 @@ TEN_FIELDS = (
 RANKS = ("P1", "P2", "P3")
 # KPI success 4: the five states of a gate record.
 GATE_STATES = ("open", "answered", "declined", "revoked", "stale")
+# DEC-328: the state lives in `status` alone; each value of `status` with the gate state it stands for.
+STATUS_STATES = (
+    ("PROPOSED", "open"),
+    ("ACCEPTED", "answered"),
+    ("DECLINED", "declined"),
+    ("REVOKED", "revoked"),
+    ("STALE", "stale"),
+)
+STATE_KEY = "status"
+CIT_KEY = "cit"
+# Shared frontmatter of every record (W1-08); it classes the record, not the gate.
+NOT_A_GATE_STATE_KEY = ("state_class",)
 CONFIDENCE_LEVELS = ("low", "medium", "high")
 
 DECISION_ID = re.compile(r"\b(?:ADR|DEC)-[0-9]{3,}\b")
@@ -150,3 +162,43 @@ def has_word(text, word):
 
 def key_tokens(key):
     return [token for token in re.split(r"[^a-z0-9]+", str(key).lower()) if token]
+
+
+def status_and_state_words(block):
+    """The `status` values (upper case, as written) and the gate state words (lower case or capitalised) of a
+    block, in the order they stand in it. ``STALE`` is a value and ``stale`` a state word."""
+    values = {value for value, _ in STATUS_STATES}
+    states = {state for _, state in STATUS_STATES}
+    found = []
+    for word in re.findall(r"[A-Za-z]+", block):
+        if word in values:
+            found.append(word)
+        elif word in states or (word.lower() in states and word == word.capitalize()):
+            found.append(word.lower())
+    return found
+
+
+def unpaired_statuses(text):
+    """The ``(value, state)`` pairs of DEC-328 that no paragraph of ``text`` states. A pair is stated when the
+    value and its state word stand next to each other, with no other value or state word between them:
+    "`ACCEPTED` is answered", "answered is `status: ACCEPTED`", or a table row with the two."""
+    stated = set()
+    for block in paragraphs(text):
+        words = status_and_state_words(block)
+        stated.update(frozenset(pair) for pair in zip(words, words[1:]))
+    return [(value, state) for value, state in STATUS_STATES if frozenset((value, state)) not in stated]
+
+
+def second_state_keys(frontmatter):
+    """The keys, other than ``status``, that would hold a gate state: a key named for a state or a status, or a
+    key whose value is one of the five state words or one of the five `status` values."""
+    words = {word.lower() for pair in STATUS_STATES for word in pair}
+    found = []
+    for key, value in frontmatter.items():
+        if key == STATE_KEY or key in NOT_A_GATE_STATE_KEY:
+            continue
+        named = {"state", "status"} & set(key_tokens(key))
+        valued = isinstance(value, str) and value.strip().lower() in words
+        if named or valued:
+            found.append(key)
+    return found
