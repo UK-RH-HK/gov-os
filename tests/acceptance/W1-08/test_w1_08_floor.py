@@ -9,7 +9,8 @@ The floor lives in `governance/project/path-map.yaml`, under three top-level key
 `warning`, `hard-block`; the schema gives each policy only the strengths at or above its kernel minimum, so the
 validator alone refuses a value below the floor (DEC-230, DEC-238). Each of the twenty-two constitutional systems
 has a `status`, a `where` unless it is absent, and a `reason` when it is absent (DEC-230). `capabilities` is closed
-to `code_intelligence` and `research_corpus` (DEC-238).
+to `code_intelligence` and `research_corpus` (DEC-238); both are required, each a closed map with a boolean
+`enabled`, and `code_intelligence` lists its `languages` when it is enabled (DEC-251).
 
 The good document is the committed path map; each bad one is that document with one change.
 """
@@ -160,6 +161,70 @@ def test_a_capability_outside_the_two_is_refused(path_map, check):
                   "a path map with the capability `w1_08_unknown`")
 
 
+def _with_capability(document, name, entry):
+    return support.set_at(document, ("capabilities", name), entry)
+
+
+def _capability(document, name):
+    """The entry of one capability in the committed path map, with `enabled` set to true."""
+    entry = _block(document, "capabilities").get(name)
+    assert isinstance(entry, dict), f"{support.PATH_MAP_REL}: the capability `{name}` is not a map"
+    return {**entry, "enabled": True}
+
+
+@pytest.mark.local_only
+@pytest.mark.parametrize("name", CAPABILITIES)
+def test_a_path_map_without_one_of_the_two_capabilities_is_refused(name, path_map, check):
+    """Both keys are required (DEC-251): a capability that is off is written `enabled: false`, not left out."""
+    schema, document = path_map
+    capabilities = _block(document, "capabilities")
+    assert name in capabilities, f"{support.PATH_MAP_REL}: `capabilities` has no `{name}`"
+    check.good(schema, document, support.PATH_MAP_REL)
+    check.refuses(schema, support.replaced(document, "capabilities", support.without(capabilities, name)),
+                  f"a path map without the capability `{name}`")
+
+
+@pytest.mark.local_only
+@pytest.mark.parametrize("name", CAPABILITIES)
+def test_a_capability_is_a_closed_map_with_a_boolean_enabled(name, path_map, check):
+    """DEC-251. Enabled and disabled are both accepted; the entry of the committed path map is the good one, so
+    `code_intelligence` keeps its `languages` in every variant and only `enabled` or the extra key is wrong."""
+    schema, document = path_map
+    entry = _capability(document, name)
+    for enabled in (True, False):
+        check.accepts(schema, _with_capability(document, name, {**entry, "enabled": enabled}),
+                      f"a path map whose capability `{name}` has enabled: {enabled}")
+    bad = {
+        "no `enabled`": support.without(entry, "enabled"),
+        "`enabled: yes` as a string": {**entry, "enabled": "yes"},
+        "`enabled: 1`": {**entry, "enabled": 1},
+        "`enabled: null`": {**entry, "enabled": None},
+        "an unknown key": {**entry, "w1_08_unknown": True},
+        "a boolean in place of the map": True,
+    }
+    check.refuses_each(schema, {label: _with_capability(document, name, value) for label, value in bad.items()},
+                       f"a path map whose capability `{name}` has")
+
+
+@pytest.mark.local_only
+def test_enabled_code_intelligence_lists_its_languages(path_map, check):
+    """DEC-251: `languages` is a non-empty list of strings when `code_intelligence` is enabled."""
+    schema, document = path_map
+    name = "code_intelligence"
+    entry = _capability(document, name)
+    check.accepts(schema, _with_capability(document, name, {**entry, "languages": ["python", "typescript"]}),
+                  "a path map whose enabled code intelligence lists two languages")
+    bad = {
+        "no `languages`": support.without(entry, "languages"),
+        "an empty `languages`": {**entry, "languages": []},
+        "`languages` as one string": {**entry, "languages": "python"},
+        "a number in `languages`": {**entry, "languages": ["python", 42]},
+        "`languages: null`": {**entry, "languages": None},
+    }
+    check.refuses_each(schema, {label: _with_capability(document, name, value) for label, value in bad.items()},
+                       "a path map whose enabled code intelligence has")
+
+
 # --- the constitutional systems [CAP-54.b] ----------------------------------------------------------------------
 
 def _identified_system(document):
@@ -214,6 +279,21 @@ def test_a_system_is_implemented_or_minimal_with_a_where(path_map, check):
                       f"a path map whose system `{name}` is {status}, with no `where`")
     check.refuses(schema, _with_system(document, name, {**entry, "where": type(entry["where"])()}),
                   f"a path map whose system `{name}` has an empty `where`")
+
+
+@pytest.mark.local_only
+def test_the_where_rule_holds_for_every_system(path_map, check):
+    """Whichever of the twenty-two systems carries the defect: `minimal` with no `where`, or with an empty one, is
+    refused. Each bad path map differs from the committed one in that one system only."""
+    schema, document = path_map
+    _, entry = _identified_system(document)
+    check.good(schema, document, support.PATH_MAP_REL)
+    bad = {}
+    for name in SYSTEMS:
+        bad[f"{name}: no `where`"] = _with_system(document, name, {"status": "minimal"})
+        bad[f"{name}: empty `where`"] = _with_system(document, name,
+                                                     {"status": "minimal", "where": type(entry["where"])()})
+    check.refuses_each(schema, bad, "a path map with a `minimal` system that has no `where`, or an empty one")
 
 
 @pytest.mark.local_only

@@ -18,8 +18,11 @@ import w1_08_support as support
 # A property or a definition with one of these names holds an id, or a list of ids.
 ID_NAMES = ("id", "supersedes", "superseded_by", "depends_on", "deps")
 NOT_AN_ID = "w1-08 probe: not an id!"
-# Ids this repository already uses: this ticket and its WBS number.
-REAL_IDS = {"ticket_id": "DAEO-uudf", "wbs_id": "W1-08"}
+# Ids this repository already uses: this ticket, its WBS number and the carried lesson (DEC-252).
+REAL_IDS = {"ticket_id": "DAEO-uudf", "wbs_id": "W1-08", "lesson_id": "L-0074"}
+# DEC-252: `lesson_id` is ^L-[0-9]{4,}$.
+LESSON_IDS = ("L-0074", "L-0000", "L-12345")
+NOT_LESSON_IDS = ("L-074", "LES-0074", "l-0074", "L0074", "L-0074a", "X-L-0074", "L-00x4")
 
 
 def _holds_an_id(name):
@@ -65,13 +68,23 @@ def test_the_five_id_grammars_are_defined_in_one_file_only():
 @pytest.mark.local_only
 @pytest.mark.parametrize("name", support.ID_GRAMMARS)
 def test_the_shared_definition_is_a_grammar(name, check):
-    """It refuses what no id is: the empty string, two lines, a number. The two grammars this repository already
+    """It refuses what no id is: the empty string, two lines, a number. The three grammars this repository already
     has ids for accept them."""
     schema = check.definition(support.shared_definitions_path(), name)
     for bad_id in ("", "two\nlines", 42, NOT_AN_ID):
         check.refuses(schema, bad_id, f"{bad_id!r} as a {name}")
     if name in REAL_IDS:
         check.accepts(schema, REAL_IDS[name], f"{REAL_IDS[name]} as a {name}")
+
+
+@pytest.mark.local_only
+def test_a_lesson_id_is_the_letter_l_and_four_or_more_digits(check):
+    """DEC-252: the form of the carried lesson `L-0074`. Three digits, another prefix, lower case and a tail are
+    refused."""
+    schema = check.definition(support.shared_definitions_path(), "lesson_id")
+    check.accepts_all(schema, {f"good-{index}": good_id for index, good_id in enumerate(LESSON_IDS)},
+                      f"one of {LESSON_IDS} as a lesson_id")
+    check.refuses_each(schema, {bad_id: bad_id for bad_id in NOT_LESSON_IDS}, "as a lesson_id")
 
 
 def test_no_record_schema_writes_an_id_pattern_of_its_own():

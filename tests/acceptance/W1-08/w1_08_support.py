@@ -267,6 +267,28 @@ class Checker:
         accepted, _ = self.run(schema, self._write(document))
         assert not accepted, f"{Path(schema).name} accepts {what}"
 
+    def refuses_each(self, schema, documents, what):
+        """Every document (``name -> document``) must be refused, each for itself, in one call of the validator."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = {}
+        for index, (name, document) in enumerate(sorted(documents.items())):
+            files[f"bad-{index}.json"] = name
+            (folder / f"bad-{index}.json").write_text(json.dumps(document, indent=2), encoding="utf-8")
+        paths = [str(folder / file_name) for file_name in files]
+        done = _run_validator(["--no-cache", "-o", "json", "--schemafile", str(schema), *paths], self.workdir)
+        assert done.returncode in (0, 1), (f"{VALIDATOR} could not validate against {Path(schema).name} "
+                                           f"(exit code {done.returncode}):\n{(done.stdout + done.stderr).strip()}")
+        try:
+            report = json.loads(done.stdout)
+        except ValueError:
+            raise AssertionError(f"{VALIDATOR} gave no JSON report:\n{(done.stdout + done.stderr).strip()}") from None
+        assert not report.get("parse_errors"), f"{VALIDATOR} could not read an instance: {report['parse_errors']}"
+        refused = {Path(error["filename"]).name for error in report.get("errors", [])}
+        accepted = [name for file_name, name in files.items() if file_name not in refused]
+        assert not accepted, f"{Path(schema).name} accepts {what}: {accepted}"
+
     def accepts_file(self, schema, text, what):
         """Validate YAML text as it is written, read by the validator's own YAML reader."""
         self.count += 1

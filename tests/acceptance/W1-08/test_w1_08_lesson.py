@@ -5,10 +5,13 @@ Success 3, third part: a lifecycle state, candidate -> corroborated -> scoped ->
 (low, medium, high or critical) are required (DEC-168) [CAP-41.f].
 
 The good lesson is the committed lesson template; each bad lesson is that template with one change. Scope and
-severity are stored in lower case, and the schema refuses the upper-case forms (DEC-226).
+severity are stored in lower case, and the schema refuses the upper-case forms (DEC-226). A lesson's id has the form
+of the carried lesson `L-0074` (DEC-252).
 """
 
 from __future__ import annotations
+
+import re
 
 import pytest
 
@@ -17,6 +20,8 @@ import w1_08_support as support
 LIFECYCLE = ("candidate", "corroborated", "scoped", "proposed", "validated", "approved")
 SCOPES = ("project", "product", "framework")
 SEVERITIES = ("low", "medium", "high", "critical")
+LESSON_ID = r"L-[0-9]{4,}"  # DEC-252
+CARRIED_LESSON = "L-0074"
 
 
 @pytest.fixture
@@ -28,6 +33,24 @@ def lesson():
 
 def _lifecycle_keys(good):
     return [key for key, value in good.items() if key not in ("scope", "severity") and value in LIFECYCLE]
+
+
+# --- the lesson id [DEC-252] ------------------------------------------------------------------------------------
+
+def test_the_lesson_template_carries_an_id_of_the_lesson_form():
+    """Every lesson template, in its frontmatter: `L-` and four or more digits, the form of `L-0074`."""
+    for path in support.template_paths("lesson"):
+        lesson_id = support.load_record(path).get("id")
+        assert isinstance(lesson_id, str) and re.fullmatch(LESSON_ID, lesson_id), (
+            f"{path.name}: `id` is {lesson_id!r}, not of the form L-0074 ({LESSON_ID}, DEC-252)")
+
+
+@pytest.mark.local_only
+def test_the_lesson_schema_accepts_the_carried_lesson_id(lesson, check):
+    """The lesson record takes the id of the lesson this repository carries, and still refuses what is no id."""
+    schema, good = lesson
+    check.accepts(schema, support.replaced(good, "id", CARRIED_LESSON), f"a lesson with id {CARRIED_LESSON}")
+    check.refuses(schema, support.replaced(good, "id", "L-074"), "a lesson with id 'L-074' (three digits)")
 
 
 # --- scope [CAP-41.c, CAP-41.f] ---------------------------------------------------------------------------------

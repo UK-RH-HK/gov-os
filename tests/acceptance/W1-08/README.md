@@ -4,7 +4,8 @@ Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket
 items its KPI lines name (CAP-31.a, CAP-53.a, CAP-06.a, CAP-03.a, CAP-03.b, CAP-03.c, CAP-41.a, CAP-50.a, CAP-06.e,
 CAP-54.b, CAP-07.b, CAP-41.c, CAP-41.f), ADR-0002 §2, §5 and §6, and DEC-012, DEC-168, DEC-185, DEC-189, DEC-221 and
 DEC-224 to DEC-230, DEC-238 and DEC-239. Written before implementation, in two batches: batch 1 left seven decision
-packages; batch 2 follows the decisions that settled them. No earlier ticket's test was rewritten.
+packages; batch 2 follows the decisions that settled them. Batch 3 was written after implementation, for DEC-251
+and DEC-252 (reason: delegated decision); see "Batch 3" below. No earlier ticket's test was rewritten.
 
 ## Run
 
@@ -16,7 +17,7 @@ Standard library, `pytest` and PyYAML (declared in `pyproject.toml`). No network
 
 - **The validator is `check-jsonschema`** (0.38.2, in the tool registry; the stack's validator, ADR-0002 §2). It
   handles `$ref` across files and every draft 2020-12 keyword, which the small validator of the W1-04 and W1-06
-  suites does not. Every case that validates is marked `local_only` (147 of 200 cases) and is skipped when the tool
+  suites does not. Every case that validates is marked `local_only` (155 of 209 cases) and is skipped when the tool
   is absent. Deselect them with `-m "not local_only"`.
 - **The good record is the committed one.** For each record type the good record is the frontmatter of the
   committed template; for the path map it is the committed `governance/project/path-map.yaml`. Each bad record is
@@ -27,7 +28,46 @@ Standard library, `pytest` and PyYAML (declared in `pyproject.toml`). No network
 
 About one minute once the schemas exist.
 
-## KPI → tests → red reason today
+## Batch 3: DEC-251 and DEC-252 (after implementation, reason "delegated decision")
+
+Run on `w1/W1-08` at `4b209505`, the implemented ticket: **9 failed, 200 passed** (209 cases, 71 test functions;
+batch 2 had 200 cases in 64 functions). Nine cases are new and one existing case is strengthened. No case was
+removed and no assertion of an earlier case was contradicted by the two decisions. The new tests were also run
+against a throwaway reference repair outside the tracked tree (all green), and with a defect seeded into one late
+system's `where` rule (caught only by the new `where` test).
+
+| KPI line | Decision | Test (cases) | Kind | Result today, and why |
+|---|---|---|---|---|
+| Success 5 **[CAP-06.e]** | DEC-251 | `test_w1_08_floor.py::test_a_path_map_without_one_of_the_two_capabilities_is_refused[2]` | new | Red: `path-map.schema.json accepts a path map without the capability <name>`; `capabilities` has no `required` |
+| Success 5 **[CAP-06.e]** | DEC-251 | `test_w1_08_floor.py::test_a_capability_is_a_closed_map_with_a_boolean_enabled[2]` (accepts `enabled` true and false; refuses no `enabled`, a string, `1`, null, an unknown key, a boolean in place of the map) | new | Red: the schema accepts every bad entry of `research_corpus` (its value is `{}`, anything) and five of six of `code_intelligence` (only "not a map" is refused today) |
+| Success 5 **[CAP-06.e]** | DEC-251 | `test_w1_08_floor.py::test_enabled_code_intelligence_lists_its_languages` (accepts two languages; refuses none, an empty list, one string, a number in the list, null) | new | Red: the schema requires the key `languages` and gives it no shape, so four of the five bad values are accepted |
+| Success 5 **[CAP-54.b]** | DEC-230 | `test_w1_08_floor.py::test_the_where_rule_holds_for_every_system` (one case, all twenty-two systems: `minimal` with no `where`, and with an empty one, each in one system only) | new, strengthens `test_a_system_is_implemented_or_minimal_with_a_where` | **Green**: every system refers to the one `system` definition, so the rule already holds for all |
+| Failure 2 | DEC-252 | `test_w1_08_id_grammar.py::test_the_shared_definition_is_a_grammar[lesson_id]` (now also accepts `L-0074`) | strengthened | Red: `'L-0074' does not match '^LES-[0-9]{3,}$'` |
+| Failure 2 | DEC-252 | `test_w1_08_id_grammar.py::test_a_lesson_id_is_the_letter_l_and_four_or_more_digits` (accepts `L-0074`, `L-0000`, `L-12345`; refuses `L-074`, `LES-0074`, `l-0074`, `L0074`, `L-0074a`, `X-L-0074`, `L-00x4`) | new | Red: the shared `lesson_id` is `^LES-[0-9]{3,}$` |
+| Success 2a **[CAP-06.a]**, lesson lines 3c, 7, 8 | DEC-252 | `test_w1_08_lesson.py::test_the_lesson_template_carries_an_id_of_the_lesson_form` | new | Red: `lesson.md: id is 'LES-0000', not of the form L-0074` |
+| Lesson lines 3c, 7, 8 **[CAP-41.a, CAP-41.c, CAP-41.f]** | DEC-252 | `test_w1_08_lesson.py::test_the_lesson_schema_accepts_the_carried_lesson_id` (accepts `L-0074`, refuses `L-074`) | new | Red: `lesson.schema.json refuses a lesson with id L-0074` |
+
+Once the template's id is `L-0000`, the existing lesson cases (which start from the template) and the three
+template cases of success 2a test the new form with no change.
+
+**Helper added.** `Checker.refuses_each` in `w1_08_support.py`: several bad documents in one call of the validator
+(`-o json`), each of which must be refused for itself. It keeps the forty-four bad path maps of the `where` test
+to one call.
+
+**Readings of batch 3.**
+
+18. **Capabilities** (DEC-251). The good entry is the one of the committed path map. `enabled` must be a JSON
+    boolean: a string, `1` and null are refused. An unknown key inside an entry is refused, for both capabilities.
+    For enabled code intelligence, `languages` is a list of one or more strings; whether an empty string is a
+    language name is not tested. Disabled code intelligence is tested only with a non-empty `languages` (accepted);
+    without `languages`, or with an empty list, it is DP-10.
+19. **`lesson_id`** (DEC-252) is tested as the pattern the decision gives. A string with a line break is already
+    refused by the batch-2 case. That the lesson record's `id` uses `lesson_id` and not another of the five
+    grammars is tested only so far as: `L-0074` is accepted and `L-074` is refused.
+20. **The `where` rule for every system.** "Identified system" is read as each of the twenty-two: the bad entry is
+    `status: minimal` with no `where` (or an empty one), also for a system the committed path map marks absent.
+
+## KPI → tests → red reason before implementation (batch 2)
 
 Red run on `w1/W1-08` at `5203ab3c`: **125 failed, 75 errors, 0 passed** (200 cases, 64 test functions). The errors
 are the same assertions, raised in a fixture. Batch 1 had 264 cases in 48 functions: 64 cases fewer, 16 functions
@@ -43,7 +83,7 @@ implementation outside the repository, and red again with defects seeded into it
 | **Success 3b.** The artefact identity fields of Contract v3 W1 are in the shared frontmatter or derived by gov **[CAP-50.a]** | `test_w1_08_frontmatter.py` | `test_a_record_without_id_type_or_status_is_refused[7]` · `test_the_optional_identity_fields_are_defined_and_optional[7]` · `test_no_template_stores_what_gov_derives[7]` | No templates; no schemas |
 | **Success 3c.** Lesson records carry a lifecycle state (candidate → … → approved) **[CAP-41.a]** | `test_w1_08_lesson.py` | `test_the_lesson_template_carries_a_lifecycle_state` · `test_the_six_lifecycle_states_are_accepted_and_no_other` | No lesson template; no lesson schema |
 | **Success 4.** Every namespace is governance/development memory or customer/runtime product data, never both **[CAP-03.b]** | `test_w1_08_path_map.py` | `test_every_namespace_is_governance_memory_or_product_data` · `test_each_memory_class_is_accepted` · `test_a_namespace_cannot_be_both_or_neither[4]` | No path map; no path-map schema |
-| **Success 5.** The overlay schema carries the project floor; it identifies each constitutional system; no overlay value goes below the kernel floor **[CAP-06.e, CAP-54.b]** | `test_w1_08_floor.py` | Floor keys: `test_a_path_map_without_the_floor_key_is_refused[3]`. Policies and the kernel floor (CAP-06.e): `test_the_path_map_gives_each_of_the_thirteen_policies_a_strength_at_or_above_the_kernel_minimum` · `test_a_path_map_without_one_of_the_thirteen_policies_is_refused` · `test_every_strength_at_or_above_the_kernel_minimum_is_accepted` · `test_a_strength_below_the_kernel_minimum_is_refused[9]` · `test_a_policy_value_that_is_not_a_strength_is_refused[2]`. Capabilities (CAP-06.e): `test_the_path_map_names_no_capability_outside_the_two` · `test_a_capability_outside_the_two_is_refused`. **The shape of a capability entry: DP-8.** Systems (CAP-54.b): `test_the_path_map_identifies_each_of_the_twenty_two_constitutional_systems` · `test_a_path_map_without_one_of_the_twenty_two_systems_is_refused` · `test_a_system_is_implemented_or_minimal_with_a_where` · `test_an_absent_system_gives_its_reason` · `test_a_system_without_one_of_the_three_statuses_is_refused[2]` | No path map; no path-map schema |
+| **Success 5.** The overlay schema carries the project floor; it identifies each constitutional system; no overlay value goes below the kernel floor **[CAP-06.e, CAP-54.b]** | `test_w1_08_floor.py` | Floor keys: `test_a_path_map_without_the_floor_key_is_refused[3]`. Policies and the kernel floor (CAP-06.e): `test_the_path_map_gives_each_of_the_thirteen_policies_a_strength_at_or_above_the_kernel_minimum` · `test_a_path_map_without_one_of_the_thirteen_policies_is_refused` · `test_every_strength_at_or_above_the_kernel_minimum_is_accepted` · `test_a_strength_below_the_kernel_minimum_is_refused[9]` · `test_a_policy_value_that_is_not_a_strength_is_refused[2]`. Capabilities (CAP-06.e): `test_the_path_map_names_no_capability_outside_the_two` · `test_a_capability_outside_the_two_is_refused`. **The shape of a capability entry: batch 3 (DEC-251).** Systems (CAP-54.b): `test_the_path_map_identifies_each_of_the_twenty_two_constitutional_systems` · `test_a_path_map_without_one_of_the_twenty_two_systems_is_refused` · `test_a_system_is_implemented_or_minimal_with_a_where` · `test_an_absent_system_gives_its_reason` · `test_a_system_without_one_of_the_three_statuses_is_refused[2]` | No path map; no path-map schema |
 | **Success 6.** The shared frontmatter records `state_class` for every record type **[CAP-07.b]** | `test_w1_08_frontmatter.py` · `test_w1_08_path_map.py` | `test_the_template_records_the_state_class_of_its_record_type[7]` · `test_a_record_without_a_state_class_is_refused[7]` · `test_the_six_state_classes_are_accepted_and_no_other[7]` · `test_the_shared_definitions_file_holds_the_six_state_classes` · `test_the_state_classes_are_written_in_one_schema_file_only` · `test_the_path_map_records_its_state_class` · `test_the_path_map_schema_takes_the_six_state_classes_and_no_other` | No templates; no schemas; no shared definitions file; no path map |
 | **Success 7.** Lesson records carry a scope of PROJECT, PRODUCT or FRAMEWORK **[CAP-41.c]** | `test_w1_08_lesson.py` | `test_the_lesson_template_carries_a_scope_and_a_severity_in_lower_case` · `test_each_scope_is_accepted[3]` · `test_a_scope_outside_the_three_is_refused[4]` | No lesson template; no lesson schema |
 | **Success 8.** The lesson schema requires both a scope and a severity (low, medium, high, critical), DEC-168 **[CAP-41.f]** | `test_w1_08_lesson.py` | `test_a_lesson_without_the_field_is_refused[2]` · `test_each_severity_is_accepted[4]` · `test_a_severity_outside_the_four_is_refused[4]` | No lesson template; no lesson schema |
@@ -51,8 +91,8 @@ implementation outside the repository, and red again with defects seeded into it
 | **Failure 2.** Two schemas define the same id grammar differently | `test_w1_08_id_grammar.py` | `test_the_five_id_grammars_are_defined_in_one_file_only` · `test_the_shared_definition_is_a_grammar[5]` · `test_no_record_schema_writes_an_id_pattern_of_its_own` · `test_the_id_of_the_record_is_governed_by_the_shared_grammar[7]` | No shared definitions file; no schema |
 
 **Count.** KPI lines with at least one test: 10 of 10 (8 of 8 success, 2 of 2 failure). Covers ids with at least one
-test: 13 of 13. Tested in part: CAP-06.e, for the capabilities (the closed list is tested; the shape of an entry
-waits for DP-8).
+test: 13 of 13. CAP-06.e was tested in part until batch 3 (the shape of a capability entry waited for DP-8, now
+DEC-251); what is left open is DP-10.
 
 **What batch 2 changed.** Added: the floor (success 5), the memory class and "every tracked path" (success 4, 2b),
 the six `state_class` values and the per-type defaults, the path map's `state_class`, the optional identity fields,
@@ -135,7 +175,8 @@ from the interpreter; it is `run_gov.py` now. That was an error in the batch-1 t
     an empty one; an `absent` system is accepted with a `reason` and refused without. Whether an extra policy or
     system key is refused, and whether an absent system may carry `where`, are not tested.
 15. **Capabilities.** `capabilities` is a map (batch 1's DP-1 option (a), which DEC-224 took) whose keys are among
-    `code_intelligence` and `research_corpus`; a third key is refused. The value of an entry is DP-8.
+    `code_intelligence` and `research_corpus`; a third key is refused. The value of an entry was DP-8, settled by
+    DEC-251: reading 18.
 16. **The committed path map must load in `gov`** (DEC-185, DEC-228): `gov status --json --root <a folder holding
     only that file>` ends with exit code 0 and no `CONFIG_INVALID`. The loader in `src/gov/config/` keeps the
     minimal shape and leaves the new keys alone.
@@ -143,9 +184,9 @@ from the interpreter; it is `run_gov.py` now. That was an error in the batch-1 t
 
 ## Not tested, and why
 
-- **The value of a capability entry** (an `enabled` flag, whether both keys are required, where `languages` is and
-  when it is required): DP-8.
-- **The id patterns themselves**, beyond the two ids this repository already uses: they are the engineer's (DEC-227).
+- **Disabled code intelligence without `languages`, or with an empty list**: DP-10.
+- **The id patterns themselves**, beyond `lesson_id` (DEC-252) and the two other ids this repository already uses:
+  they are the engineer's (DEC-227).
 - **The value shapes of the six optional identity fields**: DEC-239 names the keys only.
 - **That `gov` derives the canonical path and `content_hash`**: W1-08 changes no code; W1-10 builds the store.
 - **That `gov` refuses a path map the real schema refuses**: W1-27 (DEC-228).
@@ -173,9 +214,35 @@ schema, and its test design revises the cases that use `namespaces: {core: {}}`.
 | DP-6 | Which id grammars do two schemas share? | **DEC-227**: one shared definitions file holds the five grammars under fixed names; no other schema writes an id `pattern`; the record schemas refer to it. | Failure 2, readings 11 and 12 |
 | DP-7 | Who replaces the minimal path-map schema? | **DEC-228**: W1-27. W1-08 does not change `src/gov/config/`, and its path map must still load there. | Reading 16; no W1-07 revision |
 
+| DP-8 | The value of a capability entry | **DEC-251**: both keys required; each a closed map with a required boolean `enabled`; `code_intelligence` also has `languages`, a non-empty list of strings when it is enabled. | Batch 3, reading 18 |
+| DP-9 | The form of a lesson id | **DEC-252**: `lesson_id` is `^L-[0-9]{4,}$`, the form of the carried lesson `L-0074`, in the shared definitions file and in the lesson template. | Batch 3, reading 19 |
+
+DEC-251 and DEC-252 are recorded on another branch and were given to batch 3 in its brief; they are not yet in
+this branch's `docs/DECISION_REGISTER.md`.
+
 ## Open decision package
 
-### DP-8 — What is the value of a capability entry?
+### DP-10 — Disabled code intelligence: is `languages` required, and may it be empty?
+
+- **Question.** DEC-251: "`code_intelligence` also has `languages`, a non-empty list of strings when it is
+  enabled." When `enabled` is false, must the key `languages` still be there, and may it be an empty list?
+- **Why now.** The repair writes the schema's condition one way or the other. Two engineers can read the sentence
+  as "required only when enabled" or as "always there, non-empty only when enabled".
+- **Options.**
+  - (a) `languages` is required only when `enabled` is true. When disabled it may be left out; when present it is
+    a list of strings and may be empty. (DP-8 option (a) as it was written.)
+  - (b) `languages` is always required; it may be empty only when disabled.
+  - (c) Leave it free: the schema may do either, and no test fixes it.
+- **Impact.** (a) or (b): one more case (two documents). (c): none; the tests of batch 3 pass under both.
+- **Reversibility.** Easy: this repository's path map has code intelligence enabled, so neither choice changes it.
+  An adopted repository with the capability disabled would need a one-line edit after a change.
+- **Cost.** One line from the orchestrator (it qualifies for DEC-220), then one test case.
+- **Recommendation.** (a): a project that does not use code intelligence writes `enabled: false` and nothing else.
+- **Confidence.** Medium-high.
+
+## Settled package, kept for the record
+
+### DP-8 — What is the value of a capability entry? (settled by DEC-251)
 
 - **Question.** DEC-238 makes `capabilities` "a closed list of two: `code_intelligence` (with `languages`) and
   `research_corpus`". What does each key map to? Is "enabled" a boolean under the key, or is a capability enabled
