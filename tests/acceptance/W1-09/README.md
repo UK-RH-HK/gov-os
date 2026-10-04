@@ -6,6 +6,11 @@ CAP-34), ADR-0002 §3 and §5, the "Rules for every ticket" of the Wave 1 plan, 
 DEC-135, DEC-136, DEC-221, DEC-229 and DEC-274 to DEC-278. Written before implementation. Profile FULL. No earlier
 ticket's test was rewritten.
 
+**Added after implementation:** `test_w1_09_review.py`, 15 cases in 4 test functions, written by a fresh Independent
+Test Designer from three behaviours the review of the implementation described (DEC-136; described behaviours, never
+code), under DEC-292, DEC-293 and DEC-297. No existing test was changed. The suite is now **77 cases, 63 test
+functions**; see "Added after implementation: red run" below.
+
 ## Run
 
 ```sh
@@ -26,7 +31,7 @@ Standard library and `pytest` only. No network. Nothing is installed. No dev-tie
 - **Before the ready queue is read**, the project is committed and `gov.store.load` is run, so the rule may read
   records from the working tree or from the record graph. Claims are never committed.
 
-About 20 seconds when green; the race test takes about 6 of them.
+About 30 seconds when green; the two race tests take about 6 and about 8 of them.
 
 ## The public interface
 
@@ -92,17 +97,43 @@ exist: template/governance/kernel/bin/tk`**. The last column gives what each gro
 | **Success 4.** A ticket whose mandatory input is absent or superseded is not READY **[CAP-31.d]** | `test_w1_09_inputs.py` | `test_a_ticket_whose_mandatory_inputs_are_all_present_is_ready` · `test_a_ticket_whose_mandatory_input_is_absent_is_not_ready` · `test_one_absent_input_among_several_is_enough` · `test_the_ticket_becomes_ready_when_the_absent_input_arrives` · `test_a_ticket_whose_mandatory_input_is_superseded_is_not_ready` · `test_an_input_that_names_its_own_successor_is_superseded` · `test_the_successor_of_a_superseded_input_is_a_good_input` · `test_a_ticket_becomes_not_ready_when_its_input_is_superseded_later` · `test_a_bad_input_holds_only_the_ticket_that_names_it` | Inputs not read |
 | **Success 5.** A ticket waiting on an open decision package is blocked, and tickets that do not depend on it stay READY **[CAP-34.e]** | `test_w1_09_decisions.py` | `test_a_ticket_waiting_on_an_open_decision_package_is_blocked` · `test_tickets_that_do_not_depend_on_the_package_stay_ready` · `test_the_ticket_is_ready_again_when_the_package_is_answered` · `test_a_ticket_waiting_on_two_packages_is_blocked_while_one_is_open` · `test_a_ticket_that_depends_on_the_blocked_ticket_waits_for_it_as_for_any_dependency` · `test_an_open_package_that_names_no_ticket_of_the_project_blocks_nothing` · `test_a_record_of_another_type_that_constrains_a_ticket_does_not_block_it` | Packages not read |
 | **Failure 1.** Two agents hold the same claim | `test_w1_09_claims.py` | `test_claims_raced_from_separate_processes_give_exactly_one_holder` (8 processes, 4 rounds) · `test_a_second_claim_on_a_held_ticket_fails_with_the_holder_named` · `test_a_failed_claim_leaves_the_first_claim_as_it_was` · `test_a_lock_file_that_exists_is_a_held_claim_whatever_it_holds` · `test_a_release_by_another_than_the_holder_fails_and_the_claim_stays` | No claim |
+| **Failure 1**, added after implementation (DEC-292) | `test_w1_09_review.py` | `test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim` (4 releases and 8 claims, 6 starts of 12 tickets each) | See the red run below |
 | **Failure 2.** A ticket without tests/acceptance/<id>/ appears as READY | `test_w1_09_ready.py` | `test_a_ticket_without_its_acceptance_tests_folder_is_not_ready` · `test_the_ticket_becomes_ready_when_its_acceptance_tests_folder_exists` · `test_the_acceptance_tests_of_another_ticket_do_not_count` · `test_a_file_in_place_of_the_acceptance_tests_folder_does_not_count` · `test_the_folder_is_the_one_the_ticket_names` · `test_a_ticket_that_names_no_folder_needs_the_folder_of_its_own_id`; also the last assertion of `test_a_created_ticket_is_the_ticket_the_script_writes` | No queue |
+| **Failure 2**, added after implementation (DEC-293) | `test_w1_09_review.py` | `test_a_folder_that_is_not_below_the_projects_acceptance_tests_does_not_count[11]` · `test_a_named_folder_below_the_projects_acceptance_tests_counts[2]` (kept green) | See the red run below |
+| **Success 3**, the claimed exclusion **[CAP-31.c]**, added after implementation | `test_w1_09_review.py` | `test_a_claim_in_a_claims_folder_that_cannot_be_read_still_holds_the_ticket` (skipped for the super-user) | See the red run below |
 | DEC-229, no KPI line (package DP-7) | `test_w1_09_create.py` | `test_a_created_ticket_carries_state_class` · `test_a_created_ticket_is_the_ticket_the_script_writes` | No `create` |
 
-Covers ids: CAP-23.a (`test_w1_09_claims.py`), CAP-31.c (the dependency tests and the three exclusions of
-`test_w1_09_ready.py`), CAP-31.d (`test_w1_09_inputs.py`), CAP-34.e (`test_w1_09_decisions.py`).
+Covers ids: CAP-23.a (`test_w1_09_claims.py` and the race of `test_w1_09_review.py`), CAP-31.c (the dependency tests
+and the three exclusions of `test_w1_09_ready.py`, and the folder and claim cases of `test_w1_09_review.py`), CAP-31.d (`test_w1_09_inputs.py`), CAP-34.e (`test_w1_09_decisions.py`).
 
 **Checked that the suite can go green and catches the failure lines.** The tests were run against a throwaway
 reference outside the tracked tree, with a copy of the installed script as the vendored one: 62 passed. With a claim
 that checks for the lock and then creates it without O_EXCL, the race test failed. With the acceptance tests folder
 ignored, 9 cases failed (the six of failure 2 among them). With an open package blocking every ticket, 3 cases of
 `test_w1_09_decisions.py` failed. The reference is not in the repository.
+
+### Added after implementation: red run
+
+Red run on `w1/W1-09` at `c05e8cae`, with `gov.tasks` implemented: **13 failed, 64 passed** (77 cases). The 62 cases
+written before implementation pass. Of the 15 new cases, 13 are red and the 2 "kept green" cases pass:
+
+| Case | Red because |
+|---|---|
+| `test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim` | A release that loses the race ends with `FileNotFoundError` from removing the lock, not with the GovError `CLAIM_NOT_HELD`: two releases both found the named holder and both removed the lock. Red in 22 of 22 runs, each time in the first start. |
+| `test_a_folder_that_is_not_below_the_projects_acceptance_tests_does_not_count`, all 11: `path-absolute-outside-the-project`, `path-dot`, `path-dot-slash`, `path-parent`, `path-parent-elsewhere`, `path-src`, `path-git-folder`, `path-tests-acceptance-itself`, `wbs-id-dot`, `wbs-id-two-parents`, `link-to-a-folder-outside-the-project` | `ready` lists the ticket ("a ticket without tests/acceptance/<id>/ appears as READY"), and `blocked` gives no `NO_ACCEPTANCE_TESTS`. |
+| `test_a_claim_in_a_claims_folder_that_cannot_be_read_still_holds_the_ticket` | `ready` lists the ticket whose lock is in a claims folder of mode 000. |
+| `test_a_named_folder_below_the_projects_acceptance_tests_counts[2]` | Green, and must stay green: a named folder below `tests/acceptance/`, with and without the trailing slash. |
+
+**What the race test does and does not show.** Per ticket it asserts: at most one release succeeds and every other
+fails with `CLAIM_NOT_HELD`; at most one claim succeeds and every other fails with `CLAIM_HELD`; a claim succeeds
+only on a released ticket; the claimer that succeeded is the holder at the end. Today it fails on the first of these.
+The two other effects the review saw (two claims both succeed; the successful claimer's lock is gone at the end) come
+from the same two releases with a claim landing between their removals. They did not show on this machine (20 cores)
+in about 700 rounds of this layout and five others, tried outside the tracked tree with a driver that carries on
+after a crash. So **a repair that only turns the `FileNotFoundError` into `CLAIM_NOT_HELD` would very probably turn
+this test green while a release can still remove another holder's claim.** The repair must make "the lock names this
+holder" and "remove the lock" one step; the diff check should look at that, since no black-box test here reaches it
+reliably.
 
 ## Described behaviours from review (DEC-136)
 
@@ -111,6 +142,9 @@ ignored, 9 cases failed (the six of failure 2 among them). With an open package 
 | Two claims on one ticket raced from two separate processes: exactly one holds it, the other fails with the holder named | A test: `test_claims_raced_from_separate_processes_give_exactly_one_holder`. It is failure line 1. |
 | A claim on a closed ticket | A test on the recommended option of DP-2: `test_a_closed_ticket_cannot_be_claimed`. **Specification gap:** no source says what a claim on a closed ticket does. |
 | A claims folder (`.tickets/.claims`) that is a symbolic link | No test. **Specification gap** (package DP-9): no source says whether claims may live outside the worktree, and a shared claims folder may be what parallel worktrees need. Under DEC-135 it is a residual, not a guard finding: exclusive creation cannot overwrite a file. |
+| After implementation: a release never removes another holder's claim. Releases that name the holder and claims by others, started together from separate processes | A test: `test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim`. Failure line 1, DEC-292 (the orchestrator releases a dead session's claim by naming its holder, so two releases can overlap). Which holder a losing claim is told is not asserted: at that moment it may be the released one or the new one. |
+| After implementation: only a folder of the project, strictly below `tests/acceptance/`, with links resolved, is an acceptance tests folder | A test, 11 cases: `test_a_folder_that_is_not_below_the_projects_acceptance_tests_does_not_count`; and 2 cases kept green: `test_a_named_folder_below_the_projects_acceptance_tests_counts`. Failure line 2, DEC-293. Not tested, left open under DEC-293: a path that names another ticket's folder; an empty folder. Not tested, not described: a link to a folder inside the project. |
+| After implementation: a claim that cannot be inspected counts as a claim (claims folder of mode 000) | A test: `test_a_claim_in_a_claims_folder_that_cannot_be_read_still_holds_the_ticket`. CAP-31.c, the claimed exclusion. The project has one ticket, the one with the lock: whether a ticket without a lock is also `CLAIMED` while the folder cannot be read is not asserted (**specification gap**, package DP-10). |
 | A ticket id that contains a path separator | A test: `test_a_ticket_id_with_a_path_separator_is_no_ticket[4]`. The ticket id grammar of W1-08 (`common.schema.json`) has no separator, so such an id names no ticket; the test also checks that nothing is written. |
 
 ## Readings
@@ -297,3 +331,19 @@ Each package's affected tests are written on its recommended option. Every other
   not tracked; a linked folder is neither refused nor supported; recorded as a residual. (b) Refuse a claims folder
   that is a link. (c) A shared claims folder for all worktrees.
 - **Recommendation.** (a). **Confidence:** medium. Returned as a question; no test depends on it.
+
+### DP-10 — Tickets without a lock while the claims folder cannot be inspected (added after implementation)
+
+- **Question.** While `.tickets/.claims` cannot be read, is every open ticket `CLAIMED`, or only those known to have a
+  lock?
+- **Why now.** The described behaviour says a claim that cannot be inspected counts as a claim. With the folder
+  unreadable, no ticket can be shown to be free, and no source says what the queue does then.
+- **Options.** (a) Every open ticket is `CLAIMED` while the folder cannot be inspected: nothing is handed out on a
+  claim state nobody can read. (b) Only tickets whose lock can be shown to exist. (c) `ready` and `blocked` raise an
+  error.
+- **Impact.** (a) empties the queue until the folder is repaired, which is visible. (b) cannot be decided in general:
+  mode 000 hides which locks exist. (c) adds an error code to the interface.
+- **Reversibility.** High. **Cost.** (a) the smallest.
+- **Recommendation.** (a). **Confidence:** medium.
+- **Tests that depend on it:** none. The test uses a project whose only ticket has the lock, so it holds under (a)
+  and (b).
