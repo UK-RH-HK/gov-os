@@ -27,8 +27,11 @@ kpis:
   - A SessionStart hook on compact, clear and resume injects, within the hook's size cap, the prompt path and the checkpoint's RESUME HERE section, with the instruction to read both now (DEC-248) [CAP-37.g]
   - 'The auto-compact threshold is set to about 300k tokens (30 % of the window) if Claude Code allows it to be configured; an acceptance test proves whether it can; if it can''t, a residual is recorded: the CONTEXT_CHECKPOINT stop stays (DEC-248, DEC-208)'
   - After a forced compaction (/compact), the session's next action shows it knows the active tickets, the open owner decisions and the loop counts, without the owner restating them (DEC-248) [CAP-37.g]
+  - 'The PreCompact hook never blocks a compaction: it appends a generated state block to the checkpoint (the git head, the tickets in progress from tk, the worktree list, the pending owner decisions); the SessionStart injection warns when the checkpoint''s written part is older than that block, and tells the session to re-derive state from git and the tickets before acting (DEC-264) [CAP-37.g]'
+  - 'The SessionStart injection is role-specific: in the main tree it points to the orchestrator prompt and the orchestrator''s checkpoint; in a worktree it tells the session it is the ticket lead for its ticket, to read appendix A5 of the orchestrator prompt and its checkpoint, and carries the lead checkpoint''s RESUME HERE section (DEC-263) [CAP-37.g]'
   failure:
-  - A compaction proceeds while the checkpoint is not current, and nothing says so
+  - A compaction is blocked by the PreCompact hook
+  - The checkpoint's written part is older than the generated state block, and the SessionStart injection does not say so
   - SessionStart injects more than the hook's size cap, or leaves out the prompt path or the RESUME HERE section
   - After a compaction the session needs the owner to restate the active tickets, the open owner decisions or the loop counts
 profile: FULL
