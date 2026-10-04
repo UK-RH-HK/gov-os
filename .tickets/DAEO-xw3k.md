@@ -21,6 +21,7 @@ depends_on:
 allowed_paths:
 - src/gov/doctor/**
 - src/gov/rebuild/**
+- src/gov/config/**
 - tests/unit/doctor/**
 - template/governance/kernel/checks/recovery-rebuild*
 kpis:
@@ -34,6 +35,8 @@ kpis:
   - doctor reports Claude Code drift (DEC-210, DEC-214); the CLI at ~/.local/bin/claude and the active VS Code extension differing from each other, either being newer than the registry's record, or the extension's bundled binary
     at the recorded version with another sha256, is reported as drift; the CLI or the active extension below the minimum, 2.1.285, or the CLI at the recorded version with another sha256, is a failure
   - doctor reports a missing governance/project/held-out.yaml in this repository, because the guard treats a missing file as no held-out rule (DEC-223)
+  - gov validates governance/project/path-map.yaml against the kernel's path-map schema of W1-08, which replaces the minimal schema of W1-07 in src/gov/config/; the W1-07 acceptance cases that depend on the provisional shape
+    are revised in this ticket's test design (DEC-185, DEC-189, DEC-228)
   failure:
   - doctor passes with a tool at the wrong version
   - rebuild needs anything not in git
