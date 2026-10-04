@@ -23,16 +23,17 @@ still pass, unchanged and in order.
 ``.claude/settings.json``, one that registers no PreToolUse command, or
 ``disableAllHooks: true`` in the committed or the local settings.
 
-Who wires the guard is not decided (README, DP-11): the launcher may refuse, as
-DEC-233 refuses a ``sandbox`` key, or register the guard in the settings it
-builds. The tests of ``--setting-sources`` and of B hold under both: the launch
-is refused, or the one ``--settings`` value registers a PreToolUse command for
-every write tool (and switches the hooks back on).
+**Who wires the guard (DEC-314, batch 4).** "``gov launch`` refuses when the
+project's settings do not register the guard. The launcher does not register the
+hooks itself. As built, the refusal covers a missing or unwired
+``.claude/settings.json``, ``disableAllHooks``, ``--bare``, and
+``--setting-sources`` with any value." The tests of ``--setting-sources`` and of
+B, which accepted either answer of DP-11 in batch 3, now assert the refusal
+only: a non-zero exit, a named reason, nothing started. The settings the
+launcher builds register no hook and carry no ``disableAllHooks``.
 
-Not tested, see DP-10 in the README: ``--dangerously-skip-permissions``,
-``--allow-dangerously-skip-permissions``, ``--permission-mode
-bypassPermissions``, ``--add-dir``, and the settings keys
-``permissions.defaultMode`` and ``permissions.additionalDirectories``.
+Permission bypass and added directories (DEC-313) are in
+``test_w1_46_bypass_and_added_directories.py``.
 
 No session is started.
 """
@@ -78,9 +79,24 @@ def test_the_launcher_refuses_the_argument_that_skips_the_hooks(launch, argument
                                        ("--setting-sources", "")),
                          ids=("user-only", "user-only-joined", "no-source"))
 def test_no_session_is_started_without_the_projects_settings_unless_the_launcher_wires_the_guard(launch, arguments):
-    """Without the project's settings their PreToolUse command is not loaded."""
+    """Without the project's settings their PreToolUse command is not loaded: refused (DEC-314)."""
     launch(ENGINEER).session()
-    support.assert_no_session_without_the_guard(launch(ENGINEER, None, *HEADLESS, *arguments))
+    support.assert_refused(launch(ENGINEER, None, *HEADLESS, *arguments), "--setting-sources", "hook", "guard")
+
+
+@pytest.mark.parametrize("arguments", (("--setting-sources", "project"), ("--setting-sources=user,project,local",)),
+                         ids=("project-only", "every-source-joined"))
+def test_setting_sources_refuses_the_launch_with_any_value(launch, arguments):
+    """DEC-314: "``--setting-sources`` with any value", also one that names the project's settings."""
+    launch(ENGINEER).session()
+    support.assert_refused(launch(ENGINEER, None, *HEADLESS, *arguments), "--setting-sources", "hook", "guard")
+
+
+@pytest.mark.parametrize("role", support.WORKER_ROLES)
+def test_the_launcher_does_not_register_the_hooks_itself(launch, role):
+    """DEC-314: the guard comes from the project's settings alone; the built settings carry no hook key."""
+    found = support.hook_keys(launch(role, None, *HEADLESS).settings())
+    assert found == [], f"the settings the launcher built for a {role} session carry {found}"
 
 
 # --------------------------------------------------------------------------
@@ -113,17 +129,17 @@ UNWIRED = ("no-settings-file", "no-hooks-block", "no-pretooluse-command", "hooks
 
 @pytest.mark.parametrize("how", UNWIRED)
 def test_no_session_is_started_in_a_project_that_does_not_wire_the_guard(launch, project, how):
-    """The same project launches before the change, so the change is the reason."""
+    """The same project launches before the change, so the change is the reason. Refused (DEC-314)."""
     launch(ENGINEER).session()
     _unwire(project, how)
-    support.assert_no_session_without_the_guard(launch(ENGINEER), hooks_switched_off=how.startswith("hooks-off"))
+    support.assert_refused(launch(ENGINEER), "hook", "guard", "settings")
 
 
 def test_a_research_session_is_not_started_without_the_guard_either(launch, project):
     """The research fence leans on the guard for every path created after launch (KPI success 4)."""
     launch(RESEARCH).session()
     _unwire(project, "no-pretooluse-command")
-    support.assert_no_session_without_the_guard(launch(RESEARCH))
+    support.assert_refused(launch(RESEARCH), "hook", "guard", "settings")
 
 
 def test_hooks_left_on_explicitly_do_not_refuse_the_launch(launch, project):

@@ -20,6 +20,17 @@ lines, whatever DP-13's answer is, and only they are tested here.
   launch is refused, or both hold the session to the folder the entry resolves
   to.
 
+**DEC-273 (batch 4, on DP-13).** "The one folder of a research ticket must lie
+under a root the project names, ``experiments/`` by default. ``gov launch``
+refuses a research ticket whose folder is anywhere else, so a research ticket on
+``.claude/``, ``.tickets/``, ``governance/project/``, ``src/`` or ``.git/`` does
+not launch." The five directories of the decision are tested, and two more
+readings of "anywhere else": a folder named ``experiments`` that is not the
+root, and a root-level folder beside it. Each directory exists in the project,
+so the place is the reason. How a project names another root is not written
+down, so only the default is tested. The control, a second folder under
+``experiments/``, is in ``test_w1_46_launch_refusals.py``.
+
 No session is started.
 """
 
@@ -105,3 +116,29 @@ def test_an_entry_with_dot_dot_is_refused_or_the_fence_and_the_guard_hold_the_sa
     w47.assert_allowed(inside, "a research Write in the folder the fence was built around")
     outside = guard("Write", w47.write_input("Write", project / FOLDER / "notes.md"), RESEARCH, ticket)
     w47.assert_stopped(outside, "a research Write in the folder the entry only passes through")
+
+
+# --------------------------------------------------------------------------
+# DEC-273: the folder lies under a root the project names, ``experiments/`` by default
+# --------------------------------------------------------------------------
+
+NOT_UNDER_THE_ROOT = {
+    "dot-claude": ".claude",
+    "the-tickets": ".tickets",
+    "the-project-governance": "governance/project",
+    "the-source": "src",
+    "the-git-directory": ".git",
+    "a-folder-named-experiments-elsewhere": "docs/experiments/exp-1",
+    "a-top-level-folder-beside-the-root": "spikes/exp-1",
+}
+
+
+@pytest.mark.parametrize("name", sorted(NOT_UNDER_THE_ROOT))
+def test_a_research_ticket_whose_folder_is_not_under_the_experiments_root_refuses_the_launch(launch, project, name):
+    folder = NOT_UNDER_THE_ROOT[name]
+    if not (project / folder).is_dir():
+        support.write(project, f"{folder}/README.md", "# not an experiment folder\n")
+    assert (project / folder).is_dir()
+    launch(RESEARCH).session()
+    ticket = support.write_ticket(project, NEW_TICKET, RESEARCH, allowed_paths=(f"{folder}/**",))
+    support.assert_refused(launch(RESEARCH, ticket), "allowed_paths", "experiment", "root")

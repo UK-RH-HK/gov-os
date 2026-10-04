@@ -13,8 +13,12 @@ role other than the one launched and that role has no work on such a ticket: a
 research session on an engineer's ticket, an engineer on a research ticket, an
 engineer on an auditor's ticket. The independent test designer is launched on
 the engineer's ticket it writes the tests for (MR-3): that launch is in every
-other file of this suite. Which other tickets the two independent roles may be
-launched on is not tested; see DP-8 in the README.
+other file of this suite.
+
+DEC-271 (batch 4, on DP-8): "``gov launch`` starts an engineer or a research
+session only on a ticket of its own role. An independent test designer and an
+independent auditor are launched on any ticket that is ``in_progress``: their
+work is always on another role's ticket."
 
 No session is started.
 """
@@ -26,6 +30,7 @@ import pytest
 import w1_46_support as support
 
 ENGINEER, AUDITOR, RESEARCH = support.ENGINEER, support.AUDITOR, support.RESEARCH
+TEST_DESIGNER = support.TEST_DESIGNER
 FOLDER = support.EXPERIMENT_REL
 NEW_TICKET = "DAEO-zz98"
 
@@ -59,12 +64,38 @@ def test_the_same_ticket_in_progress_is_launched(launch, project):
     assert result.variable("GOV_TICKET") == ticket
 
 
-@pytest.mark.parametrize("role, ticket_role", ((RESEARCH, ENGINEER), (ENGINEER, RESEARCH), (ENGINEER, AUDITOR)),
+@pytest.mark.parametrize("role, ticket_role", ((RESEARCH, ENGINEER), (ENGINEER, RESEARCH), (ENGINEER, AUDITOR),
+                                               (RESEARCH, AUDITOR)),
                          ids=("research-on-an-engineers-ticket", "engineer-on-a-research-ticket",
-                              "engineer-on-an-auditors-ticket"))
+                              "engineer-on-an-auditors-ticket", "research-on-an-auditors-ticket"))
 def test_a_ticket_of_another_role_refuses_the_launch(launch, role, ticket_role):
     launch(role).session()
     support.assert_refused(launch(role, support.TICKET_OF[ticket_role]), "role")
+
+
+@pytest.mark.parametrize("role", (TEST_DESIGNER, AUDITOR))
+@pytest.mark.parametrize("ticket_role", (ENGINEER, AUDITOR, RESEARCH))
+def test_the_two_independent_roles_are_launched_on_a_ticket_of_any_role(launch, role, ticket_role):
+    """DEC-271: "on any ticket that is ``in_progress``". The session is that role's, on that ticket."""
+    ticket = support.TICKET_OF[ticket_role]
+    result = launch(role, ticket)
+    assert result.run.returncode == 0, (
+        f"gov launch refused a {role} on a ticket of the role {ticket_role}\n{result.describe()}"
+    )
+    assert (result.variable("GOV_ROLE"), result.variable("GOV_TICKET")) == (role, ticket)
+    assert support.sandbox_faults(result.settings()) == []
+    assert support.allowed_domains(result.settings()) == [], (
+        f"a {role} on a ticket of the role {ticket_role} was given a network allowlist"
+    )
+
+
+@pytest.mark.parametrize("role", (TEST_DESIGNER, AUDITOR))
+@pytest.mark.parametrize("status", ("open", "closed"))
+def test_the_two_independent_roles_are_refused_a_ticket_that_is_not_in_progress(launch, project, role, status):
+    """DEC-271: "any ticket that is ``in_progress``", and no other."""
+    launch(role).session()
+    ticket = support.write_ticket(project, NEW_TICKET, ENGINEER, status=status)
+    support.assert_refused(launch(role, ticket), "in_progress", "status", status)
 
 
 @pytest.mark.parametrize("name", sorted(NOT_ONE_EXPERIMENT_FOLDER))

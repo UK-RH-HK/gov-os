@@ -5,14 +5,15 @@ from an owner-extensible list (GitHub, PyPI, npm, Hugging Face, arXiv,
 documentation sites)".
 
 DEC-241: "``governance/project/research-allowlist.yaml`` extends the kernel
-default. The owner extends the list." The starting hosts are the seventeen
-hosts the decision names "and the subdomains of ``readthedocs.io``"; they are
-copied from the register into ``w1_46_support.STARTING_HOSTS``.
+default. The owner extends the list." The starting hosts are the hosts the
+decision names "and the subdomains of ``readthedocs.io``", less
+``cdn-lfs.huggingface.co``, which DEC-316 drops because it does not resolve:
+sixteen hosts, copied from the register into ``w1_46_support.STARTING_HOSTS``.
 
-The project's file is this repository's, copied into the temporary project. Its
-key is not fixed by the decision: a test that changes the file changes the list
-it finds there (the file's top level, or the one list a mapping holds), and the
-entries are host names as text.
+The project's file is this repository's, copied into the temporary project.
+DEC-272: "The list is under the key ``hosts``. A project without
+``governance/project/research-allowlist.yaml`` launches a research session on
+the kernel default alone: no file means no extension."
 
 "Nothing may fail open": a file that cannot be read as a list of host names
 refuses the launch, with a non-zero exit and a named reason, and nothing is
@@ -52,10 +53,19 @@ def test_this_repository_has_the_research_allowlist_file():
 
 
 def test_the_research_allowlist_carries_the_starting_hosts(launch):
-    """Each of the seventeen hosts DEC-241 names is an entry of the built allowlist, under its own name."""
+    """Each of the sixteen hosts DEC-241 and DEC-316 leave is an entry of the built allowlist, under its own name."""
+    assert len(set(support.STARTING_HOSTS)) == 16 and support.DROPPED_HOST not in support.STARTING_HOSTS
     domains = support.allowed_domains(launch(RESEARCH).settings())
     missing = [host for host in support.STARTING_HOSTS if host not in domains]
     assert missing == [], f"the built research allowlist does not carry {missing}; it holds {domains}"
+
+
+def test_the_host_the_owner_dropped_is_not_in_the_built_allowlist(launch):
+    """DEC-316: ``cdn-lfs.huggingface.co`` is no starting host, in the kernel default and in the project's file."""
+    domains = support.allowed_domains(launch(RESEARCH).settings())
+    assert support.DROPPED_HOST not in domains and not support.accepts(domains, support.DROPPED_HOST), (
+        f"the built research allowlist still accepts {support.DROPPED_HOST}; it holds {domains}"
+    )
 
 
 def test_the_research_allowlist_carries_the_readthedocs_subdomain_entry(launch):
@@ -115,3 +125,43 @@ def test_a_malformed_allowlist_file_refuses_the_launch(launch, project, name):
     else:
         support.rewrite_allowlist(project, MALFORMED[name])
     support.assert_refused(launch(RESEARCH), "allowlist")
+
+
+# --------------------------------------------------------------------------
+# DEC-272: the key is ``hosts``; a project without the file launches on the kernel default alone
+# --------------------------------------------------------------------------
+
+def test_this_repositorys_allowlist_holds_its_list_under_the_key_hosts():
+    data = yaml.safe_load((support.REPO_ROOT / support.ALLOWLIST_REL).read_text(encoding="utf-8"))
+    assert isinstance(data, dict) and isinstance(data.get(support.ALLOWLIST_KEY), list), (
+        f"{support.ALLOWLIST_REL} holds no list under the key '{support.ALLOWLIST_KEY}'"
+    )
+
+
+OTHER_SHAPES = {
+    "another-key": lambda hosts: {"allowed_domains": hosts},
+    "a-list-at-the-top-level": lambda hosts: hosts,
+}
+
+
+@pytest.mark.parametrize("name", sorted(OTHER_SHAPES))
+def test_a_list_that_is_not_under_the_key_hosts_refuses_the_launch(launch, project, name):
+    """Nothing fails open: the owner's hosts under another key are not dropped silently."""
+    launch(RESEARCH).session()
+    hosts = [*support.STARTING_HOSTS, support.ADDED_HOST]
+    support.write(project, support.ALLOWLIST_REL, yaml.safe_dump(OTHER_SHAPES[name](hosts), default_flow_style=False))
+    support.assert_refused(launch(RESEARCH), "allowlist", support.ALLOWLIST_KEY)
+
+
+def test_a_project_without_the_allowlist_file_launches_on_the_kernel_default_alone(launch, project):
+    """DEC-272: "no file means no extension". The host the project's file added is gone with the file."""
+    support.rewrite_allowlist(project, lambda entries: entries + [support.ADDED_HOST])
+    assert support.ADDED_HOST in support.allowed_domains(launch(RESEARCH).settings())
+    (project / support.ALLOWLIST_REL).unlink()
+    result = launch(RESEARCH)
+    assert result.run.returncode == 0, f"gov launch refused a project without {support.ALLOWLIST_REL}\n{result.describe()}"
+    assert support.sandbox_faults(result.settings()) == []
+    domains = support.allowed_domains(result.settings())
+    missing = [host for host in (*support.STARTING_HOSTS, support.READTHEDOCS_ENTRY) if host not in domains]
+    assert missing == [], f"without the project's file the allowlist lacks the kernel default's {missing}"
+    assert support.ADDED_HOST not in domains, "a host of the removed file is still in the allowlist"

@@ -30,8 +30,12 @@ CLI>]`` (DEC-231): the role and the ticket are positional, and everything after
 ``--`` goes to the CLI unchanged.
 
 **The research allowlist.** ``governance/project/research-allowlist.yaml`` is
-copied from this repository when it exists (DEC-241). A test that changes it
-changes the list it finds there, whatever key holds it.
+copied from this repository when it exists (DEC-241). Its list is under the key
+``hosts`` (DEC-272).
+
+**The session's exit code.** The stand-in ends with exit code 0, or with the
+code a test wrote for it (``set_session_exit_code``), as a worker session that
+ended with that code would.
 """
 
 from __future__ import annotations
@@ -126,13 +130,15 @@ PROTECTED_RUNTIME = (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov
                      ".gov-runtime/last_head.json", ".gov-runtime/a-link")
 SCRATCH_PATHS = (".gov-runtime/scratch/w1-46/seed.txt", ".gov-runtime/scratch/new/file.txt")
 
-# The starting hosts of the research allowlist, copied from DEC-241 in the register.
+# The starting hosts of the research allowlist, copied from DEC-241 in the register, less the host DEC-316 drops.
 STARTING_HOSTS = (
     "github.com", "api.github.com", "raw.githubusercontent.com", "objects.githubusercontent.com",
     "codeload.github.com", "pypi.org", "files.pythonhosted.org", "registry.npmjs.org", "huggingface.co",
-    "cdn-lfs.huggingface.co", "arxiv.org", "export.arxiv.org", "docs.python.org", "docs.rs", "crates.io",
+    "arxiv.org", "export.arxiv.org", "docs.python.org", "docs.rs", "crates.io",
     "static.crates.io", "developer.mozilla.org",
 )
+DROPPED_HOST = "cdn-lfs.huggingface.co"   # DEC-316: it does not resolve; no longer a starting host
+ALLOWLIST_KEY = "hosts"                   # DEC-272
 # "And the subdomains of readthedocs.io": the entry's form in the sandbox, and one host it must accept.
 READTHEDOCS_ENTRY = "*.readthedocs.io"
 READTHEDOCS_HOST = "docs.readthedocs.io"
@@ -251,6 +257,9 @@ record = {"kind": kind, "argv0": sys.argv[0], "args": args, "cwd": os.getcwd(), 
           "settings": settings, "directories": directories}
 with open(@LOG@, "a", encoding="utf-8") as handle:
     handle.write(json.dumps(record) + "\n")
+if kind == "session" and os.path.isfile(@EXIT@):
+    with open(@EXIT@, encoding="utf-8") as handle:
+        sys.exit(int(handle.read().strip()))
 '''
 
 
@@ -266,9 +275,19 @@ def pinned_cli_version(root=REPO_ROOT):
     return "2.1.288"
 
 
+def _exit_file(log):
+    return Path(str(log) + ".exit-code")
+
+
+def set_session_exit_code(cli, code):
+    """From now on the stand-in session ends with ``code``, as a worker session that ended with it would."""
+    _exit_file(cli.log).write_text(f"{int(code)}\n", encoding="utf-8")
+
+
 def _write_stub(path, log, kind):
     text = (_STUB.replace("@PYTHON@", sys.executable).replace("@KIND@", repr(kind))
-            .replace("@VERSION@", repr(pinned_cli_version())).replace("@LOG@", repr(str(log))))
+            .replace("@VERSION@", repr(pinned_cli_version())).replace("@LOG@", repr(str(log)))
+            .replace("@EXIT@", repr(str(_exit_file(log)))))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
@@ -429,8 +448,9 @@ def accepts(domains, host):
 def rewrite_allowlist(project, change):
     """Rewrite the project's research allowlist: ``change`` gets the list of entries and returns what replaces it.
 
-    The file's key is not fixed by DEC-241. The list is the file's top level,
-    or the one list a top-level mapping holds; the rest of the file is kept.
+    The list is under the key ``hosts`` (DEC-272); the rest of the file is kept.
+    A file of another shape is rewritten in its own shape, so that a test of a
+    malformed file can start from it.
     """
     path = Path(project) / ALLOWLIST_REL
     assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
@@ -458,36 +478,19 @@ def allowlist_key(project):
     return keys[0] if len(keys) == 1 else None
 
 
-GUARDED_TOOLS = ("Write", "Edit", "Bash")
+def hook_keys(settings):
+    """The keys of ``settings`` that register a hook or switch the hooks on or off."""
+    return sorted(key for key in ("hooks", "disableAllHooks") if key in settings)
 
 
-def tools_without_a_guard_command(settings):
-    """The write tools for which ``settings`` register no PreToolUse command."""
-    return [tool for tool in GUARDED_TOOLS if not live_support.hook_commands(settings, "PreToolUse", tool)]
-
-
-def assert_no_session_without_the_guard(result, hooks_switched_off=False):
-    """What every answer to DP-11 shares: no worker session is started that no guard decides for.
-
-    Either the launch is refused (non-zero exit, a named reason, nothing
-    started), or the launcher wires the guard itself: the one ``--settings``
-    value registers a PreToolUse command for every write tool, and switches the
-    hooks back on where the repository's settings switched them off.
-    """
-    if result.run.returncode != 0:
-        assert_refused(result, "hook", "guard", "settings")
-        return
-    built = result.settings()
-    bare = tools_without_a_guard_command(built)
-    assert bare == [], (
-        "a worker session was started although the project's settings register no guard for it, and the built "
-        f"settings register no PreToolUse command for {bare}\n{result.describe()}"
-    )
-    if hooks_switched_off:
-        assert built.get("disableAllHooks") is False, (
-            "a worker session was started although the repository's settings switch every hook off, and the built "
-            f"settings do not switch them back on\n{result.describe()}"
-        )
+def rewrite_settings(project, change, rel=SETTINGS_REL):
+    """Change the repository's settings file ``rel`` in place: ``change`` gets the parsed object ({} if missing)."""
+    path = Path(project) / rel
+    data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    change(data)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return path
 
 
 def write_ticket(project, ticket_id, role, status="in_progress", allowed_paths=("docs/**",), wbs_id="W1-98"):
@@ -567,6 +570,17 @@ def covers(specs, relpath, project, home):
 
 def edit_denied(result, relpath, project, sandbox):
     return covers(deny_rules(result.settings(), "Edit"), relpath, Path(project), sandbox.home)
+
+
+def literal_edit_denials(result, project, sandbox):
+    """The absolute paths the built settings deny by a literal ``Edit`` rule: a rule that names one path, no pattern.
+
+    The Linux sandbox skips a rule with ``*``, ``?`` or ``[`` in it (EXP-001
+    §1), so only a literal rule binds a Bash command there (DEC-311).
+    """
+    root = os.path.realpath(project)
+    return {os.path.normpath(_absolute(spec, root, str(sandbox.home)))
+            for spec in deny_rules(result.settings(), "Edit") if not has_glob_character(spec)}
 
 
 def has_glob_character(name):
