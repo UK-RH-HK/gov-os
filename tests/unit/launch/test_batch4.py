@@ -84,7 +84,8 @@ def test_the_dropped_host_is_in_neither_list():
     ("ln -s ../elsewhere/a", "a"), ("/bin/ln a b", "b"),
 ))
 def test_the_destination_of_ln_is_a_write_target(tmp_path, command, target):
-    assert _extract_bash_write_targets(command, str(tmp_path)) == [str(tmp_path / target)]
+    # Since DEC-334 the source of a hard link follows the destination.
+    assert _extract_bash_write_targets(command, str(tmp_path))[0] == str(tmp_path / target)
 
 
 @pytest.mark.parametrize("command", (

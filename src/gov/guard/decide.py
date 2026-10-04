@@ -257,7 +257,8 @@ def _is_punct(tok: str) -> bool:
 
 
 def _cp_operands(args: list[str]) -> tuple[list[str], list[str]] | None:
-    """Split the arguments of ``cp`` into operands and target directories.
+    """Split the arguments of ``cp``, ``mv`` or ``install`` into operands
+    and target directories.
 
     The directories are the values of ``-t`` and ``--target-directory``, in
     their four spellings.  ``None`` when an option cannot be read.
@@ -314,6 +315,7 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     targets: list[str] = []
     link_sources: list[str] = []  # what the links made by this command name
     link_dests = 0                # how many of *targets* are their destinations
+    hard_sources: list[str] = []  # the files a hard link gives a second name
 
     def _resolve(raw: str, targets: list[str] = targets) -> None:
         """Expand, glob-expand and resolve *raw* into *targets*."""
@@ -446,17 +448,41 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 if not a.startswith("-"):
                     _resolve(a)
             continue
-        if name == "mv":
+        if name == "link":
+            # DEC-334: both names of the hard link are judged.
             for a in args:
                 if not a.startswith("-"):
                     _resolve(a)
             continue
-        if name == "cp":
+        if name == "mv":
+            # DEC-334: the target directory is a write target in every
+            # spelling of the option, beside the operands.
+            parsed = _cp_operands(args)
+            if parsed is None:
+                targets.append(_UNRESOLVABLE)
+                continue
+            for a in parsed[0] + parsed[1]:
+                _resolve(a)
+            continue
+        if name in ("cp", "install"):
             parsed = _cp_operands(args)
             if parsed is None:
                 targets.append(_UNRESOLVABLE)
                 continue
             nf, dirs = parsed
+            short = "".join(a for a in args
+                            if a.startswith("-") and not a.startswith("--"))
+            if name == "install" and not dirs and (
+                    "d" in short or any(a.startswith("--d") for a in args)):
+                # install -d: every operand is a directory it makes.
+                for a in nf:
+                    _resolve(a)
+                continue
+            if name == "cp" and (
+                    "l" in short or any(a.startswith("--l") for a in args)):
+                # DEC-334: cp -l makes hard links to its sources.
+                for a in (nf if dirs else nf[:-1]):
+                    _resolve(a, hard_sources)
             # -t, --target-directory: every operand is a source, and the
             # copy lands in the directory under the operand's own name.
             for d in dirs:
@@ -495,7 +521,10 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                                and "s" in a)
                            for a in args)
             for a in (nf[:-1] if len(nf) >= 2 else nf):
-                if symbolic and not os.path.isabs(_expand_token(a) or ""):
+                if not symbolic:
+                    # DEC-334: a hard link is a second name of the file.
+                    _resolve(a, hard_sources)
+                elif not os.path.isabs(_expand_token(a) or ""):
                     link_sources.append(_UNRESOLVABLE)
                 else:
                     _resolve(a, link_sources)
@@ -504,6 +533,9 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     # the link: what the link names is judged as a write target too.
     if len(targets) > link_dests:
         targets.extend(link_sources)
+    # DEC-334: a later call could write through a hard link, so its source is
+    # judged as a write target whatever else the command does.
+    targets.extend(hard_sources)
 
     return targets or None
 
