@@ -14,7 +14,7 @@ change_log:
     the outcome of DEC-138 (EXP-001, ADOPT-PARTIAL); applies DEC-150…DEC-162. Envelope: boundary and tool installs extended.
     MR-3: the orchestrator exception. CAP-58 split between the OS sandbox (a worker session''s Bash) and the guard (file tools,
     the orchestrator session). New CAP-61 (worker session launcher and OS sandbox) and CAP-62 (sandbox escape hatch denied).
-    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48, same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval).'
+    New covers items in CAP-22, 25, 30, 32, 33, 38, 40, 49 and 58; wave note in CAP-37. 60 → 62 capabilities. Repair after the S2-A round-1 audit, same version: applies DEC-163…DEC-167. New covers items in CAP-22, 25, 32, 33, 41, 45 and 58; CAP-25 acceptance, CAP-41.e, CAP-61.a and CAP-61.f reworded; envelope tool installs names the research role. Second pass of the repair: CAP-41.f moved to W1 on W1-08 (DEC-168); CAP-22.d, 25.e, 49.c, 58.a, 58.b, 58.e and 61.c reworded for S2A-F-01…F-04; CAP-58.e cites DEC-171. Repair after the S2-A round-2 audit, same version: applies DEC-172 (new `CAP-25.f` on W1-47: no install or download ask rule in the committed settings); new `CAP-40.d` on W1-31 carries DEC-170 (S2A-F-15); CAP-25.e, 49.c and 61.c reworded for S2A-F-13 and F-14. DEC-173 changes the Charter only. Round-3 closure check, same version: new `CAP-25.g` on W1-47 (DEC-174: `uv add`, `uv sync`, `uv run --with` and `uvx` are installs). Owner answer during W1-48, same version: CAP-25.d reworded (DEC-209: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, in both cases recorded with its owner approval). Owner decision during Wave 1, same version: new `CAP-23.c` on W1-42 (DEC-235: parallel tickets in Wave 1, a light form of the Wave 3 concurrency capability).'
 supersedes: Governance_OS_Capability_Acceptance_Contract_v3 (kept unchanged as provenance, DEC-058)
 precedence: Charter v5 → Contract v4 → ADRs → everything else; ADRs supersede the originals where they conflict
 waves:
@@ -1352,10 +1352,12 @@ capabilities:
   acceptance: A second agent claiming a ticket already claimed by another gets a collision error naming the holder, and the
     ticket is absent from its ready queue.
   wave: W3
-  wave_note: the exclusive claim lock (G-03) is delivered in W1-09; parallel-agent concurrency and the claims role are W3
+  wave_note: the exclusive claim lock (G-03) is delivered in W1-09; a light form of parallel tickets runs in Wave 1 (DEC-235);
+    parallel-agent concurrency and the claims role are W3
   provider:
   - ticket v0.3.2
   - W1-09
+  - W1-42
   - 'W3: gov claim + claims/concurrency role'
   sources:
   - Contract v3 Gate E4
@@ -1363,6 +1365,7 @@ capabilities:
   - DEC-066
   - DEC-074
   - DEC-076
+  - DEC-235
   scenarios:
     dev:
     - CHAOS-X-03
@@ -1381,6 +1384,12 @@ capabilities:
     item: Parallel-agent concurrency and the claims role
     source: Contract v3 E4, I4; Framework v4.1.2 §44; DEC-066
     wave: W3
+  - id: CAP-23.c
+    item: 'Parallel tickets in Wave 1, a light form: up to 6 tickets in flight, each in its own short-lived worktree with a ticket lead, gated by available memory and load; the main orchestrator merges each into the integration branch after green and re-runs every suite after each merge; no worktree is left behind'
+    source: DEC-235; DEC-236
+    wave: W1
+    provider:
+    - W1-42
 - id: CAP-24
   title: Skill lifecycle and versioning
   outcome: An agent can tell which version of each skill produced a piece of work.
