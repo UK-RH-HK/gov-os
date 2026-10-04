@@ -171,7 +171,11 @@ for DEC-314, 1 for DEC-316, 2 live for DEC-311), one live case removed (DEC-316)
 **Red result after batch 4**, `-m "not local_only"`: **55 failed, 366 passed** (421 tests). 54 are batch 4's: DEC-313
 23, DEC-311 13, DEC-315 10, DEC-273 7, DEC-316 1. The other one is
 `test_the_role_file_states_the_six_parts_the_kpi_names` (it finds none of the six parts in the committed
-`.claude/agents/research.md`; red before batch 4 too, and not a batch 4 test). The `local_only` tests were run once in batch 4,
+`.claude/agents/research.md`; red before batch 4 too, and not a batch 4 test). That one was a fault of the test,
+corrected after implementation ("test error"): it kept its result per file under the base name, and the kernel role
+file and the agent definition are both `research.md`, so the agent definition's result replaced the kernel role
+file's, which states all six parts. The result is now kept under the path; the assertion and the counts are
+unchanged. The `local_only` tests were run once in batch 4,
 before the engineer's round: **2 failed, 34 passed** (36 tests); the two are DEC-315's acceptance test and ticket.
 
 **Readings of batch 4.**
