@@ -1,6 +1,6 @@
 ---
 id: DAEO-o4fg
-status: open
+status: in_progress
 deps: [DAEO-6cc2]
 links: []
 created: 2026-10-03T13:05:33Z
