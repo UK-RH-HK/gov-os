@@ -2,8 +2,9 @@
 
 Regression evidence only (DEC-136). They cover what the acceptance tests leave
 to the builder: a path allowlist does not shelter a file from the filter
-(DEC-290), content gitleaks would skip as binary is still scanned, and a path
-that leaves the root or sits in two namespaces is judged closed.
+(DEC-290), content gitleaks would skip as binary is still scanned, a path
+that leaves the root or sits in two namespaces is judged closed, big-endian
+UTF-16 is scanned, and a store file that cannot be read is not a clean store.
 No secret stands whole in this file: the planted string is built from parts.
 """
 from __future__ import annotations
@@ -59,6 +60,19 @@ def test_a_path_out_of_the_root_or_in_a_product_namespace_too_is_dropped(project
     clean = _write(project, "notes/clean.md", "Ordinary text.\n")
     both = _write(project, "exports/rows.csv", "id\n1\n")
     assert secrets.indexable(project, ["notes/../exports/rows.csv", both, "/etc/hostname", clean]) == [clean]
+
+
+def test_big_endian_utf16_text_is_still_scanned(project):
+    clean = _write(project, "notes/clean.md", "Ordinary text.\n".encode("utf-16-be"))
+    planted = _write(project, "notes/planted.md", f"The value is {PLANTED} today.\n".encode("utf-16-be"))
+    assert secrets.indexable(project, [planted, clean]) == [clean]
+
+
+def test_a_store_file_that_cannot_be_read_is_not_a_clean_store(project):
+    _write(project, ".gov-runtime/index/gone.md", "Ordinary text.\n")
+    (project / ".gov-runtime/packets").symlink_to(project / "nowhere")  # a link to nothing: it cannot be read
+    with pytest.raises(OSError):
+        secrets.stores_with_secrets(project)
 
 
 def test_a_project_without_a_gitleaks_configuration_is_refused(project):

@@ -10,9 +10,11 @@ decided raises or is left out; nothing is let through undecided.
 
 from __future__ import annotations
 
+import os
 import re
 import sqlite3
 import subprocess
+import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -26,8 +28,20 @@ _LEAKS, _TIMEOUT_S = 3, 60
 __all__ = ["indexable", "stores_with_secrets"]
 
 
+def _require_rules(root: Path) -> None:
+    """Raise unless ``.gitleaks.toml`` holds rules: a scan without rules finds nothing, which is no verdict."""
+    try:
+        config = tomllib.loads((Path(root) / CONFIG_REL).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"{CONFIG_REL} cannot be read: {error}") from None
+    if not (config.get("rules") or config.get("extend", {}).get("useDefault") is True):
+        raise RuntimeError(f"{CONFIG_REL} holds no rules: nothing can be decided")
+
+
 def _holds_secret(root: Path, content: bytes) -> bool:
     """Whether gitleaks finds a secret in ``content``. Raises when gitleaks cannot run or does not decide."""
+    if b"\0" in content:  # UTF-16 text: the same content without its zero bytes is scanned too
+        content += b"\n" + content.replace(b"\0", b"")
     # The leading newline keeps gitleaks from skipping content it would take for a binary file.
     done = subprocess.run(
         ["gitleaks", "stdin", "--config", str(Path(root) / CONFIG_REL), "--no-banner", "--redact",
@@ -54,15 +68,18 @@ def _governance(namespaces: dict, rel: str) -> bool:
 
 def indexable(root: Path, paths: list[str]) -> list[str]:
     """The sub-list of ``paths`` an indexer may read, in the order asked (DEC-285)."""
-    root = Path(root)
+    root = Path(root).resolve()
+    _require_rules(root)
     namespaces = load_config(root)["path-map.yaml"]["namespaces"]
 
     def allowed(rel: str) -> bool:
-        if rel.startswith("/") or ".." in rel.split("/") or not _governance(namespaces, rel):
+        try:  # a link is judged by what it points to: its namespace and its content
+            real = (root / rel).resolve(strict=True)
+            target = real.relative_to(root).as_posix()
+            content = real.read_bytes()
+        except (OSError, ValueError, RuntimeError):  # no file, a link loop, or a place outside the root
             return False
-        try:
-            content = (root / rel).read_bytes()  # a link is judged by what it points to
-        except OSError:
+        if not (_governance(namespaces, rel) and _governance(namespaces, target)):
             return False
         return not _holds_secret(root, content)
 
@@ -72,15 +89,16 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
 
 
 def _store_content(path: Path) -> bytes:
-    """What a derived store holds: the rows of a SQLite file as text, the bytes of any other file."""
-    with path.open("rb") as handle:
-        if handle.read(16) != b"SQLite format 3\0":
-            return path.read_bytes()
+    """What a derived store holds: the bytes of the file and, for a SQLite file, its rows as text too."""
+    content = path.read_bytes()  # deleted rows and the text of views are in the bytes
+    if not content.startswith(b"SQLite format 3\0"):
+        return content
     connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
     try:
         tables = [name for (name,) in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")]
         rows = (row for name in tables for row in connection.execute(f'SELECT * FROM "{name}"'))
-        return "\n".join(" ".join(str(value) for value in row) for row in rows).encode("utf-8", "replace")
+        text = "\n".join(" ".join(str(value) for value in row) for row in rows)
+        return content + b"\n" + text.encode("utf-8", "replace")
     finally:
         connection.close()
 
@@ -88,5 +106,15 @@ def _store_content(path: Path) -> bytes:
 def stores_with_secrets(root: Path) -> list[str]:
     """Every file under ``.gov-runtime/`` whose content holds a secret, as project-relative paths (DEC-290)."""
     root = Path(root)
-    files = sorted(path for path in (root / RUNTIME_REL).rglob("*") if path.is_file())
+    _require_rules(root)
+    if not os.path.lexists(root / RUNTIME_REL):
+        return []
+
+    def refuse(error: OSError) -> None:
+        raise error  # a folder that cannot be entered is not a store without a secret
+
+    # Linked folders are followed; a file that cannot be read raises.
+    files = sorted(Path(folder) / name
+                   for folder, _, names in os.walk(root / RUNTIME_REL, onerror=refuse, followlinks=True)
+                   for name in names)
     return [path.relative_to(root).as_posix() for path in files if _holds_secret(root, _store_content(path))]
