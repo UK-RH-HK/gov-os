@@ -6,8 +6,9 @@ secrets-indexing family check. ``path_holds_secret(root, path)`` judges a path n
 for an index that stores paths (DEC-339). All run the gitleaks binary with the rules of the
 project's ``.gitleaks.toml`` (DEC-287) over content given on standard input, so a
 path allowlist never applies (DEC-290) and no report is written. The file's other
-allowlists and its disabled rules are left out of the scan (DEC-298). Whatever cannot be
-decided raises or is left out; nothing is let through undecided.
+allowlists and its disabled rules are left out of the scan (DEC-298), and a second scan with
+the file's rules alone keeps the allowlist of gitleaks' defaults from sheltering them
+(DEC-347). Whatever cannot be decided raises or is left out; nothing is let through undecided.
 """
 
 from __future__ import annotations
@@ -40,11 +41,13 @@ def _toml(value) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
-def _rules(root: Path) -> str:
+def _rules(root: Path) -> tuple[str, ...]:
     """The rules of ``.gitleaks.toml`` as TOML, without what shelters a secret (DEC-298).
 
     Allowlists, of the file and of each rule, and disabled rules are left out. Raises unless
-    the file holds rules: a scan without rules finds nothing, which is no verdict.
+    the file holds rules: a scan without rules finds nothing, which is no verdict. Where the file
+    extends other rules, its own rules follow alone as a second configuration (DEC-347): the
+    allowlist of gitleaks' defaults, which ``extend`` lays over every rule, is not in it.
     """
     try:
         config = tomllib.loads((Path(root) / CONFIG_REL).read_text(encoding="utf-8"))
@@ -56,24 +59,30 @@ def _rules(root: Path) -> str:
         table.pop("allowlist", None)
         table.pop("allowlists", None)
     config.get("extend", {}).pop("disabledRules", None)
-    return "\n".join(f"{json.dumps(key)} = {_toml(item)}" for key, item in config.items())
+    # A rule with no expression of its own only changes a rule it extends: alone, gitleaks refuses the file for it.
+    alone = [rule for rule in config.get("rules", []) if rule.get("regex") or rule.get("path")]
+    configs = [config, {"rules": alone}] if alone and "extend" in config else [config]
+    return tuple("\n".join(f"{json.dumps(key)} = {_toml(item)}" for key, item in each.items()) for each in configs)
 
 
-def _holds_secret(rules: str, content: bytes) -> bool:
-    """Whether gitleaks finds a secret in ``content`` by ``rules``. Raises when gitleaks cannot run or does not decide."""
+def _holds_secret(rules: tuple[str, ...], content: bytes) -> bool:
+    """Whether gitleaks finds a secret in ``content`` by any of ``rules``. Raises when gitleaks cannot run or does not decide."""
     if b"\0" in content:  # UTF-16 text: the same content without its zero bytes is scanned too
         content += b"\n" + content.replace(b"\0", b"")
     # The rules go by the environment, so no file of them is written; a configuration path there would win over them.
     env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
-    # The leading newline keeps gitleaks from skipping content it would take for a binary file.
-    done = subprocess.run(
-        ["gitleaks", "stdin", "--no-banner", "--redact",
-         "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
-         "--exit-code", str(_LEAKS)],
-        input=b"\n" + content, capture_output=True, timeout=_TIMEOUT_S, env=env | {"GITLEAKS_CONFIG_TOML": rules})
-    if done.returncode not in (0, _LEAKS):
-        raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
-    return done.returncode == _LEAKS
+    for each in rules:  # clean only when every scan ran and found nothing
+        # The leading newline keeps gitleaks from skipping content it would take for a binary file.
+        done = subprocess.run(
+            ["gitleaks", "stdin", "--no-banner", "--redact",
+             "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
+             "--exit-code", str(_LEAKS)],
+            input=b"\n" + content, capture_output=True, timeout=_TIMEOUT_S, env=env | {"GITLEAKS_CONFIG_TOML": each})
+        if done.returncode not in (0, _LEAKS):
+            raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
+        if done.returncode == _LEAKS:
+            return True
+    return False
 
 
 def _matches(rel: str, pattern: str) -> bool:
