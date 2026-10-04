@@ -1,98 +1,123 @@
 """Failure 2: two schemas define the same id grammar differently.
 
-What is tested is the part that needs no list of shared grammars: a definition that two schema files of the kernel
-carry under the same name (`$defs` or `definitions`) is the same definition in both, and a schema file does not
-define one property name with two different patterns. Which grammars the schemas share by meaning (a ticket id
-used in another record, a decision id in a `supersedes` list) is decision package DP-6 in the README.
+DEC-227 makes that impossible by construction: one shared definitions file holds every id grammar under a fixed
+name (`ticket_id`, `wbs_id`, `decision_id`, `lesson_id`, `record_id`), no other schema writes an id `pattern` of
+its own, and the record schemas refer to the shared file. The patterns themselves are the engineer's; what is
+tested is where they are written and that every record's `id` is governed by them.
 """
 
 from __future__ import annotations
 
 import json
+import shutil
 
 import pytest
 
 import w1_08_support as support
 
-
-def _schemas():
-    """``file name -> schema`` for every schema file of the kernel, once the eight W1-08 schemas exist."""
-    for record_type in sorted(support.SCHEMA_TYPES):
-        support.schema_path(record_type)
-    loaded = {}
-    for path in support.schema_files():
-        try:
-            loaded[path.name] = json.loads(path.read_text(encoding="utf-8"))
-        except ValueError as exc:
-            raise AssertionError(f"{path.name} is not JSON: {exc}") from None
-    return loaded
+# A property or a definition with one of these names holds an id, or a list of ids.
+ID_NAMES = ("id", "supersedes", "superseded_by", "depends_on", "deps")
+NOT_AN_ID = "w1-08 probe: not an id!"
+# Ids this repository already uses: this ticket, its WBS number and the carried lesson (DEC-252).
+REAL_IDS = {"ticket_id": "DAEO-uudf", "wbs_id": "W1-08", "lesson_id": "L-0074"}
+# DEC-252: `lesson_id` is ^L-[0-9]{4,}$.
+LESSON_IDS = ("L-0074", "L-0000", "L-12345")
+NOT_LESSON_IDS = ("L-074", "LES-0074", "l-0074", "L0074", "L-0074a", "X-L-0074", "L-00x4")
 
 
-def _definitions(schema):
-    found = {}
-    for keyword in ("$defs", "definitions"):
-        block = schema.get(keyword) if isinstance(schema, dict) else None
-        if isinstance(block, dict):
-            found.update(block)
-    return found
+def _holds_an_id(name):
+    return name in ID_NAMES or name.endswith(("_id", "_ids")) or name in support.ID_GRAMMARS
 
 
-def _strip_annotations(value):
-    """A definition without its annotations, so that two differ only when they validate differently."""
+def _has_pattern(value):
     if isinstance(value, dict):
-        return {key: _strip_annotations(item) for key, item in value.items()
-                if key not in ("title", "description", "$comment", "examples")}
+        return isinstance(value.get("pattern"), str) or any(_has_pattern(item) for item in value.values())
     if isinstance(value, list):
-        return [_strip_annotations(item) for item in value]
-    return value
+        return any(_has_pattern(item) for item in value)
+    return False
 
 
-def _patterns_by_property(value, found):
-    """Collect ``property name -> set of patterns`` from every ``properties`` map inside ``value``."""
+def _own_id_patterns(value, trail, found):
+    """Collect the places where a schema writes a `pattern` under a property or a definition that holds an id."""
     if isinstance(value, dict):
-        properties = value.get("properties")
-        if isinstance(properties, dict):
-            for name, subschema in properties.items():
-                if isinstance(subschema, dict) and isinstance(subschema.get("pattern"), str):
-                    found.setdefault(name, set()).add(subschema["pattern"])
-        for item in value.values():
-            _patterns_by_property(item, found)
+        for keyword in ("properties",) + support.DEFINITION_KEYWORDS:
+            block = value.get(keyword)
+            if isinstance(block, dict):
+                for name, subschema in block.items():
+                    if isinstance(name, str) and _holds_an_id(name) and _has_pattern(subschema):
+                        found.append("/".join(trail + (keyword, name)))
+        for key, item in value.items():
+            _own_id_patterns(item, trail + (str(key),), found)
     elif isinstance(value, list):
-        for item in value:
-            _patterns_by_property(item, found)
+        for index, item in enumerate(value):
+            _own_id_patterns(item, trail + (str(index),), found)
     return found
 
 
-def test_a_definition_shared_by_name_is_the_same_in_every_schema():
-    schemas = _schemas()
-    by_name = {}
-    for file_name, schema in schemas.items():
-        for name, definition in _definitions(schema).items():
-            by_name.setdefault(name, []).append((file_name, _strip_annotations(definition)))
-    different = {}
-    for name, entries in by_name.items():
-        first = entries[0][1]
-        if any(definition != first for _, definition in entries[1:]):
-            different[name] = [file_name for file_name, _ in entries]
-    assert not different, f"the same definition name is defined differently in two schemas: {different}"
+def test_the_five_id_grammars_are_defined_in_one_file_only():
+    shared = support.shared_definitions_path()
+    again = {}
+    for path in support.kernel_json_files():
+        if path != shared:
+            names = [name for name in support.definitions(support.load_json(path)) if name in support.ID_GRAMMARS]
+            if names:
+                again[path.name] = names
+    assert not again, f"an id grammar of {shared.name} is defined again in another schema: {again}"
 
 
-def test_no_schema_gives_one_property_two_grammars():
-    schemas = _schemas()
-    different = {}
-    for file_name, schema in schemas.items():
-        for name, patterns in _patterns_by_property(schema, {}).items():
-            if len(patterns) > 1:
-                different[f"{file_name}: {name}"] = sorted(patterns)
-    assert not different, f"one property has two different patterns inside one schema: {different}"
+@pytest.mark.local_only
+@pytest.mark.parametrize("name", support.ID_GRAMMARS)
+def test_the_shared_definition_is_a_grammar(name, check):
+    """It refuses what no id is: the empty string, two lines, a number. The three grammars this repository already
+    has ids for accept them."""
+    schema = check.definition(support.shared_definitions_path(), name)
+    for bad_id in ("", "two\nlines", 42, NOT_AN_ID):
+        check.refuses(schema, bad_id, f"{bad_id!r} as a {name}")
+    if name in REAL_IDS:
+        check.accepts(schema, REAL_IDS[name], f"{REAL_IDS[name]} as a {name}")
+
+
+@pytest.mark.local_only
+def test_a_lesson_id_is_the_letter_l_and_four_or_more_digits(check):
+    """DEC-252: the form of the carried lesson `L-0074`. Three digits, another prefix, lower case and a tail are
+    refused."""
+    schema = check.definition(support.shared_definitions_path(), "lesson_id")
+    check.accepts_all(schema, {f"good-{index}": good_id for index, good_id in enumerate(LESSON_IDS)},
+                      f"one of {LESSON_IDS} as a lesson_id")
+    check.refuses_each(schema, {bad_id: bad_id for bad_id in NOT_LESSON_IDS}, "as a lesson_id")
+
+
+def test_no_record_schema_writes_an_id_pattern_of_its_own():
+    shared = support.shared_definitions_path()
+    own = {}
+    for record_type in sorted(support.SCHEMA_TYPES):
+        path = support.schema_path(record_type)
+        if path != shared:
+            found = _own_id_patterns(support.load_json(path), (), [])
+            if found:
+                own[path.name] = found
+    assert not own, f"a schema writes an id `pattern` of its own, outside {shared.name}: {own}"
 
 
 @pytest.mark.local_only
 @pytest.mark.parametrize("record_type", sorted(support.RECORD_TYPES))
-@pytest.mark.parametrize("bad_id", ("", "two\nlines", 42, None))
-def test_the_id_of_every_record_type_follows_a_grammar(record_type, bad_id, check):
-    """An id has a grammar at all: no record schema accepts an id that is empty, holds a line break or is no string."""
+def test_the_id_of_the_record_is_governed_by_the_shared_grammar(record_type, check, tmp_path):
+    """The record schema refuses an id that is no id. In a copy of the schemas folder whose five shared grammars
+    are loosened to "any string", the same record is accepted: the grammar of the record's `id` is the shared one."""
     schema = support.schema_path(record_type)
+    shared = support.shared_definitions_path()
     _, good = support.template(record_type)
-    check.accepts(schema, good, f"the {record_type} template")
-    check.refuses(schema, support.replaced(good, "id", bad_id), f"a {record_type} record with id {bad_id!r}")
+    bad = support.replaced(good, "id", NOT_AN_ID)
+    check.good(schema, good, f"the {record_type} template")
+    check.refuses(schema, bad, f"a {record_type} record with id {NOT_AN_ID!r}")
+
+    copy = tmp_path / "schemas"
+    shutil.copytree(support.REPO_ROOT / support.SCHEMAS_REL, copy)
+    loosened = support.load_json(shared)
+    for name in support.ID_GRAMMARS:
+        keyword, _ = support.definitions(loosened)[name]
+        loosened[keyword][name] = {"type": "string"}
+    (copy / shared.name).write_text(json.dumps(loosened, indent=2), encoding="utf-8")
+    check.accepts(copy / schema.name, bad,
+                  f"a {record_type} record with id {NOT_AN_ID!r}, although the shared id grammars accept any string "
+                  f"(the schema has an id grammar of its own, or does not refer to {shared.name})")

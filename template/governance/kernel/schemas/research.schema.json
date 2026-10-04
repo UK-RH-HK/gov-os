@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "research",
+  "description": "Frontmatter of a research record.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/record_id" },
+    "type": { "const": "research" }
+  }
+}

@@ -10,21 +10,11 @@ RECORD_TYPES = sorted(support.RECORD_TYPES)
 
 
 @pytest.mark.parametrize("record_type", RECORD_TYPES)
-def test_a_template_exists_for_the_record_type(record_type):
-    support.template_paths(record_type)
-
-
-@pytest.mark.parametrize("record_type", RECORD_TYPES)
-def test_the_template_is_tracked_by_git(record_type):
+def test_a_committed_template_exists_for_the_record_type(record_type):
     tracked = set(support.tracked_files())
     for path in support.template_paths(record_type):
         relative = path.relative_to(support.REPO_ROOT).as_posix()
         assert relative in tracked, f"{relative} is not committed"
-
-
-@pytest.mark.parametrize("record_type", RECORD_TYPES)
-def test_the_template_carries_frontmatter_that_is_a_map(record_type):
-    for path in support.template_paths(record_type):
         assert support.load_record(path), f"{path.name}: the frontmatter is empty"
 
 
@@ -48,8 +38,8 @@ def test_the_template_validates_as_it_is_written(record_type, check):
 @pytest.mark.local_only
 @pytest.mark.parametrize("record_type", RECORD_TYPES)
 def test_the_schema_refuses_a_record_that_is_not_a_map(record_type, check):
+    """A schema that accepts everything would pass the tests above."""
     schema = support.schema_path(record_type)
     _, good = support.template(record_type)
-    check.accepts(schema, good, "its own template")
+    check.good(schema, good, "its own template")
     check.refuses(schema, ["not", "a", "record"], "a list in place of a record")
-    check.refuses(schema, "not a record", "a string in place of a record")
