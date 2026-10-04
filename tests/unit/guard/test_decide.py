@@ -1968,3 +1968,77 @@ class TestCpTargetDirectory:
     def test_inside_the_paths_allowed(self, tmp_path, command):
         project = _make_project(tmp_path, _std_tickets())
         assert _bash(project, command) == "allow"
+
+
+# ---------------------------------------------------------------------------
+# W1-46 batch 6: a hard link to a file the role may not write, and mv
+# --target-directory and install (DEC-334)
+# ---------------------------------------------------------------------------
+
+class TestHardLinkMvInstall:
+
+    @pytest.mark.parametrize("command", [
+        "ln tests/acceptance/W1-99/t.py src/l.py",
+        "ln -f docs/a.py src/l.py",
+        "cp -l tests/acceptance/W1-99/t.py src/l.py",
+        "cp -al docs/a.py src/l.py",
+        "cp --link -t src docs/a.py",
+        "link .tickets/DAEO-test.md src/l.md",
+        "ln .gov-runtime/freeze src/l",
+        "mv --target-directory=tests/acceptance/W1-99 src/a.py",
+        "mv --target-directory .tickets src/a.py",
+        "mv -t.tickets src/a.py",
+        "mv --target-directory= src/a.py",    # an empty value
+        "mv --tmpfoo=x src/a.py src/b.py",    # an option the guard cannot read
+        "install -t tests/acceptance/W1-99 src/a.py",
+        "install src/a.py tests/acceptance/W1-99/t.py",
+        "install -m 644 src/a.py .tickets/DAEO-test.md",
+        "install -D src/a.py .tickets/w/a.py",
+        "install -d src/d tests/acceptance/W1-99/d",
+        "install src/a.py -t",                # no value
+    ])
+    def test_denied(self, tmp_path, command):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, command) == "deny"
+
+    @pytest.mark.parametrize("command", [
+        "link src/a.py src/l.py",
+        "cp -l src/a.py src/l.py",
+        "mv --target-directory=src/gov src/a.py",
+        "mv src/a.py src/b.py",
+        "install src/a.py src/b.py",
+        "install -t src/gov docs/a.py",
+        "install -d src/d",
+    ])
+    def test_inside_the_paths_allowed(self, tmp_path, command):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, command) == "allow"
+
+
+# ---------------------------------------------------------------------------
+# W1-46 batch 7: an option with its value after the destination of install,
+# cp and ln (DEC-334, DEC-311)
+# ---------------------------------------------------------------------------
+
+class TestOptionAfterTheDestination:
+
+    @pytest.mark.parametrize("command", [
+        "cd src && install a.py ../tests/acceptance/W1-99/t.py -m 644",
+        "cd src && install a.py ../.tickets/DAEO-test.md --mode 644",
+        "cd src && cp a.py ../tests/acceptance/W1-99/t.py -S bak",
+        "cd src && cp a.py ../tests/acceptance/W1-99/t.py --suffix bak",
+        "cd src && ln -sf a.py ../tests/acceptance/W1-99/t.py -S bak",
+        "cd src && ln a.py ../tests/acceptance/W1-99/t.py --suffix bak",
+    ])
+    def test_denied(self, tmp_path, command):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, command) == "deny"
+
+    @pytest.mark.parametrize("command", [
+        "cd src && install -m 644 a.py b.py",
+        "cd src && cp a.py b.py",
+        "cd src && cp a.py b.py -S bak",
+    ])
+    def test_inside_the_paths_allowed(self, tmp_path, command):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, command) == "allow"

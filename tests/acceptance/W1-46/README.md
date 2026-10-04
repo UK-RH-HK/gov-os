@@ -7,15 +7,18 @@ DEC-234, DEC-240 to DEC-242). Batch 3 added tests after implementation, from sev
 (DEC-136); see "Batch 3" below. Batch 4 added and revised tests after implementation for the decisions on every open
 package (DEC-271 to DEC-273, DEC-311 to DEC-317) and for the new success line (DEC-315); see "Batch 4" below.
 Batch 5 added tests after implementation, from two behaviours a review described (DEC-136); see "Batch 5" below.
+Batch 6 added tests after implementation for the delegated decision on batch 5's two packages (DEC-334); see
+"Batch 6" below. Batch 7 added tests after implementation, from one behaviour a review described (DEC-136); see
+"Batch 7" below.
 
 ```
 python3 -m pytest tests/acceptance/W1-46 -q -p no:cacheprovider                      # everything (starts two real sessions once gov launch exists)
 python3 -m pytest tests/acceptance/W1-46 -q -p no:cacheprovider -m "not local_only"  # no session, no network, no cost
 ```
 
-472 tests: 436 start nothing, 36 are `local_only`. After implementation: 45 were added in batch 3; batch 4 added 132
+494 tests: 458 start nothing, 36 are `local_only`. After implementation: 45 were added in batch 3; batch 4 added 132
 (129 that start nothing, 3 `local_only`), rewrote 12 (10 that start nothing, 2 `local_only`) and removed one
-`local_only` case (the host DEC-316 drops); batch 5 added 15 that start nothing.
+`local_only` case (the host DEC-316 drops); batch 5 added 15 that start nothing; batch 6 added 15 that start nothing; batch 7 added 7 that start nothing.
 
 ## How the tests see what the launcher builds
 
@@ -61,7 +64,7 @@ fixture stops the test, which pytest reports as an error. Red reason **R**: the 
 | Success 7 [CAP-61.d] | `test_w1_46_role_settings.py`: a temp directory of the session's own, which exists; two launches get two. Live: `mktemp` in each session, asserted (DEC-234) | L |
 | Success 8 [CAP-58.d] | Live: interpreter one-liner, command substitution, here-string, and a Write-tool call. `test_w1_46_research_role.py`: the guard refuses a file-tool write outside the repository for the four roles | L (guard tests green already) |
 | Success 9 [CAP-49.b], failure 9 | `test_w1_46_held_out.py`: the `Read` rule per role; one per configured path; read at each launch; refusal on a missing key, an empty list, a key without a value, invalid YAML, a list at the top level, an empty file; **a project with no `held-out.yaml` launches, strictly sandboxed, with no held-out rule** (DEC-242, DEC-223); no file of the ticket names a held-out path. Live: the stand-in looks empty | L |
-| Success 10 (DEC-180, DEC-311) | `test_w1_46_role_settings.py`: the built rules cover the freeze flag, findings, records, snapshots and a new entry, and not scratch; the guard refuses the file tools. `test_w1_46_runtime_and_ln.py` (batch 4): a literal rule per name that exists at launch, plus the freeze flag; the guard refuses `.gov-runtime/` outside scratch to every role, and `ln` to a destination the role may not write. `test_w1_46_links_and_cp_targets.py` (batch 5): a link and a write through it in one command, and `cp` with the target directory in an option. Live: opaque Bash writes fail, `ln` onto and into a name that exists at launch fails, scratch is writable | L |
+| Success 10 (DEC-180, DEC-311) | `test_w1_46_role_settings.py`: the built rules cover the freeze flag, findings, records, snapshots and a new entry, and not scratch; the guard refuses the file tools. `test_w1_46_runtime_and_ln.py` (batch 4): a literal rule per name that exists at launch, plus the freeze flag; the guard refuses `.gov-runtime/` outside scratch to every role, and `ln` to a destination the role may not write. `test_w1_46_links_and_cp_targets.py` (batch 5): a link and a write through it in one command, and `cp` with the target directory in an option. `test_w1_46_hard_links_mv_and_install.py` (batch 6, DEC-334): a hard link to a file the role may not write, `mv --target-directory=` and `install`. `test_w1_46_options_after_the_destination.py` (batch 7): `install`, `cp` and `ln` with an option and its value after the destination. Live: opaque Bash writes fail, `ln` onto and into a name that exists at launch fails, scratch is writable | L |
 | Success 11 (DEC-315) | `test_w1_46_protected_trees.py` (batch 4): `Edit` deny rules cover `tests/acceptance/**` for engineer, auditor and research, and `.tickets/**` and `.claude/**` for the four roles; the test designer's settings carry no rule for the acceptance tests; a ticket that names a path there keeps the rules; the guard refuses the file tools. Live: three opaque Bash writes fail in the engineer session | see Batch 4 |
 | Failure 3 (a worker role installs system-wide) | the denials of success 6, `test_sudo_stays_denied_to_the_research_role`, live `test_a_research_install_outside_the_repository_fails_at_the_write_fence` | green / L |
 | DEC-242 (no KPI line of its own; refusals in the words of success 1) | `test_w1_46_launch_refusals.py`: an unknown ticket (engineer, research); a ticket that is `open` or `closed`, with the same ticket `in_progress` launching; a ticket of another role (research on an engineer's ticket, engineer on a research ticket, engineer on an auditor's ticket) | L |
@@ -235,6 +238,83 @@ Every test of the earlier batches passes. The `local_only` tests were not run in
   (DEC-221: one other protected tree per behaviour).
 - Seen while the red result was taken, outside the two described behaviours and not tested: DP-20.
 
+## Batch 6: tests added after implementation, for the decision on DP-19 and DP-20 (DEC-334)
+
+The orchestrator decided DP-19 and DP-20 under delegation (DEC-334, option (a) of each, stricter-only). 15 cases in
+`test_w1_46_hard_links_mv_and_install.py`, none with a session, all tests added after implementation, reason
+"delegated decision" (DEC-106). Only the guard's decision on the command is asserted, never a reason text or a
+mechanism. An engineer on its ticket `src/gov/guard/**` is the role, except in the one control on the test designer.
+
+| Part of DEC-334 | Tests | Red reason today |
+|---|---|---|
+| 1. A hard link, alone in its command, whose source the role may not write | `test_the_guard_refuses_a_hard_link_to_a_file_the_role_may_not_write` (4): `ln` and `cp -l` from an acceptance test that exists, `link` from the engineer's ticket file, `ln` from the freeze flag; the destination is a new name inside the engineer's paths | 4 red: the guard allows the command; it judges the destination only |
+| 1, control on the spelling | `test_the_guard_does_not_refuse_a_hard_link_between_two_names_inside_the_roles_paths` (2: `link`, `cp -l`); `ln` has its control in batch 5 | green already |
+| 1, control on the role | `test_the_test_designer_may_hard_link_one_acceptance_test_to_another_name_there` (1) | green already |
+| 2. `mv --target-directory=<dir>` | `test_the_guard_refuses_mv_with_a_protected_directory_as_the_target_directory_option` (2: the acceptance-test directory, `.tickets`), the one operand the engineer's own file | 2 red: the guard allows the command |
+| 2, control | `test_the_guard_does_not_refuse_mv_with_a_target_directory_inside_the_roles_paths` (1): a directory that exists inside the engineer's paths | green already |
+| 3. `install` | `test_the_guard_refuses_install_into_the_acceptance_tests_and_the_tickets` (4): `install -t <dir> <file>` into the acceptance tests, `install <file> <destination>` onto an acceptance test and onto a ticket, `install -D <file> <destination path>` under `.tickets/` | 4 red: the guard allows the command; it does not judge `install` as a write |
+| 3, control | `test_the_guard_does_not_refuse_install_to_a_destination_inside_the_roles_paths` (1): the plain form, to a new name beside the source | green already |
+
+**Red result after batch 6**, `-m "not local_only"`: **10 failed, 441 passed** (451 tests). The 10 are batch 6's: 4
+hard links, 2 `mv`, 4 `install`. The 5 controls are green already. Every test of the earlier batches passes, batch
+5's eleven included. The `local_only` tests were not run in batch 6.
+
+**Readings of batch 6.**
+
+- "A file the role may not write" is judged by its path. The freeze flag does not exist in the fixture project (the
+  test asserts it): a project that is frozen could be refused for that reason alone, and the case would show
+  nothing. The acceptance test and the ticket file exist.
+- The controls are forms plainly inside the role's paths: both names of the link are the engineer's own (or, for
+  the test designer, both acceptance tests of its ticket), and the destination of `mv` and `install` is inside
+  `src/gov/guard/`. The `mv` control's directory is made by the test, so that the option names a directory.
+- Not tested (DEC-221, DEC-135): the other spellings of the target-directory option for `mv` and `install`
+  (`--target-directory <dir>`, `-t<dir>`; `cp` has the four in batch 5), `ln -t` and `ln` with several sources,
+  `ln -f`, `cp --link` and `cp -al`, a hard link made by another program, a hard link whose source is under
+  `.claude/` or one of the other names of `.gov-runtime/`, the auditor and the research role, `install -d`,
+  `install` with several sources, `install -D` together with `-t`, and the write through a hard link that is already
+  on disk (DEC-334 refuses the link, not the later write).
+
+## Batch 7: tests added after implementation (DEC-136)
+
+A review described one behaviour of the guard that batches 5 and 6 miss. It was decided from the specification and
+became tests: 7 cases in `test_w1_46_options_after_the_destination.py`, none with a session, all tests added after
+implementation, reason "review finding (DEC-136)". Only the guard's decision on the command is asserted, never a
+reason text or a mechanism; an engineer is the role in every case, on its ticket `src/gov/guard/**`.
+
+**The behaviour.** `install`, `cp` and `ln` accept an option after their operands. In `install <file> <destination>
+-m 644` the file lands on `<destination>`; the guard takes the option's value as the last operand. With the working
+directory inside the engineer's paths (the session's `cwd` is `src/gov/guard`, or the command starts with
+`cd src/gov/guard &&`) that value is a name the engineer may write, and the command is allowed.
+
+| Part | Tests | Line or decision | Red reason today |
+|---|---|---|---|
+| The described forms | `test_the_guard_refuses_a_write_onto_a_protected_file_with_an_option_after_the_destination`, 4 of its 5 cases: `install … -m 644` onto an acceptance test (`cwd` inside the paths); `cp … -S bak` onto an acceptance test (after `cd`); `cp … --suffix bak` onto an acceptance test (`cwd` inside); `install … --mode 644` onto the engineer's ticket file (after `cd`) | MR-3; DEC-135; DEC-334 (`install`); the ticket's `allowed_paths`; batch 5's `cp` control | 4 red: the guard allows the command; it judges the option's value, not the destination |
+| The same form with `ln` | the fifth case: `ln -sf <own file> <an acceptance test> -S bak` (`cwd` inside) | DEC-311 ("the destination of `ln` is a write target"); MR-3 | 1 red: the guard allows the command, for the same reason |
+| Control, the usual spelling | `test_the_guard_does_not_refuse_install_with_its_option_before_the_operands` (1): `install -m 644 <own file> <new name beside it>`, from the repository root | DEC-334 | green already |
+| Control, the working directory | `test_the_guard_does_not_refuse_cp_between_two_names_of_the_working_directory_inside_the_roles_paths` (1): `cp decide.py w1_46_copy.py` with `cwd` inside the paths | | green already |
+
+**Red result after batch 7**, `-m "not local_only"`: **5 failed, 453 passed** (458 tests). The 5 are batch 7's: the
+five refusals. The 2 controls are green already. Every test of the earlier batches passes, batch 6's ten included.
+The `local_only` tests were not run in batch 7.
+
+**Readings of batch 7.**
+
+- The destination is written relative to the working directory (`../../../tests/acceptance/W1-90/test_fixture.py`):
+  the same path without the trailing option is refused today, so the option alone makes the difference.
+- `ln` was not in the review's description. It was seen while the red result was taken: `ln -s` and `ln -sf` with
+  `-S bak` or `--suffix bak` after the destination, and `ln` (hard) with `--suffix bak`, are allowed today onto an
+  acceptance test. DEC-311 decides it, so it is one test and not a package. `mv` in that form is refused today
+  (`-S bak` and `--suffix bak`) and has no case.
+- Spellings seen as refused today and not tested: the joined ones, `-m644`, `--mode=644`, `--suffix=bak`, and an
+  option without a value after the destination (`cp <file> <destination> -p`).
+- The cp control of batch 5 runs from the repository root; this batch's control has the session's `cwd` inside the
+  role's paths, so that a guard which refuses every command from there does not pass. Not asserted as allowed: the
+  trailing-option form with a destination inside the role's paths (`install <own file> <new name> -m 644`, allowed
+  today). An engineer may refuse it.
+- Not tested (DEC-221, DEC-135): the other options with a value (`-o`, `-g`, `--owner`, `--group`, `-t` after the
+  operands), two such options after the destination, `.gov-runtime/` and `.claude/` as the destination, the other
+  roles, and other programs that write and accept options after operands (`touch -d`, `tee`, `rsync`, `dd`).
+
 ## Green before implementation (94 tests), and why
 
 - The three older roles already behave as the KPI says (42 cases): installs denied for engineer, test designer and
@@ -374,7 +454,16 @@ implemented" revision (DEC-190) is recorded. No earlier suite was changed.
 - Reversibility: high. Cost: two cases.
 - Recommendation: (a) for Wave 1. Confidence: medium.
 
-### Batch 5: two new packages
+### Batch 5: two new packages, decided in batch 6 (DEC-334)
+
+| Package | Decided by | Decision | In the suite |
+|---|---|---|---|
+| DP-19, a hard link to a protected file | DEC-334 (delegated, stricter-only) | option (a): the guard refuses `ln` without `-s`, `link` and `cp -l` when the source is a file the role may not write | 7 cases added (4 refusals, 3 controls) |
+| DP-20, `mv --target-directory` and `install` | DEC-334 (delegated, stricter-only) | option (a): their destination is a write target, as for `mv -t` and `cp -t` | 8 cases added (6 refusals, 2 controls) |
+
+Batch 6 opened no package. DP-17 and DP-18 are decided by DEC-332 and DEC-333, as built; nothing changed in the suite.
+
+Batch 7 opened no package: MR-3, DEC-334 and DEC-311 decide the described behaviour and its `ln` form.
 
 **DP-19 (P2). A hard link to a protected file, made by one call, and a write through it by a later call.**
 - Question: does the guard refuse an engineer's hard link whose source is a file the role may not write (an
