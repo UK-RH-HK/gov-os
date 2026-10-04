@@ -89,14 +89,16 @@ class Hooks:
     sessionstart_commands: dict
     sandbox: object
 
-    def precompact(self, tree, trigger, role=support.ORCHESTRATOR, transcript_age_s=600.0, stdin=None):
+    def precompact(self, tree, trigger, role=support.ORCHESTRATOR, transcript_age_s=600.0, stdin=None, ticket=None,
+                   path=None):
         data = stdin if stdin is not None else support.precompact_input(tree, self.sandbox, trigger, transcript_age_s)
-        return support.run_hook(self.precompact_commands[trigger], tree, self.sandbox, data, role=role)
+        return support.run_hook(self.precompact_commands[trigger], tree, self.sandbox, data, role=role,
+                                ticket=ticket, path=path)
 
-    def sessionstart(self, tree, source, role=support.ORCHESTRATOR, stdin=None):
+    def sessionstart(self, tree, source, role=support.ORCHESTRATOR, stdin=None, ticket=None):
         data = stdin if stdin is not None else support.sessionstart_input(tree, self.sandbox, source)
         command = self.sessionstart_commands.get(source) or self.sessionstart_commands["resume"]
-        return support.run_hook(command, tree, self.sandbox, data, role=role)
+        return support.run_hook(command, tree, self.sandbox, data, role=role, ticket=ticket)
 
 
 @pytest.fixture()

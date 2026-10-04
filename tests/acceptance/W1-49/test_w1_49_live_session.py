@@ -16,9 +16,13 @@ settings file), a stand-in prompt and, from step 2 on, a stand-in checkpoint:
 1. ``claude -p "<say READY>"`` starts the session. There is no checkpoint yet,
    so nothing this call sees carries the invented state.
 2. The test writes the checkpoint: invented tickets, invented open owner
-   decisions, invented loop counts. Then ``claude -p "/compact" --resume <id>``
-   forces the compaction: PreCompact, the compaction, SessionStart with the
-   source ``compact``.
+   decisions, invented loop counts, and a modification time three days ago.
+   Then ``claude -p "/compact" --resume <id>`` forces the compaction:
+   PreCompact, the compaction, SessionStart with the source ``compact``. Under
+   DEC-264 the old checkpoint blocks nothing, and the PreCompact hook leaves
+   its generated state block at the end of the file (revised after the
+   implementation, reason "owner decision, DEC-264": DEC-258 blocked this
+   compaction).
 3. ``claude -p "<where do you stand, what is next>" --resume <id>``. The prompt
    names no ticket, no decision and no count. ``Read`` is the only tool the
    call has (``--tools Read``), so the session can open the two files it is
@@ -33,9 +37,10 @@ an opt-in variable (DEC-232). Leave it out with ``-m "not local_only"``. A run i
 which the model does not answer the question fails with that reason and is
 repeated (DEC-232); it is not a finding against the hooks.
 
-The session runs with ``GOV_ROLE=orchestrator`` (DP-2) and without the guard
+The session runs with ``GOV_ROLE=orchestrator`` (DEC-259) and without the guard
 hooks: the temporary project registers the two W1-49 hooks and the test's own
-recorder, nothing else.
+recorder, nothing else. A stand-in ``tk`` with invented tickets in progress is
+first on the session's ``PATH``.
 """
 
 from __future__ import annotations
@@ -88,6 +93,8 @@ class Live:
     reply: str           # the answer to NEXT_PROMPT
     how: str             # how that call ended (subtype, turns), for the failure message
     window: str          # the answer to /autocompact
+    checkpoint: str      # the checkpoint file after the compaction
+    head: str            # the temporary project's HEAD commit
 
 
 def _call(project, env, *args):
@@ -128,27 +135,43 @@ def live(hooks, settings_env, precompact_commands, sessionstart_commands, base, 
     support.write(project, support.SETTINGS_REL, json.dumps(settings, indent=2) + "\n")
     env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
     env["GOV_ROLE"] = support.ORCHESTRATOR
+    env["PATH"] = support.make_sandbox(tmp / "sandbox").path
 
     started = _call(project, env, START_PROMPT, "--max-turns", "3")
     session = started["session_id"]
-    support.write_checkpoint(project, support.ORCHESTRATOR_CHECKPOINT_REL, CHECKPOINT)
+    checkpoint = support.write_checkpoint(project, support.ORCHESTRATOR_CHECKPOINT_REL, CHECKPOINT,
+                                          age_s=support.STALE_AGE_S)
     compact = _call(project, env, "/compact", "--resume", session, "--max-turns", "3")
+    after_compaction = checkpoint.read_text(encoding="utf-8")
     answered = _call(project, env, NEXT_PROMPT, "--resume", session, "--max-turns", "8", "--tools", "Read",
                      "--allowedTools", "Read")
     window = _call(project, env, "/autocompact", "--resume", session, "--max-turns", "1")
     events = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()] if log.is_file() else []
     how = f"subtype={answered.get('subtype')} turns={answered.get('num_turns')} is_error={answered.get('is_error')}"
-    return Live(compact, events, str(answered.get("result") or ""), how, str(window.get("result") or ""))
+    return Live(compact, events, str(answered.get("result") or ""), how, str(window.get("result") or ""),
+                after_compaction, support.git(project, "rev-parse", "HEAD").strip())
 
 
-def test_the_forced_compaction_ran_and_the_hooks_fired_around_it(live):
-    """Success 4: the compaction is real (PostCompact was reached) and SessionStart followed with ``compact``."""
+def test_the_forced_compaction_over_an_old_checkpoint_is_not_blocked(live):
+    """Success 4 and 5, failure 1: the compaction is real (PostCompact was reached); SessionStart followed with ``compact``."""
     names = [(event["event"], event.get("trigger") or event.get("source")) for event in live.events]
     assert ("PostCompact", "manual") in names, (
         f"the forced compaction did not complete: {str(live.compact.get('result'))[:300]!r}; hook events {names}"
     )
     assert names.index(("PreCompact", "manual")) < names.index(("SessionStart", "compact")), (
         f"PreCompact and SessionStart(compact) did not fire in this order: {names}"
+    )
+
+
+def test_the_forced_compaction_left_the_state_block_in_the_checkpoint(live):
+    """Success 5 [CAP-37.g]: the written part first and unchanged, then the block with the git head and tk's tickets."""
+    assert live.checkpoint.startswith(CHECKPOINT), "the compaction changed the written part of the checkpoint"
+    written, block = support.split_checkpoint(live.checkpoint)
+    assert block is not None and written == CHECKPOINT[:len(written)], (
+        f"the real session's PreCompact hook appended no state block: the file ends {live.checkpoint[-200:]!r}"
+    )
+    assert live.head in block and support.TK_LINES[0] in block, (
+        f"the state block does not hold the git head and the tickets in progress: {block[:500]!r}"
     )
 
 
