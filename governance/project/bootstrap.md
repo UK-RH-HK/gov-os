@@ -277,7 +277,11 @@ change acceptance tests. These edge cases stay:
     guard does not judge (see W1-45's probe above), and a ticket whose paths include the settings file.
   - Reading `governance/project/held-out.yaml` or `.claude/settings.json` is not denied: the rule is about the
     held-out path, not about the two files that hold it. An agent that reads them sees the value. Briefs tell
-    workers not to, and no agent writes or retypes it (DEC-218).
+    workers not to, and no agent writes or retypes it (DEC-218). The owner accepted this residual (DEC-223): seeing
+    the path isn't seeing the oracle's contents.
+  - A missing `held-out.yaml` means no held-out rule; a file with a missing key, an empty list or a broken shape
+    makes the guard deny every call until the owner repairs it through the operator (DEC-218, DEC-223). `gov doctor`
+    will report a missing file in this repository (W1-27).
   - A key written twice in `held-out.yaml` keeps only its last value (the YAML reader's behaviour). The owner writes
     the file.
   - With some ten thousand held-out paths the hook would pass its 100 ms budget (182 ms measured); with one to three
