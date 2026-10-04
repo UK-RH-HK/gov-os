@@ -4,9 +4,10 @@ Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket
 CAP-12 (covers CAP-12.a, CAP-12.b) and CAP-03 (covers CAP-03.e), DEC-076, DEC-078, DEC-285 to DEC-290, DEC-298,
 DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation.
 
-The suite has **41 test functions, 124 cases** in four files, a support module, a conftest and the question set
-`questions.yaml`. **No W1-15 acceptance test was rewritten**: none asserts the old token rule (see "The W1-15
-suite" below).
+The suite has **48 test functions, 132 cases** in five files, a support module, a conftest and the question set
+`questions.yaml`. The fifth file, `test_w1_16_paths_and_roots.py` (7 functions, 8 cases), is a second batch written after
+the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. **No W1-15
+acceptance test was rewritten**: none asserts the old token rule (see "The W1-15 suite" below).
 
 ## Run
 
@@ -14,8 +15,9 @@ suite" below).
 python3 -m pytest tests/acceptance/W1-16 -q -p no:cacheprovider
 ```
 
-Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About 30 seconds today; about two
-and a half minutes once the ticket is built (the tool takes 5 to 6 seconds per indexing run, and one runs at a time).
+Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About five minutes with the ticket built (the tool
+takes 5 to 6 seconds per indexing run, and one runs at a time). Run it alone: one test watches this repository's
+`.gov-runtime/`.
 
 - **No secret is committed.** Every planted string (canaries in a string, a comment and an identifier, token-shaped
   strings, the seven dev-tier values) and every prefixed identifier is built at run time from parts in
@@ -103,17 +105,17 @@ cases: 1 error, 4 passed.
 | `test_a_token_shaped_string_is_still_flagged[16]` · `test_a_body_with_a_digit_or_with_mixed_case_is_flagged[12]` · `test_the_length_floor_of_sixteen_characters_stays[2]` · `test_every_file_holding_a_dev_canary_is_still_reported[4]` · `test_a_file_with_a_token_shaped_string_is_not_indexable[4]` | Keep true: what the old rule already flags and the repaired rule must still flag. |
 | `test_the_canary_rule_is_unchanged[2]` · `test_the_token_rule_carries_no_allowlist[2]` | Keep true: the canary rule is the one W1-15 delivered, and no rule of either file has an allowlist of its own. |
 
-## `local_only` (119 cases)
+## `local_only` (127 cases)
 
 Deselect with `-m "not local_only"` (5 cases remain: the interface test and the four that read the two gitleaks
 files as TOML).
 
 - **Run the `codebase-memory-mcp` binary** (through the wrapper, or directly for the premise and `list_projects`):
   all of `test_w1_16_home.py` but the interface test, all of `test_w1_16_secret_exclusion.py`, the wrapper cases of
-  `test_w1_16_code_answers.py`, and the two index cases of `test_w1_16_token_rule.py`. Skipped when the binary is
-  not on `PATH`.
+  `test_w1_16_code_answers.py`, the two index cases of `test_w1_16_token_rule.py`, and all of
+  `test_w1_16_paths_and_roots.py` but its premise. Skipped when the binary is not on `PATH`.
 - **Run the `gitleaks` binary**, directly or through the filter: the other marked cases of
-  `test_w1_16_token_rule.py`. Skipped when the binary is not on `PATH`.
+  `test_w1_16_token_rule.py`, and the premise of `test_w1_16_paths_and_roots.py`. Skipped when the binary is not on `PATH`.
 - **Clone a dev tier** (`$GOV_DEV_TIERS`, default `~/gov-os-workbench/synthetic`; tiers `a-dev` and `b-dev`, by
   exact path): the wrapper cases of `test_w1_16_code_answers.py`, its tier premise,
   `test_no_dev_canary_reaches_the_code_index[2]` and `test_every_file_holding_a_dev_canary_is_still_reported[4]`.
@@ -200,6 +202,47 @@ files as TOML).
   file. The canary rule's expression and keywords are held equal to what W1-15 delivered.
 - **Reaches the index**: functions named like a prefixed token are defined, and have their caller, in the code
   index; a file with a token-shaped string is not there.
+
+## The second batch: secrets in path names, and roots that are refused
+
+`test_w1_16_paths_and_roots.py`, 7 test functions, 8 cases. Written after the ticket went green, from three
+behaviours a post-green review described (DEC-136). They serve failure lines 2 and 3; no KPI line was added.
+
+Red run on `w1/W1-16` at `571650ce` plus this batch: **6 failed, 126 passed**. The 124 cases of the first batch
+stay green; the two cases of the premise pass.
+
+| Failure line | Test functions | Red reason today |
+|---|---|---|
+| **Failure 3.** A planted secret is found in the code graph | `test_the_planted_path_names_are_secrets_by_the_rules[2]` (premise) · `test_no_secret_of_a_path_name_stands_under_gov_runtime` · `test_a_file_under_a_secret_path_is_not_in_the_code_graph` · `test_the_secrets_indexing_check_of_w1_15_stays_green_with_secret_path_names` | The two files are indexed: **`2 file or folder name(s) under .gov-runtime/ hold a planted path secret`** (the staged copy), **`2 planted path secret(s) came back from the code graph`** (the `path` of an answer), and **`1 store(s) hold a secret`** (the rows of the index hold the paths). The premise passes. |
+| **Failure 2.** An index file of this repository exists outside `.gov-runtime/` after a run | `test_a_sub_folder_of_a_repository_is_refused_and_nothing_is_created` · `test_a_directory_that_is_no_git_repository_is_refused_and_nothing_is_deleted` · `test_a_gov_runtime_that_links_outside_the_repository_is_refused` | **`index(root) on a sub-folder of a repository was not refused`**: it builds `pkg/.gov-runtime/codeintel/`. **`the refused call deleted: ['.gov-runtime/codeintel', …]`**: the call on a plain directory raises, after it deleted the earlier folder. **`index(root) was not refused though .gov-runtime links outside the repository; the outside folder gained 14 path(s)`**. |
+
+How these tests decide:
+
+- **A secret in a path.** Two source files are clean in their content. One has a token-shaped file name
+  (`app/<token>.py`); the other stands in a folder named like a canary (`web/<canary>/panel.ts`). Both values are
+  built at run time. The premise shows that each value, written in a file, is flagged by the token rule and by
+  the canary rule, with either gitleaks file.
+- **Under `.gov-runtime/`** covers the bytes and SQLite rows of every file, as before, and now also every file
+  and folder name. The sandbox of the indexing run is searched the same way.
+- **Not in the code graph.** The functions of the two files have no definition, and no answer or output of the
+  child holds a planted value. The clean files next to them (`app/beside.py`, `web/beside.ts`) are defined, and
+  one has its caller: leaving the whole folder out does not pass.
+- **The backstop.** `gov.secrets.stores_with_secrets(root)` returns nothing for the indexed repository.
+- **Refused** means the child process raises. The exception's class and message are not held.
+- **A sub-folder of a repository.** The sub-folder has its own path map, gitleaks file and `.gitignore`, all
+  committed, so that only the root is wrong. After the refused call the repository holds no new file or folder
+  (outside `.git/`), `git status` is clean, and the child's `HOME`, `TMPDIR` and working directory hold nothing
+  new. The runtime directory is held to no index file only (package DP-4).
+- **A directory that is no git repository.** It holds a path map, a gitleaks file, a source file, an earlier
+  `.gov-runtime/codeintel/` and another folder under `.gov-runtime/`. After the refused call every file and folder
+  is still there, unchanged, and nothing was added.
+- **`.gov-runtime` as a symbolic link** to an empty folder outside the repository. After the refused call the
+  outside folder is still empty, and the link is still a link.
+
+Not tested in this batch, on purpose: a link deeper down (`.gov-runtime/codeintel` or the home itself as a link);
+a link to a folder inside the repository; a git worktree or a submodule as the root; a bare repository; which of
+the wrapper and the filter keeps a secret path out; a secret in the name of the repository's own folder; what the
+other seven functions do with a refused root.
 
 ## The W1-15 suite
 

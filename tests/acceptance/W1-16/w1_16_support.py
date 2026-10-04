@@ -91,6 +91,11 @@ DEV_PLANTED = {
     ),
 }
 
+# Secrets that stand in a path, not in a file: a token-shaped file name and a folder named like a canary.
+PATH_TOKEN = "sk" + "_" + "W116path" + "7Qd2" + "Lm9Xb4Tz"
+FOLDER_SECRET = "_".join(["W116", "FOLDER", _WORD, "6JT1"])
+PATH_PLANTED = (PATH_TOKEN, FOLDER_SECRET)
+
 PREFIXES = ("sk", "pk", "rk", "tok")
 SEPARATORS = ("_", "-")
 
@@ -378,6 +383,11 @@ def codeintel(root, calls, sandbox):
     return run
 
 
+def refused(run):
+    """Whether the child process raised: the call was refused with an error, whatever its class and message."""
+    return run.returncode != 0 and run.results is None
+
+
 def one(root, name, args, sandbox):
     """The result of one ``gov.codeintel`` call."""
     return codeintel(root, [(name, args)], sandbox).results[0]
@@ -442,6 +452,23 @@ def listing(root, skip=()):
         for name in files:
             seen.add((Path(folder) / name).relative_to(root).as_posix())
     return seen
+
+
+def tree(root, skip=()):
+    """Every file, folder and link under ``root`` as relative paths, without the top-level folders in ``skip``."""
+    root = Path(root)
+    seen = set()
+    for folder, dirs, files in os.walk(root):
+        if Path(folder) == root:
+            dirs[:] = [name for name in dirs if name not in skip]
+        for name in dirs + files:
+            seen.add((Path(folder) / name).relative_to(root).as_posix())
+    return seen
+
+
+def names_holding(root, needles):
+    """The files and folders under ``root`` whose relative path holds a needle."""
+    return sorted(rel for rel in tree(root) if any(needle in rel for needle in needles))
 
 
 def snapshot(root):
