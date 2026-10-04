@@ -216,6 +216,82 @@ def commits_touching(path, root=REPO_ROOT):
     return git("rev-list", "--full-history", "HEAD", "--", path, root=root).split()
 
 
+def commit_parents(sha, root=REPO_ROOT):
+    """The parent commit ids of a commit; two or more for a merge commit."""
+    return git("rev-list", "--parents", "-n", "1", sha, root=root).split()[1:]
+
+
+def _blobs_under(commit, path, root):
+    """{repository-relative path: (mode, blob id)} of every file under ``path`` in ``commit``."""
+    out = git("-c", "core.quotePath=false", "ls-tree", "-r", "-z", commit, "--", path, root=root)
+    blobs = {}
+    for entry in out.split("\0"):
+        if "\t" in entry:
+            meta, name = entry.split("\t", 1)
+            mode, _, blob = meta.split()
+            blobs[name] = (mode, blob)
+    return blobs
+
+
+def merge_offences(sha, path, root=REPO_ROOT):
+    """Why a merge commit without the test designer's role may not pass (DEC-253); empty when it passes.
+
+    A merge commit passes when every change it brings under ``path`` comes from
+    commits on the merged side that carry ``Role: independent-test-designer``:
+
+    - every file under ``path`` in which the merge differs from its first parent
+      is, in the merge, exactly what one of the other parents holds (the same
+      content, or absent in both). Anything else is a change the merge commit
+      makes itself, beyond what its parents hold;
+    - every non-merge commit that is reachable from another parent, is not
+      reachable from the first parent, and touches ``path``, carries the role.
+      A merge commit on the merged side is judged by this same rule when the
+      history walk reaches it.
+    """
+    first, *others = commit_parents(sha, root)
+    merged = _blobs_under(sha, path, root)
+    base = _blobs_under(first, path, root)
+    brought = [_blobs_under(parent, path, root) for parent in others]
+    offences = []
+    own = sorted(
+        name for name in set(merged) | set(base)
+        if merged.get(name) != base.get(name)
+        and not any(side.get(name) == merged.get(name) for side in brought)
+    )
+    if own:
+        offences.append("the merge commit itself changes " + ", ".join(own))
+    for parent in others:
+        side = git("rev-list", "--no-merges", "--full-history", f"{first}..{parent}", "--", path,
+                   root=root).split()
+        without = [c[:12] for c in side if TEST_DESIGNER_ROLE not in commit_roles(c, root)]
+        if without:
+            offences.append(
+                f"it brings commits without `Role: {TEST_DESIGNER_ROLE}`: " + ", ".join(without)
+            )
+    return offences
+
+
+def acceptance_test_offenders(root=REPO_ROOT, path="tests/acceptance"):
+    """One line per commit on HEAD's history that touches ``path`` and may not.
+
+    - A commit that carries ``Role: independent-test-designer`` passes.
+    - Any other non-merge commit is an offender.
+    - Any other merge commit is an offender unless ``merge_offences`` is empty
+      (DEC-253: an integration merge of test-designer commits).
+    """
+    offenders = []
+    for sha in commits_touching(path, root):
+        if TEST_DESIGNER_ROLE in commit_roles(sha, root):
+            continue
+        if len(commit_parents(sha, root)) < 2:
+            offenders.append(sha[:12])
+            continue
+        offences = merge_offences(sha, path, root)
+        if offences:
+            offenders.append(f"{sha[:12]} (merge: {'; '.join(offences)})")
+    return offenders
+
+
 def changed_paths(sha, root=REPO_ROOT):
     """Repository-relative paths a commit adds, changes or deletes."""
     out = git(

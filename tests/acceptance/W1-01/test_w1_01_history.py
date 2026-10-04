@@ -35,20 +35,22 @@ def test_interim_rule_stays_in_force_once_introduced(interim, repo_root, probe):
 
 
 def test_only_the_test_designer_commits_to_acceptance_tests(repo_root, deny_rules, w1_05_landed):
-    """KPI failure 1: no implementer commit touches tests/acceptance/** before W1-05 lands."""
+    """KPI failure 1: no implementer commit touches tests/acceptance/** before W1-05 lands.
+
+    DEC-253 (rewrite after implementation, "owner decision: integration merges"):
+    a merge commit passes when every change it brings under tests/acceptance/
+    comes from commits on the merged side carrying the test designer's role.
+    Every non-merge commit is checked as before.
+    """
     if not w1_05_landed:
         tool, target = ACCEPTANCE_PROBE
         assert support.denying_rules(deny_rules, tool, target, repo_root), (
             f"the interim guardrail is not in force: {tool} on {target} is not denied"
         )
-    offenders = [
-        sha[:12]
-        for sha in support.commits_touching("tests/acceptance", repo_root)
-        if support.TEST_DESIGNER_ROLE not in support.commit_roles(sha, repo_root)
-    ]
+    offenders = support.acceptance_test_offenders(repo_root)
     assert not offenders, (
         "commits touch tests/acceptance/** without the trailer "
-        f"`Role: {support.TEST_DESIGNER_ROLE}`: {', '.join(offenders)}"
+        f"`Role: {support.TEST_DESIGNER_ROLE}`:\n" + "\n".join(offenders)
     )
 
 
