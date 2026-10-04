@@ -18,3 +18,4 @@ target/
 .gov-runtime/
 *.bak-*
 .vscode/
+.tickets/.claims/
