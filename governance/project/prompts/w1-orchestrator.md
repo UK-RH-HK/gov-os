@@ -24,7 +24,7 @@ W1-06 and W1-48 are installs: under DEC-083 you present a decision package, the 
 
 ## 4. How workers run
 
-- Until W1-46 closes: headless worker sessions, started from the repository root with the role and ticket in the environment, for example: GOV_ROLE=independent-test-designer GOV_TICKET=<ticket id> claude -p "<brief>" --output-format json. They run under the guard but without the sandbox (an interim, recorded in your checkpoint). Never run two writing workers at once (one working tree).
+- Until W1-46 closes: headless worker sessions, started from the repository root with the role and ticket in the environment, for example: GOV_ROLE=independent-test-designer GOV_TICKET=<ticket id> ~/.local/bin/claude -p "<brief>" --output-format json. They run under the guard but without the sandbox (an interim, recorded in your checkpoint). Never run two writing workers at once (one working tree). Always start workers with the absolute path ~/.local/bin/claude (DEC-205).
 - After W1-46 closes: gov launch <role> <ticket>, sandboxed, with the role's network profile.
 - Read-only work (review probes, exploration) may use in-session subagents of a non-role type; the guard keeps them read-only.
 - Give each worker only its brief from appendix A. Never give a worker your notes, the loop count, another worker's output, or anything from the test designer's working.
