@@ -19,6 +19,7 @@ depends_on:
 allowed_paths:
 - template/openspec/schemas/**
 - template/governance/kernel/templates/openspec/**
+- template/openspec/config.yaml
 kpis:
   success:
   - The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml [CAP-30.a]
