@@ -28,6 +28,7 @@ allowed_paths:
 - .claude/agents/research.md
 - governance/project/roster.yaml
 - tests/unit/guard/**
+- governance/project/research-allowlist.yaml
 kpis:
   success:
   - gov launch refuses to start a worker session, with a non-zero exit and a named reason, unless the settings it built have the sandbox enabled, failIfUnavailable true, allowUnsandboxedCommands false and
