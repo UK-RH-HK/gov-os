@@ -3,14 +3,15 @@
 Ticket `DAEO-jdqr`, profile FULL. Written before implementation by the Independent Test Designer (MR-3, DEC-069),
 proportional to the profile (DEC-221): every KPI line, success and failure, and every covers id has at least one test.
 Batch 2 revised the suite, still before implementation, for the decisions on batch 1's seven packages (DEC-231 to
-DEC-234, DEC-240 to DEC-242).
+DEC-234, DEC-240 to DEC-242). Batch 3 added tests after implementation, from seven behaviours a review described
+(DEC-136); see "Batch 3" below.
 
 ```
 python3 -m pytest tests/acceptance/W1-46 -q -p no:cacheprovider                      # everything (starts two real sessions once gov launch exists)
 python3 -m pytest tests/acceptance/W1-46 -q -p no:cacheprovider -m "not local_only"  # no session, no network, no cost
 ```
 
-281 tests: 247 start nothing, 34 are `local_only`.
+326 tests: 292 start nothing, 34 are `local_only`. 45 of the 292 were added in batch 3, after implementation.
 
 ## How the tests see what the launcher builds
 
@@ -84,6 +85,58 @@ New and revised tests of batch 2, and their red reason:
 | `test_a_research_install_after_cd_into_another_folder_is_denied` (1) | DEC-240 | green already (the role is unknown) |
 | removed: the `uv --directory` and `uv --project` cases (14: 2 let through, 6 outside the folder, 6 for the other roles) | DEC-240 | (6 + 6 were green) |
 
+## Batch 3: tests added after implementation (DEC-136)
+
+The ticket was implemented in `c70bbb69`. A review after it described seven behaviours, A to G, that the suite
+missed. Each was decided from the specification: a test where a KPI line, a Contract item or a decision answers it, a
+package where none does. Where a package is open, the test asserts only what every answer shares. 45 tests in four
+new files, all without a session; they count as tests added after implementation (DEC-106).
+
+| Behaviour | Tests | Line or decision | Red reason |
+|---|---|---|---|
+| A. Arguments after `--` that take the guard away | `test_w1_46_guard_wiring.py`: `test_the_launcher_refuses_the_argument_that_skips_the_hooks` (3: `--bare` alone, after and before the ordinary arguments); `test_no_session_is_started_without_the_projects_settings_unless_the_launcher_wires_the_guard` (3: `--setting-sources user`, joined with `=`, empty) | Success 2 [CAP-61.b] "both variables reach the guard"; success 8 [CAP-58.d]; MR-3; DEC-135; DEC-231 | `gov launch` ends with exit code 0 and starts the session; the built settings register no PreToolUse command |
+| A, control | `test_a_headless_workers_ordinary_arguments_pass_unchanged` (2) | DEC-231, DEC-183 | green already |
+| B. The guard is not wired | `test_no_session_is_started_in_a_project_that_does_not_wire_the_guard` (5: no settings file, no `hooks` block, no PreToolUse command, `disableAllHooks: true` committed and local); `test_a_research_session_is_not_started_without_the_guard_either` (1) | Success 2 [CAP-61.b], success 8 [CAP-58.d], success 4 (the fence leans on the guard); DP-11 | as A: exit code 0, a session, no guard registered by the launcher |
+| B, control | `test_hooks_left_on_explicitly_do_not_refuse_the_launch` (1) | | green already |
+| C. Opaque Bash writes to acceptance tests, tickets and `.claude` | none | no line of the ticket asks for it: DP-12 | |
+| D. Any directory as the experiment folder | `test_w1_46_experiment_folder.py`: `test_a_research_ticket_on_the_acceptance_tests_refuses_the_launch` (2) | MR-3; DEC-242 | exit code 0, a session whose fence leaves `tests/acceptance` open |
+| D | `test_the_guard_refuses_a_research_write_to_an_acceptance_test_on_a_ticket_that_names_them` (2), `..._bash_write_...` (1) | MR-3 | green already: the guard refuses the research role there, whatever the ticket names |
+| D | `test_a_research_ticket_on_the_runtime_directory_opens_nothing_there` (1) | Success 10 (DEC-180) | the launch keeps the runtime rules, but the guard allows a research Write to `.gov-runtime/freeze` on that ticket |
+| D | `test_an_entry_with_dot_dot_is_refused_or_the_fence_and_the_guard_hold_the_same_folder` (1) | Success 4 and 5: the fence and the guard's allow-list speak of one folder | launched with the fence built around the sibling, while the guard denies a write there |
+| D, the other directories | none | DP-13 | |
+| E. `held_out_paths` written twice | `test_w1_46_duplicate_keys.py`: `test_no_session_is_started_without_a_read_rule_for_a_path_named_under_a_repeated_key` (2); `test_the_guard_does_not_let_a_read_of_the_directory_named_first_through` (1); `test_a_broken_first_value_is_not_hidden_from_the_launcher_by_a_valid_second_one` (4); `..._from_the_guard_...` (4) | Success 9 [CAP-49.b]; DEC-218; the guard's side is W1-47's [CAP-49.c] | the last value wins: a session with no `Read` rule for the first path; the guard allows a Read of it; a broken first value launches and the guard does not fail closed |
+| F. The allowlist's key written twice | `test_a_malformed_first_list_is_not_hidden_by_a_valid_second_one` (4); `test_a_first_list_of_hosts_is_not_dropped_silently` (1) | Success 3 [CAP-61.c]; DEC-241 | the last list wins: exit code 0; the first list's host is not in the built allowlist |
+| G. `uv run -w<package>` | `test_w1_46_install_spellings.py`: denied for the three other roles (3) and for research outside its folder (1); the orchestrator is asked (1) | Failure 7; DEC-174; DEC-216 ("plus `uv run -w`") | the guard allows the command, and asks nothing |
+| G, controls | research in its folder (1); `uv run script.py -wide` is no install (1) | DEC-163, DEC-240 | green already |
+
+**Red result after batch 3**, `-m "not local_only"`: **38 failed, 0 errors, 254 passed** (292 tests). 37 of the
+failures are batch 3's, grouped above: A 6, B 6, D 4, E 11, F 5, G 5. The other one is
+`test_the_research_role_is_a_session_role_definition_like_the_others`, an open question with the owner. 8 tests of
+batch 3 are green already (the controls, and the guard's refusal of a research write to an acceptance test). The
+`local_only` tests were not run in batch 3.
+
+**Readings of batch 3.**
+
+- A and B. The CLI's help (2.1.288) says `--bare` is "Minimal mode: skip hooks (those defined in settings …)": no
+  settings can bring the guard back, and DEC-231 lets the launcher drop no argument, so the launch is refused.
+  `--setting-sources` and an unwired project can be answered two ways (DP-11), so those tests accept a refusal, or
+  a `--settings` value that registers a PreToolUse command for `Write`, `Edit` and `Bash` (and carries
+  `disableAllHooks: false` where the repository switched the hooks off).
+- A and B, not tested: `--dangerously-skip-permissions`, `--allow-dangerously-skip-permissions`, `--permission-mode
+  bypassPermissions`, `--add-dir`, `permissions.defaultMode` and `permissions.additionalDirectories`. Contract item
+  CAP-61.f names `bypassPermissions` an open residual until EXP-002, and no line says what the sandbox does with an
+  added directory. DP-10.
+- E. A key written twice is not judged as "valid" or "invalid" YAML. The tests hold under both readings: refuse, or
+  honour both values. A first value that DEC-218 refuses on its own refuses under both.
+- F. As E. The key is read from the project's file; the tests are skipped if the file holds its list without a key.
+- G. Tested: `uv run -w<package>` only. Left as residuals, not tested: the prefixes `env` and `command` (recorded
+  in `governance/project/bootstrap.md` at W1-04's close as "A prefix command (`env`, `command`, `nohup`, `time`,
+  `xargs`) hides `sudo` or an install from the rule", under DEC-135 and Contract item CAP-25.c), and `exec`, `nice`,
+  `time`, `xargs`, `bash -c '…'`, `python3 -mpip`, `uv pip sync`, `uv tool run`, `npm ci`, `npx`, `yarn add`,
+  `pnpm add`, `pipx run`, `cargo add`, `go get`, and a pipe into a shell. No KPI line and neither DEC-174 nor
+  DEC-216 names them. In a launched session of the three other roles the empty allowlist blocks the download, and
+  the sandbox stops a write outside the repository; none of them lets an implementer change an acceptance test.
+
 ## Green before implementation (94 tests), and why
 
 - The three older roles already behave as the KPI says (42 cases): installs denied for engineer, test designer and
@@ -138,7 +191,8 @@ answer `https://<host>/`, fails its one test with `curl`'s exit code and the HTT
 8. The experiment folder is the research ticket's single `allowed_paths` entry without its `/**` (DEC-242). "Not
    exactly one experiment folder" is tested with: two entries, no entry, `**`, a pattern over several folders
    (`experiments/spikes/exp-*/**`), and a file. Not tested: a folder that does not exist at launch, an entry without
-   `/**`, and where in the repository an experiment folder may be.
+   `/**`, and where in the repository an experiment folder may be (batch 3: DP-13, and three cases other lines
+   decide, in `test_w1_46_experiment_folder.py`).
 9. A missing `held-out.yaml` launches with no held-out rule (DEC-242, DEC-223): the built settings differ from the
    same launch with the file by exactly the held-out `Read` rule. A file that exists and is empty is a broken file
    and refuses (DEC-218), as the guard reads it.
@@ -207,3 +261,79 @@ implemented" revision (DEC-190) is recorded. No earlier suite was changed.
   the helper `rewrite_allowlist` names the key and one refusal test is added.
 - Reversibility: high. Cost: one test.
 - Recommendation: (a). Confidence: medium.
+
+### Batch 3: four open packages
+
+**DP-10 (P1). Permission bypass and added directories, as arguments and as repository settings.**
+- Question: does `gov launch` refuse `--dangerously-skip-permissions`, `--allow-dangerously-skip-permissions`,
+  `--permission-mode bypassPermissions` and `--add-dir` after `--`, and a repository whose `.claude/settings.json`
+  or `.claude/settings.local.json` carries `permissions.defaultMode: bypassPermissions` or
+  `permissions.additionalDirectories`?
+- Why now: the review reports that such a session keeps the sandbox but loses the permission checks, or gains
+  writable directories. The specification does not settle it: Contract item CAP-61.f lists "`bypassPermissions`
+  mode" among the sandbox cases that stay open residuals until EXP-002, and no line says whether the sandbox lets
+  Bash write to an added directory. KPI success 8 ("a Bash write outside the repository ... fails at the OS level,
+  and a file-tool write outside it is refused by the permission rules and the guard") is at stake if it does.
+- Options: (a) refuse all of them, as DEC-233 refuses a `sandbox` key; (b) refuse `--add-dir` and
+  `additionalDirectories` only, and leave the bypass mode to EXP-002; (c) refuse nothing and record both as
+  residuals.
+- Impact: (a) about eight refusal cases (six argument spellings, two settings keys), no change to the tests that
+  exist; a ticket lead can no longer start a worker in bypass mode, which DEC-183 does not use (`acceptEdits`).
+  (b) four cases. (c) none.
+- Reversibility: high; a refusal is lifted by removing a check. Cost: a few lines in the launcher, four to eight
+  cases.
+- Recommendation: (a). It fails closed, and the residual of CAP-61.f stays an experiment question instead of a
+  running risk. Confidence: medium-high.
+
+**DP-11 (P1). Who wires the guard into a launched session.**
+- Question: when the project's settings do not register the guard (no `.claude/settings.json`, no PreToolUse
+  command, `disableAllHooks: true`, or `--setting-sources` without `project`), does the launcher refuse, or does it
+  register the guard itself in the settings it builds?
+- Why now: today such a launch succeeds and the session has no guard. KPI success 2 says both variables "reach
+  the guard", but no line says whose job the wiring is. DEC-233 answers the same question for the sandbox only.
+- Options: (a) refuse, non-zero exit and a named reason, as DEC-233; (b) the launcher puts the PreToolUse and
+  post-command hooks in its `--settings` value, with `disableAllHooks: false`, and the repository's hooks no longer
+  matter for a worker; (c) both: wire them, and refuse what cannot be overridden.
+- Impact: batch 3's twelve tests accept (a) and (b). Under (a) they can be tightened to a plain refusal. Under (b)
+  the guard runs twice in a wired project unless the launcher checks first, and a live test must show that
+  `--settings` wins over `disableAllHooks: true` in the local settings.
+- Reversibility: high. Cost: (a) about ten lines; (b) more, and one more live assertion.
+- Recommendation: (a). Confidence: medium-high.
+
+**DP-12 (P1). `Edit` deny rules for acceptance tests, tickets and `.claude` in launched worker sessions.**
+- Question: do the settings built for a worker role carry `Edit` deny rules for `tests/acceptance/**` (every role
+  but the test designer), `.tickets/**` and `.claude/**` (every worker role)?
+- Why now: the review reports that in a launched engineer session an opaque Bash write (interpreter one-liner,
+  `sh -c`, here-string) to those paths lands: the guard cannot parse it and the working directory is writable in
+  the sandbox. No line of the ticket asks for such rules: "the role's Edit deny rules" (success 2) are, by the
+  other lines, `.gov-runtime/**` (DEC-180) and the research fence. MR-3 and CAP-58 give an opaque write to an
+  acceptance test to the post-command containment check, which restores it (DEC-143). The gap is a file git
+  ignores, such as `.claude/settings.local.json`: the containment check does not see it, and it can switch the
+  hooks off for the next session. So this is a specification gap, not a missing test, and nothing was added.
+- Options: (a) all three rules, as DEC-180 did for `.gov-runtime/**`, with a new KPI line; a ticket whose
+  `allowed_paths` names a path under `.claude/` (this ticket names `.claude/agents/research.md`) needs that path
+  left out of the rule; (b) `.claude/**` only, the one place the containment check cannot see, and the rest stays
+  with the containment check; (c) no rule; record the residual, and rely on DP-11 (a) to refuse the next launch.
+- Impact: (a) one KPI line, about twelve cases (three paths, four roles) and three live assertions in the engineer
+  session; the research role already has these rules through its fence. (b) one line, four cases, one live
+  assertion. (c) none.
+- Reversibility: high. Cost: (a) about fifteen lines in the launcher.
+- Recommendation: (a). DEC-135 asks to fix what could let an implementer change acceptance tests, and one `Edit`
+  rule binds the file tools and Bash at OS level (CAP-58.d). Confidence: medium.
+
+**DP-13 (P2). What makes a directory an experiment folder.**
+- Question: which directory may be the one folder of a research ticket's `allowed_paths` (DEC-242)?
+- Why now: a research ticket whose single entry is `.claude/**`, `.tickets/**`, `governance/project/**`, `src/**`
+  or `.git/**` launches, and the research role may then write and install there. DEC-242 says "exactly one
+  experiment folder" and nothing says where one may be. Batch 3 tests only what other lines decide:
+  `tests/acceptance/**` (MR-3), `.gov-runtime/**` (DEC-180), and an entry with `..`.
+- Options: (a) a folder under a root the project names, `experiments/**` by default; everything else refuses;
+  (b) any directory except a protected list: `.git`, `.claude`, `.tickets`, `.gov-runtime`, `governance`, `src`,
+  `template`, `tests`, `docs`, and anything above or around them; (c) as today, with the owner's review of the
+  ticket as the control.
+- Impact: (a) five to seven refusal cases and one control; the fixture's folder, `experiments/spikes/exp-901`,
+  already fits. (b) the same cases, and a list to maintain. (c) none. Under (a) and (b) an entry with `..` is
+  best refused outright; the test accepts that.
+- Reversibility: high. Cost: a few lines in the launcher and the guard's folder check.
+- Recommendation: (a). Experiments "run outside production paths" (DEC-102), and one root is simpler to check
+  than a list. Confidence: medium.

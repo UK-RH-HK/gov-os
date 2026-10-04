@@ -449,6 +449,47 @@ def rewrite_allowlist(project, change):
     return path
 
 
+def allowlist_key(project):
+    """The key that holds the list of hosts in the project's research allowlist, or None for a top-level list."""
+    path = Path(project) / ALLOWLIST_REL
+    assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    keys = [key for key, value in data.items() if isinstance(value, list)] if isinstance(data, dict) else []
+    return keys[0] if len(keys) == 1 else None
+
+
+GUARDED_TOOLS = ("Write", "Edit", "Bash")
+
+
+def tools_without_a_guard_command(settings):
+    """The write tools for which ``settings`` register no PreToolUse command."""
+    return [tool for tool in GUARDED_TOOLS if not live_support.hook_commands(settings, "PreToolUse", tool)]
+
+
+def assert_no_session_without_the_guard(result, hooks_switched_off=False):
+    """What every answer to DP-11 shares: no worker session is started that no guard decides for.
+
+    Either the launch is refused (non-zero exit, a named reason, nothing
+    started), or the launcher wires the guard itself: the one ``--settings``
+    value registers a PreToolUse command for every write tool, and switches the
+    hooks back on where the repository's settings switched them off.
+    """
+    if result.run.returncode != 0:
+        assert_refused(result, "hook", "guard", "settings")
+        return
+    built = result.settings()
+    bare = tools_without_a_guard_command(built)
+    assert bare == [], (
+        "a worker session was started although the project's settings register no guard for it, and the built "
+        f"settings register no PreToolUse command for {bare}\n{result.describe()}"
+    )
+    if hooks_switched_off:
+        assert built.get("disableAllHooks") is False, (
+            "a worker session was started although the repository's settings switch every hook off, and the built "
+            f"settings do not switch them back on\n{result.describe()}"
+        )
+
+
 def write_ticket(project, ticket_id, role, status="in_progress", allowed_paths=("docs/**",), wbs_id="W1-98"):
     """Put one more committed ticket in the project."""
     write(project, f".tickets/{ticket_id}.md", check_support.ticket_text(
