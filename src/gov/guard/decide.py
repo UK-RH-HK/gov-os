@@ -290,6 +290,17 @@ def _cp_operands(args: list[str]) -> tuple[list[str], list[str]] | None:
     return operands, dirs
 
 
+def _option_after_operand(args: list[str]) -> bool:
+    """True when an option is written after a word that is not one."""
+    seen = False
+    for a in args:
+        if not a.startswith("-"):
+            seen = True
+        elif seen:
+            return True
+    return False
+
+
 def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     """Return absolute write-target paths, or None when the command is read-only.
 
@@ -493,16 +504,23 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                     else:
                         _resolve(os.path.join(d, base) if d else d)
             if not dirs and len(nf) >= 2:
-                _resolve(nf[-1])
+                # An option after an operand may take the word after it as
+                # its value (-S bak, -m 644): the destination is then an
+                # earlier operand, so every operand but the first is judged.
+                for a in (nf[1:] if _option_after_operand(args) else nf[-1:]):
+                    _resolve(a)
             continue
         if name == "ln":
             # DEC-311: the destination of a symbolic or a hard link is a
             # write target.  A form whose destination is not the last
-            # operand (-t, --target-directory, "--") is refused.
-            if any(a == "--" or a.startswith("--t")
-                   or (a.startswith("-") and not a.startswith("--")
-                       and "t" in a)
-                   for a in args):
+            # operand (-t, --target-directory, "--", an option after an
+            # operand, whose value would be read as the destination) is
+            # refused.
+            if _option_after_operand(args) or any(
+                    a == "--" or a.startswith("--t")
+                    or (a.startswith("-") and not a.startswith("--")
+                        and "t" in a)
+                    for a in args):
                 targets.append(_UNRESOLVABLE)
                 continue
             nf = [a for a in args if not a.startswith("-")]
