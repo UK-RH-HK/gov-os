@@ -1,6 +1,6 @@
 ---
 id: DAEO-1ve2
-status: open
+status: in_progress
 deps: [DAEO-drvn]
 links: []
 created: 2026-09-30T22:49:58Z

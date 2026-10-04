@@ -1,6 +1,6 @@
 ---
 id: DAEO-yvzh
-status: open
+status: in_progress
 deps: [DAEO-ipqy]
 links: []
 created: 2026-09-30T22:49:59Z
