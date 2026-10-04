@@ -49,6 +49,17 @@ def test_a_path_allowlist_does_not_shelter_a_file_from_the_filter(project):
     assert secrets.indexable(project, [planted, clean]) == [clean]
 
 
+def test_an_older_allowlist_spelling_or_a_configuration_in_the_environment_shelters_nothing(project, monkeypatch):
+    lenient = _write(project, "lenient.toml", "[[rules]]\nid = 'none'\nregex = '''never-matches-anything'''\n")
+    monkeypatch.setenv("GITLEAKS_CONFIG", str(project / lenient))
+    config = project / ".gitleaks.toml"
+    config.write_text(config.read_text(encoding="utf-8").replace("[[rules]]", "[[rules]]\nallowlist = {regexes = ['.']}")
+                      + "\n[allowlist]\nstopwords = ['argus']\n", encoding="utf-8")
+    clean = _write(project, "notes/clean.md", "Ordinary text.\n")
+    planted = _write(project, "notes/planted.md", f"The value is {PLANTED} today.\n")
+    assert secrets.indexable(project, [planted, clean]) == [clean]
+
+
 def test_content_that_looks_binary_is_still_scanned(project):
     planted = _write(project, "notes/blob.bin", b"SQLite format 3\0\x7fELF " + PLANTED.encode() + b"\n")
     assert secrets.indexable(project, [planted]) == []
