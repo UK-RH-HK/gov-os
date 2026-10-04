@@ -1,0 +1,28 @@
+# Feature-readiness record. Every row starts MISSING: no cell is filled for you and N/A is never a default.
+rows:
+  - {n: 1, key: intent, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 2, key: actor, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 3, key: journey, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 4, key: scenarios, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 5, key: inputs, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 6, key: data_model, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 7, key: test_data, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 8, key: processing, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 9, key: outputs, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 10, key: functional, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 11, key: nfr, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 12, key: ux, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 13, key: backend, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 14, key: state, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 15, key: interfaces, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 16, key: security, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 17, key: integrations, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 18, key: devops, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 19, key: observability, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 20, key: performance, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 21, key: cost, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 22, key: recovery, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 23, key: success, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 24, key: failure, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 25, key: acceptance_tests, state: MISSING, evidence: [], reason: null, gap_ticket: null}
+  - {n: 26, key: docs_ops, state: MISSING, evidence: [], reason: null, gap_ticket: null}
