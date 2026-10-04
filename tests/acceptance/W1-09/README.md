@@ -119,7 +119,7 @@ written before implementation pass. Of the 15 new cases, 13 are red and the 2 "k
 
 | Case | Red because |
 |---|---|
-| `test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim` | A release that loses the race ends with `FileNotFoundError` from removing the lock, not with the GovError `CLAIM_NOT_HELD`: two releases both found the named holder and both removed the lock. Red in 22 of 22 runs, each time in the first start. |
+| `test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim` | A release that loses the race ends with `FileNotFoundError` from removing the lock, not with the GovError `CLAIM_NOT_HELD`: two releases both found the named holder and both removed the lock. Red in 24 of 24 runs, each time in the first start. |
 | `test_a_folder_that_is_not_below_the_projects_acceptance_tests_does_not_count`, all 11: `path-absolute-outside-the-project`, `path-dot`, `path-dot-slash`, `path-parent`, `path-parent-elsewhere`, `path-src`, `path-git-folder`, `path-tests-acceptance-itself`, `wbs-id-dot`, `wbs-id-two-parents`, `link-to-a-folder-outside-the-project` | `ready` lists the ticket ("a ticket without tests/acceptance/<id>/ appears as READY"), and `blocked` gives no `NO_ACCEPTANCE_TESTS`. |
 | `test_a_claim_in_a_claims_folder_that_cannot_be_read_still_holds_the_ticket` | `ready` lists the ticket whose lock is in a claims folder of mode 000. |
 | `test_a_named_folder_below_the_projects_acceptance_tests_counts[2]` | Green, and must stay green: a named folder below `tests/acceptance/`, with and without the trailing slash. |
@@ -129,7 +129,7 @@ fails with `CLAIM_NOT_HELD`; at most one claim succeeds and every other fails wi
 only on a released ticket; the claimer that succeeded is the holder at the end. Today it fails on the first of these.
 The two other effects the review saw (two claims both succeed; the successful claimer's lock is gone at the end) come
 from the same two releases with a claim landing between their removals. They did not show on this machine (20 cores)
-in about 700 rounds of this layout and five others, tried outside the tracked tree with a driver that carries on
+in about 1,800 rounds of this layout and others (one ticket per start, repeated claims, one to four processors), tried outside the tracked tree with a driver that carries on
 after a crash. So **a repair that only turns the `FileNotFoundError` into `CLAIM_NOT_HELD` would very probably turn
 this test green while a release can still remove another holder's claim.** The repair must make "the lock names this
 holder" and "remove the lock" one step; the diff check should look at that, since no black-box test here reaches it
