@@ -1,8 +1,11 @@
 """W1-48 — the CLI for headless runs and the active VS Code extension are at or above the minimum.
 
-KPI success 2: "The CLI used for headless runs and the VS Code extension's
-bundled version are the same version, at or above the pin, and the registry
-record states both [CAP-61.e]".
+KPI success 2: "The CLI used for headless runs and the active VS Code
+extension's bundled version are both at or above the minimum, 2.1.285, and the
+registry record states both; a difference between them, or from the registry's
+record, is drift that gov doctor reports, not a failure, except that the CLI
+at the recorded version with another sha256 is a failure (DEC-210, DEC-214)
+[CAP-61.e]".
 
 KPI failure 1: "A headless run uses a CLI below 2.1.285".
 
@@ -19,6 +22,11 @@ DEC-210 (the owner's answer on DP-1) says how this is tested:
 - if the CLI and the extension differ, or either is newer than the registry's
   record, that is drift, which ``gov doctor`` (W1-27) reports. It is not a test
   failure. The tests are "at or above the minimum", not "equal to the pin".
+
+DEC-214 (the owner's answer on DP-3) refines it: the CLI at
+``~/.local/bin/claude`` with the recorded version and another sha256 than the
+registry's is a hard failure; for the active extension's bundled binary the
+same difference is drift.
 
 DEC-205: "Every headless worker is started with the absolute path
 ``~/.local/bin/claude``, never a bare ``claude``". So "the CLI used for
@@ -188,7 +196,8 @@ def test_the_active_vs_code_extension_bundles_a_cli_at_2_1_285_or_later():
 
 
 # --------------------------------------------------------------------------
-# This machine against the registry's record (DEC-210): below the minimum fails, drift does not
+# This machine against the registry's record (DEC-210, DEC-214): below the minimum fails, and so does the CLI at
+# the recorded version with another sha256; drift does not
 # --------------------------------------------------------------------------
 
 @pytest.mark.local_only
@@ -196,10 +205,11 @@ def test_this_machine_compared_with_the_record_shows_no_hard_failure(registry):
     """The CLI and the active extension are read as DEC-210 says and compared with the registry's record.
 
     Both versions of the extension are read, and both digests are taken and
-    compared with the registry's. Only a version below the minimum fails. A
-    CLI or an extension that differs from the other, or from the record, is
-    drift for ``gov doctor``; the same version with another digest is left to
-    DP-3 (README).
+    compared with the registry's. Two things fail: a version below the minimum
+    (DEC-210), and the CLI at the recorded version with another sha256 than the
+    registry's (DEC-214). A CLI or an extension that differs from the other,
+    or from the record, is drift for ``gov doctor``, and so is the extension's
+    bundled binary at the recorded version with another sha256 (DEC-214).
     """
     entry = _entry(registry)
     assert support.CLI.is_file(), NO_CLI
@@ -214,5 +224,6 @@ def test_this_machine_compared_with_the_record_shows_no_hard_failure(registry):
                             extension_sha256=support.file_sha256(bundled))
         verdict = support.compare_with_record(support.field(entry, "version"), support.field(entry, "sha256"), seen)
         assert verdict.failures == (), (
-            f"this machine is below the minimum {support.FLOOR} (DEC-210): {list(verdict.failures)}"
+            f"this machine is below the minimum {support.FLOOR} (DEC-210), or its CLI is the recorded version "
+            f"with another sha256 than the registry's (DEC-214): {list(verdict.failures)}"
         )

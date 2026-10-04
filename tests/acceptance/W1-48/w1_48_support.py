@@ -15,6 +15,10 @@ DEC-210: the VS Code extension is the one VS Code has active, read from its
 ``extensions.json``. Below the minimum is a hard failure; a version that
 differs from another one or from the registry's record is drift.
 
+DEC-214: the CLI at the recorded version with another sha256 than the
+registry's is a hard failure; for the active extension's bundled binary the
+same difference is drift.
+
 DEC-211: a registry command runs the CLI by its absolute path.
 """
 
@@ -339,8 +343,11 @@ def package_version(folder):
 
 
 # --------------------------------------------------------------------------
-# Failure or drift (DEC-210)
+# Failure or drift (DEC-210, DEC-214)
 # --------------------------------------------------------------------------
+
+CLI_LABEL = "the CLI at ~/.local/bin/claude"
+EXTENSION_BINARY_LABEL = "the active extension's bundled binary"
 
 @dataclass(frozen=True)
 class Seen:
@@ -354,24 +361,31 @@ class Seen:
 
 @dataclass(frozen=True)
 class Verdict:
-    failures: tuple   # below the minimum, or no version that can be compared with it: a hard failure
-    drift: tuple      # a version that differs from another one or from the record: `gov doctor` reports it
-    digests: tuple    # the recorded version with another digest than the recorded one (README, DP-3)
+    # A hard failure: below the minimum, no version that can be compared with it, or the CLI at the recorded
+    # version with another digest than the recorded one (DEC-214).
+    failures: tuple
+    # `gov doctor` reports it: a version that differs from another one or from the record, or the extension's
+    # bundled binary at the recorded version with another digest than the recorded one (DEC-214).
+    drift: tuple
+    # Every binary at the recorded version with another digest; each one is also a failure or drift, as above.
+    digests: tuple
 
 
 def compare_with_record(recorded_version, recorded_sha256, seen, floor=FLOOR):
-    """DEC-210: what is a hard failure, and what is only drift, when a machine is compared with the registry.
+    """DEC-210, DEC-214: what is a hard failure, and what is only drift, when a machine is compared with the registry.
 
     A hard failure: the CLI, or the active extension by either of its two
     readings, is below ``floor``, or gives no version that can be compared
-    with it. Everything else that differs is drift. A digest is compared only
-    where the version equals the recorded one; a different version has a
-    different digest by itself.
+    with it; or the CLI prints the recorded version and has another sha256
+    than the recorded one. Everything else that differs is drift, and so is
+    the extension's bundled binary at the recorded version with another
+    sha256. A digest is compared only where the version equals the recorded
+    one; a different version has a different digest by itself.
     """
     versions = (
-        ("the CLI at ~/.local/bin/claude", seen.cli_version),
+        (CLI_LABEL, seen.cli_version),
         ("the active extension's package.json", seen.extension_package_version),
-        ("the active extension's bundled binary", seen.extension_binary_version),
+        (EXTENSION_BINARY_LABEL, seen.extension_binary_version),
     )
     floor_key = version_key(floor)
     failures, drift, digests = [], [], []
@@ -399,14 +413,17 @@ def compare_with_record(recorded_version, recorded_sha256, seen, floor=FLOOR):
             drift.append(f"the CLI is {seen.cli_version} and {label} is {version}")
 
     recorded = str(recorded_sha256).strip().lower()
+    # DEC-214: the same difference fails for the CLI (the binary headless workers run) and is drift for the extension.
     binaries = (
-        ("the CLI at ~/.local/bin/claude", seen.cli_version, seen.cli_sha256),
-        ("the active extension's bundled binary", seen.extension_binary_version, seen.extension_sha256),
+        (CLI_LABEL, seen.cli_version, seen.cli_sha256, failures),
+        (EXTENSION_BINARY_LABEL, seen.extension_binary_version, seen.extension_sha256, drift),
     )
-    for label, version, digest in binaries:
+    for label, version, digest, side in binaries:
         if same(version, recorded_version) and digest is not None and str(digest).strip().lower() != recorded:
-            digests.append(f"{label} is the recorded version {version} with sha256 {digest}; "
-                           f"the registry records {recorded}")
+            difference = (f"{label} is the recorded version {version} with sha256 {digest}; "
+                          f"the registry records {recorded}")
+            digests.append(difference)
+            side.append(difference)
     return Verdict(tuple(failures), tuple(drift), tuple(digests))
 
 

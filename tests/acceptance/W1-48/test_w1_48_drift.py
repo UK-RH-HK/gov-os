@@ -5,6 +5,10 @@ or the active extension is below the minimum, 2.1.285 (DEC-153). If the CLI
 and the extension differ, or either is newer than the registry's record, that
 is drift that ``gov doctor`` reports, not a test failure."
 
+DEC-214 (refines DEC-210): "For the CLI at ``~/.local/bin/claude``, the
+recorded version with a different sha256 is a hard failure. For the active
+extension's bundled binary it is drift, reported by ``gov doctor``."
+
 KPI failure 1: "A headless run uses a CLI below 2.1.285". CAP-61.e: "Sessions
 run on Claude Code 2.1.285 or later".
 
@@ -131,7 +135,8 @@ def test_a_failure_and_drift_are_told_apart_in_one_look():
 
 
 # --------------------------------------------------------------------------
-# "the binary's sha256 is compared with the registry"
+# "the binary's sha256 is compared with the registry" (DEC-210); at the recorded version another digest fails
+# for the CLI and is drift for the extension's bundled binary (DEC-214)
 # --------------------------------------------------------------------------
 
 def test_a_newer_binary_with_another_digest_is_drift_by_its_version_alone():
@@ -145,13 +150,41 @@ def test_the_recorded_digest_is_compared_without_case():
     assert verdict == support.Verdict((), (), ())
 
 
-@pytest.mark.parametrize("which", ["cli_sha", "extension_sha"])
-def test_the_recorded_version_with_another_digest_is_noticed(which):
-    """The comparison is made (DEC-210). Whether this is a failure or drift is DP-3: neither is asserted here."""
-    verdict = _verdict(_seen(**{which: SHA_OTHER}))
-    assert len(verdict.digests) == 1 and SHA_OTHER in verdict.digests[0], (
-        f"the recorded version with another digest goes unnoticed: {verdict}"
+def test_the_cli_at_the_recorded_version_with_another_digest_is_a_hard_failure():
+    """DEC-214: "For the CLI at ``~/.local/bin/claude``, the recorded version with a different sha256 is a hard
+    failure." The failure names the CLI and the digest it has; nothing else differs, so there is no drift."""
+    verdict = _verdict(_seen(cli_sha=SHA_OTHER))
+    assert len(verdict.failures) == 1, (
+        f"the CLI prints the recorded version and has another sha256: DEC-214 makes it one hard failure: {verdict}"
     )
+    assert "CLI" in verdict.failures[0] and SHA_OTHER in verdict.failures[0] and SHA_RECORDED in verdict.failures[0]
+    assert verdict.drift == (), f"the CLI's digest is a failure, not drift, and no version differs: {verdict.drift}"
+
+
+def test_the_extensions_binary_at_the_recorded_version_with_another_digest_is_drift():
+    """DEC-214: "For the active extension's bundled binary it is drift, reported by ``gov doctor``." No failure;
+    the drift names the bundled binary and the digest it has."""
+    verdict = _verdict(_seen(extension_sha=SHA_OTHER))
+    assert verdict.failures == (), (
+        f"the extension's bundled binary at the recorded version with another sha256 is drift (DEC-214), "
+        f"and the check fails it: {verdict.failures}"
+    )
+    assert len(verdict.drift) == 1, f"one difference for `gov doctor` to report, {len(verdict.drift)} named"
+    assert "bundled binary" in verdict.drift[0] and SHA_OTHER in verdict.drift[0] and SHA_RECORDED in verdict.drift[0]
+
+
+def test_both_binaries_at_the_recorded_version_with_another_digest_are_one_failure_and_one_drift():
+    """The same difference on both sides in one look: the CLI's fails, the extension's is reported (DEC-214)."""
+    verdict = _verdict(_seen(cli_sha=SHA_OTHER, extension_sha=SHA_OTHER))
+    assert len(verdict.failures) == 1 and "CLI" in verdict.failures[0], f"the CLI's digest alone fails: {verdict}"
+    assert len(verdict.drift) == 1 and "bundled binary" in verdict.drift[0], f"the extension's is drift: {verdict}"
+
+
+def test_the_clis_digest_fails_whatever_the_extension_is():
+    """A newer extension is drift (DEC-210); it does not turn the CLI's digest difference into drift (DEC-214)."""
+    verdict = _verdict(_seen(cli_sha=SHA_OTHER, package="2.1.290", binary="2.1.290", extension_sha="c" * 64))
+    assert len(verdict.failures) == 1 and SHA_OTHER in verdict.failures[0], f"the CLI's digest must fail: {verdict}"
+    assert verdict.drift, "the extension is newer than the record and than the CLI: that is drift beside the failure"
 
 
 # --------------------------------------------------------------------------
