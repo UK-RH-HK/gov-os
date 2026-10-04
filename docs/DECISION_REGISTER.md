@@ -3403,3 +3403,97 @@ the owner.
 | Version | Date | Change |
 |---|---|---|
 | 0.74 | 2026-10-04 | Delegated under DEC-220: DEC-337 (W1-16 DP-2, DP-3: a Python package; a rename is a symbol rename), DEC-338 (DP-4: daemon files in a short per-repository directory outside the repository), DEC-339 (R-1: a body beginning with `_` or `-` is flagged; R-3: a public name check in `gov.secrets`; R-2 is traced). DP-1 and the loopback UI go to the owner. |
+
+## 75. Delegated decisions on W1-17's packages (register v0.75, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the six packages the W1-17 (`DAEO-rxln`) ticket lead
+returned. For each the test designer's, the lead's and the orchestrator's recommendations agree on option (a), the
+confidence is medium or higher, and the choice is reversible until W1-20 consumes the interface. The tests already
+encode these options.
+
+### DEC-340 — W1-17 DP-1: the public interface of the lexical index
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-17 package DP-1 option (a); confidence medium-high · **Under:** CAP-18.b, CAP-11.a, DEC-322
+- **Decision:** `gov.retrieval.lexical` exposes `refresh(root)`, `search(root, query, refresh=True)`,
+  `freshness(root)`, `digest(root)`, `chunks(root, path=None)` and `parent(root, parent_id)`, with the return shapes
+  the suite's README states. `search(..., refresh=False)` never writes, so a worker session can read a live store it
+  may not write (DEC-322). W1-20 and W1-27 build on these names.
+
+### DEC-341 — W1-17 DP-3: "2.8 s scale" bounds the incremental re-index, held to 10 s
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-17 package DP-3 option (a); confidence medium · **Under:** CAP-17.a
+- **Decision:** The test times only the `search` that follows one edited, committed file on an a-dev clone, with a
+  bound of 10 seconds; the full build is not timed. G-20 is in the S0b2 output and was not read: what it measured is
+  to be confirmed if the owner allows that read, and the bound is one constant.
+
+### DEC-342 — W1-17 DP-4 and DP-5: a missing, empty or stale index makes the whole facet unavailable, and the check is not green without an index
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-17 packages DP-4 option (a), confidence medium-high, and DP-5 option (a), confidence medium · **Under:** CAP-17.a, CAP-38.b
+- **Decision:**
+  - A `search` on a missing, empty or stale index returns the facet as unavailable (`FACET_UNAVAILABLE`), with the
+    reason `missing`, `empty` or `stale` and no hits; it does not return hits from the fresh files only. A default
+    `search` builds a missing index and refreshes a stale one first.
+  - The index-freshness check is not green when no index exists; it prints each stale path, prints no traceback and
+    never writes. So the check is red in a repository whose live store has no index yet, this one included, until
+    an orchestrator-role session builds it (DEC-322). W1-26 and W1-27 take that into account.
+
+### DEC-343 — W1-17 DP-6: Python chunks get a function parent through the standard library
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-17 package DP-6 option (a); confidence medium · **Under:** DEC-091, CAP-18.b
+- **Decision:** A chunk's parent is the function for Python (through `ast`, no install), the module (the whole
+  file) for other code, and the section for Markdown. The 40 to 60 lines this adds to the estimate are accepted.
+
+### DEC-344 — W1-17 DP-7: the corpus is the working-tree content of tracked files
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-17 package DP-7 option (a); confidence medium-high · **Under:** CAP-03.d, CAP-17.a, DEC-285
+- **Decision:** The index reads tracked files as they stand in the working tree, the same content the secret
+  filter judges, not the blobs of `HEAD`. The index and the record graph (`gov.store.load` reads `HEAD`) can
+  therefore describe different states of one file; that is a residual for W1-20.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.75 | 2026-10-04 | Delegated under DEC-220: DEC-340 (W1-17 DP-1: the lexical interface), DEC-341 (DP-3: the incremental re-index is timed, 10 s), DEC-342 (DP-4, DP-5: an unusable index makes the facet unavailable; the check is not green without an index), DEC-343 (DP-6: function parents for Python through `ast`), DEC-344 (DP-7: working-tree content of tracked files). |
+
+## 76. Delegated decision on W1-17's package DP-8 (register v0.76, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220. The engineer's, the lead's and the orchestrator's
+recommendations agree, the confidence is medium, the choice is one condition and it is the stricter one.
+
+### DEC-345 — W1-17 DP-8: the index-freshness check is not green on an index that holds no chunk
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-17 package DP-8 option (a); confidence medium · **Under:** DEC-342, CAP-38.b
+- **Decision:** An index that matches the tracked blobs and holds no chunk does not pass the check, as built: a
+  filter that wrongly drops every file cannot pass, and the check agrees with `search`, which reports `empty` as
+  unavailable. A project with no governance-class file can therefore never be green; that is a residual.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.76 | 2026-10-04 | Delegated under DEC-220: DEC-345 (W1-17 DP-8: the index-freshness check is not green on an empty index). |
+
+## 77. Delegated decisions on W1-16's second round (register v0.77, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on what the W1-16 (`DAEO-lkeb`) ticket lead returned with
+its second run. Each is reversible, the recommendations agree and the confidence is medium. DEC-347 touches the
+secret filter and only makes it refuse more (stricter-only).
+
+### DEC-346 — W1-16 DP-5 and DP-6: the 16-character floor counts the rest alone, and the daemon directory is a residual with one test
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-16 packages DP-5 option (a) and DP-6 options (a) and (c); confidence medium · **Under:** DEC-325, DEC-338, DEC-339
+- **Decision:**
+  - A leading `_` or `-` of a token body (DEC-339) does not count toward the 16-character floor: the rest alone
+    needs 16 characters, as built.
+  - The files the tool's daemon leaves in the wrapper's per-repository directory under `/tmp` are a residual;
+    the wrapper does not remove the directory, because that races a live daemon. One test shows that no planted
+    secret stands in that directory after an index run.
+
+### DEC-347 — The secret filter also scans with the project's rules alone, so gitleaks' built-in global allowlist cannot shelter a finding
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-04) · **Basis:** W1-16 package R-2, fix option 1, the engineer's and the lead's recommendation; confidence medium · **Under:** DEC-298, DEC-324, DEC-286
+- **Context:** gitleaks' built-in defaults carry a global allowlist, and `[extend] useDefault = true` merges it over
+  every rule, the project's included. DEC-298's stripping removes only the allowlists written in the project's
+  file. So a canary or token that contains `abcdefghijklmnopqrstuvwxyz` in any case, contains `false`, begins with
+  `true` or ends with `null`, or contains the default uuid stopword, passes the filter and reaches an indexer.
+- **Decision:**
+  - The pre-index filter and the path-name check run a second scan with the project's rules alone, without
+    `extend`, and refuse a file that either scan flags. This closes the gap for the project's rules (the canary and
+    token rules); the built-in rules stay sheltered by their own defaults, which is a residual.
+  - W1-16 carries the change, tests first, before it closes: `src/gov/secrets/**` is in its paths. The doubled
+    gitleaks runs are accepted; batching stays the residual of DEC-339.
+  - A plain `gitleaks` run outside the filter (the pre-commit hook) keeps the built-in allowlist; whether the commit
+    hook also needs the second scan is settled before W1-41, with the owner.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.77 | 2026-10-04 | Delegated under DEC-220: DEC-346 (W1-16 DP-5, DP-6: the floor counts the rest alone; the daemon directory is a residual with one test), DEC-347 (stricter-only: the secret filter also scans with the project's rules alone, so gitleaks' built-in global allowlist cannot shelter a canary or token). |

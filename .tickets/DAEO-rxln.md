@@ -1,6 +1,6 @@
 ---
 id: DAEO-rxln
-status: in_progress
+status: closed
 deps: [DAEO-4yyl, DAEO-7nne]
 links: []
 created: 2026-09-30T22:49:58Z
