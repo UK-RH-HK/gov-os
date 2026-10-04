@@ -25,7 +25,7 @@ kpis:
     path map [CAP-31.a, CAP-53.a]
   - Every record type has a template that validates against its schema; this repository path map classifies every tracked path [CAP-06.a]
   - The path-map schema gives each namespace a sensitivity class, permitted roles, retention, export policy, embedding policy, provenance and deletion/rebuild behaviour (Framework §16); the artefact identity
-    fields of Contract v3 W1 are in the shared frontmatter; lesson records carry a lifecycle state (candidate → corroborated → scoped → proposed → validated → approved) [CAP-03.a, CAP-03.c, CAP-41.a, CAP-50.a]
+    fields of Contract v3 W1 are in the shared frontmatter or derived by gov; lesson records carry a lifecycle state (candidate → corroborated → scoped → proposed → validated → approved) [CAP-03.a, CAP-03.c, CAP-41.a, CAP-50.a]
   - The path-map schema classes every namespace as governance/development memory or customer/runtime product data, and one namespace cannot be both [CAP-03.b]
   - The overlay schema carries the project floor (enabled capabilities and policy strengths); it identifies each constitutional system at least minimally, and no overlay value may go below the kernel floor
     [CAP-06.e, CAP-54.b]
