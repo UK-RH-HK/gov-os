@@ -18,6 +18,7 @@ repository, and the dev tiers are only ever cloned.
 from __future__ import annotations
 
 import base64
+import codecs
 import hashlib
 import json
 import os
@@ -253,6 +254,13 @@ class Project:
         path.write_text(text, encoding="utf-8")
         return rel
 
+    def write_bytes(self, rel, data):
+        """A file given as bytes: text in an encoding other than UTF-8."""
+        path = self.root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        return rel
+
     def link(self, rel, target):
         path = self.root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -272,6 +280,18 @@ class Project:
         finally:
             connection.close()
         return rel
+
+
+def utf16(text, bom):
+    """``text`` as UTF-16 (little-endian), with or without a byte-order mark."""
+    return (codecs.BOM_UTF16_LE if bom else b"") + text.encode("utf-16-le")
+
+
+# Two gitleaks configurations that are valid TOML and hold no rule at all.
+RULELESS_CONFIGS = {
+    "empty-file": "",
+    "defaults-off": 'title = "no rules"\n\n[extend]\nuseDefault = false\n',
+}
 
 
 def files_holding(root, needles, skip=(".git",)):

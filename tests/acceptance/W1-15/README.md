@@ -4,7 +4,9 @@ Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket
 CAP-03 (covers CAP-03.a, CAP-03.b, CAP-03.e) and CAP-38 (CAP-38.b), DEC-074 Q8 and Q9, DEC-076, DEC-186, DEC-187,
 DEC-225 and DEC-221 (profile FULL). Written before implementation. No earlier ticket's test was rewritten.
 
-The suite has **36 test functions, 59 cases**.
+The suite has **50 test functions, 80 cases**: 36 functions and 59 cases written before implementation, and 14
+functions and 21 cases of the second batch (below), written after green from behaviours a review described
+(DEC-136).
 
 ## Run
 
@@ -100,9 +102,45 @@ Red run on `w1/W1-15` at `092cd013` plus this suite: **45 errors, 7 failed, 7 pa
 | `test_text_about_canaries_and_tokens_is_not_a_finding[repository]` | The existing file has no rule that could match prose; the test guards the new rules against matching the words "canary" and "token". |
 | `test_the_dev_tiers_hold_the_seven_canaries` | The premise of the dev-tier test: it reads the tiers, not the ticket's code. |
 
+## Second batch: behaviours a review after green described (DEC-136)
+
+File `test_w1_15_review_batch.py`: **14 test functions, 21 cases**. The review passed described behaviours, never
+code; the tests were written from them and from DEC-285, DEC-290 and the KPIs. No earlier test was changed or
+rewritten. The support module gained `Project.write_bytes`, `utf16` and `RULELESS_CONFIGS`.
+
+Red run on `w1/W1-15` at `2936beee` plus this batch: **17 failed, 63 passed** (the 59 cases of the first batch and
+the 4 "keep true" cases of this one). Without the `local_only` cases: 17 failed, 46 passed. Each failure is the
+test's own assertion, with the reason below; none is a premise or a set-up failure.
+
+| Behaviour | Test functions | Red reason today |
+|---|---|---|
+| **B1.** A link is judged by what it points to, for its namespace too (KPI success 3, CAP-03.b) | `test_a_governance_link_to_a_product_file_is_not_indexable[2]` (a relative and an absolute link) · `test_a_file_reached_through_a_governance_link_to_the_product_folder_is_not_indexable` · `test_a_governance_link_to_a_file_outside_the_project_is_not_indexable` · keep true: `test_a_governance_link_to_clean_governance_content_is_indexable[2]` (a file link and a folder link) | 4 red: the link, the path through the linked folder and the link out of the root are let through. The 2 keep-true cases pass. |
+| **B2.** A scanner configuration without rules is "cannot decide" (DEC-285, CAP-03.a) | `test_the_filter_lets_no_canary_through_when_the_configuration_has_no_rules[2]` · `test_the_check_is_not_green_when_the_configuration_has_no_rules[2]` (an empty file; the defaults switched off and no rule) | 4 red: the canary is let through, and the check is green with the canary in a store. |
+| **B3.** The check is not green on a store it cannot read (KPI success 4, CAP-38.b) | `test_the_check_is_not_green_on_a_store_it_cannot_enter[2]` (a folder under `.gov-runtime/`; `.gov-runtime/` itself) · keep true, first batch: `test_the_check_passes_when_there_is_no_derived_store` | 2 red: the check exits 0. |
+| **B4.** The check follows a linked store folder (KPI success 4) | `test_the_check_fails_on_a_canary_in_a_linked_store_folder` | 1 red: the check exits 0. |
+| **B5.** A secret in UTF-16 text is found (KPI failure 1, CAP-03.a) | `test_a_utf16_file_with_the_canary_is_not_indexable[2]` · `test_the_check_fails_on_a_canary_in_a_utf16_store[2]` (with and without a byte-order mark) · keep true: `test_the_check_passes_on_a_utf16_store_without_a_secret` | 4 red: the UTF-16 file is let through, and the check exits 0. The keep-true case passes. |
+| **B6.** The check sees the whole content of a SQLite store (DEC-290, KPI success 4) | `test_the_check_fails_on_a_canary_left_in_the_bytes_of_a_deleted_row` · `test_the_check_fails_on_a_canary_in_the_text_of_a_view` · keep true: `test_the_check_passes_on_a_database_with_a_deleted_row_and_a_view_and_no_secret` (and, first batch, `test_the_check_passes_on_stores_without_a_secret`) | 2 red: the check exits 0. The keep-true case passes. |
+
+How these tests decide:
+
+- **B1.** The linked files hold no secret, so only the namespace of what the link points to can keep them out. A
+  clean neighbour must stay, and the call must succeed: the filter can decide these.
+- **B2.** The test project's `.gitleaks.toml` is replaced by one of two files that are valid TOML and hold no rule.
+  The filter may raise instead of leaving the path out (DEC-285); no clean neighbour is required to stay.
+- **B3.** The folder's mode is set to 0 and given back at teardown. Skipped when running as root, or when the file
+  system still lets the folder be listed.
+- **B4.** The linked folder stands outside the project, in the temporary directory.
+- **B5.** UTF-16 is little-endian, with and without a byte-order mark. The filter test asserts first that the
+  canary does not stand in the project as UTF-8 bytes, and that a UTF-16 neighbour without a secret stays.
+- **B6.** The store is built with `PRAGMA secure_delete = OFF` and no vacuum. Each test asserts its premise before
+  running the check: no row of the table holds the canary, and the bytes of the SQLite file do.
+
+Not tested in this batch, on purpose: big-endian UTF-16 and other encodings; a store file (not folder) that cannot
+be read; a link to a single store file; a SQLite store in WAL mode, with its side files.
+
 ## `local_only` (17 cases)
 
-Deselect with `-m "not local_only"` (42 cases remain).
+Deselect with `-m "not local_only"` (63 cases remain).
 
 - **Run the `gitleaks` binary directly** (14 cases): `test_the_canary_is_detected[4]`,
   `test_the_gitleaks_defaults_alone_miss_the_canary[2]`, `test_a_secret_the_defaults_find_is_still_detected[4]`,
