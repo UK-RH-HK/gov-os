@@ -445,7 +445,9 @@ Recorded at W1-18's close, from the ticket lead's summary. None is a defect.
 
 Recorded at W1-10's close, from the ticket lead's summary. None is a defect; each is for a later ticket.
 
-- **Who writes `.gov-runtime/store.db` in a live session** is open with the owner (W1-10 DP-3). The guard keeps
+- **Who writes `.gov-runtime/store.db` in a live session** is decided (DEC-322, 2026-10-04): only orchestrator-role
+  sessions write the live store; tests and workers build their own stores in temporary directories; revisit when
+  `gov rebuild` is wired (W1-27). The guard keeps
   `.gov-runtime/` outside `scratch/` closed to worker roles, and W1-17, W1-20 and W1-24 read the store in worker
   sessions. Every W1-10 test builds the store in a temporary repository.
 - **What loads as a record today (DEC-274).** The charter, the contract and the plan have `id` and `status` but no
@@ -480,7 +482,8 @@ fixed. None of the following is a defect of the ticket; each names who should se
 - **The rules over-block.** The token rule flags ordinary identifiers (`pk_…`, `tok_…`, `rk_…`, `sk-…` of 16 or more
   characters), and the canary rule flags any upper-case identifier with the canary word in the middle. This
   repository loses only the W1-15 ticket file from an index; an adopting product could lose code files. Requiring a
-  digit or mixed case in the token body is the suggested repair.
+  digit or mixed case in the token body is the suggested repair. The owner decided that repair, before W1-41
+  (DEC-324); W1-16 carries it (DEC-325). The canary rule's over-blocking stays a residual.
 - **Near spellings of the canary are missed** (lower case, other separators, markdown-escaped underscores); they are
   outside DEC-286. The owner still confirms the count of seven canaries against the S0b1 manifest.
 - **Path-map patterns match narrowly.** `**/x/**` does not match a top-level `x/`; a trailing slash, a leading `/` or
@@ -510,3 +513,104 @@ fixed. None of the following is a defect of the ticket; each names who should se
   fixtures were already allowlisted. The list is the lead's reconstruction, not the first engineer's report.
 - **A guard observation.** Twice in the parallel run a worker wrote a file inside its allowed paths through a Python
   script fed by a here-document in Bash, and the guard did not stop it. For W1-46 and W1-47's residual lists.
+
+## W1-49 residuals (light auto-resume hooks, 2026-10-04)
+
+Recorded at W1-49's close, from the ticket lead's summaries and two reviews. None is a defect of the ticket; W1-29
+replaces the checkpoint file and settles most of them.
+
+- **An in-place save during the hook's read–write window can be lost** (DEC-306, accepted by the owner). If the
+  session saves its checkpoint in place between the PreCompact hook's read and its write, the new text is cut or
+  overwritten. A save by rename, or a save while `tk` runs, is safe. PreCompact runs while the session is idle, and
+  the reviewer reached the window only by wrapping the hook's file object. Until W1-29.
+- **The warning shows after every compaction** until the session rewrites its checkpoint (DEC-283, confirmed by
+  DEC-323). W1-29 may refine it. A write in the same second as the compaction gets no warning, and a file time in the
+  future never warns.
+- **"Pending owner decisions" is not known to the hook** (DEC-284): the block points to the written part.
+- **Not proved:** that a compaction really starts near 300k tokens; the `auto` trigger was never run live. The
+  auto-compact setting takes effect only in sessions started after the merge (`840f1e37`).
+- **A half-written block** after a kill or a double write failure stays as written text and is injected with the last
+  section. Eight compactions at once gave this in about 1 of 40 to 1 of 80 rounds.
+- **The modification time is not set back** after a kill, or when the user does not own the file, so the warning is
+  missing then.
+- **File kinds.** A checkpoint that is a symbolic link is written through to its target. A FIFO hangs both hooks
+  until Claude Code's hook timeout. An empty checkpoint gets a block with no written part.
+- **Text written after the block** freezes the old block into the written part. Whitespace-only lines after the block
+  are dropped.
+- **Headings and fences.** Heading variants (lower case, bold, indented, after a byte-order mark) are not found; with
+  two RESUME HERE sections the first wins; tilde fences, indented fences and an unclosed fence are not handled; a
+  form feed or U+2028 before a heading-like line cuts the section.
+- **Sizes.** The 10,000 cap is counted in code points, not UTF-16 units. The block has no size limit. A very long or
+  multi-line `GOV_TICKET` breaks the cap's promises and is injected verbatim.
+- **Process edges.** A timed-out `tk` leaves its children running; there is no fsync; the message is wrong after a
+  failed truncate; the hooks exit 120, not 0, when stdout cannot be written (nothing is blocked).
+- **Neither hook reads stdin**, so SessionStart would also inject on `startup` if that source were registered. A
+  missing or broken `precompact.py` makes SessionStart inject nothing, silently. A `CLAUDE_PROJECT_DIR` at a
+  subdirectory only reports the checkpoint missing.
+- **Two stale git-ignored `.pyc` files** remain in `template/governance/kernel/hooks/__pycache__/` in the ticket's
+  worktree; they went with the worktree.
+- **A guard observation.** The batch 4 engineer wrote its two allowed files with `python3 - <<'EOF'` scripts and the
+  guard did not refuse them. Same observation as under W1-15; for W1-46's residual list.
+
+## W1-09 residuals (ticket vendoring, claims and the READY rule, 2026-10-04)
+
+Recorded at W1-09's close, from the ticket lead's summary and the reviewer's findings, three of which were fixed.
+None is a defect of the ticket; each names who should settle it.
+
+- **Stale store.** The READY rule reads records from the store as last loaded. A specification reopened, a package
+  added or an input superseded after the load leaves tickets READY until the next `gov.store.load`. The store has no
+  freshness mark. For W1-13 and W1-26, which call the rule.
+- **Packages that do not load block nothing** (with DEC-308): broken frontmatter, no `status`, a status in another
+  case, a ticket named by its WBS id. For W1-34 and W1-11.
+- **Specification gate edges** (with DEC-307): an empty `specification:` key reads as absent; duplicate record ids
+  give an order-dependent answer; a `CLOSED` specification superseded by a draft still counts; any record type
+  counts. For W1-13.
+- **Holder comparison is on the stripped text.** `" a "` is released by `"a"` and not by itself; an empty lock is
+  released by anyone passing `""`.
+- **A ticket that is `in_progress` without a lock can be claimed.** DEC-292 left the link between `claim` and
+  `in_progress` open. `claim` also accepts `status: Closed` (capitalised) and a ticket with no status.
+- **`create` trusts the script's last output line** and does not check the script's sha256 before running it. Not
+  reachable with the pinned script. Which copy of `tk` `create` runs in this repository is open under DEC-295: it
+  always runs `<root>/governance/kernel/bin/tk`.
+- **Acceptance folder cases left open under DEC-293 and DEC-300:** a path naming another ticket's folder, and an
+  empty folder, both still count.
+- **Raw exceptions instead of `GovError`:** ids `.`, `..` or with a NUL in `holder` and `release`; a lock that is a
+  directory; a claims folder that is a file; a release on an unreadable claims folder; `create` when the script is
+  missing or fails; a holder that cannot be encoded leaves a stuck empty lock. All fail closed.
+- **`blocked` can give an empty reason list** for an unreadable ticket, an unreadable store or an unknown status; a
+  reason code for "cannot be read" needs a decision.
+- **Only `deps` is read, not `depends_on`.** A record with status `SUPERSEDED` or `REJECTED` but no edge is a good
+  input.
+- **Minor lock and ticket edges.** A dangling-link lock cannot be released through the interface; with two `status`
+  keys the last wins; a lock is keyed by file name, not by the frontmatter id. A claims folder that is a symbolic
+  link is recorded under DEC-297.
+- **The release `flock` is advisory and POSIX-only.** A lock removed by hand is outside it. The double hold the
+  reviewer saw was not reproduced (about 1,800 rounds by the designer, 480 by the lead); the fix rests on the lead's
+  reading of the diff.
+
+## W1-12 residuals (readiness schema and proposal templates, 2026-10-04)
+
+Recorded at W1-12's close, from the ticket lead's summaries and a product-spec worker's reading of G-07 and G-09
+(DEC-310). None is a defect of the ticket; each names who should settle it.
+
+- **The CIT-E rule is stated only** (DEC-309). The schema carries the source and the extension rule of
+  `readiness-dimensions.yaml`, and W1-12's suite goes red when the YAML changes without the schema. The check that a
+  change to the taxonomy or to the YAML has a linked CIT-E record is a KPI line of W1-26.
+- **The kernel `templates/openspec/` folder holds nothing** (DEC-304, DEC-326). G-07 and G-09 name no path there, and
+  OpenSpec reads templates only from the schema's own `templates/` folder. The path left the ticket's `allowed_paths`.
+- **Names.** G-07 calls the artefact `feature-readiness`; as built, the schema is `feature-readiness` and the
+  artefact is `readiness`, file `readiness.yaml` (DEC-305). G-08, W1-13's source, says the checker reads
+  `feature-readiness.md`: DEC-305 supersedes that file name. For W1-13's test design brief.
+- **The record lacks profile and capability types.** `readiness.yaml` has no `profile` or declared capability-type
+  field, and `cell_states` holds only the state names and `requires: [reason]` on N/A. The readiness YAML's
+  `meaning`, `satisfies`, `mandatory`, `rules` and `profiles` are not copied. W1-13 needs them or must read the
+  contract YAML.
+- **Artifact order.** `readiness` requires `specs`, while `tasks` and `apply` keep their upstream requirements, so
+  OpenSpec does not force the record before tasks.
+- **`validate --strict` parses only the spec deltas and `.openspec.yaml`**; the proposal, design, tasks and readiness
+  files cannot fail it. The stock `spec.md` template fails `--strict`, so the fork replaces it with plain "replace
+  this" sentences, one SHALL requirement and one scenario. The other three templates are byte-identical to upstream;
+  about 317 lines are upstream `spec-driven` text.
+- **Free fields.** `evidence` and `gap_ticket` carry no id pattern, so nothing duplicates the shared id grammars
+  (DEC-227). Validation falls to W1-13.
+- **Untested:** a `config.yaml` naming an unknown schema makes `openspec new change` exit 1 with "Unknown schema".

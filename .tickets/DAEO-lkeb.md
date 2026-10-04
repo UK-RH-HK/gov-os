@@ -1,6 +1,6 @@
 ---
 id: DAEO-lkeb
-status: open
+status: in_progress
 deps: [DAEO-7nne]
 links: []
 created: 2026-09-30T22:49:58Z

@@ -1,6 +1,6 @@
 ---
 id: DAEO-lc4q
-status: in_progress
+status: closed
 deps: [DAEO-uudf]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -18,7 +18,6 @@ depends_on:
 - W1-08
 allowed_paths:
 - template/openspec/schemas/**
-- template/governance/kernel/templates/openspec/**
 - template/openspec/config.yaml
 kpis:
   success:
