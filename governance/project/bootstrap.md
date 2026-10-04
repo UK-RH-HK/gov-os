@@ -445,7 +445,9 @@ Recorded at W1-18's close, from the ticket lead's summary. None is a defect.
 
 Recorded at W1-10's close, from the ticket lead's summary. None is a defect; each is for a later ticket.
 
-- **Who writes `.gov-runtime/store.db` in a live session** is open with the owner (W1-10 DP-3). The guard keeps
+- **Who writes `.gov-runtime/store.db` in a live session** is decided (DEC-322, 2026-10-04): only orchestrator-role
+  sessions write the live store; tests and workers build their own stores in temporary directories; revisit when
+  `gov rebuild` is wired (W1-27). The guard keeps
   `.gov-runtime/` outside `scratch/` closed to worker roles, and W1-17, W1-20 and W1-24 read the store in worker
   sessions. Every W1-10 test builds the store in a temporary repository.
 - **What loads as a record today (DEC-274).** The charter, the contract and the plan have `id` and `status` but no
@@ -480,7 +482,8 @@ fixed. None of the following is a defect of the ticket; each names who should se
 - **The rules over-block.** The token rule flags ordinary identifiers (`pk_…`, `tok_…`, `rk_…`, `sk-…` of 16 or more
   characters), and the canary rule flags any upper-case identifier with the canary word in the middle. This
   repository loses only the W1-15 ticket file from an index; an adopting product could lose code files. Requiring a
-  digit or mixed case in the token body is the suggested repair.
+  digit or mixed case in the token body is the suggested repair. The owner decided that repair, before W1-41
+  (DEC-324); W1-16 carries it (DEC-325). The canary rule's over-blocking stays a residual.
 - **Near spellings of the canary are missed** (lower case, other separators, markdown-escaped underscores); they are
   outside DEC-286. The owner still confirms the count of seven canaries against the S0b1 manifest.
 - **Path-map patterns match narrowly.** `**/x/**` does not match a top-level `x/`; a trailing slash, a leading `/` or
