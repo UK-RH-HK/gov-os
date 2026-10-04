@@ -21,7 +21,8 @@ kpis:
   success:
   - Claude Code is recorded in governance/project/tool-registry.yaml pinned at 2.1.285 or later, with install and uninstall commands, date and approving decision; the upgrade is installed by the owner,
     or by the orchestrator under DEC-083, and in both cases recorded with its owner approval (DEC-157, DEC-203, DEC-209) [CAP-25.d]
-  - The CLI used for headless runs and the VS Code extension's bundled version are the same version, at or above the pin, and the registry record states both [CAP-61.e]
+  - The CLI used for headless runs and the active VS Code extension's bundled version are both at or above the minimum, 2.1.285, and the registry record states both; a difference between them, or from the registry's record,
+    is drift that gov doctor reports, not a failure, except that the CLI at the recorded version with another sha256 is a failure (DEC-210, DEC-214) [CAP-61.e]
   - The sandbox prerequisites bubblewrap 0.9.0 and socat 1.8.0.0 are recorded in governance/project/tool-registry.yaml as owner installs, with version, install and uninstall commands, date and approving decision (DEC-141)
   failure:
   - A headless run uses a CLI below 2.1.285
