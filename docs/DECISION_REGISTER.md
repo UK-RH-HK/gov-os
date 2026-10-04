@@ -2694,3 +2694,193 @@ the guard are; DP-15 changes the owner's list of research hosts.
 | Version | Date | Change |
 |---|---|---|
 | 0.56 | 2026-10-04 | Delegated under DEC-220: DEC-271 (W1-46 DP-8: engineer and research on their own role's ticket; test designer and auditor on any ticket in progress), DEC-272 (DP-9: key `hosts`; no project file means the kernel default alone), DEC-273 (DP-13: an experiment folder lies under a named root, `experiments/` by default). DP-10, DP-11, DP-12, DP-14, DP-15 and DP-16 go to the owner. |
+
+## 57. Delegated decisions on W1-10's test design packages (register v0.57, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on five of the six packages the W1-10 (`DAEO-4yyl`) ticket
+lead returned. For each, the designer's, the lead's and the orchestrator's recommendations agree, the confidence is
+medium or higher, and the choice is reversible: each is a rule inside `gov.store.load` or the suite, and no later
+ticket has built on it yet. The suite and the implementation on the branch already follow them. DP-3 (who writes
+`.gov-runtime/store.db` in a live session) is not decided here: it touches the guard, so it goes to the owner; it
+changes nothing in this ticket.
+
+### DEC-274 — W1-10 DP-1: what a record is, and what an invalid one does to a load
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-1 option (a); confidence medium · **Under:** DEC-239, CAP-13.a
+- **Decision:**
+  - A record is any tracked Markdown file whose frontmatter has an `id`. It needs `id`, `type` and `status`
+    (DEC-239). An unreadable or incomplete one is listed in the load's `invalid` by path, and the load continues.
+  - Known consequences, recorded as residuals for later tickets: the charter, the contract and the plan have `id`
+    and `status` but no `type` and are reported invalid; the seven kernel templates load as records with
+    placeholder ids; decisions are headings in the register, not files, so every `DEC-…` reference is dangling
+    until decisions are records; two files with one id both load.
+
+### DEC-275 — W1-10 DP-2: the store's public interface is a Python interface
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-2 option (a); confidence high · **Under:** DEC-190
+- **Decision:** W1-10 delivers `gov.store.load` and `gov.store.digest`, and `gov.records.records`, `active`,
+  `edges`, `dangling` and `commits`. `gov rebuild` stays reserved; the ticket that wires it to `load` (W1-27)
+  revises its registry case with the reason "planned: command implemented".
+
+### DEC-276 — W1-10 DP-4: the digest covers the store's logical content
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-4 option (a); confidence high · **Under:** CAP-13.a
+- **Decision:** "The same digest twice" is over the store's logical content (records, edges, commits, trailers, in
+  a fixed order), not over the bytes of `store.db`.
+
+### DEC-277 — W1-10 DP-5: the source of each typed edge, and trailers
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-5 option (a); confidence medium, high for DEC-012's five keys · **Under:** DEC-012, DEC-182, CAP-09.a
+- **Decision:**
+  - A frontmatter key gives an edge of the same name in upper case, from the carrying record to each listed id:
+    `evidence_for`, `constrains`, `implements`, `tests`, `generates`, `validates`, `supersedes`, `depends_on`.
+    `superseded_by` gives the same SUPERSEDES edge once.
+  - Trailers are not edges. They come from `commits()`, and a trailer id that names no record is in `dangling()`.
+  - Before any real record uses the four keys DEC-012 does not name (`evidence_for`, `tests`, `generates`,
+    `validates`), a product-spec worker checks them against the archived Framework §11.2 (DEC-222).
+  - Known consequences, recorded as residuals: a ticket's `depends_on` holds WBS ids while its `id` is the tk id,
+    so those edges are dangling in this repository; trailer values such as `decision-record` name no record and
+    are dangling too.
+
+### DEC-278 — W1-10 DP-6: both dev tiers, and the load call alone is timed
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-10 package DP-6 option (a); confidence medium-high
+- **Decision:** "Full load of a dev tier < 5 s" is tested on both `a-dev` and `b-dev`, and the limit is on the
+  `load` call alone.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.57 | 2026-10-04 | Delegated under DEC-220: DEC-274 (W1-10 DP-1: a record is a tracked Markdown file with an `id` in its frontmatter; invalid ones are listed and the load continues), DEC-275 (DP-2: a Python interface; `gov rebuild` stays reserved for W1-27), DEC-276 (DP-4: the digest covers logical content), DEC-277 (DP-5: frontmatter key to edge of the same name; trailers are not edges), DEC-278 (DP-6: both dev tiers, the load call alone). DP-3 goes to the owner. |
+
+## 58. Delegated decisions on W1-25's test design packages (register v0.58, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on four of the six packages the W1-25 (`DAEO-rrxp`) ticket
+lead returned from its test design. For each, the designer's, the lead's and the orchestrator's recommendations
+agree, the confidence is medium or higher, and the choice is reversible. The suite on the branch already follows
+them. Two are not decided here and go to the owner: DP-1 (how the command is wired, where the designer and the lead
+recommend differently) and DP-3 (the checkpoint directory, which needs a guard and containment exception). The
+default age and commit thresholds of DP-5 are also the owner's to name.
+
+### DEC-279 — W1-25 DP-2: the checkpoint's schema, keys and arguments
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-25 package DP-2 option (a); confidence medium-high on the schema, medium on the names · **Under:** CAP-37.a, CAP-13.b, DEC-229
+- **Decision:**
+  - A checkpoint conforms to W1-08's kernel checkpoint schema, extended by this ticket: a markdown record with the
+    frontmatter keys `task`, `trigger`, `next_action`, `created`, and `inputs` as a list of `{id, version, hash}`
+    with a sha256.
+  - `template/governance/kernel/schemas/checkpoint.schema.json` and
+    `template/governance/kernel/templates/checkpoint.md` are added to W1-25's `allowed_paths`, in a commit with the
+    trailer `Task: DAEO-rrxp`.
+  - The command is `gov checkpoint --ticket <id> --trigger <ticket-transition|compaction|stop> --next <text>
+    [--input <path>]…`. The ticket file is always an input; the result gives `path` and `id`. A missing argument,
+    an unknown ticket or an input that cannot be hashed is an error (exit 1) and nothing is written.
+
+### DEC-280 — W1-25 DP-4: what W1-25 shows of "every ticket transition, compaction and stop"
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-25 package DP-4 option (a); confidence medium · **Under:** CAP-37.b
+- **Decision:** The command accepts exactly the three triggers and records which. The watchdog reports
+  `CHECKPOINT_MISSING` for a ticket with no checkpoint, and `CHECKPOINT_STALE` with the reason `ticket-transition`
+  when the ticket's status changed after the latest one. The calls at the three moments belong to W1-29, W1-49 and
+  W1-30.
+
+### DEC-281 — W1-25 DP-5: the `--watch` policy comes from arguments, and stale is exit 3
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-25 package DP-5 option (a); confidence medium · **Under:** CAP-37.c, DEC-208, DEC-237
+- **Decision:**
+  - Thresholds are arguments with kernel defaults: `--max-age-minutes`, `--max-commits`, and `--max-context`
+    (default 0.30). The caller passes `--context-utilisation`; without it, context is not judged. The watchdog
+    only reads.
+  - Fresh is exit 0 with `stale` false. Stale is `CHECKPOINT_STALE`, exit 3, with the reasons listed.
+  - **Not decided here, with the owner:** the default age and the default commit count. The tests pass thresholds
+    explicitly. A project value in `path-map.yaml` waits until W1-29 needs one.
+
+### DEC-282 — W1-25 DP-6: the resume brief, the family check, and one real session
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-25 package DP-6 option (b); confidence medium-high for the check, medium for the session · **Under:** CAP-20.a, CAP-37.f, CAP-38.b, DEC-232
+- **Decision:**
+  - `gov checkpoint --resume --ticket <id>` prints the brief (the ticket, its inputs with their hashes, the next
+    step) from the latest checkpoint alone.
+  - The fresh-agent-reconstruction family check is deterministic: it passes when that brief can be built for the
+    latest checkpoint of every ticket that has one, and fails on a missing next step or hash.
+  - The acceptance suite adds one real short headless session per run (`local_only`, the cheapest model, two
+    turns, an empty directory, only the brief), as DEC-232 did for the launcher.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.58 | 2026-10-04 | Delegated under DEC-220: DEC-279 (W1-25 DP-2: W1-08's checkpoint schema extended; keys and arguments; two kernel files join the ticket's paths), DEC-280 (DP-4: three triggers recorded; the watchdog detects a missing or outdated checkpoint), DEC-281 (DP-5: thresholds as arguments, stale is exit 3; the defaults go to the owner), DEC-282 (DP-6: `--resume`, a deterministic family check, one real session). DP-1 and DP-3 go to the owner. |
+
+## 59. Delegated decisions on W1-49's packages DP-4 and DP-5 (register v0.59, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the two packages the W1-49 (`DAEO-32n6`) test designer
+returned in batch 3, after DEC-263 and DEC-264. For each, the lead's recommendation and the orchestrator's agree, the
+confidence is medium or higher, and the choice is reversible: W1-29 replaces both hook files. The branch is built
+this way. Both read the owner's own words in DEC-264, so each is told to the owner with what it means in practice.
+A reviewer finding that could lose written content is not decided here: the prompt says such a finding is fixed,
+the lead recommends a residual, and that is the owner's to settle before the ticket is merged.
+
+### DEC-283 — W1-49 DP-4: "older than the block" compares the written part's time with the block's time
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-49 package DP-4 option (a); confidence medium · **Under:** DEC-264
+- **Decision:** The SessionStart injection warns when the checkpoint file's time, which the hook sets back to the
+  written part's time after it appends, is earlier than the block's `generated:` time. In practice the warning
+  shows after every compaction until the session rewrites its checkpoint, and then stops. No tolerance in minutes
+  is used (that was DEC-258).
+
+### DEC-284 — W1-49 DP-5: the hook does not invent the pending owner decisions
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-49 package DP-5 option (a); confidence medium-high · **Under:** DEC-264
+- **Decision:** A hook is a command and has no source for the pending owner decisions. In the generated block that
+  line says `not known to the hook; see the written part of this checkpoint`. The git head, the tickets in
+  progress and the worktree list are generated. A file the orchestrator keeps for this, which the hook could read,
+  is a matter for W1-29.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.59 | 2026-10-04 | Delegated under DEC-220: DEC-283 (W1-49 DP-4: the warning compares the written part's time with the block's; it shows after every compaction until the checkpoint is rewritten), DEC-284 (W1-49 DP-5: the block says the pending owner decisions are not known to the hook). |
+
+## 60. Delegated decisions on W1-15's test design packages (register v0.60, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the six packages the W1-15 (`DAEO-7nne`) ticket lead
+returned from its test design. For each, the designer's, the lead's and the orchestrator's recommendations agree,
+the confidence is medium or higher, and the choice is reversible until W1-16 or W1-17 builds on it. None changes
+the guard or containment. The suite on the branch already follows them.
+
+### DEC-285 — W1-15 DP-1: the filter's interface, and how a check command is run
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-1 option (a); confidence medium-high on the function, medium on the check convention · **Under:** CAP-03.a, CAP-03.e, CAP-38.b
+- **Decision:**
+  - The filter is the function `gov.secrets.indexable(root, paths)`: it takes the project root and a list of
+    project-relative paths and returns, in order, the sub-list an indexer may read. It drops a file that holds a
+    secret, a file whose namespace is not `memory_class: governance`, and anything unreadable. If it cannot decide,
+    it raises or drops the path; it never lets the path through.
+  - A family check's `command` is run by `sh -c` in the project root, and exit 0 means green. W1-26 may refine this
+    when it builds `gov check`.
+
+### DEC-286 — W1-15 DP-2: the seven dev canaries, and both spellings of the token canary
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-2 option (a); confidence medium on the count · **Under:** DEC-074 Q8
+- **Decision:** The seven dev canaries are the seven planted values the test designer found in the dev tiers (three
+  strings with the canary word and an example cloud key pair in `a-dev`; the token canary and a key-file canary in
+  `b-dev`). The token canary is detected in both spellings, with underscores as the KPI writes it and hyphenated as
+  `b-dev` holds it. The owner is asked to confirm the count against the S0b1 manifest; the list is one tuple in the
+  suite's support module.
+
+### DEC-287 — W1-15 DP-3: the filter runs the gitleaks binary
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-3 option (a); confidence medium-high · **Under:** CAP-03, DEC-195
+- **Decision:** The filter runs gitleaks 8.30.1 (in the tool registry) with the rules of `.gitleaks.toml`, so there
+  is one source of rules. The filter and check cases therefore need the binary where they run. Putting gitleaks on
+  CI is an install for the owner, raised with W1-40; until then those cases run on this machine.
+
+### DEC-288 — W1-15 DP-4: what each gitleaks file holds
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-4 option (a); confidence medium
+- **Decision:** `template/.gitleaks.toml` holds the defaults plus the token and canary rules, with no path
+  allowlist. The root `.gitleaks.toml` holds the same rules plus this repository's own allowlist. A product that
+  adopts the template inherits no allowlist.
+
+### DEC-289 — W1-15 DP-5: the two W1-08 residuals stay open
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-5 option (a); confidence high
+- **Decision:** W1-15 reads only a namespace's `paths` and `memory_class`. The closed lists for the free-text
+  namespace fields and the meaning of `permitted_roles` move to the first ticket that reads export or embedding
+  policy (W1-17 or W1-24). `bootstrap.md` is corrected at W1-15's close.
+
+### DEC-290 — W1-15 DP-6: allowlists, and secrets inside a store
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-15 package DP-6, the lead's three recommendations; confidence medium · **Under:** CAP-03.a, CAP-38.b
+- **Decision:**
+  - The root `.gitleaks.toml` allowlists, by path, the tracked documents that only name the canary identifier (the
+    ticket file, plan documents, this suite's README), after the engineer runs gitleaks over the tree and reports
+    which they are. The template gets no such entry.
+  - The pre-index filter ignores path allowlists: a file with a fake secret in a governance namespace, such as a
+    test fixture, never reaches an index.
+  - The secrets-indexing check scans the content of the stores, SQLite rows included, because `gitleaks dir` skips
+    binary files. The extra lines over the 70 LOC estimate are accepted.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.60 | 2026-10-04 | Delegated under DEC-220: DEC-285 (W1-15 DP-1: `gov.secrets.indexable(root, paths)`; a check command runs by `sh -c`, exit 0 is green), DEC-286 (DP-2: the seven canaries as found in the tiers, both spellings; the owner confirms the count), DEC-287 (DP-3: the filter runs gitleaks), DEC-288 (DP-4: the template has no allowlist), DEC-289 (DP-5: the two W1-08 residuals move to W1-17 or W1-24), DEC-290 (DP-6: a root-only allowlist for documents naming the canary; the filter ignores allowlists; the check scans store content). |
