@@ -9,7 +9,8 @@ answers of the code graph. It also carries the repair of the token rule
   ``PYTHONPATH`` (the README states the interface);
 - ``gov.secrets.indexable(root, paths)``, the filter of W1-15, called the same way;
 - the two gitleaks configuration files, given to the ``gitleaks`` binary;
-- the ``codebase-memory-mcp`` binary's own ``list_projects``, asked about the home the wrapper names.
+- the ``codebase-memory-mcp`` binary's own ``list_projects``, asked about the home the wrapper names;
+- ``gov.codeintel.daemon_dir(root)`` and ``gov.secrets.path_holds_secret(root, path)`` (the third batch).
 
 **No secret is committed.** Every planted string is built at run time from
 parts and written only into a temporary directory. No test writes into this
@@ -49,12 +50,26 @@ TOOL = "codebase-memory-mcp"
 # Where the tool keeps its index when nothing tells it otherwise (the tool registry's uninstall line).
 TOOL_DEFAULT_HOME_REL = ".cache/codebase-memory-mcp"
 
+# The tool's daemon keeps its lock and socket files in the folder ``cbm-daemon-<uid>`` of the directory
+# ``CBM_RUNTIME_DIR`` names. Without that variable the directory is ``/tmp``, whatever ``TMPDIR`` and
+# ``XDG_RUNTIME_DIR`` say: one shared default for every repository of the user (observed with version 0.11.0).
+DAEMON_FOLDER = f"cbm-daemon-{os.getuid()}"
+TOOL_SHARED_RUNTIME = Path("/tmp") / DAEMON_FOLDER
+# A unix socket address holds 108 bytes with its closing zero byte: a socket path has at most 107. The longest
+# socket name the daemon binds is ``cbm-<16 hex digits>.sock.pending``, in that folder.
+SOCKET_PATH_MAX = 107
+DAEMON_SOCKET_REL = DAEMON_FOLDER + "/cbm-" + "0" * 16 + ".sock.pending"
+DAEMON_DIR_MAX = SOCKET_PATH_MAX - 1 - len(DAEMON_SOCKET_REL)   # 57 bytes with a uid of four digits
+DAEMON_FILE = re.compile(r"^cbm-.*\.(?:lock|sock|anc|identity|pending|rw|turn)$")
+NO_NAMESPACE_EXIT = 97
+
 TIMEOUT_S = 300.0
 RESULT_MARK = "W1-16-RESULT "
 LEAKS_EXIT = 3
 SQLITE_MAGIC = b"SQLite format 3\0"
 CODE_SUFFIXES = (".rs", ".py", ".ts")
 INTERFACE = ("index", "home", "projects", "definitions", "references", "callers", "impact", "dead_code")
+NAME_CHECK = "path_holds_secret"   # gov.secrets: whether a path name holds a secret (DEC-339 R-3)
 
 
 class Missing(AssertionError):
@@ -129,6 +144,28 @@ IDENTIFIERS = {
     "rk-partition": ("rk", "_", "partition_assignment_table"),
     "sk-kebab": ("sk", "-", "learn-pipeline-estimator"),
 }
+
+
+# DEC-339 R-1: a body that begins with ``_`` or ``-``. ``(prefix, separator, first character of the body, rest)``.
+# The rest of a ``LEADING_TOKENS`` entry has 16 characters or more and holds a digit or mixed case; the rest of a
+# ``LEADING_ORDINARY`` entry holds neither, or is two characters under the floor.
+LEADING_TOKENS = {
+    "underscore-digits-and-mixed-case": ("sk", "_", "_", TOKEN_BODIES["digits-and-mixed-case"]),
+    "hyphen-mixed-case-no-digit": ("tok", "-", "-", TOKEN_BODIES["mixed-case-no-digit"]),
+    "underscore-after-hyphen-digit-last": ("pk", "-", "_", TOKEN_BODIES["digit-last"]),
+    "hyphen-after-underscore-mixed-case": ("rk", "_", "-", TOKEN_BODIES["lower-then-upper"]),
+}
+LEADING_ORDINARY = {
+    "underscore-lower-words": ("sk", "_", "_", "init_handler_registry_names"),
+    "hyphen-lower-words": ("tok", "-", "-", ORDINARY_BODIES["lower-kebab"]),
+    "underscore-upper-words": ("pk", "_", "_", ORDINARY_BODIES["upper-snake"]),
+}
+LEADING_SHORT = ("rk", "_", "_", "a1B2c3D4e5F6g7")   # the rest has 14 characters: under the floor on any reading
+
+
+def leading(prefix, separator, first, rest):
+    """A prefixed string whose body begins with ``first``, put together at run time."""
+    return prefix + separator + first + rest
 
 
 def in_prose(text):
@@ -358,12 +395,19 @@ class Run:
         return f"{asked}\nexit code: {self.returncode}\nstdout:\n{self.stdout[-3000:]}\nstderr:\n{self.stderr[-3000:]}"
 
 
-def run_calls(module, root, calls, sandbox, path=None):
-    """Call functions of ``module`` one after the other in one child process. The working directory is not the repository."""
+def run_calls(module, root, calls, sandbox, path=None, env=None, launcher=()):
+    """Call functions of ``module`` one after the other in one child process. The working directory is not the repository.
+
+    ``env`` replaces the environment ``child_env`` builds; ``launcher`` is a command put in front of the child's
+    (``isolated``).
+    """
     calls = [(name, list(args)) for name, args in calls]
+    if module == "gov.codeintel":
+        WRAPPED_ROOTS.add(str(root))
     try:
-        done = subprocess.run([sys.executable, "-c", _CHILD, module, str(root), json.dumps(calls)],
-                              cwd=str(sandbox.elsewhere), env=child_env(sandbox, path), capture_output=True,
+        done = subprocess.run([*launcher, sys.executable, "-c", _CHILD, module, str(root), json.dumps(calls)],
+                              cwd=str(sandbox.elsewhere), env=child_env(sandbox, path) if env is None else env,
+                              capture_output=True,
                               text=True, timeout=TIMEOUT_S, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
         raise AssertionError(f"{module} did not end within {TIMEOUT_S:.0f} s: {calls}") from None
@@ -414,6 +458,99 @@ def entries(value, what, repo_root=None):
                 f"{what}: {entry['path']!r} is no file of the repository"
         pairs.append((entry["path"], entry["name"]))
     return pairs
+
+
+# --------------------------------------------------------------------------
+# The daemon's directory (DEC-338)
+# --------------------------------------------------------------------------
+
+# Every root a test gave to ``gov.codeintel``: the wrapper keeps a directory outside each (``daemon_dir``).
+WRAPPED_ROOTS = set()
+
+# Run in front of a child: a user and mount namespace of its own, in which the tool's shared default is another
+# directory. Nothing the child or its children write to the shared default reaches the user's.
+_ENTER = (
+    "import ctypes, os, sys\n"
+    "stand_in, shared, command = sys.argv[1], sys.argv[2], sys.argv[3:]\n"
+    "try:\n"
+    "    uid, gid = os.getuid(), os.getgid()\n"
+    "    os.unshare(os.CLONE_NEWUSER | os.CLONE_NEWNS)\n"
+    "    for name, text in (('setgroups', 'deny'), ('uid_map', f'{uid} {uid} 1'), ('gid_map', f'{gid} {gid} 1')):\n"
+    "        with open('/proc/self/' + name, 'w') as handle:\n"
+    "            handle.write(text)\n"
+    "    libc = ctypes.CDLL(None, use_errno=True)\n"
+    "    for source, target, flags in ((b'none', b'/', 16384 | 262144),                  # MS_REC | MS_PRIVATE\n"
+    "                                  (os.fsencode(stand_in), os.fsencode(shared), 4096)):   # MS_BIND\n"
+    "        if libc.mount(source, target, None, flags, None) != 0:\n"
+    "            raise OSError(ctypes.get_errno(), 'mount')\n"
+    "except Exception as error:\n"
+    "    print(f'no namespace: {error!r}', file=sys.stderr)\n"
+    f"    sys.exit({NO_NAMESPACE_EXIT})\n"
+    "os.execvp(command[0], command)\n"
+)
+
+
+def isolated(stand_in):
+    """The command to put in front of a child's so that ``stand_in`` is the tool's shared default for it."""
+    return (sys.executable, "-c", _ENTER, str(stand_in), str(TOOL_SHARED_RUNTIME))
+
+
+def daemon_env(sandbox, given=None):
+    """The child's environment without ``CBM_RUNTIME_DIR``, or with the directory ``given`` in it."""
+    env = child_env(sandbox)
+    del env["CBM_RUNTIME_DIR"]
+    if given is not None:
+        env["CBM_RUNTIME_DIR"] = str(given)
+    return env
+
+
+def daemon_files(directory):
+    """The daemon's files under ``directory``, as relative paths."""
+    return sorted(rel for rel in tree(directory) if DAEMON_FILE.match(Path(rel).name))
+
+
+def remove_daemon_dir(path):
+    """Remove a directory the wrapper kept the daemon's files in. Anything that is not such a directory is left alone.
+
+    Such a directory holds nothing but the tool's folder ``cbm-daemon-<uid>``, and that folder nothing but daemon files.
+    """
+    try:
+        path = Path(path)
+        if not path.is_absolute() or path.is_symlink() or not path.is_dir() or path.stat().st_uid != os.getuid():
+            return False
+        if path.resolve() in (TOOL_SHARED_RUNTIME.resolve(), TOOL_SHARED_RUNTIME.parent.resolve()):
+            return False
+        folder = path / DAEMON_FOLDER
+        if os.listdir(path) not in ([], [DAEMON_FOLDER]) or folder.is_symlink():
+            return False
+        if folder.is_dir():
+            inside = list(os.scandir(folder))
+            if any(entry.is_dir(follow_symlinks=False) or not DAEMON_FILE.match(entry.name) for entry in inside):
+                return False
+            for entry in inside:
+                os.unlink(entry.path)
+            folder.rmdir()
+        path.rmdir()
+        return True
+    except OSError:
+        return False
+
+
+def remove_daemon_dirs():
+    """At the end of a session: remove the daemon directory of every root a test gave to the wrapper."""
+    if not WRAPPED_ROOTS or not (REPO_ROOT / PACKAGE_REL / "__init__.py").is_file():
+        return
+    sandbox = make_sandbox()
+    try:
+        for root in sorted(WRAPPED_ROOTS):
+            try:
+                run = run_calls("gov.codeintel", root, [("daemon_dir", [])], sandbox)
+            except AssertionError:
+                continue
+            if run.results is not None and isinstance(run.results[0], str):
+                remove_daemon_dir(run.results[0])
+    finally:
+        remove_sandbox(sandbox)
 
 
 # --------------------------------------------------------------------------

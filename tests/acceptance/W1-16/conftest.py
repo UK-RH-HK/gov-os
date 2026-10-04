@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -74,6 +75,41 @@ def gitleaks():
     if found is None:
         pytest.skip("gitleaks is not on PATH on this machine")
     return found
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _daemon_directories_are_removed():
+    """DEC-338: the wrapper keeps the daemon's files outside the repository; the session leaves none behind."""
+    yield
+    support.remove_daemon_dirs()
+
+
+@pytest.fixture(scope="session")
+def namespace():
+    """Whether a child can have the tool's shared default to itself (``support.isolated``); else the test is skipped.
+
+    The mount needs the shared default to exist: when it does not, it is made empty here and removed afterwards.
+    """
+    shared = support.TOOL_SHARED_RUNTIME
+    made = not shared.exists()
+    if made:
+        shared.mkdir(mode=0o700)
+    probe = support.make_sandbox()
+    try:
+        done = subprocess.run([*support.isolated(probe.runtime), sys.executable, "-c", "pass"],
+                              capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    finally:
+        support.remove_sandbox(probe)
+    try:
+        if done.returncode != 0:
+            pytest.skip(f"this machine gives a child no namespace of its own ({done.stderr.strip()[-200:]})")
+        yield support.isolated
+    finally:
+        if made:
+            try:
+                shared.rmdir()
+            except OSError:
+                pass
 
 
 @pytest.fixture()

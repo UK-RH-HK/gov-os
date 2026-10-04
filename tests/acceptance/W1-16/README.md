@@ -4,9 +4,11 @@ Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket
 CAP-12 (covers CAP-12.a, CAP-12.b) and CAP-03 (covers CAP-03.e), DEC-076, DEC-078, DEC-285 to DEC-290, DEC-298,
 DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation.
 
-The suite has **48 test functions, 132 cases** in five files, a support module, a conftest and the question set
+The suite has **58 test functions, 145 cases** in six files, a support module, a conftest and the question set
 `questions.yaml`. The fifth file, `test_w1_16_paths_and_roots.py` (7 functions, 8 cases), is a second batch written after
-the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. **No W1-15
+the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. The sixth file,
+`test_w1_16_daemon_dir_and_names.py` (10 functions, 13 cases), is a third batch, added after implementation for the
+delegated decisions DEC-338 and DEC-339; see "The third batch" below. **No W1-15
 acceptance test was rewritten**: none asserts the old token rule (see "The W1-15 suite" below).
 
 ## Run
@@ -38,13 +40,14 @@ takes 5 to 6 seconds per indexing run, and one runs at a time). Run it alone: on
 ## The public interface the tests assume
 
 A Python interface in the package `gov.codeintel` (`src/gov/codeintel/`), as W1-09's `gov.tasks` is. No KPI names a
-command and `src/gov/cli/**` is outside the ticket's paths (package DP-2). Eight functions; each takes the project
-root as a `pathlib.Path` and never uses the working directory.
+command and `src/gov/cli/**` is outside the ticket's paths (package DP-2). Nine functions (the ninth, `daemon_dir`,
+came with the third batch); each takes the project root as a `pathlib.Path` and never uses the working directory.
 
 | Function | What the tests hold it to |
 |---|---|
 | `index(root)` | Builds or refreshes the code index of the repository at `root`, in that repository's home. It reads only the files `gov.secrets.indexable(root, paths)` returns. Calling it again after the repository changed makes the answers follow the change. Its return value is not used. |
 | `home(root)` | The directory that is the tool's home for this repository: a path under `<root>/.gov-runtime/`. It is the directory the `codebase-memory-mcp` binary takes as `CBM_CACHE_DIR`; the tests ask the binary's own `list_projects` with it. |
+| `daemon_dir(root)` | The directory the wrapper gives the tool as `CBM_RUNTIME_DIR` for this repository, at every call that runs the tool (DEC-338): an absolute path. The tool keeps its daemon's lock and socket files in the folder `cbm-daemon-<uid>` of it. It is outside the repository, different for every repository, at most 57 bytes long for a uid of four digits (see "The third batch"), and the same whatever the caller's environment holds. The function may be called before `index(root)`; the directory exists after a call that ran the tool. |
 | `projects(root)` | The project names `list_projects` shows in that home: a list of strings. |
 | `definitions(root, name)` | Where the symbol `name` is defined. |
 | `references(root, name)` | The places that use the symbol `name`; each entry is the enclosing symbol and its file. |
@@ -60,8 +63,16 @@ root as a `pathlib.Path` and never uses the working directory.
   it.
 - **Nothing is written outside `<root>/.gov-runtime/`**: no index file in the repository, in `HOME` (the tool's
   default home `~/.cache/codebase-memory-mcp` included), in `TMPDIR` or in the working directory; `git status` of
-  the repository stays clean; the tool's `.codebase-memory/` persistence folder is not written.
+  the repository stays clean; the tool's `.codebase-memory/` persistence folder is not written. The one exception
+  is the daemon's lock and socket files, which are no index files: they go to `daemon_dir(root)` (DEC-338).
 - The functions need the `codebase-memory-mcp` and `gitleaks` binaries on `PATH`.
+
+One more function is fixed in the package `gov.secrets` (W1-15's, next to `indexable` and `stores_with_secrets`),
+by the third batch (DEC-339 R-3):
+
+| Function | What the tests hold it to |
+|---|---|
+| `path_holds_secret(root, path)` | Whether the name of `path` holds a secret by the rules of the project's `.gitleaks.toml` (DEC-287), with every allowlist of that file ignored (DEC-298). `root` is the project root as a `pathlib.Path`; `path` is a repository-relative POSIX path as a string. It returns `True` or `False`. The whole path counts: a file name and every folder name. The wrapper calls it, and W1-17 and W1-19 will. |
 
 ## KPI → tests → red reason today
 
@@ -105,10 +116,10 @@ cases: 1 error, 4 passed.
 | `test_a_token_shaped_string_is_still_flagged[16]` · `test_a_body_with_a_digit_or_with_mixed_case_is_flagged[12]` · `test_the_length_floor_of_sixteen_characters_stays[2]` · `test_every_file_holding_a_dev_canary_is_still_reported[4]` · `test_a_file_with_a_token_shaped_string_is_not_indexable[4]` | Keep true: what the old rule already flags and the repaired rule must still flag. |
 | `test_the_canary_rule_is_unchanged[2]` · `test_the_token_rule_carries_no_allowlist[2]` | Keep true: the canary rule is the one W1-15 delivered, and no rule of either file has an allowlist of its own. |
 
-## `local_only` (127 cases)
+## `local_only` (139 cases)
 
-Deselect with `-m "not local_only"` (5 cases remain: the interface test and the four that read the two gitleaks
-files as TOML).
+Deselect with `-m "not local_only"` (6 cases remain: the interface test, the four that read the two gitleaks
+files as TOML, and the one that reads what the wrapper's source imports).
 
 - **Run the `codebase-memory-mcp` binary** (through the wrapper, or directly for the premise and `list_projects`):
   all of `test_w1_16_home.py` but the interface test, all of `test_w1_16_secret_exclusion.py`, the wrapper cases of
@@ -133,6 +144,12 @@ files as TOML).
   It holds one SQLite file per project, `_config.db` and `logs/`. `list_projects` lists the projects of that home.
   Two homes can be used at the same time. The index stores names, paths, hashes, a full-text index and vectors;
   it does not store string values or comment text, but it does store identifiers.
+- **The daemon** (same version, observed the same way, in a namespace of the test's own): every `cli` call starts
+  or reaches a daemon, which keeps lock files, turn files and a unix socket in the folder `cbm-daemon-<uid>` of
+  the directory in the environment variable `CBM_RUNTIME_DIR`. Without that variable the directory is `/tmp`,
+  whatever `TMPDIR` and `XDG_RUNTIME_DIR` hold: **the shared default is `/tmp/cbm-daemon-<uid>`**, one folder for
+  every repository and every home of the user. The lock and turn files stay after the daemon has gone. The longest
+  socket name is `cbm-<16 hexadecimal digits>.sock.pending`.
 - **Two repositories, two homes.** `home(root)` is under `<root>/.gov-runtime/` and holds an index file after
   indexing. `projects(root)` has one name. The binary's own `list_projects`, asked with `CBM_CACHE_DIR` set to
   that home, shows the same single project and no project whose root path is the other repository.
@@ -244,6 +261,89 @@ a link to a folder inside the repository; a git worktree or a submodule as the r
 the wrapper and the filter keeps a secret path out; a secret in the name of the repository's own folder; what the
 other seven functions do with a refused root.
 
+## The third batch: the daemon's directory, a body that begins with a separator, a public name check
+
+`test_w1_16_daemon_dir_and_names.py`, 10 test functions, 13 cases. Tests added after implementation, reason
+"delegated decision": DEC-338 (package DP-4) and DEC-339 (packages R-1 and R-3). No KPI line was added.
+
+Red run on `w1/W1-16` at `540ce684` plus this batch: the new file alone **12 failed, 1 passed**; the whole suite
+**12 failed, 133 passed**. The 132 cases of the first two batches stay green; the premise passes.
+
+| Decision | Test functions | Red reason today |
+|---|---|---|
+| **DEC-338** the wrapper does not use the tool's shared default | `test_the_tool_alone_keeps_its_daemon_files_in_one_shared_default` (premise) · `test_a_run_does_not_use_the_tools_shared_default` | **`the run used the tool's shared default /tmp/cbm-daemon-<uid>: it gained 14 file(s)`**: the wrapper passes the caller's environment on, and without `CBM_RUNTIME_DIR` the tool falls to its default. The premise passes. |
+| **DEC-338** the wrapper decides, not the caller's environment | `test_a_directory_given_by_the_callers_environment_is_not_used` | **`the daemon's files went to the directory the caller's environment gave: 15 file(s)`** |
+| **DEC-338** a directory of its own for each repository, outside the repository, short | `test_each_repository_has_a_daemon_directory_of_its_own` · `test_the_daemon_directory_is_outside_the_repository` · `test_a_socket_path_in_the_daemon_directory_fits_in_a_socket_address` | **`gov.codeintel.daemon_dir(root) did not answer`**: `module 'gov.codeintel' has no attribute 'daemon_dir'` |
+| **DEC-339 R-1** a body that begins with `_` or `-` | `test_a_body_that_begins_with_a_separator_is_flagged_only_when_the_rest_is_token_shaped[2]` (gitleaks, each file) · `test_a_file_with_a_token_whose_body_begins_with_a_separator_is_not_indexable[2]` (the filter, each file) | **`a body that begins with a separator and is token-shaped after it is not flagged`** (the four planted pages) and **`a token whose body begins with a separator is let through to the indexer`** |
+| **DEC-339 R-3** a public name check | `test_a_path_name_that_holds_a_secret_is_told_from_an_ordinary_one` · `test_an_allowlist_of_the_project_does_not_shelter_a_path_name` · `test_the_wrapper_imports_no_private_name_of_gov_secrets` | **`gov.secrets.path_holds_secret(root, path) did not answer`**: the module has no such attribute. **`the wrapper imports private names of gov.secrets: {'src/gov/codeintel/__init__.py': ['_holds_secret', '_rules']}`** |
+
+The batch was also run against a throwaway stand-in in a scratch directory outside the repository (a copy of
+`src/` with `daemon_dir`, `path_holds_secret` and the three token rules widened by one optional separator):
+**13 passed**, and the whole suite **145 passed**. The stand-in is not part of the suite and was not committed.
+
+How these tests decide:
+
+- **The shared default is watched in a namespace.** The tool's shared default does not follow `HOME`, `TMPDIR` or
+  `XDG_RUNTIME_DIR`: it is `/tmp/cbm-daemon-<uid>`, the user's own. So every child of this file runs in a user and
+  mount namespace of its own (`support.isolated`), in which that path is an empty folder of the test's sandbox.
+  What a red run writes to "the shared default" lands in the sandbox, never in the user's folder. A machine that
+  gives no such namespace skips the six cases (fixture `namespace`). The mount needs the folder to exist: when
+  the user has none, the fixture makes it empty and removes it afterwards.
+- **The premise.** The tool alone, with no `CBM_RUNTIME_DIR` and with a `TMPDIR` and `XDG_RUNTIME_DIR` of its
+  own, leaves daemon files in the shared default and none in those two. So "the shared default is not used" can
+  only pass through the wrapper.
+- **Not used** means the folder that stands for the shared default is still empty after `index(root)` and
+  `callers(root, name)`, run with `CBM_RUNTIME_DIR` absent from the child's environment. The answer is checked, so
+  a wrapper that runs no tool does not pass. `daemon_dir(root)` is not the shared default nor in it, and holds a
+  daemon file after the run: the directory the wrapper names is the one the tool used.
+- **The wrapper decides.** Another repository is indexed and asked with `CBM_RUNTIME_DIR` naming an empty folder
+  of the sandbox. That folder stays empty, the shared default too, and `daemon_dir(root)` is neither that folder
+  nor in it. `daemon_dir(root)` of one repository is the same with the variable absent, naming that folder, and
+  set as the rest of the suite sets it.
+- **Two repositories, two directories**: three, with a repository under a long path that is never indexed.
+- **Outside the repository**: `daemon_dir(root)` is not in the repository and the repository is not in it; after
+  the runs no daemon file stands anywhere in a repository, and `git status` is clean.
+- **Short: at most 57 bytes for a uid of four digits.** A unix socket address holds 108 bytes with its closing
+  zero byte, so a socket path has at most 107. The tool binds `<CBM_RUNTIME_DIR>/cbm-daemon-<uid>/cbm-<16
+  hexadecimal digits>.sock.pending`: 50 bytes after the directory with a uid of four digits. The bound is
+  `107 - 1 - len("cbm-daemon-<uid>") - 1 - 33` bytes, computed with the uid of the run. It holds for a repository
+  whose own path has more than 150 bytes: the directory cannot be the repository's path under another root.
+- **A body that begins with a separator** is the prefix, a separator, then `_` or `-`, then the rest. Flagged
+  (four pages, with either file): a rest of digits and mixed case after `sk__`, of mixed case without a digit
+  after `tok--`, with one digit as its 16th character after `pk-_`, and of lower then upper case after `rk_-`.
+  Not flagged by any rule: a rest of lower-case words after `sk__` and `tok--`, and of upper-case words after
+  `pk__`. Not flagged by the token rule: a rest of 14 characters with digits and mixed case. The rest of exactly
+  15 characters is not held (package DP-5).
+- **Through the filter**: with either file as the project's `.gitleaks.toml`, `gov.secrets.indexable` drops the
+  four pages and lets through a source file whose function is named `sk__` and lower-case words.
+- **The name check**: three files with clean content. `path_holds_secret` is `True` for `app/<token>.py` and for
+  `web/<canary>/panel.ts`, `False` for `app/beside.py`; a truthy or falsy value of another type fails. The same
+  holds when the project's `.gitleaks.toml` allowlists every path and every match; the premise shows that
+  gitleaks itself, with that file, reports nothing for the two values written in a file.
+- **No private import**: the source of every module under `src/gov/codeintel/` is parsed. A name beginning with
+  `_` imported from `gov.secrets` (or a module of it), and an attribute beginning with `_` read from an imported
+  `gov.secrets`, fail. How the wrapper uses the public names is not held.
+
+**What changes for the tests that were here before** (none was rewritten):
+
+- Their child environment sets `CBM_RUNTIME_DIR` to the sandbox's runtime folder. Until DEC-338 is built, that is
+  where the daemon's files go. Once it is built the wrapper ignores the variable, and the folder stays empty for
+  every call through the wrapper. Four tests then look at a place the wrapper no longer writes, and still
+  pass: the runtime folder among the places with no index file (`test_no_index_file_exists_outside_gov_runtime_after_a_run`,
+  `test_a_sub_folder_of_a_repository_is_refused_and_nothing_is_created`) and among the places with no planted
+  secret (`test_no_planted_secret_is_left_outside_the_repository`,
+  `test_no_secret_of_a_path_name_stands_under_gov_runtime`). `daemon_dir(root)` is not searched by them (package
+  DP-6).
+- **Daemon directories are removed at the end of a session.** The support module notes every root a test gives
+  to `gov.codeintel`; a session fixture of the conftest asks `daemon_dir(root)` for each and removes that
+  directory when it holds nothing but the tool's folder with daemon files in it. A folder the wrapper made above
+  it stays, empty.
+
+Not tested in this batch, on purpose: where the wrapper puts the directory, and how it names it; the mode of the
+directory; what happens to the directory of a repository that was moved or deleted; two bodies' worth of leading
+separators (`sk___…`); a secret in the content of the file `path_holds_secret` is asked about; a path that does
+not exist; an absolute path or one that leaves the repository; R-2 of DEC-339 (traced by the engineer).
+
 ## The W1-15 suite
 
 No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rewritten.
@@ -262,7 +362,8 @@ No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rew
 - A command (`gov …`) for the wrapper: no KPI names one.
 - How the wrapper gives the tool only the allowed files (a staged copy, an ignore mechanism): the tests see the
   result. A file replaced between the filter's answer and the indexer's read is a W1-15 residual.
-- The daemon's lock and socket files and its local UI port (package DP-4): they are not index files.
+- The daemon's local UI port (package DP-4; DEC-338 leaves it to the owner). Where its lock and socket files go is
+  tested by the third batch.
 - Index time, memory and graph size (DEC-078 gives the envelope); other languages than Rust, Python, TypeScript.
 - Renaming a file or a folder; partial or stale indexes after a crash; two indexing jobs at once.
 - The tool's other queries (snippets, text search, architecture, traces): they are not in the interface.
@@ -272,4 +373,8 @@ No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rew
 - **DP-1** The question set and the measure of hit@5 (designer's set, provisional).
 - **DP-2** The wrapper's public interface (a Python interface, eight functions).
 - **DP-3** What "a rename" is (a function renamed in the clone).
-- **DP-4** The tool's daemon: runtime directory outside `.gov-runtime/` and a local UI port.
+- **DP-4** The tool's daemon: runtime directory outside `.gov-runtime/` and a local UI port. (Decided for the
+  directory by DEC-338.)
+- **DP-5** (third batch) The 16-character floor when a body begins with `_` or `-`: does the first character count?
+- **DP-6** (third batch) Who removes a repository's daemon directory, and what the suite's own `CBM_RUNTIME_DIR`
+  still means.
