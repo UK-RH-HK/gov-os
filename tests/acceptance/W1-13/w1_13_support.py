@@ -365,6 +365,52 @@ class Project:
 
 
 # --------------------------------------------------------------------------
+# Second batch (DEC-136): a change that is no specification record, and the project's own schema
+# --------------------------------------------------------------------------
+
+PROPOSAL_TEMPLATE = TEMPLATE_OPENSPEC / "schemas" / "feature-readiness" / "templates" / "proposal.md"
+SCHEMA_REL = "openspec/schemas/feature-readiness/schema.yaml"
+ARCHIVE_NAME = "archive"                             # ``openspec/changes/archive/``: archived changes, not a change
+PROPOSAL_BODY = "# Proposal\n\n## Why\n\nA fixture of the W1-13 acceptance tests.\n"
+
+
+def frontmatter(spec_id=SPEC, **changes):
+    """The frontmatter keys of a readable FULL specification, as a map; ``changes`` replaces a key, ``None`` drops it."""
+    keys = {"id": spec_id, "type": SPEC_TYPE, "status": STATUS_OPEN, "state_class": "AUTHORITATIVE",
+            "title": f"Specification {spec_id}", KEY_PROFILE: "FULL", KEY_SPINE: False, KEY_CAPABILITY_TYPES: []}
+    keys.update(changes)
+    return {key: value for key, value in keys.items() if value is not None}
+
+
+def proposal_text(front):
+    """A ``proposal.md``: ``front`` is a map (dumped as YAML), raw text put between the marks, or ``None`` (no marks)."""
+    if front is None:
+        return PROPOSAL_BODY
+    inner = front if isinstance(front, str) else yaml.safe_dump(front, sort_keys=False)
+    return "---\n" + inner.rstrip("\n") + "\n---\n" + PROPOSAL_BODY
+
+
+def write_change(project, change, proposal, rows, parent=CHANGES_REL):
+    """A change folder written file by file: ``proposal`` is the text of ``proposal.md``, or ``None`` for no file."""
+    folder = f"{parent}/{change}"
+    tasks_support.write(project.root, f"{folder}/.openspec.yaml", "schema: feature-readiness\n")
+    if proposal is not None:
+        tasks_support.write(project.root, f"{folder}/{SPEC_RECORD_NAME}", proposal)
+    text = "# Feature-readiness record.\n" + yaml.safe_dump({"rows": rows}, sort_keys=False)
+    tasks_support.write(project.root, f"{folder}/{READINESS_NAME}", text)
+    return folder
+
+
+def edit_schema(project, change):
+    """Rewrite the project's own copy of the ``feature-readiness`` schema: ``change(schema)`` edits the loaded map."""
+    path = project.root / SCHEMA_REL
+    schema = yaml.safe_load(path.read_text(encoding="utf-8"))
+    change(schema)
+    path.write_text(yaml.safe_dump(schema, sort_keys=False, allow_unicode=True), encoding="utf-8")
+    return schema
+
+
+# --------------------------------------------------------------------------
 # Reading what the command answered
 # --------------------------------------------------------------------------
 
@@ -438,6 +484,17 @@ def not_passed(run, interface):
         f"the specification passes, and it must not\n{run.describe()}"
     assert envelope["error"]["details"].get(KEY_CLOSED) is not True, \
         f"the specification is reported closed\n{run.describe()}"
+    return envelope["error"]
+
+
+def unreadable(run, interface, change):
+    """A change the checker cannot read as a specification: ``READINESS_INVALID``, exit code 1, the change named."""
+    envelope = envelope_of(run, interface)
+    assert envelope["ok"] is False and run.returncode != 0, \
+        f"the command passes over the change {change!r}, which it cannot judge\n{run.describe()}"
+    assert envelope["error"]["code"] == READINESS_INVALID, f"expected the error {READINESS_INVALID}\n{run.describe()}"
+    assert run.returncode == EXIT_INVALID, f"expected exit code {EXIT_INVALID}\n{run.describe()}"
+    assert change in json.dumps(envelope["error"]), f"the error does not name the change {change!r}\n{run.describe()}"
     return envelope["error"]
 
 

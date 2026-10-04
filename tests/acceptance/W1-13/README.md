@@ -1,7 +1,7 @@
 # W1-13 acceptance tests: `gov readiness`
 
 Ticket `DAEO-w616`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-92 cases in 7 files.
+110 cases in 9 files: 92 written before implementation, 18 added by the second batch (DEC-136, see below).
 
 ```
 PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH python3 -m pytest tests/acceptance/W1-13 -q -p no:cacheprovider
@@ -31,6 +31,71 @@ Observed 2026-10-05: `3 failed, 89 errors`.
 
 Checked once against a throwaway stand-in of about 110 lines under `src/gov/readiness/` in a scratch copy (never
 committed): 92 passed. The suite can be passed from the ticket's paths alone.
+
+## Second batch (DEC-136, DEC-137): two behaviours found by the independent probe
+
+Written after the 92 cases went green, by a fresh Independent Test Designer, from two behaviours described by the
+orchestrator. Both let a specification with a required row open pass the gate (KPI failure 1). No existing case was
+changed; `w1_13_support.py` gained helpers only (`frontmatter`, `proposal_text`, `write_change`, `edit_schema`,
+`unreadable`).
+
+Observed 2026-10-05, before the fix: `16 failed, 94 passed`. The 16 are the red cases below; the 94 are the 92
+earlier cases and the two controls.
+
+### B1: the bare command does not pass over a change it cannot judge
+
+`test_w1_13_unreadable.py`, 8 cases. `gov readiness` with neither selector judges every specification (DEC-351),
+and a specification is the frontmatter of the change's `proposal.md` (DEC-350), which nothing writes yet. Expected
+for a change folder under `openspec/changes/` (not `archive/`) that cannot be read as a specification record:
+`ok: false`, `READINESS_INVALID`, exit code 1, the change's folder name somewhere in `error`, nothing written.
+Every such change is written with W1-12's `readiness.yaml`, 26 rows MISSING.
+
+| Case | Red reason |
+|---|---|
+| `test_a_proposal_with_no_frontmatter_does_not_pass` (the proposal template as written today) | `ok: true`, exit 0, `specifications: []` |
+| `test_a_proposal_that_is_not_of_type_specification_does_not_pass` (no `type`, then `type: note`) | the same |
+| `test_a_proposal_with_no_id_does_not_pass` (no `id`, then an empty one) | the same |
+| `test_a_proposal_whose_frontmatter_is_not_yaml_does_not_pass` | the same |
+| `test_a_change_with_a_readiness_record_and_no_proposal_does_not_pass` | the same |
+| `test_one_unreadable_change_beside_a_complete_specification_does_not_pass` | `ok: true`, exit 0, only the complete specification reported |
+| `test_a_project_with_no_change_passes` | control, green |
+| `test_the_archive_folder_is_not_a_change` | control, green |
+
+The two cases with two forms stop at the first form; the second form of each was run once on its own and is red
+for the same reason.
+
+### B2: a weakened project schema does not weaken the gate
+
+`test_w1_13_schema.py`, 10 cases: five edits of the project's own `openspec/schemas/feature-readiness/schema.yaml`,
+each judged by the command (`test_a_weakened_schema_does_not_let_a_specification_pass`) and by
+`gov.readiness.close` (`test_a_weakened_schema_does_not_let_a_specification_be_closed`). What a profile requires is
+DEC-085's and the Contract's, not the project's copy. Expected: the command does not pass (`SPEC_NOT_CLOSED` or
+`READINESS_INVALID`, not fixed which) and `closed` is not true; `close` refuses, and the status, `.tickets/` and the
+rest of the project stay as they were.
+
+| Id | Schema edit | Specification | Red reason |
+|---|---|---|---|
+| `row-removed-FULL` | row 7 removed from `dimensions` | FULL, row 7 MISSING | exit 0, `closed: true`; `close` closes and creates an audit ticket |
+| `row-removed-spine-opened-at-LITE` | the same | spine declared LITE, row 7 MISSING | the same |
+| `only-the-mandatory-rows-FULL` | `dimensions` cut to the ten mandatory rows | FULL, the 16 other rows MISSING | the same |
+| `type-emptied-STANDARD` | `backend: []` in the capability-type table | STANDARD `backend`, row 13 MISSING | the same |
+| `type-added-STANDARD` | `blockchain: []` added to the table | STANDARD `blockchain`, mandatory rows PRESENT | the same (DEC-350: an unknown type does not pass) |
+
+The control (the schema as the template ships it, a complete specification passes) is the existing
+`test_w1_13_report.py::test_a_record_with_every_required_row_satisfied_passes` (5 cases).
+
+### Not fixed by the second batch
+
+- Where the checker takes the Contract's rows and taxonomy from in an adopted project (a temporary project holds
+  no `docs/contract/`): the tests only require that the project's own schema cannot lower them.
+- Whether an edited schema is itself an error, or is ignored: both `SPEC_NOT_CLOSED` and `READINESS_INVALID` are
+  accepted in B2.
+- A change folder with neither `proposal.md` nor `readiness.yaml`; a readable specification record with no
+  `readiness.yaml`; a readable specification record under `archive/`; `--specification` or `--ticket` beside an
+  unreadable change.
+- Consequence of B1, for the owner of DEC-350's residual: until the proposal template (W1-12) or the planning
+  skill (W1-35) writes the frontmatter, the bare command fails with `READINESS_INVALID` in any project that holds
+  a change written from today's template.
 
 ## Earlier test revised
 
@@ -92,7 +157,7 @@ All of it is named once, in the first block of `w1_13_support.py`.
 | **Success 3** "Output is identical on repeated runs" | `test_w1_13_determinism.py` (9) | `NOT_IMPLEMENTED` |
 | **Success 4** "Lists every required open row with its linked gap ticket id, or UNLINKED (DEC-089)" [CAP-30.b] | `test_w1_13_gap_tickets.py` (8) | `NOT_IMPLEMENTED` |
 | **Success 5** "Closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor naming the milestone (DEC-088)" [CAP-47.d] | `test_w1_13_close.py`: `test_closing_marks_the_record_closed_and_creates_one_audit_ticket` (3), `test_the_audit_ticket_is_for_an_independent_auditor_and_names_the_milestone` (3), `..._is_an_open_ticket_nobody_holds`, `..._carries_what_the_ticket_schema_requires`, `test_closing_changes_the_record_and_adds_the_ticket_and_nothing_else`, `test_closing_a_lite_feature_specification_creates_no_audit_ticket` | `NOT_IMPLEMENTED` |
-| **Failure 1** "A spec with a required MISSING row is reported closed" | `test_w1_13_report.py::test_one_required_missing_row_is_enough` (3), `::test_a_record_marked_closed_by_hand_with_a_required_row_missing_is_not_reported_closed`; `test_w1_13_gate.py::test_the_gate_reads_the_rows_and_not_the_status`; `test_w1_13_close.py::test_a_specification_with_a_required_row_open_is_not_closed` (3) | `NOT_IMPLEMENTED` |
+| **Failure 1** "A spec with a required MISSING row is reported closed" | second batch: `test_w1_13_unreadable.py` (8), `test_w1_13_schema.py` (10); `test_w1_13_report.py::test_one_required_missing_row_is_enough` (3), `::test_a_record_marked_closed_by_hand_with_a_required_row_missing_is_not_reported_closed`; `test_w1_13_gate.py::test_the_gate_reads_the_rows_and_not_the_status`; `test_w1_13_close.py::test_a_specification_with_a_required_row_open_is_not_closed` (3) | `NOT_IMPLEMENTED` |
 | **Failure 2** "A defaulted N/A passes" | `test_w1_13_na.py`: `test_a_silent_na_on_a_required_row_is_rejected` (7), `..._on_a_row_the_profile_does_not_require_is_rejected` (2), `test_a_record_that_defaults_every_optional_row_to_na_does_not_pass`, `test_a_record_that_drops_a_row_does_not_pass`; `test_w1_13_gate.py::test_the_gate_is_shut_on_an_invalid_record`; `test_w1_13_close.py::test_a_specification_with_a_silent_na_is_not_closed` | `NOT_IMPLEMENTED` |
 | **Failure 3** "A spine, STANDARD or FULL specification closes without an audit ticket" | `test_w1_13_close.py`: `test_a_specification_is_not_closed_when_its_audit_ticket_cannot_be_created`, `test_closing_twice_creates_one_audit_ticket`, `test_closing_marks_the_record_closed_and_creates_one_audit_ticket` (3), `test_a_spine_complete_only_for_the_profile_that_opened_it_is_not_closed` | `NOT_IMPLEMENTED` |
 
@@ -118,6 +183,8 @@ out of READY") is `test_a_ticket_stays_out_of_ready_while_its_specification_has_
 | `test_w1_13_determinism.py` | 9 | DP-3, DP-4 (arguments only, except the last two cases) |
 | `test_w1_13_gate.py` | 12 | DP-1, DP-3, DP-4; the two READY cases and `complete-spine` also DP-2 |
 | `test_w1_13_close.py` | 18 | **DP-2**, DP-3 |
+| `test_w1_13_unreadable.py` (second batch, B1) | 8 | DEC-350, DEC-351 |
+| `test_w1_13_schema.py` (second batch, B2) | 10 | DEC-085, DEC-349, DEC-350 |
 
 Only two cases are free of every package (the command is built; an unknown option is a usage error): every other
 case needs a specification to exist, and where a specification declares its profile is DP-3. Another answer to a
