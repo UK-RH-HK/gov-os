@@ -445,7 +445,9 @@ Recorded at W1-18's close, from the ticket lead's summary. None is a defect.
 
 Recorded at W1-10's close, from the ticket lead's summary. None is a defect; each is for a later ticket.
 
-- **Who writes `.gov-runtime/store.db` in a live session** is open with the owner (W1-10 DP-3). The guard keeps
+- **Who writes `.gov-runtime/store.db` in a live session** is decided (DEC-322, 2026-10-04): only orchestrator-role
+  sessions write the live store; tests and workers build their own stores in temporary directories; revisit when
+  `gov rebuild` is wired (W1-27). The guard keeps
   `.gov-runtime/` outside `scratch/` closed to worker roles, and W1-17, W1-20 and W1-24 read the store in worker
   sessions. Every W1-10 test builds the store in a temporary repository.
 - **What loads as a record today (DEC-274).** The charter, the contract and the plan have `id` and `status` but no
@@ -480,7 +482,8 @@ fixed. None of the following is a defect of the ticket; each names who should se
 - **The rules over-block.** The token rule flags ordinary identifiers (`pk_…`, `tok_…`, `rk_…`, `sk-…` of 16 or more
   characters), and the canary rule flags any upper-case identifier with the canary word in the middle. This
   repository loses only the W1-15 ticket file from an index; an adopting product could lose code files. Requiring a
-  digit or mixed case in the token body is the suggested repair.
+  digit or mixed case in the token body is the suggested repair. The owner decided that repair, before W1-41
+  (DEC-324); W1-16 carries it (DEC-325). The canary rule's over-blocking stays a residual.
 - **Near spellings of the canary are missed** (lower case, other separators, markdown-escaped underscores); they are
   outside DEC-286. The owner still confirms the count of seven canaries against the S0b1 manifest.
 - **Path-map patterns match narrowly.** `**/x/**` does not match a top-level `x/`; a trailing slash, a leading `/` or
@@ -584,3 +587,30 @@ None is a defect of the ticket; each names who should settle it.
 - **The release `flock` is advisory and POSIX-only.** A lock removed by hand is outside it. The double hold the
   reviewer saw was not reproduced (about 1,800 rounds by the designer, 480 by the lead); the fix rests on the lead's
   reading of the diff.
+
+## W1-12 residuals (readiness schema and proposal templates, 2026-10-04)
+
+Recorded at W1-12's close, from the ticket lead's summaries and a product-spec worker's reading of G-07 and G-09
+(DEC-310). None is a defect of the ticket; each names who should settle it.
+
+- **The CIT-E rule is stated only** (DEC-309). The schema carries the source and the extension rule of
+  `readiness-dimensions.yaml`, and W1-12's suite goes red when the YAML changes without the schema. The check that a
+  change to the taxonomy or to the YAML has a linked CIT-E record is a KPI line of W1-26.
+- **The kernel `templates/openspec/` folder holds nothing** (DEC-304, DEC-326). G-07 and G-09 name no path there, and
+  OpenSpec reads templates only from the schema's own `templates/` folder. The path left the ticket's `allowed_paths`.
+- **Names.** G-07 calls the artefact `feature-readiness`; as built, the schema is `feature-readiness` and the
+  artefact is `readiness`, file `readiness.yaml` (DEC-305). G-08, W1-13's source, says the checker reads
+  `feature-readiness.md`: DEC-305 supersedes that file name. For W1-13's test design brief.
+- **The record lacks profile and capability types.** `readiness.yaml` has no `profile` or declared capability-type
+  field, and `cell_states` holds only the state names and `requires: [reason]` on N/A. The readiness YAML's
+  `meaning`, `satisfies`, `mandatory`, `rules` and `profiles` are not copied. W1-13 needs them or must read the
+  contract YAML.
+- **Artifact order.** `readiness` requires `specs`, while `tasks` and `apply` keep their upstream requirements, so
+  OpenSpec does not force the record before tasks.
+- **`validate --strict` parses only the spec deltas and `.openspec.yaml`**; the proposal, design, tasks and readiness
+  files cannot fail it. The stock `spec.md` template fails `--strict`, so the fork replaces it with plain "replace
+  this" sentences, one SHALL requirement and one scenario. The other three templates are byte-identical to upstream;
+  about 317 lines are upstream `spec-driven` text.
+- **Free fields.** `evidence` and `gap_ticket` carry no id pattern, so nothing duplicates the shared id grammars
+  (DEC-227). Validation falls to W1-13.
+- **Untested:** a `config.yaml` naming an unknown schema makes `openspec new change` exit 1 with "Unknown schema".
