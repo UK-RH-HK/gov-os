@@ -8,6 +8,7 @@ lock file that stays empty is still a held claim, with ``""`` as its holder.
 
 from __future__ import annotations
 
+import fcntl
 import os
 import time
 from pathlib import Path
@@ -61,10 +62,23 @@ def claim(root: Path, ticket: str, holder_name: str) -> dict:
 
 
 def release(root: Path, ticket: str, holder_name: str) -> dict:
-    """Remove the ticket's lock, for its holder only."""
-    current = holder(root, ticket)
-    if current is None or current != holder_name:
-        raise GovError("CLAIM_NOT_HELD", f"{ticket} is not claimed by {holder_name} (holder: {current})",
-                       {"ticket": ticket, "holder": current})
-    (Path(root) / CLAIMS_REL / ticket).unlink()
-    return {"ticket": ticket, "holder": holder_name}
+    """Remove the ticket's lock, for its holder only.
+
+    Reading the holder and removing the lock are one step: both happen under an
+    exclusive ``flock`` on the claims folder, which every release takes. Only a
+    release removes a lock, so the lock read under it is the lock removed, and
+    a release never removes a lock that was created after it read the holder.
+    """
+    claims, current = Path(root) / CLAIMS_REL, None
+    if _is_id(ticket) and claims.is_dir():
+        folder = os.open(claims, os.O_RDONLY)
+        try:
+            fcntl.flock(folder, fcntl.LOCK_EX)
+            current = holder(root, ticket)
+            if current is not None and current == holder_name:
+                (claims / ticket).unlink()
+                return {"ticket": ticket, "holder": holder_name}
+        finally:
+            os.close(folder)  # closing the folder ends the flock
+    raise GovError("CLAIM_NOT_HELD", f"{ticket} is not claimed by {holder_name} (holder: {current})",
+                   {"ticket": ticket, "holder": current})

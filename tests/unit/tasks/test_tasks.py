@@ -7,6 +7,8 @@ and a ticket id with a path separator releases nothing.
 """
 from __future__ import annotations
 
+import fcntl
+import os
 import sys
 import threading
 from pathlib import Path
@@ -60,6 +62,36 @@ def test_a_holder_still_being_written_is_waited_for(tmp_path):
         timer.join()
     assert raised.value.code == "CLAIM_HELD"
     assert raised.value.details == {"ticket": "TST-a001", "holder": "engineer:winner"}
+
+
+def test_a_release_reads_the_holder_and_removes_the_lock_in_one_step(tmp_path):
+    """A release waits for the flock on the claims folder, and then acts on the lock as it is under that flock."""
+    root = _project(tmp_path, "TST-a001")
+    tasks.claim(root, "TST-a001", "engineer:dead")
+    claims = root / ".tickets" / ".claims"
+    raised = []
+
+    def release():
+        try:
+            tasks.release(root, "TST-a001", "engineer:dead")
+        except GovError as exc:
+            raised.append(exc)
+
+    folder = os.open(claims, os.O_RDONLY)
+    try:
+        fcntl.flock(folder, fcntl.LOCK_EX)  # another release is in its step
+        thread = threading.Thread(target=release)
+        thread.start()
+        thread.join(0.3)
+        assert thread.is_alive(), "the release did not wait for the release that holds the claims folder"
+        (claims / "TST-a001").unlink()  # that release removes the lock, and the next holder claims
+        tasks.claim(root, "TST-a001", "engineer:next")
+    finally:
+        os.close(folder)
+    thread.join()
+    assert [exc.code for exc in raised] == ["CLAIM_NOT_HELD"]
+    assert raised[0].details == {"ticket": "TST-a001", "holder": "engineer:next"}
+    assert tasks.holder(root, "TST-a001") == "engineer:next"
 
 
 def test_a_ticket_id_with_a_path_separator_releases_nothing(tmp_path):

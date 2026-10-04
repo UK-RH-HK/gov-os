@@ -21,6 +21,23 @@ def _list(value) -> list:
     return value if isinstance(value, list) else [] if value is None else [value]
 
 
+def _has_lock(root: Path, ticket: str) -> bool:
+    """Whether the ticket's lock exists; a claim that cannot be inspected counts as a claim."""
+    try:
+        os.lstat(root / CLAIMS_REL / ticket)
+    except FileNotFoundError:
+        return False
+    except OSError:
+        return True
+    return True
+
+
+def _has_tests(root: Path, named: str) -> bool:
+    """Whether ``named`` is, with links resolved, a directory of the project strictly below ``tests/acceptance/``."""
+    folder = (root / named).resolve()
+    return folder.is_dir() and root.resolve() / "tests" / "acceptance" in folder.parents
+
+
 def _queue(root: Path) -> tuple[list[str], dict[str, list[str]]]:
     root = Path(root)
     tickets = {path.stem: frontmatter(path) or {} for path in sorted((root / TICKETS_REL).glob("*.md"))}
@@ -42,9 +59,9 @@ def _queue(root: Path) -> tuple[list[str], dict[str, list[str]]]:
         holds = {
             "DEPENDENCY_OPEN": any(tickets.get(str(dep), {}).get("status") != "closed"
                                    for dep in _list(front.get("deps"))),
-            "CLAIMED": front.get("status") == "in_progress" or os.path.lexists(root / CLAIMS_REL / ticket),
-            "NO_ACCEPTANCE_TESTS": not (root / str(folder or f"tests/acceptance/{front.get('wbs_id') or ticket}")
-                                        ).is_dir(),
+            "CLAIMED": front.get("status") == "in_progress" or _has_lock(root, ticket),
+            "NO_ACCEPTANCE_TESTS": not _has_tests(root, str(folder or
+                                                            f"tests/acceptance/{front.get('wbs_id') or ticket}")),
             "SPEC_NOT_CLOSED": front.get("specification") is not None
                                and status.get(str(front["specification"])) != "CLOSED",
             "INPUT_ABSENT": any(item not in status for item in inputs),
