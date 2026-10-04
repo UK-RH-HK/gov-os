@@ -2,7 +2,7 @@
 id: WAVE-1-WBS
 status: PROPOSED
 depends_on: [CHARTER-v5, CONTRACT-v4, ADR-0002]
-decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-174, DEC-179, DEC-180, DEC-182, DEC-183]
+decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-174, DEC-179, DEC-180, DEC-182, DEC-183, DEC-235, DEC-236, DEC-237]
 ---
 
 # Wave 1 (Integrate) — work breakdown
@@ -16,7 +16,16 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 - **Paths:** no implementer ticket's `allowed_paths` covers `tests/acceptance/**`.
 - **Orchestrator write scope** (DEC-156, W1-45). The orchestrator may write anywhere in the repository except `tests/acceptance/**`; the guard enforces only that exclusion for it, and containment still records its changes. Its session is not sandboxed. Its checkpoint lives in `.gov-runtime/scratch/orchestrator/` until W1-25. An orchestrator change outside the active ticket's `allowed_paths` is a record, not a containment finding (DEC-171); a change under `tests/acceptance/**` stays a finding. The acceptance tests of W1-02 and W1-03 that assert the old orchestrator rule are revised by the Independent Test Designer in W1-45's test design batch, as rewrites after implementation (reason: owner correction, DEC-156). W1-45 is `in_progress` and is bootstrapped as DEC-150 states: the test designer writes its tests with the ticket in its `GOV_TICKET`, an `engineer` subagent implements it and commits its own work, and the owner closes it from the operator console.
 - **Worker sessions** (DEC-161, W1-46). Once W1-46 is closed, engineer, test designer, auditor and research or experiment work runs as worker sessions started by `gov launch`, inside the OS sandbox with the role's network profile (DEC-158). In-session subagents remain for read-only work (review, exploration, web research). The launcher sets no `excludedCommands` (DEC-164).
-- **Headless workers until the launcher** (DEC-183). Until W1-46 is closed, a worker runs as a headless session started in the repository root with `--settings '{"env":{"GOV_ROLE":"<role>","GOV_TICKET":"<id>"}}'`, which overrides the `env` block in `.claude/settings.local.json`, and with `--permission-mode acceptEdits` and Bash and the file tools allowed. The guard decides every call. These sessions are not sandboxed.
+- **Headless workers until the launcher** (DEC-183). Until W1-46 is closed, a worker runs as a headless session started by its ticket lead in the ticket's worktree (DEC-235; before the parallel run, in the repository root), in the background, with `--settings '{"env":{"GOV_ROLE":"<role>","GOV_TICKET":"<id>"}}'`, which overrides the `env` block in `.claude/settings.local.json`, and with `--permission-mode acceptEdits` and Bash and the file tools allowed. The guard decides every call. These sessions are not sandboxed.
+- **Parallel tickets** (DEC-235; a light form of CAP-23, brought forward from Wave 3 by the owner) [CAP-23.c].
+  - Up to 6 tickets are in flight, each in its own short-lived worktree (`~/gov-os-worktrees/<W1-id>`, branch `w1/<W1-id>`, cut from `w1/integrate`).
+  - A ticket starts only when its dependencies are closed and its `allowed_paths` overlap no ticket in flight; overlapping tickets wait.
+  - Resource gate, checked before each start: at least 4 GiB of memory available and a 1-minute load average below the number of CPU cores. Heavy tickets (retrieval, indexing, models) count double.
+  - The main orchestrator merges a ticket's branch into `w1/integrate` after green, in the main tree, and re-runs every acceptance suite and the builder tests after each merge. Only then is the ticket closed, its worktree removed and its branch deleted.
+  - A merge conflict is resolved in the ticket's worktree, by merging `w1/integrate` into the ticket branch and re-verifying there.
+  - The claims role and `gov claim` (CAP-23.b) stay in Wave 3.
+- **Ticket leads** (DEC-236). The main orchestrator runs the wave and reads only each lead's final summary. A ticket lead runs one ticket's loop in that ticket's worktree (tests first, red, implement, verify, review for FULL tickets), starts its workers, and holds that ticket's loop count. A lead never edits `.tickets/`, the decision register or `bootstrap.md`, never merges into `w1/integrate` and never pushes; those stay with the main orchestrator, in the main tree. A lead returns DONE, PACKAGES, ESCALATION or LEAD_CHECKPOINT.
+- **Context limits** (DEC-237, amending DEC-208). The main orchestrator checkpoints at about 300k tokens, after a merge or a close, while the leads keep running. A ticket lead at about 300k tokens writes its checkpoint in its worktree and returns LEAD_CHECKPOINT; a fresh lead resumes in the same worktree.
 - **Research role** (DEC-163, W1-46). The Wave 1 roster has a minimal research role, a role file delivered with the launcher. Its network profile is the research allowlist of DEC-158. The full research lifecycle (CAP-32) stays in Wave 3.
 - **Impact questions** (DEC-167). "What's the impact of X?" in plain language triggers the impact assessment: in Wave 1, an OpenSpec proposal plus `gov closure` (W1-35); from Wave 2, `gov impact`.
 - **Experiments** (DEC-102) are part of discovery and can run at any point; they run outside production paths, leave an evidence record, and change this plan only through CIT-P with three costed options (DEC-105).
@@ -28,7 +37,7 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 - **Covers items:** every Wave 1 `covers` item of Contract v4 is named by a KPI line of the ticket that delivers it. The line ends with the item id in brackets, for example `[CAP-03.b]`, and the contract item names that ticket as its `provider`. `docs/plan/tools/validate_s1.py` checks this both ways.
 - **Dependencies carry the KPIs:** a ticket depends on every ticket whose output its KPIs need. Each governance test family's check is registered by the ticket that builds its subject, and W1-42 asserts that 17 of 17 families have an executable check.
 - **Audits:** closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor (DEC-088).
-- **Loop policy** (DEC-096, amending DEC-044). Every review→repair, audit→repair, test→fix or verification loop runs until it converges, or until three consecutive iterations fail to converge. The third failure goes to the owner as an escalation package. The orchestrator or `gov` holds the count and never discloses it to the sessions inside the loop.
+- **Loop policy** (DEC-096, amending DEC-044). Every review→repair, audit→repair, test→fix or verification loop runs until it converges, or until three consecutive iterations fail to converge. The third failure goes to the owner as an escalation package. The ticket lead (DEC-236), the orchestrator or `gov` holds the count and never discloses it to the sessions inside the loop.
 
 ## 1. Tickets
 
@@ -217,7 +226,7 @@ Every source item is carried by a W1 ticket:
   - `gov doctor` compares the installed release with the latest and reports pending updates and their highest severity at session start; the owner decides when to run `gov update` (CAP-45);
   - product decisions, specifications and lessons never leave their repository (CAP-41).
 - **Model routing and empirical routing:** OTel (CAP-35, CAP-36). The DEC-018 local T1 model is decided here.
-- **Concurrency:** claims and concurrency for parallel agents, and the claims role (CAP-23).
+- **Concurrency:** claims and concurrency for parallel agents, and the claims role (CAP-23). A light form, parallel tickets in worktrees under ticket leads, already runs in Wave 1 (DEC-235, CAP-23.c).
 - **Traceability:** full specification lineage and Gate W (CAP-29, CAP-50).
 - **Health:** the health scheduler and SLOs (CAP-39, CAP-48).
 - **Roles and adoption:** full independent adoption and audit roles (CAP-47) with the A7, A10 and A11 gates and the final adoption verdict (CAP-44, DEC-090), and the remaining Wave 3 roles.
