@@ -1987,3 +1987,64 @@ orchestrator's report on the WBS wording.
 | Version | Date | Change |
 |---|---|---|
 | 0.40 | 2026-10-04 | Owner answers on W1-48's test design packages: DEC-210 (DP-1: the active extension from `extensions.json`, version from `package.json` and the bundled binary, sha256 compared with the registry; a hard failure only below 2.1.285; drift is reported by `gov doctor`, not failed), DEC-211 (DP-2: registry commands carry `$HOME/.local/bin/claude`; a test refuses a bare `claude`), DEC-212 (WBS line 15 aligned with DEC-209). |
+
+## 41. Owner answers on W1-47's test design packages and W1-48's DP-3 (register v0.41, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-04 to the test designer's packages DP-1…DP-6 on W1-47 (`DAEO-o4fg`) and DP-3 on W1-48
+(`DAEO-0qs5`). The entries never name the held-out path; it is held in `governance/project/held-out.yaml` only.
+
+### DEC-213 — W1-47 DP-6: the qualification oracle is outside the repository
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-6 (P1) option 1 · **Under:** DEC-162
+- **Decision:** The qualification oracle is outside the repository, so W1-05's fixture, which copies the working
+  tree, never copies it. Nothing changes.
+
+### DEC-214 — W1-48 DP-3: the recorded version with another sha256 fails for the CLI and is drift for the extension
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-48 package DP-3 option (c) · **Refines:** DEC-210 · **Under:** DEC-196, DEC-205
+- **Decision:**
+  - For the CLI at `~/.local/bin/claude`, the recorded version with a different sha256 is a hard failure.
+  - For the active extension's bundled binary it is drift, reported by `gov doctor`.
+  - W1-48's second success line is reworded to match DEC-210 ("at or above the minimum"; a difference is drift), in
+    its own commit with the trailer `Task: DAEO-0qs5`.
+  - W1-27 gets a KPI line for `gov doctor`'s Claude Code drift report (DEC-210), in its own commit with the trailer
+    `Task: DAEO-xw3k`.
+
+### DEC-215 — W1-47 DP-1: what "names the held-out path" covers
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-1 option 3 · **Under:** DEC-162
+- **Decision:**
+  - The guard denies a tool call whose input contains the held-out path literally anywhere, or reaches it through a
+    relative path, `..`, `~`, `$HOME` or a symbolic link.
+  - Exception: edits to the two files that hold the path (`governance/project/held-out.yaml` and the committed
+    `.claude/settings.json`).
+  - Parent directories, globs and look-alike siblings are recorded in `governance/project/bootstrap.md` under the
+    accepted residual.
+
+### DEC-216 — W1-47 DP-3: the install rule knows `uv`'s value options
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-3 option 2 · **Extends:** DEC-174
+- **Decision:** The install rule knows `uv`'s value options `--directory`, `--project`, `--cache-dir` and
+  `--config-file`, plus `uv run -w`, and skips their value when looking for the subcommand.
+
+### DEC-217 — W1-47 DP-4: the kernel template carries `settings.json`
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-4 option 1
+- **Decision:** The kernel template carries `template/governance/kernel/settings.json`, with PreToolUse for every
+  tool and both post-command events, commands through `$CLAUDE_PROJECT_DIR`, and a behavioural test.
+
+### DEC-218 — W1-47 DP-5: the owner wrote `held-out.yaml`; its key is `held_out_paths`
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-5 (the owner fixed the key and wrote the file) · **Under:** DEC-162, DEC-179
+- **Decision:**
+  - `governance/project/held-out.yaml` was committed by the owner in
+    `f66bd1b35dd4f5d0a88e63eec77485b7d7ca9685`. Its key is `held_out_paths`, a list of absolute paths. The guard and
+    the launcher read that key.
+  - A missing key, or a broken file, makes the guard fail closed. The owner repairs it through the operator.
+  - No agent writes or retypes the path. The engineer generates the committed `Read` deny rule in
+    `.claude/settings.json` with a script that reads `held-out.yaml`, so the path never appears in an agent's tool
+    input.
+  - The owner's commit counts as the KPI's owner confirmation of the value.
+
+### DEC-219 — W1-47 DP-2: W1-46's test design covers the research role's exception
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-47 package DP-2 option 1 · **Under:** DEC-163, DEC-174
+- **Decision:** The clause of W1-47's sixth success line on the research role's exception is tested in W1-46's test
+  design, with the four `uv` forms. W1-47 closes with the clause recorded as carried.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.41 | 2026-10-04 | Owner answers on W1-47's packages and W1-48's DP-3: DEC-213 (DP-6: the oracle is outside the repository), DEC-214 (W1-48 DP-3: another sha256 at the recorded version fails for the CLI, is drift for the extension; W1-48's second success line reworded; a W1-27 KPI line for the drift report), DEC-215 (DP-1: literal anywhere, relative path, `..`, `~`, `$HOME`, symbolic link; exception for the two files that hold the path; parents, globs and look-alike siblings are residuals), DEC-216 (DP-3: `uv`'s four value options and `uv run -w`), DEC-217 (DP-4: `template/governance/kernel/settings.json`), DEC-218 (DP-5: the owner wrote `held-out.yaml`, key `held_out_paths`; fail closed on a missing key or a broken file; the deny rule is generated by a script), DEC-219 (DP-2: W1-46's test design covers the research exception). |
