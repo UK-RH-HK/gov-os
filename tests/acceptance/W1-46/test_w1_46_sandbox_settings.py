@@ -10,6 +10,10 @@ fail-closed". Failure 2: "A sandbox setting is read from the repository's
 settings". Failure 8: "The settings the launcher builds carry an
 excludedCommands entry".
 
+DEC-233: ``gov launch`` refuses to start, with a non-zero exit and a named
+reason, when the repository's ``.claude/settings.json`` or
+``.claude/settings.local.json`` carries a ``sandbox`` key.
+
 DEC-205: the launcher starts the CLI by its absolute path ``~/.local/bin/claude``,
 never a bare ``claude``.
 
@@ -90,7 +94,7 @@ def test_the_session_is_started_in_the_repository_root(launch, project, role):
 
 
 # --------------------------------------------------------------------------
-# "Reads no sandbox setting from the repository" (failure 2)
+# "Reads no sandbox setting from the repository" (failure 2): a sandbox key there refuses the launch (DEC-233)
 # --------------------------------------------------------------------------
 
 def _plant(project, how):
@@ -110,26 +114,25 @@ def _plant(project, how):
 
 @pytest.mark.parametrize("role", (support.ENGINEER, support.RESEARCH))
 @pytest.mark.parametrize("how", ("committed-settings", "local-settings", "local-settings-linked-to-scratch"))
-def test_a_sandbox_block_in_the_repository_changes_nothing_the_launcher_builds(launch, project, role, how):
-    """Either the launcher refuses, or what it builds is what it builds without the block (see DP-3).
+def test_the_launcher_refuses_when_the_repositorys_settings_carry_a_sandbox_key(launch, project, role, how):
+    """DEC-233: non-zero exit, a named reason, nothing started. The CLI may merge the repository's settings.
 
-    In no case does a value of the repository's block reach the built settings.
+    The same project launches before the key is planted, so the key is the reason.
     """
-    clean = launch(role).settings()
+    launch(role).session()
     _plant(project, how)
-    result = launch(role)
-    if result.run.returncode != 0:
-        support.assert_refused(result, "sandbox")
-        return
-    _assert_strict(result)
-    built = result.settings()
-    assert support.NOT_A_RESEARCH_HOST not in support.allowed_domains(built), (
-        "a domain of the repository's sandbox block is in the built allowlist"
-    )
-    assert built.get("sandbox") == clean.get("sandbox"), (
-        "the built sandbox block differs once the repository's settings carry one: a sandbox setting was read from "
-        "the repository"
-    )
+    support.assert_refused(launch(role), "sandbox")
+
+
+@pytest.mark.parametrize("block", (
+    {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
+     "network": {"strictAllowlist": True, "allowedDomains": []}},
+    {},
+), ids=("a-strict-block", "an-empty-block"))
+def test_the_key_itself_refuses_the_launch_whatever_it_holds(launch, project, block):
+    """DEC-233: "carries a `sandbox` key". The launcher does not judge the block; it refuses it."""
+    support.write(project, support.LOCAL_SETTINGS_REL, json.dumps({"sandbox": block}))
+    support.assert_refused(launch(support.ENGINEER), "sandbox")
 
 
 def test_this_repositorys_settings_carry_no_sandbox_block():

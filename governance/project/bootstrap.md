@@ -614,3 +614,133 @@ Recorded at W1-12's close, from the ticket lead's summaries and a product-spec w
 - **Free fields.** `evidence` and `gap_ticket` carry no id pattern, so nothing duplicates the shared id grammars
   (DEC-227). Validation falls to W1-13.
 - **Untested:** a `config.yaml` naming an unknown schema makes `openspec new change` exit 1 with "Unknown schema".
+
+## W1-34 residuals (decision-package template, 2026-10-04)
+
+Recorded at W1-34's close, from the ticket lead's summaries. None is a defect of the ticket; each names who should
+settle it.
+
+- **Nothing enforces the template.** The tests check what the template lets through: nothing renders a package or
+  records an answer. Refusing a package without a recommendation or confidence, or an answer without a date, falls to
+  W1-35 and W1-11.
+- **The schema does not hold the five `status` values** (DEC-328). `status` is still any non-empty string and extra
+  keys are accepted, so the five values, "no second state key", `rank`, `cit` and `constrains` hold only in the
+  template and its test. W1-34 could not change schemas.
+- **What a declined, revoked or stale package does to waiting tickets** is W1-11's (DEC-308).
+- **Choices the sources do not fix.** The CIT id has no grammar (`CIT-0000` is a placeholder). The frontmatter key
+  `rank` and its default `P2`. Packages over the cap "wait, highest rank first" (DEC-093 gives only the cap and the
+  P1 bypass). "Human-resolvable" is read as "precedence does not settle it, or it is one of MR-6's questions that
+  matter". "Only an answered gate of the same CIT permits the next actions" also excludes an open gate, which
+  CAP-34.d does not list. The answer form reads `ACCEPTED (who, YYYY-MM-DD)`, not `owner`, because DEC-220 records
+  delegated answers under the orchestrator.
+- **The rules sit in an HTML comment inside the form**, which the author deletes from a filled package. W1-35's
+  skills need to carry the routing, batching and state rules themselves.
+
+## W1-25 residuals (gov checkpoint, 2026-10-04)
+
+Recorded at W1-25's close, from the ticket lead's summary. None is a defect of the ticket; each names who should
+settle it.
+
+- **Nothing calls the command yet.** W1-25 builds `gov checkpoint` (write, `--watch`, `--resume`) and the
+  fresh-agent-reconstruction check declaration. The calls at a ticket transition, a compaction and a stop are
+  W1-29's, W1-49's successor hooks' and W1-30's (DEC-280).
+- **"Only orchestrator-role sessions run `gov checkpoint`" (DEC-320) is not enforced by the command.** It rests on
+  the guard's path rules: a worker's write to `docs/checkpoints/<ticket>/` is outside its `allowed_paths`.
+- **No acceptance case holds the DEC-321 defaults** (240 minutes, 20 commits); one builder test does. Thresholds are
+  not range-checked.
+- **Numbering and writing.** Two sessions writing the same ticket's checkpoint at once, or on two branches, can take
+  the same number: there is no lock, and the write is not atomic. Files in the folder that do not match
+  `CP-<ticket>-<NNNN>.md` are ignored.
+- **What the watchdog reads.** "Commits since" counts from the commit that added the checkpoint file, across the
+  whole history of HEAD; an uncommitted checkpoint, or one not reachable from HEAD, counts 0. It checks that each
+  input has an id, a version and a well-formed sha256 and does not re-hash the files, so input drift is not
+  detected. The `ticket-transition` reason compares the ticket's status only (`task_status`, DEC-336). `--watch` on
+  a ticket whose file is gone answers `TICKET_UNKNOWN` (exit 1).
+- **The family check passes when no ticket has a checkpoint.** W1-26 runs it; whether "no checkpoint at all" should
+  fail is W1-26's or W1-29's to settle.
+- **Without `--json` the `--resume` brief is indented JSON text**, because `main.py` prints every result that way
+  (DEC-317). W1-29's SessionStart hook injects that text.
+- **The W1-46 builder test `tests/unit/launch/test_command_modules.py` uses not-yet-built commands as stand-ins**
+  (`pause`, `close`). It broke when `checkpoint` was built and will break again when W1-28 builds `pause` or W1-30
+  builds `close`: that ticket's lead renames the stand-in, as W1-25's did (`9c8fec02`).
+- **Workers ran unsandboxed** (interim, DEC-183).
+
+## W1-46 residuals (worker session launcher, 2026-10-04)
+
+Recorded at W1-46's close, from the three ticket-lead summaries and the two reviewer passes. `gov launch` is built;
+leads and workers were still started unsandboxed during this ticket (DEC-183). Each item names who should settle it
+where that is known; the rest go to EXP-002 and the mid-wave audit.
+
+**What a launched session can still do**
+
+- **A new name under `.gov-runtime/` outside `scratch/`, made at the OS level after launch, is not denied**
+  (DEC-311): the sandbox skips glob deny paths on Linux, so only the names that exist at launch and the freeze flag
+  carry literal rules. Inferred, not run: a project root whose path contains `*`, `?` or `[` would turn those literal
+  rules into patterns the sandbox skips.
+- **The shared git directory is writable from a launched session in a linked worktree.** It can commit (tested), and
+  it can also create a new file directly in the main repository's `.git`, which includes other branches' refs;
+  `.git/hooks` and `.git/config` are refused.
+- **The held-out path travels in argv**: the built settings are an inline `--settings` argument, visible in the
+  process list, the worker's own Bash included.
+- **The per-session temp directory is left behind** after the session ends.
+- **A research session starts in the repository root**, so a bare `uv add` is denied until it does `cd <folder>`. A
+  new directory a research install creates inside the repository is stopped by neither the fence nor the guard, only
+  reported by containment, and not at all if it is gitignored.
+
+**What the launcher does not check**
+
+- `~/.claude/settings.json` is not checked for bypass mode, added directories, `disableAllHooks` or a weak `sandbox`
+  block (DEC-313 covers the command line and the project's settings).
+- Option prefixes, another letter case and `--dangerously-skip-permissions=true` pass the launcher; the reviewer
+  infers the real CLI rejects them, and nobody ran it.
+- In force and stricter than some callers expect: `--setting-sources` is refused with any value, and a guard
+  registered only in `.claude/settings.local.json` refuses the launch (DEC-314).
+- `gov launch` ends with the session's exit code (DEC-332), so a session's own 1 to 4 reads like an API-0002 code;
+  a refusal is told apart by its envelope.
+
+**What the guard alone lets through** (left to the sandbox of a launched session)
+
+- **Install spellings for non-research roles:** `env` and `command` prefixes (known from W1-04), `exec`, `nice`,
+  `time`, `xargs`, `bash -c`, `python3 -mpip`, `uv pip sync`, `uv tool run`, `npm ci`, `npx`, `yarn add`, `pnpm add`,
+  `pipx run`, `cargo add`, `go get`, a pipe into a shell. Stopped only by the empty allowlist and the write fence.
+  For research: `uv --directory` or `--project`, `pip install --target` or `--user`, and `cd` behind an assignment,
+  `builtin`, `command` or `eval`. An orchestrator subagent in a worker session gets "ask" for an install, not "deny".
+- **`ln` behind a wrapper** (`env`, `command`, `nice`, `xargs`, `find -exec`, `bash -c`, backticks).
+- **Links the guard does not see made:** a write through a hard link already on disk, or through a link made by an
+  interpreter one-liner; replacing a symbolic link that already sits inside the acceptance tests and points into the
+  role's paths; a link made by `cp -s` followed by a write in the same command.
+- **Other programs that take options after operands** (`touch -d`, `tee`, `rsync`, `dd`) are not read the way `cp`
+  and `install` now are.
+- **An opaque Bash write is not judged**: an engineer changed a guard file inside its own paths with a Python script
+  fed through a here-document, and the guard allowed it, while it refuses the orchestrator's here-documents. The
+  holder exception follows a symbolic link: if `.claude/settings.json` were a link into scratch, any role could
+  write the path there.
+- **On a ticket whose `allowed_paths` name `.tickets/` or `.claude/`**, the guard alone allows writes there; only a
+  launched session carries the deny rules. DEC-315 has no exception for such a ticket: in a launched session the
+  deny rule stays (fail closed), which is why no headless session could write `.claude/agents/research.md` and the
+  owner placed it (DEC-312).
+
+**Where the guard is stricter than needed**
+
+- `ln -t`, `ln --`, a destination that is exactly the top directory of an allowed pattern, `ln <own> <own> -S bak`,
+  and a hard link whose source is outside the role's paths even when the source is harmless (a file under `docs/`).
+- A link to a protected place plus any other write in the same command; `ln -s <relative name>` plus any other
+  write; `cp -t <dir>` with a glob operand that matches nothing; `cp a b dir -p` judges the later sources as write
+  targets too.
+
+**The generic command line (DEC-317)**
+
+- A stray command module that hard-exits at import makes `gov --help` and a misspelt command end with exit 0.
+- A stray `src/gov/status/command.py` takes over `gov status`; `status` and `check` have no precedence guard.
+- No acceptance test shows that a new module alone adds a command, its arguments and its act paths. W1-25 was the
+  first user and needed no change to `main.py`.
+
+**Carried to other tickets**
+
+- **W1-08's `systems` snapshot** in the path map still shows the launcher and the research role as before this
+  ticket; it is updated when W1-33 lands the remaining role definitions.
+- **The experiments root is the fixed name `experiments/`** (DEC-333); a project key waits for a project that needs
+  one.
+- **Size.** 819 lines added outside tests against an estimate of 220, about 200 of them the DEC-317 change that
+  W1-25's package moved here; 214 acceptance cases were added after implementation, almost all for owner and
+  delegated decisions.

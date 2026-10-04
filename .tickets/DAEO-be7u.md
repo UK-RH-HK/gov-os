@@ -1,6 +1,6 @@
 ---
 id: DAEO-be7u
-status: open
+status: in_progress
 deps: [DAEO-uudf, DAEO-4yyl, DAEO-egm9]
 links: []
 created: 2026-09-30T22:49:58Z

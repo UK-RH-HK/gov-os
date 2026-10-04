@@ -1,0 +1,8 @@
+# The project's roster. W1-46 delivers the research entry (DEC-163); the
+# entries of the other roles come with their own tickets.
+roles:
+  research:
+    role_file: template/governance/kernel/roles/research.md
+    agent: .claude/agents/research.md
+    session: gov launch research <ticket>
+    network_profile: research-allowlist
