@@ -25,3 +25,13 @@ def module():
     except support.ModuleMissing as exc:
         reason = str(exc)
     pytest.fail(reason, pytrace=False)
+
+
+@pytest.fixture()
+def stage(module, tmp_path):
+    """This test's stand-ins and child environment. Every stand-in process is ended afterwards."""
+    stage = support.Stage(tmp_path / "stage")
+    try:
+        yield stage
+    finally:
+        stage.close()

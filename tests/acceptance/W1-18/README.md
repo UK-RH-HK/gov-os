@@ -2,11 +2,12 @@
 
 Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-1ve2` (W1-18), DEC-074 Q4,
 ADR-0002 §3 ("Processes") and §4 (the stopping-reason list), the `ollama` row of
-`governance/project/tool-registry.yaml`, and DEC-221 (profile STANDARD). Written before implementation. No earlier
-ticket's test was rewritten.
+`governance/project/tool-registry.yaml`, DEC-221 (profile STANDARD), and the three decisions that answer the first
+batch's packages: DEC-260, DEC-261 and DEC-257. Written before implementation. No earlier ticket's test was
+rewritten.
 
-**This is a first batch: one test.** The sources do not fix the public interface of the module, so the behavioural
-tests wait for the three decision packages below. Nothing was guessed.
+Two batches: the first held one test (`71651e81`); the second adds the behavioural tests. The suite now has
+**12 test functions, 15 cases**.
 
 ## Run
 
@@ -14,152 +15,117 @@ tests wait for the three decision packages below. Nothing was guessed.
 python3 -m pytest tests/acceptance/W1-18 -q -p no:cacheprovider
 ```
 
-Standard library and `pytest` only. No network. Nothing is installed. Ollama is not needed.
+Standard library and `pytest` only. Nothing is installed. Ollama is not needed and is never run. The whole directory
+takes about 9 seconds once the module exists.
+
+- **The function runs in a child process.** Each test starts `python3 -c` with `src/` on `PYTHONPATH`, calls
+  `gov.retrieval.ollama.ensure_available(timeout_s=...)` there, and reads the result as JSON. The child's standard
+  error is captured. A child that has not ended after 30 s is killed and the test fails as a hang.
+- **Stand-ins, in a temporary directory:**
+  - a stand-in `ollama` executable that records how it was run (arguments, pid, any keep-alive variable). Its
+    `serve` either answers `GET /api/version` with 200 on its own `OLLAMA_HOST` ("healthy") or only sleeps
+    ("never");
+  - a stand-in endpoint on a free loopback port, given through `OLLAMA_HOST`;
+  - recording stand-ins for `systemctl`, `systemd-run` and `loginctl`.
+- **Environment, built from scratch:** `PATH` (only the stage's own directory), an empty temporary `HOME`,
+  `TMPDIR`, locale, `PYTHONPATH`, `PYTHONDONTWRITEBYTECODE`, `OLLAMA_HOST`, and `GOV_OLLAMA_BIN` when the test sets
+  it. So the "no executable" case really has none, and no proxy variable is passed on.
+- **No outside network.** Only loopback, to a stand-in the test or the module started.
+- **Teardown** ends every stand-in, including a `serve` the module started (by the pid it recorded). A stand-in
+  daemon also ends by itself after a minute.
 
 ## KPI → tests → red reason today
 
-Red run on `w1/W1-18` at `5203ab3c`: **1 error, 0 passed, 0 failed**. The case errors in the `module` fixture:
+Red run on `w1/W1-18` at `71651e81` plus this batch: **15 errors, 0 passed, 0 failed**. Every case errors in the
+`module` fixture with the same reason:
 **`the Ollama lifecycle module does not exist: nothing matches src/gov/retrieval/ollama*`**.
 
 | KPI line | Test file | Test functions | Red reason today |
 |---|---|---|---|
-| **Success 1a.** gov starts `ollama serve` on demand and relies on the 5-min idle unload | — | none yet: waits for DP-1 and DP-2 | — |
-| **Success 1b.** No always-on unit | `test_w1_18_no_always_on_unit.py` | `test_the_repository_ships_no_always_on_unit_for_ollama` | The module does not exist |
-| **Success 2.** When Ollama is unavailable retrieval degrades to FTS-only with a warning and the facet state recorded | — | none yet: waits for DP-1 and DP-3 | — |
-| **Failure 1.** A query hangs > 30 s waiting for Ollama | — | none yet: waits for DP-1 | — |
-| **Failure 2.** Semantic results are silently omitted without a warning | — | none yet: waits for DP-1 and DP-3 | — |
+| **Success 1a.** gov starts `ollama serve` on demand and relies on the 5-min idle unload (DEC-260, DEC-261) | `test_w1_18_on_demand_start.py` | `test_a_healthy_endpoint_is_used_and_nothing_is_started` · `test_with_the_endpoint_down_ollama_serve_is_started_on_demand[3]` · `test_starting_sets_up_no_unit_and_no_keep_alive_override` · `test_the_started_daemon_is_left_running_and_used_again` | The module does not exist |
+| **Success 1b.** No always-on unit | `test_w1_18_no_always_on_unit.py` · `test_w1_18_on_demand_start.py` | `test_the_repository_ships_no_always_on_unit_for_ollama` · `test_starting_sets_up_no_unit_and_no_keep_alive_override` | The module does not exist |
+| **Success 2.** When Ollama is unavailable retrieval degrades to FTS-only with a warning and the facet state recorded (DEC-257) | `test_w1_18_fallback.py` | `test_without_an_executable_the_result_is_fts_only_with_the_facet_state` · `test_a_daemon_that_never_becomes_healthy_gives_the_same_degraded_result` · `test_degrading_writes_no_file` | The module does not exist |
+| **Failure 1.** A query hangs > 30 s waiting for Ollama (DEC-260) | `test_w1_18_deadline.py` | `test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline` · `test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call` · `test_the_default_deadline_is_20_seconds` · every call in the suite (killed and failed after 30 s) | The module does not exist |
+| **Failure 2.** Semantic results are silently omitted without a warning (DEC-257) | `test_w1_18_fallback.py` | `test_a_degraded_result_is_never_silent[2]` · the two Success 2 result tests | The module does not exist |
 
-**Count.** KPI lines with a test: 1 of 4, and that one only in part (2 success, 2 failure lines). Covers ids: the
-ticket names none.
+**Count.** KPI lines with tests: 4 of 4 (2 success, 2 failure). Covers ids: the ticket names none.
 
-## How the test decides
+## How the tests decide
 
-- The `module` fixture fails until something matches `src/gov/retrieval/ollama*` (the ticket's `allowed_paths`). It
-  assumes nothing else about the module.
-- The test asks git for `*.service`, `*.socket` and `*.timer` files in the working tree (tracked, or untracked and not
-  ignored) and fails when one names Ollama in its file name or its text. No other file is listed or read.
-- This is the static half of "no always-on unit". The behavioural half (starting the daemon calls no `systemctl`,
-  observed through a recording stand-in on `PATH`) needs the entry point of DP-1.
+- **The `module` fixture** fails until something matches `src/gov/retrieval/ollama*` (the ticket's `allowed_paths`).
+- **The result** is the mapping the function returns. Every call checks it has `available`, `started`, `facet`,
+  `state` and `warning`, and that the child ended with exit code 0 (the function never raises for an unavailable
+  daemon).
+- **Started on demand.** The stand-in executable's record shows one `serve` run when the endpoint was down, and none
+  when it was already healthy. The executable is found in each of the three places of DEC-260 (one case each); the
+  order between them is not tested.
+- **No unit, no keep-alive override.** No stand-in unit command was called, nothing was written under `HOME`, the
+  daemon's environment has no variable whose name contains `KEEP_ALIVE`, no argument contains `keep`, and no request
+  to the endpoint carries `keep_alive`.
+- **Never stopped.** After the child has ended, the test itself asks the endpoint and gets 200. A second call is
+  available with `started` false, still one `serve` run, and no `stop` argument.
+- **Degraded.** `available` is false, `facet` is `semantic`, `state` is `FACET_UNAVAILABLE`, and `warning` is a
+  non-empty string that names Ollama and says FTS-only. The exact warning text appears once in the child's standard
+  error. `HOME`, the working directory and `TMPDIR` hold the same files before and after.
+- **The deadline.** With `timeout_s=2`, the call itself (timed inside the child) returns within 4 s: when the daemon
+  never becomes healthy, and when the endpoint accepts the connection and never answers. The default of `timeout_s`
+  is read from the function's signature and is 20.
+- **The static test** asks git for `*.service`, `*.socket` and `*.timer` files in the working tree and fails when
+  one names Ollama in its file name or its text.
 
-## Planned second batch (after the packages are answered)
+## Readings the decisions do not spell out
 
-All through a stand-in `ollama` executable and a stand-in loopback endpoint in a temporary directory:
+1. **"Within the deadline"** allows 2 s on top of `timeout_s` for scheduling. The hard bound is the KPI's 30 s.
+2. **"Says results are FTS-only"** is matched as `FTS-only` or `FTS only`, in any letter case. **"Names Ollama"** is
+   matched in any letter case.
+3. **"Once on standard error"** means the result's `warning` string occurs exactly once in the standard error of the
+   call. Other text on standard error is allowed.
+4. **"No file is written"** is checked where a module would plausibly write: `HOME`, the working directory and
+   `TMPDIR` of the child. The repository's `src/` is protected by `PYTHONDONTWRITEBYTECODE`.
+5. **`OLLAMA_HOST`** is given as `127.0.0.1:<port>`, the form of the default. No test gives it with a scheme.
+6. **The default deadline** is tested through the signature, not by waiting 20 s.
 
-- Endpoint down and executable present: `serve` is started once, and the caller gets an available result.
-- Endpoint already up: nothing is started.
-- Starting sets up no unit (no `systemctl` call) and passes no setting that keeps the model loaded beyond 5 minutes.
-- Executable absent: FTS-only, with a warning and the facet state.
-- Executable present but the endpoint never answers: the call returns within the bound, FTS-only, with a warning.
-- Endpoint answers with an error: FTS-only, with a warning.
-- Every degraded result carries the warning; none is silent.
-- One `local_only` case against the real daemon, skipped when it is absent.
+## Left unasserted, because no decision states it
 
-## Decision packages
+- The values of `facet`, `state` and `warning` when the daemon is available.
+- The value of `started` in a degraded result.
+- What `env` means when it is given (the tests leave it `None` and set the child's process environment).
+- The order of the three executable locations, and a `GOV_OLLAMA_BIN` that names a missing file.
+- Whether a `serve` that never became healthy is left running (teardown ends it either way).
+- What the function does with the daemon's output streams.
 
-### DP-1 — The public interface of the lifecycle module
+No KPI line needs any of these, so no package is returned for them.
 
-- **Question.** Through what do callers, and these tests, use the module?
-  - (i) the entry point: its module path, its name and its arguments;
-  - (ii) how the `ollama` executable is found;
-  - (iii) how the endpoint is found, and which request counts as "healthy";
-  - (iv) how the wait bound is set, so a test need not wait 30 s;
-  - (v) how the outcome is returned.
-- **Why now.** Three and a half of the four KPI lines are behavioural. There is no `gov` command for this module
-  (W1-19 and W1-21 consume it later), and no source names any of (i) to (v).
-  - The `allowed_paths` give only `src/gov/retrieval/ollama*`.
-  - The registry note gives one location, `~/.local/ollama/bin/ollama`.
-  - Without an answer, every behavioural test would fix the interface by guessing.
-- **Options.**
-  - (a) **One function in `gov.retrieval.ollama`.**
-    - `ensure_available(*, timeout_s=30.0, env=None)` returns a mapping: `available` (boolean), `started` (boolean),
-      `facet` (`"semantic"`), `state`, and `warning` (a string, or `None` when available).
-    - Executable: `GOV_OLLAMA_BIN` if set, otherwise `ollama` on `PATH`, otherwise `~/.local/ollama/bin/ollama`.
-    - Endpoint: Ollama's own `OLLAMA_HOST`, default `127.0.0.1:11434`. Healthy means `GET /api/version` answers 200.
-    - It never raises for an unavailable daemon.
-  - (b) **A module command line.** `python3 -m gov.retrieval.ollama --json` prints the same mapping as one JSON
-    object. The tests run it as a child process, as the W1-07 suite runs `gov`. The same environment variables
-    apply, plus `--timeout`.
-  - (c) **Both.** The function of (a), with (b) as a thin wrapper.
-  - (d) **Wait.** Give W1-18 no behavioural acceptance tests, and test it through `gov retrieve` in W1-21.
-- **Impact.**
-  - (a) is the smallest and fits the 40 LOC estimate. The tests import the module in-process, so a stalled start
-    needs a watchdog in the tests.
-  - (b) adds about 15 LOC. It gives process isolation and a hard kill on a hang, which makes the 30 s line easy to
-    test honestly.
-  - (c) costs the most code.
-  - (d) leaves W1-18 with one static test, and moves its four KPI lines to a FULL ticket two steps later.
-- **Reversibility.** High for all four. Only W1-19 and W1-21 will call it and neither is written. Renaming later means
-  rewriting this suite's support module, reported as a rewrite.
-- **Cost.** (a) about 40 LOC and about 10 tests. (b) about 55 LOC and the same tests. (c) about 60 LOC. (d) none
-  now.
-- **Recommendation.** (a), with the environment variables and the `timeout_s` argument exactly as listed. The tests
-  call it in a child `python3` process they start themselves, so a hang is still killed.
-- **Confidence.** Medium. The shape is conventional. The names are my proposal, not a source's.
+## Decision packages: all three answered
 
-### DP-2 — Does `gov` stop the daemon, and what does "5-min idle unload" bind?
+The full text of the packages is in this file at `71651e81`.
 
-- **Question.** The sources disagree on stopping.
-  - ADR-0002 §3: "started and stopped by `gov`".
-  - The ticket body: "On-demand start and stop".
-  - The KPI: "starts ollama serve on demand and relies on the 5-min idle unload".
-  - Ollama's 5-minute idle behaviour (`keep_alive`) unloads the model from memory. It does not end the `serve`
-    process.
-- **Why now.** It decides what Success 1a asserts after a query:
-  - that the `serve` process is still running;
-  - that it has been stopped;
-  - or only that nothing overrides the 5-minute default.
-- **Options.**
-  - (a) **Start only.** `gov` starts `serve` when needed and never stops it. The model unloads after 5 idle minutes
-    by Ollama's default, and the idle process stays. The tests assert that no `OLLAMA_KEEP_ALIVE` or `keep_alive`
-    longer than 5 minutes is set, and that no unit is set up.
-  - (b) **Start, plus an explicit stop function.** A `stop()` ends a `serve` that `gov` itself started. A later
-    ticket calls it (`gov doctor`, or the session end). The tests assert that `stop()` ends only a daemon the module
-    started.
-  - (c) **Start and stop on every query.** The process is ended after each call.
-- **Impact.**
-  - (a) matches the KPI wording and the estimate. It leaves an idle process (small, with no model loaded), against
-    the ADR's "stopped by gov".
-  - (b) satisfies both texts and adds about 15 LOC and 2 tests.
-  - (c) defeats the warm p95 of 0.5 s that W1-19 needs.
-- **Reversibility.** High. Adding `stop()` later is additive.
-- **Cost.** (a) none extra. (b) about 15 LOC. (c) a cold start on every query.
-- **Recommendation.** (a) for W1-18, with the ADR's "stopped" read as "not kept alive by a unit". If the owner wants
-  a real stop, (b).
-- **Confidence.** Medium-high that (c) is wrong. Medium between (a) and (b).
+| Package | Question | Decision | Tested as |
+|---|---|---|---|
+| **DP-1** | The public interface of the lifecycle module | **DEC-260** (owner): `gov.retrieval.ollama.ensure_available(*, timeout_s, env=None)` returns a mapping with `available`, `started`, `facet`, `state` and `warning`, and never raises for an unavailable daemon. Executable: `GOV_OLLAMA_BIN`, then `ollama` on `PATH`, then `~/.local/ollama/bin/ollama`. Endpoint: `OLLAMA_HOST` (default `127.0.0.1:11434`); healthy means `GET /api/version` answers 200. The default total deadline is 20 s and covers the probe, the start and the wait. `src/gov/retrieval/__init__.py` joins the ticket's `allowed_paths`. | Every behavioural test |
+| **DP-2** | Does `gov` stop the daemon | **DEC-261** (owner): start on demand, never stop. No keep-alive override, no unit, no `stop`. Ollama's 5-minute idle unload frees the model's memory. | `test_w1_18_on_demand_start.py` |
+| **DP-3** | What "the facet state recorded" means | **DEC-257** (delegated): the result names facet `semantic`, state `FACET_UNAVAILABLE` and a non-empty warning that names Ollama and says results are FTS-only. The warning is also written once to standard error. No file is written. The module does not set a bundle's stopping reason. | `test_w1_18_fallback.py` |
 
-### DP-3 — What "the facet state recorded" means
+The three decisions are recorded on the integration branch. This branch does not contain them yet; their content
+reached this batch through the ticket lead's request.
 
-- **Question.** Which value is recorded, for which facet, and where?
-- **Why now.** Success 2 and Failure 2 assert it.
-  - ADR-0002 §4 and DEC-034 give `FACET_UNAVAILABLE` only as a bundle stopping reason ("index stale/down").
-  - The facets the sources name are decisions, code, tests, history, why, and lessons/failures. None is called
-    "semantic".
-  - No source gives a place for the record: the returned value, standard error, or a file under `.gov-runtime/`.
-- **Options.**
-  - (a) **In the result.** The outcome carries `facet: "semantic"`, `state: "FACET_UNAVAILABLE"` and a non-empty
-    `warning`. The same warning is written once to standard error. No file is written. W1-21 copies the state into
-    the bundle.
-  - (b) **Also in a file.** As (a), plus a line appended to a file under `.gov-runtime/`, for `gov doctor` and
-    `gov status`.
-  - (c) **Warning only.** A boolean `available` and a warning. The bundle's facet state is left to W1-21.
-- **Impact.**
-  - (a) makes "recorded" testable here, without a write path outside the ticket's `allowed_paths` story.
-  - (b) needs a file name and format that no source gives, and a reader that does not exist yet.
-  - (c) makes half of Success 2 untestable in W1-18.
-- **Reversibility.** High for (a) and (c). Medium for (b), because a file format gains readers.
-- **Cost.** (a) inside the estimate. (b) about 10 LOC more and a format decision. (c) the least.
-- **Recommendation.** (a). The warning text must name Ollama and say that results are FTS-only.
-- **Confidence.** Medium. `FACET_UNAVAILABLE` is the only state word the sources offer. "semantic" as the facet name
-  is my reading of DEC-033 ("the semantic facet").
+## Not written
+
+- The `local_only` case against the real daemon, planned in the first batch. Ollama is not on this machine's `PATH`,
+  nothing is installed in this ticket, and no KPI line needs it.
+- "Endpoint answers with an error", planned in the first batch. It is the same path as an endpoint that is down
+  (healthy means 200), so it would add a case without a KPI behind it (DEC-221).
 
 ## Observations for the ticket lead (no test depends on them)
 
-1. `src/gov/retrieval/` does not exist, and `src/gov/retrieval/__init__.py` is not matched by the implementer's
-   `allowed_paths` (`src/gov/retrieval/ollama*`). The module still imports from `src/` as a namespace package, but
-   `[tool.setuptools.packages.find]` would not package it.
-2. The registry note says "The embedding model enters the registry with W1-18" (DEC-195).
+1. The registry note says "The embedding model enters the registry with W1-18" (DEC-195).
    `governance/project/tool-registry.yaml` is not in the implementer's `allowed_paths`, and nothing is installed in
    this ticket. No KPI line asks for the row, so no test asserts it.
-3. G-22 is cited by the ticket but exists in the repository only as one line of `docs/spec/gov-os/READINESS.md`
+2. G-22 is cited by the ticket but exists in the repository only as one line of `docs/spec/gov-os/READINESS.md`
    ("Ollama health check, FTS-only fallback"). Its text is in the archived sources, which this role does not read
    (DEC-222 is for product-spec workers).
+3. ADR-0002 §3 still says the daemon is "started and stopped by `gov`", and the ticket body says "start and stop".
+   DEC-261 decides there is no stop; the two texts were not changed by this role.
+4. A daemon the function starts may inherit the caller's output streams. A caller that reads them through a pipe
+   would then wait for the daemon. The tests avoid this by sending the child's streams to files, so they do not
+   assert it either way.
