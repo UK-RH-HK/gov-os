@@ -8,18 +8,22 @@ in the main tree, the lead's in a linked worktree. A second compaction
 replaces the block. Acts only when GOV_ROLE is exactly "orchestrator"
 (DEC-259).
 
-The written part is never changed: the new file is built beside the
-checkpoint and put in its place in one step, with the modification
-time the checkpoint had, so the file's time stays the time of its
-written part. What the hook could not do it says in a systemMessage.
-Always exits 0.
+The written part is never changed: the state is gathered first, then
+the file is read and the block written in place after the written part,
+which is not rewritten, and the modification time is set back, so the
+file's time stays the time of its written part. No other file is
+touched. A block is the hook's own only when its lines match the digest
+on its `generated:` line; anything else is written text and stays.
+What the hook could not do it says in a systemMessage. Always exits 0.
 """
 
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -36,17 +40,27 @@ def checkpoint_rel(project_root: str) -> str:
     return f".gov-runtime/scratch/{'lead' if linked else 'orchestrator'}/CHECKPOINT.md"
 
 
+def digest(stamp: bytes, rest: bytes) -> bytes:
+    return hashlib.sha256(stamp + b"\n" + rest).hexdigest().encode()
+
+
 def split(data: bytes) -> tuple[bytes, bytes]:
     """(written part, generated block). There is a block only when the
-    last line that is not empty is the end marker; it starts at the
-    last line that is the begin marker and nothing else."""
+    last line that is not empty is exactly the end marker, the last
+    line that is exactly the begin marker is followed by the
+    `generated:` line, and the digest on that line is that of the
+    lines after it. Anything else is written text."""
     lines = data.splitlines(keepends=True)
-    while lines and not lines[-1].strip():
-        lines.pop()
-    if lines and lines[-1].strip() == END:
-        for index in range(len(lines) - 1, -1, -1):
-            if lines[index].strip() == BEGIN:
-                return b"".join(lines[:index]), b"".join(lines[index:])
+    end = len(lines)
+    while end and not lines[end - 1].strip():
+        end -= 1
+    if end and lines[end - 1] == END + b"\n":
+        for index in range(end - 2, -1, -1):
+            if lines[index] == BEGIN + b"\n":
+                stamp = re.fullmatch(rb"generated: (\S+) (\S+)\n", lines[index + 1])
+                if stamp and digest(stamp.group(1), b"".join(lines[index + 2:end])) == stamp.group(2):
+                    return b"".join(lines[:index]), b"".join(lines[index:])
+                break
     return data, b""
 
 
@@ -64,15 +78,22 @@ def output(project_root: str, *command: str) -> str:
 
 
 def state_block(project_root: str) -> bytes:
-    return (
-        f"{BEGIN.decode()}\n"
-        f"generated: {time.strftime(STAMP, time.gmtime())}\n"
+    stamp = time.strftime(STAMP, time.gmtime()).encode()
+    rest = (
         f"git head: {output(project_root, 'git', 'rev-parse', 'HEAD').strip()}\n"
         f"tickets in progress (`tk ls --status=in_progress`):{output(project_root, 'tk', 'ls', '--status=in_progress')}\n"
         f"worktrees (`git worktree list`):{output(project_root, 'git', 'worktree', 'list')}\n"
         "pending owner decisions: not known to the hook; see the written part of this checkpoint\n"
-        f"{END.decode()}\n"
-    ).encode("utf-8")
+    ).encode("utf-8") + END + b"\n"
+    return BEGIN + b"\ngenerated: " + stamp + b" " + digest(stamp, rest) + b"\n" + rest
+
+
+def put(f, offset: int, data: bytes) -> None:
+    """Writes data at offset and ends the file there."""
+    f.seek(offset)
+    if f.write(data) != len(data):
+        raise OSError(28, "No space left on device")
+    f.truncate()
 
 
 def main() -> None:
@@ -80,25 +101,24 @@ def main() -> None:
         return
     project_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
     rel = checkpoint_rel(project_root)
-    path = os.path.join(project_root, rel)
-    beside = path + ".precompact"
+    block = state_block(project_root)  # before the file is read: a checkpoint saved meanwhile is not put back
     try:
-        with open(path, "r+b") as f:  # fails when it is missing, a directory or read-only
-            written = split(f.read())[0]
+        # fails when it is missing, a directory or read-only
+        with open(os.path.join(project_root, rel), "r+b", buffering=0) as f:
             was = os.fstat(f.fileno())
-        if written and not written.endswith(b"\n"):
-            written += b"\n"
-        with open(beside, "wb") as f:
-            f.write(written + state_block(project_root))
-        os.chmod(beside, was.st_mode & 0o7777)
-        os.utime(beside, ns=(was.st_atime_ns, was.st_mtime_ns))
-        os.replace(beside, path)
+            data = f.read()
+            kept = len(split(data)[0])
+            try:
+                put(f, kept, block if data[:kept].endswith(b"\n") or not kept else b"\n" + block)
+            except OSError:
+                with contextlib.suppress(OSError):
+                    put(f, kept, data[kept:])  # the checkpoint as it was
+                raise
+            finally:
+                os.utime(f.fileno(), ns=(was.st_atime_ns, was.st_mtime_ns))
     except OSError as exc:
         sys.stdout.write(json.dumps({"systemMessage": f"PreCompact: no state block was appended to {rel} "
                                                       f"({exc.strerror}). The compaction proceeds."}))
-    finally:
-        with contextlib.suppress(OSError):
-            os.remove(beside)
 
 
 if __name__ == "__main__":

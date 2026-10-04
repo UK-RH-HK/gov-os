@@ -49,12 +49,19 @@ def test_resume_section_ends_at_a_heading_of_the_same_or_a_higher_level():
     assert sessionstart.resume_section("# Top\n\nRESUME HERE in prose\n") == ""
 
 
-def test_split_takes_only_a_block_that_ends_the_file():
+def _block(rest="git head: h\n"):
+    rest = rest.encode() + precompact.END + b"\n"
+    return precompact.BEGIN + b"\ngenerated: g " + precompact.digest(b"g", rest) + b"\n" + rest
+
+
+def test_split_takes_only_the_hooks_own_block_at_the_end_of_the_file():
     quoted = f"a\n{BEGIN}\nx\n{END}\nb\n".encode()
     assert precompact.split(quoted) == (quoted, b"")
-    block = f"{BEGIN}\ngenerated: g\n{END}\n".encode()
-    assert precompact.split(quoted + block + b"\n \n") == (quoted, block)
+    assert precompact.split(quoted + _block() + b"\n \n") == (quoted, _block() + b"\n \n")
     assert precompact.split(b"") == (b"", b"")
+    for changed in (_block().replace(b"git head: h\n", b"git head: h\n  added\n"), b"  " + _block(),
+                    _block().replace(b"-->\n", b"--> \n"), _block().replace(b"generated: g ", b"generated: h ")):
+        assert precompact.split(quoted + changed) == (quoted + changed, b"")
 
 
 def test_an_unset_role_is_not_the_orchestrator(tmp_path):
@@ -88,12 +95,29 @@ def test_precompact_appends_one_block_and_sessionstart_warns(tmp_path):
 def test_a_checkpoint_precompact_cannot_write_is_left_as_it_was(tmp_path):
     path = _checkpoint(tmp_path, age_s=60)
     path.chmod(0o444)
-    read_only = _run("precompact.py", tmp_path)
-    path.chmod(0o644)
-    path.parent.chmod(0o555)
-    no_room_beside = _run("precompact.py", tmp_path)
-    path.parent.chmod(0o755)
-    for run in (read_only, no_room_beside):
-        assert run.returncode == 0 and ORCH in json.loads(run.stdout)["systemMessage"]
+    run = _run("precompact.py", tmp_path)
+    assert run.returncode == 0 and ORCH in json.loads(run.stdout)["systemMessage"]
     assert path.read_text(encoding="utf-8") == WRITTEN
     assert sorted(p.name for p in path.parent.iterdir()) == ["CHECKPOINT.md"]
+
+
+def test_a_write_that_fails_part_way_leaves_the_checkpoint_as_it_was(tmp_path, monkeypatch, capsys):
+    path = _checkpoint(tmp_path, age_s=60, text=WRITTEN + "old tail\n")
+    monkeypatch.setenv("GOV_ROLE", "orchestrator")
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+    monkeypatch.setattr(precompact, "split", lambda data: (WRITTEN.encode(), b""))
+    monkeypatch.setattr(precompact, "state_block", lambda root: b"new block\n")
+    real, calls = precompact.put, []
+
+    def failing(f, offset, data):
+        calls.append(data)
+        if len(calls) == 1:
+            real(f, offset, data[:4])
+            raise OSError(28, "No space left on device")
+        real(f, offset, data)
+
+    monkeypatch.setattr(precompact, "put", failing)
+    was = path.stat().st_mtime_ns
+    precompact.main()
+    assert path.read_text(encoding="utf-8") == WRITTEN + "old tail\n" and path.stat().st_mtime_ns == was
+    assert ORCH in json.loads(capsys.readouterr().out)["systemMessage"]
