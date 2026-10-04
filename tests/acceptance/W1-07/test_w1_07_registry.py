@@ -3,6 +3,10 @@
 A reserved command that is not built yet returns a ``NOT_IMPLEMENTED`` envelope.
 W1-07 builds a minimal ``status`` and ``check --list``; the ticket that builds
 another command revises that command's case here.
+
+Planned revision (DEC-190, reason "planned: command implemented"): ``checkpoint``
+is built by W1-25 and is no longer expected to return ``NOT_IMPLEMENTED``; the
+list is ``NOT_BUILT`` in ``w1_07_support.py``.
 """
 
 from __future__ import annotations
