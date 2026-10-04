@@ -620,3 +620,41 @@ def test_wget_combined_option_into_path(cmd):
 ])
 def test_wget_combined_option_not_into_path(cmd):
     assert not has_install(cmd), f"false positive: {cmd}"
+
+
+# ===================================================================
+# W1-47: four uv forms are installs (DEC-174), value options (DEC-216)
+# ===================================================================
+
+@pytest.mark.parametrize("cmd", [
+    "uv add requests",
+    "uv sync --frozen",
+    "uv run --with requests python script.py",
+    "uv run --no-project -w rich python script.py",
+    "uvx ruff check .",
+    "uvx -q ruff check .",
+    "uv -q --no-cache sync",
+    "uv --directory sub add requests",
+    "uv --directory=sub add requests",
+    "uv --project sub --cache-dir .c sync",
+    "uv --directory run add requests",
+    "uv --config-file uv.toml run -w requests script.py",
+    "echo start && uv --directory sub add requests",
+])
+def test_uv_forms_of_dec_174_detected(cmd):
+    assert has_install(cmd), f"not detected: {cmd}"
+
+
+@pytest.mark.parametrize("cmd", [
+    "uv run python script.py",
+    "uv run --with-requirements requirements.txt python script.py",
+    "uv lock",
+    "uv remove requests",
+    "uv pip sync requirements.txt",
+    "uv tool run ruff check .",
+    "uv --directory add run python script.py",
+    "uv --project sync run pytest -q",
+    "uv --cache-dir add lock",
+])
+def test_other_uv_commands_not_detected(cmd):
+    assert not has_install(cmd), f"false positive: {cmd}"

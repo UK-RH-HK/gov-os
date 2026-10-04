@@ -102,8 +102,9 @@ def _get_allowed_paths(role: str, tid: str | None, root: str,
     if role == "orchestrator":
         # DEC-156: the wide scope applies only in an orchestrator session.
         # An orchestrator subagent in a non-orchestrator session falls
-        # through to the ticket-path rule (DEC-136 batch 3).
-        if session_role is None or session_role == "orchestrator":
+        # through to the ticket-path rule (DEC-136 batch 3).  A missing
+        # session role gives no wide scope (DEC-179).
+        if session_role == "orchestrator":
             return ["**"]
         # Fall through: use the ticket's allowed_paths when the ticket's
         # role is orchestrator; otherwise the orchestrator subagent gets
@@ -435,6 +436,21 @@ def decide(
     """Return ``("allow", "")`` or ``("deny", "<reason>")``."""
     frozen = os.path.exists(os.path.join(project_root, FREEZE_FLAG))
     erole = (role or "").strip() or ""
+
+    # CAP-62.a: no Bash call leaves the sandbox, whatever the role.
+    if tool_name == "Bash" and tool_input.get("dangerouslyDisableSandbox"):
+        return "deny", "dangerouslyDisableSandbox is denied to every role"
+
+    # DEC-162, DEC-215: no call names a held-out path, whatever the tool
+    # and the role.  A broken held-out.yaml stops every call (DEC-218).
+    from gov.guard.heldout import HeldOutError, load_held_out, names_held_out
+    try:
+        held_out = load_held_out(project_root)
+    except HeldOutError as exc:
+        return "deny", f"{exc}: every call is denied until the owner repairs it"
+    if held_out and names_held_out(tool_name, tool_input, project_root,
+                                   cwd or project_root, held_out):
+        return "deny", "the call names a held-out path"
 
     if tool_name in READ_TOOLS:
         return "allow", ""

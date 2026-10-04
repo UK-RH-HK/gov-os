@@ -7,20 +7,8 @@
       "Edit(**/*.pem)",
       "Edit(**/*.key)",
       "Edit(config/secrets*)",
-      "Bash(sudo:*)"
-    ],
-    "ask": [
-      "Bash(pip:*)",
-      "Bash(pip3:*)",
-      "Bash(python -m pip:*)",
-      "Bash(python3 -m pip:*)",
-      "Bash(uv:*)",
-      "Bash(npm install:*)",
-      "Bash(cargo install:*)",
-      "Bash(apt:*)",
-      "Bash(apt-get:*)",
-      "Bash(curl:*)",
-      "Bash(wget:*)"
+      "Bash(sudo:*)",
+      "Read(//home/usain/gov-os-workbench/qualification-oracle/**)"
     ]
   },
   "hooks": {

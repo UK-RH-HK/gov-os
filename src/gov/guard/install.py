@@ -15,6 +15,9 @@ _PKG = frozenset({
     "pip", "pip3", "npm", "cargo", "apt", "apt-get",
     "pipx", "pnpm", "yarn", "snap", "brew", "go", "gem", "conda", "dnf", "yum",
 })
+_UV_VALUE_OPTS = frozenset({
+    "--directory", "--project", "--cache-dir", "--config-file",
+})
 _SH = frozenset({"sh", "bash"})
 _PUNCT = frozenset("();<>|&\n")
 
@@ -99,6 +102,30 @@ def _download_target(nm, args):
     return None
 
 
+def _uv_install(args):
+    """True for ``uv pip install``, ``uv tool install``, ``uv add``,
+    ``uv sync`` and ``uv run --with`` / ``-w`` (DEC-174), with options
+    before the subcommand; a value option's value is skipped (DEC-216)."""
+    words = []
+    i = 0
+    while i < len(args):
+        if args[i] in _UV_VALUE_OPTS:
+            i += 2
+            continue
+        if not args[i].startswith("-"):
+            words.append(args[i])
+        i += 1
+    if not words:
+        return False
+    if words[0] in ("add", "sync"):
+        return True
+    if words[0] == "run":
+        return any(a in ("--with", "-w") or a.startswith("--with=")
+                   for a in args)
+    return (len(words) >= 2 and words[0] in ("pip", "tool")
+            and words[1] == "install")
+
+
 def has_install(command):
     """True when *command* is a package-manager install, a download piped
     to a shell, or a binary download into a ``PATH`` directory."""
@@ -134,10 +161,10 @@ def has_install(command):
                         and args[1] == "pip" and "install" in args[2:]):
                     return True
             elif nm == "uv":
-                nopt = [a for a in args if not a.startswith("-")]
-                if (len(nopt) >= 2 and nopt[0] in ("pip", "tool")
-                        and nopt[1] == "install"):
+                if _uv_install(args):
                     return True
+            elif nm == "uvx":
+                return True
             # Binary download into a PATH directory
             if nm in ("curl", "wget"):
                 t = _download_target(nm, args)
