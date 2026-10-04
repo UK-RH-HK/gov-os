@@ -4,9 +4,10 @@ Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket
 CAP-03 (covers CAP-03.a, CAP-03.b, CAP-03.e) and CAP-38 (CAP-38.b), DEC-074 Q8 and Q9, DEC-076, DEC-186, DEC-187,
 DEC-225 and DEC-221 (profile FULL). Written before implementation. No earlier ticket's test was rewritten.
 
-The suite has **50 test functions, 80 cases**: 36 functions and 59 cases written before implementation, and 14
+The suite has **53 test functions, 92 cases**: 36 functions and 59 cases written before implementation, 14
 functions and 21 cases of the second batch (below), written after green from behaviours a review described
-(DEC-136).
+(DEC-136), and 3 functions and 12 cases of the third batch (below), written after implementation from a probe
+finding (DEC-298).
 
 ## Run
 
@@ -138,14 +139,64 @@ How these tests decide:
 Not tested in this batch, on purpose: big-endian UTF-16 and other encodings; a store file (not folder) that cannot
 be read; a link to a single store file; a SQLite store in WAL mode, with its side files.
 
-## `local_only` (17 cases)
+## Third batch: a secret the project's `.gitleaks.toml` shelters (probe finding, DEC-298)
 
-Deselect with `-m "not local_only"` (63 cases remain).
+File `test_w1_15_shelter_batch.py`: **3 test functions, 12 cases**, added after implementation; reason: probe
+finding (DEC-136). The probe passed a described behaviour, never code. No earlier test was changed or rewritten.
+The support module gained `SHELTERS` and `shelter_config`.
 
-- **Run the `gitleaks` binary directly** (14 cases): `test_the_canary_is_detected[4]`,
+DEC-290 made the pre-index filter ignore path allowlists. DEC-298 extends it to the other ways a project's
+`.gitleaks.toml` can shelter a secret. The four shelters, each applied to the template's file at the test project's
+root:
+
+| Shelter | Change to the project's file | Planted secret |
+|---|---|---|
+| `global-regexes` | a `[[allowlists]]` entry whose `regexes` matches the secret | the canary (tier form) |
+| `global-stopwords` | a `[[allowlists]]` entry whose `stopwords` holds a part of the secret | the canary (tier form) |
+| `rule-allowlist` | a `[[rules.allowlists]]` entry on every rule the file itself holds (both find the canary) | the canary (tier form) |
+| `disabled-rule` | `disabledRules` under `[extend]`, naming the default rule that finds the secret | the access token (a default rule finds it) |
+
+Red run on `w1/W1-15` at `dfe244f0` plus this batch: **8 failed, 84 passed** (the 80 earlier cases and the 4
+"keep true" cases of this one). Without the `local_only` cases: 4 failed, 67 passed. Each failure is the test's own
+last assertion; every premise holds.
+
+| Behaviour | Test functions | Red reason today |
+|---|---|---|
+| **C1.** The filter lets no secret through that the project's file shelters (DEC-298, CAP-03.a) | `test_a_file_with_a_secret_the_configuration_shelters_is_not_indexable[4]` · keep true: `test_a_file_without_a_secret_is_indexable_under_a_sheltering_configuration[4]` | 4 red: the planted file is let through to the indexer. The 4 keep-true cases pass. |
+| **C2.** The check is not green on a store holding a secret the project's file shelters (KPI success 4, failure 1, CAP-38.b) | `test_the_check_is_not_green_on_a_store_with_a_secret_the_configuration_shelters[4]` | 4 red: the check exits 0. |
+
+How these tests decide:
+
+- **C1.** Before the filter is asked, the test runs the `gitleaks` binary by hand over the planted folder, twice:
+  with the template's rules it reports the planted file and only it; with the shelter it reports nothing. So the
+  shelter is one the scanner honours. Then the planted file must be absent from what the filter returns and the
+  clean neighbour present. The call must succeed: the rules are there, so the filter can decide, and the keep-true
+  cases require it to let files without a secret through under each of the four configurations.
+- **C2.** **The check reads the project's `.gitleaks.toml`.** Its public behaviour shows it: with the same store
+  the check fails under the template's file (the premise each case asserts) and is green once the file shelters the
+  secret; and it is not green when the file holds no rules (B2). So each case plants the secret in a packet under
+  `.gov-runtime/`, sees the check fail, applies the shelter, and expects the check still not to be green. DEC-298
+  names the filter; for the check the expectation comes from KPI success 4 and failure 1 (no planted secret in a
+  derived store).
+- **Disabled rules.** `gitleaks` 8.30.1 disables only rules of the configuration a file extends
+  (`[extend] disabledRules`); it has no switch for a rule the file itself holds, and naming such a rule there
+  changes nothing. So the disabled case plants a secret a default rule finds.
+
+Not tested in this batch, on purpose: a project that deletes or rewrites one of the template's own rules (package
+DP-7); the older `[allowlist]` and `[rules.allowlist]` spellings of the same shelters; allowlist `commits`, and
+`targetRules`, `condition` and `regexTarget`; inline `gitleaks:allow` comments and a `.gitleaksignore` file; that the
+check stays green on clean stores under a sheltering file.
+
+## `local_only` (21 cases)
+
+Deselect with `-m "not local_only"` (71 cases remain).
+
+- **Run the `gitleaks` binary directly** (18 cases): `test_the_canary_is_detected[4]`,
   `test_the_gitleaks_defaults_alone_miss_the_canary[2]`, `test_a_secret_the_defaults_find_is_still_detected[4]`,
   `test_text_about_canaries_and_tokens_is_not_a_finding[2]`,
-  `test_the_token_canary_file_of_the_dev_tier_is_reported[2]`. Skipped when `gitleaks` is not on `PATH`.
+  `test_the_token_canary_file_of_the_dev_tier_is_reported[2]`,
+  `test_a_file_with_a_secret_the_configuration_shelters_is_not_indexable[4]`. Skipped when `gitleaks` is not on
+  `PATH`.
 - **Clone a dev tier** (`$GOV_DEV_TIERS`, default `~/gov-os-workbench/synthetic`; tiers `a-dev` and `b-dev`, by
   exact path): `test_the_dev_tiers_hold_the_seven_canaries`, `test_no_dev_canary_is_in_a_file_an_indexer_may_read[2]`
   and the two `…dev_tier_is_reported` cases above. Skipped when the tier is absent.

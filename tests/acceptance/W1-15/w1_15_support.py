@@ -294,6 +294,73 @@ RULELESS_CONFIGS = {
 }
 
 
+# --------------------------------------------------------------------------
+# Sheltering configurations (DEC-298): ways a project's .gitleaks.toml makes the scanner stay silent on a secret
+# --------------------------------------------------------------------------
+
+def _literal(text):
+    """``text`` as a TOML literal string."""
+    assert "'''" not in text
+    return "'''" + text + "'''"
+
+
+def _global_regexes(text, secret, rule):
+    return text + "\n[[allowlists]]\ndescription = \"sheltered by the project\"\nregexes = [" \
+        + _literal(re.escape(secret)) + "]\n"
+
+
+def _global_stopwords(text, secret, rule):
+    stopword = secret[len(secret) // 2 - 6:len(secret) // 2 + 6]   # a part of the secret, not the whole of it
+    return text + "\n[[allowlists]]\ndescription = \"sheltered by the project\"\nstopwords = [" \
+        + _literal(stopword) + "]\n"
+
+
+def _rule_allowlist(text, secret, rule):
+    """An allowlist on every rule the file itself holds: whichever of them finds the secret, it is sheltered."""
+    head, *rules = re.split(r"(?m)^(?=\[\[rules\]\])", text)
+    assert rules, "the configuration holds no [[rules]] entry to put an allowlist on"
+    block = "\n[[rules.allowlists]]\nregexes = [" + _literal(re.escape(secret)) + "]\n\n"
+    return head + "".join(entry.rstrip("\n") + "\n" + block for entry in rules)
+
+
+def _disabled_rule(text, secret, rule):
+    """``disabledRules`` under ``[extend]``: the one way the format disables a rule of the extended defaults."""
+    changed, count = re.subn(r"(?m)^(useDefault[ \t]*=[ \t]*true[ \t]*)$",
+                             lambda found: found.group(1) + '\ndisabledRules = ["' + rule + '"]', text)
+    assert count == 1, "the configuration has no single 'useDefault = true' line to add disabledRules to"
+    return changed
+
+
+@dataclass(frozen=True)
+class Shelter:
+    secret: str        # the planted string the shelter hides
+    rule: str | None   # the default rule that finds it, where the shelter has to name one
+    change: object     # (configuration text, secret, rule) -> configuration text
+
+
+# ``gitleaks`` disables only rules of the configuration a file extends (``disabledRules``); a rule the file itself
+# holds has no switch. So the disabled case plants a secret a default rule finds, and the other three the canary.
+SHELTERS = {
+    "global-regexes": Shelter(TIER_FORM, None, _global_regexes),
+    "global-stopwords": Shelter(TIER_FORM, None, _global_stopwords),
+    "rule-allowlist": Shelter(TIER_FORM, None, _rule_allowlist),
+    "disabled-rule": Shelter(ACCESS_TOKEN, "github-pat", _disabled_rule),
+}
+
+
+def shelter_config(project, name):
+    """Change the project's ``.gitleaks.toml`` so that it shelters the secret of ``SHELTERS[name]``."""
+    shelter = SHELTERS[name]
+    path = project.root / ROOT_CONFIG_REL
+    text = shelter.change(path.read_text(encoding="utf-8"), shelter.secret, shelter.rule)
+    try:
+        tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        raise AssertionError(f"the sheltering configuration ({name}) is not valid TOML: {exc}") from None
+    path.write_text(text, encoding="utf-8")
+    return shelter
+
+
 def files_holding(root, needles, skip=(".git",)):
     """``relative path -> needles found`` for every regular file under ``root`` that holds one of ``needles``."""
     root = Path(root)
