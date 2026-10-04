@@ -2,7 +2,8 @@
 
 ``indexable(root, paths)`` is what every indexer calls before chunking: it returns
 the paths the indexer may read. ``stores_with_secrets(root)`` is the subject of the
-secrets-indexing family check. Both run the gitleaks binary with the rules of the
+secrets-indexing family check. ``path_holds_secret(root, path)`` judges a path name,
+for an index that stores paths (DEC-339). All run the gitleaks binary with the rules of the
 project's ``.gitleaks.toml`` (DEC-287) over content given on standard input, so a
 path allowlist never applies (DEC-290) and no report is written. The file's other
 allowlists and its disabled rules are left out of the scan (DEC-298). Whatever cannot be
@@ -27,7 +28,7 @@ RUNTIME_REL = ".gov-runtime"
 GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 
-__all__ = ["indexable", "stores_with_secrets"]
+__all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
 
 
 def _toml(value) -> str:
@@ -108,6 +109,11 @@ def indexable(root: Path, paths: list[str]) -> list[str]:
     with ThreadPoolExecutor() as pool:
         verdicts = list(pool.map(allowed, dict.fromkeys(paths)))
     return [rel for rel, verdict in zip(dict.fromkeys(paths), verdicts) if verdict]
+
+
+def path_holds_secret(root: Path, path: str) -> bool:
+    """Whether the name of ``path`` holds a secret: the whole path and each of its names, judged as content is."""
+    return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])))
 
 
 def _store_content(path: Path) -> bytes:

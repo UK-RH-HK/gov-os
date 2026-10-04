@@ -17,8 +17,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 FILES = (".gitleaks.toml", "template/.gitleaks.toml")
 # DEC-325: a digit, or both cases, in a body of 16 characters or more that begins with a letter or a digit.
+# DEC-339: one _ or - may stand before that body; it is not one of the 16 characters.
 REQUIREMENT = re.compile(r"\b(?:sk|pk|rk|tok)[_-](?=[\w-]*\d|[\w-]*[a-z][\w-]*[A-Z]|[\w-]*[A-Z][\w-]*[a-z])"
-                         r"[A-Za-z0-9][\w-]{15,}")
+                         r"[_-]?[A-Za-z0-9][\w-]{15,}")
 
 
 def _rules(rel):
@@ -45,6 +46,7 @@ def test_the_three_expressions_flag_what_the_requirement_flags():
                for length in (15, 16) for place in range(length) for other in "A7_"]
     bodies += [("A" * length)[:place] + other + ("A" * length)[place + 1:]
                for length in (15, 16) for place in range(length) for other in "a7-"]
+    bodies += [first + body for body in bodies for first in "_-"]  # DEC-339: the same after one more separator
     wrong = []
     for prefix, separator, body in itertools.product(("sk", "tok"), "_-", bodies):
         text = f"The value is {prefix}{separator}{body} today."

@@ -86,6 +86,15 @@ def test_a_store_file_that_cannot_be_read_is_not_a_clean_store(project):
         secrets.stores_with_secrets(project)
 
 
+def test_a_path_name_is_judged_by_each_of_its_names_and_no_allowlist_shelters_it(project):
+    assert secrets.path_holds_secret(project, f"fixtures/{PLANTED}/page.md") is True
+    assert secrets.path_holds_secret(project, f"fixtures/{PLANTED}.md") is True
+    assert secrets.path_holds_secret(project, "fixtures/page.md") is False
+    (project / ".gitleaks.toml").unlink()
+    with pytest.raises(RuntimeError):  # no rules: no verdict
+        secrets.path_holds_secret(project, "fixtures/page.md")
+
+
 def test_a_project_without_a_gitleaks_configuration_is_refused(project):
     (project / ".gitleaks.toml").unlink()
     clean = _write(project, "notes/clean.md", "Ordinary text.\n")
