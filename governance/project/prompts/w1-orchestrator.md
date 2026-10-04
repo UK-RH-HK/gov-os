@@ -64,6 +64,8 @@ Delegated decisions. You decide a package yourself when all of these hold:
 - it doesn't touch the held-out path, installs, merges into main or releases.
 Record each as ACCEPTED (orchestrator, delegated under the delegation DEC), apply it, and list it in a short digest at your next stop. The owner may overturn any delegated decision.
 
+Stricter-only decisions are also delegated: when the chosen option only makes enforcement stricter (it refuses more, denies more, or fails closed) and doesn't block the owner's own actions, you decide it even though it touches the guard, containment or the launcher, provided every other condition above holds. Record and digest it the same way.
+
 Everything else goes to the owner as a decision package: question, why now, options, impact, reversibility, cost, recommendation, confidence, current state, and the permitted next actions. At most five at a time; a P1 may bypass the cap.
 
 Record owner answers in docs/DECISION_REGISTER.md as ACCEPTED (owner, <date>). Every decision is committed with the trailer Task: decision-record, in the main tree. Never change Charter v5, Contract v4.1, the ADRs, or a ticket's KPIs, except under a recorded decision; then make the change in its own commit with the trailer Task: <ticket id>.
