@@ -1,4 +1,4 @@
-"""W1-48 — the CLI for headless runs and the VS Code extension's bundled version are the pin.
+"""W1-48 — the CLI for headless runs and the active VS Code extension are at or above the minimum.
 
 KPI success 2: "The CLI used for headless runs and the VS Code extension's
 bundled version are the same version, at or above the pin, and the registry
@@ -9,22 +9,27 @@ KPI failure 1: "A headless run uses a CLI below 2.1.285".
 CAP-61.e: "Sessions run on Claude Code 2.1.285 or later, and the CLI used for
 headless runs is aligned with the VS Code extension's bundled version".
 
-DEC-205: "Every headless worker is started with the absolute path
-``~/.local/bin/claude``, never a bare ``claude``", and "W1-48's test designer
-adds a check that the pinned CLI is the one at ``~/.local/bin/claude``". So
-"the CLI used for headless runs" is that file. No test here looks ``claude`` up
-through ``PATH``: a second ``claude`` (a Windows-side copy) is on it.
+DEC-210 (the owner's answer on DP-1) says how this is tested:
 
-DEC-196, DEC-203: Claude Code's CLI is a single-file binary, so the registry's
-sha256 is that binary's.
+- the extension is the one VS Code has active, read from its ``extensions.json``;
+- its bundled version is read from both its ``package.json`` and its bundled
+  binary's ``--version``, and the binary's sha256 is compared with the registry;
+- it is a hard failure only if the CLI or the active extension is below the
+  minimum, 2.1.285;
+- if the CLI and the extension differ, or either is newer than the registry's
+  record, that is drift, which ``gov doctor`` (W1-27) reports. It is not a test
+  failure. The tests are "at or above the minimum", not "equal to the pin".
+
+DEC-205: "Every headless worker is started with the absolute path
+``~/.local/bin/claude``, never a bare ``claude``". So "the CLI used for
+headless runs" is that file. No test here looks ``claude`` up through ``PATH``:
+a second ``claude`` (a Windows-side copy) is on it.
 
 The tests of what is on this machine are ``local_only``. They read files that
 are there and run ``--version``; no session is started. They fail, not skip,
-when the file is absent: on this machine it must be there.
-
-Which of several extension folders on disk is "the" extension is an open
-decision package (README, DP-1). The one extension test here holds under every
-option of that package.
+when the file is absent: on this machine it must be there. The rule that
+decides between failure and drift is tested on fixed sample values in
+``test_w1_48_drift.py``.
 """
 
 from __future__ import annotations
@@ -40,6 +45,7 @@ NAMES = support.CLAUDE_CODE
 
 HOME_CLI = re.compile(r"(?<![\w.~/-])(?:~|\$HOME|\$\{HOME\}|/home/[^/\s]+)/\.local/bin/claude(?![\w.-])")
 EXTENSION_WORD = re.compile(r"extension", re.IGNORECASE)
+CLAUDE_CODE_VERSION = re.compile(r"(?<![0-9.])\d+\.\d+\.\d+(?![0-9]|\.[0-9])")
 
 NO_CLI = f"~/{support.CLI_REL} does not exist: the CLI that headless workers start (DEC-205) is not installed"
 
@@ -50,6 +56,37 @@ def _entry(registry):
 
 def _pin(registry):
     return support.norm_version(_entry(registry).get("version", ""))
+
+
+def _extension_versions(entry):
+    """Every three-part version named in a clause of the record that holds "extension".
+
+    ``version`` and the two commands are left out: ``version`` is the CLI's.
+    """
+    return [token for statement in support.statements(entry, skip=("version", "install", "uninstall"))
+            for clause in support.clauses(statement) if EXTENSION_WORD.search(clause)
+            for token in CLAUDE_CODE_VERSION.findall(clause)]
+
+
+def _active_extensions():
+    """``[(folder, bundled binary)]`` of the Claude Code extension VS Code has active; fails when there is none."""
+    try:
+        index = support.load_extensions_index()
+    except support.Missing as exc:
+        pytest.fail(str(exc), pytrace=False)
+    rows = support.active_extension_rows(index)
+    assert rows, (
+        f"{support.EXTENSIONS / support.EXTENSIONS_INDEX} has no row for {support.EXTENSION_ID}: VS Code has no "
+        "Claude Code extension active, so its bundled version cannot be shown to be at or above the minimum"
+    )
+    found = []
+    for row in rows:
+        folder = support.extension_folder(row)
+        assert folder is not None and folder.is_dir(), (
+            f"the {support.EXTENSION_ID} row of extensions.json points at {folder}, which is not a folder"
+        )
+        found.append((folder, folder / support.BUNDLED_REL))
+    return found
 
 
 # --------------------------------------------------------------------------
@@ -67,36 +104,31 @@ def test_the_record_is_about_the_cli_at_local_bin_claude(registry):
 
 
 def test_the_record_states_the_vs_code_extensions_bundled_version(registry):
-    """One clause of the record, outside ``version`` and the two commands, holds "extension" and the pinned version.
+    """One clause of the record, outside ``version`` and the two commands, holds "extension" and a version.
 
     ``version`` is the CLI's version. The extension's is stated beside it: in
-    the note, or in a fact of its own whose key holds "extension".
+    the note, or in a fact of its own whose key holds "extension". DEC-210: it
+    need not equal the pin.
     """
     entry = _entry(registry)
-    pin = _pin(registry)
-    stated = [clause for statement in support.statements(entry, skip=("version", "install", "uninstall"))
-              for clause in support.clauses(statement)
-              if EXTENSION_WORD.search(clause) and support.names_version(clause, pin)]
-    assert pin and stated, (
-        f"the Claude Code entry states the CLI's version ({pin!r}) but no clause of it names the VS Code extension "
-        f"together with that version: the record must state both (CAP-61.e)"
+    assert _extension_versions(entry), (
+        f"the Claude Code entry states the CLI's version ({_pin(registry)!r}) but no clause of it names the VS Code "
+        "extension together with a version: the record must state both (CAP-61.e)"
     )
 
 
-def test_the_record_states_no_other_version_for_the_extension(registry):
-    """ "The same version": a clause that names the extension names no Claude Code version but the pin."""
+def test_the_record_states_no_extension_version_below_the_minimum(registry):
+    """DEC-210: a version the record names for the extension is 2.1.285 or later; it may differ from the pin."""
     entry = _entry(registry)
-    pin = _pin(registry)
-    other = sorted({token for statement in support.statements(entry, skip=("version", "install", "uninstall"))
-                    for clause in support.clauses(statement) if EXTENSION_WORD.search(clause)
-                    for token in re.findall(r"(?<![0-9.])2\.\d+\.\d+(?![0-9]|\.[0-9])", clause) if token != pin})
-    assert other == [], (
-        f"the Claude Code entry pins {pin} and names the extension with {other}: the two must be the same version"
+    floor = support.version_key(support.FLOOR)
+    below = sorted({token for token in _extension_versions(entry) if support.version_key(token) < floor})
+    assert below == [], (
+        f"the Claude Code entry names the extension with {below}, below the minimum {support.FLOOR} (DEC-153)"
     )
 
 
 # --------------------------------------------------------------------------
-# The CLI on this machine (success 2, failure 1, DEC-205, DEC-196)
+# The CLI on this machine (success 2, failure 1, DEC-205)
 # --------------------------------------------------------------------------
 
 @pytest.mark.local_only
@@ -116,49 +148,71 @@ def test_the_cli_for_headless_runs_is_2_1_285_or_later():
     )
 
 
-@pytest.mark.local_only
-def test_the_cli_for_headless_runs_is_the_pinned_version(registry):
-    """Success 2, "at or above the pin", with DEC-205: the pin is the version of the file at ``~/.local/bin/claude``.
-
-    The CLI is not allowed to be newer than the record either: the registry
-    pins one exact version, and a newer CLI is a raise of the pin that nobody
-    recorded (failure 3).
-    """
-    pin = _pin(registry)
-    assert support.CLI.is_file(), NO_CLI
-    text, version = support.cli_version()
-    assert version == pin, f"~/{support.CLI_REL} is Claude Code {text!r}; the registry pins {pin!r}"
-
-
-@pytest.mark.local_only
-def test_the_pinned_binary_is_the_one_at_local_bin_claude(registry):
-    """DEC-205 and DEC-196: the registry's sha256 is the digest of the file ``~/.local/bin/claude`` resolves to."""
-    recorded = support.field(_entry(registry), "sha256").lower()
-    assert support.CLI.is_file(), NO_CLI
-    found = support.file_sha256(support.CLI)
-    assert recorded == found, (
-        f"the registry records sha256 {recorded} for Claude Code; {os.path.realpath(support.CLI)} has {found}"
-    )
-
-
 # --------------------------------------------------------------------------
-# The VS Code extension on this machine (success 2), as far as DP-1 leaves it clear
+# The active VS Code extension on this machine (success 2, CAP-61.e, DEC-210)
 # --------------------------------------------------------------------------
 
 @pytest.mark.local_only
-def test_a_vs_code_extension_at_the_pinned_version_bundles_the_pinned_cli(registry):
-    """Whichever folder is "the" extension (DP-1), one at the pin must be on disk and bundle a CLI at the pin.
+def test_vs_code_has_a_claude_code_extension_active_that_bundles_a_cli():
+    """DEC-210: the extension is the row of ``extensions.json``; its folder holds a ``package.json`` and a binary."""
+    for folder, bundled in _active_extensions():
+        assert support.package_version(folder), f"{folder.name} has no package.json that gives a version"
+        assert bundled.is_file(), f"{folder.name} bundles no CLI at {support.BUNDLED_REL}"
 
-    The folder's version is read from its ``package.json``; its bundled binary
-    (``resources/native-binary/claude``) is asked with ``--version``.
+
+@pytest.mark.local_only
+def test_the_active_vs_code_extension_is_2_1_285_or_later_by_its_package_json():
+    floor = support.version_key(support.FLOOR)
+    for folder, _ in _active_extensions():
+        version = support.package_version(folder)
+        assert version is not None and support.version_key(version) is not None, (
+            f"the package.json of {folder.name} gives no version that can be compared with {support.FLOOR}: "
+            f"{version!r}"
+        )
+        assert support.version_key(version) >= floor, (
+            f"the active VS Code extension {folder.name} is {version} by its package.json, below {support.FLOOR}"
+        )
+
+
+@pytest.mark.local_only
+def test_the_active_vs_code_extension_bundles_a_cli_at_2_1_285_or_later():
+    """The bundled binary is asked with ``--version``; no session is started."""
+    floor = support.version_key(support.FLOOR)
+    for folder, bundled in _active_extensions():
+        assert bundled.is_file(), f"{folder.name} bundles no CLI at {support.BUNDLED_REL}"
+        text, version = support.printed_version([bundled, "--version"])
+        assert version is not None, f"the CLI bundled in {folder.name} prints no version with --version: {text!r}"
+        assert support.version_key(version) >= floor, (
+            f"the active VS Code extension {folder.name} bundles Claude Code {version}, below {support.FLOOR}"
+        )
+
+
+# --------------------------------------------------------------------------
+# This machine against the registry's record (DEC-210): below the minimum fails, drift does not
+# --------------------------------------------------------------------------
+
+@pytest.mark.local_only
+def test_this_machine_compared_with_the_record_shows_no_hard_failure(registry):
+    """The CLI and the active extension are read as DEC-210 says and compared with the registry's record.
+
+    Both versions of the extension are read, and both digests are taken and
+    compared with the registry's. Only a version below the minimum fails. A
+    CLI or an extension that differs from the other, or from the record, is
+    drift for ``gov doctor``; the same version with another digest is left to
+    DP-3 (README).
     """
-    pin = _pin(registry)
-    folders = support.extension_folders()
-    assert pin in folders, (
-        f"no Claude Code extension at {pin} under {support.EXTENSIONS} (on disk: {sorted(folders) or 'none'}): "
-        "the extension's bundled version cannot be the pin"
-    )
-    bundled = folders[pin] / support.BUNDLED_REL
-    assert bundled.is_file(), f"{folders[pin].name} bundles no CLI at {support.BUNDLED_REL}"
-    text, version = support.printed_version([bundled, "--version"])
-    assert version == pin, f"{folders[pin].name} bundles Claude Code {text!r}; the registry pins {pin!r}"
+    entry = _entry(registry)
+    assert support.CLI.is_file(), NO_CLI
+    _, cli_version = support.cli_version()
+    cli_sha256 = support.file_sha256(support.CLI)
+    for folder, bundled in _active_extensions():
+        assert bundled.is_file(), f"{folder.name} bundles no CLI at {support.BUNDLED_REL}"
+        _, binary_version = support.printed_version([bundled, "--version"])
+        seen = support.Seen(cli_version=cli_version, cli_sha256=cli_sha256,
+                            extension_package_version=support.package_version(folder),
+                            extension_binary_version=binary_version,
+                            extension_sha256=support.file_sha256(bundled))
+        verdict = support.compare_with_record(support.field(entry, "version"), support.field(entry, "sha256"), seen)
+        assert verdict.failures == (), (
+            f"this machine is below the minimum {support.FLOOR} (DEC-210): {list(verdict.failures)}"
+        )

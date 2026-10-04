@@ -10,6 +10,12 @@ is already there, or run a tool with its version flag.
 
 DEC-205: the Claude Code CLI is always the file at ``~/.local/bin/claude``. No
 helper resolves ``claude`` through ``PATH``.
+
+DEC-210: the VS Code extension is the one VS Code has active, read from its
+``extensions.json``. Below the minimum is a hard failure; a version that
+differs from another one or from the registry's record is drift.
+
+DEC-211: a registry command runs the CLI by its absolute path.
 """
 
 from __future__ import annotations
@@ -242,7 +248,8 @@ CLI_REL = ".local/bin/claude"
 CLI = Path.home() / CLI_REL
 
 EXTENSIONS = Path.home() / ".vscode-server" / "extensions"
-EXTENSION_FOLDER = re.compile(r"anthropic\.claude-code-(\d+(?:\.\d+)+)(?:-.+)?")
+EXTENSIONS_INDEX = "extensions.json"
+EXTENSION_ID = "anthropic.claude-code"
 BUNDLED_REL = "resources/native-binary/claude"
 
 # The PATH given to a tool asked for its version: neither ~/.local/bin nor any Windows-side folder is on it.
@@ -282,25 +289,163 @@ def system_tool(command):
     return shutil.which(command)
 
 
-def extension_folders():
-    """``{version: folder}`` of the Claude Code extension folders under ``~/.vscode-server/extensions/``.
+def load_extensions_index():
+    """The data of VS Code's ``extensions.json`` under ``~/.vscode-server/extensions/`` (DEC-210)."""
+    path = EXTENSIONS / EXTENSIONS_INDEX
+    if not path.is_file():
+        raise Missing(f"{path} does not exist: which extension VS Code has active cannot be read (DEC-210)")
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise Missing(f"{path} is not JSON: {exc}") from exc
 
-    The version is the one in the folder's own ``package.json``; a folder
-    without a readable one is left out.
+
+def active_extension_rows(index, extension_id=EXTENSION_ID):
+    """The rows of a parsed ``extensions.json`` whose ``identifier.id`` is ``extension_id`` (compared without case).
+
+    The file is a list with one row per extension VS Code has active; a folder
+    that is only on disk has no row.
     """
-    found = {}
-    if not EXTENSIONS.is_dir():
-        return found
-    for folder in sorted(EXTENSIONS.iterdir()):
-        if not (folder.is_dir() and EXTENSION_FOLDER.fullmatch(folder.name)):
-            continue
-        try:
-            data = json.loads((folder / "package.json").read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        if isinstance(data, dict) and data.get("version"):
-            found[norm_version(data["version"])] = folder
-    return found
+    if not isinstance(index, list):
+        return []
+    return [row for row in index
+            if isinstance(row, dict) and isinstance(row.get("identifier"), dict)
+            and norm_name(row["identifier"].get("id", "")) == extension_id]
+
+
+def extension_folder(row, base=EXTENSIONS):
+    """The folder a row of ``extensions.json`` points at: ``location.path``, else ``relativeLocation`` under ``base``.
+
+    None when the row gives neither.
+    """
+    location = row.get("location")
+    if isinstance(location, dict) and isinstance(location.get("path"), str) and location["path"].strip():
+        return Path(location["path"])
+    relative = row.get("relativeLocation")
+    if isinstance(relative, str) and relative.strip():
+        return Path(base) / relative
+    return None
+
+
+def package_version(folder):
+    """The ``version`` of the folder's ``package.json``; None when it cannot be read or gives none."""
+    try:
+        data = json.loads((Path(folder) / "package.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if isinstance(data, dict) and data.get("version"):
+        return norm_version(data["version"])
+    return None
+
+
+# --------------------------------------------------------------------------
+# Failure or drift (DEC-210)
+# --------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class Seen:
+    """What a look at one machine gives: the CLI, and the extension VS Code has active."""
+    cli_version: str | None          # what `~/.local/bin/claude --version` prints
+    cli_sha256: str | None           # of the file `~/.local/bin/claude` resolves to
+    extension_package_version: str | None   # the active extension's `package.json`
+    extension_binary_version: str | None    # what its bundled binary prints with `--version`
+    extension_sha256: str | None     # of its bundled binary
+
+
+@dataclass(frozen=True)
+class Verdict:
+    failures: tuple   # below the minimum, or no version that can be compared with it: a hard failure
+    drift: tuple      # a version that differs from another one or from the record: `gov doctor` reports it
+    digests: tuple    # the recorded version with another digest than the recorded one (README, DP-3)
+
+
+def compare_with_record(recorded_version, recorded_sha256, seen, floor=FLOOR):
+    """DEC-210: what is a hard failure, and what is only drift, when a machine is compared with the registry.
+
+    A hard failure: the CLI, or the active extension by either of its two
+    readings, is below ``floor``, or gives no version that can be compared
+    with it. Everything else that differs is drift. A digest is compared only
+    where the version equals the recorded one; a different version has a
+    different digest by itself.
+    """
+    versions = (
+        ("the CLI at ~/.local/bin/claude", seen.cli_version),
+        ("the active extension's package.json", seen.extension_package_version),
+        ("the active extension's bundled binary", seen.extension_binary_version),
+    )
+    floor_key = version_key(floor)
+    failures, drift, digests = [], [], []
+    for label, version in versions:
+        key = version_key(version) if version is not None else None
+        if key is None:
+            failures.append(f"{label} gives no version that can be compared with {floor}: {version!r}")
+        elif key < floor_key:
+            failures.append(f"{label} is {version}, below the minimum {floor}")
+
+    def same(left, right):
+        left_key, right_key = version_key(left or ""), version_key(right or "")
+        if left_key is not None and right_key is not None:
+            return left_key == right_key
+        return left is not None and right is not None and norm_version(left) == norm_version(right)
+
+    for label, version in versions:
+        if version is not None and not same(version, recorded_version):
+            drift.append(f"{label} is {version}; the registry records {norm_version(recorded_version)}")
+    if not same(seen.extension_package_version, seen.extension_binary_version):
+        drift.append(f"the active extension's package.json gives {seen.extension_package_version} and its bundled "
+                     f"binary prints {seen.extension_binary_version}")
+    for label, version in versions[1:]:
+        if version is not None and seen.cli_version is not None and not same(seen.cli_version, version):
+            drift.append(f"the CLI is {seen.cli_version} and {label} is {version}")
+
+    recorded = str(recorded_sha256).strip().lower()
+    binaries = (
+        ("the CLI at ~/.local/bin/claude", seen.cli_version, seen.cli_sha256),
+        ("the active extension's bundled binary", seen.extension_binary_version, seen.extension_sha256),
+    )
+    for label, version, digest in binaries:
+        if same(version, recorded_version) and digest is not None and str(digest).strip().lower() != recorded:
+            digests.append(f"{label} is the recorded version {version} with sha256 {digest}; "
+                           f"the registry records {recorded}")
+    return Verdict(tuple(failures), tuple(drift), tuple(digests))
+
+
+# --------------------------------------------------------------------------
+# The CLI as a command word (DEC-205, DEC-211)
+# --------------------------------------------------------------------------
+
+# The CLI's absolute path, in the spellings a command may use.
+CLI_PATH_WORD = re.compile(r"(?:~|\$HOME|\$\{HOME\}|/home/[^/\s]+)/\.local/bin/claude")
+# Where a new command starts inside a command line: an operator, a subshell, or the text given to `sh -c`.
+COMMAND_BREAK = re.compile(r"&&|\|\||[;|&\n()`]|(?<!\S)-[A-Za-z]*c\s+(?=['\"])")
+# Words that stand before the command they run.
+COMMAND_WRAPPERS = frozenset({"sudo", "env", "exec", "command", "nohup", "time", "xargs"})
+ASSIGNMENT_WORD = re.compile(r"[A-Za-z_][A-Za-z0-9_]*=.*")
+CLAUDE_PROGRAMS = frozenset({"claude", "claude.exe", "claude.cmd"})
+
+
+def command_words(command):
+    """The command word of every simple command in ``command``: the program each one runs.
+
+    Variable assignments (``PATH=…``), wrapper words (``sudo``, ``env``, …) and
+    their flags are passed over. Quotes round a word are dropped. A wrapper's
+    flag that takes a value (``sudo -u name``) is not understood.
+    """
+    words = []
+    for part in COMMAND_BREAK.split(command):
+        for word in part.split():
+            word = word.strip("'\"")
+            if not word or ASSIGNMENT_WORD.fullmatch(word) or word in COMMAND_WRAPPERS or word.startswith("-"):
+                continue
+            words.append(word)
+            break
+    return words
+
+
+def refused_claude_words(command):
+    """The command words of ``command`` that run a ``claude`` otherwise than by the CLI's absolute path (DEC-211)."""
+    return [word for word in command_words(command)
+            if word.rsplit("/", 1)[-1].lower() in CLAUDE_PROGRAMS and not CLI_PATH_WORD.fullmatch(word)]
 
 
 # --------------------------------------------------------------------------
