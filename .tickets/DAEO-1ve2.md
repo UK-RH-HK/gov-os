@@ -1,6 +1,6 @@
 ---
 id: DAEO-1ve2
-status: in_progress
+status: closed
 deps: [DAEO-drvn]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -18,6 +18,7 @@ depends_on:
 - W1-07
 allowed_paths:
 - src/gov/retrieval/ollama*
+- src/gov/retrieval/__init__.py
 - tests/unit/ollama/**
 kpis:
   success:

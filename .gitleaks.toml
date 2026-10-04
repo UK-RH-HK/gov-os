@@ -3,6 +3,19 @@ title = "Governance OS gitleaks configuration"
 [extend]
 useDefault = true
 
+# Token and canary rules (W1-15, CAP-03): strings the gitleaks defaults miss. The same rules as template/.gitleaks.toml.
+[[rules]]
+id = "gov-canary"
+description = "Planted canary identifier"
+regex = '''\b[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*[_-]CANARY[_-][A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*'''
+keywords = ["canary"]
+
+[[rules]]
+id = "gov-token"
+description = "Token-shaped string with a key prefix"
+regex = '''\b(?:sk|pk|rk|tok)[_-][A-Za-z0-9][A-Za-z0-9_-]{15,}'''
+keywords = ["sk-", "sk_", "pk-", "pk_", "rk-", "rk_", "tok-", "tok_"]
+
 # Only known synthetic fake secrets (INVENTORY.md section 7). Nothing else is allowlisted.
 [[allowlists]]
 description = "Synthetic fake-secret fixtures"
@@ -12,4 +25,11 @@ paths = [
   '''(^|/)fixtures/brownfield/project/src/app/config\.py$''',
   '''(^|/)fixtures/brownfield/project/memory/chat_history\.sql$''',
   '''(^|/)cli/tests/fixtures/core/repobuilder\.py$''',
+]
+
+# Tracked documents that only name the canary identifier (DEC-290). The pre-index filter ignores this list.
+[[allowlists]]
+description = "Documents that name the canary identifier"
+paths = [
+  '''^(.*/)?\.tickets/DAEO-7nne\.md$''',
 ]

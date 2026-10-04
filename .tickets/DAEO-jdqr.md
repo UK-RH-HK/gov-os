@@ -47,6 +47,7 @@ kpis:
     by the permission rules and the guard [CAP-58.d]
   - 'The settings it builds carry the Read deny rule for the held-out directory, whose path the launcher takes from governance/project/held-out.yaml, the file W1-47 creates; from a launched worker''s Bash that directory looks empty; the test uses a stand-in directory, never the qualification oracle [CAP-49.b]'
   - 'The settings it builds for every worker role carry an Edit deny rule for .gov-runtime/** except .gov-runtime/scratch/**: in a launched worker session a write to the freeze flag, the snapshots, the findings or the records fails, through a file tool, through an opaque Bash form and through ln, while .gov-runtime/scratch/** stays writable (DEC-180, DEC-176)'
+  - 'The settings it builds carry Edit deny rules for tests/acceptance/** (every role but the independent test designer), .tickets/** and .claude/**: in a launched worker session a write there fails, through a file tool and through an opaque Bash form (DEC-315)'
   failure:
   - A worker session starts with the sandbox off, not strict or not fail-closed
   - A sandbox setting is read from the repository's settings

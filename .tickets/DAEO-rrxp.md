@@ -1,6 +1,6 @@
 ---
 id: DAEO-rrxp
-status: open
+status: in_progress
 deps: [DAEO-drvn, DAEO-uudf]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -21,6 +21,8 @@ allowed_paths:
 - src/gov/checkpoint/**
 - tests/unit/checkpoint/**
 - template/governance/kernel/checks/fresh-agent-reconstruction*
+- template/governance/kernel/schemas/checkpoint.schema.json
+- template/governance/kernel/templates/checkpoint.md
 kpis:
   success:
   - A checkpoint conforming to the carried schema is written at every ticket transition, compaction and stop [CAP-13.b, CAP-37.a, CAP-37.b]

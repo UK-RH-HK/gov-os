@@ -1,6 +1,6 @@
 ---
 id: DAEO-topz
-status: open
+status: in_progress
 deps: [DAEO-drvn, DAEO-uudf, DAEO-4yyl]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -29,6 +29,7 @@ kpis:
   - The ready queue excludes tickets that are claimed, whose acceptance tests directory is missing, or whose specification is not closed [CAP-31.c]
   - A ticket whose mandatory input is absent or superseded is not READY [CAP-31.d]
   - A ticket waiting on an open decision package is blocked, and tickets that do not depend on it stay READY [CAP-34.e]
+  - 'A ticket created through gov.tasks.create carries state_class AUTHORITATIVE, added after the vendored tk create, whose script keeps its recorded hash (DEC-229, DEC-295)'
   failure:
   - Two agents hold the same claim
   - A ticket without tests/acceptance/<id>/ appears as READY

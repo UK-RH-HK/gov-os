@@ -65,7 +65,7 @@ else: skip('scenario ids exist in COVERAGE_MATRIX', _p)
 
 # 3. tickets
 tk = {v['wbs_id']: (p, v) for p, v in fms.items() if '/.tickets/' in p}
-check('48 W1 tickets', sorted(tk) == [f'W1-{i:02d}' for i in range(1, 49)], str(len(tk)))
+check('50 W1 tickets (48 from S1 and S2, W1-49 by DEC-248, W1-50 by DEC-255)', sorted(tk) == [f'W1-{i:02d}' for i in range(1, 51)], str(len(tk)))
 bad = [i for i, (p, v) in tk.items() if not (v.get('role') and v.get('allowed_paths') and v.get('kpis', {}).get('success') and v.get('kpis', {}).get('failure'))]
 check('every W1 ticket has role, allowed_paths, success and failure KPIs', not bad, str(bad))
 fields = ['title', 'class', 'role', 'depends_on', 'allowed_paths', 'kpis', 'profile', 'sources', 'est_loc', 'acceptance_tests']

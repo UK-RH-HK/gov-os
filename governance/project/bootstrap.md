@@ -343,3 +343,170 @@ Live attempts on 2026-10-02, in headless sessions started in the repository root
 | default | Read `README.md` | Allowed |
 
 No file was created and nothing was installed. The session logs are kept by the orchestrator at `~/gov-os-workbench/w1-build/log/w1-05-live-*.jsonl`.
+
+## Parallel run: containment records that are not defects (DEC-254, 2026-10-04)
+
+Until W1-50 (`DAEO-xnbx`) judges a HEAD move commit by commit, by each commit's own `Role` and `Task` trailers, the
+post-command containment check (W1-03) writes two kinds of finding for permitted actions of the parallel run
+(DEC-235). The owner accepted both as records, not defects (DEC-254). Each is also noted in its ticket's close row in
+the orchestrator's checkpoint.
+
+- **An integration merge.** The check flags any HEAD move that contains a merge commit ("HEAD moved (not a forward
+  move on the same branch)"). Every merge of a ticket branch into `w1/integrate` by the main orchestrator, as the
+  orchestrator prompt's section 3 prescribes, writes one such line to `.gov-runtime/findings.jsonl` in the main tree.
+  First seen: the merge of `w1/W1-37`, commit `00e3d539`.
+- **A worker's commit attributed to its lead.** In a ticket's worktree the lead (role orchestrator) waits for its
+  worker with its own Bash calls. When the test designer commits under `tests/acceptance/<W1-id>/` during such a
+  call, the check attributes the commit to the lead's call and flags "committed path(s) outside allowed paths" in
+  that worktree's `.gov-runtime/findings.jsonl`. The commit is the designer's, in the designer's scope. Seen in the
+  worktrees of W1-37, W1-18 and W1-08. A worktree's findings file is copied to
+  `.gov-runtime/scratch/orchestrator/log/<W1-id>-findings.jsonl` in the main tree before the worktree is removed.
+- **The W1-01 history test** failed on the first integration merge for the same reason, and is revised under
+  DEC-253 in W1-50's test design batch.
+
+## Ollama: started by `gov`, not stopped by `gov` (DEC-261, 2026-10-04)
+
+ADR-0002 §3 says the Ollama daemon is "started and stopped by `gov`". W1-18 (`DAEO-1ve2`) delivers the first half
+only: `gov` starts `ollama serve` on demand and never stops it. Ollama's 5-minute idle unload frees the model's GPU
+memory, which was the owner's intent; the `serve` process itself stays. The owner accepted this difference (DEC-261).
+The ADR is not changed.
+
+## W1-37 residuals (Superpowers three-skill copy, 2026-10-04)
+
+Recorded at W1-37's close, from the ticket lead's summary. None is a defect.
+
+- **Zero headroom on the sizes.** The three `SKILL.md` sizes (2,389, 2,360 and 899 by floor(characters ÷ 4),
+  DEC-247) sit exactly on their ceilings. "Characters" is read as decoded UTF-8; counted as bytes the three would be
+  2,394, 2,366 and 911 and fail. Any upstream change to a `SKILL.md` breaks the test.
+- **File modes are not asserted.** `find-polluter.sh` kept its executable bit in the copy, but no test protects it.
+- **No licence in the copy.** `template/governance/kernel/skills/superpowers/` holds no `LICENSE`; the upstream
+  licence stays in the vendor folder, which is the only source (DEC-244).
+- **CAP-24 for vendored skills.** The version is recorded beside the copies, in `vendored.yaml`, not in each
+  `SKILL.md` frontmatter; the owner reads CAP-24 this way for vendored skills (DEC-262). `gov close` (W1-30) reads a
+  vendored skill's version from that record.
+- **Guard refusals met by the engineer.** `mkdir -p` with `cp -R` onto the `superpowers` folder itself was refused,
+  so the files were copied one by one to literal paths.
+
+## W1-08 residuals (record schemas, templates and the path map, 2026-10-04)
+
+Recorded at W1-08's close, from the ticket lead's summaries. None is a defect; each names the ticket that should
+settle it.
+
+- **Capability values for this repository.** The entry shape is decided (DEC-251, DEC-265). The values in
+  `governance/project/path-map.yaml` (code intelligence on for Python, research corpus off) are the implementer's.
+- **Namespace field values are free text.** Sensitivity, retention, export policy, embedding policy, provenance and
+  deletion/rebuild behaviour are non-empty strings; the words in this path map are the implementer's. W1-15 fixes
+  closed lists when it first reads them.
+- **`permitted_roles`** is read as "may access", and all six roles are listed on every namespace. Confirm before
+  W1-15.
+- **`fixtures/**`** is the only `product` namespace.
+- **The ticket schema** requires only `kpis`, `role` and `allowed_paths` beyond the shared frontmatter; the other six
+  ticket fields are typed but optional. Consider requiring them at W1-09.
+- **`status` and `type`.** `status` is any non-empty string on every record; a lesson's lifecycle is the required
+  `lifecycle` key, closed to the six states. `type` is pinned per record type except on tickets.
+- **Id grammars.** `lesson_id` is decided (DEC-252). The other four grammars are the implementer's, and `supersedes`,
+  `superseded_by` and `consumers` have no grammar.
+- **Failure, research, decision package and checkpoint records** have no type-specific fields; the required fields of
+  the older schemas under `schemas/records/` were not carried over.
+- **Closed and open maps.** `policies`, `systems`, `capabilities` and its two entries refuse unknown keys; namespaces,
+  the path map's top level and record frontmatter accept extras. No test covers the open ones.
+- **The `systems` snapshot** (13 minimal, 9 absent, none implemented) needs updating as tickets land, W1-46 first
+  (research).
+- **New top-level folders.** The root namespace uses `*`, and `.github/` and `.rulesync/` are pre-listed. Any other
+  new top-level folder fails "every tracked path in exactly one namespace" until a namespace is added.
+- **The two committed ADRs** lack `state_class` and would not validate against the decision schema until they get it.
+- **Untested points:** language names must be non-empty strings (slightly stricter than DEC-251 says); the disabled
+  form of `code_intelligence` (DEC-265, for W1-27's test design); that a lesson record's `id` uses `lesson_id` and
+  no other grammar.
+- **The held-out path string** appeared twice in the product-spec worker's output, from printing a ticket's
+  `allowed_paths` and from ADR-0002 §6. Seeing the path is an accepted residual (DEC-223).
+
+## W1-18 residuals (Ollama on-demand lifecycle, 2026-10-04)
+
+Recorded at W1-18's close, from the ticket lead's summary. None is a defect.
+
+- **A `serve` that never becomes healthy is left running**, following DEC-261 ("never stops it"). No test asserts
+  this either way.
+- **Choices of the engineer the decisions don't name and no test asserts:** an available result has `state`
+  `AVAILABLE` and `warning` `None`; `env`, when given, is read for the three variables and passed to the daemon;
+  each health probe is capped at 1 s, and the health request bypasses proxy variables; the daemon gets its own
+  session with its streams to `/dev/null`.
+- **Readings of the test designer:** "within the deadline" allows 2 s on top of `timeout_s`; "FTS-only" matches
+  `FTS-only` or `FTS only` in any letter case; the 20 s default is read from the function's signature, not waited for.
+- **No test against the real daemon.** Ollama is not installed on this machine; the suite uses a stand-in executable
+  and a stand-in loopback endpoint. The embedding model's registry row (DEC-195) was not added: the registry is
+  outside the ticket's paths and nothing was installed. It is due when Ollama and the model are installed, at the
+  latest for W1-19.
+- **G-22's text** exists only in the archived sources; the decisions rest on the in-tree sources (DEC-260, DEC-261,
+  DEC-257).
+- **The ticket body** still says "on-demand start and stop"; DEC-261 decides start only.
+
+## W1-10 residuals (store and record graph, 2026-10-04)
+
+Recorded at W1-10's close, from the ticket lead's summary. None is a defect; each is for a later ticket.
+
+- **Who writes `.gov-runtime/store.db` in a live session** is open with the owner (W1-10 DP-3). The guard keeps
+  `.gov-runtime/` outside `scratch/` closed to worker roles, and W1-17, W1-20 and W1-24 read the store in worker
+  sessions. Every W1-10 test builds the store in a temporary repository.
+- **What loads as a record today (DEC-274).** The charter, the contract and the plan have `id` and `status` but no
+  `type`, so the load reports them invalid. The seven kernel templates load as records with placeholder ids.
+  Decisions are headings in the register, not files, so every `DEC-…` reference is dangling. Two files with one id
+  both load.
+- **Dangling edges in this repository (DEC-277).** A ticket's `depends_on` holds WBS ids while its `id` is the tk id.
+  Trailer values such as `decision-record`, `owner-prompt` and `CAP-58.a` name no record. Unresolved trailers appear
+  in `dangling()` with type `IMPLEMENTS` or `TASK`; `TASK` is outside the eight edge types.
+- **The four edge keys DEC-012 does not name** (`evidence_for`, `tests`, `generates`, `validates`) are to be checked
+  against the archived Framework §11.2 by a product-spec worker before any real record uses them (DEC-277).
+- **Records are read from `HEAD`**, not the working tree: an uncommitted edit to a record is not in the graph.
+  Untested.
+- **The DEC-182 boundary** uses the committer date in the commit's own time zone; no test fixes which date decides.
+- **The digest (DEC-276)** covers records (path, id, type, status), edges, commits, trailers and each commit's
+  changed paths. It does not cover other frontmatter keys or the record body, and no `content_hash` is stored.
+- **Merge commits** list no changed paths, so they never match `commits(root, path=…)`. Renames are untested.
+- **Two new error codes**, `STORE_MISSING` and `STORE_GIT_FAILED`, are untested.
+- **Not tested:** the `owner` and free `links` filters of CAP-08.a; no KPI line names them.
+- **A load replaces only its own five tables**, in one transaction, so tables a later ticket adds to the same file
+  survive.
+
+## W1-15 residuals (secret rules, pre-index filter and the secrets-indexing check, 2026-10-04)
+
+Recorded at W1-15's close, from the ticket lead's summaries and the reviewer's fourteen findings, seven of which were
+fixed. None of the following is a defect of the ticket; each names who should settle it.
+
+- **A project can remove or rewrite a template rule** (DEC-299). The project's `.gitleaks.toml` is the one source of
+  rules (DEC-287); its allowlists and disabled rules are ignored by the filter and the check (DEC-290, DEC-298), but a
+  rule the project deleted, such as the canary rule, is not put back. A file with no rules at all is refused. A
+  project file that extends another file with rules of its own still inherits that file's allowlists.
+- **The rules over-block.** The token rule flags ordinary identifiers (`pk_…`, `tok_…`, `rk_…`, `sk-…` of 16 or more
+  characters), and the canary rule flags any upper-case identifier with the canary word in the middle. This
+  repository loses only the W1-15 ticket file from an index; an adopting product could lose code files. Requiring a
+  digit or mixed case in the token body is the suggested repair.
+- **Near spellings of the canary are missed** (lower case, other separators, markdown-escaped underscores); they are
+  outside DEC-286. The owner still confirms the count of seven canaries against the S0b1 manifest.
+- **Path-map patterns match narrowly.** `**/x/**` does not match a top-level `x/`; a trailing slash, a leading `/` or
+  `./`, `?` and `[]` match nothing; `paths` given as a string is read character by character with no error. For the
+  path-map schema (W1-27 replaces the minimal one, DEC-228).
+- **The two W1-08 residuals that named W1-15** (closed lists for the free-text namespace fields; the meaning of
+  `permitted_roles`) move to the first ticket that reads export or embedding policy, W1-17 or W1-24 (DEC-289). W1-15
+  reads only a namespace's `paths` and `memory_class`.
+- **What the check does not see.** Compressed stores and bundles (`.gz`, deflated `.zip`, `.tar.gz`, a gzip BLOB),
+  for W1-24 if bundles are compressed; UTF-32 text; a secret in a store file's or folder's name, which is also
+  printed in the check's output when the content matches; SQLite WAL side files are scanned as plain bytes only.
+- **What the filter cannot see.** A file replaced after the filter answered and before the indexer reads it (for
+  W1-16, W1-17 and W1-19; the check is the backstop); a hard link to a product file; a secret split across lines or
+  reversed.
+- **`.gov-runtime/scratch/` counts as a store for the check**, so the check would be red in this repository on lead
+  briefs and worker logs that name the canary. W1-26 settles this before `gov check` runs the check here.
+- **gitleaks is trusted by name.** A stand-in `gitleaks` first on `PATH` that exits 0 passes everything; the version
+  is not verified. The filter and check cases need gitleaks where they run; putting it on CI is an install for the
+  owner, raised with W1-40 (DEC-287).
+- **Edges that fail closed or noisily.** A configuration whose only rules come through `[extend] path` is refused as
+  "no rules"; one with a TOML date value, or larger than about 128 KB, makes the filter raise; a not-green check on a
+  ruleless configuration or an unreadable store exits with a Python traceback; a clean store with an unloadable
+  virtual table, or a table name with a double quote, keeps the check red; a FIFO in a governance namespace would
+  block the filter (reasoned, not run).
+- **The root allowlist.** With the template's rules and no allowlist, gitleaks flags four tracked paths: the W1-15
+  ticket file, which names the canary, and three brownfield fixture files. W1-15 allowlisted only the ticket file; the
+  fixtures were already allowlisted. The list is the lead's reconstruction, not the first engineer's report.
+- **A guard observation.** Twice in the parallel run a worker wrote a file inside its allowed paths through a Python
+  script fed by a here-document in Bash, and the guard did not stop it. For W1-46 and W1-47's residual lists.
