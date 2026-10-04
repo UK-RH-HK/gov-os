@@ -2190,3 +2190,44 @@ on the identity fields (it changes a KPI's meaning, and the worker asked for the
 | Version | Date | Change |
 |---|---|---|
 | 0.44 | 2026-10-04 | Delegated under DEC-220, from the product-spec drafts: DEC-229 (W1-08 DP-4: the six `state_class` values; tickets carry it), DEC-230 (W1-08 DP-1 in part: the three top-level keys, the strength order, the thirteen policy keys, the twenty-two systems; the kernel minimums and the capability list go to the owner). |
+
+## 45. Delegated decisions on W1-46's test design packages (register v0.45, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the test designer's packages for W1-46 (`DAEO-jdqr`).
+For each, the test designer's recommendation and the orchestrator's agree, the confidence is medium, and the choice
+is reversible. The designer's "P1" on DP-1 and DP-2 marks how much they block the tests; neither is a breach or a
+loss, and the orchestrator ranks them P2. DP-4 (the install exception), DP-5 (the allowlist file) and DP-7 (three
+refusal cases) are not decided here: they touch installs, the network grant or the held-out file, or the designer's
+confidence is low. They go to the owner.
+
+### DEC-231 — W1-46 DP-1: the command line of `gov launch`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-1 option (a); the WBS and the orchestrator prompt already write `gov launch <role> <ticket>` · **Under:** DEC-161
+- **Decision:** `gov launch <role> <ticket> [-- <arguments for the CLI>]`. The role and the ticket are positional;
+  everything after `--` is passed to the CLI unchanged, which is how a headless worker gets `-p` and its prompt.
+
+### DEC-232 — W1-46 DP-2: the "launched worker" lines are tested with two short real sessions
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-2 option (a) · **Under:** CAP-61.b, DEC-221
+- **Decision:**
+  - The KPI lines that say "an acceptance test shows that a launched worker …" are tested with two short real
+    headless sessions per run (one engineer, one research), started through `gov launch`, marked `local_only`, on
+    the cheapest model with a turn limit. The sandbox is inside the CLI, so nothing else exercises it.
+  - A run in which the model does not execute the stated command fails with that reason and is repeated; it is not
+    a finding against the launcher.
+  - They are not put behind an opt-in variable, so that the ticket cannot close on skipped tests.
+
+### DEC-233 — W1-46 DP-3: a sandbox block in the repository's settings makes `gov launch` refuse
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-3 option (a); it fails closed · **Under:** CAP-61.a, DEC-161
+- **Decision:** `gov launch` refuses to start, with a non-zero exit and a named reason, when the repository's
+  `.claude/settings.json` or `.claude/settings.local.json` carries a `sandbox` key, because the CLI may merge
+  repository settings into the ones the launcher builds.
+
+### DEC-234 — W1-46 DP-6: the per-session temp directory test keeps its assertion
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-6 option (a) · **Under:** DEC-159, CAP-61.d
+- **Decision:** The live test asserts that each session's temp files land in a directory of its own. If the CLI
+  cannot be made to do that, the orchestrator records the shared `$TMPDIR` as a residual in
+  `governance/project/bootstrap.md`, as the KPI says, and the test designer revises the test to assert the residual
+  (a planned revision).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.45 | 2026-10-04 | Delegated under DEC-220: DEC-231 (W1-46 DP-1: `gov launch <role> <ticket> [-- <CLI arguments>]`), DEC-232 (W1-46 DP-2: two short real sessions, `local_only`, not opt-in), DEC-233 (W1-46 DP-3: a `sandbox` key in the repository's settings makes the launcher refuse), DEC-234 (W1-46 DP-6: the temp-directory assertion stays; a residual if the CLI can't). |
