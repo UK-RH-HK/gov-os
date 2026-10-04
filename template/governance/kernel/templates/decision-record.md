@@ -20,6 +20,9 @@ constrains: []
 
 ## Decision Outcome
 
+<!-- On acceptance, record it as ACCEPTED (who, YYYY-MM-DD). Who decided and the date are both required.
+     If this answers a decision package, name the package (DP-0000) and the option chosen. -->
+
 ### Consequences
 
 ### Confirmation
