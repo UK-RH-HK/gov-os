@@ -259,7 +259,7 @@ audit→repair, test→fix or verification loop follows DEC-096:
   - In worker sessions, the opaque-write and install-miss residuals of the guard are closed for Bash at the OS level,
     without parsing the command (EXP-001).
 - **Bad:**
-  - Wave 1 glue grows to ≈ 5,460 LOC (the figure in `docs/plan/WAVE_1_WBS.md` §3), against architecture v0.3's ≈ 2.4k.
+  - Wave 1 glue grows to ≈ 5,580 LOC (the figure in `docs/plan/WAVE_1_WBS.md` §3), against architecture v0.3's ≈ 2.4k.
     This is the effect of DEC-080, DEC-074 R1, DEC-076, DEC-083, DEC-086, the S1-A repairs (DEC-089…DEC-092, and
     a ticket KPI for every Wave 1 `covers` item), and the S2 change (+370 LOC: W1-45, W1-46 and W1-47, +320; KPIs added to W1-30 and W1-31, +50). DEC-064 turns
     DEC-001's size trigger into a per-wave review.
