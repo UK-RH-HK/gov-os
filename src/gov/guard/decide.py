@@ -169,9 +169,10 @@ def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
     rel = real[len(rr) + 1:]
     if role != "independent-test-designer" and _is_under_acceptance(rel):
         return False
-    # DEC-176: .gov-runtime/ other than scratch/** is denied to the
-    # orchestrator (the freeze flag, snapshots, findings and records).
-    if role == "orchestrator" and _is_gov_runtime_protected(rel):
+    # DEC-176, DEC-180: .gov-runtime/ other than scratch/** is denied to
+    # every role (the freeze flag, snapshots, findings and records), also
+    # on a ticket that names it.
+    if _is_gov_runtime_protected(rel):
         return False
     return any(_match_pattern(rel, p) for p in patterns)
 

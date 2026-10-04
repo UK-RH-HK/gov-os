@@ -9,7 +9,9 @@ from __future__ import annotations
 import os
 import shlex
 
-from gov.guard.decide import KNOWN_ROLES, _expand_token, _load_ticket
+from gov.guard.decide import (
+    _GOV_RUNTIME, KNOWN_ROLES, _expand_token, _is_under_acceptance,
+    _load_ticket)
 
 _PKG = frozenset({
     "pip", "pip3", "npm", "cargo", "apt", "apt-get",
@@ -107,12 +109,15 @@ def _uv_install(args):
     ``uv sync`` and ``uv run --with`` / ``-w`` (DEC-174), with options
     before the subcommand; a value option's value is skipped (DEC-216)."""
     words = []
+    first = 0  # where the subcommand is
     i = 0
     while i < len(args):
         if args[i] in _UV_VALUE_OPTS:
             i += 2
             continue
         if not args[i].startswith("-"):
+            if not words:
+                first = i
             words.append(args[i])
         i += 1
     if not words:
@@ -120,8 +125,17 @@ def _uv_install(args):
     if words[0] in ("add", "sync"):
         return True
     if words[0] == "run":
-        return any(a in ("--with", "-w") or a.startswith("--with=")
-                   for a in args)
+        if any(a in ("--with", "-w") or a.startswith("--with=")
+               for a in args):
+            return True
+        # -w<package>: the value joined, among run's own options, which
+        # end at the first word after run.
+        for a in args[first + 1:]:
+            if not a.startswith("-"):
+                return False
+            if a.startswith("-w"):
+                return True
+        return False
     return (len(words) >= 2 and words[0] in ("pip", "tool")
             and words[1] == "install")
 
@@ -192,6 +206,11 @@ def experiment_folder(project_root, ticket_id):
         return None
     rel = paths[0][:-3]
     if not rel or any(c in rel for c in "*?["):
+        return None
+    # Written as the folder it reaches (no ..), and never the acceptance
+    # tests (MR-3) or the runtime directory (DEC-180).
+    if (os.path.normpath(rel) != rel or _is_under_acceptance(rel)
+            or rel.split("/")[0] == _GOV_RUNTIME):
         return None
     root = os.path.realpath(project_root)
     real = os.path.realpath(os.path.join(root, rel))

@@ -78,6 +78,45 @@ def test_a_missing_kernel_default_refuses(tmp_path):
         launcher._research_allowlist(tmp_path)
 
 
+def test_an_allowlist_key_written_twice_refuses(tmp_path):
+    (tmp_path / "list.yaml").write_text("hosts: [pypi.org]\nhosts: [github.com]\n", encoding="utf-8")
+    with pytest.raises(GovError):
+        launcher._hosts(tmp_path, "list.yaml")
+
+
+GUARD = {"type": "command", "command": 'python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py"'}
+
+
+@pytest.mark.parametrize("entries, wired", (
+    ([{"hooks": [GUARD]}], True),
+    ([{"matcher": "*", "hooks": [GUARD]}], True),
+    ([{"matcher": "Write|Edit", "hooks": [GUARD]}, {"matcher": "Bash", "hooks": [GUARD]}], True),
+    ([{"matcher": "Write|Edit", "hooks": [GUARD]}], False),
+    ([{"matcher": "Bash.*", "hooks": [GUARD]}], False),
+    ([{"hooks": [{"type": "command", "command": "true"}]}], False),
+    ([{"hooks": []}], False),
+    ([], False),
+    (None, False),
+))
+def test_the_guard_is_wired_only_when_it_runs_before_every_guarded_tool(entries, wired):
+    assert launcher._guard_wired({"hooks": {"PreToolUse": entries}}) is wired
+
+
+def test_settings_without_a_hooks_block_do_not_wire_the_guard():
+    assert launcher._guard_wired({}) is False
+
+
+@pytest.mark.parametrize("args", (["--bare"], ["-p", "x", "--setting-sources", "user"], ["--setting-sources=project"],
+                                  ["--settings", "{}"], ["--settings={}"]))
+def test_an_argument_that_takes_the_guard_or_the_settings_away_refuses(args):
+    with pytest.raises(GovError):
+        launcher._check_cli_args(args)
+
+
+def test_a_prompt_that_names_an_argument_as_a_word_passes():
+    launcher._check_cli_args(["-p", "Do not use --bare.", "--model", "haiku"])
+
+
 def test_a_refused_launch_leaves_no_temp_directory(tmp_path, monkeypatch):
     made = []
     monkeypatch.setattr(launcher.tempfile, "mkdtemp", lambda **kw: made.append(kw) or str(tmp_path))

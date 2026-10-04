@@ -138,6 +138,9 @@ def test_missing_file_means_no_rule(tmp_path):
     "", "paths:\n- /srv/x\n", "held_out_paths: [\n", "- /srv/x\n",
     "held_out_paths:\n", "held_out_paths: []\n", "held_out_paths: /srv/x\n",
     "held_out_paths:\n- 42\n", "held_out_paths:\n- srv/x\n",
+    # The key written twice: no last value hides the first.
+    "held_out_paths:\n- /srv/x\nheld_out_paths:\n- /srv/y\n",
+    "held_out_paths: []\nheld_out_paths:\n- /srv/y\n",
 ])
 def test_broken_file_fails_closed(tmp_path, text):
     project = _project(tmp_path, text)

@@ -22,7 +22,7 @@ import yaml
 
 from gov.cli.errors import GovError
 from gov.guard.decide import FREEZE_FLAG, _load_ticket
-from gov.guard.heldout import HeldOutError, load_held_out
+from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 
 WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research")
@@ -32,6 +32,8 @@ OWN_TICKET_ROLES = frozenset({"engineer", "research"})
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
+GUARD_HOOK = "hooks/pretooluse.py"  # the guard, as the repository's settings register it
+GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
 # Open package DP-9: both files hold a list of host names under this key; the
 # project's file extends the kernel default, and may be absent (DEC-241).
 ALLOWLIST_KEY = "hosts"
@@ -47,9 +49,9 @@ def _refuse(reason: str) -> GovError:
 def _hosts(root: Path, rel: str) -> list[str]:
     """The host names of one allowlist file: a name, or ``*.<name>`` for its subdomains."""
     try:
-        data = yaml.safe_load((root / rel).read_text(encoding="utf-8"))
+        data = load_yaml_unique((root / rel).read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, yaml.YAMLError):
-        raise _refuse(f"the research allowlist {rel} cannot be read") from None
+        raise _refuse(f"the research allowlist {rel} cannot be read, or writes a key twice") from None
     hosts = data.get(ALLOWLIST_KEY) if isinstance(data, dict) else None
     if not isinstance(hosts, list) or not all(isinstance(h, str) and _HOST.fullmatch(h) for h in hosts):
         raise _refuse(f"the research allowlist {rel} must hold a list of host names under '{ALLOWLIST_KEY}'")
@@ -146,8 +148,30 @@ def _check_ticket(root: Path, role: str, ticket_id: str) -> None:
         raise _refuse(f"ticket '{ticket_id}' is a ticket of another role ('{ticket.get('role')}'), not of '{role}'")
 
 
+def _guard_wired(settings: dict) -> bool:
+    """True when the settings register the guard as a PreToolUse command for every guarded tool."""
+    hooks = settings.get("hooks")
+    entries = hooks.get("PreToolUse") if isinstance(hooks, dict) else None
+    covered = set()
+    for entry in entries if isinstance(entries, list) else []:
+        commands = entry.get("hooks") if isinstance(entry, dict) else None
+        if not any(isinstance(hook, dict) and hook.get("type") == "command" and GUARD_HOOK in str(hook.get("command"))
+                   for hook in (commands if isinstance(commands, list) else [])):
+            continue
+        matcher = entry.get("matcher")
+        if matcher in (None, "", "*"):
+            return True
+        covered |= set(matcher.split("|")) if isinstance(matcher, str) else set()
+    return GUARDED_TOOLS <= covered
+
+
 def _check_repository_settings(root: Path) -> None:
-    """DEC-233: the CLI may merge the repository's settings into the built ones."""
+    """The repository's settings carry no sandbox key (DEC-233) and wire the guard, with the hooks on.
+
+    The CLI may merge the repository's settings into the built ones, and a
+    session whose settings register no guard has none.
+    """
+    wired = False
     for rel in REPO_SETTINGS:
         if not os.path.lexists(root / rel):
             continue
@@ -157,6 +181,24 @@ def _check_repository_settings(root: Path) -> None:
             raise _refuse(f"{rel} cannot be read, so it cannot be shown to carry no sandbox key") from None
         if not isinstance(data, dict) or "sandbox" in data:
             raise _refuse(f"{rel} carries a sandbox key: the sandbox settings come from the launcher alone (DEC-233)")
+        if data.get("disableAllHooks", False) is not False:
+            raise _refuse(f"{rel} sets disableAllHooks: a worker session would have no guard")
+        wired = wired or (rel == REPO_SETTINGS[0] and _guard_wired(data))
+    if not wired:
+        raise _refuse(f"{REPO_SETTINGS[0]} does not register the guard ({GUARD_HOOK}) as a PreToolUse hook for "
+                      f"{', '.join(sorted(GUARDED_TOOLS))}: a worker session would have no guard")
+
+
+def _check_cli_args(cli_args: list[str]) -> None:
+    """Refuse the arguments that take the launcher's settings or the guard away from the session."""
+    for arg in cli_args:
+        if arg == "--settings" or arg.startswith("--settings="):
+            raise _refuse("the CLI arguments carry --settings: the sandbox settings come from the launcher alone")
+        if arg == "--bare":
+            raise _refuse("the CLI arguments carry --bare, which skips every hook: the session would have no guard")
+        if arg == "--setting-sources" or arg.startswith("--setting-sources="):
+            raise _refuse("the CLI arguments carry --setting-sources: without the project's settings the session "
+                          "would have no guard hook")
 
 
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
@@ -164,8 +206,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     root = Path(os.path.realpath(root))
     if role not in WORKER_ROLES:
         raise _refuse(f"'{role}' is not a worker role ({', '.join(WORKER_ROLES)})")
-    if any(arg == "--settings" or arg.startswith("--settings=") for arg in cli_args):
-        raise _refuse("the CLI arguments carry --settings: the sandbox settings come from the launcher alone")
+    _check_cli_args(cli_args)
     _check_ticket(root, role, ticket_id)
     _check_repository_settings(root)
     cli = Path.home() / CLI_REL
