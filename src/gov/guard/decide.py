@@ -420,6 +420,23 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
             nf = [a for a in args if not a.startswith("-")]
             if len(nf) >= 2:
                 _resolve(nf[-1])
+            continue
+        if name == "ln":
+            # DEC-311: the destination of a symbolic or a hard link is a
+            # write target.  A form whose destination is not the last
+            # operand (-t, --target-directory, "--") is refused.
+            if any(a == "--" or a.startswith("--t")
+                   or (a.startswith("-") and not a.startswith("--")
+                       and "t" in a)
+                   for a in args):
+                targets.append(_UNRESOLVABLE)
+                continue
+            nf = [a for a in args if not a.startswith("-")]
+            if len(nf) >= 2:
+                _resolve(nf[-1])
+            elif nf:
+                # "ln <target>" links under the target's name, here.
+                _resolve(os.path.basename(nf[0].rstrip("/")) or ".")
 
     return targets or None
 
