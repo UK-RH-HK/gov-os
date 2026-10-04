@@ -8,6 +8,7 @@ Public interfaces only: the committed schema files under
 
 No source fixes a file name for a schema or a template. A file is therefore found
 by the record type's word in its name (see ``RECORD_TYPES``), not by a full name.
+The shared definitions file (DEC-227) is found by what it defines.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from __future__ import annotations
 import copy
 import json
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -43,6 +45,12 @@ PATH_MAP_WORDS = (("path-map", "path_map", "pathmap"), ())
 # The eight schemas of the first KPI line: the seven frontmatter record types and the path map.
 SCHEMA_TYPES = {**RECORD_TYPES, "path-map": PATH_MAP_WORDS}
 
+# DEC-227: the id grammars, each under a fixed name in the one shared definitions file.
+ID_GRAMMARS = ("ticket_id", "wbs_id", "decision_id", "lesson_id", "record_id")
+# DEC-229: the six values of `state_class`, held once in the shared definitions file.
+STATE_CLASSES = ("AUTHORITATIVE", "DERIVED", "NARRATIVE", "EVIDENCE", "HISTORICAL", "UNKNOWN_OR_CONFLICTING")
+DEFINITION_KEYWORDS = ("$defs", "definitions")
+
 
 def _matches(name, words):
     include, exclude = words
@@ -66,6 +74,47 @@ def schema_path(record_type):
     assert len(found) == 1, (f"more than one schema file for the {record_type} record under {SCHEMAS_REL}/: "
                              f"{[path.name for path in found]}")
     return found[0]
+
+
+def load_json(path):
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise AssertionError(f"{Path(path).name} is not JSON: {exc}") from None
+
+
+def definitions(schema):
+    """``name -> (keyword, definition)`` for every ``$defs`` or ``definitions`` entry at the top of a schema."""
+    found = {}
+    for keyword in DEFINITION_KEYWORDS:
+        block = schema.get(keyword) if isinstance(schema, dict) else None
+        if isinstance(block, dict):
+            for name, definition in block.items():
+                found.setdefault(name, (keyword, definition))
+    return found
+
+
+def kernel_json_files():
+    """Every ``*.json`` file directly under the kernel schemas folder, sorted."""
+    folder = REPO_ROOT / SCHEMAS_REL
+    return sorted(path for path in folder.glob("*.json") if path.is_file()) if folder.is_dir() else []
+
+
+def shared_definitions_path():
+    """The one file of the kernel schemas folder that defines the five id grammars (DEC-227)."""
+    holders = []
+    for path in kernel_json_files():
+        try:
+            names = definitions(json.loads(path.read_text(encoding="utf-8")))
+        except ValueError:
+            continue
+        if all(name in names for name in ID_GRAMMARS):
+            holders.append(path)
+    assert holders, (f"no shared definitions file: no JSON file under {SCHEMAS_REL}/ defines "
+                     f"{', '.join(ID_GRAMMARS)} (found: {[path.name for path in kernel_json_files()]})")
+    assert len(holders) == 1, (f"more than one file under {SCHEMAS_REL}/ defines the five id grammars: "
+                               f"{[path.name for path in holders]}")
+    return holders[0]
 
 
 def template_paths(record_type):
@@ -156,12 +205,45 @@ def _run_validator(arguments, workdir):
         raise AssertionError(f"{VALIDATOR} did not end within {VALIDATOR_TIMEOUT_S:.0f} s") from None
 
 
+_ACCEPTED = set()  # (schema file, document) pairs the validator already accepted in this run
+
+
 class Checker:
     """Validates one document against one schema file with ``check-jsonschema``."""
 
     def __init__(self, workdir):
         self.workdir = Path(workdir)
         self.count = 0
+
+    def good(self, schema, document, what):
+        """``accepts`` for the unchanged record a refusal test starts from; asked of the validator once a run."""
+        key = (str(schema), json.dumps(document, sort_keys=True))
+        if key not in _ACCEPTED:
+            self.accepts(schema, document, what)
+            _ACCEPTED.add(key)
+
+    def accepts_all(self, schema, documents, what):
+        """Validate several documents (``name -> document``) against one schema in one call."""
+        folder = self.workdir / f"instances-{self.count}"
+        self.count += 1
+        folder.mkdir()
+        files = []
+        for name, document in sorted(documents.items()):
+            files.append(folder / f"{name}.json")
+            files[-1].write_text(json.dumps(document, indent=2), encoding="utf-8")
+        done = _run_validator(["--no-cache", "--schemafile", str(schema), *map(str, files)], self.workdir)
+        output = (done.stdout + done.stderr).strip()
+        assert done.returncode == 0, f"{Path(schema).name} refuses {what} (exit code {done.returncode}):\n{output}"
+
+    def definition(self, shared, name):
+        """A schema file that is only a reference to the definition ``name`` of the shared definitions file."""
+        found = definitions(load_json(shared))
+        assert name in found, f"{Path(shared).name} does not define `{name}`"
+        self.count += 1
+        path = self.workdir / f"only-{name}-{self.count}.schema.json"
+        reference = f"{Path(shared).resolve().as_uri()}#/{found[name][0]}/{name}"
+        path.write_text(json.dumps({"$ref": reference}), encoding="utf-8")
+        return path
 
     def _write(self, document):
         self.count += 1
@@ -204,6 +286,13 @@ def tracked_files():
     return [name for name in done.stdout.split("\0") if name]
 
 
+def committed_tickets():
+    """``file stem -> frontmatter`` of every committed ticket of this repository."""
+    names = [name for name in tracked_files() if name.startswith(".tickets/") and name.endswith(".md")]
+    assert names, "this repository has no committed ticket under .tickets/"
+    return {Path(name).stem: load_record(REPO_ROOT / name) for name in names}
+
+
 def load_path_map():
     path = REPO_ROOT / PATH_MAP_REL
     assert path.is_file(), f"this repository has no path map: {PATH_MAP_REL} does not exist"
@@ -219,6 +308,22 @@ def namespaces(document):
     for name, value in spaces.items():
         assert isinstance(value, dict), f"{PATH_MAP_REL}: namespace {name!r} is not a map"
     return spaces
+
+
+def matches(pattern, path):
+    """Whether ``path`` matches ``pattern`` in the language of ticket ``allowed_paths`` (DEC-225): ``**`` crosses
+    folders, ``*`` stays inside one folder, every other character stands for itself."""
+    parts = [re.escape(part).replace(r"\*", "[^/]*") for part in pattern.split("**")]
+    return re.fullmatch(".*".join(parts), path) is not None
+
+
+def set_at(document, trail, value):
+    changed = copy.deepcopy(document)
+    target = changed
+    for key in trail[:-1]:
+        target = target[key]
+    target[trail[-1]] = value
+    return changed
 
 
 def find_key(value, words, trail=()):
