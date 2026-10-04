@@ -1955,3 +1955,35 @@ the upgrade "is installed by the orchestrator", after DEC-203 made it an owner i
 | Version | Date | Change |
 |---|---|---|
 | 0.39 | 2026-10-03 | Owner answer on W1-48's KPI wording: DEC-209 (W1-48's KPI line and CAP-25.d reworded to match DEC-203: the Claude Code upgrade is installed by the owner, or by the orchestrator under DEC-083, and in both cases recorded with its owner approval). |
+
+## 40. Owner answers on W1-48's test design packages (register v0.40, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner answers of 2026-10-04 to the test designer's packages DP-1 and DP-2 on W1-48 (`DAEO-0qs5`) and to the
+orchestrator's report on the WBS wording.
+
+### DEC-210 — W1-48 DP-1: the active VS Code extension, checked against the minimum; drift is reported, not failed
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-48 package DP-1 option (a) with (iii), with a change · **Under:** DEC-153, CAP-61.e
+- **Decision:**
+  - The extension is the one VS Code has active, read from its `extensions.json`.
+  - Its bundled version is read from both `package.json` and the bundled binary's `--version`, and the binary's
+    sha256 is compared with the registry.
+  - The check is dynamic, not exact. It is a hard failure only if the CLI or the active extension is below the
+    minimum, 2.1.285 (DEC-153).
+  - If the CLI and the extension differ, or either is newer than the registry's record, that is drift that
+    `gov doctor` reports, not a test failure. The owner re-records when convenient.
+  - The test designer tests "at or above the minimum", not "equal to the pin".
+
+### DEC-211 — W1-48 DP-2: registry commands carry the absolute path of the CLI
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-48 package DP-2 option (a) · **Under:** DEC-205
+- **Decision:** Registry commands carry the absolute path (`$HOME/.local/bin/claude`), and a test refuses a bare
+  `claude`.
+
+### DEC-212 — Line 15 of the WBS is aligned with DEC-209
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the W1 orchestrator's report · **Under:** DEC-209
+- **Decision:** The "Installs" rule of `docs/plan/WAVE_1_WBS.md` says that raising the Claude Code pin is an owner
+  install, or an orchestrator install under DEC-083, recorded with its owner approval. The change is made in its
+  own commit with the trailer `Task: decision-record`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.40 | 2026-10-04 | Owner answers on W1-48's test design packages: DEC-210 (DP-1: the active extension from `extensions.json`, version from `package.json` and the bundled binary, sha256 compared with the registry; a hard failure only below 2.1.285; drift is reported by `gov doctor`, not failed), DEC-211 (DP-2: registry commands carry `$HOME/.local/bin/claude`; a test refuses a bare `claude`), DEC-212 (WBS line 15 aligned with DEC-209). |
