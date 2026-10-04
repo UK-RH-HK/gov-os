@@ -1,5 +1,5 @@
 ---
-id: LES-0000
+id: L-0000
 type: lesson
 status: PROVISIONAL
 state_class: AUTHORITATIVE
@@ -12,7 +12,7 @@ scope: project
 severity: low
 ---
 
-# LES-0000 — Short title of the lesson
+# L-0000 — Short title of the lesson
 
 ## What happened
 

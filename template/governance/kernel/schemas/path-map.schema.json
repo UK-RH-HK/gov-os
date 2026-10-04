@@ -12,12 +12,31 @@
       "additionalProperties": { "$ref": "#/$defs/namespace" }
     },
     "capabilities": {
-      "description": "The capabilities of the project: a closed list of two (DEC-238). The value of an entry is left open here, except that code_intelligence carries `languages`.",
+      "description": "The capabilities of the project: a closed list of two, both required (DEC-238, DEC-251). A capability that is off is written `enabled: false`, not left out.",
       "type": "object",
       "additionalProperties": false,
+      "required": ["code_intelligence", "research_corpus"],
       "properties": {
-        "code_intelligence": { "type": "object", "required": ["languages"] },
-        "research_corpus": {}
+        "code_intelligence": {
+          "description": "When enabled, `languages` is required and non-empty; when not enabled it is not required and, if present, is a list of strings (DEC-251).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "languages": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+          },
+          "if": { "required": ["enabled"], "properties": { "enabled": { "const": true } } },
+          "then": { "required": ["languages"], "properties": { "languages": { "minItems": 1 } } }
+        },
+        "research_corpus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": { "type": "boolean" }
+          }
+        }
       }
     },
     "policies": {

@@ -19,9 +19,9 @@
       "pattern": "^(ADR|DEC)-[0-9]{3,}$"
     },
     "lesson_id": {
-      "description": "A lesson id, as in LES-0001.",
+      "description": "A lesson id: the letter L and four or more digits, as in L-0074 (DEC-252).",
       "type": "string",
-      "pattern": "^LES-[0-9]{3,}$"
+      "pattern": "^L-[0-9]{4,}$"
     },
     "record_id": {
       "description": "The id of any other record (failure, research record, gate or decision package, checkpoint): an upper-case prefix and a local part, as in FAIL-0001 or DP-8.",
