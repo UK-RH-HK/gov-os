@@ -31,6 +31,8 @@ kpis:
   - 'Path-map compliance is checked by doctor: every tracked path matches a path-map entry, and a recorded reference to a moved path is reported [CAP-06.d]'
   - 'Registers the recovery/rebuild family check: derived state deleted and rebuilt gives the same digest [CAP-38.b]'
   - 'doctor reports an adoption level: a repository with only the kernel installed passes at the minimal level, and each completed adoption stage raises it toward ADOPTED_HEALTHY [CAP-54.a]'
+  - doctor reports Claude Code drift (DEC-210, DEC-214); the CLI at ~/.local/bin/claude and the active VS Code extension differing from each other, either being newer than the registry's record, or the extension's bundled binary
+    at the recorded version with another sha256, is reported as drift; the CLI or the active extension below the minimum, 2.1.285, or the CLI at the recorded version with another sha256, is a failure
   failure:
   - doctor passes with a tool at the wrong version
   - rebuild needs anything not in git
